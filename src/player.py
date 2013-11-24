@@ -25,7 +25,7 @@ from log import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, TileList, elements
-from meld import Meld, meldsContent
+from meld import Meld
 from message import Message
 from hand import Hand
 from intelligence import AIDefault
@@ -464,8 +464,7 @@ class PlayingPlayer(Player):
                 self.lastSource = 'd'
             # the last claimed meld is exposed
             assert lastMeld in melds, '%s: concealed=%s melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
-                    self._concealedTileNames, concealed,
-                    meldsContent(melds), lastMeld, lastTile, withDiscard)
+                    self._concealedTileNames, concealed, melds, lastMeld, lastTile, withDiscard)
             melds.remove(lastMeld)
             self.lastTile = self.lastTile.lower()
             lastMeld = lastMeld.toLower()
@@ -552,7 +551,7 @@ class PlayingPlayer(Player):
             if Debug.mahJongg:
                 game.debug('%s may say MJ:%s, active=%s' % (
                     self, list(x for x in game.players), game.activePlayer))
-            return (meldsContent(hand.hiddenMelds), withDiscard, hand.lastMeld)
+            return hand.hiddenMelds, withDiscard, hand.lastMeld
 
     def __maySayOriginalCall(self):
         """returns True if Original Call is possible"""

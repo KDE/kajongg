@@ -25,11 +25,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 
 from log import m18nc
-from tile import Tile, TileList
-
-def meldsContent(melds):
-    """return content of melds"""
-    return b' '.join([bytes(meld) for meld in melds])
+from tile import TileList, PYTHON3
 
 class Meld(TileList):
     """represents a meld. Can be empty. Many Meld methods will
@@ -222,8 +218,14 @@ class Meld(TileList):
             return Meld(tiles.toLower(0).toUpper(1, 3).toLower(3))
 
     def __lt__(self, other):
-        """used for sorting"""
-        return self.key < other.key
+        """used for sorting. Smaller value is shown first."""
+        if len(other) == 0:
+            return False
+        if len(self) == 0:
+            return True
+        if self[0].key == other[0].key:
+            return len(self) > len(other)
+        return self[0].key < other[0].key
 
     def __bytes__(self):
         return b''.join(self)
@@ -268,3 +270,39 @@ class Meld(TileList):
             state=self.__stateName(),
             meldType=self.typeName(),
             name=self[0].name()).replace('  ', ' ').strip()
+
+class MeldList(list):
+    """a list of melds"""
+    def __init__(self, newContent=None):
+        list.__init__(self)
+        if newContent is None:
+            return
+        if newContent.__class__.__name__ == 'generator':
+            newContent = list(newContent)
+        if isinstance(newContent, (list, tuple, set)):
+            list.extend(self, [Meld(x) for x in newContent])
+        elif isinstance(newContent, Meld):
+            list.append(self, newContent)
+        elif isinstance(newContent, (str, bytes)):
+            list.extend(self, [Meld(x) for x in newContent.split()]) # pylint: disable=maybe-no-member
+
+    def bytes(self):
+        """for hand strings"""
+        if len(self):
+            return b' '.join(bytes(x) for x in self)
+        else:
+            return b''
+
+    def tiles(self):
+        """flat view of all tiles in all melds"""
+        return TileList(sum(self, []))
+
+    def __bytes__(self):
+        """for python3"""
+        return self.bytes()
+
+    def __str__(self):
+        if PYTHON3:
+            return self.bytes().decode()
+        else:
+            return self.bytes()

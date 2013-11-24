@@ -73,6 +73,10 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'c2c3c4 c5c6c7 RC1C1C8C9WeWwWsWn Mee LC1C1C1', [Score(), Score(limits=1)])
         self.scoreTest(b'c2c3c4 c5c6c7 RC1C1C8C9WeWwWsWn Mee LWnWn', [Score(), Score(limits=1)])
         self.scoreTest(b'c1c1 c2c3c4 c5c6c7 RC8C9WwWwWsWn Mee Lc1c1c1', [Score(), Score()])
+        self.callingTest(b'RS1S3WwS6WsS3S3WnWeS5 s7s8s9 fs mse', b'')
+        self.callingTest(b'RS1S2WwS6WsS3S3WnWeS5 s7s8s9 fs mse', b'')
+        self.callingTest(b'RS1S2WwS6WsS3S4WnWeS5 s7s8s9 fs mse', [b'', b's1'])
+        self.callingTest(b'RS1S2WwS6WsS3S4WnWeS1 s7s8s9 fs mse', [b'', b's5'])
     def testSquirmingSnake(self):
         """the winding snake"""
         self.scoreTest(b'c1c1c1 c3c4c5 c9c9c9 c6c7c8 RC2C2 Mee Lc1c1c1c1', [Score(limits=1), Score()])
@@ -96,6 +100,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'b1b1b1b1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4',
                 [Score(points=62, doubles=4), Score()])
         self.scoreTest(b'b1b1b1B1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw Mwe LB3B2B3B4', [Score(limits=1), Score()])
+        self.callingTest(b'RB1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', [b'b1b3b4b6b7b9', b''])
     def testOnlyConcealedMelds(self):
         """only concealed melds"""
         self.scoreTest(b'RB1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys Mwe LDrDrDr', [Score(48, 2), Score()])
@@ -140,6 +145,10 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'RC1C9B9B1S1S9S9WeDgWsWnWwDbDr Mes LDrDr', Score(limits=1))
         self.scoreTest(b'dr RC1C9B9B1S1S9S9WeDgWsWnWwDb Mes Ldrdr', Score(limits=1))
         self.scoreTest(b'RC1C9B9B1S1S9S9WeDgWnWwDbDr mes LDb', [Score(), Score(limits=0.4)])
+        self.callingTest(b'Dg Dg Dr We Ws Ww Wn Wn RB1B9C1S1S9 mwe LWe', b'')
+        self.callingTest(b'Db Dg Dr We Ws Ww Wn B7 RB1B9C1S1S9 mwe LWe', b'')
+        self.callingTest(b'RDbDgDrWeWsWwWnWnB1B9C1S1S9 mwe LWn', b'c9')
+        self.callingTest(b'RDbDgDrWsWwWnWnB1B9C1S1S9C9 mwe LDg', b'we')
     def testSimpleNonWinningCases(self):
         """normal hands"""
         self.scoreTest(b's2s2s2 s2s3s4 RB1B1B1B1 c9c9c9C9 mes Ls2s2s3s4', Score(26))
@@ -319,45 +328,6 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'wewewe wswsws wnwnwnWn RWwWwWwC3B6 Mee LC3', Score())
         self.scoreTest(b'wewewe wswsws wnwnwnWn RWwWwWwC3C3 Mee LC3', Score(limits=1))
 
-    def testIsCalling(self):
-        """test calling hands"""
-        for idx, ruleset in enumerate(RULESETS):
-            for content, completingTiles in [
-                        (b'WnWn B1 B2 c4c5c6 b6b6b6 b8b8b8 ye yw mne', (b'b3', b'')),
-                        (b'WnWn B1 B2 dgdgdg b6b6b6 b8b8b8 ye yw mne', (b'b3', b'b3')),
-                        (b's1s1s1s1 b5b6b7 RB8B8C2C2C6C7C8 mwe Lb5', (b'b8c2', b'')),
-                        (b's1s1s1s1 b5b6b7 RB7B8C2C2C6C7C8 mwe Lb5', (b'b6b9', b'')),
-                        (b'RS2B2C2S4B4C4S6B6C6S7B7C7S8 mee LS8', (b'', b'b8c8')),
-                        (b'RS2B2C2S4B4C4S6B6C6B7C7S8C8 mee LC7', (b'', b's7b8')),
-                        (b'RS2B2S3B3S4B4S5B5S6B6S7B7S9 Mwn LB7', (b's9', b'b9')),
-                        (b'RDbDgDrWeWsWwWnWnB1B9C1S1S9 mwe LWn', (b'c9', b'c9')),
-                        (b'RDbDgDrWsWwWnWnB1B9C1S1S9C9 mwe LDg', (b'we', b'we')),
-                        (b'c3c3c3 RDbDbDbS5S6S7S7S8B2B2 mwe LS8', (b's6s9', b'')),
-                        (b'RC4C4C5C6C5C7C8 dgdgdg s6s6s6 mnn', (b'c4c5', b'c4c5')),
-                        (b'RS1S4C5C6C5C7C8 dgdgdg s6s6s6 mnn', (b'', b'')),
-                        (b'RB1B2B3B4B5B5B6B6B7B7B8B8B8 mwe LB1', (b'b1b3b4b6b7b9', b'')),
-                        (b'RDbDgDrWsWwWeWnB1B9C1S1S9C9 mwe LWe',
-                            (b'dbdgdrwewswwwns1s9b1b9c1c9', b'dbdgdrwewswwwns1s9b1b9c1c9')),
-                        (b'RS1S3WwS6WsS3S3WnWeS5 s7s8s9 fs mse', (b'', b'')),
-                        (b'RS1S2WwS6WsS3S3WnWeS5 s7s8s9 fs mse', (b'', b'')),
-                        (b'RS1S2WwS6WsS3S4WnWeS5 s7s8s9 fs mse', (b'', b's1')),
-                        (b'RS1S2WwS6WsS3S4WnWeS1 s7s8s9 fs mse', (b'', b's5')),
-                            ]:
-                hand = Hand(ruleset, content)
-                completedHands = hand.callingHands(99)
-                testSays = TileList(set(x.lastTile.lower() for x in completedHands)).sorted()
-                if idx >= len(completingTiles):
-                    idx %= len(RULESETS) // 2
-                completingTiles = TileList(completingTiles[idx])
-                self.assertTrue(testSays == completingTiles,
-                    '%s: %s may be completed by %s but testresult is %s' % (
-                    ruleset.name, content, completingTiles or 'None', testSays or 'None'))
-            for content in [b's1s1s1s1 b5b6b7 RB1B8C2C2C6C7C8 mwe Lb5',
-                            b'Dg Dg Dr We Ws Ww Wn Wn RB1B9C1S1S9 mwe LWe',
-                            b'Db Dg Dr We Ws Ww Wn B7 RB1B9C1S1S9 mwe LWe']:
-                hand = Hand(ruleset, content)
-                self.assertTrue(not hand.callingHands(), content)
-
     def testLastIsOnlyPossible(self):
         """tests for determining if this was the only possible last tile"""
         self.scoreTest(b'b3B3B3b3 wewewewe s2s2 RDbDbDbDrDrDr Mee Ls2s2s2',
@@ -387,6 +357,8 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'RC1C2C5C8C9S2S4S9B4B5B6B6B8 mee', [Score(), Score()])
         self.scoreTest(b'RS2B2C2S4B4C4S6B6C6S4B4C4S8 mee', [Score(), Score(limits=0.2)])
         self.scoreTest(b'RS1B1C1S2B2C2S5B5S8B8C8B9C7C9 LB2 Mew', Score(0))
+        self.callingTest(b'RS2B2C2S4B4C4S6B6C6S7B7C7S8 mee LS8', [b'', b'b8c8'])
+        self.callingTest(b'RS2B2C2S4B4C4S6B6C6B7C7S8C8 mee LC7', [b'', b's7b8'])
 
     def testKnitting(self):
         """knitting BMJA"""
@@ -399,12 +371,15 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'RS3S4S5S6S7S9B2B3B4B5B6B7B9 LB9 Mwn', [Score(), Score(limits=0.2)])
         self.scoreTest(b'RS3S4S9S9B1B1B2B3B4B8B8 s2s2s2 fs Msww LS4', Score(0))
         self.scoreTest(b'RS3S9S9B1B1B2B3B8B8S2S2S2 s4b4 fs Msww Ls4', Score(0))
+        self.callingTest(b'RS2B2S3B3S4B4S5B5S6B6S7B7S9 Mwn LB7', [b's9', b'b9'])
+
     def testAllPairHonors(self):
         """all pairs honours BMJA"""
         self.scoreTest(b'RWeWeS1S1B9B9DgDgDrDrWsWsWwWw Mwn LS1S1S1', [Score(), Score(limits=0.5)])
         self.scoreTest(b'RWeWeS1S1B9B9DgDgDrDrWsWs wwww Mwn Lww', [Score(), Score(limits=0.5)])
         self.scoreTest(b'RWeWeS1S1B9B9DgDgDrDrWsWwWw mwn LS1', [Score(6), Score(limits=0.2)])
         self.scoreTest(b'RWeWeS2S2B9B9DgDgDrDrWsWsWwWw Mwn LS2S2S2', [Score(), Score()])
+
     def testBMJA(self):
         """specials for chinese classical BMJA"""
         self.scoreTest(b'RS1S1S5S6S7S8S9WeWsWwWn s2s3s4 Msw Ls3s2s3s4', [Score(), Score(limits=1)])
@@ -414,6 +389,19 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'wewewe s1s1s1 b9b9b9 RC1C1C1C2C3 Mee LC1', [Score(38, 2), Score(34, 2)])
         self.scoreTest(b'wewewe s1s1s1 b9b9b9 RC1C2C3C3C3 Mee LC3', [Score(40, 2), Score(34, 2)])
         self.scoreTest(b'b5b6b7 s1s1s1 RB8C6C7C5B8B8C7C7 Mwew LC7', [Score(32, 0), Score(0)])
+
+    def testCallingHands(self):
+        """diverse calling hands
+        TODO: try assigning them to specif rule tests"""
+        self.callingTest(b's1s1s1s1 b5b6b7 RB1B8C2C2C6C7C8 mwe Lb5', b'')
+        self.callingTest(b'WnWn B1 B2 c4c5c6 b6b6b6 b8b8b8 ye yw mne', [b'b3', b''])
+        self.callingTest(b'WnWn B1 B2 dgdgdg b6b6b6 b8b8b8 ye yw mne', b'b3')
+        self.callingTest(b's1s1s1s1 b5b6b7 RB8B8C2C2C6C7C8 mwe Lb5', [b'b8c2', b''])
+        self.callingTest(b's1s1s1s1 b5b6b7 RB7B8C2C2C6C7C8 mwe Lb5', [b'b6b9', b''])
+        self.callingTest(b'c3c3c3 RDbDbDbS5S6S7S7S8B2B2 mwe LS8', [b's6s9', b''])
+        self.callingTest(b'RC4C4C5C6C5C7C8 dgdgdg s6s6s6 mnn', b'c4c5')
+        self.callingTest(b'RS1S4C5C6C5C7C8 dgdgdg s6s6s6 mnn', b'')
+        self.callingTest(b'RDbDgDrWsWwWeWnB1B9C1S1S9C9 mwe LWe', b'dbdgdrwewswwwns1s9b1b9c1c9')
 
     def scoreTest(self, string, expected, totals=None):
         """execute one scoreTest test"""
@@ -437,6 +425,29 @@ class Regex(unittest.TestCase):
             self.assertTrue(score == exp, self.dumpCase(variants, exp, total=None))
             if totals:
                 self.assertTrue(score.total() == totals[idx], self.dumpCase(variants, exp, totals[idx]))
+
+    def callingTest(self, string, expected):
+        """test a calling hand"""
+        for idx, ruleset in enumerate(RULESETS):
+            hand = Hand(ruleset, string)
+            completedHands = hand.callingHands(99)
+            testSays = TileList(set(x.lastTile.lower() for x in completedHands)).sorted()
+            if idx >= len(expected):
+                idx %= len(RULESETS) // 2
+            if isinstance(expected, list):
+                expIdx = idx
+                if expIdx >= len(expected):
+                    print('chaging expidx from %d to %d' % (expIdx, expIdx % len(RULESETS) // 2))
+                    expIdx %= len(RULESETS) // 2
+                if expIdx >= len(expected):
+                    print('exPdix', expIdx, 'expected', expected)
+                exp = expected[expIdx]
+            else:
+                exp = expected
+            completingTiles = TileList(exp)
+            self.assertTrue(testSays == completingTiles,
+                '%s: %s may be completed by %s but testresult is %s' % (
+                ruleset.name, string, completingTiles or 'None', testSays or 'None'))
 
     def dumpCase(self, variants, expected, total):
         """dump test case"""

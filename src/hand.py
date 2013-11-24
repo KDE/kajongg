@@ -23,7 +23,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 from log import logDebug
 from tile import Tile, elements, Values, TileList, Byteset
-from meld import Meld, meldsContent
+from meld import Meld, MeldList
 from rule import Score, Ruleset
 from common import Debug
 
@@ -135,10 +135,10 @@ class Hand(object):
         self.mjStr = b' '.join(mjStrings)
         self.__lastTile = self.__lastSource = self.__announcements = b''
         self.__lastMeld = 0
-        self.__lastMelds = []
-        self.hiddenMelds = []
-        self.declaredMelds = []
-        self.melds = []
+        self.__lastMelds = MeldList()
+        self.hiddenMelds = MeldList()
+        self.declaredMelds = MeldList()
+        self.melds = MeldList()
         self.bonusMelds, tileStrings = self.__separateBonusMelds(tileStrings)
         tileString = b' '.join(tileStrings)
         self.tileNames = TileList(tileString.replace(b' ', b'').replace(b'R', b''))
@@ -152,9 +152,6 @@ class Hand(object):
         self.tilesInHand = sum(self.hiddenMelds, [])
         for tile in self.tilesInHand:
             assert isinstance(tile, Tile), self.tilesInHand
-        self.sortedMeldsContent = meldsContent(self.melds)
-        if self.bonusMelds:
-            self.sortedMeldsContent += b' ' + meldsContent(self.bonusMelds)
 
         self.usedRules = []
         self.score = None
@@ -329,7 +326,7 @@ class Hand(object):
                         self.__lastMeld = self.__lastMelds[totals[0][1]]
             if not self.__lastMeld:
                 self.__lastMeld = Meld([self.lastTile])
-                self.__lastMelds = [self.__lastMeld]
+                self.__lastMelds = MeldList(self.__lastMeld)
 
     def __applyBestLastMeld(self):
         """select the last meld giving the highest score (only winning variants)"""
@@ -365,9 +362,9 @@ class Hand(object):
         hidden = b'R' + b''.join(self.tilesInHand)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
-        exposed = self.declaredMelds[:]
-        exposed = sorted(exposed, key=lambda x: (x != self.lastMeld, x.key))
-        boni = sorted(self.bonusMelds)
+        exposed = MeldList(self.declaredMelds[:])
+        exposed = MeldList(sorted(exposed, key=lambda x: (x != self.lastMeld, x.key)))
+        boni = MeldList(sorted(self.bonusMelds))
         for tile in tiles:
             assert isinstance(tile, Tile), tiles
             if bytes(tile.upper()) in hidden:
@@ -403,7 +400,7 @@ class Hand(object):
                     continue
                 newParts.append(part)
             mjStr = b' '.join(newParts)
-        newString = b' '.join([hidden, meldsContent(exposed), meldsContent(boni), mjStr])
+        newString = b' '.join(bytes(x) for x in (hidden, exposed, boni, mjStr))
         return Hand.cached(self, newString, self.computedRules)
 
     def manualRuleMayApply(self, rule):
@@ -575,7 +572,7 @@ class Hand(object):
             melds, _ = stdMJ.rearrange(self, rest[:])
             self.melds.extend(melds)
         assert sum(len(x) for x in self.melds) == len(self.tileNames), '%s != %s' % (
-            meldsContent(self.melds), self.tileNames)
+            self.melds, self.tileNames)
 
     def __matchingRules(self, rules):
         """return all matching rules for this hand"""
@@ -651,7 +648,7 @@ class Hand(object):
     @staticmethod
     def __separateBonusMelds(tileStrings):
         """keep them separate. One meld per bonus tile. Others depend on that."""
-        bonusMelds = []
+        bonusMelds = MeldList()
         for tileString in tileStrings[:]:
             if len(tileString) == 2:
                 tile = Tile(tileString)
@@ -708,8 +705,8 @@ class Hand(object):
 
     def __categorizeMelds(self):
         """categorize: hidden, declared"""
-        self.hiddenMelds = []
-        self.declaredMelds = []
+        self.hiddenMelds = MeldList()
+        self.declaredMelds = MeldList()
         for meld in self.melds:
             if not meld.isExposed and not meld.isKong:
                 self.hiddenMelds.append(meld)
@@ -748,7 +745,7 @@ class Hand(object):
 
     def __str__(self):
         """hand as a string"""
-        return ' '.join([str(self.sortedMeldsContent), str(self.mjStr)])
+        return ' '.join(str(x) for x in (self.melds, self.bonusMelds, self.mjStr)).replace('  ', ' ')
 
     def __repr__(self):
         """the default representation"""

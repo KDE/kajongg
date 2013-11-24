@@ -21,9 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import weakref
 
 from PyQt4.QtGui import QGraphicsRectItem
-from tile import Tile, TileList
+from tile import Tile
 from uitile import UITile
-from meld import Meld
+from meld import Meld, MeldList
 from hand import Hand
 from board import Board
 
@@ -372,19 +372,15 @@ class PlayingHandBoard(HandBoard):
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
         if self.player.concealedMelds:
-            result = sorted(self.player.concealedMelds, key=lambda x:x.key) # TODO: sollte ohne key= gehen
+            result = MeldList(self.player.concealedMelds)
         else:
             tileStr = 'R' + ''.join(str(x) for x in self.player.concealedTileNames)
             handStr = ' '.join([tileStr, self.player.mjString()])
             content = Hand.cached(self.player, handStr)
-            result = list(Meld(x) for x in content.sortedMeldsContent.split())
-            if result:
-                if self.rearrangeMelds:
-                    if result[0][0].isKnown:
-                        result = sorted(result, key=len, reverse=True)
-                else:
-                    # generate one list with all sorted tiles
-                    result = [TileList(sorted(sum((x for x in result), [])))]
+            result = MeldList(content.melds + content.bonusMelds)
+        if not self.rearrangeMelds:
+            result = MeldList(Meld(x) for x in result.tiles()) # one meld per tile
+        result.sort()
         return result
 
     def discard(self, tile):

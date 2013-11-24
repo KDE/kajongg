@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from tile import Tile, Tileset, elements, Byteset, Bytelist
-from meld import Meld
+from meld import Meld, MeldList
 from common import IntDict, WINDS
 from message import Message
 from query import Query
@@ -272,7 +272,7 @@ class StandardMahJongg(MahJonggFunction):
             checkMelds = hand.hiddenMelds
         else:
             checkMelds = hand.declaredMelds
-        return [x for x in checkMelds if hand.lastTile in x and len(x) < 4]
+        return MeldList(x for x in checkMelds if hand.lastTile in x and len(x) < 4)
 
     @staticmethod
     def appliesToHand(hand):
@@ -550,6 +550,8 @@ class CallingHand(Function):
 
     def appliesToHand(self, hand):
         if self.active:
+            # this cannot be reentrant because we attach the options to the
+            # one global CallingHand instance
             return False
         if hand.lenOffset != 0:
             return False
@@ -559,8 +561,10 @@ class CallingHand(Function):
         self.active = True
         try:
             if hasattr(self.limitHand, 'winningTileCandidates'):
+                # it is a MahJonggFunction
                 candidates = self.limitHand.winningTileCandidates(hand)
             else:
+                # it is any other normal Function
                 candidates = StandardMahJongg.winningTileCandidates(hand)
             for tileName in candidates:
                 fullHand = hand.picking(tileName.capitalize())
