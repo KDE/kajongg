@@ -47,94 +47,119 @@ class Function(object):
 # the class and method names are mostly self explaining, we do not
 # need docstringss
 
-class DragonPungKong(Function):
-    @staticmethod
-    def appliesToMeld(dummyHand, meld):
+# pylint: disable=arguments-differ
+# pylint does not know that overriding a method may change it from normal to static
+class MeldFunction(Function):
+    def appliesToMeld(self, dummyHand, dummyMeld):
+        raise NotImplementedError
+
+class MahJonggFunction(Function):
+    def winningTileCandidates(self, dummyHand):
+        """this should return all tiles leading to a winning hand no matter
+        by which mjRule the hand will be matched, see SquirmingSnake"""
+        raise NotImplementedError
+
+    def computeLastMelds(self, dummyHand):
+        """returns a list of all melds which can be built with lastTile.
+        lastTile must be known!"""
+        raise NotImplementedError
+
+    def appliesToHand(self, dummyHand):
+        raise NotImplementedError
+
+    def shouldTry(self, dummyHand, maxMissing=3):
+        raise NotImplementedError
+
+    def rearrange(self, dummyHand, pairs):
+        raise NotImplementedError
+
+class DragonPungKong(MeldFunction):
+    def appliesToMeld(self, dummyHand, meld):
         return (len(meld) >= 3
             and meld.tileType == b'd'
             and (meld.isPung or meld.isKong))
 
-class RoundWindPungKong(Function):
+class RoundWindPungKong(MeldFunction):
     @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld[0].lower() == b'w' + hand.roundWind
 
-class ExposedMinorPung(Function):
+class ExposedMinorPung(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'2345678'
 
-class ExposedTerminalsPung(Function):
+class ExposedTerminalsPung(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'19'
 
-class ExposedHonorsPung(Function):
+class ExposedHonorsPung(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.group in b'wd'
 
-class ExposedMinorKong(Function):
+class ExposedMinorKong(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'2345678'
 
-class ExposedTerminalsKong(Function):
+class ExposedTerminalsKong(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'19'
 
-class ExposedHonorsKong(Function):
+class ExposedHonorsKong(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld.group in b'wd'
 
-class ConcealedMinorPung(Function):
+class ConcealedMinorPung(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'2345678'
 
-class ConcealedTerminalsPung(Function):
+class ConcealedTerminalsPung(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'19'
 
-class ConcealedHonorsPung(Function):
+class ConcealedHonorsPung(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.group in b'WD'
 
-class ConcealedMinorKong(Function):
+class ConcealedMinorKong(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].value in b'2345678'
 
-class ConcealedTerminalsKong(Function):
+class ConcealedTerminalsKong(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].value in b'19'
 
-class ConcealedHonorsKong(Function):
+class ConcealedHonorsKong(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and not meld.isExposed and meld.group in b'wd'
 
-class OwnWindPungKong(Function):
+class OwnWindPungKong(MeldFunction):
     @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld[0].lower() == b'w' + hand.ownWind
 
-class OwnWindPair(Function):
+class OwnWindPair(MeldFunction):
     @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) == 2 and meld[0].lower() == b'w' + hand.ownWind
 
-class RoundWindPair(Function):
+class RoundWindPair(MeldFunction):
     @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) == 2 and meld[0].lower() == b'w' + hand.roundWind
 
-class DragonPair(Function):
+class DragonPair(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 2 and meld.lowerGroup == b'd'
@@ -146,12 +171,12 @@ class LastTileCompletesPairMinor(Function):
             and hand.lastMeld.group != b'X'
             and hand.lastTile.value in b'2345678')
 
-class Flower(Function):
+class Flower(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 1 and meld.group == b'f'
 
-class Season(Function):
+class Season(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 1 and meld.group == b'y'
@@ -236,11 +261,212 @@ class AllTerminals(Function):
     def appliesToHand(hand):
         return not set(hand.values) - Byteset(b'19')
 
-class SquirmingSnake(Function):
+class StandardMahJongg(MahJonggFunction):
     @staticmethod
     def computeLastMelds(hand):
-        return StandardMahJongg.computeLastMelds(hand)
+        """returns all possible last melds"""
+        if not hand.lastTile:
+            return
+        if hand.lastTile.group.isupper():
+            # TODO: split rest
+            checkMelds = hand.hiddenMelds
+        else:
+            checkMelds = hand.declaredMelds
+        return [x for x in checkMelds if hand.lastTile in x and len(x) < 4]
 
+    @staticmethod
+    def appliesToHand(hand):
+        """winner rules are not yet applied to hand"""
+        # pylint: disable=too-many-return-statements
+        # too many return statements
+        if len(hand.melds) != 5:
+            return False
+        if any(len(x) not in (2, 3, 4) for x in hand.melds):
+            return False
+        if any(x.isRest for x in hand.melds):
+            return False
+        if sum(x.isChow for x in hand.melds) > hand.ruleset.maxChows:
+            return False
+        if hand.score.total() < hand.ruleset.minMJPoints:
+            return False
+        if hand.score.doubles >= hand.ruleset.minMJDoubles:
+            # shortcut
+            return True
+        # but maybe we have enough doubles by winning:
+        doublingWinnerRules = sum(x.rule.score.doubles for x in hand.matchingWinnerRules())
+        return hand.score.doubles + doublingWinnerRules >= hand.ruleset.minMJDoubles
+
+    @staticmethod
+    def fillChow(group, values):
+        val0, val1 = values
+        if val0 + 1 == val1:
+            if val0 == 1:
+                return {Tile(group, val0 + 2)}
+            if val0 == 8:
+                return {Tile(group, val0 - 1)}
+            return {Tile(group, val0 - 1), Tile(group, val0 + 2)}
+        else:
+            assert val0 + 2 == val1, 'group:%s values:%s' % (group, values)
+            return {Tile(group, val0 + 1)}
+
+    @staticmethod
+    def winningTileCandidates(hand):
+        # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches,too-many-statements
+        if len(hand.melds) > 7:
+            # hope 7 is sufficient, 6 was not
+            return set()
+        if not hand.tilesInHand:
+            return set()
+        inHand = list(x.lower() for x in hand.tilesInHand)
+        result = inHand[:]
+        pairs = 0
+        isolated = 0
+        maxChows = hand.ruleset.maxChows - sum(x.isChow for x in hand.declaredMelds)
+        # TODO: does not differentiate between maxChows == 1 and maxChows > 1
+        # test with kajonggtest and a ruleset where maxChows == 2
+        if maxChows < 0:
+            return set()
+        if maxChows == 0:
+            checkTiles = set(inHand)
+        else:
+            checkTiles = set(inHand) & elements.honors
+        for tileName in checkTiles:
+            count = inHand.count(tileName)
+            if count == 1:
+                isolated += 1
+            elif count == 2:
+                pairs += 1
+            else:
+                for _ in range(count):
+                    result.remove(tileName)
+        if maxChows:
+            if pairs > 2 or isolated > 2 or (pairs > 1 and isolated > 1):
+                # this is not a calling hand
+                return set()
+        else:
+            if pairs + isolated > 2:
+                return set()
+        if maxChows == 0:
+            return set(result)
+        melds = []
+        for group in hand.suits & {b's', b'c', b'b'}:
+            values = sorted(int(x.value) for x in result if x.group == group)
+            changed = True
+            while (changed and len(values) > 2
+                    and values.count(values[0]) == 1
+                    and values.count(values[1]) == 1
+                    and values.count(values[2]) == 1):
+                changed = False
+                if values[0] + 2 == values[2] and (len(values) == 3 or values[3] > values[0] + 3):
+                    # print('removing first 3 from %s' % values)
+                    meld = Meld([Tile(group, values[x]) for x in range(3)])
+                    for pair in meld:
+                        result.remove(pair)
+                    melds.append(meld)
+                    values = values[3:]
+                    changed = True
+                elif values[0] + 1 == values[1] and values[2] > values[0] + 2:
+                    # print('found incomplete chow at start of %s' % values)
+                    return StandardMahJongg.fillChow(group, values[:2])
+            changed = True
+            while (changed and len(values) > 2
+                    and values.count(values[-1]) == 1
+                    and values.count(values[-2]) == 1
+                    and values.count(values[-3]) == 1):
+                changed = False
+                if values[-1] - 2 == values[-3] and (len(values) == 3 or values[-4] < values[-1] - 3):
+                    meld = Meld([Tile(group, values[x]) for x in range(-3, 0)])
+                    for pair in meld:
+                        result.remove(pair)
+                    melds.append(meld)
+                    values = values[:-3]
+                    changed = True
+                elif values[-1] - 1 == values[-2] and values[-3] < values[-1] - 2:
+                    # print('found incomplete chow at end of %s' % values)
+                    return StandardMahJongg.fillChow(group, values[-2:])
+
+            if len(values) % 3 == 0:
+                # adding a 4th, 7th or 10th tile with this color can not let us win,
+                # so we can exclude this color from the candidates
+                result = list(x for x in result if x.group != group)
+                continue
+            valueSet = set(values)
+            if len(values) == 4 and len(values) == len(valueSet):
+                if values[0] + 3 == values[-1]:
+                    # print('seq4 in %s' % hand.tilesInHand)
+                    return {Tile(group, values[0]), Tile(group, values[-1])}
+            if len(values) == 7 and len(values) == len(valueSet):
+                if values[0] + 6 == values[6]:
+                    # print('seq7 in %s' % hand.tilesInHand)
+                    return {Tile(group, values[x]) for x in (0, 3, 6)}
+            if len(values) == 1:
+                # only a pair of this value is possible
+                return {Tile(group.upper(), values[0])}
+            if len(valueSet) == 1:
+                # no chow reachable, only pair/pung
+                continue
+            singles = set(x for x in valueSet
+                 if values.count(x) == 1
+                 and not set([x-1, x-2, x+1, x+2]) & valueSet)
+            isolated += len(singles)
+            if isolated > 1:
+                # this is not a calling hand
+                return set()
+            if len(values) == 2 and len(valueSet) == 2:
+                # exactly two adjacent values: must be completed to Chow
+                if maxChows == 0:
+                    # not a calling hand
+                    return set()
+                return StandardMahJongg.fillChow(group, values)
+            if (len(values) == 4 and len(valueSet) == 2
+                    and values[0] == values[1] and values[2] == values[3]):
+                # print('we have 2 pairs of %s' % group)
+                return {Tile(group, values[0]), Tile(group, values[2])}
+            if maxChows:
+                for value in valueSet:
+                    if value > 1:
+                        result.append(Tile(group, str(value - 1)))
+                    if value < 9:
+                        result.append(Tile(group, str(value + 1)))
+        return set(result)
+
+    @staticmethod
+    def shouldTry(dummyHand):
+        return True
+    @staticmethod
+    def rearrange(hand, pairs):
+        """rest is a string with those tiles that can still
+        be rearranged: No declared melds and no bonus tiles.
+        done is already arranged, do not change this.
+        Returns list(Meld)"""
+# TODO: return all variants. The parent should find the best mjrRule/variant combo
+        assert pairs
+        _ = [pair for pair in pairs if pair.group in b'DW']
+        honourResult = hand.splitMelds(_) # b''.join(_)) # easy since they cannot have a chow
+        splitVariants = {}
+        for group in Byteset(b'SBC'):
+            groupPairs = [pair for pair in pairs if pair.group == group]
+            if not groupPairs:
+                splitVariants[group] = [None]
+                continue
+            splitVariants[group] = hand.genVariants(groupPairs)
+        bestHand = None
+        bestVariant = None
+        for combination in ((s, b, c)
+                for s in splitVariants[b'S']
+                for b in splitVariants[b'B']
+                for c in splitVariants[b'C']):
+            variantMelds = honourResult[:] + sum((x for x in combination if x is not None), [])
+            melds = hand.melds[:] + variantMelds
+            melds.extend(hand.bonusMelds)
+            _ = b' '.join(bytes(x) for x in melds) + b' ' + hand.mjStr
+            tryHand = hand.cached(hand, _, computedRules=hand.computedRules)
+            if not bestHand or tryHand.total() > bestHand.total():
+                bestHand = tryHand
+                bestVariant = variantMelds
+        return bestVariant, []
+
+class SquirmingSnake(StandardMahJongg):
     @staticmethod
     def appliesToHand(hand):
         if len(hand.suits) != 1 or not hand.suits < {b's', b'b', b'c'}:
@@ -253,7 +479,12 @@ class SquirmingSnake(Function):
             return False
         return len(set(values)) == len(values) - 5
 
-class WrigglingSnake(Function):
+    @staticmethod
+    def winningTileCandidates(hand):
+        """they have already been found by the StandardMahJongg rule"""
+        return set()
+
+class WrigglingSnake(MahJonggFunction):
     @staticmethod
     def shouldTry(hand, maxMissing=3):
         return (len(set(x.lower() for x in hand.tileNames)) + maxMissing > 12
@@ -280,7 +511,8 @@ class WrigglingSnake(Function):
                 # and the pair of 1 is incomplete too
                 return set()
             else:
-                return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) - set([x.lower() for x in hand.tileNames])
+                return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) \
+                    - set([x.lower() for x in hand.tileNames])
         else:
             # pair of 1 is not complete
             return set([Tile(group, 1)])
@@ -338,7 +570,7 @@ class CallingHand(Function):
         finally:
             self.active = False
 
-class TripleKnitting(Function):
+class TripleKnitting(MahJonggFunction):
 
     def computeLastMelds(self, hand):
         """returns all possible last melds"""
@@ -437,7 +669,7 @@ class TripleKnitting(Function):
                 result.append((tileS, tileB, tileC))
         return result, tilesS + tilesB + tilesC
 
-class Knitting(Function):
+class Knitting(MahJonggFunction):
     def computeLastMelds(self, hand):
         """returns all possible last melds"""
         if not hand.lastTile:
@@ -533,7 +765,7 @@ class Knitting(Function):
         if len(result) == 2:
             return Bytelist(result)
 
-class AllPairHonors(Function):
+class AllPairHonors(MahJonggFunction):
     @staticmethod
     def computeLastMelds(hand):
         return [Meld([hand.lastTile, hand.lastTile])]
@@ -742,212 +974,6 @@ class EastWonNineTimesInARow(Function):
     def rotate(game):
         return EastWonNineTimesInARow.appliesToGame(game, needWins = EastWonNineTimesInARow.nineTimes)
 
-
-class StandardMahJongg(Function):
-    @staticmethod
-    def computeLastMelds(hand):
-        """returns all possible last melds"""
-        if not hand.lastTile:
-            return
-        if hand.lastTile.group.isupper():
-            # TODO: split rest
-            checkMelds = hand.hiddenMelds
-        else:
-            checkMelds = hand.declaredMelds
-        return [x for x in checkMelds if hand.lastTile in x and len(x) < 4]
-
-    @staticmethod
-    def appliesToHand(hand):
-        """winner rules are not yet applied to hand"""
-        # pylint: disable=too-many-return-statements
-        # too many return statements
-        if len(hand.melds) != 5:
-            return False
-        if any(len(x) not in (2, 3, 4) for x in hand.melds):
-            return False
-        if any(x.isRest for x in hand.melds):
-            return False
-        if sum(x.isChow for x in hand.melds) > hand.ruleset.maxChows:
-            return False
-        if hand.score.total() < hand.ruleset.minMJPoints:
-            return False
-        if hand.score.doubles >= hand.ruleset.minMJDoubles:
-            # shortcut
-            return True
-        # but maybe we have enough doubles by winning:
-        doublingWinnerRules = sum(x.rule.score.doubles for x in hand.matchingWinnerRules())
-        return hand.score.doubles + doublingWinnerRules >= hand.ruleset.minMJDoubles
-
-    @staticmethod
-    def fillChow(group, values):
-        val0, val1 = values
-        if val0 + 1 == val1:
-            if val0 == 1:
-                return {Tile(group, val0 + 2)}
-            if val0 == 8:
-                return {Tile(group, val0 - 1)}
-            return {Tile(group, val0 - 1), Tile(group, val0 + 2)}
-        else:
-            assert val0 + 2 == val1, 'group:%s values:%s' % (group, values)
-            return {Tile(group, val0 + 1)}
-
-    @staticmethod
-    def winningTileCandidates(hand):
-        # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches,too-many-statements
-        if len(hand.melds) > 7:
-            # hope 7 is sufficient, 6 was not
-            return set()
-        if not hand.tilesInHand:
-            return set()
-        inHand = list(x.lower() for x in hand.tilesInHand)
-        result = inHand[:]
-        pairs = 0
-        isolated = 0
-        maxChows = hand.ruleset.maxChows - sum(x.isChow for x in hand.declaredMelds)
-        # TODO: does not differentiate between maxChows == 1 and maxChows > 1
-        # test with kajonggtest and a ruleset where maxChows == 2
-        if maxChows < 0:
-            return set()
-        if maxChows == 0:
-            checkTiles = set(inHand)
-        else:
-            checkTiles = set(inHand) & elements.honors
-        for tileName in checkTiles:
-            count = inHand.count(tileName)
-            if count == 1:
-                isolated += 1
-            elif count == 2:
-                pairs += 1
-            else:
-                for _ in range(count):
-                    result.remove(tileName)
-        if maxChows:
-            if pairs > 2 or isolated > 2 or (pairs > 1 and isolated > 1):
-                # this is not a calling hand
-                return set()
-        else:
-            if pairs + isolated > 2:
-                return set()
-        if maxChows == 0:
-            return set(result)
-        melds = []
-        for group in hand.suits & {b's', b'c', b'b'}:
-            values = sorted(int(x.value) for x in result if x.group == group)
-            changed = True
-            while (changed and len(values) > 2
-                    and values.count(values[0]) == 1
-                    and values.count(values[1]) == 1
-                    and values.count(values[2]) == 1):
-                changed = False
-                if values[0] + 2 == values[2] and (len(values) == 3 or values[3] > values[0] + 3):
-                    # print('removing first 3 from %s' % values)
-                    meld = Meld([Tile(group, values[x]) for x in range(3)])
-                    for pair in meld:
-                        result.remove(pair)
-                    melds.append(meld)
-                    values = values[3:]
-                    changed = True
-                elif values[0] + 1 == values[1] and values[2] > values[0] + 2:
-                    # print('found incomplete chow at start of %s' % values)
-                    return StandardMahJongg.fillChow(group, values[:2])
-            changed = True
-            while (changed and len(values) > 2
-                    and values.count(values[-1]) == 1
-                    and values.count(values[-2]) == 1
-                    and values.count(values[-3]) == 1):
-                changed = False
-                if values[-1] - 2 == values[-3] and (len(values) == 3 or values[-4] < values[-1] - 3):
-                    meld = Meld([Tile(group, values[x]) for x in range(-3, 0)])
-                    for pair in meld:
-                        result.remove(pair)
-                    melds.append(meld)
-                    values = values[:-3]
-                    changed = True
-                elif values[-1] - 1 == values[-2] and values[-3] < values[-1] - 2:
-                    # print('found incomplete chow at end of %s' % values)
-                    return StandardMahJongg.fillChow(group, values[-2:])
-
-            if len(values) % 3 == 0:
-                # adding a 4th, 7th or 10th tile with this color can not let us win,
-                # so we can exclude this color from the candidates
-                result = list(x for x in result if x.group != group)
-                continue
-            valueSet = set(values)
-            if len(values) == 4 and len(values) == len(valueSet):
-                if values[0] + 3 == values[-1]:
-                    # print('seq4 in %s' % hand.tilesInHand)
-                    return {Tile(group, values[0]), Tile(group, values[-1])}
-            if len(values) == 7 and len(values) == len(valueSet):
-                if values[0] + 6 == values[6]:
-                    # print('seq7 in %s' % hand.tilesInHand)
-                    return {Tile(group, values[x]) for x in (0, 3, 6)}
-            if len(values) == 1:
-                # only a pair of this value is possible
-                return {Tile(group.upper(), values[0])}
-            if len(valueSet) == 1:
-                # no chow reachable, only pair/pung
-                continue
-            singles = set(x for x in valueSet
-                 if values.count(x) == 1
-                 and not set([x-1, x-2, x+1, x+2]) & valueSet)
-            isolated += len(singles)
-            if isolated > 1:
-                # this is not a calling hand
-                return set()
-            if len(values) == 2 and len(valueSet) == 2:
-                # exactly two adjacent values: must be completed to Chow
-                if maxChows == 0:
-                    # not a calling hand
-                    return set()
-                return StandardMahJongg.fillChow(group, values)
-            if (len(values) == 4 and len(valueSet) == 2
-                    and values[0] == values[1] and values[2] == values[3]):
-                # print('we have 2 pairs of %s' % group)
-                return {Tile(group, values[0]), Tile(group, values[2])}
-            if maxChows:
-                for value in valueSet:
-                    if value > 1:
-                        result.append(Tile(group, str(value - 1)))
-                    if value < 9:
-                        result.append(Tile(group, str(value + 1)))
-        return set(result)
-
-    @staticmethod
-    def shouldTry(dummyHand):
-        return True
-    @staticmethod
-    def rearrange(hand, pairs):
-        """rest is a string with those tiles that can still
-        be rearranged: No declared melds and no bonus tiles.
-        done is already arranged, do not change this.
-        Returns list(Meld)"""
-# TODO: return all variants. The parent should find the best mjrRule/variant combo
-        assert pairs
-        _ = [pair for pair in pairs if pair.group in b'DW']
-        honourResult = hand.splitMelds(_) # b''.join(_)) # easy since they cannot have a chow
-        splitVariants = {}
-        for group in Byteset(b'SBC'):
-            groupPairs = [pair for pair in pairs if pair.group == group]
-            if not groupPairs:
-                splitVariants[group] = [None]
-                continue
-            splitVariants[group] = hand.genVariants(groupPairs)
-        bestHand = None
-        bestVariant = None
-        for combination in ((s, b, c)
-                for s in splitVariants[b'S']
-                for b in splitVariants[b'B']
-                for c in splitVariants[b'C']):
-            variantMelds = honourResult[:] + sum((x for x in combination if x is not None), [])
-            melds = hand.melds[:] + variantMelds
-            melds.extend(hand.bonusMelds)
-            _ = b' '.join(bytes(x) for x in melds) + b' ' + hand.mjStr
-            tryHand = hand.cached(hand, _, computedRules=hand.computedRules)
-            if not bestHand or tryHand.total() > bestHand.total():
-                bestHand = tryHand
-                bestVariant = variantMelds
-        return bestVariant, []
-
 class GatesOfHeaven(Function):
     def __init__(self):
         Function.__init__(self)
@@ -1002,9 +1028,9 @@ class GatesOfHeaven(Function):
                     result = b'123456789'
         return {Tile(self.suit, x) for x in result}
 
-class ThirteenOrphans(Function):
+class ThirteenOrphans(MahJonggFunction):
     def __init__(self):
-        Function.__init__(self)
+        MahJonggFunction.__init__(self)
         self.missingTiles = None
 
     @staticmethod
