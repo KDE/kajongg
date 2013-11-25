@@ -622,7 +622,7 @@ class TripleKnitting(MahJonggFunction):
         return melds, pairs
 
     def appliesToHand(self, hand):
-        if hand.windMelds or hand.dragonMelds:
+        if hand.hasHonorMelds:
             return False
         if len(hand.declaredMelds) > 1:
             return False
@@ -633,7 +633,7 @@ class TripleKnitting(MahJonggFunction):
             and rest[0].group != rest[1].group and rest[0].value == rest[1].value)
 
     def winningTileCandidates(self, hand):
-        if hand.windMelds or hand.dragonMelds:
+        if hand.hasHonorMelds:
             return set()
         if hand.declaredMelds:
             return set()
@@ -703,7 +703,7 @@ class Knitting(MahJonggFunction):
         return pairCount >= pairWanted
 
     def appliesToHand(self, hand):
-        if hand.windMelds or hand.dragonMelds:
+        if hand.hasHonorMelds:
             return False
         if len(hand.declaredMelds) > 1:
             return False
@@ -714,7 +714,7 @@ class Knitting(MahJonggFunction):
     def winningTileCandidates(self, hand):
         if hand.declaredMelds:
             return set()
-        if hand.windMelds or hand.dragonMelds:
+        if hand.hasHonorMelds:
             return set()
         couples, singleTile = self.findCouples(hand)
         if len(couples) != 6:
@@ -854,29 +854,29 @@ class ThreeGreatScholars(Function):
 class BigThreeDragons(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.dragonMelds if len(x) >= 3]) == 3
+        return len([x for x in hand.melds if x.isDragonMeld and len(x) >= 3]) == 3
 
 class BigFourJoys(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.windMelds if len(x) >= 3]) == 4
+        return len([x for x in hand.melds if x.isWindMeld and len(x) >= 3]) == 4
 
 class LittleFourJoys(Function):
     @staticmethod
     def appliesToHand(hand):
-        lengths = sorted([min(len(x), 3) for x in hand.windMelds])
+        lengths = sorted([min(len(x), 3) for x in hand.melds if x.isWindMeld])
         return lengths == [2, 3, 3, 3]
 
 class LittleThreeDragons(Function):
     @staticmethod
     def appliesToHand(hand):
-        lengths = sorted([min(len(x), 3) for x in hand.dragonMelds])
+        lengths = sorted([min(len(x), 3) for x in hand.melds if x.isDragonMeld])
         return lengths == [2, 3, 3]
 
 class FourBlessingsHoveringOverTheDoor(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len([x for x in hand.melds if len(x) >= 3 and x.group in b'wW']) == 4
+        return len([x for x in hand.melds if len(x) >= 3 and x.isWindMeld]) == 4
 
 class AllGreen(Function):
     @staticmethod

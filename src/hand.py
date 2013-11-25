@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from log import logDebug
-from tile import Tile, elements, Values, TileList, Byteset
+from tile import Tile, Values, TileList, Byteset
 from meld import Meld, MeldList
 from rule import Score, Ruleset
 from common import Debug
@@ -146,7 +146,7 @@ class Hand(object):
         self.values = Values(x.value for x in self.tileNames)
         self.suits = set(x.lowerGroup for x in self.tileNames)
         self.lenOffset = self.__computeLenOffset(tileString)
-        self.dragonMelds, self.windMelds = self.__computeDragonWindMelds(tileString)
+        self.hasHonorMelds = any(x.isHonorMeld for x in self.melds)
         self.__separateMelds(tileString)
         self.hiddenMelds.sort()
         self.tilesInHand = sum(self.hiddenMelds, [])
@@ -626,26 +626,6 @@ class Hand(object):
         return result
 
     @staticmethod
-    def __computeDragonWindMelds(tileString):
-        """returns lists with melds containing all (even single)
-        dragons respective winds"""
-        dragonMelds = []
-        windMelds = []
-        for split in tileString.split():
-            if split[:1] == b'R':
-                pairs = TileList(split[1:])
-                for lst, tiles in ((windMelds, elements.wINDS), (dragonMelds, elements.dRAGONS)):
-                    for tile in tiles:
-                        count = pairs.count(tile)
-                        if count:
-                            lst.append(Meld([tile] * count))
-            elif split[:1] in b'dD':
-                dragonMelds.append(Meld(split))
-            elif split[:1] in b'wW':
-                windMelds.append(Meld(split))
-        return dragonMelds, windMelds
-
-    @staticmethod
     def __separateBonusMelds(tileStrings):
         """keep them separate. One meld per bonus tile. Others depend on that."""
         bonusMelds = MeldList()
@@ -734,7 +714,7 @@ class Hand(object):
         """this is only an estimate because it only uses meldRules and handRules,
         but not things like mjRules, winnerRules, loserRules"""
         result = 0
-        for meld in self.dragonMelds + self.windMelds:
+        for meld in (x for x in self.melds if x.isHonorMeld):
             for rule in self.ruleset.doublingMeldRules:
                 if rule.appliesToMeld(self, meld):
                     result += rule.score.doubles
