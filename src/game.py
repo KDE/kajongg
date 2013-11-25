@@ -519,6 +519,7 @@ class Game(object):
     def _saveScores(self):
         """save computed values to database, update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        logMessage = ''
         for player in self.players:
             if player.hand:
                 manualrules = '||'.join(x.rule.name for x in player.hand.usedRules)
@@ -533,10 +534,9 @@ class Game(object):
                     WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
                     player.payment, player.balance, self.rotated, self.notRotated),
                 list([player.hand.string, manualrules]))
-            if Debug.scores:
-                self.debug('%s: handTotal=%s balance=%s %s' % (
-                    player,
-                    player.handTotal, player.balance, 'won' if player == self.winner else ''))
+            logMessage += '{player:<12} {hand:>4} {total:>5} {won} | '.format(
+                player=str(player)[:12], hand=player.handTotal, total=player.balance,
+                won='WON' if player == self.winner else '   ')
             for usedRule in player.hand.usedRules:
                 rule = usedRule.rule
                 if rule.score.limits:
@@ -544,6 +544,8 @@ class Game(object):
                     if hasattr(rule.function, 'limitHand'):
                         tag = rule.function.limitHand.__class__.__name__
                     self.addCsvTag(tag)
+        if Debug.scores:
+            self.debug(logMessage)
 
     def maybeRotateWinds(self):
         """rules which make winds rotate"""

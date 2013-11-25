@@ -130,7 +130,8 @@ Options {stropt} take a string argument like {example}""".format(
                 return '--debug: unknown option %s' % option
             if type(Debug.__dict__[option]) != type(value):
                 return '--debug: wrong value for option %s' % option
-            type.__setattr__(Debug, option, value)
+            if option != 'scores' or not Internal.isServer:
+                type.__setattr__(Debug, option, value)
         if Debug.time:
             Debug.time = datetime.datetime.now()
 
