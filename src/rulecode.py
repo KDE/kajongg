@@ -624,7 +624,7 @@ class TripleKnitting(MahJonggFunction):
         return melds, pairs
 
     def appliesToHand(self, hand):
-        if hand.hasHonorMelds:
+        if any(x.isHonor for x in hand.tileNames):
             return False
         if len(hand.declaredMelds) > 1:
             return False
@@ -705,7 +705,7 @@ class Knitting(MahJonggFunction):
         return pairCount >= pairWanted
 
     def appliesToHand(self, hand):
-        if hand.hasHonorMelds:
+        if any(x.isHonor for x in hand.tileNames):
             return False
         if len(hand.declaredMelds) > 1:
             return False

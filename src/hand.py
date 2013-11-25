@@ -44,7 +44,11 @@ class UsedRule(object):
         return 'UsedRule(%s)' % str(self)
 
 class Hand(object):
-    """represent the hand to be evaluated"""
+    """represent the hand to be evaluated.
+
+    lenOffset is <0 for short hand, 0 for correct calling hand, >0 for long hand.
+    Of course ignoring bonus tiles.
+    if there are no kongs, 13 tiles will return 0"""
 
     # pylint: disable=too-many-instance-attributes
 
@@ -112,27 +116,25 @@ class Hand(object):
         self.ownWind = None
         self.roundWind = None
         tileStrings = []
-        mjStrings = []
         haveM = False
-        splits = self.string.split()
-        for part in splits:
+        for part in self.string.split():
             partId = part[:1]
             if partId in b'Mmx':
                 haveM = True
                 self.ownWind = part[1:2]
                 self.roundWind = part[2:3]
-                mjStrings.append(part)
+                self.mjStr += b' ' + part
                 self.__won = partId == b'M'
             elif partId == b'L':
                 if len(part[1:]) > 8:
                     raise Exception('last tile cannot complete a kang:' + self.string)
-                mjStrings.append(part)
+                self.mjStr += b' ' + part
             else:
-                tileStrings.append(part)
+                if part != b'R':
+                    tileStrings.append(part)
 
         if not haveM:
             raise Exception('Hand got string without mMx: %s', self.string)
-        self.mjStr = b' '.join(mjStrings)
         self.__lastTile = self.__lastSource = self.__announcements = b''
         self.__lastMeld = 0
         self.__lastMelds = MeldList()
@@ -145,10 +147,21 @@ class Hand(object):
         self.tileNames.sort()
         self.values = Values(x.value for x in self.tileNames)
         self.suits = set(x.lowerGroup for x in self.tileNames)
-        self.lenOffset = self.__computeLenOffset(tileString)
-        self.hasHonorMelds = any(x.isHonorMeld for x in self.melds)
-        self.__separateMelds(tileString)
+        for split in tileStrings[:]:
+            if split[:1] != b'R':
+                meld = Meld(split)
+                self.melds.append(meld)
+                self.declaredMelds.append(meld)
+                tileStrings.remove(split)
+        self.lenOffset = len(self.tileNames) - 13 - sum(x.isKong for x in self.melds)
+        assert len(tileStrings) < 2, tileStrings
+        if len(tileStrings):
+            rest = TileList(tileStrings[0][1:])
+            self.__split(sorted(rest))
+        self.melds.sort()
+        self.__categorizeMelds()
         self.hiddenMelds.sort()
+        self.hasHonorMelds = any(x.isHonorMeld for x in self.melds)
         self.tilesInHand = sum(self.hiddenMelds, [])
         for tile in self.tilesInHand:
             assert isinstance(tile, Tile), self.tilesInHand
@@ -595,8 +608,9 @@ class Hand(object):
             # stdMJ is special because it might build more than one pair
             # the other special hands would put that into the rest
             # if the above TODO is done, stdMJ does not have to be special anymore
-            melds, _ = stdMJ.rearrange(self, rest[:])
-            self.melds.extend(melds)
+            if rest:
+                melds, _ = stdMJ.rearrange(self, rest[:])
+                self.melds.extend(melds)
         assert sum(len(x) for x in self.melds) == len(self.tileNames), '%s != %s' % (
             self.melds, self.tileNames)
 
@@ -640,17 +654,6 @@ class Hand(object):
         """total points of hand"""
         return self.score.total()
 
-    def __computeLenOffset(self, tileString):
-        """lenOffset is <0 for short hand, 0 for correct calling hand, >0 for long hand.
-        Of course ignoring bonus tiles.
-        if there are no kongs, 13 tiles will return 0"""
-        result = len(self.tileNames) - 13
-        for split in tileString.split():
-            if split[:1] != b'R' and len(split) == 8:
-                if Meld(split).isKong:
-                    result -= 1
-        return result
-
     @staticmethod
     def __separateBonusMelds(tileStrings):
         """keep them separate. One meld per bonus tile. Others depend on that."""
@@ -662,26 +665,6 @@ class Hand(object):
                     bonusMelds.append(Meld(tile))
                     tileStrings.remove(tileString)
         return bonusMelds, tileStrings
-
-    def __separateMelds(self, tileString):
-        """build a meld list from the hand string"""
-        # no matter how the tiles are grouped make a single
-        # meld for every bonus tile
-        # we need to remove spaces from the hand string first
-        # for building only pairs with length 2
-        splits = tileString.split()
-        rest = []
-        for split in splits:
-            if split[:1] == b'R':
-                rest = TileList(split[1:])
-            else:
-                meld = Meld(split)
-                self.melds.append(meld)
-                self.declaredMelds.append(meld)
-        if rest:
-            self.__split(sorted(rest))
-        self.melds.sort()
-        self.__categorizeMelds()
 
     def __categorizeMelds(self):
         """categorize: hidden, declared"""
