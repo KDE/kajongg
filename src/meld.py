@@ -76,9 +76,11 @@ class Meld(TileList):
                 self.cache[self.key] = self
                 self.cache[bytes(self)] = self
             self.isExposed = self.__getState()
-            self.tileType = self[0].lowerGroup if len(self) else None
             self.isSingle = self.isPair = self.isChow = self.isPung = False
             self.isKong = self.isClaimedKong = self.isRest = False
+            self.isDragonMeld = len(self) and self[0].isDragon
+            self.isWindMeld = len(self) and self[0].isWind
+            self.isHonorMeld = self.isDragonMeld or self.isWindMeld
             self.__setMeldType()
             groups = set(x.group.lower() for x in self)
             if len(groups) == 1:

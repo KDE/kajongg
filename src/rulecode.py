@@ -76,13 +76,13 @@ class MahJonggFunction(Function):
 class DragonPungKong(MeldFunction):
     def appliesToMeld(self, dummyHand, meld):
         return (len(meld) >= 3
-            and meld.tileType == b'd'
+            and meld.isDragonMeld
             and (meld.isPung or meld.isKong))
 
 class RoundWindPungKong(MeldFunction):
     @staticmethod
     def appliesToMeld(hand, meld):
-        return len(meld) >= 3 and meld[0].lower() == b'w' + hand.roundWind
+        return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.roundWind
 
 class ExposedMinorPung(MeldFunction):
     @staticmethod
@@ -142,27 +142,27 @@ class ConcealedTerminalsKong(MeldFunction):
 class ConcealedHonorsKong(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and not meld.isExposed and meld.group in b'wd'
+        return len(meld) == 4 and not meld.isExposed and meld.isHonorMeld
 
 class OwnWindPungKong(MeldFunction):
     @staticmethod
     def appliesToMeld(hand, meld):
-        return len(meld) >= 3 and meld[0].lower() == b'w' + hand.ownWind
+        return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.ownWind
 
 class OwnWindPair(MeldFunction):
     @staticmethod
     def appliesToMeld(hand, meld):
-        return len(meld) == 2 and meld[0].lower() == b'w' + hand.ownWind
+        return len(meld) == 2 and meld.isWindMeld and meld[0].value == hand.ownWind
 
 class RoundWindPair(MeldFunction):
     @staticmethod
     def appliesToMeld(hand, meld):
-        return len(meld) == 2 and meld[0].lower() == b'w' + hand.roundWind
+        return len(meld) == 2 and meld.isWindMeld and meld[0].value == hand.roundWind
 
 class DragonPair(MeldFunction):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 2 and meld.lowerGroup == b'd'
+        return len(meld) == 2 and meld.isDragonMeld
 
 class LastTileCompletesPairMinor(Function):
     @staticmethod

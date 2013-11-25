@@ -74,7 +74,9 @@ class Tile(bytes):
             self.value = self[1:]
             self.lowerGroup = self.group.lower()
             self.isBonus = self.group in b'fy'
-            self.isHonor = self.lowerGroup in b'dw'
+            self.isDragon = self.lowerGroup == b'd'
+            self.isWind = self.lowerGroup == b'w'
+            self.isHonor = self.isDragon or self.isWind
             self.key = 1 + self.hashTable.index(self) / 2
             self.isKnown = self != b'Xy'
             self._fixed = True
