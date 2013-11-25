@@ -376,7 +376,7 @@ class PlayingHandBoard(HandBoard):
         else:
             tileStr = 'R' + ''.join(str(x) for x in self.player.concealedTileNames)
             handStr = ' '.join([tileStr, self.player.mjString()])
-            content = Hand.cached(self.player, handStr)
+            content = Hand(self.player, handStr)
             result = MeldList(content.melds + content.bonusMelds)
         if not self.rearrangeMelds:
             result = MeldList(Meld(x) for x in result.tiles()) # one meld per tile

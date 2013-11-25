@@ -375,7 +375,7 @@ class Player(object):
         melds.append(mjString)
         if mjString.startswith('M') and (withTile or self.lastTile):
             melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld if self.lastMeld else ''))
-        return Hand.cached(self, ' '.join(melds), robbedTile=robbedTile)
+        return Hand(self, ' '.join(melds), robbedTile=robbedTile)
 
     def scoringString(self):
         """helper for HandBoard.__str__"""

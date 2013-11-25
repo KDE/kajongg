@@ -61,9 +61,9 @@ class Hand(object):
         Hand.hits = 0
         Hand.misses = 0
 
-    @staticmethod
-    def cached(ruleset, string, computedRules=None, robbedTile=None):
+    def __new__(cls, ruleset, string, computedRules=None, robbedTile=None):
         """since a Hand instance is never changed, we can use a cache"""
+        cache = cls.cache
         if computedRules is not None and not isinstance(computedRules, list):
             computedRules = list([computedRules])
         cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
@@ -72,16 +72,13 @@ class Hand(object):
         else:
             cacheId = id(ruleset)
         cacheKey = hash((cacheId, string, robbedTile, cRuleHash))
-        cache = Hand.cache
         if cacheKey in cache:
             if cache[cacheKey] is None:
                 raise Exception('recursion: Hand calls itself for same content')
-            Hand.hits += 1
+            cls.hits += 1
             return cache[cacheKey]
-        Hand.misses += 1
-        cache[cacheKey] = None
-        result = Hand(ruleset, string,
-            computedRules=computedRules, robbedTile=robbedTile)
+        cls.misses += 1
+        result = object.__new__(cls)
         cache[cacheKey] = result
         return result
 
@@ -90,6 +87,9 @@ class Hand(object):
         ruleset can be Hand, Game or Ruleset."""
         # silence pylint. This method is time critical, so do not split it into smaller methods
         # pylint: disable=too-many-instance-attributes,too-many-branches,too-many-statements
+        if hasattr(self, 'string'):
+            # I am from cache
+            return
         assert isinstance(string, bytes)
         if isinstance(ruleset, Hand):
             self.ruleset = ruleset.ruleset
@@ -374,7 +374,7 @@ class Hand(object):
         # set the "won" flag M
         parts = unchanged
         parts.extend([rPart, mPart.capitalize(), b'L' + tileName])
-        return Hand.cached(self, b' '.join(parts))
+        return Hand(self, b' '.join(parts))
 
     def __sub__(self, tiles):
         """returns a copy of self minus tiles. Case of tiles (hidden
@@ -427,7 +427,7 @@ class Hand(object):
                 newParts.append(part)
             mjStr = b' '.join(newParts)
         newString = b' '.join(bytes(x) for x in (hidden, exposed, boni, mjStr))
-        return Hand.cached(self, newString, self.computedRules)
+        return Hand(self, newString, self.computedRules)
 
     def manualRuleMayApply(self, rule):
         """returns True if rule has selectable() and applies to this hand"""

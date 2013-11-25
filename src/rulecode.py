@@ -462,7 +462,7 @@ class StandardMahJongg(MahJonggFunction):
             melds = hand.melds[:] + variantMelds
             melds.extend(hand.bonusMelds)
             _ = b' '.join(bytes(x) for x in melds) + b' ' + hand.mjStr
-            tryHand = hand.cached(hand, _, computedRules=hand.computedRules)
+            tryHand = hand.__class__(hand, _, computedRules=hand.computedRules)
             if not bestHand or tryHand.total() > bestHand.total():
                 bestHand = tryHand
                 bestVariant = variantMelds

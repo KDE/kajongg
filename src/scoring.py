@@ -388,7 +388,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         self.lastTile = Internal.scene.computeLastTile()
         self.lastMeld = Internal.scene.computeLastMeld()
         string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
-        return Hand.cached(self, string, computedRules=singleRule)
+        return Hand(self, string, computedRules=singleRule)
 
     def sortRulesByX(self, rules):
         """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
