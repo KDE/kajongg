@@ -215,7 +215,7 @@ class AIDefault(object):
             newHand = candidates.hand - candidate.name.capitalize()
             winningTiles = aiInstance.chancesToWin(newHand)
             for winnerTile in set(winningTiles):
-                candidate.keep -= newHand.picking(winnerTile).total() / 10.017
+                candidate.keep -= (newHand + winnerTile).total() / 10.017
             if winningTiles:
                 # more weight if we have several chances to win
                 candidate.keep -= float(len(winningTiles)) / len(set(winningTiles)) * 5.031

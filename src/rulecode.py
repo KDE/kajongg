@@ -569,7 +569,7 @@ class CallingHand(Function):
                 # it is any other normal Function
                 candidates = StandardMahJongg.winningTileCandidates(hand)
             for tileName in candidates:
-                fullHand = hand.picking(tileName.capitalize())
+                fullHand = hand + tileName.capitalize()
                 if fullHand.won and self.limitHand.appliesToHand(fullHand):
                     return True
             return False

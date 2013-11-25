@@ -350,6 +350,32 @@ class Hand(object):
                 self.__lastMeld = totals[0]
                 self.__applyRules()
 
+    def __add__(self, tileName):
+        """returns a new Hand built from this one plus tileName"""
+        assert tileName.istitle(), 'tileName %s should be title:' % tileName
+        parts = self.string.split()
+        mPart = b''
+        rPart = b'R' + tileName
+        unchanged = []
+        for part in parts:
+            if part[:1] in b'SBCDW':
+                rPart += part
+            elif part[:1] == b'R':
+                rPart += part[1:]
+            elif part[:1].lower() == b'm':
+                mPart = part
+            elif part[:1] == b'L':
+                pass
+            else:
+                unchanged.append(part)
+        # combine all parts about hidden tiles plus the new one to one part
+        # because something like DrDrS8S9 plus S7 will have to be reordered
+        # anyway
+        # set the "won" flag M
+        parts = unchanged
+        parts.extend([rPart, mPart.capitalize(), b'L' + tileName])
+        return Hand.cached(self, b' '.join(parts))
+
     def __sub__(self, tiles):
         """returns a copy of self minus tiles. Case of tiles (hidden
         or exposed) is ignored. If the tile is not hidden
@@ -434,7 +460,7 @@ class Hand(object):
                 continue
             if mustBeAvailable and not self.player.tileAvailable(tileName, self):
                 continue
-            hand = self.picking(tileName)
+            hand = self + tileName
             if hand.won:
                 result.append(hand)
                 if len(result) == wanted:
@@ -656,32 +682,6 @@ class Hand(object):
             self.__split(sorted(rest))
         self.melds.sort()
         self.__categorizeMelds()
-
-    def picking(self, tileName):
-        """returns a new Hand built from this one plus tileName"""
-        assert tileName.istitle(), 'tileName %s should be title:' % tileName
-        parts = self.string.split()
-        mPart = b''
-        rPart = b'R' + tileName
-        unchanged = []
-        for part in parts:
-            if part[:1] in b'SBCDW':
-                rPart += part
-            elif part[:1] == b'R':
-                rPart += part[1:]
-            elif part[:1].lower() == b'm':
-                mPart = part
-            elif part[:1] == b'L':
-                pass
-            else:
-                unchanged.append(part)
-        # combine all parts about hidden tiles plus the new one to one part
-        # because something like DrDrS8S9 plus S7 will have to be reordered
-        # anyway
-        # set the "won" flag M
-        parts = unchanged
-        parts.extend([rPart, mPart.capitalize(), b'L' + tileName])
-        return Hand.cached(self, b' '.join(parts))
 
     def __categorizeMelds(self):
         """categorize: hidden, declared"""
