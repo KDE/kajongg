@@ -424,24 +424,24 @@ class Hand(object):
         string = self.string
         if b' x' in string or self.lenOffset:
             return result
+        candidates = []
         for rule in self.ruleset.mjRules:
             # sort only for reproducibility
             if not hasattr(rule, 'winningTileCandidates'):
                 raise Exception('rule %s, code=%s has no winningTileCandidates' % (
                     rule.name, rule.function))
-            candidates = sorted(x.capitalize() for x in rule.winningTileCandidates(self))
-            for tileName in candidates:
-                if excludeTile and tileName == excludeTile.capitalize():
-                    continue
-                if mustBeAvailable and not self.player.tileAvailable(tileName, self):
-                    continue
-                hand = self.picking(tileName)
-                if hand.won:
-                    result.append(hand)
-                    if len(result) == wanted:
-                        break
-            if len(result) == wanted:
-                break
+            candidates.extend(x.capitalize() for x in rule.winningTileCandidates(self))
+        candidates = sorted(set(candidates))
+        for tileName in candidates:
+            if excludeTile and tileName == excludeTile.capitalize():
+                continue
+            if mustBeAvailable and not self.player.tileAvailable(tileName, self):
+                continue
+            hand = self.picking(tileName)
+            if hand.won:
+                result.append(hand)
+                if len(result) == wanted:
+                    break
         return result
 
     def __maybeMahjongg(self):
