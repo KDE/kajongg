@@ -368,6 +368,8 @@ class Player(object):
         melds = ['R' + ''.join(str(x) for x in self._concealedTileNames)]
         if withTile:
             melds[0] += withTile
+        if melds[0] == 'R':
+            melds = melds[1:]
         melds.extend(str(x) for x in self._exposedMelds)
         melds.extend(str(x) for x in self._concealedMelds)
         melds.extend(str(x) for x in self._bonusTiles)

@@ -22,10 +22,11 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from log import logDebug
-from tile import Tile, Values, TileList, Byteset
+from tile import Tile, Values, TileList
 from meld import Meld, MeldList
 from rule import Score, Ruleset
 from common import Debug
+from permutations import Permutations
 
 class UsedRule(object):
     """use this in scoring, never change class Rule.
@@ -62,6 +63,7 @@ class Hand(object):
         if Debug.handCache and Hand.cache:
             game.debug('cache hits:%d misses:%d' % (Hand.hits, Hand.misses))
         Hand.cache.clear()
+        Permutations.cache.clear()
         Hand.hits = 0
         Hand.misses = 0
 
@@ -156,8 +158,7 @@ class Hand(object):
         self.lenOffset = len(self.tileNames) - 13 - sum(x.isKong for x in self.melds)
         assert len(tileStrings) < 2, tileStrings
         if len(tileStrings):
-            rest = TileList(tileStrings[0][1:])
-            self.__split(sorted(rest))
+            self.__split(sorted(TileList(tileStrings[0][1:])))
         self.melds.sort()
         self.__categorizeMelds()
         self.hiddenMelds.sort()
@@ -494,81 +495,6 @@ class Hand(object):
             matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
         return sorted(matchingMJRules, key=lambda x: -x.score.total())
 
-    @staticmethod
-    def splitMelds(rest):
-        """split rest into melds as good as possible"""
-        melds = []
-        groups = {}
-        for group in Byteset(b'DWSBC'):
-            groups[group] = TileList(x for x in rest if x.group == group)
-        for group in Byteset(b'DWSBC'):
-            tiles = groups[group]
-            for tile in tiles[:]:
-                if tiles.count(tile) >= 3:
-                    melds.append(Meld([tile, tile, tile]))
-                    for _ in range(3):
-                        tiles.remove(tile)
-        for group in Byteset(b'SBC'):
-            tiles = groups[group]
-            for tile in tiles[:]:
-                tile2 = tile.nextForChow()
-                tile3 = tile2.nextForChow()
-                while {tile, tile2, tile3} <= set(tiles):
-                    melds.append(Meld([tile, tile2, tile3]))
-                    tiles.remove(tile)
-                    tiles.remove(tile2)
-                    tiles.remove(tile3)
-        for group in Byteset(b'DWSBC'):
-            tiles = groups[group]
-            for tile in tiles[:]:
-                while tiles.count(tile) == 2:
-                    melds.append(Meld([tile, tile]))
-                    tiles.remove(tile)
-                    tiles.remove(tile)
-            for tile in tiles:
-                melds.append(Meld(tile))
-        melds.extend(Meld(x) for x in rest if not x.isKnown)
-        return sorted(melds)
-
-    def __recurse(self, cVariants, foundMelds, rest, maxPairs, group):
-        """build the variants recursively"""
-        melds = []
-        for value in set(rest):
-            if rest.count(value) == 3:
-                melds.append([value] * 3)
-            elif rest.count(value) == 2:
-                melds.append([value] * 2)
-            if rest.count(value + 1) and rest.count(value + 2):
-                melds.append([value, value + 1, value + 2])
-        pairsFound = sum(len(x) == 2 for x in foundMelds)
-        for meld in (m for m in melds if len(m) !=2 or pairsFound < maxPairs):
-            restCopy = rest[:]
-            for value in meld:
-                restCopy.remove(value)
-            newMelds = foundMelds[:]
-            newMelds.append(meld)
-            if restCopy:
-                self.__recurse(cVariants, newMelds, restCopy, maxPairs, group)
-            else:
-                for idx, newMeld in enumerate(newMelds):
-                    newMelds[idx] = b''.join(Tile(group, x) for x in newMeld)
-                cVariants.append(b' '.join(sorted(newMelds )))
-
-    def genVariants(self, original0, maxPairs=1):
-        """generates all possible meld variants out of original
-        where original is a list of tile values like ['1','1','2']"""
-        group = original0[0].group
-        original = [ord(x.value) for x in original0]
-        cVariants = []
-        self.__recurse(cVariants, [], original, maxPairs, group)
-        gVariants = []
-        for cVariant in set(cVariants):
-            melds = [Meld(x) for x in cVariant.split()]
-            gVariants.append(melds)
-        if not gVariants:
-            gVariants.append(self.splitMelds(original0)) # fallback: nothing useful found
-        return gVariants
-
 # TODO: get rid of __split, the mjRules should do that if they need it at all
 # only __split at end of Hand.__init__, now we do it twice for winning hands
     def __split(self, rest):
@@ -576,9 +502,11 @@ class Hand(object):
         Adds melds to self.melds.
         only one special mjRule may try to rearrange melds.
         A rest will be rearranged by standard rules."""
-        if Tile.unknown in rest:
-            # hidden tiles of other players:
-            self.melds.extend(self.splitMelds(rest))
+        for tile in rest[:]:
+            if not tile.isKnown:
+                rest.remove(tile)
+                self.melds.append(Meld(tile))
+        if not rest:
             return
         arrangements = []
         for mjRule in self.ruleset.mjRules:

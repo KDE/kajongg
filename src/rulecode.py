@@ -26,6 +26,7 @@ from meld import Meld, MeldList
 from common import IntDict, WINDS
 from message import Message
 from query import Query
+from permutations import Permutations
 
 class Function(object):
     """Parent for all Function classes. We need to implement
@@ -443,22 +444,10 @@ class StandardMahJongg(MahJonggFunction):
         Returns list(Meld)"""
 # TODO: return all variants. The parent should find the best mjrRule/variant combo
         assert pairs
-        _ = [pair for pair in pairs if pair.group in b'DW']
-        honourResult = hand.splitMelds(_) # b''.join(_)) # easy since they cannot have a chow
-        splitVariants = {}
-        for group in Byteset(b'SBC'):
-            groupPairs = [pair for pair in pairs if pair.group == group]
-            if not groupPairs:
-                splitVariants[group] = [None]
-                continue
-            splitVariants[group] = hand.genVariants(groupPairs)
+        permutations = Permutations(pairs)
         bestHand = None
         bestVariant = None
-        for combination in ((s, b, c)
-                for s in splitVariants[b'S']
-                for b in splitVariants[b'B']
-                for c in splitVariants[b'C']):
-            variantMelds = honourResult[:] + sum((x for x in combination if x is not None), [])
+        for variantMelds in permutations.variants:
             melds = hand.melds[:] + variantMelds
             melds.extend(hand.bonusMelds)
             _ = b' '.join(bytes(x) for x in melds) + b' ' + hand.mjStr
