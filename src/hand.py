@@ -364,6 +364,14 @@ class Hand(object):
                 self.__lastMeld = totals[0]
                 self.__applyRules()
 
+    def chancesToWin(self):
+        """count the physical tiles that make us win and still seem availabe"""
+        result = []
+        for completedHand in self.callingHands(99):
+            result.extend([completedHand.lastTile] * (
+                    self.player.tileAvailable(completedHand.lastTile, self)))
+        return result
+
     def __add__(self, tileName):
         """returns a new Hand built from this one plus tileName"""
         assert tileName.istitle(), 'tileName %s should be title:' % tileName

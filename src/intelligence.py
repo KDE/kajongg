@@ -183,7 +183,7 @@ class AIDefault(object):
         """True if we said CaO and can still win without violating it"""
         if not self.player.originalCall or not self.player.mayWin:
             return False
-        result = self.chancesToWin(self.player.originalCallingHand)
+        result = self.player.originalCallingHand.chancesToWin()
         if not result:
             self.player.mayWin = False # bad luck
         return result
@@ -199,7 +199,7 @@ class AIDefault(object):
                     (myself.lastTile, [str(x) for x in candidates]))
             for candidate in candidates:
                 if candidate.name == myself.lastTile.lower():
-                    winningTiles = aiInstance.chancesToWin(myself.originalCallingHand)
+                    winningTiles = myself.originalCallingHand.chancesToWin()
                     if Debug.originalCall:
                         game.debug('weighOriginalCall: winningTiles=%s for %s' %
                             (winningTiles, str(myself.originalCallingHand)))
@@ -213,7 +213,7 @@ class AIDefault(object):
         """if we can get a calling hand, prefer that"""
         for candidate in candidates:
             newHand = candidates.hand - candidate.name.capitalize()
-            winningTiles = aiInstance.chancesToWin(newHand)
+            winningTiles = newHand.chancesToWin()
             for winnerTile in set(winningTiles):
                 candidate.keep -= (newHand + winnerTile).total() / 10.017
             if winningTiles:
@@ -283,14 +283,6 @@ class AIDefault(object):
         for kong in kongs:
             if not self.player.mustPlayDangerous(kong):
                 return kong
-
-    def chancesToWin(self, hand):
-        """count the physical tiles that make us win and still seem availabe"""
-        result = []
-        for completedHand in hand.callingHands(99):
-            result.extend([completedHand.lastTile] * (
-                    self.player.tileAvailable(completedHand.lastTile, hand)))
-        return result
 
     def xxxxhandValue(self):
         """UNUSED CODE!
