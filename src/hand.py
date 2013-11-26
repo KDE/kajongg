@@ -397,45 +397,41 @@ class Hand(object):
         parts.extend([rPart, mPart.capitalize(), b'L' + addTile])
         return Hand(self, b' '.join(parts))
 
-    def __sub__(self, subtractTiles):
-        """returns a copy of self minus subtractTiles. Case of subtractTiles (hidden
+    def __sub__(self, subtractTile):
+        """returns a copy of self minus subtractTile. Case of subtractTile (hidden
         or exposed) is ignored. If the tile is not hidden
         but found in an exposed meld, this meld will be hidden with
         the tile removed from it. Exposed melds of length<3 will also
         be hidden."""
         # pylint: disable=too-many-branches
-        if not isinstance(subtractTiles, list):
-            subtractTiles = list([subtractTiles])
         hidden = b'R' + b''.join(self.tilesInHand)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
         exposed = MeldList(self.declaredMelds[:])
         exposed = MeldList(sorted(exposed, key=lambda x: (x != self.lastMeld, x.key)))
         boni = MeldList(sorted(self.bonusMelds))
-        for tile in subtractTiles:
-            assert isinstance(tile, Tile), subtractTiles
-            if bytes(tile.upper()) in hidden:
-                hidden = hidden.replace(bytes(tile.upper()), b'', 1)
-            elif tile.isBonus:
-                for idx, meld in enumerate(boni):
-                    if tile == meld[0]:
-                        del boni[idx]
-                        break
-            else:
-                for idx, meld in enumerate(exposed):
-                    if tile.lower() in meld:
-                        meld = meld.without(tile.lower())
-                        del exposed[idx]
-                        meld = meld.toUpper()
-                        hidden += bytes(meld)
-                        break
+        if bytes(subtractTile.upper()) in hidden:
+            hidden = hidden.replace(bytes(subtractTile.upper()), b'', 1)
+        elif subtractTile.isBonus:
+            for idx, meld in enumerate(boni):
+                if subtractTile == meld[0]:
+                    del boni[idx]
+                    break
+        else:
+            for idx, meld in enumerate(exposed):
+                if subtractTile.lower() in meld:
+                    meld = meld.without(subtractTile.lower())
+                    del exposed[idx]
+                    meld = meld.toUpper()
+                    hidden += bytes(meld)
+                    break
         for idx, meld in enumerate(exposed):
             if len(meld) < 3:
                 del exposed[idx]
                 meld = meld.toUpper()
                 hidden += bytes(meld)
         mjStr = self.mjStr
-        if self.lastTile in subtractTiles:
+        if self.lastTile == subtractTile:
             parts = mjStr.split()
             newParts = []
             for idx, part in enumerate(parts):
