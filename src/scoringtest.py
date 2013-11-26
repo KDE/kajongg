@@ -323,7 +323,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'RB1B1B1B2B2B2B3B4 wnwnwn wewewe Mee Lwnwnwnwn', [Score(36, 3), Score(36, 2)])
         self.scoreTest(b'RB1B1B1B2B2B2B3B3B3S1S1 c3c4c5 Mee Lc3c3c4c5', [Score(36, 1), Score(36)])
         self.scoreTest(b'RB1B1B1B2B2B2B3B3S1S2S3 c3c4c5 Mee Lc3c3c4c5', [Score(32), Score()])
-        self.scoreTest(b'c1C1C1c1 b5B5B5b5 c2C2C2c2 c3C3C3c3 C4B6 fs fw fn fe Mee LC4', Score())
+        self.scoreTest(b'c1C1C1c1 b5B5B5b5 c2C2C2c2 c3C3C3c3 RC4B6 fs fw fn fe Mee LC4', Score())
         self.scoreTest(b'wewewe wswsws wnwnwnWn RWwWwWwC6 mee LC6', [Score(32, 4), Score(limits=0.4)])
         self.scoreTest(b'wewewe wswsws wnwnwnWn RWwWwWwC3B6 Mee LC3', Score())
         self.scoreTest(b'wewewe wswsws wnwnwnWn RWwWwWwC3C3 Mee LC3', Score(limits=1))
@@ -343,15 +343,14 @@ class Regex(unittest.TestCase):
 
     def testTripleKnitting(self):
         """triple knitting BMJA"""
-        self.scoreTest(b'RS2B2C2S4B4C4S6B6C6S7B7C7 s8b8 Mee Ls8s8b8', [Score(), Score(limits=0.5)])
+        self.scoreTest(b'RS2B2C2S4B4C4S6B6C6S7B7C7 s8b8 Mee Ls8s8b8', [None, Score(limits=0.5)])
         self.scoreTest(b'RB2C2S4B4C4S6B6C6S7B7C7S8B8 mee LS8', [Score(), Score(limits=0.2)])
         self.scoreTest(b'RS2B2C2S4B4C4S6B6C6S7B7C7S8 mee LS8', [Score(), Score(limits=0.2)])
         self.scoreTest(b'RS2B2C2S7B7C7S4B4C4S6B6C6 s8b8 Mee Ls8s8b8', [Score(), Score(limits=0.5)])
         self.scoreTest(b'RS2B2C2S6B6C6S7B7C7 s4b4c4 s8b8 Mee Ls8s8b8', Score())
-        self.scoreTest(b'RS2B2C2S4B4C4S6B6C6S4B4C4 s8b9 Mee Ls8s8b8', [Score(), Score()])
-        self.scoreTest(b'RS2B2C2S4B4C4S6B6C6S4B4C4 s8c8 Mee Ls8s8c8', [Score(), Score(limits=0.5)])
-        self.scoreTest(b'RS2B2C2S3B3C3S4B4C4S4B4C4 s8c8 Mee Ls8s8c8', [Score(), Score(limits=0.5)])
-        self.scoreTest(b'RB2C2B3C3B4C4S4B4C4 s2s3s4 s8c8 Mee Ls8s8c8', [Score(), Score()])
+        self.scoreTest(b'RS2B2C2S4B4C4S6B6C6S4B4C4 s8c8 Mee Ls8s8c8', [None, Score(limits=0.5)])
+        self.scoreTest(b'RS2B2C2S3B3C3S4B4C4S4B4C4 s8c8 Mee Ls8s8c8', [None, Score(limits=0.5)])
+        self.scoreTest(b'RB2C2B3C3B4C4S4B4C4 s2s3s4 s8c8 Mee Ls8s8c8', [None, Score()])
         self.scoreTest(b'RB5S7B7B3B9S7S6C9C3B7S3 c5c6c7 Mwew LS3', Score(0))
         self.scoreTest(b'RC1C2C5C8C9S2S4S9B4B5B6B6B8S1 mee', [Score(), Score()])
         self.scoreTest(b'RC1C2C5C8C9S2S4S9B4B5B6B6B8 mee', [Score(), Score()])
@@ -362,11 +361,11 @@ class Regex(unittest.TestCase):
 
     def testKnitting(self):
         """knitting BMJA"""
-        self.scoreTest(b'RS2B2S3B3S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(limits=0.5)])
+        self.scoreTest(b'RS2B2S3B3S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [None, Score(limits=0.5)])
         self.scoreTest(b'RS2B2S3B3B4S5B5S6B6S7B7 S9B9 mwn LS9', [Score(), Score(limits=0.2)])
-        self.scoreTest(b'RS2B2S3S5B5B3S4B4S6B6S7B7 s9c9 Mwn Ls9s9c9', [Score(), Score()])
-        self.scoreTest(b'RS2B3S3B3S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score()])
-        self.scoreTest(b'RS2B2S2B2S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [Score(), Score(limits=0.5)])
+        self.scoreTest(b'RS2B2S3S5B5B3S4B4S6B6S7B7 s9c9 Mwn Ls9s9c9', [None, Score()])
+        self.scoreTest(b'RS2B3S3B3S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [None, Score()])
+        self.scoreTest(b'RS2B2S2B2S4B4S5B5S6B6S7B7 s9b9 Mwn Ls9s9b9', [None, Score(limits=0.5)])
         self.scoreTest(b'RS2S3S4S5S6S7S9B2B3B4B5B6B7B9 LB9 Mwn', [Score(), Score(limits=0.5)])
         self.scoreTest(b'RS3S4S5S6S7S9B2B3B4B5B6B7B9 LB9 Mwn', [Score(), Score(limits=0.2)])
         self.scoreTest(b'RS3S4S9S9B1B1B2B3B4B8B8 s2s2s2 fs Msww LS4', Score(0))
@@ -406,6 +405,16 @@ class Regex(unittest.TestCase):
     def scoreTest(self, string, expected, totals=None):
         """execute one scoreTest test"""
         for idx, ruleset in enumerate(RULESETS):
+            if isinstance(expected, list):
+                expIdx = idx
+                if expIdx >= len(expected):
+                    expIdx %= len(RULESETS) // 2
+                exp = expected[expIdx]
+            else:
+                exp = expected
+            if exp is None:
+                continue
+            exp.ruleset = ruleset
             variants = []
             variant = Hand(ruleset, string)
             variants.append(variant)
@@ -414,14 +423,6 @@ class Regex(unittest.TestCase):
 #            kprint(string, 'expected:', expected.__str__()), variant
 #            kprint(ruleset.name.encode('utf-8'))
 #            kprint('\n'.join(variant.explain).encode('ut-f8'))
-            if isinstance(expected, list):
-                expIdx = idx
-                if expIdx >= len(expected):
-                    expIdx %= len(RULESETS) // 2
-                exp = expected[expIdx]
-            else:
-                exp = expected
-            exp.ruleset = ruleset
             self.assertTrue(score == exp, self.dumpCase(variants, exp, total=None))
             if totals:
                 self.assertTrue(score.total() == totals[idx], self.dumpCase(variants, exp, totals[idx]))
