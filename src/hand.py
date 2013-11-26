@@ -371,12 +371,12 @@ class Hand(object):
                     self.player.tileAvailable(completedHand.lastTile, self)))
         return result
 
-    def __add__(self, tileName):
-        """returns a new Hand built from this one plus tileName"""
-        assert tileName.istitle(), 'tileName %s should be title:' % tileName
+    def __add__(self, addTile):
+        """returns a new Hand built from this one plus addTile"""
+        assert addTile.istitle(), 'addTile %s should be title:' % addTile
         parts = self.string.split()
         mPart = b''
-        rPart = b'R' + tileName
+        rPart = b'R' + addTile
         unchanged = []
         for part in parts:
             if part[:1] in b'SBCDW':
@@ -394,26 +394,26 @@ class Hand(object):
         # anyway
         # set the "won" flag M
         parts = unchanged
-        parts.extend([rPart, mPart.capitalize(), b'L' + tileName])
+        parts.extend([rPart, mPart.capitalize(), b'L' + addTile])
         return Hand(self, b' '.join(parts))
 
-    def __sub__(self, tiles):
-        """returns a copy of self minus tiles. Case of tiles (hidden
+    def __sub__(self, subtractTiles):
+        """returns a copy of self minus subtractTiles. Case of subtractTiles (hidden
         or exposed) is ignored. If the tile is not hidden
         but found in an exposed meld, this meld will be hidden with
         the tile removed from it. Exposed melds of length<3 will also
         be hidden."""
         # pylint: disable=too-many-branches
-        if not isinstance(tiles, list):
-            tiles = list([tiles])
+        if not isinstance(subtractTiles, list):
+            subtractTiles = list([subtractTiles])
         hidden = b'R' + b''.join(self.tilesInHand)
         # exposed is a deep copy of declaredMelds. If lastMeld is given, it
         # must be first in the list.
         exposed = MeldList(self.declaredMelds[:])
         exposed = MeldList(sorted(exposed, key=lambda x: (x != self.lastMeld, x.key)))
         boni = MeldList(sorted(self.bonusMelds))
-        for tile in tiles:
-            assert isinstance(tile, Tile), tiles
+        for tile in subtractTiles:
+            assert isinstance(tile, Tile), subtractTiles
             if bytes(tile.upper()) in hidden:
                 hidden = hidden.replace(bytes(tile.upper()), b'', 1)
             elif tile.isBonus:
@@ -435,7 +435,7 @@ class Hand(object):
                 meld = meld.toUpper()
                 hidden += bytes(meld)
         mjStr = self.mjStr
-        if self.lastTile in tiles:
+        if self.lastTile in subtractTiles:
             parts = mjStr.split()
             newParts = []
             for idx, part in enumerate(parts):
