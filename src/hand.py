@@ -471,11 +471,9 @@ class Hand(object):
             return result
         candidates = []
         for rule in self.ruleset.mjRules:
-            # sort only for reproducibility
-            if not hasattr(rule, 'winningTileCandidates'):
-                raise Exception('rule %s, code=%s has no winningTileCandidates' % (
-                    rule.name, rule.function))
-            candidates.extend(x.capitalize() for x in rule.winningTileCandidates(self))
+            if hasattr(rule, 'winningTileCandidates'):
+                candidates.extend(x.capitalize() for x in rule.winningTileCandidates(self))
+        # sort only for reproducibility
         candidates = sorted(set(candidates))
         for tileName in candidates:
             if excludeTile and tileName == excludeTile.capitalize():

@@ -110,6 +110,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.parameterRules.add(Rule('must declare calling hand',
                 'boolmustDeclareCallingHand||Omandatory', parameter=False,
                 description=m18n('Mah Jongg is only allowed after having declared to have a calling hand')))
+        self.parameterRules.add(Rule('Standard Rotation', 'FStandardRotation||Orotate||Ointernal'))
 
     def loadRules(self):
         """define the rules"""
@@ -164,7 +165,6 @@ class ClassicalChinese(PredefinedRuleset):
         # All mjRule functions must have a winningTileCandidates() method
         self.mjRules.add(Rule('Standard Mah Jongg', 'FStandardMahJongg', points=20))
         # option internal makes it not show up in the ruleset editor
-        self.mjRules.add(Rule('Standard Rotation', 'FStandardRotation||Orotate||Ointernal'))
         self.mjRules.add(Rule('Nine Gates', 'FGatesOfHeaven||OlastExtra', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 completed '
                 'with another tile of the same color (from wall or discarded)')))
