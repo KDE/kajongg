@@ -117,6 +117,7 @@ class Hand(object):
             computedRules = list([computedRules])
         self.computedRules = computedRules or []
         self.__won = False
+        self.__callingHands = {}
         self.mjStr = b''
         self.mjRule = None
         self.ownWind = None
@@ -463,6 +464,10 @@ class Hand(object):
         If mustBeAvailable is True, make sure the missing tile might still
         be available.
         """
+        if not mustBeAvailable:
+            cacheKey = (wanted, excludeTile)
+            if cacheKey in self.__callingHands:
+                return self.__callingHands[cacheKey]
         result = []
         string = self.string
         if b' x' in string or self.lenOffset:
@@ -485,6 +490,8 @@ class Hand(object):
                 result.append(hand)
                 if len(result) == wanted:
                     break
+        if not mustBeAvailable:
+            self.__callingHands[cacheKey] = result
         return result
 
     def __maybeMahjongg(self):
