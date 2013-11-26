@@ -284,7 +284,7 @@ class Client(object, pb.Referenceable):
                         self.game.debug('everybody said "I am not interested", so {} claims chow now for {}'.format(
                             self.game.myself.name, self.game.lastDiscard.name()))
                     return result
-            elif move.message in (Message.Pung, Message.Kong) and move.notifying:
+            elif move.message in (Message.Pung, Message.Kong, Message.MahJongg) and move.notifying:
                 if Debug.delayChow:
                     self.game.debug('{} said {} so {} suppresses Chow for {}'.format(
                         move.player, move.message, self.game.myself, self.game.lastDiscard.name()).replace('  ', ' '))
