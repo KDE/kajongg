@@ -398,38 +398,38 @@ class Hand(object):
         return Hand(self, b' '.join(parts))
 
     def __sub__(self, subtractTile):
-        """returns a copy of self minus subtractTile. Case of subtractTile (hidden
-        or exposed) is ignored. If the tile is not hidden
-        but found in an exposed meld, this meld will be hidden with
-        the tile removed from it. Exposed melds of length<3 will also
-        be hidden."""
+        """returns a copy of self minus subtractTiles. Case of subtractTile (hidden
+        or exposed) is ignored. If the tile is part of a declared meld, that meld
+        will be reduced and moved to the undeclared tiles.
+        Exposed melds of length<3 will also be hidden."""
         # pylint: disable=too-many-branches
-        hidden = b'R' + b''.join(self.tilesInHand)
-        # exposed is a deep copy of declaredMelds. If lastMeld is given, it
-        # must be first in the list.
-        exposed = MeldList(self.declaredMelds[:])
-        exposed = MeldList(sorted(exposed, key=lambda x: (x != self.lastMeld, x.key)))
+        # If lastMeld is given, it must be first in the list. Next try undeclared melds, then declared melds
+        newMelds = MeldList(x for x in self.melds if not x.isDeclared)
+        newMelds.extend(sorted((x for x in self.melds if x.isDeclared), key=lambda x: (x != self.lastMeld, x.key)))
+        rest = TileList()
         boni = MeldList(sorted(self.bonusMelds))
-        if bytes(subtractTile.upper()) in hidden:
-            hidden = hidden.replace(bytes(subtractTile.upper()), b'', 1)
-        elif subtractTile.isBonus:
+        if subtractTile.isBonus:
             for idx, meld in enumerate(boni):
                 if subtractTile == meld[0]:
                     del boni[idx]
                     break
         else:
-            for idx, meld in enumerate(exposed):
+            for meld in newMelds[:]:
                 if subtractTile.lower() in meld:
-                    meld = meld.without(subtractTile.lower())
-                    del exposed[idx]
-                    meld = meld.toUpper()
-                    hidden += bytes(meld)
+                    restTiles = meld.without(subtractTile.lower())
+                    newMelds.remove(meld)
+                    rest.extend(restTiles.toUpper())
                     break
-        for idx, meld in enumerate(exposed):
+                if subtractTile.upper() in meld:
+                    restTiles = meld.without(subtractTile.upper())
+                    newMelds.remove(meld)
+                    rest.extend(restTiles.toUpper())
+                    break
+        for meld in newMelds[:]:
             if len(meld) < 3:
-                del exposed[idx]
+                newMelds.remove(meld)
                 meld = meld.toUpper()
-                hidden += bytes(meld)
+                rest.extend(meld)
         mjStr = self.mjStr
         if self.lastTile == subtractTile:
             parts = mjStr.split()
@@ -443,7 +443,8 @@ class Hand(object):
                     continue
                 newParts.append(part)
             mjStr = b' '.join(newParts)
-        newString = b' '.join(bytes(x) for x in (hidden, exposed, boni, mjStr))
+        rest = b'R' + bytes(rest) if rest else b''
+        newString = b' '.join(bytes(x) for x in (newMelds, rest, boni, mjStr))
         return Hand(self, newString, self.computedRules)
 
     def manualRuleMayApply(self, rule):
