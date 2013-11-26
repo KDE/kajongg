@@ -68,6 +68,8 @@ class MahJonggFunction(Function):
         raise NotImplementedError
 
     def shouldTry(self, dummyHand, maxMissing=3):
+        """does not have to be exact, just a fast guess if it makes sense
+        to look at this possibility harder"""
         raise NotImplementedError
 
     def rearrange(self, dummyHand, pairs):
@@ -978,10 +980,18 @@ class EastWonNineTimesInARow(Function):
     def rotate(game):
         return EastWonNineTimesInARow.appliesToGame(game, needWins = EastWonNineTimesInARow.nineTimes)
 
-class GatesOfHeaven(Function):
+class GatesOfHeaven(StandardMahJongg):
     def __init__(self):
-        Function.__init__(self)
+        StandardMahJongg.__init__(self)
         self.suit = None
+    def shouldTry(self, hand):
+        for suit in b'sbc':
+            count19 = sum(x.value in b'19' for x in hand.tileNames)
+            suitCount = len(list(x for x in hand.tileNames if x.lowerGroup == suit))
+            if suitCount > 10 and count19 > 4:
+                return True
+        return False
+
     def maybeCallingOrWon(self, hand):
         suits = set(x.lowerGroup for x in hand.tileNames)
         if len(suits) != 1 or not suits < {b's', b'c', b'b'}:
