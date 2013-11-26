@@ -1250,6 +1250,9 @@ class LastOnlyPossible(Function):
     def appliesToHand(self, hand):
         if self.active or not hand.lastTile:
             return False
+        if any(hand.lastTile in x for x in hand.melds if len(x) == 4):
+            # the last tile completed a Kong
+            return False
         shortHand = hand - hand.lastTile
         self.active = True
         try:
