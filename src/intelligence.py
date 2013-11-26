@@ -91,9 +91,9 @@ class AIDefault(object):
             else:
                 filterName = aiFilter.__name__
             if Debug.robotAI:
-                prevWeights = list((x.name, x.keep) for x in candidates)
+                prevWeights = list((x.tile, x.keep) for x in candidates)
                 candidates = aiFilter(self, candidates)
-                newWeights = list((x.name, x.keep) for x in candidates)
+                newWeights = list((x.tile, x.keep) for x in candidates)
                 for oldW, newW in zip(prevWeights, newWeights):
                     if oldW != newW:
                         game.debug('%s: %s: %.3f->%.3f' % (
@@ -116,8 +116,8 @@ class AIDefault(object):
         # too many branches
         for candidate in candidates:
             keep = candidate.keep
-            group = candidate.name.group
-            value = candidate.name.value
+            group = candidate.tile.group
+            value = candidate.tile.value
             if candidate.dangerous:
                 keep += 1000
             if candidate.occurrence >= 3:
@@ -167,7 +167,7 @@ class AIDefault(object):
                 if groupCount == 1:
                     candidate.keep -= 2.013
                 else:
-                    otherGC = sum(candidates.groupCounts[x] for x in 'sbc' if x != group)
+                    otherGC = sum(candidates.groupCounts[x] for x in b'sbc' if x != group)
                     if otherGC:
                         if groupCount > 8 or otherGC < 5:
                             # do not go for color game if we already declared something in another group:
@@ -189,13 +189,13 @@ class AIDefault(object):
                 game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
                     (myself.lastTile, [str(x) for x in candidates]))
             for candidate in candidates:
-                if candidate.name == myself.lastTile.lower():
+                if candidate.tile == myself.lastTile.lower():
                     winningTiles = myself.originalCallingHand.chancesToWin()
                     if Debug.originalCall:
                         game.debug('weighOriginalCall: winningTiles=%s for %s' %
                             (winningTiles, str(myself.originalCallingHand)))
                         game.debug('weighOriginalCall respects originalCall: %s with %d' %
-                            (candidate.name, -99 * len(winningTiles)))
+                            (candidate.tile, -99 * len(winningTiles)))
                     candidate.keep -= 99 * len(winningTiles)
         return candidates
 
@@ -203,7 +203,7 @@ class AIDefault(object):
     def weighCallingHand(aiInstance, candidates):
         """if we can get a calling hand, prefer that"""
         for candidate in candidates:
-            newHand = candidates.hand - candidate.name.capitalize()
+            newHand = candidates.hand - candidate.tile.capitalize()
             winningTiles = newHand.chancesToWin()
             for winnerTile in set(winningTiles):
                 candidate.keep -= (newHand + winnerTile).total() / 10.017
@@ -311,15 +311,15 @@ class TileAI(object):
     """holds a few AI related tile properties"""
     # pylint: disable=too-many-instance-attributes
     # we do want that many instance attributes
-    def __init__(self, candidates, name):
-        assert isinstance(name, Tile), name
-        self.name = name
-        self.group, self.value = name[:2]
-        if self.value in '123456789bgreswn' and len(name) == 2:
-            self.occurrence = candidates.hiddenTiles.count(name)
-            self.available = candidates.player.tileAvailable(name, candidates.hand)
+    def __init__(self, candidates, tile):
+        assert isinstance(tile, Tile), tile
+        self.tile = tile
+        self.group, self.value = tile.group, tile.value
+        if self.value in '123456789bgreswn' and len(tile) == 2:
+            self.occurrence = candidates.hiddenTiles.count(tile)
+            self.available = candidates.player.tileAvailable(tile, candidates.hand)
             self.maxPossible = self.available + self.occurrence
-            self.dangerous = bool(candidates.player.game.dangerousFor(candidates.player, name))
+            self.dangerous = bool(candidates.player.game.dangerousFor(candidates.player, tile))
         else:
             # value might be -1, 0, 10, 11 for suits
             self.occurrence = 0
@@ -334,7 +334,7 @@ class TileAI(object):
 
     def __str__(self):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
-        return '%s:=%s%s' % (self.name, self.keep, dang)
+        return '%s:=%s%s' % (self.tile, self.keep, dang)
 
     def __repr__(self):
         return 'TileAI(%s)' % str(self)
@@ -415,8 +415,8 @@ class DiscardCandidates(list):
     def best(self):
         """returns the candidate with the lowest value"""
         lowest = min(x.keep for x in self)
-        candidates = sorted(list(x for x in self if x.keep == lowest), key=lambda x: x.name)
-        result = self.player.game.randomGenerator.choice(candidates).name.capitalize()
+        candidates = sorted(list(x for x in self if x.keep == lowest), key=lambda x: x.tile)
+        result = self.player.game.randomGenerator.choice(candidates).tile.capitalize()
         if Debug.robotAI:
             self.player.game.debug('%s: discards %s out of %s' % (self.player, result, ' '.join(str(x) for x in self)))
         return result

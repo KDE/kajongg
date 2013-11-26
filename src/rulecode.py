@@ -583,7 +583,7 @@ class TripleKnitting(MahJonggFunction):
             for candidate in candidates:
                 if candidate.group in b'dw':
                     candidate.keep -= 50
-                if rest.count(candidate.name) > 1:
+                if rest.count(candidate.tile) > 1:
                     candidate.keep -= 10
         return candidates
 
