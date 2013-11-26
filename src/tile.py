@@ -29,7 +29,7 @@ from common import IntDict
 
 class Tile(bytes):
     """a single tile"""
-    # pylint: disable=too-many-public-methods, abstract-class-not-used
+    # pylint: disable=too-many-public-methods, abstract-class-not-used, too-many-instance-attributes
     cache = {}
     hashTable = b'XyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
                 b'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \
@@ -73,6 +73,7 @@ class Tile(bytes):
             self.group = self[:1]
             self.value = self[1:]
             self.lowerGroup = self.group.lower()
+            self.isExposed = self.group == self.lowerGroup
             self.isBonus = self.group in b'fy'
             self.isDragon = self.lowerGroup == b'd'
             self.isWind = self.lowerGroup == b'w'

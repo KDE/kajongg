@@ -70,18 +70,20 @@ class Meld(TileList):
         - a list of Tile objects"""
         if not hasattr(self, '_fixed'): # already defined if I am from cache
             TileList.__init__(self, newContent)
-            assert len(self) < 5, newContent
             self.key = TileList.key(self)
             if self.key not in self.cache:
                 self.cache[self.key] = self
                 self.cache[bytes(self)] = self
             self.isExposed = self.__getState()
             self.isSingle = self.isPair = self.isChow = self.isPung = False
-            self.isKong = self.isClaimedKong = self.isRest = False
+            self.isKong = self.isClaimedKong = self.isKnitted = False
+            self.isKnown = True
             self.isDragonMeld = len(self) and self[0].isDragon
             self.isWindMeld = len(self) and self[0].isWind
             self.isHonorMeld = self.isDragonMeld or self.isWindMeld
+            self.isKnown = len(self) and self[0].isKnown
             self.__setMeldType()
+            self.isDeclared = self.isExposed or self.isKong
             groups = set(x.group.lower() for x in self)
             if len(groups) == 1:
                 self.group = self[0].group
@@ -89,6 +91,7 @@ class Meld(TileList):
             else:
                 self.group = b'X'
                 self.lowerGroup = b'x'
+            self.isRest = False
             self._fixed = True
 
     def __setattr__(self, name, value):
@@ -124,7 +127,7 @@ class Meld(TileList):
                 remove = None
             else:
                 tiles.append(tile)
-        return Meld(tiles)
+        return tiles
 
     def toLower(self, first=None, last=None):
         """use first and last as for ranges"""
@@ -158,8 +161,14 @@ class Meld(TileList):
         """compute meld type. Except knitting melds."""
         # pylint: disable=too-many-branches,too-many-return-statements
         length = len(self)
-        if any(not x.isKnown for x in self) or length > 4:
-            self.isRest = True
+        if length == 0:
+            return
+        if length > 4:
+            raise UserWarning('Meld %s is too long' % self)
+        if any(not x.isKnown for x in self):
+            if len(set(self)) != 1:
+                raise UserWarning('Meld %s: Cannot mix known and unknown tiles')
+            self.isKnown = False
             return
         if length == 1:
             self.isSingle = True
@@ -167,8 +176,11 @@ class Meld(TileList):
         if length == 2:
             if self[0] == self[1]:
                 self.isPair = True
+            elif self[0].value == self[1].value and self[0].islower() == self[1].islower() \
+                and all(x.group in b'sbcSBC' for x in self):
+                self.isKnitted = True
             else:
-                self.isRest = True
+                raise UserWarning('Meld %s is malformed' % self)
             return
         # now length is 3 or 4
         tiles = set(self)
@@ -178,25 +190,26 @@ class Meld(TileList):
             else:
                 self.isKong = True
             return
+        if len(tiles) == 3 and length == 3:
+            if len(set(x.value for x in tiles)) == 1:
+                if sum(x.islower() for x in tiles) in (0, 3):
+                    if len(set(x.group for x in tiles)) == 3:
+                        if all(x.group in b'sbcSBC' for x in tiles):
+                            self.isKnitted = True
+                            return
         groups = set(x.group for x in self)
-        if len(groups) > 2:
-            self.isRest = True
-            return
-        if len(set(x.lower() for x in groups)) > 1:
-            self.isRest = True
-            return
+        if len(groups) > 2 or len(set(x.lower() for x in groups)) > 1:
+            raise UserWarning('Meld %s is malformed' % self)
         values = set(x.value for x in self)
         if length == 4:
             if len(values) > 1:
-                self.isRest = True
-            if self.isUpper():
-                self.isRest = True
-            elif self.isLower(0, 3) and self.isUpper(3):
+                raise UserWarning('Meld %s is malformed' % self)
+            if self.isLower(0, 3) and self.isUpper(3):
                 self.isKong = self.isClaimedKong = True
             elif self.isUpper(1, 3) and self.isLower(0) and self.isLower(3):
                 self.isKong = True
             else:
-                assert False, self
+                raise UserWarning('Meld %s is malformed' % self)
             return
         # only possibilities left are CHOW and REST
         # length is 3
@@ -206,7 +219,7 @@ class Meld(TileList):
                 if values[2] == values[0] + 2 and values[1] == values[0] + 1:
                     self.isChow = True
                     return
-        self.isRest = True
+        raise UserWarning('Meld %s is malformed' % self)
 
     def expose(self, isClaiming):
         """expose this meld. For kungs, leave one or two concealed,
