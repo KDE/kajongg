@@ -49,7 +49,11 @@ class Hand(object):
 
     lenOffset is <0 for short hand, 0 for correct calling hand, >0 for long hand.
     Of course ignoring bonus tiles.
-    if there are no kongs, 13 tiles will return 0"""
+    if there are no kongs, 13 tiles will return 0
+
+    declaredMelds are not just the exposed melds but also those we
+    want to be pre-fixed while evaluating this hand. Only tiles
+    passed in the 'R' substring may be rearranged. """
 
     # pylint: disable=too-many-instance-attributes
 
@@ -140,8 +144,6 @@ class Hand(object):
         self.__lastTile = self.__lastSource = self.__announcements = b''
         self.__lastMeld = 0
         self.__lastMelds = MeldList()
-        self.hiddenMelds = MeldList()
-        self.declaredMelds = MeldList()
         self.melds = MeldList()
         self.bonusMelds, tileStrings = self.__separateBonusMelds(tileStrings)
         tileString = b' '.join(tileStrings)
@@ -151,21 +153,17 @@ class Hand(object):
         self.suits = set(x.lowerGroup for x in self.tileNames)
         for split in tileStrings[:]:
             if split[:1] != b'R':
-                meld = Meld(split)
-                self.melds.append(meld)
-                self.declaredMelds.append(meld)
+                self.melds.append(Meld(split))
                 tileStrings.remove(split)
+        self.declaredMelds = MeldList(x for x in self.melds if x.isDeclared)
+        declaredTiles = list(sum((x for x in self.declaredMelds), []))
+        self.tilesInHand = TileList(x for x in self.tileNames if x not in declaredTiles)
         self.lenOffset = len(self.tileNames) - 13 - sum(x.isKong for x in self.melds)
         assert len(tileStrings) < 2, tileStrings
         if len(tileStrings):
             self.__split(sorted(TileList(tileStrings[0][1:])))
         self.melds.sort()
-        self.__categorizeMelds()
-        self.hiddenMelds.sort()
         self.hasHonorMelds = any(x.isHonorMeld for x in self.melds)
-        self.tilesInHand = sum(self.hiddenMelds, [])
-        for tile in self.tilesInHand:
-            assert isinstance(tile, Tile), self.tilesInHand
 
         self.usedRules = []
         self.score = None
@@ -601,16 +599,6 @@ class Hand(object):
                     bonusMelds.append(Meld(tile))
                     tileStrings.remove(tileString)
         return bonusMelds, tileStrings
-
-    def __categorizeMelds(self):
-        """categorize: hidden, declared"""
-        self.hiddenMelds = MeldList()
-        self.declaredMelds = MeldList()
-        for meld in self.melds:
-            if not meld.isExposed and not meld.isKong:
-                self.hiddenMelds.append(meld)
-            else:
-                self.declaredMelds.append(meld)
 
     def explain(self):
         """explain what rules were used for this hand"""

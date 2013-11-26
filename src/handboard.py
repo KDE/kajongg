@@ -373,11 +373,13 @@ class PlayingHandBoard(HandBoard):
         """a list of melds for the hand as it should look after sync"""
         if self.player.concealedMelds:
             result = MeldList(self.player.concealedMelds)
-        else:
+        elif self.player.concealedTileNames:
             tileStr = 'R' + ''.join(str(x) for x in self.player.concealedTileNames)
             handStr = ' '.join([tileStr, self.player.mjString()])
             content = Hand(self.player, handStr)
             result = MeldList(content.melds + content.bonusMelds)
+        else:
+            return []
         if not self.rearrangeMelds:
             result = MeldList(Meld(x) for x in result.tiles()) # one meld per tile
         result.sort()

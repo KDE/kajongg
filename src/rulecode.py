@@ -268,14 +268,7 @@ class StandardMahJongg(MahJonggFunction):
     @staticmethod
     def computeLastMelds(hand):
         """returns all possible last melds"""
-        if not hand.lastTile:
-            return
-        if hand.lastTile.group.isupper():
-            # TODO: split rest
-            checkMelds = hand.hiddenMelds
-        else:
-            checkMelds = hand.declaredMelds
-        return MeldList(x for x in checkMelds if hand.lastTile in x and len(x) < 4)
+        return MeldList(x for x in hand.melds if hand.lastTile in x and len(x) < 4)
 
     @staticmethod
     def appliesToHand(hand):
@@ -703,7 +696,7 @@ class Knitting(MahJonggFunction):
         return len(self.findCouples(hand)[0]) == 7
 
     def winningTileCandidates(self, hand):
-        if hand.declaredMelds:
+        if any(x.isDeclared for x in hand.melds):
             return set()
         if hand.hasHonorMelds:
             return set()
@@ -720,7 +713,7 @@ class Knitting(MahJonggFunction):
         return set([otherTile])
     def rearrange(self, hand, pairs):
         melds = []
-        for couple in self.findCouples(hand)[0]:
+        for couple in self.findCouples(hand, pairs)[0]:
             if couple[0].islower():
                 # this is the mj pair, lower after claiming
                 continue
@@ -728,7 +721,7 @@ class Knitting(MahJonggFunction):
             pairs.remove(couple[0])
             pairs.remove(couple[1])
         return melds, pairs
-    def findCouples(self, hand):
+    def findCouples(self, hand, pairs=None):
         """returns a list of tuples, including the mj couple.
         Also returns the remaining uncoupled tiles IF they
         are of the wanted suits"""
@@ -736,11 +729,13 @@ class Knitting(MahJonggFunction):
             if len(hand.declaredMelds) > 1 or len(hand.declaredMelds[0]) > 2:
                 return [], []
         result = []
+        if pairs is None:
+            pairs = hand.tileNames
         suits = self.pairSuits(hand)
         if not suits:
             return [], []
-        tiles0 = list(x for x in hand.tileNames if x.lowerGroup == suits[0])
-        tiles1 = list(x for x in hand.tileNames if x.lowerGroup == suits[1])
+        tiles0 = list(x for x in pairs if x.lowerGroup == suits[0])
+        tiles1 = list(x for x in pairs if x.lowerGroup == suits[1])
         for tile0 in tiles0[:]:
             if tile0.islower():
                 tile1 = Tile(suits[1], tile0.value)

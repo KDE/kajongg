@@ -25,7 +25,7 @@ from log import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, Internal, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, TileList, elements
-from meld import Meld
+from meld import Meld, MeldList
 from message import Message
 from hand import Hand
 from intelligence import AIDefault
@@ -553,7 +553,7 @@ class PlayingPlayer(Player):
             if Debug.mahJongg:
                 game.debug('%s may say MJ:%s, active=%s' % (
                     self, list(x for x in game.players), game.activePlayer))
-            return hand.hiddenMelds, withDiscard, hand.lastMeld
+            return MeldList(x for x in hand.melds if not x.isDeclared), withDiscard, hand.lastMeld
 
     def __maySayOriginalCall(self):
         """returns True if Original Call is possible"""
