@@ -179,15 +179,6 @@ class AIDefault(object):
                 candidate.keep += 15.157
         return candidates
 
-    def respectOriginalCall(self):
-        """True if we said CaO and can still win without violating it"""
-        if not self.player.originalCall or not self.player.mayWin:
-            return False
-        result = self.player.originalCallingHand.chancesToWin()
-        if not result:
-            self.player.mayWin = False # bad luck
-        return result
-
     @staticmethod
     def weighOriginalCall(aiInstance, candidates):
         """if we declared Original Call, respect it"""
@@ -238,18 +229,16 @@ class AIDefault(object):
         if discard:
             for func in self.player.game.ruleset.filterFunctions('claimness'):
                 claimness += func.claimness(hand, discard)
+        if Debug.robotAI and len(claimness):
+            hand.debug('claimnesses in selectAnswer:%s' % claimness)
         for tryAnswer in tryAnswers:
             parameter = self.player.sayable[tryAnswer]
             if not parameter:
                 continue
             if claimness[tryAnswer] < 0:
-                if Debug.robotAI:
-                    hand.debug('claimness %d inhibits %s %s' % (claimness[tryAnswer], tryAnswer, parameter))
                 continue
             if tryAnswer in [Message.Discard, Message.OriginalCall]:
                 parameter = self.selectDiscard(hand)
-            elif tryAnswer in [Message.Pung, Message.Chow, Message.Kong] and self.respectOriginalCall():
-                continue
             elif tryAnswer == Message.Pung and self.player.maybeDangerous(tryAnswer):
                 continue
             elif tryAnswer == Message.Chow:

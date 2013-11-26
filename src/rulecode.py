@@ -1172,6 +1172,21 @@ class MahJonggWithOriginalCall(Function):
         # the previous regex was too strict
         return sum(x.isExposed for x in hand.melds) < 3
 
+    @staticmethod
+    def claimness(hand, dummyDiscard):
+        result = IntDict()
+        if hand.player:
+            if hand.player.originalCall and hand.player.mayWin:
+                winningChances = hand.player.originalCallingHand.chancesToWin()
+                if not winningChances:
+                    hand.player.mayWin = False # bad luck
+                else:
+                    # winning with OriginalCall is still possible
+                    result[Message.Pung] = -999
+                    result[Message.Kong] = -999
+                    result[Message.Chow] = -999
+        return result
+
 class TwofoldFortune(Function):
     @staticmethod
     def appliesToHand(hand):
