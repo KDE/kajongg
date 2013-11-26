@@ -219,6 +219,9 @@ class AIDefault(object):
             if winningTiles:
                 # more weight if we have several chances to win
                 candidate.keep -= float(len(winningTiles)) / len(set(winningTiles)) * 5.031
+                if Debug.robotAI:
+                    aiInstance.player.game.debug('weighCallingHand %s for %s winningTiles:%s' % (
+                        newHand, candidates.hand, winningTiles))
         return candidates
 
     def selectAnswer(self, answers):
@@ -299,7 +302,7 @@ class AIDefault(object):
         This will become the central part of AI -
         moves will be done which optimize the hand value"""
         hand = self.player.hand
-        assert not hand.handlenOffset(), hand
+        assert not hand.lenOffset, hand
         result = 0
         if hand.won:
             return 1000
@@ -311,7 +314,7 @@ class AIDefault(object):
             if not meld.isChow:
                 result += 40
         garbage = []
-        for meld in []: # hand.hiddenMelds does not exist anymore
+        for meld in (x for x in hand.melds if not x.isExposed):
             assert len(meld) < 4, hand
             if meld.isPung:
                 result += 50
@@ -362,6 +365,9 @@ class DiscardCandidates(list):
         list.__init__(self)
         self._player = weakref.ref(player)
         self._hand = weakref.ref(hand)
+        if Debug.robotAI:
+            player.game.debug('DiscardCandidates for hand %s are %s' % (
+                hand, hand.tilesInHand))
         self.hiddenTiles = list(x.lower() for x in hand.tilesInHand)
         self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
         for tile in self.hiddenTiles:
