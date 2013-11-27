@@ -30,12 +30,12 @@ from util import removeIfExists, commit
 from log import initLog
 
 # fields in row:
-RULESET = 0
-AI = 1
-COMMIT = 2
-GAME = 3
-TAGS = 4
-PLAYERS = 5
+RULESETFIELD = 0
+AIFIELD = 1
+COMMITFIELD = 2
+GAMEFIELD = 3
+TAGSFIELD = 4
+PLAYERSFIELD = 5
 
 def neutralize(rows):
     """remove things we do not want to compare"""
@@ -62,8 +62,8 @@ def readGames(csvFile):
     allRows = set(tuple(x) for x in allRows)
     games = dict()
     # build set of rows for every ai
-    for variant in set(tuple(x[:COMMIT]) for x in allRows):
-        games[variant] = frozenset(x for x in allRows if tuple(x[:COMMIT]) == variant)
+    for variant in set(tuple(x[:COMMITFIELD]) for x in allRows):
+        games[variant] = frozenset(x for x in allRows if tuple(x[:COMMITFIELD]) == variant)
     return games
 
 def printDifferingResults(rowLists):
@@ -72,13 +72,13 @@ def printDifferingResults(rowLists):
     allGameIds = {}
     for rows in rowLists:
         for row in rows:
-            rowId = row[GAME]
+            rowId = row[GAMEFIELD]
             if rowId not in allGameIds:
                 allGameIds[rowId] = []
             allGameIds[rowId].append(row)
     differing = []
     for key, value in allGameIds.items():
-        if len(set(tuple(list(x)[GAME:]) for x in value)) > len(set(tuple(list(x)[:COMMIT]) for x in value)):
+        if len(set(tuple(list(x)[GAMEFIELD:]) for x in value)) > len(set(tuple(list(x)[:COMMITFIELD]) for x in value)):
             differing.append(key)
     if not differing:
         print('no games differ')
@@ -92,11 +92,11 @@ def evaluate(games):
         return
     commonGames = set()
     for variant, rows in games.items():
-        gameIds = set(x[GAME] for x in rows)
-        if len(gameIds) != len(set(tuple(list(x)[GAME:]) for x in rows)):
+        gameIds = set(x[GAMEFIELD] for x in rows)
+        if len(gameIds) != len(set(tuple(list(x)[GAMEFIELD:]) for x in rows)):
             print('ruleset "%s" AI "%s" has different rows for games' % (variant[0], variant[1]), end=' ')
             for game in sorted(gameIds, key=int):
-                if len(set(tuple(x[GAME:] for x in rows if x[GAME] == game))) > 1:
+                if len(set(tuple(x[GAMEFIELD:] for x in rows if x[GAMEFIELD] == game))) > 1:
                     print(game, end=' ')
             print()
             break
@@ -113,7 +113,7 @@ def evaluate(games):
         print('{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset = ruleset[:25], ai=aiVariant[:20],
             games=len(commonGames)), end=' ')
         for playerIdx in range(4):
-            print('{p:>8}'.format(p=sum(int(x[PLAYERS+1+playerIdx*4]) for x in rows if x[GAME] in commonGames)),
+            print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD+1+playerIdx*4]) for x in rows if x[GAMEFIELD] in commonGames)),
                 end=' ')
         print()
     print()
@@ -124,7 +124,7 @@ def evaluate(games):
             print('{ruleset:<25} {ai:<20} {rows:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
                 rows=len(rows)), end=' ')
             for playerIdx in range(4):
-                print('{p:>8}'.format(p=sum(int(x[PLAYERS+1+playerIdx*4]) for x in rows)), end=' ')
+                print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD+1+playerIdx*4]) for x in rows)), end=' ')
             print()
 
 def proposeGames(games, optionAIVariants, rulesets):
@@ -133,7 +133,7 @@ def proposeGames(games, optionAIVariants, rulesets):
     if not games:
         return []
     for key, value in games.items():
-        games[key] = frozenset(int(x[GAME]) for x in value)  # we only want the game
+        games[key] = frozenset(int(x[GAMEFIELD]) for x in value)  # we only want the game
     for ruleset in rulesets.split(','):
         for aiVariant in optionAIVariants.split(','):
             variant = tuple([ruleset, aiVariant])
