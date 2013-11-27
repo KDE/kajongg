@@ -27,7 +27,7 @@ from tile import Tile
 class AIDefault(object):
     """all AI code should go in here"""
 
-    groupPrefs = {'s':0, 'b':0, 'c':0, 'w':4, 'd':7}
+    groupPrefs = dict(zip(Tile.colors + Tile.honors, (0, 0, 0, 4, 7)))
 
     # pylint: disable=no-self-use
     # we could solve this by moving those filters into DiscardCandidates
@@ -116,24 +116,24 @@ class AIDefault(object):
         # too many branches
         for candidate in candidates:
             keep = candidate.keep
-            group = candidate.tile.group
-            value = candidate.tile.value
+            tile = candidate.tile
+            value = tile.value
             if candidate.dangerous:
                 keep += 1000
             if candidate.occurrence >= 3:
                 keep += 10.04
             elif candidate.occurrence == 2:
                 keep += 5.08
-            keep += aiInstance.groupPrefs[group]
-            if group == 'w':
+            keep += aiInstance.groupPrefs[tile.group]
+            if tile.isWind:
                 if value == candidates.hand.ownWind:
                     keep += 1.01
                 if value == candidates.hand.roundWind:
                     keep += 1.02
-            if value in '19':
+            if value in b'19':
                 keep += 2.16
             if candidate.maxPossible == 1:
-                if group in 'wd':
+                if tile.isHonor:
                     keep -= 8.32
                     # not too much, other players might profit from this tile
                 else:
@@ -144,7 +144,7 @@ class AIDefault(object):
                         if not candidate.next.maxPossible or not candidate.next2.maxPossible:
                             keep -= 100
             if candidate.available == 1 and candidate.occurrence == 1:
-                if group in 'wd':
+                if tile.isHonor:
                     keep -= 3.64
                 else:
                     if not candidate.next.maxPossible:
@@ -160,23 +160,25 @@ class AIDefault(object):
     def weighSpecialGames(dummyAiInstance, candidates):
         """like color game, many dragons, many winds"""
         for candidate in candidates:
-            group = candidate.group
-            groupCount = candidates.groupCounts[group]
-            if group in Tile.colors:
+            tile = candidate.tile
+            groupCount = candidates.groupCounts[tile.group]
+            if tile.isWind:
+                if groupCount > 8:
+                    candidate.keep += 10.153
+            elif tile.isDragon:
+                if groupCount > 7:
+                    candidate.keep += 15.157
+            else:
                 # count tiles with a different group:
                 if groupCount == 1:
                     candidate.keep -= 2.013
                 else:
-                    otherGC = sum(candidates.groupCounts[x] for x in Tile.colors if x != group)
+                    otherGC = sum(candidates.groupCounts[x] for x in Tile.colors if x != tile.group)
                     if otherGC:
                         if groupCount > 8 or otherGC < 5:
                             # do not go for color game if we already declared something in another group:
-                            if not any(candidates.declaredGroupCounts[x] for x in Tile.colors if x != group):
+                            if not any(candidates.declaredGroupCounts[x] for x in Tile.colors if x != tile.group):
                                 candidate.keep += 20 // otherGC
-            elif group == 'w' and groupCount > 8:
-                candidate.keep += 10.153
-            elif group == 'd' and groupCount > 7:
-                candidate.keep += 15.157
         return candidates
 
     @staticmethod
@@ -332,6 +334,10 @@ class TileAI(object):
         self.prev2 = None
         self.next2 = None
 
+    def __lt__(self, other):
+        """for sorting"""
+        return self.tile < other.tile
+
     def __str__(self):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
         return '%s:=%s%s' % (self.tile, self.keep, dang)
@@ -415,7 +421,7 @@ class DiscardCandidates(list):
     def best(self):
         """returns the candidate with the lowest value"""
         lowest = min(x.keep for x in self)
-        candidates = sorted(list(x for x in self if x.keep == lowest), key=lambda x: x.tile)
+        candidates = sorted(x for x in self if x.keep == lowest)
         result = self.player.game.randomGenerator.choice(candidates).tile.capitalize()
         if Debug.robotAI:
             self.player.game.debug('%s: discards %s out of %s' % (self.player, result, ' '.join(str(x) for x in self)))

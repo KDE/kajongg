@@ -40,6 +40,9 @@ class Tile(bytes):
         # intelligence.py will define Tile('b0') or Tile('s:')
     unknown = None
     colors = b'sbc'
+    wind = b'w'
+    dragon = b'd'
+    honors = wind + dragon
 
     def __new__(cls, *args):
         if isinstance(args[0], Tile):
