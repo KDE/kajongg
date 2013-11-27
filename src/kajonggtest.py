@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
 
-import os, sys, csv, subprocess, random
+import os, sys, csv, subprocess, random, atexit
 
 from optparse import OptionParser
 
@@ -36,6 +36,8 @@ COMMITFIELD = 2
 GAMEFIELD = 3
 TAGSFIELD = 4
 PLAYERSFIELD = 5
+
+SERVERS = []
 
 def neutralize(rows):
     """remove things we do not want to compare"""
@@ -159,7 +161,8 @@ def srcDir():
 
 def startServers(options):
     """starts count servers and returns a list of them"""
-    serverProcesses = [None] * options.servers
+    global SERVERS
+    SERVERS = [None] * options.servers
     for idx in range(options.servers):
         socketName = 'sock{idx}.{rnd}'.format(idx=idx, rnd=random.randrange(10000000))
         cmd = ['{src}/kajonggserver.py'.format(src=srcDir()),
@@ -167,18 +170,17 @@ def startServers(options):
                 '--socket={sock}'.format(sock=socketName)]
         if options.debug:
             cmd.append('--debug={dbg}'.format(dbg=options.debug))
-        serverProcesses[idx] = (subprocess.Popen(cmd), socketName)
-    return serverProcesses
+        SERVERS[idx] = (subprocess.Popen(cmd), socketName)
 
-def stopServers(serverProcesses):
+def stopServers():
     """stop server processes"""
-    for process, socketName in serverProcesses:
+    for process, socketName in SERVERS:
         process.terminate()
         _ = process.wait()
         removeIfExists(socketName)
 
 
-def doJobs(jobs, options, serverProcesses):
+def doJobs(jobs, options):
     """now execute all jobs"""
     # pylint: disable=too-many-branches
     # too many local branches
@@ -207,10 +209,10 @@ def doJobs(jobs, options, serverProcesses):
                 ruleset, aiVariant = _
                 # never login to the same server twice at the
                 # same time with the same player name
-                player = qIdx // len(serverProcesses) + 1
+                player = qIdx // len(SERVERS) + 1
                 cmd = ['{src}/kajongg.py'.format(src=srcDir()),
                       '--game={game}'.format(game=game),
-                      '--socket={sock}'.format(sock=serverProcesses[srvIdx][1]),
+                      '--socket={sock}'.format(sock=SERVERS[srvIdx][1]),
                       '--player=Tester {player}'.format(player=player),
                       '--ruleset={ap}'.format(ap=ruleset)]
                 if aiVariant != 'Default':
@@ -227,7 +229,7 @@ def doJobs(jobs, options, serverProcesses):
                     cmd.append('--debug={dbg}'.format(dbg=options.debug))
                 clients[qIdx] = subprocess.Popen(cmd)
                 srvIdx += 1
-                srvIdx %= len(serverProcesses)
+                srvIdx %= len(SERVERS)
 #    except KeyboardInterrupt:
 #        pass
     finally:
@@ -329,11 +331,11 @@ def main():
 
     print()
 
-    serverProcesses = startServers(options)
+    startServers(options)
     try:
         if options.fill:
             jobs = proposeGames(readGames(options.csv), options.aiVariants, options.rulesets)
-            doJobs(jobs, options, serverProcesses)
+            doJobs(jobs, options)
 
         if options.count:
             if options.game:
@@ -345,13 +347,17 @@ def main():
             allAis = options.aiVariants.split(',')
             for game in games:
                 jobs.extend([(tuple([x, y]), game) for x in rulesets for y in allAis])
-            doJobs(jobs, options, serverProcesses)
+            doJobs(jobs, options)
     finally:
-        stopServers(serverProcesses)
+        stopServers()
 
     if options.csv:
         evaluate(readGames(options.csv))
 
+def cleanup():
+    stopServers()
+
 # is one server for two clients.
 if __name__ == '__main__':
+    atexit.register(stopServers)
     main()
