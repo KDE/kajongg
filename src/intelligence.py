@@ -50,7 +50,7 @@ class AIDefault(object):
     def weighSameColors(dummyAiInstance, candidates):
         """weigh tiles of same group against each other"""
         for candidate in candidates:
-            if candidate.group in 'sbc':
+            if candidate.group in Tile.colors:
                 if candidate.prev.occurrence:
                     candidate.prev.keep += 1.001
                     candidate.keep += 1.002
@@ -162,16 +162,16 @@ class AIDefault(object):
         for candidate in candidates:
             group = candidate.group
             groupCount = candidates.groupCounts[group]
-            if group in 'sbc':
+            if group in Tile.colors:
                 # count tiles with a different group:
                 if groupCount == 1:
                     candidate.keep -= 2.013
                 else:
-                    otherGC = sum(candidates.groupCounts[x] for x in b'sbc' if x != group)
+                    otherGC = sum(candidates.groupCounts[x] for x in Tile.colors if x != group)
                     if otherGC:
                         if groupCount > 8 or otherGC < 5:
                             # do not go for color game if we already declared something in another group:
-                            if not any(candidates.declaredGroupCounts[x] for x in 'sbc' if x != group):
+                            if not any(candidates.declaredGroupCounts[x] for x in Tile.colors if x != group):
                                 candidate.keep += 20 // otherGC
             elif group == 'w' and groupCount > 8:
                 candidate.keep += 10.153
@@ -376,7 +376,7 @@ class DiscardCandidates(list):
         """define values for candidate.prev and candidate.next"""
         prev = prev2 = None
         for this in self:
-            if this.group in 'sbc':
+            if this.group in Tile.colors:
                 thisValue = this.value
                 if prev and prev.group == this.group:
                     if int(prev.value) + 1 == int(thisValue):
@@ -391,7 +391,7 @@ class DiscardCandidates(list):
             prev2 = prev
             prev = this
         for this in self:
-            if this.group in 'sbc':
+            if this.group in Tile.colors:
                 # we want every tile to have prev/prev2/next/next2
                 # the names do not matter, just occurrence, available etc
                 thisValue = ord(this.value)

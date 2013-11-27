@@ -969,7 +969,7 @@ class GatesOfHeaven(StandardMahJongg):
         StandardMahJongg.__init__(self)
         self.suit = None
     def shouldTry(self, hand):
-        for suit in b'sbc':
+        for suit in Tile.colors:
             count19 = sum(x.value in b'19' for x in hand.tileNames)
             suitCount = len(list(x for x in hand.tileNames if x.lowerGroup == suit))
             if suitCount > 10 and count19 > 4:
@@ -978,7 +978,7 @@ class GatesOfHeaven(StandardMahJongg):
 
     def maybeCallingOrWon(self, hand):
         suits = set(x.lowerGroup for x in hand.tileNames)
-        if len(suits) != 1 or not suits < {b's', b'c', b'b'}:
+        if len(suits) != 1 or not suits < Byteset(Tile.colors):
             return False
         self.suit = suits.pop()
         for meld in hand.declaredMelds:

@@ -25,7 +25,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 
 from log import m18nc
-from tile import TileList, PYTHON3
+from tile import Tile, TileList, PYTHON3
 
 class Meld(TileList):
     """represents a meld. Can be empty. Many Meld methods will
@@ -177,7 +177,7 @@ class Meld(TileList):
             if self[0] == self[1]:
                 self.isPair = True
             elif self[0].value == self[1].value and self[0].islower() == self[1].islower() \
-                and all(x.group in b'sbcSBC' for x in self):
+                and all(x.lowerGroup in Tile.colors for x in self):
                 self.isKnitted = True
             else:
                 raise UserWarning('Meld %s is malformed' % self)
@@ -194,7 +194,7 @@ class Meld(TileList):
             if len(set(x.value for x in tiles)) == 1:
                 if sum(x.islower() for x in tiles) in (0, 3):
                     if len(set(x.group for x in tiles)) == 3:
-                        if all(x.group in b'sbcSBC' for x in tiles):
+                        if all(x.lowerGroup in Tile.colors for x in tiles):
                             self.isKnitted = True
                             return
         groups = set(x.group for x in self)
@@ -214,7 +214,7 @@ class Meld(TileList):
         # only possibilities left are CHOW and REST
         # length is 3
         if len(groups) == 1:
-            if groups.pop() in b'sbcSBC':
+            if groups.pop().lower() in Tile.colors:
                 values = list(ord(x.value) for x in self)
                 if values[2] == values[0] + 2 and values[1] == values[0] + 1:
                     self.isChow = True

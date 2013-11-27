@@ -745,7 +745,7 @@ class PlayingPlayer(Player):
             group = defaultdict.keys(self.visibleTiles)[0].group
             # see http://www.logilab.org/ticket/23986
             assert group.islower(), self.visibleTiles
-            if group in 'sbc':
+            if group in Tile.colors:
                 if all(x.group == group for x in self.visibleTiles):
                     suitTiles = set([group+x for x in '123456789'])
                     if self.visibleTiles.count(suitTiles) >= 9:

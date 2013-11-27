@@ -39,6 +39,7 @@ class Tile(bytes):
         # the // is needed as separator between too many w's
         # intelligence.py will define Tile('b0') or Tile('s:')
     unknown = None
+    colors = b'sbc'
 
     def __new__(cls, *args):
         if isinstance(args[0], Tile):
@@ -336,7 +337,7 @@ class Elements(object):
         self.minors = Tileset()
         self.mINORS = Tileset()
         self.greenHandTiles = Tileset([b'dg', b'b2', b'b3', b'b4', b'b6', b'b8'])
-        for group in b'sbc':
+        for group in Tile.colors:
             for value in b'2345678':
                 self.minors.add(Tile(group, value))
         for tile in self.majors:
