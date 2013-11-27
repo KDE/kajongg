@@ -21,7 +21,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
 
-import os, sys, csv, subprocess, random, atexit
+import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+import os, sys, csv, subprocess, random, shutil, time
+from collections import OrderedDict, defaultdict
+from tempfile import mkdtemp
 
 from optparse import OptionParser
 
@@ -37,7 +42,22 @@ GAMEFIELD = 3
 TAGSFIELD = 4
 PLAYERSFIELD = 5
 
-SERVERS = []
+COMMIT = OrderedDict()
+SERVERS = defaultdict(list)
+
+class Job(object):
+    """a simple container"""
+    def __init__(self, ruleset, aiVariant, commitId, game):
+        self.ruleset = ruleset
+        self.aiVariant = aiVariant
+        self.commitId = commitId
+        self.game = game
+
+    def __str__(self):
+        return '{ruleset} AI={aiVariant} commit={commitId} {game}'.format(**self.__dict__)
+
+    def __repr__(self):
+        return 'Job(%s)' % str(self)
 
 def neutralize(rows):
     """remove things we do not want to compare"""
@@ -115,8 +135,8 @@ def evaluate(games):
         print('{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset = ruleset[:25], ai=aiVariant[:20],
             games=len(commonGames)), end=' ')
         for playerIdx in range(4):
-            print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD+1+playerIdx*4]) for x in rows if x[GAMEFIELD] in commonGames)),
-                end=' ')
+            print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD+1+playerIdx*4])
+                    for x in rows if x[GAMEFIELD] in commonGames)), end=' ')
         print()
     print()
     print('all games:')
@@ -129,94 +149,100 @@ def evaluate(games):
                 print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD+1+playerIdx*4]) for x in rows)), end=' ')
             print()
 
-def proposeGames(games, optionAIVariants, rulesets):
-    """fill holes: returns games for testing such that the csv file
-    holds more games tested for all variants"""
-    if not games:
-        return []
-    for key, value in games.items():
-        games[key] = frozenset(int(x[GAMEFIELD]) for x in value)  # we only want the game
-    for ruleset in rulesets.split(','):
-        for aiVariant in optionAIVariants.split(','):
-            variant = tuple([ruleset, aiVariant])
-            if variant not in games:
-                games[variant] = frozenset()
-    allgames = reduce(lambda x, y: x|y, games.values())
-    occ = []
-    for game in allgames:
-        count = sum(game in x for x in games.values())
-        if count < len(games.values()):
-            occ.append((game, count))
-    result = []
-    for game in list(x[0] for x in sorted(occ, key=lambda x: -x[1])):
-        for variant, ids in games.items():
-            ruleset, aiVariant = variant
-            if game not in ids:
-                result.append((variant, game))
-    return result
-
-def srcDir():
+def startingDir():
     """the path of the directory where kajonggtest has been started in"""
     return os.path.dirname(sys.argv[0])
 
-def startServers(options):
+def srcDir(commitId):
+    """the path of the directory where the particular test is running"""
+    if commitId:
+        return os.path.join(COMMIT[commitId], 'src')
+    else:
+        return '.'
+
+def startServersFor(job, options):
     """starts count servers and returns a list of them"""
-    global SERVERS
-    SERVERS = [None] * options.servers
-    for idx in range(options.servers):
-        socketName = 'sock{idx}.{rnd}'.format(idx=idx, rnd=random.randrange(10000000))
-        cmd = ['{src}/kajonggserver.py'.format(src=srcDir()),
-                '--local', '--continue',
-                '--socket={sock}'.format(sock=socketName)]
-        if options.debug:
-            cmd.append('--debug={dbg}'.format(dbg=options.debug))
-        SERVERS[idx] = (subprocess.Popen(cmd), socketName)
+    if job.commitId not in COMMIT:
+        COMMIT[job.commitId] = cloneSource(job.commitId) if job.commitId else '.'
+    if job.commitId not in SERVERS:
+        SERVERS[job.commitId] = [None] * options.servers
+        for idx in range(options.servers):
+            socketName = 'sock{idx}.{rnd}'.format(idx=idx, rnd=random.randrange(10000000))
+            print('starting server for commit %s' % (job.commitId))
+            cmd = ['{src}/kajonggserver.py'.format(src=srcDir(job.commitId)),
+                    '--local', '--continue',
+                    '--socket={sock}'.format(sock=socketName)]
+            if options.debug:
+                cmd.append('--debug={dbg}'.format(dbg=options.debug))
+            popen = subprocess.Popen(cmd, cwd=srcDir(job.commitId))
+            SERVERS[job.commitId][idx] = (popen, socketName)
+            time.sleep(1) # make sure server runs before client is started
 
 def stopServers():
-    """stop server processes"""
-    for process, socketName in SERVERS:
-        process.terminate()
-        _ = process.wait()
-        removeIfExists(socketName)
+    """stop all server processes"""
+    for commitId in COMMIT.keys()[:]:
+        stopServerFor(commitId)
 
+def stopServerFor(commitId):
+    """stop servers for commitId"""
+    print('stopping server for commit %s' % commitId)
+    for process, socketName in SERVERS[commitId]:
+        try:
+            process.terminate()
+            _ = process.wait()
+        except OSError:
+            pass
+        removeIfExists(socketName)
+    del SERVERS[commitId]
+    removeClone(COMMIT[commitId])
+    del COMMIT[commitId]
 
 def doJobs(jobs, options):
     """now execute all jobs"""
-    # pylint: disable=too-many-branches
-    # too many local branches
+    # pylint: disable=too-many-branches, too-many-locals, too-many-statements
 
-    try:
-        commit() # make sure we are at a point where comparisons make sense
-    except UserWarning as exc:
-        print(exc)
-        print()
-        print('Disabling CSV output')
-        options.csv = None
+    if not options.git and options.csv:
+        try:
+            commit() # make sure we are at a point where comparisons make sense
+        except UserWarning as exc:
+            print(exc)
+            print()
+            print('Disabling CSV output')
+            options.csv = None
 
-    clients = [None] * options.clients
+    clients = [(None, '')] * options.clients
     srvIdx = 0
     try:
         while jobs:
             for qIdx, client in enumerate(clients):
-                if client:
-                    result = client.poll()
-                    if result is None:
+                if client[0]:
+                    result = client[0].poll()
+                    if result is not None:
+                        print('   Game over: %s%s' % ('Return code: %s ' % result if result else '', client[1]))
+                        commitId = client[2]
+                        clients[qIdx] = (None, '', None)
+                        if commitId not in (x[2] for x in clients):
+                            stopServerFor(commitId)
+                    else:
+                        if all(x[0] for x in clients):
+                            time.sleep(1) # all clients are busy
                         continue
-                    clients[qIdx] = None
                 if not jobs:
                     break
-                _, game = jobs.pop(0)
-                ruleset, aiVariant = _
+                job = jobs.pop(0)
                 # never login to the same server twice at the
                 # same time with the same player name
-                player = qIdx // len(SERVERS) + 1
-                cmd = ['{src}/kajongg.py'.format(src=srcDir()),
-                      '--game={game}'.format(game=game),
-                      '--socket={sock}'.format(sock=SERVERS[srvIdx][1]),
+                startServersFor(job, options)
+                player = qIdx // len(SERVERS[job.commitId]) + 1
+                cmd = ['{src}/kajongg.py'.format(src=srcDir(job.commitId)),
+                      '--game={game}'.format(game=job.game),
+                      '--socket={sock}'.format(sock=SERVERS[job.commitId][srvIdx][1]),
                       '--player=Tester {player}'.format(player=player),
-                      '--ruleset={ap}'.format(ap=ruleset)]
-                if aiVariant != 'Default':
-                    cmd.append('--ai={ai}'.format(ai=aiVariant))
+                      '--ruleset={ap}'.format(ap=job.ruleset)]
+                if options.rounds:
+                    cmd.append('--rounds={rounds}'.format(rounds=options.rounds))
+                if job.aiVariant != 'Default':
+                    cmd.append('--ai={ai}'.format(ai=job.aiVariant))
                 if options.csv:
                     cmd.append('--csv={csv}'.format(csv=options.csv))
                 if options.gui:
@@ -227,15 +253,25 @@ def doJobs(jobs, options):
                     cmd.append('--playopen')
                 if options.debug:
                     cmd.append('--debug={dbg}'.format(dbg=options.debug))
-                clients[qIdx] = subprocess.Popen(cmd)
+                msg = '{game} {ruleset} AI={ai} commit={commit} in {dir}'.format(
+                    game=job.game, ruleset=job.ruleset, ai=job.aiVariant, commit=job.commitId, dir=COMMIT[job.commitId])
+                print('Starting game %s' % msg)
+                clients[qIdx] = (subprocess.Popen(cmd, cwd=srcDir(job.commitId)), msg, job.commitId)
                 srvIdx += 1
-                srvIdx %= len(SERVERS)
-#    except KeyboardInterrupt:
-#        pass
+                srvIdx %= len(SERVERS[job.commitId])
+    except KeyboardInterrupt:
+        for client, msg in clients:
+            try:
+                print('killing %s' % client[1])
+                client[0].terminate()
+                _ = client[0].wait()
+            except OSError:
+                pass
     finally:
         for client in clients:
-            if client:
-                _ = os.waitpid(client.pid, 0)[1]
+            if client[0]:
+                print('Waiting for   %s' % client[1])
+                _ = os.waitpid(client[0].pid, 0)[1]
 
 def parse_options():
     """parse options"""
@@ -245,6 +281,9 @@ def parse_options():
     parser.add_option('', '--ruleset', dest='rulesets',
         default='ALL', help='play like a robot using RULESET: comma separated list. If missing, test all rulesets',
         metavar='RULESET')
+    parser.add_option('', '--rounds', dest='rounds',
+        help='play only # ROUNDS per game',
+        metavar='ROUNDS')
     parser.add_option('', '--ai', dest='aiVariants',
         default=None, help='use AI variants: comma separated list',
         metavar='AI')
@@ -266,8 +305,8 @@ def parse_options():
     parser.add_option('', '--servers', dest='servers',
         help='start SERVERS kajonggserver instances. Default is one server for two clients',
         metavar='SERVERS', type=int, default=0)
-    parser.add_option('', '--fill', dest='fill', action='store_true',
-        help='fill holes in results', default=False)
+    parser.add_option('', '--git', dest='git',
+        help='check all commits: either a comma separated list or a range from..until')
     parser.add_option('', '--debug', dest='debug',
         help=Debug.help())
 
@@ -275,18 +314,17 @@ def parse_options():
 
 def improve_options(options):
     """add sensible defaults"""
+    # pylint: disable=too-many-branches
     if options.game and not options.count:
         options.count = 1
-    options.clients = min(options.clients, options.count)
     if options.servers == 0:
         options.servers = max(1, options.clients // 2)
 
-    cmd = ['{src}/kajongg.py'.format(src=srcDir()), '--rulesets=']
+    cmd = ['{src}/kajongg.py'.format(src=startingDir()), '--rulesets=']
     knownRulesets = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0].split('\n')
     knownRulesets = list(x.strip() for x in knownRulesets if x.strip())
     if options.rulesets == 'ALL':
         options.rulesets = ','.join(knownRulesets)
-        print('testing all rulesets:', options.rulesets)
     else:
         wantedRulesets = options.rulesets.split(',')
         wrong = False
@@ -300,8 +338,57 @@ def improve_options(options):
                 wrong = True
         if wrong:
             sys.exit(1)
-
+    if options.git is not None:
+        if '..' in options.git:
+            commits = subprocess.check_output('git log --pretty=%h {range}'.format(range=options.git).split())
+            options.git = list(x.strip() for x in commits.split('\n') if x.strip())
+        else:
+            options.git = options.git.split(',')
+            for commitId in options.git[:]:
+                try:
+                    subprocess.check_output('git cat-file commit {commitId}'.format(
+                        commitId=commitId).split())
+                except subprocess.CalledProcessError:
+                    print('ignoring non-existing commit {commitId}'.format(commitId=commitId))
+                    options.git.remove(commitId)
+            if not options.git:
+                sys.exit(1)
+        if options.csv:
+            options.csv = os.path.abspath(options.csv)
     return options
+
+def cloneSource(commitId):
+    """make a temp directory for commitId"""
+    tmpdir = mkdtemp(suffix='.' + commitId)
+    subprocess.Popen('git clone --local --no-checkout -q .. {temp}'.format(
+            temp=tmpdir).split()).wait()
+    subprocess.Popen('git checkout -q {commitId}'.format(
+            commitId=commitId).split(), cwd=tmpdir).wait()
+    return tmpdir
+
+def createJobs(options):
+    """the complete list"""
+    if not options.count:
+        return []
+    if options.game:
+        games = list(range(int(options.game), options.game+options.count))
+    else:
+        games = list(int(random.random() * 10**9) for _ in range(options.count))
+    jobs = []
+    rulesets = options.rulesets.split(',')
+    allAis = options.aiVariants.split(',')
+    print('rulesets:', ' '.join(rulesets))
+    print('AIs:', ' '.join(allAis))
+    if options.git:
+        print('commits:', ' '.join(options.git))
+    print('games:', ' '.join(str(x) for x in games[:20]))
+    options.servers = min(len(rulesets) * len(allAis) * len(games), options.servers)
+    for commitId in options.git or [None]:
+        for game in games:
+            for ruleset in rulesets:
+                for aiVariant in allAis:
+                    jobs.append(Job(ruleset, aiVariant, commitId, game))
+    return jobs
 
 def main():
     """parse options, play, evaluate results"""
@@ -323,7 +410,7 @@ def main():
         print('unrecognized arguments:', ' '.join(args))
         sys.exit(2)
 
-    if not options.count and not options.fill:
+    if not options.count:
         sys.exit(0)
 
     if not options.aiVariants:
@@ -331,33 +418,28 @@ def main():
 
     print()
 
-    startServers(options)
-    try:
-        if options.fill:
-            jobs = proposeGames(readGames(options.csv), options.aiVariants, options.rulesets)
+    jobs = createJobs(options)
+    if jobs:
+        try:
             doJobs(jobs, options)
-
-        if options.count:
-            if options.game:
-                games = list(range(int(options.game), options.game+options.count))
-            else:
-                games = list(int(random.random() * 10**9) for _ in range(options.count))
-            jobs = []
-            rulesets = options.rulesets.split(',')
-            allAis = options.aiVariants.split(',')
-            for game in games:
-                jobs.extend([(tuple([x, y]), game) for x in rulesets for y in allAis])
-            doJobs(jobs, options)
-    finally:
-        stopServers()
+        finally:
+            stopServers()
 
     if options.csv:
         evaluate(readGames(options.csv))
 
-def cleanup():
+def removeClone(tmpdir):
+    """remove its tmpdir"""
+    if tmpdir is not None and '/tmp/' in tmpdir:
+        shutil.rmtree(tmpdir)
+
+def cleanup(sig, dummyFrame):
+    """at program end"""
     stopServers()
+    sys.exit(sig)
 
 # is one server for two clients.
 if __name__ == '__main__':
-    atexit.register(stopServers)
+    signal.signal(signal.SIGTERM, cleanup)
+    signal.signal(signal.SIGINT, cleanup)
     main()

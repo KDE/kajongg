@@ -65,6 +65,7 @@ def defineOptions():
     options.add("table <TABLE>", ki18n("start new TABLE"))
     options.add("join <TABLE>", ki18n("join TABLE "))
     options.add("ruleset <RULESET>", ki18n("use ruleset without asking"))
+    options.add("rounds <ROUNDS>", ki18n("play one ROUNDS rounds per game. Only for debugging!"))
     options.add("player <PLAYER>", ki18n("prefer PLAYER for next login"))
     options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
     options.add("csv <CSV>", ki18n("write statistics to CSV"))
@@ -87,6 +88,8 @@ def parseOptions():
         Options.host = str(args.getOption('host'))
     if args.isSet('player'):
         Options.player = str(args.getOption('player'))
+    if args.isSet('rounds'):
+        Options.rounds = str(args.getOption('rounds'))
     if args.isSet('ai'):
         Options.AI = str(args.getOption('ai'))
     if args.isSet('csv'):

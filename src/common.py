@@ -152,6 +152,7 @@ class Options(object):
     showRulesets = False
     rulesetName = None	# will only be set by command line --ruleset
     ruleset = None # from rulesetName
+    rounds = None
     host = None
     player = None
     dbPath = None

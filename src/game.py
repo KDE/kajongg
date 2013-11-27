@@ -25,7 +25,7 @@ from collections import defaultdict
 from twisted.internet.defer import succeed
 from util import stack
 from log import logError, logWarning, logException, logDebug, m18n
-from common import WINDS, Internal, IntDict, Debug
+from common import WINDS, Internal, IntDict, Debug, Options
 from query import Transaction, Query
 from rule import Ruleset
 from tile import Tile, elements
@@ -393,7 +393,10 @@ class Game(object):
         """prepare a game hand"""
         self.clearHand()
         if self.finished():
-            self.close()
+            if Options.rounds:
+                self.close().addCallback(Internal.mainWindow.quitProgram)
+            else:
+                self.close()
 
     def initHand(self):
         """directly before starting"""
@@ -553,7 +556,9 @@ class Game(object):
 
     def finished(self):
         """The game is over after minRounds completed rounds"""
-        if self.ruleset:
+        if Options.rounds:
+            return self.roundsFinished >= 1
+        elif self.ruleset:
             # while initialising Game, ruleset might be None
             return self.roundsFinished >= self.ruleset.minRounds
 

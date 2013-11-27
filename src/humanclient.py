@@ -32,7 +32,7 @@ from kde import KIcon
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 
 from util import commit
-from log import m18n, logWarning, logException, logInfo, logDebug
+from log import m18n, logWarning, logException, logDebug
 from message import Message, ChatMessage
 from chat import ChatWindow
 from common import Options, SingleshotOptions, Internal, Debug, isAlive
@@ -716,7 +716,7 @@ class HumanClient(Client):
         if Internal.scene:
             # update the balances in the status bar:
             Internal.scene.mainWindow.updateGUI()
-        logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
+        Information(m18n(message, *args)).addCallback(yes)
 
     def remote_serverDisconnects(self, result=None):
         """we logged out or or lost connection to the server.
