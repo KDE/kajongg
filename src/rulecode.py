@@ -725,7 +725,7 @@ class Knitting(MahJonggFunction):
         assert len(singleTile) == 1
         singleTile = singleTile[0]
         otherSuit = (hand.suits - set([singleTile.lowerGroup])).pop()
-        otherTile = otherSuit.capitalize() + singleTile.value
+        otherTile = Tile(otherSuit.capitalize(), singleTile.value)
         return set([otherTile])
     def rearrange(self, hand, pairs):
         melds = []
