@@ -84,7 +84,7 @@ def printDifferingResults(rowLists):
         print('no games differ')
     elif float(len(differing)) / len(allGameIds) < 0.20:
         print('differing games (%d out of %d): %s' % (len(differing), len(allGameIds),
-             ', '.join(sorted(differing))))
+             ' '.join(sorted(differing, key=int))))
 
 def evaluate(games):
     """evaluate games"""
@@ -95,7 +95,7 @@ def evaluate(games):
         gameIds = set(x[GAME] for x in rows)
         if len(gameIds) != len(set(tuple(list(x)[GAME:]) for x in rows)):
             print('ruleset "%s" AI "%s" has different rows for games' % (variant[0], variant[1]), end=' ')
-            for game in gameIds:
+            for game in sorted(gameIds, key=int):
                 if len(set(tuple(x[GAME:] for x in rows if x[GAME] == game))) > 1:
                     print(game, end=' ')
             print()
