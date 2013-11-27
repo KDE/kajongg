@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import csv, resource, random
+import random
 
 from twisted.spread import pb
 from twisted.python.failure import Failure
@@ -31,7 +31,6 @@ from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
 from kde import KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 
-from util import commit
 from log import m18n, logWarning, logException, logDebug
 from message import Message, ChatMessage
 from chat import ChatWindow
@@ -696,20 +695,6 @@ class HumanClient(Client):
             """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
-                if Options.csv:
-                    gameWinner = max(self.game.players, key=lambda x: x.balance)
-                    writer = csv.writer(open(Options.csv,'a'), delimiter=';')
-                    if Debug.process:
-                        self.game.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-                    row = [self.game.ruleset.name, Options.AI, commit(), str(self.game.seed),
-                        ','.join(self.game.csvTags)]
-                    for player in sorted(self.game.players, key=lambda x: x.name):
-                        row.append(player.name.encode('utf-8'))
-                        row.append(player.balance)
-                        row.append(player.wonCount)
-                        row.append(1 if player == gameWinner else 0)
-                    writer.writerow(row)
-                    del writer
                 self.game.close().addCallback(Internal.mainWindow.quitProgram)
         assert self.table and self.table.tableid == tableid
         if Internal.scene:

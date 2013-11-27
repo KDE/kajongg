@@ -20,12 +20,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 import weakref
+import csv, resource
 from random import Random
 from collections import defaultdict
 from functools import total_ordering
 
 from twisted.internet.defer import succeed
-from util import stack
+from util import stack, commit
 from log import logError, logWarning, logException, logDebug, m18n
 from common import WINDS, Internal, IntDict, Debug, Options
 from query import Transaction, Query
@@ -753,9 +754,29 @@ class PlayingGame(Game):
                 if Debug.sound:
                     logDebug('myself %s gets no voice'% (myself.name))
 
+    def writeCsv(self):
+        """write game summary to Options.csv"""
+        if self.finished() and Options.csv:
+            gameWinner = max(self.players, key=lambda x: x.balance)
+            writer = csv.writer(open(Options.csv,'a'), delimiter=';')
+            if Debug.process:
+                self.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+            if Options.rounds:
+                self.csvTags.append('ROUNDS:%s' % Options.rounds)
+            row = [self.ruleset.name, Options.AI, commit(), str(self.seed),
+                ','.join(self.csvTags)]
+            for player in sorted(self.players, key=lambda x: x.name):
+                row.append(player.name.encode('utf-8'))
+                row.append(player.balance)
+                row.append(player.wonCount)
+                row.append(1 if player == gameWinner else 0)
+            writer.writerow(row)
+            del writer
+
     def close(self):
         """log off from the server and return a Deferred"""
         Game.close(self)
+        self.writeCsv()
         Internal.autoPlay = False # do that only for the first game
         if self.client:
             client = self.client
