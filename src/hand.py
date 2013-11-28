@@ -161,7 +161,8 @@ class Hand(object):
         self.declaredMelds = MeldList(x for x in self.melds if x.isDeclared)
         declaredTiles = list(sum((x for x in self.declaredMelds), []))
         self.tilesInHand = TileList(x for x in self.tileNames if x not in declaredTiles)
-        self.lenOffset = len(self.tileNames) - 13 - sum(x.isKong for x in self.melds)
+        self.lenOffset = len(self.tileNames) - 13 - sum(x.isKong for x in self.declaredMelds)
+
         assert len(tileStrings) < 2, tileStrings
         if len(tileStrings):
             self.__split(sorted(TileList(tileStrings[0][1:])))
@@ -529,6 +530,7 @@ class Hand(object):
         for mjRule in rules:
             func = mjRule.function
             if func != stdMJ and hasattr(func, 'rearrange'):
+                # hasattr is needed, the ruleset from the database may be old and not as expected
                 if ((self.lenOffset == 1 and func.appliesToHand(self))
                         or (self.lenOffset < 1 and func.shouldTry(self))):
                     melds, pairs = func.rearrange(self, rest[:])
