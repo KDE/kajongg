@@ -617,9 +617,9 @@ class TripleKnitting(MahJonggFunction):
             and rest[0].group != rest[1].group and rest[0].value == rest[1].value)
 
     def winningTileCandidates(self, hand):
-        if hand.hasHonorMelds:
-            return set()
         if hand.declaredMelds:
+            return set()
+        if any(x.isHonor for x in hand.tileNames):
             return set()
         _, rest = self.findTriples(hand)
         if len(rest) not in (1, 4):
@@ -696,9 +696,9 @@ class Knitting(MahJonggFunction):
         return len(self.findCouples(hand)[0]) == 7
 
     def winningTileCandidates(self, hand):
-        if any(x.isDeclared for x in hand.melds):
+        if hand.declaredMelds:
             return set()
-        if hand.hasHonorMelds:
+        if any(x.isHonor for x in hand.tileNames):
             return set()
         couples, singleTile = self.findCouples(hand)
         if len(couples) != 6:

@@ -156,6 +156,8 @@ class Hand(object):
             if split[:1] != b'R':
                 self.melds.append(Meld(split))
                 tileStrings.remove(split)
+        # those must be set before splitting the rest because the rearrange()
+        # functions need them
         self.declaredMelds = MeldList(x for x in self.melds if x.isDeclared)
         declaredTiles = list(sum((x for x in self.declaredMelds), []))
         self.tilesInHand = TileList(x for x in self.tileNames if x not in declaredTiles)
@@ -164,7 +166,6 @@ class Hand(object):
         if len(tileStrings):
             self.__split(sorted(TileList(tileStrings[0][1:])))
         self.melds.sort()
-        self.hasHonorMelds = any(x.isHonorMeld for x in self.melds)
 
         self.usedRules = []
         self.score = None
