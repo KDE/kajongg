@@ -378,6 +378,7 @@ class Regex(unittest.TestCase):
         self.scoreTest(b'RWeWeS1S1B9B9DgDgDrDrWsWs wwww Mwn Lww', [Score(), Score(limits=0.5)])
         self.scoreTest(b'RWeWeS1S1B9B9DgDgDrDrWsWwWw mwn LS1', [Score(6), Score(limits=0.2)])
         self.scoreTest(b'RWeWeS2S2B9B9DgDgDrDrWsWsWwWw Mwn LS2S2S2', [Score(), Score()])
+        self.scoreTest(b'RDbDbDgDgDrDrWsWsWnWnS9C1C1C9 Mwn LDrDrDr', [Score(), Score()])
 
     def testBMJA(self):
         """specials for chinese classical BMJA"""

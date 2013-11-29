@@ -775,10 +775,10 @@ class AllPairHonors(MahJonggFunction):
     def appliesToHand(self, hand):
         if not self.maybeCallingOrWon(hand):
             return False
-        if len(set(hand.values)) != 7:
+        if len(set(hand.tileNames)) != 7:
             return False
-        valueCounts = sorted([len([x for x in hand.tileNames if x.value == y]) for y in hand.values])
-        return set(valueCounts) == set([2])
+        tileCounts = list([len([x for x in hand.tileNames if x == y]) for y in hand.tileNames])
+        return set(tileCounts) == set([2])
     def winningTileCandidates(self, hand):
         if not self.maybeCallingOrWon(hand):
             return set()
