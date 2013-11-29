@@ -30,7 +30,7 @@ from tempfile import mkdtemp
 from optparse import OptionParser
 
 from common import Debug
-from util import removeIfExists, commit
+from util import removeIfExists, gitHead
 from log import initLog
 
 # fields in row:
@@ -421,7 +421,7 @@ def doJobs(jobs):
 
     if not OPTIONS.git and OPTIONS.csv:
         try:
-            commit() # make sure we are at a point where comparisons make sense
+            gitHead() # make sure we are at a point where comparisons make sense
         except UserWarning as exc:
             print('Disabling CSV output: %s' % exc)
             print()

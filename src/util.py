@@ -183,7 +183,7 @@ def checkMemory():
     print('unreachable:%s' % gc.collect())
     gc.set_debug(0)
 
-def commit():
+def gitHead():
     """the current git commit. Fail if there are uncommitted changes"""
     if not os.path.exists(os.path.join('..', '.git')):
         return Internal.version
@@ -192,7 +192,7 @@ def commit():
     uncommitted = list(x.strip() for x in _.split('\n') if len(x.strip()))
     if uncommitted:
         raise UserWarning('you cannot write to CSV while having uncommitted changes in %s' % ', '.join(uncommitted))
-    result = subprocess.Popen(['git', 'log', '-1', '--format="%H"'],
+    result = subprocess.Popen(['git', 'log', '-1', '--format="%h"'],
             stdout=subprocess.PIPE).communicate()[0]
     return result.split('\n')[0].replace('"', '')[:15]
 

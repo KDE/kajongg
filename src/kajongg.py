@@ -145,7 +145,7 @@ class EvHandler(QObject):
 
 if __name__ == "__main__":
     from log import initLog
-    from util import commit
+    from util import gitHead
     initLog('kajongg')
 
     ABOUT = About()
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     Internal.reactor = reactor
 
     if Options.csv:
-        commit() # abort if we cannot get a legal commit for the csv file?
+        gitHead() # abort if we cannot get a legal commit for the csv file?
     from mainwindow import MainWindow
     MainWindow()
     Internal.app.exec_()

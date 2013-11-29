@@ -26,7 +26,7 @@ from collections import defaultdict
 from functools import total_ordering
 
 from twisted.internet.defer import succeed
-from util import stack, commit
+from util import stack, gitHead
 from log import logError, logWarning, logException, logDebug, m18n
 from common import WINDS, Internal, IntDict, Debug, Options
 from query import Transaction, Query
@@ -765,7 +765,7 @@ class PlayingGame(Game):
                 self.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             if Options.rounds:
                 self.csvTags.append('ROUNDS:%s' % Options.rounds)
-            row = [self.ruleset.name, Options.AI, commit(), str(self.seed),
+            row = [self.ruleset.name, Options.AI, gitHead(), str(self.seed),
                 ','.join(self.csvTags)]
             for player in sorted(self.players, key=lambda x: x.name):
                 row.append(player.name.encode('utf-8'))
