@@ -512,6 +512,7 @@ class Hand(object):
         Adds melds to self.melds.
         only one special mjRule may try to rearrange melds.
         A rest will be rearranged by standard rules."""
+        assert rest
         for tile in rest[:]:
             if not tile.isKnown:
                 rest.remove(tile)

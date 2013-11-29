@@ -73,7 +73,9 @@ class MahJonggFunction(Function):
         to look at this possibility harder"""
         raise NotImplementedError
 
-    def rearrange(self, dummyHand, pairs):
+    def rearrange(self, dummyHand, rest):
+        """returns a list of possible tile groupins and perhaps a remaining rest.
+        Argument rest is granted to not be empty. It is a deep copy which we may destroy"""
         raise NotImplementedError
 
 class DragonPungKong(MeldFunction):
@@ -430,14 +432,13 @@ class StandardMahJongg(MahJonggFunction):
     def shouldTry(dummyHand):
         return True
     @staticmethod
-    def rearrange(hand, pairs):
+    def rearrange(hand, rest):
         """rest is a string with those tiles that can still
         be rearranged: No declared melds and no bonus tiles.
         done is already arranged, do not change this.
         Returns list(Meld)"""
 # TODO: return all variants. The parent should find the best mjrRule/variant combo
-        assert pairs
-        permutations = Permutations(pairs)
+        permutations = Permutations(rest)
         bestHand = None
         bestVariant = None
         for variantMelds in permutations.variants:
@@ -502,17 +503,17 @@ class WrigglingSnake(MahJonggFunction):
             return set([Tile(group, 1)])
 
     @staticmethod
-    def rearrange(dummyHand, pairs):
+    def rearrange(dummyHand, rest):
         result = []
-        for tileName in pairs[:]:
-            if pairs.count(tileName) >= 2:
+        for tileName in rest:
+            if rest.count(tileName) >= 2:
                 result.append(Meld([tileName, tileName]))
-                pairs.remove(tileName)
-                pairs.remove(tileName)
-            elif pairs.count(tileName) == 1:
+                rest.remove(tileName)
+                rest.remove(tileName)
+            elif rest.count(tileName) == 1:
                 result.append(Meld([tileName]))
-                pairs.remove(tileName)
-        return result, pairs
+                rest.remove(tileName)
+        return result, rest
 
     @staticmethod
     def appliesToHand(hand):
@@ -587,23 +588,23 @@ class TripleKnitting(MahJonggFunction):
                     candidate.keep -= 10
         return candidates
 
-    def rearrange(self, hand, pairs):
+    def rearrange(self, hand, rest):
         melds = []
         for triple in self.findTriples(hand)[0]:
             melds.append(Meld(triple))
-            pairs.remove(triple[0])
-            pairs.remove(triple[1])
-            pairs.remove(triple[2])
-        while len(pairs) >= 2:
-            for value in Byteset(list(ord(x.value) for x in pairs)):
-                suits = set(x.group for x in pairs if ord(x.value) == value)
+            rest.remove(triple[0])
+            rest.remove(triple[1])
+            rest.remove(triple[2])
+        while len(rest) >= 2:
+            for value in Byteset(list(ord(x.value) for x in rest)):
+                suits = set(x.group for x in rest if ord(x.value) == value)
                 if len(suits) <2:
-                    return melds, pairs
+                    return melds, rest
                 pair = (Tile(suits.pop(), value), Tile(suits.pop(), value))
                 melds.append(Meld(sorted(pair)))
-                pairs.remove(pair[0])
-                pairs.remove(pair[1])
-        return melds, pairs
+                rest.remove(pair[0])
+                rest.remove(pair[1])
+        return melds, rest
 
     def appliesToHand(self, hand):
         if any(x.isHonor for x in hand.tileNames):
@@ -711,16 +712,16 @@ class Knitting(MahJonggFunction):
         otherSuit = (hand.suits - set([singleTile.lowerGroup])).pop()
         otherTile = Tile(otherSuit.capitalize(), singleTile.value)
         return set([otherTile])
-    def rearrange(self, hand, pairs):
+    def rearrange(self, hand, rest):
         melds = []
-        for couple in self.findCouples(hand, pairs)[0]:
+        for couple in self.findCouples(hand, rest)[0]:
             if couple[0].islower():
                 # this is the mj pair, lower after claiming
                 continue
             melds.append(Meld(couple))
-            pairs.remove(couple[0])
-            pairs.remove(couple[1])
-        return melds, pairs
+            rest.remove(couple[0])
+            rest.remove(couple[1])
+        return melds, rest
     def findCouples(self, hand, pairs=None):
         """returns a list of tuples, including the mj couple.
         Also returns the remaining uncoupled tiles IF they
@@ -802,14 +803,14 @@ class AllPairHonors(MahJonggFunction):
         result = pairCount >= pairWanted or (pairCount + kongCount * 2) > pairWanted
         return result
     @staticmethod
-    def rearrange(dummyHand, pairs):
+    def rearrange(dummyHand, rest):
         melds = []
-        for pair in set(pairs) & elements.mAJORS:
-            while pairs.count(pair) >= 2:
+        for pair in set(rest) & elements.mAJORS:
+            while rest.count(pair) >= 2:
                 melds.append(Meld(pair * 2))
-                pairs.remove(pair)
-                pairs.remove(pair)
-        return melds, pairs
+                rest.remove(pair)
+                rest.remove(pair)
+        return melds, rest
     @staticmethod
     def weigh(dummyAiInstance, candidates):
         hand = candidates.hand
@@ -1037,17 +1038,17 @@ class ThirteenOrphans(MahJonggFunction):
         return [Meld([hand.lastTile] * meldSize)]
 
     @staticmethod
-    def rearrange(dummyHand, pairs):
+    def rearrange(dummyHand, rest):
         result = []
-        for tileName in pairs[:]:
-            if pairs.count(tileName) >= 2:
+        for tileName in rest:
+            if rest.count(tileName) >= 2:
                 result.append(Meld([tileName, tileName]))
-                pairs.remove(tileName)
-                pairs.remove(tileName)
-            elif pairs.count(tileName) == 1:
+                rest.remove(tileName)
+                rest.remove(tileName)
+            elif rest.count(tileName) == 1:
                 result.append(Meld([tileName]))
-                pairs.remove(tileName)
-        return result, pairs
+                rest.remove(tileName)
+        return result, rest
 
     @staticmethod
     def claimness(hand, discard):
