@@ -71,17 +71,14 @@ class Hand(object):
         Hand.hits = 0
         Hand.misses = 0
 
-    def __new__(cls, ruleset, string, computedRules=None, robbedTile=None):
+    def __new__(cls, ruleset, string, robbedTile=None):
         """since a Hand instance is never changed, we can use a cache"""
         cache = cls.cache
-        if computedRules is not None and not isinstance(computedRules, list):
-            computedRules = list([computedRules])
-        cRuleHash = '&&'.join([rule.name for rule in computedRules]) if computedRules else 'None'
         if isinstance(ruleset, Hand):
             cacheId = id(ruleset.player or ruleset.ruleset)
         else:
             cacheId = id(ruleset)
-        cacheKey = hash((cacheId, string, robbedTile, cRuleHash))
+        cacheKey = hash((cacheId, string, robbedTile))
         if cacheKey in cache:
             if cache[cacheKey] is None:
                 raise Exception('recursion: Hand calls itself for same content')
@@ -92,7 +89,7 @@ class Hand(object):
         cache[cacheKey] = result
         return result
 
-    def __init__(self, ruleset, string, computedRules=None, robbedTile=None):
+    def __init__(self, ruleset, string, robbedTile=None):
         """evaluate string using ruleset. rules are to be applied in any case.
         ruleset can be Hand, Game or Ruleset."""
         # silence pylint. This method is time critical, so do not split it into smaller methods
@@ -104,7 +101,6 @@ class Hand(object):
         if isinstance(ruleset, Hand):
             self.ruleset = ruleset.ruleset
             self.player = ruleset.player
-            self.computedRules = ruleset.computedRules
         elif isinstance(ruleset, Ruleset):
             self.ruleset = ruleset
             self.player = None
@@ -113,9 +109,6 @@ class Hand(object):
             self.ruleset = self.player.game.ruleset
         self.string = string
         self.robbedTile = robbedTile
-        if computedRules is not None and not isinstance(computedRules, list):
-            computedRules = list([computedRules])
-        self.computedRules = computedRules or []
         self.__won = False
         self.__callingHands = {}
         self.mjStr = b''
@@ -249,7 +242,7 @@ class Hand(object):
     def __applyRules(self):
         """find out which rules apply, collect in self.usedRules.
         This may change self.won"""
-        self.usedRules = list([UsedRule(rule) for rule in self.computedRules])
+        self.usedRules = []
         if self.__hasExclusiveRules():
             return
         self.__applyMeldRules()
@@ -447,7 +440,7 @@ class Hand(object):
             mjStr = b' '.join(newParts)
         rest = b'R' + bytes(rest) if rest else b''
         newString = b' '.join(bytes(x) for x in (newMelds, rest, boni, mjStr))
-        return Hand(self, newString, self.computedRules)
+        return Hand(self, newString)
 
     def manualRuleMayApply(self, rule):
         """returns True if rule has selectable() and applies to this hand"""

@@ -330,25 +330,31 @@ class ScoringPlayer(VisiblePlayer, Player):
         currentScore = self.hand.score
         hasManualScore = self.hasManualScore()
         for box in self.manualRuleBoxes:
-            if box.rule in self.hand.computedRules:
-                box.setVisible(True)
-                box.setChecked(True)
-                box.setEnabled(False)
-            else:
-                applicable = bool(self.hand.manualRuleMayApply(box.rule))
-                if hasManualScore:
-                    # only those rules which do not affect the score can be applied
-                    applicable = applicable and box.rule.hasNonValueAction()
-                else:
-                    # if the action would only influence the score and the rule does not change the score,
-                    # ignore the rule. If however the action does other things like penalties leave it applicable
-                    if box != sender:
-                        if applicable:
-                            applicable = bool(box.rule.hasNonValueAction()) \
-                                or (self.computeHand(singleRule=box.rule).score > currentScore)
-                box.setApplicable(applicable)
+            applicable = bool(self.hand.manualRuleMayApply(box.rule))
+            if hasManualScore:
+                # only those rules which do not affect the score can be applied
+                applicable = applicable and box.rule.hasNonValueAction()
+            elif box != sender:
+                applicable = applicable and self.__ruleChangesScore(box, currentScore)
+            box.setApplicable(applicable)
 
-    def __mjstring(self, singleRule, asWinner):
+    def __ruleChangesScore(self, box, currentScore):
+        """does the rule actually influence the result?
+        if the action would only influence the score and the rule does not change the score,
+        ignore the rule. If however the action does other things like penalties leave it applicable"""
+        if box.rule.hasNonValueAction():
+            return True
+        try:
+            box.blockSignals(True)
+            checked = box.isChecked()
+            box.setChecked(not checked)
+            newHand = self.computeHand()
+        finally:
+            box.setChecked(checked)
+            box.blockSignals(False)
+        return newHand.score > currentScore
+
+    def __mjstring(self, asWinner):
         """compile hand info into a string as needed by the scoring engine"""
         winds = self.wind.lower() + 'eswn'[self.game.roundsFinished % 4]
         if asWinner or self == self.game.winner:
@@ -361,8 +367,6 @@ class ScoringPlayer(VisiblePlayer, Player):
             lastSource = b'd'
         declaration = b''
         rules = [x.rule for x in self.manualRuleBoxes if x.isChecked()]
-        if singleRule:
-            rules.append(singleRule)
         for rule in rules:
             options = rule.options
             if 'lastsource' in options:
@@ -379,16 +383,19 @@ class ScoringPlayer(VisiblePlayer, Player):
             return ''
         if not self.lastTile:
             return ''
+        if not self.handBoard.tilesByElement(self.lastTile):
+            # this  happens if we remove the meld with lastTile from the hand again
+            return ''
         return 'L%s%s' % (self.lastTile, self.lastMeld)
 
-    def computeHand(self, singleRule=None, asWinner=None): # pylint: disable=arguments-differ
+    def computeHand(self, asWinner=None): # pylint: disable=arguments-differ
         """returns a Hand object, using a cache"""
         if asWinner is None:
             asWinner = self == self.game.winner
         self.lastTile = Internal.scene.computeLastTile()
         self.lastMeld = Internal.scene.computeLastMeld()
-        string = ' '.join([self.scoringString(), self.__mjstring(singleRule, asWinner), self.__lastString(asWinner)])
-        return Hand(self, string, computedRules=singleRule)
+        string = ' '.join([self.scoringString(), self.__mjstring(asWinner), self.__lastString(asWinner)])
+        return Hand(self, string)
 
     def sortRulesByX(self, rules):
         """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
