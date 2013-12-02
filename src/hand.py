@@ -323,8 +323,8 @@ class Hand(object):
         not yet the final choice, see __applyBestLastMeld"""
         self.__lastMeld = None
         if self.lastTile and self.won:
-            if hasattr(self.mjRule.function, 'computeLastMelds'):
-                self.__lastMelds = self.mjRule.function.computeLastMelds(self)
+            if hasattr(self.mjRule, 'computeLastMelds'):
+                self.__lastMelds = self.mjRule.computeLastMelds(self)
                 if self.__lastMelds:
                     # syncHandBoard may return nothing
                     if len(self.__lastMelds) == 1:
@@ -514,9 +514,9 @@ class Hand(object):
             func = mjRule.function
             if func != stdMJ and hasattr(func, 'rearrange'):
                 # hasattr is needed, the ruleset from the database may be old and not as expected
-                if ((self.lenOffset == 1 and func.appliesToHand(self))
-                        or (self.lenOffset < 1 and func.shouldTry(self))):
-                    melds, pairs = func.rearrange(self, rest[:])
+                if ((self.lenOffset == 1 and mjRule.appliesToHand(self))
+                        or (self.lenOffset < 1 and mjRule.shouldTry(self))):
+                    melds, pairs = mjRule.rearrange(self, rest[:])
                     if melds:
                         arrangements.append((mjRule, melds, pairs))
         if arrangements:

@@ -745,6 +745,13 @@ class Rule(object):
                     self.function = rulecode.Function.functions[variant[1:]]()
                     # when executing code for this rule, we do not want
                     # to call those things indirectly
+                    # pylint: disable=attribute-defined-outside-init
+                    if hasattr(self.function, 'rearrange'):
+                        self.rearrange = self.function.rearrange
+                    if hasattr(self.function, 'computeLastMelds'):
+                        self.computeLastMelds = self.function.computeLastMelds
+                    if hasattr(self.function, 'shouldTry'):
+                        self.shouldTry = self.function.shouldTry
                     if hasattr(self.function, 'appliesToHand'):
                         self.appliesToHand = self.function.appliesToHand
                     if hasattr(self.function, 'appliesToMeld'):
@@ -782,22 +789,6 @@ class Rule(object):
             if self.parameter < minValue:
                 return m18nc('wrong value for rule', '%1: %2 is too small, minimal value is %3',
                     m18n(self.name), self.parameter, minValue)
-
-    def appliesToHand(self, dummyHand): # pylint: disable=no-self-use, E0202
-        """does the rule apply to this hand?"""
-        return False
-
-    def selectable(self, dummyHand): # pylint: disable=no-self-use, E0202
-        """does the rule apply to this hand?"""
-        return False
-
-    def appliesToMeld(self, dummyHand, dummyMeld): # pylint: disable=no-self-use, E0202
-        """does the rule apply to this meld?"""
-        return False
-
-    def winningTileCandidates(self, dummyHand): # pylint: disable=no-self-use, E0202
-        """those might be candidates for a calling hand"""
-        return set()
 
     def explain(self, meld):
         """use this rule for scoring"""
