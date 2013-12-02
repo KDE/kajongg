@@ -502,17 +502,13 @@ class Hand(object):
         if not rest:
             return
         arrangements = []
-        for mjRule in self.ruleset.mjRules:
-            func = mjRule.function
-            if func.__class__.__name__ == 'StandardMahJongg':
-                stdMJ = func
         if self.mjRule:
             rules = [self.mjRule]
         else:
             rules = self.ruleset.mjRules
         for mjRule in rules:
             func = mjRule.function
-            if func != stdMJ and hasattr(func, 'rearrange'):
+            if func != self.ruleset.standardMJRule and hasattr(func, 'rearrange'):
                 # hasattr is needed, the ruleset from the database may be old and not as expected
                 if ((self.lenOffset == 1 and mjRule.appliesToHand(self))
                         or (self.lenOffset < 1 and mjRule.shouldTry(self))):
@@ -527,11 +523,11 @@ class Hand(object):
             self.melds.extend(arrangement[1])
             self.melds.extend([Meld(x) for x in arrangement[2]])
         else:
-            # stdMJ is special because it might build more than one pair
+            # self.ruleset.standardMJRule is special because it might build more than one pair
             # the other special hands would put that into the rest
-            # if the above TODO is done, stdMJ does not have to be special anymore
+            # if the above TODO is done, self.ruleset.standardMJRule does not have to be special anymore
             if rest:
-                melds, _ = stdMJ.rearrange(self, rest[:])
+                melds, _ = self.ruleset.standardMJRule.rearrange(self, rest[:])
                 self.melds.extend(melds)
         assert sum(len(x) for x in self.melds) == len(self.tileNames), '%s != %s' % (
             self.melds, self.tileNames)

@@ -290,6 +290,7 @@ class Ruleset(object):
         self.rawRules = None # used when we get the rules over the network
         self.doublingMeldRules = []
         self.doublingHandRules = []
+        self.standardMJRule = None
         self.meldRules = RuleList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
         self.handRules = RuleList(2, m18n('Hand Rules'),
@@ -398,6 +399,12 @@ into a situation where you have to pay a penalty"""))
                 self.allRules.append(rule)
         self.doublingMeldRules = list(x for x in self.meldRules if x.score.doubles)
         self.doublingHandRules = list(x for x in self.handRules if x.score.doubles)
+        for mjRule in self.mjRules:
+            func = mjRule.function
+            if func.__class__.__name__ == 'StandardMahJongg':
+                self.standardMJRule = mjRule
+                break
+        assert self.standardMJRule
         return self
 
     def __loadQuery(self):
