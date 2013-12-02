@@ -369,28 +369,17 @@ class Hand(object):
     def __add__(self, addTile):
         """returns a new Hand built from this one plus addTile"""
         assert addTile.istitle(), 'addTile %s should be title:' % addTile
-        parts = self.string.split()
-        mPart = b''
-        rPart = b'R' + addTile
-        unchanged = []
-        for part in parts:
-            if part[:1] in b'SBCDW':
-                rPart += part
-            elif part[:1] == b'R':
-                rPart += part[1:]
-            elif part[:1].lower() == b'm':
-                mPart = part
-            elif part[:1] == b'L':
-                pass
-            else:
-                unchanged.append(part)
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
         # set the "won" flag M
-        parts = unchanged
-        parts.extend([rPart, mPart.capitalize(), b'L' + addTile])
-        return Hand(self, b' '.join(parts))
+        parts = [bytes(self.declaredMelds)]
+        parts.extend(bytes(x[0]) for x in self.bonusMelds)
+        parts.append(b'R' + ''.join(bytes(x) for x in sorted(self.tilesInHand + [addTile])))
+        parts.append(b'M{own}{round}{ann}'.format(
+            own=self.ownWind, round=self.roundWind, ann=self.announcements))
+        parts.append(b'L' + addTile)
+        return Hand(self, b' '.join(parts).strip())
 
     def __sub__(self, subtractTile):
         """returns a copy of self minus subtractTiles. Case of subtractTile (hidden
