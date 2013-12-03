@@ -365,7 +365,7 @@ class Player(object):
         assert not (self._concealedMelds and self._concealedTileNames)
         assert isinstance(self.lastTile, (Tile, type(None)))
         assert isinstance(withTile, (Tile, type(None)))
-        melds = ['R' + ''.join(str(x) for x in self._concealedTileNames)]
+        melds = ['R' + ''.join(str(x) for x in sorted(self._concealedTileNames))]
         if withTile:
             melds[0] += withTile
         if melds[0] == 'R':
