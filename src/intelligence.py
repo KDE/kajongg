@@ -204,6 +204,9 @@ class AIDefault(object):
     @staticmethod
     def weighCallingHand(aiInstance, candidates):
         """if we can get a calling hand, prefer that"""
+        candidates.hand.calculate()
+        # calculate() is needed. Why exactly would be interesting to know but
+        # since I plan to rewrite Hand anyway I do not investigate
         for candidate in candidates:
             newHand = candidates.hand - candidate.tile.capitalize()
             winningTiles = newHand.chancesToWin()

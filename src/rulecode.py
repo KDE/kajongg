@@ -15,10 +15,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-
-
-
-Read the user manual for a description of the interface to this scoring engine
 """
 
 from tile import Tile, Tileset, elements, Byteset, Bytelist
@@ -29,9 +25,15 @@ from query import Query
 from permutations import Permutations
 
 class Function(object):
-    """Parent for all Function classes. We need to implement
-    those methods as in Regex:
-    appliesToHand and appliesToMeld"""
+    """Parent for all Function classes. A Function is used to
+    define the behaviour of a rule. Classes Rule and Function
+    are separate because
+    - different rulesets may have a rule with the same name
+    - but with different behaviour
+    - the Function class should be as short and as concise
+      as possible because this is the important part about
+      implementing a new ruleset, and it is the most error prone.
+    """
 
     functions = {}
 
@@ -74,8 +76,10 @@ class MahJonggFunction(Function):
         raise NotImplementedError
 
     def rearrange(self, dummyHand, rest):
-        """returns a list of possible tile groupins and perhaps a remaining rest.
-        Argument rest is granted to not be empty. It is a deep copy which we may destroy"""
+        """returns either a list of tuples of possible tile groupings and remaining rest
+        or just one tile grouping and the remaining rest. Of course rest may always be
+        an empty list.
+        On entry, Argument rest is granted to not be empty. It is a deep copy which we may destroy"""
         raise NotImplementedError
 
 class DragonPungKong(MeldFunction):
@@ -285,6 +289,9 @@ class StandardMahJongg(MahJonggFunction):
             return False
         if sum(x.isChow for x in hand.melds) > hand.ruleset.maxChows:
             return False
+        if hand.score is None:
+            # this only __split trying to rearrange
+            return True
         if hand.score.total() < hand.ruleset.minMJPoints:
             return False
         if hand.score.doubles >= hand.ruleset.minMJDoubles:
@@ -432,24 +439,16 @@ class StandardMahJongg(MahJonggFunction):
     def shouldTry(dummyHand):
         return True
     @staticmethod
-    def rearrange(hand, rest):
+    def rearrange(dummyHand, rest):
         """rest is a string with those tiles that can still
         be rearranged: No declared melds and no bonus tiles.
         done is already arranged, do not change this.
         Returns list(Meld)"""
-# TODO: return all variants. The parent should find the best mjrRule/variant combo
         permutations = Permutations(rest)
-        bestHand = None
-        bestVariant = None
+        result = []
         for variantMelds in permutations.variants:
-            melds = hand.melds[:] + variantMelds
-            melds.extend(hand.bonusMelds)
-            _ = b' '.join(bytes(x) for x in melds) + b' ' + hand.mjStr
-            tryHand = hand.__class__(hand, _)
-            if not bestHand or tryHand.total() > bestHand.total():
-                bestHand = tryHand
-                bestVariant = variantMelds
-        return bestVariant, []
+            result.append((variantMelds, []))
+        return result
 
 class SquirmingSnake(StandardMahJongg):
     @staticmethod

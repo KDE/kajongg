@@ -544,6 +544,7 @@ class PlayingPlayer(Player):
 
     def __maySayOriginalCall(self):
         """returns True if Original Call is possible"""
+        self.hand.calculate()
         for tileName in set(self.concealedTileNames):
             newHand = self.hand - tileName
             if newHand.callingHands():

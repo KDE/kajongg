@@ -238,6 +238,10 @@ class Meld(TileList):
             return False
         if len(self) == 0:
             return True
+        if self.isDeclared and not other.isDeclared:
+            return True
+        if not self.isDeclared and other.isDeclared:
+            return False
         if self[0].key == other[0].key:
             return len(self) > len(other)
         return self[0].key < other[0].key
@@ -300,6 +304,7 @@ class MeldList(list):
             list.append(self, newContent)
         elif isinstance(newContent, (str, bytes)):
             list.extend(self, [Meld(x) for x in newContent.split()]) # pylint: disable=maybe-no-member
+        self.sort()
 
     def bytes(self):
         """for hand strings"""
@@ -307,6 +312,14 @@ class MeldList(list):
             return b' '.join(bytes(x) for x in self)
         else:
             return b''
+
+    def extend(self, values):
+        list.extend(self, values)
+        self.sort()
+
+    def append(self, value):
+        list.append(self, value)
+        self.sort()
 
     def tiles(self):
         """flat view of all tiles in all melds"""
