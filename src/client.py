@@ -412,13 +412,14 @@ class Client(object, pb.Referenceable):
         self.game.lastDiscard = None
         self.game.discardedTiles[calledTile.lower()] -= 1
         assert calledTile in move.meld, '%s %s'% (calledTile, move.meld)
-        move.player.lastTile = calledTile.lower()
-        move.player.lastSource = 'd'
         hadTiles = move.meld[:]
         hadTiles.remove(calledTile)
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
+        move.player.lastTile = calledTile.lower()
+        move.player.lastSource = 'd'
         move.exposedMeld = move.player.exposeMeld(hadTiles, calledTile=calledTileItem or calledTile)
+
         if self.thatWasMe(move.player):
             if move.message != Message.Kong:
                 # we will get a replacement tile first

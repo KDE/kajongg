@@ -307,8 +307,9 @@ class Hand(object):
                     if len(part) > 4:
                         self.__announcements = part[4:]
         if self.__lastTile:
-            assert self.__lastTile in self.tileNames, 'lastTile %s is not in tiles %s, mjStr=%s' % (
-                self.__lastTile, self.tileNames, self.mjStr)
+            assert self.__lastTile.isBonus or self.__lastTile in self.tileNames, \
+                'lastTile %s is not in hand %s, mjStr=%s' % (
+                self.__lastTile, self.string, self.mjStr)
             if self.__lastSource == 'k':
                 assert self.tileNames.count(self.__lastTile.lower()) + \
                     self.tileNames.count(self.__lastTile.capitalize()) == 1, \
@@ -386,17 +387,19 @@ class Hand(object):
         Exposed melds of length<3 will also be hidden."""
         # pylint: disable=too-many-branches
         # If lastMeld is given, it must be first in the list. Next try undeclared melds, then declared melds
-        newMelds = MeldList(x for x in self.melds if not x.isDeclared)
-        newMelds.extend(sorted((x for x in self.melds if x.isDeclared), key=lambda x: (x != self.lastMeld, x.key)))
+        newMelds = MeldList(self.melds)
+        tryMelds = [self.lastMeld] if self.lastMeld else []
+        tryMelds.extend(x for x in newMelds if not x.isDeclared)
+        tryMelds.extend(x for x in newMelds if x.isDeclared)
         rest = TileList()
-        boni = MeldList(sorted(self.bonusMelds))
+        boni = MeldList(self.bonusMelds)
         if subtractTile.isBonus:
             for idx, meld in enumerate(boni):
                 if subtractTile == meld[0]:
                     del boni[idx]
                     break
         else:
-            for meld in newMelds[:]:
+            for meld in tryMelds:
                 if subtractTile.lower() in meld:
                     restTiles = meld.without(subtractTile.lower())
                     newMelds.remove(meld)
@@ -413,7 +416,9 @@ class Hand(object):
                 meld = meld.toUpper()
                 rest.extend(meld)
         mjStr = self.mjStr
-        if self.lastTile == subtractTile:
+        newMelds.sort()
+        newTiles = newMelds.tiles()
+        if self.lastTile not in newTiles:
             parts = mjStr.split()
             newParts = []
             for idx, part in enumerate(parts):
@@ -422,7 +427,10 @@ class Hand(object):
                     if len(part) > 3 and part[3:4] == b'k':
                         part = part[:3]
                 elif part[:1] == b'L':
-                    continue
+                    if self.lastTile.isExposed and self.lastTile.upper() in newTiles:
+                        part = b'L{}'.format(self.lastTile.upper())
+                    else:
+                        continue
                 newParts.append(part)
             mjStr = b' '.join(newParts)
         rest = b'R' + bytes(rest) if rest else b''

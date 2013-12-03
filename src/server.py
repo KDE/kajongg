@@ -522,11 +522,12 @@ class ServerTable(Table):
         txt = game.dangerousFor(player, tile)
         mustPlayDangerous = player.mustPlayDangerous()
         block = DeferredBlock(self)
+        violates = player.violatesOriginalCall(tile)
         game.hasDiscarded(player, tile)
         block.tellAll(player, Message.Discard, tile=tile)
-        if player.violatesOriginalCall():
+        if violates:
             if Debug.originalCall:
-                logDebug('%s just violated OC with %s' % (player, player.discarded[-1]))
+                logDebug('%s just violated OC with %s' % (player, tile))
             player.mayWin = False
             block.tellAll(player, Message.ViolatesOriginalCall)
         if game.ruleset.mustDeclareCallingHand and not player.isCalling:

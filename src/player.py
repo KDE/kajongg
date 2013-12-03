@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys, weakref
 from collections import defaultdict
 
-from log import logException, logWarning, m18n, m18nc, m18nE
+from log import logException, logWarning, m18n, m18nc, m18nE, logDebug
 from common import WINDS, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, TileList, elements
@@ -311,6 +311,8 @@ class Player(object):
             except ValueError:
                 raise Exception('removeTile(%s): tile not in concealed %s' % \
                     (tile, ''.join(self._concealedTileNames)))
+        if tile == self.lastTile:
+            self.lastTile = None
         self._hand = None
 
     def addConcealedTiles(self, tiles, animated=False): # pylint: disable=unused-argument
@@ -375,7 +377,7 @@ class Player(object):
         melds.extend(str(x) for x in self._bonusTiles)
         mjString = self.mjString(asWinner)
         melds.append(mjString)
-        if mjString.startswith('M') and (withTile or self.lastTile):
+        if (withTile or self.lastTile):
             melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld if self.lastMeld else ''))
         return Hand(self, ' '.join(melds), robbedTile=robbedTile)
 
@@ -411,18 +413,13 @@ class Player(object):
         visible += sum(x.lower() == lowerTile for x in hand.tileNames)
         return 4 - visible
 
-    def violatesOriginalCall(self, tileName=None):
-        """called if discarding tileName (default=just discarded tile)
-        violates the Original Call"""
+    def violatesOriginalCall(self, discard=None):
+        """called if discarding discard violates the Original Call"""
         if not self.originalCall or not self.mayWin:
             return False
-        if tileName is None:
-            if len(self.discarded) < 2:
-                return False
-            tileName = self.discarded[-1]
-        if self.lastTile.lower() != tileName.lower():
+        if self.lastTile.lower() != discard.lower():
             if Debug.originalCall:
-                self.game.debug('%s would violate OC with %s, lastTile=%s' % (self, tileName, self.lastTile))
+                self.game.debug('%s would violate OC with %s, lastTile=%s' % (self, discard, self.lastTile))
             return True
         return False
 
@@ -609,6 +606,8 @@ class PlayingPlayer(Player):
                             (self, tileNames, src, self._concealedTileNames))
                 idx = self._concealedTileNames.index(src)
                 self._concealedTileNames[idx] = dst
+            if self.lastTile and not self.lastTile.isKnown:
+                self.lastTile = None
             self._hand = None
             self.syncHandBoard()
 
@@ -654,6 +653,7 @@ class PlayingPlayer(Player):
         else:
             raise Exception('robTile: no meld found with %s' % tile)
         self.game.lastDiscard = tile.upper()
+        self.lastTile = None  #  our lastTile has just been robbed
         self._hand = None
 
     def scoreMatchesServer(self, score):
@@ -716,6 +716,8 @@ class PlayingPlayer(Player):
             for meldTile in allMeldTiles:
                 self.visibleTiles[meldTile.lower()] += 1
             meld = meld.expose(bool(calledTile))
+        if self.lastTile in allMeldTiles:
+            self.lastTile = self.lastTile.lower()
         self._exposedMelds.append(meld)
         self._hand = None
         game.computeDangerous(self)

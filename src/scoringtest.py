@@ -330,6 +330,7 @@ class Regex(unittest.TestCase):
 
     def testLastIsOnlyPossible(self):
         """tests for determining if this was the only possible last tile"""
+        self.scoreTest(b's2s3s4 DrDr S1S2S3 S6S7S8 B5B6B7 fw yw fs Mnnd Ls2s2s3s4', [Score(34), Score(0)])
         self.scoreTest(b'b3B3B3b3 wewewewe s2s2 RDbDbDbDrDrDr Mee Ls2s2s2',
             [Score(74, 6), Score(68, 5)], totals=(500, 1000, 4736, 2176))
         self.scoreTest(b'b3B3B3b3 wewewe RDbDbDbS1S1S1S2S2 Mee LS2S2S2', [Score(60, 5), Score(58, 4)])
