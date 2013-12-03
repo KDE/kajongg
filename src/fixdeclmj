@@ -1,0 +1,60 @@
+diff --git a/src/player.py b/src/player.py
+index 02601da..4503fe9 100644
+--- a/src/player.py
++++ b/src/player.py
+@@ -449,16 +449,7 @@ class PlayingPlayer(Player):
+         self.game.winner = self
+         if withDiscard:
+             assert isinstance(withDiscard, Tile), withDiscard
+-            assert withDiscard == self.game.lastDiscard, 'withDiscard: %s lastDiscard: %s' % (
+-                withDiscard, self.game.lastDiscard)
+-            if Internal.scene:
+-                discardTile = Internal.scene.discardBoard.lastDiscarded
+-                if discardTile.tile != withDiscard:
+-                    self.game.debug('%s != %s' % (discardTile.tile, withDiscard))
+-                    assert False
+-            else:
+-                discardTile = withDiscard
+-            self.addConcealedTiles([discardTile])
++            PlayingPlayer.addConcealedTiles(self, [withDiscard]) # this should NOT invoke syncHandBoard
+             melds = [Meld(x) for x in concealed.split()]
+             if self.lastSource != 'k':   # robbed the kong
+                 self.lastSource = 'd'
+@@ -466,6 +457,7 @@ class PlayingPlayer(Player):
+             assert lastMeld in melds, '%s: concealed=%s melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
+                     self._concealedTileNames, concealed, melds, lastMeld, lastTile, withDiscard)
+             melds.remove(lastMeld)
++            # TODO: use exposeMeld
+             lastTile = withDiscard.lower()
+             lastMeld = lastMeld.toLower()
+             self._exposedMelds.append(lastMeld)
+@@ -478,7 +470,6 @@ class PlayingPlayer(Player):
+         self._concealedMelds = melds
+         self._concealedTileNames = []
+         self._hand = None
+-        self.syncHandBoard()
+ 
+     def __possibleChows(self):
+         """returns a unique list of lists with possible claimable chow combinations"""
+diff --git a/src/visible.py b/src/visible.py
+index 27cc544..d59e630 100644
+--- a/src/visible.py
++++ b/src/visible.py
+@@ -162,6 +162,17 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
+             PlayingPlayer.addConcealedTiles(self, list(x.tile for x in uiTiles))
+             self.syncHandBoard(uiTiles)
+ 
++    def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
++        """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
++        PlayingPlayer.declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld)
++        if withDiscard:
++            # withDiscard is a Tile, we need the UITile
++            discardTile = Internal.scene.discardBoard.lastDiscarded
++            if discardTile.tile != withDiscard:
++                self.game.debug('%s != %s' % (discardTile.tile, withDiscard))
++                assert False
++            self.syncHandBoard([discardTile])
++
+     def removeTile(self, tile):
+         """remove from my melds or tiles"""
+         PlayingPlayer.removeTile(self, tile)

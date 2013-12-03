@@ -162,6 +162,17 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             PlayingPlayer.addConcealedTiles(self, list(x.tile for x in uiTiles))
             self.syncHandBoard(uiTiles)
 
+    def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
+        """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
+        PlayingPlayer.declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld)
+        if withDiscard:
+            # withDiscard is a Tile, we need the UITile
+            discardTile = Internal.scene.discardBoard.lastDiscarded
+            if discardTile.tile != withDiscard:
+                self.game.debug('%s != %s' % (discardTile.tile, withDiscard))
+                assert False
+            self.syncHandBoard([discardTile])
+
     def removeTile(self, tile):
         """remove from my melds or tiles"""
         PlayingPlayer.removeTile(self, tile)

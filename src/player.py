@@ -22,7 +22,7 @@ import sys, weakref
 from collections import defaultdict
 
 from log import logException, logWarning, m18n, m18nc, m18nE
-from common import WINDS, Internal, IntDict, Debug
+from common import WINDS, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, TileList, elements
 from meld import Meld, MeldList
@@ -451,18 +451,7 @@ class PlayingPlayer(Player):
         self.game.winner = self
         if withDiscard:
             assert isinstance(withDiscard, Tile), withDiscard
-            self.lastTile = withDiscard
-            self.lastMeld = lastMeld
-            assert withDiscard == self.game.lastDiscard, 'withDiscard: %s lastDiscard: %s' % (
-                withDiscard, self.game.lastDiscard)
-            if Internal.scene:
-                discardTile = Internal.scene.discardBoard.lastDiscarded
-                if discardTile.tile != withDiscard:
-                    self.game.debug('%s != %s' % (discardTile.tile, withDiscard))
-                    assert False
-            else:
-                discardTile = withDiscard
-            self.addConcealedTiles([discardTile])
+            PlayingPlayer.addConcealedTiles(self, [withDiscard]) # this should NOT invoke syncHandBoard
             melds = [Meld(x) for x in concealed.split()]
             if self.lastSource != 'k':   # robbed the kong
                 self.lastSource = 'd'
@@ -470,19 +459,18 @@ class PlayingPlayer(Player):
             assert lastMeld in melds, '%s: concealed=%s melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
                     self._concealedTileNames, concealed, melds, lastMeld, lastTile, withDiscard)
             melds.remove(lastMeld)
-            self.lastTile = self.lastTile.lower()
+            lastTile = withDiscard.lower()
             lastMeld = lastMeld.toLower()
             self._exposedMelds.append(lastMeld)
             for tileName in lastMeld:
                 self.visibleTiles[tileName] += 1
         else:
             melds = [Meld(x) for x in concealed.split()]
-            self.lastTile = lastTile
-            self.lastMeld = lastMeld
+        self.lastTile = lastTile
+        self.lastMeld = lastMeld
         self._concealedMelds = melds
         self._concealedTileNames = []
         self._hand = None
-        self.syncHandBoard()
 
     def __possibleChows(self):
         """returns a unique list of lists with possible claimable chow combinations"""
