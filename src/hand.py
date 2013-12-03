@@ -276,11 +276,9 @@ class Hand(object):
 
     def matchingWinnerRules(self):
         """returns a list of matching winner rules"""
-        matching = self.__matchingRules(self.ruleset.winnerRules)
-        for rule in matching:
-            if (self.ruleset.limit and rule.score.limits >= 1) or 'absolute' in rule.options:
-                return [UsedRule(rule)]
-        return list(UsedRule(x) for x in matching)
+        matching = list(UsedRule(x) for x in self.__matchingRules(self.ruleset.winnerRules))
+        limitRule = self.maxLimitRule(matching)
+        return [limitRule] if limitRule else matching
 
     def __hasExclusiveRules(self):
         """if we have one, remove all others"""
@@ -549,20 +547,26 @@ class Hand(object):
             if rule.appliesToHand(self):
                 self.usedRules.append(UsedRule(rule))
 
+    @staticmethod
+    def maxLimitRule(usedRules):
+        """returns the rule with the highest limit score or None"""
+        result = None
+        maxLimit = 0
+        usedRules = list(x for x in usedRules if x.rule.score.limits)
+        for usedRule in usedRules:
+            score = usedRule.rule.score
+            if score.limits > maxLimit:
+                maxLimit = score.limits
+                result = usedRule
+        return result
+
     def __totalScore(self):
         """use all used rules to compute the score"""
-        pointsTotal = Score(ruleset=self.ruleset)
+        maxRule = self.maxLimitRule(self.usedRules)
         maxLimit = 0.0
-        maxRule = None
-        for usedRule in self.usedRules:
-            score = usedRule.rule.score
-            if score.limits:
-                # we assume that a hand never gets different limits combined
-                maxLimit = max(maxLimit, score.limits)
-                maxRule = usedRule
-            else:
-                pointsTotal += score
-        if maxLimit:
+        pointsTotal = sum((x.rule.score for x in self.usedRules), Score(ruleset=self.ruleset))
+        if maxRule:
+            maxLimit = maxRule.rule.score.limits
             if maxLimit >= 1.0 or maxLimit * self.ruleset.limit > pointsTotal.total():
                 self.usedRules =  [maxRule]
                 return Score(ruleset=self.ruleset, limits=maxLimit)
