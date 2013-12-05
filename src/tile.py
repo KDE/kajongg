@@ -24,7 +24,7 @@ import platform
 
 PYTHON3 =  platform.python_version_tuple()[0] == '3'
 
-from log import m18n, m18nc
+from log import m18n, m18nc, logException
 from common import IntDict
 
 class Tile(bytes):
@@ -82,7 +82,10 @@ class Tile(bytes):
             self.isDragon = self.lowerGroup == b'd'
             self.isWind = self.lowerGroup == b'w'
             self.isHonor = self.isDragon or self.isWind
-            self.key = 1 + self.hashTable.index(self) / 2
+            try:
+                self.key = 1 + self.hashTable.index(self) / 2
+            except ValueError:
+                logException('%s is not a valid tile string' % self)
             self.isKnown = self != b'Xy'
             self._fixed = True
 
