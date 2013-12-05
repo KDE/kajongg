@@ -95,8 +95,11 @@ class Request(object):
             answer = str(self.answer)
         else:
             answer = 'OPEN'
-        result = '[{id:>4}] {cmd}->{cls}({receiver:<10}): {answer}'.format(
-            cls=self.user.__class__.__name__, id=id(self)%10000, cmd=cmd, receiver=self.user.name,
+        result = ''
+        if Debug.deferredBlock:
+            result += '[{id:>4}] '.format(id=id(self)%10000)
+        result += '{cmd}->{cls}({receiver:<10}): {answer}'.format(
+            cls=self.user.__class__.__name__, cmd=cmd, receiver=self.user.name,
             answer=answer)
         if self.age():
             result += ' after {} sec'.format(self.age())
@@ -117,9 +120,12 @@ class Request(object):
 
     def pretty(self):
         """for debug output"""
-        result = '[{id:>4}] {cmd:<12}<-{cls:>6}({receiver:<10}): ANS={answer}'.format(
+        result = ''
+        if Debug.deferredBlock:
+            result += '[{id:>4}] '.format(id=id(self)%10000)
+        result += '{cmd:<12}<-{cls:>6}({receiver:<10}): ANS={answer}'.format(
             cls=self.user.__class__.__name__,
-            id=id(self)%10000, answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.user.name)
+            answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.user.name)
         if self.age() > 0:
             result += ' after {} sec'.format(self.age())
         return result
