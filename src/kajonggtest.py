@@ -341,7 +341,7 @@ def improve_options(options):
     if options.git is not None:
         if '..' in options.git:
             commits = subprocess.check_output('git log --pretty=%h {range}'.format(range=options.git).split())
-            options.git = list(x.strip() for x in commits.split('\n') if x.strip())
+            options.git = list(reversed(list(x.strip() for x in commits.split('\n') if x.strip())))
         else:
             options.git = options.git.split(',')
             for commitId in options.git[:]:
