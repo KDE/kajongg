@@ -367,6 +367,8 @@ def improve_options(options):
             sys.exit(1)
     if options.git is not None:
         if '..' in options.git:
+            if not '^' in options.git:
+                options.git = options.git.replace('..', '^..')
             commits = subprocess.check_output('git log --pretty=%h {range}'.format(range=options.git).split())
             options.git = list(reversed(list(x.strip() for x in commits.split('\n') if x.strip())))
         else:
