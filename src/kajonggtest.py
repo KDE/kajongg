@@ -73,6 +73,33 @@ def neutralize(rows):
                 row[idx] = ','.join(parts)
         yield row
 
+def onlyExistingCommits(commits):
+    """filter out non-existing commits"""
+    result = []
+    for commitId in commits:
+        try:
+            subprocess.check_output('git cat-file commit {commitId}'.format(
+                commitId=commitId).split())
+            result.append(commitId)
+        except subprocess.CalledProcessError:
+            pass
+    return result
+
+def removeInvalidCommitsFromCsv(csvFile):
+    """remove rows with invalid git commit ids"""
+    if not os.path.exists(csvFile):
+        return
+    rows = list(csv.reader(open(csvFile, 'r'), delimiter=';'))
+    _ = set(x[COMMITFIELD] for x in rows)
+    csvCommits = set(x for x in _ if set(x) <= set('0123456789abcdef') and len(x) >= 7)
+    nonExisting = set(csvCommits) - set(onlyExistingCommits(csvCommits))
+    if nonExisting:
+        print('removing rows from kajongg.csv for commits %s' % ','.join(nonExisting))
+        writer = csv.writer(open(csvFile, 'w'), delimiter=';')
+        for row in rows:
+            if row[COMMITFIELD] not in nonExisting:
+                writer.writerow(row)
+
 def readGames(csvFile):
     """returns a dict holding a frozenset of games for each variant"""
     if not os.path.exists(csvFile):
@@ -343,14 +370,7 @@ def improve_options(options):
             commits = subprocess.check_output('git log --pretty=%h {range}'.format(range=options.git).split())
             options.git = list(reversed(list(x.strip() for x in commits.split('\n') if x.strip())))
         else:
-            options.git = options.git.split(',')
-            for commitId in options.git[:]:
-                try:
-                    subprocess.check_output('git cat-file commit {commitId}'.format(
-                        commitId=commitId).split())
-                except subprocess.CalledProcessError:
-                    print('ignoring non-existing commit {commitId}'.format(commitId=commitId))
-                    options.git.remove(commitId)
+            options.git = onlyExistingCommits(options.git.split(','))
             if not options.git:
                 sys.exit(1)
         if options.csv:
@@ -396,6 +416,8 @@ def main():
     initLog('kajonggtest')
 
     (options, args) = parse_options()
+
+    removeInvalidCommitsFromCsv(options.csv)
 
     evaluate(readGames(options.csv))
 
