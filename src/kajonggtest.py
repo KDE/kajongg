@@ -73,17 +73,17 @@ def neutralize(rows):
                 row[idx] = ','.join(parts)
         yield row
 
+KNOWNCOMMITS = set()
+
 def onlyExistingCommits(commits):
     """filter out non-existing commits"""
-    result = []
-    for commitId in commits:
-        try:
-            subprocess.check_output('git cat-file commit {commitId}'.format(
-                commitId=commitId).split())
-            result.append(commitId)
-        except subprocess.CalledProcessError:
-            pass
-    return result
+    global KNOWNCOMMITS
+    if not KNOWNCOMMITS:
+        for branch in subprocess.check_output('git branch'.split()).split('\n'):
+            KNOWNCOMMITS |= set(subprocess.check_output(
+                'git log --max-count=200 --pretty=%h {branch}'.format(
+                    branch=branch[2:]).split()).split('\n'))
+    return list(x for x in commits if x in KNOWNCOMMITS)
 
 def removeInvalidCommitsFromCsv(csvFile):
     """remove rows with invalid git commit ids"""
