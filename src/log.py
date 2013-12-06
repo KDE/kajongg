@@ -90,11 +90,13 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     msg = translateServerMessage(msg)
     logMsg = msg
     if withGamePrefix and Internal.logPrefix:
-        logMsg = u'{prefix}{process}{time}: {msg}'.format(
+        logMsg = u'{prefix}{process}: {msg}'.format(
             prefix=Internal.logPrefix,
             process = os.getpid() if Debug.process else '',
-            time = '[%s]' % elapsedSince(Debug.time) if Debug.time else '',
             msg=msg)
+    if Debug.time:
+        logMsg = u'{:08.4f} {}'.format(elapsedSince(Debug.time), logMsg)
+
     __logUnicodeMessage(prio, logMsg)
     if showStack:
         if showStack is True:
