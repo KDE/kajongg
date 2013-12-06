@@ -25,7 +25,6 @@ import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import os, sys, csv, subprocess, random, shutil, time
-from collections import OrderedDict, defaultdict
 from tempfile import mkdtemp
 
 from optparse import OptionParser
@@ -42,19 +41,248 @@ GAMEFIELD = 3
 TAGSFIELD = 4
 PLAYERSFIELD = 5
 
-COMMIT = OrderedDict()
-SERVERS = defaultdict(list)
+OPTIONS = None
+
+class Clone(object):
+    """make a temp directory for commitId"""
+    clones = {}
+    def __new__(cls, commitId):
+        if commitId in cls.clones:
+            return cls.clones[commitId]
+        return object.__new__(cls)
+
+    def __init__(self, commitId):
+        self.commitId = commitId
+        self.clones[commitId] = self
+        if commitId is 'current':
+            self.tmpdir = os.path.abspath('..')
+            assert os.path.exists(os.path.join(self.tmpdir, 'src'))
+        else:
+            self.tmpdir = mkdtemp(suffix='.' + commitId)
+            subprocess.Popen('git clone --local --no-checkout -q .. {temp}'.format(
+                temp=self.tmpdir).split()).wait()
+            subprocess.Popen('git checkout -q {commitId}'.format(
+                commitId=commitId).split(), cwd=self.tmpdir).wait()
+
+    def remove(self):
+        """remove my tmpdir"""
+        del self.clones[self.commitId]
+        if self.commitId != 'current' and '/tmp/' in self.tmpdir:
+            shutil.rmtree(self.tmpdir)
+
+    @classmethod
+    def removeUnused(cls):
+        """remove clones we do not use anymore"""
+        for commitId in cls.clones.keys():
+            if not any(x.commitId == commitId for x in Job.jobs):
+                cls.clones[commitId].remove()
+
+    @classmethod
+    def removeAll(cls):
+        """remove all clones even if they are in use"""
+        for cloneKey in cls.clones.keys()[:]:
+            cls.clones[cloneKey].remove()
+
+class Client(object):
+    """a simple container, assigning process to job"""
+    def __init__(self, process=None, job=None):
+        self.process = process
+        self.job = job
+
+class TooManyClients(UserWarning):
+    """we would surpass options.clients"""
+
+class TooManyServers(UserWarning):
+    """we would surpass options.servers"""
+
+class Server(object):
+    """represents a kajongg server instance. Called when we want to start a job."""
+    servers = []
+    def __new__(cls, job):
+        """can we reuse an existing server?"""
+        if sum(len(x.jobs) for x in cls.servers) >= OPTIONS.clients:
+            raise TooManyClients
+        if len(cls.servers) >= OPTIONS.servers:
+            # must re-use a server
+            matchingServers = list(x for x in cls.servers if x.jobs[0].serverKey() == job.serverKey())
+            matchingServers.sort(key=lambda x: len(x.jobs))
+            if matchingServers:
+                return matchingServers[0]
+            raise TooManyServers
+        result = object.__new__(cls)
+        cls.servers.append(result)
+        return result
+
+    def __init__(self, job):
+        if not hasattr(self, 'jobs'):
+            self.jobs = []
+            self.process = None
+            self.socketName = None
+            self.serverKey = None
+            self.clone = Clone(job.commitId)
+            self.start(job)
+        else:
+            self.jobs.append(job)
+        job.server = self
+
+    def start(self, job):
+        """start this server"""
+        assert self.process is None
+        self.jobs.append(job)
+        self.socketName = 'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))
+        assert self.serverKey in (None, job.serverKey())
+        self.serverKey = job.serverKey()
+        print('starting server for %s' % job)
+        cmd = ['{src}/kajonggserver.py'.format(src=job.srcDir()),
+                '--local',
+                '--socket={sock}'.format(sock=self.socketName)]
+        if OPTIONS.debug:
+            cmd.append('--debug={dbg}'.format(dbg=OPTIONS.debug))
+        if OPTIONS.log:
+            self.process = subprocess.Popen(cmd, cwd=job.srcDir(),
+                stdout=job.logFile, stderr=job.logFile)
+        else:
+            # reuse this server (otherwise it stops by itself)
+            cmd.append('--continue')
+            self.process = subprocess.Popen(cmd, cwd=job.srcDir())
+
+    def stop(self, job=None):
+        """maybe stop the server"""
+        if self not in self.servers:
+            # already stopped
+            return
+        if job:
+            self.jobs.remove(job)
+        if len(self.jobs) == 0:
+            self.servers.remove(self)
+            if self.process:
+                print('killing server for  %s' % job)
+                try:
+                    self.process.terminate()
+                    _ = self.process.wait()
+                except OSError:
+                    pass
+            if self.socketName:
+                removeIfExists(self.socketName)
+        Clone.removeUnused()
+
+    @classmethod
+    def stopAll(cls):
+        """stop all servers even if clients are still there"""
+        for server in cls.servers[:]:
+            for job in server.jobs:
+                if job.process:
+                    try:
+                        job.process.terminate()
+                        _ = job.process.wait()
+                        job.check(silent=True)
+                    except OSError:
+                        pass
+            assert len(server.jobs) == 0, server.jobs
+            server.stop()
 
 class Job(object):
     """a simple container"""
+    jobs = []
     def __init__(self, ruleset, aiVariant, commitId, game):
         self.ruleset = ruleset
         self.aiVariant = aiVariant
         self.commitId = commitId
         self.game = game
+        self.__logFile = None
+        self.logFileName = None
+        self.process = None
+        self.server = None
+        self.started = False
+        self.jobs.append(self)
+
+    def srcDir(self):
+        """the path of the directory where the particular test is running"""
+        return os.path.join(Clone.clones[self.commitId].tmpdir, 'src')
+
+    def start(self):
+        """start this job"""
+        self.server = Server(self)
+        # never login to the same server twice at the
+        # same time with the same player name
+        player = self.server.jobs.index(self) + 1
+        cmd = ['{src}/kajongg.py'.format(src=self.srcDir()),
+              '--game={game}'.format(game=self.game),
+              '--socket={sock}'.format(sock=self.server.socketName),
+              '--player=Tester {player}'.format(player=player),
+              '--ruleset={ap}'.format(ap=self.ruleset)]
+        if OPTIONS.rounds:
+            cmd.append('--rounds={rounds}'.format(rounds=OPTIONS.rounds))
+        if self.aiVariant != 'Default':
+            cmd.append('--ai={ai}'.format(ai=self.aiVariant))
+        if OPTIONS.csv:
+            cmd.append('--csv={csv}'.format(csv=OPTIONS.csv))
+        if OPTIONS.gui:
+            cmd.append('--demo')
+        else:
+            cmd.append('--nogui')
+        if OPTIONS.playopen:
+            cmd.append('--playopen')
+        if OPTIONS.debug:
+            cmd.append('--debug={dbg}'.format(dbg=OPTIONS.debug))
+        print('starting            %s' % self)
+        if OPTIONS.log:
+            self.process = subprocess.Popen(cmd, cwd=self.srcDir(),
+                stdout=self.logFile, stderr=self.logFile)
+        else:
+            self.process = subprocess.Popen(cmd, cwd=self.srcDir())
+        self.started = True
+
+    def check(self, silent=False):
+        """if done, cleanup"""
+        if not self.started or not self.process:
+            return
+        result = self.process.poll()
+        if result is not None:
+            self.process = None
+            if not silent:
+                print('   Game over: %s%s' % ('Return code: %s ' % result if result else '', self))
+            self.jobs.remove(self)
+            self.server.stop(self)
+        else:
+            if all(x.process for x in self.jobs):
+                time.sleep(1) # all jobs are busy
+
+    def serverKey(self):
+        """this defines what a server can be used for"""
+        if OPTIONS.log:
+            # because we want the server debug data only for this
+            # job, each job needs its own server instance
+            return '/'.join([str(self.game), self.ruleset, self.aiVariant, self.commitId])
+        else:
+            return self.commitId
+
+    @property
+    def logFile(self):
+        """open if needed"""
+        if self.__logFile is None:
+            logDir = os.path.join('log', str(self.game), self.ruleset, self.aiVariant)
+            if not os.path.exists(logDir):
+                os.makedirs(logDir)
+            logFileName = self.commitId
+            self.logFileName = os.path.join(logDir, logFileName)
+            self.__logFile = open(self.logFileName, 'w', buffering=0)
+        return self.__logFile
+
+    def shortRulesetName(self):
+        """strip leading chars if they are identical for all rulesets"""
+        names = OPTIONS.knownRulesets
+        for prefix in range(100):
+            if sum(x.startswith(self.ruleset[:prefix]) for x in names) == 1:
+                return self.ruleset[prefix-1:]
 
     def __str__(self):
-        return '{ruleset} AI={aiVariant} commit={commitId} {game}'.format(**self.__dict__)
+        game = 'game={}'.format(self.game)
+        ruleset = self.shortRulesetName()
+        aiName = 'AI={}'.format(self.aiVariant) if self.aiVariant != 'Default' else ''
+        dirName = 'in {}'.format(Clone.clones[self.commitId].tmpdir) if self.commitId in Clone.clones else ''
+        commit = 'commit={}'.format(self.commitId) if dirName == '[n/a]' else ''
+        return ' '.join([game, ruleset, aiName, commit, dirName]).replace('  ', '')
 
     def __repr__(self):
         return 'Job(%s)' % str(self)
@@ -77,15 +305,16 @@ KNOWNCOMMITS = set()
 
 def onlyExistingCommits(commits):
     """filter out non-existing commits"""
-    global KNOWNCOMMITS
-    if not KNOWNCOMMITS:
-        for branch in subprocess.check_output('git branch'.split()).split('\n'):
-            KNOWNCOMMITS |= set(subprocess.check_output(
-                'git log --max-count=200 --pretty=%h {branch}'.format(
-                    branch=branch[2:]).split()).split('\n'))
+    global KNOWNCOMMITS # pylint: disable=global-statement
+    if len(KNOWNCOMMITS) == 0:
+        for branch in subprocess.check_output('git branch'.split(), env={'LANG':'C'}).split('\n'):
+            if not 'detached' in branch and not 'no branch' in branch:
+                KNOWNCOMMITS |= set(subprocess.check_output(
+                    'git log --max-count=200 --pretty=%h {branch}'.format(
+                        branch=branch[2:]).split()).split('\n'))
     return list(x for x in commits if x in KNOWNCOMMITS)
 
-def removeInvalidCommitsFromCsv(csvFile):
+def removeInvalidCommits(csvFile):
     """remove rows with invalid git commit ids"""
     if not os.path.exists(csvFile):
         return
@@ -99,6 +328,16 @@ def removeInvalidCommitsFromCsv(csvFile):
         for row in rows:
             if row[COMMITFIELD] not in nonExisting:
                 writer.writerow(row)
+    # now remove all logs referencing obsolete commits
+    for dirName, _, fileNames in os.walk('log'):
+        for fileName in fileNames:
+            fullName = os.path.join(dirName, fileName)
+            if fileName not in KNOWNCOMMITS and fileName != 'current':
+                os.remove(fullName)
+        try:
+            os.removedirs(dirName)
+        except OSError:
+            pass # not yet empty
 
 def readGames(csvFile):
     """returns a dict holding a frozenset of games for each variant"""
@@ -180,125 +419,51 @@ def startingDir():
     """the path of the directory where kajonggtest has been started in"""
     return os.path.dirname(sys.argv[0])
 
-def srcDir(commitId):
-    """the path of the directory where the particular test is running"""
-    if commitId:
-        return os.path.join(COMMIT[commitId], 'src')
-    else:
-        return '.'
-
-def startServersFor(job, options):
-    """starts count servers and returns a list of them"""
-    if job.commitId not in COMMIT:
-        COMMIT[job.commitId] = cloneSource(job.commitId) if job.commitId else '.'
-    if job.commitId not in SERVERS:
-        SERVERS[job.commitId] = [None] * options.servers
-        for idx in range(options.servers):
-            socketName = 'sock{idx}.{rnd}'.format(idx=idx, rnd=random.randrange(10000000))
-            print('starting server for commit %s' % (job.commitId))
-            cmd = ['{src}/kajonggserver.py'.format(src=srcDir(job.commitId)),
-                    '--local', '--continue',
-                    '--socket={sock}'.format(sock=socketName)]
-            if options.debug:
-                cmd.append('--debug={dbg}'.format(dbg=options.debug))
-            popen = subprocess.Popen(cmd, cwd=srcDir(job.commitId))
-            SERVERS[job.commitId][idx] = (popen, socketName)
-            time.sleep(1) # make sure server runs before client is started
-
-def stopServers():
-    """stop all server processes"""
-    for commitId in COMMIT.keys()[:]:
-        stopServerFor(commitId)
-
-def stopServerFor(commitId):
-    """stop servers for commitId"""
-    print('stopping server for commit %s' % commitId)
-    for process, socketName in SERVERS[commitId]:
-        try:
-            process.terminate()
-            _ = process.wait()
-        except OSError:
-            pass
-        removeIfExists(socketName)
-    del SERVERS[commitId]
-    removeClone(COMMIT[commitId])
-    del COMMIT[commitId]
-
-def doJobs(jobs, options):
+def doJobs(jobs):
     """now execute all jobs"""
     # pylint: disable=too-many-branches, too-many-locals, too-many-statements
 
-    if not options.git and options.csv:
+    if not OPTIONS.git and OPTIONS.csv:
         try:
             commit() # make sure we are at a point where comparisons make sense
         except UserWarning as exc:
-            print(exc)
+            print('Disabling CSV output: %s' % exc)
             print()
-            print('Disabling CSV output')
-            options.csv = None
+            OPTIONS.csv = None
 
-    clients = [(None, '')] * options.clients
-    srvIdx = 0
+    print('doJobs: servers:%d clients:%d' % (OPTIONS.servers, OPTIONS.clients))
     try:
         while jobs:
-            for qIdx, client in enumerate(clients):
-                if client[0]:
-                    result = client[0].poll()
-                    if result is not None:
-                        print('   Game over: %s%s' % ('Return code: %s ' % result if result else '', client[1]))
-                        commitId = client[2]
-                        clients[qIdx] = (None, '', None)
-                        if commitId not in (x[2] for x in clients):
-                            stopServerFor(commitId)
-                    else:
-                        if all(x[0] for x in clients):
-                            time.sleep(1) # all clients are busy
-                        continue
-                if not jobs:
-                    break
-                job = jobs.pop(0)
-                # never login to the same server twice at the
-                # same time with the same player name
-                startServersFor(job, options)
-                player = qIdx // len(SERVERS[job.commitId]) + 1
-                cmd = ['{src}/kajongg.py'.format(src=srcDir(job.commitId)),
-                      '--game={game}'.format(game=job.game),
-                      '--socket={sock}'.format(sock=SERVERS[job.commitId][srvIdx][1]),
-                      '--player=Tester {player}'.format(player=player),
-                      '--ruleset={ap}'.format(ap=job.ruleset)]
-                if options.rounds:
-                    cmd.append('--rounds={rounds}'.format(rounds=options.rounds))
-                if job.aiVariant != 'Default':
-                    cmd.append('--ai={ai}'.format(ai=job.aiVariant))
-                if options.csv:
-                    cmd.append('--csv={csv}'.format(csv=options.csv))
-                if options.gui:
-                    cmd.append('--demo')
-                else:
-                    cmd.append('--nogui')
-                if options.playopen:
-                    cmd.append('--playopen')
-                if options.debug:
-                    cmd.append('--debug={dbg}'.format(dbg=options.debug))
-                msg = '{game} {ruleset} AI={ai} commit={commit} in {dir}'.format(
-                    game=job.game, ruleset=job.ruleset, ai=job.aiVariant, commit=job.commitId, dir=COMMIT[job.commitId])
-                print('Starting game %s' % msg)
-                clients[qIdx] = (subprocess.Popen(cmd, cwd=srcDir(job.commitId)), msg, job.commitId)
-                srvIdx += 1
-                srvIdx %= len(SERVERS[job.commitId])
-    except KeyboardInterrupt:
-        for client, msg in clients:
+            for checkJob in Job.jobs[:]:
+                checkJob.check()
             try:
-                print('killing %s' % client[1])
-                client[0].terminate()
-                _ = client[0].wait()
-            except OSError:
-                pass
+                jobs[0].start()
+                jobs = jobs[1:]
+            except TooManyClients :
+                time.sleep(1)
+            except TooManyServers:
+                time.sleep(1)
+            Clone.removeUnused()
+    except KeyboardInterrupt:
+        Server.stopAll()
+    except BaseException as exc:
+        print(exc)
+        raise exc
     finally:
-        for client in clients:
-            if client[0]:
-                print('Waiting for   %s' % client[1])
-                _ = os.waitpid(client[0].pid, 0)[1]
+        while True:
+            for job in Job.jobs[:]:
+                if not job.started:
+                    Job.jobs.remove(job)
+                else:
+                    job.check()
+                    if job.process:
+                        print('Waiting for   %s' % job)
+                        job.process.wait()
+            if not Server.servers:
+                if Job.jobs:
+                    print('we have jobs %s but no servers' % list(id(x) for x in Job.jobs))
+                break
+            time.sleep(1)
 
 def parse_options():
     """parse options"""
@@ -317,6 +482,10 @@ def parse_options():
     parser.add_option('', '--csv', dest='csv',
         default='kajongg.csv', help='write results to CSV',
         metavar='CSV')
+    parser.add_option('', '--log', dest='log', action='store_true',
+        default=False, help='write detailled debug info to LOG/game/ruleset/commit.' \
+                ' This starts a separate server process per job.',
+        metavar='LOG')
     parser.add_option('', '--game', dest='game',
         help='start first game with GAMEID, increment for following games.'
             ' Without this, random values are used.',
@@ -339,93 +508,95 @@ def parse_options():
 
     return parser.parse_args()
 
-def improve_options(options):
+def improve_options():
     """add sensible defaults"""
     # pylint: disable=too-many-branches
-    if options.game and not options.count:
-        options.count = 1
-    if options.servers == 0:
-        options.servers = max(1, options.clients // 2)
+    if OPTIONS.count > 10000:
+        if OPTIONS.game:
+            OPTIONS.count = 1
+        elif OPTIONS.log:
+            OPTIONS.count = 5
+    if OPTIONS.servers == 0:
+        OPTIONS.servers = max(1, OPTIONS.clients // 2)
 
     cmd = ['{src}/kajongg.py'.format(src=startingDir()), '--rulesets=']
-    knownRulesets = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0].split('\n')
-    knownRulesets = list(x.strip() for x in knownRulesets if x.strip())
-    if options.rulesets == 'ALL':
-        options.rulesets = ','.join(knownRulesets)
+    OPTIONS.knownRulesets = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0].split('\n')
+    OPTIONS.knownRulesets = list(x.strip() for x in OPTIONS.knownRulesets if x.strip())
+    if OPTIONS.rulesets == 'ALL':
+        OPTIONS.rulesets = OPTIONS.knownRulesets
     else:
-        wantedRulesets = options.rulesets.split(',')
+        wantedRulesets = OPTIONS.rulesets.split(',')
+        usingRulesets = []
         wrong = False
         for ruleset in wantedRulesets:
-            matches = list(x for x in knownRulesets if ruleset in x)
+            matches = list(x for x in OPTIONS.knownRulesets if ruleset in x)
             if len(matches) == 0:
                 print('ruleset', ruleset, 'is not known', end=' ')
                 wrong = True
             elif len(matches) > 1:
                 print('ruleset', ruleset, 'is ambiguous:', matches)
                 wrong = True
+            else:
+                usingRulesets.append(matches[0])
         if wrong:
             sys.exit(1)
-    if options.git is not None:
-        if '..' in options.git:
-            if not '^' in options.git:
-                options.git = options.git.replace('..', '^..')
-            commits = subprocess.check_output('git log --pretty=%h {range}'.format(range=options.git).split())
-            options.git = list(reversed(list(x.strip() for x in commits.split('\n') if x.strip())))
+        OPTIONS.rulesets = usingRulesets
+    if OPTIONS.git is not None:
+        if '..' in OPTIONS.git:
+            if not '^' in OPTIONS.git:
+                OPTIONS.git = OPTIONS.git.replace('..', '^..')
+            commits = subprocess.check_output('git log --pretty=%h {range}'.format(range=OPTIONS.git).split())
+            OPTIONS.git = list(reversed(list(x.strip() for x in commits.split('\n') if x.strip())))
         else:
-            options.git = onlyExistingCommits(options.git.split(','))
-            if not options.git:
+            OPTIONS.git = onlyExistingCommits(OPTIONS.git.split(','))
+            if not OPTIONS.git:
                 sys.exit(1)
-        if options.csv:
-            options.csv = os.path.abspath(options.csv)
-    return options
+        if OPTIONS.csv:
+            OPTIONS.csv = os.path.abspath(OPTIONS.csv)
+    if OPTIONS.log:
+        OPTIONS.servers = OPTIONS.clients
+        if not OPTIONS.debug:
+            OPTIONS.debug = ''
+        OPTIONS.debug += 'neutral,dangerousGame,explain,originalCall,robbingKong,robotAI,scores,traffic,hand'
 
-def cloneSource(commitId):
-    """make a temp directory for commitId"""
-    tmpdir = mkdtemp(suffix='.' + commitId)
-    subprocess.Popen('git clone --local --no-checkout -q .. {temp}'.format(
-            temp=tmpdir).split()).wait()
-    subprocess.Popen('git checkout -q {commitId}'.format(
-            commitId=commitId).split(), cwd=tmpdir).wait()
-    return tmpdir
-
-def createJobs(options):
+def createJobs():
     """the complete list"""
-    if not options.count:
+    if not OPTIONS.count:
         return []
-    if options.game:
-        games = list(range(int(options.game), options.game+options.count))
+    if OPTIONS.game:
+        games = list(range(int(OPTIONS.game), OPTIONS.game+OPTIONS.count))
     else:
-        games = list(int(random.random() * 10**9) for _ in range(options.count))
+        games = list(int(random.random() * 10**9) for _ in range(OPTIONS.count))
     jobs = []
-    rulesets = options.rulesets.split(',')
-    allAis = options.aiVariants.split(',')
-    print('rulesets:', ' '.join(rulesets))
+    allAis = OPTIONS.aiVariants.split(',')
+    print('rulesets:', ' '.join(OPTIONS.rulesets))
     print('AIs:', ' '.join(allAis))
-    if options.git:
-        print('commits:', ' '.join(options.git))
+    if OPTIONS.git:
+        print('commits:', ' '.join(OPTIONS.git))
     print('games:', ' '.join(str(x) for x in games[:20]))
-    options.servers = min(len(rulesets) * len(allAis) * len(games), options.servers)
-    for commitId in options.git or [None]:
+    for commitId in OPTIONS.git or ['current']:
         for game in games:
-            for ruleset in rulesets:
+            for ruleset in OPTIONS.rulesets:
                 for aiVariant in allAis:
                     jobs.append(Job(ruleset, aiVariant, commitId, game))
+    OPTIONS.servers = min(len(jobs), OPTIONS.servers)
+    print('len(jobs):', len(jobs))
     return jobs
 
 def main():
     """parse options, play, evaluate results"""
-
+    global OPTIONS # pylint: disable=global-statement
     initLog('kajonggtest')
 
-    (options, args) = parse_options()
+    (OPTIONS, args) = parse_options()
 
-    removeInvalidCommitsFromCsv(options.csv)
+    removeInvalidCommits(OPTIONS.csv)
 
-    evaluate(readGames(options.csv))
+    evaluate(readGames(OPTIONS.csv))
 
-    options = improve_options(options)
+    improve_options()
 
-    errorMessage = Debug.setOptions(options.debug)
+    errorMessage = Debug.setOptions(OPTIONS.debug)
     if errorMessage:
         print(errorMessage)
         sys.exit(2)
@@ -434,32 +605,24 @@ def main():
         print('unrecognized arguments:', ' '.join(args))
         sys.exit(2)
 
-    if not options.count:
+    if not OPTIONS.count:
         sys.exit(0)
 
-    if not options.aiVariants:
-        options.aiVariants = 'Default'
+    if not OPTIONS.aiVariants:
+        OPTIONS.aiVariants = 'Default'
 
     print()
 
-    jobs = createJobs(options)
+    jobs = createJobs()
     if jobs:
-        try:
-            doJobs(jobs, options)
-        finally:
-            stopServers()
-
-    if options.csv:
-        evaluate(readGames(options.csv))
-
-def removeClone(tmpdir):
-    """remove its tmpdir"""
-    if tmpdir is not None and '/tmp/' in tmpdir:
-        shutil.rmtree(tmpdir)
+        doJobs(jobs)
+        if OPTIONS.csv:
+            evaluate(readGames(OPTIONS.csv))
 
 def cleanup(sig, dummyFrame):
     """at program end"""
-    stopServers()
+    Server.stopAll()
+    Clone.removeAll()
     sys.exit(sig)
 
 # is one server for two clients.
