@@ -148,7 +148,8 @@ class ChatWindow(QWidget):
 
     def kill(self):
         """hide and null on table"""
-        print('chat.kill for %s on table %s' % (self, self.table))
+        if Debug.chat:
+            logDebug('chat.kill for %s on table %s' % (self, self.table))
         self.hide()
         self.table.chatWindow = None
 

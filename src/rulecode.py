@@ -356,7 +356,7 @@ class StandardMahJongg(MahJonggFunction):
                     and values.count(values[2]) == 1):
                 changed = False
                 if values[0] + 2 == values[2] and (len(values) == 3 or values[3] > values[0] + 3):
-                    # print('removing first 3 from %s' % values)
+                    # logDebug('removing first 3 from %s' % values)
                     meld = Meld([Tile(group, values[x]) for x in range(3)])
                     for pair in meld:
                         result.remove(pair)
@@ -364,7 +364,7 @@ class StandardMahJongg(MahJonggFunction):
                     values = values[3:]
                     changed = True
                 elif values[0] + 1 == values[1] and values[2] > values[0] + 2:
-                    # print('found incomplete chow at start of %s' % values)
+                    # logDebug('found incomplete chow at start of %s' % values)
                     return StandardMahJongg.fillChow(group, values[:2])
             changed = True
             while (changed and len(values) > 2
@@ -380,7 +380,7 @@ class StandardMahJongg(MahJonggFunction):
                     values = values[:-3]
                     changed = True
                 elif values[-1] - 1 == values[-2] and values[-3] < values[-1] - 2:
-                    # print('found incomplete chow at end of %s' % values)
+                    # logDebug('found incomplete chow at end of %s' % values)
                     return StandardMahJongg.fillChow(group, values[-2:])
 
             if len(values) % 3 == 0:
@@ -391,11 +391,11 @@ class StandardMahJongg(MahJonggFunction):
             valueSet = set(values)
             if len(values) == 4 and len(values) == len(valueSet):
                 if values[0] + 3 == values[-1]:
-                    # print('seq4 in %s' % hand.tilesInHand)
+                    # logDebug('seq4 in %s' % hand.tilesInHand)
                     return {Tile(group, values[0]), Tile(group, values[-1])}
             if len(values) == 7 and len(values) == len(valueSet):
                 if values[0] + 6 == values[6]:
-                    # print('seq7 in %s' % hand.tilesInHand)
+                    # logDebug('seq7 in %s' % hand.tilesInHand)
                     return {Tile(group, values[x]) for x in (0, 3, 6)}
             if len(values) == 1:
                 # only a pair of this value is possible
@@ -418,7 +418,7 @@ class StandardMahJongg(MahJonggFunction):
                 return StandardMahJongg.fillChow(group, values)
             if (len(values) == 4 and len(valueSet) == 2
                     and values[0] == values[1] and values[2] == values[3]):
-                # print('we have 2 pairs of %s' % group)
+                # logDebug('we have 2 pairs of %s' % group)
                 return {Tile(group, values[0]), Tile(group, values[2])}
             if maxChows:
                 for value in valueSet:

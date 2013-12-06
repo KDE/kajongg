@@ -21,8 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
-from __future__ import print_function
-
 import itertools
 
 from tile import Tile, Byteset
@@ -159,17 +157,3 @@ class Permutations(object):
             if melds:
                 result.append(melds)
         return result
-
-#if __name__ == "__main__":
-#    for i in range(10000): #00000):
-#        PPP = Permutations([Tile(b'Db'), Tile(b'fe'), Tile(b'Db'), Tile(b'Dg'), Tile(b'S2'),
-#            Tile(b'S4'), Tile(b'S5'), Tile(b'S3'), Tile(b'C4'), Tile(b'C5'), Tile(b'C5'),
-#            Tile(b'C6'), Tile(b'C6'), Tile(b'C7'), Tile(b'C8'), Tile(b'C8')])
-#        p = PPP.variants
-#    print(p)
-#    PP = Permutations(TileList(b'XyXyXyXyXy'))
-#    print(PP.variants)
-#    PP = Permutations(TileList(b'DrDrC4C4C4C7C8C9C8C8'))
-#    print(PP.variants)
-#    print(str(MeldList(list(x))) for x in PP.variants)
-#    p = Permutations([Tile(b'C3'), Tile(b'C3')])

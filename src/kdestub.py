@@ -97,7 +97,6 @@ def i18nc(context, englishIn, *args):
     _ = KGlobal.translation.gettext(withContext).decode('utf-8')
     if '\004' in _:
         # found no translation with context
-        print('nothing found with context', context, englishIn)
         result = i18n(englishIn, *args)
     else:
         result = i18n(withContext, *args)

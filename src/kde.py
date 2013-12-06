@@ -53,7 +53,6 @@ def appdataDir():
             # upgrading an old kajonggserver installation
             os.makedirs(newPath)
             shutil.move(oldPath, newPath)
-            print('moved %s to %s' % (oldPath,  newPath))
         if not os.path.exists(newPath):
             try:
                 os.makedirs(newPath)

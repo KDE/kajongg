@@ -24,7 +24,6 @@ from collections import defaultdict
 import datetime
 
 import sip
-import traceback
 import platform
 
 # pylint: disable=invalid-name
@@ -141,8 +140,6 @@ class FixedClass(type):
     all class variables become immutable"""
     def __setattr__(cls, key, value):
         if cls.fixed:
-            for line in traceback.format_stack()[:-2]:
-                print(line, end='')
             raise SystemExit('{cls}.{key} may not be changed'.format(cls=cls.__name__, key=key))
         else:
             type.__setattr__(cls, key, value)
