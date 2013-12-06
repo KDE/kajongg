@@ -140,13 +140,14 @@ class Duration(object):
 
     def __exit__(self, exc_type, exc_value, trback):
         """now check time passed"""
-        diff = datetime.datetime.now() - self.__start
-        if diff > datetime.timedelta(seconds=self.threshold):
-            msg = '%s took %d.%02d seconds' % (self.name, diff.seconds, diff.microseconds)
-            if self.bug:
-                raise UserWarning(msg)
-            else:
-                print(msg)
+        if not Debug.neutral:
+            diff = datetime.datetime.now() - self.__start
+            if diff > datetime.timedelta(seconds=self.threshold):
+                msg = '%s took %d.%02d seconds' % (self.name, diff.seconds, diff.microseconds)
+                if self.bug:
+                    raise UserWarning(msg)
+                else:
+                    print(msg)
 
 def checkMemory():
     """as the name says"""

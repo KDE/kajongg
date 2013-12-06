@@ -816,6 +816,20 @@ class HumanClient(Client):
         else:
             return succeed(None)
 
+    def __logCallServer(self, *args):
+        """for Debug.traffic"""
+        debugArgs = list(args[:])
+        if Debug.neutral:
+            if debugArgs[0] == 'ping':
+                return
+            if debugArgs[0] == 'setClientProperties':
+                debugArgs[1] = u'DBID'
+                debugArgs[3] = u'GAMEID'
+        if self.game:
+            self.game.debug('callServer(%s)' % repr(debugArgs))
+        else:
+            logDebug('callServer(%s)' % repr(debugArgs))
+
     def callServer(self, *args):
         """if we are online, call server"""
         if self.connection:
@@ -823,10 +837,7 @@ class HumanClient(Client):
                 args = args[1:]
             try:
                 if Debug.traffic:
-                    if self.game:
-                        self.game.debug('callServer(%s)' % repr(args))
-                    else:
-                        logDebug('callServer(%s)' % repr(args))
+                    self.__logCallServer(*args)
                 def callServerError(result):
                     """if serverDisconnected has been called meanwhile, just ignore msg about
                     connection lost in a non-clean fashion"""

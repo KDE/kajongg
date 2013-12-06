@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
+from common import Debug
 from message import Message
 from tile import Tile
 from meld import Meld
@@ -65,7 +66,9 @@ class Move(object):
         for key, value in kwargs.items():
             if key == 'token':
                 continue
-            if isinstance(value, bool) and value:
+            if Debug.neutral and key == 'gameid':
+                result += ' gameid:GAMEID'
+            elif isinstance(value, bool) and value:
                 result += ' %s' % key
             elif isinstance(value, bool):
                 pass
