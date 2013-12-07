@@ -281,7 +281,9 @@ class IntDict(defaultdict):
         defaultdict.clear(self)
 
     def __str__(self):
-        return str(dict(self))
+        """sort the result for better log comparison"""
+        keys = sorted(self.keys())
+        return ', '.join('{}:{}'.format(x, self[x]) for x in keys)
 
     def __repr__(self):
         return "<IntDict: %s>" % self
