@@ -92,9 +92,9 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         In that case, make an educated guess about the discard. For player==game.myself, use
         the focussed tile."""
         hand = self.hand
-        if hand and hand.tileNames and self._concealedTileNames:
+        if hand and hand.tiles and self._concealedTiles:
             if hand.lenOffset == 1 and not hand.won:
-                if any(not x.isKnown for x in self._concealedTileNames):
+                if any(not x.isKnown for x in self._concealedTiles):
                     hand -= Tile.unknown
                 elif self.handBoard.focusTile:
                     hand -= self.handBoard.focusTile.tile

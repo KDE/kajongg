@@ -869,10 +869,10 @@ class PlayingGame(Game):
             result = Tile.unknown
         else:
             result = tileName
-        if not tileName in player.concealedTileNames:
+        if not tileName in player.concealedTiles:
             raise Exception('I am %s. Player %s is told to show discard of tile %s but does not have it, he has %s' % \
                            (self.myself.name if self.myself else 'None',
-                            player.name, result, player.concealedTileNames))
+                            player.name, result, player.concealedTiles))
         return result
 
     def hasDiscarded(self, player, tileName):

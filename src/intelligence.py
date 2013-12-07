@@ -33,8 +33,8 @@ class AIDefault(object):
     # we could solve this by moving those filters into DiscardCandidates
     # but that would make it more complicated to define alternative AIs
 
-    def __init__(self, player):
-        self._player = weakref.ref(player)
+    def __init__(self, player=None):
+        self._player = weakref.ref(player) if player else None
 
     @property
     def player(self):
@@ -266,7 +266,7 @@ class AIDefault(object):
                     # do not dissolve an existing chow
                     belongsToPair = False
                     for tile in chow:
-                        if self.player.concealedTileNames.count(tile) == 2:
+                        if self.player.concealedTiles.count(tile) == 2:
                             belongsToPair = True
                             break
                     if not belongsToPair:
@@ -278,39 +278,44 @@ class AIDefault(object):
             if not self.player.mustPlayDangerous(kong):
                 return kong
 
-    def xxxxhandValue(self):
-        """UNUSED CODE!
-        compute the value of a hand.
+    def handValue(self, hand):
+        """compute the value of a hand.
         This is not just its current score but also
         what possibilities to evolve it has. E.g. if
         only one tile is concealed and 3 of it are already
         visible, chances for MJ are 0.
         This will become the central part of AI -
-        moves will be done which optimize the hand value"""
-        hand = self.player.hand
-        assert not hand.lenOffset, hand
-        result = 0
-        if hand.won:
-            return 1000
-        result = hand.total()
-        completedHands = hand.callingHands(99)
-        if completedHands:
-            result += 500 + len(completedHands) * 20
-        for meld in hand.declaredMelds:
-            if not meld.isChow:
-                result += 40
-        garbage = []
-        for meld in (x for x in hand.melds if not x.isExposed):
-            assert len(meld) < 4, hand
-            if meld.isPung:
-                result += 50
-            elif meld.isChow:
-                result += 30
-            elif meld.isPair:
-                result += 5
-            else:
-                garbage.append(meld)
-        return result
+        moves will be done which optimize the hand value.
+        For now it is only used by Hand.__split but not
+        by the actual discarding code"""
+        return hand.total()
+
+# the rest is not yet used: __split only wants something nice for
+# display but is not relevant for the real decision making
+#        if hand is None:
+#            hand = self.player.hand
+#        result = 0
+#        if hand.won:
+#            return 1000 + hand.total()
+#        result = hand.total()
+#        completedHands = hand.callingHands(99)
+#        if completedHands:
+#            result += 500 + len(completedHands) * 20
+#        for meld in hand.declaredMelds:
+#            if not meld.isChow:
+#                result += 40
+#        garbage = []
+#        for meld in (x for x in hand.melds if not x.isDeclared):
+#            assert len(meld) < 4, hand
+#            if meld.isPung:
+#                result += 50
+#            elif meld.isChow:
+#                result += 30
+#            elif meld.isPair:
+#                result += 5
+#            else:
+#                garbage.append(meld)
+#        return result
 
 class TileAI(object):
     """holds a few AI related tile properties"""

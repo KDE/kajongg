@@ -140,7 +140,7 @@ class ServerGame(PlayingGame):
             # 13 tiles at least, with names as given by wall
             player.addConcealedTiles(self.wall.deal([None] * 13))
             # compensate boni
-            while len(player.concealedTileNames) != 13:
+            while len(player.concealedTiles) != 13:
                 player.addConcealedTiles(self.wall.deal())
         PlayingGame.initHand(self)
 
@@ -516,7 +516,7 @@ class ServerTable(Table):
         game = self.game
         assert player == game.activePlayer
         tile = Tile(msg.args[0])
-        if tile not in player.concealedTileNames:
+        if tile not in player.concealedTiles:
             self.abort('player %s discarded %s but does not have it' % (player, tile))
             return
         txt = game.dangerousFor(player, tile)
@@ -538,15 +538,15 @@ class ServerTable(Table):
             if mustPlayDangerous and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
                     logDebug('%s claims no choice. Discarded %s, keeping %s. %s' % \
-                         (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
+                         (player, tile, ''.join(player.concealedTiles), ' / '.join(txt)))
                 player.claimedNoChoice = True
-                block.tellAll(player, Message.NoChoice, tiles=player.concealedTileNames)
+                block.tellAll(player, Message.NoChoice, tiles=player.concealedTiles)
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
                     logDebug('%s played dangerous. Discarded %s, keeping %s. %s' % \
-                         (player, tile, ''.join(player.concealedTileNames), ' / '.join(txt)))
-                block.tellAll(player, Message.DangerousGame, tiles=player.concealedTileNames)
+                         (player, tile, ''.join(player.concealedTiles), ' / '.join(txt)))
+                block.tellAll(player, Message.DangerousGame, tiles=player.concealedTiles)
         if msg.answer == Message.OriginalCall:
             player.isCalling = True
             block.callback(self.clientMadeOriginalCall, msg)
@@ -580,7 +580,7 @@ class ServerTable(Table):
         for clientPlayer in self.game.players:
             for player in self.game.players:
                 if player == clientPlayer or self.game.playOpen:
-                    tileNames = player.concealedTileNames
+                    tileNames = player.concealedTiles
                 else:
                     tileNames = (Tile.unknown, ) * 13
                 block.tell(player, clientPlayer, Message.SetConcealedTiles,
@@ -600,7 +600,7 @@ class ServerTable(Table):
                 if player != self.game.winner:
                     # the winner tiles are already shown in claimMahJongg
                     block.tellOthers(player, Message.ShowConcealedTiles, show=True,
-                        tiles=player.concealedTileNames)
+                        tiles=player.concealedTiles)
             block.callback(self.saveHand)
 
     def saveHand(self, dummyResults=None):
@@ -652,7 +652,7 @@ class ServerTable(Table):
             return
         if not player.hasConcealedTiles(hasTiles):
             msg = m18nE('%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
-            self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTileNames))
+            self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTiles))
             return
         # update our internal state before we listen to the clients again
         self.game.discardedTiles[lastDiscard.lower()] -= 1
@@ -685,7 +685,7 @@ class ServerTable(Table):
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, str(kongMeld))
             logDebug(m18n(msg, *args))
-            logDebug('declareKong:concealedTileNames:%s' % ''.join(player.concealedTileNames))
+            logDebug('declareKong:concealedTiles:%s' % ''.join(player.concealedTiles))
             logDebug('declareKong:concealedMelds:%s' % \
                 ' '.join(str(x) for x in player.concealedMelds))
             logDebug('declareKong:exposedMelds:%s' % \

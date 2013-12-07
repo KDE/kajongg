@@ -27,6 +27,7 @@ from meld import Meld, MeldList
 from rule import Score, Ruleset
 from common import Debug
 from permutations import Permutations
+from intelligence import AIDefault
 
 class UsedRule(object):
     """use this in scoring, never change class Rule.
@@ -113,6 +114,7 @@ class Hand(object):
         else:
             self.player = ruleset
             self.ruleset = self.player.game.ruleset
+        self.intelligence = self.player.intelligence if self.player else AIDefault()
         self.string = string
         self.robbedTile = robbedTile
         self.__won = False
@@ -148,10 +150,10 @@ class Hand(object):
         self.melds = MeldList()
         self.bonusMelds, tileStrings = self.__separateBonusMelds(tileStrings)
         tileString = b' '.join(tileStrings)
-        self.tileNames = TileList(tileString.replace(b' ', b'').replace(b'R', b''))
-        self.tileNames.sort()
-        self.values = Values(x.value for x in self.tileNames)
-        self.suits = set(x.lowerGroup for x in self.tileNames)
+        self.tiles = TileList(tileString.replace(b' ', b'').replace(b'R', b''))
+        self.tiles.sort()
+        self.values = Values(x.value for x in self.tiles)
+        self.suits = set(x.lowerGroup for x in self.tiles)
         for split in tileStrings[:]:
             if split[:1] != b'R':
                 self.melds.append(Meld(split))
@@ -160,8 +162,8 @@ class Hand(object):
         # functions need them
         self.declaredMelds = MeldList(x for x in self.melds if x.isDeclared)
         declaredTiles = list(sum((x for x in self.declaredMelds), []))
-        self.tilesInHand = TileList(x for x in self.tileNames if x not in declaredTiles)
-        self.lenOffset = len(self.tileNames) - 13 - sum(x.isKong for x in self.declaredMelds)
+        self.tilesInHand = TileList(x for x in self.tiles if x not in declaredTiles)
+        self.lenOffset = len(self.tiles) - 13 - sum(x.isKong for x in self.declaredMelds)
 
         assert len(tileStrings) < 2, tileStrings
         self.rest = TileList()
@@ -195,7 +197,7 @@ class Hand(object):
 
     def hasTiles(self):
         """tiles are assigned to this hand"""
-        return self.tileNames or self.bonusMelds
+        return self.tiles or self.bonusMelds
 
     @property
     def lastTile(self):
@@ -332,14 +334,14 @@ class Hand(object):
                     if len(part) > 4:
                         self.__announcements = part[4:]
         if self.__lastTile:
-            assert self.__lastTile.isBonus or self.__lastTile in self.tileNames, \
+            assert self.__lastTile.isBonus or self.__lastTile in self.tiles, \
                 'lastTile %s is not in hand %s, mjStr=%s' % (
                 self.__lastTile, self.string, self.mjStr)
             if self.__lastSource == 'k':
-                assert self.tileNames.count(self.__lastTile.lower()) + \
-                    self.tileNames.count(self.__lastTile.capitalize()) == 1, \
+                assert self.tiles.count(self.__lastTile.lower()) + \
+                    self.tiles.count(self.__lastTile.capitalize()) == 1, \
                     'Robbing kong: I cannot have lastTile %s more than once in %s' % (
-                    self.__lastTile, ' '.join(self.tileNames))
+                    self.__lastTile, ' '.join(self.tiles))
 
 
     def __setLastMeld(self):
@@ -574,23 +576,23 @@ class Hand(object):
         self.melds.extend(bestVariant)
         self.melds.sort()
         self.rest = []
-        assert sum(len(x) for x in self.melds) == len(self.tileNames), '%s != %s' % (
-            self.melds, self.tileNames)
+        assert sum(len(x) for x in self.melds) == len(self.tiles), '%s != %s' % (
+            self.melds, self.tiles)
 
     def __gt__(self, other):
         """compares hand values"""
         assert self.player == other.player
-        return self.total() > other.total()
+        return self.intelligence.handValue(self) > self.intelligence.handValue(other)
 
     def __lt__(self, other):
         """compares hand values"""
         assert self.player == other.player
-        return self.total() < other.total()
+        return self.intelligence.handValue(self) < self.intelligence.handValue(other)
 
     def __eq__(self, other):
         """compares hand values"""
         assert self.player == other.player
-        return self.total() == other.total()
+        return self.intelligence.handValue(self) == self.intelligence.handValue(other)
 
     def __matchingRules(self, rules):
         """return all matching rules for this hand"""

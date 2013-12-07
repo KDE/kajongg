@@ -281,7 +281,7 @@ class HandBoard(Board):
             for meld in self.player.concealedMelds:
                 logConcealed.extend(meld)
         else:
-            logConcealed = sorted(self.player.concealedTileNames)
+            logConcealed = sorted(self.player.concealedTiles)
         logExposed.sort()
         physExposed.sort()
         logConcealed.sort()
@@ -373,8 +373,8 @@ class PlayingHandBoard(HandBoard):
         """a list of melds for the hand as it should look after sync"""
         if self.player.concealedMelds:
             result = MeldList(self.player.concealedMelds)
-        elif self.player.concealedTileNames:
-            tileStr = 'R' + ''.join(str(x) for x in self.player.concealedTileNames)
+        elif self.player.concealedTiles:
+            tileStr = 'R' + ''.join(str(x) for x in self.player.concealedTiles)
             handStr = ' '.join([tileStr, self.player.mjString()])
             content = Hand(self.player, handStr)
             content.calculate()

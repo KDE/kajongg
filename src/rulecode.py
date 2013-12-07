@@ -471,7 +471,7 @@ class SquirmingSnake(StandardMahJongg):
 class WrigglingSnake(MahJonggFunction):
     @staticmethod
     def shouldTry(hand, maxMissing=3):
-        return (len(set(x.lower() for x in hand.tileNames)) + maxMissing > 12
+        return (len(set(x.lower() for x in hand.tiles)) + maxMissing > 12
            and all(not x.isChow for x in hand.declaredMelds))
 
     def computeLastMelds(self, hand):
@@ -496,7 +496,7 @@ class WrigglingSnake(MahJonggFunction):
                 return set()
             else:
                 return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) \
-                    - set([x.lower() for x in hand.tileNames])
+                    - set([x.lower() for x in hand.tiles])
         else:
             # pair of 1 is not complete
             return set([Tile(group, 1)])
@@ -606,7 +606,7 @@ class TripleKnitting(MahJonggFunction):
         return melds, rest
 
     def appliesToHand(self, hand):
-        if any(x.isHonor for x in hand.tileNames):
+        if any(x.isHonor for x in hand.tiles):
             return False
         if len(hand.declaredMelds) > 1:
             return False
@@ -619,7 +619,7 @@ class TripleKnitting(MahJonggFunction):
     def winningTileCandidates(self, hand):
         if hand.declaredMelds:
             return set()
-        if any(x.isHonor for x in hand.tileNames):
+        if any(x.isHonor for x in hand.tiles):
             return set()
         _, rest = self.findTriples(hand)
         if len(rest) not in (1, 4):
@@ -644,9 +644,9 @@ class TripleKnitting(MahJonggFunction):
             if len(hand.declaredMelds) > 1:
                 return [], None
         result = []
-        tilesS = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == b's')
-        tilesB = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == b'b')
-        tilesC = list(x.capitalize() for x in hand.tileNames if x.lowerGroup == b'c')
+        tilesS = list(x.capitalize() for x in hand.tiles if x.lowerGroup == b's')
+        tilesB = list(x.capitalize() for x in hand.tiles if x.lowerGroup == b'b')
+        tilesC = list(x.capitalize() for x in hand.tiles if x.lowerGroup == b'c')
         for tileS in tilesS[:]:
             tileB = Tile(b'B' + tileS.value)
             tileC = Tile(b'C' + tileS.value)
@@ -687,7 +687,7 @@ class Knitting(MahJonggFunction):
         return pairCount >= pairWanted
 
     def appliesToHand(self, hand):
-        if any(x.isHonor for x in hand.tileNames):
+        if any(x.isHonor for x in hand.tiles):
             return False
         if len(hand.declaredMelds) > 1:
             return False
@@ -698,7 +698,7 @@ class Knitting(MahJonggFunction):
     def winningTileCandidates(self, hand):
         if hand.declaredMelds:
             return set()
-        if any(x.isHonor for x in hand.tileNames):
+        if any(x.isHonor for x in hand.tiles):
             return set()
         couples, singleTile = self.findCouples(hand)
         if len(couples) != 6:
@@ -730,7 +730,7 @@ class Knitting(MahJonggFunction):
                 return [], []
         result = []
         if pairs is None:
-            pairs = hand.tileNames
+            pairs = hand.tiles
         suits = self.pairSuits(hand)
         if not suits:
             return [], []
@@ -749,7 +749,7 @@ class Knitting(MahJonggFunction):
     @staticmethod
     def pairSuits(hand):
         """returns a lowercase string with two suit characters. If no prevalence, returns None"""
-        suitCounts = list(len([x for x in hand.tileNames if x.lowerGroup == y]) for y in (b's', b'b', b'c'))
+        suitCounts = list(len([x for x in hand.tiles if x.lowerGroup == y]) for y in (b's', b'b', b'c'))
         minSuit = min(suitCounts)
         result = b''.join(x for idx, x in enumerate([b's', b'b', b'c']) if suitCounts[idx] > minSuit)
         if len(result) == 2:
@@ -769,20 +769,20 @@ class AllPairHonors(MahJonggFunction):
         return result
     @staticmethod
     def maybeCallingOrWon(hand):
-        if any(x.value in b'2345678' for x in hand.tileNames):
+        if any(x.value in b'2345678' for x in hand.tiles):
             return False
         return len(hand.declaredMelds) < 2
     def appliesToHand(self, hand):
         if not self.maybeCallingOrWon(hand):
             return False
-        if len(set(hand.tileNames)) != 7:
+        if len(set(hand.tiles)) != 7:
             return False
-        tileCounts = list([len([x for x in hand.tileNames if x == y]) for y in hand.tileNames])
+        tileCounts = list([len([x for x in hand.tiles if x == y]) for y in hand.tiles])
         return set(tileCounts) == set([2])
     def winningTileCandidates(self, hand):
         if not self.maybeCallingOrWon(hand):
             return set()
-        single = list(x for x in hand.tileNames if hand.tileNames.count(x) == 1)
+        single = list(x for x in hand.tiles if hand.tiles.count(x) == 1)
         if len(single) != 1:
             return set()
         return set(single)
@@ -790,7 +790,7 @@ class AllPairHonors(MahJonggFunction):
     def shouldTry(hand, maxMissing=4):
         if hand.declaredMelds:
             return False
-        tiles = list(x.lower() for x in hand.tileNames)
+        tiles = list(x.lower() for x in hand.tiles)
         pairCount = kongCount = 0
         for tile in elements.majors:
             count = tiles.count(tile)
@@ -830,7 +830,7 @@ class AllPairHonors(MahJonggFunction):
 class FourfoldPlenty(Function):
     @staticmethod
     def appliesToHand(hand):
-        return len(hand.tileNames) == 18
+        return len(hand.tiles) == 18
 
 class ThreeGreatScholars(Function):
     def appliesToHand(self, hand):
@@ -867,7 +867,7 @@ class FourBlessingsHoveringOverTheDoor(Function):
 class AllGreen(Function):
     @staticmethod
     def appliesToHand(hand):
-        tiles = set(bytes(x.lower()) for x in hand.tileNames)
+        tiles = set(bytes(x.lower()) for x in hand.tiles)
         return tiles < Tileset([b'b2', b'b3', b'b4', b'b5', b'b6', b'b8', b'dg'])
 
 class LastTileFromWall(Function):
@@ -915,7 +915,7 @@ class RobbingKong(Function):
         """for scoring game"""
         return (hand.lastSource and hand.lastSource in b'kwd'
             and hand.lastTile and hand.lastTile.group.islower()
-            and [x.lower() for x in hand.tileNames].count(hand.lastTile.lower()) < 2)
+            and [x.lower() for x in hand.tiles].count(hand.lastTile.lower()) < 2)
 
 class GatheringPlumBlossomFromRoof(Function):
     @staticmethod
@@ -970,14 +970,14 @@ class GatesOfHeaven(StandardMahJongg):
         self.suit = None
     def shouldTry(self, hand):
         for suit in Tile.colors:
-            count19 = sum(x.value in b'19' for x in hand.tileNames)
-            suitCount = len(list(x for x in hand.tileNames if x.lowerGroup == suit))
+            count19 = sum(x.value in b'19' for x in hand.tiles)
+            suitCount = len(list(x for x in hand.tiles if x.lowerGroup == suit))
             if suitCount > 10 and count19 > 4:
                 return True
         return False
 
     def maybeCallingOrWon(self, hand):
-        suits = set(x.lowerGroup for x in hand.tileNames)
+        suits = set(x.lowerGroup for x in hand.tiles)
         if len(suits) != 1 or not suits < Byteset(Tile.colors):
             return False
         self.suit = suits.pop()
@@ -1054,7 +1054,7 @@ class ThirteenOrphans(MahJonggFunction):
         result = IntDict()
         if ThirteenOrphans.shouldTry(hand):
             doublesCount = hand.doublesEstimate()
-            if hand.tileNames.count(discard) == 2:
+            if hand.tiles.count(discard) == 2:
 # TODO: compute scoring for resulting hand. If it is high anyway,
 # prefer pung over trying 13 orphans
                 for rule in hand.ruleset.doublingMeldRules:
@@ -1068,7 +1068,7 @@ class ThirteenOrphans(MahJonggFunction):
 
     @staticmethod
     def appliesToHand(hand):
-        return set(x.lower() for x in hand.tileNames) == elements.majors
+        return set(x.lower() for x in hand.tiles) == elements.majors
 
     @staticmethod
     def winningTileCandidates(hand):
@@ -1077,7 +1077,7 @@ class ThirteenOrphans(MahJonggFunction):
             return set()
         if not ThirteenOrphans.shouldTry(hand, maxMissing=1):
             return set()
-        handTiles = set(x.lower() for x in hand.tileNames)
+        handTiles = set(x.lower() for x in hand.tiles)
         missing = elements.majors - handTiles
         if len(missing) == 0:
             # if all 13 tiles are there, we need any one of them:
@@ -1093,7 +1093,7 @@ class ThirteenOrphans(MahJonggFunction):
             return False
         if hand.doublesEstimate() > 1:
             return False
-        handTiles = set(x.lower() for x in hand.tileNames)
+        handTiles = set(x.lower() for x in hand.tiles)
         missing = elements.majors - handTiles
         if len(missing) > maxMissing:
             return False
@@ -1110,7 +1110,7 @@ class ThirteenOrphans(MahJonggFunction):
         hand = candidates.hand
         if not ThirteenOrphans.shouldTry(hand):
             return candidates
-        handTiles = set(x.lower() for x in hand.tileNames)
+        handTiles = set(x.lower() for x in hand.tiles)
         missing = elements.majors - handTiles
         havePair = False
         keep = (6 - len(missing)) * 5
