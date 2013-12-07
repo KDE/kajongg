@@ -580,11 +580,11 @@ class ServerTable(Table):
         for clientPlayer in self.game.players:
             for player in self.game.players:
                 if player == clientPlayer or self.game.playOpen:
-                    tileNames = player.concealedTiles
+                    tiles = player.concealedTiles
                 else:
-                    tileNames = (Tile.unknown, ) * 13
+                    tiles = (Tile.unknown, ) * 13
                 block.tell(player, clientPlayer, Message.SetConcealedTiles,
-                    tiles=tileNames + player.bonusTiles)
+                    tiles=tiles + player.bonusTiles)
         block.callback(self.dealt)
 
     def endHand(self, dummyResults=None):

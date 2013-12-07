@@ -592,19 +592,19 @@ class PlayingPlayer(Player):
             within.remove(tile)
         return True
 
-    def showConcealedTiles(self, tileNames, show=True):
-        """show or hide tileNames"""
+    def showConcealedTiles(self, tiles, show=True):
+        """show or hide tiles"""
         if not self.game.playOpen and self != self.game.myself:
-            if not isinstance(tileNames, (list, tuple)):
-                tileNames = [tileNames]
-            assert len(tileNames) <= len(self._concealedTiles), \
-                '%s: showConcealedTiles %s, we have only %s' % (self, tileNames, self._concealedTiles)
-            for tileName in tileNames:
+            if not isinstance(tiles, (list, tuple)):
+                tiles = [tiles]
+            assert len(tiles) <= len(self._concealedTiles), \
+                '%s: showConcealedTiles %s, we have only %s' % (self, tiles, self._concealedTiles)
+            for tileName in tiles:
                 src, dst = (Tile.unknown, tileName) if show else (tileName, Tile.unknown)
-                assert src != dst, (self, src, dst, tileNames, self._concealedTiles)
+                assert src != dst, (self, src, dst, tiles, self._concealedTiles)
                 if not src in self._concealedTiles:
                     logException( '%s: showConcealedTiles(%s): %s not in %s.' % \
-                            (self, tileNames, src, self._concealedTiles))
+                            (self, tiles, src, self._concealedTiles))
                 idx = self._concealedTiles.index(src)
                 self._concealedTiles[idx] = dst
             if self.lastTile and not self.lastTile.isKnown:

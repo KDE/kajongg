@@ -81,22 +81,22 @@ class Wall(object):
             tile.tile = Tile(element)
             return tile
 
-    def deal(self, tileNames=None, deadEnd=False):
+    def deal(self, tiles=None, deadEnd=False):
         """deal tiles. May raise WallEmpty.
         Returns a list of tiles"""
-        if tileNames is None:
-            tileNames = [None]
-        count = len(tileNames)
+        if tiles is None:
+            tiles = [None]
+        count = len(tiles)
         if deadEnd:
-            tiles = self.kongBox.pop(count)
+            dealTiles = self.kongBox.pop(count)
             if len(self.kongBox) % 2 == 0:
                 self._placeLooseTiles()
         else:
             if len(self.living) < count:
                 raise WallEmpty
-            tiles = self.living[:count]
+            dealTiles = self.living[:count]
             self.living = self.living[count:]
-        return list(self.__nameTile(*x) for x in zip(tiles, tileNames)) # pylint: disable=W0142
+        return list(self.__nameTile(*x) for x in zip(dealTiles, tiles)) # pylint: disable=W0142
 
     def build(self, shuffleFirst=False):
         """virtual: build visible wall"""
