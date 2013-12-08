@@ -286,17 +286,14 @@ class Connection(object):
 
     def login(self):
         """to be called from HumanClient"""
-        result = DeferredDialog(self.dlg).addCallback(self.__haveLoginData
-            ).addCallbacks(self.assertConnectivity, self._loginReallyFailed
-            ).addCallbacks(self.loginToServer, self._loginReallyFailed
-            ).addCallback(self.loggedIn)
+        result = DeferredDialog(self.dlg).addCallback(self.__haveLoginData)
+        result.addCallback(self.assertConnectivity)
+        result.addCallback(self.loginToServer)
+        result.addCallback(self.loggedIn)
+        result.addErrback(self._loginReallyFailed)
         if Internal.autoPlay or SingleshotOptions.table or SingleshotOptions.join:
             result.clicked()
         return result
-
-    def loginToServer(self, dummy=None):
-        """login to server"""
-        return self.loginCommand(self.username).addErrback(self._loginFailed)
 
     def __haveLoginData(self, arguments):
         """user entered login data, now try to login to server"""
@@ -306,6 +303,10 @@ class Connection(object):
             Players.createIfUnknown(unicode(self.dlg.cbUser.currentText()))
         self.useSocket, self.url, self.username, self.password, self.ruleset = arguments
         self.__checkExistingConnections()
+
+    def loginToServer(self, dummy=None):
+        """login to server"""
+        return self.loginCommand(self.username).addErrback(self._loginFailed)
 
     def loggedIn(self, perspective):
         """successful login on server"""
