@@ -216,6 +216,10 @@ class RuleList(list):
                 rule.key(), self[rule.key()].definition, rule.name, rule.definition))
         self[rule.key()] = rule
 
+    def createRule(self, name, definition='', **kwargs):
+        """shortcut for simpler definition of predefined rulesets"""
+        self.add(Rule(name, definition, **kwargs))
+
 class UsedRule(object):
     """use this in scoring, never change class Rule.
     If the rule has been used for a meld, pass it"""
