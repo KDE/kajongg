@@ -446,6 +446,9 @@ class Query(object):
                         _, utf8Args = xToUtf8(u'', dataSet)
                         logDebug("{cmd} [{args}]".format(cmd=cmd, args=", ".join(utf8Args)))
                     for value in dataSet:
+                        if isinstance(value, bool):
+                            # see https://bugreports.qt-project.org/browse/QTBUG-15640
+                            value = int(value)
                         self.query.addBindValue(QVariant(value))
                     self.success = self.query.exec_()
                     if not self.success:
