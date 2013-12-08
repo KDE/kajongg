@@ -734,7 +734,7 @@ class Rule(object):
                 self.parameter = parType(parameter)
                 definition = definition[len(typeName):]
                 break
-        self.definition = definition
+        self.__setDefinition(definition)
 
     def key(self):
         """the key is used for finding a rule in a RuleList. Since we do not
@@ -760,11 +760,9 @@ class Rule(object):
             return '||'.join(self._definition)
         return self._definition
 
-    @definition.setter
-    def definition(self, definition):
-        """setter for definition"""
+    def __setDefinition(self, definition):
+        """private setter for definition"""
         #pylint: disable=too-many-branches
-        prevDefinition = self.definition
         self._definition = definition
         if not definition:
             return # may happen with special programmed rules
@@ -809,14 +807,13 @@ class Rule(object):
                     pass
         if self.function:
             self.function.options = self.options
-        self.validateDefinition(prevDefinition)
+        self.validateDefinition()
 
-    def validateDefinition(self, prevDefinition):
-        """check for validity. If wrong, restore prevDefinition."""
+    def validateDefinition(self):
+        """check for validity"""
         payers = int(self.options.get('payers', 1))
         payees = int(self.options.get('payees', 1))
         if not 2 <= payers + payees <= 4:
-            self.definition = prevDefinition
             logException(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                                   self.name, payers, payees, 'payers/payees'))
 
