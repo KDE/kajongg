@@ -24,13 +24,13 @@ from message import Message
 from query import Query
 from permutations import Permutations
 
-class Function(object):
-    """Parent for all Function classes. A Function is used to
-    define the behaviour of a rule. Classes Rule and Function
+class Rule(object):
+    """Parent for all Rule classes. A Rule is used to
+    define the behaviour of a rule. Classes RuleDefinition and Rule
     are separate because
     - different rulesets may have a rule with the same name
     - but with different behaviour
-    - the Function class should be as short and as concise
+    - the Rule class should be as short and as concise
       as possible because this is the important part about
       implementing a new ruleset, and it is the most error prone.
     """
@@ -52,11 +52,11 @@ class Function(object):
 
 # pylint: disable=arguments-differ
 # pylint does not know that overriding a method may change it from normal to static
-class MeldFunction(Function):
+class MeldRule(Rule):
     def appliesToMeld(self, dummyHand, dummyMeld):
         raise NotImplementedError
 
-class MahJonggFunction(Function):
+class MahJonggRule(Rule):
     def winningTileCandidates(self, dummyHand):
         """this should return all tiles leading to a winning hand no matter
         by which mjRule the hand will be matched, see SquirmingSnake"""
@@ -82,195 +82,195 @@ class MahJonggFunction(Function):
         On entry, Argument rest is granted to not be empty. It is a deep copy which we may destroy"""
         raise NotImplementedError
 
-class DragonPungKong(MeldFunction):
+class DragonPungKong(MeldRule):
     def appliesToMeld(self, dummyHand, meld):
         return (len(meld) >= 3
             and meld.isDragonMeld
             and (meld.isPung or meld.isKong))
 
-class RoundWindPungKong(MeldFunction):
+class RoundWindPungKong(MeldRule):
     @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.roundWind
 
-class ExposedMinorPung(MeldFunction):
+class ExposedMinorPung(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'2345678'
 
-class ExposedTerminalsPung(MeldFunction):
+class ExposedTerminalsPung(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'19'
 
-class ExposedHonorsPung(MeldFunction):
+class ExposedHonorsPung(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.group in b'wd'
 
-class ExposedMinorKong(MeldFunction):
+class ExposedMinorKong(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'2345678'
 
-class ExposedTerminalsKong(MeldFunction):
+class ExposedTerminalsKong(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'19'
 
-class ExposedHonorsKong(MeldFunction):
+class ExposedHonorsKong(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld.group in b'wd'
 
-class ConcealedMinorPung(MeldFunction):
+class ConcealedMinorPung(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'2345678'
 
-class ConcealedTerminalsPung(MeldFunction):
+class ConcealedTerminalsPung(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'19'
 
-class ConcealedHonorsPung(MeldFunction):
+class ConcealedHonorsPung(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.group in b'WD'
 
-class ConcealedMinorKong(MeldFunction):
+class ConcealedMinorKong(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].value in b'2345678'
 
-class ConcealedTerminalsKong(MeldFunction):
+class ConcealedTerminalsKong(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].value in b'19'
 
-class ConcealedHonorsKong(MeldFunction):
+class ConcealedHonorsKong(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and not meld.isExposed and meld.isHonorMeld
 
-class OwnWindPungKong(MeldFunction):
+class OwnWindPungKong(MeldRule):
     @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.ownWind
 
-class OwnWindPair(MeldFunction):
+class OwnWindPair(MeldRule):
     @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) == 2 and meld.isWindMeld and meld[0].value == hand.ownWind
 
-class RoundWindPair(MeldFunction):
+class RoundWindPair(MeldRule):
     @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) == 2 and meld.isWindMeld and meld[0].value == hand.roundWind
 
-class DragonPair(MeldFunction):
+class DragonPair(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 2 and meld.isDragonMeld
 
-class LastTileCompletesPairMinor(Function):
+class LastTileCompletesPairMinor(Rule):
     @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld.group != b'X'
             and hand.lastTile.value in b'2345678')
 
-class Flower(MeldFunction):
+class Flower(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 1 and meld.group == b'f'
 
-class Season(MeldFunction):
+class Season(MeldRule):
     @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 1 and meld.group == b'y'
 
-class LastTileCompletesPairMajor(Function):
+class LastTileCompletesPairMajor(Rule):
     @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld.group == hand.lastMeld[1].group
             and hand.lastTile.value not in b'2345678')
 
-class LastFromWall(Function):
+class LastFromWall(Rule):
     @staticmethod
     def appliesToHand(hand):
         return hand.lastTile and hand.lastTile.group.isupper()
 
-class ZeroPointHand(Function):
+class ZeroPointHand(Rule):
     @staticmethod
     def appliesToHand(hand):
         return not any(x.meld for x in hand.usedRules if x.meld and len(x.meld) > 1)
 
-class NoChow(Function):
+class NoChow(Rule):
     @staticmethod
     def appliesToHand(hand):
         return not any(x.isChow for x in hand.melds)
 
-class OnlyConcealedMelds(Function):
+class OnlyConcealedMelds(Rule):
     @staticmethod
     def appliesToHand(hand):
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
-class FalseColorGame(Function):
+class FalseColorGame(Rule):
     @staticmethod
     def appliesToHand(hand):
         dwSet = {b'd', b'w'}
         return dwSet & hand.suits and len(hand.suits - dwSet) == 1
 
-class TrueColorGame(Function):
+class TrueColorGame(Rule):
     @staticmethod
     def appliesToHand(hand):
         return len(hand.suits) == 1 and hand.suits < {b's', b'b', b'c'}
 
-class Purity(Function):
+class Purity(Rule):
     @staticmethod
     def appliesToHand(hand):
         return (len(hand.suits) == 1 and hand.suits < {b's', b'b', b'c'}
             and not any(x.isChow for x in hand.melds))
 
-class ConcealedTrueColorGame(Function):
+class ConcealedTrueColorGame(Rule):
     @staticmethod
     def appliesToHand(hand):
         if len(hand.suits) != 1 or not (hand.suits < {b's', b'b', b'c'}):
             return False
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
-class OnlyMajors(Function):
+class OnlyMajors(Rule):
     @staticmethod
     def appliesToHand(hand):
         return not set(hand.values) - Byteset(b'grbeswn19')
 
-class OnlyHonors(Function):
+class OnlyHonors(Rule):
     @staticmethod
     def appliesToHand(hand):
         return not set(hand.values) - Byteset(b'grbeswn')
 
-class HiddenTreasure(Function):
+class HiddenTreasure(Rule):
     @staticmethod
     def appliesToHand(hand):
         return (not any(((x.isExposed and not x.isClaimedKong) or x.isChow) for x in hand.melds)
             and hand.lastTile and hand.lastTile.group.isupper()
             and len(hand.melds) == 5)
 
-class BuriedTreasure(Function):
+class BuriedTreasure(Rule):
     @staticmethod
     def appliesToHand(hand):
         return (len(hand.suits - Byteset(b'dw')) == 1
             and sum(x.isPung for x in hand.melds) == 4
             and all((x.isPung and not x.isExposed ) or x.isPair for x in hand.melds))
 
-class AllTerminals(Function):
+class AllTerminals(Rule):
     @staticmethod
     def appliesToHand(hand):
         return not set(hand.values) - Byteset(b'19')
 
-class StandardMahJongg(MahJonggFunction):
+class StandardMahJongg(MahJonggRule):
     @staticmethod
     def computeLastMelds(hand):
         """returns all possible last melds"""
@@ -468,7 +468,7 @@ class SquirmingSnake(StandardMahJongg):
         """they have already been found by the StandardMahJongg rule"""
         return set()
 
-class WrigglingSnake(MahJonggFunction):
+class WrigglingSnake(MahJonggRule):
     @staticmethod
     def shouldTry(hand, maxMissing=3):
         return (len(set(x.lower() for x in hand.tiles)) + maxMissing > 12
@@ -526,9 +526,9 @@ class WrigglingSnake(MahJonggFunction):
             return False
         return len(set(hand.values)) == 13
 
-class CallingHand(Function):
+class CallingHand(Rule):
     def __init__(self):
-        Function.__init__(self)
+        Rule.__init__(self)
         self.active = False
         self.limitHand = None
 
@@ -540,15 +540,15 @@ class CallingHand(Function):
         if hand.lenOffset != 0:
             return False
         if not self.limitHand:
-            self.limitHand = Function.functions[self.options['hand']]()
+            self.limitHand = Rule.functions[self.options['hand']]()
             self.limitHand.options = self.options
         self.active = True
         try:
             if hasattr(self.limitHand, 'winningTileCandidates'):
-                # it is a MahJonggFunction
+                # it is a MahJonggRule
                 candidates = self.limitHand.winningTileCandidates(hand)
             else:
-                # it is any other normal Function
+                # it is any other normal Rule
                 candidates = StandardMahJongg.winningTileCandidates(hand)
             for tileName in candidates:
                 fullHand = hand + tileName.capitalize()
@@ -558,7 +558,7 @@ class CallingHand(Function):
         finally:
             self.active = False
 
-class TripleKnitting(MahJonggFunction):
+class TripleKnitting(MahJonggRule):
 
     def computeLastMelds(self, hand):
         """returns all possible last melds"""
@@ -657,7 +657,7 @@ class TripleKnitting(MahJonggFunction):
                 result.append((tileS, tileB, tileC))
         return result, tilesS + tilesB + tilesC
 
-class Knitting(MahJonggFunction):
+class Knitting(MahJonggRule):
     def computeLastMelds(self, hand):
         """returns all possible last melds"""
         if not hand.lastTile:
@@ -755,7 +755,7 @@ class Knitting(MahJonggFunction):
         if len(result) == 2:
             return Bytelist(result)
 
-class AllPairHonors(MahJonggFunction):
+class AllPairHonors(MahJonggRule):
     @staticmethod
     def computeLastMelds(hand):
         return [Meld([hand.lastTile, hand.lastTile])]
@@ -827,55 +827,55 @@ class AllPairHonors(MahJonggFunction):
         return candidates
 
 
-class FourfoldPlenty(Function):
+class FourfoldPlenty(Rule):
     @staticmethod
     def appliesToHand(hand):
         return len(hand.tiles) == 18
 
-class ThreeGreatScholars(Function):
+class ThreeGreatScholars(Rule):
     def appliesToHand(self, hand):
         return (BigThreeDragons.appliesToHand(hand)
             and ('nochow' not in self.options or not any(x.isChow for x in hand.melds)))
 
-class BigThreeDragons(Function):
+class BigThreeDragons(Rule):
     @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if x.isDragonMeld and len(x) >= 3]) == 3
 
-class BigFourJoys(Function):
+class BigFourJoys(Rule):
     @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if x.isWindMeld and len(x) >= 3]) == 4
 
-class LittleFourJoys(Function):
+class LittleFourJoys(Rule):
     @staticmethod
     def appliesToHand(hand):
         lengths = sorted([min(len(x), 3) for x in hand.melds if x.isWindMeld])
         return lengths == [2, 3, 3, 3]
 
-class LittleThreeDragons(Function):
+class LittleThreeDragons(Rule):
     @staticmethod
     def appliesToHand(hand):
         lengths = sorted([min(len(x), 3) for x in hand.melds if x.isDragonMeld])
         return lengths == [2, 3, 3]
 
-class FourBlessingsHoveringOverTheDoor(Function):
+class FourBlessingsHoveringOverTheDoor(Rule):
     @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if len(x) >= 3 and x.isWindMeld]) == 4
 
-class AllGreen(Function):
+class AllGreen(Rule):
     @staticmethod
     def appliesToHand(hand):
         tiles = set(bytes(x.lower()) for x in hand.tiles)
         return tiles < Tileset([b'b2', b'b3', b'b4', b'b5', b'b6', b'b8', b'dg'])
 
-class LastTileFromWall(Function):
+class LastTileFromWall(Rule):
     @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'w'
 
-class LastTileFromDeadWall(Function):
+class LastTileFromDeadWall(Rule):
     @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'e'
@@ -885,7 +885,7 @@ class LastTileFromDeadWall(Function):
         """for scoring game"""
         return hand.lastSource == b'w'
 
-class IsLastTileFromWall(Function):
+class IsLastTileFromWall(Rule):
     @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'z'
@@ -895,7 +895,7 @@ class IsLastTileFromWall(Function):
         """for scoring game"""
         return hand.lastSource == b'w'
 
-class IsLastTileFromWallDiscarded(Function):
+class IsLastTileFromWallDiscarded(Rule):
     @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'Z'
@@ -905,7 +905,7 @@ class IsLastTileFromWallDiscarded(Function):
         """for scoring game"""
         return hand.lastSource == b'd'
 
-class RobbingKong(Function):
+class RobbingKong(Rule):
     @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'k'
@@ -917,27 +917,27 @@ class RobbingKong(Function):
             and hand.lastTile and hand.lastTile.group.islower()
             and [x.lower() for x in hand.tiles].count(hand.lastTile.lower()) < 2)
 
-class GatheringPlumBlossomFromRoof(Function):
+class GatheringPlumBlossomFromRoof(Rule):
     @staticmethod
     def appliesToHand(hand):
         return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == b'S5'
 
-class PluckingMoon(Function):
+class PluckingMoon(Rule):
     @staticmethod
     def appliesToHand(hand):
         return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == b'S1'
 
-class ScratchingPole(Function):
+class ScratchingPole(Rule):
     @staticmethod
     def appliesToHand(hand):
         return RobbingKong.appliesToHand(hand) and hand.lastTile == b'b2'
 
-class StandardRotation(Function):
+class StandardRotation(Rule):
     @staticmethod
     def rotate(game):
         return game.winner and game.winner.wind != b'E'
 
-class EastWonNineTimesInARow(Function):
+class EastWonNineTimesInARow(Rule):
     nineTimes = 9
     @staticmethod
     def appliesToHand(hand):
@@ -1026,9 +1026,9 @@ class GatesOfHeaven(StandardMahJongg):
                     result = b'123456789'
         return {Tile(self.suit, x) for x in result}
 
-class ThirteenOrphans(MahJonggFunction):
+class ThirteenOrphans(MahJonggRule):
     def __init__(self):
-        MahJonggFunction.__init__(self)
+        MahJonggRule.__init__(self)
         self.missingTiles = None
 
     @staticmethod
@@ -1125,41 +1125,41 @@ class ThirteenOrphans(MahJonggFunction):
                 havePair = candidate.occurrence == 2
         return candidates
 
-class OwnFlower(Function):
+class OwnFlower(Rule):
     @staticmethod
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
         return Tile(b'f', hand.ownWind) in fsPairs
 
-class OwnSeason(Function):
+class OwnSeason(Rule):
     @staticmethod
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
         return Tile(b'y', hand.ownWind) in fsPairs
 
-class OwnFlowerOwnSeason(Function):
+class OwnFlowerOwnSeason(Rule):
     @staticmethod
     def appliesToHand(hand):
         return (OwnFlower.appliesToHand(hand)
             and OwnSeason.appliesToHand(hand))
 
-class AllFlowers(Function):
+class AllFlowers(Rule):
     @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.bonusMelds if x.group == b'f']) == 4
 
-class AllSeasons(Function):
+class AllSeasons(Rule):
     @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.bonusMelds if x.group == b'y']) == 4
 
-class ThreeConcealedPongs(Function):
+class ThreeConcealedPongs(Rule):
     @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if (
             not x.isExposed or x.isClaimedKong) and (x.isPung or x.isKong)]) >= 3
 
-class MahJonggWithOriginalCall(Function):
+class MahJonggWithOriginalCall(Rule):
     @staticmethod
     def appliesToHand(hand):
         return (b'a' in hand.announcements
@@ -1187,7 +1187,7 @@ class MahJonggWithOriginalCall(Function):
                     player.mayWin = False # bad luck
         return result
 
-class TwofoldFortune(Function):
+class TwofoldFortune(Rule):
     @staticmethod
     def appliesToHand(hand):
         return b't' in hand.announcements
@@ -1198,7 +1198,7 @@ class TwofoldFortune(Function):
         kungs = [x for x in hand.melds if len(x) == 4]
         return len(kungs) >= 2
 
-class BlessingOfHeaven(Function):
+class BlessingOfHeaven(Rule):
     @staticmethod
     def appliesToHand(hand):
         return hand.ownWind == b'e' and hand.lastSource == b'1'
@@ -1210,7 +1210,7 @@ class BlessingOfHeaven(Function):
             and hand.lastSource and hand.lastSource in b'wd'
             and not (Byteset(hand.announcements) - {b'a'}))
 
-class BlessingOfEarth(Function):
+class BlessingOfEarth(Rule):
     @staticmethod
     def appliesToHand(hand):
         return hand.ownWind != b'e' and hand.lastSource == b'1'
@@ -1222,12 +1222,12 @@ class BlessingOfEarth(Function):
             and hand.lastSource and hand.lastSource in b'wd'
             and not (Byteset(hand.announcements) - {b'a'}))
 
-class LongHand(Function):
+class LongHand(Rule):
     @staticmethod
     def appliesToHand(hand):
         return (not hand.won and hand.lenOffset > 0) or hand.lenOffset > 1
 
-class FalseDiscardForMJ(Function):
+class FalseDiscardForMJ(Rule):
     @staticmethod
     def appliesToHand(hand):
         return not hand.won
@@ -1237,7 +1237,7 @@ class FalseDiscardForMJ(Function):
         """for scoring game"""
         return not hand.won
 
-class DangerousGame(Function):
+class DangerousGame(Rule):
     @staticmethod
     def appliesToHand(hand):
         return not hand.won
@@ -1247,11 +1247,11 @@ class DangerousGame(Function):
         """for scoring game"""
         return not hand.won
 
-class LastOnlyPossible(Function):
+class LastOnlyPossible(Rule):
     """check if the last tile was the only one possible for winning"""
 
     def __init__(self):
-        Function.__init__(self)
+        Rule.__init__(self)
         self.active = False
 
     def appliesToHand(self, hand):
@@ -1269,13 +1269,13 @@ class LastOnlyPossible(Function):
             self.active = False
 
 def __scanSelf():
-    """for every Function class defined in this module,
-    generate an instance and add it to dict Function.functions"""
-    if not Function.functions:
+    """for every Rule class defined in this module,
+    generate an instance and add it to dict Rule.functions"""
+    if not Rule.functions:
         for glob in globals().values():
             if hasattr(glob, "__mro__"):
-                if glob.__mro__[-2] == Function and len(glob.__mro__) > 2:
+                if glob.__mro__[-2] == Rule and len(glob.__mro__) > 2:
                     name = glob.__name__
-                    Function.functions[name] = glob
+                    Rule.functions[name] = glob
 
 __scanSelf()

@@ -80,12 +80,12 @@ class AIDefault(object):
     def weighDiscardCandidates(self, candidates):
         """the standard"""
         game = self.player.game
-        weighFunctions = game.ruleset.filterFunctions('weigh')
+        weighRules = game.ruleset.filterRules('weigh')
         for aiFilter in [self.weighBasics, self.weighSameColors,
                 self.weighSpecialGames, self.weighCallingHand,
                 self.weighOriginalCall,
-                self.alternativeFilter] + weighFunctions:
-            if aiFilter in weighFunctions:
+                self.alternativeFilter] + weighRules:
+            if aiFilter in weighRules:
                 filterName = aiFilter.__class__.__name__
                 aiFilter = aiFilter.weigh
             else:
@@ -232,7 +232,7 @@ class AIDefault(object):
         claimness = IntDict()
         discard = self.player.game.lastDiscard
         if discard:
-            for func in self.player.game.ruleset.filterFunctions('claimness'):
+            for func in self.player.game.ruleset.filterRules('claimness'):
                 claimness += func.claimness(hand, discard)
         if Debug.robotAI and len(claimness):
             hand.debug('claimnesses in selectAnswer:%s' % claimness)

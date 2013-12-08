@@ -549,7 +549,7 @@ class Game(object):
 
     def maybeRotateWinds(self):
         """rules which make winds rotate"""
-        result = list(x for x in self.ruleset.filterFunctions('rotate') if x.rotate(self))
+        result = list(x for x in self.ruleset.filterRules('rotate') if x.rotate(self))
         if result:
             if Debug.explain:
                 if not self.belongsToRobotPlayer():

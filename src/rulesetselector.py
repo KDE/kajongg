@@ -25,7 +25,7 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
 from PyQt4.QtCore import QModelIndex
-from rule import Ruleset, PredefinedRuleset, Rule
+from rule import Ruleset, PredefinedRuleset, RuleDefinition
 from util import uniqueList
 from log import m18n, m18nc, english
 from differ import RulesetDiffer
@@ -299,7 +299,7 @@ class EditableRuleModel(RuleModel):
                     oldName = content.name
                     content.rename(english(name))
                     dirty = oldName != content.name
-                elif isinstance(content, Rule):
+                elif isinstance(content, RuleDefinition):
                     dirty, message = self.__setRuleData(column, content, value)
                     if message:
                         Sorry(message)
@@ -307,7 +307,7 @@ class EditableRuleModel(RuleModel):
                 else:
                     return False
             elif role == Qt.CheckStateRole:
-                if isinstance(content, Rule) and column ==1:
+                if isinstance(content, RuleDefinition) and column ==1:
                     if not isinstance(ruleset, PredefinedRuleset):
                         if content.parType is bool:
                             newValue = value == Qt.Checked
@@ -317,7 +317,7 @@ class EditableRuleModel(RuleModel):
                 else:
                     return False
             if dirty:
-                if isinstance(content, Rule):
+                if isinstance(content, RuleDefinition):
                     ruleset.updateRule(content)
                 self.dataChanged.emit(index, index)
             return True
@@ -334,7 +334,7 @@ class EditableRuleModel(RuleModel):
         checkable = False
         if isinstance(content, Ruleset) and column == 0:
             mayEdit = True
-        elif isinstance(content, Rule):
+        elif isinstance(content, RuleDefinition):
             checkable = column == 1 and content.parType is bool
             mayEdit = column
         else:

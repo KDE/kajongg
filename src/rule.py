@@ -169,7 +169,7 @@ class RuleList(list):
 
     def __contains__(self, key):
         """do we know this rule?"""
-        if isinstance(key, Rule):
+        if isinstance(key, RuleDefinition):
             key = key.key()
         return any(x.key() == key for x in self)
 
@@ -184,7 +184,7 @@ class RuleList(list):
 
     def __setitem__(self, key, rule):
         """set rule by key"""
-        assert isinstance(rule, Rule)
+        assert isinstance(rule, RuleDefinition)
         if isinstance(key, int):
             list.__setitem__(self, key, rule)
             return
@@ -218,10 +218,10 @@ class RuleList(list):
 
     def createRule(self, name, definition='', **kwargs):
         """shortcut for simpler definition of predefined rulesets"""
-        self.add(Rule(name, definition, **kwargs))
+        self.add(RuleDefinition(name, definition, **kwargs))
 
 class UsedRule(object):
-    """use this in scoring, never change class Rule.
+    """use this in scoring, never change class RuleDefinition.
     If the rule has been used for a meld, pass it"""
     def __init__(self, rule, meld=None):
         self.rule = rule
@@ -462,7 +462,7 @@ into a situation where you have to pay a penalty"""))
         for ruleList in self.ruleLists:
             if ruleList.listId == listNr:
                 if ruleList is self.parameterRules:
-                    rule = Rule(name, definition, parameter=parameter)
+                    rule = RuleDefinition(name, definition, parameter=parameter)
                 else:
                     try:
                         pointValue = int(points)
@@ -470,7 +470,7 @@ into a situation where you have to pay a penalty"""))
                         # this happens if the unit changed from limits to points but the value
                         # is not converted at the same time
                         pointValue = int(float(points))
-                    rule = Rule(name, definition, pointValue, int(doubles), float(limits))
+                    rule = RuleDefinition(name, definition, pointValue, int(doubles), float(limits))
                 ruleList.add(rule)
                 break
 
@@ -481,8 +481,8 @@ into a situation where you have to pay a penalty"""))
         if rulesWithAction:
             return rulesWithAction[0]
 
-    def filterFunctions(self, attrName):
-        """returns all my Function classes having attribute attrName"""
+    def filterRules(self, attrName):
+        """returns all my Rule classes having attribute attrName"""
         if attrName not in self.__filteredLists:
             functions = (x.function for x in self.allRules if x.function)
             self.__filteredLists[attrName] = list(x for x in functions if hasattr(x, attrName))
@@ -702,7 +702,7 @@ into a situation where you have to pay a penalty"""))
             result.append((None, rightDict[rule]))
         return result
 
-class Rule(object):
+class RuleDefinition(object):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
@@ -778,7 +778,7 @@ class Rule(object):
                 variant = str(variant)
                 if variant[0] == 'F':
                     assert idx == 0
-                    self.function = rulecode.Function.functions[variant[1:]]()
+                    self.function = rulecode.Rule.functions[variant[1:]]()
                     # when executing code for this rule, we do not want
                     # to call those things indirectly
                     # pylint: disable=attribute-defined-outside-init
