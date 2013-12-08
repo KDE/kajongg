@@ -216,6 +216,22 @@ class RuleList(list):
                 rule.key(), self[rule.key()].definition, rule.name, rule.definition))
         self[rule.key()] = rule
 
+class UsedRule(object):
+    """use this in scoring, never change class Rule.
+    If the rule has been used for a meld, pass it"""
+    def __init__(self, rule, meld=None):
+        self.rule = rule
+        self.meld = meld
+
+    def __str__(self):
+        result = self.rule.name
+        if self.meld:
+            result += ' ' + str(self.meld)
+        return result
+
+    def __repr__(self):
+        return 'UsedRule(%s)' % str(self)
+
 class Ruleset(object):
     """holds a full set of rules: meldRules,handRules,winnerRules.
 
@@ -290,6 +306,8 @@ class Ruleset(object):
         self.rawRules = None # used when we get the rules over the network
         self.doublingMeldRules = []
         self.doublingHandRules = []
+        self.staticMeldRules = []   # only the meld info itself is needed for applicability check
+        self.dynamicMeldRules = []  # we need hand context for applicability check, like pair of own wind
         self.standardMJRule = None
         self.meldRules = RuleList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
@@ -405,7 +423,16 @@ into a situation where you have to pay a penalty"""))
                 self.standardMJRule = mjRule
                 break
         assert self.standardMJRule
+        for meldRule in self.meldRules:
+            if 'dynamic' in meldRule.options:
+                self.dynamicMeldRules.append(meldRule)
+            else:
+                self.staticMeldRules.append(meldRule)
         return self
+
+    def applyStaticMeldRules(self, meld):
+        """returns a list of static meld rules matching meld"""
+        return list(UsedRule(x, meld) for x in self.staticMeldRules if x.appliesToMeld(None, meld))
 
     def __loadQuery(self):
         """returns a Query object with loaded ruleset"""

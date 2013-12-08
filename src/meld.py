@@ -92,12 +92,20 @@ class Meld(TileList):
                 self.group = b'X'
                 self.lowerGroup = b'x'
             self.isRest = False
+            self.__staticRules = {} # ruleset is key
             self._fixed = True
 
     def __setattr__(self, name, value):
         if hasattr(self, '_fixed'):
             raise TypeError
         TileList.__setattr__(self, name, value)
+
+    def staticRules(self, ruleset):
+        """return cached static meld rules: those always apply regardless of their context"""
+        if id(ruleset) not in self.__staticRules:
+            result = ruleset.applyStaticMeldRules(self)
+            self.__staticRules[id(ruleset)] = result
+        return self.__staticRules[id(ruleset)]
 
     def append(self, dummy):
         """we want to be immutable"""

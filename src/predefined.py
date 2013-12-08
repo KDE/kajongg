@@ -175,9 +175,9 @@ class ClassicalChinese(PredefinedRuleset):
         # doubling melds:
         self.meldRules.add(Rule('Pung/Kong of Dragons', 'FDragonPungKong',
             explainTemplate='{meldName}', doubles=1))
-        self.meldRules.add(Rule('Pung/Kong of Own Wind', 'FOwnWindPungKong',
+        self.meldRules.add(Rule('Pung/Kong of Own Wind', 'FOwnWindPungKong||Odynamic',
             explainTemplate='{meldType} of Own Wind ({value})', doubles=1))
-        self.meldRules.add(Rule('Pung/Kong of Round Wind', 'FRoundWindPungKong',
+        self.meldRules.add(Rule('Pung/Kong of Round Wind', 'FRoundWindPungKong||Odynamic',
             explainTemplate='{meldType} of Round Wind ({value})', doubles=1))
 
         # exposed melds:
@@ -210,9 +210,9 @@ class ClassicalChinese(PredefinedRuleset):
         self.meldRules.add(Rule('Concealed Pung of Honors', 'FConcealedHonorsPung',
             explainTemplate='{meldName}', points=8))
 
-        self.meldRules.add(Rule('Pair of Own Wind', 'FOwnWindPair',
+        self.meldRules.add(Rule('Pair of Own Wind', 'FOwnWindPair||Odynamic',
             explainTemplate='Pair of Own Wind ({value})', points=2))
-        self.meldRules.add(Rule('Pair of Round Wind', 'FRoundWindPair',
+        self.meldRules.add(Rule('Pair of Round Wind', 'FRoundWindPair||Odynamic',
             explainTemplate='Pair of Round Wind ({value})', points=2))
         self.meldRules.add(Rule('Pair of Dragons', 'FDragonPair',
             explainTemplate='{meldName}', points=2))

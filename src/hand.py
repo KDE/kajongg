@@ -24,26 +24,10 @@ Read the user manual for a description of the interface to this scoring engine
 from log import logDebug
 from tile import Tile, Values, TileList
 from meld import Meld, MeldList
-from rule import Score, Ruleset
+from rule import Score, Ruleset, UsedRule
 from common import Debug
 from permutations import Permutations
 from intelligence import AIDefault
-
-class UsedRule(object):
-    """use this in scoring, never change class Rule.
-    If the rule has been used for a meld, pass it"""
-    def __init__(self, rule, meld=None):
-        self.rule = rule
-        self.meld = meld
-
-    def __str__(self):
-        result = self.rule.name
-        if self.meld:
-            result += ' ' + str(self.meld)
-        return result
-
-    def __repr__(self):
-        return 'UsedRule(%s)' % str(self)
 
 class Hand(object):
     """represent the hand to be evaluated.
@@ -599,8 +583,9 @@ class Hand(object):
 
     def __applyMeldRules(self):
         """apply all rules for single melds"""
-        for rule in self.ruleset.meldRules:
-            for meld in self.melds + self.bonusMelds:
+        for meld in self.melds + self.bonusMelds:
+            self.usedRules.extend(meld.staticRules(self.ruleset))
+            for rule in self.ruleset.dynamicMeldRules:
                 if rule.appliesToMeld(self, meld):
                     self.usedRules.append(UsedRule(rule, meld))
 
