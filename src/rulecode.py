@@ -527,22 +527,19 @@ class WrigglingSnake(MahJonggRule):
         return len(set(hand.values)) == 13
 
 class CallingHand(Rule):
-    def __init__(self):
-        Rule.__init__(self)
-        self.active = False
-        self.limitHand = None
+    activeHands = []
 
     def appliesToHand(self, hand):
-        if self.active:
+        if hand in self.activeHands:
             # this cannot be reentrant because we attach the options to the
             # one global CallingHand instance
             return False
         if hand.lenOffset != 0:
             return False
-        if not self.limitHand:
+        if not hasattr(self, 'limitHand'):
             self.limitHand = Rule.functions[self.options['hand']]()
             self.limitHand.options = self.options
-        self.active = True
+        self.activeHands.append(hand)
         try:
             if hasattr(self.limitHand, 'winningTileCandidates'):
                 # it is a MahJonggRule
@@ -556,7 +553,7 @@ class CallingHand(Rule):
                     return True
             return False
         finally:
-            self.active = False
+            self.activeHands.remove(hand)
 
 class TripleKnitting(MahJonggRule):
 
@@ -965,9 +962,6 @@ class EastWonNineTimesInARow(Rule):
         return EastWonNineTimesInARow.appliesToGame(game, needWins = EastWonNineTimesInARow.nineTimes)
 
 class GatesOfHeaven(StandardMahJongg):
-    def __init__(self):
-        StandardMahJongg.__init__(self)
-        self.suit = None
     def shouldTry(self, hand):
         for suit in Tile.colors:
             count19 = sum(x.value in b'19' for x in hand.tiles)
@@ -976,11 +970,10 @@ class GatesOfHeaven(StandardMahJongg):
                 return True
         return False
 
-    def maybeCallingOrWon(self, hand):
-        suits = set(x.lowerGroup for x in hand.tiles)
-        if len(suits) != 1 or not suits < Byteset(Tile.colors):
+    @staticmethod
+    def maybeCallingOrWon(hand):
+        if len(hand.suits) != 1 or not hand.suits < Byteset(Tile.colors):
             return False
-        self.suit = suits.pop()
         for meld in hand.declaredMelds:
             if meld.isPung:
                 return False
@@ -1024,12 +1017,9 @@ class GatesOfHeaven(StandardMahJongg):
                     result = b'2345678'
                 else:
                     result = b'123456789'
-        return {Tile(self.suit, x) for x in result}
+        return {Tile(list(hand.suits)[0], x) for x in result}
 
 class ThirteenOrphans(MahJonggRule):
-    def __init__(self):
-        MahJonggRule.__init__(self)
-        self.missingTiles = None
 
     @staticmethod
     def computeLastMelds(hand):
@@ -1249,24 +1239,21 @@ class DangerousGame(Rule):
 
 class LastOnlyPossible(Rule):
     """check if the last tile was the only one possible for winning"""
-
-    def __init__(self):
-        Rule.__init__(self)
-        self.active = False
+    activeHands = []
 
     def appliesToHand(self, hand):
-        if self.active or not hand.lastTile:
+        if hand in self.activeHands or not hand.lastTile:
             return False
         if any(hand.lastTile in x for x in hand.melds if len(x) == 4):
             # the last tile completed a Kong
             return False
         shortHand = hand - hand.lastTile
-        self.active = True
+        self.activeHands.append(hand)
         try:
             otherCallingHands = shortHand.callingHands(excludeTile=hand.lastTile)
             return len(otherCallingHands) == 0
         finally:
-            self.active = False
+            self.activeHands.remove(hand)
 
 def __scanSelf():
     """for every Rule class defined in this module,
