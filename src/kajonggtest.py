@@ -280,9 +280,8 @@ class Job(object):
         game = 'game={}'.format(self.game)
         ruleset = self.shortRulesetName()
         aiName = 'AI={}'.format(self.aiVariant) if self.aiVariant != 'Default' else ''
-        dirName = 'in {}'.format(Clone.clones[self.commitId].tmpdir) if self.commitId in Clone.clones else ''
-        commit = 'commit={}'.format(self.commitId) if dirName == '[n/a]' else ''
-        return ' '.join([game, ruleset, aiName, commit, dirName]).replace('  ', '')
+        commit = 'commit={}'.format(self.commitId)
+        return ' '.join([game, ruleset, aiName, commit]).replace('  ', ' ')
 
     def __repr__(self):
         return 'Job(%s)' % str(self)
@@ -580,7 +579,7 @@ def createJobs():
                 for aiVariant in allAis:
                     jobs.append(Job(ruleset, aiVariant, commitId, game))
     OPTIONS.servers = min(len(jobs), OPTIONS.servers)
-    print('len(jobs):', len(jobs))
+    print('jobs:', len(jobs))
     return jobs
 
 def main():
