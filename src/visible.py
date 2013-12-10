@@ -94,15 +94,10 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         hand = self.hand
         if hand and hand.tileNames and self._concealedTileNames:
             if hand.lenOffset == 1 and not hand.won:
-                if self == self.game.myself:
-                    removeTile = self.handBoard.focusTile.tile
-                elif self.lastTile:
-                    removeTile = self.lastTile
-                else:
-                    removeTile = self._concealedTileNames[0]
-                if not removeTile.isBonus:
-                    hand -= removeTile
-                assert not hand.lenOffset
+                if any(not x.isKnown for x in self._concealedTileNames):
+                    hand -= Tile.unknown
+                elif self.handBoard.focusTile:
+                    hand -= self.handBoard.focusTile.tile
         return hand.total()
 
     def colorizeName(self):
