@@ -130,7 +130,7 @@ class AIDefault(object):
                     keep += 1.01
                 if value == candidates.hand.roundWind:
                     keep += 1.02
-            if value in b'19':
+            if tile.isTerminal:
                 keep += 2.16
             if candidate.maxPossible == 1:
                 if tile.isHonor:

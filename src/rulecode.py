@@ -65,11 +65,11 @@ class RoundWindPungKong(MeldRule):
 
 class ExposedMinorPung(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'2345678'
+        return meld.isPung and meld.isLower(0, 3) and meld[0].isMinor
 
 class ExposedTerminalsPung(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'19'
+        return meld.isPung and meld.isLower(0, 3) and meld[0].isTerminal
 
 class ExposedHonorsPung(MeldRule):
     def appliesToMeld(dummyHand, meld):
@@ -77,35 +77,35 @@ class ExposedHonorsPung(MeldRule):
 
 class ExposedMinorKong(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'2345678'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isMinor
 
 class ExposedTerminalsKong(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'19'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isTerminal
 
 class ExposedHonorsKong(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld.group in b'wd'
+        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isHonor
 
 class ConcealedMinorPung(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'2345678'
+        return meld.isPung and meld.isUpper(0, 3) and meld[0].isMinor
 
 class ConcealedTerminalsPung(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'19'
+        return meld.isPung and meld.isUpper(0, 3) and meld[0].isTerminal
 
 class ConcealedHonorsPung(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return meld.isPung and meld.group in b'WD'
+        return meld.isPung and meld[0].group in b'WD'
 
 class ConcealedMinorKong(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and not meld.isExposed and meld[0].value in b'2345678'
+        return len(meld) == 4 and not meld.isExposed and meld[0].isMinor
 
 class ConcealedTerminalsKong(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 4 and not meld.isExposed and meld[0].value in b'19'
+        return len(meld) == 4 and not meld.isExposed and meld[0].isTerminal
 
 class ConcealedHonorsKong(MeldRule):
     def appliesToMeld(dummyHand, meld):
@@ -117,35 +117,31 @@ class OwnWindPungKong(MeldRule):
 
 class OwnWindPair(MeldRule):
     def appliesToMeld(hand, meld):
-        return len(meld) == 2 and meld.isWindMeld and meld[0].value == hand.ownWind
+        return meld.isPair and meld.isWindMeld and meld[0].value == hand.ownWind
 
 class RoundWindPair(MeldRule):
     def appliesToMeld(hand, meld):
-        return len(meld) == 2 and meld.isWindMeld and meld[0].value == hand.roundWind
+        return meld.isPair and meld.isWindMeld and meld[0].value == hand.roundWind
 
 class DragonPair(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 2 and meld.isDragonMeld
+        return meld.isPair and meld.isDragonMeld
 
 class LastTileCompletesPairMinor(Rule):
     def appliesToHand(hand):
-        return (hand.lastMeld and len(hand.lastMeld) == 2
-            and hand.lastMeld.group != b'X'
-            and hand.lastTile.value in b'2345678')
+        return hand.lastMeld and hand.lastMeld.isPair and hand.lastTile.isMinor
 
 class Flower(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 1 and meld.group == b'f'
+        return meld.isSingle and meld.group == b'f'
 
 class Season(MeldRule):
     def appliesToMeld(dummyHand, meld):
-        return len(meld) == 1 and meld.group == b'y'
+        return meld.isSingle and meld.group == b'y'
 
 class LastTileCompletesPairMajor(Rule):
     def appliesToHand(hand):
-        return (hand.lastMeld and len(hand.lastMeld) == 2
-            and hand.lastMeld.group == hand.lastMeld[1].group
-            and hand.lastTile.value not in b'2345678')
+        return hand.lastMeld and hand.lastMeld.isPair and hand.lastTile.isMajor
 
 class LastFromWall(Rule):
     def appliesToHand(hand):
@@ -185,11 +181,11 @@ class ConcealedTrueColorGame(Rule):
 
 class OnlyMajors(Rule):
     def appliesToHand(hand):
-        return not set(hand.values) - Byteset(b'grbeswn19')
+        return all(x.isMajor for x in hand.tiles)
 
 class OnlyHonors(Rule):
     def appliesToHand(hand):
-        return not set(hand.values) - Byteset(b'grbeswn')
+        return all(x.isHonor for x in hand.tiles)
 
 class HiddenTreasure(Rule):
     def appliesToHand(hand):
@@ -205,7 +201,7 @@ class BuriedTreasure(Rule):
 
 class AllTerminals(Rule):
     def appliesToHand(hand):
-        return not set(hand.values) - Byteset(b'19')
+        return all(x.isTerminal for x in hand.tiles)
 
 class StandardMahJongg(MahJonggRule):
     def computeLastMelds(hand):
@@ -855,7 +851,7 @@ class EastWonNineTimesInARow(Rule):
 class GatesOfHeaven(StandardMahJongg):
     def shouldTry(hand, maxMissing=3):
         for suit in Tile.colors:
-            count19 = sum(x.value in b'19' for x in hand.tiles)
+            count19 = sum(x.isTerminal for x in hand.tiles)
             suitCount = len(list(x for x in hand.tiles if x.lowerGroup == suit))
             if suitCount > 10 and count19 > 4:
                 return True

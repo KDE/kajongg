@@ -82,6 +82,9 @@ class Tile(bytes):
             self.isDragon = self.lowerGroup == b'd'
             self.isWind = self.lowerGroup == b'w'
             self.isHonor = self.isDragon or self.isWind
+            self.isTerminal = self.value in b'19'
+            self.isMajor = self.isHonor or self.isTerminal
+            self.isMinor = not self.isMajor
             try:
                 self.key = 1 + self.hashTable.index(self) / 2
             except ValueError:
