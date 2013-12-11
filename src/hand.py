@@ -403,9 +403,8 @@ class Hand(object):
         # set the "won" flag M
         parts = [bytes(self.declaredMelds)]
         parts.extend(bytes(x[0]) for x in self.bonusMelds)
-        parts.append(b'R' + ''.join(bytes(x) for x in sorted(self.tilesInHand + [addTile])))
-        parts.append(b'M{own}{round}{ann}'.format(
-            own=self.ownWind, round=self.roundWind, ann=self.announcements))
+        parts.append(b'R' + b''.join(bytes(x) for x in sorted(self.tilesInHand + [addTile])))
+        parts.append(b'M' + self.ownWind + self.roundWind + self.announcements)
         parts.append(b'L' + addTile)
         return Hand(self, b' '.join(parts).strip())
 
@@ -455,7 +454,7 @@ class Hand(object):
                         part = part[:3]
                 elif part[:1] == b'L':
                     if self.lastTile.isExposed and self.lastTile.upper() in newTiles:
-                        part = b'L{}'.format(self.lastTile.upper())
+                        part = b'L' + self.lastTile.upper()
                     else:
                         continue
                 newParts.append(part)

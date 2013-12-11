@@ -46,11 +46,9 @@ class Players(list):
 
     def __getitem__(self, index):
         """allow access by idx or by wind"""
-        if isinstance(index, basestring) and len(index) == 1:
-            for player in self:
-                if player.wind == index:
-                    return player
-            logException("no player has wind %s" % index)
+        for player in self:
+            if player.wind == index:
+                return player
         return list.__getitem__(self, index)
 
     def __str__(self):

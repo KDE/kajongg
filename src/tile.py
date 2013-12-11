@@ -296,6 +296,9 @@ class TileList(list):
         """the content"""
         return str(b''.join(self))
 
+    def __bytes__(self):
+        return b''.join(self)
+
 class Bytelist(list):
     """convert a list of int to list of bytes"""
     # pylint: disable=incomplete-protocol
