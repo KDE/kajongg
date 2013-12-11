@@ -17,6 +17,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+import types
+
 from tile import Tile, Tileset, elements, Byteset, Bytelist
 from meld import Meld, MeldList
 from common import IntDict, WINDS
@@ -33,18 +35,45 @@ class Rule(object):
     - the Rule class should be as short and as concise
       as possible because this is the important part about
       implementing a new ruleset, and it is the most error prone.
+
+    All Rule methods specified here will automatically be converted
+    into staticmethods (or classmethods if the 1st arg is named 'cls').
     """
 
+    # functions holds all Rule classes defined here
     functions = {}
+
+    # those are needed for compilation. They will never be used
+    # because all our methods will be redirected to another class
+    # which also has those attributes.
     activeHands = None
     limitHand = None
     options = None
+
+    @classmethod
+    def redirectTo(cls, targetClass):
+        """inject my static and class methods into targetClass, 
+        converting functions to staticmethod/classmethod as needed"""
+        # also for inherited methods
+        classes = list(reversed(cls.__mro__[:-2]))
+        combinedDict = dict(classes[0].__dict__)
+        for ancestor in classes[1:]:
+            combinedDict.update(ancestor.__dict__)
+        for funcName, method in combinedDict.items():
+            if isinstance(method, (types.FunctionType, classmethod, staticmethod)):
+                if hasattr(method, 'im_func'):
+                    method = method.im_func
+                else:
+                    if hasattr(method, '__func__'):
+                        method = method.__func__
+                methodType = classmethod if method.__code__.co_varnames[0] == 'cls' else staticmethod
+                setattr(targetClass, funcName, methodType(method))
 
 # pylint: disable=missing-docstring
 # the class and method names are mostly self explaining, we do not
 # need docstringss
 
-# pylint: disable=no-self-argument, no-self-use, no-value-for-parameter
+# pylint: disable=no-self-argument, no-self-use, no-value-for-parameter, no-member
 # most functions are stateless
 
 class MeldRule(Rule):
@@ -1112,31 +1141,14 @@ class LastOnlyPossible(Rule):
         finally:
             cls.activeHands.remove(hand)
 
-COPYMETHODS = ('rearrange', 'computeLastMelds', 'shouldTry',
-                            'maybeCallingOrWon', 'findTriples', 'findCouples', 'pairSuits', 'rotate',
-                            'winningTileCandidates', 'fillChow', 'weigh', 'claimness', 'appliesToGame',
-                            'appliesToHand', 'appliesToMeld', 'selectable')
 def __scanSelf():
     """for every Rule class defined in this module,
-    generate an instance and add it to dict Rule.functions"""
+    generate an instance and add it to dict Rule.functions.
+    Also convert all Rule methods into classmethod or staticmethod"""
     if not Rule.functions:
-        for glob in globals().values():
-            if hasattr(glob, "__mro__"):
-                if glob.__mro__[-2] == Rule and len(glob.__mro__) > 2:
-                    name = glob.__name__
-                    Rule.functions[name] = glob
-                    for funcName in COPYMETHODS:
-                        if hasattr(glob, funcName):
-                            funct = getattr(glob, funcName)
-                            if hasattr(funct, 'im_func'):
-                                funct = funct.im_func
-                            else:
-                                if hasattr(funct, '__func__'):
-                                    funct = funct.__func__
-                            argNames = funct.__code__.co_varnames
-                            if argNames[0] == 'cls':
-                                setattr(glob, funcName, classmethod(funct))
-                            else:
-                                setattr(glob, funcName, staticmethod(funct))
-
+        for cls in globals().values():
+            if hasattr(cls, "__mro__"):
+                if cls.__mro__[-2] == Rule and len(cls.__mro__) > 2:
+                    Rule.functions[cls.__name__] = cls
+                    cls.redirectTo(cls) # this changes all methods to classmethod or staticmethod
 __scanSelf()

@@ -776,24 +776,6 @@ class RuleDefinition(RuleBase):
         """the key is used for finding a rule in a RuleList"""
         return ruleKey(self.name)
 
-    def addProxy(self, funcName):
-        """if the function class has funcName, add it to this class"""
-        classes = list(reversed(self.function.__mro__[:-2]))
-        for fromClass in classes:
-            if hasattr(fromClass, funcName):
-                funct = getattr(fromClass, funcName)
-                if hasattr(funct, 'im_func'):
-                    # we are still running on python2
-                    funct = funct.im_func
-                else:
-                    if hasattr(funct, '__func__'):
-                        funct = funct.__func__
-                argNames = funct.__code__.co_varnames
-                if argNames[0] == 'cls':
-                    setattr(self.__class__, funcName, classmethod(funct))
-                else:
-                    setattr(self.__class__, funcName, staticmethod(funct))
-
     def __parseDefinition(self):
         """private setter for definition"""
         #pylint: disable=too-many-branches
@@ -812,8 +794,7 @@ class RuleDefinition(RuleBase):
                     # when executing code for this rule, we do not want
                     # to call those things indirectly
                     # pylint: disable=attribute-defined-outside-init
-                    for funcName in rulecode.COPYMETHODS:
-                        self.addProxy(funcName)
+                    self.function.redirectTo(self.__class__)
                     if hasattr(self.function, 'selectable'):
                         self.hasSelectable = True
                 elif variant[0] == 'O':
