@@ -147,10 +147,10 @@ class ClassicalChinese(PredefinedRuleset):
                 description=m18n('4 Kongs'))
         self.winnerRules.createRule('Three Great Scholars', 'FThreeGreatScholars', limits=1,
                 description=m18n('3 Pungs or Kongs of dragons'))
-        self.winnerRules.createRule('Four Blessings Hovering Over the Door',
+        self.winnerRules.createRule('Four Blessings Hovering over the Door',
                 'FFourBlessingsHoveringOverTheDoor', limits=1,
                 description=m18n('4 Pungs or Kongs of winds'))
-        self.winnerRules.createRule('All Greens', 'FAllGreen', limits=1,
+        self.winnerRules.createRule('Imperial Jade', 'FAllGreen', limits=1,
                 description=m18n('Only green tiles: Green dragon and Bamboo 2,3,4,6,8'))
         self.winnerRules.createRule('Gathering the Plum Blossom from the Roof',
                 'FGatheringPlumBlossomFromRoof', limits=1,
@@ -286,10 +286,10 @@ class ClassicalChineseBMJA(ClassicalChinese):
 # Original Call can be possible together.
         ClassicalChinese.loadRules(self)
         del self.winnerRules['ZeroPointHand']
-        originalCall = self.winnerRules.pop('Mah Jongg with Original Call')
-        originalCall.name = m18nE('Original Call')
-        self.handRules.add(originalCall)
-        del self.mjRules['Nine Gates']
+        originalCall = self.winnerRules.pop('MahJonggwithOriginalCall')
+        self.winnerRules.createRule('Original Call', originalCall.definition, doubles=1,
+            description=originalCall.description)
+        del self.mjRules['NineGates']
         self.mjRules.createRule('Gates of Heaven', 'FGatesOfHeaven||Opair28', limits=1,
                 description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and '
                 'another tile 2..8 of the same color'))
@@ -301,18 +301,18 @@ class ClassicalChineseBMJA(ClassicalChinese):
                 description=m18n('7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons'))
         self.mjRules.createRule('All pair honors', 'FAllPairHonors', limits=0.5,
                 description=m18n('7 pairs of 1s/9s/Winds/Dragons'))
-        del self.handRules['OwnFlowerOwnSeason']
+        del self.handRules['OwnFlowerandOwnSeason']
         del self.handRules['ThreeConcealedPongs']
         self.handRules.createRule('Own Flower', 'FOwnFlower', doubles=1)
         self.handRules.createRule('Own Season', 'FOwnSeason', doubles=1)
-        del self.winnerRules['Last Tile Taken from Dead Wall']
+        del self.winnerRules['LastTileTakenfromDeadWall']
         del self.winnerRules['HiddenTreasure']
         del self.winnerRules['FalseColorGame']
         del self.winnerRules['ConcealedTrueColorGame']
-        del self.winnerRules['East won nine times in a row']
-        del self.winnerRules['LastTileCompletesPairMinor']
-        del self.winnerRules['LastTileCompletesPairMajor']
-        del self.winnerRules['LastOnlyPossible']
+        del self.winnerRules['Eastwonninetimesinarow']
+        del self.winnerRules['LastTileCompletesPairof28']
+        del self.winnerRules['LastTileCompletesPairofTerminalsorHonors']
+        del self.winnerRules['LastTileisOnlyPossibleTile']
         del self.winnerRules['TrueColorGame']
         del self.winnerRules['ThreeGreatScholars'] 
         self.winnerRules.createRule('Buried Treasure', 'FBuriedTreasure', limits=1,
@@ -321,8 +321,8 @@ class ClassicalChineseBMJA(ClassicalChinese):
                 description=m18n('Only same-colored tiles (no chows, dragons or winds)'))
         self.winnerRules.createRule('Three Great Scholars', 'FThreeGreatScholars||Onochow', limits=1,
                 description=m18n('3 Pungs or Kongs of dragons plus any pung/kong and a pair'))
-        self.winnerRules['AllGreen'].name = m18nE('Imperial Jade')
-        self.mjRules['Thirteen Orphans'].name = m18nE('The 13 Unique Wonders')
+        orphans = self.mjRules.pop('ThirteenOrphans')
+        self.mjRules.createRule('The 13 Unique Wonders', orphans.definition, limits=1, description=orphans.description)
         self.handRules['AllFlowers'].score.doubles = 2
         self.handRules['AllSeasons'].score.doubles = 2
         self.penaltyRules.createRule('False Naming of Discard, Claimed for Chow/Pung/Kong', points = -50)
@@ -333,18 +333,18 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.loserRules.createRule('Calling for Only Honors', 'FCallingHand||Ohand=OnlyHonors', limits=0.4)
         self.loserRules.createRule('Calling for Wriggling Snake', 'FCallingHand||Ohand=WrigglingSnake', limits=0.4)
         self.loserRules.createRule('Calling for Triple Knitting', 'FCallingHand||Ohand=TripleKnitting', limits=0.2)
-        self.loserRules.createRule('Calling for Gates of Heaven', 'FCallingHand||Ohand=GatesOfHeaven||Opair28',
+        self.loserRules.createRule('Calling for Gates of Heaven', 'FCallingHand||Ohand=GatesofHeaven||Opair28',
                 limits=0.4)
         self.loserRules.createRule('Calling for Knitting', 'FCallingHand||Ohand=Knitting', limits=0.2)
-        self.loserRules.createRule('Calling for Imperial Jade', 'FCallingHand||Ohand=AllGreen', limits=0.4)
-        self.loserRules.createRule('Calling for 13 Unique Wonders', 'FCallingHand||Ohand=ThirteenOrphans',
+        self.loserRules.createRule('Calling for Imperial Jade', 'FCallingHand||Ohand=ImperialJade', limits=0.4)
+        self.loserRules.createRule('Calling for The 13 Unique Wonders', 'FCallingHand||Ohand=The13UniqueWonders',
                 limits=0.4)
         self.loserRules.createRule('Calling for Three Great Scholars', 'FCallingHand||Ohand=ThreeGreatScholars',
                 limits=0.4)
-        self.loserRules.createRule('Calling for All pair honors', 'FCallingHand||Ohand=AllPairHonors', limits=0.2)
-        self.loserRules.createRule('Calling for Heads and Tails', 'FCallingHand||Ohand=AllTerminals', limits=0.4)
+        self.loserRules.createRule('Calling for All pair honors', 'FCallingHand||Ohand=Allpairhonors', limits=0.2)
+        self.loserRules.createRule('Calling for Heads and Tails', 'FCallingHand||Ohand=HeadsandTails', limits=0.4)
         self.loserRules.createRule('Calling for Four Blessings Hovering over the Door',
-                'FCallingHand||Ohand=FourBlessingsHoveringOverTheDoor', limits=0.4)
+                'FCallingHand||Ohand=FourBlessingsHoveringovertheDoor', limits=0.4)
         self.loserRules.createRule('Calling for Buried Treasure', 'FCallingHand||Ohand=BuriedTreasure', limits=0.4)
         self.loserRules.createRule('Calling for Fourfold Plenty', 'FCallingHand||Ohand=FourfoldPlenty', limits=0.4)
         self.loserRules.createRule('Calling for Purity', 'FCallingHand||Ohand=Purity', doubles=3)

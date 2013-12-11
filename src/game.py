@@ -540,9 +540,11 @@ class Game(object):
             for usedRule in player.hand.usedRules:
                 rule = usedRule.rule
                 if rule.score.limits:
-                    tag = rule.function.__class__.__name__
-                    if hasattr(rule.function, 'limitHand'):
-                        tag = rule.function.limitHand.__class__.__name__
+                    tag = rule.__class__.__name__
+                    if rule.function.limitHand:
+                        tag = rule.limitHand.__class__.__name__
+                    if tag.endswith('Rule'):
+                        tag = tag[:-4]
                     self.addCsvTag(tag)
         if Debug.scores:
             self.debug(logMessage)

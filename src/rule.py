@@ -219,16 +219,24 @@ class RuleList(list):
         """shortcut for simpler definition of predefined rulesets"""
         defParts = definition.split('||')
         rule = None
-        if 'description' not in kwargs:
-            kwargs['description'] = ''
+        description = kwargs.get('description', '')
         for cls in [IntRule, BoolRule, StrRule]:
             if defParts[0].startswith(cls.prefix):
-                rule = cls(name, definition, description=kwargs['description'], parameter=kwargs['parameter'])
+                rule = cls(name, definition, description=description, parameter=kwargs['parameter'])
                 break
         if not rule:
             if 'parameter' in kwargs:
                 del kwargs['parameter']
-            rule = RuleDefinition(name, definition, **kwargs)
+            ruleType = type(str(ruleKey(name)) + 'Rule', (RuleDefinition, ), {})
+            rule = ruleType(name, definition, **kwargs)
+            if defParts[0] == 'FCallingHand':
+                parts1 = defParts[1].split('=')
+                assert parts1[0] == 'Ohand', definition
+                ruleClassName = parts1[1] + 'Rule'
+                if ruleClassName not in RuleBase.ruleClasses:
+                    print('we want %s, definition:%s' % (ruleClassName, definition))
+                    print('we have %s' % RuleBase.ruleClasses.keys())
+                ruleType.limitHand = RuleBase.ruleClasses[ruleClassName]
         self.add(rule)
 
 class UsedRule(object):
@@ -438,8 +446,7 @@ into a situation where you have to pay a penalty"""))
         self.doublingMeldRules = list(x for x in self.meldRules if x.score.doubles)
         self.doublingHandRules = list(x for x in self.handRules if x.score.doubles)
         for mjRule in self.mjRules:
-            func = mjRule.function
-            if func.__class__.__name__ == 'StandardMahJongg':
+            if mjRule.__class__.__name__ == 'StandardMahJonggRule':
                 self.standardMJRule = mjRule
                 break
         assert self.standardMJRule
@@ -547,7 +554,7 @@ into a situation where you have to pay a penalty"""))
         """make a copy of self and return the new ruleset id. Returns the new ruleset.
         To be used only for ruleset templates"""
         newRuleset = self.clone().load()
-        newRuleset.save(minus=True)
+        newRuleset.save(minus=True, forced=True)
         if isinstance(newRuleset, PredefinedRuleset):
             newRuleset = Ruleset(newRuleset.rulesetId)
         return newRuleset
@@ -601,7 +608,7 @@ into a situation where you have to pay a penalty"""))
                 ruleIdx = ruleList.index(rule)
                 break
         assert rule in ruleList, '%s: %s not in list %s' % (type(rule), rule, ruleList.name)
-        return (self.rulesetId, ruleList.listId, ruleIdx, english(rule.name),
+        return (self.rulesetId, ruleList.listId, ruleIdx, rule.name,
             rule.definition, score.points, score.doubles, score.limits, rule.parameter)
 
     def updateRule(self, rule):
@@ -614,25 +621,27 @@ into a situation where you have to pay a penalty"""))
                   record[3:] + record[:3])
             Query("UPDATE ruleset SET hash=? WHERE id=?", list([self.hash, self.rulesetId]))
 
-    def save(self, minus=False):
+    def save(self, minus=False, forced=False):
         """save the ruleset to the database.
         If it does not yet exist in database, give it a new id
-        If the name already exists in the database, also give it a new name"""
+        If the name already exists in the database, also give it a new name
+        If the hash already exists in the database, only save if forced=True"""
         for _ in range(10):
             try:
-                if minus:
-                    # if we save a template, only check for existing templates. Otherwise this could happen:
-                    # clear kajongg.db, play game with DMJL, start ruleset editor, copy DMJL.
-                    # since play Game saved the used ruleset with id 1, id 1 is found here and no new
-                    # template is generated. Next the ruleset editor shows the original ruleset in italics
-                    # and the copy with normal font but identical name, and the copy is never saved.
-                    qData = Query("select id from ruleset where hash=? and id<0", list([self.hash])).records
-                else:
-                    qData = Query("select id from ruleset where hash=?", list([self.hash])).records
-                if qData:
-                    # is already in database
-                    self.rulesetId = qData[0][0]
-                    return
+                if not forced:
+                    if minus:
+                        # if we save a template, only check for existing templates. Otherwise this could happen:
+                        # clear kajongg.db, play game with DMJL, start ruleset editor, copy DMJL.
+                        # since play Game saved the used ruleset with id 1, id 1 is found here and no new
+                        # template is generated. Next the ruleset editor shows the original ruleset in italics
+                        # and the copy with normal font but identical name, and the copy is never saved.
+                        qData = Query("select id from ruleset where hash=? and id<0", list([self.hash])).records
+                    else:
+                        qData = Query("select id from ruleset where hash=?", list([self.hash])).records
+                    if qData:
+                        # is already in database
+                        self.rulesetId = qData[0][0]
+                        return
                 with Transaction():
                     self.rulesetId, self.name = self._newKey(minus)
                     Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
@@ -712,12 +721,20 @@ into a situation where you have to pay a penalty"""))
 class RuleBase(object):
     """a base for standard RuleDefinition and parameter rules IntRule, StrRule, BoolRule"""
 
+    options = {}
+    ruleClasses = {}
+
     def __init__(self, name, definition, description):
-        self.name = name
+        self.__name = name
         self.definition = definition
         self.description = description
-        self.options = {}
         self.hasSelectable = False
+        self.ruleClasses[self.__class__.__name__] = self.__class__
+
+    @property
+    def name(self):
+        """name is readonly"""
+        return self.__name
 
     def validate(self): # pylint: disable=no-self-use
         """is the rule valid?"""
@@ -733,12 +750,17 @@ class RuleBase(object):
     def __repr__(self):
         return self.hashStr()
 
+def ruleKey(name):
+    """the key is used for finding a rule in a RuleList"""
+    return english(name).replace(' ', '').replace('.','')
+
 class RuleDefinition(RuleBase):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
     # pylint: disable=too-many-arguments,too-many-instance-attributes
+    activeHands = []
 
     def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0,
             description=None, explainTemplate=None, debug=False):
@@ -751,17 +773,26 @@ class RuleDefinition(RuleBase):
         self.__parseDefinition()
 
     def key(self):
-        """the key is used for finding a rule in a RuleList. Since we do not
-        want to manually define a unique key for every rule, this is a bit
-        complicated:
-        - if the definition starts with F and contains no ||, key is rule.definition
-          without the leading F
-        - otherwise key is rule.name"""
-        if not self.definition:
-            return self.name
-        if self.definition[0] == 'F' and '||' not in self.definition:
-            return self.definition[1:]
-        return self.name
+        """the key is used for finding a rule in a RuleList"""
+        return ruleKey(self.name)
+
+    def addProxy(self, funcName):
+        """if the function class has funcName, add it to this class"""
+        classes = list(reversed(self.function.__mro__[:-2]))
+        for fromClass in classes:
+            if hasattr(fromClass, funcName):
+                funct = getattr(fromClass, funcName)
+                if hasattr(funct, 'im_func'):
+                    # we are still running on python2
+                    funct = funct.im_func
+                else:
+                    if hasattr(funct, '__func__'):
+                        funct = funct.__func__
+                argNames = funct.__code__.co_varnames
+                if argNames[0] == 'cls':
+                    setattr(self.__class__, funcName, classmethod(funct))
+                else:
+                    setattr(self.__class__, funcName, staticmethod(funct))
 
     def __parseDefinition(self):
         """private setter for definition"""
@@ -769,7 +800,7 @@ class RuleDefinition(RuleBase):
         if not self.definition:
             return # may happen with special programmed rules
         variants = self.definition.split('||')
-        self.options = {}
+        self.__class__.options = {}
         self.function = None
         self.hasSelectable = False
         for idx, variant in enumerate(variants):
@@ -777,25 +808,14 @@ class RuleDefinition(RuleBase):
                 variant = str(variant)
                 if variant[0] == 'F':
                     assert idx == 0
-                    self.function = rulecode.Rule.functions[variant[1:]]()
+                    self.function = rulecode.Rule.functions[variant[1:]]
                     # when executing code for this rule, we do not want
                     # to call those things indirectly
                     # pylint: disable=attribute-defined-outside-init
-                    if hasattr(self.function, 'rearrange'):
-                        self.rearrange = self.function.rearrange
-                    if hasattr(self.function, 'computeLastMelds'):
-                        self.computeLastMelds = self.function.computeLastMelds
-                    if hasattr(self.function, 'shouldTry'):
-                        self.shouldTry = self.function.shouldTry
-                    if hasattr(self.function, 'appliesToHand'):
-                        self.appliesToHand = self.function.appliesToHand
-                    if hasattr(self.function, 'appliesToMeld'):
-                        self.appliesToMeld = self.function.appliesToMeld
+                    for funcName in rulecode.COPYMETHODS:
+                        self.addProxy(funcName)
                     if hasattr(self.function, 'selectable'):
                         self.hasSelectable = True
-                        self.selectable = self.function.selectable
-                    if hasattr(self.function, 'winningTileCandidates'):
-                        self.winningTileCandidates = self.function.winningTileCandidates
                 elif variant[0] == 'O':
                     for action in variant[1:].split():
                         aParts = action.split('=')
@@ -804,8 +824,6 @@ class RuleDefinition(RuleBase):
                         self.options[aParts[0]] = aParts[1]
                 else:
                     pass
-        if self.function:
-            self.function.options = self.options
         self.validate()
 
     def validate(self):

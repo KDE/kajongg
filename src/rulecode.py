@@ -36,247 +36,182 @@ class Rule(object):
     """
 
     functions = {}
-
-    def __init__(self):
-        self.options = {}
-
-    def __str__(self):
-        return self.__class__.__name__
-
-    def __repr__(self):
-        return self.__class__.__name__
+    activeHands = None
+    limitHand = None
+    options = None
 
 # pylint: disable=missing-docstring
 # the class and method names are mostly self explaining, we do not
 # need docstringss
 
-# pylint: disable=arguments-differ
-# pylint does not know that overriding a method may change it from normal to static
+# pylint: disable=no-self-argument, no-self-use, no-value-for-parameter
+# most functions are stateless
+
 class MeldRule(Rule):
-    def appliesToMeld(self, dummyHand, dummyMeld):
-        raise NotImplementedError
+    pass
 
 class MahJonggRule(Rule):
-    def winningTileCandidates(self, dummyHand):
-        """this should return all tiles leading to a winning hand no matter
-        by which mjRule the hand will be matched, see SquirmingSnake"""
-        raise NotImplementedError
-
-    def computeLastMelds(self, dummyHand):
-        """returns a list of all melds which can be built with lastTile.
-        lastTile must be known!"""
-        raise NotImplementedError
-
-    def appliesToHand(self, dummyHand):
-        raise NotImplementedError
-
-    def shouldTry(self, dummyHand, maxMissing=3):
-        """does not have to be exact, just a fast guess if it makes sense
-        to look at this possibility harder"""
-        raise NotImplementedError
-
-    def rearrange(self, dummyHand, rest):
-        """returns either a list of tuples of possible tile groupings and remaining rest
-        or just one tile grouping and the remaining rest. Of course rest may always be
-        an empty list.
-        On entry, Argument rest is granted to not be empty. It is a deep copy which we may destroy"""
-        raise NotImplementedError
+    pass
 
 class DragonPungKong(MeldRule):
-    def appliesToMeld(self, dummyHand, meld):
+    def appliesToMeld(dummyHand, meld):
         return (len(meld) >= 3
             and meld.isDragonMeld
             and (meld.isPung or meld.isKong))
 
 class RoundWindPungKong(MeldRule):
-    @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.roundWind
 
 class ExposedMinorPung(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'2345678'
 
 class ExposedTerminalsPung(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].value in b'19'
 
 class ExposedHonorsPung(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.group in b'wd'
 
 class ExposedMinorKong(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'2345678'
 
 class ExposedTerminalsKong(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].value in b'19'
 
 class ExposedHonorsKong(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld.group in b'wd'
 
 class ConcealedMinorPung(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'2345678'
 
 class ConcealedTerminalsPung(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].value in b'19'
 
 class ConcealedHonorsPung(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return meld.isPung and meld.group in b'WD'
 
 class ConcealedMinorKong(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].value in b'2345678'
 
 class ConcealedTerminalsKong(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].value in b'19'
 
 class ConcealedHonorsKong(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 4 and not meld.isExposed and meld.isHonorMeld
 
 class OwnWindPungKong(MeldRule):
-    @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.ownWind
 
 class OwnWindPair(MeldRule):
-    @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) == 2 and meld.isWindMeld and meld[0].value == hand.ownWind
 
 class RoundWindPair(MeldRule):
-    @staticmethod
     def appliesToMeld(hand, meld):
         return len(meld) == 2 and meld.isWindMeld and meld[0].value == hand.roundWind
 
 class DragonPair(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 2 and meld.isDragonMeld
 
 class LastTileCompletesPairMinor(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld.group != b'X'
             and hand.lastTile.value in b'2345678')
 
 class Flower(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 1 and meld.group == b'f'
 
 class Season(MeldRule):
-    @staticmethod
     def appliesToMeld(dummyHand, meld):
         return len(meld) == 1 and meld.group == b'y'
 
 class LastTileCompletesPairMajor(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return (hand.lastMeld and len(hand.lastMeld) == 2
             and hand.lastMeld.group == hand.lastMeld[1].group
             and hand.lastTile.value not in b'2345678')
 
 class LastFromWall(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return hand.lastTile and hand.lastTile.group.isupper()
 
 class ZeroPointHand(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return not any(x.meld for x in hand.usedRules if x.meld and len(x.meld) > 1)
 
 class NoChow(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return not any(x.isChow for x in hand.melds)
 
 class OnlyConcealedMelds(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
 class FalseColorGame(Rule):
-    @staticmethod
     def appliesToHand(hand):
         dwSet = {b'd', b'w'}
         return dwSet & hand.suits and len(hand.suits - dwSet) == 1
 
 class TrueColorGame(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return len(hand.suits) == 1 and hand.suits < {b's', b'b', b'c'}
 
 class Purity(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return (len(hand.suits) == 1 and hand.suits < {b's', b'b', b'c'}
             and not any(x.isChow for x in hand.melds))
 
 class ConcealedTrueColorGame(Rule):
-    @staticmethod
     def appliesToHand(hand):
         if len(hand.suits) != 1 or not (hand.suits < {b's', b'b', b'c'}):
             return False
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
 class OnlyMajors(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return not set(hand.values) - Byteset(b'grbeswn19')
 
 class OnlyHonors(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return not set(hand.values) - Byteset(b'grbeswn')
 
 class HiddenTreasure(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return (not any(((x.isExposed and not x.isClaimedKong) or x.isChow) for x in hand.melds)
             and hand.lastTile and hand.lastTile.group.isupper()
             and len(hand.melds) == 5)
 
 class BuriedTreasure(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return (len(hand.suits - Byteset(b'dw')) == 1
             and sum(x.isPung for x in hand.melds) == 4
             and all((x.isPung and not x.isExposed ) or x.isPair for x in hand.melds))
 
 class AllTerminals(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return not set(hand.values) - Byteset(b'19')
 
 class StandardMahJongg(MahJonggRule):
-    @staticmethod
     def computeLastMelds(hand):
         """returns all possible last melds"""
         return MeldList(x for x in hand.melds if hand.lastTile in x and len(x) < 4)
 
-    @staticmethod
     def appliesToHand(hand):
         """winner rules are not yet applied to hand"""
         # pylint: disable=too-many-return-statements
@@ -301,7 +236,6 @@ class StandardMahJongg(MahJonggRule):
         doublingWinnerRules = sum(x.rule.score.doubles for x in hand.matchingWinnerRules())
         return hand.score.doubles + doublingWinnerRules >= hand.ruleset.minMJDoubles
 
-    @staticmethod
     def fillChow(group, values):
         val0, val1 = values
         if val0 + 1 == val1:
@@ -314,7 +248,6 @@ class StandardMahJongg(MahJonggRule):
             assert val0 + 2 == val1, 'group:%s values:%s' % (group, values)
             return {Tile(group, val0 + 1)}
 
-    @staticmethod
     def winningTileCandidates(hand):
         # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches,too-many-statements
         if len(hand.melds) > 7:
@@ -435,10 +368,8 @@ class StandardMahJongg(MahJonggRule):
                         result.append(Tile(group, str(value + 1)))
         return set(result)
 
-    @staticmethod
-    def shouldTry(dummyHand):
+    def shouldTry(dummyHand, dummyMaxMissing=10):
         return True
-    @staticmethod
     def rearrange(dummyHand, rest):
         """rest is a string with those tiles that can still
         be rearranged: No declared melds and no bonus tiles.
@@ -451,7 +382,6 @@ class StandardMahJongg(MahJonggRule):
         return result
 
 class SquirmingSnake(StandardMahJongg):
-    @staticmethod
     def appliesToHand(hand):
         if len(hand.suits) != 1 or not hand.suits < {b's', b'b', b'c'}:
             return False
@@ -463,24 +393,22 @@ class SquirmingSnake(StandardMahJongg):
             return False
         return len(set(values)) == len(values) - 5
 
-    @staticmethod
     def winningTileCandidates(hand):
         """they have already been found by the StandardMahJongg rule"""
         return set()
 
 class WrigglingSnake(MahJonggRule):
-    @staticmethod
     def shouldTry(hand, maxMissing=3):
         return (len(set(x.lower() for x in hand.tiles)) + maxMissing > 12
            and all(not x.isChow for x in hand.declaredMelds))
 
-    def computeLastMelds(self, hand):
+    def computeLastMelds(hand):
         if hand.lastTile.value == b'1':
             return [Meld([hand.lastTile] * 2)]
         else:
             return [Meld([hand.lastTile])]
 
-    def winningTileCandidates(self, hand):
+    def winningTileCandidates(hand):
         suits = hand.suits.copy()
         if b'w' not in suits or b'd' in suits or len(suits) > 2:
             return set()
@@ -501,7 +429,6 @@ class WrigglingSnake(MahJonggRule):
             # pair of 1 is not complete
             return set([Tile(group, 1)])
 
-    @staticmethod
     def rearrange(dummyHand, rest):
         result = []
         for tileName in rest:
@@ -514,7 +441,6 @@ class WrigglingSnake(MahJonggRule):
                 rest.remove(tileName)
         return result, rest
 
-    @staticmethod
     def appliesToHand(hand):
         suits = hand.suits.copy()
         if b'w' not in suits:
@@ -527,56 +453,51 @@ class WrigglingSnake(MahJonggRule):
         return len(set(hand.values)) == 13
 
 class CallingHand(Rule):
-    activeHands = []
-
-    def appliesToHand(self, hand):
-        if hand in self.activeHands:
+    def appliesToHand(cls, hand):
+        if hand in cls.activeHands:
             # this cannot be reentrant because we attach the options to the
             # one global CallingHand instance
             return False
         if hand.lenOffset != 0:
             return False
-        if not hasattr(self, 'limitHand'):
-            self.limitHand = Rule.functions[self.options['hand']]()
-            self.limitHand.options = self.options
-        self.activeHands.append(hand)
+        cls.activeHands.append(hand)
         try:
-            if hasattr(self.limitHand, 'winningTileCandidates'):
+            if hasattr(cls.limitHand, 'winningTileCandidates'):
                 # it is a MahJonggRule
-                candidates = self.limitHand.winningTileCandidates(hand)
+                candidates = cls.limitHand.winningTileCandidates(hand)
             else:
                 # it is any other normal Rule
                 candidates = StandardMahJongg.winningTileCandidates(hand)
             for tileName in candidates:
                 fullHand = hand + tileName.capitalize()
-                if fullHand.won and self.limitHand.appliesToHand(fullHand):
+                if fullHand.won and cls.limitHand.appliesToHand(fullHand):
                     return True
             return False
         finally:
-            self.activeHands.remove(hand)
+            cls.activeHands.remove(hand)
 
 class TripleKnitting(MahJonggRule):
 
-    def computeLastMelds(self, hand):
+    def computeLastMelds(cls, hand):
         """returns all possible last melds"""
         if not hand.lastTile:
             return
-        triples, rest = self.findTriples(hand)
+        triples, rest = cls.findTriples(hand)
         assert len(rest) == 2
         triples.append(rest)  # just a list of tuples
         return [Meld(x) for x in triples if hand.lastTile in x]
 
-    def claimness(self, hand, dummyDiscard):
+    def claimness(cls, hand, dummyDiscard):
         result = IntDict()
-        if self.shouldTry(hand):
+        if cls.shouldTry(hand):
             result[Message.Pung] = -999
             result[Message.Kong] = -999
             result[Message.Chow] = -999
         return result
 
-    def weigh(self, dummyAiInstance, candidates):
-        if self.shouldTry(candidates.hand):
-            _, rest = self.findTriples(candidates.hand)
+    def weigh(cls, dummyAiInstance, candidates):
+        if cls.shouldTry(candidates.hand):
+            _, rest = cls.findTriples(candidates.hand)
             for candidate in candidates:
                 if candidate.group in b'dw':
                     candidate.keep -= 50
@@ -584,9 +505,9 @@ class TripleKnitting(MahJonggRule):
                     candidate.keep -= 10
         return candidates
 
-    def rearrange(self, hand, rest):
+    def rearrange(cls, hand, rest):
         melds = []
-        for triple in self.findTriples(hand)[0]:
+        for triple in cls.findTriples(hand)[0]:
             melds.append(Meld(triple))
             rest.remove(triple[0])
             rest.remove(triple[1])
@@ -602,23 +523,23 @@ class TripleKnitting(MahJonggRule):
                 rest.remove(pair[1])
         return melds, rest
 
-    def appliesToHand(self, hand):
+    def appliesToHand(cls, hand):
         if any(x.isHonor for x in hand.tiles):
             return False
         if len(hand.declaredMelds) > 1:
             return False
         if hand.lastTile and hand.lastTile.istitle() and hand.declaredMelds:
             return False
-        triples, rest = self.findTriples(hand)
+        triples, rest = cls.findTriples(hand)
         return (len(triples) == 4 and len(rest) == 2
             and rest[0].group != rest[1].group and rest[0].value == rest[1].value)
 
-    def winningTileCandidates(self, hand):
+    def winningTileCandidates(cls, hand):
         if hand.declaredMelds:
             return set()
         if any(x.isHonor for x in hand.tiles):
             return set()
-        _, rest = self.findTriples(hand)
+        _, rest = cls.findTriples(hand)
         if len(rest) not in (1, 4):
             return set()
         result = list([Tile(x, y.value) for x in (b'S', b'B', b'C') for y in rest])
@@ -626,15 +547,14 @@ class TripleKnitting(MahJonggRule):
             result.remove(restTile)
         return set(result)
 
-    def shouldTry(self, hand, maxMissing=3):
+    def shouldTry(cls, hand, maxMissing=3):
         if hand.declaredMelds:
             return False
         tripleWanted = 7 - maxMissing // 3 # count triples
-        tripleCount = len(self.findTriples(hand)[0])
+        tripleCount = len(cls.findTriples(hand)[0])
         return tripleCount >= tripleWanted
 
-    @staticmethod
-    def findTriples(hand):
+    def findTriples(cls, hand):
         """returns a list of Triples, including the mj triple.
         Also returns the remaining untripled tiles"""
         if hand.declaredMelds:
@@ -655,49 +575,49 @@ class TripleKnitting(MahJonggRule):
         return result, tilesS + tilesB + tilesC
 
 class Knitting(MahJonggRule):
-    def computeLastMelds(self, hand):
+    def computeLastMelds(cls, hand):
         """returns all possible last melds"""
         if not hand.lastTile:
             return []
-        couples, rest = self.findCouples(hand)
+        couples, rest = cls.findCouples(hand)
         assert not rest, '%s: couples=%s rest=%s' % (hand.string, couples, rest)
         return [Meld(x) for x in couples if hand.lastTile in x]
 
-    def claimness(self, hand, dummyDiscard):
+    def claimness(cls, hand, dummyDiscard):
         result = IntDict()
-        if self.shouldTry(hand):
+        if cls.shouldTry(hand):
             result[Message.Pung] = -999
             result[Message.Kong] = -999
             result[Message.Chow] = -999
         return result
-    def weigh(self, dummyAiInstance, candidates):
-        if self.shouldTry(candidates.hand):
+    def weigh(cls, dummyAiInstance, candidates):
+        if cls.shouldTry(candidates.hand):
             for candidate in candidates:
                 if candidate.group in b'dw':
                     candidate.keep -= 50
         return candidates
-    def shouldTry(self, hand, maxMissing=4):
+    def shouldTry(cls, hand, maxMissing=4):
         if hand.declaredMelds:
             return False
         pairWanted = 7 - maxMissing // 2 # count pairs
-        pairCount = len(self.findCouples(hand)[0])
+        pairCount = len(cls.findCouples(hand)[0])
         return pairCount >= pairWanted
 
-    def appliesToHand(self, hand):
+    def appliesToHand(cls, hand):
         if any(x.isHonor for x in hand.tiles):
             return False
         if len(hand.declaredMelds) > 1:
             return False
         if hand.lastTile and hand.lastTile.istitle() and hand.declaredMelds:
             return False
-        return len(self.findCouples(hand)[0]) == 7
+        return len(cls.findCouples(hand)[0]) == 7
 
-    def winningTileCandidates(self, hand):
+    def winningTileCandidates(cls, hand):
         if hand.declaredMelds:
             return set()
         if any(x.isHonor for x in hand.tiles):
             return set()
-        couples, singleTile = self.findCouples(hand)
+        couples, singleTile = cls.findCouples(hand)
         if len(couples) != 6:
             return set()
         if not singleTile:
@@ -708,9 +628,9 @@ class Knitting(MahJonggRule):
         otherSuit = (hand.suits - set([singleTile.lowerGroup])).pop()
         otherTile = Tile(otherSuit.capitalize(), singleTile.value)
         return set([otherTile])
-    def rearrange(self, hand, rest):
+    def rearrange(cls, hand, rest):
         melds = []
-        for couple in self.findCouples(hand, rest)[0]:
+        for couple in cls.findCouples(hand, rest)[0]:
             if couple[0].islower():
                 # this is the mj pair, lower after claiming
                 continue
@@ -718,7 +638,7 @@ class Knitting(MahJonggRule):
             rest.remove(couple[0])
             rest.remove(couple[1])
         return melds, rest
-    def findCouples(self, hand, pairs=None):
+    def findCouples(cls, hand, pairs=None):
         """returns a list of tuples, including the mj couple.
         Also returns the remaining uncoupled tiles IF they
         are of the wanted suits"""
@@ -728,7 +648,7 @@ class Knitting(MahJonggRule):
         result = []
         if pairs is None:
             pairs = hand.tiles
-        suits = self.pairSuits(hand)
+        suits = cls.pairSuits(hand)
         if not suits:
             return [], []
         tiles0 = list(x for x in pairs if x.lowerGroup == suits[0])
@@ -743,7 +663,6 @@ class Knitting(MahJonggRule):
                 tiles1.remove(tile1)
                 result.append((tile0, tile1))
         return result, tiles0 + tiles1
-    @staticmethod
     def pairSuits(hand):
         """returns a lowercase string with two suit characters. If no prevalence, returns None"""
         suitCounts = list(len([x for x in hand.tiles if x.lowerGroup == y]) for y in (b's', b'b', b'c'))
@@ -753,10 +672,8 @@ class Knitting(MahJonggRule):
             return Bytelist(result)
 
 class AllPairHonors(MahJonggRule):
-    @staticmethod
     def computeLastMelds(hand):
         return [Meld([hand.lastTile, hand.lastTile])]
-    @staticmethod
     def claimness(hand, dummyDiscard):
         result = IntDict()
         if AllPairHonors.shouldTry(hand):
@@ -764,26 +681,24 @@ class AllPairHonors(MahJonggRule):
             result[Message.Kong] = -999
             result[Message.Chow] = -999
         return result
-    @staticmethod
     def maybeCallingOrWon(hand):
         if any(x.value in b'2345678' for x in hand.tiles):
             return False
         return len(hand.declaredMelds) < 2
-    def appliesToHand(self, hand):
-        if not self.maybeCallingOrWon(hand):
+    def appliesToHand(cls, hand):
+        if not cls.maybeCallingOrWon(hand):
             return False
         if len(set(hand.tiles)) != 7:
             return False
         tileCounts = list([len([x for x in hand.tiles if x == y]) for y in hand.tiles])
         return set(tileCounts) == set([2])
-    def winningTileCandidates(self, hand):
-        if not self.maybeCallingOrWon(hand):
+    def winningTileCandidates(cls, hand):
+        if not cls.maybeCallingOrWon(hand):
             return set()
         single = list(x for x in hand.tiles if hand.tiles.count(x) == 1)
         if len(single) != 1:
             return set()
         return set(single)
-    @staticmethod
     def shouldTry(hand, maxMissing=4):
         if hand.declaredMelds:
             return False
@@ -798,7 +713,6 @@ class AllPairHonors(MahJonggRule):
         pairWanted = 7 - maxMissing // 2 # count pairs
         result = pairCount >= pairWanted or (pairCount + kongCount * 2) > pairWanted
         return result
-    @staticmethod
     def rearrange(dummyHand, rest):
         melds = []
         for pair in set(rest) & elements.mAJORS:
@@ -807,7 +721,6 @@ class AllPairHonors(MahJonggRule):
                 rest.remove(pair)
                 rest.remove(pair)
         return melds, rest
-    @staticmethod
     def weigh(dummyAiInstance, candidates):
         hand = candidates.hand
         if not AllPairHonors.shouldTry(hand):
@@ -825,89 +738,74 @@ class AllPairHonors(MahJonggRule):
 
 
 class FourfoldPlenty(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return len(hand.tiles) == 18
 
 class ThreeGreatScholars(Rule):
-    def appliesToHand(self, hand):
+    def appliesToHand(cls, hand):
+#        print('TGS.appliesToHand(%s,..)' % cls)
         return (BigThreeDragons.appliesToHand(hand)
-            and ('nochow' not in self.options or not any(x.isChow for x in hand.melds)))
+            and ('nochow' not in cls.options or not any(x.isChow for x in hand.melds)))
 
 class BigThreeDragons(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if x.isDragonMeld and len(x) >= 3]) == 3
 
 class BigFourJoys(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if x.isWindMeld and len(x) >= 3]) == 4
 
 class LittleFourJoys(Rule):
-    @staticmethod
     def appliesToHand(hand):
         lengths = sorted([min(len(x), 3) for x in hand.melds if x.isWindMeld])
         return lengths == [2, 3, 3, 3]
 
 class LittleThreeDragons(Rule):
-    @staticmethod
     def appliesToHand(hand):
         lengths = sorted([min(len(x), 3) for x in hand.melds if x.isDragonMeld])
         return lengths == [2, 3, 3]
 
 class FourBlessingsHoveringOverTheDoor(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if len(x) >= 3 and x.isWindMeld]) == 4
 
 class AllGreen(Rule):
-    @staticmethod
     def appliesToHand(hand):
         tiles = set(bytes(x.lower()) for x in hand.tiles)
         return tiles < Tileset([b'b2', b'b3', b'b4', b'b5', b'b6', b'b8', b'dg'])
 
 class LastTileFromWall(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'w'
 
 class LastTileFromDeadWall(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'e'
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         return hand.lastSource == b'w'
 
 class IsLastTileFromWall(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'z'
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         return hand.lastSource == b'w'
 
 class IsLastTileFromWallDiscarded(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'Z'
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         return hand.lastSource == b'd'
 
 class RobbingKong(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return hand.lastSource == b'k'
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         return (hand.lastSource and hand.lastSource in b'kwd'
@@ -915,34 +813,28 @@ class RobbingKong(Rule):
             and [x.lower() for x in hand.tiles].count(hand.lastTile.lower()) < 2)
 
 class GatheringPlumBlossomFromRoof(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == b'S5'
 
 class PluckingMoon(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == b'S1'
 
 class ScratchingPole(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return RobbingKong.appliesToHand(hand) and hand.lastTile == b'b2'
 
 class StandardRotation(Rule):
-    @staticmethod
     def rotate(game):
         return game.winner and game.winner.wind != b'E'
 
 class EastWonNineTimesInARow(Rule):
     nineTimes = 9
-    @staticmethod
     def appliesToHand(hand):
         if not hand.player:
             return False
         game = hand.player.game
         return EastWonNineTimesInARow.appliesToGame(game)
-    @staticmethod
     def appliesToGame(game, needWins=None):
         if needWins is None:
             needWins = EastWonNineTimesInARow.nineTimes
@@ -957,12 +849,11 @@ class EastWonNineTimesInARow(Rule):
                 (game.gameid, game.players['E'].nameid, prevailing)).records[0][0])
             return eastMJCount == needWins
         return False
-    @staticmethod
     def rotate(game):
         return EastWonNineTimesInARow.appliesToGame(game, needWins = EastWonNineTimesInARow.nineTimes)
 
 class GatesOfHeaven(StandardMahJongg):
-    def shouldTry(self, hand):
+    def shouldTry(hand, maxMissing=3):
         for suit in Tile.colors:
             count19 = sum(x.value in b'19' for x in hand.tiles)
             suitCount = len(list(x for x in hand.tiles if x.lowerGroup == suit))
@@ -970,7 +861,6 @@ class GatesOfHeaven(StandardMahJongg):
                 return True
         return False
 
-    @staticmethod
     def maybeCallingOrWon(hand):
         if len(hand.suits) != 1 or not hand.suits < Byteset(Tile.colors):
             return False
@@ -979,8 +869,8 @@ class GatesOfHeaven(StandardMahJongg):
                 return False
         return True
 
-    def appliesToHand(self, hand):
-        if not self.maybeCallingOrWon(hand):
+    def appliesToHand(cls, hand):
+        if not cls.maybeCallingOrWon(hand):
             return False
         values = hand.values
         if len(set(values)) < 9 or not values.startswith(b'111') or not values.endswith(b'999'):
@@ -992,15 +882,15 @@ class GatesOfHeaven(StandardMahJongg):
         if len(values) != 1:
             return False
         surplus = values[0]
-        if 'pair28' in self.options:
+        if 'pair28' in cls.options:
             return surplus in b'2345678'
-        if 'lastExtra' in self.options:
+        if 'lastExtra' in cls.options:
             return hand.lastTile and surplus == hand.lastTile.value
         return True
 
-    def winningTileCandidates(self, hand):
+    def winningTileCandidates(cls, hand):
         result = set()
-        if not self.maybeCallingOrWon(hand):
+        if not cls.maybeCallingOrWon(hand):
             return result
         values = hand.values
         if len(set(values)) == 8:
@@ -1013,7 +903,7 @@ class GatesOfHeaven(StandardMahJongg):
             elif not values.endswith(b'999'):
                 result = b'9'
             else:
-                if 'pair28' in self.options:
+                if 'pair28' in cls.options:
                     result = b'2345678'
                 else:
                     result = b'123456789'
@@ -1021,12 +911,10 @@ class GatesOfHeaven(StandardMahJongg):
 
 class ThirteenOrphans(MahJonggRule):
 
-    @staticmethod
     def computeLastMelds(hand):
         meldSize = hand.tilesInHand.count(hand.lastTile)
         return [Meld([hand.lastTile] * meldSize)]
 
-    @staticmethod
     def rearrange(dummyHand, rest):
         result = []
         for tileName in rest:
@@ -1039,7 +927,6 @@ class ThirteenOrphans(MahJonggRule):
                 rest.remove(tileName)
         return result, rest
 
-    @staticmethod
     def claimness(hand, discard):
         result = IntDict()
         if ThirteenOrphans.shouldTry(hand):
@@ -1056,11 +943,9 @@ class ThirteenOrphans(MahJonggRule):
                 result[Message.Chow] = -999
         return result
 
-    @staticmethod
     def appliesToHand(hand):
         return set(x.lower() for x in hand.tiles) == elements.majors
 
-    @staticmethod
     def winningTileCandidates(hand):
         if any(x in hand.values for x in Byteset(b'2345678')):
             # no minors allowed
@@ -1076,7 +961,6 @@ class ThirteenOrphans(MahJonggRule):
             assert len(missing) == 1
             return missing
 
-    @staticmethod
     def shouldTry(hand, maxMissing=4):
         # TODO: look at how many tiles there still are on the wall
         if hand.declaredMelds:
@@ -1095,7 +979,6 @@ class ThirteenOrphans(MahJonggRule):
                     return False
         return True
 
-    @staticmethod
     def weigh(dummyAiInstance, candidates):
         hand = candidates.hand
         if not ThirteenOrphans.shouldTry(hand):
@@ -1116,53 +999,44 @@ class ThirteenOrphans(MahJonggRule):
         return candidates
 
 class OwnFlower(Rule):
-    @staticmethod
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
         return Tile(b'f', hand.ownWind) in fsPairs
 
 class OwnSeason(Rule):
-    @staticmethod
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
         return Tile(b'y', hand.ownWind) in fsPairs
 
 class OwnFlowerOwnSeason(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return (OwnFlower.appliesToHand(hand)
             and OwnSeason.appliesToHand(hand))
 
 class AllFlowers(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.bonusMelds if x.group == b'f']) == 4
 
 class AllSeasons(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.bonusMelds if x.group == b'y']) == 4
 
 class ThreeConcealedPongs(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return len([x for x in hand.melds if (
             not x.isExposed or x.isClaimedKong) and (x.isPung or x.isKong)]) >= 3
 
 class MahJonggWithOriginalCall(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return (b'a' in hand.announcements
             and sum(x.isExposed for x in hand.melds) < 3)
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         # one tile may be claimed before declaring OC and one for going MJ
         # the previous regex was too strict
         return sum(x.isExposed for x in hand.melds) < 3
 
-    @staticmethod
     def claimness(hand, dummyDiscard):
         result = IntDict()
         player = hand.player
@@ -1178,22 +1052,18 @@ class MahJonggWithOriginalCall(Rule):
         return result
 
 class TwofoldFortune(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return b't' in hand.announcements
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         kungs = [x for x in hand.melds if len(x) == 4]
         return len(kungs) >= 2
 
 class BlessingOfHeaven(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return hand.ownWind == b'e' and hand.lastSource == b'1'
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         return (hand.ownWind == b'e'
@@ -1201,11 +1071,9 @@ class BlessingOfHeaven(Rule):
             and not (Byteset(hand.announcements) - {b'a'}))
 
 class BlessingOfEarth(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return hand.ownWind != b'e' and hand.lastSource == b'1'
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         return (hand.ownWind != b'e'
@@ -1213,48 +1081,45 @@ class BlessingOfEarth(Rule):
             and not (Byteset(hand.announcements) - {b'a'}))
 
 class LongHand(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return (not hand.won and hand.lenOffset > 0) or hand.lenOffset > 1
 
 class FalseDiscardForMJ(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return not hand.won
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         return not hand.won
 
 class DangerousGame(Rule):
-    @staticmethod
     def appliesToHand(hand):
         return not hand.won
 
-    @staticmethod
     def selectable(hand):
         """for scoring game"""
         return not hand.won
 
 class LastOnlyPossible(Rule):
     """check if the last tile was the only one possible for winning"""
-    activeHands = []
-
-    def appliesToHand(self, hand):
-        if hand in self.activeHands or not hand.lastTile:
+    def appliesToHand(cls, hand):
+        if hand in cls.activeHands or not hand.lastTile:
             return False
         if any(hand.lastTile in x for x in hand.melds if len(x) == 4):
             # the last tile completed a Kong
             return False
         shortHand = hand - hand.lastTile
-        self.activeHands.append(hand)
+        cls.activeHands.append(hand)
         try:
             otherCallingHands = shortHand.callingHands(excludeTile=hand.lastTile)
             return len(otherCallingHands) == 0
         finally:
-            self.activeHands.remove(hand)
+            cls.activeHands.remove(hand)
 
+COPYMETHODS = ('rearrange', 'computeLastMelds', 'shouldTry',
+                            'maybeCallingOrWon', 'findTriples', 'findCouples', 'pairSuits', 'rotate',
+                            'winningTileCandidates', 'fillChow', 'weigh', 'claimness', 'appliesToGame',
+                            'appliesToHand', 'appliesToMeld', 'selectable')
 def __scanSelf():
     """for every Rule class defined in this module,
     generate an instance and add it to dict Rule.functions"""
@@ -1264,5 +1129,18 @@ def __scanSelf():
                 if glob.__mro__[-2] == Rule and len(glob.__mro__) > 2:
                     name = glob.__name__
                     Rule.functions[name] = glob
+                    for funcName in COPYMETHODS:
+                        if hasattr(glob, funcName):
+                            funct = getattr(glob, funcName)
+                            if hasattr(funct, 'im_func'):
+                                funct = funct.im_func
+                            else:
+                                if hasattr(funct, '__func__'):
+                                    funct = funct.__func__
+                            argNames = funct.__code__.co_varnames
+                            if argNames[0] == 'cls':
+                                setattr(glob, funcName, classmethod(funct))
+                            else:
+                                setattr(glob, funcName, staticmethod(funct))
 
 __scanSelf()
