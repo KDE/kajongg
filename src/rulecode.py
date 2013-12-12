@@ -77,83 +77,77 @@ class Rule(object):
 # pylint: disable=too-many-function-args, unused-argument, arguments-differ
 # most functions are stateless
 
-class MeldRule(Rule):
-    pass
-
-class MahJonggRule(Rule):
-    pass
-
-class DragonPungKong(MeldRule):
+class DragonPungKong(Rule):
     def appliesToMeld(hand, meld):
         return (len(meld) >= 3
             and meld.isDragonMeld
             and (meld.isPung or meld.isKong))
 
-class RoundWindPungKong(MeldRule):
+class RoundWindPungKong(Rule):
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.roundWind
 
-class ExposedMinorPung(MeldRule):
+class ExposedMinorPung(Rule):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].isMinor
 
-class ExposedTerminalsPung(MeldRule):
+class ExposedTerminalsPung(Rule):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].isTerminal
 
-class ExposedHonorsPung(MeldRule):
+class ExposedHonorsPung(Rule):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.group in b'wd'
 
-class ExposedMinorKong(MeldRule):
+class ExposedMinorKong(Rule):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isMinor
 
-class ExposedTerminalsKong(MeldRule):
+class ExposedTerminalsKong(Rule):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isTerminal
 
-class ExposedHonorsKong(MeldRule):
+class ExposedHonorsKong(Rule):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isHonor
 
-class ConcealedMinorPung(MeldRule):
+class ConcealedMinorPung(Rule):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].isMinor
 
-class ConcealedTerminalsPung(MeldRule):
+class ConcealedTerminalsPung(Rule):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].isTerminal
 
-class ConcealedHonorsPung(MeldRule):
+class ConcealedHonorsPung(Rule):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld[0].group in b'WD'
 
-class ConcealedMinorKong(MeldRule):
+class ConcealedMinorKong(Rule):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].isMinor
 
-class ConcealedTerminalsKong(MeldRule):
+class ConcealedTerminalsKong(Rule):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].isTerminal
 
-class ConcealedHonorsKong(MeldRule):
+class ConcealedHonorsKong(Rule):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and not meld.isExposed and meld.isHonorMeld
 
-class OwnWindPungKong(MeldRule):
+class OwnWindPungKong(Rule):
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.ownWind
 
-class OwnWindPair(MeldRule):
+class OwnWindPair(Rule):
     def appliesToMeld(hand, meld):
         return meld.isPair and meld.isWindMeld and meld[0].value == hand.ownWind
 
-class RoundWindPair(MeldRule):
+class RoundWindPair(Rule):
     def appliesToMeld(hand, meld):
         return meld.isPair and meld.isWindMeld and meld[0].value == hand.roundWind
 
-class DragonPair(MeldRule):
+class DragonPair(Rule):
     def appliesToMeld(hand, meld):
         return meld.isPair and meld.isDragonMeld
 
@@ -161,11 +155,11 @@ class LastTileCompletesPairMinor(Rule):
     def appliesToHand(hand):
         return hand.lastMeld and hand.lastMeld.isPair and hand.lastTile.isMinor
 
-class Flower(MeldRule):
+class Flower(Rule):
     def appliesToMeld(hand, meld):
         return meld.isSingle and meld.group == b'f'
 
-class Season(MeldRule):
+class Season(Rule):
     def appliesToMeld(hand, meld):
         return meld.isSingle and meld.group == b'y'
 
@@ -233,7 +227,7 @@ class AllTerminals(Rule):
     def appliesToHand(hand):
         return all(x.isTerminal for x in hand.tiles)
 
-class StandardMahJongg(MahJonggRule):
+class StandardMahJongg(Rule):
     def computeLastMelds(hand):
         """returns all possible last melds"""
         return MeldList(x for x in hand.melds if hand.lastTile in x and len(x) < 4)
@@ -423,7 +417,7 @@ class SquirmingSnake(StandardMahJongg):
         """they have already been found by the StandardMahJongg rule"""
         return set()
 
-class WrigglingSnake(MahJonggRule):
+class WrigglingSnake(Rule):
     def shouldTry(hand, maxMissing=3):
         return (len(set(x.lower() for x in hand.tiles)) + maxMissing > 12
            and all(not x.isChow for x in hand.declaredMelds))
@@ -489,7 +483,7 @@ class CallingHand(Rule):
         cls.activeHands.append(hand)
         try:
             if hasattr(cls.limitHand, 'winningTileCandidates'):
-                # it is a MahJonggRule
+                # it is a MahJongg rule
                 candidates = cls.limitHand.winningTileCandidates(hand)
             else:
                 # it is any other normal Rule
@@ -502,7 +496,7 @@ class CallingHand(Rule):
         finally:
             cls.activeHands.remove(hand)
 
-class TripleKnitting(MahJonggRule):
+class TripleKnitting(Rule):
 
     def computeLastMelds(cls, hand):
         """returns all possible last melds"""
@@ -600,7 +594,7 @@ class TripleKnitting(MahJonggRule):
                 result.append((tileS, tileB, tileC))
         return result, tilesS + tilesB + tilesC
 
-class Knitting(MahJonggRule):
+class Knitting(Rule):
     def computeLastMelds(cls, hand):
         """returns all possible last melds"""
         if not hand.lastTile:
@@ -697,7 +691,7 @@ class Knitting(MahJonggRule):
         if len(result) == 2:
             return Bytelist(result)
 
-class AllPairHonors(MahJonggRule):
+class AllPairHonors(Rule):
     def computeLastMelds(hand):
         return [Meld([hand.lastTile, hand.lastTile])]
     def claimness(hand, dummyDiscard):
@@ -935,7 +929,7 @@ class GatesOfHeaven(StandardMahJongg):
                     result = b'123456789'
         return {Tile(list(hand.suits)[0], x) for x in result}
 
-class ThirteenOrphans(MahJonggRule):
+class ThirteenOrphans(Rule):
 
     def computeLastMelds(hand):
         meldSize = hand.tilesInHand.count(hand.lastTile)
