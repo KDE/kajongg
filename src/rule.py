@@ -504,8 +504,7 @@ into a situation where you have to pay a penalty"""))
     def filterRules(self, attrName):
         """returns all my Rule classes having attribute attrName"""
         if attrName not in self.__filteredLists:
-            functions = (x.function for x in self.allRules if hasattr(x, 'function'))
-            self.__filteredLists[attrName] = list(x for x in functions if hasattr(x, attrName))
+            self.__filteredLists[attrName] = list(x for x in self.allRules if hasattr(x, attrName))
         return self.__filteredLists[attrName]
 
     @staticmethod
@@ -762,11 +761,12 @@ class Rule(RuleBase):
 
     activeHands = []
     ruleCode = None
+    limitHand = None
 
     def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0,
             description=None, explainTemplate=None, debug=False):
         RuleBase.__init__(self, name, definition, description)
-        self.function = None
+        self.hasSelectable = False
         self.explainTemplate = explainTemplate
         self.score = Score(points, doubles, limits)
         self.parameter = 0
@@ -776,7 +776,7 @@ class Rule(RuleBase):
     @staticmethod
     def redirectTo(srcClass, destClass):
         """inject my static and class methods into destClass,
-        converting functions to staticmethod/classmethod as needed"""
+        converting methods to staticmethod/classmethod as needed"""
         # also for inherited methods
         classes = list(reversed(srcClass.__mro__[:-2]))
         combinedDict = dict(classes[0].__dict__)
@@ -786,9 +786,8 @@ class Rule(RuleBase):
             if isinstance(method, (types.FunctionType, classmethod, staticmethod)):
                 if hasattr(method, 'im_func'):
                     method = method.im_func
-                else:
-                    if hasattr(method, '__func__'):
-                        method = method.__func__
+                elif hasattr(method, '__func__'):
+                    method = method.__func__
                 if method.__code__.co_varnames[0] == 'cls':
                     method = classmethod(method)
                 else:
@@ -799,7 +798,7 @@ class Rule(RuleBase):
     @classmethod
     def importRulecode(cls):
         """for every RuleCode class defined in this module,
-        generate an instance and add it to dict RuleCode.functions.
+        generate an instance and add it to dict Rule.ruleImpl.
         Also convert all RuleCode methods into classmethod or staticmethod"""
         if not cls.ruleCode:
             import rulecode
@@ -822,19 +821,18 @@ class Rule(RuleBase):
             return # may happen with special programmed rules
         variants = self.definition.split('||')
         self.__class__.options = {}
-        self.function = None
         self.hasSelectable = False
         for idx, variant in enumerate(variants):
             if isinstance(variant, (str, unicode)):
                 variant = str(variant)
                 if variant[0] == 'F':
                     assert idx == 0
-                    self.function = self.ruleCode[variant[1:]]
+                    code = self.ruleCode[variant[1:]]
                     # when executing code for this rule, we do not want
                     # to call those things indirectly
                     # pylint: disable=attribute-defined-outside-init
-                    self.redirectTo(self.function, self.__class__)
-                    if hasattr(self.function, 'selectable'):
+                    self.redirectTo(code, self.__class__)
+                    if hasattr(code, 'selectable'):
                         self.hasSelectable = True
                 elif variant[0] == 'O':
                     for action in variant[1:].split():

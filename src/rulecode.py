@@ -43,7 +43,6 @@ class RuleCode(object):
     # because all our methods will be redirected to another class
     # which also has those attributes.
     activeHands = None
-    limitHand = None
     options = None
 
 # pylint: disable=missing-docstring

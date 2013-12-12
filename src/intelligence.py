@@ -232,8 +232,8 @@ class AIDefault(object):
         claimness = IntDict()
         discard = self.player.game.lastDiscard
         if discard:
-            for func in self.player.game.ruleset.filterRules('claimness'):
-                claimness += func.claimness(hand, discard)
+            for rule in self.player.game.ruleset.filterRules('claimness'):
+                claimness += rule.claimness(hand, discard)
         if Debug.robotAI and len(claimness):
             hand.debug('claimnesses in selectAnswer:%s' % claimness)
         for tryAnswer in tryAnswers:
