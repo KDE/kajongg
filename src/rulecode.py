@@ -27,17 +27,18 @@ from query import Query
 from permutations import Permutations
 
 class RuleCode(object):
-    """Parent for all RuleCode classes. A RuleCode is used to
-    define the behaviour of a rule. Classes RuleDefinition and RuleCode
+    """Parent for all RuleCode classes. A RuleCode class can be used to
+    define the behaviour of a Rule. Classes Rule and RuleCode
     are separate because
-    - different rulesets may have a rule with the same name
-    - but with different behaviour
+    - different rulesets may have a Rule with the same name
+      but with different behaviour
+    - different rulesets may use different names for the same rule
     - the RuleCode class should be as short and as concise
       as possible because this is the important part about
       implementing a new ruleset, and it is the most error prone.
 
-    All RuleCode methods specified here will automatically be converted
-    into staticmethods (or classmethods if the 1st arg is named 'cls').
+    All methods in RuleCode classes will automatically be converted
+    into staticmethods or classmethods if the 1st arg is named 'cls'.
     """
 
     # functions holds all RuleCode classes defined here
@@ -75,7 +76,6 @@ class RuleCode(object):
 
 # pylint: disable=no-self-argument, no-self-use, no-value-for-parameter, no-member
 # pylint: disable=too-many-function-args, unused-argument, arguments-differ
-# most functions are stateless
 
 class DragonPungKong(RuleCode):
     def appliesToMeld(hand, meld):
