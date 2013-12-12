@@ -25,7 +25,7 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
 from PyQt4.QtCore import QModelIndex
-from rule import Ruleset, PredefinedRuleset, RuleDefinition, ParameterRule, \
+from rule import Ruleset, PredefinedRuleset, Rule, RuleBase, ParameterRule, \
     IntRule, BoolRule, StrRule
 from util import uniqueList
 from log import m18n, m18nc, english
@@ -300,7 +300,7 @@ class EditableRuleModel(RuleModel):
                     oldName = content.name
                     content.rename(english(name))
                     dirty = oldName != content.name
-                elif isinstance(content, (RuleDefinition, ParameterRule)):
+                elif isinstance(content, RuleBase):
                     dirty, message = self.__setRuleData(column, content, value)
                     if message:
                         Sorry(message)
@@ -317,7 +317,7 @@ class EditableRuleModel(RuleModel):
                 else:
                     return False
             if dirty:
-                if isinstance(content, (ParameterRule, RuleDefinition)):
+                if isinstance(content, RuleBase):
                     ruleset.updateRule(content)
                 self.dataChanged.emit(index, index)
             return True
@@ -334,7 +334,7 @@ class EditableRuleModel(RuleModel):
         checkable = False
         if isinstance(content, Ruleset) and column == 0:
             mayEdit = True
-        elif isinstance(content, (ParameterRule, RuleDefinition)):
+        elif isinstance(content, RuleBase):
             checkable = column == 1 and isinstance(content, BoolRule)
             mayEdit = bool(column)
         else:

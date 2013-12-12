@@ -227,7 +227,7 @@ class RuleList(list):
         if not rule:
             if 'parameter' in kwargs:
                 del kwargs['parameter']
-            ruleType = type(str(ruleKey(name)) + 'Rule', (RuleDefinition, ), {})
+            ruleType = type(str(ruleKey(name)) + 'Rule', (Rule, ), {})
             rule = ruleType(name, definition, **kwargs)
             if defParts[0] == 'FCallingHand':
                 parts1 = defParts[1].split('=')
@@ -240,7 +240,7 @@ class RuleList(list):
         self.add(rule)
 
 class UsedRule(object):
-    """use this in scoring, never change class RuleDefinition.
+    """use this in scoring, never change class Rule.
     If the rule has been used for a meld, pass it"""
     def __init__(self, rule, meld=None):
         self.rule = rule
@@ -719,7 +719,7 @@ into a situation where you have to pay a penalty"""))
         return result
 
 class RuleBase(object):
-    """a base for standard RuleDefinition and parameter rules IntRule, StrRule, BoolRule"""
+    """a base for standard Rule and parameter rules IntRule, StrRule, BoolRule"""
 
     options = {}
     ruleClasses = {}
@@ -754,7 +754,7 @@ def ruleKey(name):
     """the key is used for finding a rule in a RuleList"""
     return english(name).replace(' ', '').replace('.','')
 
-class RuleDefinition(RuleBase):
+class Rule(RuleBase):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
@@ -790,7 +790,7 @@ class RuleDefinition(RuleBase):
                 variant = str(variant)
                 if variant[0] == 'F':
                     assert idx == 0
-                    self.function = rulecode.Rule.functions[variant[1:]]
+                    self.function = rulecode.RuleCode.functions[variant[1:]]
                     # when executing code for this rule, we do not want
                     # to call those things indirectly
                     # pylint: disable=attribute-defined-outside-init
@@ -875,7 +875,7 @@ class ParameterRule(RuleBase):
         return str(self.parameter)
 
 class IntRule(ParameterRule):
-    """for int parameters. Duck typing with RuleDefinition"""
+    """for int parameters. Duck typing with Rule"""
     prefix = 'int'
     def __init__(self, name, definition, description, parameter):
         ParameterRule.__init__(self, name, definition, description, parameter)
@@ -896,7 +896,7 @@ class IntRule(ParameterRule):
                    m18n(self.name), self.parName, self.minimum)
 
 class BoolRule(ParameterRule):
-    """for bool parameters. Duck typing with RuleDefinition"""
+    """for bool parameters. Duck typing with Rule"""
     prefix = 'bool'
     def __init__(self, name, definition, description, parameter):
         ParameterRule.__init__(self, name, definition, description, parameter)
@@ -907,7 +907,7 @@ class BoolRule(ParameterRule):
         return parameter not in ('false', 'False', False, 0, '0', None, '')
 
 class StrRule(ParameterRule):
-    """for str parameters. Duck typing with RuleDefinition"""
+    """for str parameters. Duck typing with Rule"""
     prefix = 'str'
     def __init__(self, name, definition, description, parameter):
         ParameterRule.__init__(self, name, definition, description, parameter)

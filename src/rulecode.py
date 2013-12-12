@@ -26,21 +26,21 @@ from message import Message
 from query import Query
 from permutations import Permutations
 
-class Rule(object):
-    """Parent for all Rule classes. A Rule is used to
-    define the behaviour of a rule. Classes RuleDefinition and Rule
+class RuleCode(object):
+    """Parent for all RuleCode classes. A RuleCode is used to
+    define the behaviour of a rule. Classes RuleDefinition and RuleCode
     are separate because
     - different rulesets may have a rule with the same name
     - but with different behaviour
-    - the Rule class should be as short and as concise
+    - the RuleCode class should be as short and as concise
       as possible because this is the important part about
       implementing a new ruleset, and it is the most error prone.
 
-    All Rule methods specified here will automatically be converted
+    All RuleCode methods specified here will automatically be converted
     into staticmethods (or classmethods if the 1st arg is named 'cls').
     """
 
-    # functions holds all Rule classes defined here
+    # functions holds all RuleCode classes defined here
     functions = {}
 
     # those are needed for compilation. They will never be used
@@ -77,157 +77,157 @@ class Rule(object):
 # pylint: disable=too-many-function-args, unused-argument, arguments-differ
 # most functions are stateless
 
-class DragonPungKong(Rule):
+class DragonPungKong(RuleCode):
     def appliesToMeld(hand, meld):
         return (len(meld) >= 3
             and meld.isDragonMeld
             and (meld.isPung or meld.isKong))
 
-class RoundWindPungKong(Rule):
+class RoundWindPungKong(RuleCode):
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.roundWind
 
-class ExposedMinorPung(Rule):
+class ExposedMinorPung(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].isMinor
 
-class ExposedTerminalsPung(Rule):
+class ExposedTerminalsPung(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].isTerminal
 
-class ExposedHonorsPung(Rule):
+class ExposedHonorsPung(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.group in b'wd'
 
-class ExposedMinorKong(Rule):
+class ExposedMinorKong(RuleCode):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isMinor
 
-class ExposedTerminalsKong(Rule):
+class ExposedTerminalsKong(RuleCode):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isTerminal
 
-class ExposedHonorsKong(Rule):
+class ExposedHonorsKong(RuleCode):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isHonor
 
-class ConcealedMinorPung(Rule):
+class ConcealedMinorPung(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].isMinor
 
-class ConcealedTerminalsPung(Rule):
+class ConcealedTerminalsPung(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].isTerminal
 
-class ConcealedHonorsPung(Rule):
+class ConcealedHonorsPung(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld[0].group in b'WD'
 
-class ConcealedMinorKong(Rule):
+class ConcealedMinorKong(RuleCode):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].isMinor
 
-class ConcealedTerminalsKong(Rule):
+class ConcealedTerminalsKong(RuleCode):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].isTerminal
 
-class ConcealedHonorsKong(Rule):
+class ConcealedHonorsKong(RuleCode):
     def appliesToMeld(hand, meld):
         return len(meld) == 4 and not meld.isExposed and meld.isHonorMeld
 
-class OwnWindPungKong(Rule):
+class OwnWindPungKong(RuleCode):
     def appliesToMeld(hand, meld):
         return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.ownWind
 
-class OwnWindPair(Rule):
+class OwnWindPair(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPair and meld.isWindMeld and meld[0].value == hand.ownWind
 
-class RoundWindPair(Rule):
+class RoundWindPair(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPair and meld.isWindMeld and meld[0].value == hand.roundWind
 
-class DragonPair(Rule):
+class DragonPair(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPair and meld.isDragonMeld
 
-class LastTileCompletesPairMinor(Rule):
+class LastTileCompletesPairMinor(RuleCode):
     def appliesToHand(hand):
         return hand.lastMeld and hand.lastMeld.isPair and hand.lastTile.isMinor
 
-class Flower(Rule):
+class Flower(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isSingle and meld.group == b'f'
 
-class Season(Rule):
+class Season(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isSingle and meld.group == b'y'
 
-class LastTileCompletesPairMajor(Rule):
+class LastTileCompletesPairMajor(RuleCode):
     def appliesToHand(hand):
         return hand.lastMeld and hand.lastMeld.isPair and hand.lastTile.isMajor
 
-class LastFromWall(Rule):
+class LastFromWall(RuleCode):
     def appliesToHand(hand):
         return hand.lastTile and hand.lastTile.group.isupper()
 
-class ZeroPointHand(Rule):
+class ZeroPointHand(RuleCode):
     def appliesToHand(hand):
         return not any(x.meld for x in hand.usedRules if x.meld and len(x.meld) > 1)
 
-class NoChow(Rule):
+class NoChow(RuleCode):
     def appliesToHand(hand):
         return not any(x.isChow for x in hand.melds)
 
-class OnlyConcealedMelds(Rule):
+class OnlyConcealedMelds(RuleCode):
     def appliesToHand(hand):
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
-class FalseColorGame(Rule):
+class FalseColorGame(RuleCode):
     def appliesToHand(hand):
         dwSet = {b'd', b'w'}
         return dwSet & hand.suits and len(hand.suits - dwSet) == 1
 
-class TrueColorGame(Rule):
+class TrueColorGame(RuleCode):
     def appliesToHand(hand):
         return len(hand.suits) == 1 and hand.suits < {b's', b'b', b'c'}
 
-class Purity(Rule):
+class Purity(RuleCode):
     def appliesToHand(hand):
         return (len(hand.suits) == 1 and hand.suits < {b's', b'b', b'c'}
             and not any(x.isChow for x in hand.melds))
 
-class ConcealedTrueColorGame(Rule):
+class ConcealedTrueColorGame(RuleCode):
     def appliesToHand(hand):
         if len(hand.suits) != 1 or not (hand.suits < {b's', b'b', b'c'}):
             return False
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
-class OnlyMajors(Rule):
+class OnlyMajors(RuleCode):
     def appliesToHand(hand):
         return all(x.isMajor for x in hand.tiles)
 
-class OnlyHonors(Rule):
+class OnlyHonors(RuleCode):
     def appliesToHand(hand):
         return all(x.isHonor for x in hand.tiles)
 
-class HiddenTreasure(Rule):
+class HiddenTreasure(RuleCode):
     def appliesToHand(hand):
         return (not any(((x.isExposed and not x.isClaimedKong) or x.isChow) for x in hand.melds)
             and hand.lastTile and hand.lastTile.group.isupper()
             and len(hand.melds) == 5)
 
-class BuriedTreasure(Rule):
+class BuriedTreasure(RuleCode):
     def appliesToHand(hand):
         return (len(hand.suits - Byteset(b'dw')) == 1
             and sum(x.isPung for x in hand.melds) == 4
             and all((x.isPung and not x.isExposed ) or x.isPair for x in hand.melds))
 
-class AllTerminals(Rule):
+class AllTerminals(RuleCode):
     def appliesToHand(hand):
         return all(x.isTerminal for x in hand.tiles)
 
-class StandardMahJongg(Rule):
+class StandardMahJongg(RuleCode):
     def computeLastMelds(hand):
         """returns all possible last melds"""
         return MeldList(x for x in hand.melds if hand.lastTile in x and len(x) < 4)
@@ -417,7 +417,7 @@ class SquirmingSnake(StandardMahJongg):
         """they have already been found by the StandardMahJongg rule"""
         return set()
 
-class WrigglingSnake(Rule):
+class WrigglingSnake(RuleCode):
     def shouldTry(hand, maxMissing=3):
         return (len(set(x.lower() for x in hand.tiles)) + maxMissing > 12
            and all(not x.isChow for x in hand.declaredMelds))
@@ -472,7 +472,7 @@ class WrigglingSnake(Rule):
             return False
         return len(set(hand.values)) == 13
 
-class CallingHand(Rule):
+class CallingHand(RuleCode):
     def appliesToHand(cls, hand):
         if hand in cls.activeHands:
             # this cannot be reentrant because we attach the options to the
@@ -486,7 +486,7 @@ class CallingHand(Rule):
                 # it is a MahJongg rule
                 candidates = cls.limitHand.winningTileCandidates(hand)
             else:
-                # it is any other normal Rule
+                # it is any other normal RuleCode
                 candidates = StandardMahJongg.winningTileCandidates(hand)
             for tileName in candidates:
                 fullHand = hand + tileName.capitalize()
@@ -496,7 +496,7 @@ class CallingHand(Rule):
         finally:
             cls.activeHands.remove(hand)
 
-class TripleKnitting(Rule):
+class TripleKnitting(RuleCode):
 
     def computeLastMelds(cls, hand):
         """returns all possible last melds"""
@@ -594,7 +594,7 @@ class TripleKnitting(Rule):
                 result.append((tileS, tileB, tileC))
         return result, tilesS + tilesB + tilesC
 
-class Knitting(Rule):
+class Knitting(RuleCode):
     def computeLastMelds(cls, hand):
         """returns all possible last melds"""
         if not hand.lastTile:
@@ -691,7 +691,7 @@ class Knitting(Rule):
         if len(result) == 2:
             return Bytelist(result)
 
-class AllPairHonors(Rule):
+class AllPairHonors(RuleCode):
     def computeLastMelds(hand):
         return [Meld([hand.lastTile, hand.lastTile])]
     def claimness(hand, dummyDiscard):
@@ -757,48 +757,48 @@ class AllPairHonors(Rule):
         return candidates
 
 
-class FourfoldPlenty(Rule):
+class FourfoldPlenty(RuleCode):
     def appliesToHand(hand):
         return len(hand.tiles) == 18
 
-class ThreeGreatScholars(Rule):
+class ThreeGreatScholars(RuleCode):
     def appliesToHand(cls, hand):
 #        print('TGS.appliesToHand(%s,..)' % cls)
         return (BigThreeDragons.appliesToHand(hand)
             and ('nochow' not in cls.options or not any(x.isChow for x in hand.melds)))
 
-class BigThreeDragons(Rule):
+class BigThreeDragons(RuleCode):
     def appliesToHand(hand):
         return len([x for x in hand.melds if x.isDragonMeld and len(x) >= 3]) == 3
 
-class BigFourJoys(Rule):
+class BigFourJoys(RuleCode):
     def appliesToHand(hand):
         return len([x for x in hand.melds if x.isWindMeld and len(x) >= 3]) == 4
 
-class LittleFourJoys(Rule):
+class LittleFourJoys(RuleCode):
     def appliesToHand(hand):
         lengths = sorted([min(len(x), 3) for x in hand.melds if x.isWindMeld])
         return lengths == [2, 3, 3, 3]
 
-class LittleThreeDragons(Rule):
+class LittleThreeDragons(RuleCode):
     def appliesToHand(hand):
         lengths = sorted([min(len(x), 3) for x in hand.melds if x.isDragonMeld])
         return lengths == [2, 3, 3]
 
-class FourBlessingsHoveringOverTheDoor(Rule):
+class FourBlessingsHoveringOverTheDoor(RuleCode):
     def appliesToHand(hand):
         return len([x for x in hand.melds if len(x) >= 3 and x.isWindMeld]) == 4
 
-class AllGreen(Rule):
+class AllGreen(RuleCode):
     def appliesToHand(hand):
         tiles = set(bytes(x.lower()) for x in hand.tiles)
         return tiles < Tileset([b'b2', b'b3', b'b4', b'b5', b'b6', b'b8', b'dg'])
 
-class LastTileFromWall(Rule):
+class LastTileFromWall(RuleCode):
     def appliesToHand(hand):
         return hand.lastSource == b'w'
 
-class LastTileFromDeadWall(Rule):
+class LastTileFromDeadWall(RuleCode):
     def appliesToHand(hand):
         return hand.lastSource == b'e'
 
@@ -806,7 +806,7 @@ class LastTileFromDeadWall(Rule):
         """for scoring game"""
         return hand.lastSource == b'w'
 
-class IsLastTileFromWall(Rule):
+class IsLastTileFromWall(RuleCode):
     def appliesToHand(hand):
         return hand.lastSource == b'z'
 
@@ -814,7 +814,7 @@ class IsLastTileFromWall(Rule):
         """for scoring game"""
         return hand.lastSource == b'w'
 
-class IsLastTileFromWallDiscarded(Rule):
+class IsLastTileFromWallDiscarded(RuleCode):
     def appliesToHand(hand):
         return hand.lastSource == b'Z'
 
@@ -822,7 +822,7 @@ class IsLastTileFromWallDiscarded(Rule):
         """for scoring game"""
         return hand.lastSource == b'd'
 
-class RobbingKong(Rule):
+class RobbingKong(RuleCode):
     def appliesToHand(hand):
         return hand.lastSource == b'k'
 
@@ -832,23 +832,23 @@ class RobbingKong(Rule):
             and hand.lastTile and hand.lastTile.group.islower()
             and [x.lower() for x in hand.tiles].count(hand.lastTile.lower()) < 2)
 
-class GatheringPlumBlossomFromRoof(Rule):
+class GatheringPlumBlossomFromRoof(RuleCode):
     def appliesToHand(hand):
         return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == b'S5'
 
-class PluckingMoon(Rule):
+class PluckingMoon(RuleCode):
     def appliesToHand(hand):
         return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == b'S1'
 
-class ScratchingPole(Rule):
+class ScratchingPole(RuleCode):
     def appliesToHand(hand):
         return RobbingKong.appliesToHand(hand) and hand.lastTile == b'b2'
 
-class StandardRotation(Rule):
+class StandardRotation(RuleCode):
     def rotate(game):
         return game.winner and game.winner.wind != b'E'
 
-class EastWonNineTimesInARow(Rule):
+class EastWonNineTimesInARow(RuleCode):
     nineTimes = 9
     def appliesToHand(hand):
         if not hand.player:
@@ -929,7 +929,7 @@ class GatesOfHeaven(StandardMahJongg):
                     result = b'123456789'
         return {Tile(list(hand.suits)[0], x) for x in result}
 
-class ThirteenOrphans(Rule):
+class ThirteenOrphans(RuleCode):
 
     def computeLastMelds(hand):
         meldSize = hand.tilesInHand.count(hand.lastTile)
@@ -1018,35 +1018,35 @@ class ThirteenOrphans(Rule):
                 havePair = candidate.occurrence == 2
         return candidates
 
-class OwnFlower(Rule):
+class OwnFlower(RuleCode):
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
         return Tile(b'f', hand.ownWind) in fsPairs
 
-class OwnSeason(Rule):
+class OwnSeason(RuleCode):
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
         return Tile(b'y', hand.ownWind) in fsPairs
 
-class OwnFlowerOwnSeason(Rule):
+class OwnFlowerOwnSeason(RuleCode):
     def appliesToHand(hand):
         return (OwnFlower.appliesToHand(hand)
             and OwnSeason.appliesToHand(hand))
 
-class AllFlowers(Rule):
+class AllFlowers(RuleCode):
     def appliesToHand(hand):
         return len([x for x in hand.bonusMelds if x.group == b'f']) == 4
 
-class AllSeasons(Rule):
+class AllSeasons(RuleCode):
     def appliesToHand(hand):
         return len([x for x in hand.bonusMelds if x.group == b'y']) == 4
 
-class ThreeConcealedPongs(Rule):
+class ThreeConcealedPongs(RuleCode):
     def appliesToHand(hand):
         return len([x for x in hand.melds if (
             not x.isExposed or x.isClaimedKong) and (x.isPung or x.isKong)]) >= 3
 
-class MahJonggWithOriginalCall(Rule):
+class MahJonggWithOriginalCall(RuleCode):
     def appliesToHand(hand):
         return (b'a' in hand.announcements
             and sum(x.isExposed for x in hand.melds) < 3)
@@ -1071,7 +1071,7 @@ class MahJonggWithOriginalCall(Rule):
                     player.mayWin = False # bad luck
         return result
 
-class TwofoldFortune(Rule):
+class TwofoldFortune(RuleCode):
     def appliesToHand(hand):
         return b't' in hand.announcements
 
@@ -1080,7 +1080,7 @@ class TwofoldFortune(Rule):
         kungs = [x for x in hand.melds if len(x) == 4]
         return len(kungs) >= 2
 
-class BlessingOfHeaven(Rule):
+class BlessingOfHeaven(RuleCode):
     def appliesToHand(hand):
         return hand.ownWind == b'e' and hand.lastSource == b'1'
 
@@ -1090,7 +1090,7 @@ class BlessingOfHeaven(Rule):
             and hand.lastSource and hand.lastSource in b'wd'
             and not (Byteset(hand.announcements) - {b'a'}))
 
-class BlessingOfEarth(Rule):
+class BlessingOfEarth(RuleCode):
     def appliesToHand(hand):
         return hand.ownWind != b'e' and hand.lastSource == b'1'
 
@@ -1100,11 +1100,11 @@ class BlessingOfEarth(Rule):
             and hand.lastSource and hand.lastSource in b'wd'
             and not (Byteset(hand.announcements) - {b'a'}))
 
-class LongHand(Rule):
+class LongHand(RuleCode):
     def appliesToHand(hand):
         return (not hand.won and hand.lenOffset > 0) or hand.lenOffset > 1
 
-class FalseDiscardForMJ(Rule):
+class FalseDiscardForMJ(RuleCode):
     def appliesToHand(hand):
         return not hand.won
 
@@ -1112,7 +1112,7 @@ class FalseDiscardForMJ(Rule):
         """for scoring game"""
         return not hand.won
 
-class DangerousGame(Rule):
+class DangerousGame(RuleCode):
     def appliesToHand(hand):
         return not hand.won
 
@@ -1120,7 +1120,7 @@ class DangerousGame(Rule):
         """for scoring game"""
         return not hand.won
 
-class LastOnlyPossible(Rule):
+class LastOnlyPossible(RuleCode):
     """check if the last tile was the only one possible for winning"""
     def appliesToHand(cls, hand):
         if hand in cls.activeHands or not hand.lastTile:
@@ -1137,13 +1137,13 @@ class LastOnlyPossible(Rule):
             cls.activeHands.remove(hand)
 
 def __scanSelf():
-    """for every Rule class defined in this module,
-    generate an instance and add it to dict Rule.functions.
-    Also convert all Rule methods into classmethod or staticmethod"""
-    if not Rule.functions:
+    """for every RuleCode class defined in this module,
+    generate an instance and add it to dict RuleCode.functions.
+    Also convert all RuleCode methods into classmethod or staticmethod"""
+    if not RuleCode.functions:
         for cls in globals().values():
             if hasattr(cls, "__mro__"):
-                if cls.__mro__[-2] == Rule and len(cls.__mro__) > 2:
-                    Rule.functions[cls.__name__] = cls
+                if cls.__mro__[-2] == RuleCode and len(cls.__mro__) > 2:
+                    RuleCode.functions[cls.__name__] = cls
                     cls.redirectTo(cls) # this changes all methods to classmethod or staticmethod
 __scanSelf()
