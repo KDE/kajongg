@@ -482,7 +482,7 @@ class TripleKnitting(RuleCode):
         triples.append(rest)  # just a list of tuples
         return [Meld(x) for x in triples if hand.lastTile in x]
 
-    def claimness(cls, hand, dummyDiscard):
+    def claimness(cls, hand, discard):
         result = IntDict()
         if cls.shouldTry(hand):
             result[Message.Pung] = -999
@@ -490,7 +490,7 @@ class TripleKnitting(RuleCode):
             result[Message.Chow] = -999
         return result
 
-    def weigh(cls, dummyAiInstance, candidates):
+    def weigh(cls, aiInstance, candidates):
         if cls.shouldTry(candidates.hand):
             _, rest = cls.findTriples(candidates.hand)
             for candidate in candidates:
@@ -578,14 +578,14 @@ class Knitting(RuleCode):
         assert not rest, '%s: couples=%s rest=%s' % (hand.string, couples, rest)
         return [Meld(x) for x in couples if hand.lastTile in x]
 
-    def claimness(cls, hand, dummyDiscard):
+    def claimness(cls, hand, discard):
         result = IntDict()
         if cls.shouldTry(hand):
             result[Message.Pung] = -999
             result[Message.Kong] = -999
             result[Message.Chow] = -999
         return result
-    def weigh(cls, dummyAiInstance, candidates):
+    def weigh(cls, aiInstance, candidates):
         if cls.shouldTry(candidates.hand):
             for candidate in candidates:
                 if candidate.group in b'dw':
@@ -669,7 +669,7 @@ class Knitting(RuleCode):
 class AllPairHonors(RuleCode):
     def computeLastMelds(hand):
         return [Meld([hand.lastTile, hand.lastTile])]
-    def claimness(hand, dummyDiscard):
+    def claimness(hand, discard):
         result = IntDict()
         if AllPairHonors.shouldTry(hand):
             result[Message.Pung] = -999
@@ -716,7 +716,7 @@ class AllPairHonors(RuleCode):
                 rest.remove(pair)
                 rest.remove(pair)
         return melds, rest
-    def weigh(dummyAiInstance, candidates):
+    def weigh(aiInstance, candidates):
         hand = candidates.hand
         if not AllPairHonors.shouldTry(hand):
             return candidates
@@ -973,7 +973,7 @@ class ThirteenOrphans(RuleCode):
                     return False
         return True
 
-    def weigh(cls, dummyAiInstance, candidates):
+    def weigh(cls, aiInstance, candidates):
         hand = candidates.hand
         if not cls.shouldTry(hand):
             return candidates
@@ -1031,7 +1031,7 @@ class MahJonggWithOriginalCall(RuleCode):
         # the previous regex was too strict
         return sum(x.isExposed for x in hand.melds) < 3
 
-    def claimness(hand, dummyDiscard):
+    def claimness(hand, discard):
         result = IntDict()
         player = hand.player
         if player:
