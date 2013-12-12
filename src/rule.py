@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
+import types
 from hashlib import md5
 
 from PyQt4.QtCore import QVariant
@@ -28,8 +29,6 @@ from PyQt4.QtCore import QVariant
 from common import unicode # pylint: disable=redefined-builtin
 from log import m18n, m18nc, m18nE, english, logException
 from query import Query, QueryException, Transaction
-
-import rulecode
 
 class Score(object):
     """holds all parts contributing to a score. It has two use cases:
@@ -318,6 +317,7 @@ class Ruleset(object):
             - an integer: ruleset.id from the sql table
             - a list: the full ruleset specification (probably sent from the server)
             - a string: The hash value of a ruleset"""
+        Rule.importRulecode()
         self.name = name
         self.rulesetId = 0
         self.__hash = None
@@ -723,7 +723,6 @@ class RuleBase(object):
 
     options = {}
     ruleClasses = {}
-
     def __init__(self, name, definition, description):
         self.__name = name
         self.definition = definition
@@ -760,7 +759,9 @@ class Rule(RuleBase):
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
     # pylint: disable=too-many-arguments,too-many-instance-attributes
+
     activeHands = []
+    ruleCode = None
 
     def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0,
             description=None, explainTemplate=None, debug=False):
@@ -771,6 +772,44 @@ class Rule(RuleBase):
         self.parameter = 0
         self.debug = debug
         self.__parseDefinition()
+
+    @staticmethod
+    def redirectTo(srcClass, destClass):
+        """inject my static and class methods into destClass,
+        converting functions to staticmethod/classmethod as needed"""
+        # also for inherited methods
+        classes = list(reversed(srcClass.__mro__[:-2]))
+        combinedDict = dict(classes[0].__dict__)
+        for ancestor in classes[1:]:
+            combinedDict.update(ancestor.__dict__)
+        for funcName, method in combinedDict.items():
+            if isinstance(method, (types.FunctionType, classmethod, staticmethod)):
+                if hasattr(method, 'im_func'):
+                    method = method.im_func
+                else:
+                    if hasattr(method, '__func__'):
+                        method = method.__func__
+                if method.__code__.co_varnames[0] == 'cls':
+                    method = classmethod(method)
+                else:
+                    method = staticmethod(method)
+                # TODO: wrap with memorize
+                setattr(destClass, funcName, method)
+
+    @classmethod
+    def importRulecode(cls):
+        """for every RuleCode class defined in this module,
+        generate an instance and add it to dict RuleCode.functions.
+        Also convert all RuleCode methods into classmethod or staticmethod"""
+        if not cls.ruleCode:
+            import rulecode
+            cls.ruleCode = {}
+            for ruleClass in rulecode.__dict__.values():
+                if hasattr(ruleClass, "__mro__"):
+                    if ruleClass.__mro__[-2].__name__ == 'RuleCode' and len(ruleClass.__mro__) > 2:
+                        cls.ruleCode[ruleClass.__name__] = ruleClass
+                        # this changes all methods to classmethod or staticmethod
+                        cls.redirectTo(ruleClass, ruleClass)
 
     def key(self):
         """the key is used for finding a rule in a RuleList"""
@@ -790,11 +829,11 @@ class Rule(RuleBase):
                 variant = str(variant)
                 if variant[0] == 'F':
                     assert idx == 0
-                    self.function = rulecode.RuleCode.functions[variant[1:]]
+                    self.function = self.ruleCode[variant[1:]]
                     # when executing code for this rule, we do not want
                     # to call those things indirectly
                     # pylint: disable=attribute-defined-outside-init
-                    self.function.redirectTo(self.__class__)
+                    self.redirectTo(self.function, self.__class__)
                     if hasattr(self.function, 'selectable'):
                         self.hasSelectable = True
                 elif variant[0] == 'O':
