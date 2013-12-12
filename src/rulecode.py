@@ -268,7 +268,7 @@ class StandardMahJongg(RuleCode):
             assert val0 + 2 == val1, 'group:%s values:%s' % (group, values)
             return {Tile(group, val0 + 1)}
 
-    def winningTileCandidates(hand):
+    def winningTileCandidates(cls, hand):
         # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches,too-many-statements
         if len(hand.melds) > 7:
             # hope 7 is sufficient, 6 was not
@@ -325,7 +325,7 @@ class StandardMahJongg(RuleCode):
                     changed = True
                 elif values[0] + 1 == values[1] and values[2] > values[0] + 2:
                     # logDebug('found incomplete chow at start of %s' % values)
-                    return StandardMahJongg.fillChow(group, values[:2])
+                    return cls.fillChow(group, values[:2])
             changed = True
             while (changed and len(values) > 2
                     and values.count(values[-1]) == 1
@@ -341,7 +341,7 @@ class StandardMahJongg(RuleCode):
                     changed = True
                 elif values[-1] - 1 == values[-2] and values[-3] < values[-1] - 2:
                     # logDebug('found incomplete chow at end of %s' % values)
-                    return StandardMahJongg.fillChow(group, values[-2:])
+                    return cls.fillChow(group, values[-2:])
 
             if len(values) % 3 == 0:
                 # adding a 4th, 7th or 10th tile with this color can not let us win,
@@ -375,7 +375,7 @@ class StandardMahJongg(RuleCode):
                 if maxChows == 0:
                     # not a calling hand
                     return set()
-                return StandardMahJongg.fillChow(group, values)
+                return cls.fillChow(group, values)
             if (len(values) == 4 and len(valueSet) == 2
                     and values[0] == values[1] and values[2] == values[3]):
                 # logDebug('we have 2 pairs of %s' % group)
@@ -763,7 +763,6 @@ class FourfoldPlenty(RuleCode):
 
 class ThreeGreatScholars(RuleCode):
     def appliesToHand(cls, hand):
-#        print('TGS.appliesToHand(%s,..)' % cls)
         return (BigThreeDragons.appliesToHand(hand)
             and ('nochow' not in cls.options or not any(x.isChow for x in hand.melds)))
 
@@ -850,12 +849,12 @@ class StandardRotation(RuleCode):
 
 class EastWonNineTimesInARow(RuleCode):
     nineTimes = 9
-    def appliesToHand(hand):
+    def appliesToHand(cls, hand):
         if not hand.player:
             return False
         game = hand.player.game
-        return EastWonNineTimesInARow.appliesToGame(game)
-    def appliesToGame(game, needWins=None):
+        return cls.appliesToGame(game)
+    def appliesToGame(cls, game, needWins=None):
         if needWins is None:
             needWins = EastWonNineTimesInARow.nineTimes
             if game.isScoringGame():
@@ -869,8 +868,8 @@ class EastWonNineTimesInARow(RuleCode):
                 (game.gameid, game.players['E'].nameid, prevailing)).records[0][0])
             return eastMJCount == needWins
         return False
-    def rotate(game):
-        return EastWonNineTimesInARow.appliesToGame(game, needWins = EastWonNineTimesInARow.nineTimes)
+    def rotate(cls, game):
+        return cls.appliesToGame(game, needWins = EastWonNineTimesInARow.nineTimes)
 
 class GatesOfHeaven(StandardMahJongg):
     def shouldTry(hand, maxMissing=3):
@@ -947,9 +946,9 @@ class ThirteenOrphans(RuleCode):
                 rest.remove(tileName)
         return result, rest
 
-    def claimness(hand, discard):
+    def claimness(cls, hand, discard):
         result = IntDict()
-        if ThirteenOrphans.shouldTry(hand):
+        if cls.shouldTry(hand):
             doublesCount = hand.doublesEstimate()
             if hand.tiles.count(discard) == 2:
 # TODO: compute scoring for resulting hand. If it is high anyway,
@@ -957,7 +956,7 @@ class ThirteenOrphans(RuleCode):
                 for rule in hand.ruleset.doublingMeldRules:
                     if rule.appliesToMeld(hand, Meld(discard.lower() * 3)):
                         doublesCount += 1
-            if doublesCount < 2 or ThirteenOrphans.shouldTry(hand, maxMissing=1):
+            if doublesCount < 2 or cls.shouldTry(hand, 1):
                 result[Message.Pung] = -999
                 result[Message.Kong] = -999
                 result[Message.Chow] = -999
@@ -966,11 +965,11 @@ class ThirteenOrphans(RuleCode):
     def appliesToHand(hand):
         return set(x.lower() for x in hand.tiles) == elements.majors
 
-    def winningTileCandidates(hand):
+    def winningTileCandidates(cls, hand):
         if any(x in hand.values for x in Byteset(b'2345678')):
             # no minors allowed
             return set()
-        if not ThirteenOrphans.shouldTry(hand, maxMissing=1):
+        if not cls.shouldTry(hand, 1):
             return set()
         handTiles = set(x.lower() for x in hand.tiles)
         missing = elements.majors - handTiles
@@ -999,9 +998,9 @@ class ThirteenOrphans(RuleCode):
                     return False
         return True
 
-    def weigh(dummyAiInstance, candidates):
+    def weigh(cls, dummyAiInstance, candidates):
         hand = candidates.hand
-        if not ThirteenOrphans.shouldTry(hand):
+        if not cls.shouldTry(hand):
             return candidates
         handTiles = set(x.lower() for x in hand.tiles)
         missing = elements.majors - handTiles
