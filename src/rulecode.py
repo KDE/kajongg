@@ -74,6 +74,7 @@ class Rule(object):
 # need docstringss
 
 # pylint: disable=no-self-argument, no-self-use, no-value-for-parameter, no-member
+# pylint: disable=too-many-function-args, unused-argument, arguments-differ
 # most functions are stateless
 
 class MeldRule(Rule):
@@ -83,7 +84,7 @@ class MahJonggRule(Rule):
     pass
 
 class DragonPungKong(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return (len(meld) >= 3
             and meld.isDragonMeld
             and (meld.isPung or meld.isKong))
@@ -93,51 +94,51 @@ class RoundWindPungKong(MeldRule):
         return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.roundWind
 
 class ExposedMinorPung(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].isMinor
 
 class ExposedTerminalsPung(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return meld.isPung and meld.isLower(0, 3) and meld[0].isTerminal
 
 class ExposedHonorsPung(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return meld.isPung and meld.group in b'wd'
 
 class ExposedMinorKong(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isMinor
 
 class ExposedTerminalsKong(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isTerminal
 
 class ExposedHonorsKong(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isHonor
 
 class ConcealedMinorPung(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].isMinor
 
 class ConcealedTerminalsPung(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return meld.isPung and meld.isUpper(0, 3) and meld[0].isTerminal
 
 class ConcealedHonorsPung(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return meld.isPung and meld[0].group in b'WD'
 
 class ConcealedMinorKong(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].isMinor
 
 class ConcealedTerminalsKong(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return len(meld) == 4 and not meld.isExposed and meld[0].isTerminal
 
 class ConcealedHonorsKong(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return len(meld) == 4 and not meld.isExposed and meld.isHonorMeld
 
 class OwnWindPungKong(MeldRule):
@@ -153,7 +154,7 @@ class RoundWindPair(MeldRule):
         return meld.isPair and meld.isWindMeld and meld[0].value == hand.roundWind
 
 class DragonPair(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return meld.isPair and meld.isDragonMeld
 
 class LastTileCompletesPairMinor(Rule):
@@ -161,11 +162,11 @@ class LastTileCompletesPairMinor(Rule):
         return hand.lastMeld and hand.lastMeld.isPair and hand.lastTile.isMinor
 
 class Flower(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return meld.isSingle and meld.group == b'f'
 
 class Season(MeldRule):
-    def appliesToMeld(dummyHand, meld):
+    def appliesToMeld(hand, meld):
         return meld.isSingle and meld.group == b'y'
 
 class LastTileCompletesPairMajor(Rule):
@@ -393,9 +394,9 @@ class StandardMahJongg(MahJonggRule):
                         result.append(Tile(group, str(value + 1)))
         return set(result)
 
-    def shouldTry(dummyHand, dummyMaxMissing=10):
+    def shouldTry(hand, maxMissing=10):
         return True
-    def rearrange(dummyHand, rest):
+    def rearrange(hand, rest):
         """rest is a string with those tiles that can still
         be rearranged: No declared melds and no bonus tiles.
         done is already arranged, do not change this.
@@ -454,7 +455,7 @@ class WrigglingSnake(MahJonggRule):
             # pair of 1 is not complete
             return set([Tile(group, 1)])
 
-    def rearrange(dummyHand, rest):
+    def rearrange(hand, rest):
         result = []
         for tileName in rest:
             if rest.count(tileName) >= 2:
@@ -738,7 +739,7 @@ class AllPairHonors(MahJonggRule):
         pairWanted = 7 - maxMissing // 2 # count pairs
         result = pairCount >= pairWanted or (pairCount + kongCount * 2) > pairWanted
         return result
-    def rearrange(dummyHand, rest):
+    def rearrange(hand, rest):
         melds = []
         for pair in set(rest) & elements.mAJORS:
             while rest.count(pair) >= 2:
@@ -940,7 +941,7 @@ class ThirteenOrphans(MahJonggRule):
         meldSize = hand.tilesInHand.count(hand.lastTile)
         return [Meld([hand.lastTile] * meldSize)]
 
-    def rearrange(dummyHand, rest):
+    def rearrange(hand, rest):
         result = []
         for tileName in rest:
             if rest.count(tileName) >= 2:
