@@ -37,7 +37,7 @@ if not STDOUTENCODING:
 
 # util must not depend on kde
 
-from common import Debug, unicode  # pylint: disable=redefined-builtin
+from common import Debug, isPython3
 
 def stack(msg, limit=6):
     """returns a list of lines with msg as prefix"""
@@ -198,6 +198,11 @@ def gitHead():
 
 def xToUtf8(msg, args=None):
     """makes sure msg and all args are utf-8"""
+    if isPython3:
+        if args is not None:
+            return msg, args
+        else:
+            return msg
     if isinstance(msg, unicode):
         msg = msg.encode('utf-8')
     elif not isinstance(msg, str):
