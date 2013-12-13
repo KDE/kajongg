@@ -94,6 +94,7 @@ class Debug(object):
     locate = False
     neutral = False  # only neutral comparable debug output
     git = False
+    ruleCache = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

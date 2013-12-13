@@ -110,6 +110,7 @@ class Hand(object):
         self.mjRule = None
         self.ownWind = None
         self.roundWind = None
+        self.ruleCache = {}
         tileStrings = []
         haveM = False
         for part in self.string.split():
@@ -264,6 +265,7 @@ class Hand(object):
             return
         self.__score = self.__totalScore()
 
+        self.ruleCache.clear()
         # do the rest only if we know all tiles of the hand
         if Tile.unknown in self.string:
             self.won = False    # we do not know better
@@ -561,6 +563,7 @@ class Hand(object):
         self.melds.extend(bestVariant)
         self.melds.sort()
         self.rest = []
+        self.ruleCache.clear()
         assert sum(len(x) for x in self.melds) == len(self.tiles), '%s != %s' % (
             self.melds, self.tiles)
 

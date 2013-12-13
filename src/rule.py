@@ -26,7 +26,7 @@ from hashlib import md5
 
 from PyQt4.QtCore import QVariant
 
-from common import unicode # pylint: disable=redefined-builtin
+from common import Debug, unicode # pylint: disable=redefined-builtin
 from log import m18n, m18nc, m18nE, english, logException
 from query import Query, QueryException, Transaction
 
@@ -763,6 +763,32 @@ class Rule(RuleBase):
     ruleCode = None
     limitHand = None
 
+    @classmethod
+    def memoize(cls, func, srcClass):
+        """cache results for func"""
+        code = func.__code__
+        clsMethod = code.co_varnames[0] == 'cls'
+        def wrapper(*args):
+            """closure"""
+            hand = args[1] if clsMethod else args[0]
+            cacheKey = (cls, func.__name__)
+            if cacheKey not in hand.ruleCache:
+                result = func(*args)
+                hand.ruleCache[cacheKey] = result
+                if Debug.ruleCache:
+                    hand.debug('new ruleCache entry for hand %s: %s=%s' % (id(hand)%10000, cacheKey, result))
+                return result
+            else:
+                if Debug.ruleCache:
+                    if hand.ruleCache[cacheKey] != func(*args):
+                        hand.player.game.debug('cacheKey=%s rule=%s func:%s args:%s' % (cacheKey, srcClass, func, args))
+                        hand.player.game.debug('  hand:%s/%s' % (id(hand), hand))
+                        hand.player.game.debug('  cached:%s ' % str(hand.ruleCache[cacheKey]))
+                        hand.player.game.debug('    real:%s ' % str(func(*args)))
+                return hand.ruleCache[cacheKey]
+            return result
+        return classmethod(wrapper) if clsMethod else staticmethod(wrapper)
+
     def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0,
             description=None, explainTemplate=None, debug=False):
         RuleBase.__init__(self, name, definition, description)
@@ -774,7 +800,7 @@ class Rule(RuleBase):
         self.__parseDefinition()
 
     @staticmethod
-    def redirectTo(srcClass, destClass):
+    def redirectTo(srcClass, destClass, memoize=False):
         """inject my static and class methods into destClass,
         converting methods to staticmethod/classmethod as needed"""
         # also for inherited methods
@@ -788,11 +814,14 @@ class Rule(RuleBase):
                     method = method.im_func
                 elif hasattr(method, '__func__'):
                     method = method.__func__
-                if method.__code__.co_varnames[0] == 'cls':
-                    method = classmethod(method)
+                if memoize and method.__name__ in srcClass.cache:
+                    method = destClass.memoize(method, srcClass)
                 else:
-                    method = staticmethod(method)
-                # TODO: wrap with memorize
+                    if method.__code__.co_varnames[0] == 'cls':
+                        methodType = classmethod
+                    else:
+                        methodType = staticmethod
+                    method = methodType(method)
                 setattr(destClass, funcName, method)
 
     @classmethod
@@ -831,7 +860,7 @@ class Rule(RuleBase):
                     # when executing code for this rule, we do not want
                     # to call those things indirectly
                     # pylint: disable=attribute-defined-outside-init
-                    self.redirectTo(code, self.__class__)
+                    self.redirectTo(code, self.__class__, memoize=True)
                     if hasattr(code, 'selectable'):
                         self.hasSelectable = True
                 elif variant[0] == 'O':

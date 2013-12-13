@@ -39,6 +39,8 @@ class RuleCode(object):
     into staticmethods or classmethods if the 1st arg is named 'cls'.
     """
 
+    cache = ()
+
     # those are needed for compilation. They will never be used
     # because all our methods will be redirected to another class
     # which also has those attributes.
@@ -203,6 +205,8 @@ class AllTerminals(RuleCode):
         return all(x.isTerminal for x in hand.tiles)
 
 class StandardMahJongg(RuleCode):
+    cache = ('appliesToHand',)
+
     def computeLastMelds(hand):
         """returns all possible last melds"""
         return MeldList(x for x in hand.melds if hand.lastTile in x and len(x) < 4)
@@ -375,7 +379,12 @@ class StandardMahJongg(RuleCode):
             yield tuple(variantMelds), tuple()
 
 class SquirmingSnake(StandardMahJongg):
+    cache = ()
     def appliesToHand(hand):
+        cacheKey = (hand.ruleset.standardMJRule.__class__, 'appliesToHand')
+        std = hand.ruleCache.get(cacheKey, None)
+        if std is False:
+            return False
         if len(hand.suits) != 1 or not hand.suits < {b's', b'b', b'c'}:
             return False
         values = hand.values
@@ -446,6 +455,7 @@ class WrigglingSnake(RuleCode):
         return len(set(hand.values)) == 13
 
 class CallingHand(RuleCode):
+
     def appliesToHand(cls, hand):
         if hand in cls.activeHands:
             # this cannot be reentrant because we attach the options to the
@@ -477,7 +487,9 @@ class TripleKnitting(RuleCode):
             return
         triples, rest = cls.findTriples(hand)
         assert len(rest) == 2
-        triples.append(rest)  # just a list of tuples
+        if rest:
+            triples = list(triples)
+            triples.append(rest)
         return [Meld(x) for x in triples if hand.lastTile in x]
 
     def claimness(cls, hand, discard):
@@ -553,7 +565,7 @@ class TripleKnitting(RuleCode):
         Also returns the remaining untripled tiles"""
         if hand.declaredMelds:
             if len(hand.declaredMelds) > 1:
-                return [], None
+                return (tuple(), None)
         result = []
         tilesS = list(x.capitalize() for x in hand.tiles if x.lowerGroup == b's')
         tilesB = list(x.capitalize() for x in hand.tiles if x.lowerGroup == b'b')
@@ -566,7 +578,7 @@ class TripleKnitting(RuleCode):
                 tilesB.remove(tileB)
                 tilesC.remove(tileC)
                 result.append((tileS, tileB, tileC))
-        return result, tilesS + tilesB + tilesC
+        return tuple(result), tuple(tilesS + tilesB + tilesC)
 
 class Knitting(RuleCode):
     def computeLastMelds(cls, hand):
@@ -846,6 +858,7 @@ class EastWonNineTimesInARow(RuleCode):
         return cls.appliesToGame(game, needWins = EastWonNineTimesInARow.nineTimes)
 
 class GatesOfHeaven(StandardMahJongg):
+    cache = ()
     def shouldTry(hand, maxMissing=3):
         for suit in Tile.colors:
             count19 = sum(x.isTerminal for x in hand.tiles)
