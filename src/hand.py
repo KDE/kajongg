@@ -668,7 +668,7 @@ class Hand(object):
 
     def __str__(self):
         """hand as a string"""
-        rest = ''.join(str(x) for x in self.rest)
+        rest = 'REST ' + ''.join(str(x) for x in self.rest)
         return ' '.join(str(x) for x in (self.melds, rest, self.bonusMelds, self.mjStr)).replace('  ', ' ')
 
     def __repr__(self):
