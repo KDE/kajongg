@@ -63,7 +63,7 @@ class Message(object):
         # pylint: disable=too-many-return-statements
         cls = value.__class__
         if cls in (Tile, TileList, Meld, MeldList):
-            return bytes(value)
+            return str(value)
         elif isinstance(value, Message):
             return value.name
         elif isinstance(value, (list, tuple)):

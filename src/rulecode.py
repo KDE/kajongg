@@ -17,7 +17,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from tile import Tile, elements, Byteset, Bytelist
+from tile import Tile, elements
 from meld import Meld, MeldList
 from common import IntDict, WINDS
 from message import Message
@@ -162,21 +162,21 @@ class OnlyConcealedMelds(RuleCode):
 
 class FalseColorGame(RuleCode):
     def appliesToHand(hand):
-        dwSet = Byteset(Tile.honors)
+        dwSet = set(Tile.honors)
         return dwSet & hand.suits and len(hand.suits - dwSet) == 1
 
 class TrueColorGame(RuleCode):
     def appliesToHand(hand):
-        return len(hand.suits) == 1 and hand.suits < Byteset(Tile.colors)
+        return len(hand.suits) == 1 and hand.suits < set(Tile.colors)
 
 class Purity(RuleCode):
     def appliesToHand(hand):
-        return (len(hand.suits) == 1 and hand.suits < Byteset(Tile.colors)
+        return (len(hand.suits) == 1 and hand.suits < set(Tile.colors)
             and not any(x.isChow for x in hand.melds))
 
 class ConcealedTrueColorGame(RuleCode):
     def appliesToHand(hand):
-        if len(hand.suits) != 1 or not (hand.suits < Byteset(Tile.colors)):
+        if len(hand.suits) != 1 or not (hand.suits < set(Tile.colors)):
             return False
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
@@ -196,7 +196,7 @@ class HiddenTreasure(RuleCode):
 
 class BuriedTreasure(RuleCode):
     def appliesToHand(hand):
-        return (len(hand.suits - Byteset(Tile.honors)) == 1
+        return (len(hand.suits - set(Tile.honors)) == 1
             and sum(x.isPung for x in hand.melds) == 4
             and all((x.isPung and not x.isExposed ) or x.isPair for x in hand.melds))
 
@@ -286,7 +286,7 @@ class StandardMahJongg(RuleCode):
         if maxChows == 0:
             return set(result)
         melds = []
-        for group in hand.suits & Byteset(Tile.colors):
+        for group in hand.suits & set(Tile.colors):
             values = sorted(int(x.value) for x in result if x.group == group)
             changed = True
             while (changed and len(values) > 2
@@ -385,12 +385,12 @@ class SquirmingSnake(StandardMahJongg):
         std = hand.ruleCache.get(cacheKey, None)
         if std is False:
             return False
-        if len(hand.suits) != 1 or not hand.suits < Byteset(Tile.colors):
+        if len(hand.suits) != 1 or not hand.suits < set(Tile.colors):
             return False
         values = hand.values
-        if values.count(b'1') < 3 or values.count(b'9') < 3:
+        if values.count('1') < 3 or values.count('9') < 3:
             return False
-        pairs = [x for x in Byteset(b'258') if values.count(x) == 2]
+        pairs = [x for x in set('258') if values.count(x) == 2]
         if len(pairs) != 1:
             return False
         return len(set(values)) == len(values) - 5
@@ -405,7 +405,7 @@ class WrigglingSnake(RuleCode):
            and all(not x.isChow for x in hand.declaredMelds))
 
     def computeLastMelds(hand):
-        if hand.lastTile.value == b'1':
+        if hand.lastTile.value == '1':
             return [Meld([hand.lastTile] * 2)]
         else:
             return [Meld([hand.lastTile])]
@@ -421,7 +421,7 @@ class WrigglingSnake(RuleCode):
             return set()
         elif len(values) == 12:
             # one of 2..9 or a wind is missing
-            if len(list(x for x in hand.values if x == b'1')) < 2:
+            if len(list(x for x in hand.values if x == '1')) < 2:
                 # and the pair of 1 is incomplete too
                 return set()
             else:
@@ -448,9 +448,9 @@ class WrigglingSnake(RuleCode):
         if Tile.wind not in suits:
             return False
         suits -= {Tile.wind}
-        if len(suits) != 1 or not suits < Byteset(Tile.colors):
+        if len(suits) != 1 or not suits < set(Tile.colors):
             return False
-        if hand.values.count(b'1') != 2:
+        if hand.values.count('1') != 2:
             return False
         return len(set(hand.values)) == 13
 
@@ -518,8 +518,8 @@ class TripleKnitting(RuleCode):
             rest.remove(triple[1])
             rest.remove(triple[2])
         while len(rest) >= 2:
-            for value in Byteset(list(ord(x.value) for x in rest)):
-                suits = set(x.group for x in rest if ord(x.value) == value)
+            for value in set(x.value for x in rest):
+                suits = set(x.group for x in rest if x.value == value)
                 if len(suits) <2:
                     yield tuple(melds), tuple(rest)
                     return
@@ -671,11 +671,11 @@ class Knitting(RuleCode):
         return result, tiles0 + tiles1
     def pairSuits(hand):
         """returns a lowercase string with two suit characters. If no prevalence, returns None"""
-        suitCounts = list(len([x for x in hand.tiles if x.lowerGroup == y]) for y in Bytelist(Tile.colors))
+        suitCounts = list(len([x for x in hand.tiles if x.lowerGroup == y]) for y in set(Tile.colors))
         minSuit = min(suitCounts)
-        result = b''.join(x for idx, x in enumerate(Bytelist(Tile.colors)) if suitCounts[idx] > minSuit)
+        result = ''.join(x for idx, x in enumerate(set(Tile.colors)) if suitCounts[idx] > minSuit)
         if len(result) == 2:
-            return Bytelist(result)
+            return result
 
 class AllPairHonors(RuleCode):
     def computeLastMelds(hand):
@@ -780,39 +780,39 @@ class AllGreen(RuleCode):
 
 class LastTileFromWall(RuleCode):
     def appliesToHand(hand):
-        return hand.lastSource == b'w'
+        return hand.lastSource == 'w'
 
 class LastTileFromDeadWall(RuleCode):
     def appliesToHand(hand):
-        return hand.lastSource == b'e'
+        return hand.lastSource == 'e'
 
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == b'w'
+        return hand.lastSource == 'w'
 
 class IsLastTileFromWall(RuleCode):
     def appliesToHand(hand):
-        return hand.lastSource == b'z'
+        return hand.lastSource == 'z'
 
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == b'w'
+        return hand.lastSource == 'w'
 
 class IsLastTileFromWallDiscarded(RuleCode):
     def appliesToHand(hand):
-        return hand.lastSource == b'Z'
+        return hand.lastSource == 'Z'
 
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == b'd'
+        return hand.lastSource == 'd'
 
 class RobbingKong(RuleCode):
     def appliesToHand(hand):
-        return hand.lastSource == b'k'
+        return hand.lastSource == 'k'
 
     def selectable(hand):
         """for scoring game"""
-        return (hand.lastSource and hand.lastSource in b'kwd'
+        return (hand.lastSource and hand.lastSource in 'kwd'
             and hand.lastTile and hand.lastTile.group.islower()
             and [x.lower() for x in hand.tiles].count(hand.lastTile.lower()) < 2)
 
@@ -830,7 +830,7 @@ class ScratchingPole(RuleCode):
 
 class StandardRotation(RuleCode):
     def rotate(game):
-        return game.winner and game.winner.wind != b'E' # TODO e?
+        return game.winner and game.winner.wind != 'E' # TODO e?
 
 class EastWonNineTimesInARow(RuleCode):
     nineTimes = 9
@@ -845,7 +845,7 @@ class EastWonNineTimesInARow(RuleCode):
             if game.isScoringGame():
                 # we are only proposing for the last needed Win
                 needWins  -= 1
-        if game.winner and game.winner.wind == b'E' and game.notRotated >= needWins:
+        if game.winner and game.winner.wind == 'E' and game.notRotated >= needWins:
             prevailing = WINDS[game.roundsFinished % 4]
             eastMJCount = int(Query("select count(1) from score "
                 "where game=%d and won=1 and wind='E' and player=%d "
@@ -867,7 +867,7 @@ class GatesOfHeaven(StandardMahJongg):
         return False
 
     def maybeCallingOrWon(hand):
-        if len(hand.suits) != 1 or not hand.suits < Byteset(Tile.colors):
+        if len(hand.suits) != 1 or not hand.suits < set(Tile.colors):
             return False
         for meld in hand.declaredMelds:
             if meld.isPung:
@@ -878,10 +878,10 @@ class GatesOfHeaven(StandardMahJongg):
         if not cls.maybeCallingOrWon(hand):
             return False
         values = hand.values
-        if len(set(values)) < 9 or not values.startswith(b'111') or not values.endswith(b'999'):
+        if len(set(values)) < 9 or not values.startswith('111') or not values.endswith('999'):
             return False
-        values = values[3:-3]
-        for value in Byteset(Tile.minors):
+        values = list(values[3:-3])
+        for value in set(Tile.minors):
             if value in values:
                 values.remove(value)
         if len(values) != 1:
@@ -900,12 +900,12 @@ class GatesOfHeaven(StandardMahJongg):
         values = hand.values
         if len(set(values)) == 8:
             # one minor is missing
-            result = Byteset(Tile.minors) - Byteset(values)
+            result = set(Tile.minors) - set(values)
         else:
             # we have something of all values
-            if not values.startswith(b'111'):
+            if not values.startswith('111'):
                 result = (1,)
-            elif not values.endswith(b'999'):
+            elif not values.endswith('999'):
                 result = (9,)
             else:
                 if 'pair28' in cls.options:
@@ -952,7 +952,7 @@ class ThirteenOrphans(RuleCode):
         return set(x.lower() for x in hand.tiles) == elements.majors
 
     def winningTileCandidates(cls, hand):
-        if any(x in hand.values for x in Byteset(Tile.minors)):
+        if any(x in hand.values for x in set(Tile.minors)):
             # no minors allowed
             return set()
         if not cls.shouldTry(hand, 1):
@@ -1033,7 +1033,7 @@ class ThreeConcealedPongs(RuleCode):
 
 class MahJonggWithOriginalCall(RuleCode):
     def appliesToHand(hand):
-        return (b'a' in hand.announcements
+        return ('a' in hand.announcements
             and sum(x.isExposed for x in hand.melds) < 3)
 
     def selectable(hand):
@@ -1058,7 +1058,7 @@ class MahJonggWithOriginalCall(RuleCode):
 
 class TwofoldFortune(RuleCode):
     def appliesToHand(hand):
-        return b't' in hand.announcements
+        return 't' in hand.announcements
 
     def selectable(hand):
         """for scoring game"""
@@ -1067,23 +1067,23 @@ class TwofoldFortune(RuleCode):
 
 class BlessingOfHeaven(RuleCode):
     def appliesToHand(hand):
-        return hand.ownWind == Tile.east and hand.lastSource == b'1'
+        return hand.ownWind == Tile.east and hand.lastSource == '1'
 
     def selectable(hand):
         """for scoring game"""
         return (hand.ownWind == Tile.east
-            and hand.lastSource and hand.lastSource in b'wd'
-            and not (Byteset(hand.announcements) - {b'a'}))
+            and hand.lastSource and hand.lastSource in 'wd'
+            and not (set(hand.announcements) - {'a'}))
 
 class BlessingOfEarth(RuleCode):
     def appliesToHand(hand):
-        return hand.ownWind != Tile.east and hand.lastSource == b'1'
+        return hand.ownWind != Tile.east and hand.lastSource == '1'
 
     def selectable(hand):
         """for scoring game"""
         return (hand.ownWind != Tile.east
-            and hand.lastSource and hand.lastSource in b'wd'
-            and not (Byteset(hand.announcements) - {b'a'}))
+            and hand.lastSource and hand.lastSource in 'wd'
+            and not (set(hand.announcements) - {'a'}))
 
 class LongHand(RuleCode):
     def appliesToHand(hand):

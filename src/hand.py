@@ -24,7 +24,7 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 
 from log import logDebug
-from tile import Tile, Values, TileList
+from tile import Tile, TileList
 from meld import Meld, MeldList
 from rule import Score, Ruleset, UsedRule
 from common import Debug
@@ -90,7 +90,6 @@ class Hand(object):
         if hasattr(self, 'string'):
             # I am from cache
             return
-        assert isinstance(string, bytes)
         if isinstance(ruleset, Hand):
             self.ruleset = ruleset.ruleset
             self.player = ruleset.player
@@ -106,7 +105,7 @@ class Hand(object):
         self.__won = False
         self.__score = None
         self.__callingHands = {}
-        self.mjStr = b''
+        self.mjStr = ''
         self.mjRule = None
         self.ownWind = None
         self.roundWind = None
@@ -115,34 +114,34 @@ class Hand(object):
         haveM = False
         for part in self.string.split():
             partId = part[:1]
-            if partId in b'Mmx':
+            if partId in 'Mmx':
                 haveM = True
                 self.ownWind = part[1:2]
                 self.roundWind = part[2:3]
-                self.mjStr += b' ' + part
-                self.__won = partId == b'M'
-            elif partId == b'L':
+                self.mjStr += ' ' + part
+                self.__won = partId == 'M'
+            elif partId == 'L':
                 if len(part[1:]) > 8:
                     raise Exception('last tile cannot complete a kang:' + self.string)
-                self.mjStr += b' ' + part
+                self.mjStr += ' ' + part
             else:
-                if part != b'R':
+                if part != 'R':
                     tileStrings.append(part)
 
         if not haveM:
             raise Exception('Hand got string without mMx: %s', self.string)
-        self.__lastTile = self.__lastSource = self.__announcements = b''
+        self.__lastTile = self.__lastSource = self.__announcements = ''
         self.__lastMeld = 0
         self.__lastMelds = MeldList()
         self.melds = MeldList()
         self.bonusMelds, tileStrings = self.__separateBonusMelds(tileStrings)
-        tileString = b' '.join(tileStrings)
-        self.tiles = TileList(tileString.replace(b' ', b'').replace(b'R', b''))
+        tileString = ' '.join(tileStrings)
+        self.tiles = TileList(tileString.replace(' ', '').replace('R', ''))
         self.tiles.sort()
-        self.values = Values(x.value for x in self.tiles)
+        self.values = ''.join(x.value for x in self.tiles)
         self.suits = set(x.lowerGroup for x in self.tiles)
         for split in tileStrings[:]:
-            if split[:1] != b'R':
+            if split[:1] != 'R':
                 self.melds.append(Meld(split))
                 tileStrings.remove(split)
         # those must be set before splitting the rest because the rearrange()
@@ -189,21 +188,21 @@ class Hand(object):
     @property
     def lastTile(self):
         """compute and cache, readonly"""
-        if self.__lastTile == b'':
+        if self.__lastTile == '':
             self.__setLastTile()
         return self.__lastTile
 
     @property
     def lastSource(self):
         """compute and cache, readonly"""
-        if self.__lastTile == b'':
+        if self.__lastTile == '':
             self.__setLastTile()
         return self.__lastSource
 
     @property
     def announcements(self):
         """compute and cache, readonly"""
-        if self.__lastTile == b'':
+        if self.__lastTile == '':
             self.__setLastTile()
         return self.__announcements
 
@@ -243,8 +242,8 @@ class Hand(object):
         value = bool(value)
         assert not value
         self.__won = value
-        self.string = self.string.replace(b' M', b' m')
-        self.mjStr = self.mjStr.replace(b' M', b' m')
+        self.string = self.string.replace(' M', ' m')
+        self.mjStr = self.mjStr.replace(' M', ' m')
 
     def debug(self, msg, btIndent=None):
         """try to use Game.debug so we get a nice prefix"""
@@ -306,17 +305,17 @@ class Hand(object):
 
     def __setLastTile(self):
         """sets lastTile, lastSource, announcements"""
-        self.__announcements = b''
-        self.__lastTile = None # not b'' because we want to cache the result, see lastTile property
+        self.__announcements = ''
+        self.__lastTile = None # not '' because we want to cache the result, see lastTile property
         self.__lastSource = None
         parts = self.mjStr.split()
         for part in parts:
-            if part[:1] == b'L':
+            if part[:1] == 'L':
                 part = part[1:]
                 if len(part) > 2:
                     self.__lastMeld = Meld(part[2:])
                 self.__lastTile = Tile(part[:2])
-            elif part[:1] == b'M':
+            elif part[:1] == 'M':
                 if len(part) > 3:
                     self.__lastSource = part[3:4]
                     if len(part) > 4:
@@ -389,12 +388,12 @@ class Hand(object):
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
         # set the "won" flag M
-        parts = [bytes(self.declaredMelds)]
-        parts.extend(bytes(x[0]) for x in self.bonusMelds)
-        parts.append(b'R' + b''.join(bytes(x) for x in sorted(self.tilesInHand + [addTile])))
-        parts.append(b'M' + self.ownWind + self.roundWind + self.announcements)
-        parts.append(b'L' + addTile)
-        return Hand(self, b' '.join(parts).strip())
+        parts = [str(self.declaredMelds)]
+        parts.extend(str(x[0]) for x in self.bonusMelds)
+        parts.append('R' + ''.join(str(x) for x in sorted(self.tilesInHand + [addTile])))
+        parts.append('M' + self.ownWind + self.roundWind + self.announcements)
+        parts.append('L' + addTile)
+        return Hand(self, ' '.join(parts).strip())
 
     def __sub__(self, subtractTile):
         """returns a copy of self minus subtractTiles. Case of subtractTile (hidden
@@ -436,19 +435,19 @@ class Hand(object):
             parts = mjStr.split()
             newParts = []
             for idx, part in enumerate(parts):
-                if part[:1] == b'M':
-                    part = b'm' + part[1:]
-                    if len(part) > 3 and part[3:4] == b'k':
+                if part[:1] == 'M':
+                    part = 'm' + part[1:]
+                    if len(part) > 3 and part[3:4] == 'k':
                         part = part[:3]
-                elif part[:1] == b'L':
+                elif part[:1] == 'L':
                     if self.lastTile.isExposed and self.lastTile.upper() in newTiles:
-                        part = b'L' + self.lastTile.upper()
+                        part = 'L' + self.lastTile.upper()
                     else:
                         continue
                 newParts.append(part)
-            mjStr = b' '.join(newParts)
-        rest = b'R' + bytes(rest) if rest else b''
-        newString = b' '.join(bytes(x) for x in (newMelds, rest, boni, mjStr))
+            mjStr = ' '.join(newParts)
+        rest = 'R' + str(rest) if rest else ''
+        newString = ' '.join(str(x) for x in (newMelds, rest, boni, mjStr))
         return Hand(self, newString)
 
     def manualRuleMayApply(self, rule):
@@ -471,7 +470,7 @@ class Hand(object):
                 return self.__callingHands[cacheKey]
         result = []
         string = self.string
-        if b' x' in string or self.lenOffset:
+        if ' x' in string or self.lenOffset:
             return result
         candidates = []
         for rule in self.ruleset.mjRules:
@@ -549,7 +548,7 @@ class Hand(object):
             wonHands = []
             lostHands = []
             for mjRule, melds in arrangements:
-                _ = b' '.join(bytes(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + b' ' + self.mjStr
+                _ = ' '.join(str(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
                 tryHand = Hand(self, _)
                 tryHand.mjRule = mjRule
                 tryHand.calculate()

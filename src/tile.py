@@ -20,48 +20,44 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
 
-import platform
-
-PYTHON3 =  platform.python_version_tuple()[0] == '3'
-
 from log import m18n, m18nc, logException
 from common import IntDict
 
-class Tile(bytes):
+class Tile(str):
     """a single tile"""
     # pylint: disable=too-many-public-methods, abstract-class-not-used, too-many-instance-attributes
     cache = {}
-    hashTable = b'XyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
-                b'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \
-                b'B/b/B0b0B1b1B2b2B3b3B4b4B5b5B6b6B7b7B8b8B9b9B:b:B;b;' \
-                b'C/c/C0c0C1c1C2c2C3c3C4c4C5c5C6c6C7c7C8c8C9c9C:c:C;c;' \
-                b'fefsfwfnyeysywyn'
+    hashTable = 'XyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
+                'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \
+                'B/b/B0b0B1b1B2b2B3b3B4b4B5b5B6b6B7b7B8b8B9b9B:b:B;b;' \
+                'C/c/C0c0C1c1C2c2C3c3C4c4C5c5C6c6C7c7C8c8C9c9C:c:C;c;' \
+                'fefsfwfnyeysywyn'
         # the // is needed as separator between too many w's
         # intelligence.py will define Tile('b0') or Tile('s:')
     unknown = None
-    hidden = b'x'
-    stone = b's'
-    bamboo = b'b'
-    character = b'c'
+    hidden = 'x'
+    stone = 's'
+    bamboo = 'b'
+    character = 'c'
     colors = stone + bamboo + character
-    wind = b'w'
-    dragon = b'd'
-    white = b'b'
-    green = b'g'
-    red = b'r'
+    wind = 'w'
+    dragon = 'd'
+    white = 'b'
+    green = 'g'
+    red = 'r'
     dragons = white + green + red
     honors = wind + dragon
-    minors = b'2345678'
-    terminals = b'19'
-    numbers = b'123456789'
+    minors = '2345678'
+    terminals = '19'
+    numbers = '123456789'
     majors = honors + terminals
-    east = b'e'
-    south = b's'
-    west = b'w'
-    north = b'n'
+    east = 'e'
+    south = 's'
+    west = 'w'
+    north = 'n'
     winds = east + south + west + north
-    flower = b'f'
-    season = b'y'
+    flower = 'f'
+    season = 'y'
     boni = flower + season
 
     def __new__(cls, *args):
@@ -76,19 +72,12 @@ class Tile(bytes):
             if isinstance(arg1, int):
                 if arg1 < 10:
                     arg1 = arg1 + ord('0')
-            if PYTHON3:
-                if isinstance(arg0, (bytes, str)):
-                    arg0 = ord(arg0)
-                if isinstance(arg1, (bytes, str)):
-                    arg1 = ord(arg1)
-                what = (arg0, arg1)
-            else:
-                if isinstance(arg0, int):
-                    arg0 = chr(arg0)
-                if isinstance(arg1, int):
-                    arg1 = chr(arg1)
-                what = arg0 + arg1
-            cls.cache[args] = bytes.__new__(cls, what)
+            if isinstance(arg0, int):
+                arg0 = chr(arg0)
+            if isinstance(arg1, int):
+                arg1 = chr(arg1)
+            what = arg0 + arg1
+            cls.cache[args] = str.__new__(cls, what)
         return cls.cache[args]
 
     def __init__(self, *dummyArgs):
@@ -115,12 +104,12 @@ class Tile(bytes):
     def __setattr__(self, name, value):
         if hasattr(self, '_fixed'):
             raise TypeError
-        bytes.__setattr__(self, name, value)
+        str.__setattr__(self, name, value)
 
     def __getitem__(self, index):
         if hasattr(self, '_fixed'):
             raise TypeError
-        return bytes.__getitem__(self, index)
+        return str.__getitem__(self, index)
 
     def __setitem__(self, index, value):
         raise TypeError
@@ -130,13 +119,13 @@ class Tile(bytes):
 
     def lower(self):
         """return exposed element name"""
-        return Tile(bytes.lower(self))
+        return Tile(str.lower(self))
 
     def upper(self):
         """return hidden element name"""
         if self.isBonus:
             return self
-        return Tile(bytes.capitalize(self))
+        return Tile(str.capitalize(self))
 
     def capitalize(self):
         """return hidden element name. Just make sure we get a real Tile even
@@ -152,7 +141,7 @@ class Tile(bytes):
 
     def nextForChow(self):
         """the following tile for a chow"""
-        return Tile(ord(self.group), ord(self.value) + 1)
+        return Tile(self.group, ord(self.value) + 1)
 
     def __repr__(self):
         """default representation"""
@@ -168,11 +157,11 @@ class Tile(bytes):
 
     def valueName(self):
         """the name of the value this tile has"""
-        names = {b'y':m18nc('kajongg','tile'), Tile.white:m18nc('kajongg','white'),
+        names = {'y':m18nc('kajongg','tile'), Tile.white:m18nc('kajongg','white'),
             Tile.red:m18nc('kajongg','red'), Tile.green:m18nc('kajongg','green'),
             Tile.east:m18nc('kajongg','East'), Tile.south:m18nc('kajongg','South'), Tile.west:m18nc('kajongg','West'),
             Tile.north:m18nc('kajongg','North'),
-            b'1':'1', b'2':'2', b'3':'3', b'4':'4', b'5':'5', b'6':'6', b'7':'7', b'8':'8', b'9':'9'}
+            '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6':'6', '7':'7', '8':'8', '9':'9'}
         return names[self.value]
 
     def name(self):
@@ -187,25 +176,6 @@ class Tile(bytes):
     def __lt__(self, other):
         """needed for sort"""
         return self.key < other.key
-
-class Values(list):
-    """just to have startswith and endswith"""
-    def __init__(self, *args):
-        list.__init__(self, *args)
-
-    def startswith(self, seq):
-        """does the list start with bytes?"""
-        if PYTHON3 and isinstance(seq, bytes):
-            return all(ord(self[x]) == seq[x] for x in range(len(seq)))
-        else:
-            return all(self[x] == seq[x] for x in range(len(seq)))
-
-    def endswith(self, seq):
-        """does the list end with bytes?"""
-        if PYTHON3 and isinstance(seq, bytes):
-            return all(ord(self[-1-x]) == seq[-1-x] for x in range(len(seq)))
-        else:
-            return all(self[-1-x] == seq[-1-x] for x in range(len(seq)))
 
 class TileList(list):
     """a list that can only hold tiles"""
@@ -224,7 +194,7 @@ class TileList(list):
         elif hasattr(newContent, 'tile'):
             list.append(self, newContent.tile) # pylint: disable=E1103
         else:
-            assert isinstance(newContent, bytes), '%s:%s' % (type(newContent), newContent)
+            assert isinstance(newContent, str), '%s:%s' % (type(newContent), newContent)
             assert len(newContent) % 2 == 0, newContent
             list.extend(self, [Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
         for tile in self:
@@ -277,7 +247,7 @@ class TileList(list):
         else:
             assert last is None
             first, last = 0, len(self)
-        return b''.join(self[first:last]).islower()
+        return ''.join(self[first:last]).islower()
 
     def isUpper(self, first=None, last=None):
         """use first and last as for ranges"""
@@ -309,38 +279,7 @@ class TileList(list):
 
     def __str__(self):
         """the content"""
-        return str(b''.join(self))
-
-    def __bytes__(self):
-        return b''.join(self)
-
-class Bytelist(list):
-    """convert a list of int to list of bytes"""
-    # pylint: disable=incomplete-protocol
-    def __init__(self, value=None):
-        if value is None:
-            list.__init__(self)
-        elif PYTHON3:
-            assert isinstance(value, bytes), '%s/%s' % (type(value), value)
-            value = list(bytes(chr(x).encode()) for x in value)
-            list.__init__(self, value)
-        else:
-            list.__init__(self, value)
-
-class Byteset(set):
-    """convert a set of int to set of bytes"""
-    # pylint: disable=incomplete-protocol
-    def __init__(self, value=None):
-        if not value:
-            set.__init__(self)
-        elif PYTHON3:
-            value = list(value) # generator
-            if isinstance(value[0], bytes):
-                set.__init__(self, value)
-            else:
-                set.__init__(self, list(bytes(chr(x).encode()) for x in value))
-        else:
-            set.__init__(self, value)
+        return str(''.join(self))
 
 class Elements(object):
     """represents all elements"""
@@ -380,6 +319,6 @@ class Elements(object):
         """a list of all elements, each of them occurrence times"""
         return self.occurrence.all(self.__filter(ruleset))
 
-Tile.unknown = Tile(b'Xy') # must come first
+Tile.unknown = Tile('Xy') # must come first
 elements = Elements()  # pylint: disable=invalid-name
 assert not Tile.unknown.isKnown

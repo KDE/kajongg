@@ -23,7 +23,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 import itertools
 
-from tile import Tile, Byteset
+from tile import Tile
 from meld import Meld, MeldList
 
 class Permutations(object):
@@ -56,9 +56,9 @@ class Permutations(object):
                 honors.extend([Meld([tile] * count)])
         boni = list(Meld([x]) for x in self.tiles if x.isBonus)
         variants = []
-        for group in Byteset(Tile.colors.upper()):
+        for group in set(Tile.colors.upper()):
             gTiles = list(x for x in self.tiles if x.group == group)
-            groupVariants = self.colorVariants(group, b''.join(x.value for x in gTiles))
+            groupVariants = self.colorVariants(group, ''.join(x.value for x in gTiles))
             if len(groupVariants):
                 variants.append(groupVariants)
         result = []

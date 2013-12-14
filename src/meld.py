@@ -25,7 +25,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 
 from log import m18nc
-from tile import Tile, TileList, PYTHON3
+from tile import Tile, TileList
 
 class Meld(TileList):
     """represents a meld. Can be empty. Many Meld methods will
@@ -40,7 +40,7 @@ class Meld(TileList):
     cache = {}
     def __new__(cls, newContent=None):
         """try to use cache"""
-        if isinstance(newContent, (str, bytes)):
+        if isinstance(newContent, str):
             if newContent in cls.cache:
                 return cls.cache[newContent]
         if isinstance(newContent, Meld):
@@ -55,7 +55,7 @@ class Meld(TileList):
     def check(cls):
         """check cache consistency"""
         for key, value in cls.cache.items():
-            assert key == value.key or key == bytes(value), 'cache wrong: cachekey=%s realkey=%s value=%s' % (
+            assert key == value.key or key == str(value), 'cache wrong: cachekey=%s realkey=%s value=%s' % (
                 key, value.key, value)
             assert value.key == 1 + value.hashTable.index(value) / 2
             assert value.key == TileList.key(value), \
@@ -73,7 +73,7 @@ class Meld(TileList):
             self.key = TileList.key(self)
             if self.key not in self.cache:
                 self.cache[self.key] = self
-                self.cache[bytes(self)] = self
+                self.cache[str(self)] = self
             self.isExposed = self.__getState()
             self.isSingle = self.isPair = self.isChow = self.isPung = False
             self.isKong = self.isClaimedKong = self.isKnitted = False
@@ -89,8 +89,8 @@ class Meld(TileList):
                 self.group = self[0].group
                 self.lowerGroup = self.group.lower()
             else:
-                self.group = b'X'
-                self.lowerGroup = b'x'
+                self.group = 'X'
+                self.lowerGroup = 'x'
             self.isRest = False
             self.__staticRules = {} # ruleset is key
             self._fixed = True
@@ -155,7 +155,7 @@ class Meld(TileList):
 
     def __getState(self):
         """meld state"""
-        firsts = b''.join(x.group for x in self)
+        firsts = ''.join(x.group for x in self)
         if firsts.islower():
             return True
         elif len(self) == 4 and firsts[1:3].isupper():
@@ -254,9 +254,6 @@ class Meld(TileList):
             return len(self) > len(other)
         return self[0].key < other[0].key
 
-    def __bytes__(self):
-        return b''.join(self)
-
     def __repr__(self):
         """the default representation"""
         return 'Meld(%s)' % str(self)
@@ -310,16 +307,9 @@ class MeldList(list):
             list.extend(self, [Meld(x) for x in newContent])
         elif isinstance(newContent, Meld):
             list.append(self, newContent)
-        elif isinstance(newContent, (str, bytes)):
+        elif isinstance(newContent, str):
             list.extend(self, [Meld(x) for x in newContent.split()]) # pylint: disable=maybe-no-member
         self.sort()
-
-    def bytes(self):
-        """for hand strings"""
-        if len(self):
-            return b' '.join(bytes(x) for x in self)
-        else:
-            return b''
 
     def extend(self, values):
         list.extend(self, values)
@@ -333,12 +323,8 @@ class MeldList(list):
         """flat view of all tiles in all melds"""
         return TileList(sum(self, []))
 
-    def __bytes__(self):
-        """for python3"""
-        return self.bytes()
-
     def __str__(self):
-        if PYTHON3:
-            return self.bytes().decode()
+        if len(self):
+            return ' '.join(str(x) for x in self)
         else:
-            return self.bytes()
+            return ''
