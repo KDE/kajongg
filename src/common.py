@@ -23,7 +23,12 @@ from __future__ import print_function
 from collections import defaultdict
 import datetime
 
-import sip
+try:
+    from sip import unwrapinstance
+except ImportError:
+    def unwrapinstance(dummy):
+        """if there is no sip, we have no Qt objects anyway"""
+        pass
 import platform
 
 # pylint: disable=invalid-name
@@ -49,7 +54,7 @@ def isAlive(qobj):
     if qobj is None:
         return False
     try:
-        sip.unwrapinstance(qobj)
+        unwrapinstance(qobj)
     except RuntimeError:
         return False
     else:
