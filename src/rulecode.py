@@ -17,7 +17,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from tile import Tile, Tileset, elements, Byteset, Bytelist
+from tile import Tile, elements, Byteset, Bytelist
 from meld import Meld, MeldList
 from common import IntDict, WINDS
 from message import Message
@@ -74,7 +74,7 @@ class ExposedTerminalsPung(RuleCode):
 
 class ExposedHonorsPung(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPung and meld.group in b'wd'
+        return meld.isPung and meld.group in Tile.honors
 
 class ExposedMinorKong(RuleCode):
     def appliesToMeld(hand, meld):
@@ -98,7 +98,7 @@ class ConcealedTerminalsPung(RuleCode):
 
 class ConcealedHonorsPung(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPung and meld[0].group in b'WD'
+        return meld.isPung and meld[0].group in Tile.honors.upper()
 
 class ConcealedMinorKong(RuleCode):
     def appliesToMeld(hand, meld):
@@ -134,11 +134,11 @@ class LastTileCompletesPairMinor(RuleCode):
 
 class Flower(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isSingle and meld.group == b'f'
+        return meld.isSingle and meld.group == Tile.flower
 
 class Season(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isSingle and meld.group == b'y'
+        return meld.isSingle and meld.group == Tile.season
 
 class LastTileCompletesPairMajor(RuleCode):
     def appliesToHand(hand):
@@ -162,21 +162,21 @@ class OnlyConcealedMelds(RuleCode):
 
 class FalseColorGame(RuleCode):
     def appliesToHand(hand):
-        dwSet = {b'd', b'w'}
+        dwSet = Byteset(Tile.honors)
         return dwSet & hand.suits and len(hand.suits - dwSet) == 1
 
 class TrueColorGame(RuleCode):
     def appliesToHand(hand):
-        return len(hand.suits) == 1 and hand.suits < {b's', b'b', b'c'}
+        return len(hand.suits) == 1 and hand.suits < Byteset(Tile.colors)
 
 class Purity(RuleCode):
     def appliesToHand(hand):
-        return (len(hand.suits) == 1 and hand.suits < {b's', b'b', b'c'}
+        return (len(hand.suits) == 1 and hand.suits < Byteset(Tile.colors)
             and not any(x.isChow for x in hand.melds))
 
 class ConcealedTrueColorGame(RuleCode):
     def appliesToHand(hand):
-        if len(hand.suits) != 1 or not (hand.suits < {b's', b'b', b'c'}):
+        if len(hand.suits) != 1 or not (hand.suits < Byteset(Tile.colors)):
             return False
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
@@ -196,7 +196,7 @@ class HiddenTreasure(RuleCode):
 
 class BuriedTreasure(RuleCode):
     def appliesToHand(hand):
-        return (len(hand.suits - Byteset(b'dw')) == 1
+        return (len(hand.suits - Byteset(Tile.honors)) == 1
             and sum(x.isPung for x in hand.melds) == 4
             and all((x.isPung and not x.isExposed ) or x.isPair for x in hand.melds))
 
@@ -286,7 +286,7 @@ class StandardMahJongg(RuleCode):
         if maxChows == 0:
             return set(result)
         melds = []
-        for group in hand.suits & {b's', b'c', b'b'}:
+        for group in hand.suits & Byteset(Tile.colors):
             values = sorted(int(x.value) for x in result if x.group == group)
             changed = True
             while (changed and len(values) > 2
@@ -385,7 +385,7 @@ class SquirmingSnake(StandardMahJongg):
         std = hand.ruleCache.get(cacheKey, None)
         if std is False:
             return False
-        if len(hand.suits) != 1 or not hand.suits < {b's', b'b', b'c'}:
+        if len(hand.suits) != 1 or not hand.suits < Byteset(Tile.colors):
             return False
         values = hand.values
         if values.count(b'1') < 3 or values.count(b'9') < 3:
@@ -412,9 +412,9 @@ class WrigglingSnake(RuleCode):
 
     def winningTileCandidates(hand):
         suits = hand.suits.copy()
-        if b'w' not in suits or b'd' in suits or len(suits) > 2:
+        if Tile.wind not in suits or Tile.dragon in suits or len(suits) > 2:
             return set()
-        suits -= {b'w'}
+        suits -= {Tile.wind}
         group = suits.pop()
         values = set(hand.values)
         if len(values) < 12:
@@ -445,10 +445,10 @@ class WrigglingSnake(RuleCode):
 
     def appliesToHand(hand):
         suits = hand.suits.copy()
-        if b'w' not in suits:
+        if Tile.wind not in suits:
             return False
-        suits -= {b'w'}
-        if len(suits) != 1 or not suits < {b's', b'b', b'c'}:
+        suits -= {Tile.wind}
+        if len(suits) != 1 or not suits < Byteset(Tile.colors):
             return False
         if hand.values.count(b'1') != 2:
             return False
@@ -504,7 +504,7 @@ class TripleKnitting(RuleCode):
         if cls.shouldTry(candidates.hand):
             _, rest = cls.findTriples(candidates.hand)
             for candidate in candidates:
-                if candidate.group in b'dw':
+                if candidate.group in Tile.honors:
                     candidate.keep -= 50
                 if rest.count(candidate.tile) > 1:
                     candidate.keep -= 10
@@ -548,7 +548,7 @@ class TripleKnitting(RuleCode):
         _, rest = cls.findTriples(hand)
         if len(rest) not in (1, 4):
             return set()
-        result = list([Tile(x, y.value) for x in (b'S', b'B', b'C') for y in rest])
+        result = list([Tile(x, y.value).upper() for x in Tile.colors for y in rest])
         for restTile in rest:
             result.remove(restTile)
         return set(result)
@@ -567,12 +567,12 @@ class TripleKnitting(RuleCode):
             if len(hand.declaredMelds) > 1:
                 return (tuple(), None)
         result = []
-        tilesS = list(x.capitalize() for x in hand.tiles if x.lowerGroup == b's')
-        tilesB = list(x.capitalize() for x in hand.tiles if x.lowerGroup == b'b')
-        tilesC = list(x.capitalize() for x in hand.tiles if x.lowerGroup == b'c')
+        tilesS = list(x.capitalize() for x in hand.tiles if x.lowerGroup == Tile.stone)
+        tilesB = list(x.capitalize() for x in hand.tiles if x.lowerGroup == Tile.bamboo)
+        tilesC = list(x.capitalize() for x in hand.tiles if x.lowerGroup == Tile.character)
         for tileS in tilesS[:]:
-            tileB = Tile(b'B' + tileS.value)
-            tileC = Tile(b'C' + tileS.value)
+            tileB = Tile(Tile.bamboo, tileS.value).upper()
+            tileC = Tile(Tile.character, tileS.value).upper()
             if tileB in tilesB and tileC in tilesC:
                 tilesS.remove(tileS)
                 tilesB.remove(tileB)
@@ -599,7 +599,7 @@ class Knitting(RuleCode):
     def weigh(cls, aiInstance, candidates):
         if cls.shouldTry(candidates.hand):
             for candidate in candidates:
-                if candidate.group in b'dw':
+                if candidate.group in Tile.honors:
                     candidate.keep -= 50
         return candidates
     def shouldTry(cls, hand, maxMissing=4):
@@ -671,9 +671,9 @@ class Knitting(RuleCode):
         return result, tiles0 + tiles1
     def pairSuits(hand):
         """returns a lowercase string with two suit characters. If no prevalence, returns None"""
-        suitCounts = list(len([x for x in hand.tiles if x.lowerGroup == y]) for y in (b's', b'b', b'c'))
+        suitCounts = list(len([x for x in hand.tiles if x.lowerGroup == y]) for y in Bytelist(Tile.colors))
         minSuit = min(suitCounts)
-        result = b''.join(x for idx, x in enumerate([b's', b'b', b'c']) if suitCounts[idx] > minSuit)
+        result = b''.join(x for idx, x in enumerate(Bytelist(Tile.colors)) if suitCounts[idx] > minSuit)
         if len(result) == 2:
             return Bytelist(result)
 
@@ -688,7 +688,7 @@ class AllPairHonors(RuleCode):
             result[Message.Chow] = -999
         return result
     def maybeCallingOrWon(hand):
-        if any(x.value in b'2345678' for x in hand.tiles):
+        if any(x.value in Tile.minors for x in hand.tiles):
             return False
         return len(hand.declaredMelds) < 2
     def appliesToHand(cls, hand):
@@ -733,7 +733,7 @@ class AllPairHonors(RuleCode):
             return candidates
         keep = 10
         for candidate in candidates:
-            if candidate.value in b'2345678':
+            if candidate.value in Tile.minors:
                 candidate.keep -= keep
             else:
                 if candidate.occurrence == 3:
@@ -776,8 +776,7 @@ class FourBlessingsHoveringOverTheDoor(RuleCode):
 
 class AllGreen(RuleCode):
     def appliesToHand(hand):
-        tiles = set(bytes(x.lower()) for x in hand.tiles)
-        return tiles < Tileset([b'b2', b'b3', b'b4', b'b5', b'b6', b'b8', b'dg'])
+        return set(x.lower() for x in hand.tiles) < elements.greenHandTiles
 
 class LastTileFromWall(RuleCode):
     def appliesToHand(hand):
@@ -819,19 +818,19 @@ class RobbingKong(RuleCode):
 
 class GatheringPlumBlossomFromRoof(RuleCode):
     def appliesToHand(hand):
-        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == b'S5'
+        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, 5).upper()
 
 class PluckingMoon(RuleCode):
     def appliesToHand(hand):
-        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == b'S1'
+        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, 1).upper()
 
 class ScratchingPole(RuleCode):
     def appliesToHand(hand):
-        return RobbingKong.appliesToHand(hand) and hand.lastTile == b'b2'
+        return RobbingKong.appliesToHand(hand) and hand.lastTile == Tile(Tile.bamboo, 2)
 
 class StandardRotation(RuleCode):
     def rotate(game):
-        return game.winner and game.winner.wind != b'E'
+        return game.winner and game.winner.wind != b'E' # TODO e?
 
 class EastWonNineTimesInARow(RuleCode):
     nineTimes = 9
@@ -882,14 +881,14 @@ class GatesOfHeaven(StandardMahJongg):
         if len(set(values)) < 9 or not values.startswith(b'111') or not values.endswith(b'999'):
             return False
         values = values[3:-3]
-        for value in Byteset(b'2345678'):
+        for value in Byteset(Tile.minors):
             if value in values:
                 values.remove(value)
         if len(values) != 1:
             return False
         surplus = values[0]
         if 'pair28' in cls.options:
-            return surplus in b'2345678'
+            return surplus in Tile.minors
         if 'lastExtra' in cls.options:
             return hand.lastTile and surplus == hand.lastTile.value
         return True
@@ -901,18 +900,18 @@ class GatesOfHeaven(StandardMahJongg):
         values = hand.values
         if len(set(values)) == 8:
             # one minor is missing
-            result = Byteset(b'2345678') - Byteset(values)
+            result = Byteset(Tile.minors) - Byteset(values)
         else:
             # we have something of all values
             if not values.startswith(b'111'):
-                result = b'1'
+                result = (1,)
             elif not values.endswith(b'999'):
-                result = b'9'
+                result = (9,)
             else:
                 if 'pair28' in cls.options:
-                    result = b'2345678'
+                    result = Tile.minors
                 else:
-                    result = b'123456789'
+                    result = Tile.numbers
         return {Tile(list(hand.suits)[0], x) for x in result}
 
 class ThirteenOrphans(RuleCode):
@@ -953,7 +952,7 @@ class ThirteenOrphans(RuleCode):
         return set(x.lower() for x in hand.tiles) == elements.majors
 
     def winningTileCandidates(cls, hand):
-        if any(x in hand.values for x in Byteset(b'2345678')):
+        if any(x in hand.values for x in Byteset(Tile.minors)):
             # no minors allowed
             return set()
         if not cls.shouldTry(hand, 1):
@@ -994,7 +993,7 @@ class ThirteenOrphans(RuleCode):
         havePair = False
         keep = (6 - len(missing)) * 5
         for candidate in candidates:
-            if candidate.value in b'2345678':
+            if candidate.value in Tile.minors:
                 candidate.keep -= keep
             else:
                 if havePair and candidate.occurrence >= 2:
@@ -1007,12 +1006,12 @@ class ThirteenOrphans(RuleCode):
 class OwnFlower(RuleCode):
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
-        return Tile(b'f', hand.ownWind) in fsPairs
+        return Tile(Tile.flower, hand.ownWind) in fsPairs
 
 class OwnSeason(RuleCode):
     def appliesToHand(hand):
         fsPairs = list(x[0] for x in hand.bonusMelds)
-        return Tile(b'y', hand.ownWind) in fsPairs
+        return Tile(Tile.season, hand.ownWind) in fsPairs
 
 class OwnFlowerOwnSeason(RuleCode):
     def appliesToHand(hand):
@@ -1021,11 +1020,11 @@ class OwnFlowerOwnSeason(RuleCode):
 
 class AllFlowers(RuleCode):
     def appliesToHand(hand):
-        return len([x for x in hand.bonusMelds if x.group == b'f']) == 4
+        return len([x for x in hand.bonusMelds if x.group == Tile.flower]) == 4
 
 class AllSeasons(RuleCode):
     def appliesToHand(hand):
-        return len([x for x in hand.bonusMelds if x.group == b'y']) == 4
+        return len([x for x in hand.bonusMelds if x.group == Tile.season]) == 4
 
 class ThreeConcealedPongs(RuleCode):
     def appliesToHand(hand):
@@ -1068,21 +1067,21 @@ class TwofoldFortune(RuleCode):
 
 class BlessingOfHeaven(RuleCode):
     def appliesToHand(hand):
-        return hand.ownWind == b'e' and hand.lastSource == b'1'
+        return hand.ownWind == Tile.east and hand.lastSource == b'1'
 
     def selectable(hand):
         """for scoring game"""
-        return (hand.ownWind == b'e'
+        return (hand.ownWind == Tile.east
             and hand.lastSource and hand.lastSource in b'wd'
             and not (Byteset(hand.announcements) - {b'a'}))
 
 class BlessingOfEarth(RuleCode):
     def appliesToHand(hand):
-        return hand.ownWind != b'e' and hand.lastSource == b'1'
+        return hand.ownWind != Tile.east and hand.lastSource == b'1'
 
     def selectable(hand):
         """for scoring game"""
-        return (hand.ownWind != b'e'
+        return (hand.ownWind != Tile.east
             and hand.lastSource and hand.lastSource in b'wd'
             and not (Byteset(hand.announcements) - {b'a'}))
 

@@ -39,10 +39,30 @@ class Tile(bytes):
         # the // is needed as separator between too many w's
         # intelligence.py will define Tile('b0') or Tile('s:')
     unknown = None
-    colors = b'sbc'
+    hidden = b'x'
+    stone = b's'
+    bamboo = b'b'
+    character = b'c'
+    colors = stone + bamboo + character
     wind = b'w'
     dragon = b'd'
+    white = b'b'
+    green = b'g'
+    red = b'r'
+    dragons = white + green + red
     honors = wind + dragon
+    minors = b'2345678'
+    terminals = b'19'
+    numbers = b'123456789'
+    majors = honors + terminals
+    east = b'e'
+    south = b's'
+    west = b'w'
+    north = b'n'
+    winds = east + south + west + north
+    flower = b'f'
+    season = b'y'
+    boni = flower + season
 
     def __new__(cls, *args):
         if isinstance(args[0], Tile):
@@ -78,18 +98,18 @@ class Tile(bytes):
             self.value = self[1:]
             self.lowerGroup = self.group.lower()
             self.isExposed = self.group == self.lowerGroup
-            self.isBonus = self.group in b'fy'
-            self.isDragon = self.lowerGroup == b'd'
-            self.isWind = self.lowerGroup == b'w'
+            self.isBonus = self.group in Tile.boni
+            self.isDragon = self.lowerGroup == Tile.dragon
+            self.isWind = self.lowerGroup == Tile.wind
             self.isHonor = self.isDragon or self.isWind
-            self.isTerminal = self.value in b'19'
+            self.isTerminal = self.value in Tile.terminals
             self.isMajor = self.isHonor or self.isTerminal
             self.isMinor = not self.isMajor
             try:
                 self.key = 1 + self.hashTable.index(self) / 2
             except ValueError:
                 logException('%s is not a valid tile string' % self)
-            self.isKnown = self != b'Xy'
+            self.isKnown = Tile.unknown is not None and self != Tile.unknown
             self._fixed = True
 
     def __setattr__(self, name, value):
@@ -140,26 +160,26 @@ class Tile(bytes):
 
     def groupName(self):
         """the name of the group this tile is of"""
-        names = {b'x':m18nc('kajongg','hidden'), b's': m18nc('kajongg','stone'),
-            b'b': m18nc('kajongg','bamboo'), b'c':m18nc('kajongg','character'),
-            b'w':m18nc('kajongg','wind'), b'd':m18nc('kajongg','dragon'),
-            b'f':m18nc('kajongg','flower'), b'y':m18nc('kajongg','season')}
+        names = {Tile.hidden:m18nc('kajongg','hidden'), Tile.stone: m18nc('kajongg','stone'),
+            Tile.bamboo: m18nc('kajongg','bamboo'), Tile.character:m18nc('kajongg','character'),
+            Tile.wind:m18nc('kajongg','wind'), Tile.dragon:m18nc('kajongg','dragon'),
+            Tile.flower:m18nc('kajongg','flower'), Tile.season:m18nc('kajongg','season')}
         return names[self.lowerGroup]
 
     def valueName(self):
         """the name of the value this tile has"""
-        names = {b'y':m18nc('kajongg','tile'), b'b':m18nc('kajongg','white'),
-            b'r':m18nc('kajongg','red'), b'g':m18nc('kajongg','green'),
-            b'e':m18nc('kajongg','East'), b's':m18nc('kajongg','South'), b'w':m18nc('kajongg','West'),
-            b'n':m18nc('kajongg','North'),
+        names = {b'y':m18nc('kajongg','tile'), Tile.white:m18nc('kajongg','white'),
+            Tile.red:m18nc('kajongg','red'), Tile.green:m18nc('kajongg','green'),
+            Tile.east:m18nc('kajongg','East'), Tile.south:m18nc('kajongg','South'), Tile.west:m18nc('kajongg','West'),
+            Tile.north:m18nc('kajongg','North'),
             b'1':'1', b'2':'2', b'3':'3', b'4':'4', b'5':'5', b'6':'6', b'7':'7', b'8':'8', b'9':'9'}
         return names[self.value]
 
     def name(self):
         """returns name of a single tile"""
-        if self.group in b'wW':
-            result = {b'e':m18n('East Wind'), b's':m18n('South Wind'),
-                b'w':m18n('West Wind'), b'n':m18n('North Wind')}[self.value]
+        if self.group.lower() == Tile.wind:
+            result = {Tile.east:m18n('East Wind'), Tile.south:m18n('South Wind'),
+                Tile.west:m18n('West Wind'), Tile.north:m18n('North Wind')}[self.value]
         else:
             result = m18nc('kajongg tile name', '{group} {value}')
         return result.format(value=self.valueName(), group=self.groupName())
@@ -186,14 +206,6 @@ class Values(list):
             return all(ord(self[-1-x]) == seq[-1-x] for x in range(len(seq)))
         else:
             return all(self[-1-x] == seq[-1-x] for x in range(len(seq)))
-
-class Tileset(set):
-    """a helper class for simpler instantiation of the Elements attributes"""
-    # pylint: disable=incomplete-protocol
-    def __init__(self, tiles=None):
-        if tiles is None:
-            tiles = []
-        set.__init__(self, list(Tile(x) for x in tiles))
 
 class TileList(list):
     """a list that can only hold tiles"""
@@ -281,9 +293,9 @@ class TileList(list):
         """returns my chows with tileName"""
         if tile not in self:
             return []
-        group = tile.group
-        if group not in b'SBC':
+        if tile.lowerGroup not in Tile.colors:
             return []
+        group = tile.group
         value = int(tile.value)
         values = set(int(x.value) for x in self if x.group == group)
         chows = []
@@ -336,28 +348,25 @@ class Elements(object):
     # too many attributes
     def __init__(self):
         self.occurrence = IntDict() # key: db, s3 etc. value: occurrence
-        self.winds = Tileset([b'we', b'ws', b'ww', b'wn'])
-        self.wINDS = Tileset([b'We', b'Ws', b'Ww', b'Wn'])
-        self.dragons = Tileset([b'db', b'dg', b'dr'])
-        self.dRAGONS = Tileset([b'Db', b'Dg', b'Dr'])
+        self.winds = {Tile(Tile.wind, x) for x in Tile.winds}
+        self.wINDS = {x.upper() for x in self.winds}
+        self.dragons = {Tile(Tile.dragon, x) for x in Tile.dragons}
+        self.dRAGONS = {x.upper() for x in self.dragons}
         self.honors = self.winds | self.dragons
         self.hONORS = self.wINDS | self.dRAGONS
-        self.terminals = Tileset([b's1', b's9', b'b1', b'b9', b'c1', b'c9'])
-        self.tERMINALS = Tileset([b'S1', b'S9', b'B1', b'B9', b'C1', b'C9'])
+        self.terminals = {Tile(x, y) for x in Tile.colors for y in Tile.terminals}
+        self.tERMINALS = {x.upper() for x in self.terminals}
         self.majors = self.honors | self.terminals
         self.mAJORS = self.hONORS | self.tERMINALS
-        self.minors = Tileset()
-        self.mINORS = Tileset()
-        self.greenHandTiles = Tileset([b'dg', b'b2', b'b3', b'b4', b'b6', b'b8'])
-        for group in Tile.colors:
-            for value in b'2345678':
-                self.minors.add(Tile(group, value))
+        self.greenHandTiles = {Tile(Tile.bamboo, x) for x in (2, 3, 4, 6, 8)} | {Tile(Tile.dragon, Tile.green)}
+        self.minors = {Tile(x, y) for x in Tile.colors for y in Tile.minors}
         for tile in self.majors:
             self.occurrence[tile] = 4
         for tile in self.minors:
             self.occurrence[tile] = 4
-        for bonus in b'fe', b'fs', b'fw', b'fn', b'ye', b'ys', b'yw', b'yn':
-            self.occurrence[Tile(bonus)] = 1
+        for bonus in Tile.boni:
+            for wind in Tile.winds:
+                self.occurrence[Tile(bonus, wind)] = 1
 
     def __filter(self, ruleset):
         """returns element names"""
@@ -371,8 +380,6 @@ class Elements(object):
         """a list of all elements, each of them occurrence times"""
         return self.occurrence.all(self.__filter(ruleset))
 
+Tile.unknown = Tile(b'Xy') # must come first
 elements = Elements()  # pylint: disable=invalid-name
-Tile.unknown = Tile(b'Xy')
-#print('end of tile.py')
-#
-#print(Tile.unknown)
+assert not Tile.unknown.isKnown

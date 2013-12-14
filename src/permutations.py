@@ -56,7 +56,7 @@ class Permutations(object):
                 honors.extend([Meld([tile] * count)])
         boni = list(Meld([x]) for x in self.tiles if x.isBonus)
         variants = []
-        for group in Byteset(b'SBC'):
+        for group in Byteset(Tile.colors.upper()):
             gTiles = list(x for x in self.tiles if x.group == group)
             groupVariants = self.colorVariants(group, b''.join(x.value for x in gTiles))
             if len(groupVariants):
