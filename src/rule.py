@@ -232,10 +232,16 @@ class Ruleset(object):
         all of its rules. This excludes the splitting rules, IOW exactly the rules saved in the table
         rule will be used for computation.
 
-        Rulesets which are templates for new games have negative ids.
+        Rulesets which are templates for new games have negative ids: The ruleset editor only reads
+        and writes rulesets with negative id.
         Rulesets attached to a game have positive ids.
+        This can lead to a situation where the same ruleset is twice in the table:
+        1. clear database
+        2. play ruleset X which saves it with id=1
+        3. in the ruleset editor, copy X which saves it with id=-1 and name='Copy of X'
 
-        The name is not unique.
+        The name is not unique. Different remote players might save different rulesets
+        under the same name.
     """
     # pylint: disable=too-many-instance-attributes
 
@@ -586,7 +592,15 @@ into a situation where you have to pay a penalty"""))
         If the name already exists in the database, also give it a new name"""
         for _ in range(10):
             try:
-                qData = Query("select id from ruleset where hash=?", list([self.hash])).records
+                if minus:
+                    # if we save a template, only check for existing templates. Otherwise this could happen:
+                    # clear kajongg.db, play game with DMJL, start ruleset editor, copy DMJL.
+                    # since play Game saved the used ruleset with id 1, id 1 is found here and no new
+                    # template is generated. Next the ruleset editor shows the original ruleset in italics
+                    # and the copy with normal font but identical name, and the copy is never saved.
+                    qData = Query("select id from ruleset where hash=? and id<0", list([self.hash])).records
+                else:
+                    qData = Query("select id from ruleset where hash=?", list([self.hash])).records
                 if qData:
                     # is already in database
                     self.rulesetId = qData[0][0]
