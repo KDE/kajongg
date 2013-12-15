@@ -939,7 +939,7 @@ class GatesOfHeaven(Function):
         if not self.maybeCallingOrWon(hand):
             return False
         values = hand.values
-        if len(set(values)) < 0 or not values.startswith(b'111') or not values.endswith(b'999'):
+        if len(set(values)) < 9 or not values.startswith(b'111') or not values.endswith(b'999'):
             return False
         values = values[3:-3]
         for value in Byteset(b'2345678'):
