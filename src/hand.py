@@ -67,10 +67,7 @@ class Hand(object):
     def __new__(cls, player, string, robbedTile=None):
         """since a Hand instance is never changed, we can use a cache"""
         cache = cls.cache
-        if isinstance(player, Hand):
-            cacheId = id(player.player)
-        else:
-            cacheId = id(player)
+        cacheId = id(player)
         cacheKey = hash((cacheId, string, robbedTile))
         if cacheKey in cache:
             cacheEntry = cache[cacheKey]
@@ -84,17 +81,13 @@ class Hand(object):
         return result
 
     def __init__(self, player, string, robbedTile=None):
-        """evaluate string for player. rules are to be applied in any case.
-        player can be Hand, Game or Player."""
+        """evaluate string for player. rules are to be applied in any case"""
         # silence pylint. This method is time critical, so do not split it into smaller methods
         # pylint: disable=too-many-instance-attributes,too-many-branches,too-many-statements
         if hasattr(self, 'string'):
             # I am from cache
             return
-        if isinstance(player, Hand):
-            self._player = weakref.ref(player.player)
-        else:
-            self._player = weakref.ref(player)
+        self._player = weakref.ref(player)
 
         # two shortcuts for speed:
         self.ruleset = self.player.game.ruleset
@@ -394,7 +387,7 @@ class Hand(object):
         parts.append('R' + ''.join(str(x) for x in sorted(self.tilesInHand + [addTile])))
         parts.append('M' + self.ownWind + self.roundWind + self.announcements)
         parts.append('L' + addTile)
-        return Hand(self, ' '.join(parts).strip())
+        return Hand(self.player, ' '.join(parts).strip())
 
     def __sub__(self, subtractTile):
         """returns a copy of self minus subtractTiles. Case of subtractTile (hidden
@@ -449,7 +442,7 @@ class Hand(object):
             mjStr = ' '.join(newParts)
         rest = 'R' + str(rest) if rest else ''
         newString = ' '.join(str(x) for x in (newMelds, rest, boni, mjStr))
-        return Hand(self, newString)
+        return Hand(self.player, newString)
 
     def manualRuleMayApply(self, rule):
         """returns True if rule has selectable() and applies to this hand"""
