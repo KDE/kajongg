@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from common import Debug
 import unittest
+from game import PlayingGame
 from hand import Hand, Score
 from tile import TileList
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
@@ -37,6 +38,7 @@ for testRuleset in [ClassicalChineseDMJL, ClassicalChineseBMJA] * 2:
 for _ in RULESETS[2:]:
     _.roofOff = True
 
+GAMES = list([PlayingGame([], x) for x in RULESETS])
 PROGRAM = None
 
 class Regex(unittest.TestCase):
@@ -418,7 +420,8 @@ class Regex(unittest.TestCase):
                 continue
             exp.ruleset = ruleset
             variants = []
-            variant = Hand(ruleset, string)
+            game = GAMES[idx]
+            variant = Hand(game.players[0], string)
             variants.append(variant)
             score = variant.score
 # activate depending on what you are testing
@@ -432,7 +435,8 @@ class Regex(unittest.TestCase):
     def callingTest(self, string, expected):
         """test a calling hand"""
         for idx, ruleset in enumerate(RULESETS):
-            hand = Hand(ruleset, string)
+            game = GAMES[idx]
+            hand = Hand(game.players[0], string)
             completedHands = hand.callingHands(99)
             testSays = TileList(set(x.lastTile.lower() for x in completedHands)).sorted()
             if idx >= len(expected):
@@ -460,14 +464,14 @@ class Regex(unittest.TestCase):
         result.append(variants[0].string)
         for hand in variants:
             score = hand.score
-            roofOff = ' roofOff' if hand.ruleset.roofOff else ''
+            roofOff = ' roofOff' if hand.player.game.ruleset.roofOff else ''
             if score != expected:
                 result.append('%s%s: %s should be %s' % (
-                    hand.ruleset.name, roofOff, score.__str__(), expected.__str__()))
+                    hand.player.game.ruleset.name, roofOff, score.__str__(), expected.__str__()))
                 result.append('hand:%s' % hand)
             if total is not None:
                 if score.total() != total:
-                    result.append('%s%s: total %s for %s should be %s' % (hand.ruleset.name, roofOff,
+                    result.append('%s%s: total %s for %s should be %s' % (hand.player.game.ruleset.name, roofOff,
                         score.total(), score.__str__(), total))
                 result.append('hand:%s' % hand)
             result.extend(hand.explain())

@@ -22,11 +22,12 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 from itertools import chain
+import weakref
 
 from log import logDebug
 from tile import Tile, TileList
 from meld import Meld, MeldList
-from rule import Score, Ruleset, UsedRule
+from rule import Score, UsedRule
 from common import Debug
 from permutations import Permutations
 from intelligence import AIDefault
@@ -63,13 +64,13 @@ class Hand(object):
         Hand.hits = 0
         Hand.misses = 0
 
-    def __new__(cls, ruleset, string, robbedTile=None):
+    def __new__(cls, player, string, robbedTile=None):
         """since a Hand instance is never changed, we can use a cache"""
         cache = cls.cache
-        if isinstance(ruleset, Hand):
-            cacheId = id(ruleset.player or ruleset.ruleset)
+        if isinstance(player, Hand):
+            cacheId = id(player.player)
         else:
-            cacheId = id(ruleset)
+            cacheId = id(player)
         cacheKey = hash((cacheId, string, robbedTile))
         if cacheKey in cache:
             cacheEntry = cache[cacheKey]
@@ -82,23 +83,21 @@ class Hand(object):
         cache[cacheKey] = result
         return result
 
-    def __init__(self, ruleset, string, robbedTile=None):
-        """evaluate string using ruleset. rules are to be applied in any case.
-        ruleset can be Hand, Game or Ruleset."""
+    def __init__(self, player, string, robbedTile=None):
+        """evaluate string for player. rules are to be applied in any case.
+        player can be Hand, Game or Player."""
         # silence pylint. This method is time critical, so do not split it into smaller methods
         # pylint: disable=too-many-instance-attributes,too-many-branches,too-many-statements
         if hasattr(self, 'string'):
             # I am from cache
             return
-        if isinstance(ruleset, Hand):
-            self.ruleset = ruleset.ruleset
-            self.player = ruleset.player
-        elif isinstance(ruleset, Ruleset):
-            self.ruleset = ruleset
-            self.player = None
+        if isinstance(player, Hand):
+            self._player = weakref.ref(player.player)
         else:
-            self.player = ruleset
-            self.ruleset = self.player.game.ruleset
+            self._player = weakref.ref(player)
+
+        # two shortcuts for speed:
+        self.ruleset = self.player.game.ruleset
         self.intelligence = self.player.intelligence if self.player else AIDefault()
         self.string = string
         self.robbedTile = robbedTile
@@ -158,6 +157,11 @@ class Hand(object):
         self.usedRules = []
         self.calculated = False
         self._fixed = True
+
+    @property
+    def player(self):
+        """weakref"""
+        return self._player()
 
     def calculate(self):
         """rearrange and calculate score"""
@@ -247,10 +251,7 @@ class Hand(object):
 
     def debug(self, msg, btIndent=None):
         """try to use Game.debug so we get a nice prefix"""
-        if self.player:
-            self.player.game.debug(msg, btIndent=btIndent)
-        else:
-            logDebug(msg, btIndent=btIndent)
+        self.player.game.debug(msg, btIndent=btIndent)
 
     def __applyRules(self):
         """find out which rules apply, collect in self.usedRules.
@@ -368,7 +369,7 @@ class Hand(object):
             # now we have a list of only lastMelds reaching maximum score
             if prev not in totals or self.__lastMeld not in totals:
                 if Debug.explain and prev not in totals:
-                    if not self.player or not self.player.game.belongsToRobotPlayer():
+                    if not self.player.game.belongsToRobotPlayer():
                         self.debug('replaced last meld %s with %s' % (prev, totals[0]))
                 self.__lastMeld = totals[0]
                 self.__applyRules()
@@ -549,7 +550,7 @@ class Hand(object):
             lostHands = []
             for mjRule, melds in arrangements:
                 _ = ' '.join(str(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
-                tryHand = Hand(self, _)
+                tryHand = Hand(self.player, _)
                 tryHand.mjRule = mjRule
                 tryHand.calculate()
                 if tryHand.won:
@@ -642,11 +643,7 @@ class Hand(object):
 
     def explain(self):
         """explain what rules were used for this hand"""
-        if self.player:
-            usedRules = self.player.sortRulesByX(self.usedRules)
-        else:
-            # scoringtest
-            usedRules = self.usedRules
+        usedRules = self.player.sortRulesByX(self.usedRules)
         result = [x.rule.explain(x.meld) for x in usedRules
             if x.rule.score.points]
         result.extend([x.rule.explain(x.meld) for x in usedRules

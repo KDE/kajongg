@@ -835,10 +835,7 @@ class StandardRotation(RuleCode):
 class EastWonNineTimesInARow(RuleCode):
     nineTimes = 9
     def appliesToHand(cls, hand):
-        if not hand.player:
-            return False
-        game = hand.player.game
-        return cls.appliesToGame(game)
+        return cls.appliesToGame(hand.player.game)
     def appliesToGame(cls, game, needWins=None):
         if needWins is None:
             needWins = EastWonNineTimesInARow.nineTimes
@@ -976,12 +973,9 @@ class ThirteenOrphans(RuleCode):
         missing = elements.majors - handTiles
         if len(missing) > maxMissing:
             return False
-        if hand.player:
-            # in scoringtest, we have no game instance
-            # on the server we have no myself in saveHand
-            for missingTile in missing:
-                if not hand.player.tileAvailable(missingTile, hand):
-                    return False
+        for missingTile in missing:
+            if not hand.player.tileAvailable(missingTile, hand):
+                return False
         return True
 
     def weigh(cls, aiInstance, candidates):
@@ -1045,15 +1039,14 @@ class MahJonggWithOriginalCall(RuleCode):
     def claimness(hand, discard):
         result = IntDict()
         player = hand.player
-        if player:
-            if player.originalCall and player.mayWin:
-                if player.originalCallingHand.chancesToWin():
-                    # winning with OriginalCall is still possible
-                    result[Message.Pung] = -999
-                    result[Message.Kong] = -999
-                    result[Message.Chow] = -999
-                else:
-                    player.mayWin = False # bad luck
+        if player.originalCall and player.mayWin:
+            if player.originalCallingHand.chancesToWin():
+                # winning with OriginalCall is still possible
+                result[Message.Pung] = -999
+                result[Message.Kong] = -999
+                result[Message.Chow] = -999
+            else:
+                player.mayWin = False # bad luck
         return result
 
 class TwofoldFortune(RuleCode):

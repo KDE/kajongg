@@ -29,7 +29,7 @@ from twisted.internet.defer import succeed
 from util import stack, gitHead
 from log import logError, logWarning, logException, logDebug, m18n
 from common import WINDS, Internal, IntDict, Debug, Options
-from query import Transaction, Query
+from query import Transaction, Query, DBHandle
 from rule import Ruleset
 from tile import Tile, elements
 from hand import Hand
@@ -65,9 +65,9 @@ class CountingRandom(Random):
         if Debug.random:
             self.game.debug('%d out of %d calls to random by Random.shuffle from %s' % (
                 self.count - oldCount, self.count, stack('')[-2]))
-    def randrange(self, start, stop=None, step=1, intType=int, default=None, maxWidth=9007199254740992L):
+    def randrange(self, start, stop=None, step=1): # pylint: disable=arguments-differ
         oldCount = self.count
-        result = Random.randrange(self, start, stop, step, intType, default, maxWidth)
+        result = Random.randrange(self, start, stop, step)
         if Debug.random:
             self.game.debug('%d out of %d calls to random by Random.randrange(%d,%s) from %s' % (
                 self.count - oldCount, self.count, start, stop, stack('')[-2]))
@@ -463,14 +463,16 @@ class Game(object):
         """use a copy of ruleset for this game, reusing an existing copy"""
         self.ruleset = ruleset
         self.ruleset.load()
-        query = Query('select id from ruleset where id>0 and hash="%s"' % \
-            self.ruleset.hash)
-        if query.records:
-            # reuse that ruleset
-            self.ruleset.rulesetId = query.records[0][0]
-        else:
-            # generate a new ruleset
-            self.ruleset.save()
+        if DBHandle.default:
+            # only if we have a DB open. False in scoringtest.py
+            query = Query('select id from ruleset where id>0 and hash="%s"' % \
+                self.ruleset.hash)
+            if query.records:
+                # reuse that ruleset
+                self.ruleset.rulesetId = query.records[0][0]
+            else:
+                # generate a new ruleset
+                self.ruleset.save()
 
     @property
     def seed(self): # TODO: move this to PlayingGame
