@@ -219,7 +219,7 @@ class StandardMahJongg(RuleCode):
             return False
         if any(len(x) not in (2, 3, 4) for x in hand.melds):
             return False
-        if any(x.isRest for x in hand.melds):
+        if any(x.isRest or x.isKnitted for x in hand.melds):
             return False
         if sum(x.isChow for x in hand.melds) > hand.ruleset.maxChows:
             return False
