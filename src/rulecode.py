@@ -371,10 +371,8 @@ class StandardMahJongg(RuleCode):
         done is already arranged, do not change this.
         Returns list(Meld)"""
         permutations = Permutations(rest)
-        result = []
         for variantMelds in permutations.variants:
-            result.append((variantMelds, []))
-        return result
+            yield tuple(variantMelds), tuple()
 
 class SquirmingSnake(StandardMahJongg):
     def appliesToHand(hand):
@@ -425,16 +423,16 @@ class WrigglingSnake(RuleCode):
             return set([Tile(group, 1)])
 
     def rearrange(hand, rest):
-        result = []
+        melds = []
         for tileName in rest:
             if rest.count(tileName) >= 2:
-                result.append(Meld([tileName, tileName]))
+                melds.append(Meld([tileName, tileName]))
                 rest.remove(tileName)
                 rest.remove(tileName)
             elif rest.count(tileName) == 1:
-                result.append(Meld([tileName]))
+                melds.append(Meld([tileName]))
                 rest.remove(tileName)
-        return result, rest
+        yield tuple(melds), tuple(rest)
 
     def appliesToHand(hand):
         suits = hand.suits.copy()
@@ -511,12 +509,13 @@ class TripleKnitting(RuleCode):
             for value in Byteset(list(ord(x.value) for x in rest)):
                 suits = set(x.group for x in rest if ord(x.value) == value)
                 if len(suits) <2:
-                    return melds, rest
+                    yield tuple(melds), tuple(rest)
+                    return
                 pair = (Tile(suits.pop(), value), Tile(suits.pop(), value))
                 melds.append(Meld(sorted(pair)))
                 rest.remove(pair[0])
                 rest.remove(pair[1])
-        return melds, rest
+        yield tuple(melds), tuple(rest)
 
     def appliesToHand(cls, hand):
         if any(x.isHonor for x in hand.tiles):
@@ -632,7 +631,7 @@ class Knitting(RuleCode):
             melds.append(Meld(couple))
             rest.remove(couple[0])
             rest.remove(couple[1])
-        return melds, rest
+        yield tuple(melds), tuple(rest)
     def findCouples(cls, hand, pairs=None):
         """returns a list of tuples, including the mj couple.
         Also returns the remaining uncoupled tiles IF they
@@ -715,7 +714,7 @@ class AllPairHonors(RuleCode):
                 melds.append(Meld(pair * 2))
                 rest.remove(pair)
                 rest.remove(pair)
-        return melds, rest
+        yield tuple(melds), tuple(rest)
     def weigh(aiInstance, candidates):
         hand = candidates.hand
         if not AllPairHonors.shouldTry(hand):
@@ -910,16 +909,16 @@ class ThirteenOrphans(RuleCode):
         return [Meld([hand.lastTile] * meldSize)]
 
     def rearrange(hand, rest):
-        result = []
+        melds = []
         for tileName in rest:
             if rest.count(tileName) >= 2:
-                result.append(Meld([tileName, tileName]))
+                melds.append(Meld([tileName, tileName]))
                 rest.remove(tileName)
                 rest.remove(tileName)
             elif rest.count(tileName) == 1:
-                result.append(Meld([tileName]))
+                melds.append(Meld([tileName]))
                 rest.remove(tileName)
-        return result, rest
+        yield tuple(melds), tuple(rest)
 
     def claimness(cls, hand, discard):
         result = IntDict()

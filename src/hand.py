@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
+from itertools import chain
+
 from log import logDebug
 from tile import Tile, Values, TileList
 from meld import Meld, MeldList
@@ -516,15 +518,12 @@ class Hand(object):
             if ((self.lenOffset == 1 and mjRule.appliesToHand(self))
                     or (self.lenOffset < 1 and mjRule.shouldTry(self))):
                 if self.rest:
-                    variants = mjRule.rearrange(self, self.rest[:])
-                else:
-                    variants = ([], [])
-                if not isinstance(variants, list):
-                    variants = list([variants])
-                for melds, rest2 in variants:
-                    if rest2:
-                        melds.extend(stdMJ.rearrange(self, rest2[:])[0][0])
-                    arrangements.append((mjRule, melds))
+                    for melds, rest2 in mjRule.rearrange(self, self.rest[:]):
+                        if rest2:
+                            melds = list(melds)
+                            restMelds, _ = next(stdMJ.rearrange(self, rest2[:]))
+                            melds.extend(restMelds)
+                        arrangements.append((mjRule, melds))
         if not arrangements:
             arrangements.extend((stdMJ, x[0]) for x in stdMJ.rearrange(self, self.rest[:]))
         return arrangements
@@ -539,22 +538,25 @@ class Hand(object):
         if not self.rest:
             return
         arrangements = self.__arrange()
-        bestHand = None
         bestVariant = None
         bestRule = None
         if len(arrangements) == 1:
             bestRule = arrangements[0][0]
             bestVariant = arrangements[0][1]
         else:
+            wonHands = []
+            lostHands = []
             for mjRule, melds in arrangements:
-                _ = b' '.join(bytes(x) for x in (self.melds + melds + self.bonusMelds)) + b' ' + self.mjStr
+                _ = b' '.join(bytes(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + b' ' + self.mjStr
                 tryHand = Hand(self, _)
                 tryHand.mjRule = mjRule
                 tryHand.calculate()
-                if not bestHand or tryHand > bestHand:
-                    bestHand = tryHand
-                    bestVariant = melds
-                    bestRule = mjRule
+                if tryHand.won:
+                    wonHands.append((mjRule, melds, tryHand))
+                else:
+                    lostHands.append((mjRule, melds, tryHand))
+            tryHands = wonHands if wonHands else lostHands
+            bestRule, bestVariant, _ = max(tryHands, key=lambda x:x[2])
         self.mjRule = bestRule
         self.melds.extend(bestVariant)
         self.melds.sort()
