@@ -32,7 +32,6 @@ from common import WINDS, Internal, IntDict, Debug, Options
 from query import Transaction, Query, DBHandle
 from rule import Ruleset
 from tile import Tile, elements
-from hand import Hand
 from sound import Voice
 from wall import Wall
 from move import Move
@@ -292,7 +291,6 @@ class Game(object):
         self.__winner = None
         self.__activePlayer = None
         self.prevActivePlayer = None
-        Hand.clearCache(self)
         self.dangerousTiles = list()
         self.discardedTiles.clear()
         assert self.visibleTiles.count() == 0
@@ -500,7 +498,6 @@ class Game(object):
 
     def initHand(self):
         """directly before starting"""
-        Hand.clearCache(self)
         self.dangerousTiles = list()
         self.discardedTiles.clear()
         assert self.visibleTiles.count() == 0

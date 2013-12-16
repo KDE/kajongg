@@ -26,6 +26,7 @@ from common import WINDS, IntDict, Debug
 from query import Transaction, Query
 from tile import Tile, TileList, elements
 from meld import Meld, MeldList
+from permutations import Permutations
 from message import Message
 from hand import Hand
 from intelligence import AIDefault
@@ -119,9 +120,21 @@ class Player(object):
         self.wind = WINDS[0]
         self.intelligence = AIDefault(self)
         self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
+        self.handCache = {}
+        self.cacheHits = 0
+        self.cacheMisses = 0
         self.clearHand()
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.handBoard = None
+
+    def clearCache(self):
+        """clears the cache with Hands"""
+        if Debug.handCache and len(self.handCache):
+            self.game.debug('%s: cache hits:%d misses:%d' % (self, self.cacheHits, self.cacheMisses))
+        self.handCache.clear()
+        Permutations.cache.clear()
+        self.cacheHits = 0
+        self.cacheMisses = 0
 
     @property
     def name(self):
@@ -162,6 +175,7 @@ class Player(object):
         self.playedDangerous = False
         self.usedDangerousFrom = None
         self.isCalling = False
+        self.clearCache()
         self._hand = None
 
     @property

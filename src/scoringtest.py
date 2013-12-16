@@ -421,6 +421,7 @@ class Regex(unittest.TestCase):
             exp.ruleset = ruleset
             variants = []
             game = GAMES[idx]
+            game.players[0].clearCache()
             variant = Hand(game.players[0], string)
             variants.append(variant)
             score = variant.score
@@ -436,6 +437,7 @@ class Regex(unittest.TestCase):
         """test a calling hand"""
         for idx, ruleset in enumerate(RULESETS):
             game = GAMES[idx]
+            game.players[0].clearCache()
             hand = Hand(game.players[0], string)
             completedHands = hand.callingHands(99)
             testSays = TileList(set(x.lastTile.lower() for x in completedHands)).sorted()

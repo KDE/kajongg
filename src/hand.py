@@ -29,7 +29,6 @@ from tile import Tile, TileList
 from meld import Meld, MeldList
 from rule import Score, UsedRule
 from common import Debug
-from permutations import Permutations
 from intelligence import AIDefault
 
 class Hand(object):
@@ -50,32 +49,17 @@ class Hand(object):
     hand gets an mjRule even it is not a wining hand."""
     # pylint: disable=too-many-instance-attributes
 
-    cache = dict()
-    misses = 0
-    hits = 0
-
-    @staticmethod
-    def clearCache(game):
-        """clears the cache with Hands"""
-        if Debug.handCache and Hand.cache:
-            game.debug('cache hits:%d misses:%d' % (Hand.hits, Hand.misses))
-        Hand.cache.clear()
-        Permutations.cache.clear()
-        Hand.hits = 0
-        Hand.misses = 0
-
     def __new__(cls, player, string, robbedTile=None):
         """since a Hand instance is never changed, we can use a cache"""
-        cache = cls.cache
-        cacheId = id(player)
-        cacheKey = hash((cacheId, string, robbedTile))
+        cache = player.handCache
+        cacheKey = hash((string, robbedTile))
         if cacheKey in cache:
             cacheEntry = cache[cacheKey]
             if not hasattr(cacheEntry, '_fixed'):
                 raise Exception('recursion: Hand calls itself for same content')
-            cls.hits += 1
+            player.cacheHits += 1
             return cache[cacheKey]
-        cls.misses += 1
+        player.cacheMisses += 1
         result = object.__new__(cls)
         cache[cacheKey] = result
         return result
