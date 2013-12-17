@@ -121,7 +121,7 @@ class ClassicalChinese(PredefinedRuleset):
         self.winnerRules.createRule('Last Tile Completes Pair of 2..8', 'FLastTileCompletesPairMinor', points=2)
         self.winnerRules.createRule('Last Tile Completes Pair of Terminals or Honors',
                 'FLastTileCompletesPairMajor', points=4)
-        self.winnerRules.createRule('Last Tile is Only Possible Tile', 'FLastOnlyPossible', points=4)
+        self.winnerRules.createRule('Last Tile is Only Possible Tile', 'FLastOnlyPossible', points=2)
         self.winnerRules.createRule('Won with Last Tile Taken from Wall', 'FLastFromWall', points=2)
 
         self.winnerRules.createRule('Zero Point Hand', 'FZeroPointHand', doubles=1,
