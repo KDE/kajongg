@@ -552,7 +552,7 @@ class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):
         prevMove = client.game.lastMoves(only=[Message.DeclaredKong]).next()
         prevMove.player.robTile(prevMove.meld[0].upper())
         move.player.lastSource = 'k'
-        client.game.addCsvTag('robbedKong', forAllPlayers=True)
+        client.game.addCsvTag('robbedKong%s' % prevMove.meld[1], forAllPlayers=True)
 
 class MessageCalling(ServerMessage):
     """the game server tells us who announced a calling hand"""
