@@ -562,6 +562,5 @@ class TstProgram(unittest.TestProgram):
 
 if __name__ == '__main__':
     initLog('scoringtest')
-    Debug.profileRegex = True
-   # Debug.handMatch = True
+    #Debug.hand = True
     TstProgram()

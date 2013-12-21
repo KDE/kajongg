@@ -24,11 +24,13 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 import weakref
 
+from log import dbgIndent
 from tile import Tile, TileList
 from meld import Meld, MeldList
 from rule import Score, UsedRule
 from common import Debug
 from intelligence import AIDefault
+from util import callers
 
 class Hand(object):
     """represent the hand to be evaluated.
@@ -53,11 +55,16 @@ class Hand(object):
         cache = player.handCache
         cacheKey = hash((string, robbedTile))
         if cacheKey in cache:
-            cacheEntry = cache[cacheKey]
-            if not hasattr(cacheEntry, '_fixed'):
+            result = cache[cacheKey]
+            if not hasattr(result, '_fixed'):
                 raise Exception('recursion: Hand calls itself for same content')
             player.cacheHits += 1
-            return cache[cacheKey]
+            if Debug.hand:
+                result._player = weakref.ref(player)  # pylint: disable=protected-access
+                result.debug('%s: cached Hand(%s, %s, lenOffset=%d, prev=%s)' % (
+                    callers(10, exclude=['__init__']), id(result) % 10000, string,
+                    result.lenOffset, id(prevHand)%10000 if prevHand else 'None'))
+            return result
         player.cacheMisses += 1
         result = object.__new__(cls)
         cache[cacheKey] = result
@@ -71,6 +78,7 @@ class Hand(object):
             # I am from cache
             return
         self._player = weakref.ref(player)
+        self.indent = prevHand.indent + 1 if prevHand else 0
 
         # two shortcuts for speed:
         self.ruleset = self.player.game.ruleset
@@ -133,6 +141,8 @@ class Hand(object):
             self.rest.extend(TileList(tileStrings[0][1:]))
         self.usedRules = []
         self.calculated = False
+        if Debug.hand:
+            self.debug('Fixing Hand(%s, %s) won=%s' % (id(self)%10000, string, self.__won))
         self._fixed = True
 
     @property
@@ -226,9 +236,9 @@ class Hand(object):
         self.string = self.string.replace(' M', ' m')
         self.mjStr = self.mjStr.replace(' M', ' m')
 
-    def debug(self, msg, btIndent=None):
+    def debug(self, msg):
         """try to use Game.debug so we get a nice prefix"""
-        self.player.game.debug(msg, btIndent=btIndent)
+        self.player.game.debug(dbgIndent(self, self.prevHand) + msg)
 
     def __applyRules(self):
         """find out which rules apply, collect in self.usedRules.
@@ -251,6 +261,8 @@ class Hand(object):
             matchingMJRules = self.__maybeMahjongg()
             if not matchingMJRules:
                 self.won = False
+                if Debug.hand:
+                    self.debug('no matching MJ Rule for %s %s' % (id(self)%10000, self))
                 self.__score = self.__totalScore()
                 return
             self.mjRule = matchingMJRules[0]
@@ -279,6 +291,8 @@ class Hand(object):
             self.usedRules = exclusive
             self.__score = self.__totalScore()
             self.won = self.__maybeMahjongg()
+            if not self.won and Debug.hand:
+                self.debug('exclusive rule %s does not win: %s' % (exclusive, self))
         return bool(exclusive)
 
     def __setLastTile(self):
@@ -442,6 +456,7 @@ class Hand(object):
         If mustBeAvailable is True, make sure the missing tile might still
         be available.
         """
+        # pylint: disable=too-many-branches
         if not mustBeAvailable:
             cacheKey = (wanted, excludeTile)
             if cacheKey in self.__callingHands:
@@ -453,7 +468,10 @@ class Hand(object):
         candidates = []
         for rule in self.ruleset.mjRules:
             if hasattr(rule, 'winningTileCandidates'):
-                candidates.extend(x.capitalize() for x in rule.winningTileCandidates(self))
+                cand = rule.winningTileCandidates(self)
+                if Debug.hand and cand:
+                    self.debug('callingHands found %s for %s' % (cand, rule))
+                candidates.extend(x.capitalize() for x in cand)
         # sort only for reproducibility
         candidates = sorted(set(candidates))
         for tileName in candidates:
@@ -470,6 +488,8 @@ class Hand(object):
                     break
         if not mustBeAvailable:
             self.__callingHands[cacheKey] = result
+        if Debug.hand:
+            self.debug('%s %s is calling %s' % (id(self)%10000, self, list(x.mjRule.name for x in result)))
         return result
 
     def __maybeMahjongg(self):

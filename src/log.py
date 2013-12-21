@@ -63,6 +63,14 @@ def initLog(logName):
     formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
     handler.setFormatter(formatter)
 
+def dbgIndent(this, parent):
+    """show messages indented"""
+    if this.indent == 0:
+        return ''
+    else:
+        pIndent = parent.indent if parent else 0
+        return (u'. ' * (pIndent))[:pIndent] + u'└' + u'─' * (this.indent - pIndent - 1)
+
 def __logUnicodeMessage(prio, msg):
     """if we can encode the unicode msg to ascii, do so.
     Otherwise convert the unicode object into an utf-8 encoded

@@ -48,6 +48,15 @@ def stack(msg, limit=6):
                                 line, function, txt))
     return result
 
+def callers(count=1, exclude=None):
+    """returns the name of the calling method"""
+    stck = traceback.extract_stack(limit=30)
+    excluding = list(exclude) or []
+    excluding.extend(['<genexpr>', '__call__', 'run', '<module>', 'runTests'])
+    names = list(x[2] for x in stck[:-2] if x[2] not in excluding)
+    result = '.'.join(names[-count-2:])
+    return result
+
 def elapsedSince(since):
     """returns seconds since since"""
     delta = datetime.datetime.now() - since
