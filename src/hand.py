@@ -457,11 +457,10 @@ class Hand(object):
             return result
         candidates = []
         for rule in self.ruleset.mjRules:
-            if hasattr(rule, 'winningTileCandidates'):
-                cand = rule.winningTileCandidates(self)
-                if Debug.hand and cand:
-                    self.debug(fmt('callingHands found {cand} for {rule}'))
-                candidates.extend(x.capitalize() for x in cand)
+            cand = rule.winningTileCandidates(self)
+            if Debug.hand and cand:
+                self.debug(fmt('callingHands found {cand} for {rule}'))
+            candidates.extend(x.capitalize() for x in cand)
         # sort only for reproducibility
         candidates = sorted(set(candidates))
         for tileName in candidates:
