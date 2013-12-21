@@ -19,9 +19,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import logging, socket, logging.handlers, os
+import string
 
 from locale import getpreferredencoding
-from sys import stderr
+from sys import stderr, _getframe
 
 SERVERMARK = '&&SERVER&&'
 
@@ -35,6 +36,59 @@ from dialogs import Sorry, Information, NoPrompt
 ENGLISHDICT = {}
 
 LOGGER = None
+
+
+class Fmt(string.Formatter):
+    """this formatter can parse {id(x)} and output a short ascii form for id"""
+    alphabet = string.ascii_uppercase + string.ascii_lowercase
+    base = len(alphabet)
+    formatter = None
+    @staticmethod
+    def num_encode(number, length=4):
+        """make a short unique ascii string out of number, truncate to length"""
+        result = []
+        while number and len(result)<length:
+            number, remainder = divmod(number, Fmt.base)
+            result.append(Fmt.alphabet[remainder])
+        return ''.join(reversed(result))
+
+    def get_value(self, key, args, kwargs):
+        if key.startswith('id(') and key.endswith(')'):
+            idpar = key[3:-1]
+            if idpar == 'self':
+                idpar = 'SELF'
+            if kwargs[idpar] is None:
+                return 'None'
+            elif Debug.neutral:
+                return '....'
+            else:
+                return Fmt.num_encode(id(kwargs[idpar]))
+        elif key == 'self':
+            return kwargs['SELF']
+        else:
+            return kwargs[key]
+
+Fmt.formatter = Fmt()
+
+def fmt(text, **kwargs):
+    """use the context dict for finding arguments.
+    For something like {self} output 'self:selfValue'"""
+    if '}' in text:
+        parts = []
+        for part in text.split('}'):
+            if not '{' in part:
+                parts.append(part)
+            else:
+                part2 = part.split('{')
+                parts.append('%s%s:{%s}' % (part2[0], part2[1], part2[1]))
+        text = ''.join(parts)
+    argdict = _getframe(1).f_locals
+    argdict.update(kwargs)
+    if 'self' in argdict:
+        # formatter.format will not accept 'self' as keyword
+        argdict['SELF'] = argdict['self']
+        del argdict['self']
+    return Fmt.formatter.format(text, **argdict) # pylint: disable=star-args
 
 def english(i18nstring):
     """translate back from local language"""

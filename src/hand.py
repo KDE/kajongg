@@ -24,7 +24,7 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 import weakref
 
-from log import dbgIndent
+from log import dbgIndent, fmt
 from tile import Tile, TileList
 from meld import Meld, MeldList
 from rule import Score, UsedRule
@@ -60,10 +60,10 @@ class Hand(object):
                 raise Exception('recursion: Hand calls itself for same content')
             player.cacheHits += 1
             if Debug.hand:
-                result._player = weakref.ref(player)  # pylint: disable=protected-access
-                result.debug('%s: cached Hand(%s, %s, lenOffset=%d, prev=%s)' % (
-                    callers(10, exclude=['__init__']), id(result) % 10000, string,
-                    result.lenOffset, id(prevHand)%10000 if prevHand else 'None'))
+                result._player = weakref.ref(player) # pylint: disable=protected-access
+                result.debug(fmt(
+                  '{callers}: cached Hand({id(result)} {string}) {result.lenOffset} {id(prevHand)}',
+                    callers=callers(10, exclude=['__init__'])))
             return result
         player.cacheMisses += 1
         result = object.__new__(cls)
@@ -142,7 +142,7 @@ class Hand(object):
         self.usedRules = []
         self.calculated = False
         if Debug.hand:
-            self.debug('Fixing Hand(%s, %s) won=%s' % (id(self)%10000, string, self.__won))
+            self.debug(fmt('Fixing Hand({id(self)}, {string}, {self.won}'))
         self._fixed = True
 
     @property
@@ -262,7 +262,7 @@ class Hand(object):
             if not matchingMJRules:
                 self.won = False
                 if Debug.hand:
-                    self.debug('no matching MJ Rule for %s %s' % (id(self)%10000, self))
+                    self.debug(fmt('no matching MJ Rule for {id(self)} {self}'))
                 self.__score = self.__totalScore()
                 return
             self.mjRule = matchingMJRules[0]
@@ -292,7 +292,7 @@ class Hand(object):
             self.__score = self.__totalScore()
             self.won = self.__maybeMahjongg()
             if not self.won and Debug.hand:
-                self.debug('exclusive rule %s does not win: %s' % (exclusive, self))
+                self.debug(fmt('exclusive rule {exclusive} does not win: {self}'))
         return bool(exclusive)
 
     def __setLastTile(self):
@@ -361,7 +361,7 @@ class Hand(object):
             if prev not in totals or self.__lastMeld not in totals:
                 if Debug.explain and prev not in totals:
                     if not self.player.game.belongsToRobotPlayer():
-                        self.debug('replaced last meld %s with %s' % (prev, totals[0]))
+                        self.debug(fmt('replaced last meld {prev} with {totals[0]}'))
                 self.__lastMeld = totals[0]
                 self.__applyRules()
 
@@ -470,7 +470,7 @@ class Hand(object):
             if hasattr(rule, 'winningTileCandidates'):
                 cand = rule.winningTileCandidates(self)
                 if Debug.hand and cand:
-                    self.debug('callingHands found %s for %s' % (cand, rule))
+                    self.debug(fmt('callingHands found {cand} for {rule}'))
                 candidates.extend(x.capitalize() for x in cand)
         # sort only for reproducibility
         candidates = sorted(set(candidates))
@@ -489,7 +489,7 @@ class Hand(object):
         if not mustBeAvailable:
             self.__callingHands[cacheKey] = result
         if Debug.hand:
-            self.debug('%s %s is calling %s' % (id(self)%10000, self, list(x.mjRule.name for x in result)))
+            self.debug(fmt('{id(self)} {self} is calling {rules}', rules=list(x.mjRule.name for x in result)))
         return result
 
     def __maybeMahjongg(self):
