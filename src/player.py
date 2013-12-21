@@ -129,7 +129,7 @@ class Player(object):
 
     def clearCache(self):
         """clears the cache with Hands"""
-        if Debug.handCache and len(self.handCache):
+        if Debug.hand and len(self.handCache):
             self.game.debug('%s: cache hits:%d misses:%d' % (self, self.cacheHits, self.cacheMisses))
         self.handCache.clear()
         Permutations.cache.clear()

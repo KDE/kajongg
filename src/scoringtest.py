@@ -84,7 +84,7 @@ class Helpers(object):
             game = GAMES[idx]
             game.players[0].clearCache()
             game.winner = game.players[0]
-            if Debug.handCache:
+            if Debug.hand:
                 print('')
                 print('starting test for %s'% ruleset.name)
             variant = Hand(game.players[0], string)

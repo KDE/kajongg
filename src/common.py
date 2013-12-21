@@ -82,7 +82,7 @@ class Debug(object):
     chat = False
     argString = None
     scores = False
-    handCache = False
+    hand = False
     explain = False
     random = False
     deferredBlock = False
