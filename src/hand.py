@@ -389,57 +389,47 @@ class Hand(object):
 
     def __sub__(self, subtractTile):
         """returns a copy of self minus subtractTiles. Case of subtractTile (hidden
-        or exposed) is ignored. If the tile is part of a declared meld, that meld
-        will be reduced and moved to the undeclared tiles.
-        Exposed melds of length<3 will also be hidden."""
+        or exposed) is ignored. subtractTile must either be undeclared or part of
+        lastMeld. Exposed melds of length<3 will be hidden."""
         # pylint: disable=too-many-branches
         # If lastMeld is given, it must be first in the list. Next try undeclared melds, then declared melds
-        newMelds = MeldList(self.melds)
-        tryMelds = [self.lastMeld] if self.lastMeld else []
-        tryMelds.extend(x for x in newMelds if not x.isDeclared)
-        rest = TileList()
+        assert self.lenOffset == 1
+        if self.lastTile:
+            if self.lastTile == subtractTile and self.prevHand:
+                return self.prevHand
+        declaredMelds = self.declaredMelds
+        tilesInHand = TileList(self.tilesInHand)
         boni = MeldList(self.bonusMelds)
+        lastMeld = self.lastMeld
         if subtractTile.isBonus:
             for idx, meld in enumerate(boni):
                 if subtractTile == meld[0]:
                     del boni[idx]
                     break
         else:
-            for meld in tryMelds:
-                if subtractTile.lower() in meld:
-                    restTiles = meld.without(subtractTile.lower())
-                    newMelds.remove(meld)
-                    rest.extend(restTiles.toUpper())
-                    break
-                if subtractTile.upper() in meld:
-                    restTiles = meld.without(subtractTile.upper())
-                    newMelds.remove(meld)
-                    rest.extend(restTiles.toUpper())
-                    break
-        for meld in newMelds[:]:
+            if lastMeld and lastMeld.isDeclared and subtractTile.lower() in lastMeld.toLower():
+                declaredMelds.remove(lastMeld)
+                tilesInHand.extend(lastMeld.toUpper())
+            tilesInHand.remove(subtractTile.upper())
+        for meld in declaredMelds[:]:
             if len(meld) < 3:
-                newMelds.remove(meld)
-                meld = meld.toUpper()
-                rest.extend(meld)
-        mjStr = self.mjStr
-        newTiles = newMelds.tiles()
-        if self.lastTile not in newTiles:
-            parts = mjStr.split()
-            newParts = []
-            for idx, part in enumerate(parts):
-                if part[:1] == 'M':
-                    part = 'm' + part[1:]
-                    if len(part) > 3 and part[3:4] == 'k':
-                        part = part[:3]
-                elif part[:1] == 'L':
-                    if self.lastTile.isExposed and self.lastTile.upper() in newTiles:
-                        part = 'L' + self.lastTile.upper()
-                    else:
-                        continue
-                newParts.append(part)
-            mjStr = ' '.join(newParts)
-        rest = 'R' + str(rest) if rest else ''
-        newString = ' '.join(str(x) for x in (newMelds, rest, boni, mjStr))
+                declaredMelds.remove(meld)
+                tilesInHand.extend(meld.toUpper())
+        newParts = []
+        for idx, part in enumerate(self.mjStr.split()):
+            if part[:1] == 'M':
+                part = 'm' + part[1:]
+                if len(part) > 3 and part[3:4] == 'k':
+                    part = part[:3]
+            elif part[:1] == 'L':
+                if self.lastTile.isExposed and self.lastTile.upper() in tilesInHand:
+                    part = 'L' + self.lastTile.upper()
+                else:
+                    continue
+            newParts.append(part)
+        mjStr = ' '.join(newParts)
+        rest = 'R' + str(tilesInHand)
+        newString = ' '.join(str(x) for x in (declaredMelds, rest, boni, mjStr))
         return Hand(self.player, newString, prevHand=self)
 
     def manualRuleMayApply(self, rule):
