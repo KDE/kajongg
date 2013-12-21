@@ -304,7 +304,10 @@ class PlayingHandBoard(HandBoard):
             allTiles.extend(adding)
         newPlaces = self.calcPlaces(allTiles)
         source = adding if adding else newPlaces.keys()
-        focusCandidates = list(x for x in source if x.focusable)
+        focusCandidates = list(x for x in source if x.focusable and not x.tile.isExposed)
+        if not focusCandidates:
+            # happens if we just exposed a claimed meld
+            focusCandidates = list(x for x in newPlaces.keys() if x.focusable and not x.tile.isExposed)
         focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
         if focusCandidates:
             self.focusTile = focusCandidates[0]
