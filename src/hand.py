@@ -48,7 +48,7 @@ class Hand(object):
     hand gets an mjRule even it is not a wining hand."""
     # pylint: disable=too-many-instance-attributes
 
-    def __new__(cls, player, string, robbedTile=None):
+    def __new__(cls, player, string, robbedTile=None, prevHand=None): # pylint: disable=unused-argument
         """since a Hand instance is never changed, we can use a cache"""
         cache = player.handCache
         cacheKey = hash((string, robbedTile))
@@ -63,7 +63,7 @@ class Hand(object):
         cache[cacheKey] = result
         return result
 
-    def __init__(self, player, string, robbedTile=None):
+    def __init__(self, player, string, robbedTile=None, prevHand=None):
         """evaluate string for player. rules are to be applied in any case"""
         # silence pylint. This method is time critical, so do not split it into smaller methods
         # pylint: disable=too-many-instance-attributes,too-many-branches,too-many-statements
@@ -77,6 +77,7 @@ class Hand(object):
         self.intelligence = self.player.intelligence if self.player else AIDefault()
         self.string = string
         self.robbedTile = robbedTile
+        self.prevHand = prevHand
         self.__won = False
         self.__score = None
         self.__callingHands = {}
@@ -370,7 +371,7 @@ class Hand(object):
         parts.append('R' + ''.join(str(x) for x in sorted(self.tilesInHand + [addTile])))
         parts.append('M' + self.ownWind + self.roundWind + self.announcements)
         parts.append('L' + addTile)
-        return Hand(self.player, ' '.join(parts).strip())
+        return Hand(self.player, ' '.join(parts).strip(), prevHand=self)
 
     def __sub__(self, subtractTile):
         """returns a copy of self minus subtractTiles. Case of subtractTile (hidden
@@ -425,7 +426,7 @@ class Hand(object):
             mjStr = ' '.join(newParts)
         rest = 'R' + str(rest) if rest else ''
         newString = ' '.join(str(x) for x in (newMelds, rest, boni, mjStr))
-        return Hand(self.player, newString)
+        return Hand(self.player, newString, prevHand=self)
 
     def manualRuleMayApply(self, rule):
         """returns True if rule has selectable() and applies to this hand"""
@@ -528,7 +529,7 @@ class Hand(object):
             lostHands = []
             for mjRule, melds in arrangements:
                 _ = ' '.join(str(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
-                tryHand = Hand(self.player, _)
+                tryHand = Hand(self.player, _, prevHand=self)
                 tryHand.mjRule = mjRule
                 tryHand.calculate()
                 if tryHand.won:
