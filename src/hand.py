@@ -124,10 +124,10 @@ class Hand(object):
         self.tiles.sort()
         self.values = ''.join(x.value for x in self.tiles)
         self.suits = set(x.lowerGroup for x in self.tiles)
-        for split in tileStrings[:]:
-            if split[:1] != 'R':
-                self.melds.append(Meld(split))
-                tileStrings.remove(split)
+        for part in tileStrings[:]:
+            if part[:1] != 'R':
+                self.melds.append(Meld(part))
+                tileStrings.remove(part)
         # those must be set before splitting the rest because the rearrange()
         # functions need them
         self.declaredMelds = MeldList(x for x in self.melds if x.isDeclared)
