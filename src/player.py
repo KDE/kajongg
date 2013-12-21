@@ -556,10 +556,9 @@ class PlayingPlayer(Player):
 
     def __maySayOriginalCall(self):
         """returns True if Original Call is possible"""
-        self.hand.calculate()
         for tileName in set(self.concealedTiles):
             newHand = self.hand - tileName
-            if newHand.callingHands():
+            if newHand.callingHands:
                 if Debug.originalCall:
                     self.game.debug('%s may say Original Call by discarding %s from %s' % (self, tileName, self.hand))
                 return True

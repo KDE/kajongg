@@ -531,7 +531,7 @@ class ServerTable(Table):
             player.mayWin = False
             block.tellAll(player, Message.ViolatesOriginalCall)
         if game.ruleset.mustDeclareCallingHand and not player.isCalling:
-            if player.hand.callingHands(mustBeAvailable=True):
+            if player.hand.callingHands:
                 player.isCalling = True
                 block.tellAll(player, Message.Calling)
         if txt:

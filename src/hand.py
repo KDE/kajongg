@@ -56,8 +56,6 @@ class Hand(object):
         cacheKey = hash((string, robbedTile))
         if cacheKey in cache:
             result = cache[cacheKey]
-            if not hasattr(result, '_fixed'):
-                raise Exception('recursion: Hand calls itself for same content')
             player.cacheHits += 1
             if Debug.hand:
                 result._player = weakref.ref(player) # pylint: disable=protected-access
@@ -88,9 +86,9 @@ class Hand(object):
         self.prevHand = prevHand
         self.__won = False
         self.__score = None
-        self.__callingHands = {}
+        self.__callingHands = None
         self.mjStr = ''
-        self.mjRule = None
+        self.__mjRule = None
         self.ownWind = None
         self.roundWind = None
         self.ruleCache = {}
@@ -139,26 +137,32 @@ class Hand(object):
         self.rest = TileList()
         if len(tileStrings):
             self.rest.extend(TileList(tileStrings[0][1:]))
-        self.usedRules = []
-        self.calculated = False
+        self.usedRules = None
+        if Debug.hand:
+            self.debug(fmt('{callers}: new Hand({id(self)} {string} {self.lenOffset} {id(prevHand)})',
+                callers=callers(10, exclude=['__init__'])))
+        self.__splitted = None
+        self.__split()
+        self.__calculate()
+        self.__splitted = True
+        self.__won &= self.lenOffset == 1
         if Debug.hand:
             self.debug(fmt('Fixing Hand({id(self)}, {string}, {self.won}'))
         self._fixed = True
+
+    @property
+    def splitted(self):
+        """readonly"""
+        return self.__splitted
 
     @property
     def player(self):
         """weakref"""
         return self._player()
 
-    def calculate(self):
-        """rearrange and calculate score"""
-        if self.calculated:
-            return
-        self.calculated = True
-        self.__split()
-        self.melds.sort()
-
-        self.usedRules = []
+    def __calculate(self):
+        """apply rules, calculate score"""
+        assert not self.rest, 'Hand.__calculate expects there to be no rest tiles: %s' % self
         oldWon = self.__won
         self.__applyRules()
         if len(self.lastMelds) > 1:
@@ -175,6 +179,18 @@ class Hand(object):
     def hasTiles(self):
         """tiles are assigned to this hand"""
         return self.tiles or self.bonusMelds
+
+    @property
+    def mjRule(self):
+        """getter"""
+        return self.__mjRule
+
+    @mjRule.setter
+    def mjRule(self, value):
+        """changing mjRule must reset score"""
+        if self.__mjRule != value:
+            self.__mjRule = value
+            self.__score = None
 
     @property
     def lastTile(self):
@@ -200,8 +216,9 @@ class Hand(object):
     @property
     def score(self):
         """calculate it first if not yet done"""
-        if not self.__score:
-            self.calculate()
+        if self.__score is None and self.__splitted is not None:
+            self.__score = Score()
+            self.__calculate()
         return self.__score
 
     @property
@@ -224,7 +241,8 @@ class Hand(object):
         The "won" value is set to True when instantiating the hand,
         according to the mMx in the init string. Later on, it may
         only be cleared."""
-        self.calculate()
+        if self.__splitted is None and len(self.rest):
+            raise UserWarning('hand.won is undefined for unsplit hand')
         return self.__won
 
     @won.setter
@@ -255,19 +273,19 @@ class Hand(object):
         self.ruleCache.clear()
         # do the rest only if we know all tiles of the hand
         if Tile.unknown in self.string:
-            self.won = False    # we do not know better
+            self.__won = False    # we do not know better
             return
         if self.__won:
             matchingMJRules = self.__maybeMahjongg()
             if not matchingMJRules:
-                self.won = False
                 if Debug.hand:
                     self.debug(fmt('no matching MJ Rule for {id(self)} {self}'))
+                self.__won = False
                 self.__score = self.__totalScore()
                 return
-            self.mjRule = matchingMJRules[0]
-            if self.mjRule:
-                self.usedRules.append(UsedRule(self.mjRule))
+            self.__mjRule = matchingMJRules[0]
+            if self.__mjRule:
+                self.usedRules.append(UsedRule(self.__mjRule))
             if self.__hasExclusiveRules():
                 return
             self.usedRules.extend(self.matchingWinnerRules())
@@ -290,8 +308,8 @@ class Hand(object):
         if exclusive:
             self.usedRules = exclusive
             self.__score = self.__totalScore()
-            self.won = self.__maybeMahjongg()
-            if not self.won and Debug.hand:
+            self.__won = bool(len(self.__maybeMahjongg()))
+            if not self.__won and Debug.hand:
                 self.debug(fmt('exclusive rule {exclusive} does not win: {self}'))
         return bool(exclusive)
 
@@ -368,7 +386,7 @@ class Hand(object):
     def chancesToWin(self):
         """count the physical tiles that make us win and still seem availabe"""
         result = []
-        for completedHand in self.callingHands(99):
+        for completedHand in self.callingHands:
             result.extend([completedHand.lastTile] * (
                     self.player.tileAvailable(completedHand.lastTile, self)))
         return result
@@ -440,17 +458,19 @@ class Hand(object):
             return False
         return rule.selectable(self) or rule.appliesToHand(self) # needed for activated rules
 
-    def callingHands(self, wanted=1, excludeTile=None, mustBeAvailable=False):
+    @property
+    def callingHands(self):
         """the hand is calling if it only needs one tile for mah jongg.
-        Returns up to 'wanted' hands which would only need one tile.
+        Returns all hands which would only need one tile.
         If mustBeAvailable is True, make sure the missing tile might still
         be available.
         """
-        # pylint: disable=too-many-branches
-        if not mustBeAvailable:
-            cacheKey = (wanted, excludeTile)
-            if cacheKey in self.__callingHands:
-                return self.__callingHands[cacheKey]
+        if self.__callingHands is None:
+            self.__callingHands = self.__findAllCallingHands()
+        return self.__callingHands
+
+    def __findAllCallingHands(self):
+        """always try to find all of them"""
         result = []
         string = self.string
         if ' x' in string or self.lenOffset:
@@ -464,19 +484,11 @@ class Hand(object):
         # sort only for reproducibility
         candidates = sorted(set(candidates))
         for tileName in candidates:
-            if excludeTile and tileName == excludeTile.capitalize():
-                continue
-            if mustBeAvailable and not self.player.tileAvailable(tileName, self):
-                continue
             if sum(x.lower() == tileName.lower() for x in self.tiles) == 4:
                 continue
             hand = self + tileName
             if hand.won:
                 result.append(hand)
-                if len(result) == wanted:
-                    break
-        if not mustBeAvailable:
-            self.__callingHands[cacheKey] = result
         if Debug.hand:
             self.debug(fmt('{id(self)} {self} is calling {rules}', rules=list(x.mjRule.name for x in result)))
         return result
@@ -526,6 +538,8 @@ class Hand(object):
                 self.rest.remove(tile)
                 self.melds.append(Meld(tile))
         if not self.rest:
+            self.melds.sort()
+            self.__won = bool(len(self.__maybeMahjongg()))
             return
         arrangements = self.__arrange()
         bestVariant = None
@@ -540,7 +554,6 @@ class Hand(object):
                 _ = ' '.join(str(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
                 tryHand = Hand(self.player, _, prevHand=self)
                 tryHand.mjRule = mjRule
-                tryHand.calculate()
                 if tryHand.won:
                     wonHands.append((mjRule, melds, tryHand))
                 else:
@@ -558,16 +571,24 @@ class Hand(object):
     def __gt__(self, other):
         """compares hand values"""
         assert self.player == other.player
-        return self.intelligence.handValue(self) > self.intelligence.handValue(other)
+        if not other.splitted:
+            return True
+        if self.won and not (other.splitted and other.won):
+            return True
+        elif not (self.splitted and self.won) and other.won:
+            return False
+        else:
+            return self.intelligence.handValue(self) > self.intelligence.handValue(other)
 
     def __lt__(self, other):
         """compares hand values"""
-        assert self.player == other.player
-        return self.intelligence.handValue(self) < self.intelligence.handValue(other)
+        return other.__gt__(self)
 
     def __eq__(self, other):
         """compares hand values"""
         assert self.player == other.player
+        if self.won != other.won:
+            return False
         return self.intelligence.handValue(self) == self.intelligence.handValue(other)
 
     def __matchingRules(self, rules):

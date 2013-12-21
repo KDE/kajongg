@@ -380,7 +380,6 @@ class PlayingHandBoard(HandBoard):
             tileStr = 'R' + ''.join(str(x) for x in self.player.concealedTiles)
             handStr = ' '.join([tileStr, self.player.mjString()])
             content = Hand(self.player, handStr)
-            content.calculate()
             result = MeldList(content.melds + content.bonusMelds)
         else:
             return []

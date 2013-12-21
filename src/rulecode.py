@@ -223,8 +223,8 @@ class StandardMahJongg(RuleCode):
             return False
         if sum(x.isChow for x in hand.melds) > hand.ruleset.maxChows:
             return False
-        if hand.score is None:
-            # this only __split trying to rearrange
+        if hand.splitted is None:
+            # this is only __split trying to rearrange
             return True
         if hand.score.total() < hand.ruleset.minMJPoints:
             return False
@@ -373,7 +373,7 @@ class StandardMahJongg(RuleCode):
         """rest is a string with those tiles that can still
         be rearranged: No declared melds and no bonus tiles.
         done is already arranged, do not change this.
-        Returns list(Meld)"""
+        TODO: also return how many tiles are missing for winning"""
         permutations = Permutations(rest)
         for variantMelds in permutations.variants:
             yield tuple(variantMelds), tuple()
@@ -433,7 +433,7 @@ class WrigglingSnake(RuleCode):
 
     def rearrange(hand, rest):
         melds = []
-        for tileName in rest:
+        for tileName in rest[:]:
             if rest.count(tileName) >= 2:
                 melds.append(Meld([tileName, tileName]))
                 rest.remove(tileName)
@@ -457,27 +457,11 @@ class WrigglingSnake(RuleCode):
 class CallingHand(RuleCode):
 
     def appliesToHand(cls, hand):
-        if hand in cls.activeHands:
-            # this cannot be reentrant because we attach the options to the
-            # one global CallingHand instance
-            return False
-        if hand.lenOffset != 0:
-            return False
-        cls.activeHands.append(hand)
-        try:
-            if hasattr(cls.limitHand, 'winningTileCandidates'):
-                # it is a MahJongg rule
-                candidates = cls.limitHand.winningTileCandidates(hand)
-            else:
-                # it is any other normal RuleCode
-                candidates = StandardMahJongg.winningTileCandidates(hand)
-            for tileName in candidates:
-                fullHand = hand + tileName.capitalize()
-                if fullHand.won and cls.limitHand.appliesToHand(fullHand):
-                    return True
-            return False
-        finally:
-            cls.activeHands.remove(hand)
+        for callHand in hand.callingHands:
+            used = list(x.rule.__class__ for x in callHand.usedRules)
+            if cls.limitHand in used:
+                return True
+        return False
 
 class TripleKnitting(RuleCode):
 
@@ -1109,7 +1093,10 @@ class LastOnlyPossible(RuleCode):
         shortHand = hand - hand.lastTile
         cls.activeHands.append(hand)
         try:
-            otherCallingHands = shortHand.callingHands(excludeTile=hand.lastTile)
-            return len(otherCallingHands) == 0
+            result = len(shortHand.callingHands) == 1
+            if result:
+                assert hand.lastTile.upper() in shortHand.callingHands[0].tiles, 'hand %s lastTile %s shortHand %s shortHand.callingHand %s' % (
+                    hand, hand.lastTile, shortHand, shortHand.callingHands[0])
+            return result
         finally:
             cls.activeHands.remove(hand)

@@ -106,8 +106,7 @@ class Helpers(object):
             game = GAMES[idx]
             game.players[0].clearCache()
             hand = Hand(game.players[0], string)
-            completedHands = hand.callingHands(99)
-            testSays = TileList(set(x.lastTile.lower() for x in completedHands)).sorted()
+            testSays = TileList(set(x.lastTile.lower() for x in hand.callingHands)).sorted()
             if isinstance(expected, list):
                 if idx >= len(expected):
                     idx %= len(RULESETS) // 2

@@ -204,9 +204,6 @@ class AIDefault(object):
     @staticmethod
     def weighCallingHand(aiInstance, candidates):
         """if we can get a calling hand, prefer that"""
-        candidates.hand.calculate()
-        # calculate() is needed. Why exactly would be interesting to know but
-        # since I plan to rewrite Hand anyway I do not investigate
         for candidate in candidates:
             newHand = candidates.hand - candidate.tile.capitalize()
             winningTiles = newHand.chancesToWin()
@@ -307,9 +304,8 @@ class AIDefault(object):
 #        if hand.won:
 #            return 1000 + hand.total()
 #        result = hand.total()
-#        completedHands = hand.callingHands(99)
-#        if completedHands:
-#            result += 500 + len(completedHands) * 20
+#        if hand.callingHands:
+#            result += 500 + len(hand.callingHands) * 20
 #        for meld in hand.declaredMelds:
 #            if not meld.isChow:
 #                result += 40

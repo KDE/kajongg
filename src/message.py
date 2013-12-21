@@ -292,7 +292,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
         """decorate the action button which will send this message"""
         assert isinstance(tile, Tile), tile
         myself = button.client.game.myself
-        isCalling = bool((myself.hand - tile).callingHands())
+        isCalling = bool((myself.hand - tile).callingHands)
         if not isCalling:
             txt = m18n('discarding %1 and declaring Original Call makes this hand unwinnable',
                 tile.name())
