@@ -128,13 +128,13 @@ class Meld(TileList):
         raise TypeError
 
     def without(self, remove):
-        """self without tile"""
+        """self without tile. The rest will be uppercased."""
         tiles = TileList()
         for tile in self:
             if tile == remove:
                 remove = None
             else:
-                tiles.append(tile)
+                tiles.append(tile.upper())
         return tiles
 
     def toLower(self, first=None, last=None):
