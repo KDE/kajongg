@@ -759,7 +759,6 @@ class Rule(RuleBase):
     which is there for loading&saving, but internally is stripped off."""
     # pylint: disable=too-many-arguments,too-many-instance-attributes
 
-    activeHands = []
     ruleCode = None
     limitHand = None
 

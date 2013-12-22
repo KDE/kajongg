@@ -41,12 +41,6 @@ class RuleCode(object):
 
     cache = ()
 
-    # those are needed for compilation. They will never be used
-    # because all our methods will be redirected to another class
-    # which also has those attributes.
-    activeHands = None
-    options = None
-
 # pylint: disable=missing-docstring
 # the class and method names are mostly self explaining, we do not
 # need docstringss
@@ -1085,18 +1079,10 @@ class DangerousGame(RuleCode):
 class LastOnlyPossible(RuleCode):
     """check if the last tile was the only one possible for winning"""
     def appliesToHand(cls, hand):
-        if hand in cls.activeHands or not hand.lastTile:
+        if not hand.lastTile:
             return False
         if any(hand.lastTile in x for x in hand.melds if len(x) == 4):
             # the last tile completed a Kong
             return False
         shortHand = hand - hand.lastTile
-        cls.activeHands.append(hand)
-        try:
-            result = len(shortHand.callingHands) == 1
-            if result:
-                assert hand.lastTile.upper() in shortHand.callingHands[0].tiles, 'hand %s lastTile %s shortHand %s shortHand.callingHand %s' % (
-                    hand, hand.lastTile, shortHand, shortHand.callingHands[0])
-            return result
-        finally:
-            cls.activeHands.remove(hand)
+        return len(shortHand.callingHands) == 1
