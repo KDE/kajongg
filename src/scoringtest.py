@@ -136,8 +136,8 @@ class Helpers(object):
             roofOff = ' roofOff' if hand.player.game.ruleset.roofOff else ''
             score = hand.score
             if score != expected.score:
-                result.append('%s%s: %s should be %s' % (
-                    hand.player.game.ruleset.name, roofOff, score, expected))
+                result.append('%s%s: %s with %s should be %s' % (
+                    hand.player.game.ruleset.name, roofOff, 'Won' if hand.won else 'Lost', score, expected))
                 result.append('hand:%s' % hand)
             if total is not None:
                 if score.total() != total:
