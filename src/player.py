@@ -355,7 +355,7 @@ class Player(object):
         """compile hand info into a string as needed by the scoring engine"""
         game = self.game
         assert game
-        winds = self.wind.lower() + 'eswn'[game.roundsFinished % 4]
+        winds = '..'
         wonChar = 'm'
         lastSource = ''
         declaration = ''

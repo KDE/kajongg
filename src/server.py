@@ -118,7 +118,7 @@ class DBPasswordChecker(object):
 
 class ServerGame(PlayingGame):
     """the central game instance on the server"""
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments, too-many-public-methods
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True,
                 client=None, playOpen=False, autoPlay=False):
         PlayingGame.__init__(self, names, ruleset, gameid, wantedGame, shouldSave,

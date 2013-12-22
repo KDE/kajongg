@@ -187,7 +187,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
 class VisiblePlayingGame(PlayingGame):
     """for the client"""
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments, too-many-public-methods
     playerClass =  VisiblePlayingPlayer
     wallClass = UIWall
 

@@ -356,7 +356,7 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def __mjstring(self, asWinner):
         """compile hand info into a string as needed by the scoring engine"""
-        winds = self.wind.lower() + 'eswn'[self.game.roundsFinished % 4]
+        winds = '..'
         if asWinner or self == self.game.winner:
             wonChar = 'M'
         else:

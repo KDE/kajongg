@@ -90,17 +90,11 @@ class Hand(object):
         self.__callingHands = None
         self.mjStr = ''
         self.__mjRule = None
-        self.ownWind = None
-        self.roundWind = None
         self.ruleCache = {}
         tileStrings = []
-        haveM = False
         for part in self.string.split():
             partId = part[:1]
             if partId in 'Mmx':
-                haveM = True
-                self.ownWind = part[1:2]
-                self.roundWind = part[2:3]
                 self.mjStr += ' ' + part
                 self.__won = partId == 'M'
             elif partId == 'L':
@@ -111,8 +105,6 @@ class Hand(object):
                 if part != 'R':
                     tileStrings.append(part)
 
-        if not haveM:
-            raise Exception('Hand got string without mMx: %s', self.string)
         self.__lastTile = self.__lastSource = self.__announcements = ''
         self.__lastMeld = 0
         self.__lastMelds = MeldList()
@@ -160,6 +152,16 @@ class Hand(object):
     def player(self):
         """weakref"""
         return self._player()
+
+    @property
+    def ownWind(self):
+        """for easier usage"""
+        return self.player.wind.lower()
+
+    @property
+    def roundWind(self):
+        """for easier usage"""
+        return self.player.game.roundWind
 
     def __calculate(self):
         """apply rules, calculate score"""
@@ -402,7 +404,7 @@ class Hand(object):
         parts = [str(self.declaredMelds)]
         parts.extend(str(x[0]) for x in self.bonusMelds)
         parts.append('R' + ''.join(str(x) for x in sorted(self.tilesInHand + [addTile])))
-        parts.append('M' + self.ownWind + self.roundWind + self.announcements)
+        parts.append('M..' + self.announcements)
         parts.append('L' + addTile)
         return Hand(self.player, ' '.join(parts).strip(), prevHand=self)
 

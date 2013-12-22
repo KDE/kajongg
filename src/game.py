@@ -317,6 +317,11 @@ class Game(object):
         """the name of the game server this game is attached to"""
         return self.__winner
 
+    @property
+    def roundWind(self):
+        """the round wind for Hand"""
+        return 'eswn'[self.roundsFinished % 4]
+
     @winner.setter
     def winner(self, value):
         """the name of the game server this game is attached to"""
