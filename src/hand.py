@@ -24,7 +24,6 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 import weakref
 
-from log import logDebug
 from tile import Tile, TileList
 from meld import Meld, MeldList
 from rule import Score, UsedRule
@@ -460,6 +459,8 @@ class Hand(object):
             if excludeTile and tileName == excludeTile.capitalize():
                 continue
             if mustBeAvailable and not self.player.tileAvailable(tileName, self):
+                continue
+            if sum(x.lower() == tileName.lower() for x in self.tiles) == 4:
                 continue
             hand = self + tileName
             if hand.won:
