@@ -356,14 +356,15 @@ class Client(object, pb.Referenceable):
             # server already disconnected, see HumanClient.remote_ServerDisconnects
             return succeed(Message.OK)
         action = message.notifyAction if move.notifying else message.clientAction
+        game = self.game
+        if game:
+            game.moves.append(move)
         answer = action(self, move)
         if not isinstance(answer, Deferred):
             answer = succeed(answer)
-        game = self.game
         if game:
             if not move.notifying and move.player and not move.player.scoreMatchesServer(move.score):
                 game.close()
-            game.moves.append(move)
 # This is an example how to find games where specific situations arise. We prefer games where this
 # happens very early for easier reproduction. So set number of rounds to 1 in the ruleset before doing this.
 # This example looks for a situation where the single human player may call Chow but one of the

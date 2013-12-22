@@ -374,7 +374,7 @@ class Player(object):
         self._concealedTiles[0] = tileName
         self._hand = None
 
-    def computeHand(self, withTile=None, robbedTile=None, dummy=None, asWinner=False):
+    def computeHand(self, withTile=None, dummy=None, asWinner=False):
         """returns Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
         assert isinstance(self.lastTile, (Tile, type(None)))
@@ -391,7 +391,7 @@ class Player(object):
         melds.append(mjString)
         if (withTile or self.lastTile):
             melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld if self.lastMeld else ''))
-        return Hand(self, ' '.join(melds), robbedTile=robbedTile)
+        return Hand(self, ' '.join(melds))
 
     def scoringString(self):
         """helper for HandBoard.__str__"""
@@ -536,14 +536,13 @@ class PlayingPlayer(Player):
     def __maySayMahjongg(self, move):
         """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
         game = self.game
-        robbableTile = withDiscard = None
         if move.message == Message.DeclaredKong:
             withDiscard = move.meld[0].upper()
-            if move.player != self:
-                robbableTile = move.exposedMeld[1] # we want it capitalized for a hidden Kong
         elif move.message == Message.AskForClaims:
             withDiscard = game.lastDiscard
-        hand = self.computeHand(withTile=withDiscard, robbedTile=robbableTile, asWinner=True)
+        else:
+            withDiscard = None
+        hand = self.computeHand(withTile=withDiscard, asWinner=True)
         if hand.won:
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:

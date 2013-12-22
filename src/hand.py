@@ -31,6 +31,7 @@ from rule import Score, UsedRule
 from common import Debug
 from intelligence import AIDefault
 from util import callers
+from message import Message
 
 class Hand(object):
     """represent the hand to be evaluated.
@@ -50,10 +51,10 @@ class Hand(object):
     hand gets an mjRule even it is not a wining hand."""
     # pylint: disable=too-many-instance-attributes
 
-    def __new__(cls, player, string, robbedTile=None, prevHand=None): # pylint: disable=unused-argument
+    def __new__(cls, player, string, prevHand=None): # pylint: disable=unused-argument
         """since a Hand instance is never changed, we can use a cache"""
         cache = player.handCache
-        cacheKey = hash((string, robbedTile))
+        cacheKey = string
         if cacheKey in cache:
             result = cache[cacheKey]
             player.cacheHits += 1
@@ -68,7 +69,7 @@ class Hand(object):
         cache[cacheKey] = result
         return result
 
-    def __init__(self, player, string, robbedTile=None, prevHand=None):
+    def __init__(self, player, string, prevHand=None):
         """evaluate string for player. rules are to be applied in any case"""
         # silence pylint. This method is time critical, so do not split it into smaller methods
         # pylint: disable=too-many-instance-attributes,too-many-branches,too-many-statements
@@ -82,7 +83,7 @@ class Hand(object):
         self.ruleset = self.player.game.ruleset
         self.intelligence = self.player.intelligence if self.player else AIDefault()
         self.string = string
-        self.robbedTile = robbedTile
+        self.__robbedTile = 'x'
         self.prevHand = prevHand
         self.__won = False
         self.__score = None
@@ -492,6 +493,17 @@ class Hand(object):
         if Debug.hand:
             self.debug(fmt('{id(self)} {self} is calling {rules}', rules=list(x.mjRule.name for x in result)))
         return result
+
+    @property
+    def robbedTile(self):
+        """cache this here for use in rulecode"""
+        if self.__robbedTile == 'x':
+            self.__robbedTile = None
+            if self.player.game.moves: # scoringtest does not (yet) simulate this
+                lastMove = self.player.game.moves[-1]
+                if lastMove.message == Message.DeclaredKong and lastMove.player != self.player:
+                    self.__robbedTile = lastMove.meld[1] # we want it capitalized only for a hidden Kong
+        return self.__robbedTile
 
     def __maybeMahjongg(self):
         """check if this is a mah jongg hand.
