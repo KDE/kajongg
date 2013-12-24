@@ -316,7 +316,7 @@ class Hand(object):
         if exclusive:
             self.usedRules = exclusive
             self.__score = self.__totalScore()
-            self.__won = bool(len(self.__maybeMahjongg()))
+            self.__won = bool(self.__maybeMahjongg())
             if not self.__won and Debug.hand:
                 self.debug(fmt('exclusive rule {exclusive} does not win: {self}'))
         return bool(exclusive)
@@ -514,16 +514,14 @@ class Hand(object):
     def __maybeMahjongg(self):
         """check if this is a mah jongg hand.
         Return a sorted list of matching MJ rules, highest
-        total first"""
-        if not self.__won:
-            return []
-        if self.lenOffset != 1:
-            return []
-        matchingMJRules = [x for x in self.ruleset.mjRules if x.appliesToHand(self)]
-        if self.robbedTile and self.robbedTile.istitle():
-            # Millington 58: robbing hidden kong is only allowed for 13 orphans
-            matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
-        return sorted(matchingMJRules, key=lambda x: -x.score.total())
+        total first. If no rule matches, return None"""
+        if self.lenOffset == 1:
+            matchingMJRules = [x for x in self.ruleset.mjRules if x.appliesToHand(self)]
+            if matchingMJRules:
+                if self.robbedTile and self.robbedTile.istitle():
+                    # Millington 58: robbing hidden kong is only allowed for 13 orphans
+                    matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
+                return sorted(matchingMJRules, key=lambda x: -x.score.total())
 
     def __arrange(self):
         """find all legal arrangements"""
@@ -557,7 +555,8 @@ class Hand(object):
                 self.melds.append(Meld(tile))
         if not self.rest:
             self.melds.sort()
-            self.__won = bool(len(self.__maybeMahjongg()))
+            mjRules = self.__maybeMahjongg()
+            self.__won = bool(mjRules)
             return
         arrangements = self.__arrange()
         bestVariant = None
