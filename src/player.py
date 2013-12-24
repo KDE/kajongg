@@ -351,22 +351,10 @@ class Player(object):
         """virtual: player gets focus on his hand"""
         pass
 
-    def mjString(self, asWinner=False):
+    def mjString(self):
         """compile hand info into a string as needed by the scoring engine"""
-        game = self.game
-        assert game
-        winds = '..'
-        wonChar = 'm'
-        lastSource = ''
-        declaration = ''
-        if asWinner or self == game.winner:
-            wonChar = 'M'
-            lastSource = self.lastSource
-            if self.originalCall:
-                declaration = 'a'
-        if not self.mayWin:
-            wonChar = 'x'
-        return ''.join([wonChar, winds, lastSource, declaration])
+        declaration = 'a' if self.originalCall else ''
+        return ''.join(['m..', self.lastSource, declaration])
 
     def makeTileKnown(self, tileName):
         """used when somebody else discards a tile"""
@@ -374,7 +362,7 @@ class Player(object):
         self._concealedTiles[0] = tileName
         self._hand = None
 
-    def computeHand(self, withTile=None, dummy=None, asWinner=False):
+    def computeHand(self, withTile=None):
         """returns Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
         assert isinstance(self.lastTile, (Tile, type(None)))
@@ -387,7 +375,7 @@ class Player(object):
         melds.extend(str(x) for x in self._exposedMelds)
         melds.extend(str(x) for x in self._concealedMelds)
         melds.extend(str(x) for x in self._bonusTiles)
-        melds.append(self.mjString(asWinner))
+        melds.append(self.mjString())
         if (withTile or self.lastTile):
             melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld if self.lastMeld else ''))
         return Hand(self, ' '.join(melds))
@@ -541,7 +529,7 @@ class PlayingPlayer(Player):
             withDiscard = game.lastDiscard
         else:
             withDiscard = None
-        hand = self.computeHand(withTile=withDiscard, asWinner=True)
+        hand = self.computeHand(withTile=withDiscard)
         if hand.won:
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:

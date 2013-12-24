@@ -44,6 +44,11 @@ class Hand(object):
     Of course ignoring bonus tiles and respecting kong replacement tiles.
     if there are no kongs, 13 tiles will return 0
 
+    We assume that long hands never happen. For manual scoring, this should
+    be asserted by the caller after creating the Hand instance. If the Hand
+    has lenOffset 1 but is no winning hand, the Hand instance will not be
+    fully evaluated, it is given Score 0 and hand.won == False.
+
     declaredMelds are those which cannot be changed anymore: Chows, Pungs,
     Kongs.
 
@@ -55,6 +60,9 @@ class Hand(object):
     hand gets an mjRule even it is not a wining hand, it is the one which
     was used for rearranging the hiden tiles to melds."""
     # pylint: disable=too-many-instance-attributes
+
+    class __NotWon(UserWarning): # pylint: disable=invalid-name
+        """should be won but is not a winning hand"""
 
     def __new__(cls, player, string, prevHand=None): # pylint: disable=unused-argument
         """since a Hand instance is never changed, we can use a cache"""
@@ -90,7 +98,7 @@ class Hand(object):
         self.string = string
         self.__robbedTile = 'x'
         self.prevHand = prevHand
-        self.__won = False
+        self.__won = None
         self.__score = None
         self.__callingHands = None
         self.mjStr = ''
@@ -101,7 +109,6 @@ class Hand(object):
             partId = part[:1]
             if partId in 'Mmx':
                 self.mjStr += ' ' + part
-                self.__won = partId == 'M'
             elif partId == 'L':
                 if len(part[1:]) > 8:
                     raise Exception('last tile cannot complete a kang:' + self.string)
@@ -140,13 +147,18 @@ class Hand(object):
             self.debug(fmt('{callers}: new Hand({id(self)} {string} {self.lenOffset} {id(prevHand)})',
                 callers=callers(10, exclude=['__init__'])))
         self.__splitted = None
-        self.__split()
-        self.__calculate()
-        self.__splitted = True
-        self.__won &= self.lenOffset == 1
-        if Debug.hand:
-            self.debug(fmt('Fixing Hand({id(self)}, {string}, {self.won}'))
-        self._fixed = True
+        self.__won = self.lenOffset == 1 and self.player.mayWin
+        try:
+            self.__split()
+            self.__calculate()
+            self.__splitted = True
+        except Hand.__NotWon:
+            self.__won = False
+            self.__score = Score()
+        finally:
+            if Debug.hand:
+                self.debug(fmt('Fixing Hand({id(self)}, {string}, {self.won}, {self.score}'))
+            self._fixed = True
 
     @property
     def splitted(self):
@@ -245,30 +257,15 @@ class Hand(object):
 
     @property
     def won(self):
-        """have we been modified since load or last save?
-        The "won" value is set to True when instantiating the hand,
-        according to the mMx in the init string. Later on, it may
-        only be cleared."""
-        if self.__splitted is None and len(self.rest):
-            raise UserWarning('hand.won is undefined for unsplit hand')
+        """do we really have a winner hand?"""
         return self.__won
-
-    @won.setter
-    def won(self, value):
-        """must never change to True"""
-        value = bool(value)
-        assert not value
-        self.__won = value
-        self.string = self.string.replace(' M', ' m')
-        self.mjStr = self.mjStr.replace(' M', ' m')
 
     def debug(self, msg):
         """try to use Game.debug so we get a nice prefix"""
         self.player.game.debug(dbgIndent(self, self.prevHand) + msg)
 
     def __applyRules(self):
-        """find out which rules apply, collect in self.usedRules.
-        This may change self.won"""
+        """find out which rules apply, collect in self.usedRules"""
         self.usedRules = []
         if self.__hasExclusiveRules():
             return
@@ -281,16 +278,14 @@ class Hand(object):
         self.ruleCache.clear()
         # do the rest only if we know all tiles of the hand
         if Tile.unknown in self.string:
-            self.__won = False    # we do not know better
             return
         if self.__won:
             matchingMJRules = self.__maybeMahjongg()
             if not matchingMJRules:
                 if Debug.hand:
                     self.debug(fmt('no matching MJ Rule for {id(self)} {self}'))
-                self.__won = False
-                self.__score = self.__totalScore()
-                return
+                self.__score = Score()
+                raise Hand.__NotWon
             self.__mjRule = matchingMJRules[0]
             if self.__mjRule:
                 self.usedRules.append(UsedRule(self.__mjRule))
@@ -316,8 +311,7 @@ class Hand(object):
         if exclusive:
             self.usedRules = exclusive
             self.__score = self.__totalScore()
-            self.__won = bool(self.__maybeMahjongg())
-            if not self.__won and Debug.hand:
+            if self.__won and not bool(self.__maybeMahjongg()) and Debug.hand:
                 self.debug(fmt('exclusive rule {exclusive} does not win: {self}'))
         return bool(exclusive)
 
@@ -328,12 +322,12 @@ class Hand(object):
         self.__lastSource = None
         parts = self.mjStr.split()
         for part in parts:
-            if part[:1] == 'L':
+            if part[0] == 'L':
                 part = part[1:]
                 if len(part) > 2:
                     self.__lastMeld = Meld(part[2:])
                 self.__lastTile = Tile(part[:2])
-            elif part[:1] == 'M':
+            elif part[0] == 'm':
                 if len(part) > 3:
                     self.__lastSource = part[3:4]
                     if len(part) > 4:
@@ -376,10 +370,12 @@ class Hand(object):
             assert isinstance(rule, UsedRule)
         for lastMeld in self.lastMelds:
             self.__lastMeld = lastMeld
-            self.__applyRules()
-            totals.append((self.__won, self.__totalScore().total(), lastMeld))
-        if any(x[0] for x in totals): # if any won
-            totals = list(x[1:] for x in totals if x[0]) # remove lost variants
+            try:
+                self.__applyRules()
+                totals.append((self.__totalScore().total(), lastMeld))
+            except Hand.__NotWon:
+                pass
+        if totals:
             totals = sorted(totals) # sort by totalScore
             maxScore = totals[-1][0]
             totals = list(x[1] for x in totals if x[0] == maxScore)
@@ -405,11 +401,11 @@ class Hand(object):
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
-        # set the "won" flag M
         parts = [str(self.declaredMelds)]
         parts.extend(str(x[0]) for x in self.bonusMelds)
         parts.append('R' + ''.join(str(x) for x in sorted(self.tilesInHand + [addTile])))
-        parts.append('M..' + self.announcements)
+        if self.announcements:
+            parts.append('m..' + self.announcements)
         parts.append('L' + addTile)
         return Hand(self.player, ' '.join(parts).strip(), prevHand=self)
 
@@ -443,11 +439,10 @@ class Hand(object):
                 tilesInHand.extend(meld.toUpper())
         newParts = []
         for idx, part in enumerate(self.mjStr.split()):
-            if part[:1] == 'M':
-                part = 'm' + part[1:]
+            if part[0] == 'm':
                 if len(part) > 3 and part[3:4] == 'k':
                     part = part[:3]
-            elif part[:1] == 'L':
+            elif part[0] == 'L':
                 if self.lastTile.isExposed and self.lastTile.upper() in tilesInHand:
                     part = 'L' + self.lastTile.upper()
                 else:
@@ -556,7 +551,9 @@ class Hand(object):
         if not self.rest:
             self.melds.sort()
             mjRules = self.__maybeMahjongg()
-            self.__won = bool(mjRules)
+            self.__won &= bool(mjRules)
+            if mjRules:
+                self.mjRule = mjRules[0]
             return
         wonHands = []
         lostHands = []

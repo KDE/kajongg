@@ -354,13 +354,8 @@ class ScoringPlayer(VisiblePlayer, Player):
             box.blockSignals(False)
         return newHand.score > currentScore
 
-    def __mjstring(self, asWinner):
+    def __mjstring(self):
         """compile hand info into a string as needed by the scoring engine"""
-        winds = '..'
-        if asWinner or self == self.game.winner:
-            wonChar = 'M'
-        else:
-            wonChar = 'm'
         if self.lastTile and self.lastTile.istitle():
             lastSource = 'w'
         else:
@@ -375,26 +370,22 @@ class ScoringPlayer(VisiblePlayer, Player):
                     lastSource = options['lastsource']
             if 'declaration' in options:
                 declaration = options['declaration']
-        return ''.join([wonChar, winds, lastSource, declaration])
+        return ''.join(['m..', lastSource, declaration])
 
-    def __lastString(self, asWinner):
+    def __lastString(self):
         """compile hand info into a string as needed by the scoring engine"""
-        if not asWinner or self != self.game.winner:
-            return ''
         if not self.lastTile:
             return ''
         if not self.handBoard.tilesByElement(self.lastTile):
-            # this  happens if we remove the meld with lastTile from the hand again
+            # this happens if we remove the meld with lastTile from the hand again
             return ''
         return 'L%s%s' % (self.lastTile, self.lastMeld)
 
-    def computeHand(self, asWinner=None): # pylint: disable=arguments-differ
+    def computeHand(self, dummyWithTile=None):
         """returns a Hand object, using a cache"""
-        if asWinner is None:
-            asWinner = self == self.game.winner
         self.lastTile = Internal.scene.computeLastTile()
         self.lastMeld = Internal.scene.computeLastMeld()
-        string = ' '.join([self.scoringString(), self.__mjstring(asWinner), self.__lastString(asWinner)])
+        string = ' '.join([self.scoringString(), self.__mjstring(), self.__lastString()])
         return Hand(self, string)
 
     def sortRulesByX(self, rules):
