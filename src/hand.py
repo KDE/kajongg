@@ -558,25 +558,19 @@ class Hand(object):
             mjRules = self.__maybeMahjongg()
             self.__won = bool(mjRules)
             return
-        arrangements = self.__arrange()
-        bestVariant = None
-        bestRule = None
-        if len(arrangements) == 1:
-            bestRule = arrangements[0][0]
-            bestVariant = arrangements[0][1]
-        else:
-            wonHands = []
-            lostHands = []
-            for mjRule, melds in arrangements:
-                _ = ' '.join(str(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
-                tryHand = Hand(self.player, _, prevHand=self)
+        wonHands = []
+        lostHands = []
+        for mjRule, melds in self.__arrange():
+            _ = ' '.join(str(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
+            tryHand = Hand(self.player, _, prevHand=self)
+            if tryHand.won:
                 tryHand.mjRule = mjRule
-                if tryHand.won:
-                    wonHands.append((mjRule, melds, tryHand))
-                else:
-                    lostHands.append((mjRule, melds, tryHand))
-            tryHands = wonHands if wonHands else lostHands
-            bestRule, bestVariant, _ = max(tryHands, key=lambda x:x[2])
+                wonHands.append((mjRule, melds, tryHand))
+            else:
+                lostHands.append((mjRule, melds, tryHand))
+        # we prefer a won Hand even if a lost Hand might have a higher score
+        tryHands = wonHands if wonHands else lostHands
+        bestRule, bestVariant, _ = max(tryHands, key=lambda x:x[2])
         self.mjRule = bestRule
         self.melds.extend(bestVariant)
         self.melds.sort()
