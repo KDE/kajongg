@@ -36,8 +36,12 @@ from message import Message
 class Hand(object):
     """represent the hand to be evaluated.
 
-    lenOffset is <0 for short hand, 0 for correct calling hand, >0 for long hand.
-    Of course ignoring bonus tiles.
+    lenOffset is
+      <0 for a short hand
+      0 for a correct calling hand
+      1 for a correct winner hand or a long loser hand
+      >1 for a long winner hand
+    Of course ignoring bonus tiles and respecting kong replacement tiles.
     if there are no kongs, 13 tiles will return 0
 
     declaredMelds are those which cannot be changed anymore: Chows, Pungs,
@@ -47,8 +51,9 @@ class Hand(object):
 
     Only tiles passed in the 'R' substring may be rearranged.
 
-    mjRule is the one out of mjRule with the highest resulting score. Every
-    hand gets an mjRule even it is not a wining hand."""
+    mjRule is the one out of mjRules with the highest resulting score. Every
+    hand gets an mjRule even it is not a wining hand, it is the one which
+    was used for rearranging the hiden tiles to melds."""
     # pylint: disable=too-many-instance-attributes
 
     def __new__(cls, player, string, prevHand=None): # pylint: disable=unused-argument
@@ -485,11 +490,10 @@ class Hand(object):
                 self.debug(fmt('callingHands found {cand} for {rule}'))
             candidates.extend(x.capitalize() for x in cand)
         # sort only for reproducibility
-        candidates = sorted(set(candidates))
-        for tileName in candidates:
-            if sum(x.lower() == tileName.lower() for x in self.tiles) == 4:
+        for tile in sorted(set(candidates)):
+            if sum(x.lower() == tile.lower() for x in self.tiles) == 4:
                 continue
-            hand = self + tileName
+            hand = self + tile
             if hand.won:
                 result.append(hand)
         if Debug.hand:

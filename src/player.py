@@ -387,8 +387,7 @@ class Player(object):
         melds.extend(str(x) for x in self._exposedMelds)
         melds.extend(str(x) for x in self._concealedMelds)
         melds.extend(str(x) for x in self._bonusTiles)
-        mjString = self.mjString(asWinner)
-        melds.append(mjString)
+        melds.append(self.mjString(asWinner))
         if (withTile or self.lastTile):
             melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld if self.lastMeld else ''))
         return Hand(self, ' '.join(melds))
@@ -547,7 +546,7 @@ class PlayingPlayer(Player):
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:
                     game.debug('%s may rob the kong from %s/%s' % \
-                       (self, move.player, move.exposedMeld))
+                    (self, move.player, move.exposedMeld))
             if Debug.mahJongg:
                 game.debug('%s may say MJ:%s, active=%s' % (
                     self, list(x for x in game.players), game.activePlayer))

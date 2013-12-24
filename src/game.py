@@ -899,7 +899,8 @@ class PlayingGame(Game):
     def saveHand(self):
         """server told us to save this hand"""
         for player in self.players:
-            assert player.hand.won == (player == self.winner)
+            assert player.hand.won == (player == self.winner), 'hand.won:%s winner:%s' % (
+                player.hand.won, player == self.winner)
         Game.saveHand(self)
 
     def _mustExchangeSeats(self, pairs):

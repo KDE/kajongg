@@ -125,8 +125,6 @@ class Score(object):
 
     def total(self):
         """the total score"""
-        if self.ruleset is None:
-            raise Exception('Score.total: ruleset unknown for %s' % self)
         score = int(self.points * ( 2 ** self.doubles))
         if self.limits:
             if self.limits >= 1:
@@ -137,7 +135,7 @@ class Score(object):
                 self.limits = 0
         if self.limits:
             return int(round(self.limits * self.ruleset.limit))
-        if not self.ruleset.roofOff:
+        if score and not self.ruleset.roofOff:
             score = min(score, self.ruleset.limit)
         return score
 
