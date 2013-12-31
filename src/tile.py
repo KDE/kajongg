@@ -70,9 +70,6 @@ class Tile(str):
                 arg0, arg1 = args[0]
             else:
                 arg0, arg1 = args
-            if isinstance(arg1, int):
-                if arg1 < 10:
-                    arg1 = arg1 + ord('0')
             if isinstance(arg0, int):
                 arg0 = chr(arg0)
             if isinstance(arg1, int):
@@ -84,8 +81,7 @@ class Tile(str):
     def __init__(self, *dummyArgs):
         # pylint: disable=super-init-not-called
         if not hasattr(self, '_fixed'): # already defined if I am from cache
-            self.group = self[:1]
-            self.value = self[1:]
+            self.group, self.value = self
             self.lowerGroup = self.group.lower()
             self.isExposed = self.group == self.lowerGroup
             self.isBonus = self.group in Tile.boni
@@ -267,8 +263,8 @@ class TileList(list):
         if tile.lowerGroup not in Tile.colors:
             return []
         group = tile.group
-        value = int(tile.value)
-        values = set(int(x.value) for x in self if x.group == group)
+        value = ord(tile.value)
+        values = set(ord(x.value) for x in self if x.group == group)
         chows = []
         for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0,  1)]:
             subset = set([value + x for x in offsets])
@@ -298,7 +294,7 @@ class Elements(object):
         self.tERMINALS = {x.upper() for x in self.terminals}
         self.majors = self.honors | self.terminals
         self.mAJORS = self.hONORS | self.tERMINALS
-        self.greenHandTiles = {Tile(Tile.bamboo, x) for x in (2, 3, 4, 6, 8)} | {Tile(Tile.dragon, Tile.green)}
+        self.greenHandTiles = {Tile(Tile.bamboo, x) for x in '23468'} | {Tile(Tile.dragon, Tile.green)}
         self.minors = {Tile(x, y) for x in Tile.colors for y in Tile.minors}
         for tile in self.majors:
             self.occurrence[tile] = 4

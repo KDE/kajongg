@@ -232,9 +232,9 @@ class StandardMahJongg(RuleCode):
     def fillChow(group, values):
         val0, val1 = values
         if val0 + 1 == val1:
-            if val0 == 1:
+            if val0 == ord('1'): # TODO: is 49 faster?
                 return {Tile(group, val0 + 2)}
-            if val0 == 8:
+            if val0 == ord('8'):
                 return {Tile(group, val0 - 1)}
             return {Tile(group, val0 - 1), Tile(group, val0 + 2)}
         else:
@@ -281,7 +281,7 @@ class StandardMahJongg(RuleCode):
             return set(result)
         melds = []
         for group in hand.suits & set(Tile.colors):
-            values = sorted(int(x.value) for x in result if x.group == group)
+            values = sorted(ord(x.value) for x in result if x.group == group)
             changed = True
             while (changed and len(values) > 2
                     and values.count(values[0]) == 1
@@ -332,6 +332,7 @@ class StandardMahJongg(RuleCode):
                     return {Tile(group, values[x]) for x in (0, 3, 6)}
             if len(values) == 1:
                 # only a pair of this value is possible
+                # logDebug('need pair')
                 return {Tile(group.upper(), values[0])}
             if len(valueSet) == 1:
                 # no chow reachable, only pair/pung
@@ -348,23 +349,23 @@ class StandardMahJongg(RuleCode):
                 if maxChows == 0:
                     # not a calling hand
                     return set()
+                # logDebug('return fillChow for %s' % values)
                 return cls.fillChow(group, values)
             if (len(values) == 4 and len(valueSet) == 2
                     and values[0] == values[1] and values[2] == values[3]):
-                # logDebug('we have 2 pairs of %s' % group)
                 return {Tile(group, values[0]), Tile(group, values[2])}
             if maxChows:
                 for value in valueSet:
-                    if value > 1:
-                        result.append(Tile(group, str(value - 1)))
-                    if value < 9:
-                        result.append(Tile(group, str(value + 1)))
+                    if value > ord('1'):
+                        result.append(Tile(group, value - 1))
+                    if value < ord('9'):
+                        result.append(Tile(group, value + 1))
         return set(result)
 
     def shouldTry(hand, maxMissing=10):
         return True
     def rearrange(hand, rest):
-        """rest is a string with those tiles that can still
+        """rest is a list of those tiles that can still
         be rearranged: No declared melds and no bonus tiles.
         done is already arranged, do not change this.
         TODO: also return how many tiles are missing for winning"""
@@ -419,11 +420,11 @@ class WrigglingSnake(RuleCode):
                 # and the pair of 1 is incomplete too
                 return set()
             else:
-                return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) \
+                return (elements.winds | set([Tile(group, x) for x in '23456789'])) \
                     - set([x.lower() for x in hand.tiles])
         else:
             # pair of 1 is not complete
-            return set([Tile(group, 1)])
+            return set([Tile(group, '1')])
 
     def rearrange(hand, rest):
         melds = []
@@ -796,15 +797,15 @@ class RobbingKong(RuleCode):
 
 class GatheringPlumBlossomFromRoof(RuleCode):
     def appliesToHand(hand):
-        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, 5).upper()
+        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, '5').upper()
 
 class PluckingMoon(RuleCode):
     def appliesToHand(hand):
-        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, 1).upper()
+        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, '1').upper()
 
 class ScratchingPole(RuleCode):
     def appliesToHand(hand):
-        return RobbingKong.appliesToHand(hand) and hand.lastTile == Tile(Tile.bamboo, 2)
+        return RobbingKong.appliesToHand(hand) and hand.lastTile == Tile(Tile.bamboo, '2')
 
 class StandardRotation(RuleCode):
     def rotate(game):
@@ -879,9 +880,9 @@ class GatesOfHeaven(StandardMahJongg):
         else:
             # we have something of all values
             if not values.startswith('111'):
-                result = (1,)
+                result = '1'
             elif not values.endswith('999'):
-                result = (9,)
+                result = '9'
             else:
                 if 'pair28' in cls.options:
                     result = Tile.minors

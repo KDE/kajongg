@@ -20,6 +20,7 @@ add_subdirectory( voices )
 add_subdirectory( doc )
 
 set(SRCFILES 
+src/permutations.py
 src/about.py
 src/animation.py
 src/background.py

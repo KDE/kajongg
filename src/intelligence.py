@@ -398,13 +398,13 @@ class DiscardCandidates(list):
             if this.group in Tile.colors:
                 thisValue = this.value
                 if prev and prev.group == this.group:
-                    if int(prev.value) + 1 == int(thisValue):
+                    if ord(prev.value) + 1 == ord(thisValue):
                         prev.next = this
                         this.prev = prev
-                    if int(prev.value) + 2 == int(thisValue):
+                    if ord(prev.value) + 2 == ord(thisValue):
                         prev.next2 = this
                         this.prev2 = prev
-                if prev2 and prev2.group == this.group and int(prev2.value) + 2 == int(thisValue):
+                if prev2 and prev2.group == this.group and ord(prev2.value) + 2 == ord(thisValue):
                     prev2.next2 = this
                     this.prev2 = prev2
             prev2 = prev
