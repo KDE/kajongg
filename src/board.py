@@ -727,16 +727,14 @@ class SelectorBoard(CourtBoard):
             else:
                 variants.append(lowerName * 4)
                 variants.append(lowerName * 3 + upperName)
+        # TODO: old bug: move 3 identical hidden chows to east, then move
+        # one of them to south exposed
         if not wantedTile.isHonor and wantedTile.value < '8':
-            chow2 = wantedTile.nextForChow()
+            chow2 = scName.nextForChow()
             chow3 = chow2.nextForChow()
-            chow2 = self.tilesByElement(chow2.lower())
-            chow3 = self.tilesByElement(chow3.lower())
-            if chow2 and chow3:
-                baseChar = scName.group
-                baseValue = ord(scName.value)
-                varStr = '%s%s%s%s%s' % (scName, baseChar, chr(baseValue+1), baseChar, chr(baseValue+2))
-                variants.append(varStr)
+            if self.tilesByElement(chow2.lower()) and self.tilesByElement(chow3.lower()):
+                variants.append([scName, chow2, chow3])
+        # variants now holds a list of lists of tiles
         return [Meld(x) for x in variants]
 
 class MimeData(QMimeData):
