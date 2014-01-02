@@ -354,7 +354,7 @@ class Player(object):
     def mjString(self):
         """compile hand info into a string as needed by the scoring engine"""
         declaration = 'a' if self.originalCall else ''
-        return ''.join(['m..', self.lastSource, declaration])
+        return ''.join(['m', self.lastSource, declaration])
 
     def makeTileKnown(self, tileName):
         """used when somebody else discards a tile"""

@@ -287,12 +287,12 @@ class FourBlessingsOverTheDoor(Base):
         self.scoreTest('RDgDg wewewe wswsws WnWnWn wwwwwwww LDgDgDg', Win(limits=1))
         self.scoreTest('wewewe wswsws WnWnWn wwwwwwww DrDr LDrDrDr', Win(limits=1))
         self.scoreTest('wewewe wswsws WnWnWn wwwwwwww DrDr LDrDrDr', Win(limits=1))
-        self.scoreTest('wewewe wswsws WnWnWn wwwwwwww DrDr m..z LDrDrDr', Win(limits=1))
+        self.scoreTest('wewewe wswsws WnWnWn wwwwwwww DrDr mz LDrDrDr', Win(limits=1))
         self.scoreTest('wewewe wswsws RWnWnWnDr wwwwwwww', [NoWin(32, 4), NoWin(limits=0.4)])
 class AllHonours(Base):
     """only honours"""
     def testMe(self):
-        self.scoreTest('drdrdr wewe wswsws wnwnwn dbdbdb m..z Ldrdrdrdr', Win(limits=1))
+        self.scoreTest('drdrdr wewe wswsws wnwnwn dbdbdb mz Ldrdrdrdr', Win(limits=1))
         self.scoreTest('wewewe wswsws RWnWnWnB1 wwwwwwww LB1', [NoWin(32, 4), NoWin(limits=0.4)])
         # this one is limits=0.4 = 400 points, but points 512 are higher:
         self.scoreTest('wewewe drdrdr RDrDrDrDb wwwwwwww LDb', [NoWin(32, 4), NoWin(32, 4)])
@@ -300,20 +300,20 @@ class AllHonours(Base):
 class BuriedTreasure(Base):
     """buried treasure, CC BMJA"""
     def testMe(self):
-        self.scoreTest('RWeWeWeC3C3C3S3S3 c4c4c4C4 b8B8B8b8 m..e LWeWeWeWe',
+        self.scoreTest('RWeWeWeC3C3C3S3S3 c4c4c4C4 b8B8B8b8 me LWeWeWeWe',
                        [Win(limits=1), Win(58, 4)])
-        self.scoreTest('RWeWeWeC3C3C3S3S3C4C4C4B8B8B8 m..e LWeWeWeWe',
+        self.scoreTest('RWeWeWeC3C3C3S3S3C4C4C4B8B8B8 me LWeWeWeWe',
                        [Win(limits=1), Win(42, 4)])
-        self.scoreTest('RWeWeWeC3C3C3C5C5C4C4C4C8C8C8 m..e LWeWeWeWe',
+        self.scoreTest('RWeWeWeC3C3C3C5C5C4C4C4C8C8C8 me LWeWeWeWe',
                        [Win(limits=1), Win(limits=1)])
-        self.scoreTest('RWeWeC3C3C3C5C5C4C4C4C8C8C8 m..e LWe',
+        self.scoreTest('RWeWeC3C3C3C5C5C4C4C4C8C8C8 me LWe',
                        [NoWin(16, 1), NoWin(limits=0.4)])
-        self.scoreTest('RWeWeWeC3C3C3C5C5C4C4C4C7C8C9 m..e LWeWeWeWe',
+        self.scoreTest('RWeWeWeC3C3C3C5C5C4C4C4C7C8C9 me LWeWeWeWe',
                        [Win(38, 6), Win(38, 3)])
 class HiddenTreasure(Base):
     """hidden treasure, CC DMJL"""
     def testMe(self):
-        self.scoreTest('RWeWeWeC3C3C3S3S3 c4c4c4C4 b8B8B8b8 m..e LWeWeWeWe',
+        self.scoreTest('RWeWeWeC3C3C3S3S3 c4c4c4C4 b8B8B8b8 me LWeWeWeWe',
                        [Win(limits=1), Win(58, 4)])
         self.scoreTest('RWeWeWeC3C3C3S3S3 c4c4c4C4 b8B8B8b8 LC3C3C3C3',
                        [Win(limits=1), Win(58, 4)])
@@ -331,21 +331,21 @@ class FourfoldPlenty(Base):
 class PlumBlossom(Base):
     """Gathering the plum blossom from the roof"""
     def testMe(self):
-        self.scoreTest('s2s2s2 RS5S5S5B1B1B1B2B2 c9C9C9c9 m..e LS5S5S5S5', Win(limits=1))
-        self.scoreTest('s2s2s2 RS5S5S5B1B1B1B2B2 c9C9C9c9 m..e Ls2s2s2s2', [Win(66, 3), Win(66, 1)])
+        self.scoreTest('s2s2s2 RS5S5S5B1B1B1B2B2 c9C9C9c9 me LS5S5S5S5', Win(limits=1))
+        self.scoreTest('s2s2s2 RS5S5S5B1B1B1B2B2 c9C9C9c9 me Ls2s2s2s2', [Win(66, 3), Win(66, 1)])
         self.scoreTest('s2s2s2 RS5S5S5B1B1B1B2B2 c9C9C9c9 LS5S5S5S5', [Win(68, 2), Win(68, 1)])
 
 class PluckingMoon(Base):
     """plucking the moon from the bottom of the sea"""
     def testMe(self):
-        self.scoreTest('s2s2s2 RS1S1S1B1B1B1B2B2 c9C9C9c9 m..z LS1S1S1S1', Win(limits=1))
-        self.scoreTest('s2s2s2 RS1S1S1B1B1B1B2B2 c9C9C9c9 m..z Ls2s2s2s2', [Win(70, 3), Win(70, 2)])
+        self.scoreTest('s2s2s2 RS1S1S1B1B1B1B2B2 c9C9C9c9 mz LS1S1S1S1', Win(limits=1))
+        self.scoreTest('s2s2s2 RS1S1S1B1B1B1B2B2 c9C9C9c9 mz Ls2s2s2s2', [Win(70, 3), Win(70, 2)])
         self.scoreTest('s2s2s2 RS1S1S1B1B1B1B2B2 c9C9C9c9 LS1S1S1S1', [Win(72, 2), Win(72, 1)])
 
 class ScratchingPole(Base):
     """scratch a carrying pole"""
     def testMe(self):
-        self.scoreTest('b2b3b4 RS1S1S1B1B1B1B4B4 c9C9C9c9 m..k Lb2b2b3b4', Win(limits=1))
+        self.scoreTest('b2b3b4 RS1S1S1B1B1B1B4B4 c9C9C9c9 mk Lb2b2b3b4', Win(limits=1))
         self.scoreTest('b2b2b2 RS1S1S1B1B1B1B4B4 c9C9C9c9 LS1S1S1S1', [Win(72, 2), Win(72, 1)])
         self.scoreTest('b2b2b2 RS1S1S1B1B1B1B4B4 c9C9C9c9 Lb2b2b2b2', [Win(70, 2), Win(70, 1)])
 
@@ -372,73 +372,73 @@ class Rest(Base):
     def testMe(self):
         self.scoreTest('s1s1s1s1 s2s2s2 wewe RS3S3S3 s4s4s4 Ls2s2s2s2',
                        [Win(44, 2), Win(44, 1)], winds='sw')
-        self.scoreTest('s1s1s1s1 s2s2s2 RWeWeS3S3S3 s4s4s4 m..e LS3S3S3S3',
+        self.scoreTest('s1s1s1s1 s2s2s2 RWeWeS3S3S3 s4s4s4 me LS3S3S3S3',
                        [Win(46, 3), Win(46, 1)], winds='sw')
         self.scoreTest('b3B3B3b3 RDbDbDbDrDrDr wewewewe s2s2 Ls2s2s2', [Win(72, 6), Win(68, 5)])
         self.scoreTest('s1s2s3 s1s2s3 b3b3b3 b4b4b4 RB5 fn yn LB5', [NoWin(12, 1), NoWin(12, 2)], winds='ne')
         self.scoreTest('b3b3b3b3 RDbDbDb drdrdr weWeWewe s2s2 Ls2s2s2', [Win(76, 5), Win(72, 5)])
         self.scoreTest('s2s2s2 s2s3s4 RB1B1B1B1 c9C9C9c9 Ls2s2s3s4', NoWin(42))
         self.scoreTest('s2s2s2 RDgDgDbDbDbDrDrDr b2b2b2b2 Ls2s2s2s2', [Win(48, 4), Win(48, 3)])
-        self.scoreTest('s1s1s1s1 s2s2s2 s3s3s3 s4s4s4 s5s5 m..w Ls3s3s3s3', Win(42, 4))
+        self.scoreTest('s1s1s1s1 s2s2s2 s3s3s3 s4s4s4 s5s5 mw Ls3s3s3s3', Win(42, 4))
         self.scoreTest('RB2C1B2C1B2C1WeWeS4WeS4WeS6 LC1', [NoWin(20, 3), NoWin(20, 2)])
         self.scoreTest('b6b6b6 RB1B1B2B2B3B3B7S7C7B8 LB3', NoWin(2))
         self.scoreTest('RB1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw LDrDrDr',
                        [Win(54, 3), NoWin()])
         self.scoreTest('RB1B1B1B2B2B2B5B5B5B7B8B9DrDr fe fs fn fw LDrDrDr',
                        [Win(62, 4), Win(56, 4)])
-        self.scoreTest('RB1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw m..e LDrDrDr',
+        self.scoreTest('RB1B1B1B1B2B3B4B5B6B7B8B9DrDr fe fs fn fw me LDrDrDr',
                        [Win(54, 4), NoWin()])
-        self.scoreTest('RB1B1B1B1B2B3B4B4B4B7B7B7DrDr fe fs fn fw m..z LDrDrDr',
+        self.scoreTest('RB1B1B1B1B2B3B4B4B4B7B7B7DrDr fe fs fn fw mz LDrDrDr',
                        [Win(62, 5), Win(56, 5)])
-        self.scoreTest('RB1B1B1B1B2B3B4B4B4B7B7B7DrDr fe fs fn fw m..Z LDrDrDr',
+        self.scoreTest('RB1B1B1B1B2B3B4B4B4B7B7B7DrDr fe fs fn fw mZ LDrDrDr',
                        [Win(62, 5), Win(56, 5)])
-        self.scoreTest('drdr RB1B1B1B1B2B3B4B5B6B7B8B9 fe fs fn fw m..Z Ldrdrdr',
+        self.scoreTest('drdr RB1B1B1B1B2B3B4B5B6B7B8B9 fe fs fn fw mZ Ldrdrdr',
                        [Win(52, 3), NoWin()])
         self.scoreTest('RB1B1B1B1B2B3B4B5B6B7B8B8B2B2 fe fs fn fw LB4', NoWin())
         self.scoreTest('RB1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw LB4',
                        [NoWin(28, 1), NoWin(28, 3)])
-        self.scoreTest('wewe wswsws RWnWnWn wwwwwwww b1b1b1 m..z Lb1b1b1b1',
+        self.scoreTest('wewe wswsws RWnWnWn wwwwwwww b1b1b1 mz Lb1b1b1b1',
                        [Win(54, 6), Win(54, 4)], winds='ne')
-        self.scoreTest('wswsws RWeWeWnWnWnB1B1B1 wwwwwwww m..z LB1B1B1B1',
+        self.scoreTest('wswsws RWeWeWnWnWnB1B1B1 wwwwwwww mz LB1B1B1B1',
                        [Win(60, 6), Win(60, 4)], winds='ne')
-        self.scoreTest('RB2B2 b4b4b4 b5b6b7 b7b8b9 c1c1c1 m..d Lb7b7b8b9', [Win(28), NoWin()])
-        self.scoreTest('RB8B8 s4s4s4 b1b2b3 b4b5b6 c1c1c1 m..d Lb3b1b2b3', [Win(28), NoWin()])
-        self.scoreTest('RB2B2 s4s4s4 b1b2b3 b4b5b6 c1c1c1 m..d Lb3b1b2b3', [Win(26), NoWin()])
-        self.scoreTest('RB2B2 s4s4s4 b1b2b3 b4b5b6 c1c1c1 m..d Lb3b1b2b3', [Win(26), NoWin()])
+        self.scoreTest('RB2B2 b4b4b4 b5b6b7 b7b8b9 c1c1c1 md Lb7b7b8b9', [Win(28), NoWin()])
+        self.scoreTest('RB8B8 s4s4s4 b1b2b3 b4b5b6 c1c1c1 md Lb3b1b2b3', [Win(28), NoWin()])
+        self.scoreTest('RB2B2 s4s4s4 b1b2b3 b4b5b6 c1c1c1 md Lb3b1b2b3', [Win(26), NoWin()])
+        self.scoreTest('RB2B2 s4s4s4 b1b2b3 b4b5b6 c1c1c1 md Lb3b1b2b3', [Win(26), NoWin()])
 class TwofoldFortune(Base):
     """Twofold fortune"""
     def testMe(self):
-        self.scoreTest('b1B1B1b1 RB2B3B4B5B6B7 b8b8b8b8 b5b5 fe fs fn fw m...t LB4', [Win(limits=1), NoWin()])
-        self.scoreTest('b1B1B1b1 RB2B3B4B6B6B6 b8b8b8b8 b5b5 fe fs fn fw m...t LB4', Win(limits=1))
+        self.scoreTest('b1B1B1b1 RB2B3B4B5B6B7 b8b8b8b8 b5b5 fe fs fn fw m.t LB4', [Win(limits=1), NoWin()])
+        self.scoreTest('b1B1B1b1 RB2B3B4B6B6B6 b8b8b8b8 b5b5 fe fs fn fw m.t LB4', Win(limits=1))
 class OriginalCall(Base):
     """original call"""
     def testMe(self):
         # in DMJL, b4 would also win:
-        self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5B5 fn yn m...a LB5',
+        self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5B5 fn yn m.a LB5',
                        [Win(44, 2), Win(42, 3)], winds='ne')
-        self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5 fn yn m...a LB5',
+        self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5 fn yn m.a LB5',
                        [NoWin(20, 1), NoWin(20, 2)], winds='ne')
 class RobbingKong(Base):
     """robbing the kong"""
     def testMe(self):
         # this hand is only possible if the player declared a hidden chow.
         # is that legal?
-        self.scoreTest('s1s2s3 s1s2s3 RB6B6B7B7B8B8B5 fn yn m...a LB5',
+        self.scoreTest('s1s2s3 s1s2s3 RB6B6B7B7B8B8B5 fn yn m.a LB5',
                        [NoWin(8, 1), NoWin(8, 2)], winds='ne')
-        self.scoreTest('s1s2s3 s2s3s4 RB6B6B7B7B8B8B5B5 fn yn m..ka Ls1s1s2s3',
+        self.scoreTest('s1s2s3 s2s3s4 RB6B6B7B7B8B8B5B5 fn yn mka Ls1s1s2s3',
                        [Win(28, 4), NoWin()], winds='ne')
-        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8B5B5 fn yn m...a LS1S1S2S3',
+        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8B5B5 fn yn m.a LS1S1S2S3',
                        [Win(30, 3), NoWin()], winds='ne')
-        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 fn yn m...a Ls4s4s5s6',
+        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 fn yn m.a Ls4s4s5s6',
                        [NoWin(8, 1), NoWin(8, 2)], winds='ne')
 class Blessing(Base):
     """blessing of heaven or earth"""
     def testMe(self):
-        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 b5b5 fn yn m..1 LS1S1S2S3',
+        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 b5b5 fn yn m1 LS1S1S2S3',
                        [Win(limits=1), NoWin()])
-        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 b5b5 fn yn m..1 LS1S1S2S3',
+        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 b5b5 fn yn m1 LS1S1S2S3',
                        [Win(limits=1), NoWin()])
-        self.scoreTest('s4s5s6 RS1S1S1B6B6B6B8B8B8 b5b5 fn yn m..1 LS1S1S1S1',
+        self.scoreTest('s4s5s6 RS1S1S1B6B6B6B8B8B8 b5b5 fn yn m1 LS1S1S1S1',
                        Win(limits=1))
 
 class Terminals(Base):
@@ -473,7 +473,7 @@ class MJ(Base):
 class LastIsOnlyPossible(Base):
     """tests for determining if this was the only possible last tile"""
     def testMe(self):
-        self.scoreTest('s2s3s4 DrDr S1S2S3 S6S7S8 B5B6B7 fw yw fs m..d Ls2s2s3s4', [Win(34), NoWin(0)])
+        self.scoreTest('s2s3s4 DrDr S1S2S3 S6S7S8 B5B6B7 fw yw fs md Ls2s2s3s4', [Win(34), NoWin(0)])
         self.scoreTest('b3B3B3b3 wewewewe s2s2 RDbDbDbDrDrDr Ls2s2s2',
             [Win(72, 6), Win(68, 5)], totals=(500, 1000, 4608, 2176))
         self.scoreTest('b3B3B3b3 wewewe RDbDbDbS1S1S1S2S2 LS2S2S2', [Win(60, 5), Win(58, 4)])
@@ -496,7 +496,7 @@ class TripleKnitting(Base):
         self.scoreTest('RS2B2C2S4B4C4S6B6C6S4B4C4 s8c8 Ls8s8c8', [NoWin(), Win(limits=0.5)])
         self.scoreTest('RS2B2C2S3B3C3S4B4C4S4B4C4 s8c8 Ls8s8c8', [NoWin(), Win(limits=0.5)])
         self.scoreTest('RB2C2B3C3B4C4S4B4C4 s2s3s4 s8c8 Ls8s8c8', NoWin())
-        self.scoreTest('RB5S7B7B3B9S7S6C9C3B7S3 c5c6c7 m..w LS3', NoWin())
+        self.scoreTest('RB5S7B7B3B9S7S6C9C3B7S3 c5c6c7 mw LS3', NoWin())
         self.scoreTest('RC1C2C5C8C9S2S4S9B4B5B6B6B8S1', NoWin())
         self.scoreTest('RC1C2C5C8C9S2S4S9B4B5B6B6B8', NoWin())
         self.scoreTest('RS2B2C2S4B4C4S6B6C6S4B4C4S8', [NoWin(), NoWin(limits=0.2)])
@@ -514,8 +514,8 @@ class Knitting(Base):
         self.scoreTest('RS2B2S2B2S4B4S5B5S6B6S7B7 s9b9 Ls9s9b9', [NoWin(), Win(limits=0.5)])
         self.scoreTest('RS2S3S4S5S6S7S9B2B3B4B5B6B7B9 LB9', [NoWin(), Win(limits=0.5)])
         self.scoreTest('RS3S4S5S6S7S9B2B3B4B5B6B7B9 LB9', [NoWin(), NoWin(limits=0.2)])
-        self.scoreTest('RS3S4S9S9B1B1B2B3B4B8B8 s2s2s2 fs m..w LS4', NoWin())
-        self.scoreTest('RS3S9S9B1B1B2B3B8B8S2S2S2 s4b4 fs m..w Ls4', NoWin())
+        self.scoreTest('RS3S4S9S9B1B1B2B3B4B8B8 s2s2s2 fs mw LS4', NoWin())
+        self.scoreTest('RS3S9S9B1B1B2B3B8B8S2S2S2 s4b4 fs mw Ls4', NoWin())
         self.callingTest('RS2B2S3B3S4B4S5B5S6B6S7B7S9 LB7', ['s9', 'b9'])
 
 class AllPairHonors(Base):
@@ -537,7 +537,7 @@ class LastTile(Base):
     def testMe(self):
         self.scoreTest('wewewe s1s1s1 b9b9b9 RC1C1C1C2C3 LC1', [Win(38, 2), Win(34, 2)])
         self.scoreTest('wewewe s1s1s1 b9b9b9 RC1C2C3C3C3 LC3', [Win(38, 2), Win(34, 2)])
-        self.scoreTest('b5b6b7 s1s1s1 RB8C6C7C5B8B8C7C7 m..w LC7', [Win(32, 0), NoWin()])
+        self.scoreTest('b5b6b7 s1s1s1 RB8C6C7C5B8B8C7C7 mw LC7', [Win(32, 0), NoWin()])
 
 class CallingHands(Base):
     """diverse calling hands"""

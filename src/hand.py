@@ -106,8 +106,8 @@ class Hand(object):
         self.ruleCache = {}
         tileStrings = []
         for part in self.string.split():
-            partId = part[:1]
-            if partId in 'Mmx':
+            partId = part[0]
+            if partId == 'm':
                 self.mjStr += ' ' + part
             elif partId == 'L':
                 if len(part[1:]) > 8:
@@ -328,10 +328,10 @@ class Hand(object):
                     self.__lastMeld = Meld(part[2:])
                 self.__lastTile = Tile(part[:2])
             elif part[0] == 'm':
-                if len(part) > 3:
-                    self.__lastSource = part[3:4]
-                    if len(part) > 4:
-                        self.__announcements = part[4:]
+                if len(part) > 1:
+                    self.__lastSource = part[1]
+                    if len(part) > 2:
+                        self.__announcements = part[2]
         if self.__lastTile:
             assert self.__lastTile.isBonus or self.__lastTile in self.tiles, \
                 'lastTile %s is not in hand %s, mjStr=%s' % (
@@ -405,7 +405,7 @@ class Hand(object):
         parts.extend(str(x[0]) for x in self.bonusMelds)
         parts.append('R' + ''.join(str(x) for x in sorted(self.tilesInHand + [addTile])))
         if self.announcements:
-            parts.append('m..' + self.announcements)
+            parts.append('m' + self.announcements)
         parts.append('L' + addTile)
         return Hand(self.player, ' '.join(parts).strip(), prevHand=self)
 
@@ -440,8 +440,8 @@ class Hand(object):
         newParts = []
         for idx, part in enumerate(self.mjStr.split()):
             if part[0] == 'm':
-                if len(part) > 3 and part[3:4] == 'k':
-                    part = part[:3]
+                if len(part) > 1 and part[1] == 'k':
+                    continue
             elif part[0] == 'L':
                 if self.lastTile.isExposed and self.lastTile.upper() in tilesInHand:
                     part = 'L' + self.lastTile.upper()

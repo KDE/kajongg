@@ -370,7 +370,7 @@ class ScoringPlayer(VisiblePlayer, Player):
                     lastSource = options['lastsource']
             if 'declaration' in options:
                 declaration = options['declaration']
-        return ''.join(['m..', lastSource, declaration])
+        return ''.join(['m', lastSource, declaration])
 
     def __lastString(self):
         """compile hand info into a string as needed by the scoring engine"""
