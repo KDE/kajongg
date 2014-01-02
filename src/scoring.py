@@ -302,6 +302,10 @@ class ScoringPlayer(VisiblePlayer, Player):
             self.handBoard.showMoveHelper()
         self.manualRuleBoxes = []
 
+    def explainHand(self):
+        """returns the hand to be explained"""
+        return self.hand
+
     @property
     def handTotal(self):
         """the hand total of this player"""
@@ -310,10 +314,6 @@ class ScoringPlayer(VisiblePlayer, Player):
             return spValue.value()
         else:
             return self.hand.total()
-
-    def handTotalForWall(self):
-        """returns the total for the current hand"""
-        return self.handTotal
 
     def hasManualScore(self):
         """True if no tiles are assigned to this player"""

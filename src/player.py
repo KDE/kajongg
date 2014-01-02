@@ -258,7 +258,7 @@ class Player(object):
 
     @property
     def handTotal(self):
-        """the hand total of this player"""
+        """the hand total of this player for the final scoring"""
         if not self.game.winner:
             return 0
         else:

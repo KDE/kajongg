@@ -549,11 +549,12 @@ class ExplainView(QListView):
             lines.append('')
             for player in self.game.players:
                 pLines = []
-                if player.hand and player.hand.hasTiles():
-                    total = player.hand.total()
+                explainHand = player.explainHand()
+                if explainHand.hasTiles():
+                    total = explainHand.total()
                     if total:
                         pLines = ['%s - %s' % (player.localName, total)]
-                        for line in player.hand.explain():
+                        for line in explainHand.explain():
                             pLines.append('- ' + line)
                 elif player.handTotal:
                     pLines.append(m18n('Manual score for %1: %2 points', player.localName, player.handTotal))

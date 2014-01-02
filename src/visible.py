@@ -87,8 +87,8 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         if self.handBoard:
             self.handBoard.setEnabled(self.game and self.game.belongsToHumanPlayer() and self == self.game.myself)
 
-    def handTotalForWall(self):
-        """returns the totale for the new hand. Same as current unless we need to discard.
+    def explainHand(self):
+        """returns the hand to be explained. Same as current unless we need to discard.
         In that case, make an educated guess about the discard. For player==game.myself, use
         the focussed tile."""
         hand = self.hand
@@ -98,7 +98,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
                     hand -= Tile.unknown
                 elif self.handBoard.focusTile:
                     hand -= self.handBoard.focusTile.tile
-        return hand.total()
+        return hand
 
     def colorizeName(self):
         """set the color to be used for showing the player name on the wall"""
