@@ -210,9 +210,18 @@ class AIDefault(object):
         for candidate in candidates:
             newHand = candidates.hand - candidate.tile.capitalize()
             winningTiles = newHand.chancesToWin()
-            for winnerTile in set(winningTiles):
-                candidate.keep -= (newHand + winnerTile.upper()).total() / 10.017
             if winningTiles:
+                for winnerTile in set(winningTiles):
+                    winnerHand = newHand + winnerTile.upper()
+                    if Debug.robotAI:
+                        aiInstance.player.game.debug('weighCallingHand %s cand %s winnerTile %s winnerHand %s: %s' % (
+                            newHand, candidate, winnerTile, winnerHand, '     '.join(winnerHand.explain())))
+                    keep = winnerHand.total() / 10.017
+                    candidate.keep -= keep
+                    if Debug.robotAI:
+                        aiInstance.player.game.debug(
+                            'weighCallingHand %s winnerTile %s: discardCandidate %s keep -= %s' % (
+                            newHand, winnerTile, candidate, keep))
                 # more weight if we have several chances to win
                 candidate.keep -= float(len(winningTiles)) / len(set(winningTiles)) * 5.031
                 if Debug.robotAI:
@@ -234,8 +243,8 @@ class AIDefault(object):
         if discard:
             for rule in self.player.game.ruleset.filterRules('claimness'):
                 claimness += rule.claimness(hand, discard)
-        if Debug.robotAI and len(claimness):
-            hand.debug('claimnesses in selectAnswer:%s' % claimness)
+                if Debug.robotAI:
+                    hand.debug('%s: claimness in selectAnswer:%s' % (rule.name, claimness))
         for tryAnswer in tryAnswers:
             parameter = self.player.sayable[tryAnswer]
             if not parameter:
