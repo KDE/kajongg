@@ -399,7 +399,7 @@ class ScoringPlayer(VisiblePlayer, Player):
     def addMeld(self, meld):
         """add meld to this hand in a scoring game"""
         meld = Meld(meld)  # convert UITile to Tile
-        if len(meld) == 1 and meld[0].isBonus:
+        if meld.isBonus:
             self._bonusTiles.append(meld[0])
         elif not meld.isExposed and not meld.isKong:
             self._concealedMelds.append(meld)
@@ -410,7 +410,7 @@ class ScoringPlayer(VisiblePlayer, Player):
     def removeMeld(self, uiMeld):
         """remove a meld from this hand in a scoring game"""
         meld = Meld(uiMeld)
-        if len(meld) == 1 and meld[0].isBonus:
+        if meld.isBonus:
             self._bonusTiles.remove(meld[0])
         else:
             popped = False

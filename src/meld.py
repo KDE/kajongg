@@ -81,6 +81,7 @@ class Meld(TileList):
             self.isDragonMeld = len(self) and self[0].isDragon
             self.isWindMeld = len(self) and self[0].isWind
             self.isHonorMeld = self.isDragonMeld or self.isWindMeld
+            self.isBonus = len(self) == 1 and self[0].isBonus
             self.isKnown = len(self) and self[0].isKnown
             self.__setMeldType()
             self.isDeclared = self.isExposed or self.isKong
@@ -261,7 +262,7 @@ class Meld(TileList):
     def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""
         # pylint: disable=too-many-return-statements
-        if self[0].isBonus:
+        if self.isBonus:
             return m18nc('kajongg meld type', 'Bonus')
         elif self.isSingle:
             return m18nc('kajongg meld type','&single')
@@ -280,7 +281,7 @@ class Meld(TileList):
 
     def __stateName(self):
         """the translated name of the state"""
-        if self[0].isBonus or self.isClaimedKong:
+        if self.isBonus or self.isClaimedKong:
             return ''
         elif self.isExposed:
             return m18nc('kajongg meld state', 'Exposed')
