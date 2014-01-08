@@ -146,12 +146,12 @@ class Hand(object):
         if Debug.hand:
             self.debug(fmt('{callers}: new Hand({id(self)} {string} {self.lenOffset} {id(prevHand)})',
                 callers=callers(10, exclude=['__init__'])))
-        self.__splitted = None
+        self.__arranged = None
         self.__won = self.lenOffset == 1 and self.player.mayWin
         try:
-            self.__split()
+            self.__arrange()
             self.__calculate()
-            self.__splitted = True
+            self.__arranged = True
         except Hand.__NotWon:
             self.__won = False
             self.__score = Score()
@@ -161,9 +161,9 @@ class Hand(object):
             self._fixed = True
 
     @property
-    def splitted(self):
+    def arranged(self):
         """readonly"""
-        return self.__splitted
+        return self.__arranged
 
     @property
     def player(self):
@@ -236,7 +236,7 @@ class Hand(object):
     @property
     def score(self):
         """calculate it first if not yet done"""
-        if self.__score is None and self.__splitted is not None:
+        if self.__score is None and self.__arranged is not None:
             self.__score = Score()
             self.__calculate()
         return self.__score
@@ -518,10 +518,10 @@ class Hand(object):
                     matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
                 return sorted(matchingMJRules, key=lambda x: -x.score.total())
 
-    def __arrange(self):
+    def __arrangements(self):
         """find all legal arrangements"""
         self.__rest.sort()
-        arrangements = []
+        result = []
         stdMJ = self.ruleset.standardMJRule
         if self.mjRule:
             rules = [self.mjRule]
@@ -536,12 +536,12 @@ class Hand(object):
                             melds = list(melds)
                             restMelds, _ = next(stdMJ.rearrange(self, rest2[:]))
                             melds.extend(restMelds)
-                        arrangements.append((mjRule, melds))
-        if not arrangements:
-            arrangements.extend((stdMJ, x[0]) for x in stdMJ.rearrange(self, self.__rest[:]))
-        return arrangements
+                        result.append((mjRule, melds))
+        if not result:
+            result.extend((stdMJ, x[0]) for x in stdMJ.rearrange(self, self.__rest[:]))
+        return result
 
-    def __split(self):
+    def __arrange(self):
         """work hard to always return the variant with the highest Mah Jongg value.
         Adds melds to self.melds. A rest will be rearranged by standard rules."""
         for tile in self.__rest[:]:
@@ -557,7 +557,7 @@ class Hand(object):
             return
         wonHands = []
         lostHands = []
-        for mjRule, melds in self.__arrange():
+        for mjRule, melds in self.__arrangements():
             _ = ' '.join(str(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
             tryHand = Hand(self.player, _, prevHand=self)
             if tryHand.won:
@@ -579,11 +579,11 @@ class Hand(object):
     def __gt__(self, other):
         """compares hand values"""
         assert self.player == other.player
-        if not other.splitted:
+        if not other.arranged:
             return True
-        if self.won and not (other.splitted and other.won):
+        if self.won and not (other.arranged and other.won):
             return True
-        elif not (self.splitted and self.won) and other.won:
+        elif not (self.arranged and self.won) and other.won:
             return False
         else:
             return self.intelligence.handValue(self) > self.intelligence.handValue(other)

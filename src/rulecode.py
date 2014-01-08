@@ -217,8 +217,8 @@ class StandardMahJongg(RuleCode):
             return False
         if sum(x.isChow for x in hand.melds) > hand.ruleset.maxChows:
             return False
-        if hand.splitted is None:
-            # this is only __split trying to rearrange
+        if hand.arranged is None:
+            # this is only Hand.__arrange
             return True
         if hand.score.total() < hand.ruleset.minMJPoints:
             return False
