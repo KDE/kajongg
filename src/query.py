@@ -434,6 +434,7 @@ class Query(object):
         if not isinstance(cmdList, list):
             cmdList = list([cmdList])
         self.cmdList = cmdList
+        self.args = args
         for cmd in cmdList:
             self.lastError = None
             if preparedQuery:
@@ -455,7 +456,8 @@ class Query(object):
                 self.success = self.query.exec_(cmd)
             if not self.success:
                 self.lastError = unicode(self.query.lastError().text())
-                self.msg = 'ERROR in %s: %s' % (self.dbHandle.databaseName(), self.lastError)
+                self.msg = 'ERROR in %s: %s for %s' % (self.dbHandle.databaseName(), self.lastError,
+			self)
                 if mayFail:
                     if not failSilent:
                         logDebug(self.msg)
@@ -468,6 +470,10 @@ class Query(object):
         self.fields = None
         if self.query.isSelect():
             self.retrieveRecords()
+
+    def __str__(self):
+        return '{} {}'.format(' '.join(self.cmdList),
+            'args=' + ','.join(str(x) for x in self.args) if self.args else '')
 
     def rowcount(self):
         """how many rows were affected?"""
