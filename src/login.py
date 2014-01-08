@@ -322,13 +322,17 @@ class Connection(object):
         """we are online. Update table server."""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         url = english(self.url) # use unique name for Local Game
-        self.ruleset.save()     # this makes sure we have a valid rulesetId for predefined rulesets
+        if self.ruleset:
+            self.ruleset.save()     # this makes sure we have a valid rulesetId for predefined rulesets
         with Transaction():
-            serverKnown = Query('update server set lastname=?,lasttime=?,lastruleset=? where url=?',
-                list([self.username, lasttime, self.ruleset.rulesetId, url])).rowcount() == 1
+            serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
+                list([self.username, lasttime, url])).rowcount() == 1
             if not serverKnown:
-                Query('insert into server(url,lastname,lasttime,lastruleset) values(?,?,?,?)',
-                    list([url, self.username, lasttime, self.ruleset.rulesetId]))
+                Query('insert into server(url,lastname,lasttime) values(?,?,?)',
+                    list([url, self.username, lasttime]))
+            if self.ruleset:
+                Query('update server set lastruleset=? where url=?',
+                    list([self.ruleset.rulesetId, url]))
         # needed if the server knows our name but our local data base does not:
         Players.createIfUnknown(self.username)
         playerId = Players.allIds[self.username]
