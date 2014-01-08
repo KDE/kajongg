@@ -28,9 +28,9 @@ from twisted.python.failure import Failure
 
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, \
     QLabel, QComboBox, QLineEdit, QFormLayout, \
-    QSizePolicy
+    QSizePolicy, QWidget
 
-from kde import KUser, KDialogButtonBox, appdataDir, socketName
+from kde import KUser, KDialog, KDialogButtonBox, appdataDir, socketName
 from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 
 from log import english, logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
@@ -211,11 +211,8 @@ class AddUserDialog(MustChooseKDialog):
     def __init__(self, url, username, password):
         MustChooseKDialog.__init__(self, None)
         self.setWindowTitle(m18n('Create User Account') + ' - Kajongg')
-        self.buttonBox = KDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
-        vbox = QVBoxLayout(self)
+        self.setButtons(KDialog.ButtonCode(KDialog.Ok | KDialog.Cancel))
+        vbox = QVBoxLayout()
         grid = QFormLayout()
         self.lbServer = QLabel()
         self.lbServer.setText(url)
@@ -229,7 +226,9 @@ class AddUserDialog(MustChooseKDialog):
         self.edPassword2.setEchoMode(QLineEdit.PasswordEchoOnEdit)
         grid.addRow(m18n('Repeat password:'), self.edPassword2)
         vbox.addLayout(grid)
-        vbox.addWidget(self.buttonBox)
+        widget = QWidget(self)
+        widget.setLayout(vbox)
+        self.setMainWidget(widget)
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         self.lbUser.setSizePolicy(pol)
@@ -249,7 +248,7 @@ class AddUserDialog(MustChooseKDialog):
     def validate(self):
         """does the dialog hold valid data?"""
         equal = self.edPassword.size() and self.edPassword.text() == self.edPassword2.text()
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(equal)
+        self.button(KDialog.Ok).setEnabled(equal)
 
     @property
     def username(self):

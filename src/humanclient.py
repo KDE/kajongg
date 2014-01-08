@@ -25,10 +25,10 @@ from twisted.python.failure import Failure
 from twisted.internet.defer import Deferred, succeed, DeferredList
 from PyQt4.QtCore import Qt, QTimer
 from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
-    QLabel, QPushButton, \
+    QLabel, QPushButton, QWidget, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from kde import KIcon
+from kde import KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 
 from util import commit
@@ -51,17 +51,24 @@ class SelectChow(KDialogIgnoringEscape):
     def __init__(self, chows, propose, deferred):
         KDialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
+        self.setButtons(KDialog.None)
         self.chows = chows
         self.selectedChow = None
         self.deferred = deferred
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(m18n('Which chow do you want to expose?')))
+        layout = QVBoxLayout()
+        label = QLabel(m18n('Which chow do you want to expose?'))
+        layout.addWidget(label)
+        layout.setAlignment(label, Qt.AlignHCenter)
         self.buttons = []
         for chow in chows:
             button = QRadioButton('{}-{}-{}'.format(*(x.value for x in chow)))
             self.buttons.append(button)
             layout.addWidget(button)
+            layout.setAlignment(button, Qt.AlignHCenter)
             button.toggled.connect(self.toggled)
+        widget = QWidget(self)
+        widget.setLayout(layout)
+        self.setMainWidget(widget)
         for idx, chow in enumerate(chows):
             if chow == propose:
                 self.buttons[idx].setFocus()
@@ -74,29 +81,28 @@ class SelectChow(KDialogIgnoringEscape):
             self.accept()
             self.deferred.callback((Message.Chow, self.selectedChow))
 
-    def closeEvent(self, event):
-        """allow close only if a chow has been selected"""
-        if self.selectedChow:
-            event.accept()
-        else:
-            event.ignore()
-
 class SelectKong(KDialogIgnoringEscape):
     """asks which of the possible kongs is wanted"""
     def __init__(self, kongs, deferred):
         KDialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
+        self.setButtons(KDialog.None)
         self.kongs = kongs
         self.selectedKong = None
         self.deferred = deferred
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(m18n('Which kong do you want to declare?')))
+        layout = QVBoxLayout()
+        label = QLabel(m18n('Which kong do you want to declare?'))
+        layout.addWidget(label)
+        layout.setAlignment(label, Qt.AlignHCenter)
         self.buttons = []
         for kong in kongs:
             button = QRadioButton((kong[0].name()), self)
             self.buttons.append(button)
             layout.addWidget(button)
             button.toggled.connect(self.toggled)
+        widget = QWidget(self)
+        widget.setLayout(layout)
+        self.setMainWidget(widget)
 
     def toggled(self, dummyChecked):
         """a radiobutton has been toggled"""
@@ -105,13 +111,6 @@ class SelectKong(KDialogIgnoringEscape):
             self.selectedKong = self.kongs[self.buttons.index(button)]
             self.accept()
             self.deferred.callback((Message.Kong, self.selectedKong))
-
-    def closeEvent(self, event):
-        """allow close only if a chow has been selected"""
-        if self.selectedKong:
-            event.accept()
-        else:
-            event.ignore()
 
 class DlgButton(QPushButton):
     """special button for ClientDialog"""
