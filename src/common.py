@@ -167,7 +167,7 @@ class SingleshotOptions(object):
 class Internal(object):
     """global things"""
     Preferences = None
-    version = '4.11.0'
+    version = '4.13.0'
     logPrefix = 'C'
     isServer = False
     scaleScene = True
