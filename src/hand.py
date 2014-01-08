@@ -139,9 +139,9 @@ class Hand(object):
         self.lenOffset = len(self.tiles) - 13 - sum(x.isKong for x in self.declaredMelds)
 
         assert len(tileStrings) < 2, tileStrings
-        self.rest = TileList()
+        self.__rest = TileList()
         if len(tileStrings):
-            self.rest.extend(TileList(tileStrings[0][1:]))
+            self.__rest.extend(TileList(tileStrings[0][1:]))
         self.usedRules = None
         if Debug.hand:
             self.debug(fmt('{callers}: new Hand({id(self)} {string} {self.lenOffset} {id(prevHand)})',
@@ -182,7 +182,7 @@ class Hand(object):
 
     def __calculate(self):
         """apply rules, calculate score"""
-        assert not self.rest, 'Hand.__calculate expects there to be no rest tiles: %s' % self
+        assert not self.__rest, 'Hand.__calculate expects there to be no rest tiles: %s' % self
         oldWon = self.__won
         self.__applyRules()
         if len(self.lastMelds) > 1:
@@ -520,7 +520,7 @@ class Hand(object):
 
     def __arrange(self):
         """find all legal arrangements"""
-        self.rest.sort()
+        self.__rest.sort()
         arrangements = []
         stdMJ = self.ruleset.standardMJRule
         if self.mjRule:
@@ -530,25 +530,25 @@ class Hand(object):
         for mjRule in rules:
             if ((self.lenOffset == 1 and mjRule.appliesToHand(self))
                     or (self.lenOffset < 1 and mjRule.shouldTry(self))):
-                if self.rest:
-                    for melds, rest2 in mjRule.rearrange(self, self.rest[:]):
+                if self.__rest:
+                    for melds, rest2 in mjRule.rearrange(self, self.__rest[:]):
                         if rest2:
                             melds = list(melds)
                             restMelds, _ = next(stdMJ.rearrange(self, rest2[:]))
                             melds.extend(restMelds)
                         arrangements.append((mjRule, melds))
         if not arrangements:
-            arrangements.extend((stdMJ, x[0]) for x in stdMJ.rearrange(self, self.rest[:]))
+            arrangements.extend((stdMJ, x[0]) for x in stdMJ.rearrange(self, self.__rest[:]))
         return arrangements
 
     def __split(self):
         """work hard to always return the variant with the highest Mah Jongg value.
         Adds melds to self.melds. A rest will be rearranged by standard rules."""
-        for tile in self.rest[:]:
+        for tile in self.__rest[:]:
             if not tile.isKnown:
-                self.rest.remove(tile)
+                self.__rest.remove(tile)
                 self.melds.append(Meld(tile))
-        if not self.rest:
+        if not self.__rest:
             self.melds.sort()
             mjRules = self.__maybeMahjongg()
             self.__won &= bool(mjRules)
@@ -571,7 +571,7 @@ class Hand(object):
         self.mjRule = bestRule
         self.melds.extend(bestVariant)
         self.melds.sort()
-        self.rest = []
+        self.__rest = []
         self.ruleCache.clear()
         assert sum(len(x) for x in self.melds) == len(self.tiles), '%s != %s' % (
             self.melds, self.tiles)
@@ -686,7 +686,7 @@ class Hand(object):
 
     def __str__(self):
         """hand as a string"""
-        rest = 'REST ' + ''.join(str(x) for x in self.rest)
+        rest = 'REST ' + ''.join(str(x) for x in self.__rest)
         return ' '.join(str(x) for x in (self.melds, rest, self.bonusMelds, self.mjStr)).replace('  ', ' ')
 
     def __repr__(self):
