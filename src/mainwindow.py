@@ -243,13 +243,10 @@ class MainWindow(KXmlGuiWindow):
 
     def closeAction(self):
         """quit kajongg"""
-        def closeNow(dummy):
-            """user aborted running game"""
-            self.close()
+        # calling self.close() is not helpful: closeQuery or closeEvent are never called
         if self.scene:
-            self.abortAction().addCallback(closeNow)
+            self.abortAction().addCallback(self.quitProgram)
         else:
-            self.close()
             self.quitProgram()
 
     def abortAction(self):
@@ -442,6 +439,7 @@ class MainWindow(KXmlGuiWindow):
         # catch sys.exit as an exception
         # and the qt4reactor does not quit the app when being stopped
         Internal.quitWaitTime = 0
+        Internal.reactor.callLater(0.1, self.appquit)
         QTimer.singleShot(10, self.appquit)
 
     @classmethod
@@ -451,6 +449,7 @@ class MainWindow(KXmlGuiWindow):
             Internal.quitWaitTime += 10
             if Internal.quitWaitTime % 1000 == 0:
                 logDebug('waiting since %d seconds for reactor to stop' % (Internal.quitWaitTime // 1000))
+            Internal.reactor.callLater(0.1, cls.appquit)
             QTimer.singleShot(10, cls.appquit)
         else:
             if Internal.quitWaitTime > 1000:
