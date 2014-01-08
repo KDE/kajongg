@@ -467,7 +467,7 @@ class Connection(object):
             if not AddUserDialog(self.dlg.url,
                 self.dlg.username,
                 self.dlg.password).exec_():
-                return
+                raise CancelledError
             Players.createIfUnknown(self.username)
         adduserCmd = SERVERMARK.join(['adduser', self.dlg.username, self.dlg.password])
         return self.loginCommand(adduserCmd)
@@ -493,10 +493,9 @@ class Connection(object):
 
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""
-        failure.trap(CancelledError, TimeoutError, ConnectionRefusedError, DNSLookupError)
+        msg = None
         if failure.check(CancelledError):
-            # show no warning, just leave
-            return failure
+            pass
         elif failure.check(TimeoutError):
             msg = m18n('Server %1 did not answer', self.url)
         elif failure.check(ConnectionRefusedError):
@@ -506,16 +505,18 @@ class Connection(object):
         elif failure.check(DNSLookupError):
             msg = m18n('Address for server %1 cannot be found' , self.url)
         else:
-            msg = 'Login to server {} failed: {}/{}'.format(
-                self.url, failure.value.__class__.__name__, failure.getErrorMessage())
+            msg = 'Login to server {} failed: {}/{} Callstack:{}'.format(
+                self.url, failure.value.__class__.__name__, failure.getErrorMessage(),
+                failure.getTraceback())
             # Maybe the server is running but something is wrong with it
             if self.useSocket and os.name != 'nt':
                 if removeIfExists(socketName()):
                     logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
                 msg += '\n\n\n' + m18n('Please try again')
         self.dlg = None
-        logWarning(msg)
-        return failure
+        if msg:
+            logWarning(msg)
+        raise CancelledError
 
     def pingLater(self, dummyResult=None):
         """ping the server every 5 seconds"""
