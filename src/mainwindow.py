@@ -244,16 +244,18 @@ class MainWindow(KXmlGuiWindow):
     def closeAction(self):
         """quit kajongg"""
         # calling self.close() is not helpful: closeQuery or closeEvent are never called
+        def answered(result):
+            """quit if the active game has been aborted"""
+            if result:
+                self.quitProgram()
         if self.scene:
-            self.abortAction().addCallback(self.quitProgram)
+            self.abortAction().addCallback(answered)
         else:
             self.quitProgram()
 
     def abortAction(self):
         """abort current game"""
-        def doNotQuit(dummy):
-            """ignore failure to abort"""
-        return self.scene.abort().addErrback(doNotQuit)
+        return self.scene.abort()
 
     def retranslateUi(self):
         """retranslate"""

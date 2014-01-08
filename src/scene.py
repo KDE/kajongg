@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from log import m18n, m18nc, logDebug
 from common import LIGHTSOURCES, Internal, isAlive, ZValues
-from twisted.internet.defer import succeed, fail
+from twisted.internet.defer import succeed
 
 from PyQt4.QtCore import Qt, QMetaObject
 from PyQt4.QtGui import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
@@ -364,10 +364,9 @@ class PlayingScene(GameScene):
             """user answered"""
             if result:
                 self.game = None
-                return succeed(None)
             else:
                 self.mainWindow.actionAutoPlay.setChecked(autoPlaying)
-                return fail(Exception('no abort'))
+            return result
         if not self.game:
             return succeed(None)
         autoPlaying = self.mainWindow.actionAutoPlay.isChecked()
@@ -492,6 +491,7 @@ class ScoringScene(GameScene):
             """got answer"""
             if result:
                 self.game = None
+            return result
         if not self.game:
             return succeed(None)
         elif self.game.finished():
