@@ -206,7 +206,7 @@ class Client(object, pb.Referenceable):
         in our local data base - we want to use the same gameid everywhere"""
         with Transaction():
             query = Query('insert into game(id,seed) values(?,?)',
-                      list([gameid, self.connection.url]), mayFail=True)
+                      list([gameid, self.connection.url]), mayFail=True, failSilent=True)
             if query.rowcount() != 1:
                 return Message.NO
         return Message.OK

@@ -339,7 +339,7 @@ class ServerTable(Table):
         while True:
             with Transaction():
                 query = Query('insert into game(id,seed) values(?,?)',
-                      list([gameid, 'proposed']), mayFail=True)
+                      list([gameid, 'proposed']), mayFail=True, failSilent=True)
                 if query.success:
                     break
                 gameid += random.randrange(1, 100)
