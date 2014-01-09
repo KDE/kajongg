@@ -261,7 +261,8 @@ class Job(object):
     def logFile(self):
         """open if needed"""
         if self.__logFile is None:
-            logDir = os.path.join('log', str(self.game), self.ruleset, self.aiVariant)
+            logDir = os.path.expanduser(os.path.join('~', '.kajongg', 'log', str(self.game),
+                self.ruleset, self.aiVariant))
             if not os.path.exists(logDir):
                 os.makedirs(logDir)
             logFileName = self.commitId
@@ -478,13 +479,9 @@ def parse_options():
     parser.add_option('', '--ai', dest='aiVariants',
         default=None, help='use AI variants: comma separated list',
         metavar='AI')
-    parser.add_option('', '--csv', dest='csv',
-        default='kajongg.csv', help='write results to CSV',
-        metavar='CSV')
     parser.add_option('', '--log', dest='log', action='store_true',
-        default=False, help='write detailled debug info to LOG/game/ruleset/commit.' \
-                ' This starts a separate server process per job.',
-        metavar='LOG')
+        default=False, help='write detailled debug info to ~/.kajongg/log/game/ruleset/commit.' \
+                ' This starts a separate server process per job.')
     parser.add_option('', '--game', dest='game',
         help='start first game with GAMEID, increment for following games.'
             ' Without this, random values are used.',
@@ -550,8 +547,6 @@ def improve_options():
             OPTIONS.git = onlyExistingCommits(OPTIONS.git.split(','))
             if not OPTIONS.git:
                 sys.exit(1)
-        if OPTIONS.csv:
-            OPTIONS.csv = os.path.abspath(OPTIONS.csv)
     if OPTIONS.log:
         OPTIONS.servers = OPTIONS.clients
         if not OPTIONS.debug:
@@ -588,6 +583,9 @@ def main():
     initLog('kajonggtest')
 
     (OPTIONS, args) = parse_options()
+    OPTIONS.csv = os.path.expanduser(os.path.join('~', '.kajongg', 'kajongg.csv'))
+    if not os.path.exists(os.path.dirname(OPTIONS.csv)):
+        os.makedirs(os.path.dirname(OPTIONS.csv))
 
     removeInvalidCommits(OPTIONS.csv)
 
