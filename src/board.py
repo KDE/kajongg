@@ -694,9 +694,9 @@ class SelectorBoard(CourtBoard):
     def __placeAvailable(self, uiTile):
         """place the uiTile in the selector at its place"""
         # define coordinates and order for tiles:
-        offsets = {'d': (3, 6, 'bgr'), 'f': (4, 5, 'eswn'), 'y': (4, 0, 'eswn'),
-            'w': (3, 0, 'eswn'), 'b': (1, 0, '123456789'), 's': (2, 0, '123456789'),
-            'c': (0, 0, '123456789')}
+        offsets = {Tile.dragon: (3, 6, Tile.dragons), Tile.flower: (4, 5, Tile.winds), Tile.season: (4, 0, Tile.winds),
+            Tile.wind: (3, 0, Tile.winds), Tile.bamboo: (1, 0, Tile.numbers), Tile.stone: (2, 0, Tile.numbers),
+            Tile.character: (0, 0, Tile.numbers)}
         row, baseColumn, order = offsets[uiTile.tile.lowerGroup]
         column = baseColumn + order.index(uiTile.tile.value)
         uiTile.dark = False

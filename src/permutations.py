@@ -58,7 +58,7 @@ class Permutations(object):
         variants = []
         for group in Tile.colors.upper():
             gTiles = list(x for x in self.tiles if x.group == group)
-            groupVariants = self.__colorVariants(group, ''.join(x.value for x in gTiles))
+            groupVariants = self.__colorVariants(group, list(x.value for x in gTiles))
             if len(groupVariants):
                 variants.append(groupVariants)
         result = []
@@ -71,7 +71,7 @@ class Permutations(object):
     @classmethod
     def permute(cls, values):
         """returns all groupings into melds.
-        values is a tuple of int, range ord('1')..ord('9')."""
+        values is a tuple of int, range 1..9"""
         assert isinstance(values, tuple)
         values = list(values)
         result = list()
@@ -139,7 +139,7 @@ class Permutations(object):
         """generates all possible meld variants out of original
         where values is a string like '113445'.
         Returns lists of Meld"""
-        allValues = sorted(ord(x) for x in values)
+        allValues = sorted(values)
         vSet = set(allValues)
         groups = []
         for border in sorted(x+1 for x in sorted(vSet) if x+1 not in vSet):

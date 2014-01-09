@@ -125,7 +125,7 @@ class Hand(object):
         tileString = ' '.join(tileStrings)
         self.tiles = TileList(tileString.replace(' ', '').replace('R', ''))
         self.tiles.sort()
-        self.values = ''.join(x.value for x in self.tiles)
+        self.values = tuple(x.value for x in self.tiles)
         self.suits = set(x.lowerGroup for x in self.tiles)
         for part in tileStrings[:]:
             if part[:1] != 'R':

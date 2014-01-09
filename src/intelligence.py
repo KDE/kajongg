@@ -397,13 +397,13 @@ class DiscardCandidates(list):
             if this.group in Tile.colors:
                 thisValue = this.value
                 if prev and prev.group == this.group:
-                    if ord(prev.value) + 1 == ord(thisValue):
+                    if prev.value + 1 == thisValue:
                         prev.next = this
                         this.prev = prev
-                    if ord(prev.value) + 2 == ord(thisValue):
+                    if prev.value + 2 == thisValue:
                         prev.next2 = this
                         this.prev2 = prev
-                if prev2 and prev2.group == this.group and ord(prev2.value) + 2 == ord(thisValue):
+                if prev2 and prev2.group == this.group and prev2.value + 2 == thisValue:
                     prev2.next2 = this
                     this.prev2 = prev2
             prev2 = prev
@@ -412,7 +412,7 @@ class DiscardCandidates(list):
             if this.group in Tile.colors:
                 # we want every tile to have prev/prev2/next/next2
                 # the names do not matter, just occurrence, available etc
-                thisValue = ord(this.value)
+                thisValue = this.value
                 if not this.prev:
                     this.prev = TileAI(self, Tile(this.group, thisValue-1))
                 if not this.prev2:

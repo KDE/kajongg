@@ -27,18 +27,17 @@ class Tile(str):
     """a single tile, represented as a string of length 2.
 
     always True:
-    - only for suits: tile.group + chr(tile.value) == str(tile)
+    - only for suits: tile.group + chr(tile.value + 48) == str(tile)
     - Tile(tile) is tile
     - Tile(tile.group, tile.value) is tile
 
     Tile() accepts
     - another Tile
     - a string, length 2
-    - two args: a char and either a char or an int ord('1')-2 .. ord('9')+2
+    - two args: a char and either a char or an int -1..11
 
     group is a char: b=bonus w=wind d=dragon X=unknown
-    value is ord('1')..ord('9') for real suit tiles, extended range for usage in AI,
-       and a char for dragons, winds,boni
+    value is 1..9 for real suit tiles, -1/0/10/11 for usage in AI, and a char for dragons, winds,boni
     """
     # pylint: disable=too-many-public-methods, abstract-class-not-used, too-many-instance-attributes
     cache = {}
@@ -63,10 +62,10 @@ class Tile(str):
     red = 'r'
     dragons = white + green + red
     honors = wind + dragon
-    minors = '2345678'
-    terminals = '19'
-    numbers = '123456789'
-    majors = honors + terminals
+    numbers = range(1, 10)
+    terminals = list([1, 9])
+    minors = range(2, 9)
+    majors = list(honors) + terminals
     east = 'e'
     south = 's'
     west = 'w'
@@ -88,25 +87,28 @@ class Tile(str):
         else:
             arg0, arg1 = args
         if isinstance(arg1, int):
-            arg1 = chr(arg1)
+            arg1 = chr(arg1 + 48)
         what = arg0 + arg1
         return str.__new__(cls, what)
 
     def __init__(self, *dummyArgs):
         # pylint: disable=super-init-not-called
         if not hasattr(self, '_fixed'): # already defined if I am from cache
-            self.group, self.value = self
+            self.group = self[0]
             self.lowerGroup = self.group.lower()
             self.isExposed = self.group == self.lowerGroup
             self.isBonus = self.group in Tile.boni
             self.isDragon = self.lowerGroup == Tile.dragon
             self.isWind = self.lowerGroup == Tile.wind
             self.isHonor = self.isDragon or self.isWind
-            self.isTerminal = self.value in Tile.terminals
 
             if self.isHonor or self.isBonus:
+                self.value = self[1]
+                self.isTerminal = False
                 self.isReal = True
             else:
+                self.value = ord(self[1]) - 48
+                self.isTerminal = self.value in Tile.terminals
                 self.isReal = self.value in Tile.numbers
             self.isMajor = self.isHonor or self.isTerminal
             self.isMinor = not self.isMajor
@@ -159,7 +161,7 @@ class Tile(str):
 
     def nextForChow(self):
         """the following tile for a chow"""
-        return Tile(self.group, ord(self.value) + 1)
+        return Tile(self.group, self.value + 1)
 
     def __repr__(self):
         """default representation"""
@@ -178,8 +180,9 @@ class Tile(str):
         names = {'y':m18nc('kajongg','tile'), Tile.white:m18nc('kajongg','white'),
             Tile.red:m18nc('kajongg','red'), Tile.green:m18nc('kajongg','green'),
             Tile.east:m18nc('kajongg','East'), Tile.south:m18nc('kajongg','South'), Tile.west:m18nc('kajongg','West'),
-            Tile.north:m18nc('kajongg','North'),
-            '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6':'6', '7':'7', '8':'8', '9':'9'}
+            Tile.north:m18nc('kajongg','North')}
+        for idx in Tile.numbers:
+            names[idx] = chr(idx + 48)
         return names[self.value]
 
     def name(self):
@@ -284,11 +287,10 @@ class TileList(list):
         if tile.lowerGroup not in Tile.colors:
             return []
         group = tile.group
-        value = ord(tile.value)
-        values = set(ord(x.value) for x in self if x.group == group)
+        values = set(x.value for x in self if x.group == group)
         chows = []
         for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0,  1)]:
-            subset = set([value + x for x in offsets])
+            subset = set([tile.value + x for x in offsets])
             if subset <= values:
                 chow = TileList(Tile(group, x) for x in sorted(subset))
                 if chow not in chows:

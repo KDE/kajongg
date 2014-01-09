@@ -223,7 +223,7 @@ class Meld(TileList):
         # length is 3
         if len(groups) == 1:
             if groups.pop().lower() in Tile.colors:
-                values = list(ord(x.value) for x in self)
+                values = list(x.value for x in self)
                 if values[2] == values[0] + 2 and values[1] == values[0] + 1:
                     self.isChow = True
                     return

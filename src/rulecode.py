@@ -232,9 +232,9 @@ class StandardMahJongg(RuleCode):
     def fillChow(group, values):
         val0, val1 = values
         if val0 + 1 == val1:
-            if val0 == ord('1'): # TODO: is 49 faster?
+            if val0 == 1:
                 return {Tile(group, val0 + 2)}
-            if val0 == ord('8'):
+            if val0 == 8:
                 return {Tile(group, val0 - 1)}
             return {Tile(group, val0 - 1), Tile(group, val0 + 2)}
         else:
@@ -281,7 +281,7 @@ class StandardMahJongg(RuleCode):
             return set(result)
         melds = []
         for group in hand.suits & set(Tile.colors):
-            values = sorted(ord(x.value) for x in result if x.group == group)
+            values = sorted(x.value for x in result if x.group == group)
             changed = True
             while (changed and len(values) > 2
                     and values.count(values[0]) == 1
@@ -356,9 +356,9 @@ class StandardMahJongg(RuleCode):
                 return {Tile(group, values[0]), Tile(group, values[2])}
             if maxChows:
                 for value in valueSet:
-                    if value > ord('1'):
+                    if value > 1:
                         result.append(Tile(group, value - 1))
-                    if value < ord('9'):
+                    if value < 9:
                         result.append(Tile(group, value + 1))
         return set(result)
 
@@ -383,9 +383,9 @@ class SquirmingSnake(StandardMahJongg):
         if len(hand.suits) != 1 or not hand.suits < set(Tile.colors):
             return False
         values = hand.values
-        if values.count('1') < 3 or values.count('9') < 3:
+        if values.count(1) < 3 or values.count(9) < 3:
             return False
-        pairs = [x for x in set('258') if values.count(x) == 2]
+        pairs = [x for x in (2, 5, 8) if values.count(x) == 2]
         if len(pairs) != 1:
             return False
         return len(set(values)) == len(values) - 5
@@ -400,7 +400,7 @@ class WrigglingSnake(RuleCode):
            and all(not x.isChow for x in hand.declaredMelds))
 
     def computeLastMelds(hand):
-        if hand.lastTile.value == '1':
+        if hand.lastTile.value == 1:
             return [Meld([hand.lastTile] * 2)]
         else:
             return [Meld([hand.lastTile])]
@@ -416,11 +416,11 @@ class WrigglingSnake(RuleCode):
             return set()
         elif len(values) == 12:
             # one of 2..9 or a wind is missing
-            if len(list(x for x in hand.values if x == '1')) < 2:
+            if hand.values.count(1) < 2:
                 # and the pair of 1 is incomplete too
                 return set()
             else:
-                return (elements.winds | set([Tile(group, x) for x in '23456789'])) \
+                return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) \
                     - set([x.lower() for x in hand.tiles])
         else:
             # pair of 1 is not complete
@@ -445,7 +445,7 @@ class WrigglingSnake(RuleCode):
         suits -= {Tile.wind}
         if len(suits) != 1 or not suits < set(Tile.colors):
             return False
-        if hand.values.count('1') != 2:
+        if hand.values.count(1) != 2:
             return False
         return len(set(hand.values)) == 13
 
@@ -854,17 +854,17 @@ class GatesOfHeaven(StandardMahJongg):
         if not cls.maybeCallingOrWon(hand):
             return False
         values = hand.values
-        if len(set(values)) < 9 or not values.startswith('111') or not values.endswith('999'):
+        if len(set(values)) < 9 or values.count(1) != 3 or values.count(9) != 3:
             return False
         values = list(values[3:-3])
-        for value in set(Tile.minors):
+        for value in Tile.minors:
             if value in values:
                 values.remove(value)
         if len(values) != 1:
             return False
         surplus = values[0]
         if 'pair28' in cls.options:
-            return surplus in Tile.minors
+            return 1 < surplus < 9
         if 'lastExtra' in cls.options:
             return hand.lastTile and surplus == hand.lastTile.value
         return True
@@ -879,10 +879,10 @@ class GatesOfHeaven(StandardMahJongg):
             result = set(Tile.minors) - set(values)
         else:
             # we have something of all values
-            if not values.startswith('111'):
-                result = '1'
-            elif not values.endswith('999'):
-                result = '9'
+            if values.count(1) != 3:
+                result = (1,)
+            elif values.count(9) != 3:
+                result = (9,)
             else:
                 if 'pair28' in cls.options:
                     result = Tile.minors
@@ -928,7 +928,7 @@ class ThirteenOrphans(RuleCode):
         return set(x.lower() for x in hand.tiles) == elements.majors
 
     def winningTileCandidates(cls, hand):
-        if any(x in hand.values for x in set(Tile.minors)):
+        if any(x in hand.values for x in Tile.minors):
             # no minors allowed
             return set()
         if not cls.shouldTry(hand, 1):
