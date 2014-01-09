@@ -24,7 +24,22 @@ from log import m18n, m18nc, logException
 from common import IntDict
 
 class Tile(str):
-    """a single tile"""
+    """a single tile, represented as a string of length 2.
+
+    always True:
+    - only for suits: tile.group + chr(tile.value) == str(tile)
+    - Tile(tile) is tile
+    - Tile(tile.group, tile.value) is tile
+
+    Tile() accepts
+    - another Tile
+    - a string, length 2
+    - two args: a char and either a char or an int ord('1')-2 .. ord('9')+2
+
+    group is a char: b=bonus w=wind d=dragon X=unknown
+    value is ord('1')..ord('9') for real suit tiles, extended range for usage in AI,
+       and a char for dragons, winds,boni
+    """
     # pylint: disable=too-many-public-methods, abstract-class-not-used, too-many-instance-attributes
     cache = {}
     # TODO: try hashTable as dict: return idx for name
@@ -72,8 +87,6 @@ class Tile(str):
             arg0, arg1 = args[0]
         else:
             arg0, arg1 = args
-        if isinstance(arg0, int):
-            arg0 = chr(arg0)
         if isinstance(arg1, int):
             arg1 = chr(arg1)
         what = arg0 + arg1

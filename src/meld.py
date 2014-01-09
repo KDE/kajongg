@@ -77,7 +77,6 @@ class Meld(TileList):
             self.isExposed = self.__getState()
             self.isSingle = self.isPair = self.isChow = self.isPung = False
             self.isKong = self.isClaimedKong = self.isKnitted = False
-            self.isKnown = True
             self.isDragonMeld = len(self) and self[0].isDragon
             self.isWindMeld = len(self) and self[0].isWind
             self.isHonorMeld = self.isDragonMeld or self.isWindMeld
