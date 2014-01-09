@@ -735,10 +735,10 @@ class PlayingPlayer(Player):
             assert group.islower(), self.visibleTiles
             if group in Tile.colors:
                 if all(x.group == group for x in self.visibleTiles):
-                    suitTiles = set([group+x for x in '123456789'])
+                    suitTiles = set([Tile(group, x) for x in Tile.numbers])
                     if self.visibleTiles.count(suitTiles) >= 9:
                         dangerous.append((suitTiles, m18n('Player %1 may try a True Color Game', pName)))
-                elif all(x.value in '19' for x in self.visibleTiles):
+                elif all(x.value in Tile.terminals for x in self.visibleTiles):
                     dangerous.append((elements.terminals,
                         m18n('Player %1 may try an All Terminals Game', pName)))
         if expMeldCount >= 2:
