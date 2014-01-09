@@ -1025,7 +1025,8 @@ class MJServer(object):
         if Options.socket and not Options.continueServer \
             and not self.srvUsers and reactor.running and not reactor._stopped:
             if Debug.connections:
-                logDebug('local server terminates. Reason: last client disconnected')
+                logDebug('local server terminates from %s. Reason: last client disconnected' % (
+                    Options.socket))
             reactor.stop()
 
     def loadSuspendedTables(self, user):
@@ -1072,6 +1073,14 @@ class User(pb.Avatar):
         """time of last ping or message from user"""
         self.lastPing = datetime.datetime.now()
 
+    def source(self):
+        """how did he connect?"""
+        result = str(self.mind.broker.transport.getPeer())
+        if 'UNIXAddress' in result:
+            # socket: we want to get the socket name
+            result = Options.socket
+        return result
+
     def attached(self, mind):
         """override pb.Avatar.attached"""
         self.mind = mind
@@ -1079,7 +1088,7 @@ class User(pb.Avatar):
     def detached(self, dummyMind):
         """override pb.Avatar.detached"""
         if Debug.connections:
-            logDebug('%s: connection detached' % self)
+            logDebug('%s: connection detached from %s' % (self, self.source()))
         self.server.logout(self)
         self.mind = None
     def perspective_setClientProperties(self, dbIdent, voiceId, maxGameId, clientVersion=None):
@@ -1149,12 +1158,8 @@ class MJRealm(object):
         avatar = User(avatarId)
         avatar.server = self.server
         avatar.attached(mind)
-        source = str(mind.broker.transport.getPeer())
-        if 'UNIXAddress' in source:
-            # socket: we want to get the socket name
-            source = mind.broker.transport.getHost()
         if Debug.connections:
-            logDebug('Connection from %s ' % source)
+            logDebug('Connection from %s ' % avatar.source())
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
 
 def kajonggServer():
