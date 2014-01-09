@@ -327,10 +327,9 @@ class TileAI(object):
     # pylint: disable=too-many-instance-attributes
     # we do want that many instance attributes
     def __init__(self, candidates, tile):
-        assert isinstance(tile, Tile), tile
         self.tile = tile
         self.group, self.value = tile.group, tile.value
-        if self.value in '123456789bgreswn' and len(tile) == 2:
+        if tile.isReal:
             self.occurrence = candidates.hiddenTiles.count(tile)
             self.available = candidates.player.tileAvailable(tile, candidates.hand)
             self.maxPossible = self.available + self.occurrence

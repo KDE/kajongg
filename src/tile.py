@@ -89,6 +89,11 @@ class Tile(str):
             self.isWind = self.lowerGroup == Tile.wind
             self.isHonor = self.isDragon or self.isWind
             self.isTerminal = self.value in Tile.terminals
+
+            if self.isHonor or self.isBonus:
+                self.isReal = True
+            else:
+                self.isReal = self.value in Tile.numbers
             self.isMajor = self.isHonor or self.isTerminal
             self.isMinor = not self.isMajor
             try:
