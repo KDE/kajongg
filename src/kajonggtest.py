@@ -129,7 +129,8 @@ class Server(object):
         """start this server"""
         assert self.process is None
         self.jobs.append(job)
-        self.socketName = 'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))
+        self.socketName = os.path.expanduser(os.path.join('~', '.kajongg',
+            'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))))
         assert self.serverKey in (None, job.serverKey())
         self.serverKey = job.serverKey()
         print('starting server for %s' % job)
