@@ -20,7 +20,8 @@ for it. The major distributions like Ubuntu, Opensuse, Fedora do.
 
 You can always get the current source code from here:
 
-svn co svn://anonsvn.kde.org/home/kde/trunk/KDE/kdegames/kajongg
+git clone git://anongit.kde.org/kajongg
+or see online here: [url]https://projects.kde.org/projects/kde/kdegames/kajongg/repository[/url]
 
 Please also visit [url]http://kde.org/applications/games/kajongg/[/url]
 
