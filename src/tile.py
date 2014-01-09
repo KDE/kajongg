@@ -62,21 +62,22 @@ class Tile(str):
     boni = flower + season
 
     def __new__(cls, *args):
-        if isinstance(args[0], Tile):
-            return args[0]
-        if args not in cls.cache:
-            arg0 = args[0]
-            if len(args) == 1:
-                arg0, arg1 = args[0]
-            else:
-                arg0, arg1 = args
-            if isinstance(arg0, int):
-                arg0 = chr(arg0)
-            if isinstance(arg1, int):
-                arg1 = chr(arg1)
-            what = arg0 + arg1
-            cls.cache[args] = str.__new__(cls, what)
-        return cls.cache[args]
+        return cls.cache.get(args) or cls.__build(*args)
+
+    @classmethod
+    def __build(cls, *args):
+        """build a new Tile object out of args"""
+        arg0 = args[0]
+        if len(args) == 1:
+            arg0, arg1 = args[0]
+        else:
+            arg0, arg1 = args
+        if isinstance(arg0, int):
+            arg0 = chr(arg0)
+        if isinstance(arg1, int):
+            arg1 = chr(arg1)
+        what = arg0 + arg1
+        return str.__new__(cls, what)
 
     def __init__(self, *dummyArgs):
         # pylint: disable=super-init-not-called
@@ -101,6 +102,8 @@ class Tile(str):
             except ValueError:
                 logException('%s is not a valid tile string' % self)
             self.isKnown = Tile.unknown is not None and self != Tile.unknown
+            for key in (self, (str(self),), (self.group, self.value), (self[0], self[1])):
+                self.cache[key] = self
             self._fixed = True
 
     def __setattr__(self, name, value):
