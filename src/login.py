@@ -23,6 +23,7 @@ import socket, subprocess, time, datetime, os, sys
 from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import CancelledError
+from twisted.internet.task import deferLater
 from twisted.internet.error import ConnectionRefusedError, TimeoutError, ConnectionLost, DNSLookupError
 from twisted.python.failure import Failure
 
@@ -394,8 +395,20 @@ class Connection(object):
             else:
                 return True
 
-    def assertConnectivity(self, result):
+    def assertConnectivity(self, result, waiting=False):
         """make sure we have a running local server or network connectivity"""
+        # pylint: disable=too-many-branches
+        if Options.socket:
+            # just wait for that socket to appear
+            if os.path.exists(socketName()) and self.serverListening():
+                if waiting and not Debug.neutral:
+                    logDebug('Socket %s is now available' % socketName())
+                return result
+            else:
+                if not Debug.neutral:
+                    logDebug('Waiting for socket %s to %s' % (socketName(),
+                        'answer' if os.path.exists(socketName()) else 'appear'))
+                return deferLater(Internal.reactor, 0.2, self.assertConnectivity, result, True)
         if self.useSocket or self.dlg.url in ('localhost', '127.0.0.1'):
             if not self.serverListening():
                 if os.name == 'nt':
