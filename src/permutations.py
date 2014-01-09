@@ -56,7 +56,7 @@ class Permutations(object):
                 honors.extend([Meld([tile] * count)])
         boni = list(Meld([x]) for x in self.tiles if x.isBonus)
         variants = []
-        for group in set(Tile.colors.upper()):
+        for group in Tile.colors.upper():
             gTiles = list(x for x in self.tiles if x.group == group)
             groupVariants = self.__colorVariants(group, ''.join(x.value for x in gTiles))
             if len(groupVariants):
@@ -77,7 +77,7 @@ class Permutations(object):
         result = list()
         possibleMelds = []
         valueSet = set(values)
-        for value in valueSet:
+        for value in sorted(valueSet):
             if values.count(value) == 2:
                 possibleMelds.append(tuple([value] * 2))
             if values.count(value) >= 3:
@@ -98,7 +98,7 @@ class Permutations(object):
                     result.append(appendValue)
         else:
             result = list([list([tuple([x]) for x in values])])
-        return tuple(set(tuple(tuple(sorted(x)) for x in result)))
+        return tuple(sorted(set(tuple(tuple(sorted(x)) for x in result))))
 
     colorPermCache = {}
 
@@ -142,7 +142,7 @@ class Permutations(object):
         allValues = sorted(ord(x) for x in values)
         vSet = set(allValues)
         groups = []
-        for border in sorted(x+1 for x in vSet if x+1 not in vSet):
+        for border in sorted(x+1 for x in sorted(vSet) if x+1 not in vSet):
             content = list(x for x in allValues if x < border)
             if content:
                 groups.append(content)
