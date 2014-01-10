@@ -400,13 +400,15 @@ class Player(object):
     def tileAvailable(self, tileName, hand):
         """a count of how often tileName might still appear in the game
         supposing we have hand"""
-        visible = self.game.discardedTiles.count([tileName.lower()])
-        for player in self.others():
-            visible += player.visibleTiles.count([tileName.capitalize()])
-            visible += player.visibleTiles.count([tileName.lower()])
-        for pair in hand.tileNames:
-            if pair.lower() == tileName.lower():
-                visible += 1
+        lowerTile = tileName.lower()
+        upperTile = tileName.capitalize()
+        visible = self.game.discardedTiles.count([lowerTile])
+        if visible:
+            if hand.lenOffset == 0 and self.game.lastDiscard and lowerTile == self.game.lastDiscard.lower():
+                # the last discarded one is available to us since we can claim it
+                visible -= 1
+        visible += sum(x.visibleTiles.count([lowerTile, upperTile]) for x in self.others())
+        visible += sum(x.lower() == lowerTile for x in hand.tileNames)
         return 4 - visible
 
     def violatesOriginalCall(self, tileName=None):

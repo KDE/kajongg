@@ -1175,16 +1175,16 @@ class MahJonggWithOriginalCall(Function):
     @staticmethod
     def claimness(hand, dummyDiscard):
         result = IntDict()
-        if hand.player:
-            if hand.player.originalCall and hand.player.mayWin:
-                winningChances = hand.player.originalCallingHand.chancesToWin()
-                if not winningChances:
-                    hand.player.mayWin = False # bad luck
-                else:
+        player = hand.player
+        if player:
+            if player.originalCall and player.mayWin:
+                if player.originalCallingHand.chancesToWin():
                     # winning with OriginalCall is still possible
                     result[Message.Pung] = -999
                     result[Message.Kong] = -999
                     result[Message.Chow] = -999
+                else:
+                    player.mayWin = False # bad luck
         return result
 
 class TwofoldFortune(Function):
