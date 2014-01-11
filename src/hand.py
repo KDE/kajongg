@@ -389,6 +389,7 @@ class Hand(object):
 
     def chancesToWin(self):
         """count the physical tiles that make us win and still seem availabe"""
+        assert self.lenOffset == 0
         result = []
         for completedHand in self.callingHands:
             result.extend([completedHand.lastTile] * (
@@ -510,7 +511,7 @@ class Hand(object):
         """check if this is a mah jongg hand.
         Return a sorted list of matching MJ rules, highest
         total first. If no rule matches, return None"""
-        if self.lenOffset == 1:
+        if self.lenOffset == 1 and self.player.mayWin:
             matchingMJRules = [x for x in self.ruleset.mjRules if x.appliesToHand(self)]
             if matchingMJRules:
                 if self.robbedTile and self.robbedTile.istitle():
