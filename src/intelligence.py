@@ -191,7 +191,7 @@ class AIDefault(object):
                 game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
                     (myself.lastTile, [str(x) for x in candidates]))
             for candidate in candidates:
-                if candidate.tile == myself.lastTile.exposed:
+                if candidate.tile is myself.lastTile.exposed:
                     winningTiles = myself.originalCallingHand.chancesToWin()
                     if Debug.originalCall:
                         game.debug('weighOriginalCall: winningTiles=%s for %s' %

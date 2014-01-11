@@ -795,15 +795,15 @@ class RobbingKong(RuleCode):
 
 class GatheringPlumBlossomFromRoof(RuleCode):
     def appliesToHand(hand):
-        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, '5').concealed
+        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile is Tile(Tile.stone, '5').concealed
 
 class PluckingMoon(RuleCode):
     def appliesToHand(hand):
-        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, '1').concealed
+        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile is Tile(Tile.stone, '1').concealed
 
 class ScratchingPole(RuleCode):
     def appliesToHand(hand):
-        return RobbingKong.appliesToHand(hand) and hand.lastTile == Tile(Tile.bamboo, '2')
+        return RobbingKong.appliesToHand(hand) and hand.lastTile is Tile(Tile.bamboo, '2')
 
 class StandardRotation(RuleCode):
     def rotate(game):

@@ -360,7 +360,7 @@ class Board(QGraphicsRectItem):
 
     def tilesByElement(self, element):
         """returns all child items holding a uiTile for element"""
-        return list(x for x in self.uiTiles if x.tile == element)
+        return list(x for x in self.uiTiles if x.tile is element)
 
     def rotatedLightSource(self):
         """the light source we need for the original uiTile before it is rotated"""

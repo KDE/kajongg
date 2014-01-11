@@ -323,7 +323,7 @@ class Player(object):
             except ValueError:
                 raise Exception('removeTile(%s): tile not in concealed %s' % \
                     (tile, ''.join(self._concealedTiles)))
-        if tile == self.lastTile:
+        if tile is self.lastTile:
             self.lastTile = None
         self._hand = None
 
@@ -405,7 +405,7 @@ class Player(object):
         upperTile = tileName.concealed
         visible = self.game.discardedTiles.count([lowerTile])
         if visible:
-            if hand.lenOffset == 0 and self.game.lastDiscard and lowerTile == self.game.lastDiscard.exposed:
+            if hand.lenOffset == 0 and self.game.lastDiscard and lowerTile is self.game.lastDiscard.exposed:
                 # the last discarded one is available to us since we can claim it
                 visible -= 1
         visible += sum(x.visibleTiles.count([lowerTile, upperTile]) for x in self.others())

@@ -163,7 +163,7 @@ class Meld(TileList):
         """self without tile. The rest will be uppercased."""
         tiles = TileList()
         for tile in self:
-            if tile == remove:
+            if tile is remove:
                 remove = None
             else:
                 tiles.append(tile.concealed)

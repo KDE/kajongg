@@ -347,7 +347,7 @@ class PlayingHandBoard(HandBoard):
                             and x[1] and x[1].yoffset == yNew \
                             and not x[0].isBonus]
                 for element in set(x[1].tile for x in items):
-                    items = [x for x in movingPlaces.items() if x[1].tile == element]
+                    items = [x for x in movingPlaces.items() if x[1].tile is element]
                     if len(items) > 1:
                         oldList = sorted(list(x[0] for x in items), key=lambda x:bool(x.board!=self)*1000+x.xoffset)
                         newList = sorted(list(x[1] for x in items), key=lambda x:x.xoffset)
@@ -391,7 +391,7 @@ class PlayingHandBoard(HandBoard):
 
     def discard(self, tile):
         """select the rightmost matching tileItem and move it to DiscardBoard"""
-        if self.focusTile and self.focusTile.tile == tile:
+        if self.focusTile and self.focusTile.tile is tile:
             lastDiscard = self.focusTile
         else:
             matchingTiles = sorted(self.tilesByElement(tile), key=lambda x:x.xoffset)

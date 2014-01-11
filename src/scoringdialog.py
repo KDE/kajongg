@@ -1036,7 +1036,7 @@ class ScoringDialog(QWidget):
         idx = self.cbLastTile.currentIndex()
         if idx < 0:
             idx = 0
-        indexedTile = str(self.cbLastTile.itemData(idx).toPyObject())
+        indexedTile = self.cbLastTile.itemData(idx).toPyObject()
         restoredIdx = None
         self.cbLastTile.clear()
         if not winnerTiles:
@@ -1052,13 +1052,13 @@ class ScoringDialog(QWidget):
                 shownTiles.add(tile.tile)
                 self.cbLastTile.addItem(QIcon(tile.pixmapFromSvg(pmSize, withBorders=False)),
                         '', QVariant(tile.tile))
-                if indexedTile == tile.tile:
+                if indexedTile is tile.tile:
                     restoredIdx = self.cbLastTile.count() - 1
         if not restoredIdx and indexedTile:
             # try again, maybe the tile changed between concealed and exposed
             indexedTile = indexedTile.exposed
             for idx in range(self.cbLastTile.count()):
-                if indexedTile == str(self.cbLastTile.itemData(idx).toPyObject()).lower():
+                if indexedTile is self.cbLastTile.itemData(idx).toPyObject().exposed:
                     restoredIdx = idx
                     break
         if not restoredIdx:

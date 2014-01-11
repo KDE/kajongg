@@ -41,7 +41,6 @@ class Tile(str):
     """
     # pylint: disable=too-many-public-methods, abstract-class-not-used, too-many-instance-attributes
     cache = {}
-    # TODO: try hashTable as dict: return idx for name
     hashTable = 'XyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
                 'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \
                 'B/b/B0b0B1b1B2b2B3b3B4b4B5b5B6b6B7b7B8b8B9b9B:b:B;b;' \

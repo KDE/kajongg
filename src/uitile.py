@@ -269,7 +269,7 @@ class UITile(QGraphicsObject):
     @tile.setter
     def tile(self, value): # pylint: disable=arguments-differ
         """set tile name and update display"""
-        if value != self._tile:
+        if value is not self._tile:
             self._tile = value
             self.setDrawingOrder()
             self.update()

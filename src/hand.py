@@ -96,7 +96,7 @@ class Hand(object):
         self.ruleset = self.player.game.ruleset
         self.intelligence = self.player.intelligence if self.player else AIDefault()
         self.string = string
-        self.__robbedTile = 'x'
+        self.__robbedTile = Tile.unknown
         self.prevHand = prevHand
         self.__won = None
         self.__score = None
@@ -418,7 +418,7 @@ class Hand(object):
         # If lastMeld is given, it must be first in the list. Next try undeclared melds, then declared melds
         assert self.lenOffset == 1
         if self.lastTile:
-            if self.lastTile == subtractTile and self.prevHand:
+            if self.lastTile is subtractTile and self.prevHand:
                 return self.prevHand
         declaredMelds = self.declaredMelds
         tilesInHand = TileList(self.tilesInHand)
@@ -426,7 +426,7 @@ class Hand(object):
         lastMeld = self.lastMeld
         if subtractTile.isBonus:
             for idx, meld in enumerate(boni):
-                if subtractTile == meld[0]:
+                if subtractTile is meld[0]:
                     del boni[idx]
                     break
         else:
@@ -499,7 +499,7 @@ class Hand(object):
     @property
     def robbedTile(self):
         """cache this here for use in rulecode"""
-        if self.__robbedTile == 'x':
+        if self.__robbedTile is Tile.unknown:
             self.__robbedTile = None
             if self.player.game.moves: # scoringtest does not (yet) simulate this
                 lastMove = self.player.game.moves[-1]

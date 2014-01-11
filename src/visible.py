@@ -162,8 +162,8 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         if withDiscard:
             # withDiscard is a Tile, we need the UITile
             discardTile = Internal.scene.discardBoard.lastDiscarded
-            if discardTile.tile != withDiscard:
-                self.game.debug('%s != %s' % (discardTile.tile, withDiscard))
+            if discardTile.tile is not withDiscard:
+                self.game.debug('%s is not %s' % (discardTile.tile, withDiscard))
                 assert False
             self.syncHandBoard([discardTile])
 
