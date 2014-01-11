@@ -168,7 +168,6 @@ class ScoringHandBoard(HandBoard):
                 del self.uiMelds[idx] # do not use uiMelds.remove: If we have 2
                 break                 # identical melds, it removes the wrong one
         self.player.removeMeld(meld)  # uiMeld must already be deleted
-        Internal.scene.handSelectorChanged(self)
 
     def dragMoveEvent(self, event):
         """allow dropping of uiTile from ourself only to other state (open/concealed)"""
@@ -219,6 +218,8 @@ class ScoringHandBoard(HandBoard):
         self.checkTiles()
         senderBoard.autoSelectTile()
         senderBoard.checkTiles()
+        if senderBoard is not self and senderBoard.isHandBoard:
+            Internal.scene.handSelectorChanged(senderBoard)
         Internal.scene.handSelectorChanged(self)
         animate()
         self.checkTiles()

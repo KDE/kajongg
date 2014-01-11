@@ -874,7 +874,7 @@ class ScoringDialog(QWidget):
         newLastTile = self.computeLastTile()
         if not newLastTile:
             return
-        if self.prevLastTile.isExposed != newLastTile.isExposed:
+        if self.prevLastTile and self.prevLastTile.isExposed != newLastTile.isExposed:
             # state of last tile (concealed/exposed) changed:
             # for all checked boxes check if they still are applicable
             winner = self.game.winner
@@ -1146,7 +1146,8 @@ class ScoringDialog(QWidget):
             lastTile = Internal.scene.computeLastTile()
             winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4 \
                 and lastTile in m]
-            assert len(winnerMelds)
+            assert len(winnerMelds), 'lastTile %s missing in %s' % (
+                lastTile, self.game.winner.hand.melds)
             if len(winnerMelds) == 1:
                 self.cbLastMeld.addItem(QIcon(), '', QVariant(str(winnerMelds[0])))
                 self.cbLastMeld.setCurrentIndex(0)
