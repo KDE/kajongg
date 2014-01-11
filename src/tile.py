@@ -97,6 +97,7 @@ class Tile(str):
             self.group = self[0]
             self.lowerGroup = self.group.lower()
             self.isExposed = self.group == self.lowerGroup
+            self.isConcealed = not self.isExposed
             self.isBonus = self.group in Tile.boni
             self.isDragon = self.lowerGroup == Tile.dragon
             self.isWind = self.lowerGroup == Tile.wind
@@ -119,7 +120,14 @@ class Tile(str):
             self.isKnown = Tile.unknown is not None and self != Tile.unknown
             for key in (self, (str(self),), (self.group, self.value), (self[0], self[1])):
                 self.cache[key] = self
+
+            self.exposed = self.concealed = self.swapped = None  # just to please pylint
             self._fixed = True
+    
+            str.__setattr__(self, 'exposed', self if not self.isKnown else Tile(str.lower(self)))
+            str.__setattr__(self, 'concealed', self if not self.isKnown or self.isBonus else Tile(str.capitalize(self)))
+            str.__setattr__(self, 'swapped', self.exposed if self.isConcealed else self.concealed)
+
 
     def __setattr__(self, name, value):
         if hasattr(self, '_fixed'):
@@ -138,26 +146,16 @@ class Tile(str):
         raise TypeError
 
     def lower(self):
-        """return exposed element name"""
-        return Tile(str.lower(self))
+        raise TypeError
+
+    def istitle(self):
+        raise TypeError
 
     def upper(self):
-        """return hidden element name"""
-        if self.isBonus:
-            return self
-        return Tile(str.capitalize(self))
+        raise TypeError
 
     def capitalize(self):
-        """return hidden element name. Just make sure we get a real Tile even
-        if we call this"""
-        return self.upper()
-
-    def swapTitle(self):
-        """if istitle, return lower. If lower, return capitalize"""
-        if self.islower():
-            return self.upper()
-        else:
-            return self.lower()
+        raise TypeError
 
     def nextForChow(self):
         """the following tile for a chow"""
@@ -234,51 +232,25 @@ class TileList(list):
         """sort(TileList) would not keep TileList type"""
         return TileList(sorted(self))
 
-    def toLower(self, first=None, last=None):
-        """use first and last as for ranges"""
-        if first is not None:
-            if last is None:
-                self[first] = self[first].lower()
-                return self
-        else:
-            assert last is None
-            first, last = 0, len(self)
-        for idx in range(first, last):
-            self[idx] = self[idx].lower()
-        return self
-
-    def toUpper(self, first=None, last=None):
-        """use first and last as for ranges"""
-        if first is not None:
-            if last is None:
-                self[first] = self[first].capitalize()
-                return self
-        else:
-            assert last is None
-            first, last = 0, len(self)
-        for idx in range(first, last):
-            self[idx] = self[idx].capitalize()
-        return self
-
     def isLower(self, first=None, last=None):
         """use first and last as for ranges"""
         if first is not None:
             if last is None:
-                return self[first].islower()
+                return self[first].isExposed
         else:
             assert last is None
             first, last = 0, len(self)
-        return ''.join(self[first:last]).islower()
+        return all(self[x].isExposed for x in range(first, last))
 
     def isUpper(self, first=None, last=None):
         """use first and last as for ranges"""
         if first is not None:
             if last is None:
-                return self[first].istitle()
+                return self[first].isConcealed
         else:
             assert last is None
             first, last = 0, len(self)
-        return all(self[x].istitle() for x in range(first, last))
+        return all(self[x].isConcealed for x in range(first, last))
 
     def hasChows(self, tile):
         """returns my chows with tileName"""
@@ -308,13 +280,13 @@ class Elements(object):
     def __init__(self):
         self.occurrence = IntDict() # key: db, s3 etc. value: occurrence
         self.winds = {Tile(Tile.wind, x) for x in Tile.winds}
-        self.wINDS = {x.upper() for x in self.winds}
+        self.wINDS = {x.concealed for x in self.winds}
         self.dragons = {Tile(Tile.dragon, x) for x in Tile.dragons}
-        self.dRAGONS = {x.upper() for x in self.dragons}
+        self.dRAGONS = {x.concealed for x in self.dragons}
         self.honors = self.winds | self.dragons
         self.hONORS = self.wINDS | self.dRAGONS
         self.terminals = {Tile(x, y) for x in Tile.colors for y in Tile.terminals}
-        self.tERMINALS = {x.upper() for x in self.terminals}
+        self.tERMINALS = {x.concealed for x in self.terminals}
         self.majors = self.honors | self.terminals
         self.mAJORS = self.hONORS | self.tERMINALS
         self.greenHandTiles = {Tile(Tile.bamboo, x) for x in '23468'} | {Tile(Tile.dragon, Tile.green)}

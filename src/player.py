@@ -335,7 +335,7 @@ class Player(object):
             if tile.isBonus:
                 self._bonusTiles.append(tile)
             else:
-                assert tile.istitle(), '%s data=%s' % (tile, tiles)
+                assert tile.isConcealed, '%s data=%s' % (tile, tiles)
                 self._concealedTiles.append(tile)
         self._hand = None
 
@@ -401,22 +401,22 @@ class Player(object):
     def tileAvailable(self, tileName, hand):
         """a count of how often tileName might still appear in the game
         supposing we have hand"""
-        lowerTile = tileName.lower()
-        upperTile = tileName.capitalize()
+        lowerTile = tileName.exposed
+        upperTile = tileName.concealed
         visible = self.game.discardedTiles.count([lowerTile])
         if visible:
-            if hand.lenOffset == 0 and self.game.lastDiscard and lowerTile == self.game.lastDiscard.lower():
+            if hand.lenOffset == 0 and self.game.lastDiscard and lowerTile == self.game.lastDiscard.exposed:
                 # the last discarded one is available to us since we can claim it
                 visible -= 1
         visible += sum(x.visibleTiles.count([lowerTile, upperTile]) for x in self.others())
-        visible += sum(x.lower() == lowerTile for x in hand.tiles)
+        visible += sum(x.exposed == lowerTile for x in hand.tiles)
         return 4 - visible
 
     def violatesOriginalCall(self, discard=None):
         """called if discarding discard violates the Original Call"""
         if not self.originalCall or not self.mayWin:
             return False
-        if self.lastTile.lower() != discard.lower():
+        if self.lastTile.exposed != discard.exposed:
             if Debug.originalCall:
                 self.game.debug('%s would violate OC with %s, lastTile=%s' % (self, discard, self.lastTile))
             return True
@@ -455,8 +455,8 @@ class PlayingPlayer(Player):
             assert lastMeld in melds, '%s: concealed=%s melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
                     self._concealedTiles, concealed, melds, lastMeld, lastTile, withDiscard)
             melds.remove(lastMeld)
-            lastTile = withDiscard.lower()
-            lastMeld = lastMeld.toLower()
+            lastTile = withDiscard.exposed
+            lastMeld = lastMeld.exposed
             self._exposedMelds.append(lastMeld)
             for tileName in lastMeld:
                 self.visibleTiles[tileName] += 1
@@ -489,11 +489,11 @@ class PlayingPlayer(Player):
                 if self._concealedTiles.count(tileName) == 4:
                     kongs.append([tileName] * 4)
                 elif self._concealedTiles.count(tileName) == 1 and \
-                        tileName.lower() * 3 in list(str(x) for x in self._exposedMelds):
-                    kongs.append([tileName.lower()] * 3 + [tileName])
+                        tileName.exposed * 3 in list(str(x) for x in self._exposedMelds):
+                    kongs.append([tileName.exposed] * 3 + [tileName])
         if self.game.lastDiscard:
             # claiming a kong
-            discardTile = self.game.lastDiscard.upper()
+            discardTile = self.game.lastDiscard.concealed
             if self._concealedTiles.count(discardTile) == 3:
                 kongs.append([discardTile] * 4)
         for kong in kongs:
@@ -511,7 +511,7 @@ class PlayingPlayer(Player):
         returns the meld to be completed"""
         lastDiscard = self.game.lastDiscard
         if self.game.lastDiscard:
-            assert lastDiscard.group.isupper(), lastDiscard
+            assert lastDiscard.isConcealed, lastDiscard
             if self.concealedTiles.count(lastDiscard) >= 2:
                 return [lastDiscard] * 3
 
@@ -524,7 +524,7 @@ class PlayingPlayer(Player):
         """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
         game = self.game
         if move.message == Message.DeclaredKong:
-            withDiscard = move.meld[0].upper()
+            withDiscard = move.meld[0].concealed
         elif move.message == Message.AskForClaims:
             withDiscard = game.lastDiscard
         else:
@@ -622,7 +622,7 @@ class PlayingPlayer(Player):
                         msg = m18nE('%1 claiming MahJongg: She does not really have tile %2')
                         return msg, self.name, pair
                     self._concealedTiles.remove(pair)
-            if not meld.isExposed and not meld.isKong:
+            if meld.isConcealed and not meld.isKong:
                 self._concealedMelds.append(meld)
             else:
                 self._exposedMelds.append(meld)
@@ -634,15 +634,14 @@ class PlayingPlayer(Player):
     def hasExposedPungOf(self, tileName):
         """do I have an exposed Pung of tileName?"""
         for meld in self._exposedMelds:
-            if meld == [tileName.lower()] * 3:
+            if meld == [tileName.exposed] * 3:
                 return True
         return False
 
     def robTile(self, tile):
         """used for robbing the kong"""
-        assert isinstance(tile, Tile)
-        assert tile.istitle()
-        tile = tile.lower()
+        assert tile.isConcealed
+        tile = tile.exposed
         for meld in self._exposedMelds:
             if tile in meld:
                 meld = meld.without(tile)
@@ -650,7 +649,7 @@ class PlayingPlayer(Player):
                 break
         else:
             raise Exception('robTile: no meld found with %s' % tile)
-        self.game.lastDiscard = tile.upper()
+        self.game.lastDiscard = tile.concealed
         self.lastTile = None  #  our lastTile has just been robbed
         self._hand = None
 
@@ -675,7 +674,7 @@ class PlayingPlayer(Player):
             # declaring a kong is never dangerous because we get
             # an unknown replacement
             return False
-        afterExposed = list(x.lower() for x in self._concealedTiles)
+        afterExposed = list(x.exposed for x in self._concealedTiles)
         if exposing:
             exposing = exposing[:]
             if self.game.lastDiscard:
@@ -683,9 +682,9 @@ class PlayingPlayer(Player):
                 # the player who discarded it is responsible
                 exposing.remove(self.game.lastDiscard)
             for tile in exposing:
-                if tile.lower() in afterExposed:
+                if tile.exposed in afterExposed:
                     # the "if" is needed for claimed pung
-                    afterExposed.remove(tile.lower())
+                    afterExposed.remove(tile.exposed)
         return all(self.game.dangerousFor(self, x) for x in afterExposed)
 
     def exposeMeld(self, meldTiles, calledTile=None):
@@ -699,8 +698,8 @@ class PlayingPlayer(Player):
         if calledTile:
             assert isinstance(calledTile, Tile), calledTile
             allMeldTiles.append(calledTile)
-        if len(allMeldTiles) == 4 and allMeldTiles[0].islower():
-            tile0 = allMeldTiles[0].lower()
+        if len(allMeldTiles) == 4 and allMeldTiles[0].isExposed:
+            tile0 = allMeldTiles[0].exposed
             # we are adding a 4th tile to an exposed pung
             self._exposedMelds = [meld for meld in self._exposedMelds if meld != [tile0] * 3]
             meld = Meld(tile0 * 4)
@@ -712,10 +711,10 @@ class PlayingPlayer(Player):
             for meldTile in meldTiles:
                 self._concealedTiles.remove(meldTile)
             for meldTile in allMeldTiles:
-                self.visibleTiles[meldTile.lower()] += 1
-            meld = meld.expose(bool(calledTile))
+                self.visibleTiles[meldTile.exposed] += 1
+            meld = meld.exposedClaimed if calledTile else meld.declared
         if self.lastTile in allMeldTiles:
-            self.lastTile = self.lastTile.lower()
+            self.lastTile = self.lastTile.exposed
         self._exposedMelds.append(meld)
         self._hand = None
         game.computeDangerous(self)

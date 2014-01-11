@@ -191,7 +191,7 @@ class AIDefault(object):
                 game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
                     (myself.lastTile, [str(x) for x in candidates]))
             for candidate in candidates:
-                if candidate.tile == myself.lastTile.lower():
+                if candidate.tile == myself.lastTile.exposed:
                     winningTiles = myself.originalCallingHand.chancesToWin()
                     if Debug.originalCall:
                         game.debug('weighOriginalCall: winningTiles=%s for %s' %
@@ -205,11 +205,11 @@ class AIDefault(object):
     def weighCallingHand(aiInstance, candidates):
         """if we can get a calling hand, prefer that"""
         for candidate in candidates:
-            newHand = candidates.hand - candidate.tile.capitalize()
+            newHand = candidates.hand - candidate.tile.concealed
             winningTiles = newHand.chancesToWin()
             if winningTiles:
                 for winnerTile in set(winningTiles):
-                    winnerHand = newHand + winnerTile.upper()
+                    winnerHand = newHand + winnerTile.concealed
                     if Debug.robotAI:
                         aiInstance.player.game.debug('weighCallingHand %s cand %s winnerTile %s winnerHand %s: %s' % (
                             newHand, candidate, winnerTile, winnerHand, '     '.join(winnerHand.explain())))
@@ -367,14 +367,14 @@ class DiscardCandidates(list):
         if Debug.robotAI:
             player.game.debug('DiscardCandidates for hand %s are %s' % (
                 hand, hand.tilesInHand))
-        self.hiddenTiles = list(x.lower() for x in hand.tilesInHand)
+        self.hiddenTiles = list(x.exposed for x in hand.tilesInHand)
         self.groupCounts = IntDict() # counts for tile groups (sbcdw), exposed and concealed
         for tile in self.hiddenTiles:
             self.groupCounts[tile.group] += 1
         self.declaredGroupCounts = IntDict()
-        for tile in sum((x.toLower() for x in hand.declaredMelds), []):
-            self.groupCounts[tile.group] += 1
-            self.declaredGroupCounts[tile.group] += 1
+        for tile in sum((x for x in hand.declaredMelds), []):
+            self.groupCounts[tile.lowerGroup] += 1
+            self.declaredGroupCounts[tile.lowerGroup] += 1
         self.extend(list(TileAI(self, x) for x in sorted(set(self.hiddenTiles))))
         self.link()
 
@@ -434,7 +434,7 @@ class DiscardCandidates(list):
         """returns the candidate with the lowest value"""
         lowest = min(x.keep for x in self)
         candidates = sorted(x for x in self if x.keep == lowest)
-        result = self.player.game.randomGenerator.choice(candidates).tile.capitalize()
+        result = self.player.game.randomGenerator.choice(candidates).tile.concealed
         if Debug.robotAI:
             self.player.game.debug('%s: discards %s out of %s' % (self.player, result, ' '.join(str(x) for x in self)))
         return result

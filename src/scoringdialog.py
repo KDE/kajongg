@@ -874,8 +874,7 @@ class ScoringDialog(QWidget):
         newLastTile = self.computeLastTile()
         if not newLastTile:
             return
-        prevLower, newLower = self.prevLastTile.islower(), newLastTile.islower()
-        if prevLower != newLower:
+        if self.prevLastTile.isExposed != newLastTile.isExposed:
             # state of last tile (concealed/exposed) changed:
             # for all checked boxes check if they still are applicable
             winner = self.game.winner
@@ -1057,7 +1056,7 @@ class ScoringDialog(QWidget):
                     restoredIdx = self.cbLastTile.count() - 1
         if not restoredIdx and indexedTile:
             # try again, maybe the tile changed between concealed and exposed
-            indexedTile = indexedTile.lower()
+            indexedTile = indexedTile.exposed
             for idx in range(self.cbLastTile.count()):
                 if indexedTile == str(self.cbLastTile.itemData(idx).toPyObject()).lower():
                     restoredIdx = idx
@@ -1115,10 +1114,7 @@ class ScoringDialog(QWidget):
                 if indexedMeld == meldContent.lower():
                     restoredIdx = idx
                     if lastTile not in meldContent:
-                        if lastTile.lower() == lastTile:
-                            lastTile = lastTile.capitalize()
-                        else:
-                            lastTile = lastTile.lower()
+                        lastTile = lastTile.swapped
                         assert lastTile in meldContent
                         self.cbLastTile.blockSignals(True) # we want to continue right here
                         idx = self.cbLastTile.findData(QVariant(lastTile))

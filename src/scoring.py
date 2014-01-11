@@ -127,18 +127,12 @@ class ScoringHandBoard(HandBoard):
         """Kong might have variants"""
         result = []
         meld = Meld(self.uiMeldWithTile(tile))
-        if lowerHalf:
-            result.append(meld.toUpper())
-        else:
-            result.append(meld.toLower())
+        result.append(meld.concealed if lowerHalf else meld.exposed)
         if len(meld) == 4:
             if lowerHalf:
-                meld = meld.toLower()
-                meld = meld.toUpper(1, 3)
-                result = [meld]
+                result = [meld.declared]
             else:
-                meld = Meld(meld).expose(isClaiming=True)
-                result.append(meld)
+                result.append(meld.exposedClaimed)
         return result
 
     def mapMouseTile(self, uiTile):
@@ -356,7 +350,7 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def __mjstring(self):
         """compile hand info into a string as needed by the scoring engine"""
-        if self.lastTile and self.lastTile.istitle():
+        if self.lastTile and self.lastTile.isConcealed:
             lastSource = 'w'
         else:
             lastSource = 'd'
@@ -401,7 +395,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         meld = Meld(meld)  # convert UITile to Tile
         if meld.isBonus:
             self._bonusTiles.append(meld[0])
-        elif not meld.isExposed and not meld.isKong:
+        elif meld.isConcealed and not meld.isKong:
             self._concealedMelds.append(meld)
         else:
             self._exposedMelds.append(meld)

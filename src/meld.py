@@ -33,7 +33,23 @@ class Meld(TileList):
     those methods are not supposed to be called on empty melds.
     Meld is essentially a list of Tile with added methods.
     A Meld is immutable, not from the view of python but for
-    its user"""
+    its user
+
+    for melds with 3 tiles:
+        isDeclared == isExposed : 3 exposed tiles
+        not isDeclared == isConcealed: 3 concealed Tiles
+        exposed: xxx
+        exposedClaimed: xxx
+
+    for melds with 4 tiles:
+        isKong = xXXx or xxxx or xxxX but NOT XXXX
+        isDeclared = xXXx or xxxx or xxxX
+        isExposed = xxxx or xxxX
+        isConcealed: xXXx or XXXX
+        exposedClaimed: xxxX
+        exposed: xxxx
+
+    """
     # pylint: disable=too-many-instance-attributes
 
     __hash__ = None
@@ -74,7 +90,8 @@ class Meld(TileList):
             if self.key not in self.cache:
                 self.cache[self.key] = self
                 self.cache[str(self)] = self
-            self.isExposed = self.__getState()
+            self.isExposed = self.__isExposed()
+            self.isConcealed = not self.isExposed
             self.isSingle = self.isPair = self.isChow = self.isPung = False
             self.isKong = self.isClaimedKong = self.isKnitted = False
             self.isDragonMeld = len(self) and self[0].isDragon
@@ -83,6 +100,7 @@ class Meld(TileList):
             self.isBonus = len(self) == 1 and self[0].isBonus
             self.isKnown = len(self) and self[0].isKnown
             self.__setMeldType()
+            self.isPungKong = self.isPung or self.isKong
             self.isDeclared = self.isExposed or self.isKong
             groups = set(x.group.lower() for x in self)
             if len(groups) == 1:
@@ -93,7 +111,21 @@ class Meld(TileList):
                 self.lowerGroup = 'x'
             self.isRest = False
             self.__staticRules = {} # ruleset is key
+            self.concealed = self.exposed = self.exposedClaimed = None # to satisfy pylint
             self._fixed = True
+
+            if len(self) < 4:
+                TileList.__setattr__(self, 'concealed', Meld(TileList([x.concealed for x in self])))
+                TileList.__setattr__(self, 'declared', self.concealed)
+                TileList.__setattr__(self, 'exposed', Meld(TileList([x.exposed for x in self])))
+                TileList.__setattr__(self, 'exposedClaimed', self.exposed)
+            else:
+                TileList.__setattr__(self, 'concealed', Meld(TileList([x.concealed for x in self])))
+                TileList.__setattr__(self, 'declared',
+                    Meld(TileList([self[0].exposed, self[1].concealed, self[2].concealed, self[3].exposed])))
+                TileList.__setattr__(self, 'exposed', Meld(TileList([x.exposed for x in self])))
+                TileList.__setattr__(self, 'exposedClaimed',
+                    Meld(TileList([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed])))
 
     def __setattr__(self, name, value):
         if hasattr(self, '_fixed'):
@@ -134,16 +166,8 @@ class Meld(TileList):
             if tile == remove:
                 remove = None
             else:
-                tiles.append(tile.upper())
+                tiles.append(tile.concealed)
         return tiles
-
-    def toLower(self, first=None, last=None):
-        """use first and last as for ranges"""
-        return Meld(TileList(self).toLower(first, last))
-
-    def toUpper(self, first=None, last=None):
-        """use first and last as for ranges"""
-        return Meld(TileList(self).toUpper(first, last))
 
     def __setitem__(self, index, value):
         """sets a tile in the meld"""
@@ -153,8 +177,8 @@ class Meld(TileList):
         """removes a tile from the meld"""
         raise TypeError
 
-    def __getState(self):
-        """meld state"""
+    def __isExposed(self):
+        """meld state: exposed or not"""
         firsts = ''.join(x.group for x in self)
         if firsts.islower():
             return True
@@ -228,17 +252,6 @@ class Meld(TileList):
                     self.isChow = True
                     return
         raise UserWarning('Meld %s is malformed' % self)
-
-    def expose(self, isClaiming):
-        """expose this meld. For kungs, leave one or two concealed,
-        showing how the kung was built"""
-        tiles = TileList(self)
-        if len(self) < 4:
-            return Meld(tiles.toLower())
-        elif isClaiming:
-            return Meld(tiles.toLower(0, 3).toUpper(3))
-        else: # concealed kong
-            return Meld(tiles.toLower(0).toUpper(1, 3).toLower(3))
 
     def __lt__(self, other):
         """used for sorting. Smaller value is shown first."""

@@ -642,7 +642,7 @@ class SelectorBoard(CourtBoard):
         """move all tiles back into the selector"""
         with Animated(False):
             for uiTile in self.allSelectorTiles:
-                uiTile.tile = uiTile.tile.lower()
+                uiTile.tile = uiTile.tile.exposed
                 self.__placeAvailable(uiTile)
                 uiTile.dark = False
                 uiTile.focusable = True
@@ -684,7 +684,7 @@ class SelectorBoard(CourtBoard):
         assert isinstance(uiTile, UITile), uiTile
         result = UIMeld(uiTile)
         for tile in meld[1:]:
-            baseTiles = list(x for x in self.tilesByElement(tile.lower()) if x not in result)
+            baseTiles = list(x for x in self.tilesByElement(tile.exposed) if x not in result)
             result.append(baseTiles[0])
         return result
 
@@ -708,9 +708,9 @@ class SelectorBoard(CourtBoard):
         assert isinstance(uiTile, UITile)
         wantedTile = uiTile.tile
         for selectorTile in self.uiTiles:
-            selectorTile.tile = selectorTile.tile.lower()
-        lowerName = wantedTile.lower()
-        upperName = wantedTile.upper()
+            selectorTile.tile = selectorTile.tile.exposed
+        lowerName = wantedTile.exposed
+        upperName = wantedTile.concealed
         if lowerHalf:
             scName = upperName
         else:
@@ -732,7 +732,7 @@ class SelectorBoard(CourtBoard):
         if not wantedTile.isHonor and wantedTile.value < '8':
             chow2 = scName.nextForChow()
             chow3 = chow2.nextForChow()
-            if self.tilesByElement(chow2.lower()) and self.tilesByElement(chow3.lower()):
+            if self.tilesByElement(chow2.exposed) and self.tilesByElement(chow3.exposed):
                 variants.append([scName, chow2, chow3])
         # variants now holds a list of lists of tiles
         return [Meld(x) for x in variants]

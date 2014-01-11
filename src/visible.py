@@ -139,15 +139,15 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
     def robTile(self, tile):
         """used for robbing the kong"""
         PlayingPlayer.robTile(self, tile)
-        tile = tile.lower()
+        tile = tile.exposed
         hbTiles = self.handBoard.uiTiles
         lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
-        lastDiscard.tile = lastDiscard.tile.upper()
+        lastDiscard.tile = lastDiscard.tile.concealed
         Internal.scene.discardBoard.lastDiscarded = lastDiscard
         # remove from board of robbed player, otherwise syncHandBoard would
         # not fix display for the robbed player
         lastDiscard.setBoard(None)
-        assert lastDiscard.tile.istitle()
+        assert lastDiscard.tile.isConcealed
         self.syncHandBoard()
 
     def addConcealedTiles(self, uiTiles, animated=True):

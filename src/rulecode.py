@@ -50,77 +50,75 @@ class RuleCode(object):
 
 class DragonPungKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return (len(meld) >= 3
-            and meld.isDragonMeld
-            and (meld.isPung or meld.isKong))
+        return meld.isPungKong and meld.isDragonMeld
 
 class RoundWindPungKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.roundWind
+        return meld.isPungKong and meld.isWindMeld and meld[0].value == hand.roundWind
 
 class ExposedMinorPung(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPung and meld.isLower(0, 3) and meld[0].isMinor
+        return meld.isPung and meld[0].isMinor and meld.isExposed
 
 class ExposedTerminalsPung(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPung and meld.isLower(0, 3) and meld[0].isTerminal
+        return meld.isExposed and meld[0].isTerminal and meld.isPung
 
 class ExposedHonorsPung(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPung and meld.group in Tile.honors
+        return meld.isExposed and meld.isHonorMeld and meld.isPung
 
 class ExposedMinorKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isMinor
+        return meld.isExposed and meld[0].isMinor and meld.isKong
 
 class ExposedTerminalsKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isTerminal
+        return meld.isExposed and meld[0].isTerminal and meld.isKong
 
 class ExposedHonorsKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return len(meld) == 4 and meld.isLower(0, 3) and meld[0].isHonor
+        return meld.isExposed and meld.isHonorMeld and meld.isKong
 
 class ConcealedMinorPung(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPung and meld.isUpper(0, 3) and meld[0].isMinor
+        return meld.isConcealed and meld[0].isMinor and meld.isPung
 
 class ConcealedTerminalsPung(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPung and meld.isUpper(0, 3) and meld[0].isTerminal
+        return meld.isConcealed and meld[0].isTerminal and meld.isPung
 
 class ConcealedHonorsPung(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPung and meld[0].group in Tile.honors.upper()
+        return meld.isConcealed and meld.isHonorMeld and meld.isPung
 
 class ConcealedMinorKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return len(meld) == 4 and not meld.isExposed and meld[0].isMinor
+        return meld.isConcealed and meld[0].isMinor and meld.isKong
 
 class ConcealedTerminalsKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return len(meld) == 4 and not meld.isExposed and meld[0].isTerminal
+        return meld.isConcealed and meld[0].isTerminal and meld.isKong
 
 class ConcealedHonorsKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return len(meld) == 4 and not meld.isExposed and meld.isHonorMeld
+        return meld.isConcealed and meld.isHonorMeld and meld.isKong
 
 class OwnWindPungKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return len(meld) >= 3 and meld.isWindMeld and meld[0].value == hand.ownWind
+        return meld.isPungKong and meld[0].value == hand.ownWind
 
 class OwnWindPair(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPair and meld.isWindMeld and meld[0].value == hand.ownWind
+        return meld.isPair and meld[0].value == hand.ownWind
 
 class RoundWindPair(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPair and meld.isWindMeld and meld[0].value == hand.roundWind
+        return meld.isPair and meld[0].value == hand.roundWind
 
 class DragonPair(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPair and meld.isDragonMeld
+        return meld.isDragonMeld and meld.isPair
 
 class LastTileCompletesPairMinor(RuleCode):
     def appliesToHand(hand):
@@ -140,7 +138,7 @@ class LastTileCompletesPairMajor(RuleCode):
 
 class LastFromWall(RuleCode):
     def appliesToHand(hand):
-        return hand.lastTile and hand.lastTile.group.isupper()
+        return hand.lastTile and hand.lastTile.isConcealed
 
 class ZeroPointHand(RuleCode):
     def appliesToHand(hand):
@@ -185,14 +183,14 @@ class OnlyHonors(RuleCode):
 class HiddenTreasure(RuleCode):
     def appliesToHand(hand):
         return (not any(((x.isExposed and not x.isClaimedKong) or x.isChow) for x in hand.melds)
-            and hand.lastTile and hand.lastTile.group.isupper()
+            and hand.lastTile and hand.lastTile.isConcealed
             and len(hand.melds) == 5)
 
 class BuriedTreasure(RuleCode):
     def appliesToHand(hand):
         return (len(hand.suits - set(Tile.honors)) == 1
             and sum(x.isPung for x in hand.melds) == 4
-            and all((x.isPung and not x.isExposed ) or x.isPair for x in hand.melds))
+            and all((x.isPung and x.isConcealed ) or x.isPair for x in hand.melds))
 
 class AllTerminals(RuleCode):
     def appliesToHand(hand):
@@ -248,7 +246,7 @@ class StandardMahJongg(RuleCode):
             return set()
         if not hand.tilesInHand:
             return set()
-        inHand = list(x.lower() for x in hand.tilesInHand)
+        inHand = list(x.exposed for x in hand.tilesInHand)
         result = inHand[:]
         pairs = 0
         isolated = 0
@@ -333,7 +331,7 @@ class StandardMahJongg(RuleCode):
             if len(values) == 1:
                 # only a pair of this value is possible
                 # logDebug('need pair')
-                return {Tile(group.upper(), values[0])}
+                return {Tile(group, values[0]).concealed}
             if len(valueSet) == 1:
                 # no chow reachable, only pair/pung
                 continue
@@ -396,7 +394,7 @@ class SquirmingSnake(StandardMahJongg):
 
 class WrigglingSnake(RuleCode):
     def shouldTry(hand, maxMissing=3):
-        return (len(set(x.lower() for x in hand.tiles)) + maxMissing > 12
+        return (len(set(x.exposed for x in hand.tiles)) + maxMissing > 12
            and all(not x.isChow for x in hand.declaredMelds))
 
     def computeLastMelds(hand):
@@ -421,7 +419,7 @@ class WrigglingSnake(RuleCode):
                 return set()
             else:
                 return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) \
-                    - set([x.lower() for x in hand.tiles])
+                    - set([x.exposed for x in hand.tiles])
         else:
             # pair of 1 is not complete
             return set([Tile(group, '1')])
@@ -513,7 +511,7 @@ class TripleKnitting(RuleCode):
             return False
         if len(hand.declaredMelds) > 1:
             return False
-        if hand.lastTile and hand.lastTile.istitle() and hand.declaredMelds:
+        if hand.lastTile and hand.lastTile.isConcealed and hand.declaredMelds:
             return False
         triples, rest = cls.findTriples(hand)
         return (len(triples) == 4 and len(rest) == 2
@@ -527,7 +525,7 @@ class TripleKnitting(RuleCode):
         _, rest = cls.findTriples(hand)
         if len(rest) not in (1, 4):
             return set()
-        result = list([Tile(x, y.value).upper() for x in Tile.colors for y in rest])
+        result = list([Tile(x, y.value).concealed for x in Tile.colors for y in rest])
         for restTile in rest:
             result.remove(restTile)
         return set(result)
@@ -546,12 +544,12 @@ class TripleKnitting(RuleCode):
             if len(hand.declaredMelds) > 1:
                 return (tuple(), None)
         result = []
-        tilesS = list(x.capitalize() for x in hand.tiles if x.lowerGroup == Tile.stone)
-        tilesB = list(x.capitalize() for x in hand.tiles if x.lowerGroup == Tile.bamboo)
-        tilesC = list(x.capitalize() for x in hand.tiles if x.lowerGroup == Tile.character)
+        tilesS = list(x.concealed for x in hand.tiles if x.lowerGroup == Tile.stone)
+        tilesB = list(x.concealed for x in hand.tiles if x.lowerGroup == Tile.bamboo)
+        tilesC = list(x.concealed for x in hand.tiles if x.lowerGroup == Tile.character)
         for tileS in tilesS[:]:
-            tileB = Tile(Tile.bamboo, tileS.value).upper()
-            tileC = Tile(Tile.character, tileS.value).upper()
+            tileB = Tile(Tile.bamboo, tileS.value).concealed
+            tileC = Tile(Tile.character, tileS.value).concealed
             if tileB in tilesB and tileC in tilesC:
                 tilesS.remove(tileS)
                 tilesB.remove(tileB)
@@ -593,7 +591,7 @@ class Knitting(RuleCode):
             return False
         if len(hand.declaredMelds) > 1:
             return False
-        if hand.lastTile and hand.lastTile.istitle() and hand.declaredMelds:
+        if hand.lastTile and hand.lastTile.isConcealed and hand.declaredMelds:
             return False
         return len(cls.findCouples(hand)[0]) == 7
 
@@ -611,7 +609,7 @@ class Knitting(RuleCode):
         assert len(singleTile) == 1
         singleTile = singleTile[0]
         otherSuit = (hand.suits - set([singleTile.lowerGroup])).pop()
-        otherTile = Tile(otherSuit.capitalize(), singleTile.value)
+        otherTile = Tile(otherSuit, singleTile.value).concealed
         return set([otherTile])
     def rearrange(cls, hand, rest):
         melds = []
@@ -639,10 +637,10 @@ class Knitting(RuleCode):
         tiles0 = list(x for x in pairs if x.lowerGroup == suits[0])
         tiles1 = list(x for x in pairs if x.lowerGroup == suits[1])
         for tile0 in tiles0[:]:
-            if tile0.islower():
+            if tile0.isExposed:
                 tile1 = Tile(suits[1], tile0.value)
             else:
-                tile1 = Tile(suits[1].upper(), tile0.value)
+                tile1 = Tile(suits[1], tile0.value).concealed
             if tile1 in tiles1:
                 tiles0.remove(tile0)
                 tiles1.remove(tile1)
@@ -687,7 +685,7 @@ class AllPairHonors(RuleCode):
     def shouldTry(hand, maxMissing=4):
         if hand.declaredMelds:
             return False
-        tiles = list(x.lower() for x in hand.tiles)
+        tiles = list(x.exposed for x in hand.tiles)
         pairCount = kongCount = 0
         for tile in elements.majors:
             count = tiles.count(tile)
@@ -733,11 +731,11 @@ class ThreeGreatScholars(RuleCode):
 
 class BigThreeDragons(RuleCode):
     def appliesToHand(hand):
-        return len([x for x in hand.melds if x.isDragonMeld and len(x) >= 3]) == 3
+        return len([x for x in hand.melds if x.isDragonMeld and x.isPungKong]) == 3
 
 class BigFourJoys(RuleCode):
     def appliesToHand(hand):
-        return len([x for x in hand.melds if x.isWindMeld and len(x) >= 3]) == 4
+        return len([x for x in hand.melds if x.isWindMeld and x.isPungKong]) == 4
 
 class LittleFourJoys(RuleCode):
     def appliesToHand(hand):
@@ -751,11 +749,11 @@ class LittleThreeDragons(RuleCode):
 
 class FourBlessingsHoveringOverTheDoor(RuleCode):
     def appliesToHand(hand):
-        return len([x for x in hand.melds if len(x) >= 3 and x.isWindMeld]) == 4
+        return len([x for x in hand.melds if x.isPungKong and x.isWindMeld]) == 4
 
 class AllGreen(RuleCode):
     def appliesToHand(hand):
-        return set(x.lower() for x in hand.tiles) < elements.greenHandTiles
+        return set(x.exposed for x in hand.tiles) < elements.greenHandTiles
 
 class LastTileFromWall(RuleCode):
     def appliesToHand(hand):
@@ -793,15 +791,15 @@ class RobbingKong(RuleCode):
         """for scoring game"""
         return (hand.lastSource and hand.lastSource in 'kwd'
             and hand.lastTile and hand.lastTile.group.islower()
-            and [x.lower() for x in hand.tiles].count(hand.lastTile.lower()) < 2)
+            and [x.exposed for x in hand.tiles].count(hand.lastTile.exposed) < 2)
 
 class GatheringPlumBlossomFromRoof(RuleCode):
     def appliesToHand(hand):
-        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, '5').upper()
+        return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, '5').concealed
 
 class PluckingMoon(RuleCode):
     def appliesToHand(hand):
-        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, '1').upper()
+        return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile == Tile(Tile.stone, '1').concealed
 
 class ScratchingPole(RuleCode):
     def appliesToHand(hand):
@@ -916,7 +914,7 @@ class ThirteenOrphans(RuleCode):
 # TODO: compute scoring for resulting hand. If it is high anyway,
 # prefer pung over trying 13 orphans
                 for rule in hand.ruleset.doublingMeldRules:
-                    if rule.appliesToMeld(hand, Meld(discard.lower() * 3)):
+                    if rule.appliesToMeld(hand, Meld(discard.exposed * 3)):
                         doublesCount += 1
             if doublesCount < 2 or cls.shouldTry(hand, 1):
                 result[Message.Pung] = -999
@@ -925,7 +923,7 @@ class ThirteenOrphans(RuleCode):
         return result
 
     def appliesToHand(hand):
-        return set(x.lower() for x in hand.tiles) == elements.majors
+        return set(x.exposed for x in hand.tiles) == elements.majors
 
     def winningTileCandidates(cls, hand):
         if any(x in hand.values for x in Tile.minors):
@@ -933,7 +931,7 @@ class ThirteenOrphans(RuleCode):
             return set()
         if not cls.shouldTry(hand, 1):
             return set()
-        handTiles = set(x.lower() for x in hand.tiles)
+        handTiles = set(x.exposed for x in hand.tiles)
         missing = elements.majors - handTiles
         if len(missing) == 0:
             # if all 13 tiles are there, we need any one of them:
@@ -948,7 +946,7 @@ class ThirteenOrphans(RuleCode):
             return False
         if hand.doublesEstimate() > 1:
             return False
-        handTiles = set(x.lower() for x in hand.tiles)
+        handTiles = set(x.exposed for x in hand.tiles)
         missing = elements.majors - handTiles
         if len(missing) > maxMissing:
             return False
@@ -961,7 +959,7 @@ class ThirteenOrphans(RuleCode):
         hand = candidates.hand
         if not cls.shouldTry(hand):
             return candidates
-        handTiles = set(x.lower() for x in hand.tiles)
+        handTiles = set(x.exposed for x in hand.tiles)
         missing = elements.majors - handTiles
         havePair = False
         keep = (6 - len(missing)) * 5
@@ -1002,7 +1000,7 @@ class AllSeasons(RuleCode):
 class ThreeConcealedPongs(RuleCode):
     def appliesToHand(hand):
         return len([x for x in hand.melds if (
-            not x.isExposed or x.isClaimedKong) and (x.isPung or x.isKong)]) >= 3
+            x.isConcealed or x.isClaimedKong) and x.isPungKong]) >= 3
 
 class MahJonggWithOriginalCall(RuleCode):
     def appliesToHand(hand):

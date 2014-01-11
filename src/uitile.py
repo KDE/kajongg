@@ -162,10 +162,10 @@ class UITile(QGraphicsObject):
             if self.showFace():
                 if withBorders:
                     faceSize = self.tileset.faceSize.toSize()
-                    renderer.render(painter, self.tileset.svgName[str(self.tile.lower())],
+                    renderer.render(painter, self.tileset.svgName[str(self.tile.exposed)],
                             QRectF(self.facePos(), QSizeF(faceSize)))
                 else:
-                    renderer.render(painter, self.tileset.svgName[str(self.tile.lower())],
+                    renderer.render(painter, self.tileset.svgName[str(self.tile.exposed)],
                         self.boundingRect())
         if self.cross:
             self.__paintCross(painter)
@@ -212,7 +212,7 @@ class UITile(QGraphicsObject):
             faceSize = self.tileset.faceSize.toSize()
             faceSize = QSize(faceSize.width() * xScale, faceSize.height() * yScale)
             painter.translate(self.facePos())
-            renderer.render(painter, self.tileset.svgName[self.tile.lower()],
+            renderer.render(painter, self.tileset.svgName[self.tile.exposed],
                     QRectF(QPointF(), QSizeF(faceSize)))
         return result
 

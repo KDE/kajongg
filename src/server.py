@@ -392,10 +392,7 @@ class ServerTable(Table):
         wallSize = len(self.game.wall.tiles)
         self.game.wall.tiles = []
         for _ in range(wallSize):
-            tile = elementIter.next()
-            if not tile.isBonus:
-                tile = tile.capitalize()
-            self.game.wall.tiles.append(tile)
+            self.game.wall.tiles.append(elementIter.next().concealed)
         assert isinstance(self.game, ServerGame), self.game
         self.running = True
         self.__adaptOtherTables()
@@ -646,7 +643,7 @@ class ServerTable(Table):
         discardingPlayer = self.game.activePlayer
         hasTiles = hasTiles.without(lastDiscard)
         meld = Meld(meldTiles)
-        if len(meld) != 4 and not (meld.isPair or meld.isPung or meld.isKong or meld.isChow):
+        if len(meld) != 4 and not (meld.isPair or meld.isPungKong or meld.isChow):
             msg = m18nE('%1 wrongly said %2 for meld %3')
             self.abort(msg, player.name, claim.name, str(meld))
             return
@@ -655,10 +652,10 @@ class ServerTable(Table):
             self.abort(msg, player.name, claim.name, ' '.join(hasTiles), ''.join(player.concealedTiles))
             return
         # update our internal state before we listen to the clients again
-        self.game.discardedTiles[lastDiscard.lower()] -= 1
+        self.game.discardedTiles[lastDiscard.exposed] -= 1
         self.game.activePlayer = player
         if lastDiscard:
-            player.lastTile = lastDiscard.lower()
+            player.lastTile = lastDiscard.exposed
             player.lastSource = 'd'
         player.exposeMeld(hasTiles, lastDiscard)
         self.game.lastDiscard = None
@@ -712,7 +709,7 @@ class ServerTable(Table):
         robbedTheKong = lastMove.message == Message.DeclaredKong
         if robbedTheKong:
             player.lastSource = 'k'
-            withDiscard = lastMove.meld[0].upper()
+            withDiscard = lastMove.meld[0].concealed
             lastMove.player.robTile(withDiscard)
         lastMeld = Meld(lastMeld)
         msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)

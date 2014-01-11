@@ -46,14 +46,15 @@ class TileAttr(object):
             player = hand.player
             scoring = hand.__class__.__name__ ==  'ScoringHandBoard'  # TODO: get rid of this
             if yoffset == 0:
-                self.dark = self.tile.istitle()
+                self.dark = self.tile.isConcealed
             else:
                 self.dark = not self.tile.isKnown or scoring
             self.focusable = True
             if scoring:
                 self.focusable = idx == 0
             else:
-                lowerRow = not meld.isExposed if isinstance(meld, Meld) else meld.isUpper()
+                assert isinstance(meld, Meld), meld
+                lowerRow = meld.isConcealed if isinstance(meld, Meld) else meld.isUpper()
                 self.focusable = (not self.tile.isBonus
                     and self.tile.isKnown
                     and player == player.game.activePlayer
@@ -219,7 +220,7 @@ class HandBoard(Board):
         for newPosition in newPositions:
             assert isinstance(newPosition.tile, Tile)
             matches = oldTiles.get(newPosition.tile) \
-                or oldTiles.get(newPosition.tile.swapTitle()) \
+                or oldTiles.get(newPosition.tile.swapped) \
                 or oldTiles.get(Tile.unknown)
             if not matches and not newPosition.tile.isKnown and oldTiles:
                 # 13 orphans, robbing Kong, lastTile is single: no oldTiles exist
@@ -304,10 +305,10 @@ class PlayingHandBoard(HandBoard):
             allTiles.extend(adding)
         newPlaces = self.calcPlaces(allTiles)
         source = adding if adding else newPlaces.keys()
-        focusCandidates = list(x for x in source if x.focusable and not x.tile.isExposed)
+        focusCandidates = list(x for x in source if x.focusable and x.tile.isConcealed)
         if not focusCandidates:
             # happens if we just exposed a claimed meld
-            focusCandidates = list(x for x in newPlaces.keys() if x.focusable and not x.tile.isExposed)
+            focusCandidates = list(x for x in newPlaces.keys() if x.focusable and x.tile.isConcealed)
         focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
         if focusCandidates:
             self.focusTile = focusCandidates[0]

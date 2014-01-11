@@ -337,8 +337,8 @@ class Hand(object):
                 'lastTile %s is not in hand %s, mjStr=%s' % (
                 self.__lastTile, self.string, self.mjStr)
             if self.__lastSource == 'k':
-                assert self.tiles.count(self.__lastTile.lower()) + \
-                    self.tiles.count(self.__lastTile.capitalize()) == 1, \
+                assert self.tiles.count(self.__lastTile.exposed) + \
+                    self.tiles.count(self.__lastTile.concealed) == 1, \
                     'Robbing kong: I cannot have lastTile %s more than once in %s' % (
                     self.__lastTile, ' '.join(self.tiles))
 
@@ -398,7 +398,7 @@ class Hand(object):
 
     def __add__(self, addTile):
         """returns a new Hand built from this one plus addTile"""
-        assert addTile.istitle(), 'addTile %s should be title:' % addTile
+        assert addTile.isConcealed, 'addTile %s should be concealed:' % addTile
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
@@ -430,22 +430,22 @@ class Hand(object):
                     del boni[idx]
                     break
         else:
-            if lastMeld and lastMeld.isDeclared and subtractTile.lower() in lastMeld.toLower():
+            if lastMeld and lastMeld.isDeclared and (subtractTile.exposed in lastMeld.exposed):
                 declaredMelds.remove(lastMeld)
-                tilesInHand.extend(lastMeld.toUpper())
-            tilesInHand.remove(subtractTile.upper())
+                tilesInHand.extend(lastMeld.concealed)
+            tilesInHand.remove(subtractTile.concealed)
         for meld in declaredMelds[:]:
             if len(meld) < 3:
                 declaredMelds.remove(meld)
-                tilesInHand.extend(meld.toUpper())
+                tilesInHand.extend(meld.concealed)
         newParts = []
         for idx, part in enumerate(self.mjStr.split()):
             if part[0] == 'm':
                 if len(part) > 1 and part[1] == 'k':
                     continue
             elif part[0] == 'L':
-                if self.lastTile.isExposed and self.lastTile.upper() in tilesInHand:
-                    part = 'L' + self.lastTile.upper()
+                if self.lastTile.isExposed and self.lastTile.concealed in tilesInHand:
+                    part = 'L' + self.lastTile.concealed
                 else:
                     continue
             newParts.append(part)
@@ -484,10 +484,10 @@ class Hand(object):
             cand = rule.winningTileCandidates(self)
             if Debug.hand and cand:
                 self.debug(fmt('callingHands found {cand} for {rule}'))
-            candidates.extend(x.capitalize() for x in cand)
+            candidates.extend(x.concealed for x in cand)
         # sort only for reproducibility
         for tile in sorted(set(candidates)):
-            if sum(x.lower() == tile.lower() for x in self.tiles) == 4:
+            if sum(x.exposed == tile.exposed for x in self.tiles) == 4:
                 continue
             hand = self + tile
             if hand.won:
@@ -504,7 +504,7 @@ class Hand(object):
             if self.player.game.moves: # scoringtest does not (yet) simulate this
                 lastMove = self.player.game.moves[-1]
                 if lastMove.message == Message.DeclaredKong and lastMove.player != self.player:
-                    self.__robbedTile = lastMove.meld[1] # we want it capitalized only for a hidden Kong
+                    self.__robbedTile = lastMove.meld[1] # we want it concealed only for a hidden Kong
         return self.__robbedTile
 
     def __maybeMahjongg(self):
@@ -514,7 +514,7 @@ class Hand(object):
         if self.lenOffset == 1 and self.player.mayWin:
             matchingMJRules = [x for x in self.ruleset.mjRules if x.appliesToHand(self)]
             if matchingMJRules:
-                if self.robbedTile and self.robbedTile.istitle():
+                if self.robbedTile and self.robbedTile.isConcealed:
                     # Millington 58: robbing hidden kong is only allowed for 13 orphans
                     matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
                 return sorted(matchingMJRules, key=lambda x: -x.score.total())

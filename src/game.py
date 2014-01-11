@@ -309,8 +309,8 @@ class Game(object):
         self.__lastDiscard = value
         if value is not None:
             assert isinstance(value, Tile), value
-            if not value.istitle():
-                raise Exception('lastDiscard is lower:%s' % value)
+            if value.isExposed:
+                raise Exception('lastDiscard is exposed:%s' % value)
 
     @property
     def winner(self):
@@ -883,14 +883,14 @@ class PlayingGame(Game):
         assert isinstance(tileName, Tile)
         if player != self.activePlayer:
             raise Exception('Player %s discards but %s is active' % (player, self.activePlayer))
-        self.discardedTiles[tileName.lower()] += 1
+        self.discardedTiles[tileName.exposed] += 1
         player.discarded.append(tileName)
         self.__concealedTileName(tileName) # has side effect, needs to be called
         if Internal.scene:
             player.handBoard.discard(tileName)
         self.lastDiscard = Tile(tileName)
         player.removeTile(self.lastDiscard)
-        if any(tileName.lower() in x[0] for x in self.dangerousTiles):
+        if any(tileName.exposed in x[0] for x in self.dangerousTiles):
             self.computeDangerous()
         else:
             self._endWallDangerous()
@@ -955,7 +955,7 @@ class PlayingGame(Game):
         would be Dangerous game for forPlayer. One text for each
         reason - there might be more than one"""
         assert isinstance(tile, Tile), tile
-        tile = tile.lower()
+        tile = tile.exposed
         result = []
         for dang, txt in self.dangerousTiles:
             if tile in dang:

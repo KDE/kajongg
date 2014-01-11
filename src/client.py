@@ -411,13 +411,13 @@ class Client(object, pb.Referenceable):
             calledTileItem = None
             calledTile = self.game.lastDiscard
         self.game.lastDiscard = None
-        self.game.discardedTiles[calledTile.lower()] -= 1
+        self.game.discardedTiles[calledTile.exposed] -= 1
         assert calledTile in move.meld, '%s %s'% (calledTile, move.meld)
         hadTiles = move.meld[:]
         hadTiles.remove(calledTile)
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
-        move.player.lastTile = calledTile.lower()
+        move.player.lastTile = calledTile.exposed
         move.player.lastSource = 'd'
         move.exposedMeld = move.player.exposeMeld(hadTiles, calledTile=calledTileItem or calledTile)
 
