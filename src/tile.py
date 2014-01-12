@@ -48,7 +48,10 @@ class Tile(str):
                 'fefsfwfnyeysywyn'
         # the // is needed as separator between too many w's
         # intelligence.py will define Tile('b0') or Tile('s:')
+
     unknown = None
+
+    # Groups:
     hidden = 'x'
     stone = 's'
     bamboo = 'b'
@@ -56,23 +59,20 @@ class Tile(str):
     colors = stone + bamboo + character
     wind = 'w'
     dragon = 'd'
-    white = 'b'
-    green = 'g'
-    red = 'r'
-    dragons = white + green + red
     honors = wind + dragon
-    numbers = range(1, 10)
-    terminals = list([1, 9])
-    minors = range(2, 9)
-    majors = list(honors) + terminals
-    east = 'e'
-    south = 's'
-    west = 'w'
-    north = 'n'
-    winds = east + south + west + north
     flower = 'f'
     season = 'y'
     boni = flower + season
+
+    # Values:
+    dragons = 'bgr'
+    white, green, red = dragons
+    winds = 'eswn'
+    east, south, west, north = winds
+    numbers = range(1, 10)
+    terminals = list([1, 9])
+    minors = range(2, 9)
+    majors = list(dragons) + list(winds) + terminals
 
     def __new__(cls, *args):
         return cls.cache.get(args) or cls.__build(*args)
