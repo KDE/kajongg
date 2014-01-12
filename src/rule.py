@@ -757,7 +757,7 @@ class Rule(RuleBase):
     which is there for loading&saving, but internally is stripped off."""
     # pylint: disable=too-many-arguments,too-many-instance-attributes
 
-    ruleCode = None
+    ruleCode = {}
     limitHand = None
 
     @classmethod
@@ -828,7 +828,6 @@ class Rule(RuleBase):
         Also convert all RuleCode methods into classmethod or staticmethod"""
         if not cls.ruleCode:
             import rulecode
-            cls.ruleCode = {}
             for ruleClass in rulecode.__dict__.values():
                 if hasattr(ruleClass, "__mro__"):
                     if ruleClass.__mro__[-2].__name__ == 'RuleCode' and len(ruleClass.__mro__) > 2:
