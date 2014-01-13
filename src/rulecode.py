@@ -52,10 +52,6 @@ class DragonPungKong(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPungKong and meld.isDragonMeld
 
-class RoundWindPungKong(RuleCode):
-    def appliesToMeld(hand, meld):
-        return meld.isPungKong and meld.isWindMeld and meld[0].value == hand.roundWind
-
 class ExposedMinorPung(RuleCode):
     def appliesToMeld(hand, meld):
         return meld.isPung and meld[0].isMinor and meld.isExposed
@@ -106,15 +102,32 @@ class ConcealedHonorsKong(RuleCode):
 
 class OwnWindPungKong(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPungKong and meld[0].value == hand.ownWind
+        return meld[0].value == hand.ownWind
+    def mayApplyToMeld(meld):
+        """for meld rules which depend on context like hand.ownWind, we want
+        to know if there could be a context where this rule applies. See
+        Meld.rules.
+        NOTE: If a rulecode class has mayApplyToMeld, its appliesToMeld can
+        assume that mayApplyToMeld has already been checked."""
+        return meld.isPungKong and meld.isWindMeld
 
 class OwnWindPair(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPair and meld[0].value == hand.ownWind
+        return meld[0].value == hand.ownWind
+    def mayApplyToMeld(meld):
+        return meld.isPair and meld.isWindMeld
+
+class RoundWindPungKong(RuleCode):
+    def appliesToMeld(hand, meld):
+        return meld[0].value == hand.roundWind
+    def mayApplyToMeld(meld):
+        return meld.isPungKong and meld.isWindMeld
 
 class RoundWindPair(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isPair and meld[0].value == hand.roundWind
+        return meld[0].value == hand.roundWind
+    def mayApplyToMeld(meld):
+        return meld.isPair and meld.isWindMeld
 
 class DragonPair(RuleCode):
     def appliesToMeld(hand, meld):
@@ -909,13 +922,9 @@ class ThirteenOrphans(RuleCode):
     def claimness(cls, hand, discard):
         result = IntDict()
         if cls.shouldTry(hand):
-            doublesCount = hand.doublesEstimate()
-            if hand.tiles.count(discard) == 2:
+            doublesCount = hand.doublesEstimate(discard)
 # TODO: compute scoring for resulting hand. If it is high anyway,
 # prefer pung over trying 13 orphans
-                for rule in hand.ruleset.doublingMeldRules:
-                    if rule.appliesToMeld(hand, Meld(discard.exposed * 3)):
-                        doublesCount += 1
             if doublesCount < 2 or cls.shouldTry(hand, 1):
                 result[Message.Pung] = -999
                 result[Message.Kong] = -999
@@ -943,8 +952,6 @@ class ThirteenOrphans(RuleCode):
     def shouldTry(hand, maxMissing=4):
         # TODO: look at how many tiles there still are on the wall
         if hand.declaredMelds:
-            return False
-        if hand.doublesEstimate() > 1:
             return False
         handTiles = set(x.exposed for x in hand.tiles)
         missing = elements.majors - handTiles
@@ -976,11 +983,15 @@ class ThirteenOrphans(RuleCode):
 
 class OwnFlower(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isBonus and meld[0].value == hand.ownWind and meld[0].group == Tile.flower
+        return meld[0].value == hand.ownWind
+    def mayApplyToMeld(meld):
+        return meld.isBonus and meld[0].group == Tile.flower
 
 class OwnSeason(RuleCode):
     def appliesToMeld(hand, meld):
-        return meld.isBonus and meld[0].value == hand.ownWind and meld[0].group == Tile.season
+        return meld[0].value == hand.ownWind
+    def mayApplyToMeld(meld):
+        return meld.isBonus and meld[0].group == Tile.season
 
 class OwnFlowerOwnSeason(RuleCode):
     def appliesToHand(hand):

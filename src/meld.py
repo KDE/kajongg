@@ -22,7 +22,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 
-
+from itertools import chain
 
 from log import m18nc
 from tile import Tile, TileList
@@ -111,6 +111,11 @@ class Meld(TileList):
                 self.lowerGroup = 'x'
             self.isRest = False
             self.__staticRules = {} # ruleset is key
+            self.__dynamicRules = {} # ruleset is key
+            self.__staticDoublingRules = {} # ruleset is key
+            self.__dynamicDoublingRules = {} # ruleset is key
+            self.__hasRules = None # unknown yet
+            self.__hasDoublingRules = None # unknown yet
             self.concealed = self.exposed = self.exposedClaimed = None # to satisfy pylint
             self._fixed = True
 
@@ -128,16 +133,50 @@ class Meld(TileList):
                     Meld(TileList([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed])))
 
     def __setattr__(self, name, value):
-        if hasattr(self, '_fixed'):
+        if (hasattr(self, '_fixed')
+            and not name.endswith('__hasRules')
+            and not name.endswith('__hasDoublingRules')):
             raise TypeError
         TileList.__setattr__(self, name, value)
 
-    def staticRules(self, ruleset):
-        """return cached static meld rules: those always apply regardless of their context"""
-        if id(ruleset) not in self.__staticRules:
-            result = ruleset.applyStaticMeldRules(self)
-            self.__staticRules[id(ruleset)] = result
-        return self.__staticRules[id(ruleset)]
+    def __prepareRules(self, ruleset):
+        """prepare rules from ruleset"""
+        rulesetId = id(ruleset)
+        self.__staticRules[rulesetId] = list(x for x in ruleset.meldRules
+            if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
+        self.__dynamicRules[rulesetId] = list(x for x in ruleset.meldRules
+            if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self))
+        self.__hasRules = any(len(x) for x in chain(
+            self.__staticRules.values(), self.__dynamicRules.values()))
+
+        self.__staticDoublingRules[rulesetId] = list(x for x in ruleset.doublingMeldRules
+            if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
+        self.__dynamicDoublingRules[rulesetId] = list(x for x in ruleset.doublingMeldRules
+            if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self))
+        self.__hasDoublingRules = any(len(x) for x in chain(
+            self.__staticDoublingRules.values(), self.__dynamicDoublingRules.values()))
+
+    def rules(self, hand):
+        """all applicable rules for this meld being part of hand"""
+        if self.__hasRules is False:
+            return []
+        ruleset = hand.ruleset
+        rulesetId = id(ruleset)
+        if rulesetId not in self.__staticRules:
+            self.__prepareRules(ruleset)
+        result = self.__staticRules[rulesetId][:]
+        result.extend(x for x in self.__dynamicRules[rulesetId] if x.appliesToMeld(hand, self))
+        return result
+
+    def doublingRules(self, hand):
+        """all applicable doubling rules for this meld being part of hand"""
+        ruleset = hand.ruleset
+        rulesetId = id(ruleset)
+        if rulesetId not in self.__staticRules:
+            self.__prepareRules(ruleset)
+        result = self.__staticDoublingRules[rulesetId][:]
+        result.extend(x for x in self.__dynamicDoublingRules[rulesetId] if x.appliesToMeld(hand, self))
+        return result
 
     def append(self, dummy):
         """we want to be immutable"""

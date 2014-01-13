@@ -267,10 +267,13 @@ class Hand(object):
     def __applyRules(self):
         """find out which rules apply, collect in self.usedRules"""
         self.usedRules = []
-        if self.__hasExclusiveRules():
-            return
-        self.__applyMeldRules()
-        self.__applyHandRules()
+
+        for meld in chain(self.melds, self.bonusMelds):
+            self.usedRules.extend(UsedRule(x, meld) for x in meld.rules(self))
+        for rule in self.ruleset.handRules:
+            if rule.appliesToHand(self):
+                self.usedRules.append(UsedRule(rule))
+
         if self.__hasExclusiveRules():
             return
         self.__score = self.__totalScore()
@@ -307,6 +310,7 @@ class Hand(object):
 
     def __hasExclusiveRules(self):
         """if we have one, remove all others"""
+        # TODO: integrate above for speed
         exclusive = list(x for x in self.usedRules if 'absolute' in x.rule.options)
         if exclusive:
             self.usedRules = exclusive
@@ -604,20 +608,6 @@ class Hand(object):
         """return all matching rules for this hand"""
         return list(rule for rule in rules if rule.appliesToHand(self))
 
-    def __applyMeldRules(self):
-        """apply all rules for single melds"""
-        for meld in self.melds + self.bonusMelds:
-            self.usedRules.extend(meld.staticRules(self.ruleset))
-            for rule in self.ruleset.dynamicMeldRules:
-                if rule.appliesToMeld(self, meld):
-                    self.usedRules.append(UsedRule(rule, meld))
-
-    def __applyHandRules(self):
-        """apply all hand rules for both winners and losers"""
-        for rule in self.ruleset.handRules:
-            if rule.appliesToHand(self):
-                self.usedRules.append(UsedRule(rule))
-
     @staticmethod
     def maxLimitRule(usedRules):
         """returns the rule with the highest limit score or None"""
@@ -672,14 +662,16 @@ class Hand(object):
             result.append(str(self))
         return result
 
-    def doublesEstimate(self):
+    def doublesEstimate(self, discard=None):
         """this is only an estimate because it only uses meldRules and handRules,
         but not things like mjRules, winnerRules, loserRules"""
         result = 0
-        for meld in (x for x in self.melds if x.isHonorMeld):
-            for rule in self.ruleset.doublingMeldRules:
-                if rule.appliesToMeld(self, meld):
-                    result += rule.score.doubles
+        if discard and self.tiles.count(discard) == 2:
+            melds = chain(self.melds, self.bonusMelds, [Meld(discard.exposed * 3)])
+        else:
+            melds = chain(self.melds, self.bonusMelds)
+        for meld in melds:
+            result += sum(x.score.doubles for x in meld.doublingRules(self))
         for rule in self.ruleset.doublingHandRules:
             if rule.appliesToHand(self):
                 result += rule.score.doubles

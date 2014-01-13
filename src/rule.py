@@ -327,8 +327,6 @@ class Ruleset(object):
         self.rawRules = None # used when we get the rules over the network
         self.doublingMeldRules = []
         self.doublingHandRules = []
-        self.staticMeldRules = []   # only the meld info itself is needed for applicability check
-        self.dynamicMeldRules = []  # we need hand context for applicability check, like pair of own wind
         self.standardMJRule = None
         self.meldRules = RuleList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
@@ -448,16 +446,7 @@ into a situation where you have to pay a penalty"""))
                 self.standardMJRule = mjRule
                 break
         assert self.standardMJRule
-        for meldRule in self.meldRules:
-            if 'dynamic' in meldRule.options:
-                self.dynamicMeldRules.append(meldRule)
-            else:
-                self.staticMeldRules.append(meldRule)
         return self
-
-    def applyStaticMeldRules(self, meld):
-        """returns a list of static meld rules matching meld"""
-        return list(UsedRule(x, meld) for x in self.staticMeldRules if x.appliesToMeld(None, meld))
 
     def __loadQuery(self):
         """returns a Query object with loaded ruleset"""
