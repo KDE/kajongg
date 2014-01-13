@@ -414,13 +414,13 @@ class DiscardCandidates(list):
                 # the names do not matter, just occurrence, available etc
                 thisValue = this.value
                 if not this.prev:
-                    this.prev = TileAI(self, Tile(this.group, thisValue-1))
+                    this.prev = TileAI(self, this.tile.prevForChow)
                 if not this.prev2:
-                    this.prev2 = TileAI(self, Tile(this.group, thisValue-2))
+                    this.prev2 = TileAI(self, this.prev.tile.prevForChow)
                 if not this.next:
-                    this.next = TileAI(self, Tile(this.group, thisValue+1))
+                    this.next = TileAI(self, this.tile.nextForChow)
                 if not this.next2:
-                    this.next2 = TileAI(self, Tile(this.group, thisValue+2))
+                    this.next2 = TileAI(self, this.next.tile.nextForChow)
 
     def unlink(self):
         """remove links between elements. This helps garbage collection."""

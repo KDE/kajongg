@@ -730,8 +730,8 @@ class SelectorBoard(CourtBoard):
         # TODO: old bug: move 3 identical hidden chows to east, then move
         # one of them to south exposed
         if not wantedTile.isHonor and wantedTile.value < '8':
-            chow2 = scName.nextForChow()
-            chow3 = chow2.nextForChow()
+            chow2 = scName.nextForChow
+            chow3 = chow2.nextForChow
             if self.tilesByElement(chow2.exposed) and self.tilesByElement(chow3.exposed):
                 variants.append([scName, chow2, chow3])
         # variants now holds a list of lists of tiles

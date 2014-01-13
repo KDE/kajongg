@@ -121,10 +121,14 @@ class Tile(str):
 
             self.exposed = self.concealed = self.swapped = None  # just to please pylint
             self._fixed = True
-    
+
             str.__setattr__(self, 'exposed', self if not self.isKnown else Tile(str.lower(self)))
             str.__setattr__(self, 'concealed', self if not self.isKnown or self.isBonus else Tile(str.capitalize(self)))
             str.__setattr__(self, 'swapped', self.exposed if self.isConcealed else self.concealed)
+            if 0 <= self.value <= 11:
+                str.__setattr__(self, 'prevForChow', Tile(self.group, self.value - 1))
+            if -1 <= self.value <= 10:
+                str.__setattr__(self, 'nextForChow', Tile(self.group, self.value + 1))
 
 
     def __setattr__(self, name, value):
@@ -154,10 +158,6 @@ class Tile(str):
 
     def capitalize(self):
         raise TypeError
-
-    def nextForChow(self):
-        """the following tile for a chow"""
-        return Tile(self.group, self.value + 1)
 
     def __repr__(self):
         """default representation"""
