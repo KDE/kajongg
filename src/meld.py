@@ -59,7 +59,7 @@ class Meld(TileList):
         if isinstance(newContent, str):
             if newContent in cls.cache:
                 return cls.cache[newContent]
-        if isinstance(newContent, Meld):
+        elif isinstance(newContent, Meld):
             return newContent
         tiles = TileList(newContent)
         cacheKey = tiles.key()

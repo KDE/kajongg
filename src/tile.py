@@ -80,7 +80,6 @@ class Tile(str):
     @classmethod
     def __build(cls, *args):
         """build a new Tile object out of args"""
-        arg0 = args[0]
         if len(args) == 1:
             arg0, arg1 = args[0]
         else:
@@ -212,7 +211,6 @@ class TileList(list):
         elif hasattr(newContent, 'tile'):
             list.append(self, newContent.tile) # pylint: disable=E1103
         else:
-            assert isinstance(newContent, str), '%s:%s' % (type(newContent), newContent)
             assert len(newContent) % 2 == 0, newContent
             list.extend(self, [Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
         for tile in self:
