@@ -303,8 +303,8 @@ class ClassicalChineseBMJA(ClassicalChinese):
                 description=m18n('7 pairs of 1s/9s/Winds/Dragons'))
         del self.handRules['OwnFlowerandOwnSeason']
         del self.handRules['ThreeConcealedPongs']
-        self.handRules.createRule('Own Flower', 'FOwnFlower', doubles=1)
-        self.handRules.createRule('Own Season', 'FOwnSeason', doubles=1)
+        self.meldRules.createRule('Own Flower', 'FOwnFlower||Odynamic', doubles=1)
+        self.meldRules.createRule('Own Season', 'FOwnSeason||Odynamic', doubles=1)
         del self.winnerRules['LastTileTakenfromDeadWall']
         del self.winnerRules['HiddenTreasure']
         del self.winnerRules['FalseColorGame']

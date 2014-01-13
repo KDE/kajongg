@@ -975,19 +975,16 @@ class ThirteenOrphans(RuleCode):
         return candidates
 
 class OwnFlower(RuleCode):
-    def appliesToHand(hand):
-        fsPairs = list(x[0] for x in hand.bonusMelds)
-        return Tile(Tile.flower, hand.ownWind) in fsPairs
+    def appliesToMeld(hand, meld):
+        return meld.isBonus and meld[0].value == hand.ownWind and meld[0].group == Tile.flower
 
 class OwnSeason(RuleCode):
-    def appliesToHand(hand):
-        fsPairs = list(x[0] for x in hand.bonusMelds)
-        return Tile(Tile.season, hand.ownWind) in fsPairs
+    def appliesToMeld(hand, meld):
+        return meld.isBonus and meld[0].value == hand.ownWind and meld[0].group == Tile.season
 
 class OwnFlowerOwnSeason(RuleCode):
     def appliesToHand(hand):
-        return (OwnFlower.appliesToHand(hand)
-            and OwnSeason.appliesToHand(hand))
+        return sum(x.isBonus and x[0].value == hand.ownWind for x in hand.bonusMelds) == 2
 
 class AllFlowers(RuleCode):
     def appliesToHand(hand):
