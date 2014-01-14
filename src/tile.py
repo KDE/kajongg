@@ -19,7 +19,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from __future__ import print_function
-from types import GeneratorType
 
 from log import m18n, m18nc, logException
 from common import IntDict
@@ -201,21 +200,12 @@ class TileList(list):
         list.__init__(self)
         if newContent is None:
             return
-        if isinstance(newContent, GeneratorType):
-            newContent = list(newContent)
-        if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
-            self.extend(x.tile for x in newContent)
-        elif hasattr(newContent, '__iter__'):
-            list.extend(self, newContent)
-        elif isinstance(newContent, Tile):
+        if isinstance(newContent, Tile):
             list.append(self, newContent)
-        elif hasattr(newContent, 'tile'):
-            list.append(self, newContent.tile) # pylint: disable=E1103
-        else:
-            assert len(newContent) % 2 == 0, newContent
+        elif isinstance(newContent, str):
             list.extend(self, [Tile(newContent[x:x+2]) for x in range(0, len(newContent), 2)])
-        for tile in self:
-            assert isinstance(tile, Tile), self
+        else:
+            list.extend(self, newContent)
         self.isRest = True
 
     def key(self):

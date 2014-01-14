@@ -29,7 +29,6 @@ from common import Internal, isAlive, WINDS
 from animation import animate
 from log import logError, logDebug, logWarning, m18n
 from query import Query, Transaction
-from meld import Meld
 from uitile import UITile
 from board import WindLabel, Board, rotateCenter
 from game import Game
@@ -126,7 +125,7 @@ class ScoringHandBoard(HandBoard):
     def meldVariants(self, tile, lowerHalf):
         """Kong might have variants"""
         result = []
-        meld = Meld(self.uiMeldWithTile(tile))
+        meld = self.uiMeldWithTile(tile).meld # pylint: disable=maybe-no-member
         result.append(meld.concealed if lowerHalf else meld.exposed)
         if len(meld) == 4:
             if lowerHalf:
@@ -149,7 +148,7 @@ class ScoringHandBoard(HandBoard):
     def findUIMeld(self, meld):
         """find the first UIMeld matching the logical meld"""
         for result in self.uiMelds:
-            if Meld(result) == meld:
+            if result.meld == meld:
                 return result
 
     def assignUITiles(self, uiTile, meld): # pylint: disable=unused-argument
@@ -393,7 +392,6 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def addMeld(self, meld):
         """add meld to this hand in a scoring game"""
-        meld = Meld(meld)  # convert UITile to Tile
         if meld.isBonus:
             self._bonusTiles.append(meld[0])
         elif meld.isConcealed and not meld.isKong:
@@ -404,7 +402,7 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def removeMeld(self, uiMeld):
         """remove a meld from this hand in a scoring game"""
-        meld = Meld(uiMeld)
+        meld = uiMeld.meld
         if meld.isBonus:
             self._bonusTiles.remove(meld[0])
         else:

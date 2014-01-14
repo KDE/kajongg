@@ -446,6 +446,7 @@ class UIMeld(list):
             self.append(newContent)
         assert len(self), newContent
 
-    def typeName(self):
-        """convert int to speaking name with shortcut"""
-        return Meld(self).typeName()
+    @property
+    def meld(self):
+        """returns a logical meld"""
+        return Meld(x.tile for x in self)

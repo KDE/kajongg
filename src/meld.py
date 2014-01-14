@@ -120,15 +120,15 @@ class Meld(TileList):
             self._fixed = True
 
             if len(self) < 4:
-                TileList.__setattr__(self, 'concealed', Meld(TileList([x.concealed for x in self])))
+                TileList.__setattr__(self, 'concealed', Meld(TileList(x.concealed for x in self)))
                 TileList.__setattr__(self, 'declared', self.concealed)
-                TileList.__setattr__(self, 'exposed', Meld(TileList([x.exposed for x in self])))
+                TileList.__setattr__(self, 'exposed', Meld(TileList(x.exposed for x in self)))
                 TileList.__setattr__(self, 'exposedClaimed', self.exposed)
             else:
-                TileList.__setattr__(self, 'concealed', Meld(TileList([x.concealed for x in self])))
+                TileList.__setattr__(self, 'concealed', Meld(TileList(x.concealed for x in self)))
                 TileList.__setattr__(self, 'declared',
                     Meld(TileList([self[0].exposed, self[1].concealed, self[2].concealed, self[3].exposed])))
-                TileList.__setattr__(self, 'exposed', Meld(TileList([x.exposed for x in self])))
+                TileList.__setattr__(self, 'exposed', Meld(TileList(x.exposed for x in self)))
                 TileList.__setattr__(self, 'exposedClaimed',
                     Meld(TileList([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed])))
 
