@@ -27,6 +27,7 @@ import sys, os, random, traceback
 import signal
 import resource
 import datetime
+from itertools import chain
 
 # keyboardinterrupt should simply terminate
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -45,7 +46,7 @@ from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor
 
-from tile import Tile, elements
+from tile import Tile, TileList, elements
 from game import PlayingGame
 from player import Players
 from wall import WallEmpty
@@ -537,13 +538,13 @@ class ServerTable(Table):
                     logDebug('%s claims no choice. Discarded %s, keeping %s. %s' % \
                          (player, tile, ''.join(player.concealedTiles), ' / '.join(txt)))
                 player.claimedNoChoice = True
-                block.tellAll(player, Message.NoChoice, tiles=player.concealedTiles)
+                block.tellAll(player, Message.NoChoice, tiles=TileList(player.concealedTiles))
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
                     logDebug('%s played dangerous. Discarded %s, keeping %s. %s' % \
                          (player, tile, ''.join(player.concealedTiles), ' / '.join(txt)))
-                block.tellAll(player, Message.DangerousGame, tiles=player.concealedTiles)
+                block.tellAll(player, Message.DangerousGame, tiles=TileList(player.concealedTiles))
         if msg.answer == Message.OriginalCall:
             player.isCalling = True
             block.callback(self.clientMadeOriginalCall, msg)
@@ -579,9 +580,9 @@ class ServerTable(Table):
                 if player == clientPlayer or self.game.playOpen:
                     tiles = player.concealedTiles
                 else:
-                    tiles = (Tile.unknown, ) * 13
+                    tiles = TileList(Tile.unknown * 13)
                 block.tell(player, clientPlayer, Message.SetConcealedTiles,
-                    tiles=tiles + player.bonusTiles)
+                    tiles=TileList(chain(tiles, player.bonusTiles)))
         block.callback(self.dealt)
 
     def endHand(self, dummyResults=None):
@@ -597,7 +598,7 @@ class ServerTable(Table):
                 if player != self.game.winner:
                     # the winner tiles are already shown in claimMahJongg
                     block.tellOthers(player, Message.ShowConcealedTiles, show=True,
-                        tiles=player.concealedTiles)
+                        tiles=TileList(player.concealedTiles))
             block.callback(self.saveHand)
 
     def saveHand(self, dummyResults=None):
@@ -668,7 +669,7 @@ class ServerTable(Table):
                 logDebug('%s claims dangerous tile %s discarded by %s' % \
                          (player, lastDiscard, discardingPlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
-        block.tellAll(player, nextMessage, meld=meldTiles)
+        block.tellAll(player, nextMessage, meld=meld)
         if claim == Message.Kong:
             block.callback(self.pickKongReplacement)
         else:

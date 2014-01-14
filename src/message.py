@@ -215,7 +215,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
         if table.game.lastDiscard:
             table.claimTile(msg.player, self, msg.args[0], Message.Kong)
         else:
-            table.declareKong(msg.player, msg.args[0])
+            table.declareKong(msg.player, Meld(msg.args[0]))
     def toolTip(self, button, dummyTile):
         """decorate the action button which will send this message"""
         myself = button.client.game.myself

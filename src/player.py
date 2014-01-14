@@ -487,15 +487,15 @@ class PlayingPlayer(Player):
             # declaring a kong
             for tileName in set([x for x in self._concealedTiles if not x.isBonus]):
                 if self._concealedTiles.count(tileName) == 4:
-                    kongs.append([tileName] * 4)
+                    kongs.append(Meld([tileName] * 4))
                 elif self._concealedTiles.count(tileName) == 1 and \
                         tileName.exposed * 3 in list(str(x) for x in self._exposedMelds):
-                    kongs.append([tileName.exposed] * 3 + [tileName])
+                    kongs.append(Meld([tileName.exposed] * 3 + [tileName]))
         if self.game.lastDiscard:
             # claiming a kong
             discardTile = self.game.lastDiscard.concealed
             if self._concealedTiles.count(discardTile) == 3:
-                kongs.append([discardTile] * 4)
+                kongs.append(Meld(discardTile * 4))
         for kong in kongs:
             assert isinstance(kong[0], Tile)
         return kongs
@@ -513,7 +513,7 @@ class PlayingPlayer(Player):
         if self.game.lastDiscard:
             assert lastDiscard.isConcealed, lastDiscard
             if self.concealedTiles.count(lastDiscard) >= 2:
-                return [lastDiscard] * 3
+                return Meld(lastDiscard * 3)
 
     def __maySayKong(self):
         """returns answer arguments for the server if calling or declaring kong is possible.

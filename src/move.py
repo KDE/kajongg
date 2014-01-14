@@ -73,7 +73,7 @@ class Move(object):
             elif isinstance(value, bool):
                 pass
             elif isinstance(value, list) and isinstance(value[0], basestring):
-                result += ' %s:%s' % (key, ','.join(value))
+                result += ' %s:%s' % (key, ''.join(value))
             else:
                 result += ' %s:%s' % (key, value)
         result = result.replace("('", "(").replace("')", ")").replace(" '", "").replace(

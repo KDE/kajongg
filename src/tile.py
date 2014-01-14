@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from __future__ import print_function
+from types import GeneratorType
 
 from log import m18n, m18nc, logException
 from common import IntDict
@@ -200,12 +201,12 @@ class TileList(list):
         list.__init__(self)
         if newContent is None:
             return
-        if newContent.__class__.__name__ == 'generator':
+        if isinstance(newContent, GeneratorType):
             newContent = list(newContent)
         if isinstance(newContent, list) and newContent and hasattr(newContent[0], 'focusable'):
             self.extend(x.tile for x in newContent)
-        elif isinstance(newContent, (list, tuple, set)):
-            list.extend(self, [Tile(x) for x in newContent])
+        elif hasattr(newContent, '__iter__'):
+            list.extend(self, newContent)
         elif isinstance(newContent, Tile):
             list.append(self, newContent)
         elif hasattr(newContent, 'tile'):
