@@ -487,17 +487,18 @@ class PlayingPlayer(Player):
             # declaring a kong
             for tileName in set([x for x in self._concealedTiles if not x.isBonus]):
                 if self._concealedTiles.count(tileName) == 4:
-                    kongs.append(Meld([tileName] * 4))
+                    kongs.append(tileName.kong)
                 elif self._concealedTiles.count(tileName) == 1 and \
-                        tileName.exposed * 3 in list(str(x) for x in self._exposedMelds):
-                    kongs.append(Meld([tileName.exposed] * 3 + [tileName]))
+                        tileName.exposed.pung in self._exposedMelds:
+                    # the result will be an exposed Kong but the 4th tile
+                    # came from the wall, so we use the form xxxX
+                    kongs.append(tileName.kong.exposedClaimed)
         if self.game.lastDiscard:
             # claiming a kong
             discardTile = self.game.lastDiscard.concealed
             if self._concealedTiles.count(discardTile) == 3:
+                # TODO: discard.kong.concealed is xXXx but we need XXXX
                 kongs.append(Meld(discardTile * 4))
-        for kong in kongs:
-            assert isinstance(kong[0], Tile)
         return kongs
 
     def __maySayChow(self):
@@ -513,7 +514,7 @@ class PlayingPlayer(Player):
         if self.game.lastDiscard:
             assert lastDiscard.isConcealed, lastDiscard
             if self.concealedTiles.count(lastDiscard) >= 2:
-                return Meld(lastDiscard * 3)
+                return lastDiscard.pung
 
     def __maySayKong(self):
         """returns answer arguments for the server if calling or declaring kong is possible.
@@ -583,7 +584,6 @@ class PlayingPlayer(Player):
             within = self._concealedTiles
         within = within[:]
         for tile in tiles:
-            assert isinstance(tile, Tile), tile
             if tile not in within:
                 return False
             within.remove(tile)
@@ -701,8 +701,10 @@ class PlayingPlayer(Player):
         if len(allMeldTiles) == 4 and allMeldTiles[0].isExposed:
             tile0 = allMeldTiles[0].exposed
             # we are adding a 4th tile to an exposed pung
-            self._exposedMelds = [meld for meld in self._exposedMelds if meld != [tile0] * 3]
-            meld = Meld(tile0 * 4)
+            self._exposedMelds = [x for x in self._exposedMelds if x != tile0.pung]
+            meld = tile0.kong
+            if allMeldTiles[3] not in self._concealedTiles:
+                game.debug('t3 %s not in conc %s' % (allMeldTiles[3], self._concealedTiles))
             self._concealedTiles.remove(allMeldTiles[3])
             self.visibleTiles[tile0] += 1
         else:

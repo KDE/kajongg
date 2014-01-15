@@ -87,54 +87,47 @@ class Tile(str):
         if isinstance(arg1, int):
             arg1 = chr(arg1 + 48)
         what = arg0 + arg1
-        return str.__new__(cls, what)
+        result = str.__new__(cls, what)
+        result.group = result[0]
+        result.lowerGroup = result.group.lower()
+        result.isExposed = result.group == result.lowerGroup
+        result.isConcealed = not result.isExposed
+        result.isBonus = result.group in Tile.boni
+        result.isDragon = result.lowerGroup == Tile.dragon
+        result.isWind = result.lowerGroup == Tile.wind
+        result.isHonor = result.isDragon or result.isWind
 
-    def __init__(self, *dummyArgs):
-        # pylint: disable=super-init-not-called
-        if not hasattr(self, '_fixed'): # already defined if I am from cache
-            self.group = self[0]
-            self.lowerGroup = self.group.lower()
-            self.isExposed = self.group == self.lowerGroup
-            self.isConcealed = not self.isExposed
-            self.isBonus = self.group in Tile.boni
-            self.isDragon = self.lowerGroup == Tile.dragon
-            self.isWind = self.lowerGroup == Tile.wind
-            self.isHonor = self.isDragon or self.isWind
+        if result.isHonor or result.isBonus:
+            result.value = result[1]
+            result.isTerminal = False
+            result.isReal = True
+        else:
+            result.value = ord(result[1]) - 48
+            result.isTerminal = result.value in Tile.terminals
+            result.isReal = result.value in Tile.numbers
+        result.isMajor = result.isHonor or result.isTerminal
+        result.isMinor = not result.isMajor
+        try:
+            result.key = 1 + result.hashTable.index(result) / 2
+        except ValueError:
+            logException('%s is not a valid tile string' % result)
+        result.isKnown = Tile.unknown is not None and result != Tile.unknown
+        for key in (result, (str(result),), (result.group, result.value), (result[0], result[1])):
+            result.cache[key] = result
 
-            if self.isHonor or self.isBonus:
-                self.value = self[1]
-                self.isTerminal = False
-                self.isReal = True
-            else:
-                self.value = ord(self[1]) - 48
-                self.isTerminal = self.value in Tile.terminals
-                self.isReal = self.value in Tile.numbers
-            self.isMajor = self.isHonor or self.isTerminal
-            self.isMinor = not self.isMajor
-            try:
-                self.key = 1 + self.hashTable.index(self) / 2
-            except ValueError:
-                logException('%s is not a valid tile string' % self)
-            self.isKnown = Tile.unknown is not None and self != Tile.unknown
-            for key in (self, (str(self),), (self.group, self.value), (self[0], self[1])):
-                self.cache[key] = self
+        result.exposed = result.concealed = result.swapped = None  # just to please pylint
+        result._fixed = True
 
-            self.exposed = self.concealed = self.swapped = None  # just to please pylint
-            self._fixed = True
+        str.__setattr__(result, 'exposed', result if not result.isKnown else Tile(str.lower(result)))
+        str.__setattr__(result, 'concealed', result if not result.isKnown or result.isBonus else Tile(str.capitalize(result)))
+        str.__setattr__(result, 'swapped', result.exposed if result.isConcealed else result.concealed)
+        if isinstance(result.value, int):
+            if 0 <= result.value <= 11:
+                str.__setattr__(result, 'prevForChow', Tile(result.group, result.value - 1))
+            if -1 <= result.value <= 10:
+                str.__setattr__(result, 'nextForChow', Tile(result.group, result.value + 1))
 
-            str.__setattr__(self, 'exposed', self if not self.isKnown else Tile(str.lower(self)))
-            str.__setattr__(self, 'concealed', self if not self.isKnown or self.isBonus else Tile(str.capitalize(self)))
-            str.__setattr__(self, 'swapped', self.exposed if self.isConcealed else self.concealed)
-            if 0 <= self.value <= 11:
-                str.__setattr__(self, 'prevForChow', Tile(self.group, self.value - 1))
-            if -1 <= self.value <= 10:
-                str.__setattr__(self, 'nextForChow', Tile(self.group, self.value + 1))
-
-
-    def __setattr__(self, name, value):
-        if hasattr(self, '_fixed'):
-            raise TypeError
-        str.__setattr__(self, name, value)
+        return result
 
     def __getitem__(self, index):
         if hasattr(self, '_fixed'):
@@ -162,6 +155,13 @@ class Tile(str):
     def __repr__(self):
         """default representation"""
         return 'Tile(%s)' % str(self)
+
+    def meld(self, size):
+        """returns a meld of size. Those attributes are set in Meld.cacheMeldsInTiles"""
+        assert 1<= size <= 4, size
+        result = getattr(self, ('single', 'pair', 'pung', 'kong')[size-1])
+        assert len(result) == size, '%s:%s' % (size, result)
+        return result
 
     def groupName(self):
         """the name of the group this tile is of"""

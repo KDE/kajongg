@@ -25,7 +25,7 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 
 from log import m18nc
-from tile import Tile, TileList
+from tile import Tile, TileList, elements
 
 class Meld(TileList):
     """represents a meld. Can be empty. Many Meld methods will
@@ -347,6 +347,31 @@ class Meld(TileList):
             meldType=self.typeName(),
             name=self[0].name()).replace('  ', ' ').strip()
 
+    @staticmethod
+    def cacheMeldsInTiles():
+        """define all usual melds as Tile attributes"""
+        Tile.unknown.single = Meld(Tile.unknown)
+        Tile.unknown.pung = Meld(Tile.unknown * 3)
+        for tile, occ in elements.occurrence.items():
+            tile.single = Meld(tile)
+            tile.concealed.single = Meld(tile.concealed)
+            if occ > 1:
+                tile.pair = Meld(tile * 2)
+                tile.concealed.pair = Meld(tile.concealed * 2)
+                if occ > 2:
+                    tile.pung = Meld(tile * 3)
+                    tile.concealed.pung = Meld(tile.concealed * 3)
+                    if tile.value in range(1, 8):
+                        tile.chow = Meld([tile, tile.nextForChow, tile.nextForChow.nextForChow])
+                        tile.concealed.chow = Meld([tile.concealed, tile.nextForChow.concealed, tile.nextForChow.nextForChow.concealed])
+                    if tile.value in range(1, 10):
+                        tile.knitted3 = Meld([Tile(x, tile.value) for x in Tile.colors])
+                        tile.concealed.knitted3 = Meld([Tile(x, tile.value).concealed for x in Tile.colors])
+                    if occ > 3:
+                        tile.kong = Meld(tile * 4)
+                        tile.claimedKong = Meld([tile, tile, tile, tile.concealed])
+                        tile.concealed.kong = Meld(tile.concealed * 4)
+
 class MeldList(list):
     """a list of melds"""
     def __init__(self, newContent=None):
@@ -380,3 +405,5 @@ class MeldList(list):
             return ' '.join(str(x) for x in self)
         else:
             return ''
+
+Meld.cacheMeldsInTiles()

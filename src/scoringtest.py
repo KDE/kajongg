@@ -87,6 +87,7 @@ class Helpers(object):
             for widx, wind in enumerate('ESWN'):
                 game.players[widx].wind = wind
             game.winner = game.players[winds[0].upper()]
+            game.myself = game.winner
             game.roundsFinished = 'eswn'.index(winds[1])
             game.winner.clearCache()
             if Debug.hand:

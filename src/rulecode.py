@@ -301,7 +301,7 @@ class StandardMahJongg(RuleCode):
                 changed = False
                 if values[0] + 2 == values[2] and (len(values) == 3 or values[3] > values[0] + 3):
                     # logDebug('removing first 3 from %s' % values)
-                    meld = Meld([Tile(group, values[x]) for x in range(3)])
+                    meld = Tile(group, values[0]).chow
                     for pair in meld:
                         result.remove(pair)
                     melds.append(meld)
@@ -317,7 +317,7 @@ class StandardMahJongg(RuleCode):
                     and values.count(values[-3]) == 1):
                 changed = False
                 if values[-1] - 2 == values[-3] and (len(values) == 3 or values[-4] < values[-1] - 3):
-                    meld = Meld([Tile(group, values[x]) for x in range(-3, 0)])
+                    meld = Tile(group, values[-3]).chow
                     for pair in meld:
                         result.remove(pair)
                     melds.append(meld)
@@ -412,9 +412,9 @@ class WrigglingSnake(RuleCode):
 
     def computeLastMelds(hand):
         if hand.lastTile.value == 1:
-            return [Meld([hand.lastTile] * 2)]
+            return [hand.lastTile.pair]
         else:
-            return [Meld([hand.lastTile])]
+            return [hand.lastTile.single]
 
     def winningTileCandidates(hand):
         suits = hand.suits.copy()
@@ -441,11 +441,11 @@ class WrigglingSnake(RuleCode):
         melds = []
         for tileName in rest[:]:
             if rest.count(tileName) >= 2:
-                melds.append(Meld([tileName, tileName]))
+                melds.append(tileName.pair)
                 rest.remove(tileName)
                 rest.remove(tileName)
             elif rest.count(tileName) == 1:
-                melds.append(Meld([tileName]))
+                melds.append(tileName.single)
                 rest.remove(tileName)
         yield tuple(melds), tuple(rest)
 
@@ -477,9 +477,8 @@ class TripleKnitting(RuleCode):
             return
         triples, rest = cls.findTriples(hand)
         assert len(rest) == 2
-        if rest:
-            triples = list(triples)
-            triples.append(rest)
+        triples = list(triples)
+        triples.append(rest)
         return [Meld(x) for x in triples if hand.lastTile in x]
 
     def claimness(cls, hand, discard):
@@ -503,7 +502,7 @@ class TripleKnitting(RuleCode):
     def rearrange(cls, hand, rest):
         melds = []
         for triple in cls.findTriples(hand)[0]:
-            melds.append(Meld(triple))
+            melds.append(triple)
             rest.remove(triple[0])
             rest.remove(triple[1])
             rest.remove(triple[2])
@@ -551,11 +550,11 @@ class TripleKnitting(RuleCode):
         return tripleCount >= tripleWanted
 
     def findTriples(cls, hand):
-        """returns a list of Triples, including the mj triple.
+        """returns a list of triple knitted melds, including the mj triple.
         Also returns the remaining untripled tiles"""
         if hand.declaredMelds:
             if len(hand.declaredMelds) > 1:
-                return (tuple(), None)
+                return (Meld(), None)
         result = []
         tilesS = list(x.concealed for x in hand.tiles if x.lowerGroup == Tile.stone)
         tilesB = list(x.concealed for x in hand.tiles if x.lowerGroup == Tile.bamboo)
@@ -567,7 +566,7 @@ class TripleKnitting(RuleCode):
                 tilesS.remove(tileS)
                 tilesB.remove(tileB)
                 tilesC.remove(tileC)
-                result.append((tileS, tileB, tileC))
+                result.append(tileS.knitted3)
         return tuple(result), tuple(tilesS + tilesB + tilesC)
 
 class Knitting(RuleCode):
@@ -669,7 +668,7 @@ class Knitting(RuleCode):
 
 class AllPairHonors(RuleCode):
     def computeLastMelds(hand):
-        return [Meld([hand.lastTile, hand.lastTile])]
+        return [hand.lastTile.pair]
     def claimness(hand, discard):
         result = IntDict()
         if AllPairHonors.shouldTry(hand):
@@ -713,7 +712,7 @@ class AllPairHonors(RuleCode):
         melds = []
         for pair in set(rest) & elements.mAJORS:
             while rest.count(pair) >= 2:
-                melds.append(Meld(pair * 2))
+                melds.append(pair.pair)
                 rest.remove(pair)
                 rest.remove(pair)
         yield tuple(melds), tuple(rest)
@@ -905,17 +904,19 @@ class ThirteenOrphans(RuleCode):
 
     def computeLastMelds(hand):
         meldSize = hand.tilesInHand.count(hand.lastTile)
-        return [Meld([hand.lastTile] * meldSize)]
+        if meldSize == 0:
+            return [Meld()]
+        return [hand.lastTile.meld(meldSize)] # TODO: warum kann meldSize 0 sein?
 
     def rearrange(hand, rest):
         melds = []
         for tileName in rest:
             if rest.count(tileName) >= 2:
-                melds.append(Meld([tileName, tileName]))
+                melds.append(tileName.pair)
                 rest.remove(tileName)
                 rest.remove(tileName)
             elif rest.count(tileName) == 1:
-                melds.append(Meld([tileName]))
+                melds.append(tileName.single)
                 rest.remove(tileName)
         yield tuple(melds), tuple(rest)
 

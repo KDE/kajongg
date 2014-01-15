@@ -715,27 +715,27 @@ class SelectorBoard(CourtBoard):
             scName = upperName
         else:
             scName = lowerName
-        variants = [scName]
+        result = [scName.single]
         baseTiles = len(self.tilesByElement(lowerName))
         if baseTiles >= 2:
-            variants.append(scName * 2)
+            result.append(scName.pair)
         if baseTiles >= 3:
-            variants.append(scName * 3)
+            result.append(scName.pung)
         if baseTiles == 4:
             if lowerHalf:
-                variants.append(lowerName + upperName * 2 + lowerName)
+                result.append(lowerName.kong.declared)
             else:
-                variants.append(lowerName * 4)
-                variants.append(lowerName * 3 + upperName)
+                result.append(lowerName.kong)
+                result.append(lowerName.kong.exposedClaimed)
         # TODO: old bug: move 3 identical hidden chows to east, then move
         # one of them to south exposed
         if not wantedTile.isHonor and wantedTile.value < '8':
             chow2 = scName.nextForChow
             chow3 = chow2.nextForChow
             if self.tilesByElement(chow2.exposed) and self.tilesByElement(chow3.exposed):
-                variants.append([scName, chow2, chow3])
-        # variants now holds a list of lists of tiles
-        return [Meld(x) for x in variants]
+                result.append(scName.chow)
+        # result now holds a list of melds
+        return result
 
 class MimeData(QMimeData):
     """we also want to pass a reference to the moved meld"""

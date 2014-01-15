@@ -51,10 +51,10 @@ class Permutations(object):
             if tile.isHonor:
                 count = self.tiles.count(tile)
                 if count == 4:
-                    honors.append(Meld([tile]))
+                    honors.append(tile.single)
                     count -= 1
-                honors.extend([Meld([tile] * count)])
-        boni = list(Meld([x]) for x in self.tiles if x.isBonus)
+                honors.append(tile.meld(count))
+        boni = list(x.single for x in self.tiles if x.isBonus)
         variants = []
         for group in Tile.colors.upper():
             gTiles = list(x for x in self.tiles if x.group == group)
@@ -153,7 +153,7 @@ class Permutations(object):
             melds = []
             for block in variant:
                 for meld in block:
-                    melds.append(Meld([Tile(color, x) for x in meld]))
+                    melds.append(Meld(Tile(color, x) for x in meld))
             if melds:
                 result.append(melds)
         return result

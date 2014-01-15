@@ -362,7 +362,7 @@ class Hand(object):
                         totals = sorted((len(x), idx) for idx, x in enumerate(self.__lastMelds))
                         self.__lastMeld = self.__lastMelds[totals[0][1]]
             if not self.__lastMeld:
-                self.__lastMeld = Meld([self.lastTile])
+                self.__lastMeld = self.lastTile.single
                 self.__lastMelds = MeldList(self.__lastMeld)
 
     def __applyBestLastMeld(self):
@@ -549,10 +549,12 @@ class Hand(object):
     def __arrange(self):
         """work hard to always return the variant with the highest Mah Jongg value.
         Adds melds to self.melds. A rest will be rearranged by standard rules."""
-        for tile in self.__rest[:]:
-            if not tile.isKnown:
-                self.__rest.remove(tile)
-                self.melds.append(Meld(tile))
+        if any(not x.isKnown for x in self.__rest):
+            melds, rest = divmod(len(self.__rest), 3)
+            self.melds.extend([Tile.unknown.pung] * melds)
+            if rest:
+                self.melds.append(Meld(Tile.unknown * rest))
+            self.__rest = []
         if not self.__rest:
             self.melds.sort()
             mjRules = self.__maybeMahjongg()
@@ -645,7 +647,7 @@ class Hand(object):
             if len(tileString) == 2:
                 tile = Tile(tileString)
                 if tile.isBonus:
-                    bonusMelds.append(Meld(tile))
+                    bonusMelds.append(tile.single)
                     tileStrings.remove(tileString)
         return bonusMelds, tileStrings
 
@@ -667,7 +669,7 @@ class Hand(object):
         but not things like mjRules, winnerRules, loserRules"""
         result = 0
         if discard and self.tiles.count(discard) == 2:
-            melds = chain(self.melds, self.bonusMelds, [Meld(discard.exposed * 3)])
+            melds = chain(self.melds, self.bonusMelds, [discard.exposed.pung])
         else:
             melds = chain(self.melds, self.bonusMelds)
         for meld in melds:
