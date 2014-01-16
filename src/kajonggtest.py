@@ -139,7 +139,7 @@ class Server(object):
                 '--local',
                 '--socket={sock}'.format(sock=self.socketName)]
         if OPTIONS.debug:
-            cmd.append('--debug={dbg}'.format(dbg=OPTIONS.debug))
+            cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
         if OPTIONS.log:
             self.process = subprocess.Popen(cmd, cwd=job.srcDir(),
                 stdout=job.logFile, stderr=job.logFile)
@@ -220,7 +220,7 @@ class Job(object):
         if OPTIONS.playopen:
             cmd.append('--playopen')
         if OPTIONS.debug:
-            cmd.append('--debug={dbg}'.format(dbg=OPTIONS.debug))
+            cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
         print('starting            %s' % self)
         if OPTIONS.log:
             self.process = subprocess.Popen(cmd, cwd=self.srcDir(),
@@ -420,10 +420,8 @@ def doJobs(jobs):
     # pylint: disable=too-many-branches, too-many-locals, too-many-statements
 
     if not OPTIONS.git and OPTIONS.csv:
-        try:
-            gitHead() # make sure we are at a point where comparisons make sense
-        except UserWarning as exc:
-            print('Disabling CSV output: %s' % exc)
+        if gitHead() in ('current', None):
+            print('Disabling CSV output: %s' % ('You have uncommitted changes' if gitHead() == 'current' else 'No git'))
             print()
             OPTIONS.csv = None
 
@@ -543,11 +541,16 @@ def improve_options():
             OPTIONS.git = onlyExistingCommits(OPTIONS.git.split(','))
             if not OPTIONS.git:
                 sys.exit(1)
+    if OPTIONS.debug is None:
+        OPTIONS.debug = []
+    else:
+        OPTIONS.debug = [OPTIONS.debug]
     if OPTIONS.log:
         OPTIONS.servers = OPTIONS.clients
-        if not OPTIONS.debug:
-            OPTIONS.debug = ''
-        OPTIONS.debug += 'neutral,dangerousGame,explain,originalCall,robbingKong,robotAI,scores,traffic,hand'
+        OPTIONS.debug.extend(
+            'neutral,dangerousGame,explain,originalCall,robbingKong,robotAI,scores,traffic,hand'.split(','))
+    if gitHead() not in ('current', None):
+        OPTIONS.debug.append('git')
 
 def createJobs():
     """the complete list"""
@@ -589,7 +592,8 @@ def main():
 
     improve_options()
 
-    errorMessage = Debug.setOptions(OPTIONS.debug)
+    print('debug:', repr(OPTIONS.debug))
+    errorMessage = Debug.setOptions(','.join(OPTIONS.debug))
     if errorMessage:
         print(errorMessage)
         sys.exit(2)

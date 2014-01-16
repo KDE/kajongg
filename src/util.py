@@ -37,7 +37,7 @@ if not STDOUTENCODING:
 
 # util must not depend on kde
 
-from common import Internal, Debug, unicode  # pylint: disable=redefined-builtin
+from common import Debug, unicode  # pylint: disable=redefined-builtin
 
 def stack(msg, limit=6):
     """returns a list of lines with msg as prefix"""
@@ -184,14 +184,14 @@ def checkMemory():
     gc.set_debug(0)
 
 def gitHead():
-    """the current git commit. Fail if there are uncommitted changes"""
+    """the current git commit. 'current' if there are uncommitted changes and None if no .git found"""
     if not os.path.exists(os.path.join('..', '.git')):
-        return Internal.version
+        return None
     subprocess.Popen(['git', 'update-index', '-q', '--refresh'])
     _ = subprocess.Popen(['git', 'diff-index', '--name-only', 'HEAD', '--'], stdout=subprocess.PIPE).communicate()[0]
     uncommitted = list(x.strip() for x in _.split('\n') if len(x.strip()))
     if uncommitted:
-        raise UserWarning('you cannot write to CSV while having uncommitted changes in %s' % ', '.join(uncommitted))
+        return 'current'
     result = subprocess.Popen(['git', 'log', '-1', '--format="%h"'],
             stdout=subprocess.PIPE).communicate()[0]
     return result.split('\n')[0].replace('"', '')[:15]

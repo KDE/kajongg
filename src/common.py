@@ -89,6 +89,7 @@ class Debug(object):
     delayChow = False
     locate = False
     neutral = False  # only neutral comparable debug output
+    git = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

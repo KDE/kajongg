@@ -169,7 +169,9 @@ if __name__ == "__main__":
     Internal.reactor = reactor
 
     if Options.csv:
-        gitHead() # abort if we cannot get a legal commit for the csv file?
+        if gitHead() == 'current':
+            print('You cannot write to %s with changes uncommitted to git' % Options.csv)
+            sys.exit(2)
     from mainwindow import MainWindow
     MainWindow()
     Internal.app.exec_()

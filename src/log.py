@@ -28,7 +28,7 @@ SERVERMARK = '&&SERVER&&'
 # util must not import twisted or we need to change kajongg.py
 
 from common import Internal, Debug, unicode, isPython3 # pylint: disable=redefined-builtin
-from util import elapsedSince, traceback, xToUtf8
+from util import elapsedSince, traceback, xToUtf8, gitHead
 from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
 
@@ -96,6 +96,10 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
             msg=msg)
     if Debug.time:
         logMsg = u'{:08.4f} {}'.format(elapsedSince(Debug.time), logMsg)
+    if Debug.git:
+        head = gitHead()
+        if head not in ('current', None):
+            logMsg = u'git:{} {}'.format(head, logMsg)
 
     __logUnicodeMessage(prio, logMsg)
     if showStack:
