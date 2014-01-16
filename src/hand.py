@@ -267,15 +267,12 @@ class Hand(object):
     def __applyRules(self):
         """find out which rules apply, collect in self.usedRules"""
         self.usedRules = []
-
         for meld in chain(self.melds, self.bonusMelds):
             self.usedRules.extend(UsedRule(x, meld) for x in meld.rules(self))
         for rule in self.ruleset.handRules:
             if rule.appliesToHand(self):
                 self.usedRules.append(UsedRule(rule))
 
-        if self.__hasExclusiveRules():
-            return
         self.__score = self.__totalScore()
 
         self.ruleCache.clear()
@@ -290,10 +287,7 @@ class Hand(object):
                 self.__score = Score()
                 raise Hand.__NotWon
             self.__mjRule = matchingMJRules[0]
-            if self.__mjRule:
-                self.usedRules.append(UsedRule(self.__mjRule))
-            if self.__hasExclusiveRules():
-                return
+            self.usedRules.append(UsedRule(self.__mjRule))
             self.usedRules.extend(self.matchingWinnerRules())
             self.__score = self.__totalScore()
         else: # not self.won
@@ -301,6 +295,7 @@ class Hand(object):
             if loserRules:
                 self.usedRules.extend(list(UsedRule(x) for x in loserRules))
                 self.__score = self.__totalScore()
+        self.__checkHasExclusiveRules()
 
     def matchingWinnerRules(self):
         """returns a list of matching winner rules"""
@@ -308,16 +303,16 @@ class Hand(object):
         limitRule = self.maxLimitRule(matching)
         return [limitRule] if limitRule else matching
 
-    def __hasExclusiveRules(self):
+    def __checkHasExclusiveRules(self):
         """if we have one, remove all others"""
-        # TODO: integrate above for speed
         exclusive = list(x for x in self.usedRules if 'absolute' in x.rule.options)
         if exclusive:
             self.usedRules = exclusive
             self.__score = self.__totalScore()
-            if self.__won and not bool(self.__maybeMahjongg()) and Debug.hand:
-                self.debug(fmt('exclusive rule {exclusive} does not win: {self}'))
-        return bool(exclusive)
+            if self.__won and not bool(self.__maybeMahjongg()):
+                if Debug.hand:
+                    self.debug(fmt('exclusive rule {exclusive} does not win: {self}'))
+                raise Hand.__NotWon
 
     def __setLastTile(self):
         """sets lastTile, lastSource, announcements"""
