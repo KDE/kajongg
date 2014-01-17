@@ -86,6 +86,7 @@ class Meld(TileList):
         - a list of Tile objects"""
         if not hasattr(self, '_fixed'): # already defined if I am from cache
             TileList.__init__(self, newContent)
+            self.case = ''.join('a' if x.islower() else 'A' for x in self)
             self.key = TileList.key(self)
             if self.key not in self.cache:
                 self.cache[self.key] = self
@@ -218,13 +219,10 @@ class Meld(TileList):
 
     def __isExposed(self):
         """meld state: exposed or not"""
-        firsts = ''.join(x.group for x in self)
-        if firsts.islower():
+        if self.case.islower():
             return True
-        elif len(self) == 4 and firsts[1:3].isupper():
-            return False
         elif len(self) == 4:
-            return True
+            return self.case[1:3].islower()
         else:
             return False
 
@@ -247,7 +245,7 @@ class Meld(TileList):
         if length == 2:
             if self[0] == self[1]:
                 self.isPair = True
-            elif self[0].value == self[1].value and self[0].islower() == self[1].islower() \
+            elif self[0].value == self[1].value and self.case[0] == self.case[1] \
                 and all(x.lowerGroup in Tile.colors for x in self):
                 self.isKnitted = True
             else:
@@ -263,7 +261,7 @@ class Meld(TileList):
             return
         if len(tiles) == 3 and length == 3:
             if len(set(x.value for x in tiles)) == 1:
-                if sum(x.islower() for x in tiles) in (0, 3):
+                if self.case in ('aaa', 'AAA'):
                     if len(set(x.group for x in tiles)) == 3:
                         if all(x.lowerGroup in Tile.colors for x in tiles):
                             self.isKnitted = True
@@ -275,9 +273,9 @@ class Meld(TileList):
         if length == 4:
             if len(values) > 1:
                 raise UserWarning('Meld %s is malformed' % self)
-            if self.isLower(0, 3) and self.isUpper(3):
+            if self.case == 'aaaA':
                 self.isKong = self.isClaimedKong = True
-            elif self.isUpper(1, 3) and self.isLower(0) and self.isLower(3):
+            elif self.case == 'aAAa':
                 self.isKong = True
             else:
                 raise UserWarning('Meld %s is malformed' % self)
@@ -286,8 +284,7 @@ class Meld(TileList):
         # length is 3
         if len(groups) == 1:
             if groups.pop().lower() in Tile.colors:
-                values = list(x.value for x in self)
-                if values[2] == values[0] + 2 and values[1] == values[0] + 1:
+                if self[0].nextForChow is self[1] and self[1].nextForChow is self[2]:
                     self.isChow = True
                     return
         raise UserWarning('Meld %s is malformed' % self)

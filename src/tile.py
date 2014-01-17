@@ -219,26 +219,6 @@ class TileList(list):
         """sort(TileList) would not keep TileList type"""
         return TileList(sorted(self))
 
-    def isLower(self, first=None, last=None):
-        """use first and last as for ranges"""
-        if first is not None:
-            if last is None:
-                return self[first].isExposed
-        else:
-            assert last is None
-            first, last = 0, len(self)
-        return all(self[x].isExposed for x in range(first, last))
-
-    def isUpper(self, first=None, last=None):
-        """use first and last as for ranges"""
-        if first is not None:
-            if last is None:
-                return self[first].isConcealed
-        else:
-            assert last is None
-            first, last = 0, len(self)
-        return all(self[x].isConcealed for x in range(first, last))
-
     def hasChows(self, tile):
         """returns my chows with tileName"""
         if tile not in self:
