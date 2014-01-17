@@ -53,13 +53,11 @@ class TileAttr(object):
             if scoring:
                 self.focusable = idx == 0
             else:
-                assert isinstance(meld, Meld), meld
-                lowerRow = meld.isConcealed if isinstance(meld, Meld) else meld.isUpper()
                 self.focusable = (not self.tile.isBonus
                     and self.tile.isKnown
                     and player == player.game.activePlayer
                     and player == player.game.myself
-                    and (lowerRow and (len(meld) < 4 or meld.isRest)))
+                    and meld.isConcealed and not meld.isKong)
             if self.tile in Debug.focusable:
                 logDebug('TileAttr %s:%s' % (self.tile, self.focusable))
 
