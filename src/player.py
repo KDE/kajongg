@@ -491,13 +491,13 @@ class PlayingPlayer(Player):
                 elif self._concealedTiles.count(tileName) == 1 and \
                         tileName.exposed.pung in self._exposedMelds:
                     # the result will be an exposed Kong but the 4th tile
-                    # came from the wall, so we use the form xxxX
+                    # came from the wall, so we use the form aaaA
                     kongs.append(tileName.kong.exposedClaimed)
         if self.game.lastDiscard:
             # claiming a kong
             discardTile = self.game.lastDiscard.concealed
             if self._concealedTiles.count(discardTile) == 3:
-                # TODO: discard.kong.concealed is xXXx but we need XXXX
+                # TODO: discard.kong.concealed is aAAa but we need AAAA
                 kongs.append(Meld(discardTile * 4))
         return kongs
 

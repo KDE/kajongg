@@ -25,7 +25,7 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
 from PyQt4.QtCore import QModelIndex
-from rule import Ruleset, PredefinedRuleset, Rule, RuleBase, ParameterRule, \
+from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, \
     IntRule, BoolRule, StrRule
 from util import uniqueList
 from log import m18n, m18nc, english

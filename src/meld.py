@@ -38,16 +38,16 @@ class Meld(TileList):
     for melds with 3 tiles:
         isDeclared == isExposed : 3 exposed tiles
         not isDeclared == isConcealed: 3 concealed Tiles
-        exposed: xxx
-        exposedClaimed: xxx
+        exposed: aaa
+        exposedClaimed: aaa
 
     for melds with 4 tiles:
-        isKong = xXXx or xxxx or xxxX but NOT XXXX
-        isDeclared = xXXx or xxxx or xxxX
-        isExposed = xxxx or xxxX
-        isConcealed: xXXx or XXXX
-        exposedClaimed: xxxX
-        exposed: xxxx
+        isKong = aAAa or aaaa or aaaA but NOT AAAA
+        isDeclared = aAAa or aaaa or aaaA
+        isExposed = aaaa or aaaA
+        isConcealed: aAAa or AAAA
+        exposedClaimed: aaaA
+        exposed: aaaa
 
     """
     # pylint: disable=too-many-instance-attributes
@@ -116,7 +116,7 @@ class Meld(TileList):
             self.__dynamicDoublingRules = {} # ruleset is key
             self.__hasRules = None # unknown yet
             self.__hasDoublingRules = None # unknown yet
-            self.concealed = self.exposed = self.exposedClaimed = None # to satisfy pylint
+            self.concealed = self.exposed = self.declared = self.exposedClaimed = None # to satisfy pylint
             self._fixed = True
 
             if len(self) < 4:
@@ -363,7 +363,8 @@ class Meld(TileList):
                     tile.concealed.pung = Meld(tile.concealed * 3)
                     if tile.value in range(1, 8):
                         tile.chow = Meld([tile, tile.nextForChow, tile.nextForChow.nextForChow])
-                        tile.concealed.chow = Meld([tile.concealed, tile.nextForChow.concealed, tile.nextForChow.nextForChow.concealed])
+                        tile.concealed.chow = Meld([tile.concealed, tile.nextForChow.concealed,
+                            tile.nextForChow.nextForChow.concealed])
                     if tile.value in range(1, 10):
                         tile.knitted3 = Meld([Tile(x, tile.value) for x in Tile.colors])
                         tile.concealed.knitted3 = Meld([Tile(x, tile.value).concealed for x in Tile.colors])

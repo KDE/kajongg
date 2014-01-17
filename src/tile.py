@@ -116,10 +116,12 @@ class Tile(str):
             result.cache[key] = result
 
         result.exposed = result.concealed = result.swapped = None  # just to please pylint
-        result._fixed = True
+        result.single = result.pair = result.pung = result.chow = result.kong = None # dito
+        result._fixed = True  # pylint: disable=protected-access
 
         str.__setattr__(result, 'exposed', result if not result.isKnown else Tile(str.lower(result)))
-        str.__setattr__(result, 'concealed', result if not result.isKnown or result.isBonus else Tile(str.capitalize(result)))
+        str.__setattr__(result, 'concealed',
+            result if not result.isKnown or result.isBonus else Tile(str.capitalize(result)))
         str.__setattr__(result, 'swapped', result.exposed if result.isConcealed else result.concealed)
         if isinstance(result.value, int):
             if 0 <= result.value <= 11:
@@ -158,10 +160,7 @@ class Tile(str):
 
     def meld(self, size):
         """returns a meld of size. Those attributes are set in Meld.cacheMeldsInTiles"""
-        assert 1<= size <= 4, size
-        result = getattr(self, ('single', 'pair', 'pung', 'kong')[size-1])
-        assert len(result) == size, '%s:%s' % (size, result)
-        return result
+        return getattr(self, ('single', 'pair', 'pung', 'kong')[size-1])
 
     def groupName(self):
         """the name of the group this tile is of"""
