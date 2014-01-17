@@ -236,11 +236,12 @@ class RuleModel(TreeModel):
         rulesetItems = list([RulesetItem(ruleset)])
         self.insertRows(row, rulesetItems, parent)
         rulesetIndex = self.index(row, 0, parent)
-        ruleListItems = list([RuleListItem(x) for x in ruleset.ruleLists])
+        ruleLists = list(x for x in ruleset.ruleLists if len(x))
+        ruleListItems = list([RuleListItem(x) for x in ruleLists])
         for item in ruleListItems:
             item.colCount = self.rootItem.columnCount()
         self.insertRows(0, ruleListItems, rulesetIndex)
-        for ridx, ruleList in enumerate(ruleset.ruleLists):
+        for ridx, ruleList in enumerate(ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
             ruleItems = list([RuleItem(x) for x in ruleList if not 'internal' in x.options])
             self.insertRows(0, ruleItems, listIndex)
