@@ -92,7 +92,9 @@ class RulesetDiffer(QDialog):
         for left in leftRulesets:
             for right in rightRulesets[:]:
                 if left == right and left.name == right.name:
-                    rightRulesets.remove(right)
+                    # rightRulesets.remove(right) this is wrong because it removes the
+                    # first ruleset with the same hash
+                    rightRulesets = list(x for x in rightRulesets if id(x) != id(right))
         self.leftRulesets = leftRulesets
         self.rightRulesets = rightRulesets
         self.model = None
