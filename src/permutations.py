@@ -30,6 +30,7 @@ class Permutations(object):
     """creates permutations for building melds out of single tiles.
     NEVER returns Kongs!"""
     cache = {}
+    permuteCache = {}
     def __new__(cls, tiles):
         cacheKey = tuple(x.key for x in tiles)
         if cacheKey in cls.cache:
@@ -69,11 +70,13 @@ class Permutations(object):
         return result
 
     @classmethod
-    def permute(cls, values):
+    def permute(cls, valuesTuple):
         """returns all groupings into melds.
         values is a tuple of int, range 1..9"""
-        assert isinstance(values, tuple)
-        values = list(values)
+        assert isinstance(valuesTuple, tuple)
+        if valuesTuple in cls.permuteCache:
+            return cls.permuteCache[valuesTuple]
+        values = list(valuesTuple)
         result = list()
         possibleMelds = []
         valueSet = set(values)
@@ -98,7 +101,9 @@ class Permutations(object):
                     result.append(appendValue)
         else:
             result = list([list([tuple([x]) for x in values])])
-        return tuple(sorted(set(tuple(tuple(sorted(x)) for x in result))))
+        result = tuple(sorted(set(tuple(tuple(sorted(x)) for x in result))))
+        cls.permuteCache[valuesTuple] = result
+        return result
 
     colorPermCache = {}
 
