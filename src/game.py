@@ -22,6 +22,8 @@ import datetime
 import weakref
 from random import Random
 from collections import defaultdict
+from functools import total_ordering
+
 from twisted.internet.defer import succeed
 from util import stack
 from log import logError, logWarning, logException, logDebug, m18n
@@ -86,6 +88,117 @@ class CountingRandom(Random):
                 self.count - oldCount, self.count, wantedLength, stack('')[-2]))
         return result
 
+@total_ordering
+class HandId(object):
+    """handle a string representing a hand Id"""
+    def __init__(self, game, string=None, stringIdx=0):
+        self.game = game
+        self.seed = game.seed
+        self.roundsFinished = self.rotated = self.notRotated = self.move = 0
+        if string is None:
+            self.roundsFinished = game.roundsFinished
+            self.rotated = game.rotated
+            self.notRotated = game.notRotated
+            self.move = len(game.moves)
+        else:
+            self.__scanHandId(string, stringIdx)
+        assert self.rotated < 4, self
+
+    def goto(self):
+        """advance game to self"""
+        for _ in range(self.roundsFinished * 4 + self.rotated):
+            self.game.rotateWinds()
+        self.game.notRotated = self.notRotated
+
+    def __scanHandId(self, string, stringIdx):
+        """gets the --game option.
+        stringIdx 0 is the part in front of ..
+        stringIdx 1 is the part after ..
+        """
+        if not string:
+            return
+        seed = int(string.split('/')[0])
+        assert self.seed is None or self.seed == seed, string
+        self.seed = seed
+        if not '/' in string:
+            if stringIdx == 1:
+                self.roundsFinished = 100
+            return
+        string = string.split('/')[1]
+        parts = string.split('..')
+        if stringIdx == 1 and len(parts) == 2 and parts[1] == '':
+            self.roundsFinished = 100
+            return
+        if stringIdx == 0 and len(parts) == 2 and parts[0] == '':
+            return
+        if stringIdx == 1 and len(parts) == 2 and parts[1] == '':
+            self.roundsFinished = 100
+            return
+        handId = parts[min(stringIdx, len(parts)-1)]
+        if handId[0] not in 'ESWN':
+            logException('--game=%s with / must specify the round wind' % string)
+        ruleset = self.game.ruleset
+        self.roundsFinished = 'ESWN'.index(handId[0])
+        if self.roundsFinished > ruleset.minRounds:
+            logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
+                ruleset.name, ruleset.minRounds, self.roundsFinished + 1, handId[0]))
+            self.roundsFinished = ruleset.minRounds
+            return
+        self.rotated = int(handId[1]) - 1
+        if self.rotated > 3:
+            logWarning('You want %d rotations, reducing to maximum of 3' % self.rotated)
+            self.rotated = 3
+            return
+        for char in handId[2:]:
+            if char < 'a':
+                logWarning('you want %s, changed to a' % char)
+                char = 'a'
+            if char > 'z':
+                logWarning('you want %s, changed to z' % char)
+                char = 'z'
+            self.notRotated = self.notRotated * 26 + ord(char) - ord('a') + 1
+
+    def prompt(self, withSeed=True, withAI=True, withMoveCount=False):
+        """identifies the hand for window title and scoring table"""
+        aiVariant = ''
+        if withAI and self.game.belongsToHumanPlayer():
+            aiName = self.game.myself.intelligence.name() if self.game.myself else 'Default'
+            if aiName != 'Default':
+                aiVariant = aiName + '/'
+        num = self.notRotated
+        charId = ''
+        while num:
+            charId = chr(ord('a') + (num-1) % 26) + charId
+            num = (num-1) / 26
+        wind = (WINDS + 'X')[self.roundsFinished]
+        if withSeed:
+            seed = self.seed
+        else:
+            seed = ''
+        delim = '/' if withSeed or withAI else ''
+        result = '%s%s%s%s%s%s' % (aiVariant, seed, delim, wind, self.rotated + 1, charId)
+        if withMoveCount:
+            result += '/%d' % self.move
+        return result
+
+    def token(self):
+        """server and client use this for checking if they talk about the same thing"""
+        return self.prompt(withAI=False)
+
+    def __str__(self):
+        return self.prompt()
+
+    def __repr__(self):
+        return 'HandId({})'.format(self.prompt())
+
+    def __eq__(self, other):
+        return (self.roundsFinished, self.rotated, self.notRotated) == (
+            other.roundsFinished, other.rotated, other.notRotated)
+
+    def __lt__(self, other):
+        return (self.roundsFinished, self.rotated, self.notRotated) < (
+            other.roundsFinished, other.rotated, other.notRotated)
+
 class Game(object):
     """the game without GUI"""
     # pylint: disable=too-many-instance-attributes
@@ -143,6 +256,15 @@ class Game(object):
             self.saveStartTime()
         for player in self.players:
             player.clearHand()
+
+    @property
+    def handId(self):
+        """current position in game"""
+        result = HandId(self)
+        if result != self._currentHandId:
+            self._prevHandId = self._currentHandId
+            self._currentHandId = result
+        return result
 
     @property
     def client(self):
@@ -209,36 +331,11 @@ class Game(object):
     def addCsvTag(self, tag, forAllPlayers=False):
         """tag will be written to tag field in csv row"""
         if forAllPlayers or self.belongsToHumanPlayer():
-            self.csvTags.append('%s/%s' % (tag, self.handId()))
+            self.csvTags.append('%s/%s' % (tag, self.handId.prompt(withSeed=False)))
 
     def isFirstHand(self):
         """as the name says"""
         return self.roundHandCount == 0 and self.roundsFinished == 0
-
-    def handId(self, withAI=True, withMoveCount=False):
-        """identifies the hand for window title and scoring table"""
-        aiVariant = ''
-        if withAI and self.belongsToHumanPlayer():
-            aiName = self.myself.intelligence.name() if self.myself else 'Default'
-            if aiName != 'Default':
-                aiVariant = aiName + '/'
-        num = self.notRotated
-        charId = ''
-        while num:
-            charId = chr(ord('a') + (num-1) % 26) + charId
-            num = (num-1) / 26
-        if self.finished():
-            wind = 'X'
-        else:
-            wind = WINDS[self.roundsFinished]
-        seed = self.seed if hasattr(self, 'wantedGame') and self.wantedGame else 'NOSEED'
-        result = '%s%s/%s%s%s' % (aiVariant, seed, wind, self.rotated + 1, charId)
-        if withMoveCount:
-            result += '/moves:%d' % len(self.moves)
-        if result != self._currentHandId:
-            self._prevHandId = self._currentHandId
-            self._currentHandId = result
-        return result
 
     def _setGameId(self):
         """virtual"""
@@ -462,8 +559,7 @@ class Game(object):
         self.rotated += 1
         self.notRotated = 0
         if self.rotated == 4:
-            if not self.finished():
-                self.roundsFinished += 1
+            self.roundsFinished += 1
             self.rotated = 0
             self.roundHandCount = 0
         if self.finished():
@@ -492,7 +588,7 @@ class Game(object):
         else:
             logDebug(msg, btIndent=btIndent)
             return
-        logDebug('%s%s: %s' % (prefix, self._prevHandId if prevHandId else self.handId(), msg),
+        logDebug('%s%s: %s' % (prefix, self._prevHandId if prevHandId else self.handId.prompt(withMoveCount=True), msg),
             withGamePrefix=False, btIndent=btIndent)
 
     @staticmethod
@@ -555,7 +651,12 @@ class Game(object):
         return game
 
     def finished(self):
-        """The game is over after minRounds completed rounds"""
+        """The game is over after minRounds completed rounds. Also,
+        check if we reached the second handId defined by --game.
+        If we did, the game is over too"""
+        last = HandId(self, self.wantedGame, 1)
+        if self.handId > last:
+            return True
         if Options.rounds:
             return self.roundsFinished >= 1
         elif self.ruleset:
@@ -575,7 +676,7 @@ class Game(object):
             if guilty and payAction:
                 if Debug.dangerousGame:
                     self.debug('%s: winner %s. %s pays for all' % \
-                                (self.handId(), winner, guilty))
+                                (self.handId, winner, guilty))
                 guilty.hand.usedRules.append((payAction, None))
                 score = winner.handTotal
                 score = score * 6 if winner.wind == 'E' else score * 4
@@ -771,19 +872,6 @@ class PlayingGame(Game):
             self._endWallDangerous()
         self.handDiscardCount += 1
 
-    def checkTarget(self):
-        """check if we reached the point defined by --game.
-        If we did, disable autoPlay"""
-        parts = self.wantedGame.split('/')
-        if len(parts) > 1:
-            discardCount = int(parts[2]) if len(parts) > 2 else 0
-            if self.handId().split('/')[-1] == parts[1] \
-               and self.handDiscardCount >= int(discardCount):
-                self.autoPlay = False
-                self.wantedGame = parts[0] # --game has been processed
-                if Internal.scene: # mark the name of the active player in blue
-                    Internal.scene.mainWindow.actionAutoPlay.setChecked(False)
-
     def saveHand(self):
         """server told us to save this hand"""
         for player in self.players:
@@ -801,35 +889,10 @@ class PlayingGame(Game):
     def _scanGameOption(self):
         """scan the --game option and go to start of wanted hand"""
         if '/' in self.wantedGame:
-            part = self.wantedGame.split('/')[1]
-            roundsFinished, rotations, notRotated = self.__scanHandId(part)
-            for _ in range(roundsFinished * 4 + rotations):
-                self.rotateWinds()
-            self.notRotated = notRotated
-
-    def __scanHandId(self, handId):
-        """gets something like W3a, returns (roundsFinished, rotations, notRotated)"""
-        if handId[0] not in 'ESWN':
-            logException('--game option with / must specify the round wind')
-        roundsFinished = 'ESWN'.index(handId[0])
-        if roundsFinished > self.ruleset.minRounds:
-            logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
-                self.ruleset.name, self.ruleset.minRounds, roundsFinished + 1, handId[0]))
-            return self.ruleset.minRounds, 0, 0
-        rotations = int(handId[1]) - 1
-        notRotated = 0
-        if rotations > 3:
-            logWarning('You want %d rotations, reducing to maximum of 3' % rotations)
-            return roundsFinished, 3, 0
-        for char in handId[2:]:
-            if char < 'a':
-                logWarning('you want %s, changed to a' % char)
-                char = 'a'
-            if char > 'z':
-                logWarning('you want %s, changed to z' % char)
-                char = 'z'
-            notRotated = notRotated * 26 + ord(char) - ord('a') + 1
-        return roundsFinished, rotations, notRotated
+            first, last = (HandId(self, self.wantedGame, x) for x in (0, 1))
+            if first > last:
+                raise UserWarning('{}..{} is a negative range'.format(first, last))
+            HandId(self, self.wantedGame).goto()
 
     def assignVoices(self):
         """now we have all remote user voices"""

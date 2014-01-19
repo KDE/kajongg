@@ -417,7 +417,7 @@ class MessageInitHand(ServerMessage):
             client.shutdownHumanClients(exception=client)
         scene = Internal.scene
         if scene:
-            scene.mainWindow.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId()))
+            scene.mainWindow.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId.seed))
             scene.discardBoard.setRandomPlaces(client.game.randomGenerator)
         client.game.initHand()
 

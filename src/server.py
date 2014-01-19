@@ -617,7 +617,7 @@ class ServerTable(Table):
         for block in DeferredBlock.blocks:
             if block.table == self:
                 logError('request left from previous hand: %s' % block.outstandingStr())
-        token = self.game.handId() # we need to send the old token until the
+        token = self.game.handId.prompt(withAI=False) # we need to send the old token until the
                                    # clients started the new hand
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
@@ -704,7 +704,7 @@ class ServerTable(Table):
             withDiscard = Tile(withDiscard)
         if self.game.ruleset.mustDeclareCallingHand:
             assert player.isCalling, '%s %s: concmelds:%s withdiscard:%s lastmeld:%s' % (
-                self.game.handId(), player, concealedMelds, withDiscard, lastMeld)
+                self.game.handId, player, concealedMelds, withDiscard, lastMeld)
         discardingPlayer = self.game.activePlayer
         lastMove = self.game.lastMoves(withoutNotifications=True).next()
         robbedTheKong = lastMove.message == Message.DeclaredKong

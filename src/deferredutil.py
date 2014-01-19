@@ -338,7 +338,7 @@ class DeferredBlock(object):
             kwargs['score'] = str(about.hand)
         if game and game.gameid and 'token' not in kwargs:
             # this lets the client assert that the message is meant for the current hand
-            kwargs['token'] = game.handId()
+            kwargs['token'] = game.handId.token()
         else:
             kwargs['token'] = None
 

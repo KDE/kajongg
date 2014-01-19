@@ -70,7 +70,8 @@ def defineOptions():
     options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
     options.add("csv <CSV>", ki18n("write statistics to CSV"))
     options.add("rulesets", ki18n("show all available rulesets"))
-    options.add("game <seed/hand/discard>", ki18n("for testing purposes: Initializes the random generator"), "0")
+    options.add("game <seed[/[firsthand][..[lasthand]]>",
+        ki18n("for testing purposes: Initializes the random generator"), "0")
     options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
     options.add("nokde", ki18n("Do not use KDE bindings. Intended only for testing"))
     options.add("socket <SOCKET>", ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
