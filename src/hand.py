@@ -597,9 +597,7 @@ class Hand(object):
     def __eq__(self, other):
         """compares hand values"""
         assert self.player == other.player
-        if self.won != other.won:
-            return False
-        return self.intelligence.handValue(self) == self.intelligence.handValue(other)
+        return self.string == other.string
 
     def __matchingRules(self, rules):
         """return all matching rules for this hand"""
