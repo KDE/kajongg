@@ -800,22 +800,28 @@ class PlayingGame(Game):
 
     def _scanGameOption(self):
         """scan the --game option and go to start of wanted hand"""
-        if not '/' in self.wantedGame:
-            return
-        part = self.wantedGame.split('/')[1]
-        if part[0] not in 'ESWN':
+        if '/' in self.wantedGame:
+            part = self.wantedGame.split('/')[1]
+            roundsFinished, rotations, notRotated = self.__scanHandId(part)
+            for _ in range(roundsFinished * 4 + rotations):
+                self.rotateWinds()
+            self.notRotated = notRotated
+
+    def __scanHandId(self, handId):
+        """gets something like W3a, returns (roundsFinished, rotations, notRotated)"""
+        if handId[0] not in 'ESWN':
             logException('--game option with / must specify the round wind')
-        roundsFinished = 'ESWN'.index(part[0])
+        roundsFinished = 'ESWN'.index(handId[0])
         if roundsFinished > self.ruleset.minRounds:
             logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
-                self.ruleset.name, self.ruleset.minRounds, roundsFinished + 1, part[0]))
-            return self.ruleset.minRounds, 0
-        rotations = int(part[1]) - 1
+                self.ruleset.name, self.ruleset.minRounds, roundsFinished + 1, handId[0]))
+            return self.ruleset.minRounds, 0, 0
+        rotations = int(handId[1]) - 1
         notRotated = 0
         if rotations > 3:
             logWarning('You want %d rotations, reducing to maximum of 3' % rotations)
             return roundsFinished, 3, 0
-        for char in part[2:]:
+        for char in handId[2:]:
             if char < 'a':
                 logWarning('you want %s, changed to a' % char)
                 char = 'a'
@@ -823,9 +829,7 @@ class PlayingGame(Game):
                 logWarning('you want %s, changed to z' % char)
                 char = 'z'
             notRotated = notRotated * 26 + ord(char) - ord('a') + 1
-        for _ in range(roundsFinished * 4 + rotations):
-            self.rotateWinds()
-        self.notRotated = notRotated
+        return roundsFinished, rotations, notRotated
 
     def assignVoices(self):
         """now we have all remote user voices"""
