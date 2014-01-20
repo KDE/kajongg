@@ -823,7 +823,7 @@ class ScratchingPole(RuleCode):
 
 class StandardRotation(RuleCode):
     def rotate(game):
-        return game.winner and game.winner.wind != 'E' # TODO e?
+        return game.winner and game.winner.wind != 'E'
 
 class EastWonNineTimesInARow(RuleCode):
     nineTimes = 9
@@ -912,6 +912,7 @@ class ThirteenOrphans(RuleCode):
     def computeLastMelds(hand):
         meldSize = hand.tilesInHand.count(hand.lastTile)
         if meldSize == 0:
+            hand.debug('13Orphans: lastTile {} is not inHand {}'.format(hand.lastTile, hand.tilesInHand))
             return [Meld()]
         return [hand.lastTile.meld(meldSize)] # TODO: warum kann meldSize 0 sein?
 
