@@ -410,35 +410,31 @@ into a situation where you have to pay a penalty"""))
         else:
             raise Exception('ruleset %s not found' % self.name)
 
+    def __setParametersFrom(self, fromRuleset):
+        """sets attributes for parameters defined in fromRuleset.
+        Does NOT overwrite already set parameters: Silently ignore them"""
+        for par in fromRuleset.parameterRules:
+            if isinstance(par, ParameterRule):
+                if par.parName not in self.__dict__:
+                    self.__dict__[par.parName] = par.parameter
+
     def load(self):
         """load the ruleset from the database and compute the hash. Return self."""
-        # pylint: disable=too-many-branches
-        # TODO: pylint may be removed again soon
         if self.__loaded:
             return self
         self.__loaded = True
-        # we might have introduced new mandatory rules which do
-        # not exist in the rulesets saved with the games, so preload
-        # the default values from any predefined ruleset:
-        # TODO: the ruleset should know from which predefined ruleset it
-        # has been copied - use that one. For now use sorted() here to
-        # avoid random differences
-        if self.rulesetId: # a saved ruleset, do not do this for predefined rulesets
-            predefRuleset = sorted(PredefinedRuleset.rulesets())[0]
-            predefRuleset.load()
-            for par in predefRuleset.parameterRules:
-                if isinstance(par, ParameterRule):
-                    self.__dict__[par.parName] = par.parameter
         self.loadRules()
-        for par in self.parameterRules:
-            if isinstance(par, ParameterRule):
-                self.__dict__[par.parName] = par.parameter
+        self.__setParametersFrom(self)
         for ruleList in self.ruleLists:
             assert len(ruleList) == len(set(x.key() for x in ruleList)), '%s has non-unique key' % ruleList.name
             for rule in ruleList:
                 if hasattr(rule, 'score'):
                     rule.score.ruleset = self
                 self.allRules.append(rule)
+        if self.rulesetId: # a saved ruleset, do not do this for predefined rulesets
+            # we might have introduced new parameter rules which do not exist in this ruleset saved with the game,
+            # so add missing parameters from the predefined ruleset most similar to this one
+            self.__setParametersFrom(sorted(PredefinedRuleset.rulesets(), key=lambda x: len(self.diff(x)))[0])
         self.doublingMeldRules = list(x for x in self.meldRules if x.score.doubles)
         self.doublingHandRules = list(x for x in self.handRules if x.score.doubles)
         for mjRule in self.mjRules:

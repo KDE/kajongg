@@ -93,22 +93,22 @@ class ClassicalChinese(PredefinedRuleset):
 
     def addParameterRules(self):
         """as the name says"""
-        self.parameterRules.createRule('Points Needed for Mah Jongg', 'intminMJPoints||Omandatory', parameter=0)
+        self.parameterRules.createRule('Points Needed for Mah Jongg', 'intminMJPoints', parameter=0)
         self.parameterRules.createRule('Minimum number of doubles needed for Mah Jongg',
-                'intminMJDoubles||OMandatory', parameter=0)
-        self.parameterRules.createRule('Points for a Limit Hand', 'intlimit||Omandatory||Omin=1', parameter=500)
-        self.parameterRules.createRule('Play with the roof off', 'boolroofOff||Omandatory', parameter=False,
+                'intminMJDoubles', parameter=0)
+        self.parameterRules.createRule('Points for a Limit Hand', 'intlimit||Omin=1', parameter=500)
+        self.parameterRules.createRule('Play with the roof off', 'boolroofOff', parameter=False,
                 description=m18n('Play with no upper scoring limit'))
-        self.parameterRules.createRule('Claim Timeout', 'intclaimTimeout||Omandatory', parameter=10)
-        self.parameterRules.createRule('Size of Kong Box', 'intkongBoxSize||Omandatory', parameter=16,
+        self.parameterRules.createRule('Claim Timeout', 'intclaimTimeout', parameter=10)
+        self.parameterRules.createRule('Size of Kong Box', 'intkongBoxSize', parameter=16,
                 description=m18n('The Kong Box is used for replacement tiles when declaring kongs'))
-        self.parameterRules.createRule('Play with Bonus Tiles', 'boolwithBonusTiles||OMandatory', parameter=True,
+        self.parameterRules.createRule('Play with Bonus Tiles', 'boolwithBonusTiles', parameter=True,
                 description=m18n('Bonus tiles increase the luck factor'))
-        self.parameterRules.createRule('Minimum number of rounds in game', 'intminRounds||OMandatory', parameter=4)
-        self.parameterRules.createRule('number of allowed chows', 'intmaxChows||Omandatory', parameter=4,
+        self.parameterRules.createRule('Minimum number of rounds in game', 'intminRounds', parameter=4)
+        self.parameterRules.createRule('number of allowed chows', 'intmaxChows', parameter=4,
                 description=m18n('The number of chows a player may build'))
         self.parameterRules.createRule('must declare calling hand',
-                'boolmustDeclareCallingHand||Omandatory', parameter=False,
+                'boolmustDeclareCallingHand', parameter=False,
                 description=m18n('Mah Jongg is only allowed after having declared to have a calling hand'))
         self.parameterRules.createRule('Standard Rotation', 'FStandardRotation||Orotate||Ointernal')
 
