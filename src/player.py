@@ -631,13 +631,6 @@ class PlayingPlayer(Player):
             return msg, self.name
         self._hand = None
 
-    def hasExposedPungOf(self, tileName):
-        """do I have an exposed Pung of tileName?"""
-        for meld in self._exposedMelds:
-            if meld == [tileName.exposed] * 3:
-                return True
-        return False
-
     def robTile(self, tile):
         """used for robbing the kong"""
         assert tile.isConcealed

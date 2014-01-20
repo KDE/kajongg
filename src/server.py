@@ -678,7 +678,7 @@ class ServerTable(Table):
     def declareKong(self, player, meldTiles):
         """player declares a Kong, meldTiles is a list"""
         kongMeld = Meld(meldTiles)
-        if not player.hasConcealedTiles(kongMeld) and not player.hasExposedPungOf(kongMeld[0]):
+        if not player.hasConcealedTiles(kongMeld) and kongMeld[0].exposed.pung not in player.exposedMelds:
             # pylint: disable=star-args
             msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, str(kongMeld))
