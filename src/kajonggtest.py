@@ -56,7 +56,8 @@ class Clone(object):
         self.clones[commitId] = self
         if commitId is 'current':
             self.tmpdir = os.path.abspath('..')
-            assert os.path.exists(os.path.join(self.tmpdir, 'src'))
+            srcDir = os.path.join(self.tmpdir, 'src')
+            assert os.path.exists(srcDir), '{} does not exist'.format(srcDir)
         else:
             self.tmpdir = mkdtemp(suffix='.' + commitId)
             subprocess.Popen('git clone --local --no-checkout -q .. {temp}'.format(
@@ -127,11 +128,11 @@ class Server(object):
 
     def start(self, job):
         """start this server"""
-        assert self.process is None
+        assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
         self.socketName = os.path.expanduser(os.path.join('~', '.kajongg',
             'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))))
-        assert self.serverKey in (None, job.serverKey())
+        assert self.serverKey in (None, job.serverKey()), '{} not in (None, {})'.format(self.serverKey, job.serverKey())
         self.serverKey = job.serverKey()
         print('starting server for %s' % job)
         cmd = ['{src}/kajonggserver.py'.format(src=job.srcDir()),
@@ -170,16 +171,10 @@ class Server(object):
     @classmethod
     def stopAll(cls):
         """stop all servers even if clients are still there"""
-        for server in cls.servers[:]:
-            for job in server.jobs:
-                if job.process:
-                    try:
-                        job.process.terminate()
-                        _ = job.process.wait()
-                        job.check(silent=True)
-                    except OSError:
-                        pass
-            assert len(server.jobs) == 0, server.jobs
+        for server in cls.servers:
+            for job in server.jobs[:]:
+                server.stop(job)
+            assert len(server.jobs) == 0, 'stopAll expects no server jobs but found {}'.format(server.jobs)
             server.stop()
 
 class Job(object):
