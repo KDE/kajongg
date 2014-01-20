@@ -187,14 +187,14 @@ class FalseColorGame(Base):
 class WrigglingSnake(Base):
     """the wriggling snake as in BMJA"""
     def testMe(self):
-        self.scoreTest('c1c1 c2c3c4 c5c6c7 RC8C9WeWwWsWn Lc1c1c1', [NoWin(), Win(limits=1)])
-        self.scoreTest('c2c3c4 c5c6c7 RC1C1C8C9WeWwWsWn LC1C1C1', [NoWin(), Win(limits=1)])
-        self.scoreTest('c2c3c4 c5c6c7 RC1C1C8C9WeWwWsWn LWnWn', [NoWin(), Win(limits=1)])
-        self.scoreTest('c1c1 c2c3c4 c5c6c7 RC8C9WwWwWsWn Lc1c1c1', [NoWin(), NoWin()])
+        self.scoreTest('c1c1 c2c3c4 c5c6c7 RC8C9WeWwWsWn Lc1c1c1', [NoWin(), NoWin()])
+        self.scoreTest('c2c3c4 c5c6c7 RC1C1C8C9WeWwWsWn LC1C1C1', [NoWin(), NoWin()])
+        self.scoreTest('c2c3c4 c5c6c7 RC1C1C8C9WeWwWsWn LWnWn', [NoWin(), NoWin()])
+        self.scoreTest('RC1C1C2C3C4C5C6C7C8C9WeWwWsWn LC1C1', [NoWin(), Win(limits=1)])
         self.callingTest('RS1S3WwS6WsS3S3WnWeS5 s7s8s9 fs', '')
-        self.callingTest('RS1S2WwS6WsS3S3WnWeS5 s7s8s9 fs', '')
-        self.callingTest('RS1S2WwS6WsS3S4WnWeS5 s7s8s9 fs', ['', 's1'])
-        self.callingTest('RS1S2WwS6WsS3S4WnWeS1 s7s8s9 fs', ['', 's5'])
+        self.callingTest('RS1S2WwS6WsS3S3WnWeS5S7S8S9 fs', '')
+        self.callingTest('RS1S2WwS6WsS3S4WnWeS5S7S8S9 fs', ['', 's1'])
+        self.callingTest('RS1S2WwS6WsS3S4WnWeS1S7S8S9 fs', ['', 's5'])
 class SquirmingSnake(Base):
     """the winding snake"""
     def testMe(self):
@@ -531,7 +531,7 @@ class AllPairHonors(Base):
 class BMJA(Base):
     """specials for chinese classical BMJA"""
     def testMe(self):
-        self.scoreTest('RS1S1S5S6S7S8S9WeWsWwWn s2s3s4 Ls3s2s3s4', [NoWin(), Win(limits=1)])
+        self.scoreTest('RS1S1S5S6S7S8S9WeWsWwWnS2S3S4 LS3S3', [NoWin(), Win(limits=1)])
 
 class LastTile(Base):
     """will the best last meld be chosen?"""

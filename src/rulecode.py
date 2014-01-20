@@ -407,6 +407,8 @@ class SquirmingSnake(StandardMahJongg):
 
 class WrigglingSnake(RuleCode):
     def shouldTry(hand, maxMissing=3):
+        if hand.declaredMelds:
+            return False
         return (len(set(x.exposed for x in hand.tiles)) + maxMissing > 12
            and all(not x.isChow for x in hand.declaredMelds))
 
@@ -450,6 +452,8 @@ class WrigglingSnake(RuleCode):
         yield tuple(melds), tuple(rest)
 
     def appliesToHand(hand):
+        if hand.declaredMelds:
+            return False
         suits = hand.suits.copy()
         if Tile.wind not in suits:
             return False
@@ -844,7 +848,13 @@ class EastWonNineTimesInARow(RuleCode):
 
 class GatesOfHeaven(StandardMahJongg):
     cache = ()
+
+    def computeLastMelds(hand):
+        return [hand.lastTile.single]
+
     def shouldTry(hand, maxMissing=3):
+        if hand.declaredMelds:
+            return False
         for suit in Tile.colors:
             count19 = sum(x.isTerminal for x in hand.tiles)
             suitCount = len(list(x for x in hand.tiles if x.lowerGroup == suit))
@@ -855,10 +865,7 @@ class GatesOfHeaven(StandardMahJongg):
     def maybeCallingOrWon(hand):
         if len(hand.suits) != 1 or not hand.suits < set(Tile.colors):
             return False
-        for meld in hand.declaredMelds:
-            if meld.isPung:
-                return False
-        return True
+        return not hand.declaredMelds
 
     def appliesToHand(cls, hand):
         if not cls.maybeCallingOrWon(hand):
