@@ -957,9 +957,10 @@ class MJServer(object):
                     self.removeTable(table, 'silent', message, *args)
                 else:
                     table.delUser(user)
-                    block = DeferredBlock(table)
-                    block.tell(None, self.srvUsers, Message.TableChanged, source=table.asSimpleList())
-                    block.callback(False)
+                    if self.srvUsers:
+                        block = DeferredBlock(table)
+                        block.tell(None, self.srvUsers, Message.TableChanged, source=table.asSimpleList())
+                        block.callback(False)
         return True
 
     def startGame(self, user, tableid):
