@@ -426,6 +426,7 @@ class ScoringGame(Game):
 
     def __init__(self, names, ruleset, gameid=None, client=None, wantedGame=None):
         Game.__init__(self, names, ruleset, gameid=gameid, client=client, wantedGame=wantedGame)
+        self.shouldSave = True
         scene = Internal.scene
         scene.selectorBoard.load(self)
         self.prepareHand()

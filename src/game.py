@@ -205,7 +205,7 @@ class Game(object):
     playerClass = Player
     wallClass = Wall
 
-    def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, client=None):
+    def __init__(self, names, ruleset, gameid=None, wantedGame=None, client=None):
         """a new game instance. May be shown on a field, comes from database if gameid is set
 
         Game.lastDiscard is the tile last discarded by any player. It is reset to None when a
@@ -215,6 +215,7 @@ class Game(object):
         assert self.__class__ != Game, 'Do not directly instantiate Game'
         self.players = Players() # if we fail later on in init, at least we can still close the program
         self.myself = None   # the player using this client instance for talking to the server
+        self.__shouldSave = False
         self._client = None
         self.client = client
         self.rotated = 0
@@ -225,7 +226,6 @@ class Game(object):
         self._prevHandId = None
         self.randomGenerator = CountingRandom(self)
         self.wantedGame = wantedGame
-        self.shouldSave = shouldSave
         self._setHandSeed()
         self.activePlayer = None
         self.__winner = None
@@ -252,10 +252,18 @@ class Game(object):
         if self.belongsToGameServer():
             self.__shufflePlayers()
         self._scanGameOption()
-        if self.shouldSave:
-            self.saveStartTime()
         for player in self.players:
             player.clearHand()
+
+    @property
+    def shouldSave(self):
+        return self.__shouldSave
+
+    @shouldSave.setter
+    def shouldSave(self, value):
+        if value and not self.__shouldSave:
+            self.saveStartTime()
+        self.__shouldSave = value
 
     @property
     def handId(self):
@@ -737,14 +745,13 @@ class PlayingGame(Game):
     # pylint: disable=too-many-arguments,too-many-public-methods,too-many-instance-attributes
     playerClass = PlayingPlayer
 
-    def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \
+    def __init__(self, names, ruleset, gameid=None, wantedGame=None, \
             client=None, playOpen=False, autoPlay=False):
         """a new game instance, comes from database if gameid is set"""
         self.__activePlayer = None
         self.prevActivePlayer = None
         self.defaultNameBrush = None
-        Game.__init__(self, names, ruleset, gameid,
-            wantedGame=wantedGame, shouldSave=shouldSave, client=client)
+        Game.__init__(self, names, ruleset, gameid, wantedGame=wantedGame, client=client)
         self.playOpen = playOpen
         self.autoPlay = autoPlay
         myself = self.myself

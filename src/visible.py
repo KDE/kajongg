@@ -191,9 +191,8 @@ class VisiblePlayingGame(PlayingGame):
     playerClass =  VisiblePlayingPlayer
     wallClass = UIWall
 
-    def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True, \
-            client=None, playOpen=False, autoPlay=False):
-        PlayingGame.__init__(self, names, ruleset, gameid, wantedGame=wantedGame, shouldSave=shouldSave,
+    def __init__(self, names, ruleset, gameid=None, wantedGame=None, client=None, playOpen=False, autoPlay=False):
+        PlayingGame.__init__(self, names, ruleset, gameid, wantedGame=wantedGame,
             client=client, playOpen=playOpen, autoPlay=autoPlay)
 #        Internal.mainWindow.adjustView()
 #        Internal.mainWindow.updateGUI()

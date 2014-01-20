@@ -256,8 +256,9 @@ class Client(object, pb.Referenceable):
                             player.wind, self.table.endValues[1][player.wind], player.balance))
         else:
             self.game = gameClass(playerNames, self.table.ruleset,
-                shouldSave=shouldSave, gameid=gameid, wantedGame=wantedGame, client=self,
+                gameid=gameid, wantedGame=wantedGame, client=self,
                 playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
+        self.game.shouldSave = shouldSave
         self.__assignIntelligence()  # intelligence variant is not saved for suspended games
         self.game.prepareHand()
         return succeed(Message.OK)
@@ -452,3 +453,6 @@ class Client(object, pb.Referenceable):
         move.exposedMeld = move.player.exposeMeld(move.source)
         if not self.thatWasMe(move.player):
             self.ask(move, [Message.OK])
+
+    def __str__(self):
+        return self.name

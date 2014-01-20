@@ -120,10 +120,10 @@ class DBPasswordChecker(object):
 class ServerGame(PlayingGame):
     """the central game instance on the server"""
     # pylint: disable=too-many-arguments, too-many-public-methods
-    def __init__(self, names, ruleset, gameid=None, wantedGame=None, shouldSave=True,
+    def __init__(self, names, ruleset, gameid=None, wantedGame=None,
                 client=None, playOpen=False, autoPlay=False):
-        PlayingGame.__init__(self, names, ruleset, gameid, wantedGame, shouldSave,
-                client, playOpen, autoPlay)
+        PlayingGame.__init__(self, names, ruleset, gameid, wantedGame, client, playOpen, autoPlay)
+        self.shouldSave = True
 
     def throwDices(self):
         """sets random living and kongBox
@@ -279,7 +279,7 @@ class ServerTable(Table):
             names.append(robotNames[3 - len(names)])
         self.client = Client() # Game has a weakref to client, so we must keep it!
         return ServerGame(names, self.ruleset, client=self.client,
-            playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame, shouldSave=True)
+            playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame)
 
     def userForPlayer(self, player):
         """finds the table user corresponding to player"""
