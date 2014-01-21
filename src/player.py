@@ -444,24 +444,22 @@ class PlayingPlayer(Player):
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
+        melds = concealed[:]
         self.game.winner = self
         if withDiscard:
             assert isinstance(withDiscard, Tile), withDiscard
             PlayingPlayer.addConcealedTiles(self, [withDiscard]) # this should NOT invoke syncHandBoard
-            melds = [Meld(x) for x in concealed.split()]
             if self.lastSource != 'k':   # robbed the kong
                 self.lastSource = 'd'
             # the last claimed meld is exposed
-            assert lastMeld in melds, '%s: concealed=%s melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
-                    self._concealedTiles, concealed, melds, lastMeld, lastTile, withDiscard)
+            assert lastMeld in melds, '%s: melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
+                    self._concealedTiles, melds, lastMeld, lastTile, withDiscard)
             melds.remove(lastMeld)
             lastTile = withDiscard.exposed
             lastMeld = lastMeld.exposed
             self._exposedMelds.append(lastMeld)
             for tileName in lastMeld:
                 self.visibleTiles[tileName] += 1
-        else:
-            melds = [Meld(x) for x in concealed.split()]
         self.lastTile = lastTile
         self.lastMeld = lastMeld
         self._concealedMelds = melds
@@ -612,16 +610,15 @@ class PlayingPlayer(Player):
     def showConcealedMelds(self, concealedMelds, ignoreDiscard=None):
         """the server tells how the winner shows and melds his
         concealed tiles. In case of error, return message and arguments"""
-        for part in concealedMelds.split():
-            meld = Meld(part)
-            for pair in meld:
-                if pair == ignoreDiscard:
+        for meld in concealedMelds:
+            for tile in meld:
+                if tile == ignoreDiscard:
                     ignoreDiscard = None
                 else:
-                    if not pair in self._concealedTiles:
+                    if not tile in self._concealedTiles:
                         msg = m18nE('%1 claiming MahJongg: She does not really have tile %2')
-                        return msg, self.name, pair
-                    self._concealedTiles.remove(pair)
+                        return msg, self.name, tile
+                    self._concealedTiles.remove(tile)
             if meld.isConcealed and not meld.isKong:
                 self._concealedMelds.append(meld)
             else:

@@ -52,7 +52,7 @@ from player import Players
 from wall import WallEmpty
 from client import Client, Table
 from query import Transaction, Query, DBHandle, initDb
-from meld import Meld
+from meld import Meld, MeldList
 from log import m18n, m18nE, m18ncE, logDebug, logWarning, logError, SERVERMARK
 from util import Duration
 from kde import socketName
@@ -699,9 +699,9 @@ class ServerTable(Table):
         if not self.running:
             return
         player = msg.player
-        concealedMelds, withDiscard, lastMeld = msg.args
-        if withDiscard:
-            withDiscard = Tile(withDiscard)
+        concealedMelds = MeldList(msg.args[0])
+        withDiscard = Tile(msg.args[1]) if msg.args[1] else None
+        lastMeld = Meld(msg.args[2])
         if self.game.ruleset.mustDeclareCallingHand:
             assert player.isCalling, '%s %s: concmelds:%s withdiscard:%s lastmeld:%s' % (
                 self.game.handId, player, concealedMelds, withDiscard, lastMeld)
@@ -712,7 +712,6 @@ class ServerTable(Table):
             player.lastSource = 'k'
             withDiscard = lastMove.meld[0].concealed
             lastMove.player.robTile(withDiscard)
-        lastMeld = Meld(lastMeld)
         msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)
         if msgArgs:
             self.abort(*msgArgs) # pylint: disable=star-args
@@ -732,7 +731,7 @@ class ServerTable(Table):
                 logDebug('%s wins with dangerous tile %s from %s' % \
                              (player, self.game.lastDiscard, discardingPlayer))
             block.tellAll(player, Message.UsedDangerousFrom, source=discardingPlayer.name)
-        block.tellAll(player, Message.MahJongg, source=concealedMelds, lastTile=player.lastTile,
+        block.tellAll(player, Message.MahJongg, melds=concealedMelds, lastTile=player.lastTile,
                      lastMeld=lastMeld, withDiscardTile=withDiscard)
         block.callback(self.endHand)
 

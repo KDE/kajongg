@@ -276,7 +276,7 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
         return m18n('Press here and you win'), False, ''
     def clientAction(self, dummyClient, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
-        return move.player.declaredMahJongg(move.source, move.withDiscardTile,
+        return move.player.declaredMahJongg(move.melds, move.withDiscardTile,
             move.lastTile, move.lastMeld)
 
 class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):

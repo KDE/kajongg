@@ -23,7 +23,7 @@ import weakref
 from common import Debug
 from message import Message
 from tile import Tile, TileList
-from meld import Meld
+from meld import Meld, MeldList
 
 class Move(object):
     """used for decoded move information from the game server"""
@@ -50,6 +50,8 @@ class Move(object):
                 self.__setattr__(key, TileList(value))
             elif key.lower().endswith('meld'):
                 self.__setattr__(key, Meld(value))
+            elif key.lower().endswith('melds'):
+                self.__setattr__(key, MeldList(value))
             else:
                 self.__setattr__(key, value)
 
