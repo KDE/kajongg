@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from log import m18n, m18nc, logDebug
-from common import LIGHTSOURCES, Internal, isAlive, ZValues
+from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from twisted.internet.defer import succeed
 
 from PyQt4.QtCore import Qt, QMetaObject
@@ -492,6 +492,8 @@ class ScoringScene(GameScene):
             if result:
                 self.game = None
             return result
+        if Debug.quit:
+            logDebug('ScoringScene.abort invoked')
         if not self.game:
             return succeed(None)
         elif self.game.finished():

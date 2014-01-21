@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 import os
 from log import logError, logException, logDebug, m18n, m18nc
-from common import Options, Internal, isAlive
+from common import Options, Internal, isAlive, Debug
 import cgitb, tempfile, webbrowser
 
 class MyHook(cgitb.Hook):
@@ -244,8 +244,12 @@ class MainWindow(KXmlGuiWindow):
     def closeAction(self):
         """quit kajongg"""
         # calling self.close() is not helpful: closeQuery or closeEvent are never called
+        if Debug.quit:
+            logDebug('mainWindow.closeAction invoked')
         def answered(result):
             """quit if the active game has been aborted"""
+            if Debug.quit:
+                logDebug('mainWindow.closeAction.answered:{}'.format(result))
             if result:
                 self.quitProgram()
         if self.scene:
@@ -255,6 +259,8 @@ class MainWindow(KXmlGuiWindow):
 
     def abortAction(self):
         """abort current game"""
+        if Debug.quit:
+            logDebug('mainWindow.abortAction invoked')
         return self.scene.abort()
 
     def retranslateUi(self):
@@ -420,6 +426,8 @@ class MainWindow(KXmlGuiWindow):
 
     def quitProgram(self, result=None):
         """now all connections to servers are cleanly closed"""
+        if Debug.quit:
+            logDebug('mainWindow.quitProgram invoked')
         if isinstance(result, Failure):
             logException(result)
         try:
@@ -447,6 +455,8 @@ class MainWindow(KXmlGuiWindow):
     @classmethod
     def appquit(cls):
         """retry until the reactor really stopped"""
+        if Debug.quit:
+            logDebug('mainWindow.appQuit invoked')
         if Internal.reactor.running:
             Internal.quitWaitTime += 10
             if Internal.quitWaitTime % 1000 == 0:
@@ -454,7 +464,7 @@ class MainWindow(KXmlGuiWindow):
             Internal.reactor.callLater(0.1, cls.appquit)
             QTimer.singleShot(10, cls.appquit)
         else:
-            if Internal.quitWaitTime > 1000:
+            if Internal.quitWaitTime > 1000 or Debug.quit:
                 logDebug('reactor stopped after %d seconds' % (Internal.quitWaitTime // 1000))
             Internal.app.quit()
             checkMemory()
