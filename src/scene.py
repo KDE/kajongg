@@ -495,10 +495,10 @@ class ScoringScene(GameScene):
         if Debug.quit:
             logDebug('ScoringScene.abort invoked')
         if not self.game:
-            return succeed(None)
+            return succeed(True)
         elif self.game.finished():
             self.game = None
-            return succeed(None)
+            return succeed(True)
         else:
             return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(answered)
 
