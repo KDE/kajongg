@@ -376,14 +376,12 @@ class MeldList(list):
         list.__init__(self)
         if newContent is None:
             return
-        if newContent.__class__.__name__ == 'generator':
-            newContent = list(newContent)
-        if isinstance(newContent, (list, tuple, set)):
-            list.extend(self, [Meld(x) for x in newContent])
-        elif isinstance(newContent, Meld):
+        if isinstance(newContent, Meld):
             list.append(self, newContent)
         elif isinstance(newContent, str):
             list.extend(self, [Meld(x) for x in newContent.split()]) # pylint: disable=maybe-no-member
+        else:
+            list.extend(self, [Meld(x) for x in newContent])
         self.sort()
 
     def extend(self, values):
