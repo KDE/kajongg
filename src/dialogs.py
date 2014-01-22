@@ -21,8 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # pylint: disable=invalid-name,W0611
 # invalid names, unused imports
 
+import inspect
+
 from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QDialog, QMessageBox
+from PyQt4.QtGui import QDialog, QMessageBox, QWidget
 
 from kde import KMessageBox, KDialog
 
@@ -46,7 +48,16 @@ class KDialogIgnoringEscape(KDialog, IgnoreEscape):
 
 class MustChooseKDialog(KDialogIgnoringEscape):
     """this dialog can only be closed if a choice has been done"""
-    def __init__(self, parent=None):
+    def __init__(self):
+        parent = Internal.mainWindow # default
+        # if we are (maybe indirectly) called from a method belonging to a QWidget, take that as parent
+        # this does probably not work for classmethod or staticmethod but it is good enough right now
+        for frametuple in inspect.getouterframes(inspect.currentframe())[1:]:
+            if 'self' in frametuple[0].f_locals:
+                obj = frametuple[0].f_locals['self']
+                if isinstance(obj, QWidget) and not isinstance(obj, QDialog):
+                    parent = obj
+                    break
         KDialogIgnoringEscape.__init__(self, parent)
         self.chosen = None
 
@@ -64,7 +75,7 @@ class Prompt(MustChooseKDialog):
         self.msg = msg
         self.default = default
         if Options.gui:
-            MustChooseKDialog.__init__(self, Internal.mainWindow)
+            MustChooseKDialog.__init__(self)
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
             self.setCaption(caption or '')
             KMessageBox.createKMessageBox(self, icon, msg,
@@ -101,9 +112,9 @@ class DeferredDialog(Deferred):
         if self.dlg is None:
             return
         scene = Internal.scene
-        if not scene or not isAlive(self.dlg):
+        if not Options.gui or not isAlive(self.dlg):
             return self.autoAnswer()
-        autoPlay = scene.game and scene.game.autoPlay
+        autoPlay = scene and scene.game and scene.game.autoPlay
         autoAnswerDelayed = autoPlay and not self.always
         if self.modal and not autoAnswerDelayed:
             self.dlg.exec_()

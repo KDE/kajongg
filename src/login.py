@@ -210,7 +210,7 @@ class AddUserDialog(MustChooseKDialog):
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, url, username, password):
-        MustChooseKDialog.__init__(self, None)
+        MustChooseKDialog.__init__(self)
         self.setWindowTitle(m18n('Create User Account') + ' - Kajongg')
         self.setButtons(KDialog.ButtonCode(KDialog.Ok | KDialog.Cancel))
         vbox = QVBoxLayout()
