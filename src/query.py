@@ -127,7 +127,7 @@ class DBHandle(QSqlDatabase):
     def createIndex(self, name, cmd):
         """only try to create it if it does not yet exist. Do not use create if not exists because
         we want debug output only if we really create the index"""
-        if not Query("select 1 from sqlite_master where type='index' and name='%s'" % name,
+        if not Query("select 1 from sqlite_master where type='index' and name=?", [name],
                 silent=True, dbHandle=self).records:
             Query("create index %s on %s" % (name, cmd))
 
@@ -214,24 +214,26 @@ class DBHandle(QSqlDatabase):
         if int(query.records[0][0]):
             # make name non-unique. Needed for used rulesets: Content may change with identical name
             # and we now have both ruleset templates and copies of used rulesets in the same table
-            Query([
+            for statement in list([
                     'create table temp(%s)' % self.schema['ruleset'],
                     'insert into temp select id,name,hash,description from ruleset',
                     'drop table ruleset',
                     self.sqlForCreateTable('ruleset'),
                     'insert into ruleset select * from temp',
-                    'drop table temp'])
+                    'drop table temp']):
+                Query(statement)
         query = Query("select count(1) from sqlite_master "
             "where type='table' and tbl_name='rule' and sql like '%unique (ruleset,name)%'", silent=True)
         if int(query.records[0][0]):
             # make ruleset,name non-unique
-            Query([
+            for statement in list([
                     'create table temp(%s)' % self.schema['rule'],
                     'insert into temp select * from rule',
                     'drop table rule',
                     self.sqlForCreateTable('rule'),
                     'insert into rule select * from temp',
-                    'drop table temp'])
+                    'drop table temp']):
+                Query(statement)
 
     def upgradeDb(self):
         """upgrade any version to current schema"""
@@ -416,65 +418,58 @@ class Query(object):
 
     localServerName = m18ncE('kajongg name for local game server', 'Local Game')
 
-    def __init__(self, cmdList, args=None, dbHandle=None, silent=False, mayFail=False, failSilent=False):
-        """we take a list of sql statements. Only the last one is allowed to be
-        a select statement.
-        Do prepared queries by passing a single query statement in cmdList
-        and the parameters in args. If args is a list of lists, execute the
-        prepared query for every sublist.
+    def __init__(self, statement, args=None, dbHandle=None, silent=False, mayFail=False, failSilent=False):
+        """we take one sql statement.
+        Do prepared queries by passing the parameters in args.
+        If args is a list of lists, execute the prepared query for every sublist.
         If dbHandle is passed, use that for db access.
         Else if the default dbHandle (DBHandle.default) is defined, use it."""
         # pylint: disable=too-many-branches
         silent |= not Debug.sql
         self.dbHandle = dbHandle or DBHandle.default
-        preparedQuery = not isinstance(cmdList, list) and bool(args)
         self.query = QSqlQuery(self.dbHandle)
         self.msg = None
         self.records = []
-        if not isinstance(cmdList, list):
-            cmdList = list([cmdList])
-        self.cmdList = cmdList
+        self.statement = statement
         self.args = args
-        for cmd in cmdList:
-            self.lastError = None
-            if preparedQuery:
-                self.query.prepare(cmd)
-                if not isinstance(args[0], list):
-                    args = list([args])
-                for dataSet in args:
-                    if not silent:
-                        _, utf8Args = xToUtf8(u'', dataSet)
-                        logDebug("{cmd} [{args}]".format(cmd=cmd, args=", ".join(utf8Args)))
-                    for value in dataSet:
-                        if isinstance(value, bool):
-                            # see https://bugreports.qt-project.org/browse/QTBUG-15640
-                            value = int(value)
-                        self.query.addBindValue(QVariant(value))
-                    self.success = self.query.exec_()
-                    if not self.success:
-                        break
-            else:
+        self.lastError = None
+        self.query.prepare(self.statement)
+        if args is not None:
+            if not isinstance(args[0], list):
+                args = list([args])
+            for dataSet in args:
                 if not silent:
-                    logDebug('%s %s' % (self.dbHandle.name, cmd))
-                self.success = self.query.exec_(cmd)
-            if not self.success:
-                self.lastError = unicode(self.query.lastError().text())
-                self.msg = 'ERROR in %s: %s for %s' % (self.dbHandle.databaseName(), self.lastError,
-			self)
-                if mayFail:
-                    if not failSilent:
-                        logDebug(self.msg)
-                else:
-                    if not failSilent:
-                        logError(self.msg)
-                    raise QueryException(self.msg)
-                return
+                    _, utf8Args = xToUtf8(u'', dataSet)
+                    logDebug("{cmd} [{args}]".format(cmd=self.statement, args=", ".join(utf8Args)))
+                for value in dataSet:
+                    if isinstance(value, bool):
+                        # see https://bugreports.qt-project.org/browse/QTBUG-15640
+                        value = int(value)
+                    self.query.addBindValue(QVariant(value))
+                self.success = self.query.exec_()
+                if not self.success:
+                    break
+        else:
+            if not silent:
+                logDebug('%s %s' % (self.dbHandle.name, self.statement))
+            self.success = self.query.exec_()
+        if not self.success:
+            self.lastError = unicode(self.query.lastError().text())
+            self.msg = 'ERROR in %s: %s for %s' % (self.dbHandle.databaseName(), self.lastError, self)
+            if mayFail:
+                if not failSilent:
+                    logDebug(self.msg)
+            else:
+                if not failSilent:
+                    logError(self.msg)
+                raise QueryException(self.msg)
+            return
         self.records = None
         if self.query.isSelect():
             self.retrieveRecords()
 
     def __str__(self):
-        return '{} {}'.format(' '.join(self.cmdList),
+        return '{} {}'.format(' '.join(self.statement),
             'args=' + ','.join(str(x) for x in self.args) if self.args else '')
 
     def rowcount(self):

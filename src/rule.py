@@ -563,8 +563,8 @@ into a situation where you have to pay a penalty"""))
 
     def remove(self):
         """remove this ruleset from the database."""
-        Query(["DELETE FROM rule WHERE ruleset=%d" % self.rulesetId,
-                   "DELETE FROM ruleset WHERE id=%d" % self.rulesetId])
+        Query("DELETE FROM rule WHERE ruleset=%d" % self.rulesetId)
+        Query("DELETE FROM ruleset WHERE id=%d" % self.rulesetId)
 
     @staticmethod
     def ruleKey(rule):
