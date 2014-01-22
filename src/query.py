@@ -470,7 +470,6 @@ class Query(object):
                     raise QueryException(self.msg)
                 return
         self.records = None
-        self.fields = None
         if self.query.isSelect():
             self.retrieveRecords()
 
@@ -485,7 +484,6 @@ class Query(object):
     def retrieveRecords(self):
         """get all records from SQL into a python list"""
         record = self.query.record()
-        self.fields = [record.field(x) for x in range(record.count())]
         self.records = []
         while self.query.next():
             self.records.append([self.__convertField(x) for x in range(record.count())])
