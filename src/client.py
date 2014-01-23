@@ -30,7 +30,7 @@ from message import Message
 from common import Internal, Debug, Options
 from rule import Ruleset
 from game import PlayingGame
-from query import Transaction, Query
+from query import Query
 from move import Move
 from animation import animate
 from player import PlayingPlayer
@@ -204,7 +204,7 @@ class Client(object, pb.Referenceable):
     def reserveGameId(self, gameid):
         """the game server proposes a new game id. We check if it is available
         in our local data base - we want to use the same gameid everywhere"""
-        with Transaction():
+        with Internal.db:
             query = Query('insert into game(id,seed) values(?,?)',
                       list([gameid, self.connection.url]), mayFail=True, failSilent=True)
             if query.rowcount() != 1:

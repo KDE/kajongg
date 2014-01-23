@@ -38,12 +38,11 @@ def initRulesets():
     import predefined # pylint: disable=unused-variable
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
-        from query import DBHandle
         rulesets = Ruleset.selectableRulesets()
         if Options.showRulesets:
             for ruleset in rulesets:
                 kprint(ruleset.name)
-            DBHandle.default = None
+            Internal.db.close()
             sys.exit(0)
         else:
             matches = list(x for x in rulesets if Options.rulesetName in x.name)
@@ -52,7 +51,7 @@ def initRulesets():
                     msg = 'Ruleset %s is unknown' % Options.rulesetName
                 else:
                     msg = 'Ruleset %s is ambiguous: %s' % (Options.rulesetName, list(x.name for x in matches))
-                DBHandle.default = None
+                Internal.db.close()
                 raise SystemExit(msg)
             Options.ruleset = matches[0]
 

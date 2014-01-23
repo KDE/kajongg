@@ -28,7 +28,7 @@ from PyQt4.QtGui import QPushButton, QMessageBox, QComboBox
 from common import Internal, isAlive, WINDS
 from animation import animate
 from log import logError, logDebug, logWarning, m18n
-from query import Query, Transaction
+from query import Query
 from uitile import UITile
 from board import WindLabel, Board, rotateCenter
 from game import Game
@@ -514,16 +514,15 @@ class ScoringGame(Game):
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        with Transaction():
-            Query("INSERT INTO SCORE "
-                "(game,penalty,hand,data,manualrules,player,scoretime,"
-                "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
-                "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
-                (self.gameid, self.handctr, player.nameid,
-                    scoretime, int(player == self.winner),
-                    WINDS[self.roundsFinished % 4], player.wind, 0,
-                    amount, player.balance, self.rotated, self.notRotated),
-                list([player.hand.string, offense.name]))
+        Query("INSERT INTO SCORE "
+            "(game,penalty,hand,data,manualrules,player,scoretime,"
+            "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
+            "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" % \
+            (self.gameid, self.handctr, player.nameid,
+                scoretime, int(player == self.winner),
+                WINDS[self.roundsFinished % 4], player.wind, 0,
+                amount, player.balance, self.rotated, self.notRotated),
+            list([player.hand.string, offense.name]))
         Internal.mainWindow.updateGUI()
 
 def scoreGame():

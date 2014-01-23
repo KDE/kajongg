@@ -368,12 +368,12 @@ class PlayingScene(GameScene):
                 self.mainWindow.actionAutoPlay.setChecked(autoPlaying)
             return result
         if not self.game:
-            return succeed(None)
+            return succeed(True)
         autoPlaying = self.mainWindow.actionAutoPlay.isChecked()
         self.mainWindow.actionAutoPlay.setChecked(False)
         if self.game.finished():
             self.game = None
-            return succeed(None)
+            return succeed(True)
         else:
             return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(
                 gotAnswer, autoPlaying)

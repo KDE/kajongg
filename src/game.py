@@ -29,7 +29,7 @@ from twisted.internet.defer import succeed
 from util import stack, gitHead
 from log import logError, logWarning, logException, logDebug, m18n
 from common import WINDS, Internal, IntDict, Debug, Options
-from query import Transaction, Query, DBHandle
+from query import Query
 from rule import Ruleset
 from tile import Tile, elements
 from sound import Voice
@@ -115,6 +115,7 @@ class HandId(object):
         stringIdx 0 is the part in front of ..
         stringIdx 1 is the part after ..
         """
+        # pylint: disable=too-many-return-statements
         if not string:
             return
         seed = int(string.split('/')[0])
@@ -257,10 +258,12 @@ class Game(object):
 
     @property
     def shouldSave(self):
+        """as a property"""
         return self.__shouldSave
 
     @shouldSave.setter
     def shouldSave(self, value):
+        """if activated, save start time"""
         if value and not self.__shouldSave:
             self.saveStartTime()
         self.__shouldSave = value
@@ -455,11 +458,7 @@ class Game(object):
     def _newGameId():
         """write a new entry in the game table
         and returns the game id of that new entry"""
-        with Transaction():
-            query = Query("insert into game(seed) values(0)")
-            gameid, gameidOK = query.query.lastInsertId().toInt()
-        assert gameidOK
-        return gameid
+        return Query("insert into game(seed) values(0)").cursor.lastrowid
 
     def saveStartTime(self):
         """save starttime for this game"""
@@ -474,7 +473,7 @@ class Game(object):
         """use a copy of ruleset for this game, reusing an existing copy"""
         self.ruleset = ruleset
         self.ruleset.load()
-        if DBHandle.default:
+        if Internal.db:
             # only if we have a DB open. False in scoringtest.py
             query = Query('select id from ruleset where id>0 and hash="%s"' % \
                 self.ruleset.hash)
@@ -576,8 +575,8 @@ class Game(object):
             self.roundHandCount = 0
         if self.finished():
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
-            with Transaction():
-                Query('UPDATE game set endtime = "%s" where id = %d' % \
+            with Internal.db as transaction:
+                transaction.execute('UPDATE game set endtime = "%s" where id = %d' % \
                     (endtime, self.gameid))
         elif not self.belongsToPlayer():
             # the game server already told us the new placement and winds

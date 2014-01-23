@@ -26,9 +26,9 @@ from hashlib import md5
 
 from PyQt4.QtCore import QVariant
 
-from common import Debug, unicode # pylint: disable=redefined-builtin
+from common import Internal, Debug, unicode # pylint: disable=redefined-builtin
 from log import m18n, m18nc, m18nE, english, logException
-from query import Query, QueryException, Transaction
+from query import Query
 
 class Score(object):
     """holds all parts contributing to a score. It has two use cases:
@@ -552,19 +552,20 @@ into a situation where you have to pay a penalty"""))
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
-        with Transaction():
+        with Internal.db:
             if self.nameExists(newName):
                 return False
             query = Query("update ruleset set name=? where id<0 and name =?",
                 list([newName, self.name]))
-            if query.success:
+            if not query.failure:
                 self.name = newName
-            return query.success
+            return not query.failure
 
     def remove(self):
         """remove this ruleset from the database."""
-        Query("DELETE FROM rule WHERE ruleset=%d" % self.rulesetId)
-        Query("DELETE FROM ruleset WHERE id=%d" % self.rulesetId)
+        with Internal.db:
+            Query("DELETE FROM rule WHERE ruleset=%d" % self.rulesetId)
+            Query("DELETE FROM ruleset WHERE id=%d" % self.rulesetId)
 
     @staticmethod
     def ruleKey(rule):
@@ -596,7 +597,7 @@ into a situation where you have to pay a penalty"""))
     def updateRule(self, rule):
         """update rule in database"""
         self.__hash = None  # invalidate, will be recomputed when needed
-        with Transaction():
+        with Internal.db:
             record = self.ruleRecord(rule)
             Query("UPDATE rule SET name=?, definition=?, points=?, doubles=?, limits=?, parameter=? "
                   "WHERE ruleset=? AND list=? AND position=?",
@@ -608,38 +609,30 @@ into a situation where you have to pay a penalty"""))
         If it does not yet exist in database, give it a new id
         If the name already exists in the database, also give it a new name
         If the hash already exists in the database, only save if forced=True"""
-        for _ in range(10):
-            try:
-                if not forced:
-                    if minus:
-                        # if we save a template, only check for existing templates. Otherwise this could happen:
-                        # clear kajongg.db, play game with DMJL, start ruleset editor, copy DMJL.
-                        # since play Game saved the used ruleset with id 1, id 1 is found here and no new
-                        # template is generated. Next the ruleset editor shows the original ruleset in italics
-                        # and the copy with normal font but identical name, and the copy is never saved.
-                        qData = Query("select id from ruleset where hash=? and id<0", list([self.hash])).records
-                    else:
-                        qData = Query("select id from ruleset where hash=?", list([self.hash])).records
-                    if qData:
-                        # is already in database
-                        self.rulesetId = qData[0][0]
-                        return
-                with Transaction():
-                    self.rulesetId, self.name = self._newKey(minus)
-                    Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
-                        list([self.rulesetId, english(self.name), self.hash, self.description]),
-                        failSilent=True)
-                    cmd = 'INSERT INTO rule(ruleset, list, position, name, definition, ' \
-                            'points, doubles, limits, parameter) VALUES {}'.format(
-                            ', '.join(['(?,?,?,?,?,?,?,?,?)'] * len(self.allRules)))
-                    args = sum((list(self.ruleRecord(x)) for x in self.allRules), [])
-                    Query(cmd, args)
-            except QueryException:
-                pass
+        if not forced:
+            if minus:
+                # if we save a template, only check for existing templates. Otherwise this could happen:
+                # clear kajongg.db, play game with DMJL, start ruleset editor, copy DMJL.
+                # since play Game saved the used ruleset with id 1, id 1 is found here and no new
+                # template is generated. Next the ruleset editor shows the original ruleset in italics
+                # and the copy with normal font but identical name, and the copy is never saved.
+                qData = Query("select id from ruleset where hash=? and id<0", list([self.hash])).records
             else:
-                break
-        # do not put this into the transaction, keep it as short as possible. sqlite3/Qt
-        # has problems if two processes are trying to do the same here (kajonggtest)
+                qData = Query("select id from ruleset where hash=?", list([self.hash])).records
+            if qData:
+                # is already in database
+                self.rulesetId = qData[0][0]
+                return
+        with Internal.db:
+            self.rulesetId, self.name = self._newKey(minus)
+            Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
+                list([self.rulesetId, english(self.name), self.hash, self.description]),
+                failSilent=True)
+            cmd = 'INSERT INTO rule(ruleset, list, position, name, definition, ' \
+                    'points, doubles, limits, parameter) VALUES {}'.format(
+                    ', '.join(['(?,?,?,?,?,?,?,?,?)'] * len(self.allRules)))
+            args = sum((list(self.ruleRecord(x)) for x in self.allRules), [])
+            Query(cmd, args)
 
     @staticmethod
     def availableRulesets():

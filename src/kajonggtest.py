@@ -158,7 +158,7 @@ class Server(object):
         if len(self.jobs) == 0:
             self.servers.remove(self)
             if self.process:
-                print('killing server for  %s' % job)
+                print('killing server %s for  %s' % (self, job))
                 try:
                     self.process.terminate()
                     _ = self.process.wait()
@@ -176,6 +176,9 @@ class Server(object):
                 server.stop(job)
             assert len(server.jobs) == 0, 'stopAll expects no server jobs but found {}'.format(server.jobs)
             server.stop()
+
+    def __str__(self):
+        return '{} pid={} sock={}'.format(self.serverKey, self.process.pid, self.socketName)
 
 class Job(object):
     """a simple container"""
@@ -425,7 +428,6 @@ def doJobs(jobs):
             print()
             OPTIONS.csv = None
 
-    print('doJobs: servers:%d clients:%d' % (OPTIONS.servers, OPTIONS.clients))
     try:
         while jobs:
             for checkJob in Job.jobs[:]:
@@ -434,9 +436,9 @@ def doJobs(jobs):
                 jobs[0].start()
                 jobs = jobs[1:]
             except TooManyClients :
-                time.sleep(1)
+                time.sleep(3)
             except TooManyServers:
-                time.sleep(1)
+                time.sleep(3)
             Clone.removeUnused()
     except KeyboardInterrupt:
         Server.stopAll()

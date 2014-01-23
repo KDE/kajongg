@@ -18,8 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import sys
-import os
+import sys, os
+
 from log import logError, logException, logDebug, m18n, m18nc
 from common import Options, Internal, isAlive, Debug
 import cgitb, tempfile, webbrowser
@@ -80,6 +80,22 @@ if len(NOTFOUND):
     logError(MSG)
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
+
+from signal import signal, SIGABRT, SIGINT, SIGTERM, SIGHUP, SIGQUIT
+
+def cleanExit(*dummyArgs):
+    """close sqlite3 files before quitting"""
+    if Internal.mainWindow:
+        Internal.mainWindow.closeAction()
+    else:
+        try:
+            MainWindow.appquit()
+        except NameError:
+            sys.exit(0)
+
+for sig in (SIGABRT, SIGINT, SIGTERM, SIGHUP, SIGQUIT):
+    signal(sig, cleanExit)
+Internal.reactor.addSystemEventTrigger('before', 'shutdown', cleanExit)
 
 class MainWindow(KXmlGuiWindow):
     """the main window"""
@@ -456,7 +472,7 @@ class MainWindow(KXmlGuiWindow):
     def appquit(cls):
         """retry until the reactor really stopped"""
         if Debug.quit:
-            logDebug('mainWindow.appQuit invoked')
+            logDebug('mainWindow.appquit invoked')
         if Internal.reactor.running:
             Internal.quitWaitTime += 10
             if Internal.quitWaitTime % 1000 == 0:
@@ -468,3 +484,9 @@ class MainWindow(KXmlGuiWindow):
                 logDebug('reactor stopped after %d seconds' % (Internal.quitWaitTime // 1000))
             Internal.app.quit()
             checkMemory()
+            try:
+                # if we are killed while loading, Internal.db may not yet be defined
+                if Internal.db:
+                    Internal.db.close()
+            except NameError:
+                pass

@@ -18,12 +18,12 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import sys, weakref
+import weakref
 from collections import defaultdict
 
 from log import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, IntDict, Debug
-from query import Transaction, Query
+from query import Query
 from tile import Tile, TileList, elements
 from meld import Meld, MeldList
 from permutations import Permutations
@@ -72,12 +72,9 @@ class Players(list):
     @staticmethod
     def load():
         """load all defined players into self.allIds and self.allNames"""
-        query = Query("select id,name from player")
-        if not query.success:
-            sys.exit(1)
         Players.allIds = {}
         Players.allNames = {}
-        for nameid, name in query.records:
+        for nameid, name in Query("select id,name from player").records:
             Players.allIds[name] = nameid
             Players.allNames[nameid] = name
             if not name.startswith('Robot'):
@@ -89,9 +86,8 @@ class Players(list):
         if name not in Players.allNames.values():
             Players.load()  # maybe somebody else already added it
             if name not in Players.allNames.values():
-                with Transaction():
-                    Query("insert or ignore into player(name) values(?)",
-                          list([name]))
+                Query("insert or ignore into player(name) values(?)",
+                      list([name]))
                 Players.load()
         assert name in Players.allNames.values(), '%s not in %s' % (name, Players.allNames.values())
 

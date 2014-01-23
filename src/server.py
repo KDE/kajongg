@@ -24,13 +24,32 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
 import sys, os, random, traceback
-import signal
+from signal import signal, SIGABRT, SIGINT, SIGTERM, SIGHUP, SIGQUIT
 import resource
 import datetime
 from itertools import chain
 
-# keyboardinterrupt should simply terminate
-signal.signal(signal.SIGINT, signal.SIG_DFL)
+def cleanExit(*dummyArgs):
+    """we want to cleanly close sqlite3 files"""
+    try:
+        if Internal.db:
+            Internal.db.close() # setting to None does not call close(), do we need close?
+        os._exit(0) # pylint: disable=protected-access
+    except NameError:
+        pass
+    try:
+        reactor.stop()
+    except NameError:
+        sys.exit(0)
+    except ReactorNotRunning:
+        pass
+
+signal(SIGABRT, cleanExit)
+signal(SIGINT, cleanExit)
+signal(SIGTERM, cleanExit)
+signal(SIGHUP, cleanExit)
+signal(SIGQUIT, cleanExit)
+
 
 from common import Options, Internal
 Internal.isServer = True
@@ -38,20 +57,21 @@ Internal.logPrefix = 'S'
 from log import initLog
 initLog('kajonggserver')
 
-from PyQt4.QtCore import QCoreApplication
 from twisted.spread import pb
 from twisted.internet import error
 from twisted.internet.defer import maybeDeferred, fail, succeed
 from zope.interface import implements
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor
+from twisted.internet.error import ReactorNotRunning
+reactor.addSystemEventTrigger('before', 'shutdown', cleanExit)
 
 from tile import Tile, TileList, elements
 from game import PlayingGame
 from player import Players
 from wall import WallEmpty
 from client import Client, Table
-from query import Transaction, Query, DBHandle, initDb
+from query import Query, initDb
 from meld import Meld, MeldList
 from log import m18n, m18nE, m18ncE, logDebug, logWarning, logError, SERVERMARK
 from util import Duration
@@ -92,9 +112,8 @@ class DBPasswordChecker(object):
             if args[0] == 'adduser':
                 cred.username = args[1]
                 password = args[2]
-                with Transaction():
-                    query = Query('insert or ignore into player(name,password) values(?,?)',
-                        list([cred.username, password]))
+                query = Query('insert or ignore into player(name,password) values(?,?)',
+                    list([cred.username, password]))
             elif args[1] == 'deluser':
                 pass
         query = Query('select id, password from player where name=?',
@@ -305,7 +324,7 @@ class ServerTable(Table):
         If a data base is used by more than one client, only one of
         them should update. Here we set shouldSave for all players,
         while the server always saves"""
-        serverIdent = Internal.dbIdent
+        serverIdent = Internal.db.identifier
         dbIdents = set()
         game = self.game
         for player in game.players:
@@ -314,7 +333,7 @@ class ServerTable(Table):
                 dbIdent = self.remotes[player].dbIdent
                 assert dbIdent != serverIdent, \
                    'client and server try to use the same database:%s' % \
-                   DBHandle.databaseName()
+                   Internal.db.path
                 player.shouldSave = dbIdent not in dbIdents
                 dbIdents.add(dbIdent)
 
@@ -338,12 +357,11 @@ class ServerTable(Table):
     def proposeGameId(self, gameid):
         """server proposes an id to the clients ands waits for answers"""
         while True:
-            with Transaction():
-                query = Query('insert into game(id,seed) values(?,?)',
-                      list([gameid, 'proposed']), mayFail=True, failSilent=True)
-                if query.success:
-                    break
-                gameid += random.randrange(1, 100)
+            query = Query('insert into game(id,seed) values(?,?)',
+                  list([gameid, 'proposed']), mayFail=True, failSilent=True)
+            if not query.failure:
+                break
+            gameid += random.randrange(1, 100)
         block = DeferredBlock(self)
         for player in self.game.players:
             if player.shouldSave and isinstance(self.remotes[player], User):
@@ -849,8 +867,8 @@ class MJServer(object):
         """are all clients still alive? If not log them out"""
         for user in self.srvUsers:
             diff = datetime.datetime.now() - user.lastPing
-            if diff > datetime.timedelta(seconds=20):
-                logDebug('No messages from %s since 20 seconds, clearing connection now' % user.name)
+            if diff > datetime.timedelta(seconds=60):
+                logDebug('No messages from %s since 60 seconds, clearing connection now' % user.name)
                 user.mind = None
                 self.logout(user)
         reactor.callLater(10, self.checkPings)
@@ -1218,7 +1236,10 @@ def kajonggServer():
     except error.CannotListenError as errObj:
         logWarning(errObj)
     else:
+        for sig in (SIGABRT, SIGINT, SIGTERM, SIGHUP, SIGQUIT):
+            signal(sig, cleanExit)
         reactor.run()
+
 
 def profileMe():
     """where do we lose time?"""
@@ -1228,6 +1249,3 @@ def profileMe():
     statistics = pstats.Stats('prof')
     statistics.sort_stats('cumulative')
     statistics.print_stats(40)
-
-# we need this so we can load SQL driver plugins on Windows
-SERVERAPP = QCoreApplication([])

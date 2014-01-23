@@ -388,7 +388,7 @@ class HumanClient(Client):
         maxGameId = Query('select max(id) from game').records[0][0]
         maxGameId = int(maxGameId) if maxGameId else 0
         self.callServer('setClientProperties',
-            Internal.dbIdent,
+            Internal.db.identifier,
             voiceId, maxGameId, Internal.version).addCallbacks(self.__initTableList, self.__versionError)
 
     def __initTableList(self, dummy):

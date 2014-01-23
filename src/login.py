@@ -38,7 +38,7 @@ from log import english, logWarning, logException, logInfo, logDebug, m18n, m18n
 from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Internal, Debug
 from game import Players
-from query import Transaction, Query
+from query import Query
 from statesaver import StateSaver
 
 from guiutil import ListComboBox
@@ -325,7 +325,7 @@ class Connection(object):
         url = english(self.url) # use unique name for Local Game
         if self.ruleset:
             self.ruleset.save()     # this makes sure we have a valid rulesetId for predefined rulesets
-        with Transaction():
+        with Internal.db:
             serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
                 list([self.username, lasttime, url])).rowcount() == 1
             if not serverKnown:
@@ -337,7 +337,7 @@ class Connection(object):
         # needed if the server knows our name but our local data base does not:
         Players.createIfUnknown(self.username)
         playerId = Players.allIds[self.username]
-        with Transaction():
+        with Internal.db:
             if Query('update passwords set password=? where url=? and player=?',
                 list([self.password, url, playerId])).rowcount() == 0:
                 Query('insert into passwords(url,player,password) values(?,?,?)',
@@ -368,7 +368,7 @@ class Connection(object):
         """is somebody listening on that port?"""
         if self.useSocket and os.name != 'nt':
             sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            sock.settimeout(1)
+            sock.settimeout(30.0)
             try:
                 sock.connect(socketName())
             except socket.error as exception:
@@ -395,20 +395,19 @@ class Connection(object):
             else:
                 return True
 
-    def assertConnectivity(self, result, waiting=False):
+    def assertConnectivity(self, result, waiting=0):
         """make sure we have a running local server or network connectivity"""
         # pylint: disable=too-many-branches
         if Options.socket:
             # just wait for that socket to appear
             if os.path.exists(socketName()) and self.serverListening():
-                if waiting and not Debug.neutral:
-                    logDebug('Socket %s is now available' % socketName())
                 return result
             else:
-                if not Debug.neutral:
-                    logDebug('Waiting for socket %s to %s' % (socketName(),
-                        'answer' if os.path.exists(socketName()) else 'appear'))
-                return deferLater(Internal.reactor, 0.2, self.assertConnectivity, result, True)
+                if waiting > 0:
+                    logDebug('Game %s: Socket %s not available after 30 seconds, aborting' % (
+                        SingleshotOptions.game, socketName()))
+                    Internal.reactor.stop()
+                return deferLater(Internal.reactor, 2, self.assertConnectivity, result, waiting+1)
         if self.useSocket or self.dlg.url in ('localhost', '127.0.0.1'):
             if not self.serverListening():
                 if os.name == 'nt':
@@ -417,10 +416,13 @@ class Connection(object):
                     port = None
                 self.startLocalServer(port)
                 # give the server up to 5 seconds time to start
-                for loop in range(50):
+                for loop in range(100):
                     if self.serverListening():
                         break
                     time.sleep(0.1)
+                else:
+                    logDebug('After 10 seconds, the local server is not yet there, aborting')
+                    Internal.reactor.stop()
         elif which('qdbus'):
             # the state of QtDBus is unclear to me.
             # riverbank.computing says module dbus is deprecated
@@ -466,7 +468,7 @@ class Connection(object):
         factory = pb.PBClientFactory()
         reactor = Internal.reactor
         if self.useSocket and os.name != 'nt':
-            self.connector = reactor.connectUNIX(socketName(), factory, timeout=2)
+            self.connector = reactor.connectUNIX(socketName(), factory, timeout=5)
         else:
             self.connector = reactor.connectTCP(self.dlg.host, self.dlg.port, factory, timeout=5)
         utf8Password = self.dlg.password.encode('utf-8')

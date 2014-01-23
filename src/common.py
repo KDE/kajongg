@@ -195,7 +195,7 @@ class Internal(object):
     scaleScene = True
     reactor = None
     app = None
-    dbIdent = None
+    db = None
     scene = None
     mainWindow = None
     game = None
