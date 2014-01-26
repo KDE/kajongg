@@ -43,23 +43,26 @@ class TileAttr(object):
             self.tile = Tile(meld[idx])
             self.xoffset = xoffset
             self.yoffset = yoffset
-            player = hand.player
-            scoring = hand.__class__.__name__ ==  'ScoringHandBoard'  # TODO: get rid of this
-            if yoffset == 0:
-                self.dark = self.tile.isConcealed
-            else:
-                self.dark = not self.tile.isKnown or scoring
-            self.focusable = True
-            if scoring:
-                self.focusable = idx == 0
-            else:
-                self.focusable = (not self.tile.isBonus
-                    and self.tile.isKnown
-                    and player == player.game.activePlayer
-                    and player == player.game.myself
-                    and meld.isConcealed and not meld.isKong)
+            self.dark = self.setDark() # dark and focusable are different in a ScoringHandBoard
+            self.focusable = self.setFocusable(hand, meld, idx)
             if self.tile in Debug.focusable:
                 logDebug('TileAttr %s:%s' % (self.tile, self.focusable))
+
+    def setDark(self):
+        """should the tile appear darker?"""
+        if self.yoffset == 0:
+            return self.tile.isConcealed
+        else:
+            return not self.tile.isKnown
+
+    def setFocusable(self, hand, meld, dummyIdx):
+        """is it focusable?"""
+        player = hand.player
+        return (not self.tile.isBonus
+            and self.tile.isKnown
+            and player == player.game.activePlayer
+            and player == player.game.myself
+            and meld.isConcealed and not meld.isKong)
 
     def __str__(self):
         return '%s %.2f/%.1f%s%s' % (self.tile, self.xoffset, self.yoffset, ' dark' if self.dark else '', \
@@ -71,6 +74,8 @@ class TileAttr(object):
 class HandBoard(Board):
     """a board showing the tiles a player holds"""
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
+    tileAttrClass = TileAttr
+
     def __init__(self, player):
         assert player
         self._player = weakref.ref(player)
@@ -167,7 +172,7 @@ class HandBoard(Board):
             meldX = 0
             for meld in melds:
                 for idx in range(len(meld)):
-                    result.append(TileAttr(self, meld, idx, meldX, yPos))
+                    result.append(self.tileAttrClass(self, meld, idx, meldX, yPos))
                     meldX += 1
                 meldX += meldDistance
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
@@ -188,7 +193,7 @@ class HandBoard(Board):
             bonusY = self.lowerY
             tileLen = lowerLen
         tileLen += 1 + self.exposedMeldDistance
-        newBonusTiles = list(TileAttr(x) for x in bonusTiles)
+        newBonusTiles = list(self.tileAttrClass(x) for x in bonusTiles)
         xPos = 13 - len(newBonusTiles)
         xPos = max(xPos, tileLen)
         result = list()

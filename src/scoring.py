@@ -34,7 +34,7 @@ from board import WindLabel, Board, rotateCenter
 from game import Game
 from games import Games
 from hand import Hand
-from handboard import HandBoard
+from handboard import HandBoard, TileAttr
 from player import Player, Players
 from visible import VisiblePlayer
 from tables import SelectRuleset
@@ -114,9 +114,22 @@ class SelectPlayers(SelectRuleset):
         self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
         assert len(set(self.names)) == 4
 
+class ScoringTileAttr(TileAttr):
+    """Tile appearance is different in a ScoringHandBoard"""
+
+    def setDark(self):
+        """should the tile appear darker?"""
+        return self.yoffset or self.tile.isConcealed
+
+    def setFocusable(self, dummyHand, dummyMeld, idx):
+        """in a scoring handboard, only the first tile of a meld is focusable"""
+        return idx == 0
+
 class ScoringHandBoard(HandBoard):
     """a board showing the tiles a player holds"""
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
+    tileAttrClass = ScoringTileAttr
+
     def __init__(self, player):
         self.__moveHelper = None
         self.uiMelds = []
