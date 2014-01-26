@@ -24,7 +24,7 @@ from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import CancelledError
 from twisted.internet.task import deferLater
-from twisted.internet.error import ConnectionRefusedError, TimeoutError, ConnectionLost, DNSLookupError
+from twisted.internet.error import ConnectionRefusedError, TimeoutError, ConnectionLost, DNSLookupError, ConnectError
 from twisted.python.failure import Failure
 
 from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, \
@@ -423,18 +423,23 @@ class Connection(object):
                 else:
                     logDebug('After 10 seconds, the local server is not yet there, aborting')
                     Internal.reactor.stop()
-        elif which('qdbus'):
+        elif which('XXqdbus'):
+            # TODO: use twisted process because we must have a timeout. If the qdbus service
+            # does not anwer, qdbus waits for 25 seconds.
             # the state of QtDBus is unclear to me.
             # riverbank.computing says module dbus is deprecated
             # for Python 3. And Ubuntu has no package with
             # PyQt4.QtDBus. So we use good old subprocess.
-            answer = subprocess.Popen(['qdbus',
+            stdoutdata, stderrdata = subprocess.Popen(['qdbus',
                 'org.kde.kded',
                 '/modules/networkstatus',
-                'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE).communicate()[0].strip()
-            if answer != '4':
+                'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            stdoutdata = stdoutdata.strip()
+            stderrdata = stderrdata.strip()
+            if stderrdata == '' and stdoutdata != '4':
                 # pylint: disable=nonstandard-exception
-                raise Failure(m18n('You have no network connectivity: %1', answer))
+                raise ConnectError()
+            # if we have stderrdata, qdbus probably does not provide the service we want, so ignore it
         return result
 
     def startLocalServer(self, port):
@@ -520,15 +525,17 @@ class Connection(object):
             msg = m18n('Server %1 does not run a kajongg server' , self.url)
         elif failure.check(DNSLookupError):
             msg = m18n('Address for server %1 cannot be found' , self.url)
+        elif failure.check(ConnectError):
+            msg = m18n('Login to server %1 failed: You have no network connection', self.url)
         else:
             msg = 'Login to server {} failed: {}/{} Callstack:{}'.format(
                 self.url, failure.value.__class__.__name__, failure.getErrorMessage(),
                 failure.getTraceback())
-            # Maybe the server is running but something is wrong with it
-            if self.useSocket and os.name != 'nt':
-                if removeIfExists(socketName()):
-                    logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
-                msg += '\n\n\n' + m18n('Please try again')
+        # Maybe the server is running but something is wrong with it
+        if self.useSocket and os.name != 'nt':
+            if removeIfExists(socketName()):
+                logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
+            msg += '\n\n\n' + m18n('Please try again')
         self.dlg = None
         if msg:
             logWarning(msg)
