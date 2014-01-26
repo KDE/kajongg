@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2009-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2009-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,27 +18,24 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import datetime
+import datetime, weakref
 
-from PyQt4.QtCore import QTimer
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed
-from twisted.internet.error import ReactorNotRunning
-from twisted.python.failure import Failure
-from util import logDebug, logException, logWarning, Duration, m18nc, checkMemory
+from util import Duration
+from log import logDebug, logException, logWarning, m18nc
 from message import Message
-from common import Internal, Debug
+from common import Internal, Debug, Options
 from rule import Ruleset
-from meld import meldsContent
 from game import PlayingGame
-from query import Transaction, Query
+from query import Query
 from move import Move
 from animation import animate
-from intelligence import AIDefault
-from statesaver import StateSaver
 from player import PlayingPlayer
+
+import intelligence, altint
 
 class Table(object):
     """defines things common to both ClientTable and ServerTable"""
@@ -80,8 +77,7 @@ class ClientTable(Table):
         self.playersOnline = playersOnline
         self.endValues = endValues
         self.myRuleset = None # if set, points to an identical local ruleset
-        allRulesets =  Ruleset.availableRulesets()
-        for myRuleset in allRulesets:
+        for myRuleset in Ruleset.availableRulesets():
             if myRuleset == self.ruleset:
                 self.myRuleset = myRuleset
                 break
@@ -116,24 +112,26 @@ class Client(object, pb.Referenceable):
     so we can also use it on the server for robot clients. Compare
     with HumanClient(Client)"""
 
-    def __del__(self):
-        self.game = None
-
-    def __init__(self, name=None, intelligence=AIDefault):
+    def __init__(self, name=None):
         """name is something like Robot 1 or None for the game server"""
         self.name = name
         self.game = None
-        self.intelligence = intelligence(self)
         self.__connection = None
         self.tables = []
-        self.table = None
+        self._table = None
         self.tableList = None
-        self.sayable = {} # recompute for each move, use as cache
 
-    def delete(self):
-        """for better garbage collection"""
-        self.table = None
-        self.intelligence = None
+    @property
+    def table(self):
+        """hide weakref"""
+        if self._table:
+            return self._table()
+
+    @table.setter
+    def table(self, value):
+        """hide weakref"""
+        if value is not None:
+            self._table = weakref.ref(value)
 
     @property
     def connection(self):
@@ -145,54 +143,14 @@ class Client(object, pb.Referenceable):
         """update main window title if needed"""
         if self.__connection != value:
             self.__connection = value
-            if Internal.field:
-                Internal.field.updateGUI()
+            if Internal.scene:
+                Internal.scene.mainWindow.updateGUI()
 
     def _tableById(self, tableid):
         """returns table with tableid"""
         for table in self.tables:
             if table.tableid == tableid:
                 return table
-
-    @staticmethod
-    def quitProgram(result=None):
-        """now all connections to servers are cleanly closed"""
-        if isinstance(result, Failure):
-            logException(result)
-        try:
-            Internal.reactor.stop()
-        except ReactorNotRunning:
-            pass
-        StateSaver.saveAll()
-        field = Internal.field
-        if field:
-            # if we have the ruleset editor visible, we get:
-            # File "/hdd/pub/src/gitgames/kajongg/src/rulesetselector.py", line 194, in headerData
-            #  if role == Qt.DisplayRole and orientation == Qt.Horizontal:
-            #  AttributeError: 'NoneType' object has no attribute 'DisplayRole'
-            # how can Qt get None? Same happens with QEvent, see statesaver.py
-            if field.confDialog:
-                field.confDialog.hide()
-            field.hide() # do not make the user see the delay for stopping the reactor
-        # we may be in a Deferred callback which would
-        # catch sys.exit as an exception
-        # and the qt4reactor does not quit the app when being stopped
-        Internal.quitWaitTime = 0
-        QTimer.singleShot(10, Client.appquit)
-
-    @staticmethod
-    def appquit():
-        """retry until the reactor really stopped"""
-        if Internal.reactor.running:
-            Internal.quitWaitTime += 10
-            if Internal.quitWaitTime % 1000 == 0:
-                logDebug('waiting since %d seconds for reactor to stop' % (Internal.quitWaitTime // 1000))
-            QTimer.singleShot(10, Client.appquit)
-        else:
-            if Internal.quitWaitTime > 1000:
-                logDebug('reactor stopped after %d seconds' % (Internal.quitWaitTime // 1000))
-            Internal.app.quit()
-            checkMemory()
 
     def logout(self, dummyResult=None): # pylint: disable=no-self-use
         """virtual"""
@@ -246,12 +204,28 @@ class Client(object, pb.Referenceable):
     def reserveGameId(self, gameid):
         """the game server proposes a new game id. We check if it is available
         in our local data base - we want to use the same gameid everywhere"""
-        with Transaction():
+        with Internal.db:
             query = Query('insert into game(id,seed) values(?,?)',
-                      list([gameid, self.connection.url]), mayFail=True)
+                      list([gameid, self.connection.url]), mayFail=True, failSilent=True)
             if query.rowcount() != 1:
                 return Message.NO
         return Message.OK
+
+    @staticmethod
+    def __findAI(modules, aiName):
+        """list of all alternative AIs defined in altint.py"""
+        for modul in modules:
+            for key, value in modul.__dict__.items():
+                if key == 'AI' + aiName:
+                    return value
+
+    def __assignIntelligence(self):
+        """assign intelligence to myself. All players already have default intelligence."""
+        if self.isHumanClient():
+            aiClass = self.__findAI([intelligence, altint], Options.AI)
+            if not aiClass:
+                raise Exception('intelligence %s is undefined' % Options.AI)
+            self.game.myself.intelligence = aiClass(self.game.myself)
 
     def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True, gameClass=None):
         """the game server asks us if we are ready. A robot is always ready."""
@@ -282,8 +256,10 @@ class Client(object, pb.Referenceable):
                             player.wind, self.table.endValues[1][player.wind], player.balance))
         else:
             self.game = gameClass(playerNames, self.table.ruleset,
-                shouldSave=shouldSave, gameid=gameid, wantedGame=wantedGame, client=self,
+                gameid=gameid, wantedGame=wantedGame, client=self,
                 playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
+        self.game.shouldSave = shouldSave
+        self.__assignIntelligence()  # intelligence variant is not saved for suspended games
         self.game.prepareHand()
         return succeed(Message.OK)
 
@@ -305,16 +281,21 @@ class Client(object, pb.Referenceable):
             elif move.message == Message.NoClaim and move.notifying:
                 noClaimCount += 1
                 if noClaimCount == 2:
-                    # self.game.debug('everybody said "I am not interested", so %s claims chow now' %
-                    #     self.game.myself.name)
+                    if Debug.delayChow:
+                        self.game.debug('everybody said "I am not interested", so {} claims chow now for {}'.format(
+                            self.game.myself.name, self.game.lastDiscard.name()))
                     return result
-            elif move.message in (Message.Pung, Message.Kong) and move.notifying:
-                # self.game.debug('somebody said Pung or Kong, so %s suppresses Chow' % self.game.myself.name)
+            elif move.message in (Message.Pung, Message.Kong, Message.MahJongg) and move.notifying:
+                if Debug.delayChow:
+                    self.game.debug('{} said {} so {} suppresses Chow for {}'.format(
+                        move.player, move.message, self.game.myself, self.game.lastDiscard.name()).replace('  ', ' '))
                 return Message.NoClaim
         if delay < self.game.ruleset.claimTimeout * 0.95:
             # one of those slow humans is still thinking
             return deferLater(reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
-        # self.game.debug('%s must chow now because timeout is over' % self.game.myself.name)
+        if Debug.delayChow:
+            self.game.debug('{} must chow now for {} because timeout is over'.format(
+                self.game.myself.name, self.game.lastDiscard.name()))
         return result
 
     def ask(self, move, answers):
@@ -322,11 +303,13 @@ class Client(object, pb.Referenceable):
         sends answer and one parameter to server"""
         delay = 0.0
         delayStep = 0.1
-        self._computeSayable(move, answers)
-        result = self.intelligence.selectAnswer(answers)
+        myself = self.game.myself
+        myself.computeSayable(move, answers)
+        result = myself.intelligence.selectAnswer(answers)
         if result[0] == Message.Chow:
-            # self.game.debug('%s waits to see if somebody says Pung or Kong before saying chow' %
-            #     self.game.myself.name)
+            if Debug.delayChow:
+                self.game.debug('{} waits to see if somebody says Pung or Kong before saying chow for {}'.format(
+                    self.game.myself.name, self.game.lastDiscard.name()))
             return deferLater(reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         return succeed(result)
 
@@ -361,10 +344,9 @@ class Client(object, pb.Referenceable):
                 else:
                     logDebug('got Move: %s' % move)
         if self.game:
-            self.game.checkTarget()
             if move.token:
-                if move.token != self.game.handId(withAI=False):
-                    logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId()))
+                if move.token != self.game.handId.token():
+                    logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId.token()))
         with Duration('Move %s:' % move):
             return self.exec_move(move).addCallback(self.__jellyMessage)
 
@@ -375,19 +357,20 @@ class Client(object, pb.Referenceable):
             # server already disconnected, see HumanClient.remote_ServerDisconnects
             return succeed(Message.OK)
         action = message.notifyAction if move.notifying else message.clientAction
+        game = self.game
+        if game:
+            game.moves.append(move)
         answer = action(self, move)
         if not isinstance(answer, Deferred):
             answer = succeed(answer)
-        game = self.game
         if game:
             if not move.notifying and move.player and not move.player.scoreMatchesServer(move.score):
                 game.close()
-            game.moves.append(move)
 # This is an example how to find games where specific situations arise. We prefer games where this
 # happens very early for easier reproduction. So set number of rounds to 1 in the ruleset before doing this.
 # This example looks for a situation where the single human player may call Chow but one of the
 # robot players calls Pung. See https://bugs.kde.org/show_bug.cgi?id=318981
-#            if self.isHumanClient() and game.nextPlayer() == game.myself:
+#            if game.nextPlayer() == game.myself:
 #                # I am next
 #                if message == Message.Pung and move.notifying:
 #                    # somebody claimed a pung
@@ -395,9 +378,11 @@ class Client(object, pb.Referenceable):
 #                        # it was not me
 #                        if game.handctr == 0 and len(game.moves) < 30:
 #                            # early on in the game
-#                            if self.__maySayChow():
+#                            game.myself.computeSayable(move, [Message.Chow])
+#                            if game.myself.sayable[Message.Chow]:
 #                                # I may say Chow
-#                                print('FOUND EXAMPLE IN:', game.handId(withMoveCount=True))
+#                                logDebug('FOUND EXAMPLE FOR %s IN %s' % (game.myself,
+#                                       game.handId.prompt(withMoveCount=True)))
 
         if message == Message.Discard:
             # do not block here, we want to get the clientDialog
@@ -419,23 +404,24 @@ class Client(object, pb.Referenceable):
 
     def claimed(self, move):
         """somebody claimed a discarded tile"""
-        if Internal.field:
-            calledTileItem = Internal.field.discardBoard.lastDiscarded
+        if Internal.scene:
+            calledTileItem = Internal.scene.discardBoard.lastDiscarded
             calledTile = calledTileItem.tile
-            Internal.field.discardBoard.lastDiscarded = None
+            Internal.scene.discardBoard.lastDiscarded = None
         else:
             calledTileItem = None
             calledTile = self.game.lastDiscard
         self.game.lastDiscard = None
-        self.game.discardedTiles[calledTile.lower()] -= 1
+        self.game.discardedTiles[calledTile.exposed] -= 1
         assert calledTile in move.meld, '%s %s'% (calledTile, move.meld)
-        move.player.lastTile = calledTile.lower()
-        move.player.lastSource = 'd'
         hadTiles = move.meld[:]
         hadTiles.remove(calledTile)
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
+        move.player.lastTile = calledTile.exposed
+        move.player.lastSource = 'd'
         move.exposedMeld = move.player.exposeMeld(hadTiles, calledTile=calledTileItem or calledTile)
+
         if self.thatWasMe(move.player):
             if move.message != Message.Kong:
                 # we will get a replacement tile first
@@ -468,81 +454,5 @@ class Client(object, pb.Referenceable):
         if not self.thatWasMe(move.player):
             self.ask(move, [Message.OK])
 
-    def __maySayChow(self):
-        """returns answer arguments for the server if calling chow is possible.
-        returns the meld to be completed"""
-        if self.game.myself == self.game.nextPlayer():
-            return self.game.myself.possibleChows()
-
-    def __maySayPung(self):
-        """returns answer arguments for the server if calling pung is possible.
-        returns the meld to be completed"""
-        if self.game.lastDiscard:
-            lastDiscard = self.game.lastDiscard
-            assert lastDiscard[0].isupper(), lastDiscard
-            if self.game.myself.concealedTileNames.count(lastDiscard) >= 2:
-                return [lastDiscard] * 3
-
-    def __maySayKong(self):
-        """returns answer arguments for the server if calling or declaring kong is possible.
-        returns the meld to be completed or to be declared"""
-        return self.game.myself.possibleKongs()
-
-    def __maySayMahjongg(self, move):
-        """returns answer arguments for the server if calling or declaring Mah Jongg is possible"""
-        game = self.game
-        myself = game.myself
-        robbableTile = withDiscard = None
-        if move.message == Message.DeclaredKong:
-            withDiscard = move.tiles[0].upper()
-            if move.player != myself:
-                robbableTile = move.exposedMeld[1] # we want it capitalized for a hidden Kong
-        elif move.message == Message.AskForClaims:
-            withDiscard = game.lastDiscard
-        hand = myself.computeHand(withTile=withDiscard, robbedTile=robbableTile, asWinner=True)
-        if hand.won:
-            if Debug.robbingKong:
-                if move.message == Message.DeclaredKong:
-                    game.debug('%s may rob the kong from %s/%s' % \
-                       (myself, move.player, move.exposedMeld.joined))
-            if Debug.mahJongg:
-                game.debug('%s may say MJ:%s, active=%s' % (
-                    myself, list(x for x in game.players), game.activePlayer))
-            return (meldsContent(hand.hiddenMelds), withDiscard, hand.lastMeld)
-
-    def __maySayOriginalCall(self):
-        """returns True if Original Call is possible"""
-        myself = self.game.myself
-        for tileName in set(myself.concealedTileNames):
-            if (myself.hand - tileName).callingHands():
-                if Debug.originalCall:
-                    self.game.debug('%s may say Original Call' % myself)
-                return True
-
-    def _computeSayable(self, move, answers):
-        """find out what the player can legally say with this hand"""
-        self.sayable = {}
-        for message in Message.defined.values():
-            self.sayable[message] = True
-        if Message.Pung in answers:
-            self.sayable[Message.Pung] = self.__maySayPung()
-        if Message.Chow in answers:
-            self.sayable[Message.Chow] = self.__maySayChow()
-        if Message.Kong in answers:
-            self.sayable[Message.Kong] = self.__maySayKong()
-        if Message.MahJongg in answers:
-            self.sayable[Message.MahJongg] = self.__maySayMahjongg(move)
-        if Message.OriginalCall in answers:
-            self.sayable[Message.OriginalCall] = self.__maySayOriginalCall()
-
-    def maybeDangerous(self, msg):
-        """could answering with msg lead to dangerous game?
-        If so return a list of resulting melds
-        where a meld is represented by a list of 2char strings"""
-        result = []
-        if msg in (Message.Chow, Message.Pung, Message.Kong):
-            possibleMelds = self.sayable[msg]
-            if isinstance(possibleMelds[0], basestring):
-                possibleMelds = [possibleMelds]
-            result = [x for x in possibleMelds if self.game.myself.mustPlayDangerous(x)]
-        return result
+    def __str__(self):
+        return self.name

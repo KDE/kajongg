@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2010-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2010-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,12 +20,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 
-from util import m18n, m18nc, m18ncE, logWarning, logException, logDebug
+from log import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice, Sound
-from tile import Tile
-from meld import Meld
+from tile import Tile, TileList
+from meld import Meld, MeldList
 from common import Internal, Debug
-from kde import Sorry
+from dialogs import Sorry
 
 # pylint: disable=super-init-not-called
 # multiple inheritance: pylint thinks ServerMessage.__init__ does not get called.
@@ -62,10 +62,8 @@ class Message(object):
         pb.Copyable is too much overhead"""
         # pylint: disable=too-many-return-statements
         cls = value.__class__
-        if cls == Tile:
+        if cls in (Tile, TileList, Meld, MeldList):
             return str(value)
-        elif cls == Meld:
-            return value.joined
         elif isinstance(value, Message):
             return value.name
         elif isinstance(value, (list, tuple)):
@@ -152,7 +150,10 @@ class NotifyAtOnceMessage(ClientMessage):
         player who triggered us"""
         # default: tell all except the source of the notification
         game = request.block.table.game
-        return list(x for x in game.players if x != request.player)
+        if game:
+            return list(x for x in game.players if x != request.player)
+        else:
+            return []
 
 class PungChowMessage(NotifyAtOnceMessage):
     """common code for Pung and Chow"""
@@ -161,19 +162,19 @@ class PungChowMessage(NotifyAtOnceMessage):
 
     def toolTip(self, button, dummyTile):
         """decorate the action button which will send this message"""
-        maySay = button.client.sayable[self]
+        myself = button.client.game.myself
+        maySay = myself.sayable[self]
         if not maySay:
             return '', False, ''
-        myself = button.client.game.myself
         txt = []
         warn = False
         if myself.originalCall and myself.mayWin:
             warn = True
             txt.append(m18n('saying %1 violates Original Call',
                 self.i18nName))
-        dangerousMelds = button.client.maybeDangerous(self)
+        dangerousMelds = myself.maybeDangerous(self)
         if dangerousMelds:
-            lastDiscard = button.client.game.lastDiscard
+            lastDiscard = myself.game.lastDiscard
             warn = True
             if Debug.dangerousGame and len(dangerousMelds) != len(maySay):
                 button.client.game.debug('only some claimable melds are dangerous: %s' % dangerousMelds)
@@ -214,13 +215,13 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
         if table.game.lastDiscard:
             table.claimTile(msg.player, self, msg.args[0], Message.Kong)
         else:
-            table.declareKong(msg.player, msg.args[0])
+            table.declareKong(msg.player, Meld(msg.args[0]))
     def toolTip(self, button, dummyTile):
         """decorate the action button which will send this message"""
-        maySay = button.client.sayable[self]
+        myself = button.client.game.myself
+        maySay = myself.sayable[self]
         if not maySay:
             return '', False, ''
-        myself = button.client.game.myself
         txt = []
         warn = False
         if myself.originalCall and myself.mayWin:
@@ -275,7 +276,7 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
         return m18n('Press here and you win'), False, ''
     def clientAction(self, dummyClient, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
-        return move.player.declaredMahJongg(move.source, move.withDiscardTile,
+        return move.player.declaredMahJongg(move.melds, move.withDiscardTile,
             move.lastTile, move.lastMeld)
 
 class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
@@ -291,7 +292,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
         """decorate the action button which will send this message"""
         assert isinstance(tile, Tile), tile
         myself = button.client.game.myself
-        isCalling = bool((myself.hand - tile).callingHands())
+        isCalling = bool((myself.hand - tile).callingHands)
         if not isCalling:
             txt = m18n('discarding %1 and declaring Original Call makes this hand unwinnable',
                 tile.name())
@@ -341,7 +342,7 @@ class MessageDiscard(ClientMessage, ServerMessage):
         return txt, warn, txt
     def clientAction(self, client, move):
         """execute the discard locally"""
-        if client.isHumanClient() and Internal.field:
+        if client.isHumanClient() and Internal.scene:
             move.player.handBoard.setEnabled(False)
         move.player.speak(move.tile)
         return client.game.hasDiscarded(move.player, move.tile)
@@ -370,6 +371,11 @@ class MessageReadyForGameStart(ServerMessage):
         """ask the client"""
         def hideTableList(result):
             """hide it only after player says I am ready"""
+            # set scene.game first, otherwise tableList.hide()
+            # sees no current game and logs out
+            if result == Message.OK:
+                if client.game and Internal.scene:
+                    Internal.scene.game = client.game
             if result == Message.OK and client.tableList and client.tableList.isVisible():
                 if Debug.table:
                     logDebug('%s hiding table list because game started' % client.name)
@@ -409,10 +415,10 @@ class MessageInitHand(ServerMessage):
         client.game.wall.divide()
         if hasattr(client,'shutdownHumanClients'):
             client.shutdownHumanClients(exception=client)
-        field = Internal.field
-        if field:
-            field.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId()))
-            field.discardBoard.setRandomPlaces(client.game.randomGenerator)
+        scene = Internal.scene
+        if scene:
+            scene.mainWindow.setWindowTitle(m18n('Kajongg <numid>%1</numid>', client.game.handId.seed))
+            scene.discardBoard.setRandomPlaces(client.game.randomGenerator)
         client.game.initHand()
 
 class MessageSetConcealedTiles(ServerMessage):
@@ -448,7 +454,7 @@ class MessagePickedTile(ServerMessage):
         assert move.player.pickedTile(move.deadEnd, tileName=move.tile) == move.tile, \
             (move.player.lastTile, move.tile)
         if client.thatWasMe(move.player):
-            if move.tile.isBonus():
+            if move.tile.isBonus:
                 return Message.Bonus, move.tile
             else:
                 return client.myAction(move)
@@ -529,13 +535,13 @@ class MessageDeclaredKong(ServerMessage):
         """mirror the action locally"""
         prompts = None
         if not client.thatWasMe(move.player):
-            if len(move.tiles) != 4 or move.tiles[0].istitle():
+            if len(move.meld) != 4 or move.meld[0].isConcealed:
                 # do not do this when adding a 4th tile to an exposed pung
-                move.player.showConcealedTiles(move.tiles)
+                move.player.showConcealedTiles(move.meld)
             else:
-                move.player.showConcealedTiles(move.tiles[3:4])
+                move.player.showConcealedTiles(move.meld[3])
             prompts = [Message.NoClaim, Message.MahJongg]
-        move.exposedMeld = move.player.exposeMeld(move.tiles)
+        move.exposedMeld = move.player.exposeMeld(move.meld)
         if prompts:
             return client.ask(move, prompts)
 
@@ -544,10 +550,9 @@ class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):
     def clientAction(self, client, move):
         """mirror the action locally"""
         prevMove = client.game.lastMoves(only=[Message.DeclaredKong]).next()
-        prevKong = Meld(prevMove.tiles)
-        prevMove.player.robTile(prevKong[0].upper())
+        prevMove.player.robTile(prevMove.meld[0].concealed)
         move.player.lastSource = 'k'
-        client.game.addCsvTag('robbedKong', forAllPlayers=True)
+        client.game.addCsvTag('robbedKong%s' % prevMove.meld[1], forAllPlayers=True)
 
 class MessageCalling(ServerMessage):
     """the game server tells us who announced a calling hand"""
@@ -581,8 +586,7 @@ class MessageNoChoice(ServerMessage):
         move.player.showConcealedTiles(move.tiles)
         # otherwise we have a visible artifact of the discarded tile.
         # Only when animations are disabled. Why?
-        if Internal.field:
-            Internal.field.centralView.resizeEvent(None)
+#        Internal.mainWindow.centralView.resizeEvent(None)
         return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain)
 
     def hideConcealedAgain(self, result):

@@ -20,6 +20,7 @@ add_subdirectory( voices )
 add_subdirectory( doc )
 
 set(SRCFILES 
+src/permutations.py
 src/about.py
 src/animation.py
 src/background.py
@@ -33,6 +34,7 @@ src/intelligence.py
 src/altint.py
 src/common.py
 src/config.py
+src/kdestub.py
 src/deferredutil.py
 src/differ.py
 src/meld.py
@@ -44,6 +46,8 @@ src/guiutil.py
 src/humanclient.py
 src/login.py
 src/kde.py
+src/dialogs.py
+src/mainwindow.py
 src/move.py
 src/modeltest.py
 src/playerlist.py
@@ -55,6 +59,8 @@ src/rulesetselector.py
 src/hand.py
 src/rule.py
 src/rulecode.py
+src/scene.py
+src/scoringdialog.py
 src/scoring.py
 src/server.py
 src/sound.py
@@ -68,6 +74,7 @@ src/statesaver.py
 src/wall.py
 src/uiwall.py
 src/visible.py
+src/log.py
 src/util.py)
 
 IF(NOT PYQT4_FOUND)

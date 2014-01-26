@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,32 +19,53 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import datetime
-from kde import WarningYesNo, KIcon
 
-from PyQt4.QtCore import Qt, QVariant
+from kde import KIcon
+from dialogs import WarningYesNo
+
+from PyQt4.QtCore import Qt, QVariant, QAbstractTableModel
 from PyQt4.QtGui import QDialogButtonBox, QDialog, \
         QHBoxLayout, QVBoxLayout, QCheckBox, \
         QItemSelectionModel, QAbstractItemView
-from PyQt4.QtSql import QSqlQueryModel
 
-from util import logException, m18n, m18nc
+from log import logException, m18n, m18nc
+from query import Query
 from guiutil import MJTableView
 from statesaver import StateSaver
-from query import Query, DBHandle
 from common import Debug
 from modeltest import ModelTest
 
-class GamesModel(QSqlQueryModel):
-    """a model for our games table"""
-    def __init__(self, parent=None):
-        super(GamesModel, self).__init__(parent)
+class GamesModel(QAbstractTableModel):
+    """data for the list of games"""
+    def __init__(self):
+        QAbstractTableModel.__init__(self)
+        self._resultRows = []
+
+    def columnCount(self, dummyParent=None):   # pylint: disable=no-self-use
+        """including the hidden col 0"""
+        return 3
+
+    def rowCount(self, dummyParent=None):
+        """how many games"""
+        return len(self._resultRows)
+
+    def setResultset(self, rows):
+        """new data"""
+        self._resultRows = rows
+        self.reset()
+
+    def index(self, row, column, dummyParent=None):
+        """helper"""
+        return self.createIndex(row, column, 0)
 
     def data(self, index, role=None):
         """get score table from view"""
         if role is None:
             role = Qt.DisplayRole
+        if not (index.isValid() and role == Qt.DisplayRole):
+            return QVariant()
         if role == Qt.DisplayRole:
-            unformatted = unicode(self.record(index.row()).value(index.column()).toString())
+            unformatted = unicode(self._resultRows[index.row()][index.column()])
             if index.column()==2:
                 # we do not yet use this for listing remote games but if we do
                 # this translation is needed for robot players
@@ -53,7 +74,15 @@ class GamesModel(QSqlQueryModel):
             elif index.column()==1:
                 dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
                 return QVariant(dateVal.strftime('%c').decode('utf-8'))
-        return QSqlQueryModel.data(self, index, role)
+            elif index.column()==0:
+                return QVariant(int(unformatted))
+        return QAbstractTableModel.data(self, index, role)
+
+    def headerData(self, section, orientation, role):  # pylint: disable=no-self-use
+        """for the two visible columns"""
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return QVariant((m18n("Started"), m18n("Players"))[section-1])
+        return QVariant()
 
 class Games(QDialog):
     """a dialog for selecting a game"""
@@ -64,7 +93,7 @@ class Games(QDialog):
         self.setWindowTitle(m18nc('kajongg', 'Games') + ' - Kajongg')
         self.setObjectName('Games')
         self.resize(700, 400)
-        self.model = GamesModel(self)
+        self.model = GamesModel()
         if Debug.modelTest:
             self.modelTest = ModelTest(self.model, self)
 
@@ -132,7 +161,7 @@ class Games(QDialog):
 
     def setQuery(self):
         """define the query depending on self.OnlyPending"""
-        query = "select g.id, g.starttime, " \
+        query = Query("select g.id, g.starttime, " \
             "p0.name||'///'||p1.name||'///'||p2.name||'///'||p3.name " \
             "from game g, player p0," \
             "player p1, player p2, player p3 " \
@@ -141,40 +170,39 @@ class Games(QDialog):
             " and p2.id=g.p2 and p3.id=g.p3 " \
             "%s" \
             "and exists(select 1 from score where game=g.id)" % \
-            ("and g.endtime is null " if self.onlyPending else "")
-        self.model.setQuery(query, DBHandle.default)
-        self.model.setHeaderData(1, Qt.Horizontal,
-            QVariant(m18n("Started")))
-        self.model.setHeaderData(2, Qt.Horizontal,
-            QVariant(m18n("Players")))
+            ("and g.endtime is null " if self.onlyPending else ""))
+        self.model.setResultset(query.records)
         self.view.hideColumn(0)
 
     def __idxForGame(self, game):
         """returns the model index for game"""
         for row in range(self.model.rowCount()):
-            if self.model.record(row).field(0).value().toInt()[0] == game:
-                return self.model.index(row, 0)
+            idx = self.model.index(row, 0)
+            if self.model.data(idx, 0).toPyObject() == game:
+                return idx
         return self.model.index(0, 0)
+
+    def __getSelectedGame(self):
+        """returns the game id of the selected game"""
+        rows = self.selection.selectedRows()
+        if rows:
+            return self.model.data(rows[0], 0).toPyObject()
+        else:
+            return 0
 
     def pendingOrNot(self, chosen):
         """do we want to see all games or only pending games?"""
         if self.onlyPending != chosen:
             self.onlyPending = chosen
-            idx = self.view.currentIndex()
-            selectedGame = self.model.record(idx.row()).value(0).toInt()[0]
+            prevSelected = self.__getSelectedGame()
             self.setQuery()
-            idx = self.__idxForGame(selectedGame)
+            idx = self.__idxForGame(prevSelected)
             self.view.selectRow(idx.row())
         self.view.setFocus()
 
     def loadGame(self):
         """load a game"""
-        selnum = len(self.selection.selectedRows())
-        if selnum != 1:
-            # should never happen
-            logException('loadGame: %d rows selected' % selnum)
-        idx = self.view.currentIndex()
-        self.selectedGame = self.model.record(idx.row()).value(0).toInt()[0]
+        self.selectedGame = self.__getSelectedGame()
         self.buttonBox.accepted.emit()
 
     def delete(self):
@@ -182,11 +210,9 @@ class Games(QDialog):
         def answered(result, games):
             """question answered, result is True or False"""
             if result:
-                cmdList = []
                 for game in games:
-                    cmdList.append("DELETE FROM score WHERE game = %d" % game)
-                    cmdList.append("DELETE FROM game WHERE id = %d" % game)
-                Query(cmdList)
+                    Query("DELETE FROM score WHERE game = ?", (game, ))
+                    Query("DELETE FROM game WHERE id = ?", (game, ))
                 self.setQuery() # just reload entire table
         deleteGames = list(x.data().toInt()[0] for x in self.view.selectionModel().selectedRows(0))
         if len(deleteGames) == 0:

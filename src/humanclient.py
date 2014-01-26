@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2009-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2009-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,52 +18,56 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import csv, resource, random
+import random
 
 from twisted.spread import pb
 from twisted.python.failure import Failure
 from twisted.internet.defer import Deferred, succeed, DeferredList
 from PyQt4.QtCore import Qt, QTimer
 from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
-    QLabel, QPushButton, \
+    QLabel, QPushButton, QWidget, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from kde import Sorry, Information, QuestionYesNo, KIcon, \
-    DialogIgnoringEscape
+from kde import KIcon, KDialog
+from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 
-from util import m18n, logWarning, logException, \
-    logInfo, logDebug
+from log import m18n, logWarning, logException, logDebug
 from message import Message, ChatMessage
 from chat import ChatWindow
-from common import Options, SingleshotOptions, Internal, Preferences, Debug, isAlive
+from common import Options, SingleshotOptions, Internal, Debug, isAlive
 from query import Query
 from board import Board
 from client import Client, ClientTable
 from tables import TableList, SelectRuleset
 from sound import Voice
-import intelligence
-import altint
 from login import Connection
 from rule import Ruleset
 from game import PlayingGame
 from visible import VisiblePlayingGame
 
-class SelectChow(DialogIgnoringEscape):
+class SelectChow(KDialogIgnoringEscape):
     """asks which of the possible chows is wanted"""
     def __init__(self, chows, propose, deferred):
-        DialogIgnoringEscape.__init__(self)
+        KDialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
+        self.setButtons(KDialog.None)
         self.chows = chows
         self.selectedChow = None
         self.deferred = deferred
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(m18n('Which chow do you want to expose?')))
+        layout = QVBoxLayout()
+        label = QLabel(m18n('Which chow do you want to expose?'))
+        layout.addWidget(label)
+        layout.setAlignment(label, Qt.AlignHCenter)
         self.buttons = []
         for chow in chows:
-            button = QRadioButton('-'.join([chow[0][1], chow[1][1], chow[2][1]]), self)
+            button = QRadioButton('{}-{}-{}'.format(*(x.value for x in chow)))
             self.buttons.append(button)
             layout.addWidget(button)
+            layout.setAlignment(button, Qt.AlignHCenter)
             button.toggled.connect(self.toggled)
+        widget = QWidget(self)
+        widget.setLayout(layout)
+        self.setMainWidget(widget)
         for idx, chow in enumerate(chows):
             if chow == propose:
                 self.buttons[idx].setFocus()
@@ -76,29 +80,28 @@ class SelectChow(DialogIgnoringEscape):
             self.accept()
             self.deferred.callback((Message.Chow, self.selectedChow))
 
-    def closeEvent(self, event):
-        """allow close only if a chow has been selected"""
-        if self.selectedChow:
-            event.accept()
-        else:
-            event.ignore()
-
-class SelectKong(DialogIgnoringEscape):
+class SelectKong(KDialogIgnoringEscape):
     """asks which of the possible kongs is wanted"""
     def __init__(self, kongs, deferred):
-        DialogIgnoringEscape.__init__(self)
+        KDialogIgnoringEscape.__init__(self)
         self.setWindowTitle('Kajongg')
+        self.setButtons(KDialog.None)
         self.kongs = kongs
         self.selectedKong = None
         self.deferred = deferred
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(m18n('Which kong do you want to declare?')))
+        layout = QVBoxLayout()
+        label = QLabel(m18n('Which kong do you want to declare?'))
+        layout.addWidget(label)
+        layout.setAlignment(label, Qt.AlignHCenter)
         self.buttons = []
         for kong in kongs:
             button = QRadioButton((kong[0].name()), self)
             self.buttons.append(button)
             layout.addWidget(button)
             button.toggled.connect(self.toggled)
+        widget = QWidget(self)
+        widget.setLayout(layout)
+        self.setMainWidget(widget)
 
     def toggled(self, dummyChecked):
         """a radiobutton has been toggled"""
@@ -108,13 +111,6 @@ class SelectKong(DialogIgnoringEscape):
             self.accept()
             self.deferred.callback((Message.Kong, self.selectedKong))
 
-    def closeEvent(self, event):
-        """allow close only if a chow has been selected"""
-        if self.selectedKong:
-            event.accept()
-        else:
-            event.ignore()
-
 class DlgButton(QPushButton):
     """special button for ClientDialog"""
     def __init__(self, message, parent):
@@ -123,9 +119,9 @@ class DlgButton(QPushButton):
         self.client = parent.client
         self.setText(message.buttonCaption())
 
-    def decorate(self, tile):
+    def decorate(self, uiTile):
         """give me caption, shortcut, tooltip, icon"""
-        txt, warn, _ = self.message.toolTip(self, tile.tile if tile else None)
+        txt, warn, _ = self.message.toolTip(self, uiTile.tile if uiTile else None)
         if not txt:
             txt = self.message.i18nName  # .replace(i18nShortcut, '&'+i18nShortcut, 1)
         self.setToolTip(txt)
@@ -185,8 +181,8 @@ class ClientDialog(QDialog):
 
     def __declareButton(self, message):
         """define a button"""
-        maySay = self.client.sayable[message]
-        if Preferences.showOnlyPossibleActions and not maySay:
+        maySay = self.client.game.myself.sayable[message]
+        if Internal.Preferences.showOnlyPossibleActions and not maySay:
             return
         btn = DlgButton(message, self)
         btn.setAutoDefault(True)
@@ -199,16 +195,16 @@ class ClientDialog(QDialog):
             return
         for button in self.buttons:
             button.decorate(self.client.game.myself.handBoard.focusTile)
-        for tile in self.client.game.myself.handBoard.lowerHalfTiles():
+        for uiTile in self.client.game.myself.handBoard.lowerHalfTiles():
             txt = []
             for button in self.buttons:
-                _, _, tileTxt = button.message.toolTip(button, tile.tile)
+                _, _, tileTxt = button.message.toolTip(button, uiTile.tile)
                 if tileTxt:
                     txt.append(tileTxt)
             txt = '<br><br>'.join(txt)
-            tile.setToolTip(txt)
+            uiTile.setToolTip(txt)
         if self.client.game.activePlayer == self.client.game.myself:
-            Internal.field.handSelectorChanged(self.client.game.myself.handBoard)
+            Internal.scene.handSelectorChanged(self.client.game.myself.handBoard)
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
@@ -224,15 +220,15 @@ class ClientDialog(QDialog):
         focus a proposed tile depending on the action."""
         result = self.buttons[0]
         game = self.client.game
-        if game.autoPlay or Preferences.propose:
-            answer, parameter = self.client.intelligence.selectAnswer(
+        if game.autoPlay or Internal.Preferences.propose:
+            answer, parameter = game.myself.intelligence.selectAnswer(
                 self.messages())
             result = [x for x in self.buttons if x.message == answer][0]
             result.setFocus()
             if answer in [Message.Discard, Message.OriginalCall]:
-                for tileItem in game.myself.handBoard.tiles:
-                    if tileItem.tile == parameter:
-                        game.myself.handBoard.focusTile = tileItem
+                for uiTile in game.myself.handBoard.uiTiles:
+                    if uiTile.tile is parameter:
+                        game.myself.handBoard.focusTile = uiTile
         return result
 
     def askHuman(self, move, answers, deferred):
@@ -264,9 +260,9 @@ class ClientDialog(QDialog):
 
     def placeInField(self):
         """place the dialog at bottom or to the right depending on space."""
-        field = Internal.field
-        cwi = field.centralWidget()
-        view = field.centralView
+        mainWindow = Internal.scene.mainWindow
+        cwi = mainWindow.centralWidget()
+        view = mainWindow.centralView
         geometry = self.geometry()
         if not self.btnHeight:
             self.btnHeight = self.buttons[0].height()
@@ -314,6 +310,9 @@ class ClientDialog(QDialog):
 
     def selectButton(self, button=None):
         """select default answer. button may also be of type Message."""
+        if self.answered:
+            # sometimes we get this event twice
+            return
         self.timer.stop()
         self.answered = True
         if button is None:
@@ -323,10 +322,10 @@ class ClientDialog(QDialog):
             answer = button
         else:
             answer = button.message
-        if not self.client.sayable[answer]:
+        if not self.client.game.myself.sayable[answer]:
             Sorry(m18n('You cannot say %1', answer.i18nName))
             return
-        Internal.field.clientDialog = None
+        Internal.scene.clientDialog = None
         self.deferred.callback(answer)
 
     def selectedAnswer(self, dummyChecked):
@@ -340,10 +339,7 @@ class HumanClient(Client):
     # pylint: disable=too-many-public-methods
     humanClients = []
     def __init__(self):
-        aiClass = self.__findAI([intelligence, altint], Options.AI)
-        if not aiClass:
-            raise Exception('intelligence %s is undefined' % Options.AI)
-        Client.__init__(self, intelligence=aiClass)
+        Client.__init__(self)
         HumanClient.humanClients.append(self)
         self.table = None
         self.ruleset = None
@@ -383,7 +379,7 @@ class HumanClient(Client):
         self.name = connection.username
         self.tableList.show()
         voiceId = None
-        if Preferences.uploadVoice:
+        if Internal.Preferences.uploadVoice:
             voice = Voice.locate(self.name)
             if voice:
                 voiceId = voice.md5sum
@@ -392,7 +388,7 @@ class HumanClient(Client):
         maxGameId = Query('select max(id) from game').records[0][0]
         maxGameId = int(maxGameId) if maxGameId else 0
         self.callServer('setClientProperties',
-            Internal.dbIdent,
+            Internal.db.identifier,
             voiceId, maxGameId, Internal.version).addCallbacks(self.__initTableList, self.__versionError)
 
     def __initTableList(self, dummy):
@@ -420,15 +416,8 @@ class HumanClient(Client):
     @staticmethod
     def __loginFailed(dummy):
         """as the name says"""
-        Internal.field.startingGame = False
-
-    @staticmethod
-    def __findAI(modules, aiName):
-        """list of all alternative AIs defined in altint.py"""
-        for modul in modules:
-            for key, value in modul.__dict__.items():
-                if key == 'AI' + aiName:
-                    return value
+        if Internal.scene:
+            Internal.scene.startingGame = False
 
     def isRobotClient(self):
         """avoid using isinstance, it would import too much for kajonggserver"""
@@ -490,7 +479,7 @@ class HumanClient(Client):
         def gotRulesets(result):
             """the server sent us the wanted ruleset definitions"""
             for ruleset in result:
-                Ruleset.cached(ruleset).save(copy=True) # make it known to the cache and save in db
+                Ruleset.cached(ruleset).save() # make it known to the cache and save in db
             return tables
         rulesetHashes = set(x[1] for x in tables)
         needRulesets = list(x for x in rulesetHashes if not Ruleset.hashIsKnown(x))
@@ -547,7 +536,7 @@ class HumanClient(Client):
             gameClass=None):
         """playerNames are in wind order ESWN"""
         if gameClass is None:
-            if Internal.field:
+            if Options.gui:
                 gameClass = VisiblePlayingGame
             else:
                 gameClass = PlayingGame
@@ -596,25 +585,25 @@ class HumanClient(Client):
         if not self.connection:
             # disconnected meanwhile
             return
-        if Internal.field:
+        if Options.gui:
             # update the balances in the status bar:
-            Internal.field.updateGUI()
+            Internal.mainWindow.updateGUI()
         assert not self.game.isFirstHand()
         return Information(m18n("Ready for next hand?"), modal=False).addCallback(answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
-        if not Internal.field:
+        if not Options.gui:
             return Client.ask(self, move, answers)
-        self._computeSayable(move, answers)
+        self.game.myself.computeSayable(move, answers)
         deferred = Deferred()
         deferred.addCallback(self.__askAnswered)
         deferred.addErrback(self.__answerError, move, answers)
         iAmActive = self.game.myself == self.game.activePlayer
         self.game.myself.handBoard.setEnabled(iAmActive)
-        field = Internal.field
-        oldDialog = field.clientDialog
+        scene = Internal.scene
+        oldDialog = scene.clientDialog
         if oldDialog and not oldDialog.answered:
             raise Exception('old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
                 str(oldDialog.move),
@@ -624,9 +613,9 @@ class HumanClient(Client):
             # always build a new dialog because if we change its layout before
             # reshowing it, sometimes the old buttons are still visible in which
             # case the next dialog will appear at a lower position than it should
-            field.clientDialog = ClientDialog(self, field.centralWidget())
-        assert field.clientDialog.client is self
-        field.clientDialog.askHuman(move, answers, deferred)
+            scene.clientDialog = ClientDialog(self, scene.mainWindow.centralWidget())
+        assert scene.clientDialog.client is self
+        scene.clientDialog.askHuman(move, answers, deferred)
         return deferred
 
     def __selectChow(self, chows):
@@ -634,12 +623,13 @@ class HumanClient(Client):
         Since we might return a Deferred to be sent to the server,
         which contains Message.Chow plus selected Chow, we should
         return the same tuple here"""
+        intelligence = self.game.myself.intelligence
         if self.game.autoPlay:
-            return Message.Chow, self.intelligence.selectChow(chows)
+            return Message.Chow, intelligence.selectChow(chows)
         if len(chows) == 1:
             return Message.Chow, chows[0]
-        if Preferences.propose:
-            propose = self.intelligence.selectChow(chows)
+        if Internal.Preferences.propose:
+            propose = intelligence.selectChow(chows)
         else:
             propose = None
         deferred = Deferred()
@@ -650,7 +640,7 @@ class HumanClient(Client):
     def __selectKong(self, kongs):
         """which possible kong do we want to declare?"""
         if self.game.autoPlay:
-            return Message.Kong, self.intelligence.selectKong(kongs)
+            return Message.Kong, self.game.myself.intelligence.selectKong(kongs)
         if len(kongs) == 1:
             return Message.Kong, kongs[0]
         deferred = Deferred()
@@ -668,7 +658,7 @@ class HumanClient(Client):
             # including us that it has been discarded. Only then we will remove it.
             myself.handBoard.setEnabled(False)
             return answer, myself.handBoard.focusTile.tile
-        args = self.sayable[answer]
+        args = self.game.myself.sayable[answer]
         assert args
         if answer == Message.Chow:
             return self.__selectChow(args)
@@ -696,8 +686,8 @@ class HumanClient(Client):
             if self.game:
                 self.game.close()
                 if self.game.autoPlay:
-                    if Internal.field:
-                        Internal.field.close()
+                    if Internal.scene:
+                        Internal.scene.close()
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
@@ -705,28 +695,12 @@ class HumanClient(Client):
             """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
-                if Options.csv:
-                    gameWinner = max(self.game.players, key=lambda x: x.balance)
-                    writer = csv.writer(open(Options.csv,'a'), delimiter=';')
-                    if Debug.process:
-                        self.game.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-                    row = [self.game.ruleset.name, Options.AI, str(self.game.seed), ','.join(self.game.csvTags)]
-                    for player in sorted(self.game.players, key=lambda x: x.name):
-                        row.append(player.name.encode('utf-8'))
-                        row.append(player.balance)
-                        row.append(player.wonCount)
-                        row.append(1 if player == gameWinner else 0)
-                    writer.writerow(row)
-                    del writer
-                if self.game.autoPlay and Internal.field:
-                    Internal.field.close()
-                else:
-                    self.game.close().addCallback(Client.quitProgram)
+                self.game.close().addCallback(Internal.mainWindow.quitProgram)
         assert self.table and self.table.tableid == tableid
-        if Internal.field:
+        if Internal.scene:
             # update the balances in the status bar:
-            Internal.field.updateGUI()
-        logInfo(m18n(message, *args), showDialog=True).addCallback(yes)
+            Internal.scene.mainWindow.updateGUI()
+        Information(m18n(message, *args)).addCallback(yes)
 
     def remote_serverDisconnects(self, result=None):
         """we logged out or or lost connection to the server.
@@ -743,9 +717,9 @@ class HumanClient(Client):
             HumanClient.humanClients.remove(self)
         if self.beginQuestion:
             self.beginQuestion.cancel()
-        field = Internal.field
-        if field and game and field.game == game:
-            game.close() # TODO: maybe issue a Sorry first?
+        scene = Internal.scene
+        if scene and game and scene.game == game:
+            scene.game = None
 
     def serverDisconnected(self, dummyReference):
         """perspective calls us back"""
@@ -757,7 +731,9 @@ class HumanClient(Client):
     def __versionError(err):
         """log the twisted error"""
         logWarning(err.getErrorMessage())
-        Internal.field.abortGame()
+        if Internal.game:
+            Internal.game.close()
+            Internal.game = None
         return err
 
     @staticmethod
@@ -815,7 +791,7 @@ class HumanClient(Client):
     def logout(self, dummyResult=None):
         """clean visual traces and logout from server"""
         def loggedout(result, connection):
-            """TODO: do we need this?"""
+            """end the connection from client side"""
             connection.connector.disconnect()
             return result
         if self.connection:
@@ -825,6 +801,20 @@ class HumanClient(Client):
         else:
             return succeed(None)
 
+    def __logCallServer(self, *args):
+        """for Debug.traffic"""
+        debugArgs = list(args[:])
+        if Debug.neutral:
+            if debugArgs[0] == 'ping':
+                return
+            if debugArgs[0] == 'setClientProperties':
+                debugArgs[1] = u'DBID'
+                debugArgs[3] = u'GAMEID'
+        if self.game:
+            self.game.debug('callServer(%s)' % repr(debugArgs))
+        else:
+            logDebug('callServer(%s)' % repr(debugArgs))
+
     def callServer(self, *args):
         """if we are online, call server"""
         if self.connection:
@@ -832,10 +822,7 @@ class HumanClient(Client):
                 args = args[1:]
             try:
                 if Debug.traffic:
-                    if self.game:
-                        self.game.debug('callServer(%s)' % repr(args))
-                    else:
-                        logDebug('callServer(%s)' % repr(args))
+                    self.__logCallServer(*args)
                 def callServerError(result):
                     """if serverDisconnected has been called meanwhile, just ignore msg about
                     connection lost in a non-clean fashion"""

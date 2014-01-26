@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
@@ -22,10 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 
-from PyQt4.QtCore import QString
+from qt import QString
 from kde import KConfigSkeleton
-from util import logException
-import common
+from log import logException
+from common import Internal
 
 class Parameter(object):
     """helper class for defining configuration parameters"""
@@ -90,10 +90,10 @@ class IntParameter(Parameter):
 class SetupPreferences(KConfigSkeleton):
     """Holds all kajongg options. Only instantiate this once"""
     _Parameters = {}
-    def __init__(self):
-        if common.Preferences:
+    def __init__(self): # pylint: disable=super-init-not-called
+        if Internal.Preferences:
             logException('Preferences is not None')
-        common.Preferences = self
+        Internal.Preferences = self
         KConfigSkeleton.__init__(self)
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
@@ -109,14 +109,15 @@ class SetupPreferences(KConfigSkeleton):
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
         if not name in SetupPreferences._Parameters:
-            raise AttributeError
+            return self.__getattribute__(name)
         par = SetupPreferences._Parameters[name]
         return par.itemValue()
 
     def __setattr__(self, name, value):
         """undefined attributes might be parameters"""
         if not name in SetupPreferences._Parameters:
-            raise AttributeError('not defined:%s'%name)
+            KConfigSkeleton.__setattr__(self, name, value)
+            return
         par = SetupPreferences._Parameters[name]
         par.item.setValue(value)
 

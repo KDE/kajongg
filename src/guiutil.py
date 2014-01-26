@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2010-2011 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2010-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
@@ -24,10 +24,10 @@ import os
 from PyQt4.QtCore import QVariant
 from PyQt4.QtGui import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 
-from kde import KStandardDirs, KConfig, KConfigGroup
+from kde import KStandardDirs
 from PyQt4 import uic
 
-from util import m18n
+from log import m18n
 
 def loadUi(base):
     """load the ui file for class base, deriving the file name from the class name"""
@@ -101,7 +101,16 @@ class ListComboBox(QComboBox):
             raise Exception('%s not found in ListComboBox' % item.name)
         self.setCurrentIndex(newIdx)
 
-def konfigGroup(path, groupName):
-    """returns access to a group of config options"""
-    config = KConfig(path, KConfig.SimpleConfig)
-    return config, KConfigGroup(config.group(groupName))
+class Painter(object):
+    """a helper class for painting: saves/restores painter"""
+    def __init__(self, painter):
+        """painter is the painter to be saved/restored"""
+        self.painter = painter
+
+    def __enter__(self):
+        self.painter.save()
+        return self
+
+    def __exit__(self, exc_type, exc_value, trback):
+        """now check time passed"""
+        self.painter.restore()

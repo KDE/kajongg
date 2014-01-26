@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
@@ -24,8 +24,9 @@ from PyQt4.QtGui import QHBoxLayout
 from kde import KLineEdit
 from tileset import Tileset
 from uitile import UITile
-from board import Board, FittingView, MJScene
-from common import Preferences, WINDS
+from board import Board, FittingView
+from scene import SceneWithFocusRect
+from common import Internal, WINDS
 from guiutil import loadUi
 from animation import Animated
 
@@ -39,11 +40,11 @@ class TilesetSelector( QtGui.QWidget):
         self.kcfg_tilesetName.setVisible(False)
         self.kcfg_tilesetName.setObjectName('kcfg_tilesetName')
 
-        self.tileScene = MJScene()
+        self.tileScene = SceneWithFocusRect()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
-        self.tileset = Tileset(Preferences.tilesetName)
-        self.tiles = [UITile('w'+s) for s in WINDS.lower()]
+        self.tileset = Tileset(Internal.Preferences.tilesetName)
+        self.uiTiles = [UITile('w'+s) for s in WINDS.lower()]
         self.board = Board(2, 2, self.tileset)
         self.board.showShadows = True
         self.tileScene.addItem(self.board)
@@ -51,8 +52,8 @@ class TilesetSelector( QtGui.QWidget):
         layout = QHBoxLayout(self.tilesetPreview)
         layout.addWidget(self.tileView)
         for idx, offsets in enumerate([(0, 0), (0, 1), (1, 0), (1, 1)]):
-            self.tiles[idx].setBoard(self.board, *offsets) # pylint: disable=star-args
-            self.tiles[idx].focusable = False
+            self.uiTiles[idx].setBoard(self.board, *offsets) # pylint: disable=star-args
+            self.uiTiles[idx].focusable = False
         self.setUp()
 
     def setUp(self):
@@ -67,7 +68,7 @@ class TilesetSelector( QtGui.QWidget):
         self.tilesetList = Tileset.tilesAvailable()
         for aset in self.tilesetList:
             self.tilesetNameList.addItem(aset.name)
-        self.kcfg_tilesetName.setText(Preferences.tilesetName)
+        self.kcfg_tilesetName.setText(Internal.Preferences.tilesetName)
 
     def tilesetNameChanged(self, name):
         """the name changed: update the current row"""

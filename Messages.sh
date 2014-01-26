@@ -15,7 +15,7 @@ ${XGETTEXT:-xgettext} \
 		-kI18N_NOOP:1 -kI18N_NOOP2:1c,2 \
 		-kaliasLocale -kki18n:1 -kki18nc:1c,2 -kki18np:1,2 -kki18ncp:1c,2,3 \
 		-km18n:1 -km18nE:1 -km18nc:1c,2 -km18ncE:1c,2 -km18np:1,2 \
-		-kRule:1 \
+		-kcreateRule:1 \
 		--no-wrap --msgid-bugs-address=wolfgang@rohdewald.de -o${podir:-.}/kajongg.pot \
 		rc.cpp `find . -name \*.py`
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from common import Internal, Preferences, ZValues
+from common import Internal, ZValues
 from PyQt4.QtCore import QRectF, QPointF
 from PyQt4.QtGui import QGraphicsSimpleTextItem
 
@@ -35,9 +35,10 @@ class UIWallSide(Board):
         Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
         self.length = length
 
+    @property
     def name(self):
         """name for debug messages"""
-        game = Internal.field.game
+        game = Internal.scene.game
         if not game:
             return 'NOGAME'
         for player in game.players:
@@ -66,17 +67,17 @@ class UIKongBox(KongBox):
 
     def fill(self, tiles):
         """fill the box"""
-        for tile in self._tiles:
-            tile.cross = False
+        for uiTile in self._tiles:
+            uiTile.cross = False
         KongBox.fill(self, tiles)
-        for tile in self._tiles:
-            tile.cross = True
+        for uiTile in self._tiles:
+            uiTile.cross = True
 
     def pop(self, count):
         """get count tiles from kong box"""
         result = KongBox.pop(self, count)
-        for tile in result:
-            tile.cross = False
+        for uiTile in result:
+            uiTile.cross = False
         return result
 
 class UIWall(Wall):
@@ -90,15 +91,15 @@ class UIWall(Wall):
         # use any tile because the face is never shown anyway.
         game.wall = self
         Wall.__init__(self, game)
-        self.__square = Board(1, 1, Internal.field.tileset)
+        self.__square = Board(1, 1, Internal.scene.tileset)
         self.__square.setZValue(ZValues.marker)
         sideLength = len(self.tiles) // 8
-        self.__sides = [UIWallSide(Internal.field.tileset, boardRotation, sideLength) \
+        self.__sides = [UIWallSide(Internal.scene.tileset, boardRotation, sideLength) \
             for boardRotation in (0, 270, 180, 90)]
         for side in self.__sides:
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
-            side.windTile = PlayerWind('E', Internal.field.windTileset, parent=side)
+            side.windTile = PlayerWind('E', Internal.scene.windTileset, parent=side)
             side.windTile.hide()
             side.nameLabel = QGraphicsSimpleTextItem('', side)
             font = side.nameLabel.font()
@@ -112,8 +113,8 @@ class UIWall(Wall):
         self.__sides[3].setPos(xHeight=1)
         self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
         self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1 )
-        self.showShadows = Preferences.showShadows
-        Internal.field.centralScene.addItem(self.__square)
+        self.showShadows = Internal.Preferences.showShadows
+        Internal.scene.addItem(self.__square)
 
     @staticmethod
     def name():
@@ -138,36 +139,38 @@ class UIWall(Wall):
 
     def hide(self):
         """hide all four walls and their decorators"""
+        # may be called twice
         self.living = []
         self.kongBox.fill([])
         for side in self.__sides:
             side.hide()
         self.tiles = []
-        Internal.field.centralScene.removeItem(self.__square)
+        if self.__square.scene():
+            self.__square.scene().removeItem(self.__square)
 
     def __shuffleTiles(self):
         """shuffle tiles for next hand"""
-        discardBoard = Internal.field.discardBoard
+        discardBoard = Internal.scene.discardBoard
         places = [(x, y) for x in range(-3, discardBoard.width+3) for y in range(-3, discardBoard.height+3)]
         places = self.game.randomGenerator.sample(places, len(self.tiles))
-        for idx, tile in enumerate(self.tiles):
-            assert isinstance(tile, UITile)
-            tile.dark = True
-            tile.setBoard(discardBoard, *places[idx])
+        for idx, uiTile in enumerate(self.tiles):
+            uiTile.dark = True
+            uiTile.setBoard(discardBoard, *places[idx])
 
-    def build(self):
+    def build(self, shuffleFirst=False):
         """builds the wall without dividing"""
         # recycle used tiles
-        for tile in self.tiles:
-            tile.tile = Tile('Xy')
-            tile.dark = True
-#        field = Internal.field
-#        animateBuild = not field.game.isScoringGame() and not self.game.isFirstHand()
+        for uiTile in self.tiles:
+            uiTile.tile = Tile.unknown
+            uiTile.dark = True
+#        scene = Internal.scene
+#        animateBuild = not scene.game.isScoringGame() and not self.game.isFirstHand()
         animateBuild = False
         with Animated(animateBuild):
-            self.__shuffleTiles()
-            for tile in self.tiles:
-                tile.focusable = False
+            if shuffleFirst:
+                self.__shuffleTiles()
+            for uiTile in self.tiles:
+                uiTile.focusable = False
             return animate().addCallback(self.__placeWallTiles)
 
     def __placeWallTiles(self, dummyResult=None):
@@ -177,8 +180,8 @@ class UIWall(Wall):
         for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
             upper = True # upper tile is played first
             for position in range(tilesPerSide-1, -1, -1):
-                tile = tileIter.next()
-                tile.setBoard(side, position//2, 0, level=int(upper))
+                uiTile = tileIter.next()
+                uiTile.setBoard(side, position//2, 0, level=int(upper))
                 upper = not upper
         self.__setDrawingOrder()
         return animate()
@@ -232,7 +235,7 @@ class UIWall(Wall):
         """we are really calling _setRect() too often. But at least it works"""
         for player in self.game.players:
             player.handBoard.computeRect()
-        Internal.field.adjustView()
+        Internal.mainWindow.adjustView()
 
     def __setDrawingOrder(self, dummyResults=None):
         """set drawing order of the wall"""
@@ -240,16 +243,16 @@ class UIWall(Wall):
         for idx, side in enumerate(self.__sides):
             side.level = (levels[side.lightSource][idx] + 1) * ZValues.boardLevelFactor
 
-    def __moveDividedTile(self, tile, offset):
-        """moves a tile from the divide hole to its new place"""
-        board = tile.board
-        newOffset = tile.xoffset + offset
+    def __moveDividedTile(self, uiTile, offset):
+        """moves a uiTile from the divide hole to its new place"""
+        board = uiTile.board
+        newOffset = uiTile.xoffset + offset
         sideLength = len(self.tiles) // 8
         if newOffset >= sideLength:
-            sideIdx = self.__sides.index(tile.board)
+            sideIdx = self.__sides.index(uiTile.board)
             board = self.__sides[(sideIdx+1) % 4]
-        tile.setBoard(board, newOffset % sideLength, 0, level=2)
-        tile.update()
+        uiTile.setBoard(board, newOffset % sideLength, 0, level=2)
+        uiTile.update()
 
     def _placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
@@ -269,12 +272,12 @@ class UIWall(Wall):
         """divides a wall, building a living and and a dead end"""
         with Animated(False):
             Wall.divide(self)
-            for tile in self.tiles:
+            for uiTile in self.tiles:
                 # update graphics because tiles having been
                 # in kongbox in a previous game
                 # might not be there anymore. This gets rid
                 # of the cross on them.
-                tile.update()
+                uiTile.update()
             # move last two tiles onto the dead end:
             return animate().addCallback(self.__placeLooseTiles2)
 
@@ -288,7 +291,7 @@ class UIWall(Wall):
         side = player.front
         sideCenter = side.center()
         name = side.nameLabel
-        name.setText(' - '.join([player.localName, unicode(player.handTotalForWall())]))
+        name.setText(' - '.join([player.localName, unicode(player.explainHand().total())]))
         name.resetTransform()
         if side.rotation() == 180:
             rotateCenter(name, 180)

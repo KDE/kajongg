@@ -59,7 +59,7 @@ load-plugins=
 # W0122 exec statement
 # E0211 method has no argument
 # disable=R0903,R0902,W0122
-disable=R0903,E0211,I0011,I0013
+disable=R0903,E0211,I0011,I0013,too-many-ancestors
 
 
 [REPORTS]
@@ -203,7 +203,7 @@ additional-builtins=
 [IMPORTS]
 
 # Deprecated modules which should not be used, separated by a comma
-deprecated-modules=regsub,string,TERMIOS,Bastion,rexec
+deprecated-modules=regsub,TERMIOS,Bastion,rexec
 
 # Create a graph of every (i.e. internal and external) dependencies in the
 # given file (report R0402 must not be disabled)
@@ -267,7 +267,7 @@ max-public-methods=40
 ignore-iface-methods=isImplementedBy,deferred,extends,names,namesAndDescriptions,queryDescriptionFor,getBases,getDescriptionFor,getDoc,getName,getTaggedValue,getTaggedValueTags,isEqualOrExtendedBy,setTaggedValue,isImplementedByInstancesOf,adaptWith,is_implemented_by
 
 # List of method names used to declare (i.e. assign) instance attributes.
-defining-attr-methods=__init__,__new__,setUp,setupUi,setupActions,setupUILastTileMeld,clearHand
+defining-attr-methods=__init__,__new__,setUp,setupUi,setupActions,setupUILastTileMeld,clearHand,__build
 
 
 # checks for similarities and duplicated code. This computation may be
@@ -277,7 +277,7 @@ defining-attr-methods=__init__,__new__,setUp,setupUi,setupActions,setupUILastTil
 [SIMILARITIES]
 
 # Minimum lines number of a similarity.
-min-similarity-lines=4
+min-similarity-lines=8
 
 # Ignore comments when computing similarities.
 ignore-comments=yes

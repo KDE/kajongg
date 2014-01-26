@@ -4,7 +4,7 @@ Authors of original libkmahjongg in C++:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
 
 this python code:
-    Copyright (C) 2008-2011 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     kajongg is free software you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,14 +21,15 @@ this python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import QString, QVariant, Qt
+from PyQt4.QtCore import QVariant, Qt
 from PyQt4.QtGui import QPainter, QBrush, QPalette, \
     QPixmapCache, QPixmap
 from PyQt4.QtSvg import QSvgRenderer
-from kde import KGlobal, KStandardDirs
 
-from util import logWarning, logException, m18n
-from guiutil import konfigGroup
+from qt import QString
+from kde import KGlobal, KStandardDirs, KConfig
+
+from log import logWarning, logException, m18n
 
 BACKGROUNDVERSIONFORMAT = 1
 
@@ -51,7 +52,7 @@ class Background(object):
         """whatever this does"""
         if not Background.catalogDefined:
             KGlobal.dirs().addResourceType("kmahjonggbackground",
-                "data", QString.fromLatin1("kmahjongglib/backgrounds"))
+                "data", QString("kmahjongglib/backgrounds"))
             KGlobal.locale().insertCatalog("libkmahjongglib")
             Background.catalogDefined = True
 
@@ -89,8 +90,8 @@ class Background(object):
             else:
                 logWarning(m18n('cannot find background %1, using default', desktopFileName))
                 self.desktopFileName = 'default'
-        config, group = konfigGroup(self.path, "KMahjonggBackground")
-        assert config
+        config = KConfig(self.path)
+        group = config.group("KMahjonggBackground")
         self.name = group.readEntry("Name", "unknown background").toString() # Returns translated data
 
         #Version control
@@ -127,8 +128,8 @@ class Background(object):
             if self.tiled:
                 width = self.imageWidth
                 height = self.imageHeight
-            cachekey = QString("%1W%2H%3") \
-                .arg(self.name).arg(width).arg(height)
+            cachekey = QString(u'{name}W{width}H{height}'.format(
+                name=self.name, width=width, height=height))
             self.__pmap = QPixmapCache.find(cachekey)
             if not self.__pmap:
                 renderer = QSvgRenderer(self.__graphicspath)

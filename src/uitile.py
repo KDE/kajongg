@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+ Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QString, QRectF, QPointF, QSizeF, QSize, pyqtProperty
+from PyQt4.QtCore import Qt, QRectF, QPointF, QSizeF, QSize, pyqtProperty
 from PyQt4.QtGui import QGraphicsObject, QGraphicsItem, QPixmap, QPainter
 from PyQt4.QtGui import QColor
-from util import logException, stack, logDebug, m18nc
-from common import LIGHTSOURCES, ZValues, Internal, Preferences, Debug, isAlive
 
+from qt import QString
+from util import stack
+from log import logException, logDebug
+from guiutil import Painter
+from common import LIGHTSOURCES, ZValues, Internal, Debug, isAlive
 from tile import Tile
 from meld import Meld
 
@@ -55,6 +58,7 @@ class UITile(QGraphicsObject):
         self.activeAnimation = dict() # key is the property name
         self.queuedAnimations = []
 
+    @property
     def showShadows(self):
         """do we need to show shadows?"""
         return self.board.showShadows if self.board else False
@@ -117,7 +121,7 @@ class UITile(QGraphicsObject):
                 moving += ZValues.moving
         self.setZValue(moving + \
             boardLevel + \
-            (self.level+(2 if self.tile != 'Xy' else 1))*ZValues.itemLevelFactor + \
+            (self.level+(2 if self.tile.isKnown else 1))*ZValues.itemLevelFactor + \
             self.__lightDistance())
 
     def boundingRect(self):
@@ -134,61 +138,52 @@ class UITile(QGraphicsObject):
 
     def showFace(self):
         """should we show face for this tile?"""
-        game = Internal.field.game
-        element = self.tile
-        if game and game.isScoringGame():
-            result = element and element != 'Xy' and (self.yoffset or not self.dark)
-        else:
-            result = element and element != 'Xy' and not self.dark
-        return result
+        return self.tile.isKnown
 
     def __elementId(self):
         """returns the SVG element id of the tile"""
         if not self.showShadows:
             return QString("TILE_2")
         lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
-        return QString("TILE_%1").arg(lightSourceIndex%4+1)
+        return QString("TILE_{}".format(lightSourceIndex%4+1))
 
     def paint(self, painter, dummyOption, dummyWidget=None):
         """paint the entire tile.
         I tried to cache a pixmap for the tile and darkener but without face,
         but that actually made it slower."""
-        painter.save()
-        renderer = self.tileset.renderer()
-        withBorders = self.showShadows
-        if not withBorders:
-            painter.scale(*self.tileset.tileFaceRelation())
-        renderer.render(painter, self.__elementId(), self.boundingRect())
-        self._drawDarkness(painter)
-        painter.restore()
-        painter.save()
-        if self.showFace():
-            if withBorders:
-                faceSize = self.tileset.faceSize.toSize()
-                renderer.render(painter, self.tileset.svgName[self.tile.lower()],
-                        QRectF(self.facePos(), QSizeF(faceSize)))
-            else:
-                renderer.render(painter, self.tileset.svgName[self.tile.lower()],
-                    self.boundingRect())
-        painter.restore()
+        with Painter(painter):
+            renderer = self.tileset.renderer()
+            withBorders = self.showShadows
+            if not withBorders:
+                painter.scale(*self.tileset.tileFaceRelation())
+            renderer.render(painter, self.__elementId(), self.boundingRect())
+            self._drawDarkness(painter)
+        with Painter(painter):
+            if self.showFace():
+                if withBorders:
+                    faceSize = self.tileset.faceSize.toSize()
+                    renderer.render(painter, self.tileset.svgName[str(self.tile.exposed)],
+                            QRectF(self.facePos(), QSizeF(faceSize)))
+                else:
+                    renderer.render(painter, self.tileset.svgName[str(self.tile.exposed)],
+                        self.boundingRect())
         if self.cross:
             self.__paintCross(painter)
 
     def __paintCross(self, painter):
         """paint a cross on the tile"""
-        painter.save()
-        faceSize = self.tileset.faceSize
-        width = faceSize.width()
-        height = faceSize.height()
-        painter.translate(self.facePos())
-        painter.drawLine(QPointF(0.0, 0.0), QPointF(width, height))
-        painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
-        painter.restore()
+        with Painter(painter):
+            faceSize = self.tileset.faceSize
+            width = faceSize.width()
+            height = faceSize.height()
+            painter.translate(self.facePos())
+            painter.drawLine(QPointF(0.0, 0.0), QPointF(width, height))
+            painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
 
     def pixmapFromSvg(self, pmapSize=None, withBorders=None):
         """returns a pixmap with default size as given in SVG and optional borders/shadows"""
         if withBorders is None:
-            withBorders = Preferences.showShadows
+            withBorders = Internal.Preferences.showShadows
         if withBorders:
             wantSize = self.tileset.tileSize.toSize()
         else:
@@ -217,7 +212,7 @@ class UITile(QGraphicsObject):
             faceSize = self.tileset.faceSize.toSize()
             faceSize = QSize(faceSize.width() * xScale, faceSize.height() * yScale)
             painter.translate(self.facePos())
-            renderer.render(painter, self.tileset.svgName[self.tile.lower()],
+            renderer.render(painter, self.tileset.svgName[self.tile.exposed],
                     QRectF(QPointF(), QSizeF(faceSize)))
         return result
 
@@ -274,7 +269,7 @@ class UITile(QGraphicsObject):
     @tile.setter
     def tile(self, value): # pylint: disable=arguments-differ
         """set tile name and update display"""
-        if value != self._tile:
+        if value is not self._tile:
             self._tile = value
             self.setDrawingOrder()
             self.update()
@@ -422,7 +417,7 @@ class UITile(QGraphicsObject):
             size = ''
         return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
             (self.tile,
-            self.board.name() if self.board else 'None', id(self) % 10000,
+            self.board.name if self.board else 'None', id(self) % 10000,
             self.xoffset, self.x(), self.yoffset,
             self.y(), self.zValue(), size, rotation, scale, level)
 
@@ -430,20 +425,16 @@ class UITile(QGraphicsObject):
         """default representation"""
         return 'UITile(%s)' % str(self)
 
+    @property
     def isBonus(self):
         """proxy for tile"""
-        return self.tile.isBonus()
+        return self.tile.isBonus
 
 class UIMeld(list):
     """represents a visible meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds.
-    UIMeld is a list of UITile.
-
-    TODO: testen:
-    The name of the tile element in the meld does not have to be
-    identical with the name of the corresponding real tile while tiles
-    are added or removed. See end of SelectorBoard.meldVariants()."""
+    UIMeld is a list of UITile"""
 
     __hash__ = None
 
@@ -455,6 +446,7 @@ class UIMeld(list):
             self.append(newContent)
         assert len(self), newContent
 
-    def typeName(self):
-        """convert int to speaking name with shortcut"""
-        return Meld(self).typeName()
+    @property
+    def meld(self):
+        """returns a logical meld"""
+        return Meld(x.tile for x in self)

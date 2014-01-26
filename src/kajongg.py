@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,32 +29,31 @@ from about import About
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 
 from common import Options, SingleshotOptions, Internal, Debug
+from util import kprint
 
 # do not import modules using twisted before our reactor is running
-# do not import util directly or indirectly before Internal.app
-# is set
 
 def initRulesets():
     """exits if user only wanted to see available rulesets"""
     import predefined # pylint: disable=unused-variable
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
-        from util import kprint
-        from query import DBHandle
         rulesets = Ruleset.selectableRulesets()
         if Options.showRulesets:
             for ruleset in rulesets:
                 kprint(ruleset.name)
-            DBHandle.default = None
+            Internal.db.close()
             sys.exit(0)
         else:
-            for ruleset in rulesets:
-                if ruleset.name == Options.rulesetName:
-                    Options.ruleset = ruleset
-                    break
-            else:
-                DBHandle.default = None
-                raise SystemExit('Ruleset %s is unknown' % Options.rulesetName)
+            matches = list(x for x in rulesets if Options.rulesetName in x.name)
+            if len(matches) != 1:
+                if len(matches) == 0:
+                    msg = 'Ruleset %s is unknown' % Options.rulesetName
+                else:
+                    msg = 'Ruleset %s is ambiguous: %s' % (Options.rulesetName, list(x.name for x in matches))
+                Internal.db.close()
+                raise SystemExit(msg)
+            Options.ruleset = matches[0]
 
 def defineOptions():
     """this is the KDE way. Compare with kajonggserver.py"""
@@ -65,12 +64,15 @@ def defineOptions():
     options.add("table <TABLE>", ki18n("start new TABLE"))
     options.add("join <TABLE>", ki18n("join TABLE "))
     options.add("ruleset <RULESET>", ki18n("use ruleset without asking"))
+    options.add("rounds <ROUNDS>", ki18n("play one ROUNDS rounds per game. Only for debugging!"))
     options.add("player <PLAYER>", ki18n("prefer PLAYER for next login"))
     options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
     options.add("csv <CSV>", ki18n("write statistics to CSV"))
     options.add("rulesets", ki18n("show all available rulesets"))
-    options.add("game <seed/hand/discard>", ki18n("for testing purposes: Initializes the random generator"), "0")
+    options.add("game <seed[/[firsthand][..[lasthand]]>",
+        ki18n("for testing purposes: Initializes the random generator"), "0")
     options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
+    options.add("nokde", ki18n("Do not use KDE bindings. Intended only for testing"))
     options.add("socket <SOCKET>", ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
     options.add("debug <OPTIONS>", ki18n(Debug.help()))
     return options
@@ -86,6 +88,8 @@ def parseOptions():
         Options.host = str(args.getOption('host'))
     if args.isSet('player'):
         Options.player = str(args.getOption('player'))
+    if args.isSet('rounds'):
+        Options.rounds = str(args.getOption('rounds'))
     if args.isSet('ai'):
         Options.AI = str(args.getOption('ai'))
     if args.isSet('csv'):
@@ -103,7 +107,7 @@ def parseOptions():
     Internal.autoPlay = Options.demo
     msg = Debug.setOptions(str(args.getOption('debug')))
     if msg:
-        print msg
+        kprint(msg)
         sys.exit(2)
     from query import initDb
     if not initDb():
@@ -117,7 +121,7 @@ class EvHandler(QObject):
     keys = {y:x for x, y in Qt.__dict__.items() if isinstance(y, int)}
     def eventFilter(self, receiver, event):
         """will be called for all events"""
-        from util import logDebug
+        from log import logDebug
         if event.type() in self.events:
             # ignore unknown event types
             name = self.events[event.type()]
@@ -139,7 +143,8 @@ class EvHandler(QObject):
         return QObject.eventFilter(self, receiver, event)
 
 if __name__ == "__main__":
-    from util import initLog
+    from log import initLog
+    from util import gitHead
     initLog('kajongg')
 
     ABOUT = About()
@@ -162,10 +167,10 @@ if __name__ == "__main__":
     reactor.runReturn(installSignalHandlers=False)
     Internal.reactor = reactor
 
-    if Options.gui:
-        from playfield import PlayField
-        PlayField().show()
-    else:
-        from humanclient import HumanClient
-        HumanClient()
+    if Options.csv:
+        if gitHead() == 'current':
+            print('You cannot write to %s with changes uncommitted to git' % Options.csv)
+            sys.exit(2)
+    from mainwindow import MainWindow
+    MainWindow()
     Internal.app.exec_()

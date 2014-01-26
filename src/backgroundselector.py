@@ -1,5 +1,5 @@
 """
-    Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
@@ -20,10 +20,10 @@
 """
 
 from PyQt4 import QtGui
-from kde import KLineEdit
+from kde import KLineEdit, KConfig
 from background import Background
-from common import Preferences
-from guiutil import loadUi, konfigGroup
+from common import Internal
+from guiutil import loadUi
 
 class BackgroundSelector( QtGui.QWidget):
     """presents all available backgrounds with previews"""
@@ -47,7 +47,7 @@ class BackgroundSelector( QtGui.QWidget):
         self.backgroundList = Background.backgroundsAvailable()
         for aset in self.backgroundList:
             self.backgroundNameList.addItem(aset.name)
-        self.kcfg_backgroundName.setText(Preferences.backgroundName)
+        self.kcfg_backgroundName.setText(Internal.Preferences.backgroundName)
 
     def backgroundNameChanged(self, name):
         """the name changed: update the current row"""
@@ -62,8 +62,8 @@ class BackgroundSelector( QtGui.QWidget):
         selBackground = self.backgroundList[self.backgroundNameList.currentRow()]
         self.kcfg_backgroundName.setText(selBackground.desktopFileName)
 
-        config, group = konfigGroup(selBackground.path, "KMahjonggBackground")
-        assert config
+        config = KConfig(selBackground.path)
+        group = config.group("KMahjonggBackground")
 
         author = group.readEntry("Author", "unknown author").toString()
         description = group.readEntry("Description", "").toString()

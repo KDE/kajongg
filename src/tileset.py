@@ -6,7 +6,7 @@ Authors of original libkmahjongg in C++:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
 
 this adapted python code:
-    Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     kajongg is free software you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,11 +23,13 @@ this adapted python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import QString, QVariant, QSizeF
+from PyQt4.QtCore import QVariant, QSizeF
 from PyQt4.QtSvg import QSvgRenderer
-from kde import KGlobal, KStandardDirs, KConfig, KConfigGroup
-from util import logWarning, logException, m18n
-from common import LIGHTSOURCES, Internal, Preferences
+
+from qt import QString
+from kde import KGlobal, KStandardDirs, KConfig
+from log import logWarning, logException, m18n
+from common import LIGHTSOURCES, Internal
 
 TILESETVERSIONFORMAT = 1
 
@@ -50,7 +52,7 @@ class Tileset(object):
         """whatever this does"""
         if not Tileset.catalogDefined:
             KGlobal.dirs().addResourceType("kmahjonggtileset",
-                "data", QString.fromLatin1("kmahjongglib/tilesets"))
+                "data", QString("kmahjongglib/tilesets"))
             KGlobal.locale().insertCatalog("libkmahjongglib")
             Tileset.catalogDefined = True
 
@@ -95,7 +97,7 @@ class Tileset(object):
             self.desktopFileName = desktopFileName
         self.darkenerAlpha = 120 if self.desktopFileName == 'jade' else 50
         tileconfig = KConfig(self.path, KConfig.SimpleConfig)
-        group = KConfigGroup(tileconfig.group("KMahjonggTileset"))
+        group = tileconfig.group("KMahjonggTileset")
 
         self.name = group.readEntry("Name", "unknown tileset").toString() # Returns translated data
         self.author = group.readEntry("Author", "unknown author").toString()
@@ -165,7 +167,7 @@ class Tileset(object):
 
     def shadowOffsets(self, lightSource, rotation):
         """real offset of the shadow on the screen"""
-        if not Preferences.showShadows:
+        if not Internal.Preferences.showShadows:
             return (0, 0)
         lightSourceIndex = LIGHTSOURCES.index(lightSource)
         return self.__shadowOffsets[lightSourceIndex][rotation//90]

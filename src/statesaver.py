@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008,2009,2010 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,10 +18,12 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import QObject, QByteArray, QString, QEvent
+from PyQt4.QtCore import QObject, QByteArray, QEvent
 from PyQt4.QtGui import QSplitter, QHeaderView
-from util import english
-from common import Preferences, isAlive
+
+from qt import QString
+from log import english
+from common import Internal, isAlive
 
 class StateSaver(QObject):
     """saves and restores the state for widgets"""
@@ -37,9 +39,9 @@ class StateSaver(QObject):
         for widget in what:
             name = self.__generateName(widget)
             self.widgets.append((name, widget))
-            Preferences.addString('States', name)
+            Internal.Preferences.addString('States', name)
         for name, widget in self.widgets:
-            oldState = QByteArray.fromHex(Preferences[name])
+            oldState = QByteArray.fromHex(Internal.Preferences[name])
             if isinstance(widget, (QSplitter, QHeaderView)):
                 widget.restoreState(oldState)
             else:
@@ -48,16 +50,20 @@ class StateSaver(QObject):
     @staticmethod
     def __generateName(widget):
         """generate a name for this widget to be used in the config file"""
+        orgWidget = widget
         name = english(widget.objectName())
         if not name:
             while widget.parentWidget():
                 name = widget.__class__.__name__ + name
                 widget = widget.parentWidget()
-                widgetName = english(widget.parentWidget().objectName())
-                if widgetName:
-                    name = widgetName + name
-                    break
-        return name
+                if widget.parentWidget():
+                    widgetName = english(widget.parentWidget().objectName())
+                    if widgetName:
+                        name = widgetName + name
+                        break
+        if not name:
+            name = orgWidget.__class__.__name__
+        return str(name)
 
     def eventFilter(self, dummyWatched, event):
         """if the watched widget hides, save its state.
@@ -81,7 +87,7 @@ class StateSaver(QObject):
         """execute all registered savers and write states to config file"""
         for saver in StateSaver.savers.values():
             saver.save()
-        Preferences.writeConfig()
+        Internal.Preferences.writeConfig()
 
     def save(self):
         """writes the state into Preferences, but does not save"""
@@ -91,4 +97,4 @@ class StateSaver(QObject):
                     saveMethod = widget.saveState
                 else:
                     saveMethod = widget.saveGeometry
-                Preferences[name] = QString(saveMethod().toHex())
+                Internal.Preferences[name] = QString(saveMethod().toHex())

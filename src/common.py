@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,15 +21,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from __future__ import print_function
 
 from collections import defaultdict
+import datetime
 
-import sip
-import traceback
+try:
+    from sip import unwrapinstance
+except ImportError:
+    def unwrapinstance(dummy):
+        """if there is no sip, we have no Qt objects anyway"""
+        pass
+import platform
 
-# common must not import util
-
-Preferences = None # pylint: disable=invalid-name
-# pylint - just like Debug, Options
-# Preferences being a class or an instance is irrelevant for the user
+# pylint: disable=invalid-name
+if platform.python_version_tuple()[0] == '3':
+    # pylint: disable=redefined-builtin
+    unicode = str
+    basestring = str
+    isPython3 = True
+else:
+    # pylint: disable=redefined-builtin
+    unicode = unicode
+    basestring = basestring
+    isPython3 = False
 
 WINDS = 'ESWN'
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
@@ -42,7 +54,7 @@ def isAlive(qobj):
     if qobj is None:
         return False
     try:
-        sip.unwrapinstance(qobj)
+        unwrapinstance(qobj)
     except RuntimeError:
         return False
     else:
@@ -55,6 +67,7 @@ class Debug(object):
     connections = False
     traffic = False
     process = False
+    time = False
     sql = False
     animation = '' # 'yeysywynfefsfwfn'
     animationSpeed = False
@@ -69,7 +82,7 @@ class Debug(object):
     chat = False
     argString = None
     scores = False
-    handCache = False
+    hand = False
     explain = False
     random = False
     deferredBlock = False
@@ -77,6 +90,12 @@ class Debug(object):
     events = ''
     table = False
     gc = False
+    delayChow = False
+    locate = False
+    neutral = False  # only neutral comparable debug output
+    git = False
+    ruleCache = False
+    quit = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
@@ -118,15 +137,16 @@ Options {stropt} take a string argument like {example}""".format(
                 return '--debug: unknown option %s' % option
             if type(Debug.__dict__[option]) != type(value):
                 return '--debug: wrong value for option %s' % option
-            type.__setattr__(Debug, option, value)
+            if option != 'scores' or not Internal.isServer:
+                type.__setattr__(Debug, option, value)
+        if Debug.time:
+            Debug.time = datetime.datetime.now()
 
 class FixedClass(type):
     """Metaclass: after the class variable fixed is set to True,
     all class variables become immutable"""
     def __setattr__(cls, key, value):
         if cls.fixed:
-            for line in traceback.format_stack()[:-2]:
-                print(line, end='')
             raise SystemExit('{cls}.{key} may not be changed'.format(cls=cls.__name__, key=key))
         else:
             type.__setattr__(cls, key, value)
@@ -139,6 +159,7 @@ class Options(object):
     showRulesets = False
     rulesetName = None	# will only be set by command line --ruleset
     ruleset = None # from rulesetName
+    rounds = None
     host = None
     player = None
     dbPath = None
@@ -167,22 +188,19 @@ class SingleshotOptions(object):
 
 class Internal(object):
     """global things"""
-    version = '4.11.0'
+    Preferences = None
+    version = '4.13.0'
     logPrefix = 'C'
     isServer = False
     scaleScene = True
     reactor = None
     app = None
-    dbIdent = None
-    field = None
+    db = None
+    scene = None
+    mainWindow = None
     game = None
     autoPlay = False
     quitWaitTime = 0 # in milliseconds
-    try:
-        from PyKDE4.kdeui import KMessageBox
-        haveKDE = True
-    except BaseException:
-        haveKDE = False
 
     def __init__(self):
         raise Exception('Internal is not meant to be instantiated')
@@ -270,7 +288,9 @@ class IntDict(defaultdict):
         defaultdict.clear(self)
 
     def __str__(self):
-        return str(dict(self))
+        """sort the result for better log comparison"""
+        keys = sorted(self.keys())
+        return ', '.join('{}:{}'.format(x, self[x]) for x in keys)
 
     def __repr__(self):
         return "<IntDict: %s>" % self

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2010-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2010-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,11 +25,10 @@ if os.name == 'nt':
     import winsound # pylint: disable=import-error
 
 from common import Debug, Internal
-from util import which, logWarning, m18n, cacheDir, logDebug, \
-    removeIfExists, logException, uniqueList
+from util import which, removeIfExists, uniqueList
+from log import logWarning, m18n, logDebug, logException
 
-if Internal.haveKDE:
-    from kde import KGlobal, KConfigGroup
+from kde import KGlobal, cacheDir
 
 from tile import Tile
 
@@ -87,7 +86,7 @@ class Sound(object):
                 except OSError:
                     pass
                 if Debug.sound:
-                    game = Internal.field.game
+                    game = Internal.scene.game
                     game.debug('10 seconds passed. Killing %s' % process.name)
             else:
                 remaining.append(process)
@@ -98,7 +97,7 @@ class Sound(object):
         """this is what the user of this module will call."""
         if not Sound.enabled:
             return
-        game = Internal.field.game
+        game = Internal.scene.game
         reactor = Internal.reactor
         if game and not game.autoPlay and Sound.playProcesses:
             # in normal play, wait a moment between two speaks. Otherwise
@@ -194,16 +193,15 @@ class Voice(object):
     @staticmethod
     def availableVoices():
         """a list of all voice directories"""
-        if not Voice.__availableVoices and Internal.haveKDE:
+        if not Voice.__availableVoices:
             result = []
             for parentDirectory in KGlobal.dirs().findDirs("appdata", "voices"):
                 parentDirectory = unicode(parentDirectory)
                 for (dirpath, _, _) in os.walk(parentDirectory, followlinks=True):
                     if os.path.exists(os.path.join(dirpath, 's1.ogg')):
                         result.append(Voice(dirpath))
-            config = KGlobal.config()
-            group = KConfigGroup(config, 'Locale')
-            prefLanguages = uniqueList(':'.join(['local', str(group.readEntry('Language')), 'en_uS']).split(':'))
+            group = KGlobal.config().group('Locale')
+            prefLanguages = uniqueList(':'.join(['local', str(group.readEntry('Language')), 'en_US']).split(':'))
             prefLanguages = dict((x[1], x[0]) for x in enumerate(prefLanguages))
             result = sorted(result, key=lambda x: prefLanguages.get(x.language(), 9999))
             if Debug.sound:

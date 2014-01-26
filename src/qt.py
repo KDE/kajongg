@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2009-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2013-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,15 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-
-The DBPasswordChecker is based on an example from the book
-Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
-O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-from server import kajonggServer
-from util import checkMemory
+# pylint: disable=unused-import
 
-kajonggServer()
-checkMemory()
-# profileMe()
+try:
+    from PyQt4.QtCore import QString
+except ImportError:
+    # no QString? Must be python3
+    QString = str # pylint: disable=invalid-name

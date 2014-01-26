@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ from PyQt4.QtCore import Qt, QVariant, QAbstractTableModel, QModelIndex
 from PyQt4.QtGui import QLabel, QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
-from util import m18n, m18nc
+from log import m18n, m18nc
 from statesaver import StateSaver
 from guiutil import ListComboBox, MJTableView
 from common import Debug
@@ -92,7 +92,9 @@ class RulesetDiffer(QDialog):
         for left in leftRulesets:
             for right in rightRulesets[:]:
                 if left == right and left.name == right.name:
-                    rightRulesets.remove(right)
+                    # rightRulesets.remove(right) this is wrong because it removes the
+                    # first ruleset with the same hash
+                    rightRulesets = list(x for x in rightRulesets if id(x) != id(right))
         self.leftRulesets = leftRulesets
         self.rightRulesets = rightRulesets
         self.model = None

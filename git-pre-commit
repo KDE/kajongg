@@ -113,12 +113,19 @@ do
 	pylint -s y --reports=n $file
 	result=$?
 	echo done
-	if [ $result -ne 0 ]
-	then
-		echo "pylint must be quiet"
-		exit $result
-	fi
+	[ $result -ne 0 ] && break
 done
+if [ $result -ne 0 ]
+then
+	echo "trying pylint over all source files"
+	pylint -s y --reports=n *y
+	result=$?
+fi
+if [ $result -ne 0 ]
+then
+	echo "pylint must be quiet"
+	exit $result
+fi
 ./scoringtest.py
 
 result=$?

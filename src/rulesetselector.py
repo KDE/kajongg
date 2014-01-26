@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-    Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     partially based on C++ code from:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
@@ -25,12 +25,15 @@ from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
 from PyQt4.QtCore import QModelIndex
-from rule import Ruleset, PredefinedRuleset, Rule
-from util import m18n, m18nc, english, uniqueList
+from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, \
+    IntRule, BoolRule, StrRule
+from util import uniqueList
+from log import m18n, m18nc, english
 from differ import RulesetDiffer
 from common import Debug
 from tree import TreeItem, RootItem, TreeModel
-from kde import Sorry, KApplication
+from kde import KApplication
+from dialogs import Sorry
 from modeltest import ModelTest
 from genericdelegates import RightAlignedCheckboxDelegate
 from statesaver import StateSaver
@@ -111,7 +114,7 @@ class RuleItem(RuleTreeItem):
         if column == 0:
             return m18n(content.name)
         else:
-            if content.parType:
+            if isinstance(content, ParameterRule):
                 if column == 1:
                     return content.parameter
             else:
@@ -167,7 +170,7 @@ class RuleModel(TreeModel):
             item = index.internalPointer()
             if role in (Qt.DisplayRole, Qt.EditRole):
                 if index.column() == 1:
-                    if isinstance(item, RuleItem) and item.rawContent.parType is bool:
+                    if isinstance(item, RuleItem) and isinstance(item.rawContent, BoolRule):
                         return QVariant('')
                 showValue = item.content(index.column())
                 if isinstance(showValue, basestring) and showValue.endswith('.0'):
@@ -203,7 +206,7 @@ class RuleModel(TreeModel):
         if index.column() != 1:
             return False
         item = index.internalPointer()
-        return isinstance(item, RuleItem) and item.rawContent.parType is bool
+        return isinstance(item, RuleItem) and isinstance(item.rawContent, BoolRule)
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
@@ -233,11 +236,12 @@ class RuleModel(TreeModel):
         rulesetItems = list([RulesetItem(ruleset)])
         self.insertRows(row, rulesetItems, parent)
         rulesetIndex = self.index(row, 0, parent)
-        ruleListItems = list([RuleListItem(x) for x in ruleset.ruleLists])
+        ruleLists = list(x for x in ruleset.ruleLists if len(x))
+        ruleListItems = list([RuleListItem(x) for x in ruleLists])
         for item in ruleListItems:
             item.colCount = self.rootItem.columnCount()
         self.insertRows(0, ruleListItems, rulesetIndex)
-        for ridx, ruleList in enumerate(ruleset.ruleLists):
+        for ridx, ruleList in enumerate(ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
             ruleItems = list([RuleItem(x) for x in ruleList if not 'internal' in x.options])
             self.insertRows(0, ruleItems, listIndex)
@@ -255,15 +259,15 @@ class EditableRuleModel(RuleModel):
             if content.name != english(name):
                 dirty = True
                 content.name = english(name)
-        elif column == 1 and content.parType:
+        elif column == 1 and isinstance(content, ParameterRule):
             oldParameter = content.parameter
-            if content.parType is int:
+            if isinstance(content, IntRule):
                 if content.parameter != value.toInt()[0]:
                     dirty = True
                     content.parameter = value.toInt()[0]
-            elif content.parType is bool:
+            elif isinstance(content, BoolRule):
                 return False
-            elif content.parType is unicode:
+            elif isinstance(content, StrRule):
                 if content.parameter != unicode(value.toString()):
                     dirty = True
                     content.parameter = unicode(value.toString())
@@ -271,7 +275,7 @@ class EditableRuleModel(RuleModel):
                 if content.parameter != unicode(value.toString()):
                     dirty = True
                     content.parameter = unicode(value.toString())
-            message = content.validateParameter()
+            message = content.validate()
             if message:
                 content.parameter = oldParameter
                 dirty = False
@@ -297,7 +301,7 @@ class EditableRuleModel(RuleModel):
                     oldName = content.name
                     content.rename(english(name))
                     dirty = oldName != content.name
-                elif isinstance(content, Rule):
+                elif isinstance(content, RuleBase):
                     dirty, message = self.__setRuleData(column, content, value)
                     if message:
                         Sorry(message)
@@ -305,17 +309,16 @@ class EditableRuleModel(RuleModel):
                 else:
                     return False
             elif role == Qt.CheckStateRole:
-                if isinstance(content, Rule) and column ==1:
+                if isinstance(content, BoolRule) and column ==1:
                     if not isinstance(ruleset, PredefinedRuleset):
-                        if content.parType is bool:
-                            newValue = value == Qt.Checked
-                            if content.parameter != newValue:
-                                dirty = True
-                                content.parameter = newValue
+                        newValue = value == Qt.Checked
+                        if content.parameter != newValue:
+                            dirty = True
+                            content.parameter = newValue
                 else:
                     return False
             if dirty:
-                if isinstance(content, Rule):
+                if isinstance(content, RuleBase):
                     ruleset.updateRule(content)
                 self.dataChanged.emit(index, index)
             return True
@@ -332,9 +335,9 @@ class EditableRuleModel(RuleModel):
         checkable = False
         if isinstance(content, Ruleset) and column == 0:
             mayEdit = True
-        elif isinstance(content, Rule):
-            checkable = column == 1 and content.parType is bool
-            mayEdit = column
+        elif isinstance(content, RuleBase):
+            checkable = column == 1 and isinstance(content, BoolRule)
+            mayEdit = bool(column)
         else:
             mayEdit = False
         mayEdit = mayEdit and not isinstance(item.ruleset(), PredefinedRuleset)
@@ -361,7 +364,7 @@ class RuleTreeView(QTreeView):
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.ruleModel = None
         self.ruleModelTest = None
-        self.rulesets = []
+        self.rulesets = [] # nasty: this generates self.ruleModel
         self.differs = []
 
     def dataChanged(self, dummyIndex1, dummyIndex2):
@@ -388,14 +391,15 @@ class RuleTreeView(QTreeView):
                 self.ruleModelTest = ModelTest(self.ruleModel, self)
             self.show()
 
-    def selectionChanged(self, selected, dummyDeselected):
+    def selectionChanged(self, selected, dummyDeselected=None):
         """update editing buttons"""
         enableCopy = enableRemove = enableCompare = False
         if selected.indexes():
             item = selected.indexes()[0].internalPointer()
             isPredefined = isinstance(item.ruleset(), PredefinedRuleset)
             if isinstance(item, RulesetItem):
-                enableCopy = enableCompare = True
+                enableCompare = True
+                enableCopy = sum(x.hash == item.ruleset().hash for x in self.ruleModel.rulesets) == 1
                 enableRemove = not isPredefined
         if self.btnCopy:
             self.btnCopy.setEnabled(enableCopy)
@@ -428,11 +432,13 @@ class RuleTreeView(QTreeView):
     def copyRow(self):
         """copy a ruleset"""
         row = self.selectedRow()
-        if not row:
-            return
-        item = row.internalPointer()
-        assert isinstance(item, RulesetItem)
-        self.model().appendRuleset(item.rawContent.copy(minus=True))
+        if row:
+            item = row.internalPointer()
+            assert isinstance(item, RulesetItem)
+            ruleset = item.rawContent.copyTemplate()
+            self.model().appendRuleset(ruleset)
+            self.rulesets.append(ruleset)
+            self.selectionChanged(self.selectionModel().selection())
 
     def removeRow(self):
         """removes a ruleset or a rule"""
@@ -441,7 +447,10 @@ class RuleTreeView(QTreeView):
             item = row.internalPointer()
             assert not isinstance(item.ruleset(), PredefinedRuleset)
             assert isinstance(item, RulesetItem)
+            ruleset = item.ruleset()
             self.model().removeRows(row.row(), parent=row.parent())
+            self.rulesets.remove(ruleset)
+            self.selectionChanged(self.selectionModel().selection())
 
     def compareRow(self):
         """shows the difference between two rulesets"""

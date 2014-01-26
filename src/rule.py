@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Copyright (C) 2009-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+"""Copyright (C) 2009-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,15 +21,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 Read the user manual for a description of the interface to this scoring engine
 """
 
-import re # the new regex is about 7% faster
+import types
 from hashlib import md5
 
 from PyQt4.QtCore import QVariant
 
-from util import m18n, m18nc, m18nE, english, logException
-from query import Query, Transaction
-
-import rulecode
+from common import Internal, Debug, unicode # pylint: disable=redefined-builtin
+from log import m18n, m18nc, m18nE, english, logException
+from query import Query
 
 class Score(object):
     """holds all parts contributing to a score. It has two use cases:
@@ -126,8 +125,6 @@ class Score(object):
 
     def total(self):
         """the total score"""
-        if self.ruleset is None:
-            raise Exception('Score.total: ruleset unknown for %s' % self)
         score = int(self.points * ( 2 ** self.doubles))
         if self.limits:
             if self.limits >= 1:
@@ -138,7 +135,7 @@ class Score(object):
                 self.limits = 0
         if self.limits:
             return int(round(self.limits * self.ruleset.limit))
-        if not self.ruleset.roofOff:
+        if score and not self.ruleset.roofOff:
             score = min(score, self.ruleset.limit)
         return score
 
@@ -169,7 +166,7 @@ class RuleList(list):
 
     def __contains__(self, key):
         """do we know this rule?"""
-        if isinstance(key, Rule):
+        if isinstance(key, RuleBase):
             key = key.key()
         return any(x.key() == key for x in self)
 
@@ -184,7 +181,6 @@ class RuleList(list):
 
     def __setitem__(self, key, rule):
         """set rule by key"""
-        assert isinstance(rule, Rule)
         if isinstance(key, int):
             list.__setitem__(self, key, rule)
             return
@@ -216,8 +212,48 @@ class RuleList(list):
                 rule.key(), self[rule.key()].definition, rule.name, rule.definition))
         self[rule.key()] = rule
 
+    def createRule(self, name, definition='', **kwargs):
+        """shortcut for simpler definition of predefined rulesets"""
+        defParts = definition.split('||')
+        rule = None
+        description = kwargs.get('description', '')
+        for cls in [IntRule, BoolRule, StrRule]:
+            if defParts[0].startswith(cls.prefix):
+                rule = cls(name, definition, description=description, parameter=kwargs['parameter'])
+                break
+        if not rule:
+            if 'parameter' in kwargs:
+                del kwargs['parameter']
+            ruleType = type(str(ruleKey(name)) + 'Rule', (Rule, ), {})
+            rule = ruleType(name, definition, **kwargs)
+            if defParts[0] == 'FCallingHand':
+                parts1 = defParts[1].split('=')
+                assert parts1[0] == 'Ohand', definition
+                ruleClassName = parts1[1] + 'Rule'
+                if ruleClassName not in RuleBase.ruleClasses:
+                    print('we want %s, definition:%s' % (ruleClassName, definition))
+                    print('we have %s' % RuleBase.ruleClasses.keys())
+                ruleType.limitHand = RuleBase.ruleClasses[ruleClassName]
+        self.add(rule)
+
+class UsedRule(object):
+    """use this in scoring, never change class Rule.
+    If the rule has been used for a meld, pass it"""
+    def __init__(self, rule, meld=None):
+        self.rule = rule
+        self.meld = meld
+
+    def __str__(self):
+        result = self.rule.name
+        if self.meld:
+            result += ' ' + str(self.meld)
+        return result
+
+    def __repr__(self):
+        return 'UsedRule(%s)' % str(self)
+
 class Ruleset(object):
-    """holds a full set of rules: splitRules,meldRules,handRules,winnerRules.
+    """holds a full set of rules: meldRules,handRules,winnerRules.
 
         predefined rulesets are preinstalled together with kajongg. They can be customized by the user:
         He can copy them and modify the copies in any way. If a game uses a specific ruleset, it
@@ -231,10 +267,16 @@ class Ruleset(object):
         all of its rules. This excludes the splitting rules, IOW exactly the rules saved in the table
         rule will be used for computation.
 
-        Rulesets which are templates for new games have negative ids.
+        Rulesets which are templates for new games have negative ids: The ruleset editor only reads
+        and writes rulesets with negative id.
         Rulesets attached to a game have positive ids.
+        This can lead to a situation where the same ruleset is twice in the table:
+        1. clear database
+        2. play ruleset X which saves it with id=1
+        3. in the ruleset editor, copy X which saves it with id=-1 and name='Copy of X'
 
-        The name is not unique.
+        The name is not unique. Different remote players might save different rulesets
+        under the same name.
     """
     # pylint: disable=too-many-instance-attributes
 
@@ -273,6 +315,7 @@ class Ruleset(object):
             - an integer: ruleset.id from the sql table
             - a list: the full ruleset specification (probably sent from the server)
             - a string: The hash value of a ruleset"""
+        Rule.importRulecode()
         self.name = name
         self.rulesetId = 0
         self.__hash = None
@@ -282,9 +325,9 @@ class Ruleset(object):
         self.__filteredLists = {}
         self.description = None
         self.rawRules = None # used when we get the rules over the network
-        self.splitRules = []
         self.doublingMeldRules = []
         self.doublingHandRules = []
+        self.standardMJRule = None
         self.meldRules = RuleList(1, m18n('Meld Rules'),
             m18n('Meld rules are applied to single melds independent of the rest of the hand'))
         self.handRules = RuleList(2, m18n('Hand Rules'),
@@ -367,39 +410,44 @@ into a situation where you have to pay a penalty"""))
         else:
             raise Exception('ruleset %s not found' % self.name)
 
+    def __setParametersFrom(self, fromRuleset):
+        """sets attributes for parameters defined in fromRuleset.
+        Does NOT overwrite already set parameters: Silently ignore them"""
+        for par in fromRuleset.parameterRules:
+            if isinstance(par, ParameterRule):
+                if par.parName not in self.__dict__:
+                    self.__dict__[par.parName] = par.parameter
+
     def load(self):
         """load the ruleset from the database and compute the hash. Return self."""
         if self.__loaded:
             return self
         self.__loaded = True
-        # we might have introduced new mandatory rules which do
-        # not exist in the rulesets saved with the games, so preload
-        # the default values from any predefined ruleset:
-        # TODO: the ruleset should know from which predefined ruleset it
-        # has been copied - use that one. For now use sorted() here to
-        # avoid random differences
-        if self.rulesetId: # a saved ruleset, do not do this for predefined rulesets
-            predefRuleset = sorted(PredefinedRuleset.rulesets())[0]
-            predefRuleset.load()
-            for par in predefRuleset.parameterRules:
-                self.__dict__[par.parName] = par.parameter
-        self.loadSplitRules()
         self.loadRules()
-        for par in self.parameterRules:
-            self.__dict__[par.parName] = par.parameter
+        self.__setParametersFrom(self)
         for ruleList in self.ruleLists:
             assert len(ruleList) == len(set(x.key() for x in ruleList)), '%s has non-unique key' % ruleList.name
             for rule in ruleList:
-                rule.score.ruleset = self
+                if hasattr(rule, 'score'):
+                    rule.score.ruleset = self
                 self.allRules.append(rule)
+        if self.rulesetId: # a saved ruleset, do not do this for predefined rulesets
+            # we might have introduced new parameter rules which do not exist in this ruleset saved with the game,
+            # so add missing parameters from the predefined ruleset most similar to this one
+            self.__setParametersFrom(sorted(PredefinedRuleset.rulesets(), key=lambda x: len(self.diff(x)))[0])
         self.doublingMeldRules = list(x for x in self.meldRules if x.score.doubles)
         self.doublingHandRules = list(x for x in self.handRules if x.score.doubles)
+        for mjRule in self.mjRules:
+            if mjRule.__class__.__name__ == 'StandardMahJonggRule':
+                self.standardMJRule = mjRule
+                break
+        assert self.standardMJRule
         return self
 
     def __loadQuery(self):
         """returns a Query object with loaded ruleset"""
         return Query(
-            "select ruleset, name, list, position, definition, points, doubles, limits, parameter from rule "
+            "select ruleset, list, position, name, definition, points, doubles, limits, parameter from rule "
                 "where ruleset=%d order by list,position" % self.rulesetId)
 
     def toList(self):
@@ -416,20 +464,17 @@ into a situation where you have to pay a penalty"""))
 
     def __loadRule(self, record):
         """loads a rule into the correct ruleList"""
-        (_, name, listNr, _, definition, points, doubles, limits, parameter) = record
+        _, listNr, _, name, definition, points, doubles, limits, parameter = record
+        try:
+            points = int(points)
+        except ValueError:
+            # this happens if the unit changed from limits to points but the value
+            # is not converted at the same time
+            points = int(float(points))
         for ruleList in self.ruleLists:
             if ruleList.listId == listNr:
-                if ruleList is self.parameterRules:
-                    rule = Rule(name, definition, parameter=parameter)
-                else:
-                    try:
-                        pointValue = int(points)
-                    except ValueError:
-                        # this happens if the unit changed from limits to points but the value
-                        # is not converted at the same time
-                        pointValue = int(float(points))
-                    rule = Rule(name, definition, pointValue, int(doubles), float(limits))
-                ruleList.add(rule)
+                ruleList.createRule(name, definition, points=points, doubles=int(doubles), limits=float(limits),
+                    parameter=parameter)
                 break
 
     def findUniqueOption(self, action):
@@ -439,26 +484,11 @@ into a situation where you have to pay a penalty"""))
         if rulesWithAction:
             return rulesWithAction[0]
 
-    def filterFunctions(self, attrName):
-        """returns all my Function classes having attribute attrName"""
+    def filterRules(self, attrName):
+        """returns all my Rule classes having attribute attrName"""
         if attrName not in self.__filteredLists:
-            functions = (x.function for x in self.allRules if x.function)
-            self.__filteredLists[attrName] = list(x for x in functions if hasattr(x, attrName))
+            self.__filteredLists[attrName] = list(x for x in self.allRules if hasattr(x, attrName))
         return self.__filteredLists[attrName]
-
-    def loadSplitRules(self):
-        """loads the split rules"""
-        self.splitRules.append(Splitter('kong', r'([dwsbc][1-9eswnbrg])([DWSBC][1-9eswnbrg])(\2)(\2)', 4))
-        self.splitRules.append(Splitter('pung', r'([XDWSBC][1-9eswnbrgy])(\1\1)', 3))
-        for chi1 in xrange(1, 8):
-            rule = r'(?P<g>[SBC])(%d)((?P=g)%d)((?P=g)%d) ' % (chi1, chi1+1, chi1+2)
-            self.splitRules.append(Splitter('chow', rule, 3))
-            # discontinuous chow:
-            rule = r'(?P<g>[SBC])(%d).*((?P=g)%d).*((?P=g)%d)' % (chi1, chi1+1, chi1+2)
-            self.splitRules.append(Splitter('chow', rule, 3))
-            self.splitRules.append(Splitter('chow', rule, 3))
-        self.splitRules.append(Splitter('pair', r'([DWSBCdwsbc][1-9eswnbrg])(\1)', 2))
-        self.splitRules.append(Splitter('single', r'(..)', 1))
 
     @staticmethod
     def newId(minus=False):
@@ -502,10 +532,11 @@ into a situation where you have to pay a penalty"""))
         return 'type=%s, id=%d,rulesetId=%d,name=%s' % (
                 type(self), id(self), self.rulesetId, self.name)
 
-    def copy(self, minus=False):
-        """make a copy of self and return the new ruleset id. Returns a new ruleset or None"""
+    def copyTemplate(self):
+        """make a copy of self and return the new ruleset id. Returns the new ruleset.
+        To be used only for ruleset templates"""
         newRuleset = self.clone().load()
-        newRuleset.save(copy=True, minus=minus)
+        newRuleset.save(minus=True, forced=True)
         if isinstance(newRuleset, PredefinedRuleset):
             newRuleset = Ruleset(newRuleset.rulesetId)
         return newRuleset
@@ -521,19 +552,20 @@ into a situation where you have to pay a penalty"""))
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
-        with Transaction():
+        with Internal.db:
             if self.nameExists(newName):
                 return False
             query = Query("update ruleset set name=? where id<0 and name =?",
                 list([newName, self.name]))
-            if query.success:
+            if not query.failure:
                 self.name = newName
-            return query.success
+            return not query.failure
 
     def remove(self):
         """remove this ruleset from the database."""
-        Query(["DELETE FROM rule WHERE ruleset=%d" % self.rulesetId,
-                   "DELETE FROM ruleset WHERE id=%d" % self.rulesetId])
+        with Internal.db:
+            Query("DELETE FROM rule WHERE ruleset=%d" % self.rulesetId)
+            Query("DELETE FROM ruleset WHERE id=%d" % self.rulesetId)
 
     @staticmethod
     def ruleKey(rule):
@@ -550,57 +582,67 @@ into a situation where you have to pay a penalty"""))
         self.__hash = result.hexdigest()
 
     def ruleRecord(self, rule):
-        """returns the rule as tuple, prepared for use by sql"""
+        """returns the rule as tuple, prepared for use by sql. The first three
+        fields are the primary key."""
         score = rule.score
-        definition = rule.definition
-        if rule.parType:
-            parTypeName = rule.parType.__name__
-            if parTypeName == 'unicode':
-                parTypeName = 'str'
-            definition = parTypeName + definition
         ruleList = None
         for ruleList in self.ruleLists:
             if rule in ruleList:
                 ruleIdx = ruleList.index(rule)
                 break
-        assert rule in ruleList
-        return (self.rulesetId, english(rule.name), ruleList.listId, ruleIdx,
-            definition, score.points, score.doubles, score.limits, str(rule.parameter))
+        assert rule in ruleList, '%s: %s not in list %s' % (type(rule), rule, ruleList.name)
+        return (self.rulesetId, ruleList.listId, ruleIdx, rule.name,
+            rule.definition, score.points, score.doubles, score.limits, rule.parameter)
 
     def updateRule(self, rule):
         """update rule in database"""
         self.__hash = None  # invalidate, will be recomputed when needed
-        with Transaction():
-            Query("DELETE FROM rule WHERE ruleset=? and name=?", list([self.rulesetId, english(rule.name)]))
-            self.saveRule(rule)
+        with Internal.db:
+            record = self.ruleRecord(rule)
+            Query("UPDATE rule SET name=?, definition=?, points=?, doubles=?, limits=?, parameter=? "
+                  "WHERE ruleset=? AND list=? AND position=?",
+                  record[3:] + record[:3])
             Query("UPDATE ruleset SET hash=? WHERE id=?", list([self.hash, self.rulesetId]))
 
-    def saveRule(self, rule):
-        """save only rule in database"""
-        Query('INSERT INTO rule(ruleset, name, list, position, definition, '
-                'points, doubles, limits, parameter)'
-                ' VALUES(?,?,?,?,?,?,?,?,?)',
-                self.ruleRecord(rule))
-
-    def save(self, copy=False, minus=False):
+    def save(self, minus=False, forced=False):
         """save the ruleset to the database.
-        copy=True gives it a new id. If the name already exists in the database, also give it a new name"""
-        with Transaction():
-            if copy:
-                self.rulesetId, self.name = self._newKey(minus)
+        If it does not yet exist in database, give it a new id
+        If the name already exists in the database, also give it a new name
+        If the hash already exists in the database, only save if forced=True"""
+        if not forced:
+            if minus:
+                # if we save a template, only check for existing templates. Otherwise this could happen:
+                # clear kajongg.db, play game with DMJL, start ruleset editor, copy DMJL.
+                # since play Game saved the used ruleset with id 1, id 1 is found here and no new
+                # template is generated. Next the ruleset editor shows the original ruleset in italics
+                # and the copy with normal font but identical name, and the copy is never saved.
+                qData = Query("select id from ruleset where hash=? and id<0", list([self.hash])).records
+            else:
+                qData = Query("select id from ruleset where hash=?", list([self.hash])).records
+            if qData:
+                # is already in database
+                self.rulesetId = qData[0][0]
+                return
+        with Internal.db:
+            self.rulesetId, self.name = self._newKey(minus)
             Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
-                list([self.rulesetId, english(self.name), self.hash, self.description]))
-        # do not put this into the transaction, keep it as short as possible. sqlite3/Qt
-        # has problems if two processes are trying to do the same here (kajonggtest)
-        for rule in self.allRules:
-            self.saveRule(rule)
+                list([self.rulesetId, english(self.name), self.hash, self.description]),
+                failSilent=True)
+            cmd = 'INSERT INTO rule(ruleset, list, position, name, definition, ' \
+                    'points, doubles, limits, parameter) VALUES {}'.format(
+                    ', '.join(['(?,?,?,?,?,?,?,?,?)'] * len(self.allRules)))
+            args = sum((list(self.ruleRecord(x)) for x in self.allRules), [])
+            Query(cmd, args)
 
     @staticmethod
     def availableRulesets():
         """returns all rulesets defined in the database plus all predefined rulesets"""
-        # TODO: this is done twice on the client with --demo, why?
         templateIds = (x[0] for x in Query("SELECT id FROM ruleset WHERE id<0").records)
-        return [Ruleset(x) for x in templateIds] + PredefinedRuleset.rulesets()
+        result = [Ruleset(x) for x in templateIds]
+        for predefined in PredefinedRuleset.rulesets():
+            if predefined not in result or predefined.name not in [x.name for x in result]:
+                result.append(predefined)
+        return result
 
     @staticmethod
     def selectableRulesets(server=None):
@@ -651,96 +693,150 @@ into a situation where you have to pay a penalty"""))
             result.append((None, rightDict[rule]))
         return result
 
-class Rule(object):
+class RuleBase(object):
+    """a base for standard Rule and parameter rules IntRule, StrRule, BoolRule"""
+
+    options = {}
+    ruleClasses = {}
+    def __init__(self, name, definition, description):
+        self.__name = name
+        self.definition = definition
+        self.description = description
+        self.hasSelectable = False
+        self.ruleClasses[self.__class__.__name__] = self.__class__
+
+    @property
+    def name(self):
+        """name is readonly"""
+        return self.__name
+
+    def validate(self): # pylint: disable=no-self-use
+        """is the rule valid?"""
+        return True
+
+    def hashStr(self): # pylint: disable=no-self-use
+        """all that is needed to hash this rule"""
+        return ''
+
+    def __str__(self):
+        return self.hashStr()
+
+    def __repr__(self):
+        return self.hashStr()
+
+def ruleKey(name):
+    """the key is used for finding a rule in a RuleList"""
+    return english(name).replace(' ', '').replace('.','')
+
+class Rule(RuleBase):
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
     # pylint: disable=too-many-arguments,too-many-instance-attributes
 
-    def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0, parameter = None,
+    ruleCode = {}
+    limitHand = None
+
+    @classmethod
+    def memoize(cls, func, srcClass):
+        """cache results for func"""
+        code = func.__code__
+        clsMethod = code.co_varnames[0] == 'cls'
+        def wrapper(*args):
+            """closure"""
+            hand = args[1] if clsMethod else args[0]
+            cacheKey = (cls, func.__name__)
+            if cacheKey not in hand.ruleCache:
+                result = func(*args)
+                hand.ruleCache[cacheKey] = result
+                if Debug.ruleCache:
+                    hand.debug('new ruleCache entry for hand %s: %s=%s' % (id(hand)%10000, cacheKey, result))
+                return result
+            else:
+                if Debug.ruleCache:
+                    if hand.ruleCache[cacheKey] != func(*args):
+                        hand.player.game.debug('cacheKey=%s rule=%s func:%s args:%s' % (cacheKey, srcClass, func, args))
+                        hand.player.game.debug('  hand:%s/%s' % (id(hand), hand))
+                        hand.player.game.debug('  cached:%s ' % str(hand.ruleCache[cacheKey]))
+                        hand.player.game.debug('    real:%s ' % str(func(*args)))
+                return hand.ruleCache[cacheKey]
+            return result
+        return classmethod(wrapper) if clsMethod else staticmethod(wrapper)
+
+    def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0,
             description=None, explainTemplate=None, debug=False):
-        self.options = {}
-        self.function = None
+        RuleBase.__init__(self, name, definition, description)
         self.hasSelectable = False
-        self.name = name
         self.explainTemplate = explainTemplate
-        self.description = description
         self.score = Score(points, doubles, limits)
-        self._definition = None
-        self.parName = ''
-        self.parameter = ''
+        self.parameter = 0
         self.debug = debug
-        self.parType = None
-        for parType in [int, unicode, bool]:
-            typeName = parType.__name__
-            if typeName == 'unicode':
-                typeName = 'str'
-            if definition.startswith(typeName):
-                self.parType = parType
-                if parType is bool and type(parameter) in (str, unicode):
-                    parameter = parameter != 'False'
-                self.parameter = parType(parameter)
-                definition = definition[len(typeName):]
-                break
-        self.definition = definition
+        self.__parseDefinition()
+
+    @staticmethod
+    def redirectTo(srcClass, destClass, memoize=False):
+        """inject my static and class methods into destClass,
+        converting methods to staticmethod/classmethod as needed"""
+        # also for inherited methods
+        classes = list(reversed(srcClass.__mro__[:-2]))
+        combinedDict = dict(classes[0].__dict__)
+        for ancestor in classes[1:]:
+            combinedDict.update(ancestor.__dict__)
+        for funcName, method in combinedDict.items():
+            if isinstance(method, (types.FunctionType, classmethod, staticmethod)):
+                if hasattr(method, 'im_func'):
+                    method = method.im_func
+                elif hasattr(method, '__func__'):
+                    method = method.__func__
+                if memoize and method.__name__ in srcClass.cache:
+                    method = destClass.memoize(method, srcClass)
+                else:
+                    if method.__code__.co_varnames[0] == 'cls':
+                        methodType = classmethod
+                    else:
+                        methodType = staticmethod
+                    method = methodType(method)
+                setattr(destClass, funcName, method)
+
+    @classmethod
+    def importRulecode(cls):
+        """for every RuleCode class defined in this module,
+        generate an instance and add it to dict Rule.ruleImpl.
+        Also convert all RuleCode methods into classmethod or staticmethod"""
+        if not cls.ruleCode:
+            import rulecode
+            for ruleClass in rulecode.__dict__.values():
+                if hasattr(ruleClass, "__mro__"):
+                    if ruleClass.__mro__[-2].__name__ == 'RuleCode' and len(ruleClass.__mro__) > 2:
+                        cls.ruleCode[ruleClass.__name__] = ruleClass
+                        # this changes all methods to classmethod or staticmethod
+                        cls.redirectTo(ruleClass, ruleClass)
 
     def key(self):
-        """the key is used for finding a rule in a RuleList. Since we do not
-        want to manually define a unique key for every rule, this is a bit
-        complicated:
-        - if the definition starts with F and contains no ||, key is rule.definition
-          without the leading F
-        - if the definition defines a parameter, the parType at the beginning is stripped
-          and the first part before || is used
-        - otherwise key is rule.name"""
-        if not self._definition:
-            return self.name
-        if self._definition[0] == 'F' and '||' not in self._definition:
-            return self._definition[1:]
-        elif self.parType:
-            return self._definition.split('||')[0]
-        return self.name
+        """the key is used for finding a rule in a RuleList"""
+        return ruleKey(self.name)
 
-    @property
-    def definition(self):
-        """the rule definition. See user manual about ruleset."""
-        if isinstance(self._definition, list):
-            return '||'.join(self._definition)
-        return self._definition
-
-    @definition.setter
-    def definition(self, definition):
-        """setter for definition"""
+    def __parseDefinition(self):
+        """private setter for definition"""
         #pylint: disable=too-many-branches
-        prevDefinition = self.definition
-        self._definition = definition
-        if not definition:
+        if not self.definition:
             return # may happen with special programmed rules
-        variants = definition.split('||')
-        if self.parType:
-            self.parName = variants[0]
-            variants = variants[1:]
-        self.options = {}
-        self.function = None
+        variants = self.definition.split('||')
+        self.__class__.options = {}
         self.hasSelectable = False
         for idx, variant in enumerate(variants):
             if isinstance(variant, (str, unicode)):
                 variant = str(variant)
                 if variant[0] == 'F':
                     assert idx == 0
-                    self.function = rulecode.Function.functions[variant[1:]]()
+                    code = self.ruleCode[variant[1:]]
                     # when executing code for this rule, we do not want
                     # to call those things indirectly
-                    if hasattr(self.function, 'appliesToHand'):
-                        self.appliesToHand = self.function.appliesToHand
-                    if hasattr(self.function, 'appliesToMeld'):
-                        self.appliesToMeld = self.function.appliesToMeld
-                    if hasattr(self.function, 'selectable'):
+                    # pylint: disable=attribute-defined-outside-init
+                    self.redirectTo(code, self.__class__, memoize=True)
+                    if hasattr(code, 'selectable'):
                         self.hasSelectable = True
-                        self.selectable = self.function.selectable
-                    if hasattr(self.function, 'winningTileCandidates'):
-                        self.winningTileCandidates = self.function.winningTileCandidates
                 elif variant[0] == 'O':
                     for action in variant[1:].split():
                         aParts = action.split('=')
@@ -749,42 +845,15 @@ class Rule(object):
                         self.options[aParts[0]] = aParts[1]
                 else:
                     pass
-        if self.function:
-            self.function.options = self.options
-        self.validateDefinition(prevDefinition)
+        self.validate()
 
-    def validateDefinition(self, prevDefinition):
-        """check for validity. If wrong, restore prevDefinition."""
+    def validate(self):
+        """check for validity"""
         payers = int(self.options.get('payers', 1))
         payees = int(self.options.get('payees', 1))
         if not 2 <= payers + payees <= 4:
-            self.definition = prevDefinition
             logException(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                                   self.name, payers, payees, 'payers/payees'))
-
-    def validateParameter(self):
-        """check for validity"""
-        if 'min' in self.options:
-            minValue = self.parType(self.options['min'])
-            if self.parameter < minValue:
-                return m18nc('wrong value for rule', '%1: %2 is too small, minimal value is %3',
-                    m18n(self.name), self.parameter, minValue)
-
-    def appliesToHand(self, dummyHand): # pylint: disable=no-self-use, E0202
-        """does the rule apply to this hand?"""
-        return False
-
-    def selectable(self, dummyHand): # pylint: disable=no-self-use, E0202
-        """does the rule apply to this hand?"""
-        return False
-
-    def appliesToMeld(self, dummyHand, dummyMeld): # pylint: disable=no-self-use, E0202
-        """does the rule apply to this meld?"""
-        return False
-
-    def winningTileCandidates(self, dummyHand): # pylint: disable=no-self-use, E0202
-        """those might be candidates for a calling hand"""
-        return set()
 
     def explain(self, meld):
         """use this rule for scoring"""
@@ -800,21 +869,12 @@ class Rule(object):
     def hashStr(self):
         """all that is needed to hash this rule. Try not to change this to keep
         database congestion low"""
-        result = '%s: %s %s %s' % (self.name, self.parameter, self.definition, self.score)
+        result = '%s: %s %s' % (self.name, self.definition, self.score)
         return result.encode('utf-8')
 
-    def __str__(self):
-        return self.hashStr()
-
-    def __repr__(self):
-        return self.hashStr()
-
     def contentStr(self):
-        """returns a human readable string with the content: score or option value"""
-        if self.parType:
-            return str(self.parameter)
-        else:
-            return self.score.contentStr()
+        """returns a human readable string with the content"""
+        return self.score.contentStr()
 
     @staticmethod
     def exclusive():
@@ -825,33 +885,72 @@ class Rule(object):
         """Rule has a special action not changing the score directly"""
         return bool(any(x not in ['lastsource', 'declaration'] for x in self.options))
 
-class Splitter(object):
-    """a regex with a name for splitting concealed and yet unsplitted tiles into melds"""
-    def __init__(self, name, definition, size):
-        self.name = name
-        self.definition = definition
-        self.size = size
-        self.compiled = re.compile(definition)
+class ParameterRule(RuleBase):
+    """for parameters"""
+    prefix = 0
+    def __init__(self, name, definition, description, parameter):
+        RuleBase.__init__(self, name, definition, description)
+        defParts = definition.split('||')
+        self.parName = defParts[0][len(self.prefix):]
+        self.score = Score()
+        self.parameter = self.convertParameter(parameter)
 
-    def apply(self, split):
-        """work the found melds in reverse order because we remove them from the rest:"""
-        result = []
-        if len(split) >= self.size * 2:
-            for found in reversed(list(self.compiled.finditer(split))):
-                operand = ''
-                for group in found.groups():
-                    if group is not None:
-                        operand += group
-                if len(operand):
-                    result.append(operand)
-                    # remove the found meld from this split
-                    for group in range(len(found.groups()), 0, -1):
-                        start = found.start(group)
-                        end = found.end(group)
-                        split = split[:start] + split[end:]
-        result.reverse()
-        result.append(split) # append always!!!
-        return result
+    def key(self):
+        """the key is used for finding a rule in a RuleList"""
+        return self.parName
+
+    @staticmethod
+    def convertParameter(parameter):
+        """convert string to wanted type"""
+        return parameter
+
+    def hashStr(self):
+        """all that is needed to hash this rule. Try not to change this to keep
+        database congestion low"""
+        result = '%s: %s %s' % (self.name, self.definition, self.parameter)
+        return result.encode('utf-8')
+
+    def contentStr(self):
+        """returns a human readable string with the content"""
+        return str(self.parameter)
+
+class IntRule(ParameterRule):
+    """for int parameters. Duck typing with Rule"""
+    prefix = 'int'
+    def __init__(self, name, definition, description, parameter):
+        ParameterRule.__init__(self, name, definition, description, parameter)
+        self.minimum = 0
+        for defPart in definition.split('||'):
+            if defPart.startswith('Omin='):
+                self.minimum = int(defPart[5:])
+
+    @staticmethod
+    def convertParameter(parameter):
+        """convert string to wanted type"""
+        return int(parameter)
+
+    def validate(self):
+        """is the rule valid?"""
+        if self.parameter < self.minimum:
+            return m18nc('wrong value for rule', '%1: %2 is too small, minimal value is %3',
+                   m18n(self.name), self.parName, self.minimum)
+
+class BoolRule(ParameterRule):
+    """for bool parameters. Duck typing with Rule"""
+    prefix = 'bool'
+    def __init__(self, name, definition, description, parameter):
+        ParameterRule.__init__(self, name, definition, description, parameter)
+
+    @staticmethod
+    def convertParameter(parameter):
+        """convert string to wanted type"""
+        return parameter not in ('false', 'False', False, 0, '0', None, '')
+
+class StrRule(ParameterRule):
+    """for str parameters. Duck typing with Rule"""
+    prefix = 'str'
+    def __init__(self, name, definition, description, parameter):
+        ParameterRule.__init__(self, name, definition, description, parameter)
 
 class PredefinedRuleset(Ruleset):
     """special code for loading rules from program code instead of from the database"""
