@@ -6,7 +6,7 @@ Authors of original libkmahjongg in C++:
     Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
 
 this adapted python code:
-    Copyright (C) 2008-2012 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+    Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
     kajongg is free software you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
