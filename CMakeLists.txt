@@ -51,7 +51,6 @@ src/mainwindow.py
 src/move.py
 src/modeltest.py
 src/playerlist.py
-src/playfield.py
 src/predefined.py
 src/qt4reactor.py
 src/query.py
