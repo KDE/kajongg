@@ -85,7 +85,10 @@ def insertArgs(englishIn, *args):
 def i18n(englishIn, *args):
     """stub"""
     englishIn, args = xToUtf8(englishIn, args)
-    _ = KGlobal.translation.gettext(englishIn).decode('utf-8')
+    if KGlobal.translation:
+        _ = KGlobal.translation.gettext(englishIn).decode('utf-8')
+    else:
+        _ = englishIn
     return insertArgs(_, *args)
 
 ki18n = i18n # pylint: disable=invalid-name
@@ -94,7 +97,10 @@ def i18nc(context, englishIn, *args):
     """The \004 trick is taken from kdecore/localization/gettext.h,
     definition of pgettext_aux"""
     withContext = '\004'.join([context, englishIn])
-    _ = KGlobal.translation.gettext(withContext).decode('utf-8')
+    if KGlobal.translation:
+        _ = KGlobal.translation.gettext(withContext).decode('utf-8')
+    else:
+        _ = withContext
     if '\004' in _:
         # found no translation with context
         result = i18n(englishIn, *args)
@@ -215,10 +221,10 @@ class CaptionMixin(object):
     def setCaption(self, caption):
         """append app name"""
         if caption:
-            if not caption.endswith('Kajongg'):
-                caption += u' – Kajongg'
+            if not caption.endswith(i18n('Kajongg')):
+                caption += u' – {}'.format(i18n('Kajongg'))
         else:
-            caption = 'Kajongg'
+            caption = i18n('Kajongg')
         self.setWindowTitle(caption)
 
 def startHelp():
@@ -651,7 +657,10 @@ class KConfigGroup(object):
         if name in items:
             if self.groupName == 'Locale' and name == 'Language':
                 languages = list(x for x in items[name] if self.__isLanguageInstalled(x))
-                return MyStr(':'.join(languages))
+                if languages:
+                    return MyStr(':'.join(languages))
+                else:
+                    return MyStr(self.__availableLanguages())
             return MyStr(items[name])
         return self.__default(name, default)
 
@@ -696,11 +705,18 @@ class KGlobal(object):
         else:
             languages = None
         resourceDirs = KGlobal.dirs().findResourceDir('locale', '')
-        if resourceDirs:
-            cls.translation = gettext.translation('kajongg', resourceDirs[0], languages=languages)
-            for context in ('libkmahjongg', 'kdelibs4', 'libphonon', 'kio4', 'kdeqt'):
-                cls.translation.add_fallback(gettext.translation(context, resourceDirs[0], languages=languages))
+        if languages:
+            for resourceDir in resourceDirs:
+                cls.translation = gettext.translation('kajongg', resourceDirs[0], languages=languages)
+                for context in ('libkmahjongg', 'kdelibs4', 'libphonon', 'kio4', 'kdeqt', 'libc'):
+                    try:
+                        cls.translation.add_fallback(gettext.translation(context, resourceDir, languages=languages))
+                    except IOError:
+                        # no translation for language/domain available
+                        pass
             cls.translation.install()
+        else:
+            cls.translation = None
 
     @classmethod
     def dirs(cls):
@@ -950,7 +966,7 @@ class AboutKajonggDialog(KDialog):
         hLayout1.addWidget(IconLabel('kajongg', self))
         h1vLayout = QVBoxLayout()
         h1vLayout.addWidget(QLabel('Kajongg'))
-        h1vLayout.addWidget(QLabel('Version %s' % Internal.version))
+        h1vLayout.addWidget(QLabel(i18n('Version %1', Internal.version)))
         underVersions = []
         try:
             versions = subprocess.Popen(['kde4-config', '-v'],
@@ -960,11 +976,11 @@ class AboutKajonggDialog(KDialog):
             versions = dict(x.split(': ') for x in versions)
             underVersions.append('KDE %s' % versions['KDE'])
         except OSError:
-            underVersions.append('KDE (not installed)')
+            underVersions.append(i18n('KDE (not installed)'))
         underVersions.append('Qt %s' % pyqt.QT_VERSION_STR)
         underVersions.append('PyQt %s' % pyqt.PYQT_VERSION_STR)
-        h1vLayout.addWidget(QLabel('Under %s' % ', '.join(underVersions)))
-        h1vLayout.addWidget(QLabel('Not using Python KDE bindings'))
+        h1vLayout.addWidget(QLabel(i18nc('running under version', 'Under %s' % ', '.join(underVersions))))
+        h1vLayout.addWidget(QLabel(i18n('Not using Python KDE bindings')))
         hLayout1.addLayout(h1vLayout)
         spacerItem = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
         hLayout1.addItem(spacerItem)
@@ -994,11 +1010,11 @@ class AboutKajonggDialog(KDialog):
         authorWidget = QWidget()
         authorLayout = QVBoxLayout()
         bugsLabel = QLabel(i18n('Please use <a href="http://bugs.kde.org">http://bugs.kde.org</a> to report bugs.'))
-        bugsLabel.setContentsMargins(4, 2, 0, 4)
+        bugsLabel.setContentsMargins(0, 2, 0, 4)
         bugsLabel.setOpenExternalLinks(True)
         authorLayout.addWidget(bugsLabel)
 
-        titleLabel = QLabel('Authors:')
+        titleLabel = QLabel(i18n('Authors:'))
         authorLayout.addWidget(titleLabel)
 
         for name, description, mail in data.authors():

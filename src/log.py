@@ -140,8 +140,20 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
     # pylint: disable=R0912
     if isinstance(msg, Exception):
-        msg = ' '.join(unicode(x.decode(getpreferredencoding()) \
-             if isinstance(x, str) else unicode(x)) for x in msg.args if x is not None)
+        parts = []
+        for arg in msg.args:
+            if hasattr(arg, 'strerror'):
+                # when using pykde4, this is already translated at this point
+                # but I do not know what it does differently with gettext and if
+                # I can do the same with the python gettext module
+                parts.append('[Errno {}] {}'.format(arg.errno, m18n(arg.strerror)))
+            elif arg is None:
+                pass
+            elif isinstance(arg, str):
+                parts.append(unicode(arg.decode(getpreferredencoding())))
+            else:
+                parts.append(unicode(arg))
+        msg = ' '.join(parts)
     try:
         if isinstance(msg, str):
             msg = unicode(msg, 'utf-8')
