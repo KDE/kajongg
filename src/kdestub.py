@@ -623,7 +623,7 @@ class KConfigGroup(object):
         except NoSectionError:
             return self.__default(name)
         items = dict((x for x in items if x[0].startswith(name)))
-        i18nItems = dict((x for x in items.items() if x[0].startswith(name + '[')))
+        i18nItems = dict(((x[0], x[1].decode('utf-8')) for x in items.items() if x[0].startswith(name + '[')))
         if i18nItems:
             for language in KGlobal.config().group('Locale').readEntry('Language').split(':'):
                 key = '%s[%s]' % (name, language)
@@ -674,7 +674,7 @@ class KGlobal(object):
         cls.dirInstance = KStandardDirs()
         cls.localeInstance = KLocale()
         cls.configInstance = KConfig()
-        languages = cls.configInstance.group('Locale').readEntry('Language')
+        languages = str(cls.configInstance.group('Locale').readEntry('Language'))
         if languages:
             languages = languages.split(':')
         else:
