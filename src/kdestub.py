@@ -42,7 +42,6 @@ except ImportError:
     # pylint: disable=import-error
     from configparser import SafeConfigParser, NoSectionError, NoOptionError
 
-from optparse import OptionParser
 from locale import _parse_localename
 
 # here come the replacements:
@@ -60,7 +59,7 @@ from PyQt4.QtGui import QSizePolicy, QTextBrowser, QFontMetrics, QTextEdit
 
 from qt import QString
 from common import Internal, Debug
-from util import xToUtf8, uniqueList, stack
+from util import xToUtf8
 
 import gettext
 
