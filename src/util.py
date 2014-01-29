@@ -215,14 +215,14 @@ def xToUtf8(msg, args=None):
     if isinstance(msg, unicode):
         msg = msg.encode('utf-8')
     elif not isinstance(msg, str):
-        msg = str(msg)
+        msg = unicode(msg).encode('utf-8')
     if args is not None:
         args = list(args[:])
         for idx, arg in enumerate(args):
             if isinstance(arg, unicode):
                 args[idx] = arg.encode('utf-8')
             elif not isinstance(arg, str):
-                args[idx] = str(arg)
+                args[idx] = unicode(arg).encode('utf-8')
         return msg, args
     else:
         return msg
