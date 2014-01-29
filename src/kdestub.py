@@ -652,13 +652,13 @@ class KConfigGroup(object):
         items = dict((x for x in items if x[0].startswith(name)))
         i18nItems = dict((x for x in items.items() if x[0].startswith(name + '[')))
         if i18nItems:
-            for language in self.config().group('Locale').readEntry('Language').split(':'):
+            for language in KGlobal.config().group('Locale').readEntry('Language').split(':'):
                 key = '%s[%s]' % (name, language)
                 if key in i18nItems:
                     return MyStr(i18nItems[key])
         if name in items:
             if self.groupName == 'Locale' and name == 'Language':
-                languages = list(x for x in items[name] if self.__isLanguageInstalled(x))
+                languages = list(x for x in items[name].split(':') if self.__isLanguageInstalled(x))
                 if languages:
                     return MyStr(':'.join(languages))
                 else:
