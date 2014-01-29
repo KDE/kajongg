@@ -24,18 +24,18 @@
 """
 
 import sip
-from PyQt4 import QtCore
+from PyQt4.QtCore import Qt, QObject, QVariant, QAbstractItemModel, QModelIndex, \
+    QPersistentModelIndex
 
-
-class ModelTest(QtCore.QObject):
+class ModelTest(QObject):
     """tests a model"""
     def __init__(self, _model, parent):
         """
         Connect to all of the models signals, Whenever anything happens recheck everything.
         """
-        QtCore.QObject.__init__(self, parent)
+        QObject.__init__(self, parent)
         self._model = _model
-        self.model = sip.cast(_model, QtCore.QAbstractItemModel)
+        self.model = sip.cast(_model, QAbstractItemModel)
         self.insert = []
         self.remove = []
         self.changing = []
@@ -70,43 +70,43 @@ class ModelTest(QtCore.QObject):
         nonDestructiveBasicTest tries to call a number of the basic functions (not all)
         to make sure the model doesn't outright segfault, testing the functions that makes sense.
         """
-        assert(self.model.buddy(QtCore.QModelIndex()) == QtCore.QModelIndex())
-        self.model.canFetchMore(QtCore.QModelIndex())
-        assert(self.model.columnCount(QtCore.QModelIndex()) >= 0)
-        assert(self.model.data(QtCore.QModelIndex(), QtCore.Qt.DisplayRole) == QtCore.QVariant())
+        assert(self.model.buddy(QModelIndex()) == QModelIndex())
+        self.model.canFetchMore(QModelIndex())
+        assert(self.model.columnCount(QModelIndex()) >= 0)
+        assert(self.model.data(QModelIndex(), Qt.DisplayRole) == QVariant())
         self.fetchingMore = True
-        self.model.fetchMore(QtCore.QModelIndex())
+        self.model.fetchMore(QModelIndex())
         self.fetchingMore = False
-        flags = self.model.flags(QtCore.QModelIndex())
-        assert( int(flags & QtCore.Qt.ItemIsEnabled) == QtCore.Qt.ItemIsEnabled or \
-               int(flags & QtCore.Qt.ItemIsEnabled ) == 0 )
-        self.model.hasChildren(QtCore.QModelIndex())
+        flags = self.model.flags(QModelIndex())
+        assert( int(flags & Qt.ItemIsEnabled) == Qt.ItemIsEnabled or \
+               int(flags & Qt.ItemIsEnabled ) == 0 )
+        self.model.hasChildren(QModelIndex())
         self.model.hasIndex(0, 0)
-        self.model.headerData(0, QtCore.Qt.Horizontal, QtCore.Qt.DisplayRole)
-        self.model.index(0, 0, QtCore.QModelIndex())
-        self.model.itemData(QtCore.QModelIndex())
-        cache = QtCore.QVariant()
-        self.model.match(QtCore.QModelIndex(), -1, cache)
+        self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole)
+        self.model.index(0, 0, QModelIndex())
+        self.model.itemData(QModelIndex())
+        cache = QVariant()
+        self.model.match(QModelIndex(), -1, cache)
         self.model.mimeTypes()
-        assert(self.model.parent(QtCore.QModelIndex()) == QtCore.QModelIndex())
-        assert(self.model.rowCount(QtCore.QModelIndex()) >= 0)
-        variant = QtCore.QVariant()
-        self.model.setData(QtCore.QModelIndex(), variant, -1)
-        self.model.setHeaderData(-1, QtCore.Qt.Horizontal, QtCore.QVariant())
-        self.model.setHeaderData(0, QtCore.Qt.Horizontal, QtCore.QVariant())
-        self.model.setHeaderData(999999, QtCore.Qt.Horizontal, QtCore.QVariant())
-        self.model.sibling(0, 0, QtCore.QModelIndex())
-        self.model.span(QtCore.QModelIndex())
+        assert(self.model.parent(QModelIndex()) == QModelIndex())
+        assert(self.model.rowCount(QModelIndex()) >= 0)
+        variant = QVariant()
+        self.model.setData(QModelIndex(), variant, -1)
+        self.model.setHeaderData(-1, Qt.Horizontal, QVariant())
+        self.model.setHeaderData(0, Qt.Horizontal, QVariant())
+        self.model.setHeaderData(999999, Qt.Horizontal, QVariant())
+        self.model.sibling(0, 0, QModelIndex())
+        self.model.span(QModelIndex())
         self.model.supportedDropActions()
 
     def rowCount(self):
         """
-        Tests self.model's implementation of QtCore.QAbstractItemModel::rowCount() and hasChildren()
+        Tests self.model's implementation of QAbstractItemModel::rowCount() and hasChildren()
 
         self.models that are dynamically populated are not as fully tested here.
         """
         # check top row
-        topindex = self.model.index(0, 0, QtCore.QModelIndex())
+        topindex = self.model.index(0, 0, QModelIndex())
         rows = self.model.rowCount(topindex)
         assert(rows >= 0)
         if rows > 0:
@@ -125,10 +125,10 @@ class ModelTest(QtCore.QObject):
 
     def columnCount(self):
         """
-        Tests self.model's implementation of QtCore.QAbstractItemModel::columnCount() and hasChildren()
+        Tests self.model's implementation of QAbstractItemModel::columnCount() and hasChildren()
         """
         # check top row
-        topidx = self.model.index(0, 0, QtCore.QModelIndex())
+        topidx = self.model.index(0, 0, QModelIndex())
         assert(self.model.columnCount(topidx) >= 0)
 
         # check a column count where parent is valid
@@ -141,15 +141,15 @@ class ModelTest(QtCore.QObject):
 
     def hasIndex(self):
         """
-        Tests self.model's implementation of QtCore.QAbstractItemModel::hasIndex()
+        Tests self.model's implementation of QAbstractItemModel::hasIndex()
         """
         # Make sure that invalid values returns an invalid index
         assert(self.model.hasIndex(-2, -2) == False)
         assert(self.model.hasIndex(-2, 0) == False)
         assert(self.model.hasIndex(0, -2) == False)
 
-        rows = self.model.rowCount(QtCore.QModelIndex())
-        cols = self.model.columnCount(QtCore.QModelIndex())
+        rows = self.model.rowCount(QModelIndex())
+        cols = self.model.columnCount(QModelIndex())
 
         # check out of bounds
         assert(self.model.hasIndex(rows, cols) == False)
@@ -163,26 +163,26 @@ class ModelTest(QtCore.QObject):
 
     def index(self):
         """
-        Tests self.model's implementation of QtCore.QAbstractItemModel::index()
+        Tests self.model's implementation of QAbstractItemModel::index()
         """
         # Make sure that invalid values returns an invalid index
-        assert(self.model.index(-2, -2, QtCore.QModelIndex()) == QtCore.QModelIndex())
-        assert(self.model.index(-2, 0, QtCore.QModelIndex()) == QtCore.QModelIndex())
-        assert(self.model.index(0, -2, QtCore.QModelIndex()) == QtCore.QModelIndex())
+        assert(self.model.index(-2, -2, QModelIndex()) == QModelIndex())
+        assert(self.model.index(-2, 0, QModelIndex()) == QModelIndex())
+        assert(self.model.index(0, -2, QModelIndex()) == QModelIndex())
 
-        rows = self.model.rowCount(QtCore.QModelIndex())
-        cols = self.model.columnCount(QtCore.QModelIndex())
+        rows = self.model.rowCount(QModelIndex())
+        cols = self.model.columnCount(QModelIndex())
 
         if rows == 0:
             return
 
         # Catch off by one errors
-        assert(self.model.index(rows, cols, QtCore.QModelIndex()) == QtCore.QModelIndex())
-        assert(self.model.index(0, 0, QtCore.QModelIndex()).isValid() == True)
+        assert(self.model.index(rows, cols, QModelIndex()) == QModelIndex())
+        assert(self.model.index(0, 0, QModelIndex()).isValid() == True)
 
         # Make sure that the same index is *always* returned
-        idx1 = self.model.index(0, 0, QtCore.QModelIndex())
-        idx2 = self.model.index(0, 0, QtCore.QModelIndex())
+        idx1 = self.model.index(0, 0, QModelIndex())
+        idx2 = self.model.index(0, 0, QModelIndex())
         assert(idx1==idx2)
 
         # index() is tested more extensively in checkChildren()
@@ -190,13 +190,13 @@ class ModelTest(QtCore.QObject):
 
     def parent(self):
         """
-        Tests self.model's implementation of QtCore.QAbstractItemModel::parent()
+        Tests self.model's implementation of QAbstractItemModel::parent()
         """
-        # Make sure the self.model wont crash and will return an invalid QtCore.QModelIndex
+        # Make sure the self.model wont crash and will return an invalid QModelIndex
         # when asked for the parent of an invalid index
-        assert(self.model.parent(QtCore.QModelIndex()) == QtCore.QModelIndex())
+        assert(self.model.parent(QModelIndex()) == QModelIndex())
 
-        if self.model.rowCount(QtCore.QModelIndex()) == 0:
+        if self.model.rowCount(QModelIndex()) == 0:
             return
 
         # Column 0              | Column 1  |
@@ -206,8 +206,8 @@ class ModelTest(QtCore.QObject):
 
         # Common error test #1, make sure that a top level index has a parent
         # that is an invalid QtCore.Qself.modelIndex
-        topidx = self.model.index(0, 0, QtCore.QModelIndex())
-        assert(self.model.parent(topidx) == QtCore.QModelIndex())
+        topidx = self.model.index(0, 0, QModelIndex())
+        assert(self.model.parent(topidx) == QModelIndex())
 
         # Common error test #2, make sure that a second level index has a parent
         # that is the first level index
@@ -218,7 +218,7 @@ class ModelTest(QtCore.QObject):
         # Common error test #3, the second column should NOT have the same children
         # as the first column in a row
         # Usually the second column shouldn't have children
-        topidx1 = self.model.index(0, 1, QtCore.QModelIndex())
+        topidx1 = self.model.index(0, 1, QModelIndex())
         if self.model.rowCount(topidx1) > 0:
             childidx = self.model.index(0, 0, topidx)
             childidx1 = self.model.index(0, 0, topidx1)
@@ -226,66 +226,66 @@ class ModelTest(QtCore.QObject):
 
         # Full test, walk n levels deep through the self.model making sure that all
         # parent's children correctly specify their parent
-        self.checkChildren(QtCore.QModelIndex())
+        self.checkChildren(QModelIndex())
 
     def data(self):
         """
-        Tests self.model's implementation of QtCore.QAbstractItemModel::data()
+        Tests self.model's implementation of QAbstractItemModel::data()
         """
         # Invalid index should return an invalid qvariant
-        assert( not self.model.data(QtCore.QModelIndex(), QtCore.Qt.DisplayRole).isValid())
+        assert( not self.model.data(QModelIndex(), Qt.DisplayRole).isValid())
 
-        if self.model.rowCount(QtCore.QModelIndex()) == 0:
+        if self.model.rowCount(QModelIndex()) == 0:
             return
 
-        # A valid index should have a valid QtCore.QVariant data
-        assert( self.model.index(0, 0, QtCore.QModelIndex()).isValid())
+        # A valid index should have a valid QVariant data
+        assert( self.model.index(0, 0, QModelIndex()).isValid())
 
         # shouldn't be able to set data on an invalid index
-        assert( self.model.setData( QtCore.QModelIndex(), QtCore.QVariant("foo"), QtCore.Qt.DisplayRole) == False)
+        assert( self.model.setData( QModelIndex(), QVariant("foo"), Qt.DisplayRole) == False)
 
         # General Purpose roles that should return a QString
-        variant = self.model.data(self.model.index(0, 0, QtCore.QModelIndex()), QtCore.Qt.ToolTipRole)
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.ToolTipRole)
         if variant.isValid():
-            assert( variant.canConvert( QtCore.QVariant.String ) )
-        variant = self.model.data(self.model.index(0, 0, QtCore.QModelIndex()), QtCore.Qt.StatusTipRole)
+            assert( variant.canConvert( QVariant.String ) )
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.StatusTipRole)
         if variant.isValid():
-            assert( variant.canConvert( QtCore.QVariant.String ) )
-        variant = self.model.data(self.model.index(0, 0, QtCore.QModelIndex()), QtCore.Qt.WhatsThisRole)
+            assert( variant.canConvert( QVariant.String ) )
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.WhatsThisRole)
         if variant.isValid():
-            assert( variant.canConvert( QtCore.QVariant.String ) )
+            assert( variant.canConvert( QVariant.String ) )
 
         # General Purpose roles that should return a QSize
-        variant = self.model.data(self.model.index(0, 0, QtCore.QModelIndex()), QtCore.Qt.SizeHintRole)
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.SizeHintRole)
         if variant.isValid():
-            assert( variant.canConvert( QtCore.QVariant.Size ) )
+            assert( variant.canConvert( QVariant.Size ) )
 
         # General Purpose roles that should return a QFont
-        variant = self.model.data(self.model.index(0, 0, QtCore.QModelIndex()), QtCore.Qt.FontRole)
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.FontRole)
         if variant.isValid():
-            assert( variant.canConvert( QtCore.QVariant.Font ) )
+            assert( variant.canConvert( QVariant.Font ) )
 
         # Check that the alignment is one we know about
-        variant = self.model.data(self.model.index(0, 0, QtCore.QModelIndex()), QtCore.Qt.TextAlignmentRole)
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.TextAlignmentRole)
         if variant.isValid():
             alignment = variant.toInt()[0]
-            assert( alignment == (alignment & int(QtCore.Qt.AlignHorizontal_Mask | QtCore.Qt.AlignVertical_Mask)))
+            assert( alignment == (alignment & int(Qt.AlignHorizontal_Mask | Qt.AlignVertical_Mask)))
 
         # General Purpose roles that should return a QColor
-        variant = self.model.data(self.model.index(0, 0, QtCore.QModelIndex()), QtCore.Qt.BackgroundColorRole)
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.BackgroundColorRole)
         if variant.isValid():
-            assert( variant.canConvert( QtCore.QVariant.Color ) )
-        variant = self.model.data(self.model.index(0, 0, QtCore.QModelIndex()), QtCore.Qt.TextColorRole)
+            assert( variant.canConvert( QVariant.Color ) )
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.TextColorRole)
         if variant.isValid():
-            assert( variant.canConvert( QtCore.QVariant.Color ) )
+            assert( variant.canConvert( QVariant.Color ) )
 
         # Check that the "check state" is one we know about.
-        variant = self.model.data(self.model.index(0, 0, QtCore.QModelIndex()), QtCore.Qt.CheckStateRole)
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.CheckStateRole)
         if variant.isValid():
             state = variant.toInt()[0]
-            assert( state == QtCore.Qt.Unchecked or
-                state == QtCore.Qt.PartiallyChecked or
-                state == QtCore.Qt.Checked )
+            assert( state == Qt.Unchecked or
+                state == Qt.PartiallyChecked or
+                state == Qt.Checked )
 
 
     def runAllTests(self):
@@ -322,7 +322,7 @@ class ModelTest(QtCore.QObject):
 
         # if item['next'] != self.model.data(self.model.index(end+1, 0, item['parent'])):
         #   qDebug << start << end
-        #   for i in range(0, self.model.rowCount(QtCore.QModelIndex())):
+        #   for i in range(0, self.model.rowCount(QModelIndex())):
         #       qDebug << self.model.index(i, 0).data().toString()
         #   qDebug() << item['next'] << self.model.data(model.index(end+1, 0, item['parent']))
 
@@ -354,7 +354,7 @@ class ModelTest(QtCore.QObject):
         Store what is about to be changed
         """
         for i in range(0, max(0, min( self.model.rowCount(), 100))):
-            self.changing.append(QtCore.QPersistentModelIndex( self.model.index( i, 0)))
+            self.changing.append(QPersistentModelIndex( self.model.index( i, 0)))
 
     def layoutChanged(self):
         """
@@ -374,7 +374,7 @@ class ModelTest(QtCore.QObject):
         This recursive function does pretty extensive testing on the whole self.model in an
         effort to catch edge cases.
 
-        This function assumes that rowCount(QtCore.QModelIndex()), columnCount(QtCore.QModelIndex()) and index() already work.
+        This function assumes that rowCount(QModelIndex()), columnCount(QModelIndex()) and index() already work.
         If they have a bug it will point it out, but the above tests should have already
         found the basic bugs because it is easier to figure out the problem in
         those tests then this one
@@ -416,7 +416,7 @@ class ModelTest(QtCore.QObject):
             for column in range(0, cols):
                 assert(self.model.hasIndex(row, column, parent))
                 index = self.model.index(row, column, parent)
-                # rowCount(QtCore.QModelIndex()) and columnCount(QtCore.QModelIndex()) said that it existed...
+                # rowCount(QModelIndex()) and columnCount(QModelIndex()) said that it existed...
                 assert(index.isValid() == True)
 
                 # index() should always return the same index when called twice in a row
@@ -434,9 +434,9 @@ class ModelTest(QtCore.QObject):
                 # see http://www.opensubscriber.com/message/pyqt@riverbankcomputing.com/10335500.html
                 assert( index.row() == row )
                 assert( index.column() == column )
-                # While you can technically return a QtCore.QVariant usually this is a sign
+                # While you can technically return a QVariant usually this is a sign
                 # if an bug in data() Disable if this really is ok in your self.model
-                assert( self.model.data(index, QtCore.Qt.DisplayRole).isValid() == True )
+                assert( self.model.data(index, Qt.DisplayRole).isValid() == True )
 
                 #if the next test fails here is some somehwat useful debug you play with
                 # if self.model.parent(index) != parent:

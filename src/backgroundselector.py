@@ -19,13 +19,13 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4 import QtGui
+from PyQt4.QtGui import QWidget
 from kde import KLineEdit, KConfig
 from background import Background
 from common import Internal
 from guiutil import loadUi
 
-class BackgroundSelector( QtGui.QWidget):
+class BackgroundSelector(QWidget):
     """presents all available backgrounds with previews"""
     def __init__(self, parent):
         super(BackgroundSelector, self).__init__(parent)

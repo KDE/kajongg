@@ -19,8 +19,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4 import QtGui
-from PyQt4.QtGui import QHBoxLayout
+from PyQt4.QtGui import QHBoxLayout, QWidget
 from kde import KLineEdit
 from tileset import Tileset
 from uitile import UITile
@@ -30,7 +29,7 @@ from common import Internal, WINDS
 from guiutil import loadUi
 from animation import Animated
 
-class TilesetSelector( QtGui.QWidget):
+class TilesetSelector(QWidget):
     """presents all available tiles with previews"""
     def __init__(self, parent):
         super(TilesetSelector, self).__init__(parent)
