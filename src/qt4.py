@@ -47,7 +47,10 @@ from PyQt4.QtCore import QRectF
 from PyQt4.QtCore import QSize
 from PyQt4.QtCore import QSizeF
 from PyQt4.QtCore import QSocketNotifier
-from PyQt4.QtCore import QString
+try:
+    from PyQt4.QtCore import QString
+except ImportError:
+    from qstring import QString
 from PyQt4.QtCore import QTimer
 from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import SLOT

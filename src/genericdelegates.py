@@ -11,7 +11,7 @@ Copyright (C) 2008-2014 Wolfgang Rohdewald
  the GNU General Public License for more details.
 """
 
-from qt import Qt, variantValue, QSize, QRect, QEvent
+from qt import isQt5, Qt, RealQVariant, variantValue, QSize, QRect, QEvent
 from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
     QStyleOptionViewItem, QApplication
 
@@ -34,7 +34,8 @@ class RichTextColumnDelegate(QStyledItemDelegate):
         else:
             role = QPalette.AlternateBase if index.row() % 2 else QPalette.Base
         self.label.setBackgroundRole(role)
-        text = variantValue(index.model().data(index, Qt.DisplayRole))
+        with RealQVariant():
+            text = variantValue(index.model().data(index, Qt.DisplayRole))
         self.label.setText(text)
         self.label.setFixedSize(option.rect.size())
         with Painter(painter):
@@ -43,7 +44,8 @@ class RichTextColumnDelegate(QStyledItemDelegate):
 
     def sizeHint(self, option, index):
         """compute size for the final formatted richtext"""
-        text = variantValue(index.model().data(index))
+        with RealQVariant():
+            text = variantValue(index.model().data(index))
         self.document.setDefaultFont(option.font)
         self.document.setHtml(text)
         return QSize(self.document.idealWidth() + 5,
@@ -99,7 +101,9 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
                 return False
         else:
             return False
-        if value.toInt()[0] == Qt.Checked:
+        if not isQt5:
+            value = value.toInt()[0]
+        if value == Qt.Checked:
             state = Qt.Unchecked
         else:
             state = Qt.Checked

@@ -18,8 +18,11 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, SLOT, QPointF, QVariant, variantValue, pyqtSignal, \
+from qt import Qt, isQt5, QPointF, QVariant, variantValue, pyqtSignal, \
     QSize, QModelIndex, QEvent, QTimer
+
+if not isQt5:
+    from qt import SLOT
 
 from qt import QColor, QPushButton, QPixmapCache
 from qt import QWidget, QLabel, QTabWidget
@@ -417,8 +420,12 @@ class ScoreTable(QWidget):
         self.viewRight.setHorizontalScrollBar(HorizontalScrollBar(self))
         self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
         self.viewRight.setFocusPolicy(Qt.NoFocus)
-        self.viewRight.header().setClickable(False)
-        self.viewRight.header().setMovable(False)
+        if isQt5:
+            self.viewRight.header().setSectionsClickable(False)
+            self.viewRight.header().setSectionsMovable(False)
+        else:
+            self.viewRight.header().setClickable(False)
+            self.viewRight.header().setMovable(False)
         self.viewRight.setSelectionMode(QAbstractItemView.NoSelection)
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Vertical)
@@ -477,7 +484,10 @@ class ScoreTable(QWidget):
             header = view.header()
             header.setStretchLastSection(False)
             view.setAlternatingRowColors(True)
-        self.viewRight.header().setResizeMode(QHeaderView.Fixed)
+        if isQt5:
+            self.viewRight.header().setSectionResizeMode(QHeaderView.Fixed)
+        else:
+            self.viewRight.header().setResizeMode(QHeaderView.Fixed)
         for col in range(self.viewLeft.header().count()):
             self.viewLeft.header().setSectionHidden(col, col > 0)
             self.viewRight.header().setSectionHidden(col, col == 0)
@@ -574,13 +584,19 @@ class PenaltyBox(QSpinBox):
 
     def validate(self, inputData, pos):
         """check if value is a multiple of parties"""
-        result, newPos = QSpinBox.validate(self, inputData, pos)
+        if isQt5:
+            result, inputData, newPos = QSpinBox.validate(self, inputData, pos)
+        else:
+            result, newPos = QSpinBox.validate(self, inputData, pos)
         if result == QValidator.Acceptable:
             if int(inputData) % self.parties != 0:
                 result = QValidator.Intermediate
         if result == QValidator.Acceptable:
             self.prevValue = str(inputData)
-        return (result, newPos)
+        if isQt5:
+            return (result, inputData, newPos)
+        else:
+            return (result, newPos)
 
     def fixup(self, data):
         """change input to a legal value"""
@@ -654,8 +670,13 @@ class PenaltyDialog(QDialog):
         grid.addWidget(buttonBox, 7, 0, 1, 5)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         buttonBox.rejected.connect(self.reject)
-        self.btnExecute = buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole,
-            self, SLOT("accept()"))
+        if isQt5:
+            self.btnExecute = buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole)
+            self.btnExecute.clicked.connect(self.accept)
+        else:
+            self.btnExecute = buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole,
+                self, SLOT("accept()"))
+            self.btnExecute.clicked.connect(self.accept)
         self.crimeChanged()
         StateSaver(self)
 

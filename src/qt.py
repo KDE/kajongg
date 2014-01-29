@@ -21,12 +21,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # pylint: disable=unused-import, unused-wildcard-import, wildcard-import
 # pylint: disable=invalid-name
 
+import sip, sys
+
 from common import isPython3
 
-# treat QString separately because it does not exist in python3 versions
+isQt4 = True # Default for now
+isQt5 = False
 
+if '--qt5' in sys.argv:
+    try:
+        from qt5 import *
+        isQt5 = True
+    except ImportError as exc:
+        print('Cannot import Qt5:{}, using Qt4 instead'.format(exc.message))
+        from qt4 import *
+else:
+    from qt4 import *
 
-from qt4 import *
+class RealQVariant(object):
+    """context helper, forcibly disabling QVariant autoconversion for Qt5.
+    This makes it easier to write code supporting both Qt4 and Qt5"""
+    def __init__(self):
+        if isQt5:
+            sip.enableautoconversion(QVariant, False)
 
-if isPython3:
-    QString = str
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, trback):
+        """enable autoconversion again"""
+        if isQt5:
+            sip.enableautoconversion(QVariant, True)

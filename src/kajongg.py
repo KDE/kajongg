@@ -24,7 +24,7 @@ import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
 
-from qt import QObject, QEvent, Qt
+from qt import QObject, QEvent, Qt, isQt4
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 from about import About
 
@@ -73,6 +73,7 @@ def defineOptions():
         ki18n("for testing purposes: Initializes the random generator"), "0")
     options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
     options.add("nokde", ki18n("Do not use KDE bindings. Intended only for testing"))
+    options.add("qt5", ki18n("Force using Qt5. Currently Qt4 is used by default"))
     options.add("socket <SOCKET>", ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
     options.add("debug <OPTIONS>", ki18n(Debug.help()))
     return options
@@ -150,7 +151,8 @@ if __name__ == "__main__":
     ABOUT = About()
     KCmdLineArgs.init (sys.argv, ABOUT.about)
     KCmdLineArgs.addCmdLineOptions(defineOptions())
-    KApplication.setGraphicsSystem('raster')
+    if isQt4:
+        KApplication.setGraphicsSystem('raster')
     APP = KApplication()
     parseOptions()
 

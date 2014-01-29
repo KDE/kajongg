@@ -23,7 +23,7 @@ import datetime
 from kde import KIcon
 from dialogs import WarningYesNo
 
-from qt import Qt, QVariant, variantValue, QAbstractTableModel
+from qt import isQt5, Qt, QVariant, RealQVariant, variantValue, QAbstractTableModel
 from qt import QDialogButtonBox, QDialog, \
         QHBoxLayout, QVBoxLayout, QCheckBox, \
         QItemSelectionModel, QAbstractItemView
@@ -79,7 +79,8 @@ class GamesModel(QAbstractTableModel):
                 return QVariant(dateVal.strftime('%c').decode('utf-8'))
             elif index.column()==0:
                 return QVariant(int(unformatted))
-        return QAbstractTableModel.data(self, index, role)
+        with RealQVariant():
+            return QAbstractTableModel.data(self, index, role)
 
     def headerData(self, section, orientation, role):  # pylint: disable=no-self-use
         """for the two visible columns"""
@@ -217,7 +218,10 @@ class Games(QDialog):
                     Query("DELETE FROM score WHERE game = ?", (game, ))
                     Query("DELETE FROM game WHERE id = ?", (game, ))
                 self.setQuery() # just reload entire table
-        deleteGames = list(x.data().toInt()[0] for x in self.view.selectionModel().selectedRows(0))
+        if isQt5:
+            deleteGames = list(x.data() for x in self.view.selectionModel().selectedRows(0))
+        else:
+            deleteGames = list(x.data().toInt()[0] for x in self.view.selectionModel().selectedRows(0))
         if len(deleteGames) == 0:
             # should never happen
             logException('delete: 0 rows selected')

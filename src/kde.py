@@ -25,7 +25,8 @@ import os, sys, shutil
 from common import Internal, Options
 
 try:
-    if '--nokde' in sys.argv:
+    if '--nokde' in sys.argv or '--qt5' in sys.argv:
+        # for now there is no PyKDE5
         raise ImportError
     from PyKDE4.kdecore import KUser, KGlobal, KStandardDirs, \
         KAboutData, KCmdLineArgs, KConfig, KCmdLineOptions
@@ -35,7 +36,12 @@ try:
         KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
         KConfigDialog, KDialog
 except ImportError:
-    from kdestub import *  # pylint: disable=wildcard-import
+    try:
+        raise
+        # This is where we will try to import PyKDE5 when that will
+        # be available
+    except ImportError:
+        from kdestub import *  # pylint: disable=wildcard-import
 
 def appdataDir():
     """the per user directory with kajongg application information like the database"""

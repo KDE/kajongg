@@ -43,7 +43,7 @@ try:
     from qt import Qt, QVariant, variantValue, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
     from qt import QWidget, QGridLayout, QAction
 except ImportError as importError:
-    NOTFOUND.append('Package python-qt4: PyQt4: %s' % importError)
+    NOTFOUND.append('Please install PyQt4 or PyQt5: %s' % importError)
 
 try:
     from zope.interface import implements # pylint: disable=unused-import

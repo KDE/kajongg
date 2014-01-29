@@ -69,6 +69,8 @@ class Animation(QPropertyAnimation):
 
     def unpackValue(self, qvariant):
         """get the wanted value from the QVariant"""
+        if not isinstance(qvariant, QVariant):
+            return qvariant # is already autoconverted
         pName = self.pName()
         if pName == 'pos':
             return qvariant.toPointF()

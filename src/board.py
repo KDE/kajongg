@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, QPointF, QPoint, QRectF, QMimeData, QSize, QVariant
+from qt import isQt5, Qt, QPointF, QPoint, QRectF, QMimeData, QSize, QVariant
 from qt import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
 from qt import QGraphicsView, QGraphicsEllipseItem, QLabel
 from qt import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
@@ -337,7 +337,10 @@ class Board(QGraphicsRectItem):
             action = menu.exec_(menuPoint)
             if not action:
                 return None
-            idx = action.data().toInt()[0]
+            if isQt5:
+                idx = action.data() # autoconvert
+            else:
+                idx = action.data().toInt()[0]
         return variants[idx]
 
     def dragEnterEvent(self, dummyEvent):
