@@ -45,7 +45,7 @@ from twisted.python import log, runtime
 from twisted.internet import posixbase
 from twisted.python.runtime import platformType, platform
 
-from qt import QSocketNotifier, QObject, SIGNAL, QTimer, QCoreApplication
+from qt import QSocketNotifier, QObject, QTimer, QCoreApplication
 from qt import QEventLoop
 
 
@@ -65,12 +65,12 @@ class TwistedSocketNotifier(QObject):
             self.fn = self.read
         else:
             self.fn = self.write
-        QObject.connect(self.notifier, SIGNAL("activated(int)"), self.fn)
+        self.notifier.activated.connect(self.fn)
 
 
     def shutdown(self):
         self.notifier.setEnabled(False)
-        self.disconnect(self.notifier, SIGNAL("activated(int)"), self.fn)
+        self.notifier.activated.disconnect(self.fn)
         self.fn = self.watcher = None
         self.notifier.deleteLater()
         self.deleteLater()
@@ -130,7 +130,7 @@ class QtReactor(posixbase.PosixReactorBase):
         self._notifiers = {}
         self._timer = QTimer()
         self._timer.setSingleShot(True)
-        QObject.connect(self._timer, SIGNAL("timeout()"), self.iterate)
+        self._timer.timeout.connect(self.iterate)
 
         if QCoreApplication.instance() is None:
             # Application Object has not been started yet

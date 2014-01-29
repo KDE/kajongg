@@ -50,7 +50,6 @@ from PyQt4.QtCore import QSocketNotifier
 from PyQt4.QtCore import QString
 from PyQt4.QtCore import QTimer
 from PyQt4.QtCore import QTranslator
-from PyQt4.QtCore import SIGNAL
 from PyQt4.QtCore import SLOT
 from PyQt4.QtCore import pyqtProperty
 from PyQt4.QtCore import pyqtSignal
