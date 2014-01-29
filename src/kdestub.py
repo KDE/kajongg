@@ -601,22 +601,6 @@ class KLocale(object):
         """stub"""
         QCoreApplication.installTranslator(KDETranslator(app))
 
-class MyStr(str):
-    """we need something that looks like a QString"""
-    # pylint: disable=incomplete-protocol
-    def toString(self):
-        """do nothing"""
-        return self.decode('utf-8')
-    def toInt(self):
-        """like QString.toInt"""
-        try:
-            result = int(self)
-            valueOk = True
-        except ValueError:
-            result = None
-            valueOk = False
-        return result, valueOk
-
 class KConfigGroup(object):
     """mimic KConfigGroup as far as we need it"""
     def __init__(self, config, groupName):
@@ -626,7 +610,7 @@ class KConfigGroup(object):
     def __default(self, name):
         """defer computation of Languages until really needed"""
         if self.groupName == 'Locale' and name == 'Language':
-            return MyStr(self.__availableLanguages())
+            return QString(self.__availableLanguages())
 
     def readEntry(self, name, default=None):
         """get an entry from this group.
@@ -644,15 +628,15 @@ class KConfigGroup(object):
             for language in KGlobal.config().group('Locale').readEntry('Language').split(':'):
                 key = '%s[%s]' % (name, language)
                 if key in i18nItems:
-                    return MyStr(i18nItems[key])
+                    return QString(i18nItems[key])
         if name in items:
             if self.groupName == 'Locale' and name == 'Language':
                 languages = list(x for x in items[name].split(':') if self.__isLanguageInstalled(x))
                 if languages:
-                    return MyStr(':'.join(languages))
+                    return QString(':'.join(languages))
                 else:
-                    return MyStr(self.__availableLanguages())
-            return MyStr(items[name])
+                    return QString(self.__availableLanguages())
+            return QString(items[name])
         return self.__default(name)
 
     @classmethod
