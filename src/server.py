@@ -1178,9 +1178,8 @@ class MJRealm(object):
             logDebug('Connection from %s ' % avatar.source())
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
 
-def kajonggServer():
-    """start the server"""
-    # pylint: disable=too-many-branches
+def parseArgs():
+    """as the name says"""
     from optparse import OptionParser
     parser = OptionParser()
     defaultPort = Options.defaultPort()
@@ -1212,7 +1211,12 @@ def kajonggServer():
     Debug.setOptions(options.debug)
     Options.fixed = True # may not be changed anymore
     del parser           # makes Debug.gc quieter
+    return options
 
+def kajonggServer():
+    """start the server"""
+    # pylint: disable=too-many-branches
+    options = parseArgs()
     if not initDb():
         sys.exit(1)
     realm = MJRealm()
