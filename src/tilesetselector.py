@@ -19,7 +19,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtGui import QHBoxLayout, QWidget
+from qt import QWidget, QHBoxLayout
 from kde import KLineEdit
 from tileset import Tileset
 from uitile import UITile

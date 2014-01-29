@@ -18,11 +18,9 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QRectF, QPointF, QSizeF, QSize, pyqtProperty
-from PyQt4.QtGui import QGraphicsObject, QGraphicsItem, QPixmap, QPainter
-from PyQt4.QtGui import QColor
+from qt import QString, Qt, QRectF, QPointF, QSizeF, QSize, pyqtProperty
+from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor
 
-from qt import QString
 from util import stack
 from log import logException, logDebug
 from guiutil import Painter

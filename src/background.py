@@ -21,12 +21,8 @@ this python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QPainter, QBrush, QPalette, \
-    QPixmapCache, QPixmap
-from PyQt4.QtSvg import QSvgRenderer
-
-from qt import QString
+from qt import Qt, QPainter, QBrush, QPalette, QPixmapCache, QPixmap
+from qt import QString, QSvgRenderer
 from kde import KGlobal, KStandardDirs, KConfig
 
 from log import logWarning, logException, m18n

@@ -21,11 +21,10 @@
 
 import os
 
-from PyQt4.QtCore import QVariant
-from PyQt4.QtGui import QComboBox, QTableView, QSizePolicy, QAbstractItemView
+from qt import uic, QVariant
+from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 
 from kde import KStandardDirs
-from PyQt4 import uic
 
 from log import m18n
 

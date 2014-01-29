@@ -20,14 +20,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 
-from kde import KIcon, KDialogButtonBox
-from PyQt4.QtCore import Qt, QVariant, \
-        QAbstractTableModel
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QWidget, \
+from qt import Qt, QVariant, QAbstractTableModel
+from qt import QDialog, QDialogButtonBox, QWidget, \
         QHBoxLayout, QVBoxLayout, QAbstractItemView, \
         QItemSelectionModel, QGridLayout, QColor, QPalette
 
-from kde import KApplication
+from kde import KApplication, KIcon, KDialogButtonBox
 
 from genericdelegates import RichTextColumnDelegate
 

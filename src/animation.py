@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from twisted.internet.defer import Deferred, succeed
 
-from PyQt4.QtCore import QPropertyAnimation, QParallelAnimationGroup, \
+from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, QVariant
 
 from common import Internal, Debug, isAlive

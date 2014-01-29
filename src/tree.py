@@ -22,7 +22,7 @@
 Here we define classes useful for tree views
 """
 
-from PyQt4.QtCore import QAbstractItemModel, QModelIndex
+from qt import QAbstractItemModel, QModelIndex
 
 class TreeItem(object): # pylint: disable=abstract-class-little-used
     """generic class for items in a tree"""

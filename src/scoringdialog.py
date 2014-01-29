@@ -18,19 +18,19 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF, QVariant, SLOT, pyqtSignal, \
+from qt import Qt, SLOT, QPointF, QVariant, pyqtSignal, \
     QSize, QModelIndex, QEvent, QTimer
 
-from PyQt4.QtGui import QColor, QPushButton, QPixmapCache
-from PyQt4.QtGui import QWidget, QLabel, QTabWidget
-from PyQt4.QtGui import QGridLayout, QVBoxLayout, QHBoxLayout, QSpinBox
-from PyQt4.QtGui import QDialog, QStringListModel, QListView, QSplitter, QValidator
-from PyQt4.QtGui import QIcon, QPixmap, QPainter, QDialogButtonBox
-from PyQt4.QtGui import QSizePolicy, QComboBox, QCheckBox, QScrollBar
-from PyQt4.QtGui import QAbstractItemView, QHeaderView
-from PyQt4.QtGui import QTreeView, QFont, QFrame
-from PyQt4.QtGui import QStyledItemDelegate
-from PyQt4.QtGui import QBrush, QPalette
+from qt import QColor, QPushButton, QPixmapCache
+from qt import QWidget, QLabel, QTabWidget
+from qt import QGridLayout, QVBoxLayout, QHBoxLayout, QSpinBox
+from qt import QDialog, QStringListModel, QListView, QSplitter, QValidator
+from qt import QIcon, QPixmap, QPainter, QDialogButtonBox
+from qt import QSizePolicy, QComboBox, QCheckBox, QScrollBar
+from qt import QAbstractItemView, QHeaderView
+from qt import QTreeView, QFont, QFrame
+from qt import QStyledItemDelegate
+from qt import QBrush, QPalette
 from kde import KDialogButtonBox, KApplication
 
 from modeltest import ModelTest

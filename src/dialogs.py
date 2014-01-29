@@ -23,8 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import inspect
 
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QDialog, QMessageBox, QWidget
+from qt import Qt, QDialog, QMessageBox, QWidget
 
 from kde import KMessageBox, KDialog
 

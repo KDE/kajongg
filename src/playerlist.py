@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from kde import KIcon
 from dialogs import Sorry
-from PyQt4.QtCore import Qt
-from PyQt4.QtGui import QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox, \
+from qt import Qt
+from qt import QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox, \
         QTableWidget, QTableWidgetItem
 
 from query import Query

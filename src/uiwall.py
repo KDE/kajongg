@@ -19,8 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from common import Internal, ZValues
-from PyQt4.QtCore import QRectF, QPointF
-from PyQt4.QtGui import QGraphicsSimpleTextItem
+from qt import QRectF, QPointF, QGraphicsSimpleTextItem
 
 from board import PlayerWind, YellowText, Board, rotateCenter
 from wall import Wall, KongBox

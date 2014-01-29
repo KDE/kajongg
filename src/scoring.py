@@ -20,9 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 
-from PyQt4.QtCore import QPointF, QRectF
-from PyQt4.QtGui import QGraphicsRectItem, QGraphicsSimpleTextItem
-from PyQt4.QtGui import QPushButton, QMessageBox, QComboBox
+from qt import QPointF, QRectF
+from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
+from qt import QPushButton, QMessageBox, QComboBox
 
 
 from common import Internal, isAlive, WINDS

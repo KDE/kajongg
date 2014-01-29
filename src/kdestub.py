@@ -23,8 +23,6 @@ python interface to KDE.
 
 """
 
-# pylint: disable=unused-import
-
 __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
             'KCmdLineOptions', 'i18n', 'i18nc', 'ki18n',
             'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
@@ -47,18 +45,9 @@ from locale import _parse_localename
 
 # here come the replacements:
 
-from PyQt4 import Qt as pyqt
-from PyQt4.QtCore import Qt, QSize, pyqtSignal, QTranslator, QCoreApplication
-from PyQt4.QtGui import QMainWindow, QToolBar, QMenu, QIcon, QAction, QDialog
-from PyQt4.QtGui import QLineEdit as KLineEdit, QListWidget, QListWidgetItem
-from PyQt4.QtGui import QWidget, QVBoxLayout, QHBoxLayout, QDialogButtonBox
-from PyQt4.QtGui import QStackedWidget, QCheckBox, QSlider, QLabel
-from PyQt4.QtGui import QStyle, QStyleOption, QPalette, QMessageBox
-from PyQt4.QtGui import QScrollArea, QApplication, QTabWidget, QSpacerItem
-from PyQt4.QtGui import QSizePolicy, QTextBrowser, QFontMetrics, QTextEdit
+# pylint: disable=wildcard-import,unused-wildcard-import
+from qt import *
 
-
-from qt import QString
 from common import Internal, Debug
 from util import xToUtf8
 
@@ -979,8 +968,8 @@ class AboutKajonggDialog(KDialog):
             underVersions.append('KDE %s' % versions['KDE'])
         except OSError:
             underVersions.append(i18n('KDE (not installed)'))
-        underVersions.append('Qt %s' % pyqt.QT_VERSION_STR)
-        underVersions.append('PyQt %s' % pyqt.PYQT_VERSION_STR)
+        underVersions.append('Qt %s' % QT_VERSION_STR)
+        underVersions.append('PyQt %s' % PYQT_VERSION_STR)
         h1vLayout.addWidget(QLabel(i18nc('running under version', 'Under %s' % ', '.join(underVersions))))
         h1vLayout.addWidget(QLabel(i18n('Not using Python KDE bindings')))
         hLayout1.addLayout(h1vLayout)

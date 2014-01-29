@@ -27,7 +27,7 @@ from twisted.internet.task import deferLater
 from twisted.internet.error import ConnectionRefusedError, TimeoutError, ConnectionLost, DNSLookupError, ConnectError
 from twisted.python.failure import Failure
 
-from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, \
+from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
     QLabel, QComboBox, QLineEdit, QFormLayout, \
     QSizePolicy, QWidget
 
@@ -429,7 +429,7 @@ class Connection(object):
             # the state of QtDBus is unclear to me.
             # riverbank.computing says module dbus is deprecated
             # for Python 3. And Ubuntu has no package with
-            # PyQt4.QtDBus. So we use good old subprocess.
+            # QtDBus. So we use good old subprocess.
             stdoutdata, stderrdata = subprocess.Popen(['qdbus',
                 'org.kde.kded',
                 '/modules/networkstatus',

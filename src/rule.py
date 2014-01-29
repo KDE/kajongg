@@ -24,7 +24,7 @@ Read the user manual for a description of the interface to this scoring engine
 import types
 from hashlib import md5
 
-from PyQt4.QtCore import QVariant
+from qt import QVariant
 
 from common import Internal, Debug, unicode # pylint: disable=redefined-builtin
 from log import m18n, m18nc, m18nE, english, logException

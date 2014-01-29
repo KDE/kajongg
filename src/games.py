@@ -23,8 +23,8 @@ import datetime
 from kde import KIcon
 from dialogs import WarningYesNo
 
-from PyQt4.QtCore import Qt, QVariant, QAbstractTableModel
-from PyQt4.QtGui import QDialogButtonBox, QDialog, \
+from qt import Qt, QVariant, QAbstractTableModel
+from qt import QDialogButtonBox, QDialog, \
         QHBoxLayout, QVBoxLayout, QCheckBox, \
         QItemSelectionModel, QAbstractItemView
 

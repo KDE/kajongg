@@ -18,10 +18,15 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-# pylint: disable=unused-import
+# pylint: disable=unused-import, unused-wildcard-import, wildcard-import
+# pylint: disable=invalid-name
 
-try:
-    from PyQt4.QtCore import QString
-except ImportError:
-    # no QString? Must be python3
-    QString = str # pylint: disable=invalid-name
+from common import isPython3
+
+# treat QString separately because it does not exist in python3 versions
+
+
+from qt4 import *
+
+if isPython3:
+    QString = str

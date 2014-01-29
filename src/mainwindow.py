@@ -40,8 +40,8 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from PyQt4.QtCore import Qt, QVariant, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
-    from PyQt4.QtGui import QWidget, QGridLayout, QAction
+    from qt import Qt, QVariant, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
+    from qt import QWidget, QGridLayout, QAction
 except ImportError as importError:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % importError)
 

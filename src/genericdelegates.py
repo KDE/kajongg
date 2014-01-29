@@ -11,9 +11,9 @@ Copyright (C) 2008-2014 Wolfgang Rohdewald
  the GNU General Public License for more details.
 """
 
-from PyQt4.QtCore import Qt, QSize, QRect, QEvent
-from PyQt4.QtGui import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
-    QStyleOptionViewItemV4, QApplication
+from qt import Qt, QSize, QRect, QEvent
+from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
+    QStyleOptionViewItem, QApplication
 
 from guiutil import Painter
 
@@ -64,7 +64,7 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
 
     def paint(self, painter, option, index):
         """paint right aligned checkbox"""
-        viewItemOption = QStyleOptionViewItemV4(option)
+        viewItemOption = QStyleOptionViewItem(option)
         if self.cellFilter(index):
             textMargin = self.__textMargin()
             newRect = QStyle.alignedRect(option.direction, Qt.AlignRight,

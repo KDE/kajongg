@@ -18,10 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import QObject, QByteArray, QEvent
-from PyQt4.QtGui import QSplitter, QHeaderView
+from qt import QString, QObject, QByteArray, QEvent, QSplitter, QHeaderView
 
-from qt import QString
 from log import english
 from common import Internal, isAlive
 

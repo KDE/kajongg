@@ -23,8 +23,8 @@ import random
 from twisted.spread import pb
 from twisted.python.failure import Failure
 from twisted.internet.defer import Deferred, succeed, DeferredList
-from PyQt4.QtCore import Qt, QTimer
-from PyQt4.QtGui import QDialog, QVBoxLayout, QGridLayout, \
+from qt import Qt, QTimer
+from qt import QDialog, QVBoxLayout, QGridLayout, \
     QLabel, QPushButton, QWidget, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 

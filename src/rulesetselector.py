@@ -20,11 +20,11 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QVariant, QSize
-from PyQt4.QtGui import QWidget, QHBoxLayout, QVBoxLayout, \
+from qt import Qt, QVariant, QSize
+from qt import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
-from PyQt4.QtCore import QModelIndex
+from qt import QModelIndex
 from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, \
     IntRule, BoolRule, StrRule
 from util import uniqueList

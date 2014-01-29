@@ -22,8 +22,8 @@ from log import m18n, m18nc, logDebug
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from twisted.internet.defer import succeed
 
-from PyQt4.QtCore import Qt, QMetaObject
-from PyQt4.QtGui import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
+from qt import Qt, QMetaObject
+from qt import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
 
 from zope.interface import implements # pylint: disable=unused-import
 

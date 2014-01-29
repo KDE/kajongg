@@ -24,7 +24,7 @@
 """
 
 import sip
-from PyQt4.QtCore import Qt, QObject, QVariant, QAbstractItemModel, QModelIndex, \
+from qt import QObject, Qt, QVariant, QAbstractItemModel, QModelIndex, \
     QPersistentModelIndex
 
 class ModelTest(QObject):

@@ -24,9 +24,9 @@ import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
 
-from PyQt4.QtCore import QObject, QEvent, Qt
-from about import About
+from qt import QObject, QEvent, Qt
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
+from about import About
 
 from common import Options, SingleshotOptions, Internal, Debug
 from util import kprint

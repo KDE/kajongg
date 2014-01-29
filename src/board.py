@@ -18,13 +18,13 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import Qt, QPointF, QPoint, QRectF, QMimeData, QSize, QVariant
-from PyQt4.QtGui import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
-from PyQt4.QtGui import QGraphicsView, QGraphicsEllipseItem, QLabel
-from PyQt4.QtGui import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
-from PyQt4.QtGui import QFontMetrics, QTransform
-from PyQt4.QtGui import QMenu, QCursor
-from PyQt4.QtSvg import QGraphicsSvgItem
+from qt import Qt, QPointF, QPoint, QRectF, QMimeData, QSize, QVariant
+from qt import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
+from qt import QGraphicsView, QGraphicsEllipseItem, QLabel
+from qt import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
+from qt import QFontMetrics, QTransform
+from qt import QMenu, QCursor
+from qt import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile, elements
 from uitile import UITile, UIMeld

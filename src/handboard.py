@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
-from PyQt4.QtGui import QGraphicsRectItem
+from qt import QGraphicsRectItem
 from tile import Tile
 from uitile import UITile
 from meld import Meld, MeldList
