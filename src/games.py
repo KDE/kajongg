@@ -51,8 +51,11 @@ class GamesModel(QAbstractTableModel):
 
     def setResultset(self, rows):
         """new data"""
-        self._resultRows = rows
-        self.reset()
+        self.beginResetModel()
+        try:
+            self._resultRows = rows
+        finally:
+            self.endResetModel()
 
     def index(self, row, column, dummyParent=None):
         """helper"""

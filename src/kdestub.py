@@ -35,6 +35,7 @@ __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
 import sys, os, subprocess, getpass, pwd
 import weakref
 from collections import defaultdict
+
 try:
     from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
 except ImportError:
@@ -250,7 +251,7 @@ class KMessageBox(object):
         mainLayout = QVBoxLayout()
 
         hLayout = QHBoxLayout()
-        hLayout.setMargin(0)
+        hLayout.setContentsMargins(0, 0, 0, 0)
         hLayout.setSpacing(-1)
         mainLayout.addLayout(hLayout, 5)
 
@@ -590,7 +591,7 @@ class KDETranslator(QTranslator):
         QTranslator.__init__(self, parent)
 
     @staticmethod
-    def translate(dummyContext, sourceText, dummyMessage):
+    def translate(dummyContext, sourceText, dummyMessage, dummyNumber=-1):
         """for now this seems to translate all we need, otherwise
         search for translateQt in kdelibs/kdecore/localization"""
         return i18n(sourceText)
