@@ -653,8 +653,10 @@ class KConfigGroup(object):
                     localenames.extend(localename.split(':'))
                 else:
                     localenames.append(localename)
-        languages = list(_parse_localename(x)[0].split('_')[0] for x in localenames if len(x))
-        languages = list(x for x in languages if cls.__isLanguageInstalled(x))
+        languages = list(_parse_localename(x)[0] for x in localenames if len(x))
+        if languages:
+            languages = list(x.split('_')[0] for x in languages if x is not None)
+            languages = list(x for x in languages if cls.__isLanguageInstalled(x))
         if 'us' not in languages:
             languages.append('us')
         return ':'.join(languages)
@@ -680,18 +682,16 @@ class KGlobal(object):
         else:
             languages = None
         resourceDirs = KGlobal.dirs().findResourceDir('locale', '')
+        cls.translation = gettext.NullTranslations()
         if languages:
             for resourceDir in resourceDirs:
-                cls.translation = gettext.translation('kajongg', resourceDirs[0], languages=languages)
-                for context in ('libkmahjongg', 'kdelibs4', 'libphonon', 'kio4', 'kdeqt', 'libc'):
+                for context in ('kajongg', 'libkmahjongg', 'kdelibs4', 'libphonon', 'kio4', 'kdeqt', 'libc'):
                     try:
                         cls.translation.add_fallback(gettext.translation(context, resourceDir, languages=languages))
                     except IOError:
                         # no translation for language/domain available
                         pass
-            cls.translation.install()
-        else:
-            cls.translation = None
+        cls.translation.install()
 
     @classmethod
     def dirs(cls):
