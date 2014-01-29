@@ -24,6 +24,7 @@ from kde import KLineEdit, KConfig
 from background import Background
 from common import Internal
 from guiutil import loadUi
+from log import m18n
 
 class BackgroundSelector(QWidget):
     """presents all available backgrounds with previews"""
@@ -65,9 +66,9 @@ class BackgroundSelector(QWidget):
         config = KConfig(selBackground.path)
         group = config.group("KMahjonggBackground")
 
-        author = group.readEntry("Author", "unknown author").toString()
-        description = group.readEntry("Description", "").toString()
-        authorEmail = group.readEntry("AuthorEmail", "no E-Mail address available").toString()
+        author = group.readEntry("Author") or m18n("unknown author")
+        description = group.readEntry("Description") or ""
+        authorEmail = group.readEntry("AuthorEmail") or m18n("no E-Mail address available")
 
         self.backgroundAuthor.setText(author)
         self.backgroundContact.setText(authorEmail)

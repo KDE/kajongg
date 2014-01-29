@@ -633,19 +633,21 @@ class KConfigGroup(object):
         self.config = weakref.ref(config)
         self.groupName = groupName
 
-    def __default(self, name, default):
+    def __default(self, name):
         """defer computation of Languages until really needed"""
         if self.groupName == 'Locale' and name == 'Language':
-            default = self.__availableLanguages()
-        if default:
-            return MyStr(default)
+            return MyStr(self.__availableLanguages())
 
     def readEntry(self, name, default=None):
-        """get an entry from this group"""
+        """get an entry from this group.
+        If default is passed, the original returns QVariant, else QString.
+        To make things easier, we never accept a default and
+        always return QString"""
+        assert default is None
         try:
             items = self.config().items(self.groupName)
         except NoSectionError:
-            return self.__default(name, default)
+            return self.__default(name)
         items = dict((x for x in items if x[0].startswith(name)))
         i18nItems = dict((x for x in items.items() if x[0].startswith(name + '[')))
         if i18nItems:
@@ -661,7 +663,7 @@ class KConfigGroup(object):
                 else:
                     return MyStr(self.__availableLanguages())
             return MyStr(items[name])
-        return self.__default(name, default)
+        return self.__default(name)
 
     @classmethod
     def __availableLanguages(cls):

@@ -23,7 +23,7 @@ this adapted python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import QVariant, QSizeF
+from PyQt4.QtCore import QSizeF
 from PyQt4.QtSvg import QSvgRenderer
 
 from qt import QString
@@ -99,20 +99,20 @@ class Tileset(object):
         tileconfig = KConfig(self.path, KConfig.SimpleConfig)
         group = tileconfig.group("KMahjonggTileset")
 
-        self.name = group.readEntry("Name", "unknown tileset").toString() # Returns translated data
-        self.author = group.readEntry("Author", "unknown author").toString()
-        self.description = group.readEntry("Description", "no description available").toString()
-        self.authorEmail = group.readEntry("AuthorEmail", "no E-Mail address available").toString()
+        self.name = group.readEntry("Name") or m18n("unknown tileset")
+        self.author = group.readEntry("Author") or m18n("unknown author")
+        self.description = group.readEntry("Description") or m18n("no description available")
+        self.authorEmail = group.readEntry("AuthorEmail") or m18n("no E-Mail address available")
 
         #Version control
-        tileversion, entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
+        tileversion = int(group.readEntry("VersionFormat")) or 0
         #Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
-        if not entryOK or tileversion > TILESETVERSIONFORMAT:
+        if tileversion > TILESETVERSIONFORMAT:
             logException(TileException('tileversion file / program: %d/%d' % \
                 (tileversion, TILESETVERSIONFORMAT)))
 
-        graphName = QString(group.readEntry("FileName"))
+        graphName = group.readEntry("FileName")
         self.__graphicspath = locateTileset(graphName)
         if self.__graphicspath.isEmpty():
             logException(TileException('cannot find kmahjongglib/tilesets/%s for %s' % \

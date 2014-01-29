@@ -21,7 +21,7 @@ this python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from PyQt4.QtCore import QVariant, Qt
+from PyQt4.QtCore import Qt
 from PyQt4.QtGui import QPainter, QBrush, QPalette, \
     QPixmapCache, QPixmap
 from PyQt4.QtSvg import QSvgRenderer
@@ -92,13 +92,13 @@ class Background(object):
                 self.desktopFileName = 'default'
         config = KConfig(self.path)
         group = config.group("KMahjonggBackground")
-        self.name = group.readEntry("Name", "unknown background").toString() # Returns translated data
+        self.name = group.readEntry("Name") or m18n("unknown background")
 
         #Version control
-        backgroundversion, entryOK = group.readEntry("VersionFormat", QVariant(0)).toInt()
+        backgroundversion = int(group.readEntry("VersionFormat")) or 0
         #Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
-        if not entryOK or backgroundversion > BACKGROUNDVERSIONFORMAT:
+        if backgroundversion > BACKGROUNDVERSIONFORMAT:
             logException(BackgroundException('backgroundversion file / program: %d/%d' % \
                 (backgroundversion, BACKGROUNDVERSIONFORMAT)))
 
