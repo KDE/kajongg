@@ -23,7 +23,7 @@ import datetime
 from kde import KIcon
 from dialogs import WarningYesNo
 
-from qt import Qt, QVariant, QAbstractTableModel
+from qt import Qt, QVariant, variantValue, QAbstractTableModel
 from qt import QDialogButtonBox, QDialog, \
         QHBoxLayout, QVBoxLayout, QCheckBox, \
         QItemSelectionModel, QAbstractItemView
@@ -181,7 +181,7 @@ class Games(QDialog):
         """returns the model index for game"""
         for row in range(self.model.rowCount()):
             idx = self.model.index(row, 0)
-            if self.model.data(idx, 0).toPyObject() == game:
+            if variantValue(self.model.data(idx, 0)) == game:
                 return idx
         return self.model.index(0, 0)
 
@@ -189,7 +189,7 @@ class Games(QDialog):
         """returns the game id of the selected game"""
         rows = self.selection.selectedRows()
         if rows:
-            return self.model.data(rows[0], 0).toPyObject()
+            return variantValue(self.model.data(rows[0], 0))
         else:
             return 0
 

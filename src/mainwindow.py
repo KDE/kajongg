@@ -40,7 +40,7 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from qt import Qt, QVariant, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
+    from qt import Qt, QVariant, variantValue, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
     from qt import QWidget, QGridLayout, QAction
 except ImportError as importError:
     NOTFOUND.append('Package python-qt4: PyQt4: %s' % importError)
@@ -402,7 +402,7 @@ class MainWindow(KXmlGuiWindow):
         """user has toggled widget visibility with an action"""
         assert self.scene
         action = self.sender()
-        actionData = action.data().toPyObject()
+        actionData = variantValue(action.data())
         if checked:
             if isinstance(actionData, type):
                 clsName = actionData.__name__

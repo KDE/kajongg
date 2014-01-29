@@ -20,7 +20,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, QVariant, QSize
+from qt import Qt, QVariant, variantValue, QSize
 from qt import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
@@ -216,7 +216,7 @@ class RuleModel(TreeModel):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             if section >= self.rootItem.columnCount():
                 return QVariant()
-            result = self.rootItem.content(section).toString()
+            result = variantValue(self.rootItem.content(section))
             if result == 'doubles':
                 result = 'x2'
             return m18n(result)

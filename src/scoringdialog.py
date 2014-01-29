@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, SLOT, QPointF, QVariant, pyqtSignal, \
+from qt import Qt, SLOT, QPointF, QVariant, variantValue, pyqtSignal, \
     QSize, QModelIndex, QEvent, QTimer
 
 from qt import QColor, QPushButton, QPixmapCache
@@ -892,7 +892,8 @@ class ScoringDialog(QWidget):
         """returns the currently selected last tile"""
         idx = self.cbLastTile.currentIndex()
         if idx >= 0:
-            return Tile(self.cbLastTile.itemData(idx).toPyObject())
+            # TODO: isn't that already a Tile?
+            return Tile(variantValue(self.cbLastTile.itemData(idx)))
 
     def closeEvent(self, event):
         """the user pressed ALT-F4"""
@@ -1036,7 +1037,7 @@ class ScoringDialog(QWidget):
         idx = self.cbLastTile.currentIndex()
         if idx < 0:
             idx = 0
-        indexedTile = self.cbLastTile.itemData(idx).toPyObject()
+        indexedTile = variantValue(self.cbLastTile.itemData(idx))
         restoredIdx = None
         self.cbLastTile.clear()
         if not winnerTiles:
@@ -1058,7 +1059,7 @@ class ScoringDialog(QWidget):
             # try again, maybe the tile changed between concealed and exposed
             indexedTile = indexedTile.exposed
             for idx in range(self.cbLastTile.count()):
-                if indexedTile is self.cbLastTile.itemData(idx).toPyObject().exposed:
+                if indexedTile is variantValue(self.cbLastTile.itemData(idx)).exposed:
                     restoredIdx = idx
                     break
         if not restoredIdx:
@@ -1110,7 +1111,7 @@ class ScoringDialog(QWidget):
             # try again, maybe the meld changed between concealed and exposed
             indexedMeld = indexedMeld.lower()
             for idx in range(self.cbLastMeld.count()):
-                meldContent = str(self.cbLastMeld.itemData(idx).toPyObject())
+                meldContent = str(variantValue(self.cbLastMeld.itemData(idx)))
                 if indexedMeld == meldContent.lower():
                     restoredIdx = idx
                     if lastTile not in meldContent:
@@ -1136,7 +1137,7 @@ class ScoringDialog(QWidget):
             idx = self.cbLastMeld.currentIndex()
             if idx < 0:
                 idx = 0
-            indexedMeld = str(self.cbLastMeld.itemData(idx).toPyObject())
+            indexedMeld = str(variantValue(self.cbLastMeld.itemData(idx)))
             self.cbLastMeld.clear()
             self.__meldPixMaps = []
             if not self.game.winner:

@@ -21,7 +21,7 @@
 
 import os
 
-from qt import uic, QVariant
+from qt import uic, QVariant, variantValue
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 
 from kde import KStandardDirs
@@ -66,7 +66,7 @@ class ListComboBox(QComboBox):
     @property
     def items(self):
         """combo box items"""
-        return [self.itemData(idx).toPyObject() for idx in range(self.count())]
+        return [variantValue(self.itemData(idx)) for idx in range(self.count())]
 
     @items.setter
     def items(self, items):
@@ -90,7 +90,7 @@ class ListComboBox(QComboBox):
     @property
     def current(self):
         """current item"""
-        return self.itemData(self.currentIndex()).toPyObject()
+        return variantValue(self.itemData(self.currentIndex()))
 
     @current.setter
     def current(self, item):
