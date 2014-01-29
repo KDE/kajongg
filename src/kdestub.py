@@ -263,7 +263,7 @@ class KMessageBox(object):
         if messageLabel.sizeHint().width() > desktop.width() * 0.5:
             messageLabel.setWordWrap(True)
 
-        usingScrollArea = desktop.height() / 3 < messageLabel.sizeHint().height()
+        usingScrollArea = desktop.height() // 3 < messageLabel.sizeHint().height()
         if usingScrollArea:
             scrollArea = QScrollArea(dialog)
             scrollArea.setWidget(messageLabel)

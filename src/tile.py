@@ -108,7 +108,7 @@ class Tile(str):
         result.isMajor = result.isHonor or result.isTerminal
         result.isMinor = not result.isMajor
         try:
-            result.key = 1 + result.hashTable.index(result) / 2
+            result.key = 1 + result.hashTable.index(result) // 2
         except ValueError:
             logException('%s is not a valid tile string' % result)
         result.isKnown = Tile.unknown is not None and result != Tile.unknown
@@ -210,7 +210,7 @@ class TileList(list):
     def key(self):
         """usable for sorting"""
         result = 0
-        factor = len(Tile.hashTable) / 2
+        factor = len(Tile.hashTable) // 2
         for tile in self:
             result = result * factor + tile.key
         return result
