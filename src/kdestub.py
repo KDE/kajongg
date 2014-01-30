@@ -298,6 +298,7 @@ class KDialog(CaptionMixin, QDialog):
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
+        self.__mainWidget = None
 
     def setButtons(self, buttonMask):
         """(re)create the buttonbox and put all wanted buttons into it"""
@@ -310,6 +311,22 @@ class KDialog(CaptionMixin, QDialog):
             self.buttonBox.button(KDialog.RestoreDefaults).setText(i18n('&Defaults'))
         if KDialog.Help & buttonMask:
             self.buttonBox.button(KDialog.Help).clicked.connect(startHelp)
+
+    def setMainWidget(self, widget):
+        """see KDialog.setMainWidget"""
+        if self.layout() is None:
+            QVBoxLayout(self)
+            self.layout().addWidget(self.buttonBox)
+        if self.__mainWidget:
+            self.layout().removeWidget(self.__mainWidget)
+            self.layout().removeWidget(self.buttonBox)
+        self.__mainWidget = widget
+        self.layout().addWidget(widget)
+        self.layout().addWidget(self.buttonBox)
+
+    def button(self, buttonCode):
+        """returns the matching button"""
+        return self.buttonBox.button(buttonCode)
 
     @staticmethod
     def ButtonCode(value): # pylint: disable=invalid-name
