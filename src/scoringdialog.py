@@ -254,8 +254,7 @@ class ScoreModel(TreeModel):
         data = []
         records = Query(
                 'select player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
-                ' from score where game=? order by player,hand',
-                list([game.gameid])).records
+                ' from score where game=? order by player,hand', (game.gameid,)).records
         # pylint: disable=star-args
         humans = sorted(x for x in game.players if not x.name.startswith('Robot'))
         robots = sorted(x for x in game.players if x.name.startswith('Robot'))

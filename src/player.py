@@ -86,8 +86,7 @@ class Players(list):
         if name not in Players.allNames.values():
             Players.load()  # maybe somebody else already added it
             if name not in Players.allNames.values():
-                Query("insert or ignore into player(name) values(?)",
-                      list([name]))
+                Query("insert or ignore into player(name) values(?)", (name,))
                 Players.load()
         assert name in Players.allNames.values(), '%s not in %s' % (name, Players.allNames.values())
 

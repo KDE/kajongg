@@ -114,7 +114,7 @@ class LoginDlg(QDialog):
     def serverChanged(self, dummyText=None):
         """the user selected a different server"""
         records = Query('select player.name from player, passwords '
-                'where passwords.url=? and passwords.player = player.id', list([self.url])).records
+                'where passwords.url=? and passwords.player = player.id', (self.url,)).records
         players = list(x[0] for x in records)
         preferPlayer = Options.player
         if preferPlayer:
@@ -327,21 +327,21 @@ class Connection(object):
             self.ruleset.save()     # this makes sure we have a valid rulesetId for predefined rulesets
         with Internal.db:
             serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
-                list([self.username, lasttime, url])).rowcount() == 1
+                (self.username, lasttime, url)).rowcount() == 1
             if not serverKnown:
                 Query('insert into server(url,lastname,lasttime) values(?,?,?)',
-                    list([url, self.username, lasttime]))
+                    (url, self.username, lasttime))
             if self.ruleset:
                 Query('update server set lastruleset=? where url=?',
-                    list([self.ruleset.rulesetId, url]))
+                    (self.ruleset.rulesetId, url))
         # needed if the server knows our name but our local data base does not:
         Players.createIfUnknown(self.username)
         playerId = Players.allIds[self.username]
         with Internal.db:
             if Query('update passwords set password=? where url=? and player=?',
-                list([self.password, url, playerId])).rowcount() == 0:
+                (self.password, url, playerId)).rowcount() == 0:
                 Query('insert into passwords(url,player,password) values(?,?,?)',
-                    list([url, playerId, self.password]))
+                    (url, playerId, self.password))
 
     def __checkExistingConnections(self):
         """do we already have a connection to the wanted URL?"""

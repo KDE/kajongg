@@ -505,10 +505,10 @@ class ScoringGame(Game):
         Game.saveStartTime(self)
         # for PlayingGame, this one is already done in Connection.__updateServerInfoInDatabase
         known = Query('update server set lastruleset=? where url=?',
-            list([self.ruleset.rulesetId, Query.localServerName]))
+            (self.ruleset.rulesetId, Query.localServerName))
         if not known:
             Query('insert into server(url,lastruleset) values(?,?)',
-                list([self.ruleset.rulesetId, Query.localServerName]))
+                (self.ruleset.rulesetId, Query.localServerName))
 
     def _setGameId(self):
         """get a new id"""
@@ -535,7 +535,7 @@ class ScoringGame(Game):
                 scoretime, int(player == self.winner),
                 WINDS[self.roundsFinished % 4], player.wind, 0,
                 amount, player.balance, self.rotated, self.notRotated),
-            list([player.hand.string, offense.name]))
+            (player.hand.string, offense.name))
         Internal.mainWindow.updateGUI()
 
 def scoreGame():

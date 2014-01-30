@@ -49,7 +49,10 @@ class DBCursor(sqlite3.Cursor):
 
     def execute(self, statement, parameters=None, silent=False, failSilent = False, mayFail=False):
         """logging wrapper, returning all selected data"""
+        # pylint: disable=too-many-branches
         self.statement = statement
+        if parameters is not None:
+            assert isinstance(parameters, tuple), '%s / %s' % (statement, parameters)
         self.parameters = parameters
         if not silent:
             logDebug(str(self))
@@ -337,7 +340,7 @@ class PrepareDB(object):
                 currentVersion = self.__currentVersion()
                 with Internal.db: # transaction
                     getattr(self, 'updateToVersion%s' % version.replace('.', '_'))()
-                    Query('UPDATE general SET schemaversion="%s"' % version)
+                    Query('UPDATE general SET schemaversion=?', (version,))
                 logInfo(m18n('Database %1 updated from schema %2 to %3',
                     Internal.db.path, currentVersion, version), showDialog=True)
         except sqlite3.Error as exc:
@@ -383,7 +386,7 @@ class PrepareDB(object):
     def createIndex(name, cmd):
         """only try to create it if it does not yet exist. Do not use create if not exists because
         we want debug output only if we really create the index"""
-        if not Query("select 1 from sqlite_master where type='index' and name='%s'" % name,
+        if not Query("select 1 from sqlite_master where type='index' and name=?", (name,),
                 silent=True).records:
             Query("create index %s on %s" % (name, cmd))
 
@@ -410,7 +413,7 @@ class PrepareDB(object):
         Query('drop table player')
         self.createTable('player')
         for nameId, name in keep.items():
-            Query('insert into player(id,name) values(?,?)', list([nameId, name]))
+            Query('insert into player(id,name) values(?,?)', (nameId, name))
 
     @classmethod
     def removeGameServer(cls):
@@ -450,8 +453,7 @@ class PrepareDB(object):
         logInfo('Marking games using rules with regular expressions as finished: %s' % openRegexGames)
         for openGame in openRegexGames:
             endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
-            Query('update game set endtime=? where id=?',
-                list([endtime, openGame]))
+            Query('update game set endtime=? where id=?', (endtime, openGame))
 
     def removeUsedRuleset(self):
         """eliminate usedruleset and usedrule"""
@@ -525,6 +527,6 @@ class PrepareDB(object):
         assert len(records) < 2
         if not records:
             dbIdent = str(random.randrange(100000000000))
-            Query("INSERT INTO general(ident) values('%s')" % dbIdent)
+            Query("INSERT INTO general(ident) values(?)", (dbIdent,))
             if Debug.sql:
                 logDebug('generated new dbIdent %s for %s' % (dbIdent, Internal.db.path))

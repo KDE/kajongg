@@ -105,7 +105,7 @@ class ClientTable(Table):
     def gameExistsLocally(self):
         """does the game exist in the data base of the client?"""
         assert self.gameid
-        return bool(Query('select 1 from game where id=?', list([self.gameid])).records)
+        return bool(Query('select 1 from game where id=?', (self.gameid,)).records)
 
 class Client(object, pb.Referenceable):
     """interface to the server. This class only implements the logic,
@@ -206,7 +206,7 @@ class Client(object, pb.Referenceable):
         in our local data base - we want to use the same gameid everywhere"""
         with Internal.db:
             query = Query('insert into game(id,seed) values(?,?)',
-                      list([gameid, self.connection.url]), mayFail=True, failSilent=True)
+                      (gameid, self.connection.url), mayFail=True, failSilent=True)
             if query.rowcount() != 1:
                 return Message.NO
         return Message.OK

@@ -468,7 +468,7 @@ class Game(object):
         args.extend([p.nameid for p in self.players])
         args.append(self.gameid)
         Query("update game set starttime=?,seed=?,autoplay=?," \
-                "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", args)
+                "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", tuple(args))
 
     def __useRuleset(self, ruleset):
         """use a copy of ruleset for this game, reusing an existing copy"""
@@ -476,8 +476,7 @@ class Game(object):
         self.ruleset.load()
         if Internal.db:
             # only if we have a DB open. False in scoringtest.py
-            query = Query('select id from ruleset where id>0 and hash="%s"' % \
-                self.ruleset.hash)
+            query = Query('select id from ruleset where id>0 and hash=?', (self.ruleset.hash,))
             if query.records:
                 # reuse that ruleset
                 self.ruleset.rulesetId = query.records[0][0]
@@ -545,7 +544,7 @@ class Game(object):
                     scoretime, int(player == self.__winner),
                     WINDS[self.roundsFinished % 4], player.wind, player.handTotal,
                     player.payment, player.balance, self.rotated, self.notRotated),
-                list([player.hand.string, manualrules]))
+                (player.hand.string, manualrules))
             logMessage += '{player:<12} {hand:>4} {total:>5} {won} | '.format(
                 player=str(player)[:12], hand=player.handTotal, total=player.balance,
                 won='WON' if player == self.winner else '   ')
@@ -621,7 +620,7 @@ class Game(object):
     def loadFromDB(cls, gameid, client=None):
         """load game by game id and return a new Game instance"""
         Internal.logPrefix = 'S' if Internal.isServer else 'C'
-        qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = %d" % gameid)
+        qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = ?", (gameid,))
         if not qGame.records:
             return None
         rulesetId = qGame.records[0][4] or 1
@@ -629,13 +628,13 @@ class Game(object):
         Players.load() # we want to make sure we have the current definitions
         game = cls(Game.__getNames(qGame.records[0]), ruleset, gameid=gameid,
                 client=client, wantedGame=qGame.records[0][5])
-        qLastHand = Query("select hand,rotated from score where game=%d and hand="
-            "(select max(hand) from score where game=%d)" % (gameid, gameid))
+        qLastHand = Query("select hand,rotated from score where game=? and hand="
+            "(select max(hand) from score where game=?)", (gameid, gameid))
         if qLastHand.records:
             (game.handctr, game.rotated) = qLastHand.records[0]
 
         qScores = Query("select player, wind, balance, won, prevailing from score "
-            "where game=%d and hand=%d" % (gameid, game.handctr))
+            "where game=? and hand=?", (gameid, game.handctr))
         # default value. If the server saved a score entry but our client did not,
         # we get no record here. Should we try to fix this or exclude such a game from
         # the list of resumable games?
@@ -836,7 +835,7 @@ class PlayingGame(Game):
         if not self.gameid:
             # in server.__prepareNewGame, gameid is None here
             return
-        records = Query("select seed from game where id=?", list([self.gameid])).records
+        records = Query("select seed from game where id=?", (self.gameid,)).records
         assert records, 'self.gameid: %s' % self.gameid
         seed = records[0][0]
 

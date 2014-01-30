@@ -112,12 +112,10 @@ class DBPasswordChecker(object):
             if args[0] == 'adduser':
                 cred.username = args[1]
                 password = args[2]
-                query = Query('insert or ignore into player(name,password) values(?,?)',
-                    list([cred.username, password]))
+                query = Query('insert or ignore into player(name,password) values(?,?)', (cred.username, password))
             elif args[1] == 'deluser':
                 pass
-        query = Query('select id, password from player where name=?',
-            list([cred.username]))
+        query = Query('select id, password from player where name=?', (cred.username,))
         if not len(query.records):
             template = 'Wrong username: %1'
             if Debug.connections:
@@ -358,7 +356,7 @@ class ServerTable(Table):
         """server proposes an id to the clients ands waits for answers"""
         while True:
             query = Query('insert into game(id,seed) values(?,?)',
-                  list([gameid, 'proposed']), mayFail=True, failSilent=True)
+                  (gameid, 'proposed'), mayFail=True, failSilent=True)
             if not query.failure:
                 break
             gameid += random.randrange(1, 100)
@@ -1065,7 +1063,7 @@ class MJServer(object):
             " and exists(select 1 from ruleset where ruleset.id=g.ruleset)" \
             " and exists(select 1 from score where game=g.id)" \
             " and s.scoretime = (select max(scoretime) from score where game=g.id) limit 10",
-            list([user.name, user.name, user.name, user.name]))
+            (user.name, user.name, user.name, user.name))
         for gameid, _, seed, ruleset, suspendTime in query.records:
             if gameid not in (x.game.gameid for x in self.tables.values() if x.game):
                 table = ServerTable(self, None, ruleset, suspendTime, playOpen=False,
@@ -1075,7 +1073,7 @@ class MJServer(object):
 class User(pb.Avatar):
     """the twisted avatar"""
     def __init__(self, userid):
-        self.name = Query('select name from player where id=%d' % userid).records[0][0]
+        self.name = Query('select name from player where id=?', (userid,)).records[0][0]
         self.mind = None
         self.server = None
         self.dbIdent = None

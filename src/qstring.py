@@ -18,7 +18,9 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from common import unicode
+from common import isPython3
+if isPython3:
+    from common import unicode
 
 class QString(unicode):
     """If pyqt does not define it: We need something that looks like a QString"""

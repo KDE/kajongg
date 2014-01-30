@@ -388,14 +388,14 @@ into a situation where you have to pay a penalty"""))
         """returns False or True"""
         result = any(x.hash == value for x in PredefinedRuleset.rulesets())
         if not result:
-            query = Query("select id from ruleset where hash=?", list([value]))
+            query = Query("select id from ruleset where hash=?", (value,))
             result = bool(query.records)
         return result
 
     def _initRuleset(self):
         """load ruleset headers but not the rules"""
         if isinstance(self.name, int):
-            query = Query("select id,hash,name,description from ruleset where id=%d" % self.name)
+            query = Query("select id,hash,name,description from ruleset where id=?", (self.name,))
         elif isinstance(self.name, list):
             # we got the rules over the wire
             self.rawRules = self.name[1:]
@@ -403,8 +403,7 @@ into a situation where you have to pay a penalty"""))
             self.load() # load raw rules at once, rules from db only when needed
             return
         else:
-            query = Query("select id,hash,name,description from ruleset where hash=?",
-                          list([self.name]))
+            query = Query("select id,hash,name,description from ruleset where hash=?", (self.name,))
         if len(query.records):
             (self.rulesetId, self.__hash, self.name, self.description) = query.records[0]
         else:
@@ -448,7 +447,7 @@ into a situation where you have to pay a penalty"""))
         """returns a Query object with loaded ruleset"""
         return Query(
             "select ruleset, list, position, name, definition, points, doubles, limits, parameter from rule "
-                "where ruleset=%d order by list,position" % self.rulesetId)
+                "where ruleset=? order by list,position", (self.rulesetId,))
 
     def toList(self):
         """returns entire ruleset encoded in a string"""
@@ -508,7 +507,7 @@ into a situation where you have to pay a penalty"""))
         """return True if ruleset name is already in use"""
         result = any(x.name == name for x in PredefinedRuleset.rulesets())
         if not result:
-            result = bool(Query('select id from ruleset where id<0 and name=?', list([name])).records)
+            result = bool(Query('select id from ruleset where id<0 and name=?', (name,)).records)
         return result
 
     def _newKey(self, minus=False):
@@ -555,8 +554,7 @@ into a situation where you have to pay a penalty"""))
         with Internal.db:
             if self.nameExists(newName):
                 return False
-            query = Query("update ruleset set name=? where id<0 and name =?",
-                list([newName, self.name]))
+            query = Query("update ruleset set name=? where id<0 and name=?", (newName, self.name))
             if not query.failure:
                 self.name = newName
             return not query.failure
@@ -564,8 +562,8 @@ into a situation where you have to pay a penalty"""))
     def remove(self):
         """remove this ruleset from the database."""
         with Internal.db:
-            Query("DELETE FROM rule WHERE ruleset=%d" % self.rulesetId)
-            Query("DELETE FROM ruleset WHERE id=%d" % self.rulesetId)
+            Query("DELETE FROM rule WHERE ruleset=?", (self.rulesetId,))
+            Query("DELETE FROM ruleset WHERE id=?", (self.rulesetId,))
 
     @staticmethod
     def ruleKey(rule):
@@ -601,8 +599,8 @@ into a situation where you have to pay a penalty"""))
             record = self.ruleRecord(rule)
             Query("UPDATE rule SET name=?, definition=?, points=?, doubles=?, limits=?, parameter=? "
                   "WHERE ruleset=? AND list=? AND position=?",
-                  record[3:] + record[:3])
-            Query("UPDATE ruleset SET hash=? WHERE id=?", list([self.hash, self.rulesetId]))
+                  tuple(record[3:] + record[:3]))
+            Query("UPDATE ruleset SET hash=? WHERE id=?", (self.hash, self.rulesetId))
 
     def save(self, minus=False, forced=False):
         """save the ruleset to the database.
@@ -616,9 +614,9 @@ into a situation where you have to pay a penalty"""))
                 # since play Game saved the used ruleset with id 1, id 1 is found here and no new
                 # template is generated. Next the ruleset editor shows the original ruleset in italics
                 # and the copy with normal font but identical name, and the copy is never saved.
-                qData = Query("select id from ruleset where hash=? and id<0", list([self.hash])).records
+                qData = Query("select id from ruleset where hash=? and id<0", (self.hash,)).records
             else:
-                qData = Query("select id from ruleset where hash=?", list([self.hash])).records
+                qData = Query("select id from ruleset where hash=?", (self.hash,)).records
             if qData:
                 # is already in database
                 self.rulesetId = qData[0][0]
@@ -626,12 +624,12 @@ into a situation where you have to pay a penalty"""))
         with Internal.db:
             self.rulesetId, self.name = self._newKey(minus)
             Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
-                list([self.rulesetId, english(self.name), self.hash, self.description]),
+                (self.rulesetId, english(self.name), self.hash, self.description),
                 failSilent=True)
             cmd = 'INSERT INTO rule(ruleset, list, position, name, definition, ' \
                     'points, doubles, limits, parameter) VALUES {}'.format(
                     ', '.join(['(?,?,?,?,?,?,?,?,?)'] * len(self.allRules)))
-            args = sum((list(self.ruleRecord(x)) for x in self.allRules), [])
+            args = tuple(sum((list(self.ruleRecord(x)) for x in self.allRules), []))
             Query(cmd, args)
 
     @staticmethod
@@ -660,14 +658,14 @@ into a situation where you have to pay a penalty"""))
                 "order by starttime desc limit 1").records
         else:
             qData = Query('select lastruleset from server where lastruleset is not null and url=?',
-                list([server])).records
+                (server,)).records
             if not qData:
                 # we never played on that server
                 qData = Query('select lastruleset from server where lastruleset is not null '
                     'order by lasttime desc limit 1').records
         if qData:
             lastUsedId = qData[0][0]
-            qData = Query("select name from ruleset where id=%d" % lastUsedId).records
+            qData = Query("select name from ruleset where id=?", (lastUsedId,)).records
             if qData:
                 lastUsed = qData[0][0]
                 for idx, ruleset in enumerate(result):
