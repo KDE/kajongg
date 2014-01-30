@@ -208,7 +208,8 @@ class VisiblePlayingGame(PlayingGame):
             player.hide()
         if self.wall:
             self.wall.hide()
-        scene.mainWindow.actionAutoPlay.setChecked(False)
+        if isAlive(scene.mainWindow):
+            scene.mainWindow.actionAutoPlay.setChecked(False)
         scene.startingGame = False
         scene.game = None
         scene.mainWindow.updateGUI()

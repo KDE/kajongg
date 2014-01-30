@@ -136,6 +136,8 @@ class MainWindow(KXmlGuiWindow):
     @scene.setter
     def scene(self, value):
         """if changing, updateGUI"""
+        if not isAlive(self):
+            return
         if self._scene == value:
             return
         if not value:
@@ -257,6 +259,12 @@ class MainWindow(KXmlGuiWindow):
         """toggle between full screen and normal view"""
         self.actionFullscreen.setFullScreen(self, toggle)
 
+    def hideEvent(self, event):
+        """the only way to capture ALT-F4. We cannot stop quitting
+        anymore, but we can clean up. Contrary to documentation,
+        queryClose, queryExit and and closeEvent are never called in this case"""
+        cleanExit()
+
     def closeAction(self):
         """quit kajongg"""
         # calling self.close() is not helpful: closeQuery or closeEvent are never called
@@ -345,7 +353,7 @@ class MainWindow(KXmlGuiWindow):
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
-        if not Internal.scaleScene:
+        if not Internal.scaleScene or not isAlive(self):
             return
         view, scene = self.centralView, self.scene
         if scene:
@@ -426,6 +434,8 @@ class MainWindow(KXmlGuiWindow):
 
     def updateGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""
+        if not isAlive(self):
+            return
         self.setCaption('')
         for action in [self.actionScoreGame, self.actionPlayGame]:
             action.setEnabled(not bool(self.scene))
