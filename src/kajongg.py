@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 # keyboardinterrupt should simply terminate
-import signal
-signal.signal(signal.SIGINT, signal.SIG_DFL)
+#import signal
+#signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
 
 from qt import QObject, QEvent, Qt, isQt4

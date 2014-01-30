@@ -20,7 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 import weakref
-import csv, resource
+import os, csv
+if os.name != 'nt':
+    import resource
 from random import Random
 from collections import defaultdict
 from functools import total_ordering
@@ -768,7 +770,7 @@ class PlayingGame(Game):
         if self.finished() and Options.csv:
             gameWinner = max(self.players, key=lambda x: x.balance)
             writer = csv.writer(open(Options.csv,'a'), delimiter=';')
-            if Debug.process:
+            if Debug.process and os.name != 'nt':
                 self.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             if Options.rounds:
                 self.csvTags.append('ROUNDS:%s' % Options.rounds)

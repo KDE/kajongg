@@ -24,8 +24,8 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
 import sys, os, random, traceback
-from signal import signal, SIGABRT, SIGINT, SIGTERM, SIGHUP, SIGQUIT
-import resource
+if os.name != 'nt':
+    import resource
 import datetime
 from itertools import chain
 
@@ -44,11 +44,14 @@ def cleanExit(*dummyArgs):
     except ReactorNotRunning:
         pass
 
+from signal import signal, SIGABRT, SIGINT, SIGTERM
 signal(SIGABRT, cleanExit)
 signal(SIGINT, cleanExit)
 signal(SIGTERM, cleanExit)
-signal(SIGHUP, cleanExit)
-signal(SIGQUIT, cleanExit)
+if os.name != 'nt':
+    from signal import SIGHUP, SIGQUIT
+    signal(SIGHUP, cleanExit)
+    signal(SIGQUIT, cleanExit)
 
 
 from common import Options, Internal
@@ -637,7 +640,7 @@ class ServerTable(Table):
         rotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
             self.server.removeTable(self, 'gameOver', m18nE('Game <numid>%1</numid> is over!'), self.game.seed)
-            if Debug.process:
+            if Debug.process and os.name != 'nt':
                 logDebug('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             return
         self.game.sortPlayers()
@@ -1240,8 +1243,6 @@ def kajonggServer():
     except error.CannotListenError as errObj:
         logWarning(errObj)
     else:
-        for sig in (SIGABRT, SIGINT, SIGTERM, SIGHUP, SIGQUIT):
-            signal(sig, cleanExit)
         reactor.run()
 
 

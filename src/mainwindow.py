@@ -81,8 +81,6 @@ if len(NOTFOUND):
     os.popen("kdialog --sorry '%s'" % MSG)
     sys.exit(3)
 
-from signal import signal, SIGABRT, SIGINT, SIGTERM, SIGHUP, SIGQUIT
-
 def cleanExit(*dummyArgs):
     """close sqlite3 files before quitting"""
     if Internal.mainWindow:
@@ -93,8 +91,15 @@ def cleanExit(*dummyArgs):
         except NameError:
             sys.exit(0)
 
-for sig in (SIGABRT, SIGINT, SIGTERM, SIGHUP, SIGQUIT):
-    signal(sig, cleanExit)
+from signal import signal, SIGABRT, SIGINT, SIGTERM
+signal(SIGABRT, cleanExit)
+signal(SIGINT, cleanExit)
+signal(SIGTERM, cleanExit)
+if os.name != 'nt':
+    from signal import SIGHUP, SIGQUIT
+    signal(SIGHUP, cleanExit)
+    signal(SIGQUIT, cleanExit)
+
 Internal.reactor.addSystemEventTrigger('before', 'shutdown', cleanExit)
 
 class MainWindow(KXmlGuiWindow):

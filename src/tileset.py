@@ -36,8 +36,11 @@ class TileException(Exception):
 
 def locateTileset(which):
     """locate the file with a tileset"""
-    return QString(KStandardDirs.locate("kmahjonggtileset",
-                QString(which)))
+    path = KStandardDirs.locate("kmahjonggtileset", QString(which))
+    if path is None:
+        logException(TileException('cannot find kmahjonggtileset %s' % \
+                        (which)))
+    return QString(path)
 
 class Tileset(object):
     """represents a complete tileset"""

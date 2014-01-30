@@ -30,7 +30,9 @@ __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
             'KUser', 'KToggleFullScreenAction', 'KStandardAction',
             'KXmlGuiWindow', 'KStandardDirs', 'KGlobal', 'KIcon', 'KAction']
 
-import sys, os, subprocess, getpass, pwd, webbrowser
+import sys, os, subprocess, getpass, webbrowser
+if os.name != 'nt':
+    import pwd
 import weakref
 from collections import defaultdict
 
@@ -66,7 +68,7 @@ def insertArgs(englishIn, *args):
             result = result.replace('%%%d' % (idx+1), '{%d}' % idx)
         args = list(x.decode('utf-8') for x in args)
         result = result.format(*args)
-    for ignore in ['numid', 'filename']:
+    for ignore in ['numid', 'filename', 'interface']:
         result = result.replace('<%s>' % ignore, '')
         result = result.replace('</%s>' % ignore, '')
     return result
@@ -368,7 +370,7 @@ class KDialog(CaptionMixin, QDialog):
 
 class KUser(object):
     """only the things kajongg needs"""
-    def __init__(self, uid):
+    def __init__(self, uid=None):
         self.__uid = uid
     def fullName(self):
         """stub"""
@@ -496,7 +498,7 @@ class KStandardDirs(object):
                 })
             home = os.environ.get('KDEHOME', '~/.kde')
             for key, value in KStandardDirs._localBaseDirs.items():
-                KStandardDirs._localBaseDirs[key] = os.path.expanduser(home + '/' + value)
+                KStandardDirs._localBaseDirs[key] = os.path.normpath(os.path.expanduser(home + '/' + value))
             KStandardDirs._baseDirs = defaultdict(list)
             KStandardDirs._baseDirs.update({
                 'data': ['share/kde4/apps'],
@@ -504,9 +506,19 @@ class KStandardDirs(object):
                 'appdata': ['share/kde4/apps/kajongg'],
                 'icon': ['share/icons'],
                 })
-            KStandardDirs._prefix = subprocess.Popen(['which', 'kde4-config'],
-                stdout=subprocess.PIPE).communicate()[0].split('/')[1]
-            KStandardDirs._prefix = '/%s/' % KStandardDirs._prefix
+            if os.name == 'nt':
+                cwd = os.path.split(os.path.abspath(sys.argv[0]))[0]
+                assert os.path.split(cwd)[1] == 'src', \
+                    'wrong installation: script should be in src subdirectory, not in %s' % \
+                    os.path.join(*cwd) # pylint: disable=star-args
+                KStandardDirs._prefix = os.path.split(cwd)[0]
+                dirMap = KStandardDirs._baseDirs
+                for key in dirMap:
+                    dirMap[key] = list(os.path.normpath(x) for x in dirMap[key])
+            else:
+                KStandardDirs._prefix = subprocess.Popen(['which', 'kde4-config'],
+                    stdout=subprocess.PIPE).communicate()[0].split('/')[1]
+                KStandardDirs._prefix = '/%s/' % KStandardDirs._prefix
 
     @classmethod
     def kde_default(cls, type_):
@@ -562,7 +574,7 @@ class KStandardDirs(object):
         basetype = str(basetype)
         relativename = str(relativename)
         for baseDir in cls._baseDirs[basetype]:
-            cls._baseDirs[str(type_)].append(os.path.join(baseDir, relativename))
+            cls._baseDirs[str(type_)].append(os.path.normpath(os.path.join(baseDir, relativename)))
 
     @classmethod
     def prefix(cls):
