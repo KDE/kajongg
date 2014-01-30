@@ -51,8 +51,6 @@ class DBCursor(sqlite3.Cursor):
         """logging wrapper, returning all selected data"""
         # pylint: disable=too-many-branches
         self.statement = statement
-        if parameters is not None:
-            assert isinstance(parameters, tuple), '%s / %s' % (statement, parameters)
         self.parameters = parameters
         if not silent:
             logDebug(str(self))
@@ -60,7 +58,9 @@ class DBCursor(sqlite3.Cursor):
             for _ in range(10):
                 try:
                     with Duration(statement, 60.0 if Debug.neutral else 2.0):
-                        if parameters:
+                        if isinstance(parameters, list):
+                            sqlite3.Cursor.executemany(self, statement, parameters)
+                        elif parameters:
                             sqlite3.Cursor.execute(self, statement, parameters)
                         else:
                             sqlite3.Cursor.execute(self, statement)

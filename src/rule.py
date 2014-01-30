@@ -627,9 +627,8 @@ into a situation where you have to pay a penalty"""))
                 (self.rulesetId, english(self.name), self.hash, self.description),
                 failSilent=True)
             cmd = 'INSERT INTO rule(ruleset, list, position, name, definition, ' \
-                    'points, doubles, limits, parameter) VALUES {}'.format(
-                    ', '.join(['(?,?,?,?,?,?,?,?,?)'] * len(self.allRules)))
-            args = tuple(sum((list(self.ruleRecord(x)) for x in self.allRules), []))
+                    'points, doubles, limits, parameter) VALUES(?,?,?,?,?,?,?,?,?)'
+            args = list(self.ruleRecord(x) for x in self.allRules)
             Query(cmd, args)
 
     @staticmethod
