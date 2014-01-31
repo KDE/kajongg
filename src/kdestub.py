@@ -30,7 +30,7 @@ __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
             'KUser', 'KToggleFullScreenAction', 'KStandardAction',
             'KXmlGuiWindow', 'KStandardDirs', 'KGlobal', 'KIcon', 'KAction']
 
-import sys, os, subprocess, getpass, pwd
+import sys, os, subprocess, getpass, pwd, webbrowser
 import weakref
 from collections import defaultdict
 
@@ -41,7 +41,7 @@ except ImportError:
     # pylint: disable=import-error
     from configparser import SafeConfigParser, NoSectionError, NoOptionError
 
-from locale import _parse_localename
+from locale import _parse_localename, getdefaultlocale
 
 # here come the replacements:
 
@@ -49,7 +49,7 @@ from locale import _parse_localename
 from qt import *
 
 from common import Internal, Debug
-from util import xToUtf8
+from util import xToUtf8, uniqueList
 
 import gettext
 
@@ -216,9 +216,32 @@ class CaptionMixin(object):
             caption = i18n('Kajongg')
         self.setWindowTitle(caption)
 
+def getDocUrl(languages):
+    """returns the best match for the online user manual"""
+    from twisted.web import client
+    def processResult(dummyResult, fallbacks):
+        """if status 404, try the next fallback language"""
+        return getDocUrl(fallbacks) if factory.status == '404' else url
+    host = 'docs.kde.org'
+    path = '/stable/{}/kdegames/kajongg/index.html'.format(languages[0])
+    url = 'http://' + host + path
+    factory = client.HTTPClientFactory(url)
+    factory.protocol = client.HTTPPageGetter
+    factory.protocol.handleEndHeaders = lambda x: x
+    Internal.reactor.connectTCP(host, 80, factory)
+    factory.deferred.addCallback(processResult, languages[1:])
+    return factory.deferred
+
 def startHelp():
-    """start the KDE help center for kajongg"""
-    subprocess.Popen(['khelpcenter', 'help:/kajongg/index.html'])
+    """start the KDE help center for kajongg or go to docs.kde.org"""
+    try:
+        subprocess.Popen(['khelpcenter', 'help:/kajongg/index.html'])
+    except OSError:
+        def gotUrl(url):
+            """now we know where the manual is"""
+            webbrowser.open(url)
+        languages = KGlobal.config().group('Locale').readEntry('Language').split(':')
+        getDocUrl(languages).addCallback(gotUrl)
 
 class IconLabel(QLabel):
     """for use in messages and about dialog"""
@@ -657,9 +680,18 @@ class KConfigGroup(object):
         return self.__default(name)
 
     @classmethod
+    def __extendRegionLanguages(cls, languages):
+        """for de_DE, return de_DE, de"""
+        for lang in languages:
+            if lang is not None:
+                yield lang
+                if '_' in lang:
+                    yield lang.split('_')[0]
+
+    @classmethod
     def __availableLanguages(cls):
         """see python lib, getdefaultlocale (which only returns the first one)"""
-        localenames = []
+        localenames = [getdefaultlocale()[0]]
         for variable in ('LANGUAGE', 'LC_ALL', 'LC_MESSAGES', 'LANG'):
             try:
                 localename = os.environ[variable]
@@ -672,14 +704,19 @@ class KConfigGroup(object):
                     localenames.append(localename)
         languages = list(_parse_localename(x)[0] for x in localenames if len(x))
         if languages:
-            languages = list(x.split('_')[0] for x in languages if x is not None)
+            languages = uniqueList(cls.__extendRegionLanguages(languages))
             languages = list(x for x in languages if cls.__isLanguageInstalled(x))
-        if 'us' not in languages:
-            languages.append('us')
+        if 'en_US' not in languages:
+            languages.extend(['en_US', 'en'])
         return ':'.join(languages)
 
     @classmethod
     def __isLanguageInstalled(cls, lang):
+        """is any translation available for lang?"""
+        return bool(KGlobal.dirs().findDirs('locale', lang))
+
+    @classmethod
+    def __isLanguageInstalledForKajongg(cls, lang):
         """see kdelibs, KCatalog::catalogLocaleDir"""
         relpath = '{lang}/LC_MESSAGES/kajongg.mo'.format(lang=lang)
         return bool(KGlobal.dirs().findResourceDir("locale", relpath))
