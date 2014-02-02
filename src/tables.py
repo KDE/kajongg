@@ -196,16 +196,18 @@ class TableList(QWidget):
     def hideEvent(self, dummyEvent): # pylint: disable=no-self-use
         """table window hides"""
         scene = Internal.scene
-        scene.startingGame = False
+        if scene:
+            scene.startingGame = False
         model = self.view.model()
         if model:
             for table in model.tables:
                 if table.chatWindow:
                     table.chatWindow.hide()
                     table.chatWindow = None
-        if not scene.game or scene.game.client != self.client:
-            # do we still need this connection?
-            self.client.logout()
+        if scene:
+            if not scene.game or scene.game.client != self.client:
+                # do we still need this connection?
+                self.client.logout()
 
     def chat(self):
         """chat. Only generate ChatWindow after the
