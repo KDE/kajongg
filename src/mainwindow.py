@@ -500,3 +500,14 @@ class MainWindow(KXmlGuiWindow):
                     Internal.db.close()
             except NameError:
                 pass
+            if Debug.quit:
+                logDebug('appquit starts a threading timer for mercyless exit after 1 second')
+            from threading import Timer
+            timer = Timer(1.0, cls.kill)
+            timer.start()
+
+    @staticmethod
+    def kill():
+        if Debug.quit:
+            logDebug('Something hangs, doing mercyless exit')
+        os._exit(0)
