@@ -532,8 +532,12 @@ def improve_options():
                 print('ruleset', ruleset, 'is not known', end=' ')
                 wrong = True
             elif len(matches) > 1:
-                print('ruleset', ruleset, 'is ambiguous:', matches)
-                wrong = True
+                exactMatch = list(x for x in OPTIONS.knownRulesets if ruleset == x)
+                if len(exactMatch) == 1:
+                    usingRulesets.append(exactMatch[0])
+                else:
+                    print('ruleset', ruleset, 'is ambiguous:', matches)
+                    wrong = True
             else:
                 usingRulesets.append(matches[0])
         if wrong:
@@ -570,7 +574,7 @@ def createJobs():
         games = list(int(random.random() * 10**9) for _ in range(OPTIONS.count))
     jobs = []
     allAis = OPTIONS.aiVariants.split(',')
-    print('rulesets:', ' '.join(OPTIONS.rulesets))
+    print('rulesets:', ', '.join(OPTIONS.rulesets))
     print('AIs:', ' '.join(allAis))
     if OPTIONS.git:
         print('commits:', ' '.join(OPTIONS.git))

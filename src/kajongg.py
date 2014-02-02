@@ -38,22 +38,25 @@ def initRulesets():
     import predefined # pylint: disable=unused-variable
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
-        rulesets = Ruleset.selectableRulesets()
+        rulesets = dict((x.name, x) for x in Ruleset.selectableRulesets())
         if Options.showRulesets:
-            for ruleset in rulesets:
-                kprint(ruleset.name)
+            for name in rulesets:
+                kprint(name)
             Internal.db.close()
             sys.exit(0)
+        elif Options.rulesetName in rulesets:
+            # we have an exact match
+            return rulesets[Options.rulesetName]
         else:
-            matches = list(x for x in rulesets if Options.rulesetName in x.name)
+            matches = list(x for x in rulesets if Options.rulesetName in x)
             if len(matches) != 1:
                 if len(matches) == 0:
                     msg = 'Ruleset %s is unknown' % Options.rulesetName
                 else:
-                    msg = 'Ruleset %s is ambiguous: %s' % (Options.rulesetName, list(x.name for x in matches))
+                    msg = 'Ruleset %s is ambiguous: %s' % (Options.rulesetName, ', '.join(matches))
                 Internal.db.close()
                 raise SystemExit(msg)
-            Options.ruleset = matches[0]
+            Options.ruleset = rulesets[matches[0]]
 
 def defineOptions():
     """this is the KDE way. Compare with kajonggserver.py"""
