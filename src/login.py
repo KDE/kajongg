@@ -35,7 +35,7 @@ from kde import KUser, KDialog, KDialogButtonBox, appdataDir, socketName
 from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 
 from log import english, logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
-from util import removeIfExists, which
+from util import removeIfExists, which, elapsedSince
 from common import Internal, Options, SingleshotOptions, Internal, Debug
 from game import Players
 from query import Query
@@ -416,12 +416,14 @@ class Connection(object):
                     port = None
                 self.__startLocalServer(port)
                 # give the server up to 5 seconds time to start
-                for loop in range(100):
+                startWaiting = datetime.datetime.now()
+                while elapsedSince(startWaiting) < 20:
                     if self.__serverListening():
                         break
-                    time.sleep(0.1)
+                    time.sleep(0.1) # this sleeps about 1.1 seconds on
+                    # Windows7 in a virtualbox
                 else:
-                    logDebug('After 10 seconds, the local server is not yet there, aborting')
+                    logDebug('After 20 seconds, the local server is not yet there, aborting')
                     Internal.reactor.stop()
         elif which('XXqdbus'):
             # TODO: use twisted process because we must have a timeout. If the qdbus service
