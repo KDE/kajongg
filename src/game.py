@@ -56,9 +56,10 @@ class CountingRandom(Random):
         if Debug.random:
             self.game.debug('Random gets seed %s' % newSeed)
         Random.seed(self, newSeed)
-    def shuffle(self, listValue, func=None, intType=int):
+    def shuffle(self, listValue, func=None): # pylint: disable=arguments-differ
+        """pylint needed for python up to 2.7.5"""
         oldCount = self.count
-        Random.shuffle(self, listValue, func, intType)
+        Random.shuffle(self, listValue, func)
         if Debug.random:
             self.game.debug('%d calls to random by Random.shuffle from %s' % (
                 self.count - oldCount, stack('')[-2]))
