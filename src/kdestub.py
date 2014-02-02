@@ -105,7 +105,7 @@ class OptionHelper(object):
     def isSet(self, option):
         """did the user specify this option?"""
         if any(x[0].startswith('no%s' % option) for x in self.options):
-            return not any(x.startswith('--%s' % option) for x in sys.argv)
+            return not any(x.startswith('--no%s' % option) for x in sys.argv)
         else:
             return any(x.startswith('--%s' % option) for x in sys.argv)
 
