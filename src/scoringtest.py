@@ -153,7 +153,7 @@ class Helpers(object):
             result.extend(hand.explain())
             result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles, hand.total()))
             result.append('')
-        return '\n'.join(str(x) for x in result)
+        return '\n'.join(x.encode('utf-8') for x in result)
 
 # pylint: disable=missing-docstring, too-many-public-methods
 
