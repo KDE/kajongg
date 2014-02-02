@@ -1,3 +1,4 @@
+TODO
 *.pyc
 log
 *_ui.py
@@ -7,3 +8,6 @@ log
 *.csv
 Versuche
 kajongg.log
+*.py~
+*.pyw
+*.pyx
