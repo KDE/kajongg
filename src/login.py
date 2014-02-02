@@ -364,7 +364,7 @@ class Connection(object):
                 return port
         logException('cannot find a free port')
 
-    def serverListening(self):
+    def __serverListening(self):
         """is somebody listening on that port?"""
         if self.useSocket and os.name != 'nt':
             sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -400,7 +400,7 @@ class Connection(object):
         # pylint: disable=too-many-branches
         if Options.socket:
             # just wait for that socket to appear
-            if os.path.exists(socketName()) and self.serverListening():
+            if os.path.exists(socketName()) and self.__serverListening():
                 return result
             else:
                 if waiting > 0:
@@ -409,15 +409,15 @@ class Connection(object):
                     Internal.reactor.stop()
                 return deferLater(Internal.reactor, 2, self.assertConnectivity, result, waiting+1)
         if self.useSocket or self.dlg.url in ('localhost', '127.0.0.1'):
-            if not self.serverListening():
+            if not self.__serverListening():
                 if os.name == 'nt':
                     port = self.findFreePort()
                 else:
                     port = None
-                self.startLocalServer(port)
+                self.__startLocalServer(port)
                 # give the server up to 5 seconds time to start
                 for loop in range(100):
-                    if self.serverListening():
+                    if self.__serverListening():
                         break
                     time.sleep(0.1)
                 else:
@@ -442,7 +442,7 @@ class Connection(object):
             # if we have stderrdata, qdbus probably does not provide the service we want, so ignore it
         return result
 
-    def startLocalServer(self, port):
+    def __startLocalServer(self, port):
         """start a local server"""
         try:
             args = ['kajonggserver'] # the default
