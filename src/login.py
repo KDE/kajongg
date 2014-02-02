@@ -110,6 +110,7 @@ class LoginDlg(QDialog):
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         self.cbUser.setSizePolicy(pol)
+        self.__port = None
 
     def serverChanged(self, dummyText=None):
         """the user selected a different server"""
@@ -185,10 +186,31 @@ class LoginDlg(QDialog):
     @property
     def port(self):
         """abstracts the port of the dialog"""
-        try:
-            return int(self.url.partition(':')[2])
-        except ValueError:
-            return Options.defaultPort()
+        if self.__port is not  None:
+            return self.__port
+        if Options.socket and os.name == 'nt':
+            self.__port = int(Options.socket)
+        elif os.name == 'nt':
+            self.__port = self.findFreePort()
+        else:
+            try:
+                self.__port = int(self.url.partition(':')[2])
+            except ValueError:
+                self.__port = Options.defaultPort()
+        return self.__port
+
+    @staticmethod
+    def findFreePort():
+        """find an unused port on the current system.
+        used when we want to start a local server on windows"""
+        for port in range(12000, 19000):
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            try:
+                sock.connect(('127.0.0.1', port))
+            except socket.error:
+                return port
+        logException('cannot find a free port')
 
     @property
     def username(self):
@@ -351,19 +373,6 @@ class Connection(object):
                 client.tableList.activateWindow()
                 raise CancelledError
 
-    @staticmethod
-    def findFreePort():
-        """find an unused port on the current system.
-        used when we want to start a local server on windows"""
-        for port in range(2000, 9000):
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(1)
-            try:
-                sock.connect(('127.0.0.1', port))
-            except socket.error:
-                return port
-        logException('cannot find a free port')
-
     def __serverListening(self):
         """is somebody listening on that port?"""
         if self.useSocket and os.name != 'nt':
@@ -388,8 +397,15 @@ class Connection(object):
         else:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(1)
+            host = self.dlg.host
+            port = self.dlg.port
+            if int(port) == 0:
+                if Options.socket:
+                    port = int(Options.socket)
+            if host == Query.localServerName:
+                host = '127.0.0.1'
             try:
-                sock.connect((self.dlg.host, self.dlg.port))
+                sock.connect((host, port))
             except socket.error:
                 return False
             else:
@@ -398,7 +414,7 @@ class Connection(object):
     def assertConnectivity(self, result, waiting=0):
         """make sure we have a running local server or network connectivity"""
         # pylint: disable=too-many-branches
-        if Options.socket:
+        if Options.socket and os.name != 'nt':
             # just wait for that socket to appear
             if os.path.exists(socketName()) and self.__serverListening():
                 return result
@@ -411,7 +427,10 @@ class Connection(object):
         if self.useSocket or self.dlg.url in ('localhost', '127.0.0.1'):
             if not self.__serverListening():
                 if os.name == 'nt':
-                    port = self.findFreePort()
+                    if Options.socket:
+                        port = int(Options.socket)
+                    else:
+                        port = self.dlg.port
                 else:
                     port = None
                 self.__startLocalServer(port)
@@ -461,7 +480,10 @@ class Connection(object):
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
             if Options.socket:
-                args.append('--socket=%s' % Options.socket)
+                if os.name == 'nt':
+                    args.append('--port=%s' % Options.socket)
+                else:
+                    args.append('--socket=%s' % Options.socket)
             process = subprocess.Popen(args, shell=os.name=='nt')
             if Debug.connections:
                 logDebug(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
@@ -477,7 +499,10 @@ class Connection(object):
         if self.useSocket and os.name != 'nt':
             self.connector = reactor.connectUNIX(socketName(), factory, timeout=5)
         else:
-            self.connector = reactor.connectTCP(self.dlg.host, self.dlg.port, factory, timeout=5)
+            host = self.dlg.host
+            if english(host) == Query.localServerName:
+                host = '127.0.0.1'
+            self.connector = reactor.connectTCP(host, self.dlg.port, factory, timeout=5)
         utf8Password = self.dlg.password.encode('utf-8')
         utf8Username = username.encode('utf-8')
         cred = credentials.UsernamePassword(utf8Username, utf8Password)

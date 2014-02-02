@@ -130,14 +130,20 @@ class Server(object):
         """start this server"""
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
-        self.socketName = os.path.expanduser(os.path.join('~', '.kajongg',
-            'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))))
+        if os.name == 'nt':
+            self.socketName = random.randrange(1025, 65000)
+        else:
+            self.socketName = os.path.expanduser(os.path.join('~', '.kajongg',
+                'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))))
         assert self.serverKey in (None, job.serverKey()), '{} not in (None, {})'.format(self.serverKey, job.serverKey())
         self.serverKey = job.serverKey()
         print('starting server for %s' % job)
-        cmd = ['{src}/kajonggserver.py'.format(src=job.srcDir()),
-                '--local',
-                '--socket={sock}'.format(sock=self.socketName)]
+        cmd = [os.path.join(job.srcDir(), 'kajonggserver.py'), '--local']
+        if os.name == 'nt':
+            cmd.insert(0, 'python')
+            cmd.append('--port={sock}'.format(sock=self.socketName))
+        else:
+            cmd.append('--socket={sock}'.format(sock=self.socketName))
         if OPTIONS.debug:
             cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
         if OPTIONS.qt5:
@@ -166,7 +172,7 @@ class Server(object):
                     _ = self.process.wait()
                 except OSError:
                     pass
-            if self.socketName:
+            if self.socketName and os.name != 'nt':
                 removeIfExists(self.socketName)
         Clone.removeUnused()
 
@@ -207,11 +213,13 @@ class Job(object):
         # never login to the same server twice at the
         # same time with the same player name
         player = self.server.jobs.index(self) + 1
-        cmd = ['{src}/kajongg.py'.format(src=self.srcDir()),
+        cmd = [os.path.join(self.srcDir(), 'kajongg.py'),
               '--game={game}'.format(game=self.game),
               '--socket={sock}'.format(sock=self.server.socketName),
               '--player=Tester {player}'.format(player=player),
               '--ruleset={ap}'.format(ap=self.ruleset)]
+        if os.name == 'nt':
+            cmd.insert(0, 'python')
         if OPTIONS.rounds:
             cmd.append('--rounds={rounds}'.format(rounds=OPTIONS.rounds))
         if self.aiVariant != 'Default':
@@ -517,7 +525,8 @@ def improve_options():
     if OPTIONS.servers == 0:
         OPTIONS.servers = max(1, OPTIONS.clients // 2)
 
-    cmd = ['{src}/kajongg.py'.format(src=startingDir()), '--rulesets=']
+    cmdPath = os.path.join(startingDir(), 'kajongg.py')
+    cmd = ['python', cmdPath, '--rulesets=']
     OPTIONS.knownRulesets = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0].split('\n')
     OPTIONS.knownRulesets = list(x.strip() for x in OPTIONS.knownRulesets if x.strip())
     if OPTIONS.rulesets == 'ALL':
@@ -604,7 +613,6 @@ def main():
 
     improve_options()
 
-    print('debug:', repr(OPTIONS.debug))
     errorMessage = Debug.setOptions(','.join(OPTIONS.debug))
     if errorMessage:
         print(errorMessage)
