@@ -102,6 +102,7 @@ class DBHandle(sqlite3.Connection):
         Internal.db = self
         self.inTransaction = None
         self.path = path
+        self.identifier = None
         try:
             sqlite3.Connection.__init__(self, self.path, timeout=10.0)
         except sqlite3.Error as exc:
@@ -110,6 +111,9 @@ class DBHandle(sqlite3.Connection):
             cursor = self.cursor()
             cursor.execute('select ident from general')
             self.identifier = cursor.fetchone()[0]
+        if Debug.sql:
+            logDebug('Opened %s with identifier %s' % (
+                self.path, self.identifier))
 
     def __enter__(self):
         self.inTransaction = datetime.datetime.now()
