@@ -127,7 +127,7 @@ class MainWindow(KXmlGuiWindow):
             if Options.host:
                 self.scene = PlayingScene(self)
                 self.scene.applySettings()
-                self.scene.playGame()
+                HumanClient()
             self.show()
             StateSaver(self)
         else:
