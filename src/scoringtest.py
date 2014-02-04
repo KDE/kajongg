@@ -19,7 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from common import Debug  # pylint: disable=unused-import
+from common import Debug, isPython3  # pylint: disable=unused-import
 import unittest
 from game import PlayingGame
 from hand import Hand, Score
@@ -153,7 +153,10 @@ class Helpers(object):
             result.extend(hand.explain())
             result.append('base=%d,doubles=%d,total=%d' % (score.points, score.doubles, hand.total()))
             result.append('')
-        return '\n'.join(x.encode('utf-8') for x in result)
+        if isPython3:
+            return '\n'.join(result)
+        else:
+            return '\n'.join(x.encode('utf-8') for x in result)
 
 # pylint: disable=missing-docstring, too-many-public-methods
 
