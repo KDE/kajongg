@@ -69,8 +69,10 @@ class Url(str):
         str.__init__(self, url)
         if Options.socket and os.name == 'nt':
             self.port = int(Options.socket)
-        if self.port is None and not self.useSocket:
+        if self.port is None and self.isLocalHost and not self.useSocket:
             self.port = self.__findFreePort()
+        if self.port is None and not self.isLocalHost:
+            self.port = Options.defaultPort()
         if Debug.connections:
             logDebug(repr(self))
 
@@ -285,7 +287,7 @@ class LoginDlg(QDialog):
                 userIdx = self.cbUser.findText(userNames[0])
                 if userIdx >= 0:
                     self.cbUser.setCurrentIndex(userIdx)
-        showPW = self.url != Query.localServerName
+        showPW = not Url(self.url).isLocalHost
         self.grid.labelForField(self.edPassword).setVisible(showPW)
         self.edPassword.setVisible(showPW)
         self.grid.labelForField(self.cbRuleset).setVisible(not showPW and not Options.ruleset)
