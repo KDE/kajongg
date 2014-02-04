@@ -85,11 +85,10 @@ def cacheDir():
 
 def socketName():
     """client and server process use this socket to talk to each other"""
-    # TODO: do client and server really get the same name? Maybe improve Debug.connections
     serverDir = os.path.expanduser('~/.kajonggserver')
     if not os.path.exists(serverDir):
         appdataDir() # allocate the directory and possibly move old databases there
     if Options.socket:
         return Options.socket
     else:
-        return os.path.join(serverDir, 'socket')
+        return os.path.join(serverDir, 'socket{}'.format(Options.defaultPort()))
