@@ -434,7 +434,7 @@ class HumanClient(Client):
 
     def hasLocalServer(self):
         """True if we are talking to a Local Game Server"""
-        return self.connection and self.connection.useSocket
+        return self.connection and self.connection.url.isLocalHost
 
     def __updateTableList(self):
         """if it exists"""

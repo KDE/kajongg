@@ -18,7 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import socket, subprocess, time, datetime, os, sys
+import socket, subprocess, datetime, os, sys
+from itertools import chain
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -35,7 +36,7 @@ from kde import KUser, KDialog, KDialogButtonBox, appdataDir, socketName
 from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 
 from log import english, logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
-from util import removeIfExists, which, elapsedSince
+from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Internal, Debug
 from game import Players
 from query import Query
@@ -48,6 +49,156 @@ class LoginAborted(Exception):
     """the user aborted the login"""
     pass
 
+class Url(str):
+    """holds connection related attributes: host, port, socketname"""
+    # pylint: disable=incomplete-protocol,too-many-public-methods
+    def __init__(self, url):
+        self.host = None
+        self.port = None
+        if url:
+            urlParts = url.split(':')
+            self.host = urlParts[0]
+            if english(self.host) == Query.localServerName:
+                self.host = '127.0.0.1'
+            if len(urlParts) > 1:
+                self.port = int(urlParts[1])
+        else:
+            url = self.host
+            if self.port:
+                url += ':{}'.format(self.port)
+        str.__init__(self, url)
+        if Options.socket and os.name == 'nt':
+            self.port = int(Options.socket)
+        if self.port is None and not self.useSocket:
+            self.port = self.__findFreePort()
+        if Debug.connections:
+            logDebug(repr(self))
+
+    def __repr__(self):
+        """show all info"""
+        if self.useSocket:
+            return 'Url({} socket={})'.format(self, socketName())
+        else:
+            return 'Url({} host={} port={})'.format(self, self.host, self.port)
+
+    @property
+    def useSocket(self):
+        """do we use socket for current host?"""
+        return self.host == '127.0.0.1' and os.name != 'nt'
+
+    @property
+    def isLocalGame(self):
+        """Are we playing a local game not needing the network?"""
+        return self.host == '127.0.0.1'
+
+    @property
+    def isLocalHost(self):
+        """do server and client run on the same host?"""
+        return self.host in ('127.0.0.1', 'localhost')
+
+    def __findFreePort(self):
+        """find an unused port on the current system.
+        used when we want to start a local server on windows"""
+        assert self.isLocalHost
+        for port in chain([Options.defaultPort()], range(2000, 19000)):
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            try:
+                sock.connect((self.host, port))
+                sock.close()
+            except socket.error:
+                return port
+        logException('cannot find a free port')
+
+    def startServer(self, result, waiting=0):
+        """make sure we have a running local server or network connectivity"""
+        if self.isLocalHost:
+            # just wait for that server to appear
+            if self.__serverListening():
+                return result
+            else:
+                if waiting == 0:
+                    self.__startLocalServer()
+                elif waiting > 30:
+                    logDebug('Game %s: Server %s not available after 30 seconds, aborting' % (
+                        SingleshotOptions.game, self))
+                    Internal.reactor.stop()
+                return deferLater(Internal.reactor, 1, self.startServer, result, waiting+1)
+        elif which('XXqdbus'):
+            # TODO: use twisted process because we must have a timeout. If the qdbus service
+            # does not anwer, qdbus waits for 25 seconds.
+            # the state of QtDBus is unclear to me.
+            # riverbank.computing says module dbus is deprecated
+            # for Python 3. And Ubuntu has no package with
+            # QtDBus. So we use good old subprocess.
+            stdoutdata, stderrdata = subprocess.Popen(['qdbus',
+                'org.kde.kded',
+                '/modules/networkstatus',
+                'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            stdoutdata = stdoutdata.strip()
+            stderrdata = stderrdata.strip()
+            if stderrdata == '' and stdoutdata != '4':
+                # pylint: disable=nonstandard-exception
+                raise ConnectError()
+            # if we have stderrdata, qdbus probably does not provide the service we want, so ignore it
+        return result
+
+    def __startLocalServer(self):
+        """start a local server"""
+        try:
+            args = ['kajonggserver'] # the default
+            if sys.argv[0].endswith('kajongg.py'):
+                tryServer = sys.argv[0].replace('.py', 'server.py')
+                if os.path.exists(tryServer):
+                    args = ['python', tryServer]
+            elif sys.argv[0].endswith('kajongg.pyw'):
+                tryServer = sys.argv[0].replace('.pyw', 'server.py')
+                if os.path.exists(tryServer):
+                    args = ['python', tryServer]
+            if self.useSocket or os.name == 'nt': # for nt --socket tells the server to bind to 127.0.0.1
+                args.append('--socket=%s' % socketName())
+                if removeIfExists(socketName()):
+                    logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
+            else:
+                args.append('--port=%d' % self.port)
+            if self.isLocalGame:
+                args.append('--db=%slocal.db' % appdataDir())
+            if Debug.argString:
+                args.append('--debug=%s' % Debug.argString)
+            process = subprocess.Popen(args, shell=os.name=='nt')
+            if Debug.connections:
+                logDebug(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
+                    process.pid, ' '.join(args)))
+        except OSError as exc:
+            logException(exc)
+
+    def __serverListening(self):
+        """is the expected server listening?"""
+        if self.useSocket:
+            proto = socket.AF_UNIX
+            param = socketName()
+            if not os.path.exists(param):
+                return False
+        else:
+            proto = socket.AF_INET
+            param = (self.host, self.port)
+        sock = socket.socket(proto, socket.SOCK_STREAM)
+        sock.settimeout(1)
+        try:
+            sock.connect(param)
+            sock.close()
+            return True
+        except socket.error:
+            return False
+
+    def connect(self, factory):
+        """returns a twisted connector"""
+        if self.useSocket:
+            return Internal.reactor.connectUNIX(socketName(), factory, timeout=5)
+        else:
+            host = self.host
+            return Internal.reactor.connectTCP(host, self.port, factory, timeout=5)
+
 class LoginDlg(QDialog):
     """login dialog for server"""
     def __init__(self):
@@ -56,15 +207,16 @@ class LoginDlg(QDialog):
         self.setWindowTitle(m18n('Login') + ' - Kajongg')
         self.setupUi()
 
-        localName = m18nc('kajongg name for local game server', Query.localServerName)
+        localName = m18n(Query.localServerName)
         self.servers = Query('select url,lastname from server order by lasttime desc').records
-        servers = [m18nc('kajongg name for local game server', x[0]) for x in self.servers]
+        servers = [m18n(x[0]) for x in self.servers]
         # the first server combobox item should be default: either the last used server
         # or localName for autoPlay
         if localName not in servers:
             servers.append(localName)
         if 'kajongg.org' not in servers:
             servers.append('kajongg.org')
+        if Internal.autoPlay:
             demoHost = Options.host or localName
             if demoHost in servers:
                 servers.remove(demoHost)  # we want a unique list, it will be re-used for all following games
@@ -79,8 +231,8 @@ class LoginDlg(QDialog):
         StateSaver(self)
 
     def returns(self, dummyButton=None):
-        """maybe we should return an class ServerConnection"""
-        return (self.useSocket, self.url, self.username, self.password, self.__defineRuleset())
+        """login data returned by this dialog"""
+        return (Url(self.url), self.username, self.password, self.__defineRuleset())
 
     def setupUi(self):
         """create all Ui elements but do not fill them"""
@@ -174,45 +326,6 @@ class LoginDlg(QDialog):
         return english(unicode(self.cbServer.currentText()))
 
     @property
-    def host(self):
-        """abstracts the host of the dialog"""
-        return self.url.partition(':')[0]
-
-    @property
-    def useSocket(self):
-        """do we use socket for current host?"""
-        return self.host == Query.localServerName
-
-    @property
-    def port(self):
-        """abstracts the port of the dialog"""
-        if self.__port is not  None:
-            return self.__port
-        if Options.socket and os.name == 'nt':
-            self.__port = int(Options.socket)
-        elif os.name == 'nt':
-            self.__port = self.findFreePort()
-        else:
-            try:
-                self.__port = int(self.url.partition(':')[2])
-            except ValueError:
-                self.__port = Options.defaultPort()
-        return self.__port
-
-    @staticmethod
-    def findFreePort():
-        """find an unused port on the current system.
-        used when we want to start a local server on windows"""
-        for port in range(12000, 19000):
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(1)
-            try:
-                sock.connect(('127.0.0.1', port))
-            except socket.error:
-                return port
-        logException('cannot find a free port')
-
-    @property
     def username(self):
         """abstracts the username of the dialog"""
         return unicode(self.cbUser.currentText())
@@ -300,7 +413,6 @@ class Connection(object):
         self.client = client
         self.perspective = None
         self.connector = None
-        self.useSocket = False
         self.url = None
         self.username = None
         self.password = None
@@ -310,8 +422,9 @@ class Connection(object):
     def login(self):
         """to be called from HumanClient"""
         result = DeferredDialog(self.dlg).addCallback(self.__haveLoginData)
-        result.addCallback(self.assertConnectivity)
-        result.addCallback(self.loginToServer)
+        result.addCallback(self.__checkExistingConnections)
+        result.addCallback(self.__startServer)
+        result.addCallback(self.__loginToServer)
         result.addCallback(self.loggedIn)
         result.addErrback(self._loginReallyFailed)
         if Internal.autoPlay or SingleshotOptions.table or SingleshotOptions.join:
@@ -320,14 +433,17 @@ class Connection(object):
 
     def __haveLoginData(self, arguments):
         """user entered login data, now try to login to server"""
-        if self.url == 'localhost':
+        self.url, self.username, self.password, self.ruleset = arguments
+        if self.url.isLocalHost:
             # we have localhost if we play a Local Game: client and server are identical,
             # we have no security concerns about creating a new account
             Players.createIfUnknown(unicode(self.dlg.cbUser.currentText()))
-        self.useSocket, self.url, self.username, self.password, self.ruleset = arguments
-        self.__checkExistingConnections()
 
-    def loginToServer(self, dummy=None):
+    def __startServer(self, result):
+        """if needed"""
+        return self.url.startServer(result)
+
+    def __loginToServer(self, dummy=None):
         """login to server"""
         return self.loginCommand(self.username).addErrback(self._loginFailed)
 
@@ -344,7 +460,7 @@ class Connection(object):
     def __updateServerInfoInDatabase(self):
         """we are online. Update table server."""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        url = english(self.url) # use unique name for Local Game
+        url = english(self.url)
         if self.ruleset:
             self.ruleset.save()     # this makes sure we have a valid rulesetId for predefined rulesets
         with Internal.db:
@@ -365,7 +481,7 @@ class Connection(object):
                 Query('insert into passwords(url,player,password) values(?,?,?)',
                     (url, playerId, self.password))
 
-    def __checkExistingConnections(self):
+    def __checkExistingConnections(self, dummy=None):
         """do we already have a connection to the wanted URL?"""
         for client in self.client.humanClients:
             if client.connection and client.connection.url == self.url:
@@ -373,136 +489,11 @@ class Connection(object):
                 client.tableList.activateWindow()
                 raise CancelledError
 
-    def __serverListening(self):
-        """is somebody listening on that port?"""
-        if self.useSocket and os.name != 'nt':
-            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            sock.settimeout(30.0)
-            try:
-                sock.connect(socketName())
-            except socket.error as exception:
-                if os.path.exists(socketName()):
-                    # try again, avoiding a race
-                    try:
-                        sock.connect(socketName())
-                    except socket.error as exception:
-                        logInfo('socket error:%s' % str(exception))
-                        if removeIfExists(socketName()):
-                            logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
-                        return False
-                    else:
-                        return True
-            else:
-                return True
-        else:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(1)
-            host = self.dlg.host
-            port = self.dlg.port
-            if int(port) == 0:
-                if Options.socket:
-                    port = int(Options.socket)
-            if host == Query.localServerName:
-                host = '127.0.0.1'
-            try:
-                sock.connect((host, port))
-            except socket.error:
-                return False
-            else:
-                return True
-
-    def assertConnectivity(self, result, waiting=0):
-        """make sure we have a running local server or network connectivity"""
-        # pylint: disable=too-many-branches
-        if Options.socket and os.name != 'nt':
-            # just wait for that socket to appear
-            if os.path.exists(socketName()) and self.__serverListening():
-                return result
-            else:
-                if waiting > 0:
-                    logDebug('Game %s: Socket %s not available after 30 seconds, aborting' % (
-                        SingleshotOptions.game, socketName()))
-                    Internal.reactor.stop()
-                return deferLater(Internal.reactor, 2, self.assertConnectivity, result, waiting+1)
-        if self.useSocket or self.dlg.url in ('localhost', '127.0.0.1'):
-            if not self.__serverListening():
-                if os.name == 'nt':
-                    if Options.socket:
-                        port = int(Options.socket)
-                    else:
-                        port = self.dlg.port
-                else:
-                    port = None
-                self.__startLocalServer(port)
-                # give the server up to 5 seconds time to start
-                startWaiting = datetime.datetime.now()
-                while elapsedSince(startWaiting) < 20:
-                    if self.__serverListening():
-                        break
-                    time.sleep(0.1) # this sleeps about 1.1 seconds on
-                    # Windows7 in a virtualbox
-                else:
-                    logDebug('After 20 seconds, the local server is not yet there, aborting')
-                    Internal.reactor.stop()
-        elif which('XXqdbus'):
-            # TODO: use twisted process because we must have a timeout. If the qdbus service
-            # does not anwer, qdbus waits for 25 seconds.
-            # the state of QtDBus is unclear to me.
-            # riverbank.computing says module dbus is deprecated
-            # for Python 3. And Ubuntu has no package with
-            # QtDBus. So we use good old subprocess.
-            stdoutdata, stderrdata = subprocess.Popen(['qdbus',
-                'org.kde.kded',
-                '/modules/networkstatus',
-                'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            stdoutdata = stdoutdata.strip()
-            stderrdata = stderrdata.strip()
-            if stderrdata == '' and stdoutdata != '4':
-                # pylint: disable=nonstandard-exception
-                raise ConnectError()
-            # if we have stderrdata, qdbus probably does not provide the service we want, so ignore it
-        return result
-
-    def __startLocalServer(self, port):
-        """start a local server"""
-        try:
-            args = ['kajonggserver'] # the default
-            if sys.argv[0].endswith('kajongg.py'):
-                tryServer = sys.argv[0].replace('.py', 'server.py')
-                if os.path.exists(tryServer):
-                    args = ['python', tryServer]
-            if self.useSocket or os.name == 'nt':
-                args.append('--local')
-            if port:
-                args.append('--port=%d' % port)
-            if self.useSocket:
-                args.append('--db=%slocal.db' % appdataDir())
-            if Debug.argString:
-                args.append('--debug=%s' % Debug.argString)
-            if Options.socket:
-                if os.name == 'nt':
-                    args.append('--port=%s' % Options.socket)
-                else:
-                    args.append('--socket=%s' % Options.socket)
-            process = subprocess.Popen(args, shell=os.name=='nt')
-            if Debug.connections:
-                logDebug(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
-                    process.pid, ' '.join(args)))
-        except OSError as exc:
-            logException(exc)
-
     def loginCommand(self, username):
         """send a login command to server. That might be a normal login
         or adduser/deluser/change passwd encoded in the username"""
         factory = pb.PBClientFactory()
-        reactor = Internal.reactor
-        if self.useSocket and os.name != 'nt':
-            self.connector = reactor.connectUNIX(socketName(), factory, timeout=5)
-        else:
-            host = self.dlg.host
-            if english(host) == Query.localServerName:
-                host = '127.0.0.1'
-            self.connector = reactor.connectTCP(host, self.dlg.port, factory, timeout=5)
+        self.connector = self.url.connect(factory)
         utf8Password = self.dlg.password.encode('utf-8')
         utf8Username = username.encode('utf-8')
         cred = credentials.UsernamePassword(utf8Username, utf8Password)
@@ -511,8 +502,8 @@ class Connection(object):
     def __adduser(self):
         """create a user account"""
         assert self.url is not None
-        if self.dlg.host != Query.localServerName:
-            if not AddUserDialog(self.dlg.url,
+        if not self.url.isLocalHost:
+            if not AddUserDialog(self.url,
                 self.dlg.username,
                 self.dlg.password).exec_():
                 raise CancelledError
@@ -530,7 +521,7 @@ class Connection(object):
                 return Failure(CancelledError())
         message = failure.getErrorMessage()
         if 'Wrong username' in message:
-            if self.dlg.host == Query.localServerName:
+            if self.url.isLocalHost:
                 return answered(True)
             else:
                 msg = m18nc('USER is not known on SERVER',
@@ -559,7 +550,7 @@ class Connection(object):
                 self.url, failure.value.__class__.__name__, failure.getErrorMessage(),
                 failure.getTraceback())
         # Maybe the server is running but something is wrong with it
-        if self.useSocket and os.name != 'nt':
+        if self.url.useSocket:
             if removeIfExists(socketName()):
                 logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
             msg += '\n\n\n' + m18n('Please try again')

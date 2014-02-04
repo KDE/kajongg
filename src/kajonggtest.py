@@ -138,7 +138,7 @@ class Server(object):
         assert self.serverKey in (None, job.serverKey()), '{} not in (None, {})'.format(self.serverKey, job.serverKey())
         self.serverKey = job.serverKey()
         print('starting server for %s' % job)
-        cmd = [os.path.join(job.srcDir(), 'kajonggserver.py'), '--local']
+        cmd = [os.path.join(job.srcDir(), 'kajonggserver.py')]
         if os.name == 'nt':
             cmd.insert(0, 'python')
             cmd.append('--port={sock}'.format(sock=self.socketName))
@@ -516,7 +516,7 @@ def parse_options():
 
 def improve_options():
     """add sensible defaults"""
-    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-branches,too-many-statements
     if OPTIONS.count > 10000:
         if OPTIONS.game:
             OPTIONS.count = 1

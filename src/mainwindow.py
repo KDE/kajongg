@@ -124,7 +124,7 @@ class MainWindow(KXmlGuiWindow):
             for action in self.toolBar().actions():
                 if 'onfigure' in action.text():
                     action.setPriority(QAction.LowPriority)
-            if Options.host:
+            if Options.host and not Options.demo:
                 self.scene = PlayingScene(self)
                 self.scene.applySettings()
                 HumanClient()

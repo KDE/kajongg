@@ -31,6 +31,8 @@ from itertools import chain
 
 def cleanExit(*dummyArgs):
     """we want to cleanly close sqlite3 files"""
+    if Options.socket and os.name != 'nt':
+        os.remove(Options.socket)
     try:
         if Internal.db:
             Internal.db.close() # setting to None does not call close(), do we need close?
@@ -78,7 +80,6 @@ from query import Query, initDb
 from meld import Meld, MeldList
 from log import m18n, m18nE, m18ncE, logDebug, logWarning, logError, SERVERMARK
 from util import Duration
-from kde import socketName
 from message import Message, ChatMessage
 from common import Debug
 from sound import Voice
@@ -1190,8 +1191,6 @@ def parseArgs():
     parser.add_option('', '--socket', dest='socket',
         help=m18n('the server will listen on SOCKET'), default=None)
     parser.add_option('', '--db', dest='dbpath', help=m18n('name of the database'), default=None)
-    parser.add_option('', '--local', dest='local', action='store_true',
-        help=m18n('start a local game server'), default=False)
     parser.add_option('', '--continue', dest='continueServer', action='store_true',
         help=m18n('do not terminate local game server after last client disconnects'), default=False)
     parser.add_option('', '--debug', dest='debug',
@@ -1207,8 +1206,6 @@ def parseArgs():
     Options.continueServer |= options.continueServer
     if options.dbpath:
         Options.dbPath = os.path.expanduser(options.dbpath)
-    if options.local:
-        Options.socket = socketName()
     if options.socket:
         Options.socket = options.socket
     Debug.setOptions(options.debug)
@@ -1242,6 +1239,7 @@ def kajonggServer():
             reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError as errObj:
         logWarning(errObj)
+        sys.exit(1)
     else:
         reactor.run()
 
