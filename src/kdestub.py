@@ -43,7 +43,7 @@ except ImportError:
     # pylint: disable=import-error
     from configparser import SafeConfigParser, NoSectionError, NoOptionError
 
-from locale import _parse_localename, getdefaultlocale
+from locale import _parse_localename, getdefaultlocale, setlocale, LC_ALL
 
 # here come the replacements:
 
@@ -200,6 +200,10 @@ class KApplication(QApplication):
     """stub"""
     def __init__(self):
         QApplication.__init__(self, sys.argv)
+        if os.name == 'nt':
+            # on Linux, QCoreApplication initializes locale but not on Windows.
+            # This is actually documented for QCoreApplication
+            setlocale(LC_ALL, '')
         KLocale.initQtTranslator(self)
 
     @staticmethod
