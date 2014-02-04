@@ -32,6 +32,7 @@ if '--qt5' in sys.argv:
     try:
         from qt5 import *
         isQt5 = True
+        isQt4 = False
     except ImportError as exc:
         print('Cannot import Qt5:{}, using Qt4 instead'.format(exc.message))
         from qt4 import *
