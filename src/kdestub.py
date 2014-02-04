@@ -30,7 +30,7 @@ __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
             'KUser', 'KToggleFullScreenAction', 'KStandardAction',
             'KXmlGuiWindow', 'KStandardDirs', 'KGlobal', 'KIcon', 'KAction']
 
-import sys, os, subprocess, getpass, webbrowser
+import sys, os, subprocess, getpass, webbrowser, codecs
 if os.name != 'nt':
     import pwd
 import weakref
@@ -679,7 +679,7 @@ class KConfigGroup(object):
         except NoSectionError:
             return self.__default(name)
         items = dict((x for x in items if x[0].startswith(name)))
-        i18nItems = dict(((x[0], x[1].decode('utf-8')) for x in items.items() if x[0].startswith(name + '[')))
+        i18nItems = dict((x for x in items.items() if x[0].startswith(name + '[')))
         if i18nItems:
             for language in KGlobal.config().group('Locale').readEntry('Language').split(':'):
                 key = '%s[%s]' % (name, language)
@@ -793,7 +793,8 @@ class KConfig(SafeConfigParser):
         if path is None:
             path = KGlobal.dirs().locateLocal("config", "kajonggrc")
         self.path = str(path)
-        self.read(self.path)
+        with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
+            self.readfp(cfgFile)
 
     def as_dict(self):
         """a dict of dicts"""
