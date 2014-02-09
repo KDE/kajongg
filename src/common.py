@@ -132,10 +132,11 @@ Options {stropt} take a string argument like {example}.
         Debug.argString = args
         for arg in args.split(','):
             parts = arg.split(':')
-            if len(parts) == 1:
-                parts.append(True)
             option = parts[0]
-            value = ':'.join(parts[1:])
+            if len(parts) == 1:
+                value = True
+            else:
+                value = ':'.join(parts[1:])
             if option not in Debug.__dict__:
                 return '--debug: unknown option %s' % option
             if type(Debug.__dict__[option]) != type(value):
