@@ -87,6 +87,12 @@ class Prompt(MustChooseKDialog):
             button = self.default
         return button in (KDialog.Yes, KDialog.Ok)
 
+    def __unicode__(self):
+        return u'Prompt({})'.format(self.msg)
+
+    def __str__(self):
+        return 'Prompt({})'.format(self.msg.encode('utf-8'))
+
 class DeferredDialog(Deferred):
     """make dialogs usable as Deferred"""
     def __init__(self, dlg, modal=True, always=False):
