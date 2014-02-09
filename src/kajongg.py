@@ -129,20 +129,23 @@ class EvHandler(QObject):
         if event.type() in self.events:
             # ignore unknown event types
             name = self.events[event.type()]
-            if 'all' in Debug.events or name in Debug.events:
-                if hasattr(event, 'key'):
+            if hasattr(event, 'key'):
+                if event.key() in self.keys:
                     value = self.keys[event.key()]
-                elif hasattr(event, 'text'):
-                    value = str(event.text())
                 else:
-                    value = ''
-                if value:
-                    value = '(%s)' % value
-                msg = '%s%s->%s' % (name, value, receiver)
-                if hasattr(receiver, 'text'):
-                    msg += '(%s)' % receiver.text()
-                elif hasattr(receiver, 'objectName'):
-                    msg += '(%s)' % receiver.objectName()
+                    value = 'unknown key:%s' % event.key()
+            elif hasattr(event, 'text'):
+                value = str(event.text())
+            else:
+                value = ''
+            if value:
+                value = '(%s)' % value
+            msg = u'%s%s->%s' % (name, value, receiver)
+            if hasattr(receiver, 'text'):
+                msg += u'(%s)' % receiver.text()
+            elif hasattr(receiver, 'objectName'):
+                msg += u'(%s)' % receiver.objectName()
+            if 'all' in Debug.events or any(x in msg for x in Debug.events.split(':')):
                 logDebug(msg)
         return QObject.eventFilter(self, receiver, event)
 

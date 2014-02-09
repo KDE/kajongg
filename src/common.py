@@ -117,7 +117,9 @@ class Debug(object):
         opt = '\n'.join(', '.join(optYielder(allOptions)).split(' SEPARATOR, '))
         return """set debug options. Pass a comma separated list of options.
 Options are: {opt}.
-Options {stropt} take a string argument like {example}""".format(
+Options {stropt} take a string argument like {example}.
+--debug=events can get suboptions like in --debug=events:Mouse:Hide
+     meaning "show all event messages with 'Mouse' or 'Hide' in them\"""".format(
            opt=opt,
            stropt=', '.join(stringOptions), example=stringExample)
 
@@ -129,14 +131,16 @@ Options {stropt} take a string argument like {example}""".format(
             return
         Debug.argString = args
         for arg in args.split(','):
-            parts = arg.split('=')
+            parts = arg.split(':')
             if len(parts) == 1:
                 parts.append(True)
-            option, value = parts
+            option = parts[0]
+            value = ':'.join(parts[1:])
             if option not in Debug.__dict__:
                 return '--debug: unknown option %s' % option
             if type(Debug.__dict__[option]) != type(value):
-                return '--debug: wrong value for option %s' % option
+                return '--debug: wrong type for option %s: given %s/%s, should be %s' % (
+                    option, value, type(value), type(Debug.__dict__[option]))
             if option != 'scores' or not Internal.isServer:
                 type.__setattr__(Debug, option, value)
         if Debug.time:
