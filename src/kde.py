@@ -24,6 +24,8 @@ import os, sys, shutil
 
 from common import Internal, Options
 
+usingKDE = False
+
 try:
     if '--nokde' in sys.argv or '--qt5' in sys.argv:
         # for now there is no PyKDE5
@@ -35,6 +37,7 @@ try:
         KConfigSkeleton, KDialogButtonBox, KAction, KStandardAction, \
         KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
         KConfigDialog, KDialog
+    usingKDE = True
 except ImportError:
     try:
         raise
