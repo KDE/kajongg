@@ -94,26 +94,6 @@ class Sorry(Prompt):
     """wrapper, see class Prompt"""
     method = KMessageBox.sorry
 
-class NonModalInformation(Deferred):
-    """tell/ask user non modally"""
-    def __init__(self, msg, callback=None, *cbargs, **cbkw):
-        Deferred.__init__(self)
-        if callback:
-            self.addCallback(callback, *cbargs, **cbkw)
-        dlg = KDialogIgnoringEscape(InternalParameters.field)
-        dlg.setButtons(KDialog.Ok)
-        dlg.setWindowFlags(dlg.windowFlags() | Qt.WindowStaysOnTopHint)
-        dlg.setCaption('Kajongg')
-        dlg.accepted.connect(self.accepted)
-        dlg.rejected.connect(self.accepted)
-        KMessageBox.createKMessageBox(dlg, QMessageBox.Question,
-            msg, QStringList(), "", False, KMessageBox.NoExec)
-        dlg.show()
-
-    def accepted(self):
-        """or rejected"""
-        self.callback(True)
-
 def NoPrompt(dummyMsg):
     """we just want to be able to add callbacks even if non-interactive"""
     return succeed(None)

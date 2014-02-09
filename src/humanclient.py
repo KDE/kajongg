@@ -30,7 +30,7 @@ from PyQt4.QtGui import QDialog, QDialogButtonBox, QVBoxLayout, QGridLayout, \
     QLabel, QComboBox, QLineEdit, QPushButton, QFormLayout, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from kde import Sorry, NonModalInformation, QuestionYesNo, KDialogButtonBox, KUser, KIcon, \
+from kde import Sorry, Information, QuestionYesNo, KDialogButtonBox, KUser, KIcon, \
     DialogIgnoringEscape
 
 from util import m18n, m18nc, logWarning, logException, socketName, english, \
@@ -846,7 +846,7 @@ class HumanClient(Client):
         if self.game.autoPlay:
             return answered()
         else:
-            return NonModalInformation(m18n("Ready for next hand?"), answered)
+            return Information(m18n("Ready for next hand?"), answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
