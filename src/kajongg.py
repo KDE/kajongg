@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
 
-from qt import QObject, QEvent, Qt, isQt4
+from qt import QObject, QEvent, Qt, usingQt4
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 from about import About
 
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     ABOUT = About()
     KCmdLineArgs.init (sys.argv, ABOUT.about)
     KCmdLineArgs.addCmdLineOptions(defineOptions())
-    if isQt4:
+    if usingQt4:
         KApplication.setGraphicsSystem('raster')
     APP = KApplication()
     parseOptions()

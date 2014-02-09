@@ -23,7 +23,7 @@ import datetime
 from kde import KIcon
 from dialogs import WarningYesNo
 
-from qt import isQt5, Qt, QVariant, RealQVariant, variantValue, QAbstractTableModel
+from qt import usingQt5, Qt, QVariant, RealQVariant, variantValue, QAbstractTableModel
 from qt import QDialogButtonBox, QDialog, \
         QHBoxLayout, QVBoxLayout, QCheckBox, \
         QItemSelectionModel, QAbstractItemView
@@ -218,7 +218,7 @@ class Games(QDialog):
                     Query("DELETE FROM score WHERE game = ?", (game, ))
                     Query("DELETE FROM game WHERE id = ?", (game, ))
                 self.setQuery() # just reload entire table
-        if isQt5:
+        if usingQt5:
             deleteGames = list(x.data() for x in self.view.selectionModel().selectedRows(0))
         else:
             deleteGames = list(x.data().toInt()[0] for x in self.view.selectionModel().selectedRows(0))

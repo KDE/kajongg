@@ -20,7 +20,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, isQt5, QVariant, variantValue, QSize
+from qt import Qt, usingQt5, QVariant, variantValue, QSize
 from qt import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
@@ -417,7 +417,7 @@ class RuleTreeView(QTreeView):
         header = self.header()
         header.setStretchLastSection(False)
         header.setMinimumSectionSize(-1)
-        if isQt5:
+        if usingQt5:
             for col in range(1, header.count()):
                 header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
             header.setSectionResizeMode(0, QHeaderView.Stretch)

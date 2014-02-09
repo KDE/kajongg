@@ -11,7 +11,7 @@ Copyright (C) 2008-2014 Wolfgang Rohdewald
  the GNU General Public License for more details.
 """
 
-from qt import isQt5, Qt, RealQVariant, variantValue, QSize, QRect, QEvent
+from qt import usingQt5, Qt, RealQVariant, variantValue, QSize, QRect, QEvent
 from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
     QStyleOptionViewItem, QApplication
 
@@ -101,7 +101,7 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
                 return False
         else:
             return False
-        if not isQt5:
+        if not usingQt5:
             value = value.toInt()[0]
         if value == Qt.Checked:
             state = Qt.Unchecked

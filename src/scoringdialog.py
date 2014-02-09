@@ -18,10 +18,10 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, isQt5, QPointF, QVariant, variantValue, pyqtSignal, \
+from qt import Qt, usingQt5, QPointF, QVariant, variantValue, pyqtSignal, \
     QSize, QModelIndex, QEvent, QTimer
 
-if not isQt5:
+if not usingQt5:
     from qt import SLOT
 
 from qt import QColor, QPushButton, QPixmapCache
@@ -419,7 +419,7 @@ class ScoreTable(QWidget):
         self.viewRight.setHorizontalScrollBar(HorizontalScrollBar(self))
         self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
         self.viewRight.setFocusPolicy(Qt.NoFocus)
-        if isQt5:
+        if usingQt5:
             self.viewRight.header().setSectionsClickable(False)
             self.viewRight.header().setSectionsMovable(False)
         else:
@@ -483,7 +483,7 @@ class ScoreTable(QWidget):
             header = view.header()
             header.setStretchLastSection(False)
             view.setAlternatingRowColors(True)
-        if isQt5:
+        if usingQt5:
             self.viewRight.header().setSectionResizeMode(QHeaderView.Fixed)
         else:
             self.viewRight.header().setResizeMode(QHeaderView.Fixed)
@@ -583,7 +583,7 @@ class PenaltyBox(QSpinBox):
 
     def validate(self, inputData, pos):
         """check if value is a multiple of parties"""
-        if isQt5:
+        if usingQt5:
             result, inputData, newPos = QSpinBox.validate(self, inputData, pos)
         else:
             result, newPos = QSpinBox.validate(self, inputData, pos)
@@ -592,7 +592,7 @@ class PenaltyBox(QSpinBox):
                 result = QValidator.Intermediate
         if result == QValidator.Acceptable:
             self.prevValue = str(inputData)
-        if isQt5:
+        if usingQt5:
             return (result, inputData, newPos)
         else:
             return (result, newPos)
@@ -669,7 +669,7 @@ class PenaltyDialog(QDialog):
         grid.addWidget(buttonBox, 7, 0, 1, 5)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         buttonBox.rejected.connect(self.reject)
-        if isQt5:
+        if usingQt5:
             self.btnExecute = buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole)
             self.btnExecute.clicked.connect(self.accept)
         else:

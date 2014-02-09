@@ -25,14 +25,14 @@ import sip, sys
 
 from common import isPython3
 
-isQt4 = True # Default for now
-isQt5 = False
+usingQt4 = True # Default for now
+usingQt5 = False
 
 if '--qt5' in sys.argv:
     try:
         from qt5 import *
-        isQt5 = True
-        isQt4 = False
+        usingQt5 = True
+        usingQt4 = False
     except ImportError as exc:
         print('Cannot import Qt5:{}, using Qt4 instead'.format(exc.message))
         from qt4 import *
@@ -43,7 +43,7 @@ class RealQVariant(object):
     """context helper, forcibly disabling QVariant autoconversion for Qt5.
     This makes it easier to write code supporting both Qt4 and Qt5"""
     def __init__(self):
-        if isQt5:
+        if usingQt5:
             sip.enableautoconversion(QVariant, False)
 
     def __enter__(self):
@@ -51,5 +51,5 @@ class RealQVariant(object):
 
     def __exit__(self, exc_type, exc_value, trback):
         """enable autoconversion again"""
-        if isQt5:
+        if usingQt5:
             sip.enableautoconversion(QVariant, True)
