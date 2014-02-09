@@ -600,7 +600,7 @@ class HumanClient(Client):
             # update the balances in the status bar:
             Internal.field.updateGUI()
         assert not self.game.isFirstHand()
-        return Information(m18n("Ready for next hand?"), modal=False).addCallback(answered)
+        return Information(m18n("Ready for next hand?"), modal=True).addCallback(answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
