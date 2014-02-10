@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from qt import QString, QObject, QByteArray, QEvent, QSplitter, QHeaderView
 
-from log import english
+from log import english, EventData
 from common import Internal, isAlive
 
 class StateSaver(QObject):
@@ -66,19 +66,15 @@ class StateSaver(QObject):
     def eventFilter(self, dummyWatched, event):
         """if the watched widget hides, save its state.
         Return False if the event should be handled further"""
-        if QEvent is None:
-            # this happens after QApplication.quit(), should it?
-            # isAlive is also None
-            return True
-        if event.type() == QEvent.Hide:
-            self.save()
-            return False
-        elif event.type() == QEvent.Close:
-            self.save()
-            del StateSaver.savers[self.widgets[0][1]]
-            return True
-        else:
-            return False
+        if QEvent is not None:
+            # while appquit, QEvent may be None. Maybe not anymore
+            # with later versions?
+            if event.type() == QEvent.Hide:
+                self.save()
+            elif event.type() == QEvent.Close:
+                self.save()
+                del StateSaver.savers[self.widgets[0][1]]
+        return False
 
     @staticmethod
     def saveAll():
