@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
 
-from qt import QObject, QEvent, Qt, usingQt4
+from qt import QObject, usingQt4
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 from about import About
 
@@ -121,32 +121,11 @@ def parseOptions():
 
 class EvHandler(QObject):
     """an application wide event handler"""
-    events = {y:x for x, y in QEvent.__dict__.items() if isinstance(y, int)}
-    keys = {y:x for x, y in Qt.__dict__.items() if isinstance(y, int)}
+
     def eventFilter(self, receiver, event):
         """will be called for all events"""
-        from log import logDebug
-        if event.type() in self.events:
-            # ignore unknown event types
-            name = self.events[event.type()]
-            if hasattr(event, 'key'):
-                if event.key() in self.keys:
-                    value = self.keys[event.key()]
-                else:
-                    value = 'unknown key:%s' % event.key()
-            elif hasattr(event, 'text'):
-                value = str(event.text())
-            else:
-                value = ''
-            if value:
-                value = '(%s)' % value
-            msg = u'%s%s->%s' % (name, value, receiver)
-            if hasattr(receiver, 'text'):
-                msg += u'(%s)' % receiver.text()
-            elif hasattr(receiver, 'objectName'):
-                msg += u'(%s)' % receiver.objectName()
-            if 'all' in Debug.events or any(x in msg for x in Debug.events.split(':')):
-                logDebug(msg)
+        from log import EventData
+        EventData(receiver, event)
         return QObject.eventFilter(self, receiver, event)
 
 if __name__ == "__main__":

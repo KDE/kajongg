@@ -29,6 +29,7 @@ SERVERMARK = '&&SERVER&&'
 # util must not import twisted or we need to change kajongg.py
 
 from common import Internal, Debug, unicode, isPython3 # pylint: disable=redefined-builtin
+from qt import Qt, QEvent
 from util import elapsedSince, traceback, xToUtf8, gitHead
 from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
@@ -243,3 +244,49 @@ def m18ncE(dummyContext, englishText):
     """use this if you want to get the english text right now but still have the string translated"""
     return englishText
 
+class EventData(str):
+    """used for generating a nice string"""
+    events = {y:x for x, y in QEvent.__dict__.items() if isinstance(y, int)}
+    # add some old events which still arrive but are not supported by PyQt4
+    events[15] = 'Create'
+    events[16] = 'Destroy'
+    events[20] = 'Quit'
+    events[22] = 'ThreadChange'
+    events[67] = 'ChildInsertedRequest'
+    events[70] = 'ChildInserted'
+    events[152] = 'AcceptDropsChange'
+    events[154] = 'Windows:ZeroTimer'
+    events[178] = 'ContentsRectChange'
+    keys = {y:x for x, y in Qt.__dict__.items() if isinstance(y, int)}
+
+    def __new__(self, receiver, event, prefix=None):
+        """create the wanted string"""
+        if event.type() in self.events:
+            # ignore unknown event types
+            name = self.events[event.type()]
+            value = ''
+            if hasattr(event, 'key'):
+                if event.key() in self.keys:
+                    value = self.keys[event.key()]
+                else:
+                    value = 'unknown key:%s' % event.key()
+            if hasattr(event, 'text'):
+                eventText = str(event.text())
+                if eventText and eventText != '\r':
+                    value += ':%s' % eventText
+            if value:
+                value = '(%s)' % value
+            msg = u'%s%s->%s' % (name, value, receiver)
+            if hasattr(receiver, 'text'):
+                if receiver.__class__.__name__ != 'QAbstractSpinBox':
+                    # accessing QAbstractSpinBox.text() gives a segfault
+                    msg += u'(%s)' % receiver.text()
+            elif hasattr(receiver, 'objectName'):
+                msg += u'(%s)' % receiver.objectName()
+        else:
+            msg = 'unknown event:%s' % event.type()
+        if prefix:
+            msg = u': '.join([prefix, msg])
+        if 'all' in Debug.events or any(x in msg for x in Debug.events.split(':')):
+            logDebug(msg)
+        return msg
