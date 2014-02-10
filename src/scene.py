@@ -131,7 +131,6 @@ class GameScene(SceneWithFocusRect):
 
         self.scoreTable = None
         self.explainView = None
-        self.confDialog = None
         self.setupUi()
 
     @property
@@ -303,7 +302,6 @@ class PlayingScene(GameScene):
         self.__startingGame = True
         self._clientDialog = None
 
-        self.confDialog = None
         self.setupUi()
 
     @GameScene.game.setter

@@ -112,9 +112,9 @@ class MainWindow(KXmlGuiWindow):
         Internal.mainWindow = self
         self._scene = None
         self.background = None
-        self.playerWindow = None
-        self.rulesetWindow = None
-        self.confDialog = None
+        self.__playerWindow = None
+        self.__rulesetWindow = None
+        self.__confDialog = None
         if Options.gui:
             self.setupUi()
             KStandardAction.preferences(self.showSettings, self.actionCollection())
@@ -345,15 +345,15 @@ class MainWindow(KXmlGuiWindow):
 
     def slotPlayers(self):
         """show the player list"""
-        if not self.playerWindow:
-            self.playerWindow = PlayerList(self)
-        self.playerWindow.show()
+        if not self.__playerWindow:
+            self.__playerWindow = PlayerList(self)
+        self.__playerWindow.show()
 
     def slotRulesets(self):
         """show the player list"""
-        if not self.rulesetWindow:
-            self.rulesetWindow = RulesetSelector()
-        self.rulesetWindow.show()
+        if not self.__rulesetWindow:
+            self.__rulesetWindow = RulesetSelector()
+        self.__rulesetWindow.show()
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
@@ -407,9 +407,9 @@ class MainWindow(KXmlGuiWindow):
 
     def __showSettings2(self, dummyResult):
         """now that no animation is running, show settings dialog"""
-        self.confDialog = ConfigDialog(self, "settings")
-        self.confDialog.settingsChanged.connect(self.applySettings)
-        self.confDialog.show()
+        self.__confDialog = ConfigDialog(self, "settings")
+        self.__confDialog.settingsChanged.connect(self.applySettings)
+        self.__confDialog.show()
 
     def _toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""
