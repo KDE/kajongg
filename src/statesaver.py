@@ -31,8 +31,8 @@ class StateSaver(QObject):
     def __init__(self, *what):
         QObject.__init__(self)
         if what[0] not in StateSaver.savers:
-            what[0].installEventFilter(self)
             StateSaver.savers[what[0]] = self
+            what[0].installEventFilter(self)
         self.widgets = []
         for widget in what:
             name = self.__generateName(widget)
@@ -73,7 +73,9 @@ class StateSaver(QObject):
                 self.save()
             elif event.type() == QEvent.Close:
                 self.save()
-                del StateSaver.savers[self.widgets[0][1]]
+                widget = self.widgets[0][1]
+                if widget in StateSaver.savers:
+                    del StateSaver.savers[widget]
         return False
 
     @staticmethod
