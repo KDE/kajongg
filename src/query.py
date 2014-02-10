@@ -158,13 +158,13 @@ class DBHandle(sqlite3.Connection):
         except sqlite3.Error as exc:
             logWarning('%s cannot rollback: %s' % (self.name, exc.message))
 
-    def close(self):
+    def close(self, silent=False):
         """just for logging"""
-        if Debug.sql or Debug.quit:
+        if not silent and (Debug.sql or Debug.quit):
             if self is Internal.db:
-                logDebug('Closing Internal.db')
+                logDebug('Closing Internal.db: %s' % self.path)
             else:
-                logDebug('Closing DBHandle %s' % (self))
+                logDebug('Closing DBHandle %s: %s' % (self, self.path))
         if self is Internal.db:
             Internal.db = None
         try:
@@ -315,7 +315,7 @@ class PrepareDB(object):
                 self.createTables()
                 self.__generateDbIdent()
         finally:
-            Internal.db.close()
+            Internal.db.close(silent=True)
         if os.path.exists(self.path):
             # somebody was faster
             os.remove(tmpPath)
@@ -350,7 +350,7 @@ class PrepareDB(object):
         except sqlite3.Error as exc:
             logException('opening %s: %s' % (self.path, exc.message))
         finally:
-            Internal.db.close()
+            Internal.db.close(silent=True)
 
     def updateToVersion4_13_0(self):
         """as the name says"""
