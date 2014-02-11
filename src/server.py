@@ -32,7 +32,8 @@ from itertools import chain
 def cleanExit(*dummyArgs):
     """we want to cleanly close sqlite3 files"""
     if Options.socket and os.name != 'nt':
-        os.remove(Options.socket)
+        if os.path.exists(Options.socket):
+            os.remove(Options.socket)
     try:
         if Internal.db:
             Internal.db.close() # setting to None does not call close(), do we need close?
@@ -79,7 +80,7 @@ from client import Client, Table
 from query import Query, initDb
 from meld import Meld, MeldList
 from log import m18n, m18nE, m18ncE, logDebug, logWarning, logError, SERVERMARK
-from util import Duration
+from util import Duration, elapsedSince
 from message import Message, ChatMessage
 from common import Debug
 from sound import Voice
@@ -839,6 +840,7 @@ class MJServer(object):
         self.tables = {}
         self.srvUsers = list()
         Players.load()
+        self.lastPing = None
         self.checkPings()
 
     def chat(self, chatString):
@@ -865,11 +867,26 @@ class MJServer(object):
                 user.mind = None
                 self.logout(user)
 
+    @staticmethod
+    def __stopAfterLastDisconnect():
+        """as the name says"""
+        if Options.socket and not Options.continueServer:
+            try:
+                reactor.stop()
+                if Debug.connections:
+                    logDebug('local server terminates from %s. Reason: last client disconnected' % (
+                        Options.socket))
+            except ReactorNotRunning:
+                pass
+
     def checkPings(self):
         """are all clients still alive? If not log them out"""
+        if not self.srvUsers and self.lastPing and elapsedSince(self.lastPing) > 30:
+            # no user at all since 30 seconds, but we did already have a user
+            self.__stopAfterLastDisconnect()
         for user in self.srvUsers:
-            diff = datetime.datetime.now() - user.lastPing
-            if diff > datetime.timedelta(seconds=60):
+            self.lastPing = max(self.lastPing, user.lastPing) if self.lastPing else user.lastPing
+            if elapsedSince(user.lastPing) > 60:
                 logDebug('No messages from %s since 60 seconds, clearing connection now' % user.name)
                 user.mind = None
                 self.logout(user)
@@ -1029,23 +1046,6 @@ class MJServer(object):
             for request in block.requests:
                 if request.user == user:
                     block.removeRequest(request)
-        # do not stop right now, the client might reconnect right away
-        # this happens if the wanted human player name did not yet exist
-        # in the data base - in that case login fails. Next the client
-        # might tell us to add that user to the data base. So let's wait
-        # to see for 5 seconds if he does
-        reactor.callLater(5, self.__stopNowAfterLastDisconnect)
-
-    def __stopNowAfterLastDisconnect(self):
-        """as the name says"""
-        # pylint: disable=protected-access
-        # because we access _stopped
-        if Options.socket and not Options.continueServer \
-            and not self.srvUsers and reactor.running and not reactor._stopped:
-            if Debug.connections:
-                logDebug('local server terminates from %s. Reason: last client disconnected' % (
-                    Options.socket))
-            reactor.stop()
 
     def loadSuspendedTables(self, user):
         """loads all yet unloaded suspended tables where this
@@ -1084,7 +1084,6 @@ class User(pb.Avatar):
         self.voiceId = None
         self.maxGameId = None
         self.lastPing = None
-        self.lastPing = datetime.datetime.now()
         self.pinged()
 
     def pinged(self):
