@@ -262,6 +262,8 @@ class Voice(object):
 
     def speak(self, text, angle):
         """text must be a sound filename without extension"""
+        if isinstance(text, Tile):
+            text = str(text.exposed)
         fileName = self.localTextName(text, angle)
         if not os.path.exists(fileName):
             if Debug.sound:
