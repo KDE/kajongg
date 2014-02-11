@@ -193,6 +193,7 @@ class SingleshotOptions(object):
 
 class Internal(object):
     """global things"""
+    # pylint: disable=too-many-instance-attributes
     Preferences = None
     version = '4.13.0'
     logPrefix = 'C'
@@ -207,8 +208,7 @@ class Internal(object):
     autoPlay = False
     quitWaitTime = 0 # in milliseconds
 
-    def __init__(self):
-        raise Exception('Internal is not meant to be instantiated')
+Internal = Internal()
 
 class IntDict(defaultdict):
     """a dict where the values are expected to be numeric, so
