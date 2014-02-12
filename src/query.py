@@ -207,14 +207,20 @@ class Query(object):
         self.records = []
         self.statement = statement
         self.args = args
-        self.cursor = Internal.db.cursor(DBCursor) # pylint: disable=no-member
-        self.cursor.execute(statement, args, silent=silent, mayFail=mayFail, failSilent=failSilent)
-        self.failure = self.cursor.failure
-        self.records = list(self.cursor.fetchall())
+        if Internal.db:
+            self.cursor = Internal.db.cursor(DBCursor) # pylint: disable=no-member
+            self.cursor.execute(statement, args, silent=silent, mayFail=mayFail, failSilent=failSilent)
+            self.failure = self.cursor.failure
+            self.records = list(self.cursor.fetchall())
+            if not Internal.db.inTransaction:
+                Internal.db.commit()
+        else:
+            # may happen at shutdown
+            self.cursor = None
+            self.failure = None
+            self.records = list()
         if self.records and Debug.sql:
             logDebug('result set:{}'.format(self.records))
-        if not Internal.db.inTransaction:
-            Internal.db.commit()
 
     def __str__(self):
         return '{} {}'.format(self.statement,
@@ -222,7 +228,10 @@ class Query(object):
 
     def rowcount(self):
         """how many rows were affected?"""
-        return self.cursor.rowcount
+        if self.cursor:
+            return self.cursor.rowcount
+        else:
+            return 0
 
 def initDb():
     """open the db, create or update it if needed.

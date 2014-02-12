@@ -540,6 +540,8 @@ class Connection(object):
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""
         msg = None
+        if not isAlive(Internal.mainWindow):
+            raise CancelledError
         if failure.check(CancelledError):
             pass
         elif failure.check(TimeoutError):

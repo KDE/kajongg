@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, usingQt5, QPointF, QVariant, variantValue, pyqtSignal, \
+from qt import Qt, usingQt5, QPointF, QVariant, variantValue, \
     QSize, QModelIndex, QEvent, QTimer
 
 if not usingQt5:
@@ -757,8 +757,6 @@ class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
     # pylint: disable=too-many-instance-attributes
 
-    scoringClosed = pyqtSignal()
-
     def __init__(self, scene):
         QWidget.__init__(self)
         self.scene = scene
@@ -801,7 +799,6 @@ class ScoringDialog(QWidget):
         pGrid.addLayout(btnBox, 8, 4)
         StateSaver(self)
         self.refresh()
-        self.scoringClosed.connect(scene.scoringClosed)
 
     @property
     def game(self):
@@ -914,12 +911,6 @@ class ScoringDialog(QWidget):
         if idx >= 0:
             # TODO: isn't that already a Tile?
             return Tile(variantValue(self.cbLastTile.itemData(idx)))
-
-    def closeEvent(self, event):
-        """the user pressed ALT-F4"""
-        self.hide()
-        event.ignore()
-        self.scoringClosed.emit()
 
     def clickedPlayerIdx(self, checkbox):
         """the player whose box has been clicked"""

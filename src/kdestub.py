@@ -497,6 +497,21 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         """show an about dialog"""
         AboutKajonggDialog(Internal.mainWindow).exec_()
 
+    def queryClose(self):
+        """default"""
+        return True
+
+    def queryExit(self):
+        """default"""
+        return True
+
+    def closeEvent(self, event):
+        """call queryClose/queryExit"""
+        if self.queryClose() and self.queryExit():
+            event.accept()
+        else:
+            event.ignore()
+
 class KStandardDirs(object):
     """as far as we need it. """
     _localBaseDirs = None

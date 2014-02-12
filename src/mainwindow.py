@@ -19,8 +19,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import sys, os
+from threading import Timer
 
-from log import logError, logException, logDebug, m18n, m18nc
+from log import logError, logDebug, m18n, m18nc
 from common import Options, Internal, isAlive, Debug
 import cgitb, tempfile, webbrowser
 
@@ -69,7 +70,6 @@ try:
     from configdialog import ConfigDialog
     from statesaver import StateSaver
     from util import checkMemory
-    from twisted.python.failure import Failure
     from twisted.internet.error import ReactorNotRunning
 
 except ImportError as importError:
@@ -83,13 +83,16 @@ if len(NOTFOUND):
 
 def cleanExit(*dummyArgs):
     """close sqlite3 files before quitting"""
-    if Internal.mainWindow:
-        Internal.mainWindow.closeAction()
+    if isAlive(Internal.mainWindow):
+        if Debug.quit:
+            logDebug('cleanExit calling mainWindow.close')
+        Internal.mainWindow.close()
     else:
-        try:
-            MainWindow.appquit()
-        except NameError:
-            sys.exit(0)
+        # this must be very early or very late
+        if Debug.quit:
+            logDebug('cleanExit calling sys.exit(0)')
+        #sys.exit(0)
+        MainWindow.aboutToQuit()
 
 from signal import signal, SIGABRT, SIGINT, SIGTERM
 signal(SIGABRT, cleanExit)
@@ -100,8 +103,6 @@ if os.name != 'nt':
     signal(SIGHUP, cleanExit)
     signal(SIGQUIT, cleanExit)
 
-Internal.reactor.addSystemEventTrigger('before', 'shutdown', cleanExit)
-
 class MainWindow(KXmlGuiWindow):
     """the main window"""
     # pylint: disable=too-many-instance-attributes
@@ -109,12 +110,16 @@ class MainWindow(KXmlGuiWindow):
     def __init__(self):
         # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
         super(MainWindow, self).__init__()
+        Internal.app.aboutToQuit.connect(self.aboutToQuit)
+        self.exitConfirmed = None
+        self.exitReady = None
+        self.exitWaitTime = None
         Internal.mainWindow = self
         self._scene = None
         self.background = None
-        self.__playerWindow = None
-        self.__rulesetWindow = None
-        self.__confDialog = None
+        self.playerWindow = None
+        self.rulesetWindow = None
+        self.confDialog = None
         if Options.gui:
             self.setupUi()
             KStandardAction.preferences(self.showSettings, self.actionCollection())
@@ -219,7 +224,7 @@ class MainWindow(KXmlGuiWindow):
         self.actionPlayGame = self._kajonggAction("play", "arrow-right", self.playingScene, Qt.Key_N)
         self.actionAbortGame = self._kajonggAction("abort", "dialog-close", self.abortAction, Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
-        self.actionQuit = self._kajonggAction("quit", "application-exit", self.closeAction, Qt.Key_Q)
+        self.actionQuit = self._kajonggAction("quit", "application-exit", self.close, Qt.Key_Q)
         self.actionPlayers = self._kajonggAction("players", "im-user", self.slotPlayers)
         self.actionRulesets = self._kajonggAction("rulesets", "games-kajongg-law", self.slotRulesets)
         self.actionChat = self._kajonggToggleAction("chat", "call-start",
@@ -256,7 +261,7 @@ class MainWindow(KXmlGuiWindow):
         game = scoreGame()
         if game:
             self.scene.game = game
-            self.scene.adjustView()
+            self.applySettings()
             game.throwDices()
             self.updateGUI()
 
@@ -264,27 +269,150 @@ class MainWindow(KXmlGuiWindow):
         """toggle between full screen and normal view"""
         self.actionFullscreen.setFullScreen(self, toggle)
 
-    def hideEvent(self, event):
-        """the only way to capture ALT-F4. We cannot stop quitting
-        anymore, but we can clean up. Contrary to documentation,
-        queryClose, queryExit and and closeEvent are never called in this case"""
-        cleanExit()
+    def close(self, dummyResult=None):
+        """wrap close() because we call it with a QTimer"""
+        if isAlive(self):
+            return KXmlGuiWindow.close(self)
 
-    def closeAction(self):
-        """quit kajongg"""
-        # calling self.close() is not helpful: closeQuery or closeEvent are never called
-        if Debug.quit:
-            logDebug('mainWindow.closeAction invoked')
-        def answered(result):
+    def closeEvent(self, event):
+        KXmlGuiWindow.closeEvent(self, event)
+        if event.isAccepted() and self.exitReady:
+            QTimer.singleShot(5000, self.aboutToQuit)
+
+    def queryClose(self):
+        """queryClose, queryExit and aboutToQuit are no
+        ideal match for the async Deferred approach.
+
+        At app start, self.exitConfirmed and exitReady are None.
+
+        queryClose will show a confirmation prompt if needed, but
+        it will not wait for the answer. queryClose always returns True.
+
+        Later, when the user confirms exit, self.exitConfirmed will be set.
+        If the user cancels exit, self.exitConfirmed = False, otherwise
+        self.close() is called. This time, no prompt will appear because the
+        game has already been aborted.
+
+        queryExit will return False if exitConfirmed or exitReady are not True.
+        Otherwise, queryExit will set exitReady to False and asynchronously start
+        shutdown. After the reactor stops running, exitReady is set to True,
+        and self.close() is called. This time it should fall through everywhere,
+        having queryClose() and queryExit() return True.
+
+        and it will reset exitConfirmed to None.
+
+        Or in other words: If queryClose or queryExit find something that they
+        should do async like asking the user for confirmation or terminating
+        the client/server connection, they start async operation and append
+        a callback which will call self.close() when the async operation is
+        done. This repeats until queryClose() and queryExit() find nothing
+        more to do async. At that point queryExit says True
+        and we really end the program.
+        """
+
+        # pylint: disable=too-many-branches
+        def confirmed(result):
             """quit if the active game has been aborted"""
+            self.exitConfirmed = bool(result)
             if Debug.quit:
-                logDebug('mainWindow.closeAction.answered:{}'.format(result))
-            if result:
-                self.quitProgram()
-        if self.scene:
-            self.abortAction().addCallback(answered)
+                if self.exitConfirmed:
+                    logDebug('mainWindow.queryClose confirmed')
+                else:
+                    logDebug('mainWindow.queryClose not confirmed')
+            # start closing again. This time no question will appear, the game is already aborted
+            if self.exitConfirmed:
+                assert isAlive(self)
+                self.close()
+            else:
+                self.exitConfirmed = None
+        def cancelled(result):
+            """just do nothing"""
+            if Debug.quit:
+                logDebug('mainWindow.queryClose.cancelled'.format(result))
+            self.exitConfirmed = None
+        if self.exitConfirmed is False:
+            # user is currently being asked
+            return False
+        if self.exitConfirmed is None:
+            if self.scene:
+                self.exitConfirmed = False
+                self.abortAction().addCallbacks(confirmed, cancelled)
+            else:
+                self.exitConfirmed = True
+                if Debug.quit:
+                    logDebug('MainWindow.queryClose not asking, exitConfirmed=True')
+        return True
+
+    def queryExit(self):
+        """see queryClose"""
+        if self.exitReady:
+            if Debug.quit:
+                logDebug('MainWindow.queryExit returns True because exitReady is set')
+            return True
+        if self.exitConfirmed:
+            # now we can get serious
+            self.exitReady = False
+            if self.exitWaitTime is None:
+                self.exitWaitTime = 0
+            if Internal.reactor.running:
+                self.exitWaitTime += 10
+                if self.exitWaitTime % 1000 == 0:
+                    logDebug('waiting since %d seconds for reactor to stop' % (self.exitWaitTime // 1000))
+                try:
+                    if Debug.quit:
+                        logDebug('now stopping reactor')
+                    Internal.reactor.stop()
+                    assert isAlive(self)
+                    QTimer.singleShot(10, self.close)
+                except ReactorNotRunning:
+                    self.exitReady = True
+                    if Debug.quit:
+                        logDebug('MainWindow.queryExit returns True: It got exception ReactorNotRunning')
+            else:
+                self.exitReady = True
+                if Debug.quit:
+                    logDebug('MainWindow.queryExit returns True: Reactor is not running')
+        return bool(self.exitReady)
+
+    @staticmethod
+    def aboutToQuit():
+        """now all connections to servers are cleanly closed"""
+        mainWindow = Internal.mainWindow
+        Internal.mainWindow = None
+        if mainWindow:
+            if Debug.quit:
+                logDebug('aboutToQuit starting')
+            if mainWindow.exitWaitTime > 1000.0 or Debug.quit:
+                logDebug('reactor stopped after %d ms' % (mainWindow.exitWaitTime ))
+            if isAlive(mainWindow.confDialog):
+                mainWindow.confDialog.hide()
+            if isAlive(mainWindow.rulesetWindow):
+                mainWindow.rulesetWindow.hide()
+            if isAlive(mainWindow.playerWindow):
+                mainWindow.playerWindow.hide()
         else:
-            self.quitProgram()
+            if Debug.quit:
+                logDebug('aboutToQuit: mainWindow is already None')
+        StateSaver.saveAll()
+        Internal.app.quit()
+        try:
+            # if we are killed while loading, Internal.db may not yet be defined
+            if Internal.db:
+                Internal.db.close()
+        except NameError:
+            pass
+        checkMemory()
+        def kill():
+            """on Windows, if no game is running, exiting would hang here.
+            If terminated with CTRL-C, it says:
+            QObject::killTimers: timers cannot be stopped from another thread
+            Versions: Qt 4.8.5, PyQt 4.10.3, Python 2.7.6"""
+            if Debug.quit:
+                logDebug('We seem to hang, taking drastic measures: os._exit(0)')
+            os._exit(0) # pylint: disable=protected-access
+        timer = Timer(1, kill)
+        timer.start()
+
 
     def abortAction(self):
         """abort current game"""
@@ -345,15 +473,15 @@ class MainWindow(KXmlGuiWindow):
 
     def slotPlayers(self):
         """show the player list"""
-        if not self.__playerWindow:
-            self.__playerWindow = PlayerList(self)
-        self.__playerWindow.show()
+        if not self.playerWindow:
+            self.playerWindow = PlayerList(self)
+        self.playerWindow.show()
 
     def slotRulesets(self):
         """show the player list"""
-        if not self.__rulesetWindow:
-            self.__rulesetWindow = RulesetSelector()
-        self.__rulesetWindow.show()
+        if not self.rulesetWindow:
+            self.rulesetWindow = RulesetSelector()
+        self.rulesetWindow.show()
 
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
@@ -407,9 +535,9 @@ class MainWindow(KXmlGuiWindow):
 
     def __showSettings2(self, dummyResult):
         """now that no animation is running, show settings dialog"""
-        self.__confDialog = ConfigDialog(self, "settings")
-        self.__confDialog.settingsChanged.connect(self.applySettings)
-        self.__confDialog.show()
+        self.confDialog = ConfigDialog(self, "settings")
+        self.confDialog.settingsChanged.connect(self.applySettings)
+        self.confDialog.show()
 
     def _toggleWidget(self, checked):
         """user has toggled widget visibility with an action"""
@@ -434,7 +562,7 @@ class MainWindow(KXmlGuiWindow):
             self.scene.toggleDemoMode(checked)
         else:
             Internal.autoPlay = checked
-            if checked:
+            if checked and Internal.db:
                 self.playingScene()
 
     def updateGUI(self):
@@ -454,65 +582,3 @@ class MainWindow(KXmlGuiWindow):
         if self.scene:
             with Animated(False):
                 afterCurrentAnimationDo(self.scene.changeAngle)
-
-    def quitProgram(self, result=None):
-        """now all connections to servers are cleanly closed"""
-        if Debug.quit:
-            logDebug('mainWindow.quitProgram invoked')
-        if isinstance(result, Failure):
-            logException(result)
-        try:
-            Internal.reactor.stop()
-        except ReactorNotRunning:
-            pass
-        StateSaver.saveAll()
-        if self.scene:
-            # if we have the ruleset editor visible, we get:
-            # File "/hdd/pub/src/gitgames/kajongg/src/rulesetselector.py", line 194, in headerData
-            #  if role == Qt.DisplayRole and orientation == Qt.Horizontal:
-            #  AttributeError: 'NoneType' object has no attribute 'DisplayRole'
-            # how can Qt get None? Same happens with QEvent, see statesaver.py
-            if self.scene.confDialog:
-                self.scene.confDialog.hide()
-            # do not make the user see the delay for stopping the reactor
-            self.scene = None
-        # we may be in a Deferred callback which would
-        # catch sys.exit as an exception
-        # and the qt4reactor does not quit the app when being stopped
-        Internal.quitWaitTime = 0
-        Internal.reactor.callLater(0.1, self.appquit)
-        QTimer.singleShot(10, self.appquit)
-
-    @classmethod
-    def appquit(cls):
-        """retry until the reactor really stopped"""
-        if Debug.quit:
-            logDebug('mainWindow.appquit invoked')
-        if Internal.reactor.running:
-            Internal.quitWaitTime += 10
-            if Internal.quitWaitTime % 1000 == 0:
-                logDebug('waiting since %d seconds for reactor to stop' % (Internal.quitWaitTime // 1000))
-            Internal.reactor.callLater(0.1, cls.appquit)
-            QTimer.singleShot(10, cls.appquit)
-        else:
-            if Internal.quitWaitTime > 1000 or Debug.quit:
-                logDebug('reactor stopped after %d seconds' % (Internal.quitWaitTime // 1000))
-            Internal.app.quit()
-            checkMemory()
-            try:
-                # if we are killed while loading, Internal.db may not yet be defined
-                if Internal.db:
-                    Internal.db.close()
-            except NameError:
-                pass
-            if Debug.quit:
-                logDebug('appquit starts a threading timer for mercyless exit after 1 second')
-            from threading import Timer
-            timer = Timer(1.0, cls.kill)
-            timer.start()
-
-    @staticmethod
-    def kill():
-        if Debug.quit:
-            logDebug('Something hangs, doing mercyless exit')
-        os._exit(0)

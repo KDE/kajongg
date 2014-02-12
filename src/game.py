@@ -506,7 +506,7 @@ class Game(object):
         self.clearHand()
         if self.finished():
             if Options.rounds:
-                self.close().addCallback(Internal.mainWindow.quitProgram)
+                self.close().addCallback(Internal.mainWindow.close)
             else:
                 self.close()
 

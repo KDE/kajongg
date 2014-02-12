@@ -206,7 +206,6 @@ class Internal(object):
     mainWindow = None
     game = None
     autoPlay = False
-    quitWaitTime = 0 # in milliseconds
 
 Internal = Internal()
 

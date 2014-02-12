@@ -54,9 +54,11 @@ class MustChooseKDialog(KDialogIgnoringEscape):
         for frametuple in inspect.getouterframes(inspect.currentframe())[1:]:
             if 'self' in frametuple[0].f_locals:
                 obj = frametuple[0].f_locals['self']
-                if isinstance(obj, QWidget) and not isinstance(obj, QDialog):
+                if isinstance(obj, QWidget) and not isinstance(obj, QDialog) and isAlive(obj):
                     parent = obj
                     break
+        if not isAlive(parent):
+            parent = None
         KDialogIgnoringEscape.__init__(self, parent)
         self.chosen = None
 

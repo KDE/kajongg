@@ -695,7 +695,7 @@ class HumanClient(Client):
             """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
-                self.game.close().addCallback(Internal.mainWindow.quitProgram)
+                self.game.close().addCallback(Internal.mainWindow.close)
         assert self.table and self.table.tableid == tableid
         if Internal.scene:
             # update the balances in the status bar:

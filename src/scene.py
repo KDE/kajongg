@@ -180,14 +180,6 @@ class GameScene(SceneWithFocusRect):
         """abort current game"""
         # to be implemented by children
 
-    def closeEvent(self, event):
-        """somebody wants us to close, maybe ALT-F4 or so"""
-        event.ignore()
-        def doNotQuit(dummy):
-            """ignore failure to abort"""
-        self.abort().addCallback(HumanClient.shutdownHumanClients).addCallbacks(
-            Internal.mainWindow.quitProgram, doNotQuit)
-
     def adjustView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
@@ -562,10 +554,6 @@ class ScoringScene(GameScene):
         """apply preferences"""
         GameScene.applySettings(self)
         self.selectorBoard.showShadows = self.showShadows
-
-    def scoringClosed(self):
-        """the scoring window has been closed with ALT-F4 or similar"""
-        assert self.game is None
 
     def prepareHand(self):
         """redecorate wall"""

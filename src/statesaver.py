@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from qt import QString, QObject, QByteArray, QEvent, QSplitter, QHeaderView
 
-from log import english, EventData
+from log import english
 from common import Internal, isAlive
 
 class StateSaver(QObject):
