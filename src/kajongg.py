@@ -46,7 +46,7 @@ def initRulesets():
             sys.exit(0)
         elif Options.rulesetName in rulesets:
             # we have an exact match
-            return rulesets[Options.rulesetName]
+            Options.ruleset = rulesets[Options.rulesetName]
         else:
             matches = list(x for x in rulesets if Options.rulesetName in x)
             if len(matches) != 1:
