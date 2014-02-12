@@ -161,7 +161,7 @@ class Url(str):
                 args.append('--socket=%s' % socketName())
                 if removeIfExists(socketName()):
                     logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
-            else:
+            if not self.useSocket:
                 args.append('--port=%d' % self.port)
             if self.isLocalGame:
                 args.append('--db=%slocal.db' % appdataDir())
