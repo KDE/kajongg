@@ -431,7 +431,16 @@ def startingDir():
     """the path of the directory where kajonggtest has been started in"""
     return os.path.dirname(sys.argv[0])
 
-def doJobs(jobs):
+def getJobs(jobs):
+    """fill the queue"""
+    try:
+        while len(jobs) < OPTIONS.servers * OPTIONS.clients:
+            jobs.append(next(OPTIONS.jobs))
+    except StopIteration:
+        pass
+    return jobs
+
+def doJobs():
     """now execute all jobs"""
     # pylint: disable=too-many-branches, too-many-locals, too-many-statements
 
@@ -442,17 +451,19 @@ def doJobs(jobs):
             OPTIONS.csv = None
 
     try:
-        while jobs:
+        jobs = []
+        while getJobs(jobs):
             for checkJob in Job.jobs[:]:
                 checkJob.check()
             try:
                 jobs[0].start()
                 jobs = jobs[1:]
-            except TooManyClients :
+            except TooManyClients:
                 time.sleep(3)
             except TooManyServers:
                 time.sleep(3)
             Clone.removeUnused()
+            jobs = getJobs(jobs)
     except KeyboardInterrupt:
         Server.stopAll()
     except BaseException as exc:
@@ -498,8 +509,8 @@ def parse_options():
             ' Without this, random values are used.',
         metavar='GAMEID', type=int, default=0)
     parser.add_option('', '--count', dest='count',
-        help='play COUNT games. Default is 99999',
-        metavar='COUNT', type=int, default=99999)
+        help='play COUNT games. Default is unlimited',
+        metavar='COUNT', type=int, default=999999999)
     parser.add_option('', '--playopen', dest='playopen', action='store_true',
         help='all robots play with visible concealed tiles' , default=False)
     parser.add_option('', '--clients', dest='clients',
@@ -518,11 +529,6 @@ def parse_options():
 def improve_options():
     """add sensible defaults"""
     # pylint: disable=too-many-branches,too-many-statements
-    if OPTIONS.count > 10000:
-        if OPTIONS.game:
-            OPTIONS.count = 1
-        elif OPTIONS.log:
-            OPTIONS.count = 5
     if OPTIONS.servers == 0:
         OPTIONS.servers = max(1, OPTIONS.clients // 2)
 
@@ -573,30 +579,37 @@ def improve_options():
             'neutral,dangerousGame,explain,originalCall,robbingKong,robotAI,scores,traffic,hand'.split(','))
     if gitHead() not in ('current', None):
         OPTIONS.debug.append('git')
-
-def createJobs():
-    """the complete list"""
-    if not OPTIONS.count:
-        return []
-    if OPTIONS.game:
-        games = list(range(int(OPTIONS.game), OPTIONS.game+OPTIONS.count))
-    else:
-        games = list(int(random.random() * 10**9) for _ in range(OPTIONS.count))
-    jobs = []
-    allAis = OPTIONS.aiVariants.split(',')
+    if not OPTIONS.aiVariants:
+        OPTIONS.aiVariants = 'Default'
+    OPTIONS.allAis = OPTIONS.aiVariants.split(',')
     print('rulesets:', ', '.join(OPTIONS.rulesets))
-    print('AIs:', ' '.join(allAis))
+    print('AIs:', ' '.join(OPTIONS.allAis))
     if OPTIONS.git:
         print('commits:', ' '.join(OPTIONS.git))
-    print('games:', ' '.join(str(x) for x in games[:20]))
+    OPTIONS.jobs = allJobs()
+    OPTIONS.games = allGames()
+    OPTIONS.jobCount = 0
+
+def allGames():
+    """a generator returning game ids"""
+    while True:
+        if OPTIONS.game:
+            result = OPTIONS.game
+            OPTIONS.game += 1
+        else:
+            result = int(random.random() * 10**9)
+        yield result
+
+def allJobs():
+    """a generator returning Job instances"""
     for commitId in OPTIONS.git or ['current']:
-        for game in games:
+        for game in OPTIONS.games:
             for ruleset in OPTIONS.rulesets:
-                for aiVariant in allAis:
-                    jobs.append(Job(ruleset, aiVariant, commitId, game))
-    OPTIONS.servers = min(len(jobs), OPTIONS.servers)
-    print('jobs:', len(jobs))
-    return jobs
+                for aiVariant in OPTIONS.allAis:
+                    OPTIONS.jobCount += 1
+                    if OPTIONS.jobCount > OPTIONS.count:
+                        raise StopIteration
+                    yield Job(ruleset, aiVariant, commitId, game)
 
 def main():
     """parse options, play, evaluate results"""
@@ -623,19 +636,11 @@ def main():
         print('unrecognized arguments:', ' '.join(args))
         sys.exit(2)
 
-    if not OPTIONS.count:
-        sys.exit(0)
-
-    if not OPTIONS.aiVariants:
-        OPTIONS.aiVariants = 'Default'
-
     print()
 
-    jobs = createJobs()
-    if jobs:
-        doJobs(jobs)
-        if OPTIONS.csv:
-            evaluate(readGames(OPTIONS.csv))
+    doJobs()
+    if OPTIONS.csv:
+        evaluate(readGames(OPTIONS.csv))
 
 def cleanup(sig, dummyFrame):
     """at program end"""
