@@ -29,14 +29,14 @@ class About(object):
         catalog = ""
         homePage = "http://kde.org/applications/games/kajongg/"
         version = Internal.version
-        programName = ki18n ("Kajongg")
-        description = ki18n ("Mah Jongg - the ancient Chinese board game for 4 players")
+        programName = ki18n("Kajongg")
+        description = ki18n("Mah Jongg - the ancient Chinese board game for 4 players")
         kajongglicense = KAboutData.License_GPL
-        kajonggcopyright = ki18n ("(C) 2008-2014 Wolfgang Rohdewald")
+        kajonggcopyright = ki18n("(C) 2008-2014 Wolfgang Rohdewald")
         aboutText = ki18n("This is the classical Mah Jongg for four players. "
             "If you are looking for Mah Jongg solitaire please use the "
             "application kmahjongg.")
 
-        self.about = KAboutData (self.appName, catalog, programName,
+        self.about = KAboutData(self.appName, catalog, programName,
             version, description, kajongglicense, kajonggcopyright, aboutText, homePage)
         self.about.addAuthor(ki18n("Wolfgang Rohdewald"), ki18n("Original author"), "wolfgang@rohdewald.de")

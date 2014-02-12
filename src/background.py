@@ -113,7 +113,7 @@ class Background(object):
             if self.__graphicspath.isEmpty():
                 logException(BackgroundException(
                     'cannot find kmahjongglib/backgrounds/%s for %s' % \
-                        (graphName, self.desktopFileName )))
+                        (graphName, self.desktopFileName)))
 
     def pixmap(self, size):
         """returns a background pixmap or None for isPlain"""
