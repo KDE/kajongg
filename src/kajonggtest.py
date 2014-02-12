@@ -59,7 +59,7 @@ class Clone(object):
             srcDir = os.path.join(self.tmpdir, 'src')
             assert os.path.exists(srcDir), '{} does not exist'.format(srcDir)
         else:
-            self.tmpdir = mkdtemp(suffix='.' + commitId)
+            self.tmpdir = mkdtemp(prefix='kajonggtest.{}.'.format(commitId))
             subprocess.Popen('git clone --local --no-checkout -q .. {temp}'.format(
                 temp=self.tmpdir).split()).wait()
             subprocess.Popen('git checkout -q {commitId}'.format(
@@ -75,7 +75,7 @@ class Clone(object):
     def removeUnused(cls):
         """remove clones we do not use anymore"""
         for commitId in cls.clones.keys():
-            if not any(x.commitId == commitId for x in Job.jobs):
+            if not any(x.commitId == commitId for x in Server.servers):
                 cls.clones[commitId].remove()
 
     @classmethod
@@ -101,17 +101,24 @@ class Server(object):
     servers = []
     def __new__(cls, job):
         """can we reuse an existing server?"""
-        if sum(len(x.jobs) for x in cls.servers) >= OPTIONS.clients:
+        running = Server.allRunningJobs()
+        if len(running) >= OPTIONS.clients:
             raise TooManyClients
-        if len(cls.servers) >= OPTIONS.servers:
-            # must re-use a server
-            matchingServers = list(x for x in cls.servers if x.jobs[0].serverKey() == job.serverKey())
-            matchingServers.sort(key=lambda x: len(x.jobs))
-            if matchingServers:
-                return matchingServers[0]
-            raise TooManyServers
-        result = object.__new__(cls)
-        cls.servers.append(result)
+        matchingServers = list(x for x in cls.servers if x.commitId == job.commitId)
+        if matchingServers:
+            result = sorted(matchingServers, key=lambda x: len(x.jobs))[0]
+        else:
+            if len(cls.servers) >= OPTIONS.servers:
+                # maybe we can kill a server without jobs?
+                for server in cls.servers:
+                    if len(server.jobs) == 0:
+                        server.stop()
+                        break # we only need to stop one server
+                else:
+                    # no server without jobs found
+                    raise TooManyServers
+            result = object.__new__(cls)
+            cls.servers.append(result)
         return result
 
     def __init__(self, job):
@@ -119,12 +126,17 @@ class Server(object):
             self.jobs = []
             self.process = None
             self.socketName = None
-            self.serverKey = None
+            self.commitId = job.commitId
             self.clone = Clone(job.commitId)
             self.start(job)
         else:
             self.jobs.append(job)
         job.server = self
+
+    @classmethod
+    def allRunningJobs(cls):
+        """a list of all jobs on all servers"""
+        return sum((x.jobs for x in cls.servers), [])
 
     def start(self, job):
         """start this server"""
@@ -135,8 +147,7 @@ class Server(object):
         else:
             self.socketName = os.path.expanduser(os.path.join('~', '.kajongg',
                 'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))))
-        assert self.serverKey in (None, job.serverKey()), '{} not in (None, {})'.format(self.serverKey, job.serverKey())
-        self.serverKey = job.serverKey()
+        assert self.commitId == job.commitId
         print('starting server for %s' % job)
         cmd = [os.path.join(job.srcDir(), 'kajonggserver.py')]
         if os.name == 'nt':
@@ -166,7 +177,7 @@ class Server(object):
         if len(self.jobs) == 0:
             self.servers.remove(self)
             if self.process:
-                print('killing server %s for  %s' % (self, job))
+                print('killing server %s%s' % (self, ' for {}'.format(job) if job else ''))
                 try:
                     self.process.terminate()
                     _ = self.process.wait()
@@ -186,11 +197,10 @@ class Server(object):
             server.stop()
 
     def __str__(self):
-        return '{} pid={} sock={}'.format(self.serverKey, self.process.pid, self.socketName)
+        return '{} pid={} sock={}'.format(self.commitId, self.process.pid, self.socketName)
 
 class Job(object):
     """a simple container"""
-    jobs = []
     def __init__(self, ruleset, aiVariant, commitId, game):
         self.ruleset = ruleset
         self.aiVariant = aiVariant
@@ -201,7 +211,6 @@ class Job(object):
         self.process = None
         self.server = None
         self.started = False
-        self.jobs.append(self)
 
     def srcDir(self):
         """the path of the directory where the particular test is running"""
@@ -253,20 +262,7 @@ class Job(object):
             self.process = None
             if not silent:
                 print('   Game over: %s%s' % ('Return code: %s ' % result if result else '', self))
-            self.jobs.remove(self)
-            self.server.stop(self)
-        else:
-            if all(x.process for x in self.jobs):
-                time.sleep(1) # all jobs are busy
-
-    def serverKey(self):
-        """this defines what a server can be used for"""
-        if OPTIONS.log:
-            # because we want the server debug data only for this
-            # job, each job needs its own server instance
-            return '/'.join([str(self.game), self.ruleset, self.aiVariant, self.commitId])
-        else:
-            return self.commitId
+            self.server.jobs.remove(self)
 
     @property
     def logFile(self):
@@ -453,17 +449,15 @@ def doJobs():
     try:
         jobs = []
         while getJobs(jobs):
-            for checkJob in Job.jobs[:]:
+            for checkJob in Server.allRunningJobs()[:]:
                 checkJob.check()
             try:
                 jobs[0].start()
                 jobs = jobs[1:]
-            except TooManyClients:
-                time.sleep(3)
             except TooManyServers:
                 time.sleep(3)
-            Clone.removeUnused()
-            jobs = getJobs(jobs)
+            except TooManyClients:
+                time.sleep(3)
     except KeyboardInterrupt:
         Server.stopAll()
     except BaseException as exc:
@@ -471,18 +465,17 @@ def doJobs():
         raise exc
     finally:
         while True:
-            for job in Job.jobs[:]:
+            running = Server.allRunningJobs()
+            if not running:
+                break
+            for job in running:
                 if not job.started:
-                    Job.jobs.remove(job)
+                    job.server.jobs.remove(job)
                 else:
                     job.check()
                     if job.process:
                         print('Waiting for   %s' % job)
                         job.process.wait()
-            if not Server.servers:
-                if Job.jobs:
-                    print('we have jobs %s but no servers' % list(id(x) for x in Job.jobs))
-                break
             time.sleep(1)
 
 def parse_options():
@@ -503,7 +496,7 @@ def parse_options():
         metavar='AI')
     parser.add_option('', '--log', dest='log', action='store_true',
         default=False, help='write detailled debug info to ~/.kajongg/log/game/ruleset/commit.' \
-                ' This starts a separate server process per job.')
+                ' This starts a separate server process per job, it sets --servers to --clients.')
     parser.add_option('', '--game', dest='game',
         help='start first game with GAMEID, increment for following games.'
             ' Without this, random values are used.',
@@ -514,11 +507,11 @@ def parse_options():
     parser.add_option('', '--playopen', dest='playopen', action='store_true',
         help='all robots play with visible concealed tiles' , default=False)
     parser.add_option('', '--clients', dest='clients',
-        help='start CLIENTS kajongg instances simultaneously',
+        help='start a maximum of CLIENTS kajongg instances. Default is 2',
         metavar='CLIENTS', type=int, default=1)
     parser.add_option('', '--servers', dest='servers',
-        help='start SERVERS kajonggserver instances. Default is one server for two clients',
-        metavar='SERVERS', type=int, default=0)
+        help='start a maximum of SERVERS kajonggserver instances. Default is 1',
+        metavar='SERVERS', type=int, default=1)
     parser.add_option('', '--git', dest='git',
         help='check all commits: either a comma separated list or a range from..until')
     parser.add_option('', '--debug', dest='debug',
@@ -529,8 +522,8 @@ def parse_options():
 def improve_options():
     """add sensible defaults"""
     # pylint: disable=too-many-branches,too-many-statements
-    if OPTIONS.servers == 0:
-        OPTIONS.servers = max(1, OPTIONS.clients // 2)
+    if OPTIONS.servers < 1:
+        OPTIONS.servers = 1
 
     cmdPath = os.path.join(startingDir(), 'kajongg.py')
     cmd = ['python', cmdPath, '--rulesets=']
@@ -586,6 +579,7 @@ def improve_options():
     print('AIs:', ' '.join(OPTIONS.allAis))
     if OPTIONS.git:
         print('commits:', ' '.join(OPTIONS.git))
+        # since we order jobs by game, commit we want one permanent server per commit
     OPTIONS.jobs = allJobs()
     OPTIONS.games = allGames()
     OPTIONS.jobCount = 0
@@ -602,8 +596,8 @@ def allGames():
 
 def allJobs():
     """a generator returning Job instances"""
-    for commitId in OPTIONS.git or ['current']:
-        for game in OPTIONS.games:
+    for game in OPTIONS.games:
+        for commitId in OPTIONS.git or ['current']:
             for ruleset in OPTIONS.rulesets:
                 for aiVariant in OPTIONS.allAis:
                     OPTIONS.jobCount += 1
@@ -650,8 +644,13 @@ def cleanup(sig, dummyFrame):
 
 # is one server for two clients.
 if __name__ == '__main__':
+    signal.signal(signal.SIGABRT, cleanup)
     signal.signal(signal.SIGTERM, cleanup)
     signal.signal(signal.SIGINT, cleanup)
+    if os.name != 'nt':
+        signal.signal(signal.SIGHUP, cleanup)
+        signal.signal(signal.SIGQUIT, cleanup)
+
     main()
     gc.collect()
     checkMemory()
