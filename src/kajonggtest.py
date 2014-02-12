@@ -24,13 +24,13 @@ from __future__ import print_function
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-import os, sys, csv, subprocess, random, shutil, time
+import os, sys, csv, subprocess, random, shutil, time, gc
 from tempfile import mkdtemp
 
 from optparse import OptionParser
 
 from common import Debug
-from util import removeIfExists, gitHead
+from util import removeIfExists, gitHead, checkMemory
 from log import initLog
 
 # fields in row:
@@ -289,11 +289,12 @@ class Job(object):
                 return self.ruleset[prefix-1:]
 
     def __str__(self):
+        pid = 'pid={}'.format(self.process.pid) if self.process and Debug.process else ''
         game = 'game={}'.format(self.game)
         ruleset = self.shortRulesetName()
         aiName = 'AI={}'.format(self.aiVariant) if self.aiVariant != 'Default' else ''
         commit = 'commit={}'.format(self.commitId)
-        return ' '.join([game, ruleset, aiName, commit]).replace('  ', ' ')
+        return ' '.join([pid, game, ruleset, aiName, commit]).replace('  ', ' ')
 
     def __repr__(self):
         return 'Job(%s)' % str(self)
@@ -647,3 +648,5 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, cleanup)
     signal.signal(signal.SIGINT, cleanup)
     main()
+    gc.collect()
+    checkMemory()
