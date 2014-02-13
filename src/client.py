@@ -272,6 +272,9 @@ class Client(object, pb.Referenceable):
 
     def __delayAnswer(self, result, delay, delayStep):
         """try again, may we chow now?"""
+        if not self.game:
+            # game has been aborted meanwhile
+            return result
         noClaimCount = 0
         delay += delayStep
         for move in self.game.lastMoves():
