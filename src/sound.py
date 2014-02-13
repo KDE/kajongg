@@ -46,22 +46,33 @@ class Sound(object):
     """the sound interface. Use class variables and class methods,
     thusly ensuring no two instances try to speak"""
     enabled = False
-    __hasogg = None
+    __oggName = None
     playProcesses = []
     lastCleaned = None
 
     @staticmethod
     def findOgg():
-        """sets __hasogg to True or False"""
-        if Sound.__hasogg is None:
-            oggName = r'c:\vorbis\oggdec.exe' if os.name == 'nt' else 'ogg123'
-            if not which(oggName):
+        """sets __oggName to exe name or False"""
+        if Sound.__oggName is None:
+            if os.name == 'nt':
+                parentDirectories = KGlobal.dirs().findDirs("appdata", "voices")
+                if parentDirectories:
+                    oggName = os.path.join(parentDirectories[0], 'oggdec.exe')
+                    msg = '' # we bundle oggdec.exe with the kajongg installer, it must be there
+                else:
+                    msg = m18n('No voices will be heard because the program %1 is missing', 'oggdec.exe')
+            else:
+                oggName = 'ogg123'
+                msg = m18n('No voices will be heard because the program %1 is missing', oggName)
+            if which(oggName):
+                Sound.__oggName = oggName
+            else:
+                Sound.__oggName = False
                 Sound.enabled = False
                 # checks again at next reenable
-                logWarning(m18n('No voices will be heard because the program %1 is missing', oggName))
-                return
-            Sound.__hasogg = True
-        return Sound.__hasogg
+                if msg:
+                    logWarning(msg)
+        return Sound.__oggName
 
     @staticmethod
     def cleanProcesses():
@@ -107,18 +118,18 @@ class Sound(object):
                 reactor.callLater(1, Sound.speak, what)
                 return
         if os.path.exists(what):
-            if Sound.findOgg():
+            oggName = Sound.findOgg()
+            if oggName:
                 if os.name == 'nt':
                     name, ext = os.path.splitext(what)
                     assert ext == '.ogg'
                     wavName = name + '.wav'
                     if not os.path.exists(wavName):
-                        args = [r'c:\vorbis\oggdec', '--quiet', what]
-                        process = subprocess.Popen(args)
-                        os.waitpid(process.pid, 0)
+                        args = [oggName, '-w', wavName, what]
+                        subprocess.call(args)
                     winsound.PlaySound(wavName, winsound.SND_FILENAME)
                 else:
-                    args = ['ogg123', '-q', what]
+                    args = [oggName, '-q', what]
                     if Debug.sound:
                         game.debug(' '.join(args))
                     process = subprocess.Popen(args)
