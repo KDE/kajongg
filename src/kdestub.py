@@ -35,6 +35,7 @@ if os.name != 'nt':
     import pwd
 import weakref
 from collections import defaultdict
+from argparse import ArgumentParser
 
 try:
     from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
@@ -138,6 +139,9 @@ class KCmdLineArgs(object):
     @classmethod
     def parsedArgs(cls):
         """stub"""
+        if '--help' in sys.argv:
+            KCmdLineOptions.parser.parse_args()
+            KCmdLineOptions.parser.print_help()
         return cls.options
 
     @classmethod
@@ -153,12 +157,15 @@ class KCmdLineArgs(object):
 
 class KCmdLineOptions(list):
     """stub"""
+    parser = ArgumentParser()
     def __init__(self):
         list.__init__(self)
 
     def add(self, definition, helptext, default=None):
         """stub"""
         self.append((definition, helptext, default))
+        # self.parser is currently only used for generating --help text
+        self.parser.add_argument('--' + definition, dest=definition, help=helptext, action='store_true')
 
 class KAboutData(object):
     """stub"""
