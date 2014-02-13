@@ -77,8 +77,8 @@ class Prompt(MustChooseKDialog):
             MustChooseKDialog.__init__(self)
             self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
             self.setCaption(caption or '')
-            KMessageBox.createKMessageBox(self, icon, msg,
-                [], "", False, KMessageBox.NoExec)
+            box = KMessageBox.createKMessageBox(self, icon, msg,
+                [], "", False, KMessageBox.Options(KMessageBox.NoExec | KMessageBox.AllowLink))
             self.setButtons(KDialog.ButtonCode(buttons))
 
     def returns(self, button=None):

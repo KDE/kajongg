@@ -262,8 +262,11 @@ class IconLabel(QLabel):
 class KMessageBox(object):
     """again only what we need"""
     NoExec = 1
+    AllowLink = 2
+    Options = int
+
     @staticmethod
-    def createKMessageBox(dialog, icon, text, dummyStrlist, dummyAsk, dummyCheckboxReturn, dummyOptions):
+    def createKMessageBox(dialog, icon, text, dummyStrlist, dummyAsk, dummyCheckboxReturn, options):
         """translated as far as needed from kmessagegox.cpp"""
         # pylint: disable=too-many-locals
         mainLayout = QVBoxLayout()
@@ -285,8 +288,11 @@ class KMessageBox(object):
         hLayout.addLayout(iconLayout, 0)
 
         messageLabel = QLabel(text)
-        messageLabel.setTextInteractionFlags(
-            Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard)
+        flags = Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard
+        if options & KMessageBox.AllowLink:
+            flags |= Qt.LinksAccessibleByMouse
+            messageLabel.setOpenExternalLinks(True)
+        messageLabel.setTextInteractionFlags(flags)
 
         desktop = KApplication.kApplication().desktop().availableGeometry()
         if messageLabel.sizeHint().width() > desktop.width() * 0.5:
