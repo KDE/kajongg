@@ -525,10 +525,7 @@ class KStandardDirs(object):
                 })
             if os.name == 'nt':
                 cwd = os.path.split(os.path.abspath(sys.argv[0]))[0]
-                assert os.path.split(cwd)[1] == 'src', \
-                    'wrong installation: script should be in src subdirectory, not in %s' % \
-                    os.path.join(*cwd) # pylint: disable=star-args
-                KStandardDirs._prefix = os.path.split(cwd)[0]
+                KStandardDirs._prefix = cwd
                 dirMap = KStandardDirs._baseDirs
                 for key in dirMap:
                     dirMap[key] = list(os.path.normpath(x) for x in dirMap[key])
