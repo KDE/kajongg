@@ -116,10 +116,10 @@ class Tileset(object):
         self.__graphicspath = locateTileset(graphName)
         if self.__graphicspath.isEmpty():
             logException(TileException('cannot find kmahjongglib/tilesets/%s for %s' % \
-                        (graphName, self.desktopFileName )))
+                        (graphName, self.desktopFileName)))
         self.renderer() # now that we get the sizes from the svg, we need the renderer right away
 
-        self.svgName = { 'wn': 'WIND_1', 'ws': 'WIND_2', 'we': 'WIND_3', 'ww': 'WIND_4',
+        self.svgName = {'wn': 'WIND_1', 'ws': 'WIND_2', 'we': 'WIND_3', 'ww': 'WIND_4',
             'db': 'DRAGON_1', 'dg': 'DRAGON_2', 'dr': 'DRAGON_3'}
         for value in '123456789':
             self.svgName['s%s' % value] = 'ROD_%s' % value

@@ -295,8 +295,8 @@ class DeferredBlock(object):
                     answerList = []
                     for answer in set(x.prettyAnswer() for x in self.requests if x.deferred.command == command):
                         answerList.append((answer, list(x for x in self.requests
-                            if x.deferred.command == command and answer==x.prettyAnswer())))
-                    answerList = sorted(answerList, key=lambda x:len(x[1]))
+                            if x.deferred.command == command and answer == x.prettyAnswer())))
+                    answerList = sorted(answerList, key=lambda x: len(x[1]))
                     answerTexts = []
                     if len(answerList) == 1:
                         answerTexts.append('{answer} from all'.format(answer=answerList[-1][0]))

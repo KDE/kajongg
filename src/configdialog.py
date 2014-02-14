@@ -35,7 +35,7 @@ from statesaver import StateSaver
 from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 
-class PlayConfigTab( QWidget):
+class PlayConfigTab(QWidget):
     """Display Config tab"""
     def __init__(self, parent):
         super(PlayConfigTab, self).__init__(parent)
@@ -91,14 +91,11 @@ class ConfigDialog(KConfigDialog): # pylint: disable=too-many-public-methods
     def __init__(self, parent, name):
         # pylint: disable=super-init-not-called
         KConfigDialog.__init__(self, parent, QString(name), Internal.Preferences)
-        self.pages = [
-            self.addPage(PlayConfigTab(self),
-                m18nc('kajongg','Play'), "arrow-right"),
-            self.addPage(TilesetSelector(self),
-                m18n("Tiles"), "games-config-tiles"),
-            self.addPage(BackgroundSelector(self),
-                m18n("Backgrounds"), "games-config-background")]
         StateSaver(self)
+        self.pages = [
+            self.addPage(PlayConfigTab(self), m18nc('kajongg', 'Play'), "arrow-right"),
+            self.addPage(TilesetSelector(self), m18n("Tiles"), "games-config-tiles"),
+            self.addPage(BackgroundSelector(self), m18n("Backgrounds"), "games-config-background")]
 
     def keyPressEvent(self, event):
         """The four tabs can be selected with CTRL-1 .. CTRL-4"""

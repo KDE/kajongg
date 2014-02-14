@@ -60,7 +60,6 @@ class UIWallSide(Board):
 
 class UIKongBox(KongBox):
     """Kong box with UITiles"""
-    # pylint: disable=incomplete-protocol
     def __init__(self):
         KongBox.__init__(self)
 
@@ -111,7 +110,7 @@ class UIWall(Wall):
         self.__sides[0].setPos(yWidth=sideLength)
         self.__sides[3].setPos(xHeight=1)
         self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
-        self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1 )
+        self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1)
         self.showShadows = Internal.Preferences.showShadows
         Internal.scene.addItem(self.__square)
 

@@ -48,8 +48,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
             text = variantValue(index.model().data(index))
         self.document.setDefaultFont(option.font)
         self.document.setHtml(text)
-        return QSize(self.document.idealWidth() + 5,
-                     option.fontMetrics.height() )
+        return QSize(self.document.idealWidth() + 5, option.fontMetrics.height())
 
 class RightAlignedCheckboxDelegate(QStyledItemDelegate):
     """as the name says. From
@@ -80,7 +79,7 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
         """edit right aligned checkbox"""
         flags = model.flags(index)
         # make sure that the item is checkable
-        if (not (flags & Qt.ItemIsUserCheckable) or not (flags & Qt.ItemIsEnabled)):
+        if not flags & Qt.ItemIsUserCheckable or not flags & Qt.ItemIsEnabled:
             return False
         # make sure that we have a check state
         value = index.data(Qt.CheckStateRole)

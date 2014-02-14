@@ -324,10 +324,10 @@ KDialogButtonBox = QDialogButtonBox # pylint: disable=invalid-name
 
 class KDialog(CaptionMixin, QDialog):
     """QDialog should be enough for kajongg"""
-    Ok = QDialogButtonBox.Ok
+    Ok = QDialogButtonBox.Ok # pylint: disable=invalid-name
     Cancel = QDialogButtonBox.Cancel
     Yes = QDialogButtonBox.Yes
-    No = QDialogButtonBox.No
+    No = QDialogButtonBox.No # pylint: disable=invalid-name
     Help = QDialogButtonBox.Help
     Apply = QDialogButtonBox.Apply
     RestoreDefaults = QDialogButtonBox.RestoreDefaults
@@ -497,11 +497,11 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         """show an about dialog"""
         AboutKajonggDialog(Internal.mainWindow).exec_()
 
-    def queryClose(self):
+    def queryClose(self): # pylint: disable=no-self-use
         """default"""
         return True
 
-    def queryExit(self):
+    def queryExit(self): # pylint: disable=no-self-use
         """default"""
         return True
 
@@ -1221,7 +1221,7 @@ class KConfigDialog(KDialog):
         icons = list(self.iconList.item(x) for x in range(len(self.iconList)))
         neededIconWidth = max(self.iconList.visualItemRect(x).width() for x in icons)
         margins = self.iconList.contentsMargins()
-        neededIconWidth +=  margins.left() + margins.right()
+        neededIconWidth += margins.left() + margins.right()
         self.iconList.setMaximumWidth(neededIconWidth)
         self.iconList.setMinimumWidth(neededIconWidth)
         for child in self.allChildren(self):
@@ -1279,6 +1279,6 @@ class KConfigDialog(KDialog):
         """show wanted page and select its icon"""
         self.tabSpace.setCurrentWidget(page)
         for idx in range(self.tabSpace.count()):
-            self.iconList.item(idx).setSelected(idx==self.tabSpace.currentIndex())
+            self.iconList.item(idx).setSelected(idx == self.tabSpace.currentIndex())
 
 KGlobal.initStatic()

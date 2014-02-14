@@ -47,7 +47,7 @@ class DBCursor(sqlite3.Cursor):
         self.parameters = None
         self.failure = None
 
-    def execute(self, statement, parameters=None, silent=False, failSilent = False, mayFail=False):
+    def execute(self, statement, parameters=None, silent=False, failSilent=False, mayFail=False):
         """logging wrapper, returning all selected data"""
         # pylint: disable=too-many-branches
         self.statement = statement
@@ -139,7 +139,7 @@ class DBHandle(sqlite3.Connection):
         name = stack[-3]
         if name in ('__exit__', '__init__'):
             name = stack[-4]
-        return '%s on %s (%x)' % (name , self.path, id(self))
+        return '%s on %s (%x)' % (name, self.path, id(self))
 
     def commit(self, silent=None):
         """commit and log it"""

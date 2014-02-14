@@ -269,7 +269,7 @@ class ClientDialog(QDialog):
         vertical = view.width() > view.height() * 1.2
         if vertical:
             height = (len(self.buttons) + 1) * self.btnHeight * 1.2
-            width = (cwi.width() - cwi.height() ) // 2
+            width = (cwi.width() - cwi.height()) // 2
             geometry.setX(cwi.width() - width)
             geometry.setY(min(cwi.height()//3, cwi.height() - height))
         else:

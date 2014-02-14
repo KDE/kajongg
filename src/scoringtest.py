@@ -19,6 +19,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+from __future__ import print_function
+
 from common import Debug, isPython3  # pylint: disable=unused-import
 import unittest
 from game import PlayingGame

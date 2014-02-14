@@ -24,7 +24,7 @@ import os, sys, shutil
 
 from common import Internal, Options
 
-usingKDE = False
+usingKDE = False # pylint: disable=invalid-name
 
 try:
     if '--nokde' in sys.argv or '--qt5' in sys.argv:
@@ -37,7 +37,7 @@ try:
         KConfigSkeleton, KDialogButtonBox, KAction, KStandardAction, \
         KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
         KConfigDialog, KDialog
-    usingKDE = True
+    usingKDE = True # pylint: disable=invalid-name
 except ImportError:
     try:
         raise

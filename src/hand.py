@@ -569,7 +569,7 @@ class Hand(object):
                 lostHands.append((mjRule, melds, tryHand))
         # we prefer a won Hand even if a lost Hand might have a higher score
         tryHands = wonHands if wonHands else lostHands
-        bestRule, bestVariant, _ = max(tryHands, key=lambda x:x[2])
+        bestRule, bestVariant, _ = max(tryHands, key=lambda x: x[2])
         self.mjRule = bestRule
         self.melds.extend(bestVariant)
         self.melds.sort()
@@ -624,7 +624,7 @@ class Hand(object):
         if maxRule:
             maxLimit = maxRule.rule.score.limits
             if maxLimit >= 1.0 or maxLimit * self.ruleset.limit > pointsTotal.total():
-                self.usedRules =  [maxRule]
+                self.usedRules = [maxRule]
                 return Score(ruleset=self.ruleset, limits=maxLimit)
         return pointsTotal
 

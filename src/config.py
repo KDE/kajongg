@@ -66,7 +66,7 @@ class BoolParameter(Parameter):
 
     def add(self, skeleton):
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItemBool(self.name, self.value, self.default )
+        self.item = skeleton.addItemBool(self.name, self.value, self.default)
 
 class IntParameter(Parameter):
     """helper class for defining integer parameters"""

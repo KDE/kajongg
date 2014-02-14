@@ -83,7 +83,7 @@ class Tile(str):
         if len(args) == 1:
             arg0, arg1 = args[0]
         else:
-            arg0, arg1 = args
+            arg0, arg1 = args # pylint: disable=unbalanced-tuple-unpacking
         if isinstance(arg1, int):
             arg1 = chr(arg1 + 48)
         what = arg0 + arg1
@@ -164,18 +164,18 @@ class Tile(str):
 
     def groupName(self):
         """the name of the group this tile is of"""
-        names = {Tile.hidden:m18nc('kajongg','hidden'), Tile.stone: m18nc('kajongg','stone'),
-            Tile.bamboo: m18nc('kajongg','bamboo'), Tile.character:m18nc('kajongg','character'),
-            Tile.wind:m18nc('kajongg','wind'), Tile.dragon:m18nc('kajongg','dragon'),
-            Tile.flower:m18nc('kajongg','flower'), Tile.season:m18nc('kajongg','season')}
+        names = {Tile.hidden:m18nc('kajongg', 'hidden'), Tile.stone: m18nc('kajongg', 'stone'),
+            Tile.bamboo: m18nc('kajongg', 'bamboo'), Tile.character:m18nc('kajongg', 'character'),
+            Tile.wind:m18nc('kajongg', 'wind'), Tile.dragon:m18nc('kajongg', 'dragon'),
+            Tile.flower:m18nc('kajongg', 'flower'), Tile.season:m18nc('kajongg', 'season')}
         return names[self.lowerGroup]
 
     def valueName(self):
         """the name of the value this tile has"""
-        names = {'y':m18nc('kajongg','tile'), Tile.white:m18nc('kajongg','white'),
-            Tile.red:m18nc('kajongg','red'), Tile.green:m18nc('kajongg','green'),
-            Tile.east:m18nc('kajongg','East'), Tile.south:m18nc('kajongg','South'), Tile.west:m18nc('kajongg','West'),
-            Tile.north:m18nc('kajongg','North')}
+        names = {'y':m18nc('kajongg', 'tile'), Tile.white:m18nc('kajongg', 'white'),
+            Tile.red:m18nc('kajongg', 'red'), Tile.green:m18nc('kajongg', 'green'),
+            Tile.east:m18nc('kajongg', 'East'), Tile.south:m18nc('kajongg', 'South'),
+            Tile.west:m18nc('kajongg', 'West'), Tile.north:m18nc('kajongg', 'North')}
         for idx in Tile.numbers:
             names[idx] = chr(idx + 48)
         return names[self.value]
@@ -228,7 +228,7 @@ class TileList(list):
         group = tile.group
         values = set(x.value for x in self if x.group == group)
         chows = []
-        for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0,  1)]:
+        for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
             subset = set([tile.value + x for x in offsets])
             if subset <= values:
                 chow = TileList(Tile(group, x) for x in sorted(subset))

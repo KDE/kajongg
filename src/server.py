@@ -212,7 +212,7 @@ class ServerTable(Table):
         number of humans before suspending"""
         result = 4
         if self.suspendedAt:
-            result -= sum (x.name.startswith('Robot ') for x in self.game.players)
+            result -= sum(x.name.startswith('Robot ') for x in self.game.players)
         return result
 
     def sendChatMessage(self, chatLine):
@@ -904,7 +904,7 @@ class MJServer(object):
         if len(tables):
             data = list(x.asSimpleList() for x in tables)
             if Debug.table:
-                logDebug('sending %d tables to %s: %s' % ( len(tables), user.name, data))
+                logDebug('sending %d tables to %s: %s' % (len(tables), user.name, data))
             return self.callRemote(user, 'newTables', data)
         else:
             return succeed([])
@@ -1038,7 +1038,7 @@ class MJServer(object):
 
     def __logout2(self, user):
         """now the leaveTable message had a good chance to get to the clients first"""
-        self.callRemote(user,'serverDisconnects')
+        self.callRemote(user, 'serverDisconnects')
         user.mind = None
         for block in DeferredBlock.blocks:
             for request in block.requests:
@@ -1169,13 +1169,13 @@ class MJRealm(object):
     def requestAvatar(self, avatarId, mind, *interfaces):
         """as the tutorials do..."""
         if not pb.IPerspective in interfaces:
-            raise NotImplementedError, "No supported avatar interface"
+            raise NotImplementedError("No supported avatar interface")
         avatar = User(avatarId)
         avatar.server = self.server
         avatar.attached(mind)
         if Debug.connections:
             logDebug('Connection from %s ' % avatar.source())
-        return pb.IPerspective, avatar, lambda a = avatar:a.detached(mind)
+        return pb.IPerspective, avatar, lambda a=avatar: a.detached(mind)
 
 def parseArgs():
     """as the name says"""

@@ -181,7 +181,7 @@ class Purity(RuleCode):
 
 class ConcealedTrueColorGame(RuleCode):
     def appliesToHand(hand):
-        if len(hand.suits) != 1 or not (hand.suits < set(Tile.colors)):
+        if len(hand.suits) != 1 or not hand.suits < set(Tile.colors):
             return False
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
@@ -203,7 +203,7 @@ class BuriedTreasure(RuleCode):
     def appliesToHand(hand):
         return (len(hand.suits - set(Tile.honors)) == 1
             and sum(x.isPung for x in hand.melds) == 4
-            and all((x.isPung and x.isConcealed ) or x.isPair for x in hand.melds))
+            and all((x.isPung and x.isConcealed) or x.isPair for x in hand.melds))
 
 class AllTerminals(RuleCode):
     def appliesToHand(hand):
@@ -513,7 +513,7 @@ class TripleKnitting(RuleCode):
         while len(rest) >= 2:
             for value in set(x.value for x in rest):
                 suits = set(x.group for x in rest if x.value == value)
-                if len(suits) <2:
+                if len(suits) < 2:
                     yield tuple(melds), tuple(rest)
                     return
                 pair = (Tile(suits.pop(), value), Tile(suits.pop(), value))
@@ -834,7 +834,7 @@ class EastWonNineTimesInARow(RuleCode):
             needWins = EastWonNineTimesInARow.nineTimes
             if game.isScoringGame():
                 # we are only proposing for the last needed Win
-                needWins  -= 1
+                needWins -= 1
         if game.winner and game.winner.wind == 'E' and game.notRotated >= needWins:
             prevailing = WINDS[game.roundsFinished % 4]
             eastMJCount = int(Query("select count(1) from score "
@@ -844,7 +844,7 @@ class EastWonNineTimesInARow(RuleCode):
             return eastMJCount == needWins
         return False
     def rotate(cls, game):
-        return cls.appliesToGame(game, needWins = EastWonNineTimesInARow.nineTimes)
+        return cls.appliesToGame(game, needWins=EastWonNineTimesInARow.nineTimes)
 
 class GatesOfHeaven(StandardMahJongg):
     cache = ()
@@ -1060,7 +1060,7 @@ class BlessingOfHeaven(RuleCode):
         """for scoring game"""
         return (hand.ownWind == Tile.east
             and hand.lastSource and hand.lastSource in 'wd'
-            and not (set(hand.announcements) - {'a'}))
+            and not set(hand.announcements) - {'a'})
 
 class BlessingOfEarth(RuleCode):
     def appliesToHand(hand):
@@ -1070,7 +1070,7 @@ class BlessingOfEarth(RuleCode):
         """for scoring game"""
         return (hand.ownWind != Tile.east
             and hand.lastSource and hand.lastSource in 'wd'
-            and not (set(hand.announcements) - {'a'}))
+            and not set(hand.announcements) - {'a'})
 
 class LongHand(RuleCode):
     def appliesToHand(hand):

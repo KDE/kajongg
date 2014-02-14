@@ -175,7 +175,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         """give an unknown tileItem a name"""
         PlayingPlayer.makeTileKnown(self, tile)
         assert tile.isKnown
-        matchingTiles = sorted(self.handBoard.tilesByElement(Tile.unknown), key=lambda x:x.xoffset)
+        matchingTiles = sorted(self.handBoard.tilesByElement(Tile.unknown), key=lambda x: x.xoffset)
         matchingTiles[-1].tile = tile
 
     def exposeMeld(self, meldTiles, calledTile=None):
@@ -187,7 +187,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 class VisiblePlayingGame(PlayingGame):
     """for the client"""
     # pylint: disable=too-many-arguments, too-many-public-methods
-    playerClass =  VisiblePlayingPlayer
+    playerClass = VisiblePlayingPlayer
     wallClass = UIWall
 
     def __init__(self, names, ruleset, gameid=None, wantedGame=None, client=None, playOpen=False, autoPlay=False):

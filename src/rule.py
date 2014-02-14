@@ -125,7 +125,7 @@ class Score(object):
 
     def total(self):
         """the total score"""
-        score = int(self.points * ( 2 ** self.doubles))
+        score = int(self.points * (2 ** self.doubles))
         if self.limits:
             if self.limits >= 1:
                 self.points = self.doubles = 0
@@ -338,7 +338,7 @@ class Ruleset(object):
             m18n('Loser rules are applied to the entire hand but only for non-winners'))
         self.mjRules = RuleList(4, m18n('Mah Jongg Rules'),
             m18n('Only hands matching a Mah Jongg rule can win'))
-        self.parameterRules = RuleList(999, m18nc('kajongg','Options'),
+        self.parameterRules = RuleList(999, m18nc('kajongg', 'Options'),
             m18n('Here we have several special game related options'))
         self.penaltyRules = RuleList(9999, m18n('Penalties'), m18n(
             """Penalties are applied manually by the user. They are only used for scoring games.
@@ -670,7 +670,7 @@ into a situation where you have to pay a penalty"""))
                 for idx, ruleset in enumerate(result):
                     if ruleset.name == lastUsed:
                         del result[idx]
-                        return [ruleset ] + result
+                        return [ruleset] + result
         return result
 
     def diff(self, other):
@@ -723,7 +723,7 @@ class RuleBase(object):
 
 def ruleKey(name):
     """the key is used for finding a rule in a RuleList"""
-    return english(name).replace(' ', '').replace('.','')
+    return english(name).replace(' ', '').replace('.', '')
 
 class Rule(RuleBase):
     """a mahjongg rule with a name, matching variants, and resulting score.
@@ -761,7 +761,7 @@ class Rule(RuleBase):
             return result
         return classmethod(wrapper) if clsMethod else staticmethod(wrapper)
 
-    def __init__(self, name, definition='', points = 0, doubles = 0, limits = 0,
+    def __init__(self, name, definition='', points=0, doubles=0, limits=0,
             description=None, explainTemplate=None, debug=False):
         RuleBase.__init__(self, name, definition, description)
         self.hasSelectable = False
@@ -854,7 +854,7 @@ class Rule(RuleBase):
 
     def explain(self, meld):
         """use this rule for scoring"""
-        return '%s: %s' % ( m18n(
+        return '%s: %s' % (m18n(
             self.explainTemplate if self.explainTemplate else self.name).format(
                 group=meld[0].groupName() if meld else '',
                 value=meld[0].valueName() if meld else '',
@@ -963,7 +963,7 @@ class PredefinedRuleset(Ruleset):
         """a list of instances for all predefined rulesets"""
         if PredefinedRuleset.preRulesets is None:
             PredefinedRuleset.preRulesets = list(x()
-                for x in sorted(PredefinedRuleset.classes, key=lambda x:x.__name__))
+                for x in sorted(PredefinedRuleset.classes, key=lambda x: x.__name__))
         return PredefinedRuleset.preRulesets
 
     def rules(self):

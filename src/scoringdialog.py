@@ -112,8 +112,8 @@ class ScorePlayerItem(ScoreTreeItem):
         column -= 1
         points = points[column:column+4]
         points = [float(x) for x in points]
-        for idx in range( 1, len(points)-2 ):  # skip the ends
-            for step in range(steps ):
+        for idx in range(1, len(points)-2):  # skip the ends
+            for step in range(steps):
                 point_1, point0, point1, point2 = points[idx-1:idx+3]
                 fstep = float(step) / steps
                 # wikipedia Catmull-Rom -> Cubic_Hermite_spline
@@ -122,7 +122,7 @@ class ScorePlayerItem(ScoreTreeItem):
                           fstep*((2-fstep)*fstep - 1) * point_1
                                 + (fstep*fstep*(3*fstep - 5) + 2) * point0
                                 + fstep*((4 - 3*fstep)*fstep + 1) * point1
-                                + (fstep-1)*fstep*fstep * point2 ) / 2
+                                + (fstep-1)*fstep*fstep * point2) / 2
         yield points[-2]
 
 
@@ -159,7 +159,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
 class ScoreModel(TreeModel):
     """a model for our score table"""
     steps = 30 # how fine do we want the stepping in the chart spline
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(ScoreModel, self).__init__(parent)
         self.scoreTable = parent
         self.rootItem = ScoreRootItem(None)
@@ -216,7 +216,7 @@ class ScoreModel(TreeModel):
                 content = item.content(column)
                 if not isinstance(content, HandResult):
                     return QVariant(QBrush(ScoreItemDelegate.colors[index.row()]))
-        if column > 0 and isinstance(item, ScorePlayerItem) :
+        if column > 0 and isinstance(item, ScorePlayerItem):
             content = item.content(column)
             # pylint: disable=maybe-no-member
             # pylint thinks content is a str
@@ -263,8 +263,8 @@ class ScoreModel(TreeModel):
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         groupIndex = self.index(self.rootItem.childCount(), 0, parent)
-        groupNames = [m18nc('kajongg','Score'), m18nc('kajongg','Payments'),
-                m18nc('kajongg','Balance'), m18nc('kajongg', 'Chart')]
+        groupNames = [m18nc('kajongg', 'Score'), m18nc('kajongg', 'Payments'),
+                m18nc('kajongg', 'Balance'), m18nc('kajongg', 'Chart')]
         for idx, groupName in enumerate(groupNames):
             self.insertRows(idx, list([ScoreGroupItem(groupName)]), groupIndex)
             listIndex = self.index(idx, 0, groupIndex)
@@ -438,7 +438,7 @@ class ScoreTable(QWidget):
         self.scoreLayout.addLayout(leftLayout)
         self.scoreLayout.addWidget(self.viewRight)
         self.splitter.addWidget(scoreWidget)
-        self.ruleTree = RuleTreeView(m18nc('kajongg','Used Rules'))
+        self.ruleTree = RuleTreeView(m18nc('kajongg', 'Used Rules'))
         self.splitter.addWidget(self.ruleTree)
         # this shows just one line for the ruleTree - so we just see the
         # name of the ruleset:
@@ -726,7 +726,7 @@ class PenaltyDialog(QDialog):
         self.spPenalty.prevValue = str(-offense.score.points)
         self.spPenalty.setValue(-offense.score.points)
         self.spPenalty.parties = max(payers, payees)
-        self.spPenalty.setSingleStep(10 )
+        self.spPenalty.setSingleStep(10)
         self.lblUnits.setText(m18n('points'))
         self.playerChanged()
         self.penaltyChanged()
@@ -743,8 +743,8 @@ class PenaltyDialog(QDialog):
         payeeAmount = penalty // payees
         for pList, amount, count in ((self.payers, payerAmount, payers), (self.payees, payeeAmount, payees)):
             for idx, player in enumerate(pList):
-                player.setVisible(idx<count)
-                player.lblPayment.setVisible(idx<count)
+                player.setVisible(idx < count)
+                player.lblPayment.setVisible(idx < count)
                 if idx < count:
                     if pList == self.payers:
                         player.lblPayment.setText(m18nc('penalty dialog, appears behind paying player combobox',
@@ -781,7 +781,7 @@ class ScoringDialog(QWidget):
         pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
         for idx in range(4):
             self.setupUiForPlayer(pGrid, idx)
-        self.draw = QCheckBox(m18nc('kajongg','Draw'))
+        self.draw = QCheckBox(m18nc('kajongg', 'Draw'))
         self.draw.clicked.connect(self.wonChanged)
         btnPenalties = QPushButton(m18n("&Penalties"))
         btnPenalties.clicked.connect(self.penalty)
@@ -843,7 +843,7 @@ class ScoringDialog(QWidget):
         self.wonBoxes[idx].clicked.connect(self.wonChanged)
         self.spValues[idx].valueChanged.connect(self.slotInputChanged)
         detailTab = QWidget()
-        self.detailTabs.addTab(detailTab,'')
+        self.detailTabs.addTab(detailTab, '')
         self.details[idx] = QWidget()
         detailTabLayout = QVBoxLayout(detailTab)
         detailTabLayout.addWidget(self.details[idx])

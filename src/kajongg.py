@@ -86,7 +86,7 @@ def parseOptions():
     args = KCmdLineArgs.parsedArgs()
     Internal.app = APP
     Options.playOpen |= args.isSet('playopen')
-    Options.showRulesets|= args.isSet('rulesets')
+    Options.showRulesets |= args.isSet('rulesets')
     Options.rulesetName = str(args.getOption('ruleset'))
     if args.isSet('host'):
         Options.host = str(args.getOption('host'))
@@ -132,7 +132,7 @@ if __name__ == "__main__":
     from util import gitHead
 
     ABOUT = About()
-    KCmdLineArgs.init (sys.argv, ABOUT.about)
+    KCmdLineArgs.init(sys.argv, ABOUT.about)
     KCmdLineArgs.addCmdLineOptions(defineOptions())
     if usingQt4:
         KApplication.setGraphicsSystem('raster')

@@ -31,7 +31,7 @@ from kde import KApplication
 
 class ChatModel(QAbstractTableModel):
     """a model for the chat view"""
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(ChatModel, self).__init__(parent)
         self.chatLines = []
 

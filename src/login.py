@@ -37,7 +37,7 @@ from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 
 from log import english, logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
-from common import Internal, Options, SingleshotOptions, Internal, Debug
+from common import Internal, Options, SingleshotOptions, Internal, Debug, isAlive
 from game import Players
 from query import Query
 from statesaver import StateSaver
@@ -51,7 +51,7 @@ class LoginAborted(Exception):
 
 class Url(str):
     """holds connection related attributes: host, port, socketname"""
-    # pylint: disable=incomplete-protocol,too-many-public-methods
+    # pylint: disable=too-many-public-methods
     def __init__(self, url):
         self.host = None
         self.port = None
@@ -147,6 +147,7 @@ class Url(str):
 
     def __startLocalServer(self):
         """start a local server"""
+        # pylint: disable=too-many-branches
         try:
             if sys.argv[0].endswith('kajongg.py'):
                 tryServer = sys.argv[0].replace('.py', 'server.py')
@@ -172,7 +173,7 @@ class Url(str):
                 args.append('--db={}'.format(os.path.normpath(appdataDir() + 'local.db')))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
-            process = subprocess.Popen(args, shell=os.name=='nt')
+            process = subprocess.Popen(args, shell=os.name == 'nt')
             if Debug.connections:
                 logDebug(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                     process.pid, ' '.join(args)))
@@ -549,9 +550,9 @@ class Connection(object):
         elif failure.check(ConnectionRefusedError):
             msg = m18n('Server %1 refused connection', self.url)
         elif failure.check(ConnectionLost):
-            msg = m18n('Server %1 does not run a kajongg server' , self.url)
+            msg = m18n('Server %1 does not run a kajongg server', self.url)
         elif failure.check(DNSLookupError):
-            msg = m18n('Address for server %1 cannot be found' , self.url)
+            msg = m18n('Address for server %1 cannot be found', self.url)
         elif failure.check(ConnectError):
             msg = m18n('Login to server %1 failed: You have no network connection', self.url)
         else:

@@ -51,7 +51,7 @@ def rotateCenter(item, angle):
 
 class PlayerWind(QGraphicsEllipseItem):
     """a round wind tile"""
-    def __init__(self, name, tileset, roundsFinished=0, parent = None):
+    def __init__(self, name, tileset, roundsFinished=0, parent=None):
         """generate new wind tile"""
         if not len(WINDPIXMAPS):
             WINDPIXMAPS[('E', False)] = None # avoid recursion
@@ -128,7 +128,7 @@ class WindLabel(QLabel):
             self.__wind = wind
             self._refresh()
 
-    def __init__(self, wind = None, roundsFinished = 0, parent=None):
+    def __init__(self, wind=None, roundsFinished=0, parent=None):
         QLabel.__init__(self, parent)
         self.__wind = None
         if wind is None:

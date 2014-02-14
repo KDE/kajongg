@@ -37,7 +37,7 @@ class UITile(QGraphicsObject):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, tile, xoffset = 0.0, yoffset = 0.0, level=0):
+    def __init__(self, tile, xoffset=0.0, yoffset=0.0, level=0):
         QGraphicsObject.__init__(self)
         if not isinstance(tile, Tile):
             tile = Tile(tile)

@@ -69,15 +69,15 @@ class GamesModel(QAbstractTableModel):
             return QVariant()
         if role == Qt.DisplayRole:
             unformatted = unicode(self._resultRows[index.row()][index.column()])
-            if index.column()==2:
+            if index.column() == 2:
                 # we do not yet use this for listing remote games but if we do
                 # this translation is needed for robot players
                 names = [m18n(name) for name in unformatted.split('///')]
                 return QVariant(', '.join(names))
-            elif index.column()==1:
+            elif index.column() == 1:
                 dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
                 return QVariant(dateVal.strftime('%c').decode('utf-8'))
-            elif index.column()==0:
+            elif index.column() == 0:
                 return QVariant(int(unformatted))
         with RealQVariant():
             return QAbstractTableModel.data(self, index, role)

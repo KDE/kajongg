@@ -371,7 +371,7 @@ class Player(object):
         melds.extend(str(x) for x in self._concealedMelds)
         melds.extend(str(x) for x in self._bonusTiles)
         melds.append(self.mjString())
-        if (withTile or self.lastTile):
+        if withTile or self.lastTile:
             melds.append('L%s%s' % (withTile or self.lastTile, self.lastMeld if self.lastMeld else ''))
         return Hand(self, ' '.join(melds))
 
@@ -593,7 +593,7 @@ class PlayingPlayer(Player):
                 src, dst = (Tile.unknown, tileName) if show else (tileName, Tile.unknown)
                 assert src != dst, (self, src, dst, tiles, self._concealedTiles)
                 if not src in self._concealedTiles:
-                    logException( '%s: showConcealedTiles(%s): %s not in %s.' % \
+                    logException('%s: showConcealedTiles(%s): %s not in %s.' % \
                             (self, tiles, src, self._concealedTiles))
                 idx = self._concealedTiles.index(src)
                 self._concealedTiles[idx] = dst
@@ -728,8 +728,8 @@ class PlayingPlayer(Player):
                     dangerous.append((elements.terminals,
                         m18n('Player %1 may try an All Terminals Game', pName)))
         if expMeldCount >= 2:
-            windMelds = sum(self.visibleTiles[x] >=3 for x in elements.winds)
-            dragonMelds = sum(self.visibleTiles[x] >=3 for x in elements.dragons)
+            windMelds = sum(self.visibleTiles[x] >= 3 for x in elements.winds)
+            dragonMelds = sum(self.visibleTiles[x] >= 3 for x in elements.dragons)
             windsDangerous = dragonsDangerous = False
             if windMelds + dragonMelds == expMeldCount and expMeldCount >= 3:
                 windsDangerous = dragonsDangerous = True

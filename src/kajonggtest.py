@@ -350,7 +350,7 @@ def readGames(csvFile):
     """returns a dict holding a frozenset of games for each variant"""
     if not os.path.exists(csvFile):
         return
-    allRows = neutralize(csv.reader(open(csvFile,'r'), delimiter=';'))
+    allRows = neutralize(csv.reader(open(csvFile, 'r'), delimiter=';'))
     if not allRows:
         return
     # we want unique tuples so we can work with sets
@@ -405,7 +405,7 @@ def evaluate(games):
         ruleset='Ruleset', ai='AI variant', games='games', points='points'))
     for variant, rows in games.items():
         ruleset, aiVariant = variant
-        print('{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset = ruleset[:25], ai=aiVariant[:20],
+        print('{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
             games=len(commonGames)), end=' ')
         for playerIdx in range(4):
             print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD+1+playerIdx*4])
@@ -504,7 +504,7 @@ def parse_options():
         help='play COUNT games. Default is unlimited',
         metavar='COUNT', type=int, default=999999999)
     parser.add_option('', '--playopen', dest='playopen', action='store_true',
-        help='all robots play with visible concealed tiles' , default=False)
+        help='all robots play with visible concealed tiles', default=False)
     parser.add_option('', '--clients', dest='clients',
         help='start a maximum of CLIENTS kajongg instances. Default is 2',
         metavar='CLIENTS', type=int, default=1)

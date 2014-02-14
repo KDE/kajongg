@@ -20,11 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from common import isPython3
 if isPython3:
-    from common import unicode
+    from common import unicode # pylint: disable=redefined-builtin
 
 class QString(unicode):
     """If pyqt does not define it: We need something that looks like a QString"""
-    # pylint: disable=incomplete-protocol, too-many-public-methods
+    # pylint: disable=too-many-public-methods
     def toString(self):
         """do nothing"""
         return self.decode('utf-8')

@@ -40,7 +40,7 @@ from chat import ChatMessage, ChatWindow
 
 class TablesModel(QAbstractTableModel):
     """a model for our tables"""
-    def __init__(self, tables, parent = None):
+    def __init__(self, tables, parent=None):
         super(TablesModel, self).__init__(parent)
         self.tables = tables
         assert isinstance(tables, list)
@@ -169,7 +169,7 @@ class TableList(QWidget):
         self.leaveButton.clicked.connect(self.leaveTable)
         self.leaveButton.setIcon(KIcon("list-remove-user"))
         self.leaveButton.setToolTip(m18n("Leave a table"))
-        self.compareButton = buttonBox.addButton(m18nc('Kajongg-Ruleset','Compare'), QDialogButtonBox.AcceptRole)
+        self.compareButton = buttonBox.addButton(m18nc('Kajongg-Ruleset', 'Compare'), QDialogButtonBox.AcceptRole)
         self.compareButton.clicked.connect(self.compareRuleset)
         self.compareButton.setIcon(KIcon("preferences-plugin-script"))
         self.compareButton.setToolTip(m18n('Compare the rules of this table with my own rulesets'))
@@ -262,8 +262,8 @@ class TableList(QWidget):
             not running and
             not table.isOnline(self.client.name) and
             (self.client.name in table.playerNames) == suspended)
-        self.leaveButton.setVisible(not (suspendedLocalGame))
-        self.compareButton.setVisible(not (suspendedLocalGame))
+        self.leaveButton.setVisible(not suspendedLocalGame)
+        self.compareButton.setVisible(not suspendedLocalGame)
         self.startButton.setVisible(not suspended)
         if suspendedLocalGame:
             self.newButton.setToolTip(m18n("Start a new game"))

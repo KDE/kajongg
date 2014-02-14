@@ -80,7 +80,7 @@ class ClassicalChinese(PredefinedRuleset):
         """as the name says"""
         self.penaltyRules.createRule(
                 'False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah Jongg',
-                'Oabsolute payers=2 payees=2', points = -300)
+                'Oabsolute payers=2 payees=2', points=-300)
 
     def addHandRules(self):
         """as the name says"""
@@ -251,16 +251,16 @@ class ClassicalChineseDMJL(ClassicalChinese):
 
         self.winnerRules['OnlyHonors'].doubles = 2
 
-        self.penaltyRules.createRule('False Naming of Discard, Claimed for Chow', points = -50)
-        self.penaltyRules.createRule('False Naming of Discard, Claimed for Pung/Kong', points = -100)
+        self.penaltyRules.createRule('False Naming of Discard, Claimed for Chow', points=-50)
+        self.penaltyRules.createRule('False Naming of Discard, Claimed for Pung/Kong', points=-100)
         self.penaltyRules.createRule('False Declaration of Mah Jongg by One Player',
-                'Oabsolute payees=3', points = -300)
+                'Oabsolute payees=3', points=-300)
         self.penaltyRules.createRule('False Declaration of Mah Jongg by Two Players',
-                'Oabsolute payers=2 payees=2', points = -300)
+                'Oabsolute payers=2 payees=2', points=-300)
         self.penaltyRules.createRule('False Declaration of Mah Jongg by Three Players',
-                'Oabsolute payers=3', points = -300)
+                'Oabsolute payers=3', points=-300)
         self.penaltyRules.createRule('False Naming of Discard, Claimed for Mah Jongg',
-                'Oabsolute payees=3', points = -300)
+                'Oabsolute payees=3', points=-300)
 
 class ClassicalChineseBMJA(ClassicalChinese):
     """classical chinese rules, British rules"""
@@ -314,7 +314,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
         del self.winnerRules['LastTileCompletesPairofTerminalsorHonors']
         del self.winnerRules['LastTileisOnlyPossibleTile']
         del self.winnerRules['TrueColorGame']
-        del self.winnerRules['ThreeGreatScholars'] 
+        del self.winnerRules['ThreeGreatScholars']
         self.winnerRules.createRule('Buried Treasure', 'FBuriedTreasure', limits=1,
                 description=m18n('Concealed pungs of one suit with winds/dragons and a pair'))
         self.winnerRules.createRule('Purity', 'FPurity', doubles=3,
@@ -325,9 +325,9 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.mjRules.createRule('The 13 Unique Wonders', orphans.definition, limits=1, description=orphans.description)
         self.handRules['AllFlowers'].score.doubles = 2
         self.handRules['AllSeasons'].score.doubles = 2
-        self.penaltyRules.createRule('False Naming of Discard, Claimed for Chow/Pung/Kong', points = -50)
+        self.penaltyRules.createRule('False Naming of Discard, Claimed for Chow/Pung/Kong', points=-50)
         self.penaltyRules.createRule('False Declaration of Mah Jongg by One Player',
-                'Oabsolute payees=3', limits = -0.5)
+                'Oabsolute payees=3', limits=-0.5)
         self.winnerRules.createRule('False Naming of Discard, Claimed for Mah Jongg', 'FFalseDiscardForMJ||Opayforall')
 
         self.loserRules.createRule('Calling for Only Honors', 'FCallingHand||Ohand=OnlyHonors', limits=0.4)

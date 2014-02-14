@@ -313,17 +313,17 @@ class Meld(TileList):
         if self.isBonus:
             return m18nc('kajongg meld type', 'Bonus')
         elif self.isSingle:
-            return m18nc('kajongg meld type','&single')
+            return m18nc('kajongg meld type', '&single')
         elif self.isPair:
-            return m18nc('kajongg meld type','&pair')
+            return m18nc('kajongg meld type', '&pair')
         elif self.isChow:
-            return m18nc('kajongg meld type','&chow')
+            return m18nc('kajongg meld type', '&chow')
         elif self.isPung:
-            return m18nc('kajongg meld type','p&ung')
+            return m18nc('kajongg meld type', 'p&ung')
         elif self.isClaimedKong:
-            return m18nc('kajongg meld type','c&laimed kong')
+            return m18nc('kajongg meld type', 'c&laimed kong')
         elif self.isKong:
-            return m18nc('kajongg meld type','k&ong')
+            return m18nc('kajongg meld type', 'k&ong')
         else:
             return m18nc('kajongg meld type', 'rest of tiles')
 

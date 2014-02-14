@@ -48,7 +48,7 @@ class Message(object):
         Message.defined[self.name] = self
         className = self.__class__.__name__.replace('Message', '')
         msgName = self.name.replace(' ', '')
-        assert className ==  msgName, '%s != %s' % ( className, msgName)
+        assert className == msgName, '%s != %s' % (className, msgName)
 
     def __str__(self):
         return self.name
@@ -195,7 +195,7 @@ class MessagePung(PungChowMessage, ServerMessage):
     """somebody said pung and gets the tile"""
     def __init__(self):
         PungChowMessage.__init__(self,
-            name=m18ncE('kajongg','Pung'),
+            name=m18ncE('kajongg', 'Pung'),
             shortcut=m18ncE('kajongg game dialog:Key for Pung', 'P'))
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
@@ -208,7 +208,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
     """somebody said kong and gets the tile"""
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
-            name=m18ncE('kajongg','Kong'),
+            name=m18ncE('kajongg', 'Kong'),
             shortcut=m18ncE('kajongg game dialog:Key for Kong', 'K'))
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
@@ -241,7 +241,7 @@ class MessageChow(PungChowMessage, ServerMessage):
     """somebody said chow and gets the tile"""
     def __init__(self):
         PungChowMessage.__init__(self,
-            name=m18ncE('kajongg','Chow'),
+            name=m18ncE('kajongg', 'Chow'),
             shortcut=m18ncE('kajongg game dialog:Key for Chow', 'C'))
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
@@ -266,7 +266,7 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
     sendScore = True
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
-            name=m18ncE('kajongg','Mah Jongg'),
+            name=m18ncE('kajongg', 'Mah Jongg'),
             shortcut=m18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
@@ -283,7 +283,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
     """somebody made an original call"""
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
-            name=m18ncE('kajongg','Original Call'),
+            name=m18ncE('kajongg', 'Original Call'),
             shortcut=m18ncE('kajongg game dialog:Key for Original Call', 'O'))
     def serverAction(self, table, msg):
         """the server tells all others"""
@@ -318,7 +318,7 @@ class MessageDiscard(ClientMessage, ServerMessage):
  #   sendScore = True
     def __init__(self):
         ClientMessage.__init__(self,
-            name=m18ncE('kajongg','Discard'),
+            name=m18ncE('kajongg', 'Discard'),
             shortcut=m18ncE('kajongg game dialog:Key for Discard', 'D'))
     def serverAction(self, table, msg):
         """the server mirrors that action"""
@@ -413,7 +413,7 @@ class MessageInitHand(ServerMessage):
         """prepare a new hand"""
         client.game.divideAt = move.divideAt
         client.game.wall.divide()
-        if hasattr(client,'shutdownHumanClients'):
+        if hasattr(client, 'shutdownHumanClients'):
             client.shutdownHumanClients(exception=client)
         scene = Internal.scene
         if scene:
@@ -622,7 +622,7 @@ class MessageOK(ClientMessage):
     """a client says OK"""
     def __init__(self):
         ClientMessage.__init__(self,
-            name=m18ncE('kajongg','OK'),
+            name=m18ncE('kajongg', 'OK'),
             shortcut=m18ncE('kajongg game dialog:Key for OK', 'O'))
     def toolTip(self, dummyButton, dummyTile):
         """returns text and warning flag for button and text for tile for button and text for tile"""
@@ -632,7 +632,7 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
     """A player explicitly says he will not claim a tile"""
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
-            name=m18ncE('kajongg','No Claim'),
+            name=m18ncE('kajongg', 'No Claim'),
             shortcut=m18ncE('kajongg game dialog:Key for No claim', 'N'))
     def toolTip(self, dummyButton, dummyTile):
         """returns text and warning flag for button and text for tile for button and text for tile"""

@@ -80,7 +80,7 @@ def uniqueList(seq):
     """makes list content unique, keeping only the first occurrence"""
     seen = set()
     seen_add = seen.add
-    return [ x for x in seq if x not in seen and not seen_add(x)]
+    return [x for x in seq if x not in seen and not seen_add(x)]
 
 import gc
 
@@ -163,8 +163,8 @@ def checkMemory():
     #pylint: disable=too-many-branches
     if not Debug.gc:
         return
-    gc.set_threshold( 0 )
-    gc.set_debug( gc.DEBUG_LEAK )
+    gc.set_threshold(0)
+    gc.set_debug(gc.DEBUG_LEAK)
     gc.enable()
     print('collecting {{{')
     gc.collect()        # we want to eliminate all output

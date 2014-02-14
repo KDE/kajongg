@@ -427,7 +427,7 @@ class Game(object):
 
     def __shufflePlayers(self):
         """assign random seats to the players and assign winds"""
-        self.players.sort(key=lambda x:x.name)
+        self.players.sort(key=lambda x: x.name)
         self.randomGenerator.shuffle(self.players)
         for player, wind in zip(self.players, WINDS):
             player.wind = wind
@@ -769,7 +769,7 @@ class PlayingGame(Game):
         """write game summary to Options.csv"""
         if self.finished() and Options.csv:
             gameWinner = max(self.players, key=lambda x: x.balance)
-            writer = csv.writer(open(Options.csv,'a'), delimiter=';')
+            writer = csv.writer(open(Options.csv, 'a'), delimiter=';')
             if Debug.process and os.name != 'nt':
                 self.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             if Options.rounds:
@@ -986,7 +986,7 @@ class PlayingGame(Game):
 
     def _endWallDangerous(self):
         """if end of living wall is reached, declare all invisible tiles as dangerous"""
-        if len(self.wall.living) <=5:
+        if len(self.wall.living) <= 5:
             allTiles = [x for x in defaultdict.keys(elements.occurrence) if not x.isBonus]
             for tile in allTiles:
                 assert isinstance(tile, Tile), tile

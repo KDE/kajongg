@@ -27,6 +27,8 @@ import sip
 from qt import QObject, Qt, QVariant, QAbstractItemModel, QModelIndex, \
     QPersistentModelIndex
 
+# pylint: skip-file
+
 class ModelTest(QObject):
     """tests a model"""
     def __init__(self, _model, parent):

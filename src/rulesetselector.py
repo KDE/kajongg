@@ -134,7 +134,7 @@ class RuleItem(RuleTreeItem):
 
 class RuleModel(TreeModel):
     """a model for our rule table"""
-    def __init__(self, rulesets, title, parent = None):
+    def __init__(self, rulesets, title, parent=None):
         super(RuleModel, self).__init__(parent)
         self.rulesets = rulesets
         self.loaded = False
@@ -266,7 +266,7 @@ class EditableRuleModel(RuleModel):
                     dirty = True
                     content.parameter = value.toInt()[0]
             elif isinstance(content, BoolRule):
-                return False
+                return False, ''
             elif isinstance(content, StrRule):
                 if content.parameter != unicode(value.toString()):
                     dirty = True
@@ -309,7 +309,7 @@ class EditableRuleModel(RuleModel):
                 else:
                     return False
             elif role == Qt.CheckStateRole:
-                if isinstance(content, BoolRule) and column ==1:
+                if isinstance(content, BoolRule) and column == 1:
                     if not isinstance(ruleset, PredefinedRuleset):
                         newValue = value == Qt.Checked
                         if content.parameter != newValue:
@@ -466,7 +466,7 @@ class RuleTreeView(QTreeView):
         differ.show()
         self.differs.append(differ)
 
-class RulesetSelector( QWidget):
+class RulesetSelector(QWidget):
     """presents all available rulesets with previews"""
     def __init__(self, parent=None):
         super(RulesetSelector, self).__init__(parent)
@@ -491,7 +491,7 @@ class RulesetSelector( QWidget):
         self.btnRemove = QPushButton()
         self.btnCompare = QPushButton()
         self.btnClose = QPushButton()
-        self.rulesetView = RuleTreeView(m18nc('kajongg','Rule'), self.btnCopy, self.btnRemove, self.btnCompare)
+        self.rulesetView = RuleTreeView(m18nc('kajongg', 'Rule'), self.btnCopy, self.btnRemove, self.btnCompare)
         v1layout.addWidget(self.rulesetView)
         self.rulesetView.setWordWrap(True)
         self.rulesetView.setMouseTracking(True)

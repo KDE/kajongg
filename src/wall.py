@@ -28,8 +28,6 @@ class WallEmpty(Exception):
 
 class KongBox(object):
     """a non-ui kong box"""
-    # pylint: disable=incomplete-protocol
-
     def __init__(self):
         self._tiles = []
 

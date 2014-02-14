@@ -45,7 +45,7 @@ class Fmt(string.Formatter):
     def num_encode(number, length=4):
         """make a short unique ascii string out of number, truncate to length"""
         result = []
-        while number and len(result)<length:
+        while number and len(result) < length:
             number, remainder = divmod(number, Fmt.base)
             result.append(Fmt.alphabet[remainder])
         return ''.join(reversed(result))
@@ -150,7 +150,7 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     if withGamePrefix and Internal.logPrefix:
         logMsg = u'{prefix}{process}: {msg}'.format(
             prefix=Internal.logPrefix,
-            process = os.getpid() if Debug.process else '',
+            process=os.getpid() if Debug.process else '',
             msg=msg)
     if Debug.time:
         logMsg = u'{:08.4f} {}'.format(elapsedSince(Debug.time), logMsg)
@@ -242,15 +242,16 @@ class EventData(str):
     events[178] = 'ContentsRectChange'
     keys = {y:x for x, y in Qt.__dict__.items() if isinstance(y, int)}
 
-    def __new__(self, receiver, event, prefix=None):
+    def __new__(cls, receiver, event, prefix=None):
         """create the wanted string"""
-        if event.type() in self.events:
+        # pylint: disable=too-many-branches
+        if event.type() in cls.events:
             # ignore unknown event types
-            name = self.events[event.type()]
+            name = cls.events[event.type()]
             value = ''
             if hasattr(event, 'key'):
-                if event.key() in self.keys:
-                    value = self.keys[event.key()]
+                if event.key() in cls.keys:
+                    value = cls.keys[event.key()]
                 else:
                     value = 'unknown key:%s' % event.key()
             if hasattr(event, 'text'):

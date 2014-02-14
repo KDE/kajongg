@@ -121,9 +121,9 @@ class HandBoard(Board):
         """set showShadows"""
         if self._showShadows is None or self._showShadows != value:
             if value:
-                self.setPos(yHeight= 1.5)
+                self.setPos(yHeight=1.5)
             else:
-                self.setPos(yHeight= 1.0)
+                self.setPos(yHeight=1.0)
             if value:
                 self.lowerY = 1.2
             else:
@@ -181,12 +181,12 @@ class HandBoard(Board):
         """returns list(TileAttr)
         calculate places for bonus tiles. Put them all in one row,
         right adjusted. If necessary, extend to the right even outside of our board"""
-        positions = list(x.xoffset for x in newTilePositions if x.yoffset==0)
+        positions = list(x.xoffset for x in newTilePositions if x.yoffset == 0)
         upperLen = max(positions) if positions else 0
-        positions = list(x.xoffset for x in newTilePositions if x.yoffset!=0)
+        positions = list(x.xoffset for x in newTilePositions if x.yoffset != 0)
         lowerLen = max(positions) if positions else 0
 # TODO: keep them in the row they are in as long as there is room
-        if upperLen < lowerLen :
+        if upperLen < lowerLen:
             bonusY = 0
             tileLen = upperLen
         else:
@@ -352,8 +352,8 @@ class PlayingHandBoard(HandBoard):
                 for element in set(x[1].tile for x in items):
                     items = [x for x in movingPlaces.items() if x[1].tile is element]
                     if len(items) > 1:
-                        oldList = sorted(list(x[0] for x in items), key=lambda x:bool(x.board!=self)*1000+x.xoffset)
-                        newList = sorted(list(x[1] for x in items), key=lambda x:x.xoffset)
+                        oldList = sorted(list(x[0] for x in items), key=lambda x: bool(x.board != self)*1000+x.xoffset)
+                        newList = sorted(list(x[1] for x in items), key=lambda x: x.xoffset)
                         for idx, oldTile in enumerate(oldList):
                             places[oldTile] = newList[idx]
 
@@ -397,7 +397,7 @@ class PlayingHandBoard(HandBoard):
         if self.focusTile and self.focusTile.tile is tile:
             lastDiscard = self.focusTile
         else:
-            matchingTiles = sorted(self.tilesByElement(tile), key=lambda x:x.xoffset)
+            matchingTiles = sorted(self.tilesByElement(tile), key=lambda x: x.xoffset)
             # if an opponent player discards, we want to discard from the right end of the hand
             # thus minimizing tile movement within the hand
             lastDiscard = matchingTiles[-1]

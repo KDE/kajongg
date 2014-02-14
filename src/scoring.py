@@ -434,7 +434,7 @@ class ScoringPlayer(VisiblePlayer, Player):
 class ScoringGame(Game):
     """we play manually on a real table with real tiles and use
     kajongg only for scoring"""
-    playerClass =  ScoringPlayer
+    playerClass = ScoringPlayer
     wallClass = UIWall
 
     def __init__(self, names, ruleset, gameid=None, client=None, wantedGame=None):

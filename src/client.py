@@ -349,7 +349,7 @@ class Client(object, pb.Referenceable):
         if self.game:
             if move.token:
                 if move.token != self.game.handId.token():
-                    logException( 'wrong token: %s, we have %s' % (move.token, self.game.handId.token()))
+                    logException('wrong token: %s, we have %s' % (move.token, self.game.handId.token()))
         with Duration('Move %s:' % move):
             return self.exec_move(move).addCallback(self.__jellyMessage)
 

@@ -48,7 +48,7 @@ class DifferModel(QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
         """get from model"""
-        if not index.isValid() or not (0 <= index.row() < len(self.diffs)):
+        if not index.isValid() or not 0 <= index.row() < len(self.diffs):
             return QVariant()
         diff = self.diffs[index.row()]
         column = index.column()
