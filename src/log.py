@@ -18,11 +18,11 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import logging, socket, logging.handlers, os
+import logging, os
 import string
 
 from locale import getpreferredencoding
-from sys import stderr, _getframe
+from sys import _getframe
 
 SERVERMARK = '&&SERVER&&'
 
@@ -35,9 +35,6 @@ from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
 
 ENGLISHDICT = {}
-
-LOGGER = None
-
 
 class Fmt(string.Formatter):
     """this formatter can parse {id(x)} and output a short ascii form for id"""
@@ -104,20 +101,6 @@ def translateServerMessage(msg):
         return m18n(*tuple(msg.split(SERVERMARK)[1:-1]))
     return msg
 
-def initLog(logName):
-    """init the loggers"""
-    global LOGGER # pylint: disable=global-statement
-    LOGGER = logging.getLogger(logName)
-    try:
-        handler = logging.handlers.SysLogHandler('/dev/log')
-    except (AttributeError, socket.error):
-        handler = logging.handlers.RotatingFileHandler('kajongg.log', maxBytes=100000000, backupCount=10)
-    LOGGER.addHandler(handler)
-    LOGGER.addHandler(logging.StreamHandler(stderr))
-    LOGGER.setLevel(logging.DEBUG)
-    formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
-    handler.setFormatter(formatter)
-
 def dbgIndent(this, parent):
     """show messages indented"""
     if this.indent == 0:
@@ -135,7 +118,7 @@ def __logUnicodeMessage(prio, msg):
     msg = msg.encode(getpreferredencoding(), 'ignore')[:4000]
     if isPython3:
         msg = msg.decode()
-    LOGGER.log(prio, msg)
+    Internal.logger.log(prio, msg)
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""

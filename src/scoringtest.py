@@ -25,7 +25,6 @@ from game import PlayingGame
 from hand import Hand, Score
 from tile import TileList
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
-from log import initLog
 
 RULESETS = []
 
@@ -572,6 +571,5 @@ class TstProgram(unittest.TestProgram):
         unittest.TestProgram.__init__(self, *args, **kwargs)
 
 if __name__ == '__main__':
-    initLog('scoringtest')
     #Debug.hand = True
     TstProgram()

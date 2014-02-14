@@ -31,7 +31,6 @@ from optparse import OptionParser
 
 from common import Debug
 from util import removeIfExists, gitHead, checkMemory
-from log import initLog
 
 # fields in row:
 RULESETFIELD = 0
@@ -608,7 +607,6 @@ def allJobs():
 def main():
     """parse options, play, evaluate results"""
     global OPTIONS # pylint: disable=global-statement
-    initLog('kajonggtest')
 
     (OPTIONS, args) = parse_options()
     OPTIONS.csv = os.path.expanduser(os.path.join('~', '.kajongg', 'kajongg.csv'))

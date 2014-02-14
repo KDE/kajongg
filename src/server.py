@@ -60,8 +60,6 @@ if os.name != 'nt':
 from common import Options, Internal
 Internal.isServer = True
 Internal.logPrefix = 'S'
-from log import initLog
-initLog('kajonggserver')
 
 from twisted.spread import pb
 from twisted.internet import error

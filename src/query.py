@@ -66,7 +66,7 @@ class DBCursor(sqlite3.Cursor):
                             sqlite3.Cursor.execute(self, statement)
                     break
                 except sqlite3.OperationalError as exc:
-                    print('{} failed after {} tries:{}'.format(self, _, exc.message))
+                    logDebug('{} failed after {} tries:{}'.format(self, _, exc.message))
                     time.sleep(1)
                 else:
                     break
@@ -174,7 +174,7 @@ class DBHandle(sqlite3.Connection):
         try:
             sqlite3.Connection.close(self)
         except sqlite3.Error as exc:
-            print(exc)
+            logDebug(exc)
 
     @staticmethod
     def hasTable(table):

@@ -27,7 +27,7 @@ from hashlib import md5
 from qt import QVariant
 
 from common import Internal, Debug, unicode # pylint: disable=redefined-builtin
-from log import m18n, m18nc, m18nE, english, logException
+from log import m18n, m18nc, m18nE, english, logException, logDebug
 from query import Query
 
 class Score(object):
@@ -231,8 +231,8 @@ class RuleList(list):
                 assert parts1[0] == 'Ohand', definition
                 ruleClassName = parts1[1] + 'Rule'
                 if ruleClassName not in RuleBase.ruleClasses:
-                    print('we want %s, definition:%s' % (ruleClassName, definition))
-                    print('we have %s' % RuleBase.ruleClasses.keys())
+                    logDebug('we want %s, definition:%s' % (ruleClassName, definition))
+                    logDebug('we have %s' % RuleBase.ruleClasses.keys())
                 ruleType.limitHand = RuleBase.ruleClasses[ruleClassName]
         self.add(rule)
 

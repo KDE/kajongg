@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sip, sys
 
-from common import isPython3
+from common import isPython3, Internal
 
 usingQt4 = True # Default for now
 usingQt5 = False
@@ -34,7 +34,7 @@ if '--qt5' in sys.argv:
         usingQt5 = True
         usingQt4 = False
     except ImportError as exc:
-        print('Cannot import Qt5:{}, using Qt4 instead'.format(exc.message))
+        Internal.logger.debug('Cannot import Qt5:{}, using Qt4 instead'.format(exc.message))
         from qt4 import *
 else:
     from qt4 import *

@@ -23,7 +23,7 @@ from threading import Timer
 
 from log import logError, logDebug, m18n, m18nc
 from common import Options, Internal, isAlive, Debug
-import cgitb, tempfile, webbrowser
+import cgitb, tempfile, webbrowser, logging
 
 class MyHook(cgitb.Hook):
     """override the standard cgitb hook: invoke the browser"""

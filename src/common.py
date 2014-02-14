@@ -22,6 +22,7 @@ from __future__ import print_function
 
 from collections import defaultdict
 import datetime
+import sys, os, logging, logging.handlers, socket
 
 try:
     from sip import unwrapinstance
@@ -206,6 +207,27 @@ class Internal(object):
     mainWindow = None
     game = None
     autoPlay = False
+    logger = None
+
+    def __init__(self):
+        """init the loggers"""
+        logName = sys.argv[0].replace('.py', '') + '.log'
+        self.logger = logging.getLogger(logName)
+        if os.name == 'nt':
+            haveDevLog = False
+        else:
+            try:
+                handler = logging.handlers.SysLogHandler('/dev/log')
+                haveDevLog = True
+            except (AttributeError, socket.error):
+                haveDevLog = False
+        if not haveDevLog:
+            handler = logging.handlers.RotatingFileHandler('kajongg.log', maxBytes=100000000, backupCount=10)
+        self.logger.addHandler(handler)
+        self.logger.addHandler(logging.StreamHandler(sys.stderr))
+        self.logger.setLevel(logging.DEBUG)
+        formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
+        handler.setFormatter(formatter)
 
 Internal = Internal()
 

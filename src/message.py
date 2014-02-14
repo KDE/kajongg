@@ -656,7 +656,7 @@ def __scanSelf():
                         try:
                             msg = glob()
                         except Exception:
-                            print('cannot instantiate %s' % glob.__name__)
+                            logDebug('cannot instantiate %s' % glob.__name__)
                             raise
                         type.__setattr__(Message, msg.name.replace(' ', ''), msg)
 

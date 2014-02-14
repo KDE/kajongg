@@ -59,7 +59,7 @@ import gettext
 def insertArgs(englishIn, *args):
     """format the string"""
     if '@' in englishIn:
-        print('insertargs:', englishIn)
+        Internal.logger.debug('insertargs:', englishIn)
 
     if '\004' in englishIn:
         englishIn = englishIn.split('\004')[1]
@@ -563,9 +563,9 @@ class KStandardDirs(object):
         exists = os.path.exists(tryThis)
         if Debug.locate:
             if exists:
-                print('found: %s' % tryThis)
+                Internal.logger.debug('found: %s' % tryThis)
             else:
-                print('not found: %s' % tryThis)
+                Internal.logger.debug('not found: %s' % tryThis)
         return exists, tryThis
 
     @classmethod
@@ -589,10 +589,10 @@ class KStandardDirs(object):
         fullPath = os.path.join(cls._localBaseDirs[type_], filename)
         if not os.path.exists(os.path.dirname(fullPath)):
             if Debug.locate:
-                print('locateLocal creates missing dir %s', fullPath)
+                Internal.logger.debug('locateLocal creates missing dir %s', fullPath)
             os.makedirs(os.path.dirname(fullPath))
         if Debug.locate:
-            print('locateLocal(%s, %s) returns %s' % (
+            Internal.logger.debug('locateLocal(%s, %s) returns %s' % (
                 type_, filename, fullPath))
         return fullPath
 
@@ -651,7 +651,7 @@ class KStandardDirs(object):
         """tries to find the directory the file is in"""
         result = cls.findDirs(type_, filename)
         if Debug.locate:
-            print('findResourceDir(%s,%s) finds %s' % (type_, filename, result))
+            Internal.logger.debug('findResourceDir(%s,%s) finds %s' % (type_, filename, result))
         return result
 
 class KDETranslator(QTranslator):

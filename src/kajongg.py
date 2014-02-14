@@ -129,9 +129,7 @@ class EvHandler(QObject):
         return QObject.eventFilter(self, receiver, event)
 
 if __name__ == "__main__":
-    from log import initLog
     from util import gitHead
-    initLog('kajongg')
 
     ABOUT = About()
     KCmdLineArgs.init (sys.argv, ABOUT.about)
@@ -156,7 +154,7 @@ if __name__ == "__main__":
 
     if Options.csv:
         if gitHead() == 'current':
-            print('You cannot write to %s with changes uncommitted to git' % Options.csv)
+            Internal.logger.debug('You cannot write to %s with changes uncommitted to git' % Options.csv)
             sys.exit(2)
     from mainwindow import MainWindow
     MainWindow()
