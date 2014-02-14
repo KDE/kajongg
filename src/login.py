@@ -148,7 +148,6 @@ class Url(str):
     def __startLocalServer(self):
         """start a local server"""
         try:
-            args = ['kajonggserver'] # the default
             if sys.argv[0].endswith('kajongg.py'):
                 tryServer = sys.argv[0].replace('.py', 'server.py')
                 if os.path.exists(tryServer):
@@ -157,6 +156,12 @@ class Url(str):
                 tryServer = sys.argv[0].replace('.pyw', 'server.py')
                 if os.path.exists(tryServer):
                     args = ['python', tryServer]
+            elif sys.argv[0].endswith('kajongg.exe'):
+                tryServer = sys.argv[0].replace('.exe', 'server.exe')
+                if os.path.exists(tryServer):
+                    args = [tryServer]
+            else:
+                args = ['kajonggserver']
             if self.useSocket or os.name == 'nt': # for nt --socket tells the server to bind to 127.0.0.1
                 args.append('--socket=%s' % socketName())
                 if removeIfExists(socketName()):
