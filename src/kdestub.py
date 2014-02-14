@@ -1149,7 +1149,6 @@ class KConfigDialog(KDialog):
         self.iconList.itemClicked.connect(self.iconClicked)
         self.iconList.currentItemChanged.connect(self.iconClicked)
         self.tabSpace = QStackedWidget()
-        self.tabSpace.setVisible(True)
         self.setButtons(KDialog.Help | KDialog.Ok | KDialog.Apply | KDialog.Cancel | KDialog.RestoreDefaults)
         self.buttonBox.button(KDialog.Apply).clicked.connect(self.applySettings)
         cmdLayout = QHBoxLayout()
