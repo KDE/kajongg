@@ -94,4 +94,4 @@ def socketName():
     if Options.socket:
         return Options.socket
     else:
-        return os.path.join(serverDir, 'socket{}'.format(Options.defaultPort()))
+        return os.path.normpath('{}/socket{}'.format(serverDir, Options.defaultPort()))

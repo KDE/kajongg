@@ -169,7 +169,7 @@ class Url(str):
             if not self.useSocket:
                 args.append('--port=%d' % self.port)
             if self.isLocalGame:
-                args.append('--db=%slocal.db' % appdataDir())
+                args.append('--db={}'.format(os.path.normpath(appdataDir() + 'local.db')))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
             process = subprocess.Popen(args, shell=os.name=='nt')
