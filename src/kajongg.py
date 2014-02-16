@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # keyboardinterrupt should simply terminate
 #import signal
 #signal.signal(signal.SIGINT, signal.SIG_DFL)
-import sys
+import sys, logging
 
 from qt import QObject, usingQt4
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
@@ -111,7 +111,8 @@ def parseOptions():
     Internal.autoPlay = Options.demo
     msg = Debug.setOptions(str(args.getOption('debug')))
     if msg:
-        kprint(msg)
+        Internal.logger.debug(msg)
+        logging.shutdown()
         sys.exit(2)
     from query import initDb
     if not initDb():

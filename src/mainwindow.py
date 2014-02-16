@@ -402,6 +402,7 @@ class MainWindow(KXmlGuiWindow):
         except NameError:
             pass
         checkMemory()
+        logging.shutdown()
         def kill():
             """on Windows, if no game is running, exiting would hang here.
             If terminated with CTRL-C, it says:

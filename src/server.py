@@ -26,7 +26,7 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 import sys, os, random, traceback
 if os.name != 'nt':
     import resource
-import datetime
+import datetime, logging
 from itertools import chain
 
 def cleanExit(*dummyArgs):
@@ -37,9 +37,10 @@ def cleanExit(*dummyArgs):
     try:
         if Internal.db:
             Internal.db.close() # setting to None does not call close(), do we need close?
+        logging.shutdown()
         os._exit(0) # pylint: disable=protected-access
     except NameError:
-        pass
+        logging.shutdown()
     try:
         reactor.stop()
     except NameError:
