@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from common import Internal, ZValues
-from qt import QRectF, QPointF, QGraphicsSimpleTextItem
+from qt import QRectF, QPointF, QGraphicsSimpleTextItem, QFontMetrics
 
 from board import PlayerWind, YellowText, Board, rotateCenter
 from wall import Wall, KongBox
@@ -100,9 +100,6 @@ class UIWall(Wall):
             side.windTile = PlayerWind('E', Internal.scene.windTileset, parent=side)
             side.windTile.hide()
             side.nameLabel = QGraphicsSimpleTextItem('', side)
-            font = side.nameLabel.font()
-            font.setPointSize(48)
-            side.nameLabel.setFont(font)
             side.message = YellowText(side)
             side.message.setZValue(ZValues.popup)
             side.message.setVisible(False)
@@ -112,6 +109,7 @@ class UIWall(Wall):
         self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
         self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1)
         self.showShadows = Internal.Preferences.showShadows
+        self.__findOptimalFontHeight()
         Internal.scene.addItem(self.__square)
 
     @staticmethod
@@ -210,9 +208,22 @@ class UIWall(Wall):
         if self.tileset != value:
             assert ParallelAnimationGroup.current is None
             self.__square.tileset = value
+            self.__findOptimalFontHeight()
             for side in self.__sides:
                 side.tileset = value
             self.__resizeHandBoards()
+
+    def __findOptimalFontHeight(self):
+        """for names on walls"""
+        tileHeight = Internal.scene.tileset.faceSize.height()
+        font = self.__sides[0].nameLabel.font()
+        size = 80
+        font.setPointSize(size)
+        while QFontMetrics(font).ascent() > tileHeight:
+            size -= 1
+            font.setPointSize(size)
+        for side in self.__sides:
+            side.nameLabel.setFont(font)
 
     @property
     def showShadows(self):
