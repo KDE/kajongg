@@ -26,7 +26,7 @@ if not hasattr(sys, 'version_info') or sys.version_info < (2, 6, 0, 'final'):
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
 URL = "http://www.kde.org/applications/games/kajongg/"
-VERSION = "4.11.0"
+VERSION = "4.13.0"
 
 # =======================================================
 
