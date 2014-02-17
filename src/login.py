@@ -124,7 +124,7 @@ class Url(str):
                 elif waiting > 30:
                     logDebug('Game %s: Server %s not available after 30 seconds, aborting' % (
                         SingleshotOptions.game, self))
-                    Internal.reactor.stop()
+                    raise CancelledError
                 return deferLater(Internal.reactor, 1, self.startServer, result, waiting+1)
         elif which('XXqdbus'):
             # TODO: use twisted process because we must have a timeout. If the qdbus service
