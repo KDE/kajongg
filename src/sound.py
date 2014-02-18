@@ -25,7 +25,7 @@ if os.name == 'nt':
     import winsound # pylint: disable=import-error
 
 from common import Debug, Internal
-from util import which, removeIfExists, uniqueList
+from util import which, removeIfExists, uniqueList, elapsedSince
 from log import logWarning, m18n, logDebug, logException
 
 from kde import KGlobal, cacheDir
@@ -114,7 +114,7 @@ class Sound(object):
             # in normal play, wait a moment between two speaks. Otherwise
             # sometimes too many simultaneous speaks make them ununderstandable
             lastSpeakStart = max(x.startTime for x in Sound.playProcesses)
-            if datetime.datetime.now() - lastSpeakStart < datetime.timedelta(seconds=0.3):
+            if elapsedSince(lastSpeakStart) < 0.3:
                 reactor.callLater(1, Sound.speak, what)
                 return
         if os.path.exists(what):
@@ -126,7 +126,9 @@ class Sound(object):
                     wavName = name + '.wav'
                     if not os.path.exists(wavName):
                         args = [oggName, '-w', wavName, what]
-                        subprocess.call(args)
+                        startupinfo = subprocess.STARTUPINFO()
+                        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                        subprocess.call(args, startupinfo=startupinfo)
                     winsound.PlaySound(wavName, winsound.SND_FILENAME)
                 else:
                     args = [oggName, '-q', what]
