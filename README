@@ -1,5 +1,31 @@
 Kajongg - the classical Mah Jongg for four players. If you are looking for the Mah Jongg solitaire please use the application KMahjongg.
 
+[b][u]Installing Kajongg on Windows[/b][/u]
+
+Download the installer from the link below.
+
+Kajongg needs the Microsoft Visual C++ Redistributable Package.
+I believe I am not allowed to include a copy in the installer.
+Chances are good that you already have this installed. Otherwise
+you should see a corresponding error message. You can get that
+package from Microsoft here: [url]http://www.microsoft.com/en-us/download/details.aspx?id=29[/url]
+
+Support for Windows is very new, there might be a few things missing. Still to be done:
+
+- toolbar, statusbar, keyboard shortcuts everywhere
+
+- application language selection. For now, the language of the installed Windows
+  is used. If Kajongg is not translated into that language, it is english. If you really
+  need to, you can edit a configuration file and select any of the available languages.
+
+
+[b][u]Installing Kajongg on Linux[/b][/u]
+
+Kajongg is part of the KDE games, your Linux distribution should bring it to you.
+
+
+[b][u]More[/b][/u]
+
 Kajongg is covered by the GNU GPL2 license - see COPYING.
 
 Kajongg can be used in two different ways: Scoring a manual
@@ -7,16 +33,12 @@ game where you play as always and use Kajongg for the computation
 of scores and for bookkeeping. Or you can use Kajongg to play
 against any combination of other human players or computer players.
 
-Kajongg comes with a ruleset for classical chinese as played in Germany.
-You can change the ruleset at your will and also define whole new
-rulesets. The rules for a game are saved in the database, so every
+Kajongg currently comes with two rulesets for classical chinese, one
+for rules in Germany and one for rules in England.
+You can change many things in the rulesets at your will.
+The rules for a game are saved in the database, so every
 game could be played with different rules. Changing a ruleset
 does not affect existing games.
-
-Since KDE SC 4.5 Kajongg is part of the KDE games, so I do not
-offer a separate downloadable package anymore. If your favorite
-distribution should not yet distribute Kajongg, please ask them
-for it. The major distributions like Ubuntu, Opensuse, Fedora do.
 
 You can always get the current source code from here:
 
@@ -30,35 +52,4 @@ menu commmand Help / Report Bug or mail me directly to the Mail
 Address given in that bug reporting dialog. I will not follow links
 to pages I do not trust like upload pages, shortlink services or
 similar.
-
-[b][u]Requirements[/b][/u]
-
-If you install Kajongg from your Linux distribution, you can skip this.
-
-Kajongg is a true KDE4 application and therefore requires the KDE4 libraries
-KDE4 as well as the Qt4 libraries. However you can of course also use it
-in a GNOME environment.
-
-Please read debian.control for information about what other software
-needs to be installed for using Kajongg.
-
-
-
-[b][u]Installing Kajongg[/b][/u]
-
-Again, if you install Kajongg from your Linux distribution, you can skip
-this chapter.
-
-First, get the source code as described above.
-cd kajongg
-./setup.py install
-
-
-[b][u]Translations[/b][/u]
-
-The above installation will install Kajongg without any translations.
-Please install the wanted KDE language packs from your linux distribution.
-
-Here you can check if there is a translation for you:
-[url]http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/[/url]
 
