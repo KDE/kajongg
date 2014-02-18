@@ -59,7 +59,7 @@ import gettext
 def insertArgs(englishIn, *args):
     """format the string"""
     if '@' in englishIn:
-        Internal.logger.debug('insertargs:', englishIn)
+        Internal.logger.debug('insertargs:%s' % englishIn)
 
     if '\004' in englishIn:
         englishIn = englishIn.split('\004')[1]
@@ -77,7 +77,7 @@ def insertArgs(englishIn, *args):
 def i18n(englishIn, *args):
     """stub"""
     englishIn, args = xToUtf8(englishIn, args)
-    if KGlobal.translation:
+    if KGlobal.translation and englishIn:
         _ = KGlobal.translation.gettext(englishIn).decode('utf-8')
     else:
         _ = englishIn
