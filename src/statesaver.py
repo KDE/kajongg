@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from qt import QString, QObject, QByteArray, QEvent, QSplitter, QHeaderView
+from kde import KIcon
 
 from log import english
 from common import Internal, isAlive
@@ -35,6 +36,7 @@ class StateSaver(QObject):
             what[0].installEventFilter(self)
         self.widgets = []
         for widget in what:
+            widget.setWindowIcon(KIcon('kajongg'))
             name = self.__generateName(widget)
             self.widgets.append((name, widget))
             Internal.Preferences.addString('States', name)
