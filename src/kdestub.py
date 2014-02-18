@@ -198,7 +198,7 @@ class KAboutData(object):
     def licenseFile():
         """which may currently only be 1: GPL_V2"""
         for path in ('COPYING', '../COPYING',
-            '%s/share/kde4/apps/LICENSES/GPL_V2' % KStandardDirs.prefix()):
+            '%s/share/kde4/apps/LICENSES/GPL_V2' % KStandardDirs.prefix):
             path = os.path.abspath(path)
             if os.path.exists(path):
                 return path
@@ -516,7 +516,7 @@ class KStandardDirs(object):
     """as far as we need it. """
     _localBaseDirs = None
     _baseDirs = None
-    _prefix = None
+    prefix = None
     Recursive = 1
 
     def __init__(self):
@@ -540,14 +540,14 @@ class KStandardDirs(object):
                 })
             if os.name == 'nt':
                 cwd = os.path.split(os.path.abspath(sys.argv[0]))[0]
-                KStandardDirs._prefix = cwd
+                KStandardDirs.prefix = cwd
                 dirMap = KStandardDirs._baseDirs
                 for key in dirMap:
                     dirMap[key] = list(os.path.normpath(x) for x in dirMap[key])
             else:
-                KStandardDirs._prefix = subprocess.Popen(['which', 'kde4-config'],
+                KStandardDirs.prefix = subprocess.Popen(['which', 'kde4-config'],
                     stdout=subprocess.PIPE).communicate()[0].split('/')[1]
-                KStandardDirs._prefix = '/%s/' % KStandardDirs._prefix
+                KStandardDirs.prefix = '/%s/' % KStandardDirs.prefix
 
     @classmethod
     def kde_default(cls, type_):
@@ -577,7 +577,7 @@ class KStandardDirs(object):
         if found:
             return path
         for baseDir in cls._baseDirs[type_]:
-            found, path = cls.__tryPath(cls._prefix, baseDir, filename)
+            found, path = cls.__tryPath(cls.prefix, baseDir, filename)
             if found:
                 return path
 
@@ -606,12 +606,6 @@ class KStandardDirs(object):
             cls._baseDirs[str(type_)].append(os.path.normpath(os.path.join(baseDir, relativename)))
 
     @classmethod
-    def prefix(cls):
-        """returns the big prefix like usr or usr/local
-            KDEDIRS KDEHOME KDEROOTHOME"""
-        return cls._prefix
-
-    @classmethod
     def resourceDirs(cls, type_):
         """see KStandardDirs doc"""
         type_ = str(type_)
@@ -629,7 +623,7 @@ class KStandardDirs(object):
         if found:
             result.append(path)
         for baseDir in cls._baseDirs[type_]:
-            found, path = cls.__tryPath(cls._prefix, baseDir, reldir)
+            found, path = cls.__tryPath(cls.prefix, baseDir, reldir)
             if found:
                 result.append(path)
         return result
@@ -866,6 +860,15 @@ class KIcon(QIcon):
     def __init__(self, name=None):
         if name is None:
             QIcon.__init__(self)
+            return
+        if os.name == 'nt':
+            # we have full control about file and location, no need to search
+            extension = 'svgz' if name in ('games-kajongg-law', 'kajongg') else 'png'
+            name = os.path.normpath('{}/share/icons/{}.{}'.format(KStandardDirs.prefix, name, extension))
+            if not os.path.exists(name):
+                Internal.logger.debug('not found:%s' % name)
+                raise UserWarning('not found:%s' % name)
+            QIcon.__init__(self, name)
             return
         dirs = KGlobal.dirs()
         if not KIcon.initDone:
