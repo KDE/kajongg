@@ -295,7 +295,7 @@ class KMessageBox(object):
         hLayout.addLayout(iconLayout, 0)
 
         messageLabel = QLabel(text)
-        flags = Qt.TextSelectableByMouse | Qt.TextSelectableByKeyboard
+        flags = Qt.TextSelectableByMouse
         if options & KMessageBox.AllowLink:
             flags |= Qt.LinksAccessibleByMouse
             messageLabel.setOpenExternalLinks(True)
