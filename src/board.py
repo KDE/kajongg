@@ -179,6 +179,7 @@ class Board(QGraphicsRectItem):
         self._showShadows = None
         self.tileset = tileset
         self.level = 0
+        self.showShadows = Internal.Preferences.showShadows
 
     @property
     def name(self): # pylint: disable=no-self-use
@@ -265,11 +266,12 @@ class Board(QGraphicsRectItem):
         """sets focus on this board"""
         if isAlive(self):
             scene = self.scene()
-            if scene.focusBoard == self or value:
-                if self.focusTile:
-                    assert self.focusTile.board == self, '%s not in self %s' % (self.focusTile, self)
-            if value:
-                scene.focusBoard = self
+            if isAlive(scene):
+                if scene.focusBoard == self or value:
+                    if self.focusTile:
+                        assert self.focusTile.board == self, '%s not in self %s' % (self.focusTile, self)
+                if value:
+                    scene.focusBoard = self
 
     @staticmethod
     def mapChar2Arrow(event):

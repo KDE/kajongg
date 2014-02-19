@@ -108,7 +108,6 @@ class UIWall(Wall):
         self.__sides[3].setPos(xHeight=1)
         self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
         self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1)
-        self.showShadows = Internal.Preferences.showShadows
         self.__findOptimalFontHeight()
         Internal.scene.addItem(self.__square)
 
