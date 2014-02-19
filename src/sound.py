@@ -125,11 +125,14 @@ class Sound(object):
                     assert ext == '.ogg'
                     wavName = name + '.wav'
                     if not os.path.exists(wavName):
-                        args = [oggName, '-w', wavName, what]
+                        args = [oggName, '-a', '-w', wavName, what]
                         startupinfo = subprocess.STARTUPINFO()
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                         subprocess.call(args, startupinfo=startupinfo)
-                    winsound.PlaySound(wavName, winsound.SND_FILENAME)
+                    try:
+                        winsound.PlaySound(wavName, winsound.SND_FILENAME | winsound.SND_NODEFAULT)
+                    except RuntimeError:
+                        pass
                 else:
                     args = [oggName, '-q', what]
                     if Debug.sound:
