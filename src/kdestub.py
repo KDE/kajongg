@@ -812,8 +812,9 @@ class KConfig(SafeConfigParser):
         if path is None:
             path = KGlobal.dirs().locateLocal("config", "kajonggrc")
         self.path = str(path)
-        with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
-            self.readfp(cfgFile)
+        if os.path.exists(self.path):
+            with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
+                self.readfp(cfgFile)
 
     def as_dict(self):
         """a dict of dicts"""
