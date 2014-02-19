@@ -121,9 +121,12 @@ class Sound(object):
             oggName = Sound.findOgg()
             if oggName:
                 if os.name == 'nt':
+                    # convert to .wav, store .wav in cacheDir
                     name, ext = os.path.splitext(what)
                     assert ext == '.ogg'
-                    wavName = name + '.wav'
+                    nameParts = os.path.normpath(name).split(os.sep)
+                    nameParts = nameParts[nameParts.index('voices')+1:]
+                    wavName = os.path.normpath('{}/{}.wav'.format(cacheDir(), '_'.join(nameParts)))
                     if not os.path.exists(wavName):
                         args = [oggName, '-a', '-w', wavName, what]
                         startupinfo = subprocess.STARTUPINFO()
