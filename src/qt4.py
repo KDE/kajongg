@@ -82,6 +82,7 @@ from PyQt4.QtGui import QGridLayout
 from PyQt4.QtGui import QHBoxLayout
 from PyQt4.QtGui import QHeaderView
 from PyQt4.QtGui import QIcon
+from PyQt4.QtGui import QImageReader
 from PyQt4.QtGui import QItemSelectionModel
 from PyQt4.QtGui import QLabel
 from PyQt4.QtGui import QLineEdit

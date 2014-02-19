@@ -78,6 +78,7 @@ from PyQt5.QtWidgets import QGridLayout
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QHeaderView
 from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QImageReader
 from PyQt5.QtCore import QItemSelectionModel
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QLineEdit

@@ -864,7 +864,10 @@ class KIcon(QIcon):
             return
         if os.name == 'nt':
             # we have full control about file and location, no need to search
-            extension = 'svgz' if name in ('games-kajongg-law', 'kajongg') else 'png'
+            extension = 'png'
+            if name in ('games-kajongg-law', 'kajongg'):
+                # windows 2000 does not support svg/svgz
+                extension = 'svgz' if 'svgz' in QImageReader.supportedImageFormats() else 'ico'
             name = os.path.normpath('{}/share/icons/{}.{}'.format(KStandardDirs.prefix, name, extension))
             if not os.path.exists(name):
                 Internal.logger.debug('not found:%s' % name)

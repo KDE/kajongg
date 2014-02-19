@@ -61,6 +61,7 @@ copy('tilesetselector.ui', DEST + '/kde4/apps/kajongg')
 
 copy('../hisc-apps-kajongg.svgz', DEST + '/icons/kajongg.svgz')
 call(('convert.im6 ../hisc-apps-kajongg.svgz kajongg.ico').split())
+call(('convert.im6 {}/icons/games-kajongg-law.svgz {}/icons/games-kajongg-law.ico'.format(DEST, DEST)).split())
 copy('kajongg.ico', DEST + '/icons')
 
 # select sufficiently complete languages from http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/
