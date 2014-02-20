@@ -165,6 +165,9 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
                 self.game.debug('%s is not %s' % (discardTile.tile, withDiscard))
                 assert False
             self.syncHandBoard([discardTile])
+        else:
+            # show concealed tiles
+            self.syncHandBoard()
 
     def removeTile(self, tile):
         """remove from my melds or tiles"""
