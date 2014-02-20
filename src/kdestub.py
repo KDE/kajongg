@@ -777,7 +777,8 @@ class KGlobal(object):
                 for language in languages:
                     for context in ('kajongg', 'libkmahjongg', 'kdelibs4', 'libphonon', 'kio4', 'kdeqt', 'libc'):
                         try:
-                            cls.translation.add_fallback(gettext.translation(context, resourceDir, languages=[language]))
+                            cls.translation.add_fallback(gettext.translation(
+                                context, resourceDir, languages=[language]))
                         except IOError:
                             # no translation for language/domain available
                             pass

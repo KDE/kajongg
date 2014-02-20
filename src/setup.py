@@ -33,7 +33,7 @@ URL = "http://www.kde.org/applications/games/kajongg/"
 VERSION = "4.13.0"
 # ==========================
 
-import os, sys, re
+import os, re
 from shutil import rmtree
 
 from cx_Freeze import setup, Executable
