@@ -109,6 +109,7 @@ from PyQt4.QtGui import QSpacerItem
 from PyQt4.QtGui import QSpinBox
 from PyQt4.QtGui import QSplitter
 from PyQt4.QtGui import QStackedWidget
+from PyQt4.QtGui import QStatusBar
 from PyQt4.QtGui import QStringListModel
 from PyQt4.QtGui import QStyle
 from PyQt4.QtGui import QStyledItemDelegate

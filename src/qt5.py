@@ -106,6 +106,7 @@ from PyQt5.QtWidgets import QSpacerItem
 from PyQt5.QtWidgets import QSpinBox
 from PyQt5.QtWidgets import QSplitter
 from PyQt5.QtWidgets import QStackedWidget
+from PyQt5.QtWidgets import QStatusBar
 from PyQt5.QtCore import QStringListModel
 from PyQt5.QtWidgets import QStyle
 from PyQt5.QtWidgets import QStyledItemDelegate

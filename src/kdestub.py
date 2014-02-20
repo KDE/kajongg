@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 # -*- coding: utf-8 -*-
 
 """
@@ -414,11 +415,22 @@ class KStandardAction(object):
     @classmethod
     def preferences(cls, slot, actionCollection):
         """should add config dialog menu entry"""
-        action = KAction(Internal.mainWindow)
+        mainWindow = Internal.mainWindow
+        separator = QAction(Internal.mainWindow)
+        separator.setSeparator(True)
+        actionCollection.addAction('options_configure', separator)
+        actionStatusBar = mainWindow.kajonggAction('options_show_statusbar', None)
+        actionStatusBar.setCheckable(True)
+        actionStatusBar.setEnabled(True)
+        actionStatusBar.toggled.connect(mainWindow.toggleStatusBar)
+        actionStatusBar.setChecked(True)
+        actionStatusBar.setText(i18nc('@action:inmenu', "Show St&atusbar"))
+        action = KAction(mainWindow)
         action.triggered.connect(slot)
         action.setText(i18n('Configure Kajongg'))
         action.setIcon(KIcon('configure'))
         action.setIconText(i18n('Configure'))
+        separator = QAction(Internal.mainWindow)
         separator = QAction(Internal.mainWindow)
         separator.setSeparator(True)
         actionCollection.addAction('options_configure', separator)
@@ -437,20 +449,44 @@ class ActionCollection(object):
             if name in content[1]:
                 content[0].addAction(action)
 
-class MyStatusBar(object):
-    """/dev/null. KStatusBar has those things, QStatusBar does not.
-    So for now just live without status bar"""
-    def hasItem(self, *dummyArgs): # pylint:disable=no-self-use
+class MyStatusBarItem(object):
+    """one of the four player items"""
+    def __init__(self, text, idx, stretch=0):
+        self.idx = idx
+        self.stretch = stretch
+        self.label = QLabel()
+        self.label.setText(text)
+        self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+
+class KStatusBar(QStatusBar):
+    """stub"""
+    def __init__(self, *args, **kwargs):
+        QStatusBar.__init__(self, *args, **kwargs)
+        self.__items = []
+
+    def hasItem(self, idx):
         """stub"""
-        return False
-    def changeItem(self, *args):
+        return len(self.__items) > idx
+
+    def changeItem(self, text, idx):
         """stub"""
-    def insertItem(self, *args):
+        self.__items[idx].label.setText(text)
+
+    def insertItem(self, text, idx, stretch):
         """stub"""
-    def removeItem(self, *args):
+        item = MyStatusBarItem(text, idx, stretch)
+        self.__items.append(item)
+        self.insertWidget(item.idx, item.label, stretch=item.stretch)
+
+    def removeItem(self, idx):
         """stub"""
-    def setItemAlignment(self, *args):
+        item = self.__items[idx]
+        self.removeWidget(item.label)
+        del self.__items[idx]
+
+    def setItemAlignment(self, idx, alignment):
         """stub"""
+        self.__items[idx].label.setAlignment(alignment)
 
 class KXmlGuiWindow(CaptionMixin, QMainWindow):
     """stub"""
@@ -458,21 +494,26 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         QMainWindow.__init__(self)
         self._actions = ActionCollection(self)
         self._toolBar = QToolBar(self)
-        self._statusBar = MyStatusBar()
+        self.setStatusBar(KStatusBar(self))
+        self.statusBar().setVisible(True)
         self.menus = {}
         for menu in (
             (i18n('&Game'), ('scoreGame', 'play', 'abort', 'quit')),
             (i18n('&View'), ('scoreTable', 'explain')),
-            (i18n('&Settings'), ('players', 'rulesets', 'demoMode', '', 'options_configure')),
-            (i18n('&Help'), ('help', 'aboutkajongg', 'aboutkde'))):
+            (i18n('&Settings'), ('players', 'rulesets', 'demoMode', '', 'options_show_statusbar', 'options_configure')),
+            (i18n('&Help'), ('help', 'aboutkajongg'))):
             self.menus[menu[0]] = (QMenu(menu[0]), menu[1])
             self.menuBar().addMenu(self.menus[menu[0]][0])
         self.setCaption('')
-        self.actionHelp = self._kajonggAction("help", "help-contents", startHelp)
+        self.actionHelp = self.kajonggAction("help", "help-contents", startHelp)
         self.actionHelp.setText(i18nc('@action:inmenu', 'Help'))
-        self.actionAboutKajongg = self._kajonggAction('aboutkajongg', 'kajongg', self.aboutKajongg)
+        self.actionAboutKajongg = self.kajonggAction('aboutkajongg', 'kajongg', self.aboutKajongg)
         self.actionAboutKajongg.setText(i18nc('@action:inmenu', 'About Kajongg'))
         self.setWindowIcon(KIcon('kajongg'))
+
+    def toggleStatusBar(self, checked):
+        """show / hide status bar"""
+        self.statusBar().setVisible(checked)
 
     def actionCollection(self):
         """stub"""
@@ -485,11 +526,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         """stub"""
         return self._toolBar
 
-    def statusBar(self):
-        """stub"""
-        return self._statusBar
-
-    def _kajonggAction(self, name, icon, slot=None, shortcut=None, actionData=None):
+    def kajonggAction(self, name, icon, slot=None, shortcut=None, actionData=None):
         """this is defined in MainWindow(KXmlGuiWindow)"""
 
     @staticmethod
