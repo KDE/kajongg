@@ -541,7 +541,7 @@ into a situation where you have to pay a penalty"""))
         return newRuleset
 
     def __ruleList(self, rule):
-        """return the list containg rule. We could make the list
+        """return the list containing rule. We could make the list
         an attribute of the rule but then we rarely
         need this, and it is not time critical"""
         for ruleList in self.ruleLists:

@@ -89,7 +89,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
     def explainHand(self):
         """returns the hand to be explained. Same as current unless we need to discard.
         In that case, make an educated guess about the discard. For player==game.myself, use
-        the focussed tile."""
+        the focused tile."""
         hand = self.hand
         if hand and hand.tiles and self._concealedTiles:
             if hand.lenOffset == 1 and not hand.won:

@@ -19,7 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 The DBPasswordChecker is based on an example from the book
-Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
+Twisted Network Programming Essentials by Abe Fettig, 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
@@ -374,7 +374,7 @@ class ServerTable(Table):
     def collectGameIdAnswers(self, requests, gameid):
         """clients answered if the proposed game id is free"""
         if requests:
-            # when errrors happen, there might be no requests left
+            # when errors happen, there might be no requests left
             for msg in requests:
                 if msg.answer == Message.NO:
                     self.proposeGameId(gameid + 1)

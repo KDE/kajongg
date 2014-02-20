@@ -440,7 +440,7 @@ class ModelTest(QObject):
                 # if an bug in data() Disable if this really is ok in your self.model
                 assert( self.model.data(index, Qt.DisplayRole).isValid() == True )
 
-                #if the next test fails here is some somehwat useful debug you play with
+                #if the next test fails here is some somewhat useful debug you play with
                 # if self.model.parent(index) != parent:
                 #   qDebug() << row << column << depth << self.model.data(index).toString()
                 #        << self.model.data(parent).toString()

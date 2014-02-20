@@ -1,4 +1,4 @@
-# Copyright (c) 2001-2011 Twisted Matrix Laboratories.
+# Copyright (c) 2001-2011 Twisted Matrix Laboratories <twisted-python@twistedmatrix.com>
 # See LICENSE for details.
 
 # pylint: skip-file
@@ -95,7 +95,7 @@ class TwistedSocketNotifier(QObject):
             if why:
                 self.reactor._disconnectSelectable(w, why, inRead)
             elif self.watcher:
-                self.notifier.setEnabled(True) # Re enable notification following sucessfull read
+                self.notifier.setEnabled(True) # Re enable notification following successfull read
             self.reactor._iterate(fromqt=True)
         log.callWithLogger(w, _read)
 

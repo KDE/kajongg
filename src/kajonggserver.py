@@ -18,9 +18,6 @@ You should have received a copy of the GNU General Public License
 along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-The DBPasswordChecker is based on an example from the book
-Twisted Network Programming Essentials by Abe Fettig. Copyright 2006
-O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
 from server import kajonggServer

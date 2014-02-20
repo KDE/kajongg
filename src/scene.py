@@ -39,7 +39,7 @@ from animation import Animated, afterCurrentAnimationDo
 from scoringdialog import ScoringDialog
 
 class FocusRect(QGraphicsRectItem):
-    """show a focusRect with blue border around focussed tile or meld"""
+    """show a focusRect with blue border around focused tile or meld"""
     def __init__(self):
         QGraphicsRectItem.__init__(self)
         pen = QPen(QColor(Qt.blue))
@@ -173,7 +173,7 @@ class GameScene(SceneWithFocusRect):
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
 
     def showWall(self):
-        """shows the wall according to the game rules (lenght may vary)"""
+        """shows the wall according to the game rules (length may vary)"""
         UIWall(self.game)   # sets self.game.wall
 
     def abort(self):
@@ -344,7 +344,7 @@ class PlayingScene(GameScene):
         self.mainWindow.actionChat.setChecked(bool(game) and bool(game.client) and bool(game.client.table.chatWindow))
 
     def showWall(self):
-        """shows the wall according to the game rules (lenght may vary)"""
+        """shows the wall according to the game rules (length may vary)"""
         GameScene.showWall(self)
         self.discardBoard.maximize()
 

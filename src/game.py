@@ -357,7 +357,7 @@ class Game(object):
 
     def _setGameId(self):
         """virtual"""
-        assert not self # we want it to fail, and quiten pylint
+        assert not self # we want it to fail, and quieten pylint
 
     def close(self):
         """log off from the server and return a Deferred"""

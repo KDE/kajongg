@@ -128,7 +128,7 @@ class Url(str):
                 return deferLater(Internal.reactor, 1, self.startServer, result, waiting+1)
         elif which('XXqdbus'):
             # TODO: use twisted process because we must have a timeout. If the qdbus service
-            # does not anwer, qdbus waits for 25 seconds.
+            # does not answer, qdbus waits for 25 seconds.
             # the state of QtDBus is unclear to me.
             # riverbank.computing says module dbus is deprecated
             # for Python 3. And Ubuntu has no package with

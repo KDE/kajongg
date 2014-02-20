@@ -214,8 +214,8 @@ class Client(object, pb.Referenceable):
     @staticmethod
     def __findAI(modules, aiName):
         """list of all alternative AIs defined in altint.py"""
-        for modul in modules:
-            for key, value in modul.__dict__.items():
+        for module in modules:
+            for key, value in module.__dict__.items():
                 if key == 'AI' + aiName:
                     return value
 

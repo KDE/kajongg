@@ -294,8 +294,8 @@ class FourBlessingsOverTheDoor(Base):
         self.scoreTest('wewewe wswsws WnWnWn wwwwwwww DrDr LDrDrDr', Win(limits=1))
         self.scoreTest('wewewe wswsws WnWnWn wwwwwwww DrDr mz LDrDrDr', Win(limits=1))
         self.scoreTest('wewewe wswsws RWnWnWnDr wwwwwwww', [NoWin(32, 4), NoWin(limits=0.4)])
-class AllHonours(Base):
-    """only honours"""
+class AllHonors(Base):
+    """only honors"""
     def testMe(self):
         self.scoreTest('drdrdr wewe wswsws wnwnwn dbdbdb mz Ldrdrdrdr', Win(limits=1))
         self.scoreTest('wewewe wswsws RWnWnWnB1 wwwwwwww LB1', [NoWin(32, 4), NoWin(limits=0.4)])
@@ -524,7 +524,7 @@ class Knitting(Base):
         self.callingTest('RS2B2S3B3S4B4S5B5S6B6S7B7S9 LB7', ['s9', 'b9'])
 
 class AllPairHonors(Base):
-    """all pairs honours BMJA"""
+    """all pairs honors BMJA"""
     def testMe(self):
         self.scoreTest('RWeWeS1S1B9B9DgDgDrDrWsWsWwWw LS1S1S1', [NoWin(), Win(limits=0.5)])
         self.scoreTest('RWeWeS1S1B9B9DgDgDrDrWsWs wwww Lww', [NoWin(), Win(limits=0.5)])
