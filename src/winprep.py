@@ -65,8 +65,8 @@ call(('convert.im6 {}/icons/games-kajongg-law.svgz {}/icons/games-kajongg-law.ic
 copy('kajongg.ico', DEST + '/icons')
 
 # select sufficiently complete languages from http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/
-languages = ('de', 'fr', 'pt_BR', 'ca', 'zh_TW', 'da', 'nl', 'it', 'kk', 'km', 'nds',
-   'nb', 'pl', 'pt', 'ru', 'sl', 'es', 'sv', 'uk')
+languages = ('bs', 'ca', 'da', 'de', 'en_GB', 'es', 'et', 'fr', 'gl', 'it', 'kk', 'km', 'nl', 'nb', 'nds',
+   'pl', 'pt', 'pt_BR', 'ru', 'sl', 'sv', 'uk', 'zh_TW')
 
 #languages = ('de', 'zh_TW')
 
