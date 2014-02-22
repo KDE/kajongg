@@ -29,6 +29,7 @@ class StateSaver(QObject):
 
     def __init__(self, *what):
         QObject.__init__(self)
+        pref = Internal.Preferences
         if what[0] not in StateSaver.savers:
             StateSaver.savers[what[0]] = self
             what[0].installEventFilter(self)
@@ -36,13 +37,31 @@ class StateSaver(QObject):
         for widget in what:
             name = self.__generateName(widget)
             self.widgets.append((name, widget))
-            Internal.Preferences.addString('States', name)
+            pref.addString('States', name + 'State')
+            pref.addString('States', name + 'Geometry')
         for name, widget in self.widgets:
-            oldState = QByteArray.fromHex(Internal.Preferences[name])
-            if isinstance(widget, (QSplitter, QHeaderView)):
-                widget.restoreState(oldState)
+            stateFound = self.__restore(widget, name + 'State')
+            geometryFound = self.__restore(widget, name + 'Geometry')
+            if not stateFound and not geometryFound:
+                pref.addString('States', name)
+                self.__restore(widget, name)
+
+    @staticmethod
+    def __restore(widget, name):
+        """decode the saved string"""
+        state = QByteArray.fromHex(Internal.Preferences[name])
+        if state:
+            if name.endswith('State'):
+                widget.restoreState(state)
+            elif name.endswith('Geometry'):
+                widget.restoreGeometry(state)
             else:
-                widget.restoreGeometry(oldState)
+                # legacy
+                if isinstance(widget, (QSplitter, QHeaderView)):
+                    widget.restoreState(state)
+                else:
+                    widget.restoreGeometry(state)
+        return bool(state)
 
     @staticmethod
     def __generateName(widget):
@@ -88,8 +107,7 @@ class StateSaver(QObject):
         """writes the state into Preferences, but does not save"""
         for name, widget in self.widgets:
             if isAlive(widget):
-                if isinstance(widget, (QSplitter, QHeaderView)):
-                    saveMethod = widget.saveState
-                else:
-                    saveMethod = widget.saveGeometry
-                Internal.Preferences[name] = QString(saveMethod().toHex())
+                if hasattr(widget, 'saveState'):
+                    Internal.Preferences[name + 'State'] = QString(widget.saveState().toHex())
+                if hasattr(widget, 'saveGeometry'):
+                    Internal.Preferences[name + 'Geometry'] = QString(widget.saveGeometry().toHex())
