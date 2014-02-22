@@ -52,7 +52,7 @@ from locale import _parse_localename, getdefaultlocale, setlocale, LC_ALL
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
 
-from common import Internal, Debug
+from common import Internal, Debug, ENGLISHDICT
 from util import xToUtf8, uniqueList
 
 import gettext
@@ -82,6 +82,7 @@ def i18n(englishIn, *args):
         _ = KGlobal.translation.gettext(englishIn).decode('utf-8')
     else:
         _ = englishIn
+    ENGLISHDICT[_] = englishIn
     return insertArgs(_, *args)
 
 ki18n = i18n # pylint: disable=invalid-name

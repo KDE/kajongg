@@ -26,8 +26,8 @@ from hashlib import md5
 
 from qt import QVariant
 
-from common import Internal, Debug, unicode # pylint: disable=redefined-builtin
-from log import m18n, m18nc, m18nE, english, logException, logDebug
+from common import Internal, Debug, unicode, english # pylint: disable=redefined-builtin
+from log import m18n, m18nc, m18nE, logException, logDebug
 from query import Query
 
 class Score(object):

@@ -28,13 +28,11 @@ SERVERMARK = '&&SERVER&&'
 
 # util must not import twisted or we need to change kajongg.py
 
-from common import Internal, Debug, unicode, isPython3 # pylint: disable=redefined-builtin
+from common import Internal, Debug, unicode, isPython3, ENGLISHDICT # pylint: disable=redefined-builtin
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, xToUtf8, gitHead
 from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
-
-ENGLISHDICT = {}
 
 class Fmt(string.Formatter):
     """this formatter can parse {id(x)} and output a short ascii form for id"""
@@ -87,10 +85,6 @@ def fmt(text, **kwargs):
         argdict['SELF'] = argdict['self']
         del argdict['self']
     return Fmt.formatter.format(text, **argdict) # pylint: disable=star-args
-
-def english(i18nstring):
-    """translate back from local language"""
-    return ENGLISHDICT.get(i18nstring, i18nstring)
 
 def translateServerMessage(msg):
     """because a PB exception can not pass a list of arguments, the server

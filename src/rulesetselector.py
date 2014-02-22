@@ -28,9 +28,9 @@ from qt import QModelIndex
 from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, \
     IntRule, BoolRule, StrRule
 from util import uniqueList
-from log import m18n, m18nc, english
+from log import m18n, m18nc
 from differ import RulesetDiffer
-from common import Debug
+from common import Debug, english
 from tree import TreeItem, RootItem, TreeModel
 from kde import KApplication
 from dialogs import Sorry

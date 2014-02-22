@@ -35,9 +35,9 @@ from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
 from kde import KUser, KDialog, KDialogButtonBox, appdataDir, socketName
 from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 
-from log import english, logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
+from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
-from common import Internal, Options, SingleshotOptions, Internal, Debug, isAlive
+from common import Internal, Options, SingleshotOptions, Internal, Debug, isAlive, english
 from game import Players
 from query import Query
 from statesaver import StateSaver

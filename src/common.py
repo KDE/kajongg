@@ -46,6 +46,7 @@ else:
 
 WINDS = 'ESWN'
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
+ENGLISHDICT = {}
 
 def isAlive(qobj):
     """is the underlying C++ object still valid?
@@ -328,3 +329,7 @@ class ZValues(object):
     marker = boardLevelFactor * 100 + 1
     moving = marker + 1
     popup = moving + 1
+
+def english(i18nstring):
+    """translate back from local language"""
+    return ENGLISHDICT.get(i18nstring, i18nstring)
