@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
     Copyright (C) 2010-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
@@ -24,7 +25,7 @@ import os
 from qt import uic, QVariant, variantValue
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 
-from kde import KStandardDirs
+from kde import KStandardDirs, KIcon
 
 from log import m18n
 
@@ -111,3 +112,11 @@ class Painter(object):
     def __exit__(self, exc_type, exc_value, trback):
         """now check time passed"""
         self.painter.restore()
+
+def decorateWindow(window, name=None):
+    """standard kajongg window title and icon"""
+    if name:
+        window.setWindowTitle(u'{} – {}'.format(name, m18n('Kajongg')))
+    else:
+        window.setWindowTitle(m18n('Kajongg'))
+    window.setWindowIcon(KIcon('kajongg'))

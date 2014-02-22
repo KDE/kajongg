@@ -42,7 +42,7 @@ from game import Players
 from query import Query
 from statesaver import StateSaver
 
-from guiutil import ListComboBox
+from guiutil import ListComboBox, decorateWindow
 from rule import Ruleset
 
 class LoginAborted(Exception):
@@ -212,7 +212,7 @@ class LoginDlg(QDialog):
     def __init__(self):
         """self.servers is a list of tuples containing server and last playername"""
         QDialog.__init__(self, None)
-        self.setWindowTitle(m18n('Login') + ' - Kajongg')
+        decorateWindow(self, m18n('Login'))
         self.setupUi()
 
         localName = m18n(Query.localServerName)
@@ -354,7 +354,7 @@ class AddUserDialog(MustChooseKDialog):
 
     def __init__(self, url, username, password):
         MustChooseKDialog.__init__(self)
-        self.setWindowTitle(m18n('Create User Account') + ' - Kajongg')
+        decorateWindow(self, m18n('Create User Account'))
         self.setButtons(KDialog.ButtonCode(KDialog.Ok | KDialog.Cancel))
         vbox = QVBoxLayout()
         grid = QFormLayout()
@@ -533,7 +533,7 @@ class Connection(object):
                 return answered(True)
             else:
                 msg = m18nc('USER is not known on SERVER',
-                    '%1 is not known on %2, do you want to open an account?', self.dlg.username, self.dlg.host)
+                    '%1 is not known on %2, do you want to open an account?', self.dlg.username, self.url.host)
                 return QuestionYesNo(msg).addCallback(answered)
         else:
             return self._loginReallyFailed(failure)

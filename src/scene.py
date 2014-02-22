@@ -28,7 +28,7 @@ from qt import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
 from zope.interface import implements # pylint: disable=unused-import
 
 from dialogs import QuestionYesNo
-
+from guiutil import decorateWindow
 from board import SelectorBoard, DiscardBoard
 from tileset import Tileset
 from meld import Meld
@@ -421,9 +421,9 @@ class PlayingScene(GameScene):
             connections = list(x.connection for x in HumanClient.humanClients if x.connection)
             title = ', '.join('{name}/{url}'.format(name=x.username, url=x.url) for x in connections)
             if title:
-                mainWindow.setWindowTitle('%s - Kajongg' % title)
+                decorateWindow(mainWindow, title)
         else:
-            mainWindow.setWindowTitle('%s - Kajongg' % game.seed)
+            decorateWindow(mainWindow, str(game.seed))
         for action in [mainWindow.actionScoreGame, mainWindow.actionPlayGame]:
             action.setEnabled(not bool(game))
         mainWindow.actionAbortGame.setEnabled(bool(game))

@@ -24,7 +24,7 @@ from qt import QLabel, QDialog, \
 
 from log import m18n, m18nc
 from statesaver import StateSaver
-from guiutil import ListComboBox, MJTableView
+from guiutil import ListComboBox, MJTableView, decorateWindow
 from common import Debug
 from modeltest import ModelTest
 
@@ -122,7 +122,7 @@ class RulesetDiffer(QDialog):
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
 
-        self.setWindowTitle(m18n("Compare") + ' - Kajongg')
+        decorateWindow(self, m18n("Compare"))
         self.setObjectName('RulesetDiffer')
 
         self.cbRuleset1.currentIndexChanged.connect(self.leftRulesetChanged)

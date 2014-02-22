@@ -37,6 +37,7 @@ from dialogs import Sorry
 from modeltest import ModelTest
 from genericdelegates import RightAlignedCheckboxDelegate
 from statesaver import StateSaver
+from guiutil import decorateWindow
 
 class RuleRootItem(RootItem):
     """the root item for the ruleset tree"""
@@ -475,7 +476,7 @@ class RulesetSelector(QWidget):
 
     def setupUi(self):
         """layout the window"""
-        self.setWindowTitle(m18n('Customize rulesets') + ' - Kajongg')
+        decorateWindow(self, m18n('Customize rulesets'))
         self.setObjectName('Rulesets')
         hlayout = QHBoxLayout(self)
         v1layout = QVBoxLayout()

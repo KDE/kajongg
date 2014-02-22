@@ -32,7 +32,7 @@ from genericdelegates import RichTextColumnDelegate
 from log import m18n, m18nc, m18nE, logDebug
 from statesaver import StateSaver
 from rule import Ruleset
-from guiutil import ListComboBox, MJTableView
+from guiutil import ListComboBox, MJTableView, decorateWindow
 from differ import RulesetDiffer
 from common import Internal, Debug
 from modeltest import ModelTest
@@ -127,7 +127,7 @@ class SelectRuleset(QDialog):
     """a dialog for selecting a ruleset"""
     def __init__(self, server=None):
         QDialog.__init__(self, None)
-        self.setWindowTitle(m18n('Select a ruleset') + ' - Kajongg')
+        decorateWindow(self, m18n('Select a ruleset'))
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
         self.buttonBox.accepted.connect(self.accept)
@@ -234,7 +234,7 @@ class TableList(QWidget):
             title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
         else:
             title = m18n('Tables at %1', self.client.connection.url)
-        self.setWindowTitle(' - '.join([self.client.name, title, 'Kajongg']))
+        decorateWindow(self, ' - '.join([self.client.name, title]))
         self.view.hideColumn(1)
         tableCount = self.view.model().rowCount(None) if self.view.model() else 0
         self.view.showColumn(0)

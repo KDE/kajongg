@@ -39,12 +39,13 @@ from player import Player, Players
 from visible import VisiblePlayer
 from tables import SelectRuleset
 from uiwall import UIWall
+from guiutil import decorateWindow
 
 class SwapDialog(QMessageBox):
     """ask the user if two players should change seats"""
     def __init__(self, swappers):
         QMessageBox.__init__(self)
-        self.setWindowTitle(m18n("Swap Seats") + ' - Kajongg')
+        decorateWindow(self, m18n("Swap Seats"))
         self.setText(m18n("By the rules, %1 and %2 should now exchange their seats. ",
             swappers[0].name, swappers[1].name))
         self.yesAnswer = QPushButton(m18n("&Exchange"))
@@ -57,7 +58,7 @@ class SelectPlayers(SelectRuleset):
     def __init__(self):
         SelectRuleset.__init__(self)
         Players.load()
-        self.setWindowTitle(m18n('Select four players') + ' - Kajongg')
+        decorateWindow(self, m18n('Select four players'))
         self.names = None
         self.nameWidgets = []
         for idx, wind in enumerate(WINDS):

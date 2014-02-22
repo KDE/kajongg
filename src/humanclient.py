@@ -30,7 +30,7 @@ from qt import QDialog, QVBoxLayout, QGridLayout, \
 
 from kde import usingKDE, KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
-
+from guiutil import decorateWindow
 from log import m18n, logWarning, logException, logDebug
 from message import Message, ChatMessage
 from chat import ChatWindow
@@ -49,7 +49,7 @@ class SelectChow(KDialogIgnoringEscape):
     """asks which of the possible chows is wanted"""
     def __init__(self, chows, propose, deferred):
         KDialogIgnoringEscape.__init__(self)
-        self.setWindowTitle('Kajongg')
+        decorateWindow(self)
         self.setButtons(KDialog.None)
         self.chows = chows
         self.selectedChow = None
@@ -84,7 +84,7 @@ class SelectKong(KDialogIgnoringEscape):
     """asks which of the possible kongs is wanted"""
     def __init__(self, kongs, deferred):
         KDialogIgnoringEscape.__init__(self)
-        self.setWindowTitle('Kajongg')
+        decorateWindow(self)
         self.setButtons(KDialog.None)
         self.kongs = kongs
         self.selectedKong = None
@@ -149,7 +149,7 @@ class ClientDialog(QDialog):
     """a simple popup dialog for asking the player what he wants to do"""
     def __init__(self, client, parent=None):
         QDialog.__init__(self, parent)
-        self.setWindowTitle(m18n('Choose') + ' - Kajongg')
+        decorateWindow(self, m18n('Choose'))
         self.setObjectName('ClientDialog')
         self.client = client
         self.layout = QGridLayout(self)

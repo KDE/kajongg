@@ -22,7 +22,7 @@ from qt import Qt, QVariant, QAbstractTableModel, QModelIndex, QSize
 from qt import QWidget, QLineEdit, QVBoxLayout, QColor, QAbstractItemView
 
 from log import m18n, logDebug
-from guiutil import MJTableView
+from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
 from message import ChatMessage
 from common import Debug
@@ -114,9 +114,9 @@ class ChatWindow(QWidget):
         super(ChatWindow, self).__init__(None)
         self.table = table or game.client.table
         self.table.chatWindow = self
-        title = m18n('Chat on table %1 at %2', self.table.tableid, self.table.client.connection.url)
         self.setObjectName('chatWindow')
-        self.setWindowTitle(title + ' - kajongg')
+        title = m18n('Chat on table %1 at %2', self.table.tableid, self.table.client.connection.url)
+        decorateWindow(self, title)
         self.messageView = ChatView()
         self.messageView.setModel(ChatModel())
         self.messageView.setFocusPolicy(Qt.NoFocus)

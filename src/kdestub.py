@@ -230,6 +230,7 @@ class CaptionMixin(object):
         else:
             caption = i18n('Kajongg')
         self.setWindowTitle(caption)
+        self.setWindowIcon(KIcon('kajongg'))
 
 def getDocUrl(languages):
     """returns the best match for the online user manual"""
@@ -510,7 +511,6 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.actionHelp.setText(i18nc('@action:inmenu', 'Help'))
         self.actionAboutKajongg = self.kajonggAction('aboutkajongg', 'kajongg', self.aboutKajongg)
         self.actionAboutKajongg.setText(i18nc('@action:inmenu', 'About Kajongg'))
-        self.setWindowIcon(KIcon('kajongg'))
 
     def toggleStatusBar(self, checked):
         """show / hide status bar"""

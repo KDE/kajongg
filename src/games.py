@@ -30,7 +30,7 @@ from qt import QDialogButtonBox, QDialog, \
 
 from log import logException, m18n, m18nc
 from query import Query
-from guiutil import MJTableView
+from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
 from common import Debug
 from modeltest import ModelTest
@@ -94,7 +94,7 @@ class Games(QDialog):
         super(Games, self).__init__(parent)
         self.selectedGame = None
         self.onlyPending = True
-        self.setWindowTitle(m18nc('kajongg', 'Games') + ' - Kajongg')
+        decorateWindow(self, m18nc('kajongg', 'Games'))
         self.setObjectName('Games')
         self.resize(700, 400)
         self.model = GamesModel()

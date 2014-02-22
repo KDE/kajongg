@@ -45,7 +45,7 @@ from log import m18n, m18nc
 from common import WINDS, Internal, Debug
 from statesaver import StateSaver
 from query import Query
-from guiutil import ListComboBox, Painter
+from guiutil import ListComboBox, Painter, decorateWindow
 from tree import TreeItem, RootItem, TreeModel
 from tile import Tile
 
@@ -393,7 +393,7 @@ class ScoreTable(QWidget):
         self.scene = scene
         self.scoreModel = None
         self.scoreModelTest = None
-        self.setWindowTitle(m18nc('kajongg', 'Scores') + ' - Kajongg')
+        decorateWindow(self, m18nc('kajongg', 'Scores'))
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.setMouseTracking(True)
         self.__tableFields = ['prevailing', 'won', 'wind',
@@ -474,7 +474,7 @@ class ScoreTable(QWidget):
             title = m18n('Final scores for game <numid>%1</numid>', gameid)
         else:
             title = m18n('Scores for game <numid>%1</numid>', gameid)
-        self.setWindowTitle(title + ' - Kajongg')
+        decorateWindow(self, title)
         self.ruleTree.rulesets = list([self.game.ruleset])
         self.scoreModel = ScoreModel(self)
         if Debug.modelTest:
@@ -536,7 +536,7 @@ class ExplainView(QListView):
     def __init__(self, scene):
         QListView.__init__(self)
         self.scene = scene
-        self.setWindowTitle(m18n('Explain Scores').replace('&', '') + ' - Kajongg')
+        decorateWindow(self, m18n('Explain Scores').replace('&', ''))
         self.setGeometry(0, 0, 300, 400)
         self.model = QStringListModel()
         self.setModel(self.model)
@@ -629,7 +629,7 @@ class PenaltyDialog(QDialog):
     def __init__(self, game):
         """selection for this player, tiles are the still available tiles"""
         QDialog.__init__(self, None)
-        self.setWindowTitle(m18n("Penalty") + ' - Kajongg')
+        decorateWindow(self, m18n("Penalty"))
         self.game = game
         grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
@@ -760,7 +760,7 @@ class ScoringDialog(QWidget):
     def __init__(self, scene):
         QWidget.__init__(self)
         self.scene = scene
-        self.setWindowTitle(m18n('Scoring for this Hand') + ' - Kajongg')
+        decorateWindow(self, m18n('Scoring for this Hand'))
         self.nameLabels = [None] * 4
         self.spValues = [None] * 4
         self.windLabels = [None] * 4

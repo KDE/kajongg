@@ -25,7 +25,7 @@ from qt import QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox, \
         QTableWidget, QTableWidgetItem
 
 from query import Query
-
+from guiutil import decorateWindow
 from log import m18n, m18nc
 from statesaver import StateSaver
 
@@ -57,8 +57,7 @@ class PlayerList(QDialog):
         layout.addWidget(self.table)
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
-
-        self.setWindowTitle(m18n("Players") + ' - Kajongg')
+        decorateWindow(self, m18n("Players"))
         self.setObjectName('Players')
 
     def showEvent(self, dummyEvent):
