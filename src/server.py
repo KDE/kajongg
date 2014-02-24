@@ -70,6 +70,7 @@ from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor
 from twisted.internet.error import ReactorNotRunning
 reactor.addSystemEventTrigger('before', 'shutdown', cleanExit)
+Internal.reactor = reactor
 
 from tile import Tile, TileList, elements
 from game import PlayingGame

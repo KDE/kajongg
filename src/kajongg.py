@@ -147,12 +147,6 @@ if __name__ == "__main__":
     from config import SetupPreferences
     SetupPreferences()
 
-    import qt4reactor
-    qt4reactor.install()
-    from twisted.internet import reactor
-    reactor.runReturn(installSignalHandlers=False)
-    Internal.reactor = reactor
-
     if Options.csv:
         if gitHead() == 'current':
             Internal.logger.debug('You cannot write to %s with changes uncommitted to git' % Options.csv)

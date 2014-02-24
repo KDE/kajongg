@@ -19,7 +19,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import sys, os
-from threading import Timer
 
 from log import logError, logDebug, m18n, m18nc
 from common import Options, Internal, isAlive, Debug
@@ -355,7 +354,7 @@ class MainWindow(KXmlGuiWindow):
             self.exitReady = False
             if self.exitWaitTime is None:
                 self.exitWaitTime = 0
-            if Internal.reactor.running:
+            if Internal.reactor and Internal.reactor.running:
                 self.exitWaitTime += 10
                 if self.exitWaitTime % 1000 == 0:
                     logDebug('waiting since %d seconds for reactor to stop' % (self.exitWaitTime // 1000))
@@ -404,17 +403,6 @@ class MainWindow(KXmlGuiWindow):
             pass
         checkMemory()
         logging.shutdown()
-        def kill():
-            """on Windows, if no game is running, exiting would hang here.
-            If terminated with CTRL-C, it says:
-            QObject::killTimers: timers cannot be stopped from another thread
-            Versions: Qt 4.8.5, PyQt 4.10.3, Python 2.7.6"""
-            if Debug.quit:
-                logDebug('We seem to hang, taking drastic measures: os._exit(0)')
-            os._exit(0) # pylint: disable=protected-access
-        timer = Timer(1, kill)
-        timer.start()
-
 
     def abortAction(self):
         """abort current game"""

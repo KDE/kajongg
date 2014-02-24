@@ -76,6 +76,15 @@ class Url(str):
         if Debug.connections:
             logDebug(repr(self))
 
+        if Internal.reactor is None:
+            import qt4reactor
+            qt4reactor.install()
+            from twisted.internet import reactor
+            reactor.runReturn(installSignalHandlers=False)
+            Internal.reactor = reactor
+            if Debug.quit:
+                logDebug('Installed qt4reactor')
+
     def __repr__(self):
         """show all info"""
         if self.useSocket:

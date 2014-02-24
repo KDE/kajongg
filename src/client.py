@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import datetime, weakref
 
 from twisted.spread import pb
-from twisted.internet import reactor
 from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed
 from util import Duration
@@ -295,7 +294,7 @@ class Client(object, pb.Referenceable):
                 return Message.NoClaim
         if delay < self.game.ruleset.claimTimeout * 0.95:
             # one of those slow humans is still thinking
-            return deferLater(reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
+            return deferLater(Internal.reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         if Debug.delayChow:
             self.game.debug('{} must chow now for {} because timeout is over'.format(
                 self.game.myself.name, self.game.lastDiscard.name()))
@@ -313,7 +312,7 @@ class Client(object, pb.Referenceable):
             if Debug.delayChow:
                 self.game.debug('{} waits to see if somebody says Pung or Kong before saying chow for {}'.format(
                     self.game.myself.name, self.game.lastDiscard.name()))
-            return deferLater(reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
+            return deferLater(Internal.reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         return succeed(result)
 
     def thatWasMe(self, player):
