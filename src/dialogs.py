@@ -82,6 +82,10 @@ class Prompt(MustChooseKDialog):
             box = KMessageBox.createKMessageBox(self, icon, msg,
                 [], "", False, KMessageBox.Options(KMessageBox.NoExec | KMessageBox.AllowLink))
             self.setButtons(KDialog.ButtonCode(buttons))
+            # buttons is either Yes/No or Ok
+            defaultButton = KDialog.Yes if KDialog.Yes & buttons else KDialog.Ok
+            assert defaultButton & buttons, buttons
+            self.button(defaultButton).setFocus()
 
     def returns(self, button=None):
         """the user answered"""
