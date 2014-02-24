@@ -353,7 +353,7 @@ class Client(object, pb.Referenceable):
             return self.exec_move(move).addCallback(self.__jellyMessage)
 
     def exec_move(self, move):
-        """mirror the move of a player as told by the the game server"""
+        """mirror the move of a player as told by the game server"""
         message = move.message
         if message.needsGame and not self.game:
             # server already disconnected, see HumanClient.remote_ServerDisconnects

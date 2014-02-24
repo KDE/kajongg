@@ -1,5 +1,5 @@
 """
-Copyright (c) 2007-2008 Qtrac Ltd. All rights reserved.
+Copyright (c) 2007-2008 Qtrac Ltd <mark@qtrac.eu>
 Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
  This program or module is free software: you can redistribute it and/or
