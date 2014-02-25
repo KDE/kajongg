@@ -124,6 +124,7 @@ from PyQt4.QtGui import QTextBrowser
 from PyQt4.QtGui import QTextDocument
 from PyQt4.QtGui import QTextEdit
 from PyQt4.QtGui import QToolBar
+from PyQt4.QtGui import QToolButton
 from PyQt4.QtGui import QTransform
 from PyQt4.QtGui import QTreeView
 from PyQt4.QtGui import QVBoxLayout

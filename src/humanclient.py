@@ -50,7 +50,7 @@ class SelectChow(KDialogIgnoringEscape):
     def __init__(self, chows, propose, deferred):
         KDialogIgnoringEscape.__init__(self)
         decorateWindow(self)
-        self.setButtons(KDialog.None)
+        self.setButtons(0)
         self.chows = chows
         self.selectedChow = None
         self.deferred = deferred
@@ -85,7 +85,7 @@ class SelectKong(KDialogIgnoringEscape):
     def __init__(self, kongs, deferred):
         KDialogIgnoringEscape.__init__(self)
         decorateWindow(self)
-        self.setButtons(KDialog.None)
+        self.setButtons(0)
         self.kongs = kongs
         self.selectedKong = None
         self.deferred = deferred

@@ -121,6 +121,7 @@ from PyQt5.QtWidgets import QTextBrowser
 from PyQt5.QtGui import QTextDocument
 from PyQt5.QtWidgets import QTextEdit
 from PyQt5.QtWidgets import QToolBar
+from PyQt5.QtWidgets import QToolButton
 from PyQt5.QtGui import QTransform
 from PyQt5.QtWidgets import QTreeView
 from PyQt5.QtWidgets import QVBoxLayout

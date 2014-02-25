@@ -132,8 +132,8 @@ class MainWindow(KXmlGuiWindow):
                 self.scene = PlayingScene(self)
                 self.scene.applySettings()
                 HumanClient()
-            self.show()
             StateSaver(self)
+            self.show()
         else:
             HumanClient()
 

@@ -54,6 +54,7 @@ from qt import *
 
 from common import Internal, Debug, ENGLISHDICT
 from util import xToUtf8, uniqueList
+from statesaver import StateSaver
 
 import gettext
 
@@ -334,6 +335,7 @@ class KDialog(CaptionMixin, QDialog):
     Help = QDialogButtonBox.Help
     Apply = QDialogButtonBox.Apply
     RestoreDefaults = QDialogButtonBox.RestoreDefaults
+    Default = QDialogButtonBox.RestoreDefaults
     Close = QDialogButtonBox.Close
 
     def __init__(self, parent=None, flags=None):
@@ -420,36 +422,51 @@ class KStandardAction(object):
         mainWindow = Internal.mainWindow
         separator = QAction(Internal.mainWindow)
         separator.setSeparator(True)
-        actionCollection.addAction('options_configure', separator)
-        actionStatusBar = mainWindow.kajonggAction('options_show_statusbar', None)
-        actionStatusBar.setCheckable(True)
-        actionStatusBar.setEnabled(True)
-        actionStatusBar.toggled.connect(mainWindow.toggleStatusBar)
-        actionStatusBar.setChecked(True)
-        actionStatusBar.setText(i18nc('@action:inmenu', "Show St&atusbar"))
+        mainWindow.actionStatusBar = mainWindow.kajonggAction('options_show_statusbar', None)
+        mainWindow.actionStatusBar.setCheckable(True)
+        mainWindow.actionStatusBar.setEnabled(True)
+        mainWindow.actionStatusBar.toggled.connect(mainWindow.toggleStatusBar)
+        mainWindow.actionStatusBar.setText(i18nc('@action:inmenu', "Show St&atusbar"))
+        mainWindow.actionToolBar = mainWindow.kajonggAction('options_show_toolbar', None)
+        mainWindow.actionToolBar.setCheckable(True)
+        mainWindow.actionToolBar.setEnabled(True)
+        mainWindow.actionToolBar.toggled.connect(mainWindow.toggleToolBar)
+        mainWindow.actionToolBar.setText(i18nc('@action:inmenu', "Show &Toolbar"))
+
+        actionCollection.addAction('', separator)
+
+        action = KAction(mainWindow)
+        action.triggered.connect(mainWindow.configureToolBar)
+        action.setText(i18n('Configure Toolbars'))
+        action.setIcon(KIcon('configure-toolbars')) # TODO: winprep
+        action.setIconText(i18n('Configure toolbars'))
+        separator = QAction(Internal.mainWindow)
+        separator.setSeparator(True)
+        actionCollection.addAction('options_configure_toolbars', action)
+
         action = KAction(mainWindow)
         action.triggered.connect(slot)
         action.setText(i18n('Configure Kajongg'))
         action.setIcon(KIcon('configure'))
         action.setIconText(i18n('Configure'))
-        separator = QAction(Internal.mainWindow)
-        separator = QAction(Internal.mainWindow)
-        separator.setSeparator(True)
-        actionCollection.addAction('options_configure', separator)
         actionCollection.addAction('options_configure', action)
 
-class ActionCollection(object):
+class KActionCollection(object):
     """stub"""
     def __init__(self, mainWindow):
-        self._collections = {}
+        self.__actions = {}
         self.mainWindow = mainWindow
 
     def addAction(self, name, action):
         """stub"""
-        self._collections[name] = action
+        self.__actions[name] = action
         for content in self.mainWindow.menus.values():
             if name in content[1]:
                 content[0].addAction(action)
+
+    def actions(self):
+        """the actions in this collection"""
+        return self.__actions
 
 class MyStatusBarItem(object):
     """one of the four player items"""
@@ -494,15 +511,18 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
     """stub"""
     def __init__(self):
         QMainWindow.__init__(self)
-        self._actions = ActionCollection(self)
+        self._actions = KActionCollection(self)
         self._toolBar = QToolBar(self)
+        self._toolBar.setObjectName('Toolbar')
+        self.addToolBar(self.toolBar())
         self.setStatusBar(KStatusBar(self))
-        self.statusBar().setVisible(True)
+        self.statusBar().setObjectName('StatusBar')
         self.menus = {}
         for menu in (
             (i18n('&Game'), ('scoreGame', 'play', 'abort', 'quit')),
             (i18n('&View'), ('scoreTable', 'explain')),
-            (i18n('&Settings'), ('players', 'rulesets', 'demoMode', '', 'options_show_statusbar', 'options_configure')),
+            (i18n('&Settings'), ('players', 'rulesets', 'demoMode', '', 'options_show_statusbar',
+                'options_show_toolbar', '', 'options_configure_toolbars', 'options_configure')),
             (i18n('&Help'), ('help', 'aboutkajongg'))):
             self.menus[menu[0]] = (QMenu(menu[0]), menu[1])
             self.menuBar().addMenu(self.menus[menu[0]][0])
@@ -511,14 +531,46 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.actionHelp.setText(i18nc('@action:inmenu', 'Help'))
         self.actionAboutKajongg = self.kajonggAction('aboutkajongg', 'kajongg', self.aboutKajongg)
         self.actionAboutKajongg.setText(i18nc('@action:inmenu', 'About Kajongg'))
+        self.toolBar().setMovable(False)
+        self.toolBar().setFloatable(False)
+        self.toolBar().setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+
+    def showEvent(self, event):
+        """now that the MainWindow code has run, we know all actions"""
+        self.refreshToolBar()
+        self.toolBar().setVisible(Internal.Preferences.toolBarVisible)
+        self.actionStatusBar.setChecked(self.statusBar().isVisible())
+        self.actionToolBar.setChecked(self.toolBar().isVisible())
+        QMainWindow.showEvent(self, event)
+
+    def hideEvent(self, event):
+        """save status"""
+        Internal.Preferences.toolBarVisible = self.toolBar().isVisible() # pylint: disable=attribute-defined-outside-init
+        QMainWindow.hideEvent(self, event)
 
     def toggleStatusBar(self, checked):
         """show / hide status bar"""
         self.statusBar().setVisible(checked)
 
+    def toggleToolBar(self, checked):
+        """show / hide status bar"""
+        self.toolBar().setVisible(checked)
+
+    def configureToolBar(self):
+        """configure toolbar"""
+        dlg = KEditToolBar(self)
+        dlg.show()
+
+    def refreshToolBar(self):
+        """reload settings for toolbar actions"""
+        self.toolBar().clear()
+        for name in Internal.Preferences.toolBarActions.split(','):
+            self.toolBar().addAction(self.actionCollection().actions()[name])
+
     def actionCollection(self):
         """stub"""
         return self._actions
+
     def setupGUI(self):
         """stub"""
         self.applySettings()
@@ -1028,6 +1080,14 @@ class KConfigSkeleton(object):
         self.currentGroup = None
         self.items = []
         self.config = KConfig()
+        self.addBool('MainWindow', 'toolBarVisible', True)
+        self.addString('MainWindow', 'toolBarActions', 'quit,play,scoreTable,explain,players,options_configure')
+
+    def addBool(self, group, name, default=None):
+        """to be overridden in MainWindow"""
+
+    def addString(self, group, name, default=None):
+        """to be overridden in MainWindow"""
 
     def readConfig(self):
         """init already read config"""
@@ -1327,5 +1387,212 @@ class KConfigDialog(KDialog):
         self.tabSpace.setCurrentWidget(page)
         for idx in range(self.tabSpace.count()):
             self.iconList.item(idx).setSelected(idx == self.tabSpace.currentIndex())
+
+class KSeparator(QFrame):
+    """used for toolbar editor"""
+    def __init__(self, parent=None):
+        QFrame.__init__(self, parent)
+        self.setLineWidth(1)
+        self.setMidLineWidth(0)
+        self.setFrameShape(QFrame.HLine)
+        self.setFrameShadow(QFrame.Sunken)
+        self.setMinimumSize(0, 2)
+
+class ToolBarItem(QListWidgetItem):
+    """a toolbar item"""
+    emptyIcon = None
+    def __init__(self, action, parent):
+        self.action = action
+        self.parent = parent
+        QListWidgetItem.__init__(self, self.icon, self.text, parent)
+        # drop between items, not onto items
+        self.setFlags((self.flags() | Qt.ItemIsDragEnabled) & ~Qt.ItemIsDropEnabled)
+
+    @property
+    def icon(self):
+        """the action icon, default is an empty icon"""
+        result = self.action.icon()
+        if result.isNull():
+            if not self.emptyIcon:
+                iconSize = self.parent.style().pixelMetric(QStyle.PM_SmallIconSize)
+                self.emptyIcon = QPixmap(iconSize, iconSize)
+                self.emptyIcon.fill(Qt.transparent)
+                self.emptyIcon = QIcon(self.emptyIcon)
+            result = self.emptyIcon
+        return result
+
+    @property
+    def text(self):
+        """the action text"""
+        return self.action.text().replace('&', '')
+
+class ToolBarList(QListWidget):
+    """QListWidget without internal moves"""
+    def __init__(self, parent):
+        QListWidget.__init__(self, parent)
+        self.setDragDropMode(QAbstractItemView.DragDrop) # no internal moves
+
+class KEditToolBar(KDialog):
+    """stub"""
+    def __init__(self, parent=None):
+        # pylint: disable=too-many-statements
+        KDialog.__init__(self, parent)
+        self.setCaption(i18n('Configure Toolbars'))
+        StateSaver(self)
+        self.inactiveLabel = QLabel(i18n("A&vailable actions:"), self)
+        self.inactiveList = ToolBarList(self)
+        self.inactiveList.setDragEnabled(True)
+        self.inactiveList.setMinimumSize(180, 250)
+        self.inactiveList.setDropIndicatorShown(False)
+        self.inactiveLabel.setBuddy(self.inactiveList)
+        self.inactiveList.itemSelectionChanged.connect(self.inactiveSelectionChanged)
+        self.inactiveList.itemDoubleClicked.connect(self.insertButton)
+        self.inactiveList.setSortingEnabled(True)
+
+        self.activeLabel = QLabel(i18n('Curr&ent actions:'), self)
+        self.activeList = ToolBarList(self)
+        self.activeList.setDragEnabled(True)
+        self.activeLabel.setBuddy(self.activeList)
+        self.activeList.itemSelectionChanged.connect(self.activeSelectionChanged)
+        self.activeList.itemDoubleClicked.connect(self.removeButton)
+
+        self.upAction = QToolButton(self)
+        self.upAction.setIcon(KIcon('go-up'))
+        self.upAction.setEnabled(False)
+        self.upAction.setAutoRepeat(True)
+        self.upAction.clicked.connect(self.upButton)
+        self.insertAction = QToolButton(self)
+        self.insertAction.setIcon(KIcon('go-next' if QApplication.isRightToLeft else 'go-previous'))
+        self.insertAction.setEnabled(False)
+        self.insertAction.clicked.connect(self.insertButton)
+        self.removeAction = QToolButton(self)
+        self.removeAction.setIcon(KIcon('go-previous' if QApplication.isRightToLeft else 'go-next'))
+        self.removeAction.setEnabled(False)
+        self.removeAction.clicked.connect(self.removeButton)
+        self.downAction = QToolButton(self)
+        self.downAction.setIcon(KIcon('go-down'))
+        self.downAction.setEnabled(False)
+        self.downAction.setAutoRepeat(True)
+        self.downAction.clicked.connect(self.downButton)
+
+        top_layout = QVBoxLayout(self)
+        top_layout.setMargin(0)
+        list_layout = QHBoxLayout()
+
+        inactive_layout = QVBoxLayout()
+        active_layout = QVBoxLayout()
+
+        button_layout = QGridLayout()
+
+        button_layout.setSpacing(0)
+        button_layout.setRowStretch(0, 10)
+        button_layout.addWidget(self.upAction, 1, 1)
+        button_layout.addWidget(self.removeAction, 2, 0)
+        button_layout.addWidget(self.insertAction, 2, 2)
+        button_layout.addWidget(self.downAction, 3, 1)
+        button_layout.setRowStretch(4, 10)
+
+        inactive_layout.addWidget(self.inactiveLabel)
+        inactive_layout.addWidget(self.inactiveList, 1)
+        active_layout.addWidget(self.activeLabel)
+        active_layout.addWidget(self.activeList, 1)
+
+        list_layout.addLayout(inactive_layout)
+        list_layout.addLayout(button_layout)
+        list_layout.addLayout(active_layout)
+
+        top_layout.addLayout(list_layout, 10)
+        top_layout.addWidget(KSeparator(self))
+        self.loadActions()
+
+        self.buttonBox = QDialogButtonBox()
+        top_layout.addWidget(self.buttonBox)
+        self.setButtons(KDialog.Ok | KDialog.Cancel)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+    def accept(self):
+        """save and close"""
+        self.saveActions()
+        self.hide()
+
+    def reject(self):
+        """do not save and close"""
+        self.hide()
+
+    def inactiveSelectionChanged(self):
+        """update buttons"""
+        if self.inactiveList.selectedItems():
+            self.insertAction.setEnabled(True)
+        else:
+            self.insertAction.setEnabled(False)
+
+    def activeSelectionChanged(self):
+        """update buttons"""
+        row = self.activeList.currentRow()
+        toolItem = None
+        if self.activeList.selectedItems():
+            toolItem = self.activeList.selectedItems()[0]
+        self.removeAction.setEnabled(bool(toolItem))
+        if toolItem:
+            self.upAction.setEnabled(bool(row))
+            self.downAction.setEnabled(row < len(self.activeList) - 1)
+        else:
+            self.upAction.setEnabled(False)
+            self.downAction.setEnabled(False)
+
+    def insertButton(self):
+        """activate an action"""
+        self.__moveItem(toActive=True)
+
+    def removeButton(self):
+        """deactivate an action"""
+        self.__moveItem(toActive=False)
+
+    def __moveItem(self, toActive):
+        """move item between the two lists"""
+        if toActive:
+            fromList = self.inactiveList
+            toList = self.activeList
+        else:
+            fromList = self.activeList
+            toList = self.inactiveList
+        item = fromList.takeItem(fromList.currentRow())
+        ToolBarItem(item.action, toList)
+
+    def upButton(self):
+        """move action up"""
+        self.__moveUpDown(moveUp=True)
+
+    def downButton(self):
+        """move action down"""
+        self.__moveUpDown(moveUp=False)
+
+    def __moveUpDown(self, moveUp):
+        """change place of action in list"""
+        active = self.activeList
+        row = active.currentRow()
+        item = active.takeItem(row)
+        offset = -1 if moveUp else 1
+        newRow = row + offset
+        active.insertItem(newRow, item)
+        active.setCurrentRow(newRow)
+
+    def loadActions(self):
+        """load active actions from Preferences"""
+        for name, action in Internal.mainWindow.actionCollection().actions().items():
+            if action.text():
+                if name in Internal.Preferences.toolBarActions:
+                    ToolBarItem(action, self.activeList)
+                else:
+                    ToolBarItem(action, self.inactiveList)
+
+    def saveActions(self):
+        """write active actions into Preferences"""
+        activeActions = (self.activeList.item(x).action for x in range(len(self.activeList)))
+        names = {v:k for k, v in Internal.mainWindow.actionCollection().actions().items()}
+        activeNames = list(names[x] for x in activeActions)
+        Internal.Preferences.toolBarActions = ','.join(activeNames) # pylint: disable=attribute-defined-outside-init
+        Internal.mainWindow.refreshToolBar()
 
 KGlobal.initStatic()

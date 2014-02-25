@@ -61,7 +61,8 @@ copy(oxy48Apps + 'preferences-plugin-script.png', DEST + '/icons')
 for png in ('application-exit', 'games-config-background', 'arrow-right', 'format-list-ordered',
             'object-rotate-left', 'help-contents', 'dialog-close', 'im-user', 'draw-freehand',
             'call-start', 'configure', 'games-config-tiles', 'arrow-right-double', 'document-new',
-            'edit-delete', 'document-open', 'list-add-user', 'list-remove-user'):
+            'edit-delete', 'document-open', 'list-add-user', 'list-remove-user', 'configure-toolbars',
+            'go-up', 'go-down', 'go-next', 'go-previous'):
     copy('{}/{}.png'.format(oxy48Act, png), DEST + '/icons')
 
 copy(iconDir + '/hicolor/scalable/actions/games-kajongg-law.svgz', DEST + '/icons')
@@ -85,7 +86,7 @@ copy('kajongg.ico', DEST + '/icons')
 languages = ('bs', 'ca', 'da', 'de', 'en_GB', 'es', 'et', 'fr', 'gl', 'it', 'kk', 'km', 'nl', 'nb', 'nds',
    'pl', 'pt', 'pt_BR', 'ru', 'sl', 'sv', 'uk', 'zh_TW')
 
-#languages = ('de', 'zh_TW')
+languages = ('de', 'zh_TW')
 
 for lang in languages:
     print 'getting language', lang
