@@ -3,7 +3,7 @@
 """
 Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kajongg is free software you can redistribute it and/or modify
+Kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -434,7 +434,7 @@ class ScoringPlayer(VisiblePlayer, Player):
 
 class ScoringGame(Game):
     """we play manually on a real table with real tiles and use
-    kajongg only for scoring"""
+    Kajongg only for scoring"""
     playerClass = ScoringPlayer
     wallClass = UIWall
 

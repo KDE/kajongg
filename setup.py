@@ -4,7 +4,7 @@
 """
 Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kajongg is free software you can redistribute it and/or modify
+Kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -19,7 +19,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
-Start this in the installation directory of kajongg: That
+Start this in the installation directory of Kajongg: That
 is where this program resides. Below you find a code
 block that might have to be adapted.
 """
@@ -98,7 +98,7 @@ class KmjBuild(build):
         call(['cp hisc-action-games-kajongg-law.svgz games-kajongg-law.svgz'], shell=True)
         build.run(self)
 
-setup(name='kajongg',
+setup(name='Kajongg',
     version=VERSION,
     description='The classical game of Mah Jongg',
     long_description="This is the classical Mah Jongg for four players. "

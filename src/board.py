@@ -3,7 +3,7 @@
 """
 Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kajongg is free software you can redistribute it and/or modify
+Kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -202,7 +202,7 @@ class Board(QGraphicsRectItem):
             self.setVisible(False)
 
     def autoSelectTile(self):
-        """call this when kajongg should automatically focus
+        """call this when Kajongg should automatically focus
         on an appropriate uiTile"""
         focusCandidates = self._focusableTiles()
         if focusCandidates:

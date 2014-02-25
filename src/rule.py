@@ -2,7 +2,7 @@
 
 """Copyright (C) 2009-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kajongg is free software you can redistribute it and/or modify
+Kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -255,7 +255,7 @@ class UsedRule(object):
 class Ruleset(object):
     """holds a full set of rules: meldRules,handRules,winnerRules.
 
-        predefined rulesets are preinstalled together with kajongg. They can be customized by the user:
+        predefined rulesets are preinstalled together with Kajongg. They can be customized by the user:
         He can copy them and modify the copies in any way. If a game uses a specific ruleset, it
         checks the used rulesets for an identical ruleset and refers to that one, or it generates
         a new used ruleset.

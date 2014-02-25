@@ -2,7 +2,7 @@
 
 Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-kajongg is free software you can redistribute it and/or modify
+Kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation either version 2 of the License, or
 (at your option) any later version.
@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 This is to be executed on windows.
 The directory 'share' must already be filled.
 That can be done with winprep.py which should run
-on linux in the src directory with kajongg fully installed.
+on linux in the src directory with Kajongg fully installed.
 
 Usage: see ../README.windows
 """
@@ -63,7 +63,7 @@ kajServer = Executable('kajonggserver.py', icon='kajongg.ico')
 executables = [kajExe, kajServer]
 
 setup(
-    name='kajongg',
+    name='Kajongg',
     version=VERSION,
     description='The classical game of Mah Jongg',
     long_description="This is the classical Mah Jongg for four players. "

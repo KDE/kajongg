@@ -114,7 +114,7 @@ class Painter(object):
         self.painter.restore()
 
 def decorateWindow(window, name=None):
-    """standard kajongg window title and icon"""
+    """standard Kajongg window title and icon"""
     if name:
         window.setWindowTitle(u'{} – {}'.format(name, m18n('Kajongg')))
     else:
