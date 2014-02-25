@@ -182,7 +182,12 @@ class Url(str):
                 args.append('--db={}'.format(os.path.normpath(appdataDir() + 'local.db')))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
-            process = subprocess.Popen(args, shell=os.name == 'nt')
+            if os.name == 'nt':
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            else:
+                startupinfo = None
+            process = subprocess.Popen(args, startupinfo=startupinfo) # , shell=os.name == 'nt')
             if Debug.connections:
                 logDebug(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
                     process.pid, ' '.join(args)))
