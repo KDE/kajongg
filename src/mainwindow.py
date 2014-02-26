@@ -150,6 +150,7 @@ class MainWindow(KXmlGuiWindow):
         if self._scene == value:
             return
         if not value:
+            self.actionChat.setChecked(False)
             self.actionExplain.setChecked(False)
             self.actionScoreTable.setChecked(False)
             self.actionExplain.setData(QVariant(ExplainView))
@@ -158,6 +159,7 @@ class MainWindow(KXmlGuiWindow):
         self.centralView.setScene(value)
         self.adjustView()
         self.updateGUI()
+        self.actionChat.setEnabled(isinstance(value, PlayingScene))
         self.actionExplain.setEnabled(value is not None)
         self.actionScoreTable.setEnabled(value is not None)
 
@@ -229,6 +231,7 @@ class MainWindow(KXmlGuiWindow):
         self.actionRulesets = self.kajonggAction("rulesets", "games-kajongg-law", self.slotRulesets)
         self.actionChat = self._kajonggToggleAction("chat", "call-start",
             shortcut=Qt.Key_H, actionData=ChatWindow)
+        self.actionChat.setEnabled(False)
         self.actionAngle = self.kajonggAction("angle", "object-rotate-left", self.changeAngle, Qt.Key_G)
         self.actionAngle.setEnabled(False)
         self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())

@@ -303,6 +303,15 @@ class PlayingScene(GameScene):
         GameScene.game.fset(self, value)
         if changing:
             self.__startingGame = False
+        self.mainWindow.actionChat.setEnabled(
+            bool(value)
+            and bool(value.client)
+            and bool(value.client.connection)
+            and not value.client.connection.url.isLocalGame)
+        self.mainWindow.actionChat.setChecked(
+            bool(value)
+            and bool(value.client)
+            and bool(value.client.table.chatWindow))
 
     @property
     def clientDialog(self):
@@ -339,9 +348,6 @@ class PlayingScene(GameScene):
         self.addItem(self.discardBoard)
 
         self.adjustView()
-        game = self.game
-        self.mainWindow.actionChat.setEnabled(bool(game) and bool(game.client) and not game.client.hasLocalServer())
-        self.mainWindow.actionChat.setChecked(bool(game) and bool(game.client) and bool(game.client.table.chatWindow))
 
     def showWall(self):
         """shows the wall according to the game rules (length may vary)"""
@@ -430,7 +436,8 @@ class PlayingScene(GameScene):
         self.discardBoard.setVisible(bool(game))
         mainWindow.actionAutoPlay.setEnabled(not self.startingGame)
         mainWindow.actionChat.setEnabled(bool(game) and bool(game.client)
-            and not game.client.hasLocalServer() and not self.startingGame)
+            and bool(game.client.connection)
+            and not game.client.connection.url.isLocalGame and not self.startingGame)
             # chatting on tables before game started works with chat button per table
         mainWindow.actionChat.setChecked(mainWindow.actionChat.isEnabled() and bool(game.client.table.chatWindow))
 
