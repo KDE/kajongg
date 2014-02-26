@@ -23,6 +23,7 @@ import sys, os
 from log import logError, logDebug, m18n, m18nc
 from common import Options, Internal, isAlive, Debug
 import cgitb, tempfile, webbrowser, logging
+from itertools import chain
 
 class MyHook(cgitb.Hook):
     """override the standard cgitb hook: invoke the browser"""
@@ -355,9 +356,10 @@ class MainWindow(KXmlGuiWindow):
         if self.exitConfirmed:
             # now we can get serious
             self.exitReady = False
-            for humanClient in HumanClient.humanClients:
-                if isAlive(humanClient.tableList):
-                    humanClient.tableList.hide()
+            for widget in chain((x.tableList for x in HumanClient.humanClients), [self.confDialog,
+                    self.rulesetWindow, self.playerWindow]):
+                if isAlive(widget):
+                    widget.hide()
             if self.exitWaitTime is None:
                 self.exitWaitTime = 0
             if Internal.reactor and Internal.reactor.running:
@@ -390,12 +392,6 @@ class MainWindow(KXmlGuiWindow):
                 logDebug('aboutToQuit starting')
             if mainWindow.exitWaitTime > 1000.0 or Debug.quit:
                 logDebug('reactor stopped after %d ms' % (mainWindow.exitWaitTime ))
-            if isAlive(mainWindow.confDialog):
-                mainWindow.confDialog.hide()
-            if isAlive(mainWindow.rulesetWindow):
-                mainWindow.rulesetWindow.hide()
-            if isAlive(mainWindow.playerWindow):
-                mainWindow.playerWindow.hide()
         else:
             if Debug.quit:
                 logDebug('aboutToQuit: mainWindow is already None')
