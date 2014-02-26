@@ -355,6 +355,9 @@ class MainWindow(KXmlGuiWindow):
         if self.exitConfirmed:
             # now we can get serious
             self.exitReady = False
+            for humanClient in HumanClient.humanClients:
+                if isAlive(humanClient.tableList):
+                    humanClient.tableList.hide()
             if self.exitWaitTime is None:
                 self.exitWaitTime = 0
             if Internal.reactor and Internal.reactor.running:
