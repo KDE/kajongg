@@ -328,6 +328,7 @@ KDialogButtonBox = QDialogButtonBox # pylint: disable=invalid-name
 
 class KDialog(CaptionMixin, QDialog):
     """QDialog should be enough for kajongg"""
+    _None = 0
     Ok = QDialogButtonBox.Ok # pylint: disable=invalid-name
     Cancel = QDialogButtonBox.Cancel
     Yes = QDialogButtonBox.Yes
@@ -349,6 +350,9 @@ class KDialog(CaptionMixin, QDialog):
 
     def setButtons(self, buttonMask):
         """(re)create the buttonbox and put all wanted buttons into it"""
+        if not buttonMask:
+            self.buttonBox.clear()
+            return
         self.buttonBox.setStandardButtons(buttonMask)
         if KDialog.Apply & buttonMask:
             self.buttonBox.button(KDialog.Apply).setText(i18n('&Apply'))

@@ -46,6 +46,9 @@ except ImportError:
     except ImportError:
         from kdestub import *  # pylint: disable=wildcard-import
 
+if usingKDE:
+    KDialog._None = KDialog.None
+
 def appdataDir():
     """the per user directory with kajongg application information like the database"""
     if Internal.isServer:
