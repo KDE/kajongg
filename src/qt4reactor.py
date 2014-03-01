@@ -112,7 +112,7 @@ class TwistedSocketNotifier(QObject):
             if why:
                 self.reactor._disconnectSelectable(w, why, inRead)
             elif self.watcher:
-                self.notifier.setEnabled(True) # Re enable notification following successfull read
+                self.notifier.setEnabled(True) # Re enable notification following successful read
             self.reactor._iterate(fromqt=True)
         log.callWithLogger(w, _read)
 
