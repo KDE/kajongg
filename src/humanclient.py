@@ -763,6 +763,7 @@ class HumanClient(Client):
         """as the name says"""
         if ruleset is None:
             ruleset = self.ruleset
+        self.connection.ruleset = ruleset # side effect: saves ruleset as last used for server
         return self.callServer('newTable', ruleset.hash, Options.playOpen,
             Internal.autoPlay, self.__wantedGame(), tableid).addErrback(self.tableError)
 
