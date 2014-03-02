@@ -26,9 +26,29 @@ block that might have to be adapted.
 from subprocess import check_output, call
 from shutil import copy, move, copytree, rmtree
 
-import os, zipfile
+import os, zipfile, tempfile
 
 # pylint:disable=invalid-name
+
+def makeIcon(svgName):
+    """generates kajongg.ico"""
+    tmpDir = tempfile.mkdtemp(prefix='kaj')
+    def pngName(resolution):
+        """name for this resolution"""
+        return '{}/kajongg{}.png'.format(
+            tmpDir, resolution)
+    resolutions = (16, 24, 32, 40, 48, 64, 96, 128)
+    try:
+        for resolution in resolutions:
+            pngFile = 'kajongg{}.png'.format(resolution)
+            call('inkscape -z -e {outfile} -w {resolution} -h {resolution} {infile}'.format(
+                outfile=pngName(resolution), resolution=resolution, infile=svgName).split())
+        call('convert {pngFiles} kajongg.ico'.format(pngFiles = ' '.join(pngName(x) for x in resolutions)).split())
+    finally:
+        for resolution in resolutions:
+            if os.path.exists(pngName(resolution)):
+                os.remove(pngName(resolution))
+        os.rmdir(tmpDir)
 
 dataDir = check_output("kde4-config --expandvars --install data".format(type).split()).strip()
 iconDir = check_output("kde4-config --expandvars --install icon".format(type).split()).strip()
@@ -78,15 +98,15 @@ copy('backgroundselector.ui', DEST + '/kde4/apps/kajongg')
 copy('tilesetselector.ui', DEST + '/kde4/apps/kajongg')
 
 copy('../hisc-apps-kajongg.svgz', DEST + '/icons/kajongg.svgz')
-call(('convert.im6 ../hisc-apps-kajongg.svgz kajongg.ico').split())
-call(('convert.im6 {}/icons/games-kajongg-law.svgz {}/icons/games-kajongg-law.ico'.format(DEST, DEST)).split())
+
+makeIcon('../hisc-apps-kajongg.svgz')
 copy('kajongg.ico', DEST + '/icons')
 
 # select sufficiently complete languages from http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/
 languages = ('bs', 'ca', 'da', 'de', 'en_GB', 'es', 'et', 'fr', 'gl', 'it', 'kk', 'km', 'nl', 'nb', 'nds',
    'pl', 'pt', 'pt_BR', 'ru', 'sl', 'sv', 'uk', 'zh_TW')
 
-languages = ('de', 'zh_TW')
+#languages = ('de', 'zh_TW')
 
 for lang in languages:
     print 'getting language', lang
