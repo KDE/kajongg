@@ -30,8 +30,8 @@ import os, zipfile, tempfile
 
 # pylint:disable=invalid-name
 
-def makeIcon(svgName):
-    """generates kajongg.ico"""
+def makeIcon(svgName, icoName):
+    """generates icoName.ico"""
     tmpDir = tempfile.mkdtemp(prefix='kaj')
     def pngName(resolution):
         """name for this resolution"""
@@ -40,10 +40,10 @@ def makeIcon(svgName):
     resolutions = (16, 24, 32, 40, 48, 64, 96, 128)
     try:
         for resolution in resolutions:
-            pngFile = 'kajongg{}.png'.format(resolution)
+            pngFile = '{}{}.png'.format(icoName, resolution)
             call('inkscape -z -e {outfile} -w {resolution} -h {resolution} {infile}'.format(
                 outfile=pngName(resolution), resolution=resolution, infile=svgName).split())
-        call('convert {pngFiles} kajongg.ico'.format(pngFiles = ' '.join(pngName(x) for x in resolutions)).split())
+        call('convert {pngFiles} {icoName}.ico'.format(pngFiles = ' '.join(pngName(x) for x in resolutions), icoName=icoName).split())
     finally:
         for resolution in resolutions:
             if os.path.exists(pngName(resolution)):
@@ -88,19 +88,24 @@ for png in ('application-exit', 'games-config-background', 'arrow-right', 'forma
 copy(iconDir + '/hicolor/scalable/actions/games-kajongg-law.svgz', DEST + '/icons')
 
 oggdec = 'oggdecV1.9.9.zip'
-call('wget http://www.rarewares.org/files/ogg/{}'.format(oggdec).split())
-with zipfile.ZipFile(oggdec) as ziparch:
-    ziparch.extract('oggdec.exe')
-os.remove(oggdec)
+try:
+    call('wget http://www.rarewares.org/files/ogg/{}'.format(oggdec).split())
+    with zipfile.ZipFile(oggdec) as ziparch:
+        ziparch.extract('oggdec.exe')
+finally:
+    os.remove(oggdec)
 move('oggdec.exe', DEST + '/kde4/apps/kajongg/voices')
 
 copy('backgroundselector.ui', DEST + '/kde4/apps/kajongg')
 copy('tilesetselector.ui', DEST + '/kde4/apps/kajongg')
 
 copy('../hisc-apps-kajongg.svgz', DEST + '/icons/kajongg.svgz')
+copy(iconDir + '/hicolor/scalable/actions/games-kajongg-law.svgz', DEST + '/icons')
 
-makeIcon('../hisc-apps-kajongg.svgz')
+makeIcon('../hisc-apps-kajongg.svgz', 'kajongg')
+makeIcon(DEST + '/icons/games-kajongg-law.svgz', 'games-kajongg-law')
 copy('kajongg.ico', DEST + '/icons')
+copy('games-kajongg-law.ico', DEST + '/icons')
 
 # select sufficiently complete languages from http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/
 languages = ('bs', 'ca', 'da', 'de', 'en_GB', 'es', 'et', 'fr', 'gl', 'it', 'kk', 'km', 'nl', 'nb', 'nds',
