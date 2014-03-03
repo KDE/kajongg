@@ -33,7 +33,7 @@ URL = "http://www.kde.org/applications/games/kajongg/"
 VERSION = "4.13.0"
 # ==========================
 
-import os, re
+import os, re, msilib
 from shutil import rmtree
 
 from cx_Freeze import setup, Executable
@@ -62,7 +62,33 @@ kajExe = Executable('kajongg.py', icon='kajongg.ico', base='Win32GUI',
 kajServer = Executable('kajonggserver.py', icon='kajongg.ico')
 executables = [kajExe, kajServer]
 
+
+from cx_Freeze import windist
+
+class bdist_msi(windist.bdist_msi):
+    """we add an icon for the uninstaller"""
+    def productcode(self):
+        """get our productcode"""
+        view = self.db.OpenView("SELECT Value FROM Property WHERE Property = 'ProductCode'")
+        view.Execute(None)
+        record = view.Fetch()
+        result = record.GetString(1)
+        view.Close()
+        return result
+
+    def add_config(self, fullname):
+        """add the uninstaller icon"""
+        windist.bdist_msi.add_config(self, fullname)
+        msilib.add_data(self.db, "Registry", [("DisplayIcon",  # Registry
+                                          -1,  # Root
+                                          r"Software\Microsoft\Windows\CurrentVersion\Uninstall\%s" %
+                                          self.productcode(),  # Key
+                                          "DisplayIcon",  # Name
+                                          r"[icons]kajongg.ico",  # Value
+                                          "TARGETDIR")])  # default Component
+
 setup(
+    cmdclass={'bdist_msi': bdist_msi},  # define custom build class
     name='Kajongg',
     version=VERSION,
     description='The classical game of Mah Jongg',
