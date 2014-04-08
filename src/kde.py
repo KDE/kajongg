@@ -47,10 +47,11 @@ except ImportError:
         from kdestub import *  # pylint: disable=wildcard-import
 
 if usingKDE:
-    KDialog._None = KDialog.None
+    KDialog.NoButton = KDialog.None
 
 def appdataDir():
     """the per user directory with kajongg application information like the database"""
+    serverDir = os.path.expanduser('~/.kajonggserver/')
     if Internal.isServer:
         # the server might or might not have KDE installed, so to be on
         # the safe side we use our own .kajonggserver directory
@@ -60,18 +61,20 @@ def appdataDir():
         oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/kajonggserver.db')
         if not os.path.exists(oldPath):
             oldPath = os.path.expanduser('~/.kde4/share/apps/kajongg/kajonggserver.db')
-        newPath = os.path.expanduser('~/.kajonggserver/')
-        if os.path.exists(oldPath) and not os.path.exists(newPath):
+        if os.path.exists(oldPath) and not os.path.exists(serverDir):
             # upgrading an old kajonggserver installation
-            os.makedirs(newPath)
-            shutil.move(oldPath, newPath)
-        if not os.path.exists(newPath):
+            os.makedirs(serverDir)
+            shutil.move(oldPath, serverDir)
+        if not os.path.exists(serverDir):
             try:
-                os.makedirs(newPath)
+                os.makedirs(serverDir)
             except OSError:
                 pass
-        return newPath
+        return serverDir
     else:
+        if not os.path.exists(serverDir):
+            # the client wants to place the socket in serverDir
+            os.makedirs(serverDir)
         result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
         return result
 

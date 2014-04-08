@@ -50,7 +50,7 @@ class SelectChow(KDialogIgnoringEscape):
     def __init__(self, chows, propose, deferred):
         KDialogIgnoringEscape.__init__(self)
         decorateWindow(self)
-        self.setButtons(KDialog._None)
+        self.setButtons(KDialog.NoButton)
         self.chows = chows
         self.selectedChow = None
         self.deferred = deferred
@@ -763,6 +763,7 @@ class HumanClient(Client):
         """as the name says"""
         if ruleset is None:
             ruleset = self.ruleset
+        self.connection.ruleset = ruleset # side effect: saves ruleset as last used for server
         return self.callServer('newTable', ruleset.hash, Options.playOpen,
             Internal.autoPlay, self.__wantedGame(), tableid).addErrback(self.tableError)
 

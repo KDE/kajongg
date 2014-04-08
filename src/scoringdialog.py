@@ -408,7 +408,7 @@ class ScoreTable(QWidget):
         return self.scene.game
 
     def setColWidth(self):
-        """we want to accomodate for 5 digits plus minus sign
+        """we want to accommodate for 5 digits plus minus sign
         and all column widths should be the same, making
         horizontal scrolling per item more pleasant"""
         self.viewRight.setColWidth()

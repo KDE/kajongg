@@ -438,8 +438,27 @@ class Connection(object):
         self.url = None
         self.username = None
         self.password = None
-        self.ruleset = None
+        self.__ruleset = None
         self.dlg = LoginDlg()
+
+    @property
+    def ruleset(self):
+        """reader"""
+        return self.__ruleset
+
+    @ruleset.setter
+    def ruleset(self, value):
+        """save changed ruleset as last used ruleset for this server"""
+        if  self.__ruleset != value:
+            self.__ruleset = value
+            if value:
+                def write():
+                    """write to database, returns 1 for success"""
+                    return Query('update server set lastruleset=? where url=?', (value.rulesetId, self.url))
+                value.save()     # make sure we have a valid rulesetId for predefined rulesets
+                if not write():
+                    self.__updateServerInfoInDatabase()
+                    write()
 
     def login(self):
         """to be called from HumanClient"""
@@ -482,26 +501,20 @@ class Connection(object):
     def __updateServerInfoInDatabase(self):
         """we are online. Update table server."""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        url = english(self.url)
-        if self.ruleset:
-            self.ruleset.save()     # this makes sure we have a valid rulesetId for predefined rulesets
         with Internal.db:
             serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
-                (self.username, lasttime, url)).rowcount() == 1
+                (self.username, lasttime, self.url)).rowcount() == 1
             if not serverKnown:
                 Query('insert into server(url,lastname,lasttime) values(?,?,?)',
-                    (url, self.username, lasttime))
-            if self.ruleset:
-                Query('update server set lastruleset=? where url=?',
-                    (self.ruleset.rulesetId, url))
+                    (self.url, self.username, lasttime))
         # needed if the server knows our name but our local data base does not:
         Players.createIfUnknown(self.username)
         playerId = Players.allIds[self.username]
         with Internal.db:
             if Query('update passwords set password=? where url=? and player=?',
-                (self.password, url, playerId)).rowcount() == 0:
+                (self.password, self.url, playerId)).rowcount() == 0:
                 Query('insert into passwords(url,player,password) values(?,?,?)',
-                    (url, playerId, self.password))
+                    (self.url, playerId, self.password))
 
     def __checkExistingConnections(self, dummy=None):
         """do we already have a connection to the wanted URL?"""

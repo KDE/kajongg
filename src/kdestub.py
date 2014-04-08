@@ -328,7 +328,7 @@ KDialogButtonBox = QDialogButtonBox # pylint: disable=invalid-name
 
 class KDialog(CaptionMixin, QDialog):
     """QDialog should be enough for kajongg"""
-    _None = 0
+    NoButton = 0
     Ok = QDialogButtonBox.Ok # pylint: disable=invalid-name
     Cancel = QDialogButtonBox.Cancel
     Yes = QDialogButtonBox.Yes
