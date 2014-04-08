@@ -51,6 +51,7 @@ if usingKDE:
 
 def appdataDir():
     """the per user directory with kajongg application information like the database"""
+    serverDir = os.path.expanduser('~/.kajonggserver/')
     if Internal.isServer:
         # the server might or might not have KDE installed, so to be on
         # the safe side we use our own .kajonggserver directory
@@ -60,7 +61,6 @@ def appdataDir():
         oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/kajonggserver.db')
         if not os.path.exists(oldPath):
             oldPath = os.path.expanduser('~/.kde4/share/apps/kajongg/kajonggserver.db')
-        serverDir = os.path.expanduser('~/.kajonggserver/')
         if os.path.exists(oldPath) and not os.path.exists(serverDir):
             # upgrading an old kajonggserver installation
             os.makedirs(serverDir)
@@ -72,6 +72,9 @@ def appdataDir():
                 pass
         return serverDir
     else:
+        if not os.path.exists(serverDir):
+            # the client wants to place the socket in serverDir
+            os.makedirs(serverDir)
         result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
         return result
 
