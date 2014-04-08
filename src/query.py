@@ -306,7 +306,8 @@ class PrepareDB(object):
                 player integer,
                 password text"""
     schema['general'] = """
-                ident text"""
+                ident text,
+                schemaversion text"""
 
     def __init__(self, path):
         self.path = path
@@ -322,6 +323,7 @@ class PrepareDB(object):
         try:
             with Internal.db:
                 self.createTables()
+                Query('UPDATE general SET schemaversion=?', (Internal.version,))
                 self.__generateDbIdent()
         finally:
             Internal.db.close(silent=True)
@@ -385,9 +387,12 @@ class PrepareDB(object):
     @classmethod
     def createTables(cls):
         """creates empty tables"""
-        for table in ['player', 'game', 'score', 'ruleset', 'rule']:
+        for table in ['player', 'game', 'score', 'ruleset', 'rule', 'general']:
             cls.createTable(table)
         cls.createIndex('idxgame', 'score(game)')
+        # this makes finding suspended games much faster in the presence
+        # of many test games (with autoplay=1)
+        cls.createIndex('idxautoplay', 'game(autoplay)')
 
         if Internal.isServer:
             Query('ALTER TABLE player add password text')
@@ -533,9 +538,9 @@ class PrepareDB(object):
         self.removeUsedRuleset()
         self.stopGamesWithRegex()
 
-    def __generateDbIdent(self):
+    @staticmethod
+    def __generateDbIdent():
         """make sure the database has a unique ident and get it"""
-        self.createTable('general')
         records = Query('select ident from general').records
         assert len(records) < 2
         if not records:
