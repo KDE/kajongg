@@ -60,17 +60,17 @@ def appdataDir():
         oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/kajonggserver.db')
         if not os.path.exists(oldPath):
             oldPath = os.path.expanduser('~/.kde4/share/apps/kajongg/kajonggserver.db')
-        newPath = os.path.expanduser('~/.kajonggserver/')
-        if os.path.exists(oldPath) and not os.path.exists(newPath):
+        serverDir = os.path.expanduser('~/.kajonggserver/')
+        if os.path.exists(oldPath) and not os.path.exists(serverDir):
             # upgrading an old kajonggserver installation
-            os.makedirs(newPath)
-            shutil.move(oldPath, newPath)
-        if not os.path.exists(newPath):
+            os.makedirs(serverDir)
+            shutil.move(oldPath, serverDir)
+        if not os.path.exists(serverDir):
             try:
-                os.makedirs(newPath)
+                os.makedirs(serverDir)
             except OSError:
                 pass
-        return newPath
+        return serverDir
     else:
         result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
         return result
