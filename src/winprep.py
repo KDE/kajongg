@@ -85,8 +85,6 @@ for png in ('application-exit', 'games-config-background', 'arrow-right', 'forma
             'go-up', 'go-down', 'go-next', 'go-previous'):
     copy('{}/{}.png'.format(oxy48Act, png), DEST + '/icons')
 
-copy(iconDir + '/hicolor/scalable/actions/games-kajongg-law.svgz', DEST + '/icons')
-
 oggdec = 'oggdecV1.9.9.zip'
 try:
     call('wget http://www.rarewares.org/files/ogg/{}'.format(oggdec).split())
@@ -100,10 +98,9 @@ copy('backgroundselector.ui', DEST + '/kde4/apps/kajongg')
 copy('tilesetselector.ui', DEST + '/kde4/apps/kajongg')
 
 copy('../hisc-apps-kajongg.svgz', DEST + '/icons/kajongg.svgz')
-copy(iconDir + '/hicolor/scalable/actions/games-kajongg-law.svgz', DEST + '/icons')
 
 makeIcon('../hisc-apps-kajongg.svgz', 'kajongg')
-makeIcon(DEST + '/icons/games-kajongg-law.svgz', 'games-kajongg-law')
+makeIcon(iconDir + '/hicolor/scalable/actions/games-kajongg-law.svgz', 'games-kajongg-law')
 copy('kajongg.ico', DEST + '/icons')
 copy('games-kajongg-law.ico', DEST + '/icons')
 
