@@ -449,7 +449,7 @@ class Connection(object):
     @ruleset.setter
     def ruleset(self, value):
         """save changed ruleset as last used ruleset for this server"""
-        if  self.__ruleset != value:
+        if self.__ruleset != value:
             self.__ruleset = value
             if value:
                 def write():

@@ -19,7 +19,7 @@ set(PROGRAM_VERSION 4.6.0)
 add_subdirectory( voices )
 add_subdirectory( doc )
 
-set(SRCFILES 
+set(SRCFILES
 src/permutations.py
 src/about.py
 src/animation.py

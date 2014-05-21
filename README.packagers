@@ -3,4 +3,3 @@ at the file debian.control
 
 all content of debian.control is used by make_debian_package,
 so its syntax must follow debian package rules
-

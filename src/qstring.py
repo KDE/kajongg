@@ -41,4 +41,3 @@ class QString(unicode):
     def isEmpty(self):
         """is the QString empty?"""
         return len(self) == 0
-

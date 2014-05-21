@@ -3,7 +3,7 @@
 # http://api.kde.org/4.0-api/kdelibs-apidocs/kdecore/html/classKLocalizedString.html
 # extract messages from *.py
 
-# currently, the .pot lives at 
+# currently, the .pot lives at
 # http://websvn.kde.org/trunk/l10n-kde4/templates/messages/playground-games/kajongg.pot
 
 ${EXTRACTRC:-extractrc} src/*.ui src/*.rc >> rc.cpp
@@ -18,4 +18,3 @@ ${XGETTEXT:-xgettext} \
 		-kcreateRule:1 \
 		--no-wrap --msgid-bugs-address=wolfgang@rohdewald.de -o${podir:-.}/kajongg.pot \
 		rc.cpp `find . -name \*.py`
-
