@@ -50,7 +50,7 @@ do
 	if test `expr $file : '.*.py$'` -ne 0
 	then
 		cmakefile=$file
-		if test $cmakefile != src/scoringtest.py -a $cmakefile != src/kajonggtest.py -a $cmakefile != setup.py
+		if test $cmakefile != src/scoringtest.py -a $cmakefile != src/kajonggtest.py -a $cmakefile != src/setup.py -a $cmakefile != src/winprep.py
 		then
 			if ! grep -w $cmakefile CMakeLists.txt >/dev/null
 			then
@@ -106,25 +106,28 @@ trap "rm -rf $MIRROR" 0
 git checkout-index --prefix=$MIRROR/ -af
 cd $MIRROR/src
 
-for file in $checkfiles
-do
-	test $file = qt4reactor.py && continue
-	echo -n pylint for $file in `pwd`...
-	pylint -s y --reports=n $file
-	result=$?
-	echo done
-	[ $result -ne 0 ] && break
-done
-if [ $result -ne 0 ]
+if test x$skip_pylint != x
 then
-	echo "trying pylint over all source files"
-	pylint -s y --reports=n *y
-	result=$?
-fi
-if [ $result -ne 0 ]
-then
-	echo "pylint must be quiet"
-	exit $result
+	for file in $checkfiles
+	do
+		test $file = qt4reactor.py && continue
+		echo -n pylint for $file in `pwd`...
+		pylint --reports=n $file
+		result=$?
+		echo done
+		[ $result -ne 0 ] && break
+	done
+	if [ $result -ne 0 ]
+	then
+		echo "trying pylint over all source files"
+		pylint --reports=n *y
+		result=$?
+	fi
+	if [ $result -ne 0 ]
+	then
+		echo "pylint must be quiet"
+		exit $result
+	fi
 fi
 ./scoringtest.py
 
