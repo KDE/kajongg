@@ -74,6 +74,11 @@ src/wall.py
 src/uiwall.py
 src/visible.py
 src/log.py
+src/qstring.py
+src/qt.py
+src/qt4.py
+src/qt5.py
+src/configdialog.py
 src/util.py)
 
 IF(NOT PYQT4_FOUND)
