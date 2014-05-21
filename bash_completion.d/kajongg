@@ -1,8 +1,8 @@
-_kajongg() 
+_kajongg()
 {
     _rulesets()
     {
-    	${COMP_WORDS[0]} --rulesets
+        ${COMP_WORDS[0]} --rulesets
     }
     local cur prev opts
     COMPREPLY=()

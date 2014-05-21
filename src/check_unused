@@ -25,7 +25,7 @@ grep -he 'def .*\(.*\)' *py | sed 's/def //' | sed s'/(.*//' | sed 's/ //'g |
 do
 	grep $name *py | grep -v "def $name" > /dev/null
 	if test $? -ne 0
- 	then
+	then
 		echo not used: $name
 	fi
 done

@@ -82,7 +82,7 @@
 	</para>
 	<para>
                 &kajongg; can be used in two different ways: Scoring a manual game where you play as always without the help of a computer and use &kajongg; for the computation of scores and for bookkeeping. Or you can use &kajongg; to play against any combination of other human players or computer players.
-		
+
 	</para>
 </chapter>
 
@@ -176,7 +176,7 @@
 		</mediaobject>
 	</screenshot>
 	<para>
- 		This is the window for entering hand results. It automatically shows itself when &kajongg; thinks you might need it. You can always show or hide it by pressing  <keycombo action="simul">&Ctrl;<keycap>S</keycap></keycombo> or by selecting the corresponding menu entry.
+		This is the window for entering hand results. It automatically shows itself when &kajongg; thinks you might need it. You can always show or hide it by pressing  <keycombo action="simul">&Ctrl;<keycap>S</keycap></keycombo> or by selecting the corresponding menu entry.
 	</para>
 	<para>
 		As always the prevailing wind has its background colored.
@@ -188,7 +188,7 @@
 		After having entered all relevant data for a hand, press the button <guibutton>Save Hand</guibutton>. The hand values will be entered in the data base, and they are also shown in the score table. You might be prompted to change the seating positions of the players but you can choose not to change seats. The proposed changes are currently not customizable - if a ruleset needs something different, we will change that.
 	</para>
 	<para>
- 		If the player might have won, the check box in the column "Winner" will be enabled - click this for the winner.
+		If the player might have won, the check box in the column "Winner" will be enabled - click this for the winner.
 	</para>
 	<para>
 		The status bar will now show the updated balances for the players, and you can continue with the next hand.

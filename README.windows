@@ -9,7 +9,7 @@ cd kajongg/src
 ./winprep.py # generates a directory "share" with files to be installed
 
 when using Python2.7 with PyQt4:
-goto C:\Python27\Lib\site-packages\PyQt4\uic\ and rename the dictionary 
+goto C:\Python27\Lib\site-packages\PyQt4\uic\ and rename the dictionary
 "port_v3" into something else like "port_v3_".
 Reason: http://www.riverbankcomputing.com/pipermail/pyqt/2013-June/032883.html
 
@@ -19,4 +19,3 @@ must work
 cd src ; python setup.py bdist_msi
 
 the result is in src/dist
-

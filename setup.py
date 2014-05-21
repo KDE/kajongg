@@ -120,4 +120,3 @@ setup(name='Kajongg',
         'Intended Audience :: End Users/Desktop',
         'Programming Language :: Python',],
     **extra)
-
