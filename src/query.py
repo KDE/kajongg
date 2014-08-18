@@ -323,8 +323,8 @@ class PrepareDB(object):
         try:
             with Internal.db:
                 self.createTables()
-                Query('UPDATE general SET schemaversion=?', (Internal.version,))
                 self.__generateDbIdent()
+                Query('UPDATE general SET schemaversion=?', (Internal.version,))
         finally:
             Internal.db.close(silent=True)
         if os.path.exists(self.path):
