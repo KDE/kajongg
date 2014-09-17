@@ -28,7 +28,7 @@ from twisted.internet.defer import Deferred
 
 from log import m18nE, logInfo, logDebug, logException
 from message import Message
-from common import Debug
+from common import Debug, isPython3
 from move import Move
 
 class Request(object):
@@ -358,6 +358,13 @@ class DeferredBlock(object):
 
     def tell(self, about, receivers, command, **kwargs):
         """send info about player 'about' to users 'receivers'"""
+        if isPython3:
+            # TODO: remove isPython3
+            # do not send as unicode, causing more traffic
+            # compare with Move.__init__
+            for kw in ('tile', 'tiles', 'meld', 'melds'):
+                if kw in kwargs:
+                    kwargs[kw] = str(kwargs[kw]).encode()
         if about.__class__.__name__ == 'User':
             about = self.playerForUser(about)
         if not isinstance(receivers, list):
