@@ -894,7 +894,10 @@ class MJServer(object):
 
     @staticmethod
     def ignoreLostConnection(failure):
-        """if the client went away, do not dump error messages on stdout"""
+        """if the client went away correctly, do not dump error messages on stdout."""
+        msg = failure.getErrorMessage()
+        if not 'twisted.internet.error.ConnectionDone' in msg:
+            logError(msg)
         failure.trap(pb.PBConnectionLost)
 
     def sendTables(self, user, tables=None):
