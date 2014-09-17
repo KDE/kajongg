@@ -415,7 +415,7 @@ class ServerTable(Table):
         wallSize = len(self.game.wall.tiles)
         self.game.wall.tiles = []
         for _ in range(wallSize):
-            self.game.wall.tiles.append(elementIter.next().concealed)
+            self.game.wall.tiles.append(next(elementIter).concealed)
         assert isinstance(self.game, ServerGame), self.game
         self.running = True
         self.__adaptOtherTables()
@@ -744,7 +744,7 @@ class ServerTable(Table):
             assert player.isCalling, '%s %s: concmelds:%s withdiscard:%s lastmeld:%s' % (
                 self.game.handId, player, concealedMelds, withDiscard, lastMeld)
         discardingPlayer = self.game.activePlayer
-        lastMove = self.game.lastMoves(withoutNotifications=True).next()
+        lastMove = next(self.game.lastMoves(withoutNotifications=True))
         robbedTheKong = lastMove.message == Message.DeclaredKong
         if robbedTheKong:
             player.lastSource = 'k'
