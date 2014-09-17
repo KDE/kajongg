@@ -65,7 +65,7 @@ Internal.logPrefix = 'S'
 from twisted.spread import pb
 from twisted.internet import error
 from twisted.internet.defer import maybeDeferred, fail, succeed
-from zope.interface import implements
+from zope.interface import implementer
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor
 from twisted.internet.error import ReactorNotRunning
@@ -103,9 +103,9 @@ def srvError(cls, *args):
     """raise an exception, passing args as a single string"""
     raise cls(srvMessage(*args))
 
+@implementer(checkers.ICredentialsChecker)
 class DBPasswordChecker(object):
     """checks against our sqlite3 databases"""
-    implements(checkers.ICredentialsChecker)
     credentialInterfaces = (credentials.IUsernamePassword,
                             credentials.IUsernameHashedPassword)
 
@@ -1181,9 +1181,9 @@ class User(pb.Avatar):
     def __repr__(self):
         return 'User({!s})'.format(self)
 
+@implementer(portal.IRealm)
 class MJRealm(object):
     """connects mind and server"""
-    implements(portal.IRealm)
 
     def __init__(self):
         self.server = None
