@@ -198,12 +198,12 @@ def gitHead():
         return None
     subprocess.Popen(['git', 'update-index', '-q', '--refresh'])
     _ = subprocess.Popen(['git', 'diff-index', '--name-only', 'HEAD', '--'], stdout=subprocess.PIPE).communicate()[0]
-    uncommitted = list(x.strip() for x in _.split('\n') if len(x.strip()))
+    uncommitted = list(x.strip() for x in _.split(b'\n') if len(x.strip()))
     if uncommitted:
         return 'current'
     result = subprocess.Popen(['git', 'log', '-1', '--format="%h"'],
             stdout=subprocess.PIPE).communicate()[0]
-    return result.split('\n')[0].replace('"', '')[:15]
+    return result.split(b'\n')[0].replace(b'"', b'')[:15].decode()
 
 def xToUtf8(msg, args=None):
     """makes sure msg and all args are utf-8"""
