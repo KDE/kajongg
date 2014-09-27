@@ -173,6 +173,7 @@ class Options(object):
     player = None
     dbPath = None
     socket = None
+    port = None
     playOpen = False
     gui = False
     AI = 'Default'

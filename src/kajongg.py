@@ -78,6 +78,7 @@ def defineOptions():
     options.add("nokde", ki18n("Do not use KDE bindings. Intended only for testing"))
     options.add("qt5", ki18n("Force using Qt5. Currently Qt4 is used by default"))
     options.add("socket <SOCKET>", ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
+    options.add("port <PORT>", ki18n("use a dedicated server listening on PORT. Intended only for testing"))
     options.add("debug <OPTIONS>", ki18n(Debug.help()))
     return options
 
@@ -100,6 +101,8 @@ def parseOptions():
         Options.csv = str(args.getOption('csv'))
     if args.isSet('socket'):
         Options.socket = str(args.getOption('socket'))
+    if args.isSet('port'):
+        Options.port = str(args.getOption('port'))
     SingleshotOptions.game = str(args.getOption('game'))
     Options.gui |= args.isSet('gui')
     if args.isSet('table'):

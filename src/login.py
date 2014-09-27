@@ -67,8 +67,8 @@ class Url(str):
             if self.port:
                 url += ':{}'.format(self.port)
         str.__init__(self, url)
-        if Options.socket and os.name == 'nt':
-            self.port = int(Options.socket)
+        if Options.port:
+            self.port = int(Options.port)
         if self.port is None and self.isLocalHost and not self.useSocket:
             self.port = self.__findFreePort()
         if self.port is None and not self.isLocalHost:
@@ -95,7 +95,7 @@ class Url(str):
     @property
     def useSocket(self):
         """do we use socket for current host?"""
-        return self.host == '127.0.0.1' and os.name != 'nt'
+        return self.host == '127.0.0.1' and os.name != 'nt' and not Options.port
 
     @property
     def isLocalGame(self):

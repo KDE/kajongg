@@ -141,7 +141,7 @@ class Server(object):
         """start this server"""
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
-        if os.name == 'nt':
+        if os.name == 'nt' or OPTIONS.server3:
             self.socketName = random.randrange(1025, 65000)
         else:
             self.socketName = os.path.expanduser(os.path.join('~', '.kajongg',
@@ -149,8 +149,13 @@ class Server(object):
         assert self.commitId == job.commitId
         print('starting server for %s' % job)
         cmd = [os.path.join(job.srcDir(), 'kajonggserver.py')]
-        if os.name == 'nt':
+        if OPTIONS.server3:
+            cmd.insert(0, 'python3')
+        elif os.name == 'nt':
             cmd.insert(0, 'python')
+        else:
+            cmd.insert(0, 'python2')
+        if os.name == 'nt' or OPTIONS.server3:
             cmd.append('--port={sock}'.format(sock=self.socketName))
         else:
             cmd.append('--socket={sock}'.format(sock=self.socketName))
@@ -182,7 +187,7 @@ class Server(object):
                     _ = self.process.wait()
                 except OSError:
                     pass
-            if self.socketName and os.name != 'nt':
+            if self.socketName and os.name != 'nt' and not OPTIONS.server3:
                 removeIfExists(self.socketName)
         Clone.removeUnused()
 
@@ -221,10 +226,14 @@ class Job(object):
         # never login to the same server twice at the
         # same time with the same player name
         player = self.server.jobs.index(self) + 1
+        if OPTIONS.server3 or os.name == 'nt':
+            socketArg = '--port={sock}'.format(sock=self.server.socketName)
+        else:
+            socketArg = '--socket={sock}'.format(sock=self.server.socketName)
         cmd = [os.path.join(self.srcDir(), 'kajongg.py'),
               '--game={game}'.format(game=self.game),
               '--socket={sock}'.format(sock=self.server.socketName),
-              '--player=Tester {player}'.format(player=player),
+              '--player={tester} {player}'.format(player=player, tester=u'Tester'.encode('utf-8')),
               '--ruleset={ap}'.format(ap=self.ruleset)]
         if os.name == 'nt':
             cmd.insert(0, 'python')
@@ -484,8 +493,8 @@ def parse_options():
         default=False, help='show graphical user interface')
     parser.add_option('', '--qt5', dest='qt5', action='store_true',
         default=False, help='Force using Qt5')
-    parser.add_option('', '--ruleset', dest='rulesets',
-        default='ALL', help='play like a robot using RULESET: comma separated list. If missing, test all rulesets',
+    parser.add_option('', '--ruleset', dest='rulesets', default='ALL',
+        help='play like a robot using RULESET: comma separated list. If missing, test all rulesets',
         metavar='RULESET')
     parser.add_option('', '--rounds', dest='rounds',
         help='play only # ROUNDS per game',
@@ -515,6 +524,9 @@ def parse_options():
         help='check all commits: either a comma separated list or a range from..until')
     parser.add_option('', '--debug', dest='debug',
         help=Debug.help())
+    parser.add_option('', '--server3', dest='server3', action='store_true', default = False,
+        help='use Python 3 for all servers. This will use ports instead of sockets because'
+        ' twisted does not yet support sockets for Python 3')
 
     return parser.parse_args()
 
