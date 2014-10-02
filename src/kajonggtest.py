@@ -141,7 +141,7 @@ class Server(object):
         """start this server"""
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
-        if os.name == 'nt' or OPTIONS.server3 or OPTIONS.client3:
+        if OPTIONS.usePort:
             self.socketName = random.randrange(1025, 65000)
         else:
             self.socketName = os.path.expanduser(os.path.join('~', '.kajongg',
@@ -155,7 +155,7 @@ class Server(object):
             cmd.insert(0, 'python')
         else:
             cmd.insert(0, 'python2')
-        if os.name == 'nt' or OPTIONS.server3 or OPTIONS.client3:
+        if OPTIONS.usePort:
             cmd.append('--port={sock}'.format(sock=self.socketName))
         else:
             cmd.append('--socket={sock}'.format(sock=self.socketName))
@@ -187,8 +187,7 @@ class Server(object):
                     _ = self.process.wait()
                 except OSError:
                     pass
-            if self.socketName and os.name != 'nt' and not OPTIONS.server3 and not OPTIONS.client3:
-                # TODO: self.useSockets()
+            if self.socketName and not OPTIONS.usePort:
                 removeIfExists(self.socketName)
         Clone.removeUnused()
 
@@ -227,7 +226,7 @@ class Job(object):
         # never login to the same server twice at the
         # same time with the same player name
         player = self.server.jobs.index(self) + 1
-        if OPTIONS.server3 or OPTIONS.client3 or os.name == 'nt':
+        if OPTIONS.usePort:
             socketArg = '--port={sock}'.format(sock=self.server.socketName)
         else:
             socketArg = '--socket={sock}'.format(sock=self.server.socketName)
@@ -602,6 +601,7 @@ def improve_options():
     OPTIONS.jobs = allJobs()
     OPTIONS.games = allGames()
     OPTIONS.jobCount = 0
+    OPTIONS.usePort = os.name == 'nt' or OPTIONS.server3 or OPTIONS.client3
 
 def allGames():
     """a generator returning game ids"""
