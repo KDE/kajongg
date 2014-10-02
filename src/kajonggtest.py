@@ -141,7 +141,7 @@ class Server(object):
         """start this server"""
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
-        if os.name == 'nt' or OPTIONS.server3:
+        if os.name == 'nt' or OPTIONS.server3 or OPTIONS.client3:
             self.socketName = random.randrange(1025, 65000)
         else:
             self.socketName = os.path.expanduser(os.path.join('~', '.kajongg',
@@ -155,7 +155,7 @@ class Server(object):
             cmd.insert(0, 'python')
         else:
             cmd.insert(0, 'python2')
-        if os.name == 'nt' or OPTIONS.server3:
+        if os.name == 'nt' or OPTIONS.server3 or OPTIONS.client3:
             cmd.append('--port={sock}'.format(sock=self.socketName))
         else:
             cmd.append('--socket={sock}'.format(sock=self.socketName))
@@ -187,7 +187,8 @@ class Server(object):
                     _ = self.process.wait()
                 except OSError:
                     pass
-            if self.socketName and os.name != 'nt' and not OPTIONS.server3:
+            if self.socketName and os.name != 'nt' and not OPTIONS.server3 and not OPTIONS.client3:
+                # TODO: self.useSockets()
                 removeIfExists(self.socketName)
         Clone.removeUnused()
 
@@ -226,7 +227,7 @@ class Job(object):
         # never login to the same server twice at the
         # same time with the same player name
         player = self.server.jobs.index(self) + 1
-        if OPTIONS.server3 or os.name == 'nt':
+        if OPTIONS.server3 or OPTIONS.client3 or os.name == 'nt':
             socketArg = '--port={sock}'.format(sock=self.server.socketName)
         else:
             socketArg = '--socket={sock}'.format(sock=self.server.socketName)
@@ -235,8 +236,12 @@ class Job(object):
               '--socket={sock}'.format(sock=self.server.socketName),
               '--player={tester} {player}'.format(player=player, tester=u'Tester'.encode('utf-8')),
               '--ruleset={ap}'.format(ap=self.ruleset)]
-        if os.name == 'nt':
+        if OPTIONS.client3:
+            cmd.insert(0, 'python3')
+        elif os.name == 'nt':
             cmd.insert(0, 'python')
+        else:
+            cmd.insert(0, 'python2')
         if OPTIONS.rounds:
             cmd.append('--rounds={rounds}'.format(rounds=OPTIONS.rounds))
         if self.aiVariant != 'Default':
@@ -524,6 +529,9 @@ def parse_options():
         help='check all commits: either a comma separated list or a range from..until')
     parser.add_option('', '--debug', dest='debug',
         help=Debug.help())
+    parser.add_option('', '--client3', dest='client3', action='store_true', default = False,
+        help='use Python 3 for all clients. This will use ports instead of sockets because'
+        ' twisted does not yet support sockets for Python 3')
     parser.add_option('', '--server3', dest='server3', action='store_true', default = False,
         help='use Python 3 for all servers. This will use ports instead of sockets because'
         ' twisted does not yet support sockets for Python 3')
