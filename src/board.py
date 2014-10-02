@@ -734,7 +734,7 @@ class SelectorBoard(CourtBoard):
                 result.append(lowerName.kong.exposedClaimed)
         # TODO: old bug: move 3 identical hidden chows to east, then move
         # one of them to south exposed
-        if not wantedTile.isHonor and wantedTile.value < 8:
+        if wantedTile.isNumber and wantedTile.value < 8:
             chow2 = scName.nextForChow
             chow3 = chow2.nextForChow
             if self.tilesByElement(chow2.exposed) and self.tilesByElement(chow3.exposed):

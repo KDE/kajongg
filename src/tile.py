@@ -100,10 +100,12 @@ class Tile(str):
         if result.isHonor or result.isBonus:
             result.value = result[1]
             result.isTerminal = False
+            result.isNumber = False
             result.isReal = True
         else:
             result.value = ord(result[1]) - 48
             result.isTerminal = result.value in Tile.terminals
+            result.isNumber = True
             result.isReal = result.value in Tile.numbers
         result.isMajor = result.isHonor or result.isTerminal
         result.isMinor = not result.isMajor
