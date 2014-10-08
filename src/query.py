@@ -337,7 +337,8 @@ class PrepareDB(object):
     def __currentVersion():
         """get current version of DB schema as a comparable string"""
         if Internal.db.tableHasField('general', 'schemaversion'):
-            return Query('select schemaversion from general').records[0][0]
+            return str(Query('select schemaversion from general').records[0][0])
+            # Query returns unicode
         else:
             return '1.1.1'
 

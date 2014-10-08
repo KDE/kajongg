@@ -1149,7 +1149,7 @@ class AboutKajonggDialog(KDialog):
         try:
             versions = subprocess.Popen(['kde4-config', '-v'],
                 stdout=subprocess.PIPE).communicate()[0]
-            versions = versions.split('\n')
+            versions = versions.decode().split('\n')
             versions = (x.strip() for x in versions if ': ' in x.strip())
             versions = dict(x.split(': ') for x in versions)
             underVersions.append('KDE %s' % versions['KDE'])

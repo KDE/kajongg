@@ -1130,6 +1130,7 @@ class User(pb.Avatar):
         self.dbIdent = dbIdent
         self.voiceId = voiceId
         self.maxGameId = maxGameId
+        clientVersion = nativeString(clientVersion)
         serverVersion = Internal.version
         if clientVersion != serverVersion:
             # we assume that versions x.y.* are compatible
@@ -1140,8 +1141,8 @@ class User(pb.Avatar):
                         serverVersion))
             else:
                 commonDigits = len([x for x in zip(
-                    clientVersion.split('.'),
-                    serverVersion.split('.'))
+                    clientVersion.split(b'.'),
+                    serverVersion.split(b'.'))
                     if x[0] == x[1]])
                 if commonDigits < 2:
                     return fail(srvError(pb.Error,
