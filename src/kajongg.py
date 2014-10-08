@@ -28,7 +28,7 @@ from qt import QObject, usingQt4
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
 from about import About
 
-from common import Options, SingleshotOptions, Internal, Debug
+from common import Options, SingleshotOptions, Internal, Debug, unicodeString
 from util import kprint
 
 # do not import modules using twisted before our reactor is running
@@ -92,7 +92,7 @@ def parseOptions():
     if args.isSet('host'):
         Options.host = str(args.getOption('host'))
     if args.isSet('player'):
-        Options.player = str(args.getOption('player'))
+        Options.player = unicodeString(args.getOption('player'))
     if args.isSet('rounds'):
         Options.rounds = str(args.getOption('rounds'))
     if args.isSet('ai'):

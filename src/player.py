@@ -147,7 +147,11 @@ class Player(StrMixin):
 
     @property
     def name(self):
-        """write once, read many"""
+        """
+        The name of the player, can be changed only once.
+
+        @type: unicode
+        """
         return self.__name
 
     @name.setter
@@ -155,6 +159,7 @@ class Player(StrMixin):
         """write once"""
         assert self.__name == ''
         assert value
+        assert isinstance(value, unicode)
         self.__name = value
 
     @property

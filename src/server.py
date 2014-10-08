@@ -214,7 +214,7 @@ class ServerTable(Table):
         number of humans before suspending"""
         result = 4
         if self.suspendedAt:
-            result -= sum(x.name.startswith('Robot ') for x in self.game.players)
+            result -= sum(x.name.startswith(u'Robot ') for x in self.game.players)
         return result
 
     def sendChatMessage(self, chatLine):
@@ -271,7 +271,7 @@ class ServerTable(Table):
         offlineString = u''
         if self.game:
             offlineNames = list(x.name for x in self.game.players if x.name not in onlineNames
-                and not x.name.startswith('Robot'))
+                and not x.name.startswith(u'Robot'))
             if offlineNames:
                 offlineString = u' offline:' + u','.join(offlineNames)
         return u'%d(%s%s)' % (self.tableid, u','.join(onlineNames), offlineString)
@@ -291,9 +291,9 @@ class ServerTable(Table):
         # the server and all databases save the english name but we
         # want to make sure a translation exists for the client GUI
         robotNames = [
-            m18ncE('kajongg, name of robot player, to be translated', 'Robot 1'),
-            m18ncE('kajongg, name of robot player, to be translated', 'Robot 2'),
-            m18ncE('kajongg, name of robot player, to be translated', 'Robot 3')]
+            m18ncE('kajongg, name of robot player, to be translated', u'Robot 1'),
+            m18ncE('kajongg, name of robot player, to be translated', u'Robot 2'),
+            m18ncE('kajongg, name of robot player, to be translated', u'Robot 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
         names = list(tuple([WINDS[idx], name]) for idx,name in enumerate(names))
@@ -816,7 +816,7 @@ class ServerTable(Table):
         if not answers:
             return
         for answer in answers:
-            msg = '<-  %s' % unicode(answer)
+            msg = '<-  %s' % nativeString(answer)
             if Debug.traffic:
                 logDebug(msg)
             with Duration(msg):
