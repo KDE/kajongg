@@ -38,6 +38,8 @@ try:
         KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
         KConfigDialog, KDialog
     usingKDE = True # pylint: disable=invalid-name
+    KDialog.NoButton = getattr(KDialog, 'None')
+    # see https://bugs.kde.org/show_bug.cgi?id=333683
 except ImportError:
     try:
         raise
@@ -45,9 +47,6 @@ except ImportError:
         # be available
     except ImportError:
         from kdestub import *  # pylint: disable=wildcard-import
-
-if usingKDE:
-    KDialog.NoButton = KDialog.None
 
 def appdataDir():
     """the per user directory with kajongg application information like the database"""
