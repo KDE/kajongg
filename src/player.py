@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import weakref
 from collections import defaultdict
 
+from twisted.python.compat import nativeString
+
 from log import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, IntDict, Debug
 from query import Query
@@ -53,6 +55,9 @@ class Players(list):
         return list.__getitem__(self, index)
 
     def __str__(self):
+        return self.__unicode__().encode('utf-8')
+
+    def __unicode__(self):
         return ', '.join(list('%s: %s' % (x.name, x.wind) for x in self))
 
     def byId(self, playerid):
@@ -300,7 +305,10 @@ class Player(object):
         self.__payment = 0
 
     def __repr__(self):
-        return u'{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
+        return nativeString(self.__unicode__(), encoding='utf-8')
+
+    def __str__(self):
+        return self.__unicode__().encode('utf-8')
 
     def __unicode__(self):
         return u'{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)

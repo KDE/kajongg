@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime, weakref
 
+from twisted.python.compat import nativeString
 from twisted.spread import pb
 from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed
@@ -90,16 +91,19 @@ class ClientTable(Table):
         return False
 
     def __str__(self):
+        return self.__unicode__().encode('utf-8')
+
+    def __unicode__(self):
         onlineNames = list(x for x in self.playerNames if self.isOnline(x))
         offlineString = ''
         offlineNames = list(x for x in self.playerNames if x not in onlineNames
-            and not x.startswith('Robot'))
+            and not x.startswith(u'Robot'))
         if offlineNames:
-            offlineString = ' offline:' + ','.join(offlineNames)
-        return '%d(%s %s%s)' % (self.tableid, self.ruleset.name, ','.join(onlineNames), offlineString)
+            offlineString = u' offline:' + ','.join(offlineNames)
+        return u'%d(%s %s%s)' % (self.tableid, self.ruleset.name, ','.join(onlineNames), offlineString)
 
     def __repr__(self):
-        return 'ClientTable(%s)' % str(self)
+        return 'ClientTable(%s)' % nativeString(self.__unicode__(), encoding='utf-8')
 
     def gameExistsLocally(self):
         """does the game exist in the data base of the client?"""

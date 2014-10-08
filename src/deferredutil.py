@@ -90,19 +90,22 @@ class Request(object):
         return int((datetime.datetime.now() - self.startTime).total_seconds())
 
     def __str__(self):
+        return self.__unicode__().encode('utf-8')
+
+    def __unicode__(self):
         cmd = self.deferred.command
         if self.answer:
-            answer = str(self.answer)
+            answer = unicode(self.answer)
         else:
             answer = 'OPEN'
-        result = ''
+        result = u''
         if Debug.deferredBlock:
-            result += '[{id:>4}] '.format(id=id(self)%10000)
-        result += '{cmd}->{cls}({receiver:<10}): {answer}'.format(
+            result += u'[{id:>4}] '.format(id=id(self)%10000)
+        result += u'{cmd}->{cls}({receiver:<10}): {answer}'.format(
             cls=self.user.__class__.__name__, cmd=cmd, receiver=self.user.name,
             answer=answer)
         if self.age():
-            result += ' after {} sec'.format(self.age())
+            result += u' after {} sec'.format(self.age())
         return result
 
     def __repr__(self):
