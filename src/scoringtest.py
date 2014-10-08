@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
 
-from common import Debug, isPython3  # pylint: disable=unused-import
+from common import Debug, isPython3, WINDS  # pylint: disable=unused-import
 import unittest
 from player import Players
 from game import PlayingGame
@@ -89,7 +89,7 @@ class Helpers(object):
             exp.ruleset = ruleset
             variants = []
             game = GAMES[idx]
-            for widx, wind in enumerate('ESWN'):
+            for widx, wind in enumerate(WINDS):
                 game.players[widx].wind = wind
             game.winner = game.players[winds[0].upper()]
             game.myself = game.winner

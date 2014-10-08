@@ -44,8 +44,8 @@ else:
     basestring = basestring
     isPython3 = False
 
-WINDS = 'ESWN'
-LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
+WINDS = u'ESWN'
+LIGHTSOURCES = [u'NE', u'NW', u'SW', u'SE']
 ENGLISHDICT = {}
 
 def isAlive(qobj):

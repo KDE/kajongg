@@ -139,10 +139,10 @@ class HandId(object):
             self.roundsFinished = 100
             return
         handId = parts[min(stringIdx, len(parts)-1)]
-        if handId[0] not in 'ESWN':
+        if handId[0] not in WINDS:
             logException('--game=%s with / must specify the round wind' % string)
         ruleset = self.game.ruleset
-        self.roundsFinished = 'ESWN'.index(handId[0])
+        self.roundsFinished = WINDS.index(handId[0])
         if self.roundsFinished > ruleset.minRounds:
             logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
                 ruleset.name, ruleset.minRounds, self.roundsFinished + 1, handId[0]))
@@ -448,8 +448,8 @@ class Game(object):
 
     def sortPlayers(self):
         """sort by wind order. Place ourself at bottom (idx=0)"""
-        self.players.sort(key=lambda x: 'ESWN'.index(x.wind))
-        self.activePlayer = self.players['E']
+        self.players.sort(key=lambda x: WINDS.index(x.wind))
+        self.activePlayer = self.players[u'E']
         if Internal.scene:
             if self.belongsToHumanPlayer():
                 while self.players[0] != self.myself:

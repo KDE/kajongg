@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from log import m18n, m18nc, logDebug
-from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
+from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug, WINDS
 from twisted.internet.defer import succeed
 
 from qt import Qt, QMetaObject
@@ -489,12 +489,13 @@ class ScoringScene(GameScene):
         mod = event.modifiers()
         key = event.key()
         wind = chr(key%128)
+        windsX = WINDS + u'X'
         moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players ' \
-            'with wind ESWN or to the central tile selector (X)', 'ESWNX')
+            'with wind ESWN or to the central tile selector (X)', windsX)
         uiTile = self.focusItem()
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
-            wind = 'ESWNX'[moveCommands.index(wind)]
+            wind = windsX[moveCommands.index(wind)]
             self.__moveTile(uiTile, wind, bool(mod &Qt.ShiftModifier))
             return True
         if key == Qt.Key_Tab and self.game:
