@@ -33,8 +33,10 @@ class MyHook(cgitb.Hook):
 
     def handle(self, info=None):
         """handling the exception: show backtrace in browser"""
-        cgitb.Hook.handle(self, info)
-        webbrowser.open(self.tmpFileName)
+        if getattr(cgitb, 'Hook', None):
+            # if we cannot import twisted (syntax error), Hook is not yet known
+            cgitb.Hook.handle(self, info)
+            webbrowser.open(self.tmpFileName)
 
 sys.excepthook = MyHook()
 
