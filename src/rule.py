@@ -27,6 +27,7 @@ from hashlib import md5
 from qt import QVariant
 
 from common import Internal, Debug, unicode, english # pylint: disable=redefined-builtin
+from common import unicodeString, StrMixin
 from log import m18n, m18nc, m18nE, logException, logDebug
 from query import Query
 
@@ -690,7 +691,7 @@ into a situation where you have to pay a penalty"""))
             result.append((None, rightDict[rule]))
         return result
 
-class RuleBase(object):
+class RuleBase(StrMixin):
     """a base for standard Rule and parameter rules IntRule, StrRule, BoolRule"""
 
     options = {}
@@ -712,13 +713,15 @@ class RuleBase(object):
         return True
 
     def hashStr(self): # pylint: disable=no-self-use
-        """all that is needed to hash this rule"""
-        return ''
+        """
+        all that is needed to hash this rule
 
-    def __str__(self):
-        return self.hashStr()
+        @return: The unique hash string
+        @rtype: unicode
+        """
+        return u''
 
-    def __repr__(self):
+    def __unicode__(self):
         return self.hashStr()
 
 def ruleKey(name):

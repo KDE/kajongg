@@ -29,7 +29,7 @@ from tempfile import mkdtemp
 
 from optparse import OptionParser
 
-from common import Debug
+from common import Debug, StrMixin
 from util import removeIfExists, gitHead, checkMemory
 
 # fields in row:
@@ -95,7 +95,7 @@ class TooManyClients(UserWarning):
 class TooManyServers(UserWarning):
     """we would surpass options.servers"""
 
-class Server(object):
+class Server(StrMixin):
     """represents a kajongg server instance. Called when we want to start a job."""
     servers = []
     def __new__(cls, job):
@@ -200,10 +200,10 @@ class Server(object):
             assert len(server.jobs) == 0, 'stopAll expects no server jobs but found {}'.format(server.jobs)
             server.stop()
 
-    def __str__(self):
-        return '{} pid={} sock={}'.format(self.commitId, self.process.pid, self.socketName)
+    def __unicode__(self):
+        return u'{} pid={} sock={}'.format(self.commitId, self.process.pid, self.socketName)
 
-class Job(object):
+class Job(StrMixin):
     """a simple container"""
     def __init__(self, ruleset, aiVariant, commitId, game):
         self.ruleset = ruleset
@@ -296,16 +296,14 @@ class Job(object):
             if sum(x.startswith(self.ruleset[:prefix]) for x in names) == 1:
                 return self.ruleset[prefix-1:]
 
-    def __str__(self):
-        pid = 'pid={}'.format(self.process.pid) if self.process and Debug.process else ''
-        game = 'game={}'.format(self.game)
+    def __unicode__(self):
+        pid = u'pid={}'.format(self.process.pid) if self.process and Debug.process else u''
+        game = u'game={}'.format(self.game)
         ruleset = self.shortRulesetName()
-        aiName = 'AI={}'.format(self.aiVariant) if self.aiVariant != 'Default' else ''
-        commit = 'commit={}'.format(self.commitId)
-        return ' '.join([pid, game, ruleset, aiName, commit]).replace('  ', ' ')
+        aiName = u'AI={}'.format(self.aiVariant) if self.aiVariant != u'Default' else u''
+        commit = u'commit={}'.format(self.commitId)
+        return u' '.join([pid, game, ruleset, aiName, commit]).replace('  ', ' ')
 
-    def __repr__(self):
-        return 'Job(%s)' % str(self)
 
 def neutralize(rows):
     """remove things we do not want to compare"""

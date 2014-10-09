@@ -25,6 +25,7 @@ from sound import Voice, Sound
 from tile import Tile, TileList
 from meld import Meld, MeldList
 from common import Internal, Debug
+from common import unicodeString, StrMixin
 from dialogs import Sorry
 
 # pylint: disable=super-init-not-called
@@ -53,8 +54,11 @@ class Message(object):
     def __str__(self):
         return self.name
 
+    def __unicode__(self):
+        return unicodeString(self.name)
+
     def __repr__(self):
-        return self.name
+        return 'Message.{}'.format(self.name)
 
     @staticmethod
     def jelly(key, value):
@@ -682,16 +686,13 @@ class ChatMessage(object):
 
     def __unicode__(self):
         local = self.localtimestamp()
-        return 'statusMessage=%s %02d:%02d:%02d %s: %s' % (
-            str(self.isStatusMessage),
+        return u'statusMessage=%s %02d:%02d:%02d %s: %s' % (
+            unicode(self.isStatusMessage),
             local.hour,
             local.minute,
             local.second,
             self.fromUser,
             m18n(self.message))
-
-    def __repr__(self):
-        return unicode(self)
 
     def asList(self):
         """encode me for network transfer"""

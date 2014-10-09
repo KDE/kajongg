@@ -20,12 +20,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
-from common import Debug
+from common import Debug, unicodeString, StrMixin
 from message import Message
 from tile import Tile, TileList
 from meld import Meld, MeldList
 
-class Move(object):
+class Move(StrMixin):
     """used for decoded move information from the game server"""
     def __init__(self, player, command, kwargs):
         if isinstance(command, Message):
@@ -68,22 +68,26 @@ class Move(object):
         for key, value in kwargs.items():
             if key == 'token':
                 continue
+            if isinstance(value, (list, tuple)) and isinstance(value[0], (list, tuple)):
+                oldValue = value
+                tuples = []
+                for t in oldValue:
+                    tuples.append(u''.join(unicodeString(x) for x in t))
+                value = u','.join(tuples)
             if Debug.neutral and key == 'gameid':
                 result += ' gameid:GAMEID'
             elif isinstance(value, bool) and value:
                 result += ' %s' % key
             elif isinstance(value, bool):
                 pass
-            elif isinstance(value, list) and isinstance(value[0], basestring):
-                result += ' %s:%s' % (key, ''.join(value))
+            elif isinstance(value, bytes):
+                result += u' %s:%s' % (key, unicodeString(value))
             else:
-                result += ' %s:%s' % (key, value)
-        result = result.replace("('", "(").replace("')", ")").replace(" '", "").replace(
-                "',", ",").replace("[(", "(").replace("])", ")")
+                result += u' %s:%s' % (key, value)
+        for old, new in ((u"('", u"("), (u"')", u")"), (u" '", u""),
+                (u"',", u","), (u"[(", u"("), (u"])", u")")):
+            result = result.replace(old, new)
         return result
 
     def __unicode__(self):
         return u'%s %s%s' % (self.player, self.message, Move.prettyKwargs(self.kwargs))
-
-    def __repr__(self):
-        return '<Move: %s>' % unicode(self)

@@ -28,10 +28,10 @@ from twisted.internet.defer import Deferred
 
 from log import m18nE, logInfo, logDebug, logException
 from message import Message
-from common import Debug, isPython3
+from common import Debug, isPython3, StrMixin
 from move import Move
 
-class Request(object):
+class Request(StrMixin):
     """holds a Deferred and related attributes, used as part of a DeferredBlock"""
     def __init__(self, block, deferred, user, about):
         self._block = weakref.ref(block)
@@ -89,15 +89,12 @@ class Request(object):
         """my age in full seconds"""
         return int((datetime.datetime.now() - self.startTime).total_seconds())
 
-    def __str__(self):
-        return self.__unicode__().encode('utf-8')
-
     def __unicode__(self):
         cmd = self.deferred.command
         if self.answer:
             answer = unicode(self.answer)
         else:
-            answer = 'OPEN'
+            answer = u'OPEN'
         result = u''
         if Debug.deferredBlock:
             result += u'[{id:>4}] '.format(id=id(self)%10000)
@@ -107,9 +104,6 @@ class Request(object):
         if self.age():
             result += u' after {} sec'.format(self.age())
         return result
-
-    def __repr__(self):
-        return 'Request(%s)' % str(self)
 
     def prettyAnswer(self):
         """for debug output"""
@@ -133,7 +127,7 @@ class Request(object):
             result += ' after {} sec'.format(self.age())
         return result
 
-class DeferredBlock(object):
+class DeferredBlock(StrMixin):
     """holds a list of deferreds and waits for each of them individually,
     with each deferred having its own independent callbacks. Fires a
     'general' callback after all deferreds have returned.
@@ -172,18 +166,18 @@ class DeferredBlock(object):
         """standard debug format"""
         logDebug(' '.join([self.debugPrefix(marker), msg]))
 
-    def __str__(self):
-        return '%s requests=%s outstanding=%d %s callback=%s' % (
+    def __unicode__(self):
+        return u'%s requests=%s outstanding=%d %s callback=%s' % (
             self.debugPrefix(),
-            '[' + ','.join(str(x) for x in self.requests) + ']',
+            u'[' + u','.join(unicode(x) for x in self.requests) + u']',
             self.outstanding,
-            'is completed' if self.completed else 'not completed',
+            u'is completed' if self.completed else u'not completed',
             self.prettyCallback())
 
-    def outstandingStr(self):
-        """like __str__ but only with outstanding answers"""
-        return '%s callback=%s:%s' % (self.calledBy, self.prettyCallback(),
-            '[' + ','.join(str(x) for x in self.requests if not x.answer) + ']')
+    def outstandingUnicode(self):
+        """like __unicode__ but only with outstanding answers"""
+        return u'%s callback=%s:%s' % (self.calledBy, self.prettyCallback(),
+            u'[' + u','.join(str(x) for x in self.requests if not x.answer) + u']')
 
     @staticmethod
     def garbageCollection():

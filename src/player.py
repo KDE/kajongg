@@ -21,10 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import weakref
 from collections import defaultdict
 
-from twisted.python.compat import nativeString
-
 from log import logException, logWarning, m18n, m18nc, m18nE
 from common import WINDS, IntDict, Debug
+from common import StrMixin
 from query import Query
 from tile import Tile, TileList, elements
 from meld import Meld, MeldList
@@ -33,7 +32,7 @@ from message import Message
 from hand import Hand
 from intelligence import AIDefault
 
-class Players(list):
+class Players(list, StrMixin):
     """a list of players where the player can also be indexed by wind.
     The position in the list defines the place on screen. First is on the
     screen bottom, second on the right, third top, forth left"""
@@ -54,11 +53,8 @@ class Players(list):
                 return player
         return list.__getitem__(self, index)
 
-    def __str__(self):
-        return self.__unicode__().encode('utf-8')
-
     def __unicode__(self):
-        return ', '.join(list('%s: %s' % (x.name, x.wind) for x in self))
+        return u', '.join(list(u'%s: %s' % (x.name, x.wind) for x in self))
 
     def byId(self, playerid):
         """lookup the player by id"""
@@ -101,7 +97,7 @@ class Players(list):
         known = set(x.name for x in self)
         return list(self.byName(x).localName if x in known else x for x in names)
 
-class Player(object):
+class Player(StrMixin):
     """
     all player related attributes without GUI stuff.
     concealedTiles: used during the hand for all concealed tiles, ungrouped.
@@ -303,12 +299,6 @@ class Player(object):
         """the payments for the current hand"""
         assert payment == 0
         self.__payment = 0
-
-    def __repr__(self):
-        return nativeString(self.__unicode__(), encoding='utf-8')
-
-    def __str__(self):
-        return self.__unicode__().encode('utf-8')
 
     def __unicode__(self):
         return u'{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)

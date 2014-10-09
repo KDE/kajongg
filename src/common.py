@@ -160,6 +160,19 @@ class FixedClass(type):
         else:
             type.__setattr__(cls, key, value)
 
+class StrMixin(object):
+    """
+    A mixin defining defaults for __str__ and __repr__,
+    using __unicode__.
+    """
+    def __str__(self):
+        return nativeString(self.__unicode__())
+
+    def __repr__(self):
+        return '{cls}({content})'.format(
+            cls=self.__class__.__name__,
+            content=self.__str__())
+
 class Options(object):
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
@@ -235,7 +248,7 @@ class Internal(object):
 
 Internal = Internal()
 
-class IntDict(defaultdict):
+class IntDict(defaultdict, StrMixin):
     """a dict where the values are expected to be numeric, so
     we can add dicts.If parent is given, parent is expected to
     be another IntDict, and our changes propagate into parent.
@@ -317,13 +330,11 @@ class IntDict(defaultdict):
                 self.parent[key] -= value
         defaultdict.clear(self)
 
-    def __str__(self):
+    def __unicode__(self):
         """sort the result for better log comparison"""
         keys = sorted(self.keys())
-        return ', '.join('{}:{}'.format(x, self[x]) for x in keys)
+        return u', '.join('{}:{}'.format(unicodeString(x), unicodeString(self[x])) for x in keys)
 
-    def __repr__(self):
-        return "<IntDict: %s>" % self
 
 class ZValues(object):
     """here we collect all zValues used in Kajongg"""
@@ -336,3 +347,91 @@ class ZValues(object):
 def english(i18nstring):
     """translate back from local language"""
     return ENGLISHDICT.get(i18nstring, i18nstring)
+
+def unicodeString(s, encoding='utf-8'):
+    """
+    If s is not unicode, make it so.
+
+    @param s: The original string or None.
+    @type s: C{QString}, C{unicode}, C{str} or C{bytes}
+    @rtype: C{unicode} or None.
+    """
+    if s is None:
+        return s
+    if s.__class__.__name__ == 'QString': # avoid import of QString
+        return unicode(s)
+    elif isinstance(s, unicode):
+        return s
+    else:
+        return s.decode(encoding)
+
+def isStringType(s):
+    if s.__class__.__name__  in ('QString', 'QByteArray'):
+        return True
+    return isinstance(s, (bytes, unicode))
+
+def nativeString(s, encoding='utf-8'):
+    """
+    Code inspired by twisted.python.compat.
+
+    Convert C{QByteArray}, C{QString}, C{bytes} or C{unicode}
+    to the native C{str} type, using the given encoding if
+    conversion is necessary.
+
+    @param s: The original string or None.
+    @type s: C{QByteArray}, C{QString}, C{unicode}, C{str} or C{bytes}
+    @param encoding: The encoding for the given string, if it is
+                not of type C{unicode}. Default is utf-8.
+    @returns: The string.
+    @rtype: C{str}
+
+    @raise UnicodeError: The input string is not encodable/decodable.
+    @raise TypeError: The input is not of string type.
+    """
+    if s is None:
+        return s
+    if s.__class__.__name__ == 'QString': # avoid import of QString
+        s = unicode(s)
+    if s.__class__.__name__ == 'QByteArray': # avoid import of QByteArray
+        s = bytes(s)
+    if not isStringType(s):
+        return s
+    if isPython3:
+        if isinstance(s, bytes):
+            return s.decode(encoding)
+        else:
+            # Ensure we're limited to the given encoding subset:
+            s.encode(encoding)
+    else:
+        if isinstance(s, unicode):
+            return s.encode(encoding)
+        else:
+            # Ensure we're limited to the given encoding subset:
+            s.decode(encoding)
+    return s
+
+def nativeStringArgs(args, encoding='utf-8'):
+    """
+    Convert string elements of a tuple to the native C{str} type,
+    Those elements which are not of some string type are left alone.
+    For acceptable string types see L{common.nativeString}.
+
+    @param s: None or a string to convert to C{str} if necessary.
+    @param encoding: The encoding for the strings. Default is utf-8.
+    @returns: A tuple with the converted strings.
+    @rtype: C{tuple}
+    """
+    return tuple((nativeString(x, encoding) if isStringType(x) else x for x in args))
+
+def unicodeStringArgs(args, encoding='utf-8'):
+    """
+    Convert string elements of a tuple to C{unicode},
+    Those elements which are not of some string type are left alone.
+    For acceptable string types see L{common.nativeString}.
+
+    @param s: None or a string to convert to C{str} if necessary.
+    @param encoding: The encoding for the strings. Default is utf-8.
+    @returns: A tuple with the converted strings.
+    @rtype: C{tuple}
+    """
+    return tuple((unicodeString(x, encoding) if isStringType(x) else x for x in args))

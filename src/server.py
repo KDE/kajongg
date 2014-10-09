@@ -58,7 +58,7 @@ if os.name != 'nt':
     signal(SIGQUIT, cleanExit)
 
 
-from common import Options, Internal, unicode, WINDS
+from common import Options, Internal, unicode, WINDS, nativeString
 Internal.isServer = True
 Internal.logPrefix = 'S'
 
@@ -265,19 +265,16 @@ class ServerTable(Table):
                     logDebug('%s leaves table %d, %s stays owner' % (
                         user.name, self.tableid, self.owner))
 
-    def __str__(self):
+    def __unicode__(self):
         """for debugging output"""
-        onlineNames = list(x.name + ('(Owner)' if x == self.owner.name else '') for x in self.users)
-        offlineString = ''
+        onlineNames = list(x.name + (u'(Owner)' if x == self.owner.name else u'') for x in self.users)
+        offlineString = u''
         if self.game:
             offlineNames = list(x.name for x in self.game.players if x.name not in onlineNames
                 and not x.name.startswith('Robot'))
             if offlineNames:
-                offlineString = ' offline:' + ','.join(offlineNames)
-        return '%d(%s%s)' % (self.tableid, ','.join(onlineNames), offlineString)
-
-    def __repr__(self):
-        return 'ServerTable(%s)' % str(self)
+                offlineString = u' offline:' + u','.join(offlineNames)
+        return u'%d(%s%s)' % (self.tableid, u','.join(onlineNames), offlineString)
 
     def calcGameId(self):
         """based upon the max gameids we got from the clients, propose
@@ -1166,6 +1163,7 @@ class User(pb.Avatar):
         return self.server.leaveTable(self, tableid)
     def perspective_newTable(self, ruleset, playOpen, autoPlay, wantedGame, tableId=None):
         """perspective_* methods are to be called remotely"""
+        wantedGame = nativeString(wantedGame)
         return self.server.newTable(self, ruleset, playOpen, autoPlay, wantedGame, tableId)
     def perspective_startGame(self, tableid):
         """perspective_* methods are to be called remotely"""
@@ -1176,10 +1174,8 @@ class User(pb.Avatar):
     def perspective_chat(self, chatString):
         """perspective_* methods are to be called remotely"""
         return self.server.chat(chatString)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
-    def __repr__(self):
-        return 'User({!s})'.format(self)
 
 @implementer(portal.IRealm)
 class MJRealm(object):
