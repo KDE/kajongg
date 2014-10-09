@@ -181,10 +181,11 @@ class HandId(object):
             if aiName != 'Default':
                 aiVariant = aiName + '/'
         num = self.notRotated
+        assert isinstance(num, int), num
         charId = ''
         while num:
             charId = chr(ord('a') + (num-1) % 26) + charId
-            num = (num-1) / 26
+            num = (num-1) // 26
         wind = (WINDS + 'X')[self.roundsFinished]
         if withSeed:
             seed = self.seed
@@ -207,8 +208,11 @@ class HandId(object):
         return 'HandId({})'.format(self.prompt())
 
     def __eq__(self, other):
-        return (self.roundsFinished, self.rotated, self.notRotated) == (
+        return other and (self.roundsFinished, self.rotated, self.notRotated) == (
             other.roundsFinished, other.rotated, other.notRotated)
+
+    def __ne__(self, other):
+        return not self == other
 
     def __lt__(self, other):
         return (self.roundsFinished, self.rotated, self.notRotated) < (
