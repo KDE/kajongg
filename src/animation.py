@@ -25,7 +25,7 @@ from twisted.internet.defer import Deferred, succeed
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, QVariant
 
-from common import Internal, Debug, isAlive, isPython3
+from common import Internal, Debug, isAlive, isPython3, nativeString
 from log import logDebug
 
 class Animation(QPropertyAnimation):
@@ -66,8 +66,12 @@ class Animation(QPropertyAnimation):
             return 'A%d' % (id(self) % 10000)
 
     def pName(self):
-        """return self.propertyName() as a python string"""
-        return str(self.propertyName())
+        """
+        Return self.propertyName() as a python string.
+
+        @return: C{str}
+        """
+        return nativeString(self.propertyName())
 
     def unpackValue(self, qvariant):
         """get the wanted value from the QVariant"""
