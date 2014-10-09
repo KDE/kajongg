@@ -103,7 +103,7 @@ class ClientTable(Table):
         assert self.gameid
         return bool(Query('select 1 from game where id=?', (self.gameid,)).records)
 
-class Client(object, pb.Referenceable):
+class Client(pb.Referenceable):
     """interface to the server. This class only implements the logic,
     so we can also use it on the server for robot clients. Compare
     with HumanClient(Client)"""
