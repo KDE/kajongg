@@ -294,7 +294,11 @@ class IntDict(defaultdict, StrMixin):
         return result
 
     def __eq__(self, other):
+        # TODO: could be optimized for speed
         return self.all() == other.all()
+
+    def __ne__(self, other):
+        return self.all() != other.all()
 
     def count(self, countFilter=None):
         """how many tiles defined by countFilter do we hold?

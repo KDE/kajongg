@@ -602,6 +602,11 @@ class Hand(object):
         assert self.player == other.player
         return self.string == other.string
 
+    def __ne__(self, other):
+        """compares hand values"""
+        assert self.player == other.player
+        return self.string != other.string
+
     def __matchingRules(self, rules):
         """return all matching rules for this hand"""
         return list(rule for rule in rules if rule.appliesToHand(self))

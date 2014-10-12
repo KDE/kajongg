@@ -375,7 +375,12 @@ into a situation where you have to pay a penalty"""))
     def __eq__(self, other):
         """two rulesets are equal if everything except name or description is identical.
         The name might be localized."""
-        return self.hash == other.hash
+        return other and self.hash == other.hash
+
+    def __ne__(self, other):
+        """two rulesets are equal if everything except name or description is identical.
+        The name might be localized."""
+        return not other or self.hash != other.hash
 
     def minMJTotal(self):
         """the minimum score for Mah Jongg including all winner points. This is not accurate,
