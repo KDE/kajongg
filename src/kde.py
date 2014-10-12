@@ -22,13 +22,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import os, sys, shutil
 
-from common import Internal, Options, unicode
+from common import Internal, Options, unicode, isPython3
 
 usingKDE = False # pylint: disable=invalid-name
 
 try:
     if '--nokde' in sys.argv or '--qt5' in sys.argv:
         # for now there is no PyKDE5
+        raise ImportError
+    if isPython3:
+        # PyKDE4 for python3 is unusable, fall back to qt only
+        # see KDE bug 253123
         raise ImportError
     from PyKDE4.kdecore import KUser, KGlobal, KStandardDirs, \
         KAboutData, KCmdLineArgs, KConfig, KCmdLineOptions
