@@ -35,13 +35,17 @@ import platform
 # pylint: disable=invalid-name
 if platform.python_version_tuple()[0] == '3':
     # pylint: disable=redefined-builtin
-    unicode = str
+    unicode = str # pylint: disable=W0622
     basestring = str
+    bytes = bytes
+    long = int
     isPython3 = True
 else:
     # pylint: disable=redefined-builtin
     unicode = unicode
     basestring = basestring
+    bytes = str
+    long = long
     isPython3 = False
 
 WINDS = u'ESWN'
