@@ -22,7 +22,7 @@
 
 import os
 
-from qt import uic, QVariant, variantValue
+from qt import uic, toQVariant, variantValue
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 
 from kde import KStandardDirs, KIcon
@@ -73,7 +73,7 @@ class ListComboBox(QComboBox):
         self.clear()
         if items:
             for item in items:
-                self.addItem(m18n(item.name), QVariant(item))
+                self.addItem(m18n(item.name), toQVariant(item))
 
     def findItem(self, search):
         """returns the index or -1 of not found """

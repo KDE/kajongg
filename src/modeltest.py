@@ -24,7 +24,7 @@
 """
 
 import sip
-from qt import QObject, Qt, QVariant, QAbstractItemModel, QModelIndex, \
+from qt import QObject, Qt, toQVariant, QAbstractItemModel, QModelIndex, \
     QPersistentModelIndex
 
 # pylint: skip-file
@@ -75,7 +75,7 @@ class ModelTest(QObject):
         assert(self.model.buddy(QModelIndex()) == QModelIndex())
         self.model.canFetchMore(QModelIndex())
         assert(self.model.columnCount(QModelIndex()) >= 0)
-        assert(self.model.data(QModelIndex(), Qt.DisplayRole) == QVariant())
+        assert(self.model.data(QModelIndex(), Qt.DisplayRole) == toQVariant())
         self.fetchingMore = True
         self.model.fetchMore(QModelIndex())
         self.fetchingMore = False
@@ -87,16 +87,16 @@ class ModelTest(QObject):
         self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole)
         self.model.index(0, 0, QModelIndex())
         self.model.itemData(QModelIndex())
-        cache = QVariant()
+        cache = toQVariant()
         self.model.match(QModelIndex(), -1, cache)
         self.model.mimeTypes()
         assert(self.model.parent(QModelIndex()) == QModelIndex())
         assert(self.model.rowCount(QModelIndex()) >= 0)
-        variant = QVariant()
+        variant = toQVariant()
         self.model.setData(QModelIndex(), variant, -1)
-        self.model.setHeaderData(-1, Qt.Horizontal, QVariant())
-        self.model.setHeaderData(0, Qt.Horizontal, QVariant())
-        self.model.setHeaderData(999999, Qt.Horizontal, QVariant())
+        self.model.setHeaderData(-1, Qt.Horizontal, toQVariant())
+        self.model.setHeaderData(0, Qt.Horizontal, toQVariant())
+        self.model.setHeaderData(999999, Qt.Horizontal, toQVariant())
         self.model.sibling(0, 0, QModelIndex())
         self.model.span(QModelIndex())
         self.model.supportedDropActions()
@@ -244,7 +244,7 @@ class ModelTest(QObject):
         assert( self.model.index(0, 0, QModelIndex()).isValid())
 
         # shouldn't be able to set data on an invalid index
-        assert( self.model.setData( QModelIndex(), QVariant("foo"), Qt.DisplayRole) == False)
+        assert( self.model.setData( QModelIndex(), toQVariant("foo"), Qt.DisplayRole) == False)
 
         # General Purpose roles that should return a QString
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.ToolTipRole)

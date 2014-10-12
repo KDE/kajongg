@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, usingQt5, QPointF, QVariant, variantValue, \
+from qt import Qt, usingQt5, QPointF, toQVariant, variantValue, \
     QSize, QModelIndex, QEvent, QTimer
 from kde import usingKDE
 
@@ -182,7 +182,7 @@ class ScoreModel(TreeModel):
         """score table"""
         # pylint: disable=too-many-return-statements
         if not index.isValid():
-            return QVariant()
+            return toQVariant()
         column = index.column()
         item = index.internalPointer()
         if role is None:
@@ -199,36 +199,36 @@ class ScoreModel(TreeModel):
                         content = str(content.payments)
                     else:
                         content = str(content.balance)
-                return QVariant(content)
+                return toQVariant(content)
             else:
                 if column > 0:
-                    return QVariant('')
+                    return toQVariant('')
                 else:
-                    return QVariant(item.content(0))
+                    return toQVariant(item.content(0))
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
-                return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                return toQVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
             else:
-                return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+                return toQVariant(int(Qt.AlignRight|Qt.AlignVCenter))
         if role == Qt.FontRole:
             return QFont('Monospaced')
         if role == Qt.ForegroundRole:
             if isinstance(item, ScorePlayerItem) and item.parent.row() == 3:
                 content = item.content(column)
                 if not isinstance(content, HandResult):
-                    return QVariant(QBrush(ScoreItemDelegate.colors[index.row()]))
+                    return toQVariant(QBrush(ScoreItemDelegate.colors[index.row()]))
         if column > 0 and isinstance(item, ScorePlayerItem):
             content = item.content(column)
             # pylint: disable=maybe-no-member
             # pylint thinks content is a str
             if role == Qt.BackgroundRole:
                 if content and content.won:
-                    return QVariant(QColor(165, 255, 165))
+                    return toQVariant(QColor(165, 255, 165))
             if role == Qt.ToolTipRole:
                 englishHints = content.manualrules.split('||')
                 tooltip = '<br />'.join(m18n(x) for x in englishHints)
-                return QVariant(tooltip)
-        return QVariant()
+                return toQVariant(tooltip)
+        return toQVariant()
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
@@ -244,10 +244,10 @@ class ScoreModel(TreeModel):
                     return handResult.handId()
         elif role == Qt.TextAlignmentRole:
             if section == 0:
-                return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                return toQVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
             else:
-                return QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
-        return QVariant()
+                return toQVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+        return toQVariant()
 
     def loadData(self):
         """loads all data from the data base into a 2D matrix formatted like the wanted tree"""
@@ -1062,7 +1062,7 @@ class ScoringDialog(QWidget):
             if tile.tile in lastTiles and tile.tile not in shownTiles:
                 shownTiles.add(tile.tile)
                 self.cbLastTile.addItem(QIcon(tile.pixmapFromSvg(pmSize, withBorders=False)),
-                        '', QVariant(tile.tile))
+                        '', toQVariant(tile.tile))
                 if indexedTile is tile.tile:
                     restoredIdx = self.cbLastTile.count() - 1
         if not restoredIdx and indexedTile:
@@ -1112,7 +1112,7 @@ class ScoringDialog(QWidget):
                     winner.handBoard.tilesByElement(element) \
                     [0].pixmapFromSvg(QSize(faceWidth, faceHeight), withBorders=False))
                 painter.translate(QPointF(faceWidth, 0.0))
-            self.cbLastMeld.addItem(QIcon(pixMap), '', QVariant(str(meld)))
+            self.cbLastMeld.addItem(QIcon(pixMap), '', toQVariant(str(meld)))
             if indexedMeld == str(meld):
                 restoredIdx = self.cbLastMeld.count() - 1
         if not restoredIdx and indexedMeld:
@@ -1126,7 +1126,7 @@ class ScoringDialog(QWidget):
                         lastTile = lastTile.swapped
                         assert lastTile in meldContent
                         with BlockSignals(self.cbLastTile): # we want to continue right here
-                            idx = self.cbLastTile.findData(QVariant(lastTile))
+                            idx = self.cbLastTile.findData(toQVariant(lastTile))
                             self.cbLastTile.setCurrentIndex(idx)
                     break
         if not restoredIdx:
@@ -1156,7 +1156,7 @@ class ScoringDialog(QWidget):
             assert len(winnerMelds), 'lastTile %s missing in %s' % (
                 lastTile, self.game.winner.hand.melds)
             if len(winnerMelds) == 1:
-                self.cbLastMeld.addItem(QIcon(), '', QVariant(str(winnerMelds[0])))
+                self.cbLastMeld.addItem(QIcon(), '', toQVariant(str(winnerMelds[0])))
                 self.cbLastMeld.setCurrentIndex(0)
                 return
             showCombo = True

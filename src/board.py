@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import usingQt5, Qt, QPointF, QPoint, QRectF, QMimeData, QSize, QVariant
+from qt import usingQt5, Qt, QPointF, QPoint, QRectF, QMimeData, QSize, toQVariant
 from qt import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
 from qt import QGraphicsView, QGraphicsEllipseItem, QLabel
 from qt import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
@@ -330,7 +330,7 @@ class Board(QGraphicsRectItem):
             menu = QMenu(m18n('Choose from'))
             for idx, variant in enumerate(variants):
                 action = menu.addAction(variant.typeName())
-                action.setData(QVariant(idx))
+                action.setData(toQVariant(idx))
             if Internal.scene.mainWindow.centralView.dragObject:
                 menuPoint = QCursor.pos()
             else:

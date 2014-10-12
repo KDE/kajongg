@@ -20,7 +20,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, usingQt5, QVariant, variantValue, QSize
+from qt import Qt, usingQt5, toQVariant, variantValue, QSize
 from qt import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
@@ -146,9 +146,9 @@ class RuleModel(TreeModel):
                 unitNames.extend(rule.score.unitNames.items())
         unitNames = sorted(unitNames, key=lambda x: x[1])
         unitNames = uniqueList(x[0] for x in unitNames)
-        rootData = [QVariant(title)]
+        rootData = [toQVariant(title)]
         for unitName in unitNames:
-            rootData.append(QVariant(unitName))
+            rootData.append(toQVariant(unitName))
         self.rootItem = RuleRootItem(rootData)
 
     def canFetchMore(self, dummyParent=None):
@@ -166,13 +166,13 @@ class RuleModel(TreeModel):
         """get data fom model"""
         # pylint: disable=too-many-branches
         # too many branches
-        result = QVariant()
+        result = toQVariant()
         if index.isValid():
             item = index.internalPointer()
             if role in (Qt.DisplayRole, Qt.EditRole):
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and isinstance(item.rawContent, BoolRule):
-                        return QVariant('')
+                        return toQVariant('')
                 showValue = item.content(index.column())
                 if isinstance(showValue, basestring) and showValue.endswith('.0'):
                     try:
@@ -181,25 +181,25 @@ class RuleModel(TreeModel):
                         pass
                 if showValue == '0':
                     showValue = ''
-                result = QVariant(showValue)
+                result = showValue
             elif role == Qt.CheckStateRole:
                 if self.isCheckboxCell(index):
                     bData = item.content(index.column())
-                    result = QVariant(Qt.Checked if bData else Qt.Unchecked)
+                    result = Qt.Checked if bData else Qt.Unchecked
             elif role == Qt.TextAlignmentRole:
-                result = QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                result = int(Qt.AlignLeft|Qt.AlignVCenter)
                 if index.column() > 0:
-                    result = QVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+                    result = int(Qt.AlignRight|Qt.AlignVCenter)
             elif role == Qt.FontRole and index.column() == 0:
                 ruleset = item.ruleset()
                 if isinstance(ruleset, PredefinedRuleset):
                     font = QFont()
                     font.setItalic(True)
-                    result = QVariant(font)
+                    result = font
             elif role == Qt.ToolTipRole:
                 tip = '<b></b>%s<b></b>' % m18n(item.tooltip()) if item else ''
-                result = QVariant(tip)
-        return result
+                result = tip
+        return toQVariant(result)
 
     @staticmethod
     def isCheckboxCell(index):
@@ -216,16 +216,16 @@ class RuleModel(TreeModel):
             return
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             if section >= self.rootItem.columnCount():
-                return QVariant()
+                return toQVariant()
             result = variantValue(self.rootItem.content(section))
             if result == 'doubles':
                 result = 'x2'
             return m18n(result)
         elif role == Qt.TextAlignmentRole:
             leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
-            return QVariant(int(leftRight|Qt.AlignVCenter))
+            return toQVariant(int(leftRight|Qt.AlignVCenter))
         else:
-            return QVariant()
+            return toQVariant()
 
     def appendRuleset(self, ruleset):
         """append ruleset to the model"""

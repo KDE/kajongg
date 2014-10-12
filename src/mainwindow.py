@@ -46,8 +46,8 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from qt import Qt, QVariant, variantValue, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
-    from qt import QWidget, QGridLayout, QAction, QString
+    from qt import Qt, toQVariant, variantValue, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
+    from qt import QWidget, QGridLayout, QAction
 except ImportError as importError:
     NOTFOUND.append('Please install PyQt4 or PyQt5: %s' % importError)
 
@@ -158,8 +158,8 @@ class MainWindow(KXmlGuiWindow):
             self.actionChat.setChecked(False)
             self.actionExplain.setChecked(False)
             self.actionScoreTable.setChecked(False)
-            self.actionExplain.setData(QVariant(ExplainView))
-            self.actionScoreTable.setData(QVariant(ScoreTable))
+            self.actionExplain.setData(toQVariant(ExplainView))
+            self.actionScoreTable.setData(toQVariant(ScoreTable))
         self._scene = value
         self.centralView.setScene(value)
         self.adjustView()
@@ -197,7 +197,7 @@ class MainWindow(KXmlGuiWindow):
             res.setShortcut( Qt.CTRL + shortcut)
             res.setShortcutContext(Qt.ApplicationShortcut)
         if PYQT_VERSION_STR != '4.5.2' or actionData is not None:
-            res.setData(QVariant(actionData))
+            res.setData(toQVariant(actionData))
         return res
 
     def _kajonggToggleAction(self, name, icon, shortcut=None, actionData=None):
@@ -529,7 +529,7 @@ class MainWindow(KXmlGuiWindow):
             if isinstance(actionData, type):
                 clsName = actionData.__name__
                 actionData = actionData(scene=self.scene)
-                action.setData(QVariant(actionData))
+                action.setData(toQVariant(actionData))
                 setattr(self.scene, clsName[0].lower() + clsName[1:], actionData)
             actionData.show()
             actionData.raise_()

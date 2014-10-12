@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, QVariant, QAbstractTableModel, QModelIndex, QSize
+from qt import Qt, toQVariant, QAbstractTableModel, QModelIndex, QSize
 from qt import QWidget, QLineEdit, QVBoxLayout, QColor, QAbstractItemView
 
 from log import m18n, logDebug
@@ -40,17 +40,17 @@ class ChatModel(QAbstractTableModel):
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
                 if section == 1:
-                    return QVariant(int(Qt.AlignRight))
+                    return toQVariant(int(Qt.AlignRight))
                 else:
-                    return QVariant(int(Qt.AlignLeft))
+                    return toQVariant(int(Qt.AlignLeft))
         if orientation != Qt.Horizontal:
-            return QVariant(int(section+1))
+            return toQVariant(int(section+1))
         if role != Qt.DisplayRole:
-            return QVariant()
+            return toQVariant()
         result = ''
         if section < self.columnCount():
             result = [m18n('Time'), m18n('Player'), m18n('Message')][section]
-        return QVariant(result)
+        return toQVariant(result)
 
     def rowCount(self, parent=None):
         """how many lines are in the model?"""
@@ -65,28 +65,28 @@ class ChatModel(QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
         """score table"""
-        result = QVariant()
+        result = toQVariant()
         if role == Qt.TextAlignmentRole:
             if index.column() == 1:
-                return QVariant(int(Qt.AlignRight))
+                return toQVariant(int(Qt.AlignRight))
             else:
-                return QVariant(int(Qt.AlignLeft))
+                return toQVariant(int(Qt.AlignLeft))
         if index.isValid() and (0 <= index.row() < len(self.chatLines)):
             chatLine = self.chatLines[index.row()]
             if role == Qt.DisplayRole and index.column() == 0:
                 local = chatLine.localtimestamp()
-                result = QVariant('%02d:%02d:%02d' % (
+                result = toQVariant('%02d:%02d:%02d' % (
                     local.hour,
                     local.minute,
                     local.second))
             elif role == Qt.DisplayRole and index.column() == 1:
-                result = QVariant(chatLine.fromUser)
+                result = toQVariant(chatLine.fromUser)
             elif role == Qt.DisplayRole and index.column() == 2:
-                result = QVariant(m18n(chatLine.message))
+                result = toQVariant(m18n(chatLine.message))
             elif role == Qt.ForegroundRole and index.column() == 2:
                 palette = KApplication.palette()
                 color = 'blue' if chatLine.isStatusMessage else palette.windowText()
-                result = QVariant(QColor(color))
+                result = toQVariant(QColor(color))
         return result
 
     def appendLines(self, lines):

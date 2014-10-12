@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, QVariant, QAbstractTableModel, QModelIndex
+from qt import Qt, toQVariant, QAbstractTableModel, QModelIndex
 from qt import QLabel, QDialog, \
         QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
@@ -50,30 +50,30 @@ class DifferModel(QAbstractTableModel):
     def data(self, index, role=Qt.DisplayRole):
         """get from model"""
         if not index.isValid() or not 0 <= index.row() < len(self.diffs):
-            return QVariant()
+            return toQVariant()
         diff = self.diffs[index.row()]
         column = index.column()
         if role == Qt.DisplayRole:
-            return QVariant(diff[column])
+            return toQVariant(diff[column])
         elif role == Qt.TextAlignmentRole:
-            return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
-        return QVariant()
+            return toQVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+        return toQVariant()
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
-                return QVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                return toQVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
         if role != Qt.DisplayRole:
-            return QVariant()
+            return toQVariant()
         if orientation == Qt.Horizontal:
             if section == 0:
-                return QVariant(m18nc('Kajongg', 'Rule'))
+                return toQVariant(m18nc('Kajongg', 'Rule'))
             if section == 1:
-                return QVariant(m18n(self.view.cbRuleset1.current.name))
+                return toQVariant(m18n(self.view.cbRuleset1.current.name))
             if section == 2:
-                return QVariant(m18n(self.view.cbRuleset2.current.name))
-            return QVariant()
+                return toQVariant(m18n(self.view.cbRuleset2.current.name))
+            return toQVariant()
 
 
 class RulesetDiffer(QDialog):

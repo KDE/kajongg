@@ -23,7 +23,7 @@ import datetime
 from kde import KIcon
 from dialogs import WarningYesNo
 
-from qt import usingQt5, Qt, QVariant, RealQVariant, variantValue, QAbstractTableModel
+from qt import usingQt5, Qt, toQVariant, RealQVariant, variantValue, QAbstractTableModel
 from qt import QDialogButtonBox, QDialog, \
         QHBoxLayout, QVBoxLayout, QCheckBox, \
         QItemSelectionModel, QAbstractItemView
@@ -32,7 +32,7 @@ from log import logException, m18n, m18nc
 from query import Query
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
-from common import Debug
+from common import Debug, nativeString
 from modeltest import ModelTest
 
 class GamesModel(QAbstractTableModel):
@@ -66,27 +66,27 @@ class GamesModel(QAbstractTableModel):
         if role is None:
             role = Qt.DisplayRole
         if not (index.isValid() and role == Qt.DisplayRole):
-            return QVariant()
+            return toQVariant()
         if role == Qt.DisplayRole:
             unformatted = unicode(self._resultRows[index.row()][index.column()])
             if index.column() == 2:
                 # we do not yet use this for listing remote games but if we do
                 # this translation is needed for robot players
                 names = [m18n(name) for name in unformatted.split('///')]
-                return QVariant(', '.join(names))
+                return toQVariant(', '.join(names))
             elif index.column() == 1:
                 dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
-                return QVariant(dateVal.strftime('%c').decode('utf-8'))
+                return toQVariant(nativeString(dateVal.strftime('%c')))
             elif index.column() == 0:
-                return QVariant(int(unformatted))
+                return toQVariant(int(unformatted))
         with RealQVariant():
             return QAbstractTableModel.data(self, index, role)
 
     def headerData(self, section, orientation, role):  # pylint: disable=no-self-use
         """for the two visible columns"""
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant((m18n("Started"), m18n("Players"))[section-1])
-        return QVariant()
+            return toQVariant((m18n("Started"), m18n("Players"))[section-1])
+        return toQVariant()
 
 class Games(QDialog):
     """a dialog for selecting a game"""

@@ -55,3 +55,10 @@ class RealQVariant(object):
         """enable autoconversion again"""
         if usingQt5:
             sip.enableautoconversion(QVariant, True)
+
+if isPython3:
+    def toQVariant(obj=None):
+        return obj
+else:
+    def toQVariant(obj=None):
+        return QVariant(obj)
