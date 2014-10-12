@@ -136,6 +136,12 @@ class Player(StrMixin):
         self.__lastSource = '1' # no source: blessing from heaven or earth
         self.handBoard = None
 
+    def __lt__(self, other):
+        """Used for sorting"""
+        if not other:
+            return False
+        return self.name < other.name
+
     def clearCache(self):
         """clears the cache with Hands"""
         if Debug.hand and len(self.handCache):
