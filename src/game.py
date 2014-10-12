@@ -97,12 +97,12 @@ class HandId(object):
     def __init__(self, game, string=None, stringIdx=0):
         self.game = game
         self.seed = game.seed
-        self.roundsFinished = self.rotated = self.notRotated = self.move = 0
+        self.roundsFinished = self.rotated = self.notRotated = self.moveCount = 0
         if string is None:
             self.roundsFinished = game.roundsFinished
             self.rotated = game.rotated
             self.notRotated = game.notRotated
-            self.move = len(game.moves)
+            self.moveCount = len(game.moves)
         else:
             self.__scanHandId(string, stringIdx)
         assert self.rotated < 4, self
@@ -163,7 +163,18 @@ class HandId(object):
             self.notRotated = self.notRotated * 26 + ord(char) - ord('a') + 1
 
     def prompt(self, withSeed=True, withAI=True, withMoveCount=False):
-        """identifies the hand for window title and scoring table"""
+        """
+        Identifies the hand for window title and scoring table.
+
+        @param withSeed: If set, include the seed used for the random generator.
+        @type  withSeed: C{Boolean}
+        @param withAI:   If set and AI != Default: include AI name for human players.
+        @type  withAI:   C{Boolean}
+        @param withMoveCount:   If set, include the current count of moves.
+        @type  withMoveCount:   C{Boolean}
+        @return:         The prompt.
+        @rtype:          C{str}
+        """
         aiVariant = ''
         if withAI and self.game.belongsToHumanPlayer():
             aiName = self.game.myself.intelligence.name() if self.game.myself else 'Default'
@@ -182,7 +193,7 @@ class HandId(object):
         delim = '/' if withSeed or withAI else ''
         result = '%s%s%s%s%s%s' % (aiVariant, seed, delim, wind, self.rotated + 1, charId)
         if withMoveCount:
-            result += '/%d' % self.move
+            result += '/%d' % self.moveCount
         return result
 
     def token(self):
