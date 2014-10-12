@@ -221,7 +221,7 @@ class HandBoard(Board):
                 or oldTiles.get(Tile.unknown)
             if not matches and not newPosition.tile.isKnown and oldTiles:
                 # 13 orphans, robbing Kong, lastTile is single: no oldTiles exist
-                matches = oldTiles.values()[0]
+                matches = list(oldTiles.values())[0]
             if matches:
                 # no matches happen when we move a uiTile within a board,
                 # here we simply ignore existing tiles with no matches

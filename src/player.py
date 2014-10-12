@@ -735,7 +735,7 @@ class PlayingPlayer(Player):
             if all(x in elements.greenHandTiles for x in self.visibleTiles):
                 dangerous.append((elements.greenHandTiles,
                      m18n('Player %1 has 3 or 4 exposed melds, all are green', pName)))
-            group = defaultdict.keys(self.visibleTiles)[0].group
+            group = list(defaultdict.keys(self.visibleTiles))[0].group
             # see http://www.logilab.org/ticket/23986
             assert group.islower(), self.visibleTiles
             if group in Tile.colors:

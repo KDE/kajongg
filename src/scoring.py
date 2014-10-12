@@ -66,7 +66,7 @@ class SelectPlayers(SelectRuleset):
             cbName.manualSelect = False
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350) # is this good for all platforms?
-            cbName.addItems(Players.humanNames.values())
+            cbName.addItems(list(Players.humanNames.values()))
             self.grid.addWidget(cbName, idx+1, 1)
             self.nameWidgets.append(cbName)
             self.grid.addWidget(WindLabel(wind), idx+1, 0)

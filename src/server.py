@@ -998,7 +998,7 @@ class MJServer(object):
 
     def tablesWith(self, user):
         """table ids with user, except table 'without'"""
-        return (x.tableid for x in self.tables.values() if user in x.users)
+        return list(x.tableid for x in self.tables.values() if user in x.users)
 
     def leaveTable(self, user, tableid, message=None, *args):
         """user leaves table. If no human user is left on a new table, remove it"""

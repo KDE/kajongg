@@ -90,7 +90,7 @@ class TablesModel(QAbstractTableModel):
                 result = toQVariant(table.tableid)
             elif role == Qt.DisplayRole and index.column() == 2:
                 players = []
-                zipped = zip(table.playerNames, table.playersOnline)
+                zipped = list(zip(table.playerNames, table.playersOnline))
                 for idx, pair in enumerate(zipped):
                     name, online = pair[0], pair[1]
                     if idx < len(zipped) - 1:
