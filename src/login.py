@@ -49,32 +49,34 @@ class LoginAborted(Exception):
     """the user aborted the login"""
     pass
 
-class Url(str):
+class Url(unicode):
     """holds connection related attributes: host, port, socketname"""
     # pylint: disable=too-many-public-methods
-    def __init__(self, url):
-        self.host = None
-        self.port = None
+    def __new__(cls, url):
+        host = None
+        port = None
         if url:
             urlParts = url.split(':')
-            self.host = urlParts[0]
-            if english(self.host) == Query.localServerName:
-                self.host = '127.0.0.1'
+            host = urlParts[0]
+            if english(host) == Query.localServerName:
+                host = '127.0.0.1'
             if len(urlParts) > 1:
-                self.port = int(urlParts[1])
+                port = int(urlParts[1])
         else:
-            url = self.host
-            if self.port:
+            url = host
+            if port:
                 url += ':{}'.format(self.port)
-        str.__init__(self, url)
+        obj = unicode.__new__(cls, url)
+        obj.host = host
+        obj.port = port
         if Options.port:
-            self.port = int(Options.port)
-        if self.port is None and self.isLocalHost and not self.useSocket:
-            self.port = self.__findFreePort()
-        if self.port is None and not self.isLocalHost:
-            self.port = Options.defaultPort()
+            obj.port = int(Options.port)
+        if obj.port is None and obj.isLocalHost and not obj.useSocket:
+            obj.port = obj.__findFreePort()
+        if obj.port is None and not obj.isLocalHost:
+            obj.port = Options.defaultPort()
         if Debug.connections:
-            logDebug(repr(self))
+            logDebug(repr(obj))
 
         if Internal.reactor is None:
             import qt4reactor
@@ -84,6 +86,7 @@ class Url(str):
             Internal.reactor = reactor
             if Debug.quit:
                 logDebug('Installed qt4reactor')
+        return obj
 
     def __repr__(self):
         """show all info"""
