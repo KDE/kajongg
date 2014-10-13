@@ -279,7 +279,7 @@ class TableList(QWidget):
         self.compareButton.setEnabled(hasTable and table.myRuleset is None)
         self.chatButton.setVisible(not self.client.hasLocalServer())
         self.chatButton.setEnabled(not running and hasTable and self.client.name in table.playerNames
-            and sum(x.startswith('Robot ') for x in table.playerNames) < 3)
+            and sum(x.startswith(u'Robot ') for x in table.playerNames) < 3)
         if self.chatButton.isEnabled():
             self.chatButton.setToolTip(m18n("Chat with others on this table"))
         else:

@@ -531,7 +531,7 @@ class ServerTable(Table):
         assert player == self.game.activePlayer
         tile = Tile(msg.args[0])
         if tile not in player.concealedTiles:
-            self.abort('player %s discarded %s but does not have it' % (player, tile))
+            self.abort(u'player %s discarded %s but does not have it' % (player, tile))
             return
         dangerousText = self.game.dangerousFor(player, tile)
         mustPlayDangerous = player.mustPlayDangerous()

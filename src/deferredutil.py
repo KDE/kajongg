@@ -267,7 +267,7 @@ class DeferredBlock(StrMixin):
                 traceBack = result.getTraceback()
             except BaseException:
                 # may happen with twisted 12.3.0
-                traceBack = 'twisted cannot give us a traceback'
+                traceBack = u'twisted cannot give us a traceback'
             self.table.abort(msg, request.user.name, result.getErrorMessage(), traceBack)
 
     def logBug(self, msg):
@@ -378,7 +378,7 @@ class DeferredBlock(StrMixin):
         for rec in self.__convertReceivers(receivers):
             isClient = rec.__class__.__name__.endswith('Client')
             if Debug.traffic and not isClient:
-                message = '-> {receiver:<15} about {about} {command}{kwargs}'.format(
+                message = u'-> {receiver:<15} about {about} {command}{kwargs}'.format(
                     receiver=rec.name[:15], about=about, command=command,
                     kwargs=Move.prettyKwargs(kwargs))
                 logDebug(message)

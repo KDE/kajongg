@@ -330,12 +330,12 @@ class LoginDlg(QDialog):
 
     def userChanged(self, text):
         """the username has been changed, lookup password"""
-        if text == '':
+        if text == u'':
             self.edPassword.clear()
             return
         passw = None
         for entry in self.passwords:
-            if entry[0] == self.url and entry[1] == unicode(text):
+            if entry[0] == self.url and entry[1] == text:
                 passw = entry[2]
         if passw:
             self.edPassword.setText(passw)

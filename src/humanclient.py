@@ -563,7 +563,7 @@ class HumanClient(Client):
                 self.__updateTableList()
                 self.tableList.show()
             return Message.NoGameStart
-        if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
+        if sum(not x[1].startswith(u'Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start: no need to ask again
             return clientReady()
         assert not self.table

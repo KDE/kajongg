@@ -64,7 +64,7 @@ class Move(StrMixin):
     @staticmethod
     def prettyKwargs(kwargs):
         """this is also used by the server, but the server does not use class Move"""
-        result = ''
+        result = u''
         for key, value in kwargs.items():
             if key == 'token':
                 continue
@@ -75,9 +75,9 @@ class Move(StrMixin):
                     tuples.append(u''.join(unicodeString(x) for x in t))
                 value = u','.join(tuples)
             if Debug.neutral and key == 'gameid':
-                result += ' gameid:GAMEID'
+                result += u' gameid:GAMEID'
             elif isinstance(value, bool) and value:
-                result += ' %s' % key
+                result += u' %s' % key
             elif isinstance(value, bool):
                 pass
             elif isinstance(value, bytes):

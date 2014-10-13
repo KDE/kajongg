@@ -394,7 +394,7 @@ class PlayingScene(GameScene):
         mainWindow = self.mainWindow
         if not game:
             connections = list(x.connection for x in HumanClient.humanClients if x.connection)
-            title = ', '.join('{name}/{url}'.format(name=x.username, url=x.url) for x in connections)
+            title = u', '.join(u'{name}/{url}'.format(name=x.username, url=x.url) for x in connections)
             if title:
                 decorateWindow(mainWindow, title)
         else:

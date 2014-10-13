@@ -96,7 +96,7 @@ class Score(object):
             parts.append(m18nc('Kajongg', '%1 doubles', self.doubles))
         if self.limits:
             parts.append(m18nc('Kajongg', '%1 limits', self.limits))
-        return ' '.join(parts)
+        return u' '.join(parts)
 
     def __eq__(self, other):
         """ == comparison """
@@ -215,7 +215,7 @@ class RuleList(list):
 
     def createRule(self, name, definition='', **kwargs):
         """shortcut for simpler definition of predefined rulesets"""
-        defParts = definition.split('||')
+        defParts = definition.split(u'||')
         rule = None
         description = kwargs.get('description', '')
         for cls in [IntRule, BoolRule, StrRule]:

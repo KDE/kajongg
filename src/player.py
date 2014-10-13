@@ -78,7 +78,7 @@ class Players(list, StrMixin):
         for nameid, name in Query("select id,name from player").records:
             Players.allIds[name] = nameid
             Players.allNames[nameid] = name
-            if not name.startswith('Robot'):
+            if not name.startswith(u'Robot'):
                 Players.humanNames[nameid] = name
 
     @staticmethod
