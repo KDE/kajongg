@@ -38,6 +38,7 @@ from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Internal, Debug, isAlive, english, unicode
+from common import isPython3
 from game import Players
 from query import Query
 from statesaver import StateSaver
@@ -98,7 +99,12 @@ class Url(unicode):
     @property
     def useSocket(self):
         """do we use socket for current host?"""
-        return self.host == '127.0.0.1' and os.name != 'nt' and not Options.port
+        return (
+            self.host == '127.0.0.1'
+            and os.name != 'nt'
+            and not Options.port
+            and not isPython3
+            and not Options.server3)
 
     @property
     def isLocalGame(self):
@@ -160,15 +166,16 @@ class Url(unicode):
     def __startLocalServer(self):
         """start a local server"""
         # pylint: disable=too-many-branches
+        serverPython = 'python3' if Options.server3 else 'python'
         try:
             if sys.argv[0].endswith('kajongg.py'):
                 tryServer = sys.argv[0].replace('.py', 'server.py')
                 if os.path.exists(tryServer):
-                    args = ['python', tryServer]
+                    args = [serverPython, tryServer]
             elif sys.argv[0].endswith('kajongg.pyw'):
                 tryServer = sys.argv[0].replace('.pyw', 'server.py')
                 if os.path.exists(tryServer):
-                    args = ['python', tryServer]
+                    args = [serverPython, tryServer]
             elif sys.argv[0].endswith('kajongg.exe'):
                 tryServer = sys.argv[0].replace('.exe', 'server.exe')
                 if os.path.exists(tryServer):
