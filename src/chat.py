@@ -25,7 +25,7 @@ from log import m18n, logDebug
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
 from message import ChatMessage
-from common import Debug
+from common import Debug, unicode
 from modeltest import ModelTest
 from kde import KApplication
 

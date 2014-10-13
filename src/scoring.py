@@ -25,7 +25,7 @@ from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
 from qt import QPushButton, QMessageBox, QComboBox
 
 
-from common import Internal, isAlive, WINDS
+from common import Internal, isAlive, WINDS, unicode
 from animation import animate
 from log import logError, logDebug, logWarning, m18n
 from query import Query

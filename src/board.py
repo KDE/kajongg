@@ -35,7 +35,7 @@ from message import Message
 
 from util import kprint, stack, uniqueList
 from log import logDebug, logException, m18n, m18nc
-from common import WINDS, LIGHTSOURCES, Internal, Debug, isAlive
+from common import WINDS, LIGHTSOURCES, Internal, Debug, isAlive, unicode
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 

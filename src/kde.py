@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import os, sys, shutil
 
-from common import Internal, Options
+from common import Internal, Options, unicode
 
 usingKDE = False # pylint: disable=invalid-name
 

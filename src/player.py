@@ -22,7 +22,7 @@ import weakref
 from collections import defaultdict
 
 from log import logException, logWarning, m18n, m18nc, m18nE
-from common import WINDS, IntDict, Debug
+from common import WINDS, IntDict, Debug, unicode
 from common import StrMixin
 from query import Query
 from tile import Tile, TileList, elements

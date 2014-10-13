@@ -28,7 +28,7 @@ from twisted.internet.defer import Deferred
 
 from log import m18nE, logInfo, logDebug, logException
 from message import Message
-from common import Debug, isPython3, StrMixin
+from common import Debug, isPython3, StrMixin, unicode
 from move import Move
 
 class Request(StrMixin):

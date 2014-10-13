@@ -22,7 +22,7 @@ from qt import Qt, QBrush, QColor
 
 from log import m18nc
 from message import Message
-from common import Internal, isAlive
+from common import Internal, isAlive, unicode
 from player import Player, PlayingPlayer
 from game import PlayingGame
 from tile import Tile

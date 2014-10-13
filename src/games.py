@@ -32,7 +32,7 @@ from log import logException, m18n, m18nc
 from query import Query
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
-from common import Debug, nativeString
+from common import Debug, nativeString, unicode
 from modeltest import ModelTest
 
 class GamesModel(QAbstractTableModel):

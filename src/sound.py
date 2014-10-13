@@ -24,7 +24,7 @@ from hashlib import md5
 if os.name == 'nt':
     import winsound # pylint: disable=import-error
 
-from common import Debug, Internal
+from common import Debug, Internal, unicode
 from util import which, removeIfExists, uniqueList, elapsedSince
 from log import logWarning, m18n, logDebug, logException
 

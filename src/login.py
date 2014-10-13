@@ -37,7 +37,7 @@ from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 
 from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
-from common import Internal, Options, SingleshotOptions, Internal, Debug, isAlive, english
+from common import Internal, Options, SingleshotOptions, Internal, Debug, isAlive, english, unicode
 from game import Players
 from query import Query
 from statesaver import StateSaver

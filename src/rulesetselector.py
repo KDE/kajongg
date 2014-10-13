@@ -30,7 +30,7 @@ from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, \
 from util import uniqueList
 from log import m18n, m18nc
 from differ import RulesetDiffer
-from common import Debug, english
+from common import Debug, english, basestring, unicode
 from tree import TreeItem, RootItem, TreeModel
 from kde import KApplication
 from dialogs import Sorry

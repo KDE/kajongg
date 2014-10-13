@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from log import m18n, m18nc, logDebug
-from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug, WINDS
+from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug, WINDS, unicode
 from twisted.internet.defer import succeed
 
 from qt import Qt, QMetaObject

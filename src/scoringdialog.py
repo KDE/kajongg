@@ -42,7 +42,7 @@ from modeltest import ModelTest
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS
 from log import m18n, m18nc
-from common import WINDS, Internal, Debug
+from common import WINDS, Internal, Debug, unicode
 from statesaver import StateSaver
 from query import Query
 from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
