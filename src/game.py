@@ -786,7 +786,7 @@ class PlayingGame(Game):
         """write game summary to Options.csv"""
         if self.finished() and Options.csv:
             gameWinner = max(self.players, key=lambda x: x.balance)
-            writer = csv.writer(open(Options.csv, 'a'), delimiter=';')
+            writer = csv.writer(open(Options.csv, 'ab'), delimiter=';')
             if Debug.process and os.name != 'nt':
                 self.csvTags.append('MEM:%s' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             if Options.rounds:

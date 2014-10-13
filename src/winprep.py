@@ -117,7 +117,7 @@ for lang in languages:
             ('kdelibs', 'kdelibs4'), ('qt', 'kdeqt')):
         mo_data = check_output('svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kde4/{}/messages/{}/{}.po'.format(
             lang, directory, filename).split())
-        with open('x.po'.format(filename), 'w') as outfile:
+        with open('x.po'.format(filename), 'wb') as outfile:
             outfile.write(mo_data)
         call('msgfmt x.po -o {}/locale/{}/LC_MESSAGES/{}.mo'.format(DEST, lang, filename).split())
         os.remove('x.po')

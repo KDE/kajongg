@@ -286,7 +286,7 @@ class Job(StrMixin):
                 os.makedirs(logDir)
             logFileName = self.commitId
             self.logFileName = os.path.join(logDir, logFileName)
-            self.__logFile = open(self.logFileName, 'w', buffering=0)
+            self.__logFile = open(self.logFileName, 'wb', buffering=0)
         return self.__logFile
 
     def shortRulesetName(self):
@@ -336,13 +336,13 @@ def removeInvalidCommits(csvFile):
     """remove rows with invalid git commit ids"""
     if not os.path.exists(csvFile):
         return
-    rows = list(csv.reader(open(csvFile, 'r'), delimiter=';'))
+    rows = list(csv.reader(open(csvFile, 'rb'), delimiter=';'))
     _ = set(x[COMMITFIELD] for x in rows)
     csvCommits = set(x for x in _ if set(x) <= set('0123456789abcdef') and len(x) >= 7)
     nonExisting = set(csvCommits) - set(onlyExistingCommits(csvCommits))
     if nonExisting:
         print('removing rows from kajongg.csv for commits %s' % ','.join(nonExisting))
-        writer = csv.writer(open(csvFile, 'w'), delimiter=';')
+        writer = csv.writer(open(csvFile, 'wb'), delimiter=';')
         for row in rows:
             if row[COMMITFIELD] not in nonExisting:
                 writer.writerow(row)
@@ -361,7 +361,7 @@ def readGames(csvFile):
     """returns a dict holding a frozenset of games for each variant"""
     if not os.path.exists(csvFile):
         return
-    allRows = neutralize(csv.reader(open(csvFile, 'r'), delimiter=';'))
+    allRows = neutralize(csv.reader(open(csvFile, 'rb'), delimiter=';'))
     if not allRows:
         return
     # we want unique tuples so we can work with sets

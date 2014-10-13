@@ -317,19 +317,20 @@ class Voice(object):
             return
         md5sum = md5()
         for oggFile in ogg:
-            md5sum.update(open(os.path.join(self.directory, oggFile)).read())
+            md5sum.update(open(os.path.join(self.directory, oggFile), 'rb').read())
         # the md5 stamp goes into the old archive directory 'username'
         self.__md5sum = md5sum.hexdigest()
+#        print(self.directory, self.__md5sum)
         existingMd5sum = self.savedmd5Sum()
         md5Name = self.md5FileName()
-        if self.__md5sum != existingMd5sum:
+        if False: # TODO: warum ist das in python3 unterschiedlich? self.__md5sum != existingMd5sum:
             if Debug.sound:
                 if not os.path.exists(md5Name):
                     logDebug('creating new %s' % md5Name)
                 else:
                     logDebug('md5sum %s changed, rewriting %s with %s' % (existingMd5sum, md5Name, self.__md5sum))
             try:
-                open(md5Name, 'w').write('%s\n' % self.__md5sum)
+                open(md5Name, 'wb').write('%s\n' % self.__md5sum)
             except BaseException as exception:
                 logException(m18n('cannot write <filename>%1</filename>: %2', md5Name, str(exception)))
         if archiveExists:
@@ -357,7 +358,7 @@ class Voice(object):
     def savedmd5Sum(self):
         """returns the current value of the md5sum file"""
         if os.path.exists(self.md5FileName()):
-            return open(self.md5FileName(), 'r').readlines()[0].strip()
+            return open(self.md5FileName(), 'rb').readlines()[0].strip()
 
     @property
     def md5sum(self):
@@ -384,7 +385,7 @@ class Voice(object):
         """the content of the tarfile"""
         self.__buildArchive()
         if os.path.exists(self.archiveName()):
-            return open(self.archiveName()).read()
+            return open(self.archiveName(), 'rb').read()
 
     @archiveContent.setter
     def archiveContent(self, content):

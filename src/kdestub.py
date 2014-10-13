@@ -908,7 +908,7 @@ class KConfig(SafeConfigParser):
             path = KGlobal.dirs().locateLocal("config", "kajonggrc")
         self.path = str(path)
         if os.path.exists(self.path):
-            with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
+            with codecs.open(self.path, 'rb', encoding='utf-8') as cfgFile:
                 self.readfp(cfgFile)
 
     def as_dict(self):
@@ -935,16 +935,17 @@ class KConfig(SafeConfigParser):
             fileName = self.path
         with open(fileName, 'wb') as filePointer:
             for section in self._sections:
-                filePointer.write("[%s]\n" % section)
+                filePointer.write(("[%s]\n" % section).encode('utf-8'))
                 for (key, value) in self._sections[section].items():
-                    key = str(key)
-                    value = str(value)
+                    key = str(key).encode('utf-8')
+                    value = str(value).encode('utf-8')
                     if key == "__name__":
                         continue
                     if value is not None:
-                        key = "=".join((key, value.replace('\n', '\n\t')))
-                    filePointer.write('%s\n' % (key))
-                filePointer.write('\n')
+                        key = b"=".join((key, value.replace(b'\n', b'\n\t')))
+                    filePointer.write(key)
+                    filePointer.write(b'\n')
+                filePointer.write(b'\n')
 
     def group(self, groupName):
         """just like KConfig"""
@@ -1224,7 +1225,7 @@ class LicenseDialog(KDialog):
         self.setCaption(i18n("License Agreement"))
         self.setButtons(KDialog.Close)
         self.buttonBox.setFocus()
-        licenseText = open(KGlobal.aboutData.licenseFile()).read()
+        licenseText = open(KGlobal.aboutData.licenseFile(), 'rb').read()
         self.licenseBrowser = QTextBrowser()
         self.licenseBrowser.setLineWrapMode(QTextEdit.NoWrap)
         self.licenseBrowser.setText(licenseText)
