@@ -25,9 +25,40 @@
 
 import sip
 from qt import QObject, Qt, toQVariant, QAbstractItemModel, QModelIndex, \
-    QPersistentModelIndex
+    QPersistentModelIndex, QVariant
+
+from common import isPython3
 
 # pylint: skip-file
+
+def isValid(variant):
+    if isPython3:
+        return (variant is not None)
+    else:
+        return variant.isValid()
+
+def toInt(variant):
+    if isPython3:
+        return variant
+    else:
+        return variant.toInt()[0]
+
+def canConvert(variant, variantType):
+    """
+    Wrapper for Python3 where QVariant.canConvert() does not exist.
+
+    @param variant: Any of a lot of different Qt types, and str.
+    @param variantType: C{int}, represents C{PyQt4.QtCore.QVariant.X}
+                        where X is something like Font, Color etc.
+    """
+    if isPython3:
+        shortTypeName = variant.__class__.__name__.split('.')[-1][1:]
+        if shortTypeName not in QVariant.__dict__:
+            if isinstance(variant, str) and variantType == QVariant.String:
+                return True
+        return QVariant.__dict__[shortTypeName] == variantType
+    else:
+        return variant.canConvert(variantType)
 
 class ModelTest(QObject):
     """tests a model"""
@@ -135,7 +166,7 @@ class ModelTest(QObject):
 
         # check a column count where parent is valid
         childidx = self.model.index(0, 0, topidx)
-        if childidx.isValid() :
+        if childidx.isValid():
             assert(self.model.columnCount(childidx) >= 0)
 
         # columnCount() is tested more extensively in checkChildren,
@@ -235,56 +266,59 @@ class ModelTest(QObject):
         Tests self.model's implementation of QAbstractItemModel::data()
         """
         # Invalid index should return an invalid qvariant
-        assert( not self.model.data(QModelIndex(), Qt.DisplayRole).isValid())
+        assert not isValid(self.model.data(QModelIndex(), Qt.DisplayRole))
 
         if self.model.rowCount(QModelIndex()) == 0:
             return
 
         # A valid index should have a valid QVariant data
-        assert( self.model.index(0, 0, QModelIndex()).isValid())
+        assert isValid(self.model.index(0, 0, QModelIndex()))
 
         # shouldn't be able to set data on an invalid index
         assert( self.model.setData( QModelIndex(), toQVariant("foo"), Qt.DisplayRole) == False)
 
         # General Purpose roles that should return a QString
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.ToolTipRole)
-        if variant.isValid():
-            assert( variant.canConvert( QVariant.String ) )
+        if isValid(variant):
+            assert canConvert(variant, QVariant.String)
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.StatusTipRole)
-        if variant.isValid():
-            assert( variant.canConvert( QVariant.String ) )
+        if isValid(variant):
+            assert canConvert(variant, QVariant.String)
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.WhatsThisRole)
-        if variant.isValid():
-            assert( variant.canConvert( QVariant.String ) )
+        if isValid(variant):
+            assert canConvert(variant, QVariant.String)
 
         # General Purpose roles that should return a QSize
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.SizeHintRole)
-        if variant.isValid():
-            assert( variant.canConvert( QVariant.Size ) )
-
+        if isValid(variant):
+            assert canConvert(variant, QVariant.Size)
         # General Purpose roles that should return a QFont
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.FontRole)
-        if variant.isValid():
-            assert( variant.canConvert( QVariant.Font ) )
+        if isValid(variant):
+            assert canConvert(variant, QVariant.Font)
 
         # Check that the alignment is one we know about
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.TextAlignmentRole)
-        if variant.isValid():
-            alignment = variant.toInt()[0]
+        if isValid(variant):
+            alignment = toInt(variant)
             assert( alignment == (alignment & int(Qt.AlignHorizontal_Mask | Qt.AlignVertical_Mask)))
 
         # General Purpose roles that should return a QColor
+        variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.ForegroundRole)
+        if isValid(variant):
+            print('found foregroundrole', variant)
+            assert canConvert(variant, QVariant.Color)
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.BackgroundColorRole)
-        if variant.isValid():
-            assert( variant.canConvert( QVariant.Color ) )
+        if isValid(variant):
+            assert canConvert(variant, QVariant.Color)
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.TextColorRole)
-        if variant.isValid():
-            assert( variant.canConvert( QVariant.Color ) )
+        if isValid(variant):
+            assert canConvert(variant, QVariant.Color)
 
         # Check that the "check state" is one we know about.
         variant = self.model.data(self.model.index(0, 0, QModelIndex()), Qt.CheckStateRole)
-        if variant.isValid():
-            state = variant.toInt()[0]
+        if isValid(variant):
+            state = toInt(variant)
             assert( state == Qt.Unchecked or
                 state == Qt.PartiallyChecked or
                 state == Qt.Checked )
@@ -438,7 +472,7 @@ class ModelTest(QObject):
                 assert( index.column() == column )
                 # While you can technically return a QVariant usually this is a sign
                 # if an bug in data() Disable if this really is ok in your self.model
-                assert( self.model.data(index, Qt.DisplayRole).isValid() == True )
+                assert isValid(self.model.data(index, Qt.DisplayRole))
 
                 #if the next test fails here is some somewhat useful debug you play with
                 # if self.model.parent(index) != parent:
