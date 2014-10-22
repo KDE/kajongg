@@ -410,28 +410,17 @@ class Game(object):
         return self.belongsToRobotPlayer() or self.belongsToHumanPlayer()
 
     def assignPlayers(self, playerNames):
-        """the server tells us the seating order and player names"""
-        pairs = []
-        for idx, pair in enumerate(playerNames):
-            if isinstance(pair, basestring):
-                wind, name = WINDS[idx], pair
-            else:
-                wind, name = pair
-            pairs.append((wind, name))
+        """
+        The server tells us the seating order and player names.
 
+        @param playerNames: A list of 4 tuples. Each tuple holds wind and name.
+        @type playerNames: The tuple contents must be C{unicode}
+        @todo: Can we pass L{Players} instead of that tuple list?
+        """
         if not self.players:
-            for _ in range(4):
-                self.players.append(self.playerClass(self))
-            for idx, pair in enumerate(pairs):
-                wind, name = pair
-                player = self.players[idx]
-                Players.createIfUnknown(name)
-                player.wind = wind
-                player.name = name
-        else:
-            for idx, pair in enumerate(playerNames):
-                wind, name = pair
-                self.players.byName(name).wind = wind
+            self.players = Players(self.playerClass(self, playerNames[x][1]) for x in range(4))
+        for wind, name in playerNames:
+            self.players.byName(name).wind = wind
         if self.client and self.client.name:
             self.myself = self.players.byName(self.client.name)
         self.sortPlayers()
@@ -616,45 +605,60 @@ class Game(object):
             withGamePrefix=False, btIndent=btIndent)
 
     @staticmethod
-    def __getNames(record):
-        """get name ids from record
-        and return the names"""
-        names = []
-        for idx in range(4):
-            nameid = record[idx]
-            try:
-                name = Players.allNames[nameid]
-            except KeyError:
-                name = m18n('Player %1 not known', nameid)
-            names.append(name)
-        return names
+    def __getName(playerid):
+        """get name for playerid
+        """
+        try:
+            return Players.allNames[playerid]
+        except KeyError:
+            return m18n('Player %1 not known', playerid)
 
     @classmethod
     def loadFromDB(cls, gameid, client=None):
         """load game by game id and return a new Game instance"""
         Internal.logPrefix = 'S' if Internal.isServer else 'C'
-        qGame = Query("select p0,p1,p2,p3,ruleset,seed from game where id = ?", (gameid,))
-        if not qGame.records:
+        qGameRecords = Query("select p0,p1,p2,p3,ruleset,seed from game where id = ?", (gameid,)).records
+        if not qGameRecords:
             return None
-        rulesetId = qGame.records[0][4] or 1
+        qGameRecord = qGameRecords[0]
+        rulesetId = qGameRecord[4] or 1
         ruleset = Ruleset.cached(rulesetId)
         Players.load() # we want to make sure we have the current definitions
-        game = cls(Game.__getNames(qGame.records[0]), ruleset, gameid=gameid,
-                client=client, wantedGame=qGame.records[0][5])
-        qLastHand = Query("select hand,rotated from score where game=? and hand="
-            "(select max(hand) from score where game=?)", (gameid, gameid))
-        if qLastHand.records:
-            (game.handctr, game.rotated) = qLastHand.records[0]
+        qLastHandRecords = Query("select hand,rotated from score where game=? and hand="
+            "(select max(hand) from score where game=?)", (gameid, gameid)).records
+        if qLastHandRecords:
+            qLastHandRecord = qLastHandRecords[0]
+        else:
+            qLastHandRecord = tuple([0,0])
+        qScoreRecords = Query("select player, wind, balance, won, prevailing from score "
+            "where game=? and hand=?", (gameid, qLastHandRecord[0])).records
+        if not qScoreRecords:
+            # this should normally not happen
+            qScoreRecords = tuple([
+                    tuple([qGameRecord[x], WINDS[x], 0, False, 'E']) for x in range(4)
+                   ])
+        if len(qScoreRecords) != 4:
+            logError(u'game %d inconsistent: There should be exactly '
+                    '4 score records for the last hand' % gameid)
 
-        qScores = Query("select player, wind, balance, won, prevailing from score "
-            "where game=? and hand=?", (gameid, game.handctr))
+        # after loading SQL, prepare values.
+
         # default value. If the server saved a score entry but our client did not,
         # we get no record here. Should we try to fix this or exclude such a game from
         # the list of resumable games?
-        prevailing = 'E'
-        for record in qScores.records:
+        if len(set(x[4] for x in qScoreRecords)) != 1:
+            logError(u'game %d inconsistent: All score records for the same '
+                'hand must have the same prevailing wind' % gameid)
+        prevailing = qScoreRecords[0][4]
+
+        players = list(tuple([x[1], Game.__getName(x[0])]) for x in qScoreRecords)
+
+        # create the game instance.
+        game = cls(players, ruleset, gameid=gameid, client=client, wantedGame=qGameRecord[5])
+        game.handctr, game.rotated = qLastHandRecord
+
+        for record in qScoreRecords:
             playerid = record[0]
-            wind = str(record[1])
             player = game.players.byId(playerid)
             if not player:
                 logError(
@@ -662,10 +666,8 @@ class Game(object):
                     (gameid, playerid))
             else:
                 player.getsPayment(record[2])
-                player.wind = wind
             if record[3]:
                 game.winner = player
-            prevailing = record[4]
         game.roundsFinished = WINDS.index(prevailing)
         game.handctr += 1
         game.notRotated += 1

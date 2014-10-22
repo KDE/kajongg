@@ -23,6 +23,7 @@ from __future__ import print_function
 
 from common import Debug, isPython3  # pylint: disable=unused-import
 import unittest
+from player import Players
 from game import PlayingGame
 from hand import Hand, Score
 from tile import TileList
@@ -39,8 +40,11 @@ for testRuleset in [ClassicalChineseDMJL, ClassicalChineseBMJA] * 2:
 for _ in RULESETS[2:]:
     _.roofOff = True
 
+# Do not create our test players in the data base:
+Players.createIfUnknown = str
+
 #RULESETS=RULESETS[:1]
-GAMES = list([PlayingGame([], x) for x in RULESETS])
+GAMES = list([PlayingGame(list(tuple([wind, wind]) for wind in WINDS), x) for x in RULESETS])
 PROGRAM = None
 
 class Expected(object):

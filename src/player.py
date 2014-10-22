@@ -97,13 +97,24 @@ class Players(list):
         return list(self.byName(x).localName if x in known else x for x in names)
 
 class Player(object):
-    """all player related attributes without GUI stuff.
+    """
+    all player related attributes without GUI stuff.
     concealedTiles: used during the hand for all concealed tiles, ungrouped.
     concealedMelds: is empty during the hand, will be valid after end of hand,
-    containing the concealed melds as the player presents them."""
+    containing the concealed melds as the player presents them.
+
+    @todo: Now that Player() always calls createIfUnknown, test defining new
+    players and adding new players to server
+    """
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
 
-    def __init__(self, game):
+    def __init__(self, game, name):
+        """
+        Initialize a player for a give game.
+
+        @type game: L{Game} or None.
+        @param game: The game this player is part of. May be None.
+        """
         if game:
             self._game = weakref.ref(game)
         else:
@@ -112,6 +123,8 @@ class Player(object):
         self.__payment = 0
         self.wonCount = 0
         self.__name = ''
+        Players.createIfUnknown(name)
+        self.name = name
         self.wind = WINDS[0]
         self.intelligence = AIDefault(self)
         self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
@@ -421,9 +434,9 @@ class PlayingPlayer(Player):
     """a player in a computer game as opposed to a ScoringPlayer"""
     # pylint: disable=too-many-public-methods
     # too many public methods
-    def __init__(self, game):
+    def __init__(self, game, name):
         self.sayable = {}               # recompute for each move, use as cache
-        Player.__init__(self, game)
+        Player.__init__(self, game, name)
 
     def popupMsg(self, msg):
         """virtual: show popup on display"""

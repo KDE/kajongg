@@ -69,10 +69,10 @@ class VisiblePlayer(Player):
 class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
     """this player instance has a visual representation"""
     # pylint: disable=too-many-public-methods
-    def __init__(self, game):
+    def __init__(self, game, name):
         assert game
         self.handBoard = None # because Player.init calls clearHand()
-        PlayingPlayer.__init__(self, game)
+        PlayingPlayer.__init__(self, game, name)
         VisiblePlayer.__init__(self)
         self.handBoard = PlayingHandBoard(self)
         self.voice = None

@@ -334,8 +334,7 @@ class Client(object, pb.Referenceable):
         if self.game:
             player = self.game.playerByName(playerName)
         elif playerName:
-            player = PlayingPlayer(None)
-            player.name = playerName
+            player = PlayingPlayer(None, playerName)
         else:
             player = None
         move = Move(player, command, kwargs)

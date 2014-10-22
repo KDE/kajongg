@@ -292,10 +292,10 @@ class ScoringHandBoard(HandBoard):
 class ScoringPlayer(VisiblePlayer, Player):
     """Player in a scoring game"""
     # pylint: disable=too-many-public-methods
-    def __init__(self, game):
+    def __init__(self, game, name):
         self.handBoard = None # because Player.init calls clearHand()
         self.manualRuleBoxes = []
-        Player.__init__(self, game)
+        Player.__init__(self, game, name)
         VisiblePlayer.__init__(self)
         self.handBoard = ScoringHandBoard(self)
 
@@ -557,4 +557,4 @@ def scoreGame():
         selectDialog = SelectPlayers()
         if not selectDialog.exec_():
             return
-        return ScoringGame(selectDialog.names, selectDialog.cbRuleset.current)
+        return ScoringGame(list(zip(WINDS, selectDialog.names)), selectDialog.cbRuleset.current)
