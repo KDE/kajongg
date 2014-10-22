@@ -114,7 +114,7 @@ class Debug(object):
         options = list(x for x in Debug.__dict__ if not x.startswith('_'))
         boolOptions = sorted(x for x in options if isinstance(Debug.__dict__[x], bool))
         stringOptions = sorted(x for x in options if isinstance(Debug.__dict__[x], basestring))
-        stringExample = '%s=%s' % (stringOptions[0], 's3s4')
+        stringExample = '%s:%s' % (stringOptions[0], 's3s4')
         allOptions = sorted(boolOptions + stringOptions)
         opt = '\n'.join(', '.join(optYielder(allOptions)).split(' SEPARATOR, '))
         return """set debug options. Pass a comma separated list of options.
