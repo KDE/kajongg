@@ -266,10 +266,11 @@ class MainWindow(KXmlGuiWindow):
 
     def scoringScene(self):
         """start a scoring scene"""
-        self.scene = ScoringScene(self)
+        scene = ScoringScene(self)
         game = scoreGame()
         if game:
-            self.scene.game = game
+            self.scene = scene
+            scene.game = game
             self.applySettings()
             game.throwDices()
             self.updateGUI()
