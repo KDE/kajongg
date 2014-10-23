@@ -912,9 +912,9 @@ class ThirteenOrphans(RuleCode):
     def computeLastMelds(hand):
         meldSize = hand.tilesInHand.count(hand.lastTile)
         if meldSize == 0:
-            hand.debug('13Orphans: lastTile {} is not inHand {}'.format(hand.lastTile, hand.tilesInHand))
+            # the last tile is called and not yet in the hand
             return [Meld()]
-        return [hand.lastTile.meld(meldSize)] # TODO: warum kann meldSize 0 sein?
+        return [hand.lastTile.meld(meldSize)]
 
     def rearrange(hand, rest):
         melds = []
