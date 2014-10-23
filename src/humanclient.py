@@ -685,9 +685,6 @@ class HumanClient(Client):
             logWarning(m18n(message, *args))
             if self.game:
                 self.game.close()
-                if self.game.autoPlay:
-                    if Internal.scene:
-                        Internal.scene.close()
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
