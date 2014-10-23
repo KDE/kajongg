@@ -28,9 +28,9 @@ from collections import defaultdict
 import sqlite3
 
 from kde import appdataDir
-from util import xToUtf8, Duration
+from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug, m18ncE, m18n
-from common import IntDict, Options, Internal, Debug
+from common import IntDict, Options, Internal, Debug, nativeStringArgs
 
 class QueryException(Exception):
     """as the name says"""
@@ -88,8 +88,8 @@ class DBCursor(sqlite3.Cursor):
     def __str__(self):
         """the statement"""
         if self.parameters is not None:
-            _, utf8Args = xToUtf8(u'', self.parameters)
-            return "{cmd} [{args}]".format(cmd=self.statement, args=", ".join(utf8Args))
+            native = nativeStringArgs(self.parameters)
+            return "{cmd} [{args}]".format(cmd=self.statement, args=native)
         else:
             return self.statement
 
