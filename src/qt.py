@@ -34,7 +34,9 @@ if '--qt5' in sys.argv:
         usingQt5 = True
         usingQt4 = False
     except ImportError as exc:
-        Internal.logger.debug('Cannot import Qt5:{}, using Qt4 instead'.format(exc.message))
+        Internal.logger.debug('{who}: Cannot import Qt5:{msg}, using Qt4 instead'.format(
+            who='Server' if Internal.isServer else 'Client',
+            msg=exc.message))
         from qt4 import *
 else:
     from qt4 import *
