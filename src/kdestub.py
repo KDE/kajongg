@@ -628,7 +628,7 @@ class KStandardDirs(object):
             KStandardDirs._baseDirs = defaultdict(list)
             KStandardDirs._baseDirs.update({
                 'data': ['share/kde4/apps'],
-                'locale': ['share/locale'],
+                'locale': ['local/share/locale', 'share/locale-kdelibs4', 'share/locale'],
                 'appdata': ['share/kde4/apps/kajongg'],
                 'icon': ['share/icons'],
                 })
