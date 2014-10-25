@@ -359,7 +359,7 @@ class TableList(QWidget):
         if Debug.table:
             for table in tables:
                 if table.gameid and not table.gameExistsLocally():
-                    logDebug('Table %s does not exist locally' % table)
+                    logDebug(u'Table %s does not exist locally' % table)
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
         tables.sort(key=lambda x: x.tableid)
         preselectTableId = self.__preselectTableId(tables)

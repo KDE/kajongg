@@ -82,7 +82,7 @@ class SelectPlayers(SelectRuleset):
                         if playerIdx >= 0:
                             cbName.setCurrentIndex(playerIdx)
                     except KeyError:
-                        logError('database is inconsistent: player with id %d is in game but not in player' \
+                        logError(u'database is inconsistent: player with id %d is in game but not in player' \
                                 % playerId)
         self.slotValidate()
 
@@ -433,9 +433,9 @@ class ScoringPlayer(VisiblePlayer, Player):
                         melds.pop(idx)
                         popped = True
             if not popped:
-                logDebug('%s: %s.removeMeld did not find %s' % (self.name, self.__class__.__name__, meld), showStack=3)
-                logDebug('    concealed: %s' % self._concealedMelds)
-                logDebug('      exposed: %s' % self._exposedMelds)
+                logDebug(u'%s: %s.removeMeld did not find %s' % (self.name, self.__class__.__name__, meld), showStack=3)
+                logDebug(u'    concealed: %s' % self._concealedMelds)
+                logDebug(u'      exposed: %s' % self._exposedMelds)
         self._hand = None
 
 class ScoringGame(Game):

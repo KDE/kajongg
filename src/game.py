@@ -30,7 +30,7 @@ from functools import total_ordering
 from twisted.internet.defer import succeed
 from util import stack, gitHead
 from log import logError, logWarning, logException, logDebug, m18n
-from common import WINDS, Internal, IntDict, Debug, Options
+from common import WINDS, Internal, IntDict, Debug, Options, unicodeString
 from query import Query
 from rule import Ruleset
 from tile import Tile, elements
@@ -144,21 +144,21 @@ class HandId(object):
         ruleset = self.game.ruleset
         self.roundsFinished = WINDS.index(handId[0])
         if self.roundsFinished > ruleset.minRounds:
-            logWarning('Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
+            logWarning(u'Ruleset %s has %d minimum rounds but you want round %d(%s)' % (
                 ruleset.name, ruleset.minRounds, self.roundsFinished + 1, handId[0]))
             self.roundsFinished = ruleset.minRounds
             return
         self.rotated = int(handId[1]) - 1
         if self.rotated > 3:
-            logWarning('You want %d rotations, reducing to maximum of 3' % self.rotated)
+            logWarning(u'You want %d rotations, reducing to maximum of 3' % self.rotated)
             self.rotated = 3
             return
         for char in handId[2:]:
             if char < 'a':
-                logWarning('you want %s, changed to a' % char)
+                logWarning(u'you want %s, changed to a' % char)
                 char = 'a'
             if char > 'z':
-                logWarning('you want %s, changed to z' % char)
+                logWarning(u'you want %s, changed to z' % char)
                 char = 'z'
             self.notRotated = self.notRotated * 26 + ord(char) - ord('a') + 1
 
@@ -595,18 +595,32 @@ class Game(object):
                 self.__exchangeSeats()
 
     def debug(self, msg, btIndent=None, prevHandId=False):
-        """prepend game id"""
+        """
+        Log a debug message.
+
+        @param msg: The message.
+        @type msg: A string.
+        @param btIndent: If given, message is indented by depth(backtrace)-btIndent
+        @type btIndent: C{int}
+        @param prevHandId: If True, do not use current handId but previous
+        @type prevHandId: C{bool}
+        """
         if self.belongsToRobotPlayer():
-            prefix = 'R'
+            prefix = u'R'
         elif self.belongsToHumanPlayer():
-            prefix = 'C'
+            prefix = u'C'
         elif self.belongsToGameServer():
-            prefix = 'S'
+            prefix = u'S'
         else:
             logDebug(msg, btIndent=btIndent)
             return
-        logDebug('%s%s: %s' % (prefix, self._prevHandId if prevHandId else self.handId.prompt(withMoveCount=True), msg),
-            withGamePrefix=False, btIndent=btIndent)
+        handId = unicodeString(self._prevHandId if prevHandId else
+                        self.handId.prompt(withMoveCount=True))
+        msg = unicodeString(msg)
+        logDebug(
+            u'%s%s: %s' % ( prefix, handId, msg),
+            withGamePrefix=False,
+            btIndent=btIndent)
 
     @staticmethod
     def __getName(playerid):
@@ -666,7 +680,7 @@ class Game(object):
             player = game.players.byId(playerid)
             if not player:
                 logError(
-                'game %d inconsistent: player %d missing in game table' % \
+                    u'game %d inconsistent: player %d missing in game table' % \
                     (gameid, playerid))
             else:
                 player.getsPayment(record[2])
@@ -777,10 +791,10 @@ class PlayingGame(Game):
             myself.voice = Voice.locate(myself.name)
             if myself.voice:
                 if Debug.sound:
-                    logDebug('myself %s gets voice %s' % (myself.name, myself.voice))
+                    logDebug(u'myself %s gets voice %s' % (myself.name, myself.voice))
             else:
                 if Debug.sound:
-                    logDebug('myself %s gets no voice'% (myself.name))
+                    logDebug(u'myself %s gets no voice'% (myself.name))
 
     def writeCsv(self):
         """write game summary to Options.csv"""
@@ -953,12 +967,12 @@ class PlayingGame(Game):
             if player.voice and player.voice.oggFiles():
                 # remote human player sent her voice, or we are human and have a voice
                 if Debug.sound and player != self.myself:
-                    logDebug('%s got voice from opponent: %s' % (player.name, player.voice))
+                    logDebug(u'%s got voice from opponent: %s' % (player.name, player.voice))
             else:
                 player.voice = Voice.locate(player.name)
                 if player.voice:
                     if Debug.sound:
-                        logDebug('%s has own local voice %s' % (player.name, player.voice))
+                        logDebug(u'%s has own local voice %s' % (player.name, player.voice))
             if player.voice:
                 for voice in Voice.availableVoices():
                     if voice in available and voice.md5sum == player.voice.md5sum:
@@ -973,7 +987,7 @@ class PlayingGame(Game):
             if player.voice is None and predefined:
                 player.voice = predefined.pop(0)
                 if Debug.sound:
-                    logDebug('%s gets one of the still available voices %s' % (player.name, player.voice))
+                    logDebug(u'%s gets one of the still available voices %s' % (player.name, player.voice))
 
     def dangerousFor(self, forPlayer, tile):
         """returns a list of explaining texts if discarding tile

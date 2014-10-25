@@ -66,7 +66,7 @@ class DBCursor(sqlite3.Cursor):
                             sqlite3.Cursor.execute(self, statement)
                     break
                 except sqlite3.OperationalError as exc:
-                    logDebug('{} failed after {} tries:{}'.format(self, _, exc.message))
+                    logDebug(u'{} failed after {} tries:{}'.format(self, _, exc.message))
                     time.sleep(1)
                 else:
                     break
@@ -75,7 +75,7 @@ class DBCursor(sqlite3.Cursor):
             self.failure = None
         except sqlite3.Error as exc:
             self.failure = exc
-            msg = 'ERROR in %s: %s for %s' % (self.connection.path, exc.message, self)
+            msg = u'ERROR in %s: %s for %s' % (self.connection.path, exc.message, self)
             if mayFail:
                 if not failSilent:
                     logDebug(msg)
@@ -112,19 +112,19 @@ class DBHandle(sqlite3.Connection):
             cursor.execute('select ident from general')
             self.identifier = cursor.fetchone()[0]
         if Debug.sql:
-            logDebug('Opened %s with identifier %s' % (
+            logDebug(u'Opened %s with identifier %s' % (
                 self.path, self.identifier))
 
     def __enter__(self):
         self.inTransaction = datetime.datetime.now()
         if Debug.sql:
-            logDebug('starting transaction')
+            logDebug(u'starting transaction')
         return sqlite3.Connection.__enter__(self)
     def __exit__(self, *args):
         self.inTransaction = None
         sqlite3.Connection.__exit__(self, *args)
         if Debug.sql:
-            logDebug('finished transaction')
+            logDebug(u'finished transaction')
 
     @staticmethod
     def dbPath():
@@ -147,24 +147,24 @@ class DBHandle(sqlite3.Connection):
             sqlite3.Connection.commit(self)
         except sqlite3.Error as exc:
             if not silent:
-                logWarning('%s cannot commit: %s :' % (self.name, exc.message))
+                logWarning(u'%s cannot commit: %s :' % (self.name, exc.message))
 
     def rollback(self, silent=None):
         """rollback and log it"""
         try:
             sqlite3.Connection.rollback(self)
             if not silent and Debug.sql:
-                logDebug('%x rollbacked transaction' % id(self))
+                logDebug(u'%x rollbacked transaction' % id(self))
         except sqlite3.Error as exc:
-            logWarning('%s cannot rollback: %s' % (self.name, exc.message))
+            logWarning(u'%s cannot rollback: %s' % (self.name, exc.message))
 
     def close(self, silent=False):
         """just for logging"""
         if not silent and (Debug.sql or Debug.quit):
             if self is Internal.db:
-                logDebug('Closing Internal.db: %s' % self.path)
+                logDebug(u'Closing Internal.db: %s' % self.path)
             else:
-                logDebug('Closing DBHandle %s: %s' % (self, self.path))
+                logDebug(u'Closing DBHandle %s: %s' % (self, self.path))
         if self is Internal.db:
             Internal.db = None
         try:
@@ -220,7 +220,7 @@ class Query(object):
             self.failure = None
             self.records = list()
         if self.records and Debug.sql:
-            logDebug('result set:{}'.format(self.records))
+            logDebug(u'result set:{}'.format(self.records))
 
     def __str__(self):
         return '{} {}'.format(self.statement,
@@ -548,4 +548,4 @@ class PrepareDB(object):
             dbIdent = str(random.randrange(100000000000))
             Query("INSERT INTO general(ident) values(?)", (dbIdent,))
             if Debug.sql:
-                logDebug('generated new dbIdent %s for %s' % (dbIdent, Internal.db.path))
+                logDebug(u'generated new dbIdent %s for %s' % (dbIdent, Internal.db.path))

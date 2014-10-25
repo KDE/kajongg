@@ -58,7 +58,7 @@ class FocusRect(QGraphicsRectItem):
     def board(self, value):
         """assign and show/hide as needed"""
         if value and not isAlive(value):
-            logDebug('assigning focusRect to a non-alive board %s/%s' % (type(value), value))
+            logDebug(u'assigning focusRect to a non-alive board %s/%s' % (type(value), value))
             return
         if value:
             self._board = value
@@ -458,7 +458,7 @@ class ScoringScene(GameScene):
                 self.game = None
             return result
         if Debug.quit:
-            logDebug('ScoringScene.abort invoked')
+            logDebug(u'ScoringScene.abort invoked')
         if not self.game:
             return succeed(True)
         elif self.game.finished():

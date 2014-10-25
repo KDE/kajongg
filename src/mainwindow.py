@@ -88,12 +88,12 @@ def cleanExit(*dummyArgs):
     """close sqlite3 files before quitting"""
     if isAlive(Internal.mainWindow):
         if Debug.quit:
-            logDebug('cleanExit calling mainWindow.close')
+            logDebug(u'cleanExit calling mainWindow.close')
         Internal.mainWindow.close()
     else:
         # this must be very early or very late
         if Debug.quit:
-            logDebug('cleanExit calling sys.exit(0)')
+            logDebug(u'cleanExit calling sys.exit(0)')
         #sys.exit(0)
         MainWindow.aboutToQuit()
 
@@ -324,9 +324,9 @@ class MainWindow(KXmlGuiWindow):
             self.exitConfirmed = bool(result)
             if Debug.quit:
                 if self.exitConfirmed:
-                    logDebug('mainWindow.queryClose confirmed')
+                    logDebug(u'mainWindow.queryClose confirmed')
                 else:
-                    logDebug('mainWindow.queryClose not confirmed')
+                    logDebug(u'mainWindow.queryClose not confirmed')
             # start closing again. This time no question will appear, the game is already aborted
             if self.exitConfirmed:
                 assert isAlive(self)
@@ -336,7 +336,7 @@ class MainWindow(KXmlGuiWindow):
         def cancelled(result):
             """just do nothing"""
             if Debug.quit:
-                logDebug('mainWindow.queryClose.cancelled: {}'.format(result))
+                logDebug(u'mainWindow.queryClose.cancelled: {}'.format(result))
             self.exitConfirmed = None
         if self.exitConfirmed is False:
             # user is currently being asked
@@ -348,14 +348,14 @@ class MainWindow(KXmlGuiWindow):
             else:
                 self.exitConfirmed = True
                 if Debug.quit:
-                    logDebug('MainWindow.queryClose not asking, exitConfirmed=True')
+                    logDebug(u'MainWindow.queryClose not asking, exitConfirmed=True')
         return True
 
     def queryExit(self):
         """see queryClose"""
         if self.exitReady:
             if Debug.quit:
-                logDebug('MainWindow.queryExit returns True because exitReady is set')
+                logDebug(u'MainWindow.queryExit returns True because exitReady is set')
             return True
         if self.exitConfirmed:
             # now we can get serious
@@ -369,21 +369,21 @@ class MainWindow(KXmlGuiWindow):
             if Internal.reactor and Internal.reactor.running:
                 self.exitWaitTime += 10
                 if self.exitWaitTime % 1000 == 0:
-                    logDebug('waiting since %d seconds for reactor to stop' % (self.exitWaitTime // 1000))
+                    logDebug(u'waiting since %d seconds for reactor to stop' % (self.exitWaitTime // 1000))
                 try:
                     if Debug.quit:
-                        logDebug('now stopping reactor')
+                        logDebug(u'now stopping reactor')
                     Internal.reactor.stop()
                     assert isAlive(self)
                     QTimer.singleShot(10, self.close)
                 except ReactorNotRunning:
                     self.exitReady = True
                     if Debug.quit:
-                        logDebug('MainWindow.queryExit returns True: It got exception ReactorNotRunning')
+                        logDebug(u'MainWindow.queryExit returns True: It got exception ReactorNotRunning')
             else:
                 self.exitReady = True
                 if Debug.quit:
-                    logDebug('MainWindow.queryExit returns True: Reactor is not running')
+                    logDebug(u'MainWindow.queryExit returns True: Reactor is not running')
         return bool(self.exitReady)
 
     @staticmethod
@@ -393,12 +393,12 @@ class MainWindow(KXmlGuiWindow):
         Internal.mainWindow = None
         if mainWindow:
             if Debug.quit:
-                logDebug('aboutToQuit starting')
+                logDebug(u'aboutToQuit starting')
             if mainWindow.exitWaitTime > 1000.0 or Debug.quit:
-                logDebug('reactor stopped after %d ms' % (mainWindow.exitWaitTime ))
+                logDebug(u'reactor stopped after %d ms' % (mainWindow.exitWaitTime ))
         else:
             if Debug.quit:
-                logDebug('aboutToQuit: mainWindow is already None')
+                logDebug(u'aboutToQuit: mainWindow is already None')
         StateSaver.saveAll()
         Internal.app.quit()
         try:
@@ -413,7 +413,7 @@ class MainWindow(KXmlGuiWindow):
     def abortAction(self):
         """abort current game"""
         if Debug.quit:
-            logDebug('mainWindow.abortAction invoked')
+            logDebug(u'mainWindow.abortAction invoked')
         return self.scene.abort()
 
     def retranslateUi(self):

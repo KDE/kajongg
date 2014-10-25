@@ -86,7 +86,7 @@ class Url(unicode):
             reactor.runReturn(installSignalHandlers=False)
             Internal.reactor = reactor
             if Debug.quit:
-                logDebug('Installed qt4reactor')
+                logDebug(u'Installed qt4reactor')
         return obj
 
     def __repr__(self):
@@ -140,7 +140,7 @@ class Url(unicode):
                 if waiting == 0:
                     self.__startLocalServer()
                 elif waiting > 30:
-                    logDebug('Game %s: Server %s not available after 30 seconds, aborting' % (
+                    logDebug(u'Game %s: Server %s not available after 30 seconds, aborting' % (
                         SingleshotOptions.game, self))
                     raise CancelledError
                 return deferLater(Internal.reactor, 1, self.startServer, result, waiting+1)
@@ -340,6 +340,7 @@ class LoginDlg(QDialog):
 
     def userChanged(self, text):
         """the username has been changed, lookup password"""
+        text = unicode(text)
         if text == u'':
             self.edPassword.clear()
             return
@@ -593,14 +594,15 @@ class Connection(object):
         elif failure.check(ConnectError):
             msg = m18n('Login to server %1 failed: You have no network connection', self.url)
         else:
-            msg = 'Login to server {} failed: {}/{} Callstack:{}'.format(
+            tb = unicodeString(failure.getTraceback())
+            msg = u'Login to server {} failed: {}/{} Callstack:{}'.format(
                 self.url, failure.value.__class__.__name__, failure.getErrorMessage(),
-                failure.getTraceback())
+                tb)
         # Maybe the server is running but something is wrong with it
         if self.url.useSocket:
             if removeIfExists(socketName()):
                 logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
-            msg += '\n\n\n' + m18n('Please try again')
+            msg += u'\n\n\n' + m18n('Please try again')
         self.dlg = None
         if msg:
             logWarning(msg)

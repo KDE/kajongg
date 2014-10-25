@@ -232,8 +232,8 @@ class RuleList(list):
                 assert parts1[0] == 'Ohand', definition
                 ruleClassName = parts1[1] + 'Rule'
                 if ruleClassName not in RuleBase.ruleClasses:
-                    logDebug('we want %s, definition:%s' % (ruleClassName, definition))
-                    logDebug('we have %s' % RuleBase.ruleClasses.keys())
+                    logDebug(u'we want %s, definition:%s' % (ruleClassName, definition))
+                    logDebug(u'we have %s' % RuleBase.ruleClasses.keys())
                 ruleType.limitHand = RuleBase.ruleClasses[ruleClassName]
         self.add(rule)
 

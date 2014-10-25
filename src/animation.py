@@ -44,16 +44,16 @@ class Animation(QPropertyAnimation):
         if uiTile.tile in Debug.animation:
             oldAnimation = uiTile.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
-                logDebug('new animation %s (after %s is done)' % (self, oldAnimation.ident()))
+                logDebug(u'new animation %s (after %s is done)' % (self, oldAnimation.ident()))
             else:
-                logDebug('new animation %s' % self)
+                logDebug(u'new animation %s' % self)
 
     def setEndValue(self, endValue):
         """wrapper with debugging code"""
         uiTile = self.targetObject()
         if uiTile.tile in Debug.animation:
             pName = self.pName()
-            logDebug('%s: change endValue for %s: %s->%s  %s' % (self.ident(), pName, self.formatValue(self.endValue()),
+            logDebug(u'%s: change endValue for %s: %s->%s  %s' % (self.ident(), pName, self.formatValue(self.endValue()),
                     self.formatValue(endValue), uiTile))
         QPropertyAnimation.setEndValue(self, endValue)
 
@@ -122,7 +122,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         self.debug = False
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
-                logDebug('Chaining Animation group %d to %d' % \
+                logDebug(u'Chaining Animation group %d to %d' % \
                         (id(self), id(ParallelAnimationGroup.current)))
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
         else:
@@ -168,7 +168,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         scene.focusRect.hide()
         QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)
         if self.debug:
-            logDebug('Animation group %d started (%s)' % (
+            logDebug(u'Animation group %d started (%s)' % (
                     id(self), ','.join('A%d' % (id(x) % 10000) for x in self.animations)))
         return succeed(None)
 
@@ -181,12 +181,12 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if Debug.animationSpeed and self.duration():
             perSecond = self.steps * 1000.0 / self.duration()
             if perSecond < 50:
-                logDebug('%d steps for %d animations, %.1f/sec' % \
+                logDebug(u'%d steps for %d animations, %.1f/sec' % \
                 (self.steps, len(self.children()), perSecond))
         # if we have a deferred, callback now
         assert self.deferred
         if self.debug:
-            logDebug('Animation group %d done' % id(self))
+            logDebug(u'Animation group %d done' % id(self))
         if self.deferred:
             self.deferred.callback(None)
 
@@ -227,7 +227,7 @@ def __afterCurrentAnimationDo(callback, *args, **kwargs):
     if current:
         current.deferred.addCallback(callback, *args, **kwargs)
         if current.debug:
-            logDebug('after current animation %d do %s %s' % \
+            logDebug(u'after current animation %d do %s %s' % \
                 (id(current), callback, ','.join(args) if args else ''))
     else:
         callback(None, *args, **kwargs)

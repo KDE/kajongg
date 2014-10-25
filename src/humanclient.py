@@ -384,7 +384,7 @@ class HumanClient(Client):
             if voice:
                 voiceId = voice.md5sum
             if Debug.sound and voiceId:
-                logDebug('%s sends own voice %s to server' % (self.name, voiceId))
+                logDebug(u'%s sends own voice %s to server' % (self.name, voiceId))
         maxGameId = Query('select max(id) from game').records[0][0]
         maxGameId = int(maxGameId) if maxGameId else 0
         self.callServer('setClientProperties',
@@ -399,14 +399,14 @@ class HumanClient(Client):
             self.__requestNewTableFromServer(SingleshotOptions.table).addCallback(
                 self.__showTables).addErrback(self.tableError)
             if Debug.table:
-                logDebug('%s: --table lets us open an new table %d' % (self.name, SingleshotOptions.table))
+                logDebug(u'%s: --table lets us open an new table %d' % (self.name, SingleshotOptions.table))
             SingleshotOptions.table = False
         elif SingleshotOptions.join:
             Internal.autoPlay = False
             self.callServer('joinTable', SingleshotOptions.join).addCallback(
                 self.__showTables).addErrback(self.tableError)
             if Debug.table:
-                logDebug('%s: --join lets us join table %s' % (self.name, self._tableById(SingleshotOptions.join)))
+                logDebug(u'%s: --join lets us join table %s' % (self.name, self._tableById(SingleshotOptions.join)))
             SingleshotOptions.join = False
         elif not self.game and (Internal.autoPlay or (not self.tables and self.hasLocalServer())):
             self.__requestNewTableFromServer().addCallback(self.__newLocalTable).addErrback(self.tableError)
@@ -525,7 +525,7 @@ class HumanClient(Client):
         """others chat to me"""
         chatLine = ChatMessage(data)
         if Debug.chat:
-            logDebug('got chatLine: %s' % chatLine)
+            logDebug(u'got chatLine: %s' % chatLine)
         table = self._tableById(chatLine.tableid)
         if not chatLine.isStatusMessage and not table.chatWindow:
             ChatWindow(table)
@@ -555,7 +555,7 @@ class HumanClient(Client):
         def cancelled(dummy):
             """the user does not want to start now. Back to table list"""
             if Debug.table:
-                logDebug('%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
+                logDebug(u'%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
                     self.name, self._tableById(tableid)))
             self.table = None
             self.beginQuestion = None
@@ -703,7 +703,7 @@ class HumanClient(Client):
         """we logged out or or lost connection to the server.
         Remove visual traces depending on that connection."""
         if Debug.connections and result:
-            logDebug('server %s disconnects: %s' % (self.connection.url, result))
+            logDebug(u'server %s disconnects: %s' % (self.connection.url, result))
         self.connection = None
         game = self.game
         self.game = None # avoid races: messages might still arrive
@@ -721,7 +721,7 @@ class HumanClient(Client):
     def serverDisconnected(self, dummyReference):
         """perspective calls us back"""
         if self.connection and (Debug.traffic or Debug.connections):
-            logDebug('perspective notifies disconnect: %s' % self.connection.url)
+            logDebug(u'perspective notifies disconnect: %s' % self.connection.url)
         self.remote_serverDisconnects()
 
     @staticmethod
@@ -811,7 +811,7 @@ class HumanClient(Client):
         if self.game:
             self.game.debug('callServer(%s)' % repr(debugArgs))
         else:
-            logDebug('callServer(%s)' % repr(debugArgs))
+            logDebug(u'callServer(%s)' % repr(debugArgs))
 
     def callServer(self, *args):
         """if we are online, call server"""

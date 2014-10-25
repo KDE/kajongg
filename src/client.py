@@ -27,6 +27,7 @@ from util import Duration
 from log import logDebug, logException, logWarning, m18nc
 from message import Message
 from common import Internal, Debug, Options, StrMixin
+from common import unicodeString, nativeString
 from rule import Ruleset
 from game import PlayingGame
 from query import Query
@@ -52,13 +53,13 @@ class Table(StrMixin):
 
     def status(self):
         """a status string"""
-        result = ''
+        result = u''
         if self.suspendedAt:
             result = m18nc('table status', 'Suspended')
-            result += ' ' + datetime.datetime.strptime(self.suspendedAt,
-                '%Y-%m-%dT%H:%M:%S').strftime('%c').decode('utf-8')
+            result += u' ' + unicodeString(datetime.datetime.strptime(self.suspendedAt,
+                '%Y-%m-%dT%H:%M:%S').strftime('%c'))
         if self.running:
-            result += ' ' + m18nc('table status', 'Running')
+            result += u' ' + m18nc('table status', 'Running')
         return result or m18nc('table status', 'New')
 
 class ClientTable(Table):
@@ -170,7 +171,7 @@ class Client(pb.Referenceable):
         newTables = list(ClientTable(self, *x) for x in tables) # pylint: disable=star-args
         self.tables.extend(newTables)
         if Debug.table:
-            logDebug('%s got new tables:%s' % (self.name, newTables))
+            logDebug(u'%s got new tables:%s' % (nativeString(self.name), newTables))
 
     @staticmethod
     def remote_serverRulesets(hashes):
@@ -228,7 +229,7 @@ class Client(pb.Referenceable):
         def disagree(about):
             """do not bother to translate this, it should normally not happen"""
             self.game.close()
-            msg = 'The data bases for game %s have different %s' % (self.game.seed, about)
+            msg = u'The data bases for game %s have different %s' % (self.game.seed, about)
             logWarning(msg)
             raise pb.Error(msg)
         if not self.table:
@@ -281,19 +282,19 @@ class Client(pb.Referenceable):
                 noClaimCount += 1
                 if noClaimCount == 2:
                     if Debug.delayChow:
-                        self.game.debug('everybody said "I am not interested", so {} claims chow now for {}'.format(
+                        self.game.debug(u'everybody said "I am not interested", so {} claims chow now for {}'.format(
                             self.game.myself.name, self.game.lastDiscard.name()))
                     return result
             elif move.message in (Message.Pung, Message.Kong, Message.MahJongg) and move.notifying:
                 if Debug.delayChow:
-                    self.game.debug('{} said {} so {} suppresses Chow for {}'.format(
+                    self.game.debug(u'{} said {} so {} suppresses Chow for {}'.format(
                         move.player, move.message, self.game.myself, self.game.lastDiscard.name()).replace('  ', ' '))
                 return Message.NoClaim
         if delay < self.game.ruleset.claimTimeout * 0.95:
             # one of those slow humans is still thinking
             return deferLater(Internal.reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         if Debug.delayChow:
-            self.game.debug('{} must chow now for {} because timeout is over'.format(
+            self.game.debug(u'{} must chow now for {} because timeout is over'.format(
                 self.game.myself.name, self.game.lastDiscard.name()))
         return result
 
@@ -307,7 +308,7 @@ class Client(pb.Referenceable):
         result = myself.intelligence.selectAnswer(answers)
         if result[0] == Message.Chow:
             if Debug.delayChow:
-                self.game.debug('{} waits to see if somebody says Pung or Kong before saying chow for {}'.format(
+                self.game.debug(u'{} waits to see if somebody says Pung or Kong before saying chow for {}'.format(
                     self.game.myself.name, self.game.lastDiscard.name()))
             return deferLater(Internal.reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         return succeed(result)
@@ -338,9 +339,9 @@ class Client(pb.Referenceable):
         if Debug.traffic:
             if self.isHumanClient():
                 if self.game:
-                    self.game.debug('got Move: %s' % move)
+                    self.game.debug(u'got Move: %s' % move)
                 else:
-                    logDebug('got Move: %s' % move)
+                    logDebug(u'got Move: %s' % move)
         if self.game:
             if move.token:
                 if move.token != self.game.handId.token():
@@ -379,7 +380,7 @@ class Client(pb.Referenceable):
 #                            game.myself.computeSayable(move, [Message.Chow])
 #                            if game.myself.sayable[Message.Chow]:
 #                                # I may say Chow
-#                                logDebug('FOUND EXAMPLE FOR %s IN %s' % (game.myself,
+#                                logDebug(u'FOUND EXAMPLE FOR %s IN %s' % (game.myself,
 #                                       game.handId.prompt(withMoveCount=True)))
 
         if message == Message.Discard:

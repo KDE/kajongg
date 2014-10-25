@@ -237,7 +237,7 @@ class Board(QGraphicsRectItem):
             self.__prevPos = uiTile.sortKey()
         self._focusTile = uiTile
         if self._focusTile and self._focusTile.tile in Debug.focusable:
-            logDebug('%s: new focus uiTile %s from %s' % (
+            logDebug(u'%s: new focus uiTile %s from %s' % (
                 self.name, self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
         if self.hasFocus:
             self.scene().focusBoard = self

@@ -365,7 +365,7 @@ class UITile(QGraphicsObject, StrMixin):
         """redirect and generate Debug output"""
         if self.tile in Debug.focusable:
             newStr = 'focusable' if value else 'unfocusable'
-            logDebug('%s: %s from %s' % (newStr, self.tile, stack('')[-2]))
+            logDebug(u'%s: %s from %s' % (newStr, self.tile, stack('')[-2]))
         self.setFlag(QGraphicsItem.ItemIsFocusable, value)
 
     @property

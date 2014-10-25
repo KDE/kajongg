@@ -115,7 +115,7 @@ class ClientMessage(Message):
 
     def toolTip(self, dummyButton, dummyTile):
         """returns text and warning flag for button and text for tile for button and text for tile"""
-        txt = 'toolTip is not defined for %s' % self.name
+        txt = u'toolTip is not defined for %s' % self.name
         logWarning(txt)
         return txt, True, ''
 
@@ -312,7 +312,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
         if client.thatWasMe(player):
             player.originalCallingHand = player.hand
             if Debug.originalCall:
-                logDebug('%s gets originalCallingHand:%s' % (player, player.originalCallingHand))
+                logDebug(u'%s gets originalCallingHand:%s' % (player, player.originalCallingHand))
         player.originalCall = True
         client.game.addCsvTag('originalCall')
         return client.ask(move, [Message.OK])
@@ -382,7 +382,7 @@ class MessageReadyForGameStart(ServerMessage):
                     Internal.scene.game = client.game
             if result == Message.OK and client.tableList and client.tableList.isVisible():
                 if Debug.table:
-                    logDebug('%s hiding table list because game started' % client.name)
+                    logDebug(u'%s hiding table list because game started' % client.name)
                 client.tableList.hide()
             return result
         # move.source are the players in seating order
@@ -478,7 +478,7 @@ class MessageViolatesOriginalCall(ServerMessage):
         move.player.popupMsg(self)
         move.player.mayWin = False
         if Debug.originalCall:
-            logDebug('%s: cleared mayWin' % move.player)
+            logDebug(u'%s: cleared mayWin' % move.player)
         return client.ask(move, [Message.OK])
 
 class MessageVoiceId(ServerMessage):
@@ -497,7 +497,7 @@ class MessageVoiceData(ServerMessage):
         """server sent us voice sounds about somebody else"""
         move.player.voice = Voice(move.md5sum, move.source)
         if Debug.sound:
-            logDebug('%s gets voice data %s from server, language=%s' % (
+            logDebug(u'%s gets voice data %s from server, language=%s' % (
                 move.player, move.player.voice, move.player.voice.language()))
 
 class MessageAssignVoices(ServerMessage):
@@ -515,7 +515,7 @@ class MessageServerWantsVoiceData(ServerMessage):
     def clientAction(self, dummyClient, move):
         """send voice sounds as requested to server"""
         if Debug.sound:
-            logDebug('%s: send wanted voice data %s to server' % (
+            logDebug(u'%s: send wanted voice data %s to server' % (
                 move.player, move.player.voice))
         return Message.ServerGetsVoiceData, move.player.voice.archiveContent
 
@@ -527,10 +527,10 @@ class MessageServerGetsVoiceData(ClientMessage):
         voice.archiveContent = msg.args[0]
         if Debug.sound:
             if voice.oggFiles():
-                logDebug('%s: server got wanted voice data %s' % (
+                logDebug(u'%s: server got wanted voice data %s' % (
                     msg.player, voice))
             else:
-                logDebug('%s: server got empty voice data %s (arg0=%s)' % (
+                logDebug(u'%s: server got empty voice data %s (arg0=%s)' % (
                     msg.player, voice, repr(msg.args[0][:100])))
 
 class MessageDeclaredKong(ServerMessage):
@@ -604,7 +604,7 @@ class MessageUsedDangerousFrom(ServerMessage):
         fromPlayer = client.game.playerByName(move.source)
         move.player.usedDangerousFrom = fromPlayer
         if Debug.dangerousGame:
-            logDebug('%s claimed a dangerous tile discarded by %s' % \
+            logDebug(u'%s claimed a dangerous tile discarded by %s' % \
                 (move.player, fromPlayer))
 
 class MessageDraw(ServerMessage):
@@ -660,7 +660,7 @@ def __scanSelf():
                         try:
                             msg = glob()
                         except Exception:
-                            logDebug('cannot instantiate %s' % glob.__name__)
+                            logDebug(u'cannot instantiate %s' % glob.__name__)
                             raise
                         type.__setattr__(Message, msg.name.replace(' ', ''), msg)
 

@@ -150,7 +150,7 @@ class ChatWindow(QWidget):
     def kill(self):
         """hide and null on table"""
         if Debug.chat:
-            logDebug('chat.kill for %s on table %s' % (self, self.table))
+            logDebug(u'chat.kill for %s on table %s' % (self, self.table))
         self.hide()
         self.table.chatWindow = None
 
@@ -161,7 +161,7 @@ class ChatWindow(QWidget):
             self.edit.clear()
         if line:
             if Debug.chat:
-                logDebug('sending line %s to others' % line)
+                logDebug(u'sending line %s to others' % line)
             msg = ChatMessage(self.table.tableid, self.table.client.name, line, isStatusMessage)
             self.table.client.sendChat(msg).addErrback(self.chatError)
 
