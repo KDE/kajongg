@@ -38,6 +38,8 @@ import weakref
 from collections import defaultdict
 from argparse import ArgumentParser
 
+import sip
+
 try:
     from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
 except ImportError:
@@ -748,7 +750,7 @@ class KDETranslator(QTranslator):
         QTranslator.__init__(self, parent)
 
     @staticmethod
-    def translate(dummyContext, sourceText, dummyMessage, dummyNumber=-1):
+    def translate(dummyContext, sourceText, dummyDisambiguation, dummyNumerus=-1):
         """for now this seems to translate all we need, otherwise
         search for translateQt in kdelibs/kdecore/localization"""
         return i18n(sourceText)
@@ -767,7 +769,13 @@ class KLocale(object):
     @staticmethod
     def initQtTranslator(app):
         """stub"""
-        QCoreApplication.installTranslator(KDETranslator(app))
+        if isPython3 and sip.SIP_VERSION < 0x041004:
+            # This needs sip 4.16.4 and Qt 4/5 from Oct 28 2014 or later
+            # TODO: check for updated PyQt versions as soon as they are released.
+            # Older versions segfault when KDETranslator.translate is called
+            raise Exception('Kajongg needs sip v4.16.4 or higher when running without KDE libraries')
+        translator = KDETranslator(app)
+        QCoreApplication.installTranslator(translator)
 
 class KConfigGroup(object):
     """mimic KConfigGroup as far as we need it"""
