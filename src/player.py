@@ -156,7 +156,7 @@ class Player(StrMixin):
         """
         The name of the player, can be changed only once.
 
-        @type: unicode
+        @type: C{unicode}
         """
         return self.__name
 
@@ -671,9 +671,14 @@ class PlayingPlayer(Player):
         return False
 
     def mustPlayDangerous(self, exposing=None):
-        """returns True if the player has no choice, otherwise False.
-        Exposing may be a meld which will be exposed before we might
-        play dangerous"""
+        """]
+        True if the player has no choice, otherwise False.
+
+        @param exposing: May be a meld which will be exposed before we might
+        play dangerous.
+        @type exposing: L{Meld}
+        @rtype: C{Boolean}
+        """
         if self == self.game.activePlayer and exposing and len(exposing) == 4:
             # declaring a kong is never dangerous because we get
             # an unknown replacement

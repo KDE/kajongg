@@ -198,7 +198,18 @@ def logException(exception, withGamePrefix=True):
     raise exception
 
 def m18n(englishText, *args):
-    """wrapper around i18n converting QString into a Python unicode string"""
+    """
+    Wrapper around i18n.
+
+    @param englishText : The text template.
+    @type englishText: C{str} (utf-8)  or C{unicode}.
+
+    @param args : Arguments for the text template.
+    @type args: A list or tuple of strings.
+
+    @return: The translated text with args inserted.
+    @rtype: C{unicode}.
+    """
     englishText = xToUtf8(englishText)
     result = unicode(i18n(englishText, *args))
     if not args:
@@ -206,7 +217,21 @@ def m18n(englishText, *args):
     return result
 
 def m18nc(context, englishText, *args):
-    """wrapper around i18nc converting QString into a Python unicode string"""
+    """
+    Wrapper around i18n. i18n only accepts and returns
+    native strings.
+
+    @param context: The context for this string.
+    @type context: C{str}
+    @param englishText : The text template.
+    @type englishText: C{str} (utf-8) or C{unicode}.
+
+    @param args : Arguments for the text template.
+    @type args: A list or tuple of strings.
+
+    @return: The translated text with args inserted.
+    @rtype: C{unicode}.
+    """
     englishText = xToUtf8(englishText)
     result = unicode(i18nc(context, englishText, *args))
     if not args:

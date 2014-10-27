@@ -53,7 +53,12 @@ except ImportError:
         from kdestub import *  # pylint: disable=wildcard-import
 
 def appdataDir():
-    """the per user directory with kajongg application information like the database"""
+    """
+    The per user directory with kajongg application information like the database.
+
+    @return: The directory path.
+    @rtype: C{str}.
+    """
     serverDir = os.path.expanduser('~/.kajonggserver/')
     if Internal.isServer:
         # the server might or might not have KDE installed, so to be on

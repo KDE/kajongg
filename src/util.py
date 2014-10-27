@@ -114,7 +114,12 @@ def get_all_objects():
     return olist
 
 def kprint(*args, **kwargs):
-    """a wrapper around print, always encoding unicode to something sensible"""
+    """
+    A wrapper around print, always encoding unicode to something sensible for the konsole.
+
+    @param args: anything
+    @param kwargs: anything
+    """
     newArgs = []
     for arg in args:
         try:

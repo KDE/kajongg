@@ -214,8 +214,29 @@ class SingleshotOptions(object):
     join = False
     game = None
 
-class Internal(object):
-    """global things"""
+class __Internal(object):
+    """
+    Global things.
+
+    @cvar Preferences: The L{SetupPreferences}.
+    @type Preferences: L{SetupPreferences}
+    @cvar version: The version of Kajongg.
+    @type version: C{str}
+    @cvar logPrefix: C for client and S for server.
+    @type logPrefix: C{str}
+    @cvar isServer: True if this is the server process.
+    @type isServer: C{bool}
+    @cvar scaleScene: Defines if the scene is scaled. Disable for debugging only.
+    @type scaleScene: C{bool}
+    @cvar reactor: The twisted reactor instance.
+    @type reactor: L{twisted.internet.reactor}
+    @cvar app: The Qt or KDE app instance
+    @type app: L{KApplication}
+    @cvar db: The sqlite3 data base
+    @type db: L{DBHandle}
+    @cvar scene: The QGraphicsScene.
+    @type scene: L{PlayingScene} or L{ScoringScene}
+    """
     # pylint: disable=too-many-instance-attributes
     Preferences = None
     version = '4.13.0'
@@ -251,7 +272,7 @@ class Internal(object):
         formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
         handler.setFormatter(formatter)
 
-Internal = Internal()
+Internal = __Internal()
 
 class IntDict(defaultdict, StrMixin):
     """a dict where the values are expected to be numeric, so
@@ -425,7 +446,7 @@ def nativeStringArgs(args, encoding='utf-8'):
     Those elements which are not of some string type are left alone.
     For acceptable string types see L{common.nativeString}.
 
-    @param s: None or a string to convert to C{str} if necessary.
+    @param args: A sequence of L{nativeString}.
     @param encoding: The encoding for the strings. Default is utf-8.
     @returns: A tuple with the converted strings.
     @rtype: C{tuple}

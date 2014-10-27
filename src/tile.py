@@ -24,17 +24,18 @@ from log import m18n, m18nc, logException
 from common import IntDict
 
 class Tile(str):
-    """a single tile, represented as a string of length 2.
+    """
+    A single tile, represented as a string of length 2.
 
-    always True:
-    - only for suits: tile.group + chr(tile.value + 48) == str(tile)
-    - Tile(tile) is tile
-    - Tile(tile.group, tile.value) is tile
+    Always True:
+      - only for suits: tile.group + chr(tile.value + 48) == str(tile)
+      - Tile(tile) is tile
+      - Tile(tile.group, tile.value) is tile
 
     Tile() accepts
-    - another Tile
-    - a string, length 2
-    - two args: a char and either a char or an int -1..11
+      - another Tile
+      - a string, length 2
+      - two args: a char and either a char or an int -1..11
 
     group is a char: b=bonus w=wind d=dragon X=unknown
     value is 1..9 for real suit tiles, -1/0/10/11 for usage in AI, and a char for dragons, winds,boni

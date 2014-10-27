@@ -4,7 +4,7 @@
 Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 partially based on C++ code from:
-    Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
+ - Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
 
 Kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -128,7 +128,12 @@ class DBHandle(sqlite3.Connection):
 
     @staticmethod
     def dbPath():
-        """the path for the data base"""
+        """
+        The path for the data base.
+
+        @return: The full path for kajonggserver.db or kajongg.db.
+        @rtype: C{str}
+        """
         name = 'kajonggserver.db' if Internal.isServer else 'kajongg.db'
         return Options.dbPath.decode('utf-8') if Options.dbPath else appdataDir() + name
 
@@ -335,7 +340,12 @@ class PrepareDB(object):
 
     @staticmethod
     def __currentVersion():
-        """get current version of DB schema as a comparable string"""
+        """
+        Get current version of DB schema as a comparable string.
+
+        @returns: The current version from the database.
+        @rtype: C{str}
+        """
         if Internal.db.tableHasField('general', 'schemaversion'):
             return str(Query('select schemaversion from general').records[0][0])
             # Query returns unicode

@@ -61,7 +61,18 @@ from statesaver import StateSaver
 import gettext
 
 def __insertArgs(translatedTemplate, *args):
-    """format the string"""
+    """
+    put format arguments into the translated template.
+    KDE semantics markup is removed.
+
+    @param translatedTemplate: The translated string template.
+    @type translatedTemplate: C{str}
+    @param args: The format arguments
+    @type args: A list or tuple of C{str}
+
+    @return: The formatted translated text.
+    @rtype: C{str}
+    """
     if '@' in translatedTemplate:
         Internal.logger.debug('insertargs:%s' % translatedTemplate)
 
@@ -79,7 +90,15 @@ def __insertArgs(translatedTemplate, *args):
     return result
 
 def i18n(englishIn, *args):
-    """stub"""
+    """
+    Translate. Since this is a 1:1 replacement for the
+    corresponding KDE function, it accepts only C{str}.
+
+    @param englishIn: The english template.
+    @type englishIn: C{str}
+    @return: The translated text, args included.
+    @rtype: C{unicode}
+    """
     englishIn, args = xToUtf8(englishIn, args)
     if KGlobal.translation and englishIn:
         _ = KGlobal.translation.gettext(englishIn).decode('utf-8')
@@ -91,8 +110,19 @@ def i18n(englishIn, *args):
 ki18n = i18n # pylint: disable=invalid-name
 
 def i18nc(context, englishIn, *args):
-    """The \004 trick is taken from kdecore/localization/gettext.h,
-    definition of pgettext_aux"""
+    """
+    Translate. Since this is a 1:1 replacement for the
+    corresponding KDE function, it accepts only C{str}.
+
+    @param context: The context of this string.
+    @type context: C{str}
+    @param englishIn: The english template.
+    @type englishIn: C{str}
+    @return: The translated text, args included.
+    @rtype: C{unicode}
+    """
+    # The \004 trick is taken from kdecore/localization/gettext.h,
+    # definition of pgettext_aux"""
     withContext = '\004'.join([context, englishIn])
     if KGlobal.translation:
         _ = KGlobal.translation.gettext(withContext).decode('utf-8')

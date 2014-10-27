@@ -35,19 +35,19 @@ class Meld(TileList):
     A Meld is immutable, not from the view of python but for
     its user
 
-    for melds with 3 tiles:
+    for melds with 3 tiles::
         isDeclared == isExposed : 3 exposed tiles
         not isDeclared == isConcealed: 3 concealed Tiles
-        exposed: aaa
-        exposedClaimed: aaa
+        exposed = aaa
+        exposedClaimed = aaa
 
-    for melds with 4 tiles:
+    for melds with 4 tiles::
         isKong = aAAa or aaaa or aaaA but NOT AAAA
         isDeclared = aAAa or aaaa or aaaA
         isExposed = aaaa or aaaA
-        isConcealed: aAAa or AAAA
-        exposedClaimed: aaaA
-        exposed: aaaa
+        isConcealed = aAAa or AAAA
+        exposedClaimed = aaaA
+        exposed = aaaa
 
     """
     # pylint: disable=too-many-instance-attributes
