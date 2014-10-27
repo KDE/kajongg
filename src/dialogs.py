@@ -73,6 +73,7 @@ class Prompt(MustChooseKDialog):
     """common code for things like QuestionYesNo, Information"""
     def __init__(self, msg, icon=QMessageBox.Information, buttons=KDialog.Ok, caption=None, default=None):
         """buttons is button codes or-ed like KDialog.Ok | KDialog.Cancel. First one is default."""
+        msg = msg.replace(r'\n', '\n') # TODO: where does this come from?
         self.msg = msg
         self.default = default
         if Options.gui:
