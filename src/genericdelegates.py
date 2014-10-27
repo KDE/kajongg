@@ -20,13 +20,16 @@ from guiutil import Painter
 
 class RichTextColumnDelegate(QStyledItemDelegate):
     """enables rich text in a view"""
-    label = QLabel()
-    label.setIndent(5)
-    label.setTextFormat(Qt.RichText)
-    document = QTextDocument()
+    label = None
+    document = None
 
     def __init__(self, parent=None):
         super(RichTextColumnDelegate, self).__init__(parent)
+        if self.label is None:
+            self.label = QLabel()
+            self.label.setIndent(5)
+            self.label.setTextFormat(Qt.RichText)
+            self.document = QTextDocument()
 
     def paint(self, painter, option, index):
         """paint richtext"""
