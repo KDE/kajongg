@@ -671,7 +671,7 @@ class KStandardDirs(object):
                     dirMap[key] = list(os.path.normpath(x) for x in dirMap[key])
             else:
                 KStandardDirs.prefix = subprocess.Popen(['which', 'kde4-config'],
-                    stdout=subprocess.PIPE).communicate()[0].split('/')[1]
+                    stdout=subprocess.PIPE).communicate()[0].split(b'/')[1].decode('utf-8') # TODO: fsencoding
                 KStandardDirs.prefix = '/%s/' % KStandardDirs.prefix
 
     @classmethod
