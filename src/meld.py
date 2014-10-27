@@ -56,10 +56,9 @@ class Meld(TileList):
     cache = {}
     def __new__(cls, newContent=None):
         """try to use cache"""
-        if isinstance(newContent, str):
-            if newContent in cls.cache:
-                return cls.cache[newContent]
-        elif isinstance(newContent, Meld):
+        if isinstance(newContent, str) and newContent in cls.cache:
+            return cls.cache[newContent]
+        if isinstance(newContent, Meld):
             return newContent
         tiles = TileList(newContent)
         cacheKey = tiles.key()
