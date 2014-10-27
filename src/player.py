@@ -507,7 +507,7 @@ class PlayingPlayer(Player):
         if self.game.lastDiscard:
             assert lastDiscard.isConcealed, lastDiscard
             if self.concealedTiles.count(lastDiscard) >= 2:
-                return lastDiscard.pung
+                return MeldList([lastDiscard.pung])
 
     def __maySayKong(self):
         """returns answer arguments for the server if calling or declaring kong is possible.
@@ -563,13 +563,10 @@ class PlayingPlayer(Player):
         """could answering with msg lead to dangerous game?
         If so return a list of resulting melds
         where a meld is represented by a list of 2char strings"""
-        result = []
         if msg in (Message.Chow, Message.Pung, Message.Kong):
-            possibleMelds = self.sayable[msg]
-            if isinstance(possibleMelds[0], basestring):
-                possibleMelds = [possibleMelds]
-            result = [x for x in possibleMelds if self.mustPlayDangerous(x)]
-        return result
+            return [x for x in self.sayable[msg] if self.mustPlayDangerous(x)]
+        else:
+            return []
 
     def hasConcealedTiles(self, tiles, within=None):
         """do I have those concealed tiles?"""
