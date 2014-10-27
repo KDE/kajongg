@@ -135,7 +135,7 @@ class DBHandle(sqlite3.Connection):
         @rtype: C{str}
         """
         name = 'kajonggserver.db' if Internal.isServer else 'kajongg.db'
-        return Options.dbPath.decode('utf-8') if Options.dbPath else appdataDir() + name
+        return Options.dbPath if Options.dbPath else appdataDir() + name
 
     @property
     def name(self):
