@@ -34,7 +34,7 @@ from statesaver import StateSaver
 from rule import Ruleset
 from guiutil import ListComboBox, MJTableView, decorateWindow
 from differ import RulesetDiffer
-from common import Internal, Debug
+from common import Internal, Debug, unicodeString
 from modeltest import ModelTest
 from chat import ChatMessage, ChatWindow
 
@@ -108,11 +108,11 @@ class TablesModel(QAbstractTableModel):
             elif role == Qt.DisplayRole and index.column() == 3:
                 status = table.status()
                 if table.suspendedAt:
-                    dateVal = ' ' + datetime.datetime.strptime(table.suspendedAt,
-                        '%Y-%m-%dT%H:%M:%S').strftime('%c').decode('utf-8')
-                    status = 'Suspended'
+                    dateVal = u' ' + unicodeString(datetime.datetime.strptime(table.suspendedAt,
+                        '%Y-%m-%dT%H:%M:%S').strftime('%c'))
+                    status = u'Suspended'
                 else:
-                    dateVal = ''
+                    dateVal = u''
                 result = toQVariant(m18nc('table status', status) + dateVal)
             elif index.column() == 4:
                 if role == Qt.DisplayRole:
