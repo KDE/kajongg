@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
-from common import Debug, unicodeString, StrMixin
+from common import Debug, unicodeString, StrMixin, nativeString
 from message import Message
 from tile import Tile, TileList
 from meld import Meld, MeldList
@@ -31,7 +31,7 @@ class Move(StrMixin):
         if isinstance(command, Message):
             self.message = command
         else:
-            self.message = Message.defined[command]
+            self.message = Message.defined[nativeString(command)]
         self.table = None
         self.notifying = False
         self._player = weakref.ref(player) if player else None
@@ -45,13 +45,15 @@ class Move(StrMixin):
             if value is None:
                 self.__setattr__(key, None)
             elif key.lower().endswith('tile'):
-                self.__setattr__(key, Tile(value))
+                self.__setattr__(key, Tile(nativeString(value)))
             elif key.lower().endswith('tiles'):
-                self.__setattr__(key, TileList(value))
+                self.__setattr__(key, TileList(nativeString(value)))
             elif key.lower().endswith('meld'):
-                self.__setattr__(key, Meld(value))
+                self.__setattr__(key, Meld(nativeString(value)))
             elif key.lower().endswith('melds'):
-                self.__setattr__(key, MeldList(value))
+                self.__setattr__(key, MeldList(nativeString(value)))
+            elif key in ('wantedGame', 'score'):
+                self.__setattr__(key, nativeString(value))
             else:
                 self.__setattr__(key, value)
 

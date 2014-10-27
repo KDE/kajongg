@@ -35,6 +35,7 @@ from log import m18n, logWarning, logException, logDebug
 from message import Message, ChatMessage
 from chat import ChatWindow
 from common import Options, SingleshotOptions, Internal, Debug, isAlive
+from common import nativeString, nativeStringArgs
 from query import Query
 from board import Board
 from client import Client, ClientTable
@@ -470,6 +471,7 @@ class HumanClient(Client):
                 # when playing a local game, only show pending tables with
                 # previously selected ruleset
                 self.tables = list(x for x in self.tables if x.ruleset == self.ruleset)
+                assert self.tables
         if len(self.tables):
             self.__updateTableList()
 
@@ -678,6 +680,8 @@ class HumanClient(Client):
 
     def remote_abort(self, tableid, message, *args):
         """the server aborted this game"""
+        message = nativeString(message)
+        args = nativeStringArgs(args)
         if self.table and self.table.tableid == tableid:
             # translate Robot to Roboter:
             if self.game:
