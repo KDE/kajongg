@@ -135,4 +135,7 @@ from PyQt4.QtSvg import QSvgRenderer
 
 def variantValue(variant):
     """convert QVariant to a python variable"""
-    return variant.toPyObject()
+    if hasattr(variant, 'toPyObject'):
+        return variant.toPyObject()
+    else:
+        return variant
