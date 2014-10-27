@@ -30,7 +30,7 @@ from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, \
 from util import uniqueList
 from log import m18n, m18nc
 from differ import RulesetDiffer
-from common import Debug, english, basestring, unicode
+from common import Debug, english, unicode
 from tree import TreeItem, RootItem, TreeModel
 from kde import KApplication
 from dialogs import Sorry
@@ -174,7 +174,7 @@ class RuleModel(TreeModel):
                     if isinstance(item, RuleItem) and isinstance(item.rawContent, BoolRule):
                         return toQVariant('')
                 showValue = item.content(index.column())
-                if isinstance(showValue, basestring) and showValue.endswith('.0'):
+                if isinstance(showValue, unicode) and showValue.endswith('.0'):
                     try:
                         showValue = str(int(float(showValue)))
                     except ValueError:

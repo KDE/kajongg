@@ -24,8 +24,8 @@ from log import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice, Sound
 from tile import Tile, TileList
 from meld import Meld, MeldList
-from common import Internal, Debug
-from common import unicodeString, StrMixin
+from common import Internal, Debug, long
+from common import unicode, unicodeString, StrMixin
 from dialogs import Sorry
 
 # pylint: disable=super-init-not-called
@@ -78,7 +78,7 @@ class Message(object):
         elif isinstance(value, dict):
             return dict((Message.jelly('key', x[0]), Message.jelly('value', x[1])) for x in value.items())
         else:
-            if not isinstance(value, (int, long, basestring, float, type(None))):
+            if not isinstance(value, (int, long, bytes, unicode, float, type(None))):
                 raise Exception('callRemote got illegal arg: %s %s(%s)' % (key, type(value), str(value)))
             return value
 

@@ -36,14 +36,12 @@ import platform
 if platform.python_version_tuple()[0] == '3':
     # pylint: disable=redefined-builtin
     unicode = str # pylint: disable=W0622
-    basestring = str
     bytes = bytes
     long = int
     isPython3 = True
 else:
     # pylint: disable=redefined-builtin
     unicode = unicode
-    basestring = basestring
     bytes = str
     long = long
     isPython3 = False
@@ -119,7 +117,7 @@ class Debug(object):
                     yield 'SEPARATOR'
         options = list(x for x in Debug.__dict__ if not x.startswith('_'))
         boolOptions = sorted(x for x in options if isinstance(Debug.__dict__[x], bool))
-        stringOptions = sorted(x for x in options if isinstance(Debug.__dict__[x], basestring))
+        stringOptions = sorted(x for x in options if isinstance(Debug.__dict__[x], str))
         stringExample = '%s:%s' % (stringOptions[0], 's3s4')
         allOptions = sorted(boolOptions + stringOptions)
         opt = '\n'.join(', '.join(optYielder(allOptions)).split(' SEPARATOR, '))
