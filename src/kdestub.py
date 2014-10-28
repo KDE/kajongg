@@ -54,8 +54,8 @@ from locale import _parse_localename, getdefaultlocale, setlocale, LC_ALL
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
 
-from common import Internal, Debug, ENGLISHDICT
-from util import xToUtf8, uniqueList
+from common import Internal, Debug, ENGLISHDICT, unicodeString
+from util import uniqueList
 from statesaver import StateSaver
 
 import gettext
@@ -82,7 +82,6 @@ def __insertArgs(translatedTemplate, *args):
     if '%' in result:
         for idx in range(len(args)):
             result = result.replace('%%%d' % (idx+1), '{%d}' % idx)
-        args = list(x.decode('utf-8') for x in args)
         result = result.format(*args)
     for ignore in ['numid', 'filename', 'interface']:
         result = result.replace('<%s>' % ignore, '')
@@ -99,13 +98,14 @@ def i18n(englishIn, *args):
     @return: The translated text, args included.
     @rtype: C{unicode}
     """
-    englishIn, args = xToUtf8(englishIn, args)
+    assert englishIn
     if KGlobal.translation and englishIn:
-        _ = KGlobal.translation.gettext(englishIn).decode('utf-8')
+        _ = KGlobal.translation.gettext(englishIn)
     else:
         _ = englishIn
     ENGLISHDICT[_] = englishIn
-    return __insertArgs(_, *args)
+    result = __insertArgs(_, *args)
+    return unicodeString(result)
 
 ki18n = i18n # pylint: disable=invalid-name
 
@@ -125,7 +125,7 @@ def i18nc(context, englishIn, *args):
     # definition of pgettext_aux"""
     withContext = '\004'.join([context, englishIn])
     if KGlobal.translation:
-        _ = KGlobal.translation.gettext(withContext).decode('utf-8')
+        _ = KGlobal.translation.gettext(withContext)
     else:
         _ = withContext
     if '\004' in _:
@@ -133,7 +133,7 @@ def i18nc(context, englishIn, *args):
         result = i18n(englishIn, *args)
     else:
         result = i18n(withContext, *args)
-    return result
+    return unicodeString(result)
 
 class OptionHelper(object):
     """stub"""
