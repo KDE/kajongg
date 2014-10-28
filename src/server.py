@@ -88,16 +88,22 @@ from deferredutil import DeferredBlock
 from rule import Ruleset
 
 def srvMessage(*args):
-    """concatenate all args needed for m18n encoded in one string.
-    For an explanation see util.translateServerString"""
+    """
+    concatenate all args needed for m18n encoded in one string.
+    For an explanation see util.translateServerMessage.
+
+    @returns: The string to be wired.
+    @rtype: C{str}, utf-8 encoded
+    """
     strArgs = []
     for arg in args:
         if isinstance(arg, unicode):
             arg = arg.encode('utf-8')
-        elif not isinstance(arg, str):
-            arg = str(arg)
+        else:
+            arg = str(arg).encode('utf-8')
         strArgs.append(arg)
-    return SERVERMARK+SERVERMARK.join(strArgs)+SERVERMARK
+    mark = SERVERMARK.encode()
+    return mark+mark.join(strArgs)+mark
 
 def srvError(cls, *args):
     """raise an exception, passing args as a single string"""
