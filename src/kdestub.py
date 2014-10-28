@@ -58,14 +58,14 @@ from statesaver import StateSaver
 
 import gettext
 
-def insertArgs(englishIn, *args):
+def __insertArgs(translatedTemplate, *args):
     """format the string"""
-    if '@' in englishIn:
-        Internal.logger.debug('insertargs:%s' % englishIn)
+    if '@' in translatedTemplate:
+        Internal.logger.debug('insertargs:%s' % translatedTemplate)
 
-    if '\004' in englishIn:
-        englishIn = englishIn.split('\004')[1]
-    result = englishIn
+    if '\004' in translatedTemplate:
+        translatedTemplate = translatedTemplate.split('\004')[1]
+    result = translatedTemplate
     if '%' in result:
         for idx in range(len(args)):
             result = result.replace('%%%d' % (idx+1), '{%d}' % idx)
@@ -84,7 +84,7 @@ def i18n(englishIn, *args):
     else:
         _ = englishIn
     ENGLISHDICT[_] = englishIn
-    return insertArgs(_, *args)
+    return __insertArgs(_, *args)
 
 ki18n = i18n # pylint: disable=invalid-name
 
