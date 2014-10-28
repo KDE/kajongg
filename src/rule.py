@@ -26,8 +26,8 @@ from hashlib import md5
 
 from qt import QVariant
 
-from common import Internal, Debug, unicode, english # pylint: disable=redefined-builtin
-from common import unicodeString, StrMixin
+from common import Internal, Debug, english # pylint: disable=redefined-builtin
+from common import unicodeString, StrMixin, nativeString, nativeStringArgs
 from log import m18n, m18nc, m18nE, logException, logDebug
 from query import Query
 
@@ -215,6 +215,8 @@ class RuleList(list):
 
     def createRule(self, name, definition='', **kwargs):
         """shortcut for simpler definition of predefined rulesets"""
+        name = unicodeString(name)
+        definition = unicodeString(definition)
         defParts = definition.split(u'||')
         rule = None
         description = kwargs.get('description', '')
@@ -404,12 +406,13 @@ into a situation where you have to pay a penalty"""))
             query = Query("select id,hash,name,description from ruleset where id=?", (self.name,))
         elif isinstance(self.name, list):
             # we got the rules over the wire
-            self.rawRules = self.name[1:]
+            self.rawRules = (nativeStringArgs(x) for x in self.name[1:])
             (self.rulesetId, self.__hash, self.name, self.description) = self.name[0]
+            self.__hash = nativeString(self.__hash)
             self.load() # load raw rules at once, rules from db only when needed
             return
         else:
-            query = Query("select id,hash,name,description from ruleset where hash=?", (self.name,))
+            query = Query("select id,hash,name,description from ruleset where hash=?", (nativeString(self.name),))
         if len(query.records):
             (self.rulesetId, self.__hash, self.name, self.description) = query.records[0]
         else:
@@ -574,7 +577,7 @@ into a situation where you have to pay a penalty"""))
     @staticmethod
     def ruleKey(rule):
         """needed for sorting the rules"""
-        return rule.__str__()
+        return rule.__unicode__()
 
     def __computeHash(self):
         """compute the hash for this ruleset using all rules but not name and
@@ -582,8 +585,9 @@ into a situation where you have to pay a penalty"""))
         self.load()
         result = md5()
         for rule in sorted(self.allRules, key=Ruleset.ruleKey):
-            result.update(rule.hashStr())
+            result.update(rule.hashStr().encode('utf-8'))
         self.__hash = result.hexdigest()
+        # TODO: warum geht fuer HC.newTable ein u'fdfads' als hash vom Py2-Client zum Server?
 
     def ruleRecord(self, rule):
         """returns the rule as tuple, prepared for use by sql. The first three
@@ -702,9 +706,9 @@ class RuleBase(StrMixin):
     options = {}
     ruleClasses = {}
     def __init__(self, name, definition, description):
-        self.__name = name
-        self.definition = definition
-        self.description = description
+        self.__name = unicodeString(name)
+        self.definition = unicodeString(definition)
+        self.description = unicodeString(description)
         self.hasSelectable = False
         self.ruleClasses[self.__class__.__name__] = self.__class__
 
@@ -871,10 +875,14 @@ class Rule(RuleBase):
             ).replace('&', '').replace('  ', ' ').strip(), self.score.contentStr())
 
     def hashStr(self):
-        """all that is needed to hash this rule. Try not to change this to keep
-        database congestion low"""
-        result = '%s: %s %s' % (self.name, self.definition, self.score)
-        return result.encode('utf-8')
+        """
+        all that is needed to hash this rule. Try not to change this to keep
+        database congestion low.
+
+        @return: The unique hash string
+        @rtype: unicode
+        """
+        return u'%s: %s %s' % (self.name, self.definition, self.score)
 
     def contentStr(self):
         """returns a human readable string with the content"""
@@ -909,10 +917,15 @@ class ParameterRule(RuleBase):
         return parameter
 
     def hashStr(self):
-        """all that is needed to hash this rule. Try not to change this to keep
-        database congestion low"""
-        result = '%s: %s %s' % (self.name, self.definition, self.parameter)
-        return result.encode('utf-8')
+        """
+        all that is needed to hash this rule. Try not to change this to keep
+        database congestion low.
+
+        @return: The unique hash string
+        @rtype: unicode
+        """
+        result = u'%s: %s %s' % (self.name, self.definition, self.parameter)
+        return result
 
     def contentStr(self):
         """returns a human readable string with the content"""
