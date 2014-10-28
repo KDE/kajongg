@@ -189,9 +189,9 @@ def logInfo(msg, showDialog=False, withGamePrefix=True):
     """log an info message"""
     return logMessage(msg, logging.INFO, showDialog, withGamePrefix=withGamePrefix)
 
-def logError(msg, withGamePrefix=True):
+def logError(msg, showStack=True, withGamePrefix=True):
     """log an error message"""
-    return logMessage(msg, logging.ERROR, True, showStack=True, withGamePrefix=withGamePrefix)
+    return logMessage(msg, logging.ERROR, True, showStack=showStack, withGamePrefix=withGamePrefix)
 
 def logDebug(msg, showStack=False, withGamePrefix=True, btIndent=None):
     """log this message and show it on stdout

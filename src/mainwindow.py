@@ -79,9 +79,7 @@ from twisted.internet.error import ReactorNotRunning
 #    NOTFOUND.append('Kajongg is not correctly installed: modules: %s' % importError)
 
 if len(NOTFOUND):
-    MSG = "\n".join(" * %s" % s for s in NOTFOUND)
-    logError(MSG)
-    os.popen("kdialog --sorry '%s'" % MSG)
+    logError("\n".join(" * %s" % s for s in NOTFOUND), showStack=False)
     sys.exit(3)
 
 def cleanExit(*dummyArgs):
