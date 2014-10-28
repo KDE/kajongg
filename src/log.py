@@ -114,6 +114,30 @@ def __logUnicodeMessage(prio, msg):
         msg = msg.decode()
     Internal.logger.log(prio, msg)
 
+def __enrichMessage(msg, withGamePrefix=True):
+    """
+    Add some optional prefixes to msg: S/C, process id, time, git commit.
+
+    @param msg: The original message.
+    @type msg: C{unicode}
+    @param withGamePrefix: If set, prepend the game prefix.
+    @type withGamePrefix: C{Boolean}
+    @rtype: C{unicode}
+    """
+    result = msg # set the default
+    if withGamePrefix and Internal.logPrefix:
+        result = u'{prefix}{process}: {msg}'.format(
+            prefix=Internal.logPrefix,
+            process=os.getpid() if Debug.process else '',
+            msg=msg)
+    if Debug.time:
+        result = u'{:08.4f} {}'.format(elapsedSince(Debug.time), result)
+    if Debug.git:
+        head = gitHead()
+        if head not in ('current', None):
+            result = u'git:{} {}'.format(head, result)
+    return result
+
 def __exceptionToString(exception):
     """
     Convert exception into a useful string for logging.
@@ -151,20 +175,7 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     except TypeError:
         pass # python3 TODO:
     msg = translateServerMessage(msg)
-    logMsg = msg
-    if withGamePrefix and Internal.logPrefix:
-        logMsg = u'{prefix}{process}: {msg}'.format(
-            prefix=Internal.logPrefix,
-            process=os.getpid() if Debug.process else '',
-            msg=msg)
-    if Debug.time:
-        logMsg = u'{:08.4f} {}'.format(elapsedSince(Debug.time), logMsg)
-    if Debug.git:
-        head = gitHead()
-        if head not in ('current', None):
-            logMsg = u'git:{} {}'.format(head, logMsg)
-
-    __logUnicodeMessage(prio, logMsg)
+    __logUnicodeMessage(prio, __enrichMessage(msg, withGamePrefix))
     if showStack:
         if showStack is True:
             lower = 2
