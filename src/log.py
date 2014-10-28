@@ -167,13 +167,7 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     # pylint: disable=R0912
     if isinstance(msg, Exception):
         msg = __exceptionToString(msg)
-    try:
-        if isinstance(msg, str):
-            msg = unicode(msg, 'utf-8')
-        elif not isinstance(msg, unicode):
-            msg = unicode(str(msg), 'utf-8')
-    except TypeError:
-        pass # python3 TODO:
+    msg = unicodeString(msg)
     msg = translateServerMessage(msg)
     __logUnicodeMessage(prio, __enrichMessage(msg, withGamePrefix))
     if showStack:
