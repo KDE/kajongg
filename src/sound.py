@@ -24,7 +24,7 @@ from hashlib import md5
 if os.name == 'nt':
     import winsound # pylint: disable=import-error
 
-from common import Debug, Internal, unicode
+from common import Debug, Internal, nativeString
 from util import which, removeIfExists, uniqueList, elapsedSince
 from log import logWarning, m18n, logDebug, logException
 
@@ -205,7 +205,7 @@ class Voice(object):
         else:
             logException('have neither HOME nor HOMEPATH')
         if home:
-            if self.directory.startswith(home.decode('utf-8')):
+            if self.directory.startswith(home):
                 return 'local'
         result = os.path.split(self.directory)[0]
         result = os.path.split(result)[1]
@@ -220,7 +220,7 @@ class Voice(object):
         if not Voice.__availableVoices:
             result = []
             for parentDirectory in KGlobal.dirs().findDirs("appdata", "voices"):
-                parentDirectory = unicode(parentDirectory)
+                parentDirectory = nativeString(parentDirectory)
                 for (dirpath, _, _) in os.walk(parentDirectory, followlinks=True):
                     if os.path.exists(os.path.join(dirpath, 's1.ogg')):
                         result.append(Voice(dirpath))
