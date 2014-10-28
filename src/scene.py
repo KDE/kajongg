@@ -19,10 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from log import m18n, m18nc, logDebug
-from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug, WINDS, unicode
+from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug, WINDS
+from common import unicode, nativeString
 from twisted.internet.defer import succeed
 
-from qt import Qt, QMetaObject
+from qt import Qt, QMetaObject, variantValue
 from qt import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
 
 from zope.interface import implements # pylint: disable=unused-import
@@ -565,5 +566,6 @@ class ScoringScene(GameScene):
             cbLastMeld = self.scoringDialog.cbLastMeld
             idx = cbLastMeld.currentIndex()
             if idx >= 0:
-                return Meld(str(cbLastMeld.itemData(idx).toString()))
+                return Meld(nativeString(
+                    variantValue(cbLastMeld.itemData(idx))))
         return Meld()
