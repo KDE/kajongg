@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import sys, os
+import sys, os, codecs
 
 from log import logError, logDebug, m18n, m18nc
 from common import Options, Internal, isAlive, Debug
@@ -29,7 +29,10 @@ class MyHook(cgitb.Hook):
     """override the standard cgitb hook: invoke the browser"""
     def __init__(self):
         self.tmpFileName = tempfile.mkstemp(suffix='.html', prefix='bt_', text=True)[1]
-        cgitb.Hook.__init__(self, file=open(self.tmpFileName, 'w'))
+        # cgitb can only handle ascii, work around that.
+        # See http://bugs.python.org/issue22746
+        cgitb.Hook.__init__(self, file=codecs.open(self.tmpFileName, 'w',
+            encoding='latin-1', errors='xmlcharrefreplace'))
 
     def handle(self, info=None):
         """handling the exception: show backtrace in browser"""
