@@ -368,7 +368,7 @@ class RuleTreeView(QTreeView):
         self.rulesets = [] # nasty: this generates self.ruleModel
         self.differs = []
 
-    def dataChanged(self, dummyIndex1, dummyIndex2):
+    def dataChanged(self, dummyIndex1, dummyIndex2, dummyRoles=None):
         """gets called if the model has changed: Update all differs"""
         for differ in self.differs:
             differ.rulesetChanged()
