@@ -216,6 +216,7 @@ class Player(StrMixin):
     @property
     def hand(self):
         """a readonly tuple"""
+# TODO: str or what?
         if not self._hand:
             self._hand = self.computeHand()
         return self._hand
