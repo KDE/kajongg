@@ -29,8 +29,9 @@ SERVERMARK = '&&SERVER&&'
 # util must not import twisted or we need to change kajongg.py
 
 from common import Internal, Debug, unicode, isPython3, ENGLISHDICT # pylint: disable=redefined-builtin
+from common import unicodeString, nativeString, nativeStringArgs
 from qt import Qt, QEvent
-from util import elapsedSince, traceback, xToUtf8, gitHead
+from util import elapsedSince, traceback, gitHead
 from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
 
@@ -226,10 +227,13 @@ def m18n(englishText, *args):
     @return: The translated text with args inserted.
     @rtype: C{unicode}.
     """
-    englishText = xToUtf8(englishText)
-    result = unicode(i18n(englishText, *args))
+    result = unicodeString(
+                i18n(
+                    nativeString(
+                        englishText),
+                        *nativeStringArgs(args)))
     if not args:
-        ENGLISHDICT[result] = englishText
+        ENGLISHDICT[result] = unicodeString(englishText)
     return result
 
 def m18nc(context, englishText, *args):
@@ -248,19 +252,23 @@ def m18nc(context, englishText, *args):
     @return: The translated text with args inserted.
     @rtype: C{unicode}.
     """
-    englishText = xToUtf8(englishText)
-    result = unicode(i18nc(context, englishText, *args))
+    result = unicodeString(
+                i18nc(
+                    context,
+                    nativeString(
+                        englishText),
+                        *nativeStringArgs(args)))
     if not args:
-        ENGLISHDICT[result] = englishText
+        ENGLISHDICT[result] = unicodeString(englishText)
     return result
 
 def m18nE(englishText):
     """use this if you want to get the english text right now but still have the string translated"""
-    return englishText
+    return unicodeString(englishText)
 
 def m18ncE(dummyContext, englishText):
     """use this if you want to get the english text right now but still have the string translated"""
-    return englishText
+    return unicodeString(englishText)
 
 class EventData(str):
     """used for generating a nice string"""

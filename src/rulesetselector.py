@@ -73,7 +73,7 @@ class RulesetItem(RuleTreeItem):
         """return content stored in this item"""
         if column == 0:
             return m18n(self.rawContent.name)
-        return ''
+        return u''
 
     def columnCount(self):
         return 1
@@ -95,12 +95,12 @@ class RuleListItem(RuleTreeItem):
         """return content stored in this item"""
         if column == 0:
             return m18n(self.rawContent.name)
-        return ''
+        return u''
 
     def tooltip(self):
         """tooltip for a list item explaining the usage of this list"""
         ruleset = self.ruleset()
-        return '<b>' + m18n(ruleset.name) + '</b><br><br>' + \
+        return u'<b>' + m18n(ruleset.name) + u'</b><br><br>' + \
             m18n(self.rawContent.description)
 
 class RuleItem(RuleTreeItem):
@@ -128,7 +128,7 @@ class RuleItem(RuleTreeItem):
         """tooltip for rule: just the name of the ruleset"""
         ruleset = self.ruleset()
         if self.rawContent.description:
-            return '<b>' + m18n(ruleset.name) + '</b><br><br>' + \
+            return u'<b>' + m18n(ruleset.name) + u'</b><br><br>' + \
                 m18n(self.rawContent.description)
         else:
             return m18n(ruleset.name)
@@ -197,7 +197,7 @@ class RuleModel(TreeModel):
                     font.setItalic(True)
                     result = font
             elif role == Qt.ToolTipRole:
-                tip = '<b></b>%s<b></b>' % m18n(item.tooltip()) if item else ''
+                tip = u'<b></b>%s<b></b>' % m18n(item.tooltip()) if item else u''
                 result = tip
         return toQVariant(result)
 
