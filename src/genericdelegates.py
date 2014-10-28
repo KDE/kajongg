@@ -12,7 +12,7 @@ Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
  the GNU General Public License for more details.
 """
 
-from qt import usingQt5, Qt, RealQVariant, variantValue, QSize, QRect, QEvent
+from qt import Qt, RealQVariant, variantValue, QSize, QRect, QEvent
 from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
     QStyleOptionViewItem, QApplication
 
@@ -87,7 +87,8 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
             return False
         # make sure that we have a check state
         value = index.data(Qt.CheckStateRole)
-        if not value.isValid():
+        if not isinstance(value, int) and not value.isValid():
+            # in Python3, we get the python3 data type int
             return False
         # make sure that we have the right event type
         if event.type() == QEvent.MouseButtonRelease:
@@ -104,8 +105,7 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
                 return False
         else:
             return False
-        if not usingQt5:
-            value = value.toInt()[0]
+        value = variantValue(value)
         if value == Qt.Checked:
             state = Qt.Unchecked
         else:
