@@ -38,7 +38,7 @@ from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Internal, Debug, isAlive, english, unicode
-from common import isPython3
+from common import isPython3, nativeString
 from game import Players
 from query import Query
 from statesaver import StateSaver
@@ -53,6 +53,7 @@ class LoginAborted(Exception):
 class Url(unicode):
     """holds connection related attributes: host, port, socketname"""
     # pylint: disable=too-many-public-methods
+    # TODO: base content: host:port
     def __new__(cls, url):
         host = None
         port = None
@@ -64,6 +65,7 @@ class Url(unicode):
             if len(urlParts) > 1:
                 port = int(urlParts[1])
         else:
+            # TODO: but host is None, do we ever get here?
             url = host
             if port:
                 url += ':{}'.format(self.port)
@@ -96,7 +98,7 @@ class Url(unicode):
         if self.useSocket:
             return 'Url({} socket={})'.format(self, socketName())
         else:
-            return 'Url({} host={} port={})'.format(self, self.host, self.port)
+            return 'Url({} host={} port={})'.format(self, nativeString(self.host), self.port)
 
     @property
     def useSocket(self):
@@ -556,6 +558,9 @@ class Connection(object):
                 self.dlg.password).exec_():
                 raise CancelledError
             Players.createIfUnknown(self.username)
+        # TODO: are dlg.username/password always unicode?
+        assert isinstance(self.dlg.username, unicode), self.dlg.username
+        assert isinstance(self.dlg.password, unicode), self.dlg.password
         adduserCmd = SERVERMARK.join(['adduser', self.dlg.username, self.dlg.password])
         return self.loginCommand(adduserCmd)
 
