@@ -89,6 +89,8 @@ class Url(unicode):
                 logDebug(u'Installed qt4reactor')
         return obj
 
+        return obj
+
     def __repr__(self):
         """show all info"""
         if self.useSocket:
