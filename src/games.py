@@ -218,10 +218,8 @@ class Games(QDialog):
                     Query("DELETE FROM score WHERE game = ?", (game, ))
                     Query("DELETE FROM game WHERE id = ?", (game, ))
                 self.setQuery() # just reload entire table
-        if usingQt5:
-            deleteGames = list(x.data() for x in self.view.selectionModel().selectedRows(0))
-        else:
-            deleteGames = list(x.data().toInt()[0] for x in self.view.selectionModel().selectedRows(0))
+        allGames = self.view.selectionModel().selectedRows(0)
+        deleteGames = list(variantValue(x.data()) for x in allGames)
         if len(deleteGames) == 0:
             # should never happen
             logException('delete: 0 rows selected')
