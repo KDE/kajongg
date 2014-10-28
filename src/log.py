@@ -146,7 +146,7 @@ def __exceptionToString(exception):
     @param exception: The exception to be logged.
     @type exception: C{Exception}
 
-    @rtype: C{str}
+    @rtype: C{unicode}
     """
     parts = []
     for arg in exception.args:
@@ -154,14 +154,12 @@ def __exceptionToString(exception):
             # when using pykde4, this is already translated at this point
             # but I do not know what it does differently with gettext and if
             # I can do the same with the python gettext module
-            parts.append('[Errno {}] {}'.format(arg.errno, m18n(arg.strerror)))
+            parts.append(u'[Errno {}] {}'.format(arg.errno, m18n(arg.strerror)))
         elif arg is None:
             pass
-        elif isinstance(arg, str):
-            parts.append(unicode(arg.decode(getpreferredencoding())))
         else:
             parts.append(unicode(arg))
-    return ' '.join(parts)
+    return u' '.join(parts)
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
@@ -209,10 +207,7 @@ def logWarning(msg, withGamePrefix=True):
 def logException(exception, withGamePrefix=True):
     """logs error message and re-raises exception"""
     logError(exception, withGamePrefix=withGamePrefix)
-    if isinstance(exception, (str, unicode)):
-        msg = exception.encode('utf-8', 'replace')
-        exception = Exception(msg)
-    raise exception
+    raise Exception(nativeString(exception))
 
 def m18n(englishText, *args):
     """
