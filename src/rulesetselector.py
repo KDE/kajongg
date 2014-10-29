@@ -110,7 +110,7 @@ class RuleItem(RuleTreeItem):
 
     def content(self, column):
         """return the content stored in this node"""
-        colNames = [unicode(x.toString()) for x in self.parent.parent.parent.rawContent]
+        colNames = self.parent.parent.parent.rawContent
         content = self.rawContent
         if column == 0:
             return m18n(content.name)
@@ -146,9 +146,8 @@ class RuleModel(TreeModel):
                 unitNames.extend(rule.score.unitNames.items())
         unitNames = sorted(unitNames, key=lambda x: x[1])
         unitNames = uniqueList(x[0] for x in unitNames)
-        rootData = [toQVariant(title)]
-        for unitName in unitNames:
-            rootData.append(toQVariant(unitName))
+        rootData = [title]
+        rootData.extend(unitNames)
         self.rootItem = RuleRootItem(rootData)
 
     def canFetchMore(self, dummyParent=None):
@@ -166,7 +165,7 @@ class RuleModel(TreeModel):
         """get data fom model"""
         # pylint: disable=too-many-branches
         # too many branches
-        result = toQVariant()
+        result = None
         if index.isValid():
             item = index.internalPointer()
             if role in (Qt.DisplayRole, Qt.EditRole):
@@ -256,7 +255,7 @@ class EditableRuleModel(RuleModel):
         """change rule data in the model"""
         dirty, message = False, None
         if column == 0:
-            name = unicode(value.toString())
+            name = unicode(value)
             if content.name != english(name):
                 dirty = True
                 content.name = english(name)
@@ -269,13 +268,13 @@ class EditableRuleModel(RuleModel):
             elif isinstance(content, BoolRule):
                 return False, ''
             elif isinstance(content, StrRule):
-                if content.parameter != unicode(value.toString()):
+                if content.parameter != unicode(value):
                     dirty = True
-                    content.parameter = unicode(value.toString())
+                    content.parameter = unicode(value)
             else:
-                if content.parameter != unicode(value.toString()):
+                if content.parameter != unicode(value):
                     dirty = True
-                    content.parameter = unicode(value.toString())
+                    content.parameter = unicode(value)
             message = content.validate()
             if message:
                 content.parameter = oldParameter
@@ -298,7 +297,7 @@ class EditableRuleModel(RuleModel):
             content = item.rawContent
             if role == Qt.EditRole:
                 if isinstance(content, Ruleset) and column == 0:
-                    name = unicode(value.toString())
+                    name = unicode(value)
                     oldName = content.name
                     content.rename(english(name))
                     dirty = oldName != content.name
