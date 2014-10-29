@@ -772,7 +772,7 @@ class FittingView(QGraphicsView):
         """we do not want scrolling for the scene view.
         Instead scrolling down changes perspective like in kmahjongg"""
         if event.orientation() == Qt.Vertical and event.delta() < 0:
-            Internal.scene.changeAngle()
+            Internal.mainWindow.changeAngle()
         # otherwise do not call ignore() because we do want
         # to consume this
 
