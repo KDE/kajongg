@@ -69,7 +69,7 @@ disable=R0903,E0211,I0011,I0013,too-many-ancestors
 output-format=text
 
 # Include message's id in output
-include-ids=yes
+# include-ids=yes deprecated
 
 # Put messages in a separate file for each module / package specified on the
 # command line instead of printing them on stdout. Reports (if any) will be
