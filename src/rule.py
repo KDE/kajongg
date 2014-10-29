@@ -823,25 +823,24 @@ class Rule(RuleBase):
         self.__class__.options = {}
         self.hasSelectable = False
         for idx, variant in enumerate(variants):
-            if isinstance(variant, (str, unicode)):
-                variant = str(variant)
-                if variant[0] == 'F':
-                    assert idx == 0
-                    code = self.ruleCode[variant[1:]]
-                    # when executing code for this rule, we do not want
-                    # to call those things indirectly
-                    # pylint: disable=attribute-defined-outside-init
-                    self.redirectTo(code, self.__class__, memoize=True)
-                    if hasattr(code, 'selectable'):
-                        self.hasSelectable = True
-                elif variant[0] == 'O':
-                    for action in variant[1:].split():
-                        aParts = action.split('=')
-                        if len(aParts) == 1:
-                            aParts.append('None')
-                        self.options[aParts[0]] = aParts[1]
-                else:
-                    pass
+            variant = str(variant)
+            if variant[0] == 'F':
+                assert idx == 0
+                code = self.ruleCode[variant[1:]]
+                # when executing code for this rule, we do not want
+                # to call those things indirectly
+                # pylint: disable=attribute-defined-outside-init
+                self.redirectTo(code, self.__class__, memoize=True)
+                if hasattr(code, 'selectable'):
+                    self.hasSelectable = True
+            elif variant[0] == 'O':
+                for action in variant[1:].split():
+                    aParts = action.split('=')
+                    if len(aParts) == 1:
+                        aParts.append('None')
+                    self.options[aParts[0]] = aParts[1]
+            else:
+                pass
         self.validate()
 
     def validate(self):
