@@ -18,16 +18,22 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from common import isPython3
-if isPython3:
-    from common import unicode # pylint: disable=redefined-builtin
+from common import unicode, nativeString
 
 class QString(unicode):
     """If pyqt does not define it: We need something that looks like a QString"""
     # pylint: disable=too-many-public-methods
+
+    def __new__(cls, value=None):
+        if value is None:
+            return unicode.__new__(cls)
+        else:
+            return unicode.__new__(cls, nativeString(value))
+
     def toString(self):
         """do nothing"""
-        return self.decode('utf-8')
+        return self
+
     def toInt(self):
         """like QString.toInt"""
         try:
