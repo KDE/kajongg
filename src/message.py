@@ -482,7 +482,7 @@ class MessageVoiceId(ServerMessage):
     this voice, ask the server"""
     def clientAction(self, dummyClient, move):
         """the server gave us a voice id about another player"""
-        if Sound.enabled:
+        if Internal.Preferences.useSounds:
             move.player.voice = Voice.locate(move.source)
             if not move.player.voice:
                 return Message.ClientWantsVoiceData, move.source
@@ -499,7 +499,7 @@ class MessageVoiceData(ServerMessage):
 class MessageAssignVoices(ServerMessage):
     """The server tells us that we now got all voice data available"""
     def clientAction(self, client, move):
-        if Sound.enabled:
+        if Internal.Preferences.useSounds:
             client.game.assignVoices()
 
 class MessageClientWantsVoiceData(ClientMessage):

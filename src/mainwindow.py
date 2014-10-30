@@ -520,7 +520,6 @@ class MainWindow(KXmlGuiWindow):
         if self.backgroundName != Internal.Preferences.backgroundName:
             self.backgroundName = Internal.Preferences.backgroundName
         self.adjustView()
-        Sound.enabled = Internal.Preferences.useSounds
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""

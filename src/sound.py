@@ -45,7 +45,6 @@ from tile import Tile
 class Sound(object):
     """the sound interface. Use class variables and class methods,
     thusly ensuring no two instances try to speak"""
-    enabled = False
     __oggName = None
     playProcesses = []
     lastCleaned = None
@@ -68,7 +67,7 @@ class Sound(object):
                 Sound.__oggName = oggName
             else:
                 Sound.__oggName = False
-                Sound.enabled = False
+                Internal.Preferences.useSounds = False
                 # checks again at next reenable
                 if msg:
                     logWarning(msg)
@@ -106,7 +105,7 @@ class Sound(object):
     @staticmethod
     def speak(what):
         """this is what the user of this module will call."""
-        if not Sound.enabled:
+        if not Internal.Preferences.useSounds:
             return
         game = Internal.scene.game
         reactor = Internal.reactor
