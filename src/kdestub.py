@@ -577,7 +577,6 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
 
     def setupGUI(self):
         """stub"""
-        self.applySettings()
 
     def toolBar(self):
         """stub"""
@@ -1018,7 +1017,9 @@ class KConfigSkeletonItem(object):
 
     def setValue(self, value):
         """default setter"""
-        self._value = value
+        if self._value != value:
+            self._value = value
+            self.skeleton.configChanged.emit()
 
     def getFromConfig(self):
         """if not there, use default"""
@@ -1071,9 +1072,11 @@ class ItemInt(KConfigSkeletonItem):
         """maximum value for this setting"""
         self.maxValue = value
 
-class KConfigSkeleton(object):
+class KConfigSkeleton(QObject):
     """handles preferences settings"""
+    configChanged = pyqtSignal()
     def __init__(self):
+        QObject.__init__(self)
         self.currentGroup = None
         self.items = []
         self.config = KConfig()
@@ -1081,10 +1084,10 @@ class KConfigSkeleton(object):
         self.addString('MainWindow', 'toolBarActions', 'quit,play,scoreTable,explain,players,options_configure')
 
     def addBool(self, group, name, default=None):
-        """to be overridden in MainWindow"""
+        """to be overridden"""
 
     def addString(self, group, name, default=None):
-        """to be overridden in MainWindow"""
+        """to be overridden"""
 
     def readConfig(self):
         """init already read config"""
@@ -1243,7 +1246,6 @@ class LicenseDialog(KDialog):
 
 class KConfigDialog(KDialog):
     """for the game preferences"""
-    settingsChanged = pyqtSignal()
     dialog = None
     getFunc = {
             'QCheckBox': 'isChecked',
@@ -1343,16 +1345,12 @@ class KConfigDialog(KDialog):
         """Apply pressed"""
         changed = self.updateButtons()
         self.updateSettings()
-        if changed:
-            self.settingsChanged.emit()
         self.updateButtons()
 
     def accept(self):
         """OK pressed"""
         changed = self.updateButtons()
         self.updateSettings()
-        if changed:
-            self.settingsChanged.emit()
         KDialog.accept(self)
 
     def updateButtons(self):

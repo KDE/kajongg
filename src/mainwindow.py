@@ -41,13 +41,13 @@ class MyHook(cgitb.Hook):
             cgitb.Hook.handle(self, info)
             webbrowser.open(self.tmpFileName)
 
-sys.excepthook = MyHook()
+#sys.excepthook = MyHook()
 
 NOTFOUND = []
 
 try:
     from qt import Qt, QVariant, variantValue, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
-    from qt import QWidget, QGridLayout, QAction
+    from qt import QWidget, QGridLayout, QAction, QString
 except ImportError as importError:
     NOTFOUND.append('Please install PyQt4 or PyQt5: %s' % importError)
 
@@ -59,26 +59,24 @@ except ImportError as importError:
 from kde import KIcon, KAction, KApplication, KToggleFullScreenAction, \
     KXmlGuiWindow, KStandardAction
 
-try:
-    from board import FittingView
-    from playerlist import PlayerList
-    from tileset import Tileset
-    from background import Background
-    from scoring import scoreGame
-    from scoringdialog import ScoreTable, ExplainView
-    from humanclient import HumanClient
-    from rulesetselector import RulesetSelector
-    from sound import Sound
-    from animation import animate, afterCurrentAnimationDo, Animated
-    from chat import ChatWindow
-    from scene import PlayingScene, ScoringScene
-    from configdialog import ConfigDialog
-    from statesaver import StateSaver
-    from util import checkMemory
-    from twisted.internet.error import ReactorNotRunning
+from board import FittingView
+from playerlist import PlayerList
+from tileset import Tileset
+from background import Background
+from scoring import scoreGame
+from scoringdialog import ScoreTable, ExplainView
+from humanclient import HumanClient
+from rulesetselector import RulesetSelector
+from animation import animate, afterCurrentAnimationDo, Animated
+from chat import ChatWindow
+from scene import PlayingScene, ScoringScene
+from configdialog import ConfigDialog
+from statesaver import StateSaver
+from util import checkMemory
+from twisted.internet.error import ReactorNotRunning
 
-except ImportError as importError:
-    NOTFOUND.append('Kajongg is not correctly installed: modules: %s' % importError)
+#except ImportError as importError:
+#    NOTFOUND.append('Kajongg is not correctly installed: modules: %s' % importError)
 
 if len(NOTFOUND):
     MSG = "\n".join(" * %s" % s for s in NOTFOUND)
@@ -121,22 +119,24 @@ class MainWindow(KXmlGuiWindow):
         self.exitWaitTime = None
         Internal.mainWindow = self
         self._scene = None
+        self.centralView = None
         self.background = None
         self.playerWindow = None
         self.rulesetWindow = None
         self.confDialog = None
         if Options.gui:
-            self.setupUi()
             KStandardAction.preferences(self.showSettings, self.actionCollection())
-            self.applySettings()
+            self.setupUi()
             self.setupGUI()
+            Internal.Preferences.addWatch('tilesetName', self.tilesetNameChanged)
+            Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
+            Internal.Preferences.addWatch('backgroundName', self.backgroundChanged)
             self.retranslateUi()
             for action in self.toolBar().actions():
                 if 'onfigure' in action.text():
                     action.setPriority(QAction.LowPriority)
             if Options.host and not Options.demo:
                 self.scene = PlayingScene(self)
-                self.scene.applySettings()
                 HumanClient()
             StateSaver(self)
             self.show()
@@ -271,7 +271,6 @@ class MainWindow(KXmlGuiWindow):
         if game:
             self.scene = scene
             scene.game = game
-            self.applySettings()
             game.throwDices()
             self.updateGUI()
 
@@ -495,31 +494,37 @@ class MainWindow(KXmlGuiWindow):
             if oldRect != newRect:
                 view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
-    @property
-    def backgroundName(self):
-        """setting this also actually changes the background"""
-        return self.background.desktopFileName if self.background else ''
-
-    @backgroundName.setter
-    def backgroundName(self, name):
-        """setter for backgroundName"""
-        self.background = Background(name)
-        self.background.setPalette(self.centralWidget())
-        self.centralWidget().setAutoFillBackground(True)
-
-    def applySettings(self):
-        """apply preferences"""
+    def backgroundChanged(self, oldName, newName):
         animate() # drain the queue
-        afterCurrentAnimationDo(self.__applySettings2)
+        afterCurrentAnimationDo(self.__backgroundChanged2, newName)
 
-    def __applySettings2(self, dummyResults):
+    def __backgroundChanged2(self, dummyResults, newName):
+        centralWidget = self.centralWidget()
+        if centralWidget:
+            self.background = Background(newName)
+            self.background.setPalette(centralWidget)
+            centralWidget.setAutoFillBackground(True)
+
+    def tilesetNameChanged(self, oldValue=None, newValue=None):
+        if self.centralView:
+            animate() # drain the queue
+            afterCurrentAnimationDo(self.__tilesetNameChanged2, newValue)
+
+    def __tilesetNameChanged2(self, dummyResults, newValue):
         """now no animation is running"""
         with Animated(False):
             if self.scene:
                 self.scene.applySettings()
-        if self.backgroundName != Internal.Preferences.backgroundName:
-            self.backgroundName = Internal.Preferences.backgroundName
         self.adjustView()
+
+    def showShadowsChanged(self, oldValue, newValue):
+        animate() # drain the queue
+        afterCurrentAnimationDo(self.__showShadowsChanged2, newValue)
+
+    def __showShadowsChanged2(self, dummyResults, newValue):
+        with Animated(False):
+            if self.scene:
+                self.scene.applySettings()
 
     def showSettings(self):
         """show preferences dialog. If it already is visible, do nothing"""
@@ -533,7 +538,6 @@ class MainWindow(KXmlGuiWindow):
     def __showSettings2(self, dummyResult):
         """now that no animation is running, show settings dialog"""
         self.confDialog = ConfigDialog(self, "settings")
-        self.confDialog.settingsChanged.connect(self.applySettings)
         self.confDialog.show()
 
     def _toggleWidget(self, checked):

@@ -593,7 +593,7 @@ class Board(QGraphicsRectItem):
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
     def __init__(self, width, height):
-        Board.__init__(self, width, height, Internal.scene.tileset)
+        Board.__init__(self, width, height, Tileset.activeTileset())
         self.setAcceptDrops(True)
 
     def maximize(self):
@@ -777,16 +777,9 @@ class FittingView(QGraphicsView):
         # to consume this
 
     def resizeEvent(self, dummyEvent):
-        """scale the scene for new view size"""
-        # also adjust the background to the container. Do this here because this way
-        # it is easier to minimize calls to setBackground()
-        parent = self.parentWidget()
-        if parent:
-            grandpa = parent.parentWidget()
-            if grandpa and grandpa.objectName() == 'MainWindow':
-                grandpa.applySettings()
-                # resize background:
-                grandpa.backgroundName = grandpa.backgroundName
+        """scale the scene and its background for new view size"""
+        Internal.Preferences.callTrigger('tilesetName') # this redraws and resizes
+        Internal.Preferences.callTrigger('backgroundName') # redraw background
         if Internal.scaleScene and self.scene():
             self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
         self.setFocus()

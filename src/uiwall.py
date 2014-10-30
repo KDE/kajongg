@@ -24,6 +24,7 @@ from qt import QRectF, QPointF, QGraphicsSimpleTextItem, QFontMetrics
 from board import PlayerWind, YellowText, Board, rotateCenter
 from wall import Wall, KongBox
 from tile import Tile
+from tileset import Tileset
 from uitile import UITile
 from animation import animate, afterCurrentAnimationDo, Animated, \
     ParallelAnimationGroup
@@ -89,10 +90,10 @@ class UIWall(Wall):
         # use any tile because the face is never shown anyway.
         game.wall = self
         Wall.__init__(self, game)
-        self.__square = Board(1, 1, Internal.scene.tileset)
+        self.__square = Board(1, 1, Tileset.activeTileset())
         self.__square.setZValue(ZValues.marker)
         sideLength = len(self.tiles) // 8
-        self.__sides = [UIWallSide(Internal.scene.tileset, boardRotation, sideLength) \
+        self.__sides = [UIWallSide(Tileset.activeTileset(), boardRotation, sideLength) \
             for boardRotation in (0, 270, 180, 90)]
         for side in self.__sides:
             side.setParentItem(self.__square)
@@ -214,7 +215,7 @@ class UIWall(Wall):
 
     def __findOptimalFontHeight(self):
         """for names on walls"""
-        tileHeight = Internal.scene.tileset.faceSize.height()
+        tileHeight = Tileset.activeTileset().faceSize.height()
         font = self.__sides[0].nameLabel.font()
         size = 80
         font.setPointSize(size)

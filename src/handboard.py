@@ -22,6 +22,7 @@ import weakref
 
 from qt import QGraphicsRectItem
 from tile import Tile
+from tileset import Tileset
 from uitile import UITile
 from meld import Meld, MeldList
 from hand import Hand
@@ -82,13 +83,13 @@ class HandBoard(Board):
         self.exposedMeldDistance = 0.15
         self.concealedMeldDistance = 0.0
         self.lowerY = 1.0
-        Board.__init__(self, 15.6, 2.0, Internal.scene.tileset)
+        Board.__init__(self, 15.6, 2.0, Tileset.activeTileset())
         self.isHandBoard = True
         self.tileDragEnabled = False
         self.setParentItem(player.front)
         self.setAcceptDrops(True)
-        self.rearrangeMelds = Internal.Preferences.rearrangeMelds
         self.showShadows = Internal.Preferences.showShadows
+        Internal.Preferences.addWatch('rearrangeMelds', self.rearrangeMeldsChanged)
 
     def computeRect(self):
         """also adjust the scale for maximum usage of space"""
@@ -132,18 +133,11 @@ class HandBoard(Board):
             self._reload(self.tileset, showShadows=value)
             self.sync()
 
-    @property
-    def rearrangeMelds(self):
-        """when setting this, concealed melds are grouped"""
-        return bool(self.concealedMeldDistance)
-
-    @rearrangeMelds.setter
-    def rearrangeMelds(self, rearrangeMelds):
-        """when setting this, concealed melds are grouped"""
-        if rearrangeMelds != self.rearrangeMelds:
-            self.concealedMeldDistance = self.exposedMeldDistance if rearrangeMelds else 0.0
-            self._reload(self.tileset, self._lightSource)
-            self.sync()
+    def rearrangeMeldsChanged(self, oldValue, newValue):
+        """when True, concealed melds are grouped"""
+        self.concealedMeldDistance = self.exposedMeldDistance if newValue else 0.0
+        self._reload(self.tileset, self._lightSource)
+        self.sync()
 
     def focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
@@ -387,7 +381,7 @@ class PlayingHandBoard(HandBoard):
             result = MeldList(content.melds + content.bonusMelds)
         else:
             return []
-        if not self.rearrangeMelds:
+        if not Internal.Preferences.rearrangeMelds:
             result = MeldList(Meld(x) for x in result.tiles()) # one meld per tile
         result.sort()
         return result

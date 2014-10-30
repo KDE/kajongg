@@ -168,8 +168,6 @@ class GameScene(SceneWithFocusRect):
     def setupUi(self):
         """prepare scene"""
         # pylint: disable=too-many-statements
-        self.tileset = None # just for pylint
-        self.tilesetName = Internal.Preferences.tilesetName
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
 
     def showWall(self):
@@ -190,34 +188,12 @@ class GameScene(SceneWithFocusRect):
                     if uiTile.board:
                         uiTile.board.placeTile(uiTile)
 
-    @property
-    def tilesetName(self):
-        """the name of the current tileset"""
-        return self.tileset.desktopFileName
-
-    @tilesetName.setter
-    def tilesetName(self, name):
-        """the name of the current tileset"""
-        self.tileset = Tileset(name)
-
     def applySettings(self):
         """apply preferences"""
         self.mainWindow.actionAngle.setEnabled(bool(self.game) and Internal.Preferences.showShadows)
         with Animated(False):
-            if self.tilesetName != Internal.Preferences.tilesetName:
-                self.tilesetName = Internal.Preferences.tilesetName
-                if self.game:
-                    self.game.wall.tileset = self.tileset
-                for item in self.nonTiles():
-                    try:
-                        item.tileset = self.tileset
-                    except AttributeError:
-                        continue
-                # change players last because we need the wall already to be repositioned
-            if self.game:
-                for player in self.game.players:
-                    if player.handBoard:
-                        player.handBoard.rearrangeMelds = Internal.Preferences.rearrangeMelds
+            for item in self.nonTiles():
+                item.tileset = Tileset.activeTileset()
             if self.showShadows is None or self.showShadows != Internal.Preferences.showShadows:
                 self.showShadows = Internal.Preferences.showShadows
                 if self.game:

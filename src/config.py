@@ -21,11 +21,12 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+from collections import defaultdict
 
 from qt import QString
 from kde import KConfigSkeleton
-from log import logException
-from common import Internal
+from log import logException, logDebug
+from common import Internal, Debug
 
 class Parameter(object):
     """helper class for defining configuration parameters"""
@@ -90,11 +91,15 @@ class IntParameter(Parameter):
 class SetupPreferences(KConfigSkeleton):
     """Holds all Kajongg options. Only instantiate this once"""
     _Parameters = {}
+
     def __init__(self): # pylint: disable=super-init-not-called
         if Internal.Preferences:
             logException('Preferences is not None')
+        self.__watching = defaultdict(list)
         Internal.Preferences = self
         KConfigSkeleton.__init__(self)
+        self.configChanged.connect(self.callTriggers)
+        self.__oldValues = defaultdict(str)
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'wood_light')
@@ -105,6 +110,33 @@ class SetupPreferences(KConfigSkeleton):
         self.addInteger('Display', 'animationSpeed', 70, 0, 99)
         self.addBool('Display', 'useSounds', True)
         self.addBool('Display', 'uploadVoice', False)
+
+    def callTrigger(self, name):
+        newValue = getattr(self, name)
+        if self.__oldValues[name] != newValue:
+            if Debug.preferences:
+                logDebug(u'{}: {} -> {} calling {}'.format(
+                    name,
+                    self.__oldValues[name],
+                    newValue,
+                    ','.join(x.__name__ for x in self.__watching[name])))
+            for method in self.__watching[name]:
+                method(self.__oldValues[name], newValue)
+        self.__oldValues[name] = newValue
+
+    def callTriggers(self):
+        """call registered callbacks for specific attribute changes"""
+        for name in self.__watching:
+            self.callTrigger(name)
+
+    def addWatch(self, name, method):
+        """If name changes, call method.
+        method must accept 2 arguments: old value and new value."""
+        if method not in self.__watching[name]:
+            self.__watching[name].append(method)
+            if Debug.preferences:
+                logDebug('addWatch on {}, hook {}'.format(name, method.__name__))
+            self.callTrigger(name) # initial change
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""

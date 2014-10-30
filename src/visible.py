@@ -105,7 +105,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             return
         if self == self.game.activePlayer and self.game.client:
             color = Qt.blue
-        elif Internal.scene.tilesetName == 'jade':
+        elif Internal.Preferences.tilesetName == 'jade':
             color = Qt.white
         else:
             color = Qt.black

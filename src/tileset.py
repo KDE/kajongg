@@ -46,6 +46,7 @@ class Tileset(object):
     """represents a complete tileset"""
     # pylint: disable=too-many-instance-attributes
     catalogDefined = False
+    __activeTileset = None
 
     @staticmethod
     def defineCatalog():
@@ -132,6 +133,13 @@ class Tileset(object):
     def __str__(self):
         return "tileset id=%d name=%s, name id=%d" % \
             (id(self), self.desktopFileName, id(self.desktopFileName))
+
+    @staticmethod
+    def activeTileset():
+        prefName = Internal.Preferences.tilesetName
+        if not Tileset.__activeTileset or Tileset.__activeTileset.desktopFileName != prefName:
+            Tileset.__activeTileset = Tileset(prefName)
+        return Tileset.__activeTileset
 
     def shadowWidth(self):
         """the size of border plus shadow"""
