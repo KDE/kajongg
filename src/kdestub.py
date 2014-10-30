@@ -1020,10 +1020,6 @@ class KConfigSkeletonItem(object):
         """default setter"""
         self._value = value
 
-    def setPythonValue(self, value):
-        """default setter"""
-        self._value = value
-
     def getFromConfig(self):
         """if not there, use default"""
         try:
@@ -1052,9 +1048,6 @@ class ItemString(KConfigSkeletonItem):
 
     def pythonValue(self):
         return str(self._value)
-
-    def setPythonValue(self, value):
-        self._value = QString(value)
 
 class ItemInt(KConfigSkeletonItem):
     """integer preferences setting used by KOnfigSkeleton"""
