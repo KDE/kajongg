@@ -236,7 +236,10 @@ def afterQueuedAnimations(f):
         animate()
         method = types.MethodType( f, args[0])
         args = args[1:]
-        assert f.func_code.co_varnames[1] == 'deferredResult', f.__qualname__ if isPython3 else f.__name__
+        if isPython3:
+            assert f.__code__.co_varnames[1] == 'deferredResult', f.__qualname__
+        else:
+            assert f.func_code.co_varnames[1] == 'deferredResult', f.__name__
         return __afterCurrentAnimationDo(method, *args, **kwargs)
 
     return doAfterQueuedAnimations
