@@ -994,33 +994,34 @@ class ScoringDialog(QWidget):
         if self.game.finished():
             self.hide()
             return
-        for idx, player in enumerate(self.game.players):
-            with BlockSignals([self.spValues[idx], self.wonBoxes[idx]):
+        for nameLabel, wonBox, spValue, player in zip(
+            self.nameLabels, self.wonBoxes, self.spValues, self.game.players):
+            with BlockSignals([spValue, wonBox]):
                 # we do not want that change to call computeScores again
                 if player.handBoard and player.handBoard.uiTiles:
-                    self.spValues[idx].setEnabled(False)
-                    self.nameLabels[idx].setBuddy(self.wonBoxes[idx])
+                    spValue.setEnabled(False)
+                    nameLabel.setBuddy(wonBox)
                     for loop in range(10):
                         prevTotal = player.handTotal
                         handContent = player.computeHand()
-                        self.wonBoxes[idx].setVisible(handContent.won)
-                        if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
-                            self.wonBoxes[idx].setChecked(False)
+                        wonBox.setVisible(handContent.won)
+                        if not wonBox.isVisibleTo(self) and wonBox.isChecked():
+                            wonBox.setChecked(False)
                             self.game.winner = None
                         elif prevTotal == player.handTotal:
                             break
                         player.refreshManualRules()
-                    self.spValues[idx].setValue(player.handTotal)
+                    spValue.setValue(player.handTotal)
                 else:
-                    if not self.spValues[idx].isEnabled():
-                        self.spValues[idx].clear()
-                        self.spValues[idx].setValue(0)
-                        self.spValues[idx].setEnabled(True)
-                        self.nameLabels[idx].setBuddy(self.spValues[idx])
-                    self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJTotal())
-                    if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
-                        self.wonBoxes[idx].setChecked(False)
-                if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
+                    if not spValue.isEnabled():
+                        spValue.clear()
+                        spValue.setValue(0)
+                        spValue.setEnabled(True)
+                        nameLabel.setBuddy(spValue)
+                    wonBox.setVisible(player.handTotal >= self.game.ruleset.minMJTotal())
+                    if not wonBox.isVisibleTo(self) and wonBox.isChecked():
+                        wonBox.setChecked(False)
+                if not wonBox.isVisibleTo(self) and player is self.game.winner:
                     self.game.winner = None
         if Internal.scene.explainView:
             Internal.scene.explainView.refresh()
