@@ -76,6 +76,7 @@ class HandBoard(Board):
     """a board showing the tiles a player holds"""
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
     tileAttrClass = TileAttr
+    penColor = 'blue'
 
     def __init__(self, player):
         assert player

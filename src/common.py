@@ -99,6 +99,7 @@ class Debug(object):
     ruleCache = False
     quit = False
     preferences = False
+    graphics = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

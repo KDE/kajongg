@@ -31,6 +31,7 @@ from animation import animate, afterCurrentAnimationDo, Animated, \
 
 class UIWallSide(Board):
     """a Board representing a wall of tiles"""
+    penColor = 'red'
     def __init__(self, tileset, boardRotation, length):
         Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
         self.length = length

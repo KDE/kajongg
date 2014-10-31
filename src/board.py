@@ -158,6 +158,8 @@ class Board(QGraphicsRectItem):
     """ a board with any number of positioned tiles"""
     # pylint: disable=too-many-instance-attributes
 
+    penColor = 'black'
+
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
     def __init__(self, width, height, tileset, boardRotation=0):
         QGraphicsRectItem.__init__(self)
@@ -347,7 +349,7 @@ class Board(QGraphicsRectItem):
 
     def dragEnterEvent(self, dummyEvent):
         """drag enters the HandBoard: highlight it"""
-        self.setPen(QPen(QColor('blue')))
+        self.setPen(QPen(QColor(self.penColor)))
 
     def dragLeaveEvent(self, dummyEvent):
         """drag leaves the HandBoard"""
@@ -355,7 +357,10 @@ class Board(QGraphicsRectItem):
 
     def _noPen(self):
         """remove pen for this board. The pen defines the border"""
-        self.setPen(QPen(Qt.NoPen))
+        if Debug.graphics:
+            self.setPen(QPen(QColor(self.penColor)))
+        else:
+            self.setPen(QPen(Qt.NoPen))
 
     def tileAt(self, xoffset, yoffset, level=0):
         """if there is a uiTile at this place, return it"""
@@ -592,6 +597,7 @@ class Board(QGraphicsRectItem):
 
 class CourtBoard(Board):
     """A Board that is displayed within the wall"""
+    penColor = 'green'
     def __init__(self, width, height):
         Board.__init__(self, width, height, Tileset.activeTileset())
         self.setAcceptDrops(True)
@@ -897,6 +903,7 @@ class YellowText(QGraphicsRectItem):
 class DiscardBoard(CourtBoard):
     """A special board for discarded tiles"""
     # pylint: disable=too-many-public-methods
+    penColor = 'orange'
     def __init__(self):
         CourtBoard.__init__(self, 11, 9)
         self.__places = None
