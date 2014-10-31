@@ -196,7 +196,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
 
 class Animated(object):
     """a helper class for moving tiles with or without animation"""
-    def __init__(self, animateMe=True):
+    def __init__(self, animateMe=False):
         if Internal.Preferences:
             self.__animateMe = animateMe
             self.prevAnimationSpeed = Internal.Preferences.animationSpeed

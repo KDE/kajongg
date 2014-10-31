@@ -651,7 +651,7 @@ class SelectorBoard(CourtBoard):
 
     def refill(self):
         """move all tiles back into the selector"""
-        with Animated(False):
+        with Animated():
             for uiTile in self.allSelectorTiles:
                 uiTile.tile = uiTile.tile.exposed
                 self.__placeAvailable(uiTile)

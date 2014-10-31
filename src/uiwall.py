@@ -280,7 +280,7 @@ class UIWall(Wall):
 
     def divide(self):
         """divides a wall, building a living and and a dead end"""
-        with Animated(False):
+        with Animated():
             Wall.divide(self)
             for uiTile in self.tiles:
                 # update graphics because tiles having been

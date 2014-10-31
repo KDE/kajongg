@@ -182,7 +182,7 @@ class GameScene(SceneWithFocusRect):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            with Animated(False):
+            with Animated():
                 self.game.wall.decorate()
                 for uiTile in self.game.wall.tiles:
                     if uiTile.board:
@@ -191,7 +191,7 @@ class GameScene(SceneWithFocusRect):
     def applySettings(self):
         """apply preferences"""
         self.mainWindow.actionAngle.setEnabled(bool(self.game) and Internal.Preferences.showShadows)
-        with Animated(False):
+        with Animated():
             for item in self.nonTiles():
                 item.tileset = Tileset.activeTileset()
             if self.showShadows is None or self.showShadows != Internal.Preferences.showShadows:
@@ -360,7 +360,7 @@ class PlayingScene(GameScene):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            with Animated(False):
+            with Animated():
                 self.discardBoard.maximize()
         GameScene.adjustView(self)
 
@@ -526,7 +526,7 @@ class ScoringScene(GameScene):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            with Animated(False):
+            with Animated():
                 self.selectorBoard.maximize()
         GameScene.adjustView(self)
 

@@ -84,5 +84,5 @@ class TilesetSelector(QWidget):
         self.tilesetAuthor.setText(selTileset.author)
         self.tilesetContact.setText(selTileset.authorEmail)
         self.tilesetDescription.setText(selTileset.description)
-        with Animated(False):
+        with Animated():
             self.board.tileset = selTileset

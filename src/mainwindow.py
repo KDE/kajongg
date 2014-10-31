@@ -510,7 +510,7 @@ class MainWindow(KXmlGuiWindow):
 
     def __tilesetNameChanged2(self, dummyResults, newValue):
         """now no animation is running"""
-        with Animated(False):
+        with Animated():
             if self.scene:
                 self.scene.applySettings()
         self.adjustView()
@@ -519,7 +519,7 @@ class MainWindow(KXmlGuiWindow):
         afterQueuedAnimationsDo(self.__showShadowsChanged2, newValue)
 
     def __showShadowsChanged2(self, dummyResults, newValue):
-        with Animated(False):
+        with Animated():
             if self.scene:
                 self.scene.applySettings()
 
@@ -578,5 +578,5 @@ class MainWindow(KXmlGuiWindow):
     def changeAngle(self):
         """change the lightSource"""
         if self.scene:
-            with Animated(False):
+            with Animated():
                 afterQueuedAnimationsDo(self.scene.changeAngle)
