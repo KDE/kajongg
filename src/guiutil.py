@@ -113,6 +113,25 @@ class Painter(object):
         """now check time passed"""
         self.painter.restore()
 
+class BlockSignals(object):
+    """a helper class for temporary blocking of Qt signals"""
+    def __init__(self, qobject):
+        self.qobject = qobject
+
+    def __enter__(self):
+        if isinstance(self.qobject, list):
+            for obj in self.qobject:
+                obj.blockSignals(True)
+        else:
+            self.qobject.blockSignals(True)
+
+    def __exit__(self, exc_type, exc_value, trback):
+        if isinstance(self.qobject, list):
+            for obj in self.qobject:
+                obj.blockSignals(False)
+        else:
+            self.qobject.blockSignals(False)
+
 def decorateWindow(window, name=None):
     """standard Kajongg window title and icon"""
     if name:
