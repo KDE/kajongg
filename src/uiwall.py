@@ -112,6 +112,7 @@ class UIWall(Wall):
         self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1)
         self.__findOptimalFontHeight()
         Internal.scene.addItem(self.__square)
+        Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @staticmethod
     def name():
@@ -226,20 +227,10 @@ class UIWall(Wall):
         for side in self.__sides:
             side.nameLabel.setFont(font)
 
-    @property
-    def showShadows(self):
-        """The current value"""
-        return self.__square.showShadows
-
-    @showShadows.setter
-    def showShadows(self, showShadows):
+    def showShadowsChanged(self, oldValue, newValue):
         """setting this actually changes the visuals."""
-        if self.showShadows != showShadows:
-            assert ParallelAnimationGroup.current is None
-            self.__square.showShadows = showShadows
-            for side in self.__sides:
-                side.showShadows = showShadows
-            self.__resizeHandBoards()
+        assert ParallelAnimationGroup.current is None
+        self.__resizeHandBoards()
 
     def __resizeHandBoards(self, dummyResults=None):
         """we are really calling _setRect() too often. But at least it works"""

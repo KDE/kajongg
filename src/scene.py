@@ -124,11 +124,11 @@ class GameScene(SceneWithFocusRect):
         self.mainWindow = parent
         self._game = None
         super(GameScene, self).__init__()
-        self.showShadows = True
 
         self.scoreTable = None
         self.explainView = None
         self.setupUi()
+        Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @property
     def game(self):
@@ -153,6 +153,11 @@ class GameScene(SceneWithFocusRect):
                 self.mainWindow.scene = None
         self.mainWindow.updateGUI()
         self.mainWindow.adjustView()
+
+    def showShadowsChanged(self,oldValue, newValue):
+        for uiTile in self.graphicsTileItems():
+            uiTile.setClippingFlags()
+        self.applySettings()
 
     def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
@@ -191,13 +196,6 @@ class GameScene(SceneWithFocusRect):
         with MoveImmediate():
             for item in self.nonTiles():
                 item.tileset = Tileset.activeTileset()
-            if self.showShadows is None or self.showShadows != Internal.Preferences.showShadows:
-                self.showShadows = Internal.Preferences.showShadows
-                if self.game:
-                    wall = self.game.wall
-                    wall.showShadows = self.showShadows
-                for uiTile in self.graphicsTileItems():
-                    uiTile.setClippingFlags()
 
     def prepareHand(self):
         """redecorate wall"""
@@ -212,7 +210,7 @@ class GameScene(SceneWithFocusRect):
         for action in [mainWindow.actionScoreGame, mainWindow.actionPlayGame]:
             action.setEnabled(not bool(game))
         mainWindow.actionAbortGame.setEnabled(bool(game))
-        mainWindow.actionAngle.setEnabled(bool(game) and self.showShadows)
+        mainWindow.actionAngle.setEnabled(bool(game) and Internal.Preferences.showShadows)
         for view in [self.explainView, self.scoreTable]:
             if view:
                 view.refresh()
@@ -376,7 +374,7 @@ class PlayingScene(GameScene):
     def applySettings(self):
         """apply preferences"""
         GameScene.applySettings(self)
-        self.discardBoard.showShadows = self.showShadows
+        self.discardBoard.showShadows = Internal.Preferences.showShadows
 
     def toggleDemoMode(self, checked):
         """switch on / off for autoPlay"""
@@ -526,11 +524,6 @@ class ScoringScene(GameScene):
             with MoveImmediate():
                 self.selectorBoard.maximize()
         GameScene.adjustView(self)
-
-    def applySettings(self):
-        """apply preferences"""
-        GameScene.applySettings(self)
-        self.selectorBoard.showShadows = self.showShadows
 
     def prepareHand(self):
         """redecorate wall"""

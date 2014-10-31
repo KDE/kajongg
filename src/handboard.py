@@ -88,9 +88,10 @@ class HandBoard(Board):
         self.isHandBoard = True
         self.tileDragEnabled = False
         self.setParentItem(player.front)
+        self.setPosition()
         self.setAcceptDrops(True)
-        self.showShadows = Internal.Preferences.showShadows
         Internal.Preferences.addWatch('rearrangeMelds', self.rearrangeMeldsChanged)
+        Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     def computeRect(self):
         """also adjust the scale for maximum usage of space"""
@@ -106,11 +107,6 @@ class HandBoard(Board):
         if self._player:
             return self._player()
 
-    @property
-    def showShadows(self):
-        """the active value"""
-        return self._showShadows
-
     # this is ordered such that pylint does not complain about identical code in board.py
 
     @property
@@ -118,21 +114,24 @@ class HandBoard(Board):
         """for debugging messages"""
         return self.player.name
 
-    @showShadows.setter
-    def showShadows(self, value): # pylint: disable=arguments-differ
-        """set showShadows"""
-        if self._showShadows is None or self._showShadows != value:
-            if value:
-                self.setPos(yHeight=1.5)
-            else:
-                self.setPos(yHeight=1.0)
-            if value:
-                self.lowerY = 1.2
-            else:
-                self.lowerY = 1.0
-            self.setRect(15.6, 1.0 + self.lowerY)
-            self._reload(self.tileset, showShadows=value)
-            self.sync()
+    def showShadowsChanged(self, oldValue, newValue):
+        """Add or remove the shadows."""
+        self.setPosition()
+
+    def setPosition(self):
+        """Position myself"""
+        show = Internal.Preferences.showShadows
+        if show:
+            self.setPos(yHeight=1.5)
+        else:
+            self.setPos(yHeight=1.0)
+        if show:
+            self.lowerY = 1.2
+        else:
+            self.lowerY = 1.0
+        self.setRect(15.6, 1.0 + self.lowerY)
+        self._reload(self.tileset, showShadows=show)
+        self.sync()
 
     def rearrangeMeldsChanged(self, oldValue, newValue):
         """when True, concealed melds are grouped"""

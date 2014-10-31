@@ -129,7 +129,6 @@ class MainWindow(KXmlGuiWindow):
             self.setupUi()
             self.setupGUI()
             Internal.Preferences.addWatch('tilesetName', self.tilesetNameChanged)
-            Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
             Internal.Preferences.addWatch('backgroundName', self.backgroundChanged)
             self.retranslateUi()
             for action in self.toolBar().actions():
@@ -509,12 +508,6 @@ class MainWindow(KXmlGuiWindow):
                 if self.scene:
                     self.scene.applySettings()
             self.adjustView()
-
-    @afterQueuedAnimations
-    def showShadowsChanged(self, deferredResult, oldValue, newValue):
-        with MoveImmediate():
-            if self.scene:
-                self.scene.applySettings()
 
     @afterQueuedAnimations
     def showSettings(self, deferredResult):

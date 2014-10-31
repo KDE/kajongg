@@ -178,10 +178,9 @@ class Board(QGraphicsRectItem):
         self.__fixedWidth = width
         self.__fixedHeight = height
         self._tileset = None
-        self._showShadows = None
         self.tileset = tileset
         self.level = 0
-        self.showShadows = Internal.Preferences.showShadows
+        Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @property
     def name(self): # pylint: disable=no-self-use
@@ -380,7 +379,7 @@ class Board(QGraphicsRectItem):
 
     def tileFacePos(self):
         """the face pos of a uiTile relative to its origin"""
-        if not self.showShadows:
+        if not Internal.Preferences.showShadows:
             return QPointF()
         lightSource = self.rotatedLightSource()
         xoffset = self.tileset.shadowWidth() - 1 if 'E' in lightSource else 0
@@ -419,7 +418,7 @@ class Board(QGraphicsRectItem):
         """translate from our rect coordinates to scene coord"""
         sizeX = self.tileset.faceSize.width() * self.__fixedWidth
         sizeY = self.tileset.faceSize.height() * self.__fixedHeight
-        if self.showShadows:
+        if Internal.Preferences.showShadows:
             sizeX += self.tileset.shadowWidth() + 2 * self.tileset.shadowHeight()
             sizeY += self.tileset.shadowHeight()
         rect = self.rect()
@@ -444,7 +443,7 @@ class Board(QGraphicsRectItem):
         This is also called when the tileset or the light source for this board changes"""
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
-        if not self.showShadows:
+        if not Internal.Preferences.showShadows:
             offsets = (0, 0)
         elif self.isHandBoard:
             offsets = (-self.tileset.shadowHeight() * 2, 0)
@@ -454,18 +453,11 @@ class Board(QGraphicsRectItem):
         newY = self.__yWidth*width+self.__yHeight*height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
 
-    @property
-    def showShadows(self):
-        """the active lightSource"""
-        return self._showShadows
-
-    @showShadows.setter
-    def showShadows(self, value):
+    def showShadowsChanged(self, oldValue,newValue):
         """set active lightSource"""
-        if self._showShadows != value:
-            for uiTile in self.uiTiles:
-                uiTile.setClippingFlags()
-            self._reload(self.tileset, showShadows=value)
+        for uiTile in self.uiTiles:
+            uiTile.setClippingFlags()
+        self._reload(self.tileset, showShadows=newValue)
 
     @property
     def lightSource(self):
@@ -497,8 +489,8 @@ class Board(QGraphicsRectItem):
         if lightSource is None:
             lightSource = self._lightSource
         if showShadows is None:
-            showShadows = self._showShadows
-        if self._tileset != tileset or self._lightSource != lightSource or self._showShadows != showShadows:
+            showShadows = Internal.Preferences.showShadows
+        if self._tileset != tileset or self._lightSource != lightSource or Internal.Preferences.showShadows != showShadows:
             self.prepareGeometryChange()
             self._tileset = tileset
             self._lightSource = lightSource
@@ -525,7 +517,7 @@ class Board(QGraphicsRectItem):
         level is the vertical position. 0 is the face position on
         ground level, -1 is the imprint a uiTile makes on the
         surface it stands on"""
-        if not self.showShadows:
+        if not Internal.Preferences.showShadows:
             return QPointF()
         shiftX = 0
         shiftY = 0
@@ -612,7 +604,7 @@ class CourtBoard(Board):
         yAvail = cWall[0].sceneBoundingRect().top() - newSceneY
         shadowHeight = tileset.shadowHeight()
         shadowWidth = tileset.shadowWidth()
-        if self.showShadows:
+        if Internal.Preferences.showShadows:
             # this should use the real shadow values from the wall because the wall
             # tiles are smaller than those in the CourtBoard but this should be
             # good enough

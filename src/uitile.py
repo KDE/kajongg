@@ -56,14 +56,9 @@ class UITile(QGraphicsObject):
         self.activeAnimation = dict() # key is the property name
         self.queuedAnimations = []
 
-    @property
-    def showShadows(self):
-        """do we need to show shadows?"""
-        return self.board.showShadows if self.board else False
-
     def setClippingFlags(self):
         """if we do not show shadows, we need to clip"""
-        showShadows = self.showShadows
+        showShadows = Internal.Preferences.showShadows
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape, enabled=not showShadows)
         self.setFlag(QGraphicsItem.ItemClipsToShape, enabled=not showShadows)
 
@@ -126,7 +121,7 @@ class UITile(QGraphicsObject):
         """define the part of the tile we want to see. Do not return QRect()
         if tileset is not known because that makes QGraphicsscene crash"""
         if self.tileset:
-            self._boundingRect = QRectF(QPointF(), self.tileset.tileSize if self.showShadows else self.tileset.faceSize)
+            self._boundingRect = QRectF(QPointF(), self.tileset.tileSize if Internal.Preferences.showShadows else self.tileset.faceSize)
         return self._boundingRect
 
     def facePos(self):
@@ -140,7 +135,7 @@ class UITile(QGraphicsObject):
 
     def __elementId(self):
         """returns the SVG element id of the tile"""
-        if not self.showShadows:
+        if not Internal.Preferences.showShadows:
             return QString("TILE_2")
         lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
         return QString("TILE_{}".format(lightSourceIndex%4+1))
@@ -151,7 +146,7 @@ class UITile(QGraphicsObject):
         but that actually made it slower."""
         with Painter(painter):
             renderer = self.tileset.renderer()
-            withBorders = self.showShadows
+            withBorders = Internal.Preferences.showShadows
             if not withBorders:
                 painter.scale(*self.tileset.tileFaceRelation())
             renderer.render(painter, self.__elementId(), self.boundingRect())
