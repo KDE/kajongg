@@ -45,7 +45,7 @@ from log import m18n, m18nc
 from common import WINDS, Internal, Debug
 from statesaver import StateSaver
 from query import Query
-from guiutil import ListComboBox, Painter, decorateWindow
+from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
 from tree import TreeItem, RootItem, TreeModel
 from tile import Tile
 
@@ -995,35 +995,33 @@ class ScoringDialog(QWidget):
             self.hide()
             return
         for idx, player in enumerate(self.game.players):
-            self.spValues[idx].blockSignals(True) # we do not want that change to call computeScores again
-            self.wonBoxes[idx].blockSignals(True) # we do not want that change to call computeScores again
-            if player.handBoard and player.handBoard.uiTiles:
-                self.spValues[idx].setEnabled(False)
-                self.nameLabels[idx].setBuddy(self.wonBoxes[idx])
-                for loop in range(10):
-                    prevTotal = player.handTotal
-                    handContent = player.computeHand()
-                    self.wonBoxes[idx].setVisible(handContent.won)
+            with BlockSignals([self.spValues[idx], self.wonBoxes[idx]):
+                # we do not want that change to call computeScores again
+                if player.handBoard and player.handBoard.uiTiles:
+                    self.spValues[idx].setEnabled(False)
+                    self.nameLabels[idx].setBuddy(self.wonBoxes[idx])
+                    for loop in range(10):
+                        prevTotal = player.handTotal
+                        handContent = player.computeHand()
+                        self.wonBoxes[idx].setVisible(handContent.won)
+                        if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
+                            self.wonBoxes[idx].setChecked(False)
+                            self.game.winner = None
+                        elif prevTotal == player.handTotal:
+                            break
+                        player.refreshManualRules()
+                    self.spValues[idx].setValue(player.handTotal)
+                else:
+                    if not self.spValues[idx].isEnabled():
+                        self.spValues[idx].clear()
+                        self.spValues[idx].setValue(0)
+                        self.spValues[idx].setEnabled(True)
+                        self.nameLabels[idx].setBuddy(self.spValues[idx])
+                    self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJTotal())
                     if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
                         self.wonBoxes[idx].setChecked(False)
-                        self.game.winner = None
-                    elif prevTotal == player.handTotal:
-                        break
-                    player.refreshManualRules()
-                self.spValues[idx].setValue(player.handTotal)
-            else:
-                if not self.spValues[idx].isEnabled():
-                    self.spValues[idx].clear()
-                    self.spValues[idx].setValue(0)
-                    self.spValues[idx].setEnabled(True)
-                    self.nameLabels[idx].setBuddy(self.spValues[idx])
-                self.wonBoxes[idx].setVisible(player.handTotal >= self.game.ruleset.minMJTotal())
-                if not self.wonBoxes[idx].isVisibleTo(self) and self.wonBoxes[idx].isChecked():
-                    self.wonBoxes[idx].setChecked(False)
-            if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
-                self.game.winner = None
-            self.spValues[idx].blockSignals(False)
-            self.wonBoxes[idx].blockSignals(False)
+                if not self.wonBoxes[idx].isVisibleTo(self) and player is self.game.winner:
+                    self.game.winner = None
         if Internal.scene.explainView:
             Internal.scene.explainView.refresh()
 
@@ -1092,12 +1090,10 @@ class ScoringDialog(QWidget):
         lastTiles, winnerTiles = self.__lastMeldContent()
         if self.comboTilePairs == lastTiles:
             return
-        self.cbLastTile.blockSignals(True) # we only want to emit the changed signal once
-        try:
+        with BlockSignals(self.cbLastTile):
+            # we only want to emit the changed signal once
             self.__fillLastTileComboWith(lastTiles, winnerTiles)
-        finally:
-            self.cbLastTile.blockSignals(False)
-            self.cbLastTile.currentIndexChanged.emit(0)
+        self.cbLastTile.currentIndexChanged.emit(0)
 
     def __fillLastMeldComboWith(self, winnerMelds, indexedMeld, lastTile):
         """fill last meld combo with prepared content"""
@@ -1128,10 +1124,9 @@ class ScoringDialog(QWidget):
                     if lastTile not in meldContent:
                         lastTile = lastTile.swapped
                         assert lastTile in meldContent
-                        self.cbLastTile.blockSignals(True) # we want to continue right here
-                        idx = self.cbLastTile.findData(QVariant(lastTile))
-                        self.cbLastTile.setCurrentIndex(idx)
-                        self.cbLastTile.blockSignals(False)
+                        with BlockSignals(self.cbLastTile): # we want to continue right here
+                            idx = self.cbLastTile.findData(QVariant(lastTile))
+                            self.cbLastTile.setCurrentIndex(idx)
                     break
         if not restoredIdx:
             restoredIdx = 0
@@ -1142,8 +1137,7 @@ class ScoringDialog(QWidget):
         """fill the drop down list with all possible melds.
         If the drop down had content before try to preserve the
         current index. Even if the meld changed state meanwhile."""
-        self.cbLastMeld.blockSignals(True) # we only want to emit the changed signal once
-        try:
+        with BlockSignals(self.cbLastMeld): # we only want to emit the changed signal once
             showCombo = False
             idx = self.cbLastMeld.currentIndex()
             if idx < 0:
@@ -1166,11 +1160,9 @@ class ScoringDialog(QWidget):
                 return
             showCombo = True
             self.__fillLastMeldComboWith(winnerMelds, indexedMeld, lastTile)
-        finally:
             self.lblLastMeld.setVisible(showCombo)
             self.cbLastMeld.setVisible(showCombo)
-            self.cbLastMeld.blockSignals(False)
-            self.cbLastMeld.currentIndexChanged.emit(0)
+        self.cbLastMeld.currentIndexChanged.emit(0)
 
     def slotInputChanged(self):
         """some input fields changed: update"""

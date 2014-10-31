@@ -25,6 +25,7 @@ from qt import QLabel, QDialog, \
 from log import m18n, m18nc
 from statesaver import StateSaver
 from guiutil import ListComboBox, MJTableView, decorateWindow
+from guiutil import BlockSignals
 from common import Debug
 from modeltest import ModelTest
 
@@ -149,11 +150,8 @@ class RulesetDiffer(QDialog):
         leftRuleset = self.cbRuleset1.current
         diffPairs = sorted([(len(x.diff(leftRuleset)), x) for x in self.rightRulesets])
         combo = self.cbRuleset2
-        try:
-            combo.blockSignals(True)
+        with BlockSignals(combo):
             combo.items = [x[1] for x in diffPairs]
-        finally:
-            combo.blockSignals(False)
         combo.setCurrentIndex(0)
 
     def formattedDiffs(self):
