@@ -226,6 +226,12 @@ def afterCurrentAnimationDo(callback, *args, **kwargs):
     else:
         callback(None, *args, **kwargs)
 
+def afterQueuedAnimationsDo(callback, *args, **kwargs):
+    """a helper, delaying some action until all queued
+    animations have finished"""
+    animate() # start all qeued animations
+    afterCurrentAnimationDo(callback, *args, **kwargs)
+
 def animate():
     """now run all prepared animations. Returns a Deferred
         so callers can attach callbacks to be executed when

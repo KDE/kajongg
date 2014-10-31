@@ -67,7 +67,7 @@ from scoring import scoreGame
 from scoringdialog import ScoreTable, ExplainView
 from humanclient import HumanClient
 from rulesetselector import RulesetSelector
-from animation import animate, afterCurrentAnimationDo, Animated
+from animation import animate, afterQueuedAnimationsDo, Animated
 from chat import ChatWindow
 from scene import PlayingScene, ScoringScene
 from configdialog import ConfigDialog
@@ -495,8 +495,7 @@ class MainWindow(KXmlGuiWindow):
                 view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
     def backgroundChanged(self, oldName, newName):
-        animate() # drain the queue
-        afterCurrentAnimationDo(self.__backgroundChanged2, newName)
+        afterQueuedAnimationsDo(self.__backgroundChanged2, newName)
 
     def __backgroundChanged2(self, dummyResults, newName):
         centralWidget = self.centralWidget()
@@ -507,8 +506,7 @@ class MainWindow(KXmlGuiWindow):
 
     def tilesetNameChanged(self, oldValue=None, newValue=None):
         if self.centralView:
-            animate() # drain the queue
-            afterCurrentAnimationDo(self.__tilesetNameChanged2, newValue)
+            afterQueuedAnimationsDo(self.__tilesetNameChanged2, newValue)
 
     def __tilesetNameChanged2(self, dummyResults, newValue):
         """now no animation is running"""
@@ -518,8 +516,7 @@ class MainWindow(KXmlGuiWindow):
         self.adjustView()
 
     def showShadowsChanged(self, oldValue, newValue):
-        animate() # drain the queue
-        afterCurrentAnimationDo(self.__showShadowsChanged2, newValue)
+        afterQueuedAnimationsDo(self.__showShadowsChanged2, newValue)
 
     def __showShadowsChanged2(self, dummyResults, newValue):
         with Animated(False):
@@ -533,7 +530,7 @@ class MainWindow(KXmlGuiWindow):
         # if an animation is running, Qt segfaults somewhere deep
         # in the SVG renderer rendering the wind tiles for the tile
         # preview
-        afterCurrentAnimationDo(self.__showSettings2)
+        afterQueuedAnimationsDo(self.__showSettings2)
 
     def __showSettings2(self, dummyResult):
         """now that no animation is running, show settings dialog"""
@@ -582,4 +579,4 @@ class MainWindow(KXmlGuiWindow):
         """change the lightSource"""
         if self.scene:
             with Animated(False):
-                afterCurrentAnimationDo(self.scene.changeAngle)
+                afterQueuedAnimationsDo(self.scene.changeAngle)

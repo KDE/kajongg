@@ -35,7 +35,7 @@ from meld import Meld
 from humanclient import HumanClient
 from uitile import UITile
 from uiwall import UIWall
-from animation import Animated, afterCurrentAnimationDo
+from animation import Animated, afterQueuedAnimationsDo
 from scoringdialog import ScoringDialog
 
 class FocusRect(QGraphicsRectItem):
@@ -85,7 +85,7 @@ class FocusRect(QGraphicsRectItem):
 
     def refresh(self):
         """show/hide on correct position after current animations end"""
-        afterCurrentAnimationDo(self.__refreshNow)
+        afterQueuedAnimationsDo(self.__refreshNow)
 
 class SceneWithFocusRect(QGraphicsScene):
     """our scene with a potential Qt bug fix. FocusRect is a blue frame around a tile or meld"""
