@@ -362,7 +362,7 @@ class UITile(QGraphicsObject):
     @focusable.setter
     def focusable(self, value):
         """redirect and generate Debug output"""
-        if str(self) in Debug.focusable:
+        if self.tile in Debug.focusable:
             newStr = 'focusable' if value else 'unfocusable'
             logDebug('%s: %s from %s' % (newStr, self.tile, stack('')[-2]))
         self.setFlag(QGraphicsItem.ItemIsFocusable, value)
