@@ -26,7 +26,7 @@ from wall import Wall, KongBox
 from tile import Tile
 from tileset import Tileset
 from uitile import UITile
-from animation import animate, afterCurrentAnimationDo, MoveImmediate, \
+from animation import animate, afterQueuedAnimationsDo, MoveImmediate, \
     ParallelAnimationGroup
 
 class UIWallSide(Board):
@@ -267,7 +267,7 @@ class UIWall(Wall):
     def _placeLooseTiles(self):
         """place the last 2 tiles on top of kong box"""
         assert len(self.kongBox) % 2 == 0
-        afterCurrentAnimationDo(self.__placeLooseTiles2)
+        afterQueuedAnimationsDo(self.__placeLooseTiles2)
 
     def __placeLooseTiles2(self, dummyResult):
         """place the last 2 tiles on top of kong box, no animation is active"""
