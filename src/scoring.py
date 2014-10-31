@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 
-from qt import QPointF, QRectF
+from qt import QPointF, QRectF,QDialogButtonBox
 from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
 from qt import QPushButton, QMessageBox, QComboBox
 
@@ -39,7 +39,7 @@ from player import Player, Players
 from visible import VisiblePlayer
 from tables import SelectRuleset
 from uiwall import UIWall
-from guiutil import decorateWindow
+from guiutil import decorateWindow, BlockSignals
 
 class SwapDialog(QMessageBox):
     """ask the user if two players should change seats"""
@@ -74,21 +74,25 @@ class SelectPlayers(SelectRuleset):
 
         query = Query("select p0,p1,p2,p3 from game where seed is null and game.id = (select max(id) from game)")
         if len(query.records):
-            for pidx, playerId in enumerate(query.records[0]):
-                try:
-                    playerName = Players.humanNames[playerId]
-                    cbName = self.nameWidgets[pidx]
-                    playerIdx = cbName.findText(playerName)
-                    if playerIdx >= 0:
-                        cbName.setCurrentIndex(playerIdx)
-                except KeyError:
-                    logError('database is inconsistent: player with id %d is in game but not in player' \
-                               % playerId)
+            with BlockSignals(self.nameWidgets):
+                for cbName, playerId in zip(self.nameWidgets, query.records[0]):
+                    try:
+                        playerName = Players.humanNames[playerId]
+                        playerIdx = cbName.findText(playerName)
+                        if playerIdx >= 0:
+                            cbName.setCurrentIndex(playerIdx)
+                    except KeyError:
+                        logError('database is inconsistent: player with id %d is in game but not in player' \
+                                % playerId)
         self.slotValidate()
 
     def showEvent(self, dummyEvent):
         """start with player 0"""
         self.nameWidgets[0].setFocus()
+
+    def __selectedNames(self):
+        """A set with the currently selected names"""
+        return set(list(unicode(cbName.currentText()) for cbName in self.nameWidgets))
 
     def slotValidate(self):
         """try to find 4 different players and update status of the Ok button"""
@@ -96,24 +100,27 @@ class SelectPlayers(SelectRuleset):
         if not isinstance(changedCombo, QComboBox):
             changedCombo = self.nameWidgets[0]
         changedCombo.manualSelect = True
-        usedNames = set([unicode(x.currentText()) for x in self.nameWidgets if x.manualSelect])
         allNames = set(Players.humanNames.values())
-        unusedNames = allNames - usedNames
-        for combo in self.nameWidgets:
-            combo.blockSignals(True)
-        try:
+        unusedNames = allNames - self.__selectedNames()
+        with BlockSignals(self.nameWidgets):
+            used = set([unicode(x.currentText()) for x in self.nameWidgets if x.manualSelect])
             for combo in self.nameWidgets:
-                if combo.manualSelect:
-                    continue
-                comboName = unusedNames.pop()
+                if not combo.manualSelect:
+                    if unicode(combo.currentText()) in used:
+                        comboName = unusedNames.pop()
+                        combo.clear()
+                        combo.addItems([comboName])
+                        used.add(unicode(combo.currentText()))
+            for combo in self.nameWidgets:
+                comboName = unicode(combo.currentText())
                 combo.clear()
                 combo.addItems([comboName])
-                combo.addItems(sorted(allNames - usedNames - set([comboName])))
-        finally:
-            for combo in self.nameWidgets:
-                combo.blockSignals(False)
+                combo.addItems(sorted(
+                    allNames - self.__selectedNames() - set([comboName])))
+                combo.setCurrentIndex(0)
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
+            len(self.__selectedNames()) == 4)
         self.names = list(unicode(cbName.currentText()) for cbName in self.nameWidgets)
-        assert len(set(self.names)) == 4
 
 class ScoringTileAttr(TileAttr):
     """Tile appearance is different in a ScoringHandBoard"""
@@ -352,14 +359,13 @@ class ScoringPlayer(VisiblePlayer, Player):
         ignore the rule. If however the action does other things like penalties leave it applicable"""
         if box.rule.hasNonValueAction():
             return True
-        try:
-            box.blockSignals(True)
-            checked = box.isChecked()
-            box.setChecked(not checked)
-            newHand = self.computeHand()
-        finally:
-            box.setChecked(checked)
-            box.blockSignals(False)
+        with BlockSignals(box):
+            try:
+                checked = box.isChecked()
+                box.setChecked(not checked)
+                newHand = self.computeHand()
+            finally:
+                box.setChecked(checked)
         return newHand.score > currentScore
 
     def __mjstring(self):
