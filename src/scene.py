@@ -265,12 +265,11 @@ class GameScene(SceneWithFocusRect):
 class PlayingScene(GameScene):
     """scene with a playing game"""
     def __init__(self, parent):
-        super(PlayingScene, self).__init__(parent)
-        self.game = None
+        self._game = None
         self.__startingGame = True
         self._clientDialog = None
 
-        self.setupUi()
+        super(PlayingScene, self).__init__(parent)
 
     @GameScene.game.setter
     def game(self, value): # pylint: disable=arguments-differ
@@ -320,7 +319,6 @@ class PlayingScene(GameScene):
         self.setObjectName("PlayingField")
 
         self.discardBoard = DiscardBoard()
-        #self.discardBoard.setVisible(True)
         self.addItem(self.discardBoard)
 
         self.adjustView()
@@ -427,9 +425,8 @@ class ScoringScene(GameScene):
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, parent=None):
-        super(ScoringScene, self).__init__(parent)
         self.scoringDialog = None
-        self.setupUi()
+        super(ScoringScene, self).__init__(parent)
         self.selectorBoard.hasFocus = True
 
     @GameScene.game.setter
