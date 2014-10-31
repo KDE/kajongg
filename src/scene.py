@@ -35,7 +35,7 @@ from meld import Meld
 from humanclient import HumanClient
 from uitile import UITile
 from uiwall import UIWall
-from animation import MoveImmediate, afterQueuedAnimationsDo
+from animation import MoveImmediate, afterQueuedAnimations
 from scoringdialog import ScoringDialog
 
 class FocusRect(QGraphicsRectItem):
@@ -64,8 +64,9 @@ class FocusRect(QGraphicsRectItem):
             self._board = value
             self.refresh()
 
-    def __refreshNow(self, dummy):
-        """show/hide on correct position"""
+    @afterQueuedAnimations
+    def refresh(self, deferredResult=None):
+        """show/hide on correct position after queued animations end"""
         board = self.board
         if not isAlive(board) or not isAlive(self):
             if isAlive(self):
@@ -82,10 +83,6 @@ class FocusRect(QGraphicsRectItem):
         game = Internal.scene.game
         self.setVisible(board.isVisible() and bool(board.focusTile)
             and board.isEnabled() and board.hasFocus and bool(game) and not game.autoPlay)
-
-    def refresh(self):
-        """show/hide on correct position after current animations end"""
-        afterQueuedAnimationsDo(self.__refreshNow)
 
 class SceneWithFocusRect(QGraphicsScene):
     """our scene with a potential Qt bug fix. FocusRect is a blue frame around a tile or meld"""
@@ -226,7 +223,7 @@ class GameScene(SceneWithFocusRect):
         oldIdx = LIGHTSOURCES.index(self.game.wall.lightSource)
         return LIGHTSOURCES[(oldIdx + 1) % 4]
 
-    def changeAngle(self, dummyResult):
+    def changeAngle(self):
         """change the lightSource"""
         self.game.wall.lightSource = self.newLightSource()
         self.focusRect.refresh()
@@ -415,10 +412,10 @@ class PlayingScene(GameScene):
             # chatting on tables before game started works with chat button per table
         mainWindow.actionChat.setChecked(mainWindow.actionChat.isEnabled() and bool(game.client.table.chatWindow))
 
-    def changeAngle(self, result):
+    def changeAngle(self):
         """now that no animation is running, really change"""
         self.discardBoard.lightSource = self.newLightSource()
-        GameScene.changeAngle(self, result)
+        GameScene.changeAngle(self)
 
 class ScoringScene(GameScene):
     """a scoring game"""
@@ -554,10 +551,10 @@ class ScoringScene(GameScene):
         self.selectorBoard.setVisible(bool(game))
         self.selectorBoard.setEnabled(bool(game))
 
-    def changeAngle(self, result):
+    def changeAngle(self):
         """now that no animation is running, really change"""
         self.selectorBoard.lightSource = self.newLightSource()
-        GameScene.changeAngle(self, result)
+        GameScene.changeAngle(self)
 
     def computeLastTile(self):
         """compile hand info into a string as needed by the scoring engine"""

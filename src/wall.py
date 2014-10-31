@@ -99,7 +99,7 @@ class Wall(object):
     def build(self, shuffleFirst=False):
         """virtual: build visible wall"""
 
-    def _placeLooseTiles(self):
+    def _placeLooseTiles(self, deferredResult=None):
         """to be done only for UIWall"""
         pass
 

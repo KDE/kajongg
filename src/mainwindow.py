@@ -67,7 +67,7 @@ from scoring import scoreGame
 from scoringdialog import ScoreTable, ExplainView
 from humanclient import HumanClient
 from rulesetselector import RulesetSelector
-from animation import animate, afterQueuedAnimationsDo, MoveImmediate
+from animation import animate, afterQueuedAnimations, MoveImmediate
 from chat import ChatWindow
 from scene import PlayingScene, ScoringScene
 from configdialog import ConfigDialog
@@ -494,46 +494,36 @@ class MainWindow(KXmlGuiWindow):
             if oldRect != newRect:
                 view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
-    def backgroundChanged(self, oldName, newName):
-        afterQueuedAnimationsDo(self.__backgroundChanged2, newName)
-
-    def __backgroundChanged2(self, dummyResults, newName):
+    @afterQueuedAnimations
+    def backgroundChanged(self, deferredResult, oldName, newName):
         centralWidget = self.centralWidget()
         if centralWidget:
             self.background = Background(newName)
             self.background.setPalette(centralWidget)
             centralWidget.setAutoFillBackground(True)
 
-    def tilesetNameChanged(self, oldValue=None, newValue=None):
+    @afterQueuedAnimations
+    def tilesetNameChanged(self, deferredResult, oldValue=None, newValue=None, *args):
         if self.centralView:
-            afterQueuedAnimationsDo(self.__tilesetNameChanged2, newValue)
+            with MoveImmediate():
+                if self.scene:
+                    self.scene.applySettings()
+            self.adjustView()
 
-    def __tilesetNameChanged2(self, dummyResults, newValue):
-        """now no animation is running"""
-        with MoveImmediate():
-            if self.scene:
-                self.scene.applySettings()
-        self.adjustView()
-
-    def showShadowsChanged(self, oldValue, newValue):
-        afterQueuedAnimationsDo(self.__showShadowsChanged2, newValue)
-
-    def __showShadowsChanged2(self, dummyResults, newValue):
+    @afterQueuedAnimations
+    def showShadowsChanged(self, deferredResult, oldValue, newValue):
         with MoveImmediate():
             if self.scene:
                 self.scene.applySettings()
 
-    def showSettings(self):
+    @afterQueuedAnimations
+    def showSettings(self, deferredResult):
         """show preferences dialog. If it already is visible, do nothing"""
         if ConfigDialog.showDialog("settings"):
             return
         # if an animation is running, Qt segfaults somewhere deep
         # in the SVG renderer rendering the wind tiles for the tile
         # preview
-        afterQueuedAnimationsDo(self.__showSettings2)
-
-    def __showSettings2(self, dummyResult):
-        """now that no animation is running, show settings dialog"""
         self.confDialog = ConfigDialog(self, "settings")
         self.confDialog.show()
 
@@ -575,8 +565,9 @@ class MainWindow(KXmlGuiWindow):
         if isAlive(scene):
             scene.updateSceneGUI()
 
-    def changeAngle(self):
+    @afterQueuedAnimations
+    def changeAngle(self, deferredResult, dummyButtons, dummyModifiers):
         """change the lightSource"""
         if self.scene:
             with MoveImmediate():
-                afterQueuedAnimationsDo(self.scene.changeAngle)
+                self.scene.changeAngle()

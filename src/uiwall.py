@@ -26,7 +26,7 @@ from wall import Wall, KongBox
 from tile import Tile
 from tileset import Tileset
 from uitile import UITile
-from animation import animate, afterQueuedAnimationsDo, MoveImmediate, \
+from animation import animate, afterQueuedAnimations, MoveImmediate, \
     ParallelAnimationGroup
 
 class UIWallSide(Board):
@@ -264,13 +264,10 @@ class UIWall(Wall):
         uiTile.setBoard(board, newOffset % sideLength, 0, level=2)
         uiTile.update()
 
-    def _placeLooseTiles(self):
+    @afterQueuedAnimations
+    def _placeLooseTiles(self, deferredResult):
         """place the last 2 tiles on top of kong box"""
         assert len(self.kongBox) % 2 == 0
-        afterQueuedAnimationsDo(self.__placeLooseTiles2)
-
-    def __placeLooseTiles2(self, dummyResult):
-        """place the last 2 tiles on top of kong box, no animation is active"""
         placeCount = len(self.kongBox) // 2
         if placeCount >= 4:
             first = min(placeCount-1, 5)
@@ -289,7 +286,7 @@ class UIWall(Wall):
                 # of the cross on them.
                 uiTile.update()
             # move last two tiles onto the dead end:
-            return animate().addCallback(self.__placeLooseTiles2)
+            return self._placeLooseTiles()
 
     def decorate(self):
         """show player info on the wall"""

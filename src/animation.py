@@ -18,12 +18,14 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+import functools, types
+
 from twisted.internet.defer import Deferred, succeed
 
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, QVariant
 
-from common import Internal, Debug, isAlive
+from common import Internal, Debug, isAlive, isPython3
 from log import logDebug
 
 class Animation(QPropertyAnimation):
@@ -214,10 +216,9 @@ class MoveImmediate(object):
                 Internal.Preferences.animationSpeed = self.prevAnimationSpeed
 
 
-def afterQueuedAnimationsDo(callback, *args, **kwargs):
-    """a helper, delaying some action until all queued
+def __afterCurrentAnimationDo(callback, *args, **kwargs):
+    """a helper, delaying some action until all active
     animations have finished"""
-    animate() # start all qeued animations
     current = ParallelAnimationGroup.current
     if current:
         current.deferred.addCallback(callback, *args, **kwargs)
@@ -226,6 +227,19 @@ def afterQueuedAnimationsDo(callback, *args, **kwargs):
                 (id(current), callback, ','.join(args) if args else ''))
     else:
         callback(None, *args, **kwargs)
+
+def afterQueuedAnimations(f):
+    """A decorator"""
+
+    @functools.wraps(f)
+    def doAfterQueuedAnimations(*args, **kwargs):
+        animate()
+        method = types.MethodType( f, args[0])
+        args = args[1:]
+        assert f.func_code.co_varnames[1] == 'deferredResult', f.__qualname__ if isPython3 else f.__name__
+        return __afterCurrentAnimationDo(method, *args, **kwargs)
+
+    return doAfterQueuedAnimations
 
 def animate():
     """now run all prepared animations. Returns a Deferred
