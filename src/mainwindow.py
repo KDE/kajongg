@@ -67,7 +67,7 @@ from scoring import scoreGame
 from scoringdialog import ScoreTable, ExplainView
 from humanclient import HumanClient
 from rulesetselector import RulesetSelector
-from animation import animate, afterQueuedAnimationsDo, Animated
+from animation import animate, afterQueuedAnimationsDo, MoveImmediate
 from chat import ChatWindow
 from scene import PlayingScene, ScoringScene
 from configdialog import ConfigDialog
@@ -510,7 +510,7 @@ class MainWindow(KXmlGuiWindow):
 
     def __tilesetNameChanged2(self, dummyResults, newValue):
         """now no animation is running"""
-        with Animated():
+        with MoveImmediate():
             if self.scene:
                 self.scene.applySettings()
         self.adjustView()
@@ -519,7 +519,7 @@ class MainWindow(KXmlGuiWindow):
         afterQueuedAnimationsDo(self.__showShadowsChanged2, newValue)
 
     def __showShadowsChanged2(self, dummyResults, newValue):
-        with Animated():
+        with MoveImmediate():
             if self.scene:
                 self.scene.applySettings()
 
@@ -578,5 +578,5 @@ class MainWindow(KXmlGuiWindow):
     def changeAngle(self):
         """change the lightSource"""
         if self.scene:
-            with Animated():
+            with MoveImmediate():
                 afterQueuedAnimationsDo(self.scene.changeAngle)

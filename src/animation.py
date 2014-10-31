@@ -194,7 +194,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             Internal.scene.focusRect.refresh()
         return
 
-class Animated(object):
+class MoveImmediate(object):
     """a helper class for moving tiles with or without animation"""
     def __init__(self, animateMe=False):
         if Internal.Preferences:

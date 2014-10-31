@@ -35,7 +35,7 @@ from meld import Meld
 from humanclient import HumanClient
 from uitile import UITile
 from uiwall import UIWall
-from animation import Animated, afterQueuedAnimationsDo
+from animation import MoveImmediate, afterQueuedAnimationsDo
 from scoringdialog import ScoringDialog
 
 class FocusRect(QGraphicsRectItem):
@@ -182,7 +182,7 @@ class GameScene(SceneWithFocusRect):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            with Animated():
+            with MoveImmediate():
                 self.game.wall.decorate()
                 for uiTile in self.game.wall.tiles:
                     if uiTile.board:
@@ -191,7 +191,7 @@ class GameScene(SceneWithFocusRect):
     def applySettings(self):
         """apply preferences"""
         self.mainWindow.actionAngle.setEnabled(bool(self.game) and Internal.Preferences.showShadows)
-        with Animated():
+        with MoveImmediate():
             for item in self.nonTiles():
                 item.tileset = Tileset.activeTileset()
             if self.showShadows is None or self.showShadows != Internal.Preferences.showShadows:
@@ -360,7 +360,7 @@ class PlayingScene(GameScene):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            with Animated():
+            with MoveImmediate():
                 self.discardBoard.maximize()
         GameScene.adjustView(self)
 
@@ -526,7 +526,7 @@ class ScoringScene(GameScene):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            with Animated():
+            with MoveImmediate():
                 self.selectorBoard.maximize()
         GameScene.adjustView(self)
 

@@ -27,7 +27,7 @@ from board import Board, FittingView
 from scene import SceneWithFocusRect
 from common import Internal, WINDS
 from guiutil import loadUi
-from animation import Animated
+from animation import MoveImmediate
 
 class TilesetSelector(QWidget):
     """presents all available tiles with previews"""
@@ -84,5 +84,5 @@ class TilesetSelector(QWidget):
         self.tilesetAuthor.setText(selTileset.author)
         self.tilesetContact.setText(selTileset.authorEmail)
         self.tilesetDescription.setText(selTileset.description)
-        with Animated():
+        with MoveImmediate():
             self.board.tileset = selTileset

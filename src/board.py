@@ -30,7 +30,7 @@ from tile import Tile, elements
 from uitile import UITile, UIMeld
 from guiutil import Painter
 from meld import Meld
-from animation import Animation, Animated, animate
+from animation import Animation, MoveImmediate, animate
 from message import Message
 
 from util import kprint, stack, uniqueList
@@ -651,7 +651,7 @@ class SelectorBoard(CourtBoard):
 
     def refill(self):
         """move all tiles back into the selector"""
-        with Animated():
+        with MoveImmediate():
             for uiTile in self.allSelectorTiles:
                 uiTile.tile = uiTile.tile.exposed
                 self.__placeAvailable(uiTile)
