@@ -261,8 +261,8 @@ class Job(StrMixin):
               '--game={game}'.format(game=self.game),
               '--socket={sock}'.format(sock=self.server.socketName),
               '--player={tester} {player}'.format(
-               player=player,
-     tester=u'Tester'.encode('utf-8')),
+                player=player,
+                tester=u'Tüster'.encode('utf-8')),
               '--ruleset={ap}'.format(ap=self.ruleset)]
         if OPTIONS.client3:
             cmd.insert(0, 'python3')
