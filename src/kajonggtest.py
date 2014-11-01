@@ -344,7 +344,7 @@ def neutralize(rows):
     """remove things we do not want to compare"""
     for row in rows:
         for idx, field in enumerate(row):
-            if field.startswith(u'Tester '):
+            if field.startswith(u'Tester ') or field.startswith(u'Tüster'):
                 row[idx] = 'Tester'
             if 'MEM' in field:
                 parts = field.split(',')
