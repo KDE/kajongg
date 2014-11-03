@@ -355,13 +355,9 @@ class DeferredBlock(StrMixin):
 
     def tell(self, about, receivers, command, **kwargs):
         """send info about player 'about' to users 'receivers'"""
-        if isPython3:
-            # TODO: remove isPython3
-            # do not send as unicode, causing more traffic
-            # compare with Move.__init__
-            for kw in ('tile', 'tiles', 'meld', 'melds'):
-                if kw in kwargs:
-                    kwargs[kw] = str(kwargs[kw]).encode()
+        for kw in ('tile', 'tiles', 'meld', 'melds'):
+            if kw in kwargs:
+                kwargs[kw] = str(kwargs[kw]).encode()
         if about.__class__.__name__ == 'User':
             about = self.playerForUser(about)
         if not isinstance(receivers, list):
