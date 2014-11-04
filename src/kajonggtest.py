@@ -24,7 +24,14 @@ from __future__ import print_function
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-import os, sys, csv, subprocess, random, shutil, time, gc
+import os
+import sys
+import csv
+import subprocess
+import random
+import shutil
+import time
+import gc
 from tempfile import mkdtemp
 
 from optparse import OptionParser
@@ -42,9 +49,12 @@ PLAYERSFIELD = 5
 
 OPTIONS = None
 
+
 class Clone(object):
+
     """make a temp directory for commitId"""
     clones = {}
+
     def __new__(cls, commitId):
         if commitId in cls.clones:
             return cls.clones[commitId]
@@ -83,27 +93,38 @@ class Clone(object):
         for cloneKey in cls.clones.keys()[:]:
             cls.clones[cloneKey].remove()
 
+
 class Client(object):
+
     """a simple container, assigning process to job"""
+
     def __init__(self, process=None, job=None):
         self.process = process
         self.job = job
 
+
 class TooManyClients(UserWarning):
+
     """we would surpass options.clients"""
 
+
 class TooManyServers(UserWarning):
+
     """we would surpass options.servers"""
 
+
 class Server(StrMixin):
+
     """represents a kajongg server instance. Called when we want to start a job."""
     servers = []
+
     def __new__(cls, job):
         """can we reuse an existing server?"""
         running = Server.allRunningJobs()
         if len(running) >= OPTIONS.clients:
             raise TooManyClients
-        matchingServers = list(x for x in cls.servers if x.commitId == job.commitId)
+        matchingServers = list(
+            x for x in cls.servers if x.commitId == job.commitId)
         if matchingServers:
             result = sorted(matchingServers, key=lambda x: len(x.jobs))[0]
         else:
@@ -112,7 +133,7 @@ class Server(StrMixin):
                 for server in cls.servers:
                     if len(server.jobs) == 0:
                         server.stop()
-                        break # we only need to stop one server
+                        break  # we only need to stop one server
                 else:
                     # no server without jobs found
                     raise TooManyServers
@@ -181,7 +202,9 @@ class Server(StrMixin):
         if len(self.jobs) == 0:
             self.servers.remove(self)
             if self.process:
-                print('killing server %s%s' % (self, ' for {}'.format(job) if job else ''))
+                print(
+                    'killing server %s%s' %
+                    (self, ' for {}'.format(job) if job else ''))
                 try:
                     self.process.terminate()
                     _ = self.process.wait()
@@ -197,14 +220,18 @@ class Server(StrMixin):
         for server in cls.servers:
             for job in server.jobs[:]:
                 server.stop(job)
-            assert len(server.jobs) == 0, 'stopAll expects no server jobs but found {}'.format(server.jobs)
+            assert len(server.jobs) == 0, 'stopAll expects no server jobs but found {}'.format(
+                server.jobs)
             server.stop()
 
     def __unicode__(self):
         return u'{} pid={} sock={}'.format(self.commitId, self.process.pid, self.socketName)
 
+
 class Job(StrMixin):
+
     """a simple container"""
+
     def __init__(self, ruleset, aiVariant, commitId, game):
         self.ruleset = ruleset
         self.aiVariant = aiVariant
@@ -233,7 +260,9 @@ class Job(StrMixin):
         cmd = [os.path.join(self.srcDir(), 'kajongg.py'),
               '--game={game}'.format(game=self.game),
               '--socket={sock}'.format(sock=self.server.socketName),
-              '--player={tester} {player}'.format(player=player, tester=u'Tester'.encode('utf-8')),
+              '--player={tester} {player}'.format(
+               player=player,
+     tester=u'Tester'.encode('utf-8')),
               '--ruleset={ap}'.format(ap=self.ruleset)]
         if OPTIONS.client3:
             cmd.insert(0, 'python3')
@@ -273,14 +302,18 @@ class Job(StrMixin):
         if result is not None:
             self.process = None
             if not silent:
-                print('   Game over: %s%s' % ('Return code: %s ' % result if result else '', self))
+                print(
+                    '   Game over: %s%s' %
+                    ('Return code: %s ' %
+     result if result else '', self))
             self.server.jobs.remove(self)
 
     @property
     def logFile(self):
         """open if needed"""
         if self.__logFile is None:
-            logDir = os.path.expanduser(os.path.join('~', '.kajongg', 'log', str(self.game),
+            logDir = os.path.expanduser(
+                os.path.join('~', '.kajongg', 'log', str(self.game),
                 self.ruleset, self.aiVariant))
             if not os.path.exists(logDir):
                 os.makedirs(logDir)
@@ -294,13 +327,15 @@ class Job(StrMixin):
         names = OPTIONS.knownRulesets
         for prefix in range(100):
             if sum(x.startswith(self.ruleset[:prefix]) for x in names) == 1:
-                return self.ruleset[prefix-1:]
+                return self.ruleset[prefix - 1:]
 
     def __unicode__(self):
-        pid = u'pid={}'.format(self.process.pid) if self.process and Debug.process else u''
+        pid = u'pid={}'.format(
+            self.process.pid) if self.process and Debug.process else u''
         game = u'game={}'.format(self.game)
         ruleset = self.shortRulesetName()
-        aiName = u'AI={}'.format(self.aiVariant) if self.aiVariant != u'Default' else u''
+        aiName = u'AI={}'.format(
+            self.aiVariant) if self.aiVariant != u'Default' else u''
         commit = u'commit={}'.format(self.commitId)
         return u' '.join([pid, game, ruleset, aiName, commit]).replace('  ', ' ')
 
@@ -321,16 +356,18 @@ def neutralize(rows):
 
 KNOWNCOMMITS = set()
 
+
 def onlyExistingCommits(commits):
     """filter out non-existing commits"""
-    global KNOWNCOMMITS # pylint: disable=global-statement
+    global KNOWNCOMMITS  # pylint: disable=global-statement
     if len(KNOWNCOMMITS) == 0:
-        for branch in subprocess.check_output('git branch'.split(), env={'LANG':'C'}).split('\n'):
+        for branch in subprocess.check_output('git branch'.split(), env={'LANG': 'C'}).split('\n'):
             if not 'detached' in branch and not 'no branch' in branch:
                 KNOWNCOMMITS |= set(subprocess.check_output(
                     'git log --max-count=200 --pretty=%h {branch}'.format(
                         branch=branch[2:]).split()).split('\n'))
     return list(x for x in commits if x in KNOWNCOMMITS)
+
 
 def removeInvalidCommits(csvFile):
     """remove rows with invalid git commit ids"""
@@ -338,10 +375,16 @@ def removeInvalidCommits(csvFile):
         return
     rows = list(csv.reader(open(csvFile, 'rb'), delimiter=';'))
     _ = set(x[COMMITFIELD] for x in rows)
-    csvCommits = set(x for x in _ if set(x) <= set('0123456789abcdef') and len(x) >= 7)
+    csvCommits = set(
+        x for x in _ if set(
+            x) <= set(
+            '0123456789abcdef') and len(
+                x) >= 7)
     nonExisting = set(csvCommits) - set(onlyExistingCommits(csvCommits))
     if nonExisting:
-        print('removing rows from kajongg.csv for commits %s' % ','.join(nonExisting))
+        print(
+            'removing rows from kajongg.csv for commits %s' %
+            ','.join(nonExisting))
         writer = csv.writer(open(csvFile, 'wb'), delimiter=';')
         for row in rows:
             if row[COMMITFIELD] not in nonExisting:
@@ -355,7 +398,8 @@ def removeInvalidCommits(csvFile):
         try:
             os.removedirs(dirName)
         except OSError:
-            pass # not yet empty
+            pass  # not yet empty
+
 
 def readGames(csvFile):
     """returns a dict holding a frozenset of games for each variant"""
@@ -369,8 +413,10 @@ def readGames(csvFile):
     games = dict()
     # build set of rows for every ai
     for variant in set(tuple(x[:COMMITFIELD]) for x in allRows):
-        games[variant] = frozenset(x for x in allRows if tuple(x[:COMMITFIELD]) == variant)
+        games[variant] = frozenset(
+            x for x in allRows if tuple(x[:COMMITFIELD]) == variant)
     return games
+
 
 def printDifferingResults(rowLists):
     """if most games get the same result with all tried variants,
@@ -389,8 +435,10 @@ def printDifferingResults(rowLists):
     if not differing:
         print('no games differ')
     elif float(len(differing)) / len(allGameIds) < 0.20:
-        print('differing games (%d out of %d): %s' % (len(differing), len(allGameIds),
+        print(
+            'differing games (%d out of %d): %s' % (len(differing), len(allGameIds),
              ' '.join(sorted(differing, key=int))))
+
 
 def evaluate(games):
     """evaluate games"""
@@ -400,7 +448,9 @@ def evaluate(games):
     for variant, rows in games.items():
         gameIds = set(x[GAMEFIELD] for x in rows)
         if len(gameIds) != len(set(tuple(list(x)[GAMEFIELD:]) for x in rows)):
-            print('ruleset "%s" AI "%s" has different rows for games' % (variant[0], variant[1]), end=' ')
+            print(
+                'ruleset "%s" AI "%s" has different rows for games' %
+                (variant[0], variant[1]), end=' ')
             for game in sorted(gameIds, key=int):
                 if len(set(tuple(x[GAMEFIELD:] for x in rows if x[GAMEFIELD] == game))) > 1:
                     print(game, end=' ')
@@ -416,10 +466,11 @@ def evaluate(games):
         ruleset='Ruleset', ai='AI variant', games='games', points='points'))
     for variant, rows in games.items():
         ruleset, aiVariant = variant
-        print('{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
+        print(
+            '{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
             games=len(commonGames)), end=' ')
         for playerIdx in range(4):
-            print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD+1+playerIdx*4])
+            print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD + 1 + playerIdx * 4])
                     for x in rows if x[GAMEFIELD] in commonGames)), end=' ')
         print()
     print()
@@ -427,15 +478,23 @@ def evaluate(games):
     for variant, rows in games.items():
         ruleset, aiVariant = variant
         if len(rows) > len(commonGames):
-            print('{ruleset:<25} {ai:<20} {rows:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
+            print(
+                '{ruleset:<25} {ai:<20} {rows:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
                 rows=len(rows)), end=' ')
             for playerIdx in range(4):
-                print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD+1+playerIdx*4]) for x in rows)), end=' ')
+                print(
+                    '{p:>8}'.format(
+                        p=sum(
+                            int(x[
+                                PLAYERSFIELD + 1 + playerIdx * 4]) for x in rows)),
+                    end=' ')
             print()
+
 
 def startingDir():
     """the path of the directory where kajonggtest has been started in"""
     return os.path.dirname(sys.argv[0])
+
 
 def getJobs(jobs):
     """fill the queue"""
@@ -446,13 +505,16 @@ def getJobs(jobs):
         pass
     return jobs
 
+
 def doJobs():
     """now execute all jobs"""
     # pylint: disable=too-many-branches, too-many-locals, too-many-statements
 
     if not OPTIONS.git and OPTIONS.csv:
         if gitHead() in ('current', None):
-            print('Disabling CSV output: %s' % ('You have uncommitted changes' if gitHead() == 'current' else 'No git'))
+            print(
+                'Disabling CSV output: %s' %
+                ('You have uncommitted changes' if gitHead() == 'current' else 'No git'))
             print()
             OPTIONS.csv = None
 
@@ -488,6 +550,7 @@ def doJobs():
                         job.process.wait()
             time.sleep(1)
 
+
 def parse_options():
     """parse options"""
     parser = OptionParser()
@@ -505,7 +568,7 @@ def parse_options():
         default=None, help='use AI variants: comma separated list',
         metavar='AI')
     parser.add_option('', '--log', dest='log', action='store_true',
-        default=False, help='write detailled debug info to ~/.kajongg/log/game/ruleset/commit.' \
+        default=False, help='write detailled debug info to ~/.kajongg/log/game/ruleset/commit.'
                 ' This starts a separate server process per job, it sets --servers to --clients.')
     parser.add_option('', '--game', dest='game',
         help='start first game with GAMEID, increment for following games.'
@@ -526,14 +589,17 @@ def parse_options():
         help='check all commits: either a comma separated list or a range from..until')
     parser.add_option('', '--debug', dest='debug',
         help=Debug.help())
-    parser.add_option('', '--client3', dest='client3', action='store_true', default = False,
+    parser.add_option(
+        '', '--client3', dest='client3', action='store_true', default=False,
         help='use Python 3 for all clients. This will use ports instead of sockets because'
         ' twisted does not yet support sockets for Python 3')
-    parser.add_option('', '--server3', dest='server3', action='store_true', default = False,
+    parser.add_option(
+        '', '--server3', dest='server3', action='store_true', default=False,
         help='use Python 3 for all servers. This will use ports instead of sockets because'
         ' twisted does not yet support sockets for Python 3')
 
     return parser.parse_args()
+
 
 def improve_options():
     """add sensible defaults"""
@@ -543,8 +609,11 @@ def improve_options():
 
     cmdPath = os.path.join(startingDir(), 'kajongg.py')
     cmd = ['python', cmdPath, '--rulesets=']
-    OPTIONS.knownRulesets = subprocess.Popen(cmd, stdout=subprocess.PIPE).communicate()[0].split('\n')
-    OPTIONS.knownRulesets = list(x.strip() for x in OPTIONS.knownRulesets if x.strip())
+    OPTIONS.knownRulesets = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE).communicate()[0].split('\n')
+    OPTIONS.knownRulesets = list(x.strip()
+                                 for x in OPTIONS.knownRulesets if x.strip())
     if OPTIONS.rulesets == 'ALL':
         OPTIONS.rulesets = OPTIONS.knownRulesets
     else:
@@ -557,7 +626,8 @@ def improve_options():
                 print('ruleset', ruleset, 'is not known', end=' ')
                 wrong = True
             elif len(matches) > 1:
-                exactMatch = list(x for x in OPTIONS.knownRulesets if ruleset == x)
+                exactMatch = list(
+                    x for x in OPTIONS.knownRulesets if ruleset == x)
                 if len(exactMatch) == 1:
                     usingRulesets.append(exactMatch[0])
                 else:
@@ -572,8 +642,12 @@ def improve_options():
         if '..' in OPTIONS.git:
             if not '^' in OPTIONS.git:
                 OPTIONS.git = OPTIONS.git.replace('..', '^..')
-            commits = subprocess.check_output('git log --pretty=%h {range}'.format(range=OPTIONS.git).split())
-            OPTIONS.git = list(reversed(list(x.strip() for x in commits.split('\n') if x.strip())))
+            commits = subprocess.check_output(
+                'git log --pretty=%h {range}'.format(
+                    range=OPTIONS.git).split(
+            ))
+            OPTIONS.git = list(reversed(list(x.strip()
+                               for x in commits.split('\n') if x.strip())))
         else:
             OPTIONS.git = onlyExistingCommits(OPTIONS.git.split(','))
             if not OPTIONS.git:
@@ -595,11 +669,13 @@ def improve_options():
     print('AIs:', ' '.join(OPTIONS.allAis))
     if OPTIONS.git:
         print('commits:', ' '.join(OPTIONS.git))
-        # since we order jobs by game, commit we want one permanent server per commit
+        # since we order jobs by game, commit we want one permanent server per
+        # commit
     OPTIONS.jobs = allJobs()
     OPTIONS.games = allGames()
     OPTIONS.jobCount = 0
     OPTIONS.usePort = os.name == 'nt' or OPTIONS.server3 or OPTIONS.client3
+
 
 def allGames():
     """a generator returning game ids"""
@@ -608,8 +684,9 @@ def allGames():
             result = OPTIONS.game
             OPTIONS.game += 1
         else:
-            result = int(random.random() * 10**9)
+            result = int(random.random() * 10 ** 9)
         yield result
+
 
 def allJobs():
     """a generator returning Job instances"""
@@ -622,12 +699,14 @@ def allJobs():
                         raise StopIteration
                     yield Job(ruleset, aiVariant, commitId, game)
 
+
 def main():
     """parse options, play, evaluate results"""
-    global OPTIONS # pylint: disable=global-statement
+    global OPTIONS  # pylint: disable=global-statement
 
     (OPTIONS, args) = parse_options()
-    OPTIONS.csv = os.path.expanduser(os.path.join('~', '.kajongg', 'kajongg.csv'))
+    OPTIONS.csv = os.path.expanduser(
+        os.path.join('~', '.kajongg', 'kajongg.csv'))
     if not os.path.exists(os.path.dirname(OPTIONS.csv)):
         os.makedirs(os.path.dirname(OPTIONS.csv))
 
@@ -651,6 +730,7 @@ def main():
     doJobs()
     if OPTIONS.csv:
         evaluate(readGames(OPTIONS.csv))
+
 
 def cleanup(sig, dummyFrame):
     """at program end"""

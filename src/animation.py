@@ -18,7 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import functools, types
+import functools
+import types
 
 from twisted.internet.defer import Deferred, succeed
 
@@ -28,7 +29,9 @@ from qt import QPropertyAnimation, QParallelAnimationGroup, \
 from common import Internal, Debug, isAlive, isPython3, nativeString
 from log import logDebug
 
+
 class Animation(QPropertyAnimation):
+
     """a Qt4 animation with helper methods"""
 
     nextAnimations = []
@@ -44,7 +47,9 @@ class Animation(QPropertyAnimation):
         if uiTile.tile in Debug.animation:
             oldAnimation = uiTile.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
-                logDebug(u'new animation %s (after %s is done)' % (self, oldAnimation.ident()))
+                logDebug(
+                    u'new animation %s (after %s is done)' %
+                    (self, oldAnimation.ident()))
             else:
                 logDebug(u'new animation %s' % self)
 
@@ -53,15 +58,16 @@ class Animation(QPropertyAnimation):
         uiTile = self.targetObject()
         if uiTile.tile in Debug.animation:
             pName = self.pName()
-            logDebug(u'%s: change endValue for %s: %s->%s  %s' % (self.ident(), pName, self.formatValue(self.endValue()),
-                    self.formatValue(endValue), uiTile))
+            logDebug(
+                u'%s: change endValue for %s: %s->%s  %s' % (self.ident(), pName, self.formatValue(self.endValue()),
+                                                             self.formatValue(endValue), uiTile))
         QPropertyAnimation.setEndValue(self, endValue)
 
     def ident(self):
         """the identifier to be used in debug messages"""
         pGroup = self.group()
         if pGroup:
-            return '%d/A%d' % (id(pGroup)%10000, id(self) % 10000)
+            return '%d/A%d' % (id(pGroup) % 10000, id(self) % 10000)
         else:
             return 'A%d' % (id(self) % 10000)
 
@@ -76,7 +82,7 @@ class Animation(QPropertyAnimation):
     def unpackValue(self, qvariant):
         """get the wanted value from the QVariant"""
         if not isinstance(qvariant, QVariant):
-            return qvariant # is already autoconverted
+            return qvariant  # is already autoconverted
         pName = self.pName()
         if pName == 'pos':
             return qvariant.toPointF()
@@ -104,12 +110,14 @@ class Animation(QPropertyAnimation):
     def __str__(self):
         """for debug messages"""
         return '%s: %s->%s for %s' % (self.ident(), self.pName(),
-            self.formatValue(self.endValue()), self.targetObject())
+                                      self.formatValue(self.endValue()), self.targetObject())
+
 
 class ParallelAnimationGroup(QParallelAnimationGroup):
+
     """override __init__"""
 
-    running = [] # we need a reference to active animation groups
+    running = []  # we need a reference to active animation groups
     current = None
 
     def __init__(self, parent=None):
@@ -122,8 +130,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         self.debug = False
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
-                logDebug(u'Chaining Animation group %d to %d' % \
-                        (id(self), id(ParallelAnimationGroup.current)))
+                logDebug(u'Chaining Animation group %d to %d' %
+                         (id(self), id(ParallelAnimationGroup.current)))
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
         else:
             self.start()
@@ -166,10 +174,12 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         self.finished.connect(self.allFinished)
         scene = Internal.scene
         scene.focusRect.hide()
-        QParallelAnimationGroup.start(self, QAbstractAnimation.DeleteWhenStopped)
+        QParallelAnimationGroup.start(
+            self,
+            QAbstractAnimation.DeleteWhenStopped)
         if self.debug:
             logDebug(u'Animation group %d started (%s)' % (
-                    id(self), ','.join('A%d' % (id(x) % 10000) for x in self.animations)))
+                id(self), ','.join('A%d' % (id(x) % 10000) for x in self.animations)))
         return succeed(None)
 
     def allFinished(self):
@@ -181,8 +191,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if Debug.animationSpeed and self.duration():
             perSecond = self.steps * 1000.0 / self.duration()
             if perSecond < 50:
-                logDebug(u'%d steps for %d animations, %.1f/sec' % \
-                (self.steps, len(self.children()), perSecond))
+                logDebug(u'%d steps for %d animations, %.1f/sec' %
+                         (self.steps, len(self.children()), perSecond))
         # if we have a deferred, callback now
         assert self.deferred
         if self.debug:
@@ -200,8 +210,11 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             Internal.scene.focusRect.refresh()
         return
 
+
 class MoveImmediate(object):
+
     """a helper class for moving tiles with or without animation"""
+
     def __init__(self, animateMe=False):
         if Internal.Preferences:
             self.__animateMe = animateMe
@@ -227,10 +240,11 @@ def __afterCurrentAnimationDo(callback, *args, **kwargs):
     if current:
         current.deferred.addCallback(callback, *args, **kwargs)
         if current.debug:
-            logDebug(u'after current animation %d do %s %s' % \
-                (id(current), callback, ','.join(args) if args else ''))
+            logDebug(u'after current animation %d do %s %s' %
+                     (id(current), callback, ','.join(args) if args else ''))
     else:
         callback(None, *args, **kwargs)
+
 
 def afterQueuedAnimations(f):
     """A decorator"""
@@ -238,15 +252,17 @@ def afterQueuedAnimations(f):
     @functools.wraps(f)
     def doAfterQueuedAnimations(*args, **kwargs):
         animate()
-        method = types.MethodType( f, args[0])
+        method = types.MethodType(f, args[0])
         args = args[1:]
         if isPython3:
-            assert f.__code__.co_varnames[1] == 'deferredResult', f.__qualname__
+            assert f.__code__.co_varnames[
+                1] == 'deferredResult', f.__qualname__
         else:
             assert f.func_code.co_varnames[1] == 'deferredResult', f.__name__
         return __afterCurrentAnimationDo(method, *args, **kwargs)
 
     return doAfterQueuedAnimations
+
 
 def animate():
     """now run all prepared animations. Returns a Deferred
@@ -259,10 +275,11 @@ def animate():
     """
     if Animation.nextAnimations:
         shortcutMe = (Internal.scene is None
-                or Internal.mainWindow.centralView.dragObject
-                or Internal.Preferences.animationSpeed == 99
-                or len(Animation.nextAnimations) > 1000)
-                # change 1000 to 100 if we do not want to animate shuffling and initial deal
+                      or Internal.mainWindow.centralView.dragObject
+                      or Internal.Preferences.animationSpeed == 99
+                      or len(Animation.nextAnimations) > 1000)
+                # change 1000 to 100 if we do not want to animate shuffling and
+                # initial deal
         if not shortcutMe:
             duration = 0
             for animation in Animation.nextAnimations:

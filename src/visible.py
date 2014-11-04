@@ -30,7 +30,9 @@ from handboard import PlayingHandBoard
 from animation import MoveImmediate
 from uiwall import UIWall
 
+
 class VisiblePlayer(Player):
+
     """Mixin for VisiblePlayingPlayer and ScoringPlayer"""
 
     def __init__(self):
@@ -45,7 +47,7 @@ class VisiblePlayer(Player):
     @property
     def idx(self):
         """our index in the player list"""
-        if not self in self.game.players:
+        if self not in self.game.players:
             # we will be added next
             return len(self.game.players)
         return self.game.players.index(self)
@@ -66,12 +68,15 @@ class VisiblePlayer(Player):
         """update display of handBoard. Set Focus to tileName."""
         self.handBoard.sync(adding)
 
+
 class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
+
     """this player instance has a visual representation"""
     # pylint: disable=too-many-public-methods
+
     def __init__(self, game, name):
         assert game
-        self.handBoard = None # because Player.init calls clearHand()
+        self.handBoard = None  # because Player.init calls clearHand()
         PlayingPlayer.__init__(self, game, name)
         VisiblePlayer.__init__(self)
         self.handBoard = PlayingHandBoard(self)
@@ -84,12 +89,14 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             # is None while __del__
             self.front = self.game.wall[self.idx]
         if self.handBoard:
-            self.handBoard.setEnabled(self.game and self.game.belongsToHumanPlayer() and self == self.game.myself)
+            self.handBoard.setEnabled(
+                self.game and self.game.belongsToHumanPlayer(
+                ) and self == self.game.myself)
 
     def explainHand(self):
         """returns the hand to be explained. Same as current unless we need to discard.
-        In that case, make an educated guess about the discard. For player==game.myself, use
-        the focused tile."""
+        In that case, make an educated guess about the discard.
+        For player==game.myself, use the focused tile."""
         hand = self.hand
         if hand and hand.tiles and self._concealedTiles:
             if hand.lenOffset == 1 and not hand.won:
@@ -121,7 +128,8 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         if msg != Message.NoClaim:
             self.speak(msg.name.lower())
             yellow = self.front.message
-            yellow.setText('  '.join([unicode(yellow.msg), m18nc('kajongg', msg.name)]))
+            yellow.setText(
+                '  '.join([unicode(yellow.msg), m18nc('kajongg', msg.name)]))
             yellow.setVisible(True)
 
     def hidePopup(self):
@@ -152,17 +160,27 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
     def addConcealedTiles(self, uiTiles, animated=True):
         """add to my tiles and sync the hand board"""
         with MoveImmediate(animated):
-            PlayingPlayer.addConcealedTiles(self, list(x.tile for x in uiTiles))
+            PlayingPlayer.addConcealedTiles(
+                self,
+                list(x.tile for x in uiTiles))
             self.syncHandBoard(uiTiles)
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
-        """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
-        PlayingPlayer.declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld)
+        """player declared mah jongg. Determine last meld, show
+        concealed tiles grouped to melds"""
+        PlayingPlayer.declaredMahJongg(
+            self,
+            concealed,
+            withDiscard,
+            lastTile,
+            lastMeld)
         if withDiscard:
             # withDiscard is a Tile, we need the UITile
             discardTile = Internal.scene.discardBoard.lastDiscarded
             if discardTile.tile is not withDiscard:
-                self.game.debug('%s is not %s' % (discardTile.tile, withDiscard))
+                self.game.debug(
+                    '%s is not %s' %
+                    (discardTile.tile, withDiscard))
                 assert False
             self.syncHandBoard([discardTile])
         else:
@@ -178,23 +196,32 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         """give an unknown tileItem a name"""
         PlayingPlayer.makeTileKnown(self, tile)
         assert tile.isKnown
-        matchingTiles = sorted(self.handBoard.tilesByElement(Tile.unknown), key=lambda x: x.xoffset)
+        matchingTiles = sorted(
+            self.handBoard.tilesByElement(Tile.unknown),
+            key=lambda x: x.xoffset)
         matchingTiles[-1].tile = tile
 
     def exposeMeld(self, meldTiles, calledTile=None):
-        result = PlayingPlayer.exposeMeld(self, meldTiles, calledTile.tile if calledTile else None)
+        result = PlayingPlayer.exposeMeld(
+            self,
+            meldTiles,
+            calledTile.tile if calledTile else None)
         adding = [calledTile] if calledTile else None
         self.syncHandBoard(adding=adding)
         return result
 
+
 class VisiblePlayingGame(PlayingGame):
+
     """for the client"""
     # pylint: disable=too-many-arguments, too-many-public-methods
     playerClass = VisiblePlayingPlayer
     wallClass = UIWall
 
-    def __init__(self, names, ruleset, gameid=None, wantedGame=None, client=None, playOpen=False, autoPlay=False):
-        PlayingGame.__init__(self, names, ruleset, gameid, wantedGame=wantedGame,
+    def __init__(self, names, ruleset, gameid=None,
+                 wantedGame=None, client=None, playOpen=False, autoPlay=False):
+        PlayingGame.__init__(
+            self, names, ruleset, gameid, wantedGame=wantedGame,
             client=client, playOpen=playOpen, autoPlay=autoPlay)
 #        Internal.mainWindow.adjustView()
 #        Internal.mainWindow.updateGUI()

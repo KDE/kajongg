@@ -28,8 +28,11 @@ from kde import KConfigSkeleton
 from log import logException, logDebug
 from common import Internal, Debug
 
+
 class Parameter(object):
+
     """helper class for defining configuration parameters"""
+
     def __init__(self, group, name, default=None):
         """configuration group, parameter name, default value"""
         self.group = group
@@ -41,8 +44,11 @@ class Parameter(object):
         """returns the value of this item"""
         return self.item.value()
 
+
 class StringParameter(Parameter):
+
     """helper class for defining string parameters"""
+
     def __init__(self, group, name, default=None):
         if default is None:
             default = ''
@@ -51,14 +57,18 @@ class StringParameter(Parameter):
 
     def add(self, skeleton):
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItemString(self.name, self.value, QString(self.default or ''))
+        self.item = skeleton.addItemString(
+            self.name, self.value, QString(self.default or ''))
 
     def itemValue(self):
         """returns the value of this item"""
         return str(self.item.value())
 
+
 class BoolParameter(Parameter):
+
     """helper class for defining boolean parameters"""
+
     def __init__(self, group, name, default=None):
         if default is None:
             default = False
@@ -69,9 +79,13 @@ class BoolParameter(Parameter):
         """add tis parameter to the skeleton"""
         self.item = skeleton.addItemBool(self.name, self.value, self.default)
 
+
 class IntParameter(Parameter):
+
     """helper class for defining integer parameters"""
-    def __init__(self, group, name, default=None, minValue=None, maxValue=None):
+
+    def __init__(self, group, name, default=None,
+                 minValue=None, maxValue=None):
         """minValue and maxValue are also used by the edit widget"""
         if default is None:
             default = 0
@@ -88,11 +102,13 @@ class IntParameter(Parameter):
         if self.maxValue is not None:
             self.item.setMaxValue(self.maxValue)
 
+
 class SetupPreferences(KConfigSkeleton):
+
     """Holds all Kajongg options. Only instantiate this once"""
     _Parameters = {}
 
-    def __init__(self): # pylint: disable=super-init-not-called
+    def __init__(self):  # pylint: disable=super-init-not-called
         if Internal.Preferences:
             logException('Preferences is not None')
         self.__watching = defaultdict(list)
@@ -135,19 +151,20 @@ class SetupPreferences(KConfigSkeleton):
         if method not in self.__watching[name]:
             self.__watching[name].append(method)
             if Debug.preferences:
-                logDebug('addWatch on {}, hook {}'.format(name, method.__name__))
-            self.callTrigger(name) # initial change
+                logDebug('addWatch on {}, hook {}'.format(
+                    name, method.__name__))
+            self.callTrigger(name)  # initial change
 
     def __getattr__(self, name):
         """undefined attributes might be parameters"""
-        if not name in SetupPreferences._Parameters:
+        if name not in SetupPreferences._Parameters:
             return self.__getattribute__(name)
         par = SetupPreferences._Parameters[name]
         return par.itemValue()
 
     def __setattr__(self, name, value):
         """undefined attributes might be parameters"""
-        if not name in SetupPreferences._Parameters:
+        if name not in SetupPreferences._Parameters:
             KConfigSkeleton.__setattr__(self, name, value)
             return
         par = SetupPreferences._Parameters[name]
@@ -182,9 +199,11 @@ class SetupPreferences(KConfigSkeleton):
         """add a string parameter to the skeleton"""
         self.addParameter(BoolParameter(group, name, default))
 
-    def addInteger(self, group, name, default=None, minValue=None, maxValue=None):
+    def addInteger(self, group, name, default=None,
+                   minValue=None, maxValue=None):
         """add a string parameter to the skeleton"""
-        self.addParameter(IntParameter(group, name, default, minValue, maxValue))
+        self.addParameter(IntParameter(
+            group, name, default, minValue, maxValue))
 
     def animationDuration(self):
         """in milliseconds"""

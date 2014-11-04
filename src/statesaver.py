@@ -22,7 +22,9 @@ from qt import QString, QObject, QByteArray, QEvent, QSplitter, QHeaderView
 
 from common import Internal, isAlive, english
 
+
 class StateSaver(QObject):
+
     """saves and restores the state for widgets"""
 
     savers = {}
@@ -108,6 +110,8 @@ class StateSaver(QObject):
         for name, widget in self.widgets:
             if isAlive(widget):
                 if hasattr(widget, 'saveState'):
-                    Internal.Preferences[name + 'State'] = QString(widget.saveState().toHex())
+                    Internal.Preferences[name + 'State'] = QString(
+                        widget.saveState().toHex())
                 if hasattr(widget, 'saveGeometry'):
-                    Internal.Preferences[name + 'Geometry'] = QString(widget.saveGeometry().toHex())
+                    Internal.Preferences[name + 'Geometry'] = QString(
+                        widget.saveGeometry().toHex())

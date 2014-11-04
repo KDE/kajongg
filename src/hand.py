@@ -33,7 +33,9 @@ from intelligence import AIDefault
 from util import callers
 from message import Message
 
+
 class Hand(object):
+
     """represent the hand to be evaluated.
 
     lenOffset is
@@ -61,10 +63,12 @@ class Hand(object):
     was used for rearranging the hiden tiles to melds."""
     # pylint: disable=too-many-instance-attributes
 
-    class __NotWon(UserWarning): # pylint: disable=invalid-name
+    class __NotWon(UserWarning):  # pylint: disable=invalid-name
+
         """should be won but is not a winning hand"""
 
-    def __new__(cls, player, string, prevHand=None): # pylint: disable=unused-argument
+    def __new__(cls, player, string, prevHand=None):
+        # pylint: disable=unused-argument
         """since a Hand instance is never changed, we can use a cache"""
         cache = player.handCache
         cacheKey = string
@@ -72,10 +76,13 @@ class Hand(object):
             result = cache[cacheKey]
             player.cacheHits += 1
             if Debug.hand:
-                result._player = weakref.ref(player) # pylint: disable=protected-access
-                result.debug(fmt(
-                  '{callers}: cached Hand({id(result)} {string}) {result.lenOffset} {id(prevHand)}',
-                    callers=callers(10, exclude=['__init__'])))
+                result._player = (  # pylint: disable=protected-access
+                    weakref.ref(player))
+                result.debug(
+                    fmt(
+                        '{callers}: cached Hand({id(result)} {string}) '
+                        '{result.lenOffset} {id(prevHand)}',
+                        callers=callers(10, exclude=['__init__'])))
             return result
         player.cacheMisses += 1
         result = object.__new__(cls)
@@ -84,8 +91,10 @@ class Hand(object):
 
     def __init__(self, player, string, prevHand=None):
         """evaluate string for player. rules are to be applied in any case"""
-        # silence pylint. This method is time critical, so do not split it into smaller methods
-        # pylint: disable=too-many-instance-attributes,too-many-branches,too-many-statements
+        # silence pylint. This method is time critical, so do not split it
+        # into smaller methods
+        # pylint: disable=too-many-instance-attributes,too-many-branches
+        # pylint: disable=too-many-statements
         if hasattr(self, 'string'):
             # I am from cache
             return
@@ -94,7 +103,10 @@ class Hand(object):
 
         # two shortcuts for speed:
         self.ruleset = self.player.game.ruleset
-        self.intelligence = self.player.intelligence if self.player else AIDefault()
+        if self.player:
+            self.intelligence = self.player.intelligence
+        else:
+            self.intelligence = AIDefault()
         self.string = string
         self.__robbedTile = Tile.unknown
         self.prevHand = prevHand
@@ -111,7 +123,8 @@ class Hand(object):
                 self.mjStr += ' ' + part
             elif partId == 'L':
                 if len(part[1:]) > 8:
-                    raise Exception('last tile cannot complete a kang:' + self.string)
+                    raise Exception(
+                        'last tile cannot complete a kang:' + self.string)
                 self.mjStr += ' ' + part
             else:
                 if part != 'R':
@@ -135,8 +148,10 @@ class Hand(object):
         # functions need them
         self.declaredMelds = MeldList(x for x in self.melds if x.isDeclared)
         declaredTiles = list(sum((x for x in self.declaredMelds), []))
-        self.tilesInHand = TileList(x for x in self.tiles if x not in declaredTiles)
-        self.lenOffset = len(self.tiles) - 13 - sum(x.isKong for x in self.declaredMelds)
+        self.tilesInHand = TileList(x for x in self.tiles
+                                    if x not in declaredTiles)
+        self.lenOffset = (len(self.tiles) - 13
+                          - sum(x.isKong for x in self.declaredMelds))
 
         assert len(tileStrings) < 2, tileStrings
         self.__rest = TileList()
@@ -144,7 +159,9 @@ class Hand(object):
             self.__rest.extend(TileList(tileStrings[0][1:]))
         self.usedRules = None
         if Debug.hand:
-            self.debug(fmt('{callers}: new Hand({id(self)} {string} {self.lenOffset} {id(prevHand)})',
+            self.debug(fmt(
+                '{callers}: new Hand({id(self)} {string} '
+                '{self.lenOffset} {id(prevHand)})',
                 callers=callers(10, exclude=['__init__'])))
         self.__arranged = None
         self.__won = self.lenOffset == 1 and self.player.mayWin
@@ -157,7 +174,9 @@ class Hand(object):
             self.__score = Score()
         finally:
             if Debug.hand:
-                self.debug(fmt('Fixing Hand({id(self)}, {string}, {self.won}, {self.score}'))
+                self.debug(fmt(
+                    'Fixing Hand({id(self)}, {string}, '
+                    '{self.won}, {self.score}'))
             self._fixed = True
 
     @property
@@ -182,7 +201,8 @@ class Hand(object):
 
     def __calculate(self):
         """apply rules, calculate score"""
-        assert not self.__rest, 'Hand.__calculate expects there to be no rest tiles: %s' % self
+        assert not self.__rest, (
+            'Hand.__calculate expects there to be no rest tiles: %s' % self)
         oldWon = self.__won
         self.__applyRules()
         if len(self.lastMelds) > 1:
@@ -283,14 +303,15 @@ class Hand(object):
             matchingMJRules = self.__maybeMahjongg()
             if not matchingMJRules:
                 if Debug.hand:
-                    self.debug(fmt('no matching MJ Rule for {id(self)} {self}'))
+                    self.debug(fmt(
+                        'no matching MJ Rule for {id(self)} {self}'))
                 self.__score = Score()
                 raise Hand.__NotWon
             self.__mjRule = matchingMJRules[0]
             self.usedRules.append(UsedRule(self.__mjRule))
             self.usedRules.extend(self.matchingWinnerRules())
             self.__score = self.__totalScore()
-        else: # not self.won
+        else:  # not self.won
             loserRules = self.__matchingRules(self.ruleset.loserRules)
             if loserRules:
                 self.usedRules.extend(list(UsedRule(x) for x in loserRules))
@@ -299,25 +320,30 @@ class Hand(object):
 
     def matchingWinnerRules(self):
         """returns a list of matching winner rules"""
-        matching = list(UsedRule(x) for x in self.__matchingRules(self.ruleset.winnerRules))
+        matching = list(
+            UsedRule(x)
+            for x in self.__matchingRules(self.ruleset.winnerRules))
         limitRule = self.maxLimitRule(matching)
         return [limitRule] if limitRule else matching
 
     def __checkHasExclusiveRules(self):
         """if we have one, remove all others"""
-        exclusive = list(x for x in self.usedRules if 'absolute' in x.rule.options)
+        exclusive = list(x for x in self.usedRules
+                         if 'absolute' in x.rule.options)
         if exclusive:
             self.usedRules = exclusive
             self.__score = self.__totalScore()
             if self.__won and not bool(self.__maybeMahjongg()):
                 if Debug.hand:
-                    self.debug(fmt('exclusive rule {exclusive} does not win: {self}'))
+                    self.debug(fmt(
+                        'exclusive rule {exclusive} does not win: {self}'))
                 raise Hand.__NotWon
 
     def __setLastTile(self):
         """sets lastTile, lastSource, announcements"""
         self.__announcements = ''
-        self.__lastTile = None # not '' because we want to cache the result, see lastTile property
+        self.__lastTile = None
+        # not '' because we want to cache the result, see lastTile property
         self.__lastSource = None
         parts = self.mjStr.split()
         for part in parts:
@@ -334,13 +360,13 @@ class Hand(object):
         if self.__lastTile:
             assert self.__lastTile.isBonus or self.__lastTile in self.tiles, \
                 'lastTile %s is not in hand %s, mjStr=%s' % (
-                self.__lastTile, self.string, self.mjStr)
+                    self.__lastTile, self.string, self.mjStr)
             if self.__lastSource == 'k':
                 assert self.tiles.count(self.__lastTile.exposed) + \
-                    self.tiles.count(self.__lastTile.concealed) == 1, \
-                    'Robbing kong: I cannot have lastTile %s more than once in %s' % (
-                    self.__lastTile, ' '.join(self.tiles))
-
+                    self.tiles.count(self.__lastTile.concealed) == 1, (
+                        'Robbing kong: I cannot have '
+                        'lastTile %s more than once in %s' % (
+                            self.__lastTile, ' '.join(self.tiles)))
 
     def __setLastMeld(self):
         """sets the shortest possible last meld. This is
@@ -354,14 +380,17 @@ class Hand(object):
                     if len(self.__lastMelds) == 1:
                         self.__lastMeld = self.__lastMelds[0]
                     else:
-                        totals = sorted((len(x), idx) for idx, x in enumerate(self.__lastMelds))
+                        totals = sorted(
+                            (len(x), idx)
+                            for idx, x in enumerate(self.__lastMelds))
                         self.__lastMeld = self.__lastMelds[totals[0][1]]
             if not self.__lastMeld:
                 self.__lastMeld = self.lastTile.single
                 self.__lastMelds = MeldList(self.__lastMeld)
 
     def __applyBestLastMeld(self):
-        """select the last meld giving the highest score (only winning variants)"""
+        """select the last meld giving the highest score
+        (only winning variants)"""
         assert len(self.lastMelds) > 1
         totals = []
         prev = self.lastMeld
@@ -375,14 +404,15 @@ class Hand(object):
             except Hand.__NotWon:
                 pass
         if totals:
-            totals = sorted(totals) # sort by totalScore
+            totals = sorted(totals)  # sort by totalScore
             maxScore = totals[-1][0]
             totals = list(x[1] for x in totals if x[0] == maxScore)
             # now we have a list of only lastMelds reaching maximum score
             if prev not in totals or self.__lastMeld not in totals:
                 if Debug.explain and prev not in totals:
                     if not self.player.game.belongsToRobotPlayer():
-                        self.debug(fmt('replaced last meld {prev} with {totals[0]}'))
+                        self.debug(fmt(
+                            'replaced last meld {prev} with {totals[0]}'))
                 self.__lastMeld = totals[0]
                 self.__applyRules()
 
@@ -391,8 +421,9 @@ class Hand(object):
         assert self.lenOffset == 0
         result = []
         for completedHand in self.callingHands:
-            result.extend([completedHand.lastTile] * (
-                    self.player.tileAvailable(completedHand.lastTile, self)))
+            result.extend(
+                [completedHand.lastTile] *
+                (self.player.tileAvailable(completedHand.lastTile, self)))
         return result
 
     def __add__(self, addTile):
@@ -403,18 +434,21 @@ class Hand(object):
         # anyway
         parts = [str(self.declaredMelds)]
         parts.extend(str(x[0]) for x in self.bonusMelds)
-        parts.append('R' + ''.join(str(x) for x in sorted(self.tilesInHand + [addTile])))
+        parts.append('R' + ''.join(str(x) for x in sorted(
+            self.tilesInHand + [addTile])))
         if self.announcements:
             parts.append('m' + self.announcements)
         parts.append('L' + addTile)
         return Hand(self.player, ' '.join(parts).strip(), prevHand=self)
 
     def __sub__(self, subtractTile):
-        """returns a copy of self minus subtractTiles. Case of subtractTile (hidden
-        or exposed) is ignored. subtractTile must either be undeclared or part of
+        """returns a copy of self minus subtractTiles.
+        Case of subtractTile (hidden or exposed) is ignored.
+        subtractTile must either be undeclared or part of
         lastMeld. Exposed melds of length<3 will be hidden."""
         # pylint: disable=too-many-branches
-        # If lastMeld is given, it must be first in the list. Next try undeclared melds, then declared melds
+        # If lastMeld is given, it must be first in the list.
+        # Next try undeclared melds, then declared melds
         assert self.lenOffset == 1
         if self.lastTile:
             if self.lastTile is subtractTile and self.prevHand:
@@ -429,7 +463,8 @@ class Hand(object):
                     del boni[idx]
                     break
         else:
-            if lastMeld and lastMeld.isDeclared and (subtractTile.exposed in lastMeld.exposed):
+            if lastMeld and lastMeld.isDeclared and (
+                    subtractTile.exposed in lastMeld.exposed):
                 declaredMelds.remove(lastMeld)
                 tilesInHand.extend(lastMeld.concealed)
             tilesInHand.remove(subtractTile.concealed)
@@ -443,14 +478,16 @@ class Hand(object):
                 if len(part) > 1 and part[1] == 'k':
                     continue
             elif part[0] == 'L':
-                if self.lastTile.isExposed and self.lastTile.concealed in tilesInHand:
+                if (self.lastTile.isExposed
+                        and self.lastTile.concealed in tilesInHand):
                     part = 'L' + self.lastTile.concealed
                 else:
                     continue
             newParts.append(part)
         mjStr = ' '.join(newParts)
         rest = 'R' + str(tilesInHand)
-        newString = ' '.join(str(x) for x in (declaredMelds, rest, boni, mjStr))
+        newString = ' '.join(str(x) for x in (
+            declaredMelds, rest, boni, mjStr))
         return Hand(self.player, newString, prevHand=self)
 
     def manualRuleMayApply(self, rule):
@@ -459,7 +496,8 @@ class Hand(object):
             return False
         if not self.__won and rule in self.ruleset.winnerRules:
             return False
-        return rule.selectable(self) or rule.appliesToHand(self) # needed for activated rules
+        return rule.selectable(self) or rule.appliesToHand(self)
+        # needed for activated rules
 
     @property
     def callingHands(self):
@@ -495,7 +533,9 @@ class Hand(object):
             if hand.won:
                 result.append(hand)
         if Debug.hand:
-            self.debug(fmt('{id(self)} {self} is calling {rules}', rules=list(x.mjRule.name for x in result)))
+            self.debug(
+                fmt('{id(self)} {self} is calling {rules}',
+                    rules=list(x.mjRule.name for x in result)))
         return result
 
     @property
@@ -503,10 +543,13 @@ class Hand(object):
         """cache this here for use in rulecode"""
         if self.__robbedTile is Tile.unknown:
             self.__robbedTile = None
-            if self.player.game.moves: # scoringtest does not (yet) simulate this
+            if self.player.game.moves:
+                # scoringtest does not (yet) simulate this
                 lastMove = self.player.game.moves[-1]
-                if lastMove.message == Message.DeclaredKong and lastMove.player != self.player:
-                    self.__robbedTile = lastMove.meld[1] # we want it concealed only for a hidden Kong
+                if (lastMove.message == Message.DeclaredKong
+                        and lastMove.player != self.player):
+                    self.__robbedTile = lastMove.meld[1]
+                    # we want it concealed only for a hidden Kong
         return self.__robbedTile
 
     def __maybeMahjongg(self):
@@ -514,11 +557,15 @@ class Hand(object):
         Return a sorted list of matching MJ rules, highest
         total first. If no rule matches, return None"""
         if self.lenOffset == 1 and self.player.mayWin:
-            matchingMJRules = [x for x in self.ruleset.mjRules if x.appliesToHand(self)]
+            matchingMJRules = [x for x in self.ruleset.mjRules
+                               if x.appliesToHand(self)]
             if matchingMJRules:
                 if self.robbedTile and self.robbedTile.isConcealed:
-                    # Millington 58: robbing hidden kong is only allowed for 13 orphans
-                    matchingMJRules = [x for x in matchingMJRules if 'mayrobhiddenkong' in x.options]
+                    # Millington 58: robbing hidden kong is only
+                    # allowed for 13 orphans
+                    matchingMJRules = [
+                        x for x in matchingMJRules
+                        if 'mayrobhiddenkong' in x.options]
                 return sorted(matchingMJRules, key=lambda x: -x.score.total())
 
     def __arrangements(self):
@@ -537,16 +584,20 @@ class Hand(object):
                     for melds, rest2 in mjRule.rearrange(self, self.__rest[:]):
                         if rest2:
                             melds = list(melds)
-                            restMelds, _ = next(stdMJ.rearrange(self, rest2[:]))
+                            restMelds, _ = next(
+                                stdMJ.rearrange(self, rest2[:]))
                             melds.extend(restMelds)
                         result.append((mjRule, melds))
         if not result:
-            result.extend((stdMJ, x[0]) for x in stdMJ.rearrange(self, self.__rest[:]))
+            result.extend(
+                (stdMJ, x[0])
+                for x in stdMJ.rearrange(self, self.__rest[:]))
         return result
 
     def __arrange(self):
         """work hard to always return the variant with the highest Mah Jongg value.
-        Adds melds to self.melds. A rest will be rearranged by standard rules."""
+        Adds melds to self.melds. A rest will be rearranged by
+        standard rules."""
         if any(not x.isKnown for x in self.__rest):
             melds, rest = divmod(len(self.__rest), 3)
             self.melds.extend([Tile.unknown.pung] * melds)
@@ -563,7 +614,8 @@ class Hand(object):
         wonHands = []
         lostHands = []
         for mjRule, melds in self.__arrangements():
-            _ = ' '.join(str(x) for x in sorted(chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
+            _ = ' '.join(str(x) for x in sorted(
+                chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
             tryHand = Hand(self.player, _, prevHand=self)
             if tryHand.won:
                 tryHand.mjRule = mjRule
@@ -578,8 +630,8 @@ class Hand(object):
         self.melds.sort()
         self.__rest = []
         self.ruleCache.clear()
-        assert sum(len(x) for x in self.melds) == len(self.tiles), '%s != %s' % (
-            self.melds, self.tiles)
+        assert sum(len(x) for x in self.melds) == len(self.tiles), (
+            '%s != %s' % (self.melds, self.tiles))
 
     def __gt__(self, other):
         """compares hand values"""
@@ -591,7 +643,8 @@ class Hand(object):
         elif not (self.arranged and self.won) and other.won:
             return False
         else:
-            return self.intelligence.handValue(self) > self.intelligence.handValue(other)
+            return (self.intelligence.handValue(self)
+                    > self.intelligence.handValue(other))
 
     def __lt__(self, other):
         """compares hand values"""
@@ -628,10 +681,12 @@ class Hand(object):
         """use all used rules to compute the score"""
         maxRule = self.maxLimitRule(self.usedRules)
         maxLimit = 0.0
-        pointsTotal = sum((x.rule.score for x in self.usedRules), Score(ruleset=self.ruleset))
+        pointsTotal = sum((x.rule.score for x in self.usedRules),
+                          Score(ruleset=self.ruleset))
         if maxRule:
             maxLimit = maxRule.rule.score.limits
-            if maxLimit >= 1.0 or maxLimit * self.ruleset.limit > pointsTotal.total():
+            if (maxLimit >= 1.0
+                    or maxLimit * self.ruleset.limit > pointsTotal.total()):
                 self.usedRules = [maxRule]
                 return Score(ruleset=self.ruleset, limits=maxLimit)
         return pointsTotal
@@ -642,7 +697,7 @@ class Hand(object):
 
     @staticmethod
     def __separateBonusMelds(tileStrings):
-        """keep them separate. One meld per bonus tile. Others depend on that."""
+        """One meld per bonus tile. Others depend on that."""
         bonusMelds = MeldList()
         for tileString in tileStrings[:]:
             if len(tileString) == 2:
@@ -656,11 +711,13 @@ class Hand(object):
         """explain what rules were used for this hand"""
         usedRules = self.player.sortRulesByX(self.usedRules)
         result = [x.rule.explain(x.meld) for x in usedRules
-            if x.rule.score.points]
-        result.extend([x.rule.explain(x.meld) for x in usedRules
-            if x.rule.score.doubles])
-        result.extend([x.rule.explain(x.meld) for x in usedRules
-            if not x.rule.score.points and not x.rule.score.doubles])
+                  if x.rule.score.points]
+        result.extend(
+            [x.rule.explain(x.meld) for x in usedRules
+             if x.rule.score.doubles])
+        result.extend(
+            [x.rule.explain(x.meld) for x in usedRules
+             if not x.rule.score.points and not x.rule.score.doubles])
         if any(x.rule.debug for x in usedRules):
             result.append(str(self))
         return result
@@ -683,7 +740,8 @@ class Hand(object):
     def __str__(self):
         """hand as a string"""
         rest = 'REST ' + ''.join(str(x) for x in self.__rest)
-        return ' '.join(str(x) for x in (self.melds, rest, self.bonusMelds, self.mjStr)).replace('  ', ' ')
+        return ' '.join(str(x) for x in (
+            self.melds, rest, self.bonusMelds, self.mjStr)).replace('  ', ' ')
 
     def __repr__(self):
         """the default representation"""

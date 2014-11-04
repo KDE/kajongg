@@ -19,8 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from qt import Qt, toQVariant, QAbstractTableModel, QModelIndex
-from qt import QLabel, QDialog, \
-        QHBoxLayout, QVBoxLayout, QDialogButtonBox
+from qt import QLabel, QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
 from log import m18n, m18nc
 from statesaver import StateSaver
@@ -29,16 +28,20 @@ from guiutil import BlockSignals
 from common import Debug
 from modeltest import ModelTest
 
+
 class DifferModel(QAbstractTableModel):
+
     """a model for our ruleset differ"""
+
     def __init__(self, diffs, view):
         super(DifferModel, self).__init__()
         self.diffs = diffs
         self.view = view
 
-    def columnCount(self, dummyIndex=QModelIndex()): # pylint: disable=no-self-use
+    def columnCount(self, dummyIndex=QModelIndex()):
+        # pylint: disable=no-self-use
         """how many columns does this node have?"""
-        return 3 # rule name, left values, right values
+        return 3  # rule name, left values, right values
 
     def rowCount(self, parent):
         """how many items?"""
@@ -56,14 +59,14 @@ class DifferModel(QAbstractTableModel):
         if role == Qt.DisplayRole:
             return toQVariant(diff[column])
         elif role == Qt.TextAlignmentRole:
-            return toQVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+            return toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         return toQVariant()
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
-                return toQVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                return toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         if role != Qt.DisplayRole:
             return toQVariant()
         if orientation == Qt.Horizontal:
@@ -77,7 +80,9 @@ class DifferModel(QAbstractTableModel):
 
 
 class RulesetDiffer(QDialog):
+
     """Shows differences between rulesets"""
+
     def __init__(self, leftRulesets, rightRulesets, parent=None):
         QDialog.__init__(self, parent)
         if not isinstance(leftRulesets, list):
@@ -93,9 +98,10 @@ class RulesetDiffer(QDialog):
         for left in leftRulesets:
             for right in rightRulesets[:]:
                 if left == right and left.name == right.name:
-                    # rightRulesets.remove(right) this is wrong because it removes the
-                    # first ruleset with the same hash
-                    rightRulesets = list(x for x in rightRulesets if id(x) != id(right))
+                    # rightRulesets.remove(right) this is wrong because it
+                    # removes the first ruleset with the same hash
+                    rightRulesets = list(
+                        x for x in rightRulesets if id(x) != id(right))
         self.leftRulesets = leftRulesets
         self.rightRulesets = rightRulesets
         self.model = None
@@ -148,7 +154,8 @@ class RulesetDiffer(QDialog):
         """order the right rulesets by similarity to current left ruleset.
         Similarity is defined by the length of the diff list."""
         leftRuleset = self.cbRuleset1.current
-        diffPairs = sorted([(len(x.diff(leftRuleset)), x) for x in self.rightRulesets])
+        diffPairs = sorted([(len(x.diff(leftRuleset)), x)
+                           for x in self.rightRulesets])
         combo = self.cbRuleset2
         with BlockSignals(combo):
             combo.items = [x[1] for x in diffPairs]
@@ -164,8 +171,10 @@ class RulesetDiffer(QDialog):
         rightRuleset.load()
         for rule1, rule2 in leftRuleset.diff(rightRuleset):
             name = m18n(rule1.name if rule1 else rule2.name)
-            left = rule1.contentStr() if rule1 else m18nc('Kajongg-Rule', 'not defined')
-            right = rule2.contentStr() if rule2 else m18nc('Kajongg-Rule', 'not defined')
+            left = rule1.contentStr() if rule1 else m18nc(
+                'Kajongg-Rule', 'not defined')
+            right = rule2.contentStr() if rule2 else m18nc(
+                'Kajongg-Rule', 'not defined')
             formatted.append((name, left, right))
             if rule1 and rule2 and rule1.definition != rule2.definition:
                 formatted.append(('', rule1.definition, rule2.definition))

@@ -133,6 +133,7 @@ from PyQt4.QtGui import QValidator
 from PyQt4.QtSvg import QGraphicsSvgItem
 from PyQt4.QtSvg import QSvgRenderer
 
+
 def variantValue(variant):
     """convert QVariant to a python variable"""
     if hasattr(variant, 'toPyObject'):

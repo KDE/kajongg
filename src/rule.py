@@ -26,12 +26,14 @@ from hashlib import md5
 
 from qt import QVariant
 
-from common import Internal, Debug, english # pylint: disable=redefined-builtin
+from common import Internal, Debug, english  # pylint: disable=redefined-builtin
 from common import unicodeString, StrMixin, nativeString, nativeStringArgs
 from log import m18n, m18nc, m18nE, logException, logDebug
 from query import Query
 
+
 class Score(object):
+
     """holds all parts contributing to a score. It has two use cases:
     1. for defining what a rules does: either points or doubles or limits, holding never more than one unit
     2. for summing up the scores of all rules: Now more than one of the units can be in use. If a rule
@@ -41,7 +43,7 @@ class Score(object):
     __hash__ = None
 
     def __init__(self, points=0, doubles=0, limits=0, ruleset=None):
-        self.points = 0 # define the types for those values
+        self.points = 0  # define the types for those values
         self.doubles = 0
         self.limits = 0.0
         self.ruleset = ruleset
@@ -49,7 +51,10 @@ class Score(object):
         self.doubles = type(self.doubles)(doubles)
         self.limits = type(self.limits)(limits)
 
-    unitNames = {m18nE('points'):0, m18nE('doubles'):50, m18nE('limits'):9999}
+    unitNames = {m18nE(
+                 'points'): 0,
+                 m18nE('doubles'): 50,
+                 m18nE('limits'): 9999}
 
     def clear(self):
         """set all to 0"""
@@ -121,8 +126,8 @@ class Score(object):
 
     def __add__(self, other):
         """implement adding Score"""
-        return Score(self.points + other.points, self.doubles+other.doubles,
-            max(self.limits, other.limits), self.ruleset or other.ruleset)
+        return Score(self.points + other.points, self.doubles + other.doubles,
+                     max(self.limits, other.limits), self.ruleset or other.ruleset)
 
     def total(self):
         """the total score"""
@@ -148,7 +153,9 @@ class Score(object):
         """for bool() conversion"""
         return self.points != 0 or self.doubles != 0 or self.limits != 0
 
+
 class RuleList(list):
+
     """a list with a name and a description (to be used as hint).
     Rules can be indexed by name or index.
     Adding a rule either replaces an existing rule or appends it."""
@@ -209,7 +216,7 @@ class RuleList(list):
     def add(self, rule):
         """use add instead of append"""
         if rule.key() in self:
-            logException('%s is already defined as %s, not accepting new rule %s/%s'% (
+            logException('%s is already defined as %s, not accepting new rule %s/%s' % (
                 rule.key(), self[rule.key()].definition, rule.name, rule.definition))
         self[rule.key()] = rule
 
@@ -222,7 +229,11 @@ class RuleList(list):
         description = kwargs.get('description', '')
         for cls in [IntRule, BoolRule, StrRule]:
             if defParts[0].startswith(cls.prefix):
-                rule = cls(name, definition, description=description, parameter=kwargs['parameter'])
+                rule = cls(
+                    name,
+                    definition,
+                    description=description,
+                    parameter=kwargs['parameter'])
                 break
         if not rule:
             if 'parameter' in kwargs:
@@ -234,14 +245,19 @@ class RuleList(list):
                 assert parts1[0] == 'Ohand', definition
                 ruleClassName = parts1[1] + 'Rule'
                 if ruleClassName not in RuleBase.ruleClasses:
-                    logDebug(u'we want %s, definition:%s' % (ruleClassName, definition))
+                    logDebug(
+                        u'we want %s, definition:%s' %
+                        (ruleClassName, definition))
                     logDebug(u'we have %s' % RuleBase.ruleClasses.keys())
                 ruleType.limitHand = RuleBase.ruleClasses[ruleClassName]
         self.add(rule)
 
+
 class UsedRule(object):
+
     """use this in scoring, never change class Rule.
     If the rule has been used for a meld, pass it"""
+
     def __init__(self, rule, meld=None):
         self.rule = rule
         self.meld = meld
@@ -255,7 +271,9 @@ class UsedRule(object):
     def __repr__(self):
         return 'UsedRule(%s)' % str(self)
 
+
 class Ruleset(object):
+
     """holds a full set of rules: meldRules,handRules,winnerRules.
 
         predefined rulesets are preinstalled together with Kajongg. They can be customized by the user:
@@ -323,32 +341,33 @@ class Ruleset(object):
         self.rulesetId = 0
         self.__hash = None
         self.allRules = []
-        self.__dirty = False # only the ruleset editor is supposed to make us dirty
+        self.__dirty = False  # only the ruleset editor is supposed to make us dirty
         self.__loaded = False
         self.__filteredLists = {}
         self.description = None
-        self.rawRules = None # used when we get the rules over the network
+        self.rawRules = None  # used when we get the rules over the network
         self.doublingMeldRules = []
         self.doublingHandRules = []
         self.standardMJRule = None
         self.meldRules = RuleList(1, m18n('Meld Rules'),
-            m18n('Meld rules are applied to single melds independent of the rest of the hand'))
+                                  m18n('Meld rules are applied to single melds independent of the rest of the hand'))
         self.handRules = RuleList(2, m18n('Hand Rules'),
-            m18n('Hand rules are applied to the entire hand, for all players'))
+                                  m18n('Hand rules are applied to the entire hand, for all players'))
         self.winnerRules = RuleList(3, m18n('Winner Rules'),
-            m18n('Winner rules are applied to the entire hand but only for the winner'))
+                                    m18n('Winner rules are applied to the entire hand but only for the winner'))
         self.loserRules = RuleList(33, m18n('Loser Rules'),
-            m18n('Loser rules are applied to the entire hand but only for non-winners'))
+                                   m18n('Loser rules are applied to the entire hand but only for non-winners'))
         self.mjRules = RuleList(4, m18n('Mah Jongg Rules'),
-            m18n('Only hands matching a Mah Jongg rule can win'))
+                                m18n('Only hands matching a Mah Jongg rule can win'))
         self.parameterRules = RuleList(999, m18nc('kajongg', 'Options'),
-            m18n('Here we have several special game related options'))
+                                       m18n('Here we have several special game related options'))
         self.penaltyRules = RuleList(9999, m18n('Penalties'), m18n(
             """Penalties are applied manually by the user. They are only used for scoring games.
 When playing against the computer or over the net, Kajongg will never let you get
 into a situation where you have to pay a penalty"""))
-        self.ruleLists = list([self.meldRules, self.handRules, self.mjRules, self.winnerRules,
-            self.loserRules, self.parameterRules, self.penaltyRules])
+        self.ruleLists = list(
+            [self.meldRules, self.handRules, self.mjRules, self.winnerRules,
+             self.loserRules, self.parameterRules, self.penaltyRules])
         # the order of ruleLists is the order in which the lists appear in the ruleset editor
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
@@ -372,7 +391,6 @@ into a situation where you have to pay a penalty"""))
         if not self.__hash:
             self.__computeHash()
         return self.__hash
-
 
     def __eq__(self, other):
         """two rulesets are equal if everything except name or description is identical.
@@ -403,18 +421,25 @@ into a situation where you have to pay a penalty"""))
     def _initRuleset(self):
         """load ruleset headers but not the rules"""
         if isinstance(self.name, int):
-            query = Query("select id,hash,name,description from ruleset where id=?", (self.name,))
+            query = Query(
+                "select id,hash,name,description from ruleset where id=?", (self.name,))
         elif isinstance(self.name, list):
             # we got the rules over the wire
             self.rawRules = (nativeStringArgs(x) for x in self.name[1:])
-            (self.rulesetId, self.__hash, self.name, self.description) = self.name[0]
+            (self.rulesetId, self.__hash, self.name,
+             self.description) = self.name[0]
             self.__hash = nativeString(self.__hash)
-            self.load() # load raw rules at once, rules from db only when needed
+            self.load()
+                      # load raw rules at once, rules from db only when needed
             return
         else:
-            query = Query("select id,hash,name,description from ruleset where hash=?", (nativeString(self.name),))
+            query = Query(
+                "select id,hash,name,description from ruleset where hash=?",
+                (nativeString(self.name),
+                 ))
         if len(query.records):
-            (self.rulesetId, self.__hash, self.name, self.description) = query.records[0]
+            (self.rulesetId, self.__hash, self.name,
+             self.description) = query.records[0]
         else:
             raise Exception('ruleset %s not found' % self.name)
 
@@ -434,17 +459,23 @@ into a situation where you have to pay a penalty"""))
         self.loadRules()
         self.__setParametersFrom(self)
         for ruleList in self.ruleLists:
-            assert len(ruleList) == len(set(x.key() for x in ruleList)), '%s has non-unique key' % ruleList.name
+            assert len(ruleList) == len(set(x.key()
+                                            for x in ruleList)), '%s has non-unique key' % ruleList.name
             for rule in ruleList:
                 if hasattr(rule, 'score'):
                     rule.score.ruleset = self
                 self.allRules.append(rule)
-        if self.rulesetId: # a saved ruleset, do not do this for predefined rulesets
+        if self.rulesetId:  # a saved ruleset, do not do this for predefined rulesets
             # we might have introduced new parameter rules which do not exist in this ruleset saved with the game,
-            # so add missing parameters from the predefined ruleset most similar to this one
-            self.__setParametersFrom(sorted(PredefinedRuleset.rulesets(), key=lambda x: len(self.diff(x)))[0])
-        self.doublingMeldRules = list(x for x in self.meldRules if x.score.doubles)
-        self.doublingHandRules = list(x for x in self.handRules if x.score.doubles)
+            # so add missing parameters from the predefined ruleset most
+            # similar to this one
+            self.__setParametersFrom(
+                sorted(PredefinedRuleset.rulesets(),
+                       key=lambda x: len(self.diff(x)))[0])
+        self.doublingMeldRules = list(
+            x for x in self.meldRules if x.score.doubles)
+        self.doublingHandRules = list(
+            x for x in self.handRules if x.score.doubles)
         for mjRule in self.mjRules:
             if mjRule.__class__.__name__ == 'StandardMahJonggRule':
                 self.standardMJRule = mjRule
@@ -481,21 +512,24 @@ into a situation where you have to pay a penalty"""))
             points = int(float(points))
         for ruleList in self.ruleLists:
             if ruleList.listId == listNr:
-                ruleList.createRule(name, definition, points=points, doubles=int(doubles), limits=float(limits),
+                ruleList.createRule(
+                    name, definition, points=points, doubles=int(doubles), limits=float(limits),
                     parameter=parameter)
                 break
 
     def findUniqueOption(self, action):
         """return first rule with option"""
         rulesWithAction = list(x for x in self.allRules if action in x.options)
-        assert len(rulesWithAction) < 2, '%s has too many matching rules for %s' % (str(self), action)
+        assert len(rulesWithAction) < 2, '%s has too many matching rules for %s' % (
+            str(self), action)
         if rulesWithAction:
             return rulesWithAction[0]
 
     def filterRules(self, attrName):
         """returns all my Rule classes having attribute attrName"""
         if attrName not in self.__filteredLists:
-            self.__filteredLists[attrName] = list(x for x in self.allRules if hasattr(x, attrName))
+            self.__filteredLists[attrName] = list(
+                x for x in self.allRules if hasattr(x, attrName))
         return self.__filteredLists[attrName]
 
     @staticmethod
@@ -516,7 +550,8 @@ into a situation where you have to pay a penalty"""))
         """return True if ruleset name is already in use"""
         result = any(x.name == name for x in PredefinedRuleset.rulesets())
         if not result:
-            result = bool(Query('select id from ruleset where id<0 and name=?', (name,)).records)
+            result = bool(
+                Query('select id from ruleset where id<0 and name=?', (name,)).records)
         return result
 
     def _newKey(self, minus=False):
@@ -527,7 +562,8 @@ into a situation where you have to pay a penalty"""))
             copyNr = 1
             while self.nameExists(newName):
                 copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
-                newName = m18nc('Ruleset._newKey:%1 is empty or space plus number',
+                newName = m18nc(
+                    'Ruleset._newKey:%1 is empty or space plus number',
                     'Copy%1 of %2', copyStr, m18n(self.name))
                 copyNr += 1
         return newId, newName
@@ -538,7 +574,7 @@ into a situation where you have to pay a penalty"""))
 
     def __str__(self):
         return 'type=%s, id=%d,rulesetId=%d,name=%s' % (
-                type(self), id(self), self.rulesetId, self.name)
+            type(self), id(self), self.rulesetId, self.name)
 
     def copyTemplate(self):
         """make a copy of self and return the new ruleset id. Returns the new ruleset.
@@ -563,7 +599,8 @@ into a situation where you have to pay a penalty"""))
         with Internal.db:
             if self.nameExists(newName):
                 return False
-            query = Query("update ruleset set name=? where id<0 and name=?", (newName, self.name))
+            query = Query(
+                "update ruleset set name=? where id<0 and name=?", (newName, self.name))
             if not query.failure:
                 self.name = newName
             return not query.failure
@@ -587,7 +624,8 @@ into a situation where you have to pay a penalty"""))
         for rule in sorted(self.allRules, key=Ruleset.ruleKey):
             result.update(rule.hashStr().encode('utf-8'))
         self.__hash = result.hexdigest()
-        # TODO: warum geht fuer HC.newTable ein u'fdfads' als hash vom Py2-Client zum Server?
+        # TODO: warum geht fuer HC.newTable ein u'fdfads' als hash vom
+        # Py2-Client zum Server?
 
     def ruleRecord(self, rule):
         """returns the rule as tuple, prepared for use by sql. The first three
@@ -598,9 +636,10 @@ into a situation where you have to pay a penalty"""))
             if rule in ruleList:
                 ruleIdx = ruleList.index(rule)
                 break
-        assert rule in ruleList, '%s: %s not in list %s' % (type(rule), rule, ruleList.name)
+        assert rule in ruleList, '%s: %s not in list %s' % (
+            type(rule), rule, ruleList.name)
         return (self.rulesetId, ruleList.listId, ruleIdx, rule.name,
-            rule.definition, score.points, score.doubles, score.limits, rule.parameter)
+                rule.definition, score.points, score.doubles, score.limits, rule.parameter)
 
     def updateRule(self, rule):
         """update rule in database"""
@@ -610,7 +649,10 @@ into a situation where you have to pay a penalty"""))
             Query("UPDATE rule SET name=?, definition=?, points=?, doubles=?, limits=?, parameter=? "
                   "WHERE ruleset=? AND list=? AND position=?",
                   tuple(record[3:] + record[:3]))
-            Query("UPDATE ruleset SET hash=? WHERE id=?", (self.hash, self.rulesetId))
+            Query(
+                "UPDATE ruleset SET hash=? WHERE id=?",
+                (self.hash,
+                 self.rulesetId))
 
     def save(self, minus=False, forced=False):
         """save the ruleset to the database.
@@ -623,28 +665,34 @@ into a situation where you have to pay a penalty"""))
                 # clear kajongg.db, play game with DMJL, start ruleset editor, copy DMJL.
                 # since play Game saved the used ruleset with id 1, id 1 is found here and no new
                 # template is generated. Next the ruleset editor shows the original ruleset in italics
-                # and the copy with normal font but identical name, and the copy is never saved.
-                qData = Query("select id from ruleset where hash=? and id<0", (self.hash,)).records
+                # and the copy with normal font but identical name, and the
+                # copy is never saved.
+                qData = Query(
+                    "select id from ruleset where hash=? and id<0", (self.hash,)).records
             else:
-                qData = Query("select id from ruleset where hash=?", (self.hash,)).records
+                qData = Query(
+                    "select id from ruleset where hash=?", (self.hash,)).records
             if qData:
                 # is already in database
                 self.rulesetId = qData[0][0]
                 return
         with Internal.db:
             self.rulesetId, self.name = self._newKey(minus)
-            Query('INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
-                (self.rulesetId, english(self.name), self.hash, self.description),
+            Query(
+                'INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
+                (self.rulesetId, english(self.name),
+                 self.hash, self.description),
                 failSilent=True)
             cmd = 'INSERT INTO rule(ruleset, list, position, name, definition, ' \
-                    'points, doubles, limits, parameter) VALUES(?,?,?,?,?,?,?,?,?)'
+                'points, doubles, limits, parameter) VALUES(?,?,?,?,?,?,?,?,?)'
             args = list(self.ruleRecord(x) for x in self.allRules)
             Query(cmd, args)
 
     @staticmethod
     def availableRulesets():
         """returns all rulesets defined in the database plus all predefined rulesets"""
-        templateIds = (x[0] for x in Query("SELECT id FROM ruleset WHERE id<0").records)
+        templateIds = (x[0]
+                       for x in Query("SELECT id FROM ruleset WHERE id<0").records)
         result = [Ruleset(x) for x in templateIds]
         for predefined in PredefinedRuleset.rulesets():
             if predefined not in result or predefined.name not in [x.name for x in result]:
@@ -659,22 +707,27 @@ into a situation where you have to pay a penalty"""))
         result = Ruleset.availableRulesets()
         # if we have a selectable ruleset with the same name as the last used ruleset
         # put that ruleset in front of the list. We do not want to use the exact same last used
-        # ruleset because we might have made some fixes to the ruleset meanwhile
-        if server is None: # scoring game
+        # ruleset because we might have made some fixes to the ruleset
+        # meanwhile
+        if server is None:  # scoring game
             # the exists clause is only needed for inconsistent data bases
             qData = Query("select ruleset from game where seed is null "
-                " and exists(select id from ruleset where game.ruleset=ruleset.id)"
-                "order by starttime desc limit 1").records
+                          " and exists(select id from ruleset where game.ruleset=ruleset.id)"
+                          "order by starttime desc limit 1").records
         else:
-            qData = Query('select lastruleset from server where lastruleset is not null and url=?',
+            qData = Query(
+                'select lastruleset from server where lastruleset is not null and url=?',
                 (server,)).records
             if not qData:
                 # we never played on that server
                 qData = Query('select lastruleset from server where lastruleset is not null '
-                    'order by lasttime desc limit 1').records
+                              'order by lasttime desc limit 1').records
         if qData:
             lastUsedId = qData[0][0]
-            qData = Query("select name from ruleset where id=?", (lastUsedId,)).records
+            qData = Query(
+                "select name from ruleset where id=?",
+                (lastUsedId,
+                 )).records
             if qData:
                 lastUsed = qData[0][0]
                 for idx, ruleset in enumerate(result):
@@ -700,11 +753,14 @@ into a situation where you have to pay a penalty"""))
             result.append((None, rightDict[rule]))
         return result
 
+
 class RuleBase(StrMixin):
+
     """a base for standard Rule and parameter rules IntRule, StrRule, BoolRule"""
 
     options = {}
     ruleClasses = {}
+
     def __init__(self, name, definition, description):
         self.__name = unicodeString(name)
         self.definition = unicodeString(definition)
@@ -717,11 +773,11 @@ class RuleBase(StrMixin):
         """name is readonly"""
         return self.__name
 
-    def validate(self): # pylint: disable=no-self-use
+    def validate(self):  # pylint: disable=no-self-use
         """is the rule valid?"""
         return True
 
-    def hashStr(self): # pylint: disable=no-self-use
+    def hashStr(self):  # pylint: disable=no-self-use
         """
         all that is needed to hash this rule
 
@@ -733,11 +789,14 @@ class RuleBase(StrMixin):
     def __unicode__(self):
         return self.hashStr()
 
+
 def ruleKey(name):
     """the key is used for finding a rule in a RuleList"""
     return english(name).replace(' ', '').replace('.', '')
 
+
 class Rule(RuleBase):
+
     """a mahjongg rule with a name, matching variants, and resulting score.
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
@@ -752,6 +811,7 @@ class Rule(RuleBase):
         """cache results for func"""
         code = func.__code__
         clsMethod = code.co_varnames[0] == 'cls'
+
         def wrapper(*args):
             """closure"""
             hand = args[1] if clsMethod else args[0]
@@ -760,21 +820,32 @@ class Rule(RuleBase):
                 result = func(*args)
                 hand.ruleCache[cacheKey] = result
                 if Debug.ruleCache:
-                    hand.debug('new ruleCache entry for hand %s: %s=%s' % (id(hand)%10000, cacheKey, result))
+                    hand.debug(
+                        'new ruleCache entry for hand %s: %s=%s' %
+                        (id(hand) %
+                         10000, cacheKey, result))
                 return result
             else:
                 if Debug.ruleCache:
                     if hand.ruleCache[cacheKey] != func(*args):
-                        hand.player.game.debug('cacheKey=%s rule=%s func:%s args:%s' % (cacheKey, srcClass, func, args))
-                        hand.player.game.debug('  hand:%s/%s' % (id(hand), hand))
-                        hand.player.game.debug('  cached:%s ' % str(hand.ruleCache[cacheKey]))
-                        hand.player.game.debug('    real:%s ' % str(func(*args)))
+                        hand.player.game.debug(
+                            'cacheKey=%s rule=%s func:%s args:%s' %
+                            (cacheKey, srcClass, func, args))
+                        hand.player.game.debug(
+                            '  hand:%s/%s' %
+                            (id(hand), hand))
+                        hand.player.game.debug(
+                            '  cached:%s ' %
+                            str(hand.ruleCache[cacheKey]))
+                        hand.player.game.debug(
+                            '    real:%s ' %
+                            str(func(*args)))
                 return hand.ruleCache[cacheKey]
             return result
         return classmethod(wrapper) if clsMethod else staticmethod(wrapper)
 
     def __init__(self, name, definition='', points=0, doubles=0, limits=0,
-            description=None, explainTemplate=None, debug=False):
+                 description=None, explainTemplate=None, debug=False):
         RuleBase.__init__(self, name, definition, description)
         self.hasSelectable = False
         self.explainTemplate = explainTemplate
@@ -795,7 +866,7 @@ class Rule(RuleBase):
         for funcName, method in combinedDict.items():
             if isinstance(method, (types.FunctionType, classmethod, staticmethod)):
                 if hasattr(method, 'im_func'):
-                    method = method.im_func
+                    method = method.__func__
                 elif hasattr(method, '__func__'):
                     method = method.__func__
                 if memoize and method.__name__ in srcClass.cache:
@@ -819,7 +890,8 @@ class Rule(RuleBase):
                 if hasattr(ruleClass, "__mro__"):
                     if ruleClass.__mro__[-2].__name__ == 'RuleCode' and len(ruleClass.__mro__) > 2:
                         cls.ruleCode[ruleClass.__name__] = ruleClass
-                        # this changes all methods to classmethod or staticmethod
+                        # this changes all methods to classmethod or
+                        # staticmethod
                         cls.redirectTo(ruleClass, ruleClass)
 
     def key(self):
@@ -828,9 +900,9 @@ class Rule(RuleBase):
 
     def __parseDefinition(self):
         """private setter for definition"""
-        #pylint: disable=too-many-branches
+        # pylint: disable=too-many-branches
         if not self.definition:
-            return # may happen with special programmed rules
+            return  # may happen with special programmed rules
         variants = self.definition.split('||')
         self.__class__.options = {}
         self.hasSelectable = False
@@ -860,7 +932,9 @@ class Rule(RuleBase):
         payers = int(self.options.get('payers', 1))
         payees = int(self.options.get('payees', 1))
         if not 2 <= payers + payees <= 4:
-            logException(m18nc('%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
+            logException(
+                m18nc(
+                    '%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                                   self.name, payers, payees, 'payers/payees'))
 
     def explain(self, meld):
@@ -872,7 +946,7 @@ class Rule(RuleBase):
                 meldType=meld.typeName() if meld else '',
                 meldName=meld.name() if meld else '',
                 tileName=meld[0].name() if meld else ''
-            ).replace('&', '').replace('  ', ' ').strip(), self.score.contentStr())
+        ).replace('&', '').replace('  ', ' ').strip(), self.score.contentStr())
 
     def hashStr(self):
         """
@@ -897,9 +971,12 @@ class Rule(RuleBase):
         """Rule has a special action not changing the score directly"""
         return bool(any(x not in ['lastsource', 'declaration'] for x in self.options))
 
+
 class ParameterRule(RuleBase):
+
     """for parameters"""
     prefix = 0
+
     def __init__(self, name, definition, description, parameter):
         RuleBase.__init__(self, name, definition, description)
         defParts = definition.split('||')
@@ -931,9 +1008,12 @@ class ParameterRule(RuleBase):
         """returns a human readable string with the content"""
         return str(self.parameter)
 
+
 class IntRule(ParameterRule):
+
     """for int parameters. Duck typing with Rule"""
     prefix = 'int'
+
     def __init__(self, name, definition, description, parameter):
         ParameterRule.__init__(self, name, definition, description, parameter)
         self.minimum = 0
@@ -949,12 +1029,16 @@ class IntRule(ParameterRule):
     def validate(self):
         """is the rule valid?"""
         if self.parameter < self.minimum:
-            return m18nc('wrong value for rule', '%1: %2 is too small, minimal value is %3',
+            return m18nc(
+                'wrong value for rule', '%1: %2 is too small, minimal value is %3',
                    m18n(self.name), self.parName, self.minimum)
 
+
 class BoolRule(ParameterRule):
+
     """for bool parameters. Duck typing with Rule"""
     prefix = 'bool'
+
     def __init__(self, name, definition, description, parameter):
         ParameterRule.__init__(self, name, definition, description, parameter)
 
@@ -963,13 +1047,18 @@ class BoolRule(ParameterRule):
         """convert string to wanted type"""
         return parameter not in ('false', 'False', False, 0, '0', None, '')
 
+
 class StrRule(ParameterRule):
+
     """for str parameters. Duck typing with Rule"""
     prefix = 'str'
+
     def __init__(self, name, definition, description, parameter):
         ParameterRule.__init__(self, name, definition, description, parameter)
 
+
 class PredefinedRuleset(Ruleset):
+
     """special code for loading rules from program code instead of from the database"""
 
     classes = set()  # only those will be playable
@@ -983,7 +1072,7 @@ class PredefinedRuleset(Ruleset):
         """a list of instances for all predefined rulesets"""
         if PredefinedRuleset.preRulesets is None:
             PredefinedRuleset.preRulesets = list(x()
-                for x in sorted(PredefinedRuleset.classes, key=lambda x: x.__name__))
+                                                 for x in sorted(PredefinedRuleset.classes, key=lambda x: x.__name__))
         return PredefinedRuleset.preRulesets
 
     def rules(self):

@@ -49,7 +49,9 @@ from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
 from tree import TreeItem, RootItem, TreeModel
 from tile import Tile
 
+
 class ScoreTreeItem(TreeItem):
+
     """generic class for items in our score tree"""
     # pylint: disable=abstract-method
     # we know content() is abstract, this class is too
@@ -63,7 +65,9 @@ class ScoreTreeItem(TreeItem):
             return len(child1.rawContent[1]) + 1
         return 1
 
+
 class ScoreRootItem(RootItem):
+
     """the root item for the score tree"""
 
     def columnCount(self):
@@ -74,8 +78,11 @@ class ScoreRootItem(RootItem):
             return len(child1.rawContent[1]) + 1
         return 1
 
+
 class ScoreGroupItem(ScoreTreeItem):
+
     """represents a group in the tree like Points, Payments, Balance"""
+
     def __init__(self, content):
         ScoreTreeItem.__init__(self, content)
 
@@ -83,8 +90,11 @@ class ScoreGroupItem(ScoreTreeItem):
         """return content stored in this item"""
         return m18n(self.rawContent)
 
+
 class ScorePlayerItem(ScoreTreeItem):
+
     """represents a player in the tree"""
+
     def __init__(self, content):
         ScoreTreeItem.__init__(self, content)
 
@@ -94,7 +104,7 @@ class ScorePlayerItem(ScoreTreeItem):
             return m18n(self.rawContent[0])
         else:
             try:
-                return self.hands()[column-1]
+                return self.hands()[column - 1]
             except IndexError:
                 # we have a penalty but no hand yet. Should
                 # not happen in practical use
@@ -111,29 +121,34 @@ class ScorePlayerItem(ScoreTreeItem):
         points.insert(0, 0)
         points.append(points[-1])
         column -= 1
-        points = points[column:column+4]
+        points = points[column:column + 4]
         points = [float(x) for x in points]
-        for idx in range(1, len(points)-2):  # skip the ends
+        for idx in range(1, len(points) - 2):  # skip the ends
             for step in range(steps):
-                point_1, point0, point1, point2 = points[idx-1:idx+3]
+                point_1, point0, point1, point2 = points[idx - 1:idx + 3]
                 fstep = float(step) / steps
                 # wikipedia Catmull-Rom -> Cubic_Hermite_spline
-                # 0 -> point0, 1 -> point1, 1/2 -> (- point_1 + 9 point0 + 9 point1 - point2) / 16
+                # 0 -> point0, 1 -> point1, 1/2 -> (- point_1 + 9 point0 + 9
+                # point1 - point2) / 16
                 yield (
-                          fstep*((2-fstep)*fstep - 1) * point_1
-                                + (fstep*fstep*(3*fstep - 5) + 2) * point0
-                                + fstep*((4 - 3*fstep)*fstep + 1) * point1
-                                + (fstep-1)*fstep*fstep * point2) / 2
+                    fstep * ((2 - fstep) * fstep - 1) * point_1
+                                + (fstep * fstep * (
+                                    3 * fstep - 5) + 2) * point0
+                                + fstep *
+                                    ((4 - 3 * fstep) * fstep + 1) * point1
+                                + (fstep - 1) * fstep * fstep * point2) / 2
         yield points[-2]
 
 
 class ScoreItemDelegate(QStyledItemDelegate):
+
     """since setting delegates for a row does not work as wanted with a
     tree view, we set the same delegate on ALL items."""
     # try to use colors that look good with all color schemes. Bright
     # contrast colors are not optimal as long as our lines have a width of
     # only one pixel: antialiasing is not sufficient
-    colors = [KApplication.palette().color(x) for x in [QPalette.Text, QPalette.Link, QPalette.LinkVisited]]
+    colors = [KApplication.palette().color(x)
+              for x in [QPalette.Text, QPalette.Link, QPalette.LinkVisited]]
     colors.append(QColor('orange'))
 
     def __init__(self, parent=None):
@@ -152,14 +167,19 @@ class ScoreItemDelegate(QStyledItemDelegate):
                         painter.setRenderHint(QPainter.Antialiasing)
                         # if we want to use a pen width > 1, we can no longer directly drawPolyline
                         # separately per cell beause the lines spread vertically over two rows: We would
-                        # have to draw the lines into one big pixmap and copy from the into the cells
-                        painter.drawPolyline(*chart) # pylint: disable=star-args
+                        # have to draw the lines into one big pixmap and copy
+                        # from the into the cells
+                        painter.drawPolyline(
+                            *chart)  # pylint: disable=star-args
             return
         return QStyledItemDelegate.paint(self, painter, option, index)
 
+
 class ScoreModel(TreeModel):
+
     """a model for our score table"""
-    steps = 30 # how fine do we want the stepping in the chart spline
+    steps = 30  # how fine do we want the stepping in the chart spline
+
     def __init__(self, parent=None):
         super(ScoreModel, self).__init__(parent)
         self.scoreTable = parent
@@ -178,7 +198,7 @@ class ScoreModel(TreeModel):
         xValues = list(x * stepX for x in range(self.steps + 1))
         return list(QPointF(x, y) for x, y in zip(xValues, yValues))
 
-    def data(self, index, role=None): # pylint: disable=no-self-use,too-many-branches
+    def data(self, index, role=None):  # pylint: disable=no-self-use,too-many-branches
         """score table"""
         # pylint: disable=too-many-return-statements
         if not index.isValid():
@@ -194,7 +214,7 @@ class ScoreModel(TreeModel):
                     parentRow = item.parent.row()
                     if parentRow == 0:
                         if not content.penalty:
-                            content = '%d %s'% (content.points, content.wind)
+                            content = '%d %s' % (content.points, content.wind)
                     elif parentRow == 1:
                         content = str(content.payments)
                     else:
@@ -207,9 +227,9 @@ class ScoreModel(TreeModel):
                     return toQVariant(item.content(0))
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
-                return toQVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                return toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
             else:
-                return toQVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+                return toQVariant(int(Qt.AlignRight | Qt.AlignVCenter))
         if role == Qt.FontRole:
             return QFont('Monospaced')
         if role == Qt.ForegroundRole:
@@ -239,14 +259,14 @@ class ScoreModel(TreeModel):
             if child1 and child1.children:
                 child1 = child1.children[0]
                 hands = child1.hands()
-                handResult = hands[section-1]
+                handResult = hands[section - 1]
                 if not handResult.penalty:
                     return handResult.handId()
         elif role == Qt.TextAlignmentRole:
             if section == 0:
-                return toQVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                return toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
             else:
-                return toQVariant(int(Qt.AlignRight|Qt.AlignVCenter))
+                return toQVariant(int(Qt.AlignRight | Qt.AlignVCenter))
         return toQVariant()
 
     def loadData(self):
@@ -254,18 +274,20 @@ class ScoreModel(TreeModel):
         game = self.scoreTable.game
         data = []
         records = Query(
-                'select player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
+            'select player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
                 ' from score where game=? order by player,hand', (game.gameid,)).records
         # pylint: disable=star-args
-        humans = sorted((x for x in game.players if not x.name.startswith(u'Robot')))
-        robots = sorted((x for x in game.players if x.name.startswith(u'Robot')))
-        data = list(tuple([player.localName, [HandResult(*x[1:]) for x in records \
-                if x[0] == player.nameid]]) for player in humans + robots)
+        humans = sorted(
+            (x for x in game.players if not x.name.startswith(u'Robot')))
+        robots = sorted(
+            (x for x in game.players if x.name.startswith(u'Robot')))
+        data = list(tuple([player.localName, [HandResult(*x[1:]) for x in records
+                                              if x[0] == player.nameid]]) for player in humans + robots)
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         groupIndex = self.index(self.rootItem.childCount(), 0, parent)
         groupNames = [m18nc('kajongg', 'Score'), m18nc('kajongg', 'Payments'),
-                m18nc('kajongg', 'Balance'), m18nc('kajongg', 'Chart')]
+                      m18nc('kajongg', 'Balance'), m18nc('kajongg', 'Chart')]
         for idx, groupName in enumerate(groupNames):
             self.insertRows(idx, list([ScoreGroupItem(groupName)]), groupIndex)
             listIndex = self.index(idx, 0, groupIndex)
@@ -280,17 +302,21 @@ class ScoreModel(TreeModel):
         for item in data:
             playerItem = ScorePlayerItem(item)
             for col in range(len(playerItem.hands())):
-                points = list(playerItem.chartPoints(col+1, self.steps))
+                points = list(playerItem.chartPoints(col + 1, self.steps))
                 self.minY = min(self.minY, min(points))
                 self.maxY = max(self.maxY, max(points))
-        self.minY -= 2 # antialiasing might cross the cell border
+        self.minY -= 2  # antialiasing might cross the cell border
         self.maxY += 2
 
+
 class HandResult(object):
+
     """holds the results of a hand for the scoring table"""
     # pylint: disable=too-many-arguments
     # we have too many arguments
-    def __init__(self, rotated, notRotated, penalty, won, prevailing, wind, points, payments, balance, manualrules):
+
+    def __init__(self, rotated, notRotated, penalty, won,
+                 prevailing, wind, points, payments, balance, manualrules):
         self.rotated = rotated
         self.notRotated = notRotated
         self.penalty = bool(penalty)
@@ -304,11 +330,12 @@ class HandResult(object):
 
     def __str__(self):
         return '%d %d %s %d %d %s' % (
-                self.penalty, self.points, self.wind, self.payments, self.balance, self.manualrules)
+            self.penalty, self.points, self.wind, self.payments, self.balance, self.manualrules)
 
     def handId(self):
         """identifies the hand for window title and scoring table"""
-        character = chr(ord('a') - 1 + self.notRotated) if self.notRotated else ''
+        character = chr(
+            ord('a') - 1 + self.notRotated) if self.notRotated else ''
         return '%s%s%s' % (self.prevailing, self.rotated + 1, character)
 
     def roundHand(self, allHands):
@@ -323,8 +350,11 @@ class HandResult(object):
                 return idx + 1
         return idx + 2
 
+
 class ScoreViewLeft(QTreeView):
+
     """subclass for defining sizeHint"""
+
     def __init__(self, parent=None):
         QTreeView.__init__(self, parent)
         self.setItemDelegate(ScoreItemDelegate(self))
@@ -344,8 +374,11 @@ class ScoreViewLeft(QTreeView):
         we always want to see them in full"""
         return self.sizeHint()
 
+
 class ScoreViewRight(QTreeView):
+
     """we need to subclass for catching events"""
+
     def __init__(self, parent=None):
         QTreeView.__init__(self, parent)
         self.setItemDelegate(ScoreItemDelegate(self))
@@ -365,8 +398,11 @@ class ScoreViewRight(QTreeView):
             for col in colRange:
                 self.setColumnWidth(col, width)
 
+
 class HorizontalScrollBar(QScrollBar):
+
     """We subclass here because we want to react on show/hide"""
+
     def __init__(self, scoreTable, parent=None):
         QScrollBar.__init__(self, parent)
         self.scoreTable = scoreTable
@@ -377,16 +413,20 @@ class HorizontalScrollBar(QScrollBar):
 
     def hideEvent(self, dummyEvent):
         """adjust the left view"""
-        self.scoreTable.viewRight.header().setOffset(0) # we should not have to do this...
+        self.scoreTable.viewRight.header().setOffset(
+            0)  # we should not have to do this...
         # how to reproduce problem without setOffset:
         # show table with hor scroll, scroll to right, extend window
         # width very fast. The faster we do that, the wronger the
         # offset of the first column in the viewport.
         self.scoreTable.adaptLeftViewHeight()
 
+
 class ScoreTable(QWidget):
+
     """show scores of current or last game, even if the last game is
     finished. To achieve this we keep our own reference to game."""
+
     def __init__(self, scene):
         super(ScoreTable, self).__init__(None)
         self.setObjectName('ScoreTable')
@@ -397,7 +437,7 @@ class ScoreTable(QWidget):
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.setMouseTracking(True)
         self.__tableFields = ['prevailing', 'won', 'wind',
-                                'points', 'payments', 'balance', 'hand', 'manualrules']
+                              'points', 'payments', 'balance', 'hand', 'manualrules']
         self.setupUi()
         self.refresh()
         StateSaver(self, self.splitter)
@@ -449,7 +489,8 @@ class ScoreTable(QWidget):
         """give the scoring table window a sensible default size"""
         result = QWidget.sizeHint(self)
         result.setWidth(result.height() * 3 / 2)
-        # the default is too small. Use at least 2/5 of screen height and 1/4 of screen width:
+        # the default is too small. Use at least 2/5 of screen height and 1/4
+        # of screen width:
         available = KApplication.kApplication().desktop().availableGeometry()
         height = max(result.height(), available.height() * 2 / 5)
         width = max(result.width(), available.width() / 4)
@@ -465,7 +506,8 @@ class ScoreTable(QWidget):
             return
         if self.scoreModel:
             expandGroups = [
-                self.viewLeft.isExpanded(self.scoreModel.index(x, 0, QModelIndex()))
+                self.viewLeft.isExpanded(
+                    self.scoreModel.index(x, 0, QModelIndex()))
                 for x in range(4)]
         else:
             expandGroups = [True, False, True, True]
@@ -499,9 +541,14 @@ class ScoreTable(QWidget):
         for master, slave in ((self.viewRight, self.viewLeft), (self.viewLeft, self.viewRight)):
             master.expanded.connect(slave.expand)
             master.collapsed.connect(slave.collapse)
-            master.verticalScrollBar().valueChanged.connect(slave.verticalScrollBar().setValue)
+            master.verticalScrollBar().valueChanged.connect(
+                slave.verticalScrollBar().setValue)
         for row, expand in enumerate(expandGroups):
-            self.viewLeft.setExpanded(self.scoreModel.index(row, 0, QModelIndex()), expand)
+            self.viewLeft.setExpanded(
+                self.scoreModel.index(row,
+                                      0,
+                                      QModelIndex()),
+                expand)
         self.viewLeft.resizeColumnToContents(0)
         self.viewRight.setColWidth()
         # we need a timer since the scrollbar is not yet visible
@@ -531,8 +578,11 @@ class ScoreTable(QWidget):
         if height:
             self.leftLayout.addSpacing(height)
 
+
 class ExplainView(QListView):
+
     """show a list explaining all score computations"""
+
     def __init__(self, scene):
         QListView.__init__(self)
         self.scene = scene
@@ -567,7 +617,11 @@ class ExplainView(QListView):
                         for line in explainHand.explain():
                             pLines.append('- ' + line)
                 elif player.handTotal:
-                    pLines.append(m18n('Manual score for %1: %2 points', player.localName, player.handTotal))
+                    pLines.append(
+                        m18n(
+                            'Manual score for %1: %2 points',
+                            player.localName,
+                            player.handTotal))
                 if pLines:
                     pLines.append('')
                 lines.extend(pLines)
@@ -575,8 +629,11 @@ class ExplainView(QListView):
             # QStringListModel does not optimize identical lists away, so we do
             self.model.setStringList(lines)
 
+
 class PenaltyBox(QSpinBox):
+
     """with its own validator, we only accept multiples of parties"""
+
     def __init__(self, parties, parent=None):
         QSpinBox.__init__(self, parent)
         self.parties = parties
@@ -612,8 +669,11 @@ class PenaltyBox(QSpinBox):
         data.clear()
         data.append(newV)
 
+
 class RuleBox(QCheckBox):
+
     """additional attribute: ruleId"""
+
     def __init__(self, rule):
         QCheckBox.__init__(self, m18n(rule.name))
         self.rule = rule
@@ -624,8 +684,11 @@ class RuleBox(QCheckBox):
         if not applicable:
             self.setChecked(False)
 
+
 class PenaltyDialog(QDialog):
+
     """enter penalties"""
+
     def __init__(self, game):
         """selection for this player, tiles are the still available tiles"""
         QDialog.__init__(self, None)
@@ -633,7 +696,8 @@ class PenaltyDialog(QDialog):
         self.game = game
         grid = QGridLayout(self)
         lblOffense = QLabel(m18n('Offense:'))
-        crimes = list([x for x in game.ruleset.penaltyRules if not ('absolute' in x.options and game.winner)])
+        crimes = list(
+            [x for x in game.ruleset.penaltyRules if not ('absolute' in x.options and game.winner)])
         self.cbCrime = ListComboBox(crimes)
         lblOffense.setBuddy(self.cbCrime)
         grid.addWidget(lblOffense, 0, 0)
@@ -653,13 +717,13 @@ class PenaltyDialog(QDialog):
             self.payers.append(ListComboBox(game.losers()))
             self.payees.append(ListComboBox(game.losers()))
         for idx, payer in enumerate(self.payers):
-            grid.addWidget(payer, 3+idx, 0)
+            grid.addWidget(payer, 3 + idx, 0)
             payer.lblPayment = QLabel()
-            grid.addWidget(payer.lblPayment, 3+idx, 1)
+            grid.addWidget(payer.lblPayment, 3 + idx, 1)
         for idx, payee in enumerate(self.payees):
-            grid.addWidget(payee, 3+idx, 3)
+            grid.addWidget(payee, 3 + idx, 3)
             payee.lblPayment = QLabel()
-            grid.addWidget(payee.lblPayment, 3+idx, 4)
+            grid.addWidget(payee.lblPayment, 3 + idx, 4)
         grid.addWidget(QLabel(''), 6, 0)
         grid.setRowStretch(6, 10)
         for player in self.payers + self.payees:
@@ -671,10 +735,13 @@ class PenaltyDialog(QDialog):
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         buttonBox.rejected.connect(self.reject)
         if not usingKDE:
-            self.btnExecute = buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole)
+            self.btnExecute = buttonBox.addButton(
+                m18n("&Execute"),
+                QDialogButtonBox.AcceptRole)
             self.btnExecute.clicked.connect(self.accept)
         else:
-            self.btnExecute = buttonBox.addButton(m18n("&Execute"), QDialogButtonBox.AcceptRole,
+            self.btnExecute = buttonBox.addButton(
+                m18n("&Execute"), QDialogButtonBox.AcceptRole,
                 self, SLOT("accept()"))
         self.crimeChanged()
         StateSaver(self)
@@ -701,7 +768,7 @@ class PenaltyDialog(QDialog):
 
     def allParties(self):
         """return all parties involved in penalty payment"""
-        return [x.current for x in self.usedCombos(self.payers+self.payees)]
+        return [x.current for x in self.usedCombos(self.payers + self.payees)]
 
     def playerChanged(self):
         """shuffle players to ensure everybody only appears once.
@@ -712,7 +779,7 @@ class PenaltyDialog(QDialog):
         usedPlayers = set(self.allParties())
         unusedPlayers = set(self.game.losers()) - usedPlayers
         foundPlayers = [changedCombo.current]
-        for combo in self.usedCombos(self.payers+self.payees):
+        for combo in self.usedCombos(self.payers + self.payees):
             if combo is not changedCombo:
                 if combo.current in foundPlayers:
                     combo.current = unusedPlayers.pop()
@@ -747,13 +814,19 @@ class PenaltyDialog(QDialog):
                 player.lblPayment.setVisible(idx < count)
                 if idx < count:
                     if pList == self.payers:
-                        player.lblPayment.setText(m18nc('penalty dialog, appears behind paying player combobox',
-                            'pays %1 points', -amount))
+                        player.lblPayment.setText(
+                            m18nc(
+                                'penalty dialog, appears behind paying player combobox',
+                                'pays %1 points', -amount))
                     else:
-                        player.lblPayment.setText(m18nc('penalty dialog, appears behind profiting player combobox',
-                            'gets %1 points', amount))
+                        player.lblPayment.setText(
+                            m18nc(
+                                'penalty dialog, appears behind profiting player combobox',
+                                'gets %1 points', amount))
+
 
 class ScoringDialog(QWidget):
+
     """a dialog for entering the scores"""
     # pylint: disable=too-many-instance-attributes
 
@@ -813,14 +886,16 @@ class ScoringDialog(QWidget):
         vpol = QSizePolicy()
         vpol.setHorizontalPolicy(QSizePolicy.Fixed)
         self.cbLastTile.setSizePolicy(vpol)
-        self.cbLastTile.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.cbLastTile.setSizeAdjustPolicy(
+            QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
         self.lblLastMeld = QLabel(m18n('L&ast Meld:'))
         self.prevLastTile = None
         self.cbLastMeld = QComboBox()
         self.cbLastMeld.setMinimumContentsLength(1)
         self.cbLastMeld.setSizePolicy(vpol)
-        self.cbLastMeld.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLengthWithIcon)
+        self.cbLastMeld.setSizeAdjustPolicy(
+            QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastMeld.setBuddy(self.cbLastMeld)
         self.comboTilePairs = set()
         pGrid.setRowStretch(6, 5)
@@ -835,11 +910,11 @@ class ScoringDialog(QWidget):
         self.nameLabels[idx] = QLabel()
         self.nameLabels[idx].setBuddy(self.spValues[idx])
         self.windLabels[idx] = WindLabel()
-        pGrid.addWidget(self.nameLabels[idx], idx+2, 0)
-        pGrid.addWidget(self.windLabels[idx], idx+2, 1)
-        pGrid.addWidget(self.spValues[idx], idx+2, 2)
+        pGrid.addWidget(self.nameLabels[idx], idx + 2, 0)
+        pGrid.addWidget(self.windLabels[idx], idx + 2, 1)
+        pGrid.addWidget(self.spValues[idx], idx + 2, 2)
         self.wonBoxes[idx] = QCheckBox("")
-        pGrid.addWidget(self.wonBoxes[idx], idx+2, 3)
+        pGrid.addWidget(self.wonBoxes[idx], idx + 2, 3)
         self.wonBoxes[idx].clicked.connect(self.wonChanged)
         self.spValues[idx].valueChanged.connect(self.slotInputChanged)
         detailTab = QWidget()
@@ -849,7 +924,6 @@ class ScoringDialog(QWidget):
         detailTabLayout.addWidget(self.details[idx])
         detailTabLayout.addStretch()
         self.detailsLayout[idx] = QVBoxLayout(self.details[idx])
-
 
     def refresh(self):
         """reload game"""
@@ -869,7 +943,8 @@ class ScoringDialog(QWidget):
                     self.windLabels[idx].wind = player.wind
                     self.windLabels[idx].roundsFinished = game.roundsFinished
                     self.detailTabs.setTabText(idx, player.localName)
-                    player.manualRuleBoxes = [RuleBox(x) for x in game.ruleset.allRules if x.hasSelectable]
+                    player.manualRuleBoxes = [RuleBox(x)
+                                              for x in game.ruleset.allRules if x.hasSelectable]
                     for ruleBox in player.manualRuleBoxes:
                         self.detailsLayout[idx].addWidget(ruleBox)
                         ruleBox.clicked.connect(self.slotInputChanged)
@@ -980,7 +1055,7 @@ class ScoringDialog(QWidget):
         else:
             for idx, player in enumerate(self.game.players):
                 self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind,
-                            player.wind == WINDS[self.game.roundsFinished % 4])])
+                                                            player.wind == WINDS[self.game.roundsFinished % 4])])
             self.computeScores()
             self.spValues[0].setFocus()
             self.spValues[0].selectAll()
@@ -995,7 +1070,7 @@ class ScoringDialog(QWidget):
             self.hide()
             return
         for nameLabel, wonBox, spValue, player in zip(
-            self.nameLabels, self.wonBoxes, self.spValues, self.game.players):
+                self.nameLabels, self.wonBoxes, self.spValues, self.game.players):
             with BlockSignals([spValue, wonBox]):
                 # we do not want that change to call computeScores again
                 if player.handBoard and player.handBoard.uiTiles:
@@ -1018,7 +1093,8 @@ class ScoringDialog(QWidget):
                         spValue.setValue(0)
                         spValue.setEnabled(True)
                         nameLabel.setBuddy(spValue)
-                    wonBox.setVisible(player.handTotal >= self.game.ruleset.minMJTotal())
+                    wonBox.setVisible(
+                        player.handTotal >= self.game.ruleset.minMJTotal())
                     if not wonBox.isVisibleTo(self) and wonBox.isChecked():
                         wonBox.setChecked(False)
                 if not wonBox.isVisibleTo(self) and player is self.game.winner:
@@ -1061,7 +1137,8 @@ class ScoringDialog(QWidget):
         for tile in winnerTiles:
             if tile.tile in lastTiles and tile.tile not in shownTiles:
                 shownTiles.add(tile.tile)
-                self.cbLastTile.addItem(QIcon(tile.pixmapFromSvg(pmSize, withBorders=False)),
+                self.cbLastTile.addItem(
+                    QIcon(tile.pixmapFromSvg(pmSize, withBorders=False)),
                         '', toQVariant(tile.tile))
                 if indexedTile is tile.tile:
                     restoredIdx = self.cbLastTile.count() - 1
@@ -1109,8 +1186,8 @@ class ScoringDialog(QWidget):
             painter = QPainter(pixMap)
             for element in meld:
                 painter.drawPixmap(0, 0,
-                    winner.handBoard.tilesByElement(element) \
-                    [0].pixmapFromSvg(QSize(faceWidth, faceHeight), withBorders=False))
+                                   winner.handBoard.tilesByElement(element)
+                                   [0].pixmapFromSvg(QSize(faceWidth, faceHeight), withBorders=False))
                 painter.translate(QPointF(faceWidth, 0.0))
             self.cbLastMeld.addItem(QIcon(pixMap), '', toQVariant(str(meld)))
             if indexedMeld == str(meld):
@@ -1125,8 +1202,9 @@ class ScoringDialog(QWidget):
                     if lastTile not in meldContent:
                         lastTile = lastTile.swapped
                         assert lastTile in meldContent
-                        with BlockSignals(self.cbLastTile): # we want to continue right here
-                            idx = self.cbLastTile.findData(toQVariant(lastTile))
+                        with BlockSignals(self.cbLastTile):  # we want to continue right here
+                            idx = self.cbLastTile.findData(
+                                toQVariant(lastTile))
                             self.cbLastTile.setCurrentIndex(idx)
                     break
         if not restoredIdx:
@@ -1138,7 +1216,7 @@ class ScoringDialog(QWidget):
         """fill the drop down list with all possible melds.
         If the drop down had content before try to preserve the
         current index. Even if the meld changed state meanwhile."""
-        with BlockSignals(self.cbLastMeld): # we only want to emit the changed signal once
+        with BlockSignals(self.cbLastMeld):  # we only want to emit the changed signal once
             showCombo = False
             idx = self.cbLastMeld.currentIndex()
             if idx < 0:
@@ -1151,12 +1229,15 @@ class ScoringDialog(QWidget):
             if self.cbLastTile.count() == 0:
                 return
             lastTile = Internal.scene.computeLastTile()
-            winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4 \
-                and lastTile in m]
+            winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4
+                           and lastTile in m]
             assert len(winnerMelds), 'lastTile %s missing in %s' % (
                 lastTile, self.game.winner.hand.melds)
             if len(winnerMelds) == 1:
-                self.cbLastMeld.addItem(QIcon(), '', toQVariant(str(winnerMelds[0])))
+                self.cbLastMeld.addItem(
+                    QIcon(),
+                    '',
+                    toQVariant(str(winnerMelds[0])))
                 self.cbLastMeld.setCurrentIndex(0)
                 return
             showCombo = True

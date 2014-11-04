@@ -31,8 +31,12 @@ from board import Board
 from log import logDebug
 from common import Internal, Debug, isAlive
 
+
 class TileAttr(object):
-    """a helper class for syncing the hand board, holding relevant tile attributes"""
+
+    """a helper class for syncing the hand board, holding relevant
+    tile attributes"""
+
     def __init__(self, hand, meld=None, idx=None, xoffset=None, yoffset=None):
         if isinstance(hand, UITile):
             self.tile = hand.tile
@@ -44,7 +48,8 @@ class TileAttr(object):
             self.tile = Tile(meld[idx])
             self.xoffset = xoffset
             self.yoffset = yoffset
-            self.dark = self.setDark() # dark and focusable are different in a ScoringHandBoard
+            self.dark = self.setDark()
+            # dark and focusable are different in a ScoringHandBoard
             self.focusable = self.setFocusable(hand, meld, idx)
             if self.tile in Debug.focusable:
                 logDebug(u'TileAttr %s:%s' % (self.tile, self.focusable))
@@ -59,20 +64,26 @@ class TileAttr(object):
     def setFocusable(self, hand, meld, dummyIdx):
         """is it focusable?"""
         player = hand.player
-        return (not self.tile.isBonus
+        return (
+            not self.tile.isBonus
             and self.tile.isKnown
             and player == player.game.activePlayer
             and player == player.game.myself
             and meld.isConcealed and not meld.isKong)
 
     def __str__(self):
-        return '%s %.2f/%.1f%s%s' % (self.tile, self.xoffset, self.yoffset, ' dark' if self.dark else '', \
-            ' focusable' if self.focusable else '')
+        return (
+            '%s %.2f/%.1f%s%s' %
+            (self.tile, self.xoffset, self.yoffset,
+             ' dark' if self.dark else '',
+             ' focusable' if self.focusable else ''))
 
     def __repr__(self):
         return 'TileAttr(%s)' % str(self)
 
+
 class HandBoard(Board):
+
     """a board showing the tiles a player holds"""
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
     tileAttrClass = TileAttr
@@ -90,15 +101,18 @@ class HandBoard(Board):
         self.setParentItem(player.front)
         self.setPosition()
         self.setAcceptDrops(True)
-        Internal.Preferences.addWatch('rearrangeMelds', self.rearrangeMeldsChanged)
-        Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
+        Internal.Preferences.addWatch(
+            'rearrangeMelds', self.rearrangeMeldsChanged)
+        Internal.Preferences.addWatch(
+            'showShadows', self.showShadowsChanged)
 
     def computeRect(self):
         """also adjust the scale for maximum usage of space"""
         Board.computeRect(self)
         sideRect = self.player.front.boundingRect()
         boardRect = self.boundingRect()
-        scale = (sideRect.width() + sideRect.height()) / (boardRect.width() - boardRect.height())
+        scale = ((sideRect.width() + sideRect.height())
+                 / (boardRect.width() - boardRect.height()))
         self.setScale(scale)
 
     @property
@@ -107,7 +121,8 @@ class HandBoard(Board):
         if self._player:
             return self._player()
 
-    # this is ordered such that pylint does not complain about identical code in board.py
+    # this is ordered such that pylint does not complain about
+    # identical code in board.py
 
     @property
     def name(self):
@@ -135,7 +150,8 @@ class HandBoard(Board):
 
     def rearrangeMeldsChanged(self, oldValue, newValue):
         """when True, concealed melds are grouped"""
-        self.concealedMeldDistance = self.exposedMeldDistance if newValue else 0.0
+        self.concealedMeldDistance = (
+            self.exposedMeldDistance if newValue else 0.0)
         self._reload(self.tileset, self._lightSource)
         self.sync()
 
@@ -149,7 +165,8 @@ class HandBoard(Board):
         return self.player.scoringString()
 
     def lowerHalfTiles(self):
-        """returns a list with all single tiles of the lower half melds without boni"""
+        """returns a list with all single tiles of the lower half melds
+        without boni"""
         return list(x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus)
 
     def newLowerMelds(self):
@@ -162,11 +179,13 @@ class HandBoard(Board):
         newUpperMelds = list(self.player.exposedMelds)
         newLowerMelds = self.newLowerMelds()
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
-            meldDistance = self.concealedMeldDistance if yPos else self.exposedMeldDistance
+            meldDistance = (self.concealedMeldDistance if yPos
+                            else self.exposedMeldDistance)
             meldX = 0
             for meld in melds:
                 for idx in range(len(meld)):
-                    result.append(self.tileAttrClass(self, meld, idx, meldX, yPos))
+                    result.append(
+                        self.tileAttrClass(self, meld, idx, meldX, yPos))
                     meldX += 1
                 meldX += meldDistance
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
@@ -174,7 +193,8 @@ class HandBoard(Board):
     def newBonusPositions(self, bonusTiles, newTilePositions):
         """returns list(TileAttr)
         calculate places for bonus tiles. Put them all in one row,
-        right adjusted. If necessary, extend to the right even outside of our board"""
+        right adjusted. If necessary, extend to the right even
+        outside of our board"""
         positions = list(x.xoffset for x in newTilePositions if x.yoffset == 0)
         upperLen = max(positions) if positions else 0
         positions = list(x.xoffset for x in newTilePositions if x.yoffset != 0)
@@ -209,7 +229,7 @@ class HandBoard(Board):
                 targetDict = oldBonusTiles
             else:
                 targetDict = oldTiles
-            if not uiTile.tile in targetDict.keys():
+            if uiTile.tile not in targetDict.keys():
                 targetDict[uiTile.tile] = list()
             targetDict[uiTile.tile].append(uiTile)
         result = dict()
@@ -220,24 +240,27 @@ class HandBoard(Board):
                 or oldTiles.get(newPosition.tile.swapped) \
                 or oldTiles.get(Tile.unknown)
             if not matches and not newPosition.tile.isKnown and oldTiles:
-                # 13 orphans, robbing Kong, lastTile is single: no oldTiles exist
+                # 13 orphans, robbing Kong, lastTile is single:
+                # no oldTiles exist
                 matches = list(oldTiles.values())[0]
             if matches:
                 # no matches happen when we move a uiTile within a board,
                 # here we simply ignore existing tiles with no matches
-                matches = sorted(matches, key=lambda x: \
-                    + abs(newPosition.yoffset-x.yoffset) * 100 \
-                    + abs(newPosition.xoffset-x.xoffset))
+                matches = sorted(
+                    matches, key=lambda x:
+                    + abs(newPosition.yoffset - x.yoffset) * 100
+                    + abs(newPosition.xoffset - x.xoffset))
                 match = matches[0]
                 result[match] = newPosition
                 oldTiles[match.tile].remove(match)
                 if not len(oldTiles[match.tile]):
                     del oldTiles[match.tile]
-        for newBonusPosition in self.newBonusPositions(list(x for x in tiles if x.isBonus), newPositions):
+        for newBonusPosition in self.newBonusPositions(
+                list(x for x in tiles if x.isBonus), newPositions):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
         self._avoidCrossingMovements(result)
         for uiTile, newPos in result.items():
-            uiTile.level = 0 # for tiles coming from the wall
+            uiTile.level = 0  # for tiles coming from the wall
             uiTile.tile = newPos.tile
             uiTile.setBoard(self, newPos.xoffset, newPos.yoffset)
             uiTile.dark = newPos.dark
@@ -284,14 +307,20 @@ class HandBoard(Board):
         physExposed.sort()
         logConcealed.sort()
         physConcealed.sort()
-        assert logExposed == physExposed, '%s: exposed: player %s != hand %s. Check those:%s' % (
-            self.player, logExposed, physExposed, set(logExposed) ^ set(physExposed))
-        assert logConcealed == physConcealed, '%s: concealed: player %s != hand %s' % (
-            self.player, logConcealed, physConcealed)
+        assert logExposed == physExposed, (
+            '%s: exposed: player %s != hand %s. Check those:%s' %
+            (self.player, logExposed, physExposed,
+             set(logExposed) ^ set(physExposed)))
+        assert logConcealed == physConcealed, (
+            '%s: concealed: player %s != hand %s' %
+            (self.player, logConcealed, physConcealed))
+
 
 class PlayingHandBoard(HandBoard):
+
     """a board showing the tiles a player holds"""
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
+
     def __init__(self, player):
         HandBoard.__init__(self, player)
 
@@ -302,10 +331,12 @@ class PlayingHandBoard(HandBoard):
             allTiles.extend(adding)
         newPlaces = self.calcPlaces(allTiles)
         source = adding if adding else newPlaces.keys()
-        focusCandidates = list(x for x in source if x.focusable and x.tile.isConcealed)
+        focusCandidates = list(x for x in source
+                               if x.focusable and x.tile.isConcealed)
         if not focusCandidates:
             # happens if we just exposed a claimed meld
-            focusCandidates = list(x for x in newPlaces.keys() if x.focusable and x.tile.isConcealed)
+            focusCandidates = list(x for x in newPlaces.keys()
+                                   if x.focusable and x.tile.isConcealed)
         focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
         if focusCandidates:
             self.focusTile = focusCandidates[0]
@@ -313,7 +344,7 @@ class PlayingHandBoard(HandBoard):
         self.hasFocus = bool(adding)
 
     @Board.focusTile.setter
-    def focusTile(self, uiTile): # pylint: disable=arguments-differ
+    def focusTile(self, uiTile):  # pylint: disable=arguments-differ
         Board.focusTile.fset(self, uiTile)
         if self.player and Internal.scene.clientDialog:
             Internal.scene.clientDialog.focusTileChanged()
@@ -323,31 +354,37 @@ class PlayingHandBoard(HandBoard):
         if isAlive(self):
             # aborting a running game: the underlying C++ object might
             # already have been destroyed
-            self.tileDragEnabled = enabled and self.player == self.player.game.myself
+            self.tileDragEnabled = (
+                enabled
+                and self.player == self.player.game.myself)
             QGraphicsRectItem.setEnabled(self, enabled)
 
-    def dragMoveEvent(self, event): # pylint: disable=no-self-use
+    def dragMoveEvent(self, event):  # pylint: disable=no-self-use
         """only dragging to discard board should be possible"""
         event.setAccepted(False)
 
     def _avoidCrossingMovements(self, places):
         """"the above is a good approximation but if the board already had more
-        than one identical tile they often switch places - this should not happen.
-        So for each element, we make sure that the left-right order is still the
-        same as before. For this check, ignore all new tiles"""
+        than one identical tile they often switch places - this should not
+        happen. So for each element, we make sure that the left-right order is
+        still the same as before. For this check, ignore all new tiles"""
         movingPlaces = self.__movingPlaces(places)
         for yOld in 0, self.lowerY:
             for yNew in 0, self.lowerY:
-                items = [x for x in movingPlaces.items() \
-                         if (x[0].board == self) \
-                            and x[0].yoffset == yOld \
-                            and x[1] and x[1].yoffset == yNew \
-                            and not x[0].isBonus]
+                items = [x for x in movingPlaces.items()
+                         if (x[0].board == self)
+                         and x[0].yoffset == yOld
+                         and x[1] and x[1].yoffset == yNew
+                         and not x[0].isBonus]
                 for element in set(x[1].tile for x in items):
-                    items = [x for x in movingPlaces.items() if x[1].tile is element]
+                    items = [x for x in movingPlaces.items()
+                             if x[1].tile is element]
                     if len(items) > 1:
-                        oldList = sorted(list(x[0] for x in items), key=lambda x: bool(x.board != self)*1000+x.xoffset)
-                        newList = sorted(list(x[1] for x in items), key=lambda x: x.xoffset)
+                        oldList = sorted(list(x[0] for x in items),
+                                         key=lambda x:
+                                         bool(x.board != self) * 1000 + x.xoffset)
+                        newList = sorted(list(x[1] for x in items),
+                                         key=lambda x: x.xoffset)
                         for idx, oldTile in enumerate(oldList):
                             places[oldTile] = newList[idx]
 
@@ -360,12 +397,15 @@ class PlayingHandBoard(HandBoard):
             rowPlaces = sorted(rowPlaces, key=lambda x: x[0].xoffset)
             smallestX = 999
             for tileItem, newPos in places.items():
-                if tileItem.xoffset != newPos.xoffset or tileItem.yoffset != newPos.yoffset:
+                if (tileItem.xoffset != newPos.xoffset
+                        or tileItem.yoffset != newPos.yoffset):
                     if newPos.yoffset == yOld:
                         smallestX = min(smallestX, newPos.xoffset)
                     else:
                         smallestX = min(smallestX, tileItem.xoffset)
-            rows[idx] = [x for x in rowPlaces if x[0].xoffset >= smallestX and x[1].xoffset >= smallestX]
+            rows[idx] = [x for x in rowPlaces
+                         if x[0].xoffset >= smallestX
+                         and x[1].xoffset >= smallestX]
         result = dict(rows[0])
         result.update(dict(rows[1]))
         return result
@@ -382,18 +422,22 @@ class PlayingHandBoard(HandBoard):
         else:
             return []
         if not Internal.Preferences.rearrangeMelds:
-            result = MeldList(Meld(x) for x in result.tiles()) # one meld per tile
+            result = MeldList(Meld(x) for x in result.tiles())
+            # one meld per tile
         result.sort()
         return result
 
     def discard(self, tile):
-        """select the rightmost matching tileItem and move it to DiscardBoard"""
+        """select the rightmost matching tileItem and move it
+        to DiscardBoard"""
         if self.focusTile and self.focusTile.tile is tile:
             lastDiscard = self.focusTile
         else:
-            matchingTiles = sorted(self.tilesByElement(tile), key=lambda x: x.xoffset)
-            # if an opponent player discards, we want to discard from the right end of the hand
-            # thus minimizing tile movement within the hand
+            matchingTiles = sorted(self.tilesByElement(tile),
+                                   key=lambda x: x.xoffset)
+            # if an opponent player discards, we want to discard from the
+            # right end of the hand# thus minimizing tile movement
+            # within the hand
             lastDiscard = matchingTiles[-1]
         Internal.scene.discardBoard.discardTile(lastDiscard)
         for uiTile in self.uiTiles:

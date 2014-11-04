@@ -22,15 +22,18 @@ from kde import KIcon
 from dialogs import Sorry
 from qt import Qt
 from qt import QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox, \
-        QTableWidget, QTableWidgetItem
+    QTableWidget, QTableWidgetItem
 
 from query import Query
 from guiutil import decorateWindow
 from log import m18n, m18nc
 from statesaver import StateSaver
 
+
 class PlayerList(QDialog):
+
     """QtSQL Model view of the players"""
+
     def __init__(self, parent):
         QDialog.__init__(self)
         self.parent = parent
@@ -42,12 +45,17 @@ class PlayerList(QDialog):
         self.table.itemChanged.connect(self.itemChanged)
         self.updateTable()
         self.buttonBox = QDialogButtonBox()
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Close) # Close has the Rejected role
+        self.buttonBox.setStandardButtons(
+            QDialogButtonBox.Close)  # Close has the Rejected role
         self.buttonBox.rejected.connect(self.accept)
-        self.newButton = self.buttonBox.addButton(m18nc('define a new player', "&New"), QDialogButtonBox.ActionRole)
+        self.newButton = self.buttonBox.addButton(
+            m18nc('define a new player',
+                  "&New"),
+            QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.slotInsert)
-        self.deleteButton = self.buttonBox.addButton(m18n("&Delete"), QDialogButtonBox.ActionRole)
+        self.deleteButton = self.buttonBox.addButton(
+            m18n("&Delete"), QDialogButtonBox.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.deleteButton.clicked.connect(self.delete)
 
@@ -78,7 +86,8 @@ class PlayerList(QDialog):
         table = self.table
         table.clear()
         if data is None:
-            data = dict(Query('select name, id from player where name not like "ROBOT %"').records)
+            data = dict(
+                Query('select name, id from player where name not like "ROBOT %"').records)
         self._data = data
         table.setColumnCount(1)
         table.setRowCount(len(self._data))
@@ -104,12 +113,17 @@ class PlayerList(QDialog):
         if currentName in self._data:
             Sorry(m18n('Player %1 already exists', currentName))
             self.setFocus()
-            del self._data[unicode(self.table.item(self.table.currentRow(), 0).text())]
+            del self._data[
+                unicode(self.table.item(self.table.currentRow(), 0).text())]
             self.updateTable(currentName=currentName)
             return
         query = Query('insert into player(name) values(?)', (currentName, ))
         if query.failure:
-            Sorry(m18n('Error while adding player %1: %2', currentName, query.failure.message))
+            Sorry(
+                m18n(
+                    'Error while adding player %1: %2',
+                    currentName,
+                    query.failure.message))
         self.updateTable(currentName=currentName)
 
     def slotInsert(self):
@@ -128,14 +142,16 @@ class PlayerList(QDialog):
         if len(items):
             name = unicode(items[0].text())
             playerId = self._data[name]
-            query = Query("select 1 from game where p0=? or p1=? or p2=? or p3=?",
+            query = Query(
+                "select 1 from game where p0=? or p1=? or p2=? or p3=?",
                     (playerId, ) * 4)
             if len(query.records):
-                Sorry(m18n('This player cannot be deleted. There are games associated with %1.', name))
+                Sorry(
+                    m18n('This player cannot be deleted. There are games associated with %1.', name))
                 return
             Query("delete from player where name=?", (name,))
             self.updateTable()
-        self.table.setCurrentCell(min(currentRow, len(self._data)-1), 0)
+        self.table.setCurrentCell(min(currentRow, len(self._data) - 1), 0)
 
     def keyPressEvent(self, event):
         """use insert/delete keys for insert/delete"""

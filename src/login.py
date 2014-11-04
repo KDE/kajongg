@@ -18,7 +18,11 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import socket, subprocess, datetime, os, sys
+import socket
+import subprocess
+import datetime
+import os
+import sys
 from itertools import chain
 
 from twisted.spread import pb
@@ -46,11 +50,15 @@ from statesaver import StateSaver
 from guiutil import ListComboBox, decorateWindow
 from rule import Ruleset
 
+
 class LoginAborted(Exception):
+
     """the user aborted the login"""
     pass
 
+
 class Url(unicode):
+
     """holds connection related attributes: host, port, socketname"""
     # pylint: disable=too-many-public-methods
     # TODO: base content: host:port
@@ -147,7 +155,7 @@ class Url(unicode):
                     logDebug(u'Game %s: Server %s not available after 30 seconds, aborting' % (
                         SingleshotOptions.game, self))
                     raise CancelledError
-                return deferLater(Internal.reactor, 1, self.startServer, result, waiting+1)
+                return deferLater(Internal.reactor, 1, self.startServer, result, waiting + 1)
         elif which('XXqdbus'):
             # TODO: use twisted process because we must have a timeout. If the qdbus service
             # does not answer, qdbus waits for 25 seconds.
@@ -156,15 +164,16 @@ class Url(unicode):
             # for Python 3. And Ubuntu has no package with
             # QtDBus. So we use good old subprocess.
             stdoutdata, stderrdata = subprocess.Popen(['qdbus',
-                'org.kde.kded',
-                '/modules/networkstatus',
-                'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                                                       'org.kde.kded',
+                                                       '/modules/networkstatus',
+                                                       'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             stdoutdata = stdoutdata.strip()
             stderrdata = stderrdata.strip()
             if stderrdata == '' and stdoutdata != '4':
                 # pylint: disable=nonstandard-exception
                 raise ConnectError()
-            # if we have stderrdata, qdbus probably does not provide the service we want, so ignore it
+            # if we have stderrdata, qdbus probably does not provide the
+            # service we want, so ignore it
         return result
 
     def __startLocalServer(self):
@@ -186,14 +195,16 @@ class Url(unicode):
                     args = [tryServer]
             else:
                 args = ['kajonggserver']
-            if self.useSocket or os.name == 'nt': # for nt --socket tells the server to bind to 127.0.0.1
+            if self.useSocket or os.name == 'nt':  # for nt --socket tells the server to bind to 127.0.0.1
                 args.append('--socket=%s' % socketName())
                 if removeIfExists(socketName()):
-                    logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
+                    logInfo(
+                        m18n('removed stale socket <filename>%1</filename>', socketName()))
             if not self.useSocket:
                 args.append('--port=%d' % self.port)
             if self.isLocalGame:
-                args.append('--db={}'.format(os.path.normpath(appdataDir() + 'local.db')))
+                args.append(
+                    '--db={}'.format(os.path.normpath(appdataDir() + 'local.db')))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
             if os.name == 'nt':
@@ -201,10 +212,14 @@ class Url(unicode):
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             else:
                 startupinfo = None
-            process = subprocess.Popen(args, startupinfo=startupinfo) # , shell=os.name == 'nt')
+            process = subprocess.Popen(
+                args,
+                startupinfo=startupinfo)  # , shell=os.name == 'nt')
             if Debug.connections:
-                logDebug(m18n('started the local kajongg server: pid=<numid>%1</numid> %2',
-                    process.pid, ' '.join(args)))
+                logDebug(
+                    m18n(
+                        'started the local kajongg server: pid=<numid>%1</numid> %2',
+                        process.pid, ' '.join(args)))
         except OSError as exc:
             logException(exc)
 
@@ -235,8 +250,11 @@ class Url(unicode):
             host = self.host
             return Internal.reactor.connectTCP(host, self.port, factory, timeout=5)
 
+
 class LoginDlg(QDialog):
+
     """login dialog for server"""
+
     def __init__(self):
         """self.servers is a list of tuples containing server and last playername"""
         QDialog.__init__(self, None)
@@ -244,7 +262,8 @@ class LoginDlg(QDialog):
         self.setupUi()
 
         localName = m18n(Query.localServerName)
-        self.servers = Query('select url,lastname from server order by lasttime desc').records
+        self.servers = Query(
+            'select url,lastname from server order by lasttime desc').records
         servers = [m18n(x[0]) for x in self.servers]
         # the first server combobox item should be default: either the last used server
         # or localName for autoPlay
@@ -255,11 +274,13 @@ class LoginDlg(QDialog):
         if Internal.autoPlay:
             demoHost = Options.host or localName
             if demoHost in servers:
-                servers.remove(demoHost)  # we want a unique list, it will be re-used for all following games
-            servers.insert(0, demoHost)   # in this process but they will not be autoPlay
+                servers.remove(
+                    demoHost)  # we want a unique list, it will be re-used for all following games
+            servers.insert(0, demoHost)
+                           # in this process but they will not be autoPlay
         self.cbServer.addItems(servers)
         self.passwords = Query('select url, p.name, passwords.password from passwords, player p '
-            'where passwords.player=p.id').records
+                               'where passwords.player=p.id').records
         Players.load()
         self.cbServer.editTextChanged.connect(self.serverChanged)
         self.cbUser.editTextChanged.connect(self.userChanged)
@@ -273,7 +294,8 @@ class LoginDlg(QDialog):
     def setupUi(self):
         """create all Ui elements but do not fill them"""
         buttonBox = KDialogButtonBox(self)
-        buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        buttonBox.setStandardButtons(
+            QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
         # Ubuntu 11.10 unity is a bit strange - without this, it sets focus on
         # the cancel button (which it shows on the left). I found no obvious
         # way to use setDefault and setAutoDefault for fixing this.
@@ -303,7 +325,7 @@ class LoginDlg(QDialog):
     def serverChanged(self, dummyText=None):
         """the user selected a different server"""
         records = Query('select player.name from player, passwords '
-                'where passwords.url=? and passwords.player = player.id', (self.url,)).records
+                        'where passwords.url=? and passwords.player = player.id', (self.url,)).records
         players = list(x[0] for x in records)
         preferPlayer = Options.player
         if preferPlayer:
@@ -324,7 +346,9 @@ class LoginDlg(QDialog):
         showPW = not Url(self.url).isLocalHost
         self.grid.labelForField(self.edPassword).setVisible(showPW)
         self.edPassword.setVisible(showPW)
-        self.grid.labelForField(self.cbRuleset).setVisible(not showPW and not Options.ruleset)
+        self.grid.labelForField(
+            self.cbRuleset).setVisible(
+                not showPW and not Options.ruleset)
         self.cbRuleset.setVisible(not showPW and not Options.ruleset)
         if not showPW:
             self.cbRuleset.clear()
@@ -377,7 +401,9 @@ class LoginDlg(QDialog):
         """abstracts the password of the dialog"""
         self.edPassword.setText(password)
 
+
 class AddUserDialog(MustChooseKDialog):
+
     """add a user account on a server: This dialog asks for the needed attributes"""
     # pylint: disable=too-many-instance-attributes
 
@@ -420,7 +446,10 @@ class AddUserDialog(MustChooseKDialog):
 
     def validate(self):
         """does the dialog hold valid data?"""
-        equal = self.edPassword.size() and self.edPassword.text() == self.edPassword2.text()
+        equal = self.edPassword.size(
+        ) and self.edPassword.text(
+        ) == self.edPassword2.text(
+        )
         self.button(KDialog.Ok).setEnabled(equal)
 
     @property
@@ -445,7 +474,9 @@ class AddUserDialog(MustChooseKDialog):
 
 
 class Connection(object):
+
     """creates a connection to server"""
+
     def __init__(self, client):
         self.client = client
         self.perspective = None
@@ -470,7 +501,9 @@ class Connection(object):
                 def write():
                     """write to database, returns 1 for success"""
                     return Query('update server set lastruleset=? where url=?', (value.rulesetId, self.url))
-                value.save()     # make sure we have a valid rulesetId for predefined rulesets
+                value.save()
+                           # make sure we have a valid rulesetId for predefined
+                           # rulesets
                 if not write():
                     self.__updateServerInfoInDatabase()
                     write()
@@ -510,32 +543,37 @@ class Connection(object):
         self.perspective.notifyOnDisconnect(self.client.serverDisconnected)
         self.__updateServerInfoInDatabase()
         self.dlg = None
-        self.pingLater() # not right now, client.connection is still None
+        self.pingLater()  # not right now, client.connection is still None
         return self
 
     def __updateServerInfoInDatabase(self):
         """we are online. Update table server."""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         with Internal.db:
-            serverKnown = Query('update server set lastname=?,lasttime=? where url=?',
+            serverKnown = Query(
+                'update server set lastname=?,lasttime=? where url=?',
                 (self.username, lasttime, self.url)).rowcount() == 1
             if not serverKnown:
-                Query('insert into server(url,lastname,lasttime) values(?,?,?)',
+                Query(
+                    'insert into server(url,lastname,lasttime) values(?,?,?)',
                     (self.url, self.username, lasttime))
         # needed if the server knows our name but our local data base does not:
         Players.createIfUnknown(self.username)
         playerId = Players.allIds[self.username]
         with Internal.db:
-            if Query('update passwords set password=? where url=? and player=?',
-                (self.password, self.url, playerId)).rowcount() == 0:
-                Query('insert into passwords(url,player,password) values(?,?,?)',
+            if Query(
+                'update passwords set password=? where url=? and player=?',
+                     (self.password, self.url, playerId)).rowcount() == 0:
+                Query(
+                    'insert into passwords(url,player,password) values(?,?,?)',
                     (self.url, playerId, self.password))
 
     def __checkExistingConnections(self, dummy=None):
         """do we already have a connection to the wanted URL?"""
         for client in self.client.humanClients:
             if client.connection and client.connection.url == self.url:
-                logWarning(m18n('You are already connected to server %1', self.url))
+                logWarning(
+                    m18n('You are already connected to server %1', self.url))
                 client.tableList.activateWindow()
                 raise CancelledError
 
@@ -554,14 +592,15 @@ class Connection(object):
         assert self.url is not None
         if not self.url.isLocalHost:
             if not AddUserDialog(self.url,
-                self.dlg.username,
-                self.dlg.password).exec_():
+                                 self.dlg.username,
+                                 self.dlg.password).exec_():
                 raise CancelledError
             Players.createIfUnknown(self.username)
         # TODO: are dlg.username/password always unicode?
         assert isinstance(self.dlg.username, unicode), self.dlg.username
         assert isinstance(self.dlg.password, unicode), self.dlg.password
-        adduserCmd = SERVERMARK.join(['adduser', self.dlg.username, self.dlg.password])
+        adduserCmd = SERVERMARK.join(
+            ['adduser', self.dlg.username, self.dlg.password])
         return self.loginCommand(adduserCmd)
 
     def _loginFailed(self, failure):
@@ -578,7 +617,7 @@ class Connection(object):
                 return answered(True)
             else:
                 msg = m18nc('USER is not known on SERVER',
-                    '%1 is not known on %2, do you want to open an account?', self.dlg.username, self.url.host)
+                            '%1 is not known on %2, do you want to open an account?', self.dlg.username, self.url.host)
                 return QuestionYesNo(msg).addCallback(answered)
         else:
             return self._loginReallyFailed(failure)
@@ -599,16 +638,20 @@ class Connection(object):
         elif failure.check(DNSLookupError):
             msg = m18n('Address for server %1 cannot be found', self.url)
         elif failure.check(ConnectError):
-            msg = m18n('Login to server %1 failed: You have no network connection', self.url)
+            msg = m18n(
+                'Login to server %1 failed: You have no network connection',
+                self.url)
         else:
             tb = unicodeString(failure.getTraceback())
             msg = u'Login to server {} failed: {}/{} Callstack:{}'.format(
-                self.url, failure.value.__class__.__name__, failure.getErrorMessage(),
+                self.url, failure.value.__class__.__name__, failure.getErrorMessage(
+                ),
                 tb)
         # Maybe the server is running but something is wrong with it
         if self.url.useSocket:
             if removeIfExists(socketName()):
-                logInfo(m18n('removed stale socket <filename>%1</filename>', socketName()))
+                logInfo(
+                    m18n('removed stale socket <filename>%1</filename>', socketName()))
             msg += u'\n\n\n' + m18n('Please try again')
         self.dlg = None
         if msg:
@@ -624,4 +667,7 @@ class Connection(object):
         if self.client.connection:
             # when pinging starts, we do have a connection and when the
             # connection goes away, it does not come back
-            self.client.callServer('ping').addCallback(self.pingLater).addErrback(self.client.remote_serverDisconnects)
+            self.client.callServer(
+                'ping').addCallback(
+                    self.pingLater).addErrback(
+                        self.client.remote_serverDisconnects)

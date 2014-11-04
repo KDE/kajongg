@@ -26,11 +26,14 @@ import itertools
 from tile import Tile
 from meld import Meld, MeldList
 
+
 class Permutations(object):
+
     """creates permutations for building melds out of single tiles.
     NEVER returns Kongs!"""
     cache = {}
     permuteCache = {}
+
     def __new__(cls, tiles):
         cacheKey = tuple(x.key for x in tiles)
         if cacheKey in cls.cache:
@@ -59,11 +62,12 @@ class Permutations(object):
         variants = []
         for group in Tile.colors.upper():
             gTiles = list(x for x in self.tiles if x.group == group)
-            groupVariants = self.__colorVariants(group, list(x.value for x in gTiles))
+            groupVariants = self.__colorVariants(
+                group, list(x.value for x in gTiles))
             if len(groupVariants):
                 variants.append(groupVariants)
         result = []
-        for variant in (sum(x, []) for x in itertools.product(*variants)): # pylint: disable=star-args
+        for variant in (sum(x, []) for x in itertools.product(*variants)):  # pylint: disable=star-args
             if variant not in result:
                 result.append(variant)
         result = sorted(MeldList(honors + x + boni) for x in result)
@@ -85,8 +89,8 @@ class Permutations(object):
                 possibleMelds.append(tuple([value] * 2))
             if values.count(value) >= 3:
                 possibleMelds.append(tuple([value] * 3))
-            if values.count(value+1) and values.count(value+2):
-                possibleMelds.append(tuple([value, value+1, value+2]))
+            if values.count(value + 1) and values.count(value + 2):
+                possibleMelds.append(tuple([value, value + 1, value + 2]))
         if possibleMelds:
             for meld in possibleMelds:
                 appendValue = list([meld])
@@ -126,7 +130,8 @@ class Permutations(object):
                 if len(variant) < minMelds:
                     minMelds = len(variant)
                     minMeldVariant = variant
-                pungCount = sum(len(meld) == 3 and len(set(meld)) == 1 for meld in variant)
+                pungCount = sum(
+                    len(meld) == 3 and len(set(meld)) == 1 for meld in variant)
                 if pungCount > maxPungs:
                     maxPungs = pungCount
                     maxPungVariant = variant
@@ -147,14 +152,14 @@ class Permutations(object):
         allValues = sorted(values)
         vSet = set(allValues)
         groups = []
-        for border in sorted(x+1 for x in sorted(vSet) if x+1 not in vSet):
+        for border in sorted(x + 1 for x in sorted(vSet) if x + 1 not in vSet):
             content = list(x for x in allValues if x < border)
             if content:
                 groups.append(content)
                 allValues = list(x for x in allValues if x > border)
         combinations = list(cls.usefulPermutations(x) for x in groups)
         result = []
-        for variant in list(itertools.product(*combinations)): # pylint: disable=star-args
+        for variant in list(itertools.product(*combinations)):  # pylint: disable=star-args
             melds = []
             for block in variant:
                 for meld in block:

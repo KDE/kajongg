@@ -18,7 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import logging, os
+import logging
+import os
 import string
 
 from locale import getpreferredencoding
@@ -28,18 +29,21 @@ SERVERMARK = '&&SERVER&&'
 
 # util must not import twisted or we need to change kajongg.py
 
-from common import Internal, Debug, unicode, isPython3, ENGLISHDICT # pylint: disable=redefined-builtin
+from common import Internal, Debug, unicode, isPython3, ENGLISHDICT  # pylint: disable=redefined-builtin
 from common import unicodeString, nativeString, nativeStringArgs
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead
 from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
 
+
 class Fmt(string.Formatter):
+
     """this formatter can parse {id(x)} and output a short ascii form for id"""
     alphabet = string.ascii_uppercase + string.ascii_lowercase
     base = len(alphabet)
     formatter = None
+
     @staticmethod
     def num_encode(number, length=4):
         """make a short unique ascii string out of number, truncate to length"""
@@ -67,6 +71,7 @@ class Fmt(string.Formatter):
 
 Fmt.formatter = Fmt()
 
+
 def fmt(text, **kwargs):
     """use the context dict for finding arguments.
     For something like {self} output 'self:selfValue'"""
@@ -85,7 +90,8 @@ def fmt(text, **kwargs):
         # formatter.format will not accept 'self' as keyword
         argdict['SELF'] = argdict['self']
         del argdict['self']
-    return Fmt.formatter.format(text, **argdict) # pylint: disable=star-args
+    return Fmt.formatter.format(text, **argdict)  # pylint: disable=star-args
+
 
 def translateServerMessage(msg):
     """because a PB exception can not pass a list of arguments, the server
@@ -96,6 +102,7 @@ def translateServerMessage(msg):
         return m18n(*tuple(msg.split(SERVERMARK)[1:-1]))
     return msg
 
+
 def dbgIndent(this, parent):
     """show messages indented"""
     if this.indent == 0:
@@ -103,6 +110,7 @@ def dbgIndent(this, parent):
     else:
         pIndent = parent.indent if parent else 0
         return (u'. ' * (pIndent))[:pIndent] + u'└' + u'─' * (this.indent - pIndent - 1)
+
 
 def __logUnicodeMessage(prio, msg):
     """if we can encode the unicode msg to ascii, do so.
@@ -115,6 +123,7 @@ def __logUnicodeMessage(prio, msg):
         msg = msg.decode()
     Internal.logger.log(prio, msg)
 
+
 def __enrichMessage(msg, withGamePrefix=True):
     """
     Add some optional prefixes to msg: S/C, process id, time, git commit.
@@ -125,7 +134,7 @@ def __enrichMessage(msg, withGamePrefix=True):
     @type withGamePrefix: C{Boolean}
     @rtype: C{unicode}
     """
-    result = msg # set the default
+    result = msg  # set the default
     if withGamePrefix and Internal.logPrefix:
         result = u'{prefix}{process}: {msg}'.format(
             prefix=Internal.logPrefix,
@@ -138,6 +147,7 @@ def __enrichMessage(msg, withGamePrefix=True):
         if head not in ('current', None):
             result = u'git:{} {}'.format(head, result)
     return result
+
 
 def __exceptionToString(exception):
     """
@@ -154,12 +164,14 @@ def __exceptionToString(exception):
             # when using pykde4, this is already translated at this point
             # but I do not know what it does differently with gettext and if
             # I can do the same with the python gettext module
-            parts.append(u'[Errno {}] {}'.format(arg.errno, m18n(arg.strerror)))
+            parts.append(
+                u'[Errno {}] {}'.format(arg.errno, m18n(arg.strerror)))
         elif arg is None:
             pass
         else:
             parts.append(unicode(arg))
     return u' '.join(parts)
+
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
@@ -184,13 +196,16 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
             return Sorry(msg)
     return NoPrompt(msg)
 
+
 def logInfo(msg, showDialog=False, withGamePrefix=True):
     """log an info message"""
     return logMessage(msg, logging.INFO, showDialog, withGamePrefix=withGamePrefix)
 
+
 def logError(msg, showStack=True, withGamePrefix=True):
     """log an error message"""
     return logMessage(msg, logging.ERROR, True, showStack=showStack, withGamePrefix=withGamePrefix)
+
 
 def logDebug(msg, showStack=False, withGamePrefix=True, btIndent=None):
     """log this message and show it on stdout
@@ -200,14 +215,17 @@ def logDebug(msg, showStack=False, withGamePrefix=True, btIndent=None):
         msg = ' ' * (len(depth) - btIndent) + msg
     return logMessage(msg, logging.DEBUG, False, showStack=showStack, withGamePrefix=withGamePrefix)
 
+
 def logWarning(msg, withGamePrefix=True):
     """log this message and show it on stdout"""
     return logMessage(msg, logging.WARNING, True, withGamePrefix=withGamePrefix)
+
 
 def logException(exception, withGamePrefix=True):
     """logs error message and re-raises exception"""
     logError(exception, withGamePrefix=withGamePrefix)
     raise Exception(nativeString(exception))
+
 
 def m18n(englishText, *args):
     """
@@ -223,13 +241,14 @@ def m18n(englishText, *args):
     @rtype: C{unicode}.
     """
     result = unicodeString(
-                i18n(
-                    nativeString(
-                        englishText),
+        i18n(
+            nativeString(
+                englishText),
                         *nativeStringArgs(args)))
     if not args:
         ENGLISHDICT[result] = unicodeString(englishText)
     return result
+
 
 def m18nc(context, englishText, *args):
     """
@@ -248,8 +267,8 @@ def m18nc(context, englishText, *args):
     @rtype: C{unicode}.
     """
     result = unicodeString(
-                i18nc(
-                    context,
+        i18nc(
+            context,
                     nativeString(
                         englishText),
                         *nativeStringArgs(args)))
@@ -257,17 +276,21 @@ def m18nc(context, englishText, *args):
         ENGLISHDICT[result] = unicodeString(englishText)
     return result
 
+
 def m18nE(englishText):
     """use this if you want to get the english text right now but still have the string translated"""
     return unicodeString(englishText)
+
 
 def m18ncE(dummyContext, englishText):
     """use this if you want to get the english text right now but still have the string translated"""
     return unicodeString(englishText)
 
+
 class EventData(str):
+
     """used for generating a nice string"""
-    events = {y:x for x, y in QEvent.__dict__.items() if isinstance(y, int)}
+    events = {y: x for x, y in QEvent.__dict__.items() if isinstance(y, int)}
     # add some old events which still arrive but are not supported by PyQt4
     events[15] = 'Create'
     events[16] = 'Destroy'
@@ -278,7 +301,7 @@ class EventData(str):
     events[152] = 'AcceptDropsChange'
     events[154] = 'Windows:ZeroTimer'
     events[178] = 'ContentsRectChange'
-    keys = {y:x for x, y in Qt.__dict__.items() if isinstance(y, int)}
+    keys = {y: x for x, y in Qt.__dict__.items() if isinstance(y, int)}
 
     def __new__(cls, receiver, event, prefix=None):
         """create the wanted string"""

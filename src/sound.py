@@ -18,11 +18,14 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import os, tarfile, subprocess, datetime
+import os
+import tarfile
+import subprocess
+import datetime
 from io import BytesIO
 from hashlib import md5
 if os.name == 'nt':
-    import winsound # pylint: disable=import-error
+    import winsound  # pylint: disable=import-error
 
 from common import Debug, Internal, nativeString
 from util import which, removeIfExists, uniqueList, elapsedSince
@@ -42,7 +45,9 @@ from tile import Tile
         # self.audio.enqueue(Phonon.MediaSource(wavName))
         # self.audio.play()
 
+
 class Sound(object):
+
     """the sound interface. Use class variables and class methods,
     thusly ensuring no two instances try to speak"""
     __oggName = None
@@ -54,15 +59,20 @@ class Sound(object):
         """sets __oggName to exe name or False"""
         if Sound.__oggName is None:
             if os.name == 'nt':
-                parentDirectories = KGlobal.dirs().findDirs("appdata", "voices")
+                parentDirectories = KGlobal.dirs().findDirs(
+                    "appdata", "voices")
                 if parentDirectories:
                     oggName = os.path.join(parentDirectories[0], 'oggdec.exe')
-                    msg = '' # we bundle oggdec.exe with the kajongg installer, it must be there
+                    msg = ''  # we bundle oggdec.exe with the kajongg installer, it must be there
                 else:
-                    msg = m18n('No voices will be heard because the program %1 is missing', 'oggdec.exe')
+                    msg = m18n(
+                        'No voices will be heard because the program %1 is missing',
+                        'oggdec.exe')
             else:
                 oggName = 'ogg123'
-                msg = m18n('No voices will be heard because the program %1 is missing', oggName)
+                msg = m18n(
+                    'No voices will be heard because the program %1 is missing',
+                    oggName)
             if which(oggName):
                 Sound.__oggName = oggName
             else:
@@ -124,15 +134,19 @@ class Sound(object):
                     name, ext = os.path.splitext(what)
                     assert ext == '.ogg'
                     nameParts = os.path.normpath(name).split(os.sep)
-                    nameParts = nameParts[nameParts.index('voices')+1:]
-                    wavName = os.path.normpath('{}/{}.wav'.format(cacheDir(), '_'.join(nameParts)))
+                    nameParts = nameParts[nameParts.index('voices') + 1:]
+                    wavName = os.path.normpath(
+                        '{}/{}.wav'.format(cacheDir(),
+                                           '_'.join(nameParts)))
                     if not os.path.exists(wavName):
                         args = [oggName, '-a', '-w', wavName, what]
                         startupinfo = subprocess.STARTUPINFO()
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                         subprocess.call(args, startupinfo=startupinfo)
                     try:
-                        winsound.PlaySound(wavName, winsound.SND_FILENAME | winsound.SND_NODEFAULT)
+                        winsound.PlaySound(
+                            wavName,
+                            winsound.SND_FILENAME | winsound.SND_NODEFAULT)
                     except RuntimeError:
                         pass
                 else:
@@ -161,10 +175,12 @@ class Sound(object):
             if len(text) == 2 and text[0] in 'sdbcw':
                 text = Tile(text).name()
             args = ['qdbus', 'org.kde.jovie',
-                '/KSpeech', 'say', text, '1']
+                    '/KSpeech', 'say', text, '1']
             subprocess.Popen(args)
 
+
 class Voice(object):
+
     """this administers voice sounds.
 
     When transporting voices between players, a compressed tarfile
@@ -213,7 +229,6 @@ class Voice(object):
             result = 'en_US'
         return result
 
-
     @staticmethod
     def availableVoices():
         """a list of all voice directories"""
@@ -225,9 +240,12 @@ class Voice(object):
                     if os.path.exists(os.path.join(dirpath, 's1.ogg')):
                         result.append(Voice(dirpath))
             group = KGlobal.config().group('Locale')
-            prefLanguages = uniqueList(':'.join(['local', str(group.readEntry('Language')), 'en_US']).split(':'))
-            prefLanguages = dict((x[1], x[0]) for x in enumerate(prefLanguages))
-            result = sorted(result, key=lambda x: prefLanguages.get(x.language(), 9999))
+            prefLanguages = uniqueList(
+                ':'.join(['local', str(group.readEntry('Language')), 'en_US']).split(':'))
+            prefLanguages = dict((x[1], x[0])
+                                 for x in enumerate(prefLanguages))
+            result = sorted(
+                result, key=lambda x: prefLanguages.get(x.language(), 9999))
             if Debug.sound:
                 logDebug(u'found voices:%s' % [str(x) for x in result])
             Voice.__availableVoices = result
@@ -241,18 +259,26 @@ class Voice(object):
             dirname = os.path.split(voice.directory)[-1]
             if name == voice.md5sum:
                 if Debug.sound:
-                    logDebug(u'locate found %s by md5sum in %s' % (name, voice.directory))
+                    logDebug(
+                        u'locate found %s by md5sum in %s' %
+                        (name, voice.directory))
                 return voice
             elif name == dirname and voice.language() == 'local':
                 if Debug.sound:
-                    logDebug(u'locate found %s by name in %s' % (name, voice.directory))
+                    logDebug(
+                        u'locate found %s by name in %s' %
+                        (name, voice.directory))
                 return voice
         if Debug.sound:
             logDebug(u'%s not found' % (name))
 
     def buildSubvoice(self, oggName, side):
         """side is 'left' or 'right'."""
-        angleDirectory = os.path.join(cacheDir(), 'angleVoices', self.md5sum, side)
+        angleDirectory = os.path.join(
+            cacheDir(),
+            'angleVoices',
+            self.md5sum,
+            side)
         stdName = os.path.join(self.directory, oggName)
         angleName = os.path.join(angleDirectory, oggName)
         if os.path.exists(stdName) and not os.path.exists(angleName):
@@ -269,7 +295,9 @@ class Voice(object):
             callResult = subprocess.call(args)
             if callResult:
                 if Debug.sound:
-                    logDebug(u'failed to build subvoice %s: return code=%s' % (angleName, callResult))
+                    logDebug(
+                        u'failed to build subvoice %s: return code=%s' %
+                        (angleName, callResult))
                 return stdName
             if Debug.sound:
                 logDebug(u'built subvoice %s' % angleName)
@@ -317,24 +345,31 @@ class Voice(object):
             return
         md5sum = md5()
         for oggFile in ogg:
-            md5sum.update(open(os.path.join(self.directory, oggFile), 'rb').read())
+            md5sum.update(
+                open(os.path.join(self.directory, oggFile), 'rb').read())
         # the md5 stamp goes into the old archive directory 'username'
         self.__md5sum = md5sum.hexdigest()
 #        print(self.directory, self.__md5sum)
         existingMd5sum = self.savedmd5Sum()
         md5Name = self.md5FileName()
-        if False: # TODO: warum ist das in python3 unterschiedlich? self.__md5sum != existingMd5sum:
+        if False:  # TODO: warum ist das in python3 unterschiedlich? self.__md5sum != existingMd5sum:
             if Debug.sound:
                 if not os.path.exists(md5Name):
                     logDebug(u'creating new %s' % md5Name)
                 else:
-                    logDebug(u'md5sum %s changed, rewriting %s with %s' % (existingMd5sum, md5Name, self.__md5sum))
+                    logDebug(
+                        u'md5sum %s changed, rewriting %s with %s' %
+                        (existingMd5sum, md5Name, self.__md5sum))
             try:
                 open(md5Name, 'wb').write('%s\n' % self.__md5sum)
             except BaseException as exception:
-                logException(m18n('cannot write <filename>%1</filename>: %2', md5Name, str(exception)))
+                logException(
+                    m18n('cannot write <filename>%1</filename>: %2',
+                         md5Name,
+                         str(exception)))
         if archiveExists:
-            archiveIsOlder = os.path.getmtime(md5Name) > os.path.getmtime(self.archiveName())
+            archiveIsOlder = os.path.getmtime(
+                md5Name) > os.path.getmtime(self.archiveName())
             if self.__md5sum != existingMd5sum or archiveIsOlder:
                 os.remove(self.archiveName())
 
@@ -344,7 +379,11 @@ class Voice(object):
         if not os.path.exists(self.archiveName()):
             tarFile = tarfile.open(self.archiveName(), mode='w:bz2')
             for oggFile in self.oggFiles():
-                tarFile.add(os.path.join(self.directory, oggFile), arcname=oggFile)
+                tarFile.add(
+                    os.path.join(
+                        self.directory,
+                        oggFile),
+                    arcname=oggFile)
             tarFile.close()
 
     def archiveName(self):

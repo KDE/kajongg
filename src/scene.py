@@ -26,7 +26,7 @@ from twisted.internet.defer import succeed
 from qt import Qt, QMetaObject, variantValue
 from qt import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
 
-from zope.interface import implements # pylint: disable=unused-import
+from zope.interface import implements  # pylint: disable=unused-import
 
 from dialogs import QuestionYesNo
 from guiutil import decorateWindow
@@ -39,8 +39,11 @@ from uiwall import UIWall
 from animation import MoveImmediate, afterQueuedAnimations
 from scoringdialog import ScoringDialog
 
+
 class FocusRect(QGraphicsRectItem):
+
     """show a focusRect with blue border around focused tile or meld"""
+
     def __init__(self):
         QGraphicsRectItem.__init__(self)
         pen = QPen(QColor(Qt.blue))
@@ -59,7 +62,9 @@ class FocusRect(QGraphicsRectItem):
     def board(self, value):
         """assign and show/hide as needed"""
         if value and not isAlive(value):
-            logDebug(u'assigning focusRect to a non-alive board %s/%s' % (type(value), value))
+            logDebug(
+                u'assigning focusRect to a non-alive board %s/%s' %
+                (type(value), value))
             return
         if value:
             self._board = value
@@ -74,7 +79,7 @@ class FocusRect(QGraphicsRectItem):
                 self.setVisible(False)
             return
         rect = board.tileFaceRect()
-        rect.setWidth(rect.width()*board.focusRectWidth())
+        rect.setWidth(rect.width() * board.focusRectWidth())
         self.setRect(rect)
         self.setRotation(board.sceneRotation())
         self.setScale(board.scale())
@@ -83,10 +88,13 @@ class FocusRect(QGraphicsRectItem):
             self.setPos(board.focusTile.pos)
         game = Internal.scene.game
         self.setVisible(board.isVisible() and bool(board.focusTile)
-            and board.isEnabled() and board.hasFocus and bool(game) and not game.autoPlay)
+                        and board.isEnabled() and board.hasFocus and bool(game) and not game.autoPlay)
+
 
 class SceneWithFocusRect(QGraphicsScene):
+
     """our scene with a potential Qt bug fix. FocusRect is a blue frame around a tile or meld"""
+
     def __init__(self):
         QGraphicsScene.__init__(self)
         self.focusRect = FocusRect()
@@ -118,7 +126,9 @@ class SceneWithFocusRect(QGraphicsScene):
         """get / set the board that has its focusRect shown"""
         self.focusRect.board = board
 
+
 class GameScene(SceneWithFocusRect):
+
     """the game field"""
     # pylint: disable=too-many-instance-attributes
 
@@ -157,7 +167,7 @@ class GameScene(SceneWithFocusRect):
         self.mainWindow.updateGUI()
         self.mainWindow.adjustView()
 
-    def showShadowsChanged(self,oldValue, newValue):
+    def showShadowsChanged(self, oldValue, newValue):
         for uiTile in self.graphicsTileItems():
             uiTile.setClippingFlags()
         self.applySettings()
@@ -165,8 +175,10 @@ class GameScene(SceneWithFocusRect):
     def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
         if self.game and not self.game.finished():
-            self.game.wall.decoratePlayer(handBoard.player) # pylint:disable=no-member
-        # first decorate walls - that will compute player.handBoard for explainView
+            self.game.wall.decoratePlayer(
+                handBoard.player)  # pylint:disable=no-member
+        # first decorate walls - that will compute player.handBoard for
+        # explainView
         if self.explainView:
             self.explainView.refresh()
 
@@ -195,7 +207,8 @@ class GameScene(SceneWithFocusRect):
 
     def applySettings(self):
         """apply preferences"""
-        self.mainWindow.actionAngle.setEnabled(bool(self.game) and Internal.Preferences.showShadows)
+        self.mainWindow.actionAngle.setEnabled(
+            bool(self.game) and Internal.Preferences.showShadows)
         with MoveImmediate():
             for item in self.nonTiles():
                 item.tileset = Tileset.activeTileset()
@@ -213,7 +226,8 @@ class GameScene(SceneWithFocusRect):
         for action in [mainWindow.actionScoreGame, mainWindow.actionPlayGame]:
             action.setEnabled(not bool(game))
         mainWindow.actionAbortGame.setEnabled(bool(game))
-        mainWindow.actionAngle.setEnabled(bool(game) and Internal.Preferences.showShadows)
+        mainWindow.actionAngle.setEnabled(
+            bool(game) and Internal.Preferences.showShadows)
         for view in [self.explainView, self.scoreTable]:
             if view:
                 view.refresh()
@@ -260,8 +274,11 @@ class GameScene(SceneWithFocusRect):
             self.removeItem(item)
         self.focusRect.hide()
 
+
 class PlayingScene(GameScene):
+
     """scene with a playing game"""
+
     def __init__(self, parent):
         self._game = None
         self.__startingGame = True
@@ -270,7 +287,7 @@ class PlayingScene(GameScene):
         super(PlayingScene, self).__init__(parent)
 
     @GameScene.game.setter
-    def game(self, value): # pylint: disable=arguments-differ
+    def game(self, value):  # pylint: disable=arguments-differ
         game = self._game
         changing = value != game
         GameScene.game.fset(self, value)
@@ -382,11 +399,14 @@ class PlayingScene(GameScene):
     def toggleDemoMode(self, checked):
         """switch on / off for autoPlay"""
         if self.game:
-            self.focusRect.refresh() # show/hide it
+            self.focusRect.refresh()  # show/hide it
             self.game.autoPlay = checked
             if checked and self.clientDialog:
-                self.clientDialog.proposeAction() # an illegal action might have focus
-                self.clientDialog.selectButton() # select default, abort timeout
+                self.clientDialog.proposeAction()
+                                                # an illegal action might have
+                                                # focus
+                self.clientDialog.selectButton()
+                                               # select default, abort timeout
 
     def updateSceneGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""
@@ -396,8 +416,10 @@ class PlayingScene(GameScene):
         game = self.game
         mainWindow = self.mainWindow
         if not game:
-            connections = list(x.connection for x in HumanClient.humanClients if x.connection)
-            title = u', '.join(u'{name}/{url}'.format(name=x.username, url=x.url) for x in connections)
+            connections = list(
+                x.connection for x in HumanClient.humanClients if x.connection)
+            title = u', '.join(u'{name}/{url}'.format(name=x.username, url=x.url)
+                               for x in connections)
             if title:
                 decorateWindow(mainWindow, title)
         else:
@@ -408,17 +430,23 @@ class PlayingScene(GameScene):
         self.discardBoard.setVisible(bool(game))
         mainWindow.actionAutoPlay.setEnabled(not self.startingGame)
         mainWindow.actionChat.setEnabled(bool(game) and bool(game.client)
-            and bool(game.client.connection)
-            and not game.client.connection.url.isLocalGame and not self.startingGame)
-            # chatting on tables before game started works with chat button per table
-        mainWindow.actionChat.setChecked(mainWindow.actionChat.isEnabled() and bool(game.client.table.chatWindow))
+                                         and bool(game.client.connection)
+                                         and not game.client.connection.url.isLocalGame and not self.startingGame)
+            # chatting on tables before game started works with chat button per
+            # table
+        mainWindow.actionChat.setChecked(
+            mainWindow.actionChat.isEnabled(
+            ) and bool(
+                game.client.table.chatWindow))
 
     def changeAngle(self):
         """now that no animation is running, really change"""
         self.discardBoard.lightSource = self.newLightSource()
         GameScene.changeAngle(self)
 
+
 class ScoringScene(GameScene):
+
     """a scoring game"""
     # pylint: disable=too-many-instance-attributes
 
@@ -428,7 +456,7 @@ class ScoringScene(GameScene):
         self.selectorBoard.hasFocus = True
 
     @GameScene.game.setter
-    def game(self, value): # pylint: disable=arguments-differ
+    def game(self, value):  # pylint: disable=arguments-differ
         game = self._game
         changing = value != game
         GameScene.game.fset(self, value)
@@ -491,25 +519,26 @@ class ScoringScene(GameScene):
         """keyboard navigation in a scoring game"""
         mod = event.modifiers()
         key = event.key()
-        wind = chr(key%128)
+        wind = chr(key % 128)
         windsX = WINDS + u'X'
-        moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players ' \
-            'with wind ESWN or to the central tile selector (X)', windsX)
+        moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players '
+                             'with wind ESWN or to the central tile selector (X)', windsX)
         uiTile = self.focusItem()
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
             wind = windsX[moveCommands.index(wind)]
-            self.__moveTile(uiTile, wind, bool(mod &Qt.ShiftModifier))
+            self.__moveTile(uiTile, wind, bool(mod & Qt.ShiftModifier))
             return True
         if key == Qt.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
-            tabItems.extend(list(p.handBoard for p in self.game.players if p.handBoard.uiTiles))
+            tabItems.extend(
+                list(p.handBoard for p in self.game.players if p.handBoard.uiTiles))
             tabItems.append(tabItems[0])
             currentBoard = uiTile.board
             currIdx = 0
-            while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) -2:
+            while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) - 2:
                 currIdx += 1
-            tabItems[currIdx+1].hasFocus = True
+            tabItems[currIdx + 1].hasFocus = True
             return True
 
     def keyPressEvent(self, event):

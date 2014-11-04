@@ -22,12 +22,17 @@ import weakref
 
 from tile import Tile, elements
 
+
 class WallEmpty(Exception):
+
     """exception when trying to get a tile off the empty wall"""
     pass
 
+
 class KongBox(object):
+
     """a non-ui kong box"""
+
     def __init__(self):
         self._tiles = []
 
@@ -50,15 +55,21 @@ class KongBox(object):
         """# of tiles in kong box"""
         return len(self._tiles)
 
+
 class Wall(object):
-    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom.
-    Wall.tiles always holds references to all tiles in the game even when they are used"""
+
+    """represents the wall with four sides. self.wall[] indexes them
+    counter clockwise, 0..3. 0 is bottom.
+    Wall.tiles always holds references to all tiles in the game even
+    when they are used"""
     tileClass = Tile
     kongBoxClass = KongBox
+
     def __init__(self, game):
         """init and position the wall"""
         self._game = weakref.ref(game)  # avoid cycles for garbage collection
-        self.tiles = [self.tileClass(Tile.unknown) for _ in range(elements.count(game.ruleset))]
+        self.tiles = [self.tileClass(Tile.unknown)
+                      for _ in range(elements.count(game.ruleset))]
         self.living = None
         self.kongBox = self.kongBoxClass()
         assert len(self.tiles) % 8 == 0
@@ -94,7 +105,8 @@ class Wall(object):
                 raise WallEmpty
             dealTiles = self.living[:count]
             self.living = self.living[count:]
-        return list(self.__nameTile(*x) for x in zip(dealTiles, tiles)) # pylint: disable=W0142
+        return list(self.__nameTile(*x)
+                    for x in zip(dealTiles, tiles))  # pylint: disable=W0142
 
     def build(self, shuffleFirst=False):
         """virtual: build visible wall"""
@@ -111,13 +123,19 @@ class Wall(object):
 
     def divide(self):
         """divides a wall, building a living and and a dead end"""
-        # neutralise the different directions of winds and removal of wall tiles
+        # neutralise the different directions of winds and removal of wall
+        # tiles
         assert self.game.divideAt is not None
         # shift tiles: tile[0] becomes living end
-        self.tiles[:] = self.tiles[self.game.divideAt:] + self.tiles[0:self.game.divideAt]
+        self.tiles[:] = self.tiles[
+            self.game.divideAt:] + \
+            self.tiles[0:self.game.divideAt]
         kongBoxSize = self.game.ruleset.kongBoxSize
         self.living = self.tiles[:-kongBoxSize]
         boxTiles = self.tiles[-kongBoxSize:]
         for pair in range(kongBoxSize // 2):
-            boxTiles = boxTiles[:pair*2] + [boxTiles[pair*2+1], boxTiles[pair*2]] + boxTiles[pair*2+2:]
+            boxTiles = boxTiles[:pair * 2] + [
+                boxTiles[pair * 2 + 1],
+                boxTiles[pair * 2]] + \
+                boxTiles[pair * 2 + 2:]
         self.kongBox.fill(boxTiles)

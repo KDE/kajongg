@@ -29,7 +29,9 @@ from log import logWarning, logException, m18n
 
 BACKGROUNDVERSIONFORMAT = 1
 
+
 class BackgroundException(Exception):
+
     """will be thrown if the tileset cannot be loaded"""
     pass
 
@@ -37,9 +39,11 @@ class BackgroundException(Exception):
 def locatebackground(which):
     """locate the file with a background"""
     return QString(KStandardDirs.locate("kmahjonggbackground",
-                QString(which)))
+                                        QString(which)))
+
 
 class Background(object):
+
     """represents a background"""
     catalogDefined = False
 
@@ -48,7 +52,7 @@ class Background(object):
         """whatever this does"""
         if not Background.catalogDefined:
             KGlobal.dirs().addResourceType("kmahjonggbackground",
-                "data", QString("kmahjongglib/backgrounds"))
+                                           "data", QString("kmahjongglib/backgrounds"))
             KGlobal.locale().insertCatalog("libkmahjongglib")
             Background.catalogDefined = True
 
@@ -60,11 +64,12 @@ class Background(object):
             "kmahjonggbackground", "*.desktop", KStandardDirs.Recursive)
         # now we have a list of full paths. Use the base name minus .desktop:
         # put the result into a set, avoiding duplicates
-        backgrounds = set(str(x).rsplit('/')[-1].split('.')[0] for x in backgroundsAvailableQ)
+        backgrounds = set(str(x).rsplit('/')[-1].split('.')[0]
+                          for x in backgroundsAvailableQ)
         if 'default' in backgrounds:
             # we want default to be first in list
             sortedBackgrounds = ['default']
-            sortedBackgrounds.extend(backgrounds-set(['default']))
+            sortedBackgrounds.extend(backgrounds - set(['default']))
             backgrounds = sortedBackgrounds
         return [Background(x) for x in backgrounds]
 
@@ -73,30 +78,35 @@ class Background(object):
             desktopFileName = 'default'
         self.__svg = None
         self.__pmap = None
-        QPixmapCache.setCacheLimit(20480) # the chinese landscape needs much
+        QPixmapCache.setCacheLimit(20480)  # the chinese landscape needs much
         self.defineCatalog()
         self.desktopFileName = desktopFileName
         self.path = locatebackground(desktopFileName + '.desktop')
         if self.path.isEmpty():
             self.path = locatebackground('default.desktop')
             if self.path.isEmpty():
-                directories = '\n\n' +'\n'.join(str(x) for x in KGlobal.dirs().resourceDirs("kmahjonggbackground"))
-                logException(BackgroundException(m18n( \
-                'cannot find any background in the following directories, is libkmahjongg installed?') + directories))
+                directories = '\n\n' + \
+                    '\n'.join(str(x)
+                              for x in KGlobal.dirs().resourceDirs("kmahjonggbackground"))
+                logException(BackgroundException(m18n(
+                                                 'cannot find any background in the following directories, is libkmahjongg installed?') + directories))
             else:
-                logWarning(m18n('cannot find background %1, using default', desktopFileName))
+                logWarning(
+                    m18n(
+                        'cannot find background %1, using default',
+                        desktopFileName))
                 self.desktopFileName = 'default'
         config = KConfig(self.path)
         group = config.group("KMahjonggBackground")
         self.name = group.readEntry("Name") or m18n("unknown background")
 
-        #Version control
+        # Version control
         backgroundversion = int(group.readEntry("VersionFormat")) or 0
-        #Format is increased when we have incompatible changes, meaning that
+        # Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if backgroundversion > BACKGROUNDVERSIONFORMAT:
-            logException(BackgroundException('backgroundversion file / program: %d/%d' % \
-                (backgroundversion, BACKGROUNDVERSIONFORMAT)))
+            logException(BackgroundException('backgroundversion file / program: %d/%d' %
+                                             (backgroundversion, BACKGROUNDVERSIONFORMAT)))
 
         self.tiled = group.readEntry('Tiled') == '1'
         if self.tiled:
@@ -112,7 +122,7 @@ class Background(object):
             self.__graphicspath = locatebackground(graphName)
             if self.__graphicspath.isEmpty():
                 logException(BackgroundException(
-                    'cannot find kmahjongglib/backgrounds/%s for %s' % \
+                    'cannot find kmahjongglib/backgrounds/%s for %s' %
                         (graphName, self.desktopFileName)))
 
     def pixmap(self, size):
@@ -130,8 +140,8 @@ class Background(object):
             if not self.__pmap:
                 renderer = QSvgRenderer(self.__graphicspath)
                 if not renderer.isValid():
-                    logException(BackgroundException( \
-                    m18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))
+                    logException(BackgroundException(
+                                 m18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))
                 self.__pmap = QPixmap(width, height)
                 self.__pmap.fill(Qt.transparent)
                 painter = QPainter(self.__pmap)

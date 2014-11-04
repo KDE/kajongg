@@ -22,7 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # depend on kde.py
 
 from __future__ import print_function
-import traceback, os, datetime
+import traceback
+import os
+import datetime
 import time
 import subprocess
 
@@ -39,14 +41,20 @@ if not STDOUTENCODING:
 
 from common import Debug, isPython3
 
+
 def stack(msg, limit=6):
     """returns a list of lines with msg as prefix"""
     result = []
-    for idx, values in enumerate(traceback.extract_stack(limit=limit+2)[:-2]):
+    for idx, values in enumerate(
+            traceback.extract_stack(limit=limit + 2)[:-2]):
         fileName, line, function, txt = values
-        result.append('%2d: %s %s/%d %s: %s' % (idx, msg, os.path.splitext(os.path.basename(fileName))[0],
-                                line, function, txt))
+        result.append(
+            '%2d: %s %s/%d %s: %s' %
+            (idx, msg, os.path.splitext(
+                os.path.basename(fileName))[0],
+             line, function, txt))
     return result
+
 
 def callers(count=1, exclude=None):
     """returns the name of the calling method"""
@@ -54,13 +62,17 @@ def callers(count=1, exclude=None):
     excluding = list(exclude) or []
     excluding.extend(['<genexpr>', '__call__', 'run', '<module>', 'runTests'])
     names = list(x[2] for x in stck[:-2] if x[2] not in excluding)
-    result = '.'.join(names[-count-2:])
+    result = '.'.join(names[-count - 2:])
     return result
+
 
 def elapsedSince(since):
     """returns seconds since since"""
     delta = datetime.datetime.now() - since
-    return float(delta.microseconds + (delta.seconds + delta.days * 24 * 3600) * 10**6) / 10**6
+    return float(
+        delta.microseconds
+        + (delta.seconds + delta.days * 24 * 3600) * 10 ** 6) / 10 ** 6
+
 
 def which(program):
     """returns the full path for the binary or None"""
@@ -69,12 +81,14 @@ def which(program):
         if os.path.exists(fullName):
             return fullName
 
+
 def removeIfExists(filename):
     """remove file if it exists. Returns True if it existed"""
     exists = os.path.exists(filename)
     if exists:
         os.remove(filename)
     return exists
+
 
 def uniqueList(seq):
     """makes list content unique, keeping only the first occurrence"""
@@ -83,6 +97,7 @@ def uniqueList(seq):
     return [x for x in seq if x not in seen and not seen_add(x)]
 
 import gc
+
 
 def _getr(slist, olist, seen):
     """Recursively expand slist's objects into olist, using seen to track
@@ -97,6 +112,8 @@ def _getr(slist, olist, seen):
             _getr(tlist, olist, seen)
 
 # The public function.
+
+
 def get_all_objects():
     """Return a list of all live Python objects, not including the
     list itself. May use this in Duration for showing where
@@ -113,9 +130,11 @@ def get_all_objects():
     _getr(gcl, olist, seen)
     return olist
 
+
 def kprint(*args, **kwargs):
     """
-    A wrapper around print, always encoding unicode to something sensible for the konsole.
+    A wrapper around print, always encoding unicode to something
+    sensible for the konsole.
 
     @param args: anything
     @param kwargs: anything
@@ -130,16 +149,21 @@ def kprint(*args, **kwargs):
         newArgs.append(arg)
     # we need * magic: pylint: disable=star-args
     try:
-        print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
+        print(*newArgs, sep=kwargs.get('sep', ' '),
+              end=kwargs.get('end', '\n'), file=kwargs.get('file'))
     except IOError as exception:
         # very big konsole, busy system: sometimes Python says
         # resource temporarily not available
         time.sleep(0.1)
         print(exception)
-        print(*newArgs, sep=kwargs.get('sep', ' '), end=kwargs.get('end', '\n'), file=kwargs.get('file'))
+        print(*newArgs, sep=kwargs.get('sep', ' '),
+              end=kwargs.get('end', '\n'), file=kwargs.get('file'))
+
 
 class Duration(object):
+
     """a helper class for checking code execution duration"""
+
     def __init__(self, name, threshold=None, bug=False):
         """name describes where in the source we are checking
         threshold in seconds: do not warn below
@@ -157,15 +181,19 @@ class Duration(object):
         if not Debug.neutral:
             diff = datetime.datetime.now() - self.__start
             if diff > datetime.timedelta(seconds=self.threshold):
-                msg = '%s took %d.%02d seconds' % (self.name, diff.seconds, diff.microseconds)
+                msg = '%s took %d.%02d seconds' % (
+                    self.name,
+                    diff.seconds,
+                    diff.microseconds)
                 if self.bug:
                     raise UserWarning(msg)
                 else:
                     print(msg)
 
+
 def checkMemory():
     """as the name says"""
-    #pylint: disable=too-many-branches
+    # pylint: disable=too-many-branches
     if not Debug.gc:
         return
     gc.set_threshold(0)
@@ -192,23 +220,33 @@ def checkMemory():
                     for referent in gc.get_referents(referrer):
                         print('%s refers to %s' % (referrer, referent))
                 else:
-                    print('referrer of %s/%s is: id=%s type=%s %s' % (
-                        type(obj), obj, id(referrer), type(referrer), referrer))
+                    print('referrer of %s/%s is: id=%s type=%s %s' %
+                          (type(obj), obj, id(referrer),
+                           type(referrer), referrer))
     print('unreachable:%s' % gc.collect())
     gc.set_debug(0)
 
+
 def gitHead():
-    """the current git commit. 'current' if there are uncommitted changes and None if no .git found"""
+    """the current git commit. 'current' if there are uncommitted changes
+    and None if no .git found"""
     if not os.path.exists(os.path.join('..', '.git')):
         return None
     subprocess.Popen(['git', 'update-index', '-q', '--refresh'])
-    _ = subprocess.Popen(['git', 'diff-index', '--name-only', 'HEAD', '--'], stdout=subprocess.PIPE).communicate()[0]
+    _ = subprocess.Popen(
+        ['git',
+         'diff-index',
+         '--name-only',
+         'HEAD',
+         '--'],
+        stdout=subprocess.PIPE).communicate()[0]
     uncommitted = list(x.strip() for x in _.split(b'\n') if len(x.strip()))
     if uncommitted:
         return 'current'
     result = subprocess.Popen(['git', 'log', '-1', '--format="%h"'],
-            stdout=subprocess.PIPE).communicate()[0]
+                              stdout=subprocess.PIPE).communicate()[0]
     return result.split(b'\n')[0].replace(b'"', b'')[:15].decode()
+
 
 def xToUtf8(msg, args=None):
     """makes sure msg and all args are utf-8"""

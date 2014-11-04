@@ -29,7 +29,9 @@ from common import StrMixin
 from tile import Tile
 from meld import Meld
 
+
 class UITile(QGraphicsObject, StrMixin):
+
     """A tile visible on the screen. Every tile is only allocated once
     and then reshuffled and reused for every game.
     The unit of xoffset is the width of the tile,
@@ -54,19 +56,21 @@ class UITile(QGraphicsObject, StrMixin):
         self.__yoffset = yoffset
         self.__dark = False
         self.level = level
-        self.activeAnimation = dict() # key is the property name
+        self.activeAnimation = dict()  # key is the property name
         self.queuedAnimations = []
 
     def setClippingFlags(self):
         """if we do not show shadows, we need to clip"""
         showShadows = Internal.Preferences.showShadows
-        self.setFlag(QGraphicsItem.ItemClipsChildrenToShape, enabled=not showShadows)
+        self.setFlag(
+            QGraphicsItem.ItemClipsChildrenToShape,
+            enabled=not showShadows)
         self.setFlag(QGraphicsItem.ItemClipsToShape, enabled=not showShadows)
 
     def keyPressEvent(self, event):
         """redirect to the board"""
         assert self == self.board.focusTile, 'id(self):%s, self:%s, focusTile:%s/%s' % \
-        (id(self), self, id(self.board.focusTile), self.board.focusTile)
+            (id(self), self, id(self.board.focusTile), self.board.focusTile)
         return self.board.keyPressEvent(event)
 
     def __lightDistance(self):
@@ -94,7 +98,10 @@ class UITile(QGraphicsObject, StrMixin):
 
     def setDrawingOrder(self):
         """set drawing order for this tile"""
-        boardLevel = self.board.level if self.board else ZValues.boardLevelFactor
+        if self.board:
+            boardLevel = self.board.level
+        else:
+            boardLevel = ZValues.boardLevelFactor
         moving = 0
         # show moving tiles above non-moving tiles
         changePos = self.activeAnimation.get('pos')
@@ -113,16 +120,20 @@ class UITile(QGraphicsObject, StrMixin):
                 newY = changePos.unpackEndValue().x()
             if currentY != newY:
                 moving += ZValues.moving
-        self.setZValue(moving + \
-            boardLevel + \
-            (self.level+(2 if self.tile.isKnown else 1))*ZValues.itemLevelFactor + \
-            self.__lightDistance())
+        self.setZValue(moving +
+                       boardLevel +
+                       (self.level + (2 if self.tile.isKnown else 1))
+                       * ZValues.itemLevelFactor +
+                       self.__lightDistance())
 
     def boundingRect(self):
         """define the part of the tile we want to see. Do not return QRect()
         if tileset is not known because that makes QGraphicsscene crash"""
         if self.tileset:
-            self._boundingRect = QRectF(QPointF(), self.tileset.tileSize if Internal.Preferences.showShadows else self.tileset.faceSize)
+            self._boundingRect = QRectF(
+                QPointF(),
+                self.tileset.tileSize if Internal.Preferences.showShadows
+                else self.tileset.faceSize)
         return self._boundingRect
 
     def facePos(self):
@@ -139,7 +150,7 @@ class UITile(QGraphicsObject, StrMixin):
         if not Internal.Preferences.showShadows:
             return QString("TILE_2")
         lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
-        return QString("TILE_{}".format(lightSourceIndex%4+1))
+        return QString("TILE_{}".format(lightSourceIndex % 4 + 1))
 
     def paint(self, painter, dummyOption, dummyWidget=None):
         """paint the entire tile.
@@ -156,10 +167,12 @@ class UITile(QGraphicsObject, StrMixin):
             if self.showFace():
                 if withBorders:
                     faceSize = self.tileset.faceSize.toSize()
-                    renderer.render(painter, self.tileset.svgName[str(self.tile.exposed)],
-                            QRectF(self.facePos(), QSizeF(faceSize)))
+                    renderer.render(
+                        painter, self.tileset.svgName[str(self.tile.exposed)],
+                        QRectF(self.facePos(), QSizeF(faceSize)))
                 else:
-                    renderer.render(painter, self.tileset.svgName[str(self.tile.exposed)],
+                    renderer.render(
+                        painter, self.tileset.svgName[str(self.tile.exposed)],
                         self.boundingRect())
         if self.cross:
             self.__paintCross(painter)
@@ -175,7 +188,8 @@ class UITile(QGraphicsObject, StrMixin):
             painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
 
     def pixmapFromSvg(self, pmapSize=None, withBorders=None):
-        """returns a pixmap with default size as given in SVG and optional borders/shadows"""
+        """returns a pixmap with default size as given in SVG
+        and optional borders/shadows"""
         if withBorders is None:
             withBorders = Internal.Preferences.showShadows
         if withBorders:
@@ -188,7 +202,9 @@ class UITile(QGraphicsObject, StrMixin):
         result.fill(Qt.transparent)
         painter = QPainter(result)
         if not painter.isActive():
-            logException('painter is not active. Wanted size: %s' % str(pmapSize))
+            logException(
+                'painter is not active. Wanted size: %s' %
+                str(pmapSize))
         try:
             xScale = float(pmapSize.width()) / wantSize.width()
             yScale = float(pmapSize.height()) / wantSize.height()
@@ -204,10 +220,12 @@ class UITile(QGraphicsObject, StrMixin):
         self._drawDarkness(painter)
         if self.showFace():
             faceSize = self.tileset.faceSize.toSize()
-            faceSize = QSize(faceSize.width() * xScale, faceSize.height() * yScale)
+            faceSize = QSize(
+                faceSize.width() * xScale,
+                faceSize.height() * yScale)
             painter.translate(self.facePos())
             renderer.render(painter, self.tileset.svgName[self.tile.exposed],
-                    QRectF(QPointF(), QSizeF(faceSize)))
+                            QRectF(QPointF(), QSizeF(faceSize)))
         return result
 
     def _drawDarkness(self, painter):
@@ -222,7 +240,7 @@ class UITile(QGraphicsObject, StrMixin):
     def sortKey(self, sortDir=Qt.Key_Right):
         """moving order for cursor"""
         dirs = [Qt.Key_Right, Qt.Key_Up, Qt.Key_Left, Qt.Key_Down] * 2
-        sorter = dirs[dirs.index(sortDir) + self.__board.sceneRotation()//90]
+        sorter = dirs[dirs.index(sortDir) + self.__board.sceneRotation() // 90]
         if sorter == Qt.Key_Down:
             return self.xoffset * 100 + self.yoffset
         elif sorter == Qt.Key_Up:
@@ -261,7 +279,7 @@ class UITile(QGraphicsObject, StrMixin):
         return self._tile
 
     @tile.setter
-    def tile(self, value): # pylint: disable=arguments-differ
+    def tile(self, value):  # pylint: disable=arguments-differ
         """set tile name and update display"""
         if value is not self._tile:
             self._tile = value
@@ -331,24 +349,30 @@ class UITile(QGraphicsObject, StrMixin):
 
     def shortcutAnimation(self, animation):
         """directly set the end value of the animation"""
-        setattr(self, animation.pName(), animation.unpackValue(animation.endValue()))
+        setattr(
+            self,
+            animation.pName(),
+            animation.unpackValue(animation.endValue()))
         self.queuedAnimations = []
         self.setDrawingOrder()
 
     def getValue(self, pName):
         """gets a property value by not returning a QVariant"""
-        return {'pos': self.pos, 'rotation': self.rotation, 'scale':self.scale}[pName]
+        return {'pos': self.pos, 'rotation': self.rotation,
+                'scale': self.scale}[pName]
 
     def setActiveAnimation(self, animation):
         """the tile knows which of its properties are currently animated"""
         self.queuedAnimations = []
         propName = animation.pName()
-        assert propName not in self.activeAnimation or not isAlive(self.activeAnimation[propName])
+        assert propName not in self.activeAnimation or not isAlive(
+            self.activeAnimation[propName])
         self.activeAnimation[propName] = animation
         self.setCacheMode(QGraphicsItem.ItemCoordinateCache)
 
     def clearActiveAnimation(self, animation):
-        """an animation for this tile has ended. Finalize tile in its new position"""
+        """an animation for this tile has ended.
+        Finalize tile in its new position"""
         del self.activeAnimation[animation.pName()]
         self.setDrawingOrder()
         if not len(self.activeAnimation):
@@ -411,16 +435,18 @@ class UITile(QGraphicsObject, StrMixin):
             size = u''
         return u'%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
             (self.tile,
-            self.board.name if self.board else u'None', id(self) % 10000,
-            self.xoffset, self.x(), self.yoffset,
-            self.y(), self.zValue(), size, rotation, scale, level)
+             self.board.name if self.board else u'None', id(self) % 10000,
+             self.xoffset, self.x(), self.yoffset,
+             self.y(), self.zValue(), size, rotation, scale, level)
 
     @property
     def isBonus(self):
         """proxy for tile"""
         return self.tile.isBonus
 
+
 class UIMeld(list):
+
     """represents a visible meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds.
@@ -430,7 +456,10 @@ class UIMeld(list):
 
     def __init__(self, newContent):
         list.__init__(self)
-        if isinstance(newContent, list) and newContent and isinstance(newContent[0], UITile):
+        if (
+                isinstance(newContent, list)
+                and newContent
+                and isinstance(newContent[0], UITile)):
             self.extend(newContent)
         elif isinstance(newContent, UITile):
             self.append(newContent)

@@ -1,31 +1,34 @@
 # -*- coding: utf-8 -*-
 """
-    Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-    partially based on C++ code from:
-    Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
+partially based on C++ code from:
+Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
 
-    Libkmahjongg is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+Libkmahjongg is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 Here we define classes useful for tree views
 """
 
 from qt import QAbstractItemModel, QModelIndex
 
-class TreeItem(object): # pylint: disable=abstract-class-little-used
+
+class TreeItem(object):  # pylint: disable=abstract-class-little-used
+
     """generic class for items in a tree"""
+
     def __init__(self, content):
         self.rawContent = content
         self.parent = None
@@ -38,10 +41,11 @@ class TreeItem(object): # pylint: disable=abstract-class-little-used
         self.children.insert(row, child)
         return child
 
-    def remove(self): # pylint: disable=no-self-use
+    def remove(self):  # pylint: disable=no-self-use
         """remove this item from the model and the database.
         This is an abstract method."""
-        raise Exception('cannot remove this TreeItem. We should never get here.')
+        raise Exception(
+            'cannot remove this TreeItem. We should never get here.')
 
     def child(self, row):
         """return a specific child item"""
@@ -61,8 +65,11 @@ class TreeItem(object): # pylint: disable=abstract-class-little-used
             return self.parent.children.index(self)
         return 0
 
+
 class RootItem(TreeItem):
+
     """an item for header data"""
+
     def __init__(self, content):
         TreeItem.__init__(self, content)
 
@@ -70,11 +77,13 @@ class RootItem(TreeItem):
         """content held by this item"""
         return self.rawContent[column]
 
-    def columnCount(self): # pylint: disable=no-self-use
+    def columnCount(self):  # pylint: disable=no-self-use
         """is 1 always correct? No, inherit from RootItem"""
         return 1
 
+
 class TreeModel(QAbstractItemModel):
+
     """a basic class for Kajongg tree views"""
 
     def columnCount(self, parent):
@@ -92,7 +101,10 @@ class TreeModel(QAbstractItemModel):
         """generate an index for this item"""
         if self.rootItem is None:
             return QModelIndex()
-        if row < 0 or column < 0 or row >= self.rowCount(parent) or column >= self.columnCount(parent):
+        if (row < 0
+                or column < 0
+                or row >= self.rowCount(parent)
+                or column >= self.columnCount(parent)):
             return QModelIndex()
         parentItem = self.itemForIndex(parent)
         assert parentItem
@@ -127,7 +139,7 @@ class TreeModel(QAbstractItemModel):
     def insertRows(self, position, items, parent=QModelIndex()):
         """inserts items into the model"""
         parentItem = self.itemForIndex(parent)
-        self.beginInsertRows(parent, position, position + len(items)- 1)
+        self.beginInsertRows(parent, position, position + len(items) - 1)
         for row, item in enumerate(items):
             parentItem.insert(position + row, item)
         self.endInsertRows()
@@ -139,6 +151,8 @@ class TreeModel(QAbstractItemModel):
         parentItem = self.itemForIndex(parent)
         for row in parentItem.children[position:position + rows]:
             row.remove()
-        parentItem.children = parentItem.children[:position] + parentItem.children[position + rows:]
+        parentItem.children = parentItem.children[
+            :position] + parentItem.children[
+                position + rows:]
         self.endRemoveRows()
         return True

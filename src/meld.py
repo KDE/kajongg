@@ -27,7 +27,9 @@ from itertools import chain
 from log import m18nc
 from tile import Tile, TileList, elements
 
+
 class Meld(TileList):
+
     """represents a meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
     those methods are not supposed to be called on empty melds.
@@ -54,6 +56,7 @@ class Meld(TileList):
 
     __hash__ = None
     cache = {}
+
     def __new__(cls, newContent=None):
         """try to use cache"""
         if isinstance(newContent, str) and newContent in cls.cache:
@@ -83,7 +86,7 @@ class Meld(TileList):
         - a list containing such strings
         - another meld. Its tiles are not passed.
         - a list of Tile objects"""
-        if not hasattr(self, '_fixed'): # already defined if I am from cache
+        if not hasattr(self, '_fixed'):  # already defined if I am from cache
             TileList.__init__(self, newContent)
             self.case = ''.join('a' if x.islower() else 'A' for x in self)
             self.key = TileList.key(self)
@@ -110,32 +113,44 @@ class Meld(TileList):
                 self.group = 'X'
                 self.lowerGroup = 'x'
             self.isRest = False
-            self.__staticRules = {} # ruleset is key
-            self.__dynamicRules = {} # ruleset is key
-            self.__staticDoublingRules = {} # ruleset is key
-            self.__dynamicDoublingRules = {} # ruleset is key
-            self.__hasRules = None # unknown yet
-            self.__hasDoublingRules = None # unknown yet
-            self.concealed = self.exposed = self.declared = self.exposedClaimed = None # to satisfy pylint
+            self.__staticRules = {}  # ruleset is key
+            self.__dynamicRules = {}  # ruleset is key
+            self.__staticDoublingRules = {}  # ruleset is key
+            self.__dynamicDoublingRules = {}  # ruleset is key
+            self.__hasRules = None  # unknown yet
+            self.__hasDoublingRules = None  # unknown yet
+            self.concealed = self.exposed = self.declared = self.exposedClaimed = None  # to satisfy pylint
             self._fixed = True
 
             if len(self) < 4:
-                TileList.__setattr__(self, 'concealed', Meld(TileList(x.concealed for x in self)))
+                TileList.__setattr__(
+                    self,
+                    'concealed',
+                    Meld(TileList(x.concealed for x in self)))
                 TileList.__setattr__(self, 'declared', self.concealed)
-                TileList.__setattr__(self, 'exposed', Meld(TileList(x.exposed for x in self)))
+                TileList.__setattr__(
+                    self,
+                    'exposed',
+                    Meld(TileList(x.exposed for x in self)))
                 TileList.__setattr__(self, 'exposedClaimed', self.exposed)
             else:
-                TileList.__setattr__(self, 'concealed', Meld(TileList(x.concealed for x in self)))
+                TileList.__setattr__(
+                    self,
+                    'concealed',
+                    Meld(TileList(x.concealed for x in self)))
                 TileList.__setattr__(self, 'declared',
-                    Meld(TileList([self[0].exposed, self[1].concealed, self[2].concealed, self[3].exposed])))
-                TileList.__setattr__(self, 'exposed', Meld(TileList(x.exposed for x in self)))
+                                     Meld(TileList([self[0].exposed, self[1].concealed, self[2].concealed, self[3].exposed])))
+                TileList.__setattr__(
+                    self,
+                    'exposed',
+                    Meld(TileList(x.exposed for x in self)))
                 TileList.__setattr__(self, 'exposedClaimed',
-                    Meld(TileList([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed])))
+                                     Meld(TileList([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed])))
 
     def __setattr__(self, name, value):
         if (hasattr(self, '_fixed')
             and not name.endswith('__hasRules')
-            and not name.endswith('__hasDoublingRules')):
+                and not name.endswith('__hasDoublingRules')):
             raise TypeError
         TileList.__setattr__(self, name, value)
 
@@ -143,16 +158,16 @@ class Meld(TileList):
         """prepare rules from ruleset"""
         rulesetId = id(ruleset)
         self.__staticRules[rulesetId] = list(x for x in ruleset.meldRules
-            if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
+                                             if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
         self.__dynamicRules[rulesetId] = list(x for x in ruleset.meldRules
-            if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self))
+                                              if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self))
         self.__hasRules = any(len(x) for x in chain(
             self.__staticRules.values(), self.__dynamicRules.values()))
 
         self.__staticDoublingRules[rulesetId] = list(x for x in ruleset.doublingMeldRules
-            if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
+                                                     if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
         self.__dynamicDoublingRules[rulesetId] = list(x for x in ruleset.doublingMeldRules
-            if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self))
+                                                      if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self))
         self.__hasDoublingRules = any(len(x) for x in chain(
             self.__staticDoublingRules.values(), self.__dynamicDoublingRules.values()))
 
@@ -165,7 +180,8 @@ class Meld(TileList):
         if rulesetId not in self.__staticRules:
             self.__prepareRules(ruleset)
         result = self.__staticRules[rulesetId][:]
-        result.extend(x for x in self.__dynamicRules[rulesetId] if x.appliesToMeld(hand, self))
+        result.extend(x for x in self.__dynamicRules[
+                      rulesetId] if x.appliesToMeld(hand, self))
         return result
 
     def doublingRules(self, hand):
@@ -175,7 +191,8 @@ class Meld(TileList):
         if rulesetId not in self.__staticRules:
             self.__prepareRules(ruleset)
         result = self.__staticDoublingRules[rulesetId][:]
-        result.extend(x for x in self.__dynamicDoublingRules[rulesetId] if x.appliesToMeld(hand, self))
+        result.extend(x for x in self.__dynamicDoublingRules[
+                      rulesetId] if x.appliesToMeld(hand, self))
         return result
 
     def append(self, dummy):
@@ -235,7 +252,8 @@ class Meld(TileList):
             raise UserWarning('Meld %s is too long' % self)
         if any(not x.isKnown for x in self):
             if len(set(self)) != 1:
-                raise UserWarning('Meld %s: Cannot mix known and unknown tiles')
+                raise UserWarning(
+                    'Meld %s: Cannot mix known and unknown tiles')
             self.isKnown = False
             return
         if length == 1:
@@ -245,7 +263,7 @@ class Meld(TileList):
             if self[0] == self[1]:
                 self.isPair = True
             elif self[0].value == self[1].value and self.case[0] == self.case[1] \
-                and all(x.lowerGroup in Tile.colors for x in self):
+                    and all(x.lowerGroup in Tile.colors for x in self):
                 self.isKnitted = True
             else:
                 raise UserWarning('Meld %s is malformed' % self)
@@ -337,7 +355,9 @@ class Meld(TileList):
 
     def name(self):
         """the long name"""
-        result = m18nc('kajongg meld name, do not translate parameter names', '{state} {meldType} {name}')
+        result = m18nc(
+            'kajongg meld name, do not translate parameter names',
+            '{state} {meldType} {name}')
         return result.format(
             state=self.__stateName(),
             meldType=self.typeName(),
@@ -358,19 +378,29 @@ class Meld(TileList):
                     tile.pung = Meld(tile * 3)
                     tile.concealed.pung = Meld(tile.concealed * 3)
                     if tile.value in range(1, 8):
-                        tile.chow = Meld([tile, tile.nextForChow, tile.nextForChow.nextForChow])
-                        tile.concealed.chow = Meld([tile.concealed, tile.nextForChow.concealed,
-                            tile.nextForChow.nextForChow.concealed])
+                        tile.chow = Meld(
+                            [tile,
+                             tile.nextForChow,
+                             tile.nextForChow.nextForChow])
+                        tile.concealed.chow = Meld(
+                            [tile.concealed, tile.nextForChow.concealed,
+                             tile.nextForChow.nextForChow.concealed])
                     if tile.value in range(1, 10):
-                        tile.knitted3 = Meld([Tile(x, tile.value) for x in Tile.colors])
-                        tile.concealed.knitted3 = Meld([Tile(x, tile.value).concealed for x in Tile.colors])
+                        tile.knitted3 = Meld(
+                            [Tile(x, tile.value) for x in Tile.colors])
+                        tile.concealed.knitted3 = Meld(
+                            [Tile(x, tile.value).concealed for x in Tile.colors])
                     if occ > 3:
                         tile.kong = Meld(tile * 4)
-                        tile.claimedKong = Meld([tile, tile, tile, tile.concealed])
+                        tile.claimedKong = Meld(
+                            [tile, tile, tile, tile.concealed])
                         tile.concealed.kong = Meld(tile.concealed * 4)
 
+
 class MeldList(list):
+
     """a list of melds"""
+
     def __init__(self, newContent=None):
         list.__init__(self)
         if newContent is None:
@@ -378,7 +408,8 @@ class MeldList(list):
         if isinstance(newContent, Meld):
             list.append(self, newContent)
         elif isinstance(newContent, str):
-            list.extend(self, [Meld(x) for x in newContent.split()]) # pylint: disable=maybe-no-member
+            list.extend(self, [Meld(x)
+                        for x in newContent.split()])  # pylint: disable=maybe-no-member
         else:
             list.extend(self, [Meld(x) for x in newContent])
         self.sort()

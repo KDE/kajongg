@@ -23,7 +23,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 """
 
-import os, traceback, time, datetime, random
+import os
+import traceback
+import time
+import datetime
+import random
 from collections import defaultdict
 import sqlite3
 
@@ -32,22 +36,29 @@ from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug, m18ncE, m18n
 from common import IntDict, Options, Internal, Debug, nativeStringArgs, unicodeString
 
+
 class QueryException(Exception):
+
     """as the name says"""
+
     def __init__(self, msg):
         Exception.__init__(self, msg)
 
+
 class DBCursor(sqlite3.Cursor):
+
     """logging wrapper"""
 
     # pylint: disable=no-member
+
     def __init__(self, dbHandle):
         sqlite3.Cursor.__init__(self, dbHandle)
         self.statement = None
         self.parameters = None
         self.failure = None
 
-    def execute(self, statement, parameters=None, silent=False, failSilent=False, mayFail=False):
+    def execute(self, statement, parameters=None,
+                silent=False, failSilent=False, mayFail=False):
         """logging wrapper, returning all selected data"""
         # pylint: disable=too-many-branches
         self.statement = statement
@@ -59,23 +70,29 @@ class DBCursor(sqlite3.Cursor):
                 try:
                     with Duration(statement, 60.0 if Debug.neutral else 2.0):
                         if isinstance(parameters, list):
-                            sqlite3.Cursor.executemany(self, statement, parameters)
+                            sqlite3.Cursor.executemany(
+                                self, statement, parameters)
                         elif parameters:
                             sqlite3.Cursor.execute(self, statement, parameters)
                         else:
                             sqlite3.Cursor.execute(self, statement)
                     break
                 except sqlite3.OperationalError as exc:
-                    logDebug(u'{} failed after {} tries:{}'.format(self, _, exc.message))
+                    logDebug(
+                        u'{} failed after {} tries:{}'.format(self, _, exc.message))
                     time.sleep(1)
                 else:
                     break
             else:
-                raise sqlite3.OperationalError('Failed after 10 tries:{}'.format(self))
+                raise sqlite3.OperationalError(
+                    'Failed after 10 tries:{}'.format(self))
             self.failure = None
         except sqlite3.Error as exc:
             self.failure = exc
-            msg = u'ERROR in %s: %s for %s' % (self.connection.path, exc.message, self)
+            msg = u'ERROR in %s: %s for %s' % (
+                self.connection.path,
+                exc.message,
+                self)
             if mayFail:
                 if not failSilent:
                     logDebug(msg)
@@ -93,10 +110,13 @@ class DBCursor(sqlite3.Cursor):
         else:
             return self.statement
 
+
 class DBHandle(sqlite3.Connection):
+
     """a handle with our preferred configuration"""
 
     # pylint: disable=no-member
+
     def __init__(self, path):
         assert Internal.db is None, id(self)
         Internal.db = self
@@ -106,7 +126,9 @@ class DBHandle(sqlite3.Connection):
         try:
             sqlite3.Connection.__init__(self, self.path, timeout=10.0)
         except sqlite3.Error as exc:
-            logException(u'opening %s: %s' % (unicodeString(self.path), exc.message))
+            logException(
+                u'opening %s: %s' %
+                (unicodeString(self.path), exc.message))
         if self.hasTable('general'):
             cursor = self.cursor()
             cursor.execute('select ident from general')
@@ -120,6 +142,7 @@ class DBHandle(sqlite3.Connection):
         if Debug.sql:
             logDebug(u'starting transaction')
         return sqlite3.Connection.__enter__(self)
+
     def __exit__(self, *args):
         self.inTransaction = None
         sqlite3.Connection.__exit__(self, *args)
@@ -152,7 +175,9 @@ class DBHandle(sqlite3.Connection):
             sqlite3.Connection.commit(self)
         except sqlite3.Error as exc:
             if not silent:
-                logWarning(u'%s cannot commit: %s :' % (self.name, exc.message))
+                logWarning(
+                    u'%s cannot commit: %s :' %
+                    (self.name, exc.message))
 
     def rollback(self, silent=None):
         """rollback and log it"""
@@ -169,7 +194,9 @@ class DBHandle(sqlite3.Connection):
             if self is Internal.db:
                 logDebug(u'Closing Internal.db: %s' % unicodeString(self.path))
             else:
-                logDebug(u'Closing DBHandle %s: %s' % (self, unicodeString(self.path)))
+                logDebug(
+                    u'Closing DBHandle %s: %s' %
+                    (self, unicodeString(self.path)))
         if self is Internal.db:
             Internal.db = None
         try:
@@ -192,15 +219,20 @@ class DBHandle(sqlite3.Connection):
         cursor.execute('select * from %s' % table)
         return any(x[0] == field for x in cursor.description)
 
+
 class Query(object):
+
     """a wrapper arout python sqlite3, adding logging and some exception handling.
     For selecting queries we fill a list with ALL records which is never much.
     Every record is a list of all fields. q.records[0][1] is record 0, field 1.
     """
 
-    localServerName = m18ncE('kajongg name for local game server', 'Local Game')
+    localServerName = m18ncE(
+        'kajongg name for local game server',
+        'Local Game')
 
-    def __init__(self, statement, args=None, silent=False, mayFail=False, failSilent=False):
+    def __init__(self, statement, args=None,
+                 silent=False, mayFail=False, failSilent=False):
         """we take one sql statement.
         Do prepared queries by passing the parameters in args.
         If args is a list of lists, execute the prepared query for every sublist.
@@ -213,8 +245,14 @@ class Query(object):
         self.statement = statement
         self.args = args
         if Internal.db:
-            self.cursor = Internal.db.cursor(DBCursor) # pylint: disable=no-member
-            self.cursor.execute(statement, args, silent=silent, mayFail=mayFail, failSilent=failSilent)
+            self.cursor = Internal.db.cursor(
+                DBCursor)  # pylint: disable=no-member
+            self.cursor.execute(
+                statement,
+                args,
+                silent=silent,
+                mayFail=mayFail,
+                failSilent=failSilent)
             self.failure = self.cursor.failure
             self.records = list(self.cursor.fetchall())
             if not Internal.db.inTransaction:
@@ -229,7 +267,7 @@ class Query(object):
 
     def __str__(self):
         return '{} {}'.format(self.statement,
-            'args=' + ','.join(str(x) for x in self.args) if self.args else '')
+                              'args=' + ','.join(str(x) for x in self.args) if self.args else '')
 
     def rowcount(self):
         """how many rows were affected?"""
@@ -238,12 +276,13 @@ class Query(object):
         else:
             return 0
 
+
 def initDb():
     """open the db, create or update it if needed.
     sets Internal.db."""
-    PrepareDB(DBHandle.dbPath()) # create or upgrade
+    PrepareDB(DBHandle.dbPath())  # create or upgrade
     DBHandle(DBHandle.dbPath())
-#    if not Internal.db = DBHandle.default:  # had to create it. Close and reopen
+# if not Internal.db = DBHandle.default:  # had to create it. Close and reopen
 #        Internal.db = DBHandle()
 #        assert Internal.db = DBHandle.default
 #    except sqlite3.Error as exc:
@@ -251,7 +290,9 @@ def initDb():
 #        return False
     return True
 
+
 class PrepareDB(object):
+
     """create or upgrade DB if needed"""
     schema = {}
     schema['player'] = """
@@ -329,7 +370,8 @@ class PrepareDB(object):
             with Internal.db:
                 self.createTables()
                 self.__generateDbIdent()
-                Query('UPDATE general SET schemaversion=?', (Internal.version,))
+                Query(
+                    'UPDATE general SET schemaversion=?', (Internal.version,))
         finally:
             Internal.db.close(silent=True)
         if os.path.exists(self.path):
@@ -364,13 +406,17 @@ class PrepareDB(object):
                 allVersions = allVersions[1:]
             for version in allVersions:
                 currentVersion = self.__currentVersion()
-                with Internal.db: # transaction
-                    getattr(self, 'updateToVersion%s' % version.replace('.', '_'))()
+                with Internal.db:  # transaction
+                    getattr(
+                        self, 'updateToVersion%s' %
+                        version.replace('.', '_'))()
                     Query('UPDATE general SET schemaversion=?', (version,))
                 logInfo(m18n('Database %1 updated from schema %2 to %3',
-                    Internal.db.path, currentVersion, version), showDialog=True)
+                             Internal.db.path, currentVersion, version), showDialog=True)
         except sqlite3.Error as exc:
-            logException(u'opening %s: %s' % (unicodeString(self.path), exc.message))
+            logException(
+                u'opening %s: %s' %
+                (unicodeString(self.path), exc.message))
         finally:
             Internal.db.close(silent=True)
 
@@ -415,7 +461,9 @@ class PrepareDB(object):
     def createIndex(name, cmd):
         """only try to create it if it does not yet exist. Do not use create if not exists because
         we want debug output only if we really create the index"""
-        if not Query("select 1 from sqlite_master where type='index' and name=?", (name,),
+        if not Query(
+            "select 1 from sqlite_master where type='index' and name=?", (
+                name,),
                 silent=True).records:
             Query("create index %s on %s" % (name, cmd))
 
@@ -433,11 +481,21 @@ class PrepareDB(object):
             keep[keepId] = name
             if counter > 1:
                 for nameId in nameIds[1:]:
-                    Query('update score set player=%d where player=%d' % (keepId, nameId))
-                    Query('update game set p0=%d where p0=%d' % (keepId, nameId))
-                    Query('update game set p1=%d where p1=%d' % (keepId, nameId))
-                    Query('update game set p2=%d where p2=%d' % (keepId, nameId))
-                    Query('update game set p3=%d where p3=%d' % (keepId, nameId))
+                    Query(
+                        'update score set player=%d where player=%d' %
+                        (keepId, nameId))
+                    Query(
+                        'update game set p0=%d where p0=%d' %
+                        (keepId, nameId))
+                    Query(
+                        'update game set p1=%d where p1=%d' %
+                        (keepId, nameId))
+                    Query(
+                        'update game set p2=%d where p2=%d' %
+                        (keepId, nameId))
+                    Query(
+                        'update game set p3=%d where p3=%d' %
+                        (keepId, nameId))
                     Query('delete from player where id=%d' % nameId)
         Query('drop table player')
         self.createTable('player')
@@ -449,11 +507,11 @@ class PrepareDB(object):
         """drops column server from table game. Sqlite3 cannot drop columns"""
         Query('create table gameback(%s)' % cls.schema['game'])
         Query('insert into gameback '
-            'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from game')
+              'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from game')
         Query('drop table game')
         Query('create table game(%s)' % cls.schema['game'])
         Query('insert into game '
-            'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback')
+              'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback')
         Query('drop table gameback')
 
     @staticmethod
@@ -464,24 +522,27 @@ class PrepareDB(object):
         if not Internal.db.hasTable('usedrule'):
             return
         usedRegexRulesets = Query("select distinct ruleset from usedrule "
-            "where definition not like 'F%' "
-            "and definition not like 'O%' "
-            "and definition not like 'int%' "
-            "and definition not like 'bool%' "
-            "and definition<>'' "
-            "and definition not like 'XEAST9X%'").records
+                                  "where definition not like 'F%' "
+                                  "and definition not like 'O%' "
+                                  "and definition not like 'int%' "
+                                  "and definition not like 'bool%' "
+                                  "and definition<>'' "
+                                  "and definition not like 'XEAST9X%'").records
         usedRegexRulesets = list(unicode(x[0]) for x in usedRegexRulesets)
         if not usedRegexRulesets:
             return
         openRegexGames = Query("select id from game "
-            "where endtime is null "
-            "and ruleset in (%s)" % ','.join(usedRegexRulesets)).records
+                               "where endtime is null "
+                               "and ruleset in (%s)" % ','.join(usedRegexRulesets)).records
         openRegexGames = list(x[0] for x in openRegexGames)
         if not openRegexGames:
             return
-        logInfo('Marking games using rules with regular expressions as finished: %s' % openRegexGames)
+        logInfo(
+            'Marking games using rules with regular expressions as finished: %s' %
+            openRegexGames)
         for openGame in openRegexGames:
-            endtime = datetime.datetime.now().replace(microsecond=0).isoformat()
+            endtime = datetime.datetime.now().replace(
+                microsecond=0).isoformat()
             Query('update game set endtime=? where id=?', (endtime, openGame))
 
     def removeUsedRuleset(self):
@@ -489,7 +550,8 @@ class PrepareDB(object):
         if Internal.db.hasTable('usedruleset'):
             if Internal.db.hasTable('ruleset'):
                 Query('UPDATE ruleset set id=-id where id>0')
-                Query('INSERT OR IGNORE INTO usedruleset SELECT * FROM ruleset')
+                Query(
+                    'INSERT OR IGNORE INTO usedruleset SELECT * FROM ruleset')
                 Query('DROP TABLE ruleset')
             Query('ALTER TABLE usedruleset RENAME TO ruleset')
         if Internal.db.hasTable('usedrule'):
@@ -499,10 +561,11 @@ class PrepareDB(object):
                 Query('DROP TABLE rule')
             Query('ALTER TABLE usedrule RENAME TO rule')
         query = Query("select count(1) from sqlite_master "
-            "where type='table' and tbl_name='ruleset' and sql like '%name text unique,%'", silent=True)
+                      "where type='table' and tbl_name='ruleset' and sql like '%name text unique,%'", silent=True)
         if int(query.records[0][0]):
             # make name non-unique. Needed for used rulesets: Content may change with identical name
-            # and we now have both ruleset templates and copies of used rulesets in the same table
+            # and we now have both ruleset templates and copies of used
+            # rulesets in the same table
             for statement in list([
                     'create table temp(%s)' % self.schema['ruleset'],
                     'insert into temp select id,name,hash,description from ruleset',
@@ -512,7 +575,7 @@ class PrepareDB(object):
                     'drop table temp']):
                 Query(statement)
         query = Query("select count(1) from sqlite_master "
-            "where type='table' and tbl_name='rule' and sql like '%unique (ruleset,name)%'", silent=True)
+                      "where type='table' and tbl_name='rule' and sql like '%unique (ruleset,name)%'", silent=True)
         if int(query.records[0][0]):
             # make ruleset,name non-unique
             for statement in list([
@@ -532,7 +595,7 @@ class PrepareDB(object):
         if not Internal.db.tableHasField('score', 'penalty'):
             Query('ALTER TABLE score add penalty integer default 0')
             Query("UPDATE score SET penalty=1 WHERE manualrules LIKE "
-                    "'False Naming%' OR manualrules LIKE 'False Decl%'")
+                  "'False Naming%' OR manualrules LIKE 'False Decl%'")
         if Internal.db.tableHasField('player', 'host'):
             self.cleanPlayerTable()
         if Internal.isServer:
@@ -558,4 +621,6 @@ class PrepareDB(object):
             dbIdent = str(random.randrange(100000000000))
             Query("INSERT INTO general(ident) values(?)", (dbIdent,))
             if Debug.sql:
-                logDebug(u'generated new dbIdent %s for %s' % (dbIdent, Internal.db.path))
+                logDebug(
+                    u'generated new dbIdent %s for %s' %
+                    (dbIdent, Internal.db.path))

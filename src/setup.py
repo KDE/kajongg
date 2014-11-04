@@ -33,7 +33,9 @@ URL = "http://www.kde.org/applications/games/kajongg/"
 VERSION = "4.13.0"
 # ==========================
 
-import os, re, msilib
+import os
+import re
+import msilib
 from shutil import rmtree
 
 from cx_Freeze import setup, Executable
@@ -45,31 +47,41 @@ from cx_Freeze import setup, Executable
 if os.path.exists('build'):
     rmtree('build')
 
-includes = ["zope.interface", "twisted.internet", "twisted.internet.protocol", "pkg_resources"]
+includes = [
+    "zope.interface",
+     "twisted.internet",
+     "twisted.internet.protocol",
+     "pkg_resources"]
 packages = []
 namespace_packages = ["zope"]
 include_files = ('share',)
 
 excludes = ['tcl', 'tk', 'ttk', 'tkinter', 'Tkconstants', 'Tkinter']
-# strangely, excluding modules does not get rid of warnings about missing modules
+# strangely, excluding modules does not get rid of warnings about missing
+# modules
 
-build_exe_options = {"packages": packages, "excludes": excludes, "includes": includes,
-    "include_files": include_files, 'icon':'kajongg.ico',
-    "namespace_packages": namespace_packages, "append_script_to_exe":True, 'silent':False}
+build_exe_options = {
+    "packages": packages, "excludes": excludes, "includes": includes,
+    "include_files": include_files, 'icon': 'kajongg.ico',
+    "namespace_packages": namespace_packages, "append_script_to_exe": True, 'silent': False}
 
 kajExe = Executable('kajongg.py', icon='kajongg.ico', base='Win32GUI',
-    shortcutName='Kajongg', shortcutDir='ProgramMenuFolder')
+                    shortcutName='Kajongg', shortcutDir='ProgramMenuFolder')
 kajServer = Executable('kajonggserver.py', icon='kajongg.ico')
 executables = [kajExe, kajServer]
 
 
 from cx_Freeze import windist
 
+
 class bdist_msi(windist.bdist_msi):
+
     """we add an icon for the uninstaller"""
+
     def productcode(self):
         """get our productcode"""
-        view = self.db.OpenView("SELECT Value FROM Property WHERE Property = 'ProductCode'")
+        view = self.db.OpenView(
+            "SELECT Value FROM Property WHERE Property = 'ProductCode'")
         view.Execute(None)
         record = view.Fetch()
         result = record.GetString(1)
@@ -80,12 +92,12 @@ class bdist_msi(windist.bdist_msi):
         """add the uninstaller icon"""
         windist.bdist_msi.add_config(self, fullname)
         msilib.add_data(self.db, "Registry", [("DisplayIcon",  # Registry
-                                          -1,  # Root
-                                          r"Software\Microsoft\Windows\CurrentVersion\Uninstall\%s" %
-                                          self.productcode(),  # Key
-                                          "DisplayIcon",  # Name
-                                          r"[icons]kajongg.ico",  # Value
-                                          "TARGETDIR")])  # default Component
+                                               -1,  # Root
+                                               r"Software\Microsoft\Windows\CurrentVersion\Uninstall\%s" %
+                                               self.productcode(),  # Key
+                                               "DisplayIcon",  # Name
+                                               r"[icons]kajongg.ico",  # Value
+                                               "TARGETDIR")])  # default Component
 
 setup(
     cmdclass={'bdist_msi': bdist_msi},  # define custom build class

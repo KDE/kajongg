@@ -25,13 +25,18 @@ python interface to KDE.
 """
 
 __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
-            'KCmdLineOptions', 'i18n', 'i18nc', 'ki18n',
-            'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
-            'KConfigDialog', 'KDialog', 'KLineEdit',
-            'KUser', 'KToggleFullScreenAction', 'KStandardAction',
-            'KXmlGuiWindow', 'KStandardDirs', 'KGlobal', 'KIcon', 'KAction']
+           'KCmdLineOptions', 'i18n', 'i18nc', 'ki18n',
+           'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
+           'KConfigDialog', 'KDialog', 'KLineEdit',
+           'KUser', 'KToggleFullScreenAction', 'KStandardAction',
+           'KXmlGuiWindow', 'KStandardDirs', 'KGlobal', 'KIcon', 'KAction']
 
-import sys, os, subprocess, getpass, webbrowser, codecs
+import sys
+import os
+import subprocess
+import getpass
+import webbrowser
+import codecs
 if os.name != 'nt':
     import pwd
 import weakref
@@ -60,6 +65,7 @@ from statesaver import StateSaver
 
 import gettext
 
+
 def __insertArgs(translatedTemplate, *args):
     """
     put format arguments into the translated template.
@@ -81,12 +87,13 @@ def __insertArgs(translatedTemplate, *args):
     result = translatedTemplate
     if '%' in result:
         for idx in range(len(args)):
-            result = result.replace('%%%d' % (idx+1), '{%d}' % idx)
+            result = result.replace('%%%d' % (idx + 1), '{%d}' % idx)
         result = result.format(*args)
     for ignore in ['numid', 'filename', 'interface']:
         result = result.replace('<%s>' % ignore, '')
         result = result.replace('</%s>' % ignore, '')
     return result
+
 
 def i18n(englishIn, *args):
     """
@@ -107,7 +114,8 @@ def i18n(englishIn, *args):
     result = __insertArgs(_, *args)
     return unicodeString(result)
 
-ki18n = i18n # pylint: disable=invalid-name
+ki18n = i18n  # pylint: disable=invalid-name
+
 
 def i18nc(context, englishIn, *args):
     """
@@ -135,8 +143,11 @@ def i18nc(context, englishIn, *args):
         result = i18n(withContext, *args)
     return unicodeString(result)
 
+
 class OptionHelper(object):
+
     """stub"""
+
     def __init__(self, options):
         self.options = options
 
@@ -165,7 +176,9 @@ class OptionHelper(object):
                     return False
         return ''
 
+
 class KCmdLineArgs(object):
+
     """stub"""
     options = None
     argv = None
@@ -190,9 +203,12 @@ class KCmdLineArgs(object):
         """stub"""
         cls.options = OptionHelper(options)
 
+
 class KCmdLineOptions(list):
+
     """stub"""
     parser = ArgumentParser()
+
     def __init__(self):
         list.__init__(self)
 
@@ -200,14 +216,20 @@ class KCmdLineOptions(list):
         """stub"""
         self.append((definition, helptext, default))
         # self.parser is currently only used for generating --help text
-        self.parser.add_argument('--' + definition, dest=definition, help=helptext, action='store_true')
+        self.parser.add_argument(
+            '--' + definition,
+            dest=definition,
+            help=helptext,
+            action='store_true')
+
 
 class KAboutData(object):
+
     """stub"""
     License_GPL = 1
 
     def __init__(self, appname, catalog, programName, version, description,
-        kajLicense, kajCopyright, aboutText, homePage):
+                 kajLicense, kajCopyright, aboutText, homePage):
         # pylint: disable=too-many-arguments
         KGlobal.aboutData = self
         self.appname = appname
@@ -233,13 +255,16 @@ class KAboutData(object):
     def licenseFile():
         """which may currently only be 1: GPL_V2"""
         for path in ('COPYING', '../COPYING',
-            '%s/share/kde4/apps/LICENSES/GPL_V2' % KStandardDirs.prefix):
+                     '%s/share/kde4/apps/LICENSES/GPL_V2' % KStandardDirs.prefix):
             path = os.path.abspath(path)
             if os.path.exists(path):
                 return path
 
+
 class KApplication(QApplication):
+
     """stub"""
+
     def __init__(self):
         QApplication.__init__(self, sys.argv)
         if os.name == 'nt':
@@ -253,8 +278,11 @@ class KApplication(QApplication):
         """the global app instance"""
         return QApplication.instance()
 
+
 class CaptionMixin(object):
+
     """used by KDialog and KXmlGuiWindow"""
+
     def setCaption(self, caption):
         """append app name"""
         if caption:
@@ -265,9 +293,11 @@ class CaptionMixin(object):
         self.setWindowTitle(caption)
         self.setWindowIcon(KIcon('kajongg'))
 
+
 def getDocUrl(languages):
     """returns the best match for the online user manual"""
     from twisted.web import client
+
     def processResult(dummyResult, fallbacks):
         """if status 404, try the next fallback language"""
         return getDocUrl(fallbacks) if factory.status == '404' else url
@@ -281,6 +311,7 @@ def getDocUrl(languages):
     factory.deferred.addCallback(processResult, languages[1:])
     return factory.deferred
 
+
 def startHelp():
     """start the KDE help center for kajongg or go to docs.kde.org"""
     try:
@@ -289,11 +320,15 @@ def startHelp():
         def gotUrl(url):
             """now we know where the manual is"""
             webbrowser.open(url)
-        languages = KGlobal.config().group('Locale').readEntry('Language').split(':')
+        languages = KGlobal.config().group(
+            'Locale').readEntry('Language').split(':')
         getDocUrl(languages).addCallback(gotUrl)
 
+
 class IconLabel(QLabel):
+
     """for use in messages and about dialog"""
+
     def __init__(self, iconName, dialog):
         QLabel.__init__(self)
         icon = KIcon(iconName)
@@ -302,14 +337,17 @@ class IconLabel(QLabel):
         self.setPixmap(icon.pixmap(dialog.style().pixelMetric(
             QStyle.PM_MessageBoxIconSize, option, dialog)))
 
+
 class KMessageBox(object):
+
     """again only what we need"""
     NoExec = 1
     AllowLink = 2
     Options = int
 
     @staticmethod
-    def createKMessageBox(dialog, icon, text, dummyStrlist, dummyAsk, dummyCheckboxReturn, options):
+    def createKMessageBox(
+            dialog, icon, text, dummyStrlist, dummyAsk, dummyCheckboxReturn, options):
         """translated as far as needed from kmessagegox.cpp"""
         # pylint: disable=too-many-locals
         mainLayout = QVBoxLayout()
@@ -341,7 +379,10 @@ class KMessageBox(object):
         if messageLabel.sizeHint().width() > desktop.width() * 0.5:
             messageLabel.setWordWrap(True)
 
-        usingScrollArea = desktop.height() // 3 < messageLabel.sizeHint().height()
+        usingScrollArea = desktop.height(
+        ) // 3 < messageLabel.sizeHint(
+        ).height(
+        )
         if usingScrollArea:
             scrollArea = QScrollArea(dialog)
             scrollArea.setWidget(messageLabel)
@@ -356,15 +397,17 @@ class KMessageBox(object):
         mainLayout.addWidget(dialog.buttonBox)
         dialog.setLayout(mainLayout)
 
-KDialogButtonBox = QDialogButtonBox # pylint: disable=invalid-name
+KDialogButtonBox = QDialogButtonBox  # pylint: disable=invalid-name
+
 
 class KDialog(CaptionMixin, QDialog):
+
     """QDialog should be enough for kajongg"""
     NoButton = 0
-    Ok = QDialogButtonBox.Ok # pylint: disable=invalid-name
+    Ok = QDialogButtonBox.Ok  # pylint: disable=invalid-name
     Cancel = QDialogButtonBox.Cancel
     Yes = QDialogButtonBox.Yes
-    No = QDialogButtonBox.No # pylint: disable=invalid-name
+    No = QDialogButtonBox.No  # pylint: disable=invalid-name
     Help = QDialogButtonBox.Help
     Apply = QDialogButtonBox.Apply
     RestoreDefaults = QDialogButtonBox.RestoreDefaults
@@ -391,7 +434,8 @@ class KDialog(CaptionMixin, QDialog):
         if KDialog.Cancel & buttonMask:
             self.buttonBox.button(KDialog.Cancel).setText(i18n('&Cancel'))
         if KDialog.RestoreDefaults & buttonMask:
-            self.buttonBox.button(KDialog.RestoreDefaults).setText(i18n('&Defaults'))
+            self.buttonBox.button(
+                KDialog.RestoreDefaults).setText(i18n('&Defaults'))
         if KDialog.Help & buttonMask:
             self.buttonBox.button(KDialog.Help).clicked.connect(startHelp)
 
@@ -412,7 +456,7 @@ class KDialog(CaptionMixin, QDialog):
         return self.buttonBox.button(buttonCode)
 
     @staticmethod
-    def ButtonCode(value): # pylint: disable=invalid-name
+    def ButtonCode(value):  # pylint: disable=invalid-name
         """not needed in Python"""
         return value
 
@@ -426,10 +470,14 @@ class KDialog(CaptionMixin, QDialog):
         """stub"""
         return QApplication.style().pixelMetric(QStyle.PM_DefaultChildMargin)
 
+
 class KUser(object):
+
     """only the things kajongg needs"""
+
     def __init__(self, uid=None):
         self.__uid = uid
+
     def fullName(self):
         """stub"""
         if os.name == 'nt':
@@ -437,20 +485,26 @@ class KUser(object):
         else:
             return pwd.getpwnam(self.loginName()).pw_gecos.replace(',', '')
         return None
+
     @staticmethod
     def loginName():
         """stub"""
         return getpass.getuser()
 
+
 class KToggleFullScreenAction(QAction):
+
     """stub"""
+
     def __init__(self, *dummyArgs):
         QAction.__init__(self, Internal.mainWindow)
 
     def setWindow(self, window):
         """stub"""
 
+
 class KStandardAction(object):
+
     """stub"""
     @classmethod
     def preferences(cls, slot, actionCollection):
@@ -458,23 +512,27 @@ class KStandardAction(object):
         mainWindow = Internal.mainWindow
         separator = QAction(Internal.mainWindow)
         separator.setSeparator(True)
-        mainWindow.actionStatusBar = mainWindow.kajonggAction('options_show_statusbar', None)
+        mainWindow.actionStatusBar = mainWindow.kajonggAction(
+            'options_show_statusbar', None)
         mainWindow.actionStatusBar.setCheckable(True)
         mainWindow.actionStatusBar.setEnabled(True)
         mainWindow.actionStatusBar.toggled.connect(mainWindow.toggleStatusBar)
-        mainWindow.actionStatusBar.setText(i18nc('@action:inmenu', "Show St&atusbar"))
-        mainWindow.actionToolBar = mainWindow.kajonggAction('options_show_toolbar', None)
+        mainWindow.actionStatusBar.setText(
+            i18nc('@action:inmenu', "Show St&atusbar"))
+        mainWindow.actionToolBar = mainWindow.kajonggAction(
+            'options_show_toolbar', None)
         mainWindow.actionToolBar.setCheckable(True)
         mainWindow.actionToolBar.setEnabled(True)
         mainWindow.actionToolBar.toggled.connect(mainWindow.toggleToolBar)
-        mainWindow.actionToolBar.setText(i18nc('@action:inmenu', "Show &Toolbar"))
+        mainWindow.actionToolBar.setText(
+            i18nc('@action:inmenu', "Show &Toolbar"))
 
         actionCollection.addAction('', separator)
 
         action = KAction(mainWindow)
         action.triggered.connect(mainWindow.configureToolBar)
         action.setText(i18n('Configure Toolbars'))
-        action.setIcon(KIcon('configure-toolbars')) # TODO: winprep
+        action.setIcon(KIcon('configure-toolbars'))  # TODO: winprep
         action.setIconText(i18n('Configure toolbars'))
         separator = QAction(Internal.mainWindow)
         separator.setSeparator(True)
@@ -487,8 +545,11 @@ class KStandardAction(object):
         action.setIconText(i18n('Configure'))
         actionCollection.addAction('options_configure', action)
 
+
 class KActionCollection(object):
+
     """stub"""
+
     def __init__(self, mainWindow):
         self.__actions = {}
         self.mainWindow = mainWindow
@@ -504,8 +565,11 @@ class KActionCollection(object):
         """the actions in this collection"""
         return self.__actions
 
+
 class MyStatusBarItem(object):
+
     """one of the four player items"""
+
     def __init__(self, text, idx, stretch=0):
         self.idx = idx
         self.stretch = stretch
@@ -513,8 +577,11 @@ class MyStatusBarItem(object):
         self.label.setText(text)
         self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
 
+
 class KStatusBar(QStatusBar):
+
     """stub"""
+
     def __init__(self, *args, **kwargs):
         QStatusBar.__init__(self, *args, **kwargs)
         self.__items = []
@@ -543,8 +610,11 @@ class KStatusBar(QStatusBar):
         """stub"""
         self.__items[idx].label.setAlignment(alignment)
 
+
 class KXmlGuiWindow(CaptionMixin, QMainWindow):
+
     """stub"""
+
     def __init__(self):
         QMainWindow.__init__(self)
         self._actions = KActionCollection(self)
@@ -558,15 +628,18 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
             (i18n('&Game'), ('scoreGame', 'play', 'abort', 'quit')),
             (i18n('&View'), ('scoreTable', 'explain')),
             (i18n('&Settings'), ('players', 'rulesets', 'demoMode', '', 'options_show_statusbar',
-                'options_show_toolbar', '', 'options_configure_toolbars', 'options_configure')),
-            (i18n('&Help'), ('help', 'aboutkajongg'))):
+                                 'options_show_toolbar', '', 'options_configure_toolbars', 'options_configure')),
+                (i18n('&Help'), ('help', 'aboutkajongg'))):
             self.menus[menu[0]] = (QMenu(menu[0]), menu[1])
             self.menuBar().addMenu(self.menus[menu[0]][0])
         self.setCaption('')
-        self.actionHelp = self.kajonggAction("help", "help-contents", startHelp)
+        self.actionHelp = self.kajonggAction(
+            "help", "help-contents", startHelp)
         self.actionHelp.setText(i18nc('@action:inmenu', 'Help'))
-        self.actionAboutKajongg = self.kajonggAction('aboutkajongg', 'kajongg', self.aboutKajongg)
-        self.actionAboutKajongg.setText(i18nc('@action:inmenu', 'About Kajongg'))
+        self.actionAboutKajongg = self.kajonggAction(
+            'aboutkajongg', 'kajongg', self.aboutKajongg)
+        self.actionAboutKajongg.setText(
+            i18nc('@action:inmenu', 'About Kajongg'))
         self.toolBar().setMovable(False)
         self.toolBar().setFloatable(False)
         self.toolBar().setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
@@ -581,7 +654,9 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
 
     def hideEvent(self, event):
         """save status"""
-        Internal.Preferences.toolBarVisible = self.toolBar().isVisible() # pylint: disable=attribute-defined-outside-init
+        Internal.Preferences.toolBarVisible = self.toolBar(
+        ).isVisible(
+        )  # pylint: disable=attribute-defined-outside-init
         QMainWindow.hideEvent(self, event)
 
     def toggleStatusBar(self, checked):
@@ -614,7 +689,8 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         """stub"""
         return self._toolBar
 
-    def kajonggAction(self, name, icon, slot=None, shortcut=None, actionData=None):
+    def kajonggAction(
+            self, name, icon, slot=None, shortcut=None, actionData=None):
         """this is defined in MainWindow(KXmlGuiWindow)"""
 
     @staticmethod
@@ -622,11 +698,11 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         """show an about dialog"""
         AboutKajonggDialog(Internal.mainWindow).exec_()
 
-    def queryClose(self): # pylint: disable=no-self-use
+    def queryClose(self):  # pylint: disable=no-self-use
         """default"""
         return True
 
-    def queryExit(self): # pylint: disable=no-self-use
+    def queryExit(self):  # pylint: disable=no-self-use
         """default"""
         return True
 
@@ -637,7 +713,9 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         else:
             event.ignore()
 
+
 class KStandardDirs(object):
+
     """as far as we need it. """
     _localBaseDirs = None
     _baseDirs = None
@@ -652,26 +730,32 @@ class KStandardDirs(object):
                 'data': 'share/apps',
                 'config': 'share/config',
                 'appdata': 'share/apps/kajongg',
-                })
+            })
             home = os.environ.get('KDEHOME', '~/.kde')
             for key, value in KStandardDirs._localBaseDirs.items():
-                KStandardDirs._localBaseDirs[key] = os.path.normpath(os.path.expanduser(home + '/' + value))
+                KStandardDirs._localBaseDirs[key] = os.path.normpath(
+                    os.path.expanduser(home + '/' + value))
             KStandardDirs._baseDirs = defaultdict(list)
             KStandardDirs._baseDirs.update({
                 'data': ['share/kde4/apps'],
-                'locale': ['local/share/locale', 'share/locale-kdelibs4', 'share/locale'],
+                'locale':
+                    ['local/share/locale',
+                     'share/locale-kdelibs4',
+                     'share/locale'],
                 'appdata': ['share/kde4/apps/kajongg'],
                 'icon': ['share/icons'],
-                })
+            })
             if os.name == 'nt':
                 cwd = os.path.split(os.path.abspath(sys.argv[0]))[0]
                 KStandardDirs.prefix = cwd
                 dirMap = KStandardDirs._baseDirs
                 for key in dirMap:
-                    dirMap[key] = list(os.path.normpath(x) for x in dirMap[key])
+                    dirMap[key] = list(os.path.normpath(x)
+                                       for x in dirMap[key])
             else:
-                KStandardDirs.prefix = subprocess.Popen(['which', 'kde4-config'],
-                    stdout=subprocess.PIPE).communicate()[0].split(b'/')[1].decode('utf-8') # TODO: fsencoding
+                KStandardDirs.prefix = subprocess.Popen(
+                    ['which', 'kde4-config'],
+                    stdout=subprocess.PIPE).communicate()[0].split(b'/')[1].decode('utf-8')  # TODO: fsencoding
                 KStandardDirs.prefix = '/%s/' % KStandardDirs.prefix
 
     @classmethod
@@ -714,7 +798,9 @@ class KStandardDirs(object):
         fullPath = os.path.join(cls._localBaseDirs[type_], filename)
         if not os.path.exists(os.path.dirname(fullPath)):
             if Debug.locate:
-                Internal.logger.debug('locateLocal creates missing dir %s', fullPath)
+                Internal.logger.debug(
+                    'locateLocal creates missing dir %s',
+                    fullPath)
             os.makedirs(os.path.dirname(fullPath))
         if Debug.locate:
             Internal.logger.debug('locateLocal(%s, %s) returns %s' % (
@@ -728,7 +814,8 @@ class KStandardDirs(object):
         basetype = str(basetype)
         relativename = str(relativename)
         for baseDir in cls._baseDirs[basetype]:
-            cls._baseDirs[str(type_)].append(os.path.normpath(os.path.join(baseDir, relativename)))
+            cls._baseDirs[str(type_)].append(
+                os.path.normpath(os.path.join(baseDir, relativename)))
 
     @classmethod
     def resourceDirs(cls, type_):
@@ -759,10 +846,13 @@ class KStandardDirs(object):
         dirs = cls.findDirs(type_, '')
         type_ = str(type_)
         filter_ = str(filter_)
-        assert filter_ == '*.desktop' # nothing else we need
+        assert filter_ == '*.desktop'  # nothing else we need
         result = []
         for directory in dirs:
-            result.extend(x for x in os.listdir(directory) if x.endswith('.desktop'))
+            result.extend(
+                x for x in os.listdir(
+                    directory) if x.endswith(
+                        '.desktop'))
         return result
 
     @classmethod
@@ -770,17 +860,23 @@ class KStandardDirs(object):
         """tries to find the directory the file is in"""
         result = cls.findDirs(type_, filename)
         if Debug.locate:
-            Internal.logger.debug('findResourceDir(%s,%s) finds %s' % (type_, filename, result))
+            Internal.logger.debug(
+                'findResourceDir(%s,%s) finds %s' %
+                (type_, filename, result))
         return result
 
+
 class KDETranslator(QTranslator):
+
     """we also want Qt-only strings translated. Make Qt call this
     translator for its own strings"""
+
     def __init__(self, parent):
         QTranslator.__init__(self, parent)
 
     @staticmethod
-    def translate(dummyContext, sourceText, dummyDisambiguation, dummyNumerus=-1):
+    def translate(dummyContext, sourceText,
+                  dummyDisambiguation, dummyNumerus=-1):
         """for now this seems to translate all we need, otherwise
         search for translateQt in kdelibs/kdecore/localization"""
         return i18n(sourceText)
@@ -790,7 +886,9 @@ class KDETranslator(QTranslator):
         """stub"""
         return False
 
+
 class KLocale(object):
+
     """as far as we need it"""
     @staticmethod
     def insertCatalog(dummy):
@@ -803,12 +901,16 @@ class KLocale(object):
             # This needs sip 4.16.4 and Qt 4/5 from Oct 28 2014 or later
             # TODO: check for updated PyQt versions as soon as they are released.
             # Older versions segfault when KDETranslator.translate is called
-            raise Exception('Kajongg needs sip v4.16.4 or higher when running without KDE libraries')
+            raise Exception(
+                'Kajongg needs sip v4.16.4 or higher when running without KDE libraries')
         translator = KDETranslator(app)
         QCoreApplication.installTranslator(translator)
 
+
 class KConfigGroup(object):
+
     """mimic KConfigGroup as far as we need it"""
+
     def __init__(self, config, groupName):
         self.config = weakref.ref(config)
         self.groupName = groupName
@@ -829,7 +931,8 @@ class KConfigGroup(object):
         except NoSectionError:
             return self.__default(name)
         items = dict((x for x in items if x[0].startswith(name)))
-        i18nItems = dict((x for x in items.items() if x[0].startswith(name + '[')))
+        i18nItems = dict(
+            (x for x in items.items() if x[0].startswith(name + '[')))
         if i18nItems:
             for language in KGlobal.config().group('Locale').readEntry('Language').split(':'):
                 key = '%s[%s]' % (name, language)
@@ -837,7 +940,8 @@ class KConfigGroup(object):
                     return QString(i18nItems[key])
         if name in items:
             if self.groupName == 'Locale' and name == 'Language':
-                languages = list(x for x in items[name].split(':') if self.__isLanguageInstalled(x))
+                languages = list(x for x in items[name].split(
+                    ':') if self.__isLanguageInstalled(x))
                 if languages:
                     return QString(':'.join(languages))
                 else:
@@ -868,10 +972,12 @@ class KConfigGroup(object):
                     localenames.extend(localename.split(':'))
                 else:
                     localenames.append(localename)
-        languages = list(_parse_localename(x)[0] for x in localenames if len(x))
+        languages = list(_parse_localename(x)[0]
+                         for x in localenames if len(x))
         if languages:
             languages = uniqueList(cls.__extendRegionLanguages(languages))
-            languages = list(x for x in languages if cls.__isLanguageInstalled(x))
+            languages = list(
+                x for x in languages if cls.__isLanguageInstalled(x))
         if 'en_US' not in languages:
             languages.extend(['en_US', 'en'])
         return ':'.join(languages)
@@ -887,7 +993,9 @@ class KConfigGroup(object):
         relpath = '{lang}/LC_MESSAGES/kajongg.mo'.format(lang=lang)
         return bool(KGlobal.dirs().findResourceDir("locale", relpath))
 
+
 class KGlobal(object):
+
     """stub"""
 
     @classmethod
@@ -896,7 +1004,10 @@ class KGlobal(object):
         cls.dirInstance = KStandardDirs()
         cls.localeInstance = KLocale()
         cls.configInstance = KConfig()
-        languages = str(cls.configInstance.group('Locale').readEntry('Language'))
+        languages = str(
+            cls.configInstance.group(
+                'Locale').readEntry(
+                    'Language'))
         if languages:
             languages = languages.split(':')
         else:
@@ -930,7 +1041,9 @@ class KGlobal(object):
         """stub"""
         return cls.configInstance
 
+
 class KConfig(SafeConfigParser):
+
     """Parse KDE config files.
     This mimics KDE KConfig but can also be used like any SafeConfigParser but
     without support for a default section.
@@ -989,9 +1102,12 @@ class KConfig(SafeConfigParser):
         """just like KConfig"""
         return KConfigGroup(self, groupName)
 
+
 class KIcon(QIcon):
+
     """stub"""
     initDone = False
+
     def __init__(self, name=None):
         if name is None:
             QIcon.__init__(self)
@@ -1001,8 +1117,13 @@ class KIcon(QIcon):
             extension = 'png'
             if name in ('games-kajongg-law', 'kajongg'):
                 # windows 2000 does not support svg/svgz
-                extension = 'svgz' if 'svgz' in QImageReader.supportedImageFormats() else 'ico'
-            name = os.path.normpath('{}/share/icons/{}.{}'.format(KStandardDirs.prefix, name, extension))
+                extension = 'svgz' if 'svgz' in QImageReader.supportedImageFormats(
+                ) else 'ico'
+            name = os.path.normpath(
+                '{}/share/icons/{}.{}'.format(
+                    KStandardDirs.prefix,
+                    name,
+                    extension))
             if not os.path.exists(name):
                 Internal.logger.debug('not found:%s' % name)
                 raise UserWarning('not found:%s' % name)
@@ -1016,7 +1137,10 @@ class KIcon(QIcon):
             dirs.addResourceType('appicon', 'icon', 'oxygen/48x48/categories/')
             dirs.addResourceType('appicon', 'icon', 'oxygen/48x48/status/')
             dirs.addResourceType('appicon', 'icon', 'hicolor/scalable/apps/')
-            dirs.addResourceType('appicon', 'icon', 'hicolor/scalable/actions/')
+            dirs.addResourceType(
+                'appicon',
+                'icon',
+                'hicolor/scalable/actions/')
         for suffix in ('png', 'svgz', 'svg', 'xpm'):
             result = dirs.locate('appicon', '.'.join([name, suffix]))
             if result:
@@ -1024,8 +1148,11 @@ class KIcon(QIcon):
                 break
         QIcon.__init__(self, name)
 
+
 class KAction(QAction):
+
     """stub"""
+
     def __init__(self, *args, **kwargs):
         QAction.__init__(self, *args, **kwargs)
         self.__helpText = None
@@ -1034,8 +1161,11 @@ class KAction(QAction):
         """stub"""
         self.__helpText = text
 
+
 class KConfigSkeletonItem(object):
+
     """one preferences setting used by KOnfigSkeleton"""
+
     def __init__(self, skeleton, key, value, default=None):
         assert skeleton
         self.skeleton = skeleton
@@ -1067,8 +1197,11 @@ class KConfigSkeletonItem(object):
         except (NoSectionError, NoOptionError):
             self._value = self.default
 
+
 class ItemBool(KConfigSkeletonItem):
+
     """boolean preferences setting used by KOnfigSkeleton"""
+
     def __init__(self, skeleton, key, value, default=None):
         KConfigSkeletonItem.__init__(self, skeleton, key, value, default)
 
@@ -1079,8 +1212,11 @@ class ItemBool(KConfigSkeletonItem):
         except (NoSectionError, NoOptionError):
             self._value = self.default
 
+
 class ItemString(KConfigSkeletonItem):
+
     """string preferences setting used by KOnfigSkeleton"""
+
     def __init__(self, skeleton, key, value, default=None):
         if value == '':
             value = default
@@ -1089,8 +1225,11 @@ class ItemString(KConfigSkeletonItem):
     def pythonValue(self):
         return str(self._value)
 
+
 class ItemInt(KConfigSkeletonItem):
+
     """integer preferences setting used by KOnfigSkeleton"""
+
     def __init__(self, skeleton, key, value, default=0):
         KConfigSkeletonItem.__init__(self, skeleton, key, value, default)
         self.minValue = -99999
@@ -1111,16 +1250,22 @@ class ItemInt(KConfigSkeletonItem):
         """maximum value for this setting"""
         self.maxValue = value
 
+
 class KConfigSkeleton(QObject):
+
     """handles preferences settings"""
     configChanged = pyqtSignal()
+
     def __init__(self):
         QObject.__init__(self)
         self.currentGroup = None
         self.items = []
         self.config = KConfig()
         self.addBool('MainWindow', 'toolBarVisible', True)
-        self.addString('MainWindow', 'toolBarActions', 'quit,play,scoreTable,explain,players,options_configure')
+        self.addString(
+            'MainWindow',
+            'toolBarActions',
+            'quit,play,scoreTable,explain,players,options_configure')
 
     def addBool(self, group, name, default=None):
         """to be overridden"""
@@ -1171,8 +1316,11 @@ class KConfigSkeleton(QObject):
         self.items.append(result)
         return result
 
+
 class AboutKajonggDialog(KDialog):
+
     """about kajongg dialog"""
+
     def __init__(self, parent):
         # pylint: disable=too-many-locals, too-many-statements
         KDialog.__init__(self, parent)
@@ -1187,7 +1335,7 @@ class AboutKajonggDialog(KDialog):
         underVersions = []
         try:
             versions = subprocess.Popen(['kde4-config', '-v'],
-                stdout=subprocess.PIPE).communicate()[0]
+                                        stdout=subprocess.PIPE).communicate()[0]
             versions = versions.decode().split('\n')
             versions = (x.strip() for x in versions if ': ' in x.strip())
             versions = dict(x.split(': ') for x in versions)
@@ -1196,11 +1344,22 @@ class AboutKajonggDialog(KDialog):
             underVersions.append(i18n('KDE (not installed)'))
         underVersions.append('Qt %s' % QT_VERSION_STR)
         underVersions.append('PyQt %s' % PYQT_VERSION_STR)
-        underVersions.append('Python {}.{}.{} {}'.format(*sys.version_info[:5]))
-        h1vLayout.addWidget(QLabel(i18nc('running under version', 'Under %s' % ', '.join(underVersions))))
+        underVersions.append(
+            'Python {}.{}.{} {}'.format(*sys.version_info[:5]))
+        h1vLayout.addWidget(
+            QLabel(
+                i18nc(
+                    'running under version',
+                    'Under %s' %
+                    ', '.join(
+                        underVersions))))
         h1vLayout.addWidget(QLabel(i18n('Not using Python KDE bindings')))
         hLayout1.addLayout(h1vLayout)
-        spacerItem = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
+        spacerItem = QSpacerItem(
+            20,
+            20,
+            QSizePolicy.Expanding,
+            QSizePolicy.Expanding)
         hLayout1.addItem(spacerItem)
         vLayout.addLayout(hLayout1)
         tabWidget = QTabWidget()
@@ -1212,13 +1371,14 @@ class AboutKajonggDialog(KDialog):
         aboutLabel = QLabel()
         aboutLabel.setWordWrap(True)
         aboutLabel.setOpenExternalLinks(True)
-        aboutLabel.setText('<br /><br />'.join([data.description, data.aboutText,
-            data.kajCopyright,
-            '<a href="{link}">{link}</a>'.format(link=data.homePage)]))
+        aboutLabel.setText(
+            '<br /><br />'.join([data.description, data.aboutText,
+                                 data.kajCopyright,
+                                 '<a href="{link}">{link}</a>'.format(link=data.homePage)]))
         licenseLabel = QLabel()
         licenseLabel.setText(
             '<a href="file://{link}">GNU General Public License Version 2</a>'.format(
-            link=data.licenseFile()))
+                link=data.licenseFile()))
         licenseLabel.linkActivated.connect(self.showLicense)
         aboutLayout.addWidget(aboutLabel)
         aboutLayout.addWidget(licenseLabel)
@@ -1227,7 +1387,8 @@ class AboutKajonggDialog(KDialog):
 
         authorWidget = QWidget()
         authorLayout = QVBoxLayout()
-        bugsLabel = QLabel(i18n('Please use <a href="http://bugs.kde.org">http://bugs.kde.org</a> to report bugs.'))
+        bugsLabel = QLabel(
+            i18n('Please use <a href="http://bugs.kde.org">http://bugs.kde.org</a> to report bugs.'))
         bugsLabel.setContentsMargins(0, 2, 0, 4)
         bugsLabel.setOpenExternalLinks(True)
         authorLayout.addWidget(bugsLabel)
@@ -1240,7 +1401,11 @@ class AboutKajonggDialog(KDialog):
                 name=name, mail=mail, description=description))
             label.setOpenExternalLinks(True)
             authorLayout.addWidget(label)
-        spacerItem = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Expanding)
+        spacerItem = QSpacerItem(
+            20,
+            20,
+            QSizePolicy.Expanding,
+            QSizePolicy.Expanding)
         authorLayout.addItem(spacerItem)
         authorWidget.setLayout(authorLayout)
         tabWidget.addTab(authorWidget, 'A&uthor')
@@ -1255,8 +1420,11 @@ class AboutKajonggDialog(KDialog):
         """as the name says"""
         LicenseDialog(Internal.mainWindow).exec_()
 
+
 class LicenseDialog(KDialog):
+
     """see kaboutapplicationdialog.cpp"""
+
     def __init__(self, parent):
         KDialog.__init__(self, parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -1278,20 +1446,23 @@ class LicenseDialog(KDialog):
         document is visible without horizontal scroll-bars being required"""
         idealWidth = self.licenseBrowser.document().idealWidth() + (2 * self.marginHint()) \
             + self.licenseBrowser.verticalScrollBar().width() * 2 + 1
-        # try to allow enough height for a reasonable number of lines to be shown
+        # try to allow enough height for a reasonable number of lines to be
+        # shown
         metrics = QFontMetrics(self.licenseBrowser.font())
         idealHeight = metrics.height() * 30
         return KDialog.sizeHint(self).expandedTo(QSize(idealWidth, idealHeight))
 
+
 class KConfigDialog(KDialog):
+
     """for the game preferences"""
     dialog = None
     getFunc = {
-            'QCheckBox': 'isChecked',
+        'QCheckBox': 'isChecked',
             'QSlider': 'value',
             'QLineEdit': 'text'}
     setFunc = {
-            'QCheckBox': 'setChecked',
+        'QCheckBox': 'setChecked',
             'QSlider': 'setValue',
             'QLineEdit': 'setText'}
 
@@ -1309,8 +1480,11 @@ class KConfigDialog(KDialog):
         self.iconList.itemClicked.connect(self.iconClicked)
         self.iconList.currentItemChanged.connect(self.iconClicked)
         self.tabSpace = QStackedWidget()
-        self.setButtons(KDialog.Help | KDialog.Ok | KDialog.Apply | KDialog.Cancel | KDialog.RestoreDefaults)
-        self.buttonBox.button(KDialog.Apply).clicked.connect(self.applySettings)
+        self.setButtons(KDialog.Help | KDialog.Ok |
+                        KDialog.Apply | KDialog.Cancel | KDialog.RestoreDefaults)
+        self.buttonBox.button(
+            KDialog.Apply).clicked.connect(
+                self.applySettings)
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(self.buttonBox)
         self.contentLayout = QHBoxLayout()
@@ -1339,7 +1513,8 @@ class KConfigDialog(KDialog):
 
     def iconClicked(self, item):
         """show the wanted config tab"""
-        self.setCurrentPage(self.pages[self.iconList.indexFromItem(item).row()])
+        self.setCurrentPage(
+            self.pages[self.iconList.indexFromItem(item).row()])
 
     @classmethod
     def allChildren(cls, widget):
@@ -1364,13 +1539,15 @@ class KConfigDialog(KDialog):
         self.iconList.addItem(item)
         self.tabSpace.addWidget(configTab)
         icons = list(self.iconList.item(x) for x in range(len(self.iconList)))
-        neededIconWidth = max(self.iconList.visualItemRect(x).width() for x in icons)
+        neededIconWidth = max(self.iconList.visualItemRect(x).width()
+                              for x in icons)
         margins = self.iconList.contentsMargins()
         neededIconWidth += margins.left() + margins.right()
         self.iconList.setMaximumWidth(neededIconWidth)
         self.iconList.setMinimumWidth(neededIconWidth)
         for child in self.allChildren(self):
-            self.configWidgets[str(child.objectName()).replace('kcfg_', '')] = child
+            self.configWidgets[
+                str(child.objectName()).replace('kcfg_', '')] = child
             if isinstance(child, QCheckBox):
                 child.stateChanged.connect(self.updateButtons)
             elif isinstance(child, QSlider):
@@ -1397,7 +1574,9 @@ class KConfigDialog(KDialog):
         changed = False
         for name, widget in self.configWidgets.items():
             oldValue = self.preferences[name]
-            newValue = getattr(widget, self.getFunc[widget.__class__.__name__])()
+            newValue = getattr(
+                widget,
+                self.getFunc[widget.__class__.__name__])()
             if oldValue != newValue:
                 changed = True
                 break
@@ -1407,23 +1586,30 @@ class KConfigDialog(KDialog):
     def updateSettings(self):
         """Update the settings from the dialog"""
         for name, widget in self.configWidgets.items():
-            self.preferences[name] = getattr(widget, self.getFunc[widget.__class__.__name__])()
+            self.preferences[name] = getattr(
+                widget,
+                self.getFunc[widget.__class__.__name__])()
         self.preferences.writeConfig()
 
     def updateWidgets(self):
         """Update the dialog based on the settings"""
         self.preferences.readConfig()
         for name, widget in self.configWidgets.items():
-            getattr(widget, self.setFunc[widget.__class__.__name__])(getattr(self.preferences, name))
+            getattr(widget, self.setFunc[widget.__class__.__name__])(
+                getattr(self.preferences, name))
 
     def setCurrentPage(self, page):
         """show wanted page and select its icon"""
         self.tabSpace.setCurrentWidget(page)
         for idx in range(self.tabSpace.count()):
-            self.iconList.item(idx).setSelected(idx == self.tabSpace.currentIndex())
+            self.iconList.item(idx).setSelected(
+                idx == self.tabSpace.currentIndex())
+
 
 class KSeparator(QFrame):
+
     """used for toolbar editor"""
+
     def __init__(self, parent=None):
         QFrame.__init__(self, parent)
         self.setLineWidth(1)
@@ -1432,15 +1618,19 @@ class KSeparator(QFrame):
         self.setFrameShadow(QFrame.Sunken)
         self.setMinimumSize(0, 2)
 
+
 class ToolBarItem(QListWidgetItem):
+
     """a toolbar item"""
     emptyIcon = None
+
     def __init__(self, action, parent):
         self.action = action
         self.parent = parent
         QListWidgetItem.__init__(self, self.icon, self.text, parent)
         # drop between items, not onto items
-        self.setFlags((self.flags() | Qt.ItemIsDragEnabled) & ~Qt.ItemIsDropEnabled)
+        self.setFlags(
+            (self.flags() | Qt.ItemIsDragEnabled) & ~Qt.ItemIsDropEnabled)
 
     @property
     def icon(self):
@@ -1448,7 +1638,8 @@ class ToolBarItem(QListWidgetItem):
         result = self.action.icon()
         if result.isNull():
             if not self.emptyIcon:
-                iconSize = self.parent.style().pixelMetric(QStyle.PM_SmallIconSize)
+                iconSize = self.parent.style().pixelMetric(
+                    QStyle.PM_SmallIconSize)
                 self.emptyIcon = QPixmap(iconSize, iconSize)
                 self.emptyIcon.fill(Qt.transparent)
                 self.emptyIcon = QIcon(self.emptyIcon)
@@ -1460,14 +1651,20 @@ class ToolBarItem(QListWidgetItem):
         """the action text"""
         return self.action.text().replace('&', '')
 
+
 class ToolBarList(QListWidget):
+
     """QListWidget without internal moves"""
+
     def __init__(self, parent):
         QListWidget.__init__(self, parent)
-        self.setDragDropMode(QAbstractItemView.DragDrop) # no internal moves
+        self.setDragDropMode(QAbstractItemView.DragDrop)  # no internal moves
+
 
 class KEditToolBar(KDialog):
+
     """stub"""
+
     def __init__(self, parent=None):
         # pylint: disable=too-many-statements
         KDialog.__init__(self, parent)
@@ -1479,7 +1676,8 @@ class KEditToolBar(KDialog):
         self.inactiveList.setMinimumSize(180, 250)
         self.inactiveList.setDropIndicatorShown(False)
         self.inactiveLabel.setBuddy(self.inactiveList)
-        self.inactiveList.itemSelectionChanged.connect(self.inactiveSelectionChanged)
+        self.inactiveList.itemSelectionChanged.connect(
+            self.inactiveSelectionChanged)
         self.inactiveList.itemDoubleClicked.connect(self.insertButton)
         self.inactiveList.setSortingEnabled(True)
 
@@ -1487,7 +1685,8 @@ class KEditToolBar(KDialog):
         self.activeList = ToolBarList(self)
         self.activeList.setDragEnabled(True)
         self.activeLabel.setBuddy(self.activeList)
-        self.activeList.itemSelectionChanged.connect(self.activeSelectionChanged)
+        self.activeList.itemSelectionChanged.connect(
+            self.activeSelectionChanged)
         self.activeList.itemDoubleClicked.connect(self.removeButton)
 
         self.upAction = QToolButton(self)
@@ -1496,11 +1695,13 @@ class KEditToolBar(KDialog):
         self.upAction.setAutoRepeat(True)
         self.upAction.clicked.connect(self.upButton)
         self.insertAction = QToolButton(self)
-        self.insertAction.setIcon(KIcon('go-next' if QApplication.isRightToLeft else 'go-previous'))
+        self.insertAction.setIcon(
+            KIcon('go-next' if QApplication.isRightToLeft else 'go-previous'))
         self.insertAction.setEnabled(False)
         self.insertAction.clicked.connect(self.insertButton)
         self.removeAction = QToolButton(self)
-        self.removeAction.setIcon(KIcon('go-previous' if QApplication.isRightToLeft else 'go-next'))
+        self.removeAction.setIcon(
+            KIcon('go-previous' if QApplication.isRightToLeft else 'go-next'))
         self.removeAction.setEnabled(False)
         self.removeAction.clicked.connect(self.removeButton)
         self.downAction = QToolButton(self)
@@ -1623,10 +1824,17 @@ class KEditToolBar(KDialog):
 
     def saveActions(self):
         """write active actions into Preferences"""
-        activeActions = (self.activeList.item(x).action for x in range(len(self.activeList)))
-        names = {v:k for k, v in Internal.mainWindow.actionCollection().actions().items()}
+        activeActions = (self.activeList.item(
+            x).action for x in range(len(self.activeList)))
+        names = {
+            v: k for k,
+            v in Internal.mainWindow.actionCollection(
+            ).actions(
+            ).items(
+            )}
         activeNames = list(names[x] for x in activeActions)
-        Internal.Preferences.toolBarActions = ','.join(activeNames) # pylint: disable=attribute-defined-outside-init
+        Internal.Preferences.toolBarActions = ','.join(
+            activeNames)  # pylint: disable=attribute-defined-outside-init
         Internal.mainWindow.refreshToolBar()
 
 KGlobal.initStatic()

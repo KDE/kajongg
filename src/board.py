@@ -41,6 +41,7 @@ ROUNDWINDCOLOR = QColor(235, 235, 173)
 
 WINDPIXMAPS = {}
 
+
 def rotateCenter(item, angle):
     """rotates a QGraphicsItem around its center"""
     center = item.boundingRect().center()
@@ -49,12 +50,15 @@ def rotateCenter(item, angle):
         centerX, centerY).rotate(angle).translate(-centerX, -centerY))
     return item
 
+
 class PlayerWind(QGraphicsEllipseItem):
+
     """a round wind tile"""
+
     def __init__(self, name, tileset, roundsFinished=0, parent=None):
         """generate new wind tile"""
         if not len(WINDPIXMAPS):
-            WINDPIXMAPS[('E', False)] = None # avoid recursion
+            WINDPIXMAPS[('E', False)] = None  # avoid recursion
             self.genWINDPIXMAPS()
         QGraphicsEllipseItem.__init__(self)
         if parent:
@@ -94,8 +98,8 @@ class PlayerWind(QGraphicsEllipseItem):
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
         diameter = size.height() * 1.1
         scaleFactor = 0.9
-        facePos = {'traditional':(10, 10), 'default':(15, 10),
-                   'classic':(19, 1), 'jade':(19, 1)}
+        facePos = {'traditional': (10, 10), 'default': (15, 10),
+                   'classic': (19, 1), 'jade': (19, 1)}
         self.setRect(0, 0, diameter, diameter)
         self.setScale(scaleFactor)
         faceX, faceY = facePos[self.tileset.desktopFileName]
@@ -110,10 +114,12 @@ class PlayerWind(QGraphicsEllipseItem):
         else:
             self.prevailing = name == WINDS[roundsFinished % 4]
         self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
-        windtilenr = {'N':1, 'S':2, 'E':3, 'W':4}
+        windtilenr = {'N': 1, 'S': 2, 'E': 3, 'W': 4}
         self.face.setElementId('WIND_%d' % windtilenr[name])
 
+
 class WindLabel(QLabel):
+
     """QLabel holding the wind tile"""
 
     @property
@@ -152,15 +158,18 @@ class WindLabel(QLabel):
         """update pixmaps"""
         PlayerWind.genWINDPIXMAPS()
         self.setPixmap(WINDPIXMAPS[(self.__wind,
-            self.__wind == WINDS[min(self.__roundsFinished, 3)])])
+                                    self.__wind == WINDS[min(self.__roundsFinished, 3)])])
+
 
 class Board(QGraphicsRectItem):
+
     """ a board with any number of positioned tiles"""
     # pylint: disable=too-many-instance-attributes
 
     penColor = 'black'
 
     arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
+
     def __init__(self, width, height, tileset, boardRotation=0):
         QGraphicsRectItem.__init__(self)
         self.uiTiles = []
@@ -183,7 +192,7 @@ class Board(QGraphicsRectItem):
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @property
-    def name(self): # pylint: disable=no-self-use
+    def name(self):  # pylint: disable=no-self-use
         """default board name, used for debugging messages"""
         return 'board'
 
@@ -209,7 +218,8 @@ class Board(QGraphicsRectItem):
         if focusCandidates:
             firstCandidate = focusCandidates[0]
             if self._focusTile not in focusCandidates:
-                focusCandidates = list(x for x in focusCandidates if x.sortKey() >= self.__prevPos)
+                focusCandidates = list(
+                    x for x in focusCandidates if x.sortKey() >= self.__prevPos)
                 focusCandidates.append(firstCandidate)
                 self.focusTile = focusCandidates[0]
 
@@ -270,7 +280,8 @@ class Board(QGraphicsRectItem):
             if isAlive(scene):
                 if scene.focusBoard == self or value:
                     if self.focusTile:
-                        assert self.focusTile.board == self, '%s not in self %s' % (self.focusTile, self)
+                        assert self.focusTile.board == self, '%s not in self %s' % (
+                            self.focusTile, self)
                 if value:
                     scene.focusBoard = self
 
@@ -280,7 +291,9 @@ class Board(QGraphicsRectItem):
         key = event.key()
         if key in Board.arrows:
             return key
-        charArrows = m18nc('kajongg:arrow keys hjkl like in konqueror', 'hjklHJKL')
+        charArrows = m18nc(
+            'kajongg:arrow keys hjkl like in konqueror',
+            'hjklHJKL')
         key = unicode(event.text())
         if key and key in charArrows:
             key = Board.arrows[charArrows.index(key) % 4]
@@ -302,22 +315,24 @@ class Board(QGraphicsRectItem):
             # has no focusable tiles. Like after declaring
             # Original Call.
             oldPos = self.focusTile.xoffset, self.focusTile.yoffset
-            tiles = list(x for x in tiles if (x.xoffset, x.yoffset) != oldPos or x == self.focusTile)
+            tiles = list(
+                x for x in tiles if (x.xoffset,
+                                     x.yoffset) != oldPos or x == self.focusTile)
             assert tiles, [str(x) for x in self.uiTiles]
             tiles.append(tiles[0])
-            self.focusTile = tiles[tiles.index(self.focusTile)+1]
+            self.focusTile = tiles[tiles.index(self.focusTile) + 1]
 
-    def mapMouseTile(self, uiTile): # pylint: disable=no-self-use
+    def mapMouseTile(self, uiTile):  # pylint: disable=no-self-use
         """map the pressed tile to the wanted tile. For melds, this would
         be the first tile no matter which one is pressed"""
         return uiTile
 
-    def uiMeldWithTile(self, uiTile): # pylint: disable=no-self-use
+    def uiMeldWithTile(self, uiTile):  # pylint: disable=no-self-use
         """returns the UI Meld with uiTile. A Board does not know about melds,
         so default is to return a Meld with only uiTile"""
         return Meld(uiTile)
 
-    def meldVariants(self, uiTile, lowerHalf): # pylint: disable=no-self-use,unused-argument
+    def meldVariants(self, uiTile, lowerHalf):  # pylint: disable=no-self-use,unused-argument
         """all possible melds that could be meant by dragging/dropping uiTile"""
         return [Meld(uiTile)]
 
@@ -336,7 +351,8 @@ class Board(QGraphicsRectItem):
             else:
                 menuPoint = uiTile.board.tileFaceRect().bottomRight()
                 view = Internal.scene.mainWindow.centralView
-                menuPoint = view.mapToGlobal(view.mapFromScene(uiTile.mapToScene(menuPoint)))
+                menuPoint = view.mapToGlobal(
+                    view.mapFromScene(uiTile.mapToScene(menuPoint)))
             action = menu.exec_(menuPoint)
             if not action:
                 return None
@@ -371,7 +387,7 @@ class Board(QGraphicsRectItem):
     def rotatedLightSource(self):
         """the light source we need for the original uiTile before it is rotated"""
         lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
-        lightSourceIndex = (lightSourceIndex+self.sceneRotation() // 90)%4
+        lightSourceIndex = (lightSourceIndex + self.sceneRotation() // 90) % 4
         return LIGHTSOURCES[lightSourceIndex]
 
     def tileFacePos(self):
@@ -390,8 +406,13 @@ class Board(QGraphicsRectItem):
     def sceneRotation(self):
         """the combined rotation of self and all parents"""
         matrix = self.sceneTransform()
-        matrix = (int(matrix.m11()), int(matrix.m12()), int(matrix.m21()), int(matrix.m22()))
-        rotations = {(0, 0, 0, 0):0, (1, 0, 0, 1):0, (0, 1, -1, 0):90, (-1, 0, 0, -1):180, (0, -1, 1, 0):270}
+        matrix = (
+            int(matrix.m11()),
+            int(matrix.m12()),
+            int(matrix.m21()),
+            int(matrix.m22()))
+        rotations = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
+            0, 1, -1, 0): 90, (-1, 0, 0, -1): 180, (0, -1, 1, 0): 270}
         if matrix not in rotations:
             raise Exception('matrix unknown:%s' % str(matrix))
         return rotations[matrix]
@@ -416,7 +437,8 @@ class Board(QGraphicsRectItem):
         sizeX = self.tileset.faceSize.width() * self.__fixedWidth
         sizeY = self.tileset.faceSize.height() * self.__fixedHeight
         if Internal.Preferences.showShadows:
-            sizeX += self.tileset.shadowWidth() + 2 * self.tileset.shadowHeight()
+            sizeX += self.tileset.shadowWidth() + \
+                2 * self.tileset.shadowHeight()
             sizeY += self.tileset.shadowHeight()
         rect = self.rect()
         rect.setWidth(sizeX)
@@ -445,12 +467,14 @@ class Board(QGraphicsRectItem):
         elif self.isHandBoard:
             offsets = (-self.tileset.shadowHeight() * 2, 0)
         else:
-            offsets = self.tileset.shadowOffsets(self._lightSource, self.sceneRotation())
-        newX = self.__xWidth*width+self.__xHeight*height + offsets[0]
-        newY = self.__yWidth*width+self.__yHeight*height + offsets[1]
+            offsets = self.tileset.shadowOffsets(
+                self._lightSource,
+                self.sceneRotation())
+        newX = self.__xWidth * width + self.__xHeight * height + offsets[0]
+        newY = self.__yWidth * width + self.__yHeight * height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
 
-    def showShadowsChanged(self, oldValue,newValue):
+    def showShadowsChanged(self, oldValue, newValue):
         """set active lightSource"""
         for uiTile in self.uiTiles:
             uiTile.setClippingFlags()
@@ -466,7 +490,10 @@ class Board(QGraphicsRectItem):
         """set active lightSource"""
         if self._lightSource != lightSource:
             if lightSource not in LIGHTSOURCES:
-                logException(TileException('lightSource %s illegal' % lightSource))
+                logException(
+                    TileException(
+                        'lightSource %s illegal' %
+                        lightSource))
             self._reload(self.tileset, lightSource)
 
     @property
@@ -504,7 +531,7 @@ class Board(QGraphicsRectItem):
             if self.hasFocus:
                 self.scene().focusBoard = self
 
-    def focusRectWidth(self): # pylint: disable=no-self-use
+    def focusRectWidth(self):  # pylint: disable=no-self-use
         """how many tiles are in focus rect?"""
         return 1
 
@@ -519,8 +546,8 @@ class Board(QGraphicsRectItem):
         shiftY = 0
         if level != 0:
             lightSource = self.rotatedLightSource()
-            stepX = level*self.tileset.shadowWidth()/2
-            stepY = level*self.tileset.shadowHeight()/2
+            stepX = level * self.tileset.shadowWidth() / 2
+            stepY = level * self.tileset.shadowHeight() / 2
             if 'E' in lightSource:
                 shiftX = stepX
             if 'W' in lightSource:
@@ -548,7 +575,9 @@ class Board(QGraphicsRectItem):
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
         shiftZ = self.shiftZ(uiTile.level)
-        boardPos = QPointF(uiTile.xoffset*width, uiTile.yoffset*height) + shiftZ
+        boardPos = QPointF(
+            uiTile.xoffset * width,
+            uiTile.yoffset * height) + shiftZ
         scenePos = self.mapToScene(boardPos)
         uiTile.setDrawingOrder()
         return {'pos': scenePos, 'rotation': self.sceneRotation(), 'scale': self.scale()}
@@ -583,9 +612,12 @@ class Board(QGraphicsRectItem):
         if self.currentFocusTile == uiTile:
             self.focusTile = None
 
+
 class CourtBoard(Board):
+
     """A Board that is displayed within the wall"""
     penColor = 'green'
+
     def __init__(self, width, height):
         Board.__init__(self, width, height, Tileset.activeTileset())
         self.setAcceptDrops(True)
@@ -617,9 +649,12 @@ class CourtBoard(Board):
         for uiTile in self.uiTiles:
             uiTile.board.placeTile(uiTile)
 
+
 class SelectorBoard(CourtBoard):
+
     """a board containing all possible tiles for selection"""
     # pylint: disable=too-many-public-methods
+
     def __init__(self):
         CourtBoard.__init__(self, 9, 5)
         self.lastReceived = None
@@ -634,7 +669,8 @@ class SelectorBoard(CourtBoard):
         for uiTile in self.uiTiles:
             uiTile.setBoard(None)
         self.uiTiles = []
-        self.allSelectorTiles = list(UITile(x) for x in elements.all(game.ruleset))
+        self.allSelectorTiles = list(UITile(x)
+                                     for x in elements.all(game.ruleset))
         self.refill()
 
     def refill(self):
@@ -648,7 +684,7 @@ class SelectorBoard(CourtBoard):
             self.focusTile = self.tilesByElement(Tile('c1'))[0]
 
     @property
-    def name(self): # pylint: disable=no-self-use
+    def name(self):  # pylint: disable=no-self-use
         """for debugging messages"""
         return 'selector'
 
@@ -663,7 +699,7 @@ class SelectorBoard(CourtBoard):
         self.dropTile(uiTile)
         event.accept()
 
-    def dropTile(self, uiTile, lowerHalf=False): # pylint: disable=unused-argument
+    def dropTile(self, uiTile, lowerHalf=False):  # pylint: disable=unused-argument
         """drop uiTile into selector board"""
         senderHand = uiTile.board
         if senderHand == self:
@@ -683,7 +719,9 @@ class SelectorBoard(CourtBoard):
         assert isinstance(uiTile, UITile), uiTile
         result = UIMeld(uiTile)
         for tile in meld[1:]:
-            baseTiles = list(x for x in self.tilesByElement(tile.exposed) if x not in result)
+            baseTiles = list(
+                x for x in self.tilesByElement(
+                    tile.exposed) if x not in result)
             result.append(baseTiles[0])
         return result
 
@@ -693,7 +731,9 @@ class SelectorBoard(CourtBoard):
     def __placeAvailable(self, uiTile):
         """place the uiTile in the selector at its place"""
         # define coordinates and order for tiles:
-        offsets = {Tile.dragon: (3, 6, Tile.dragons), Tile.flower: (4, 5, Tile.winds), Tile.season: (4, 0, Tile.winds),
+        offsets = {Tile.dragon: (
+            3, 6, Tile.dragons), Tile.flower: (
+                4, 5, Tile.winds), Tile.season: (4, 0, Tile.winds),
             Tile.wind: (3, 0, Tile.winds), Tile.bamboo: (1, 0, Tile.numbers), Tile.stone: (2, 0, Tile.numbers),
             Tile.character: (0, 0, Tile.numbers)}
         row, baseColumn, order = offsets[uiTile.tile.lowerGroup]
@@ -736,15 +776,21 @@ class SelectorBoard(CourtBoard):
         # result now holds a list of melds
         return result
 
+
 class MimeData(QMimeData):
+
     """we also want to pass a reference to the moved meld"""
+
     def __init__(self, uiTile):
         QMimeData.__init__(self)
         self.uiTile = uiTile
         self.setText(str(uiTile))
 
+
 class FittingView(QGraphicsView):
+
     """a graphics view that always makes sure the whole scene is visible"""
+
     def __init__(self, parent=None):
         """generate a fitting view with our favourite properties"""
         QGraphicsView.__init__(self, parent)
@@ -772,10 +818,13 @@ class FittingView(QGraphicsView):
 
     def resizeEvent(self, dummyEvent):
         """scale the scene and its background for new view size"""
-        Internal.Preferences.callTrigger('tilesetName') # this redraws and resizes
-        Internal.Preferences.callTrigger('backgroundName') # redraw background
+        Internal.Preferences.callTrigger(
+            'tilesetName')  # this redraws and resizes
+        Internal.Preferences.callTrigger('backgroundName')  # redraw background
         if Internal.scaleScene and self.scene():
-            self.fitInView(self.scene().itemsBoundingRect(), Qt.KeepAspectRatio)
+            self.fitInView(
+                self.scene().itemsBoundingRect(),
+                Qt.KeepAspectRatio)
         self.setFocus()
 
     def __matchingTile(self, position, uiTile):
@@ -806,7 +855,9 @@ class FittingView(QGraphicsView):
         if tiles:
             if event.modifiers() & Qt.ShiftModifier:
                 for uiTile in tiles:
-                    kprint('%s: board.level:%s' % (str(uiTile), uiTile.board.level))
+                    kprint(
+                        '%s: board.level:%s' %
+                        (str(uiTile), uiTile.board.level))
             board = tiles[0].board
             uiTile = board.mapMouseTile(tiles[0])
             if uiTile.focusable:
@@ -847,14 +898,19 @@ class FittingView(QGraphicsView):
         drag.setMimeData(mimeData)
         tRect = uiTile.boundingRect()
         tRect = self.viewportTransform().mapRect(tRect)
-        pmapSize = QSize(tRect.width() * uiTile.scale, tRect.height() * uiTile.scale)
+        pmapSize = QSize(
+            tRect.width() * uiTile.scale,
+            tRect.height() * uiTile.scale)
         pMap = uiTile.pixmapFromSvg(pmapSize)
         drag.setPixmap(pMap)
-        drag.setHotSpot(QPoint(pMap.width()/2, pMap.height()/2))
+        drag.setHotSpot(QPoint(pMap.width() / 2, pMap.height() / 2))
         return drag
 
+
 class YellowText(QGraphicsRectItem):
+
     """a yellow rect with a message, used for claims"""
+
     def __init__(self, side):
         QGraphicsRectItem.__init__(self, side)
         self.side = side
@@ -876,29 +932,33 @@ class YellowText(QGraphicsRectItem):
         self.setPos(self.side.center())
         rotation = self.side.rotation()
         rotateCenter(self, -rotation)
-        xOffset = -self.rect().width()/2
-        yOffset = -self.rect().height()/2
+        xOffset = -self.rect().width() / 2
+        yOffset = -self.rect().height() / 2
         if rotation % 180 == 0:
             self.moveBy(xOffset, yOffset * 4)
         else:
             self.moveBy(xOffset, yOffset)
+
     def paint(self, painter, dummyOption, dummyWidget):
         """override predefined paint"""
         painter.setFont(self.font)
         painter.fillRect(self.rect(), QBrush(QColor('yellow')))
         painter.drawText(self.rect(), self.msg)
 
+
 class DiscardBoard(CourtBoard):
+
     """A special board for discarded tiles"""
     # pylint: disable=too-many-public-methods
     penColor = 'orange'
+
     def __init__(self):
         CourtBoard.__init__(self, 11, 9)
         self.__places = None
         self.lastDiscarded = None
 
     @property
-    def name(self): # pylint: disable=no-self-use
+    def name(self):  # pylint: disable=no-self-use
         """to be used in debug output"""
         return "discardBoard"
 
@@ -909,7 +969,8 @@ class DiscardBoard(CourtBoard):
 
     def setRandomPlaces(self, randomGenerator):
         """precompute random positions"""
-        self.__places = [(x, y) for x in range(self.width) for y in range(self.height)]
+        self.__places = [(x, y) for x in range(self.width)
+                         for y in range(self.height)]
         randomGenerator.shuffle(self.__places)
 
     def discardTile(self, uiTile):

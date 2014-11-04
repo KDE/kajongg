@@ -29,9 +29,12 @@ from uitile import UITile
 from animation import animate, afterQueuedAnimations, MoveImmediate, \
     ParallelAnimationGroup
 
+
 class UIWallSide(Board):
+
     """a Board representing a wall of tiles"""
     penColor = 'red'
+
     def __init__(self, tileset, boardRotation, length):
         Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
         self.length = length
@@ -44,14 +47,15 @@ class UIWallSide(Board):
             return 'NOGAME'
         for player in game.players:
             if player.front == self:
-                return 'wall %s'% player.name
+                return 'wall %s' % player.name
 
     def center(self):
-        """returns the center point of the wall in relation to the faces of the upper level"""
+        """returns the center point of the wall in relation to the
+        faces of the upper level"""
         faceRect = self.tileFaceRect()
         result = faceRect.topLeft() + self.shiftZ(1) + \
-            QPointF(self.length // 2 * faceRect.width(), faceRect.height()/2)
-        result.setX(result.x() + faceRect.height()/2) # corner tile
+            QPointF(self.length // 2 * faceRect.width(), faceRect.height() / 2)
+        result.setX(result.x() + faceRect.height() / 2)  # corner tile
         return result
 
     def hide(self):
@@ -60,8 +64,11 @@ class UIWallSide(Board):
         self.nameLabel.hide()
         Board.hide(self)
 
+
 class UIKongBox(KongBox):
+
     """Kong box with UITiles"""
+
     def __init__(self):
         KongBox.__init__(self)
 
@@ -80,8 +87,11 @@ class UIKongBox(KongBox):
             uiTile.cross = False
         return result
 
+
 class UIWall(Wall):
-    """represents the wall with four sides. self.wall[] indexes them counter clockwise, 0..3. 0 is bottom."""
+
+    """represents the wall with four sides. self.wall[] indexes them
+    counter clockwise, 0..3. 0 is bottom."""
     tileClass = UITile
     kongBoxClass = UIKongBox
 
@@ -94,12 +104,16 @@ class UIWall(Wall):
         self.__square = Board(1, 1, Tileset.activeTileset())
         self.__square.setZValue(ZValues.marker)
         sideLength = len(self.tiles) // 8
-        self.__sides = [UIWallSide(Tileset.activeTileset(), boardRotation, sideLength) \
-            for boardRotation in (0, 270, 180, 90)]
+        self.__sides = [UIWallSide(
+            Tileset.activeTileset(),
+            boardRotation, sideLength) for boardRotation in (0, 270, 180, 90)]
         for side in self.__sides:
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
-            side.windTile = PlayerWind('E', Internal.scene.windTileset, parent=side)
+            side.windTile = PlayerWind(
+                'E',
+                Internal.scene.windTileset,
+                parent=side)
             side.windTile.hide()
             side.nameLabel = QGraphicsSimpleTextItem('', side)
             side.message = YellowText(side)
@@ -149,7 +163,8 @@ class UIWall(Wall):
     def __shuffleTiles(self):
         """shuffle tiles for next hand"""
         discardBoard = Internal.scene.discardBoard
-        places = [(x, y) for x in range(-3, discardBoard.width+3) for y in range(-3, discardBoard.height+3)]
+        places = [(x, y) for x in range(-3, discardBoard.width + 3)
+                  for y in range(-3, discardBoard.height + 3)]
         places = self.game.randomGenerator.sample(places, len(self.tiles))
         for idx, uiTile in enumerate(self.tiles):
             uiTile.dark = True
@@ -162,7 +177,8 @@ class UIWall(Wall):
             uiTile.tile = Tile.unknown
             uiTile.dark = True
 #        scene = Internal.scene
-#        animateBuild = not scene.game.isScoringGame() and not self.game.isFirstHand()
+# animateBuild = not scene.game.isScoringGame() and not
+# self.game.isFirstHand()
         animateBuild = False
         with MoveImmediate(animateBuild):
             if shuffleFirst:
@@ -175,11 +191,12 @@ class UIWall(Wall):
         """place all wall tiles"""
         tileIter = iter(self.tiles)
         tilesPerSide = len(self.tiles) // 4
-        for side in (self.__sides[0], self.__sides[3], self.__sides[2], self.__sides[1]):
-            upper = True # upper tile is played first
-            for position in range(tilesPerSide-1, -1, -1):
+        for side in (self.__sides[0], self.__sides[3],
+                     self.__sides[2], self.__sides[1]):
+            upper = True  # upper tile is played first
+            for position in range(tilesPerSide - 1, -1, -1):
                 uiTile = next(tileIter)
-                uiTile.setBoard(side, position//2, 0, level=int(upper))
+                uiTile.setBoard(side, position // 2, 0, level=int(upper))
                 upper = not upper
         self.__setDrawingOrder()
         return animate()
@@ -240,9 +257,13 @@ class UIWall(Wall):
 
     def __setDrawingOrder(self, dummyResults=None):
         """set drawing order of the wall"""
-        levels = {'NW': (2, 3, 1, 0), 'NE':(3, 1, 0, 2), 'SE':(1, 0, 2, 3), 'SW':(0, 2, 3, 1)}
+        levels = {'NW': (2, 3, 1, 0), 'NE': (
+            3, 1, 0, 2), 'SE': (1, 0, 2, 3), 'SW': (0, 2, 3, 1)}
         for idx, side in enumerate(self.__sides):
-            side.level = (levels[side.lightSource][idx] + 1) * ZValues.boardLevelFactor
+            side.level = (
+                levels[
+                    side.lightSource][
+                        idx] + 1) * ZValues.boardLevelFactor
 
     def __moveDividedTile(self, uiTile, offset):
         """moves a uiTile from the divide hole to its new place"""
@@ -251,7 +272,7 @@ class UIWall(Wall):
         sideLength = len(self.tiles) // 8
         if newOffset >= sideLength:
             sideIdx = self.__sides.index(uiTile.board)
-            board = self.__sides[(sideIdx+1) % 4]
+            board = self.__sides[(sideIdx + 1) % 4]
         uiTile.setBoard(board, newOffset % sideLength, 0, level=2)
         uiTile.update()
 
@@ -261,8 +282,8 @@ class UIWall(Wall):
         assert len(self.kongBox) % 2 == 0
         placeCount = len(self.kongBox) // 2
         if placeCount >= 4:
-            first = min(placeCount-1, 5)
-            second = max(first-2, 1)
+            first = min(placeCount - 1, 5)
+            second = max(first - 2, 1)
             self.__moveDividedTile(self.kongBox[-1], second)
             self.__moveDividedTile(self.kongBox[-2], first)
 
@@ -289,16 +310,21 @@ class UIWall(Wall):
         side = player.front
         sideCenter = side.center()
         name = side.nameLabel
-        name.setText(' - '.join([player.localName, unicode(player.explainHand().total())]))
+        name.setText(
+            ' - '.join([player.localName,
+                        unicode(player.explainHand().total())]))
         name.resetTransform()
         if side.rotation() == 180:
             rotateCenter(name, 180)
         nameRect = QRectF()
-        nameRect.setSize(name.mapToParent(name.boundingRect()).boundingRect().size())
+        nameRect.setSize(
+            name.mapToParent(name.boundingRect()).boundingRect().size())
         name.setPos(sideCenter - nameRect.center())
         player.colorizeName()
         side.windTile.setWind(player.wind, self.game.roundsFinished)
         side.windTile.resetTransform()
-        side.windTile.setPos(sideCenter.x()*1.63, sideCenter.y()-side.windTile.rect().height()/2.5)
+        side.windTile.setPos(
+            sideCenter.x() * 1.63,
+            sideCenter.y() - side.windTile.rect().height() / 2.5)
         side.nameLabel.show()
         side.windTile.show()

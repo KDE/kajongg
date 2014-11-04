@@ -39,13 +39,17 @@ from genericdelegates import RightAlignedCheckboxDelegate
 from statesaver import StateSaver
 from guiutil import decorateWindow
 
+
 class RuleRootItem(RootItem):
+
     """the root item for the ruleset tree"""
 
     def columnCount(self):
         return len(self.rawContent)
 
+
 class RuleTreeItem(TreeItem):
+
     """generic class for items in our rule tree"""
     # pylint: disable=abstract-method
     # we know content() is abstract, this class is too
@@ -53,7 +57,7 @@ class RuleTreeItem(TreeItem):
     def columnCount(self):
         """can be different for every rule"""
         if hasattr(self, 'colCount'):
-            return self.colCount # pylint: disable=no-member
+            return self.colCount  # pylint: disable=no-member
         else:
             return len(self.rawContent)
 
@@ -64,8 +68,11 @@ class RuleTreeItem(TreeItem):
             item = item.parent
         return item.rawContent
 
+
 class RulesetItem(RuleTreeItem):
+
     """represents a ruleset in the tree"""
+
     def __init__(self, content):
         RuleTreeItem.__init__(self, content)
 
@@ -86,8 +93,11 @@ class RulesetItem(RuleTreeItem):
         """the tooltip for a ruleset"""
         return self.rawContent.description
 
+
 class RuleListItem(RuleTreeItem):
+
     """represents a list of rules in the tree"""
+
     def __init__(self, content):
         RuleTreeItem.__init__(self, content)
 
@@ -103,8 +113,11 @@ class RuleListItem(RuleTreeItem):
         return u'<b>' + m18n(ruleset.name) + u'</b><br><br>' + \
             m18n(self.rawContent.description)
 
+
 class RuleItem(RuleTreeItem):
+
     """represents a rule in the tree"""
+
     def __init__(self, content):
         RuleTreeItem.__init__(self, content)
 
@@ -133,8 +146,11 @@ class RuleItem(RuleTreeItem):
         else:
             return m18n(ruleset.name)
 
+
 class RuleModel(TreeModel):
+
     """a model for our rule table"""
+
     def __init__(self, rulesets, title, parent=None):
         super(RuleModel, self).__init__(parent)
         self.rulesets = rulesets
@@ -161,7 +177,7 @@ class RuleModel(TreeModel):
             self.appendRuleset(ruleset)
         self.loaded = True
 
-    def data(self, index, role): # pylint: disable=no-self-use
+    def data(self, index, role):  # pylint: disable=no-self-use
         """get data fom model"""
         # pylint: disable=too-many-branches
         # too many branches
@@ -186,9 +202,9 @@ class RuleModel(TreeModel):
                     bData = item.content(index.column())
                     result = Qt.Checked if bData else Qt.Unchecked
             elif role == Qt.TextAlignmentRole:
-                result = int(Qt.AlignLeft|Qt.AlignVCenter)
+                result = int(Qt.AlignLeft | Qt.AlignVCenter)
                 if index.column() > 0:
-                    result = int(Qt.AlignRight|Qt.AlignVCenter)
+                    result = int(Qt.AlignRight | Qt.AlignVCenter)
             elif role == Qt.FontRole and index.column() == 0:
                 ruleset = item.ruleset()
                 if isinstance(ruleset, PredefinedRuleset):
@@ -196,7 +212,8 @@ class RuleModel(TreeModel):
                     font.setItalic(True)
                     result = font
             elif role == Qt.ToolTipRole:
-                tip = u'<b></b>%s<b></b>' % m18n(item.tooltip()) if item else u''
+                tip = u'<b></b>%s<b></b>' % m18n(
+                    item.tooltip()) if item else u''
                 result = tip
         return toQVariant(result)
 
@@ -222,7 +239,7 @@ class RuleModel(TreeModel):
             return m18n(result)
         elif role == Qt.TextAlignmentRole:
             leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
-            return toQVariant(int(leftRight|Qt.AlignVCenter))
+            return toQVariant(int(leftRight | Qt.AlignVCenter))
         else:
             return toQVariant()
 
@@ -243,11 +260,15 @@ class RuleModel(TreeModel):
         self.insertRows(0, ruleListItems, rulesetIndex)
         for ridx, ruleList in enumerate(ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
-            ruleItems = list([RuleItem(x) for x in ruleList if not 'internal' in x.options])
+            ruleItems = list([RuleItem(x)
+                             for x in ruleList if not 'internal' in x.options])
             self.insertRows(0, ruleItems, listIndex)
 
+
 class EditableRuleModel(RuleModel):
+
     """add methods needed for editing"""
+
     def __init__(self, rulesets, title, parent=None):
         RuleModel.__init__(self, rulesets, title, parent)
 
@@ -325,7 +346,7 @@ class EditableRuleModel(RuleModel):
         except BaseException:
             return False
 
-    def flags(self, index): # pylint: disable=no-self-use
+    def flags(self, index):  # pylint: disable=no-self-use
         """tell the view what it can do with this item"""
         if not index.isValid():
             return Qt.ItemIsEnabled
@@ -348,9 +369,13 @@ class EditableRuleModel(RuleModel):
             result |= Qt.ItemIsUserCheckable
         return result
 
+
 class RuleTreeView(QTreeView):
+
     """Tree view for our rulesets"""
-    def __init__(self, name, btnCopy=None, btnRemove=None, btnCompare=None, parent=None):
+
+    def __init__(self, name, btnCopy=None,
+                 btnRemove=None, btnCompare=None, parent=None):
         QTreeView.__init__(self, parent)
         self.name = name
         self.setObjectName('RuleTreeView')
@@ -364,7 +389,7 @@ class RuleTreeView(QTreeView):
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.ruleModel = None
         self.ruleModelTest = None
-        self.rulesets = [] # nasty: this generates self.ruleModel
+        self.rulesets = []  # nasty: this generates self.ruleModel
         self.differs = []
 
     def dataChanged(self, dummyIndex1, dummyIndex2, dummyRoles=None):
@@ -385,7 +410,11 @@ class RuleTreeView(QTreeView):
                 self.ruleModel = EditableRuleModel(rulesets, self.name)
             else:
                 self.ruleModel = RuleModel(rulesets, self.name)
-            self.setItemDelegateForColumn(1, RightAlignedCheckboxDelegate(self, self.ruleModel.isCheckboxCell))
+            self.setItemDelegateForColumn(
+                1,
+                RightAlignedCheckboxDelegate(
+                    self,
+                    self.ruleModel.isCheckboxCell))
             self.setModel(self.ruleModel)
             if Debug.modelTest:
                 self.ruleModelTest = ModelTest(self.ruleModel, self)
@@ -399,7 +428,9 @@ class RuleTreeView(QTreeView):
             isPredefined = isinstance(item.ruleset(), PredefinedRuleset)
             if isinstance(item, RulesetItem):
                 enableCompare = True
-                enableCopy = sum(x.hash == item.ruleset().hash for x in self.ruleModel.rulesets) == 1
+                enableCopy = sum(
+                    x.hash == item.ruleset(
+                    ).hash for x in self.ruleModel.rulesets) == 1
                 enableRemove = not isPredefined
         if self.btnCopy:
             self.btnCopy.setEnabled(enableCopy)
@@ -466,8 +497,11 @@ class RuleTreeView(QTreeView):
         differ.show()
         self.differs.append(differ)
 
+
 class RulesetSelector(QWidget):
+
     """presents all available rulesets with previews"""
+
     def __init__(self, parent=None):
         super(RulesetSelector, self).__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
@@ -491,11 +525,20 @@ class RulesetSelector(QWidget):
         self.btnRemove = QPushButton()
         self.btnCompare = QPushButton()
         self.btnClose = QPushButton()
-        self.rulesetView = RuleTreeView(m18nc('kajongg', 'Rule'), self.btnCopy, self.btnRemove, self.btnCompare)
+        self.rulesetView = RuleTreeView(
+            m18nc('kajongg',
+                  'Rule'),
+            self.btnCopy,
+            self.btnRemove,
+            self.btnCompare)
         v1layout.addWidget(self.rulesetView)
         self.rulesetView.setWordWrap(True)
         self.rulesetView.setMouseTracking(True)
-        spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        spacerItem = QSpacerItem(
+            20,
+            20,
+            QSizePolicy.Minimum,
+            QSizePolicy.Expanding)
         v2layout.addWidget(self.btnCopy)
         v2layout.addWidget(self.btnRemove)
         v2layout.addWidget(self.btnCompare)

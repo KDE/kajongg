@@ -29,13 +29,16 @@ from common import Debug, unicode
 from modeltest import ModelTest
 from kde import KApplication
 
+
 class ChatModel(QAbstractTableModel):
+
     """a model for the chat view"""
+
     def __init__(self, parent=None):
         super(ChatModel, self).__init__(parent)
         self.chatLines = []
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable=no-self-use
+    def headerData(self, section, orientation, role=Qt.DisplayRole):  # pylint: disable=no-self-use
         """show header"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
@@ -44,7 +47,7 @@ class ChatModel(QAbstractTableModel):
                 else:
                     return toQVariant(int(Qt.AlignLeft))
         if orientation != Qt.Horizontal:
-            return toQVariant(int(section+1))
+            return toQVariant(int(section + 1))
         if role != Qt.DisplayRole:
             return toQVariant()
         result = ''
@@ -59,7 +62,7 @@ class ChatModel(QAbstractTableModel):
             return 0
         return len(self.chatLines)
 
-    def columnCount(self, dummyParent=None): # pylint: disable=no-self-use
+    def columnCount(self, dummyParent=None):  # pylint: disable=no-self-use
         """for now we only have time, who, message"""
         return 3
 
@@ -85,7 +88,8 @@ class ChatModel(QAbstractTableModel):
                 result = toQVariant(m18n(chatLine.message))
             elif role == Qt.ForegroundRole and index.column() == 2:
                 palette = KApplication.palette()
-                color = 'blue' if chatLine.isStatusMessage else palette.windowText()
+                color = 'blue' if chatLine.isStatusMessage else palette.windowText(
+                )
                 result = toQVariant(QColor(color))
         return result
 
@@ -93,30 +97,44 @@ class ChatModel(QAbstractTableModel):
         """insert a chatline"""
         if not isinstance(lines, list):
             lines = [lines]
-        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount() + len(lines) - 1)
+        self.beginInsertRows(
+            QModelIndex(),
+            self.rowCount(),
+            self.rowCount() + len(lines) - 1)
         self.chatLines.extend(lines)
         self.endInsertRows()
 
+
 class ChatView(MJTableView):
+
     """define a minimum size"""
+
     def __init__(self):
         MJTableView.__init__(self)
-    def sizeHint(self): # pylint: disable=no-self-use
+
+    def sizeHint(self):  # pylint: disable=no-self-use
         """sizeHint"""
         return QSize(400, 100)
+
     def minimumSizeHint(self):
         """minimumSizeHint"""
         return self.sizeHint()
 
+
 class ChatWindow(QWidget):
+
     """a widget for showing chat messages"""
+
     def __init__(self, scene=None, table=None):
         super(ChatWindow, self).__init__(None)
         self.scene = scene
         self.table = table or scene.game.client.table
         self.table.chatWindow = self
         self.setObjectName('chatWindow')
-        title = m18n('Chat on table %1 at %2', self.table.tableid, self.table.client.connection.url)
+        title = m18n(
+            'Chat on table %1 at %2',
+            self.table.tableid,
+            self.table.client.connection.url)
         decorateWindow(self, title)
         self.messageView = ChatView()
         self.messageView.setModel(ChatModel())
@@ -125,7 +143,9 @@ class ChatWindow(QWidget):
         self.messageView.setWordWrap(False)
         self.messageView.setSelectionMode(QAbstractItemView.NoSelection)
         if Debug.modelTest:
-            self.debugModelTest = ModelTest(self.messageView.model(), self.messageView)
+            self.debugModelTest = ModelTest(
+                self.messageView.model(),
+                self.messageView)
         self.edit = QLineEdit()
         layout = QVBoxLayout()
         layout.addWidget(self.messageView)
@@ -162,7 +182,11 @@ class ChatWindow(QWidget):
         if line:
             if Debug.chat:
                 logDebug(u'sending line %s to others' % line)
-            msg = ChatMessage(self.table.tableid, self.table.client.name, line, isStatusMessage)
+            msg = ChatMessage(
+                self.table.tableid,
+                self.table.client.name,
+                line,
+                isStatusMessage)
             self.table.client.sendChat(msg).addErrback(self.chatError)
 
     def chatError(self, result):
@@ -180,6 +204,8 @@ class ChatWindow(QWidget):
         self.show()
         self.messageView.model().appendLines(chatLine)
         for row in range(self.messageView.model().rowCount()):
-            self.messageView.setRowHeight(row, self.messageView.fontMetrics().height())
+            self.messageView.setRowHeight(
+                row,
+                self.messageView.fontMetrics().height())
         self.messageView.resizeColumnsToContents()
         self.messageView.scrollToBottom()

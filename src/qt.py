@@ -21,11 +21,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # pylint: disable=unused-import, unused-wildcard-import, wildcard-import
 # pylint: disable=invalid-name
 
-import sip, sys
+import sip
+import sys
 
 from common import isPython3, Internal
 
-usingQt4 = True # Default for now
+usingQt4 = True  # Default for now
 usingQt5 = False
 
 if '--qt5' in sys.argv:
@@ -41,9 +42,12 @@ if '--qt5' in sys.argv:
 else:
     from qt4 import *
 
+
 class RealQVariant(object):
+
     """context helper, forcibly disabling QVariant autoconversion for Qt5.
     This makes it easier to write code supporting both Qt4 and Qt5"""
+
     def __init__(self):
         if usingQt5:
             sip.enableautoconversion(QVariant, False)

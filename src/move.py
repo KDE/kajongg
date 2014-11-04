@@ -25,8 +25,11 @@ from message import Message
 from tile import Tile, TileList
 from meld import Meld, MeldList
 
+
 class Move(StrMixin):
+
     """used for decoded move information from the game server"""
+
     def __init__(self, player, command, kwargs):
         if isinstance(command, Message):
             self.message = command
@@ -87,7 +90,7 @@ class Move(StrMixin):
             else:
                 result += u' %s:%s' % (key, value)
         for old, new in ((u"('", u"("), (u"')", u")"), (u" '", u""),
-                (u"',", u","), (u"[(", u"("), (u"])", u")")):
+                         (u"',", u","), (u"[(", u"("), (u"])", u")")):
             result = result.replace(old, new)
         return result
 

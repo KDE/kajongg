@@ -31,8 +31,11 @@ from message import Message
 from common import Debug, isPython3, StrMixin, unicode, nativeString, nativeStringArgs
 from move import Move
 
+
 class Request(StrMixin):
+
     """holds a Deferred and related attributes, used as part of a DeferredBlock"""
+
     def __init__(self, block, deferred, user, about):
         self._block = weakref.ref(block)
         self.deferred = deferred
@@ -97,7 +100,7 @@ class Request(StrMixin):
             answer = u'OPEN'
         result = u''
         if Debug.deferredBlock:
-            result += u'[{id:>4}] '.format(id=id(self)%10000)
+            result += u'[{id:>4}] '.format(id=id(self) % 10000)
         result += u'{cmd}->{cls}({receiver:<10}): {answer}'.format(
             cls=self.user.__class__.__name__, cmd=cmd, receiver=self.user.name,
             answer=answer)
@@ -119,7 +122,7 @@ class Request(StrMixin):
         """for debug output"""
         result = u''
         if Debug.deferredBlock:
-            result += u'[{id:>4}] '.format(id=id(self)%10000)
+            result += u'[{id:>4}] '.format(id=id(self) % 10000)
         result += u'{cmd:<12}<-{cls:>6}({receiver:<10}): ANS={answer}'.format(
             cls=self.user.__class__.__name__,
             answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.user.name)
@@ -127,14 +130,16 @@ class Request(StrMixin):
             result += u' after {} sec'.format(self.age())
         return result
 
+
 class DeferredBlock(StrMixin):
+
     """holds a list of deferreds and waits for each of them individually,
     with each deferred having its own independent callbacks. Fires a
     'general' callback after all deferreds have returned.
     Usage: 1. define, 2. add requests, 3. set callback"""
 
     blocks = []
-    blockWarned = False # did we already warn about too many blocks?
+    blockWarned = False  # did we already warn about too many blocks?
 
     def __init__(self, table, temp=False):
         dummy, dummy, function, dummy = traceback.extract_stack()[-2]
@@ -177,7 +182,7 @@ class DeferredBlock(StrMixin):
     def outstandingUnicode(self):
         """like __unicode__ but only with outstanding answers"""
         return u'%s callback=%s:%s' % (self.calledBy, self.prettyCallback(),
-            u'[' + u','.join(str(x) for x in self.requests if not x.answer) + u']')
+                                       u'[' + u','.join(str(x) for x in self.requests if not x.answer) + u']')
 
     @staticmethod
     def garbageCollection():
@@ -190,7 +195,9 @@ class DeferredBlock(StrMixin):
             if block.completed:
                 DeferredBlock.blocks.remove(block)
         if len(DeferredBlock.blocks) > 100:
-            logDebug(u'We have %d DeferredBlocks, they must be leaking' % len(DeferredBlock.blocks))
+            logDebug(
+                u'We have %d DeferredBlocks, they must be leaking' %
+                len(DeferredBlock.blocks))
 
     def __addRequest(self, deferred, user, about):
         """add deferred for user to this block"""
@@ -199,12 +206,16 @@ class DeferredBlock(StrMixin):
         request = Request(self, deferred, user, about)
         self.requests.append(request)
         self.outstanding += 1
-        deferred.addCallback(self.__gotAnswer, request).addErrback(self.__failed, request)
+        deferred.addCallback(
+            self.__gotAnswer,
+            request).addErrback(
+                self.__failed,
+                request)
         if Debug.deferredBlock:
             notifying = ' notifying' if deferred.notifying else ''
             rqString = u'[{id:>4}] {cmd}{notifying} {about}->{cls:>6}({receiver:<10})'.format(
                 cls=user.__class__.__name__,
-                id=id(request)%10000, cmd=deferred.command, receiver=user.name,
+                id=id(request) % 10000, cmd=deferred.command, receiver=user.name,
                 about=about.name if about else '', notifying=notifying)
             self.debug('+:%d' % len(self.requests), rqString)
 
@@ -230,7 +241,8 @@ class DeferredBlock(StrMixin):
     def __gotAnswer(self, result, request):
         """got answer from user"""
         if request in self.requests:
-            # after having lost connection to client, an answer could still be in the pipe
+            # after having lost connection to client, an answer could still be
+            # in the pipe
             if result is None:
                 if Debug.deferredBlock:
                     self.debug('IGN', request.pretty())
@@ -246,7 +258,11 @@ class DeferredBlock(StrMixin):
                     block = DeferredBlock(self.table, temp=True)
                     receivers = request.answer.receivers(request)
                     if receivers:
-                        block.tell(request.player, receivers, request.answer, notifying=True)
+                        block.tell(
+                            request.player,
+                            receivers,
+                            request.answer,
+                            notifying=True)
             self.outstanding -= 1
             assert self.outstanding >= 0, '__gotAnswer: outstanding %d' % self.outstanding
             self.callbackIfDone()
@@ -268,7 +284,11 @@ class DeferredBlock(StrMixin):
             except BaseException:
                 # may happen with twisted 12.3.0
                 traceBack = u'twisted cannot give us a traceback'
-            self.table.abort(msg, request.user.name, result.getErrorMessage(), traceBack)
+            self.table.abort(
+                msg,
+                request.user.name,
+                result.getErrorMessage(),
+                traceBack)
 
     def logBug(self, msg):
         """log msg and raise exception"""
@@ -284,7 +304,9 @@ class DeferredBlock(StrMixin):
         if self.outstanding == 0 and self.callbackMethod is not None:
             self.completed = True
             if any(not x.answer for x in self.requests):
-                self.logBug(u'Block %s: Some requests are unanswered' % str(self))
+                self.logBug(
+                    u'Block %s: Some requests are unanswered' %
+                    str(self))
             if Debug.deferredBlock:
                 commandText = []
                 for command in set(x.deferred.command for x in self.requests):
@@ -292,22 +314,28 @@ class DeferredBlock(StrMixin):
                     answerList = []
                     for answer in set(x.prettyAnswer() for x in self.requests if x.deferred.command == command):
                         answerList.append((answer, list(x for x in self.requests
-                            if x.deferred.command == command and answer == x.prettyAnswer())))
+                                                        if x.deferred.command == command and answer == x.prettyAnswer())))
                     answerList = sorted(answerList, key=lambda x: len(x[1]))
                     answerTexts = []
                     if len(answerList) == 1:
-                        answerTexts.append(u'{answer} from all'.format(answer=answerList[-1][0]))
+                        answerTexts.append(
+                            u'{answer} from all'.format(answer=answerList[-1][0]))
                     else:
                         for answer, requests in answerList[:-1]:
-                            answerTexts.append(u'{answer} from {players}'.format(answer=answer,
-                                players=u','.join(x.user.name for x in requests)))
-                        answerTexts.append(u'{answer} from others'.format(answer=answerList[-1][0]))
+                            answerTexts.append(
+                                u'{answer} from {players}'.format(answer=answer,
+                                                                  players=u','.join(x.user.name for x in requests)))
+                        answerTexts.append(
+                            u'{answer} from others'.format(answer=answerList[-1][0]))
                     text += u', '.join(answerTexts)
                     commandText.append(text)
                 methodName = self.prettyCallback()
                 if methodName:
                     methodName = u' next:%s' % methodName
-                self.debug(u'END', u'{answers} {method}'.format(method=methodName, answers=u' / '.join(commandText)))
+                self.debug(
+                    u'END',
+                    u'{answers} {method}'.format(method=methodName,
+                                                 answers=u' / '.join(commandText)))
             if self.callbackMethod is not False:
                 self.callbackMethod(self.requests, *self.__callbackArgs)
 
@@ -320,7 +348,8 @@ class DeferredBlock(StrMixin):
         else:
             result = self.callbackMethod.__name__
             if self.__callbackArgs:
-                result += u'({})'.format(u','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else u''))
+                result += u'({})'.format(
+                    u','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else u''))
         return result
 
     def playerForUser(self, user):
@@ -340,7 +369,8 @@ class DeferredBlock(StrMixin):
             # very much in finding bugs.
             kwargs['score'] = str(about.hand)
         if game and game.gameid and 'token' not in kwargs:
-            # this lets the client assert that the message is meant for the current hand
+            # this lets the client assert that the message is meant for the
+            # current hand
             kwargs['token'] = game.handId.token()
         else:
             kwargs['token'] = None
@@ -382,7 +412,12 @@ class DeferredBlock(StrMixin):
                 defer = Deferred()
                 defer.addCallback(rec.remote_move, command, **kwargs)
             else:
-                defer = self.table.server.callRemote(rec, 'move', aboutName, command.name, **kwargs)
+                defer = self.table.server.callRemote(
+                    rec,
+                    'move',
+                    aboutName,
+                    command.name,
+                    **kwargs)
             if defer:
                 defer.command = command.name
                 defer.notifying = 'notifying' in kwargs
@@ -393,7 +428,7 @@ class DeferredBlock(StrMixin):
             if isClient:
                 localDeferreds.append(defer)
         for defer in localDeferreds:
-            defer.callback(aboutName) # callback needs an argument !
+            defer.callback(aboutName)  # callback needs an argument !
 
     def tellPlayer(self, player, command, **kwargs):
         """address only one user"""
@@ -401,7 +436,12 @@ class DeferredBlock(StrMixin):
 
     def tellOthers(self, player, command, **kwargs):
         """tell others about player'"""
-        self.tell(player, list([x for x in self.table.game.players if x.name != player.name]), command, **kwargs)
+        self.tell(
+            player,
+            list(
+                [x for x in self.table.game.players if x.name != player.name]),
+            command,
+            **kwargs)
 
     def tellAll(self, player, command, **kwargs):
         """tell something to all players"""

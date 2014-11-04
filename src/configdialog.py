@@ -35,8 +35,11 @@ from statesaver import StateSaver
 from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 
+
 class PlayConfigTab(QWidget):
+
     """Display Config tab"""
+
     def __init__(self, parent):
         super(PlayConfigTab, self).__init__(parent)
         self.setupUi()
@@ -49,10 +52,13 @@ class PlayConfigTab(QWidget):
         sliderLayout = QHBoxLayout()
         self.kcfg_showShadows = QCheckBox(m18n('Show tile shadows'), self)
         self.kcfg_showShadows.setObjectName('kcfg_showShadows')
-        self.kcfg_rearrangeMelds = QCheckBox(m18n('Rearrange undisclosed tiles to melds'), self)
+        self.kcfg_rearrangeMelds = QCheckBox(
+            m18n('Rearrange undisclosed tiles to melds'), self)
         self.kcfg_rearrangeMelds.setObjectName('kcfg_rearrangeMelds')
-        self.kcfg_showOnlyPossibleActions = QCheckBox(m18n('Show only possible actions'))
-        self.kcfg_showOnlyPossibleActions.setObjectName('kcfg_showOnlyPossibleActions')
+        self.kcfg_showOnlyPossibleActions = QCheckBox(m18n(
+            'Show only possible actions'))
+        self.kcfg_showOnlyPossibleActions.setObjectName(
+            'kcfg_showOnlyPossibleActions')
         self.kcfg_propose = QCheckBox(m18n('Propose what to do'))
         self.kcfg_propose.setObjectName('kcfg_propose')
         self.kcfg_animationSpeed = QSlider(self)
@@ -65,12 +71,14 @@ class PlayConfigTab(QWidget):
         sliderLayout.addWidget(self.kcfg_animationSpeed)
         self.kcfg_useSounds = QCheckBox(m18n('Use sounds if available'), self)
         self.kcfg_useSounds.setObjectName('kcfg_useSounds')
-        self.kcfg_uploadVoice = QCheckBox(m18n('Let others hear my voice'), self)
+        self.kcfg_uploadVoice = QCheckBox(m18n(
+            'Let others hear my voice'), self)
         self.kcfg_uploadVoice.setObjectName('kcfg_uploadVoice')
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Expanding)
-        spacerItem = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        spacerItem = QSpacerItem(
+            20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         vlayout.addWidget(self.kcfg_showShadows)
         vlayout.addWidget(self.kcfg_rearrangeMelds)
         vlayout.addWidget(self.kcfg_showOnlyPossibleActions)
@@ -86,22 +94,32 @@ class PlayConfigTab(QWidget):
         """translate to current language"""
         pass
 
-class ConfigDialog(KConfigDialog): # pylint: disable=too-many-public-methods
+
+class ConfigDialog(KConfigDialog):  # pylint: disable=too-many-public-methods
+
     """configuration dialog with several pages"""
+
     def __init__(self, parent, name):
         # pylint: disable=super-init-not-called
-        KConfigDialog.__init__(self, parent, QString(name), Internal.Preferences)
+        KConfigDialog.__init__(
+            self, parent, QString(name), Internal.Preferences)
         StateSaver(self)
         self.pages = [
-            self.addPage(PlayConfigTab(self), m18nc('kajongg', 'Play'), "arrow-right"),
-            self.addPage(TilesetSelector(self), m18n("Tiles"), "games-config-tiles"),
-            self.addPage(BackgroundSelector(self), m18n("Backgrounds"), "games-config-background")]
+            self.addPage(
+                PlayConfigTab(self),
+                m18nc('kajongg', 'Play'), "arrow-right"),
+            self.addPage(
+                TilesetSelector(self),
+                m18n("Tiles"), "games-config-tiles"),
+            self.addPage(
+                BackgroundSelector(self),
+                m18n("Backgrounds"), "games-config-background")]
 
     def keyPressEvent(self, event):
         """The four tabs can be selected with CTRL-1 .. CTRL-4"""
         mod = event.modifiers()
-        key = chr(event.key()%128)
+        key = chr(event.key() % 128)
         if Qt.ControlModifier | mod and key in '123456789'[:len(self.pages)]:
-            self.setCurrentPage(self.pages[int(key)-1])
+            self.setCurrentPage(self.pages[int(key) - 1])
             return
         KConfigDialog.keyPressEvent(self, event)

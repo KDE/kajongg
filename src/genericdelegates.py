@@ -18,7 +18,9 @@ from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
 
 from guiutil import Painter
 
+
 class RichTextColumnDelegate(QStyledItemDelegate):
+
     """enables rich text in a view"""
     label = None
     document = None
@@ -52,11 +54,14 @@ class RichTextColumnDelegate(QStyledItemDelegate):
             text = variantValue(index.model().data(index))
         self.document.setDefaultFont(option.font)
         self.document.setHtml(text)
-        return QSize(self.document.idealWidth() + 5, option.fontMetrics.height())
+        return QSize(self.document.idealWidth() + 5,
+                     option.fontMetrics.height())
+
 
 class RightAlignedCheckboxDelegate(QStyledItemDelegate):
+
     """as the name says. From
-    http://qt-project.org/faq/answer/how_can_i_align_the_checkboxes_in_a_view"""
+http://qt-project.org/faq/answer/how_can_i_align_the_checkboxes_in_a_view"""
 
     def __init__(self, parent, cellFilter):
         super(RightAlignedCheckboxDelegate, self).__init__(parent)
@@ -65,17 +70,23 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
     @staticmethod
     def __textMargin():
         """text margin"""
-        return QApplication.style().pixelMetric(QStyle.PM_FocusFrameHMargin) + 1
+        return QApplication.style().pixelMetric(
+            QStyle.PM_FocusFrameHMargin) + 1
 
     def paint(self, painter, option, index):
         """paint right aligned checkbox"""
         viewItemOption = QStyleOptionViewItem(option)
         if self.cellFilter(index):
             textMargin = self.__textMargin()
-            newRect = QStyle.alignedRect(option.direction, Qt.AlignRight,
-                 QSize(option.decorationSize.width() + 5, option.decorationSize.height()),
-                 QRect(option.rect.x() + textMargin, option.rect.y(),
-                 option.rect.width() - (2 * textMargin), option.rect.height()))
+            newRect = QStyle.alignedRect(
+                option.direction, Qt.AlignRight,
+                QSize(
+                    option.decorationSize.width() + 5,
+                    option.decorationSize.height()),
+                QRect(
+                    option.rect.x() + textMargin, option.rect.y(),
+                    option.rect.width() - (2 * textMargin),
+                    option.rect.height()))
             viewItemOption.rect = newRect
         QStyledItemDelegate.paint(self, painter, viewItemOption, index)
 
@@ -93,9 +104,11 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
         # make sure that we have the right event type
         if event.type() == QEvent.MouseButtonRelease:
             textMargin = self.__textMargin()
-            checkRect = QStyle.alignedRect(option.direction, Qt.AlignRight,
-                  option.decorationSize,
-                  QRect(option.rect.x() + (2 * textMargin), option.rect.y(),
+            checkRect = QStyle.alignedRect(
+                option.direction, Qt.AlignRight,
+                option.decorationSize,
+                QRect(
+                    option.rect.x() + (2 * textMargin), option.rect.y(),
                     option.rect.width() - (2 * textMargin),
                     option.rect.height()))
             if not checkRect.contains(event.pos()):

@@ -21,9 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import datetime
 
 from qt import Qt, toQVariant, QAbstractTableModel
-from qt import QDialog, QDialogButtonBox, QWidget, \
-        QHBoxLayout, QVBoxLayout, QAbstractItemView, \
-        QItemSelectionModel, QGridLayout, QColor, QPalette
+from qt import QDialog, QDialogButtonBox, QWidget
+from qt import QHBoxLayout, QVBoxLayout, QAbstractItemView
+from qt import QItemSelectionModel, QGridLayout, QColor, QPalette
 
 from kde import KApplication, KIcon, KDialogButtonBox
 
@@ -38,28 +38,38 @@ from common import Internal, Debug, unicodeString
 from modeltest import ModelTest
 from chat import ChatMessage, ChatWindow
 
+
 class TablesModel(QAbstractTableModel):
+
     """a model for our tables"""
+
     def __init__(self, tables, parent=None):
         super(TablesModel, self).__init__(parent)
         self.tables = tables
         assert isinstance(tables, list)
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole): # pylint: disable=no-self-use
+    def headerData(  # pylint: disable=no-self-use
+            self, section,
+            orientation, role=Qt.DisplayRole):
         """show header"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
                 if section in [3, 4]:
                     return toQVariant(int(Qt.AlignLeft))
                 else:
-                    return toQVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
+                    return toQVariant(int(Qt.AlignHCenter | Qt.AlignVCenter))
         if role != Qt.DisplayRole:
             return toQVariant()
         if orientation != Qt.Horizontal:
-            return toQVariant(int(section+1))
+            return toQVariant(int(section + 1))
         result = ''
         if section < 5:
-            result = [m18n('Table'), '', m18n('Players'), m18nc('table status', 'Status'), m18n('Ruleset')][section]
+            result = [m18n('Table'),
+                      '',
+                      m18n('Players'),
+                      m18nc('table status',
+                            'Status'),
+                      m18n('Ruleset')][section]
         return toQVariant(result)
 
     def rowCount(self, parent=None):
@@ -69,8 +79,9 @@ class TablesModel(QAbstractTableModel):
             return 0
         return len(self.tables)
 
-    def columnCount(self, dummyParent=None): # pylint: disable=no-self-use
-        """for now we only have id (invisible), id (visible), players, status, ruleset.name.
+    def columnCount(self, dummyParent=None):  # pylint: disable=no-self-use
+        """for now we only have id (invisible), id (visible), players,
+        status, ruleset.name.
         id(invisible) always holds the real id, also 1000 for suspended tables.
         id(visible) is what should be displayed."""
         return 5
@@ -81,9 +92,9 @@ class TablesModel(QAbstractTableModel):
         result = toQVariant()
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
-                result = toQVariant(int(Qt.AlignHCenter|Qt.AlignVCenter))
+                result = toQVariant(int(Qt.AlignHCenter | Qt.AlignVCenter))
             else:
-                result = toQVariant(int(Qt.AlignLeft|Qt.AlignVCenter))
+                result = toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
         if index.isValid() and (0 <= index.row() < len(self.tables)):
             table = self.tables[index.row()]
             if role == Qt.DisplayRole and index.column() in (0, 1):
@@ -97,18 +108,30 @@ class TablesModel(QAbstractTableModel):
                         name += ', '
                     palette = KApplication.palette()
                     if online:
-                        color = palette.color(QPalette.Active, QPalette.WindowText).name()
-                        style = 'font-weight:normal;font-style:normal;color:%s' % color
+                        color = palette.color(
+                            QPalette.Active,
+                            QPalette.WindowText).name()
+                        style = ('font-weight:normal;'
+                                 'font-style:normal;color:%s'
+                                 % color)
                     else:
-                        color = palette.color(QPalette.Disabled, QPalette.WindowText).name()
-                        style = 'font-weight:100;font-style:italic;color:%s' % color
-                    players.append('<nobr style="%s">' % style + name + '</nobr>')
+                        color = palette.color(
+                            QPalette.Disabled,
+                            QPalette.WindowText).name()
+                        style = ('font-weight:100;font-style:italic;color:%s'
+                                 % color)
+                    players.append(
+                        '<nobr style="%s">' %
+                        style +
+                        name +
+                        '</nobr>')
                 names = ''.join(players)
                 result = toQVariant(names)
             elif role == Qt.DisplayRole and index.column() == 3:
                 status = table.status()
                 if table.suspendedAt:
-                    dateVal = u' ' + unicodeString(datetime.datetime.strptime(table.suspendedAt,
+                    dateVal = u' ' + unicodeString(datetime.datetime.strptime(
+                        table.suspendedAt,
                         '%Y-%m-%dT%H:%M:%S').strftime('%c'))
                     status = u'Suspended'
                 else:
@@ -116,24 +139,31 @@ class TablesModel(QAbstractTableModel):
                 result = toQVariant(m18nc('table status', status) + dateVal)
             elif index.column() == 4:
                 if role == Qt.DisplayRole:
-                    result = toQVariant(m18n((table.myRuleset if table.myRuleset else table.ruleset).name))
+                    result = toQVariant(
+                        m18n((
+                            table.myRuleset if table.myRuleset
+                            else table.ruleset).name))
                 elif role == Qt.ForegroundRole:
                     palette = KApplication.palette()
                     color = palette.windowText() if table.myRuleset else 'red'
                     result = toQVariant(QColor(color))
         return result
 
+
 class SelectRuleset(QDialog):
+
     """a dialog for selecting a ruleset"""
+
     def __init__(self, server=None):
         QDialog.__init__(self, None)
         decorateWindow(self, m18n('Select a ruleset'))
         self.buttonBox = KDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(
+            QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
         self.cbRuleset = ListComboBox(Ruleset.selectableRulesets(server))
-        self.grid = QGridLayout() # our child SelectPlayers needs this
+        self.grid = QGridLayout()  # our child SelectPlayers needs this
         self.grid.setColumnStretch(0, 1)
         self.grid.setColumnStretch(1, 6)
         vbox = QVBoxLayout(self)
@@ -141,9 +171,12 @@ class SelectRuleset(QDialog):
         vbox.addWidget(self.cbRuleset)
         vbox.addWidget(self.buttonBox)
 
+
 class TableList(QWidget):
+
     """a widget for viewing, joining, leaving tables"""
     # pylint: disable=too-many-instance-attributes
+
     def __init__(self, client):
         super(TableList, self).__init__(None)
         self.autoStarted = False
@@ -154,32 +187,51 @@ class TableList(QWidget):
         self.differ = None
         self.debugModelTest = None
         self.requestedNewTable = False
-        self.view.setItemDelegateForColumn(2, RichTextColumnDelegate(self.view))
+        self.view.setItemDelegateForColumn(
+            2,
+            RichTextColumnDelegate(self.view))
 
         buttonBox = QDialogButtonBox(self)
-        self.newButton = buttonBox.addButton(m18nc('allocate a new table', "&New"), QDialogButtonBox.ActionRole)
+        self.newButton = buttonBox.addButton(
+            m18nc('allocate a new table',
+                  "&New"),
+            QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.setToolTip(m18n("Allocate a new table"))
         self.newButton.clicked.connect(self.client.newTable)
-        self.joinButton = buttonBox.addButton(m18n("&Join"), QDialogButtonBox.AcceptRole)
+        self.joinButton = buttonBox.addButton(
+            m18n("&Join"),
+            QDialogButtonBox.AcceptRole)
         self.joinButton.clicked.connect(client.joinTable)
         self.joinButton.setIcon(KIcon("list-add-user"))
         self.joinButton.setToolTip(m18n("Join a table"))
-        self.leaveButton = buttonBox.addButton(m18n("&Leave"), QDialogButtonBox.AcceptRole)
+        self.leaveButton = buttonBox.addButton(
+            m18n("&Leave"),
+            QDialogButtonBox.AcceptRole)
         self.leaveButton.clicked.connect(self.leaveTable)
         self.leaveButton.setIcon(KIcon("list-remove-user"))
         self.leaveButton.setToolTip(m18n("Leave a table"))
-        self.compareButton = buttonBox.addButton(m18nc('Kajongg-Ruleset', 'Compare'), QDialogButtonBox.AcceptRole)
+        self.compareButton = buttonBox.addButton(
+            m18nc('Kajongg-Ruleset',
+                  'Compare'),
+            QDialogButtonBox.AcceptRole)
         self.compareButton.clicked.connect(self.compareRuleset)
         self.compareButton.setIcon(KIcon("preferences-plugin-script"))
-        self.compareButton.setToolTip(m18n('Compare the rules of this table with my own rulesets'))
-        self.chatButton = buttonBox.addButton(m18n('&Chat'), QDialogButtonBox.AcceptRole)
+        self.compareButton.setToolTip(
+            m18n('Compare the rules of this table with my own rulesets'))
+        self.chatButton = buttonBox.addButton(
+            m18n('&Chat'),
+            QDialogButtonBox.AcceptRole)
         self.chatButton.setIcon(KIcon("call-start"))
         self.chatButton.clicked.connect(self.chat)
-        self.startButton = buttonBox.addButton(m18n('&Start'), QDialogButtonBox.AcceptRole)
+        self.startButton = buttonBox.addButton(
+            m18n('&Start'),
+            QDialogButtonBox.AcceptRole)
         self.startButton.clicked.connect(self.startGame)
         self.startButton.setIcon(KIcon("arrow-right"))
-        self.startButton.setToolTip(m18n("Start playing on a table. Empty seats will be taken by robot players."))
+        self.startButton.setToolTip(
+            m18n("Start playing on a table. "
+                 "Empty seats will be taken by robot players."))
 
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(buttonBox)
@@ -193,7 +245,7 @@ class TableList(QWidget):
         StateSaver(self, self.view.horizontalHeader())
         self.updateButtonsForTable(None)
 
-    def hideEvent(self, dummyEvent): # pylint: disable=no-self-use
+    def hideEvent(self, dummyEvent):  # pylint: disable=no-self-use
         """table window hides"""
         scene = Internal.scene
         if scene:
@@ -221,8 +273,15 @@ class TableList(QWidget):
         table = self.selectedTable()
         if not table.chatWindow:
             line = m18nE('opens a chat window')
-            msg = ChatMessage(table.tableid, table.client.name, line, isStatusMessage=True)
-            table.client.sendChat(msg).addCallback(initChat).addErrback(self.client.tableError)
+            msg = ChatMessage(
+                table.tableid,
+                table.client.name,
+                line,
+                isStatusMessage=True)
+            table.client.sendChat(
+                msg).addCallback(
+                    initChat).addErrback(
+                        self.client.tableError)
         elif table.chatWindow.isVisible():
             table.chatWindow.hide()
         else:
@@ -231,12 +290,15 @@ class TableList(QWidget):
     def show(self):
         """prepare the view and show it"""
         if self.client.hasLocalServer():
-            title = m18n('Local Games with Ruleset %1', self.client.ruleset.name)
+            title = m18n(
+                'Local Games with Ruleset %1',
+                self.client.ruleset.name)
         else:
             title = m18n('Tables at %1', self.client.connection.url)
         decorateWindow(self, ' - '.join([self.client.name, title]))
         self.view.hideColumn(1)
-        tableCount = self.view.model().rowCount(None) if self.view.model() else 0
+        tableCount = self.view.model().rowCount(
+            None) if self.view.model() else 0
         self.view.showColumn(0)
         self.view.showColumn(2)
         self.view.showColumn(4)
@@ -257,8 +319,11 @@ class TableList(QWidget):
         hasTable = bool(table)
         suspended = hasTable and bool(table.suspendedAt)
         running = hasTable and table.running
-        suspendedLocalGame = suspended and table.gameid and self.client.hasLocalServer()
-        self.joinButton.setEnabled(hasTable and
+        suspendedLocalGame = (
+            suspended and table.gameid
+            and self.client.hasLocalServer())
+        self.joinButton.setEnabled(
+            hasTable and
             not running and
             not table.isOnline(self.client.name) and
             (self.client.name in table.playerNames) == suspended)
@@ -267,23 +332,32 @@ class TableList(QWidget):
         self.startButton.setVisible(not suspended)
         if suspendedLocalGame:
             self.newButton.setToolTip(m18n("Start a new game"))
-            self.joinButton.setText(m18nc('resuming a local suspended game', '&Resume'))
-            self.joinButton.setToolTip(m18n("Resume the selected suspended game"))
+            self.joinButton.setText(
+                m18nc('resuming a local suspended game', '&Resume'))
+            self.joinButton.setToolTip(
+                m18n("Resume the selected suspended game"))
         else:
             self.newButton.setToolTip(m18n("Allocate a new table"))
             self.joinButton.setText(m18n('&Join'))
             self.joinButton.setToolTip(m18n("Join a table"))
-        self.leaveButton.setEnabled(hasTable and not running and not self.joinButton.isEnabled())
-        self.startButton.setEnabled(not running and not suspendedLocalGame and hasTable \
+        self.leaveButton.setEnabled(
+            hasTable and not running and not self.joinButton.isEnabled())
+        self.startButton.setEnabled(
+            not running and not suspendedLocalGame and hasTable
             and self.client.name == table.playerNames[0])
         self.compareButton.setEnabled(hasTable and table.myRuleset is None)
         self.chatButton.setVisible(not self.client.hasLocalServer())
-        self.chatButton.setEnabled(not running and hasTable and self.client.name in table.playerNames
+        self.chatButton.setEnabled(
+            not running and hasTable
+            and self.client.name in table.playerNames
             and sum(x.startswith(u'Robot ') for x in table.playerNames) < 3)
         if self.chatButton.isEnabled():
-            self.chatButton.setToolTip(m18n("Chat with others on this table"))
+            self.chatButton.setToolTip(m18n(
+                "Chat with others on this table"))
         else:
-            self.chatButton.setToolTip(m18n("For chatting with others on this table, please first take a seat"))
+            self.chatButton.setToolTip(m18n(
+                "For chatting with others on this table, "
+                "please first take a seat"))
 
     def selectionChanged(self, selected, dummyDeselected):
         """update button states according to selection"""
@@ -307,17 +381,25 @@ class TableList(QWidget):
         """start playing at the selected table"""
         table = self.selectedTable()
         self.startButton.setEnabled(False)
-        self.client.callServer('startGame', table.tableid).addErrback(self.client.tableError)
+        self.client.callServer(
+            'startGame',
+            table.tableid).addErrback(
+                self.client.tableError)
 
     def leaveTable(self):
         """leave a table"""
         table = self.selectedTable()
-        self.client.callServer('leaveTable', table.tableid).addErrback(self.client.tableError)
+        self.client.callServer(
+            'leaveTable',
+            table.tableid).addErrback(
+                self.client.tableError)
 
     def __keepChatWindows(self, tables):
-        """copy chatWindows from the old table list which will be thrown away"""
+        """copy chatWindows from the old table list which will be
+        thrown away"""
         if self.view.model():
-            chatWindows = dict((x.tableid, x.chatWindow) for x in self.view.model().tables)
+            chatWindows = dict((x.tableid, x.chatWindow)
+                               for x in self.view.model().tables)
             unusedWindows = set(x.chatWindow for x in self.view.model().tables)
             for table in tables:
                 table.chatWindow = chatWindows.get(table.tableid, None)
@@ -330,8 +412,9 @@ class TableList(QWidget):
         """which table should be preselected?
         If we just requested a new table:
           select first new table.
-          Only in the rare case that two clients request a new table at the same
-          moment, this could put the focus on the wrong table. Ignore that for now.
+          Only in the rare case that two clients request a new table at
+          the same moment, this could put the focus on the wrong table.
+          Ignore that for now.
         else if we had one selected:
           select that again
         else:

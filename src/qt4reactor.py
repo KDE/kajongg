@@ -67,6 +67,7 @@ from qt import QEventLoop
 
 
 class TwistedSocketNotifier(QObject):
+
     """
     Connection between an fd event and reader/writer callbacks.
     """
@@ -84,7 +85,6 @@ class TwistedSocketNotifier(QObject):
             self.fn = self.write
         self.notifier.activated.connect(self.fn)
 
-
     def shutdown(self):
         self.notifier.setEnabled(False)
         self.notifier.activated.disconnect(self.fn)
@@ -92,14 +92,15 @@ class TwistedSocketNotifier(QObject):
         self.notifier.deleteLater()
         self.deleteLater()
 
-
     def read(self, fd):
         if not self.watcher:
             return
         w = self.watcher
-        # doRead can cause self.shutdown to be called so keep a reference to self.watcher
+        # doRead can cause self.shutdown to be called so keep a reference to
+        # self.watcher
+
         def _read():
-            #Don't call me again, until the data has been read
+            # Don't call me again, until the data has been read
             self.notifier.setEnabled(False)
             why = None
             try:
@@ -112,7 +113,8 @@ class TwistedSocketNotifier(QObject):
             if why:
                 self.reactor._disconnectSelectable(w, why, inRead)
             elif self.watcher:
-                self.notifier.setEnabled(True) # Re enable notification following successful read
+                self.notifier.setEnabled(
+                    True)  # Re enable notification following successful read
             self.reactor._iterate(fromqt=True)
         log.callWithLogger(w, _read)
 
@@ -120,6 +122,7 @@ class TwistedSocketNotifier(QObject):
         if not self.watcher:
             return
         w = self.watcher
+
         def _write():
             why = None
             self.notifier.setEnabled(False)
@@ -137,7 +140,6 @@ class TwistedSocketNotifier(QObject):
         log.callWithLogger(w, _write)
 
 
-
 @implementer(IReactorFDSet)
 class QtReactor(posixbase.PosixReactorBase):
 
@@ -151,14 +153,13 @@ class QtReactor(posixbase.PosixReactorBase):
 
         if QCoreApplication.instance() is None:
             # Application Object has not been started yet
-            self.qApp=QCoreApplication([])
-            self._ownApp=True
+            self.qApp = QCoreApplication([])
+            self._ownApp = True
         else:
             self.qApp = QCoreApplication.instance()
-            self._ownApp=False
+            self._ownApp = False
         self._blockApp = None
         posixbase.PosixReactorBase.__init__(self)
-
 
     def _add(self, xer, primary, type):
         """
@@ -170,20 +171,17 @@ class QtReactor(posixbase.PosixReactorBase):
         if xer not in primary:
             primary[xer] = TwistedSocketNotifier(None, self, xer, type)
 
-
     def addReader(self, reader):
         """
         Add a FileDescriptor for notification of data available to read.
         """
         self._add(reader, self._reads, QSocketNotifier.Read)
 
-
     def addWriter(self, writer):
         """
         Add a FileDescriptor for notification of data available to write.
         """
         self._add(writer, self._writes, QSocketNotifier.Write)
-
 
     def _remove(self, xer, primary):
         """
@@ -196,20 +194,17 @@ class QtReactor(posixbase.PosixReactorBase):
             notifier = primary.pop(xer)
             notifier.shutdown()
 
-
     def removeReader(self, reader):
         """
         Remove a Selectable for notification of data available to read.
         """
         self._remove(reader, self._reads)
 
-
     def removeWriter(self, writer):
         """
         Remove a Selectable for notification of data available to write.
         """
         self._remove(writer, self._writes)
-
 
     def removeAll(self):
         """
@@ -218,26 +213,21 @@ class QtReactor(posixbase.PosixReactorBase):
         rv = self._removeAll(self._reads, self._writes)
         return rv
 
-
     def getReaders(self):
         return self._reads.keys()
-
 
     def getWriters(self):
         return self._writes.keys()
 
-
-    def callLater(self,howlong, *args, **kargs):
-        rval = super(QtReactor,self).callLater(howlong, *args, **kargs)
+    def callLater(self, howlong, *args, **kargs):
+        rval = super(QtReactor, self).callLater(howlong, *args, **kargs)
         self.reactorInvocation()
         return rval
-
 
     def reactorInvocation(self):
         self._timer.stop()
         self._timer.setInterval(0)
         self._timer.start()
-
 
     def _iterate(self, delay=None, fromqt=False):
         """See twisted.internet.interfaces.IReactorCore.iterate.
@@ -265,11 +255,9 @@ class QtReactor(posixbase.PosixReactorBase):
         self._timer.setInterval(timeout * 1000)
         self._timer.start()
 
-
     def runReturn(self, installSignalHandlers=True):
         self.startRunning(installSignalHandlers=installSignalHandlers)
         self.reactorInvocation()
-
 
     def run(self, installSignalHandlers=True):
         if self._ownApp:
@@ -281,17 +269,16 @@ class QtReactor(posixbase.PosixReactorBase):
 
 
 class QtEventReactor(QtReactor):
+
     def __init__(self, *args, **kwargs):
         self._events = {}
         super(QtEventReactor, self).__init__()
-
 
     def addEvent(self, event, fd, action):
         """
         Add a new win32 event to the event loop.
         """
         self._events[event] = (fd, action)
-
 
     def removeEvent(self, event):
         """
@@ -300,13 +287,16 @@ class QtEventReactor(QtReactor):
         if event in self._events:
             del self._events[event]
 
-
     def doEvents(self):
         handles = self._events.keys()
         if len(handles) > 0:
             val = None
             while val != WAIT_TIMEOUT:
-                val = MsgWaitForMultipleObjects(handles, 0, 0, QS_ALLINPUT | QS_ALLEVENTS)
+                val = MsgWaitForMultipleObjects(
+                    handles,
+                    0,
+                    0,
+                    QS_ALLINPUT | QS_ALLEVENTS)
                 if val >= WAIT_OBJECT_0 and val < WAIT_OBJECT_0 + len(handles):
                     event_id = handles[val - WAIT_OBJECT_0]
                     if event_id in self._events:
@@ -315,9 +305,8 @@ class QtEventReactor(QtReactor):
                 elif val == WAIT_TIMEOUT:
                     pass
                 else:
-                    #print 'Got an unexpected return of %r' % val
+                    # print 'Got an unexpected return of %r' % val
                     return
-
 
     def _runAction(self, action, fd):
         try:
@@ -329,11 +318,9 @@ class QtEventReactor(QtReactor):
         if closed:
             self._disconnectSelectable(fd, closed, action == 'doRead')
 
-
     def timeout(self):
         t = super(QtEventReactor, self).timeout()
         return min(t, 0.01)
-
 
     def iterate(self, delay=None):
         """See twisted.internet.interfaces.IReactorCore.iterate.

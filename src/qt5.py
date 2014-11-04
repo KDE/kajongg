@@ -82,7 +82,7 @@ from PyQt5.QtGui import QImageReader
 from PyQt5.QtCore import QItemSelectionModel
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QLineEdit
-KLineEdit = QLineEdit # pylint: disable=invalid-name
+KLineEdit = QLineEdit  # pylint: disable=invalid-name
 # TODO: where?
 from PyQt5.QtWidgets import QListWidget
 from PyQt5.QtWidgets import QListWidgetItem
@@ -130,9 +130,10 @@ from PyQt5.QtGui import QValidator
 from PyQt5.QtSvg import QGraphicsSvgItem
 from PyQt5.QtSvg import QSvgRenderer
 
+
 def variantValue(variant):
     """convert QVariant to python variable"""
     if isinstance(variant, QVariant):
         return variant.value()
     else:
-        return variant # autoconverted by qt5
+        return variant  # autoconverted by qt5

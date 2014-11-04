@@ -26,8 +26,11 @@ from common import Internal
 from guiutil import loadUi
 from log import m18n
 
+
 class BackgroundSelector(QWidget):
+
     """presents all available backgrounds with previews"""
+
     def __init__(self, parent):
         super(BackgroundSelector, self).__init__(parent)
         loadUi(self)
@@ -39,12 +42,14 @@ class BackgroundSelector(QWidget):
     def setUp(self):
         """fill the selector"""
 
-        #The lineEdit widget holds our background path, but the user does
+        # The lineEdit widget holds our background path, but the user does
         # not manipulate it directly
         self.kcfg_backgroundName.hide()
 
-        self.backgroundNameList.currentRowChanged.connect(self.backgroundRowChanged)
-        self.kcfg_backgroundName.textChanged.connect(self.backgroundNameChanged)
+        self.backgroundNameList.currentRowChanged.connect(
+            self.backgroundRowChanged)
+        self.kcfg_backgroundName.textChanged.connect(
+            self.backgroundNameChanged)
         self.backgroundList = Background.backgroundsAvailable()
         for aset in self.backgroundList:
             self.backgroundNameList.addItem(aset.name)
@@ -60,7 +65,8 @@ class BackgroundSelector(QWidget):
 
     def backgroundRowChanged(self):
         """user selected a new background, update our information about it and paint preview"""
-        selBackground = self.backgroundList[self.backgroundNameList.currentRow()]
+        selBackground = self.backgroundList[
+            self.backgroundNameList.currentRow()]
         self.kcfg_backgroundName.setText(selBackground.desktopFileName)
 
         config = KConfig(selBackground.path)
@@ -68,7 +74,9 @@ class BackgroundSelector(QWidget):
 
         author = group.readEntry("Author") or m18n("unknown author")
         description = group.readEntry("Description") or ""
-        authorEmail = group.readEntry("AuthorEmail") or m18n("no E-Mail address available")
+        authorEmail = group.readEntry(
+            "AuthorEmail") or m18n(
+                "no E-Mail address available")
 
         self.backgroundAuthor.setText(author)
         self.backgroundContact.setText(authorEmail)

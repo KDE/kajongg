@@ -1,22 +1,22 @@
 """
-    Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-    partially based on C++ code from:
-    Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
+partially based on C++ code from:
+Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>
 
-    Libkmahjongg is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+Libkmahjongg is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from qt import QWidget, QHBoxLayout
@@ -29,8 +29,11 @@ from common import Internal, WINDS
 from guiutil import loadUi
 from animation import MoveImmediate
 
+
 class TilesetSelector(QWidget):
+
     """presents all available tiles with previews"""
+
     def __init__(self, parent):
         super(TilesetSelector, self).__init__(parent)
 
@@ -43,22 +46,25 @@ class TilesetSelector(QWidget):
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(Internal.Preferences.tilesetName)
-        self.uiTiles = [UITile('w'+s) for s in WINDS.lower()]
+        self.uiTiles = [UITile('w' + s) for s in WINDS.lower()]
         self.board = Board(2, 2, self.tileset)
         self.board.showShadows = True
         self.tileScene.addItem(self.board)
         self.tileView.setParent(self.tilesetPreview)
         layout = QHBoxLayout(self.tilesetPreview)
         layout.addWidget(self.tileView)
+        # pylint: disable=star-args
         for idx, offsets in enumerate([(0, 0), (0, 1), (1, 0), (1, 1)]):
-            self.uiTiles[idx].setBoard(self.board, *offsets) # pylint: disable=star-args
+            self.uiTiles[idx].setBoard(
+                self.board,
+                *offsets)
             self.uiTiles[idx].focusable = False
         self.setUp()
 
     def setUp(self):
         """set-up the selector"""
 
-        #The lineEdit widget holds our tileset path, but the user does
+        # The lineEdit widget holds our tileset path, but the user does
         # not manipulate it directly
         self.kcfg_tilesetName.hide()
 
@@ -78,7 +84,8 @@ class TilesetSelector(QWidget):
         self.tilesetNameList.setCurrentRow(igrindex)
 
     def tilesetRowChanged(self):
-        """user selected a new tileset, update our information about it and paint preview"""
+        """user selected a new tileset, update our information about it and
+        paint preview"""
         selTileset = self.tilesetList[self.tilesetNameList.currentRow()]
         self.kcfg_tilesetName.setText(selTileset.desktopFileName)
         self.tilesetAuthor.setText(selTileset.author)

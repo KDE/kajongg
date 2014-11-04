@@ -22,21 +22,29 @@ from kde import ki18n, KAboutData
 
 from common import Internal
 
+
 class About(object):
+
     """we need persistancy but do not want to spoil global name space"""
+
     def __init__(self):
         self.appName = "kajongg"
         catalog = ""
         homePage = "http://kde.org/applications/games/kajongg/"
         version = Internal.version
         programName = ki18n("Kajongg")
-        description = ki18n("Mah Jongg - the ancient Chinese board game for 4 players")
+        description = ki18n(
+            "Mah Jongg - the ancient Chinese board game for 4 players")
         kajongglicense = KAboutData.License_GPL
         kajonggcopyright = ki18n("(C) 2008-2014 Wolfgang Rohdewald")
         aboutText = ki18n("This is the classical Mah Jongg for four players. "
-            "If you are looking for Mah Jongg solitaire please use the "
-            "application kmahjongg.")
+                          "If you are looking for Mah Jongg solitaire please "
+                          "use the application kmahjongg.")
 
         self.about = KAboutData(self.appName, catalog, programName,
-            version, description, kajongglicense, kajonggcopyright, aboutText, homePage)
-        self.about.addAuthor(ki18n("Wolfgang Rohdewald"), ki18n("Original author"), "wolfgang@rohdewald.de")
+                                version, description, kajongglicense,
+                                kajonggcopyright, aboutText, homePage)
+        self.about.addAuthor(
+            ki18n("Wolfgang Rohdewald"),
+            ki18n("Original author"),
+            "wolfgang@rohdewald.de")

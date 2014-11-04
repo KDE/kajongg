@@ -20,9 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 # keyboardinterrupt should simply terminate
-#import signal
-#signal.signal(signal.SIGINT, signal.SIG_DFL)
-import sys, logging
+# import signal
+# signal.signal(signal.SIGINT, signal.SIG_DFL)
+import sys
+import logging
 
 from qt import QObject, usingQt4
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
@@ -33,9 +34,10 @@ from util import kprint
 
 # do not import modules using twisted before our reactor is running
 
+
 def initRulesets():
     """exits if user only wanted to see available rulesets"""
-    import predefined # pylint: disable=unused-variable
+    import predefined  # pylint: disable=unused-variable
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
         rulesets = dict((x.name, x) for x in Ruleset.selectableRulesets())
@@ -53,35 +55,57 @@ def initRulesets():
                 if len(matches) == 0:
                     msg = 'Ruleset %s is unknown' % Options.rulesetName
                 else:
-                    msg = 'Ruleset %s is ambiguous: %s' % (Options.rulesetName, ', '.join(matches))
+                    msg = 'Ruleset %s is ambiguous: %s' % (
+                        Options.rulesetName,
+                        ', '.join(matches))
                 Internal.db.close()
                 raise SystemExit(msg)
             Options.ruleset = rulesets[matches[0]]
 
+
 def defineOptions():
     """this is the KDE way. Compare with kajonggserver.py"""
     options = KCmdLineOptions()
-    options.add("playopen", ki18n("all robots play with visible concealed tiles"))
+    options.add(
+        "playopen",
+        ki18n("all robots play with visible concealed tiles"))
     options.add("demo", ki18n("start with demo mode"))
     options.add("host <HOST>", ki18n("login to HOST"))
     options.add("table <TABLE>", ki18n("start new TABLE"))
     options.add("join <TABLE>", ki18n("join TABLE "))
     options.add("ruleset <RULESET>", ki18n("use ruleset without asking"))
-    options.add("rounds <ROUNDS>", ki18n("play one ROUNDS rounds per game. Only for debugging!"))
+    options.add(
+        "rounds <ROUNDS>",
+        ki18n("play one ROUNDS rounds per game. Only for debugging!"))
     options.add("player <PLAYER>", ki18n("prefer PLAYER for next login"))
-    options.add("ai <AI>", ki18n("use AI variant for human player in demo mode"))
+    options.add(
+        "ai <AI>",
+        ki18n("use AI variant for human player in demo mode"))
     options.add("csv <CSV>", ki18n("write statistics to CSV"))
     options.add("rulesets", ki18n("show all available rulesets"))
     options.add("game <seed(/(firsthand)(..(lasthand))>",
-        ki18n("for testing purposes: Initializes the random generator"), "0")
-    options.add("nogui", ki18n("show no graphical user interface. Intended only for testing"))
-    options.add("nokde", ki18n("Do not use KDE bindings. Intended only for testing"))
-    options.add("qt5", ki18n("Force using Qt5. Currently Qt4 is used by default"))
-    options.add("socket <SOCKET>", ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
-    options.add("port <PORT>", ki18n("use a dedicated server listening on PORT. Intended only for testing"))
-    options.add("server3", ki18n("start the server using Python 3. Meant only for testing."))
+                ki18n("for testing purposes: Initializes the random generator"), "0")
+    options.add(
+        "nogui",
+        ki18n("show no graphical user interface. Intended only for testing"))
+    options.add(
+        "nokde",
+        ki18n("Do not use KDE bindings. Intended only for testing"))
+    options.add(
+        "qt5",
+        ki18n("Force using Qt5. Currently Qt4 is used by default"))
+    options.add(
+        "socket <SOCKET>",
+        ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
+    options.add(
+        "port <PORT>",
+        ki18n("use a dedicated server listening on PORT. Intended only for testing"))
+    options.add(
+        "server3",
+        ki18n("start the server using Python 3. Meant only for testing."))
     options.add("debug <OPTIONS>", ki18n(Debug.help()))
     return options
+
 
 def parseOptions():
     """parse command line options and save the values"""
@@ -123,9 +147,11 @@ def parseOptions():
     if not initDb():
         raise SystemExit('Cannot initialize database')
     initRulesets()
-    Options.fixed = True # may not be changed anymore
+    Options.fixed = True  # may not be changed anymore
+
 
 class EvHandler(QObject):
+
     """an application wide event handler"""
 
     def eventFilter(self, receiver, event):
@@ -154,7 +180,9 @@ if __name__ == "__main__":
 
     if Options.csv:
         if gitHead() == 'current':
-            Internal.logger.debug('You cannot write to %s with changes uncommitted to git' % Options.csv)
+            Internal.logger.debug(
+                'You cannot write to %s with changes uncommitted to git' %
+                Options.csv)
             sys.exit(2)
     from mainwindow import MainWindow
     MainWindow()

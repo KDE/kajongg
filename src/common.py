@@ -22,7 +22,11 @@ from __future__ import print_function
 
 from collections import defaultdict
 import datetime
-import sys, os, logging, logging.handlers, socket
+import sys
+import os
+import logging
+import logging.handlers
+import socket
 
 try:
     from sip import unwrapinstance
@@ -35,7 +39,7 @@ import platform
 # pylint: disable=invalid-name
 if platform.python_version_tuple()[0] == '3':
     # pylint: disable=redefined-builtin
-    unicode = str # pylint: disable=W0622
+    unicode = str  # pylint: disable=W0622
     bytes = bytes
     long = int
     isPython3 = True
@@ -49,6 +53,7 @@ else:
 WINDS = u'ESWN'
 LIGHTSOURCES = [u'NE', u'NW', u'SW', u'SE']
 ENGLISHDICT = {}
+
 
 def isAlive(qobj):
     """is the underlying C++ object still valid?
@@ -64,7 +69,9 @@ def isAlive(qobj):
     else:
         return True
 
+
 class Debug(object):
+
     """holds flags for debugging output. At a later time we might
     want to add command line parameters for initialisation, and
     look at kdebugdialog"""
@@ -73,7 +80,7 @@ class Debug(object):
     process = False
     time = False
     sql = False
-    animation = '' # 'yeysywynfefsfwfn'
+    animation = ''  # 'yeysywynfefsfwfn'
     animationSpeed = False
     robotAI = False
     dangerousGame = False
@@ -116,18 +123,21 @@ class Debug(object):
                 if idx < len(options) - 1 and idx % 5 == 4:
                     yield 'SEPARATOR'
         options = list(x for x in Debug.__dict__ if not x.startswith('_'))
-        boolOptions = sorted(x for x in options if isinstance(Debug.__dict__[x], bool))
-        stringOptions = sorted(x for x in options if isinstance(Debug.__dict__[x], str))
+        boolOptions = sorted(x for x in options
+                             if isinstance(Debug.__dict__[x], bool))
+        stringOptions = sorted(x for x in options
+                               if isinstance(Debug.__dict__[x], str))
         stringExample = '%s:%s' % (stringOptions[0], 's3s4')
         allOptions = sorted(boolOptions + stringOptions)
-        opt = '\n'.join(', '.join(optYielder(allOptions)).split(' SEPARATOR, '))
+        opt = '\n'.join(
+            ', '.join(optYielder(allOptions)).split(' SEPARATOR, '))
         return """set debug options. Pass a comma separated list of options.
 Options are: {opt}.
 Options {stropt} take a string argument like {example}.
 --debug=events can get suboptions like in --debug=events:Mouse:Hide
-     meaning "show all event messages with 'Mouse' or 'Hide' in them\"""".format(
-           opt=opt,
-           stropt=', '.join(stringOptions), example=stringExample)
+     showing all event messages with 'Mouse' or 'Hide' in them""".format(
+            opt=opt,
+            stropt=', '.join(stringOptions), example=stringExample)
 
     @staticmethod
     def setOptions(args):
@@ -145,28 +155,36 @@ Options {stropt} take a string argument like {example}.
                 value = ':'.join(parts[1:])
             if option not in Debug.__dict__:
                 return '--debug: unknown option %s' % option
-            if type(Debug.__dict__[option]) != type(value):
-                return '--debug: wrong type for option %s: given %s/%s, should be %s' % (
-                    option, value, type(value), type(Debug.__dict__[option]))
+            if not isinstance(Debug.__dict__[option], type(value)):
+                return ('--debug: wrong type for option %s: '
+                        'given %s/%s, should be %s') % (
+                            option, value, type(value),
+                            type(Debug.__dict__[option]))
             if option != 'scores' or not Internal.isServer:
                 type.__setattr__(Debug, option, value)
         if Debug.time:
             Debug.time = datetime.datetime.now()
 
+
 class FixedClass(type):
+
     """Metaclass: after the class variable fixed is set to True,
     all class variables become immutable"""
     def __setattr__(cls, key, value):
         if cls.fixed:
-            raise SystemExit('{cls}.{key} may not be changed'.format(cls=cls.__name__, key=key))
+            raise SystemExit('{cls}.{key} may not be changed'.format(
+                cls=cls.__name__, key=key))
         else:
             type.__setattr__(cls, key, value)
 
+
 class StrMixin(object):
+
     """
     A mixin defining defaults for __str__ and __repr__,
     using __unicode__.
     """
+
     def __str__(self):
         return nativeString(self.__unicode__())
 
@@ -175,14 +193,16 @@ class StrMixin(object):
             cls=self.__class__.__name__,
             content=self.__str__())
 
+
 class Options(object):
+
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
     __metaclass__ = FixedClass
     demo = False
     showRulesets = False
-    rulesetName = None	# will only be set by command line --ruleset
-    ruleset = None # from rulesetName
+    rulesetName = None	 # will only be set by command line --ruleset
+    ruleset = None       # from rulesetName
     rounds = None
     host = None
     player = None
@@ -206,13 +226,17 @@ class Options(object):
         parts = Internal.version.split('.')
         return 8000 + int(parts[0]) * 100 + int(parts[1])
 
+
 class SingleshotOptions(object):
+
     """Options which are cleared after having been used once"""
     table = False
     join = False
     game = None
 
+
 class __Internal(object):
+
     """
     Global things.
 
@@ -224,7 +248,8 @@ class __Internal(object):
     @type logPrefix: C{str}
     @cvar isServer: True if this is the server process.
     @type isServer: C{bool}
-    @cvar scaleScene: Defines if the scene is scaled. Disable for debugging only.
+    @cvar scaleScene: Defines if the scene is scaled.
+        Disable for debugging only.
     @type scaleScene: C{bool}
     @cvar reactor: The twisted reactor instance.
     @type reactor: L{twisted.internet.reactor}
@@ -263,7 +288,8 @@ class __Internal(object):
             except (AttributeError, socket.error):
                 haveDevLog = False
         if not haveDevLog:
-            handler = logging.handlers.RotatingFileHandler('kajongg.log', maxBytes=100000000, backupCount=10)
+            handler = logging.handlers.RotatingFileHandler(
+                'kajongg.log', maxBytes=100000000, backupCount=10)
         self.logger.addHandler(handler)
         self.logger.addHandler(logging.StreamHandler(sys.stderr))
         self.logger.setLevel(logging.DEBUG)
@@ -272,7 +298,9 @@ class __Internal(object):
 
 Internal = __Internal()
 
+
 class IntDict(defaultdict, StrMixin):
+
     """a dict where the values are expected to be numeric, so
     we can add dicts.If parent is given, parent is expected to
     be another IntDict, and our changes propagate into parent.
@@ -324,10 +352,12 @@ class IntDict(defaultdict, StrMixin):
         """how many tiles defined by countFilter do we hold?
         countFilter is an iterator of element names. No countFilter: Take all
         So count(['we','ws']) should return 8"""
-        return sum((defaultdict.get(self, x) or 0) for x in countFilter or self)
+        return sum((defaultdict.get(self, x) or 0)
+                   for x in countFilter or self)
 
     def all(self, countFilter=None):
-        """returns a list of all tiles defined by countFilter, each tile multiplied by its occurrence
+        """returns a list of all tiles defined by countFilter,
+        each tile multiplied by its occurrence.
         countFilter is an iterator of element names. No countFilter: take all
         So all(['we','fs']) should return ['we', 'we', 'we', 'we', 'fs']"""
         result = []
@@ -361,10 +391,12 @@ class IntDict(defaultdict, StrMixin):
     def __unicode__(self):
         """sort the result for better log comparison"""
         keys = sorted(self.keys())
-        return u', '.join('{}:{}'.format(unicodeString(x), unicodeString(self[x])) for x in keys)
+        return u', '.join('{}:{}'.format(
+            unicodeString(x), unicodeString(self[x])) for x in keys)
 
 
 class ZValues(object):
+
     """here we collect all zValues used in Kajongg"""
     itemLevelFactor = 100000
     boardLevelFactor = itemLevelFactor * 100
@@ -372,9 +404,11 @@ class ZValues(object):
     moving = marker + 1
     popup = moving + 1
 
+
 def english(i18nstring):
     """translate back from local language"""
     return ENGLISHDICT.get(i18nstring, i18nstring)
+
 
 def unicodeString(s, encoding='utf-8'):
     """
@@ -386,17 +420,20 @@ def unicodeString(s, encoding='utf-8'):
     """
     if s is None:
         return s
-    if s.__class__.__name__ == 'QString': # avoid import of QString
+    if s.__class__.__name__ == 'QString':  # avoid import of QString
         return unicode(s)
     elif isinstance(s, unicode):
         return s
     else:
         return s.decode(encoding)
 
+
 def isStringType(s):
-    if s.__class__.__name__  in ('QString', 'QByteArray'):
+    """Returns True for QString, QByteArray, str, bytes, unicode."""
+    if s.__class__.__name__ in ('QString', 'QByteArray'):
         return True
     return isinstance(s, (bytes, unicode))
+
 
 def nativeString(s, encoding='utf-8'):
     """
@@ -418,9 +455,9 @@ def nativeString(s, encoding='utf-8'):
     """
     if s is None:
         return s
-    if s.__class__.__name__ == 'QString': # avoid import of QString
+    if s.__class__.__name__ == 'QString':  # avoid import of QString
         s = unicode(s)
-    if s.__class__.__name__ == 'QByteArray': # avoid import of QByteArray
+    if s.__class__.__name__ == 'QByteArray':  # avoid import of QByteArray
         s = bytes(s)
     if not isStringType(s):
         return s
@@ -438,6 +475,7 @@ def nativeString(s, encoding='utf-8'):
             s.decode(encoding)
     return s
 
+
 def nativeStringArgs(args, encoding='utf-8'):
     """
     Convert string elements of a tuple to the native C{str} type,
@@ -449,7 +487,9 @@ def nativeStringArgs(args, encoding='utf-8'):
     @returns: A tuple with the converted strings.
     @rtype: C{tuple}
     """
-    return tuple((nativeString(x, encoding) if isStringType(x) else x for x in args))
+    return tuple((nativeString(x, encoding)
+                  if isStringType(x) else x for x in args))
+
 
 def unicodeStringArgs(args, encoding='utf-8'):
     """
@@ -462,4 +502,5 @@ def unicodeStringArgs(args, encoding='utf-8'):
     @returns: A tuple with the converted strings.
     @rtype: C{tuple}
     """
-    return tuple((unicodeString(x, encoding) if isStringType(x) else x for x in args))
+    return tuple((unicodeString(x, encoding)
+                  if isStringType(x) else x for x in args))

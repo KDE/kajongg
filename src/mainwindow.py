@@ -18,21 +18,32 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import sys, os, codecs
+import sys
+import os
+import codecs
 
 from log import logError, logDebug, m18n, m18nc
 from common import Options, Internal, isAlive, Debug
-import cgitb, tempfile, webbrowser, logging
+import cgitb
+import tempfile
+import webbrowser
+import logging
 from itertools import chain
 
+
 class MyHook(cgitb.Hook):
+
     """override the standard cgitb hook: invoke the browser"""
+
     def __init__(self):
-        self.tmpFileName = tempfile.mkstemp(suffix='.html', prefix='bt_', text=True)[1]
+        self.tmpFileName = tempfile.mkstemp(
+            suffix='.html',
+            prefix='bt_',
+            text=True)[1]
         # cgitb can only handle ascii, work around that.
         # See http://bugs.python.org/issue22746
         cgitb.Hook.__init__(self, file=codecs.open(self.tmpFileName, 'w',
-            encoding='latin-1', errors='xmlcharrefreplace'))
+                                                   encoding='latin-1', errors='xmlcharrefreplace'))
 
     def handle(self, info=None):
         """handling the exception: show backtrace in browser"""
@@ -41,7 +52,7 @@ class MyHook(cgitb.Hook):
             cgitb.Hook.handle(self, info)
             webbrowser.open(self.tmpFileName)
 
-#sys.excepthook = MyHook()
+# sys.excepthook = MyHook()
 
 NOTFOUND = []
 
@@ -52,7 +63,7 @@ except ImportError as importError:
     NOTFOUND.append('Please install PyQt4 or PyQt5: %s' % importError)
 
 try:
-    from zope.interface import implements # pylint: disable=unused-import
+    from zope.interface import implements  # pylint: disable=unused-import
 except ImportError as importError:
     NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
 
@@ -75,12 +86,14 @@ from statesaver import StateSaver
 from util import checkMemory
 from twisted.internet.error import ReactorNotRunning
 
-#except ImportError as importError:
-#    NOTFOUND.append('Kajongg is not correctly installed: modules: %s' % importError)
+# except ImportError as importError:
+# NOTFOUND.append('Kajongg is not correctly installed: modules: %s' %
+# importError)
 
 if len(NOTFOUND):
     logError("\n".join(" * %s" % s for s in NOTFOUND), showStack=False)
     sys.exit(3)
+
 
 def cleanExit(*dummyArgs):
     """close sqlite3 files before quitting"""
@@ -92,7 +105,7 @@ def cleanExit(*dummyArgs):
         # this must be very early or very late
         if Debug.quit:
             logDebug(u'cleanExit calling sys.exit(0)')
-        #sys.exit(0)
+        # sys.exit(0)
         MainWindow.aboutToQuit()
 
 from signal import signal, SIGABRT, SIGINT, SIGTERM
@@ -104,7 +117,9 @@ if os.name != 'nt':
     signal(SIGHUP, cleanExit)
     signal(SIGQUIT, cleanExit)
 
+
 class MainWindow(KXmlGuiWindow):
+
     """the main window"""
     # pylint: disable=too-many-instance-attributes
 
@@ -123,11 +138,17 @@ class MainWindow(KXmlGuiWindow):
         self.rulesetWindow = None
         self.confDialog = None
         if Options.gui:
-            KStandardAction.preferences(self.showSettings, self.actionCollection())
+            KStandardAction.preferences(
+                self.showSettings,
+                self.actionCollection())
             self.setupUi()
             self.setupGUI()
-            Internal.Preferences.addWatch('tilesetName', self.tilesetNameChanged)
-            Internal.Preferences.addWatch('backgroundName', self.backgroundChanged)
+            Internal.Preferences.addWatch(
+                'tilesetName',
+                self.tilesetNameChanged)
+            Internal.Preferences.addWatch(
+                'backgroundName',
+                self.backgroundChanged)
             self.retranslateUi()
             for action in self.toolBar().actions():
                 if 'onfigure' in action.text():
@@ -169,8 +190,10 @@ class MainWindow(KXmlGuiWindow):
     def sizeHint(self):
         """give the main window a sensible default size"""
         result = KXmlGuiWindow.sizeHint(self)
-        result.setWidth(result.height() * 3 // 2) # we want space to the right for the buttons
-        # the default is too small. Use at least 2/3 of screen height and 1/2 of screen width:
+        result.setWidth(result.height() * 3 // 2)
+                        # we want space to the right for the buttons
+        # the default is too small. Use at least 2/3 of screen height and 1/2
+        # of screen width:
         available = KApplication.kApplication().desktop().availableGeometry()
         height = max(result.height(), available.height() * 2 // 3)
         width = max(result.width(), available.width() // 2)
@@ -183,7 +206,8 @@ class MainWindow(KXmlGuiWindow):
         self.centralView.resizeEvent(True)
         KXmlGuiWindow.showEvent(self, event)
 
-    def kajonggAction(self, name, icon, slot=None, shortcut=None, actionData=None):
+    def kajonggAction(
+            self, name, icon, slot=None, shortcut=None, actionData=None):
         """simplify defining actions"""
         res = KAction(self)
         if icon:
@@ -192,7 +216,7 @@ class MainWindow(KXmlGuiWindow):
             res.triggered.connect(slot)
         self.actionCollection().addAction(name, res)
         if shortcut:
-            res.setShortcut( Qt.CTRL + shortcut)
+            res.setShortcut(Qt.CTRL + shortcut)
             res.setShortcutContext(Qt.ApplicationShortcut)
         if PYQT_VERSION_STR != '4.5.2' or actionData is not None:
             res.setData(toQVariant(actionData))
@@ -200,7 +224,11 @@ class MainWindow(KXmlGuiWindow):
 
     def _kajonggToggleAction(self, name, icon, shortcut=None, actionData=None):
         """a checkable action"""
-        res = self.kajonggAction(name, icon, shortcut=shortcut, actionData=actionData)
+        res = self.kajonggAction(
+            name,
+            icon,
+            shortcut=shortcut,
+            actionData=actionData)
         res.setCheckable(True)
         res.toggled.connect(self._toggleWidget)
         return res
@@ -222,34 +250,65 @@ class MainWindow(KXmlGuiWindow):
         layout.addWidget(self.centralView)
         self.setCentralWidget(centralWidget)
         self.centralView.setFocusPolicy(Qt.StrongFocus)
-        self.background = None # just for pylint
+        self.background = None  # just for pylint
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
         self.adjustView()
-        self.actionScoreGame = self.kajonggAction("scoreGame", "draw-freehand", self.scoringScene, Qt.Key_C)
-        self.actionPlayGame = self.kajonggAction("play", "arrow-right", self.playingScene, Qt.Key_N)
-        self.actionAbortGame = self.kajonggAction("abort", "dialog-close", self.abortAction, Qt.Key_W)
+        self.actionScoreGame = self.kajonggAction(
+            "scoreGame",
+            "draw-freehand",
+            self.scoringScene,
+            Qt.Key_C)
+        self.actionPlayGame = self.kajonggAction(
+            "play",
+            "arrow-right",
+            self.playingScene,
+            Qt.Key_N)
+        self.actionAbortGame = self.kajonggAction(
+            "abort",
+            "dialog-close",
+            self.abortAction,
+            Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
-        self.actionQuit = self.kajonggAction("quit", "application-exit", self.close, Qt.Key_Q)
-        self.actionPlayers = self.kajonggAction("players", "im-user", self.slotPlayers)
-        self.actionRulesets = self.kajonggAction("rulesets", "games-kajongg-law", self.slotRulesets)
+        self.actionQuit = self.kajonggAction(
+            "quit",
+            "application-exit",
+            self.close,
+            Qt.Key_Q)
+        self.actionPlayers = self.kajonggAction(
+            "players", "im-user", self.slotPlayers)
+        self.actionRulesets = self.kajonggAction(
+            "rulesets",
+            "games-kajongg-law",
+            self.slotRulesets)
         self.actionChat = self._kajonggToggleAction("chat", "call-start",
-            shortcut=Qt.Key_H, actionData=ChatWindow)
+                                                    shortcut=Qt.Key_H, actionData=ChatWindow)
         self.actionChat.setEnabled(False)
-        self.actionAngle = self.kajonggAction("angle", "object-rotate-left", self.changeAngle, Qt.Key_G)
+        self.actionAngle = self.kajonggAction(
+            "angle",
+            "object-rotate-left",
+            self.changeAngle,
+            Qt.Key_G)
         self.actionAngle.setEnabled(False)
-        self.actionFullscreen = KToggleFullScreenAction(self.actionCollection())
+        self.actionFullscreen = KToggleFullScreenAction(
+            self.actionCollection())
         self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)
         self.actionFullscreen.setShortcutContext(Qt.ApplicationShortcut)
         self.actionFullscreen.setWindow(self)
         self.actionCollection().addAction("fullscreen", self.actionFullscreen)
         self.actionFullscreen.toggled.connect(self.fullScreen)
-        self.actionScoreTable = self._kajonggToggleAction("scoreTable", "format-list-ordered",
+        self.actionScoreTable = self._kajonggToggleAction(
+            "scoreTable", "format-list-ordered",
             Qt.Key_T, actionData=ScoreTable)
         self.actionScoreTable.setEnabled(False)
-        self.actionExplain = self._kajonggToggleAction("explain", "applications-education",
+        self.actionExplain = self._kajonggToggleAction(
+            "explain", "applications-education",
             Qt.Key_E, actionData=ExplainView)
         self.actionExplain.setEnabled(False)
-        self.actionAutoPlay = self.kajonggAction("demoMode", "arrow-right-double", None, Qt.Key_D)
+        self.actionAutoPlay = self.kajonggAction(
+            "demoMode",
+            "arrow-right-double",
+            None,
+            Qt.Key_D)
         self.actionAutoPlay.setCheckable(True)
         self.actionAutoPlay.setEnabled(True)
         self.actionAutoPlay.toggled.connect(self._toggleDemoMode)
@@ -325,12 +384,14 @@ class MainWindow(KXmlGuiWindow):
                     logDebug(u'mainWindow.queryClose confirmed')
                 else:
                     logDebug(u'mainWindow.queryClose not confirmed')
-            # start closing again. This time no question will appear, the game is already aborted
+            # start closing again. This time no question will appear, the game
+            # is already aborted
             if self.exitConfirmed:
                 assert isAlive(self)
                 self.close()
             else:
                 self.exitConfirmed = None
+
         def cancelled(result):
             """just do nothing"""
             if Debug.quit:
@@ -346,19 +407,23 @@ class MainWindow(KXmlGuiWindow):
             else:
                 self.exitConfirmed = True
                 if Debug.quit:
-                    logDebug(u'MainWindow.queryClose not asking, exitConfirmed=True')
+                    logDebug(
+                        u'MainWindow.queryClose not asking, exitConfirmed=True')
         return True
 
     def queryExit(self):
         """see queryClose"""
         if self.exitReady:
             if Debug.quit:
-                logDebug(u'MainWindow.queryExit returns True because exitReady is set')
+                logDebug(
+                    u'MainWindow.queryExit returns True because exitReady is set')
             return True
         if self.exitConfirmed:
             # now we can get serious
             self.exitReady = False
-            for widget in chain((x.tableList for x in HumanClient.humanClients), [self.confDialog,
+            for widget in chain(
+                (x.tableList for x in HumanClient.humanClients), [
+                    self.confDialog,
                     self.rulesetWindow, self.playerWindow]):
                 if isAlive(widget):
                     widget.hide()
@@ -367,7 +432,9 @@ class MainWindow(KXmlGuiWindow):
             if Internal.reactor and Internal.reactor.running:
                 self.exitWaitTime += 10
                 if self.exitWaitTime % 1000 == 0:
-                    logDebug(u'waiting since %d seconds for reactor to stop' % (self.exitWaitTime // 1000))
+                    logDebug(
+                        u'waiting since %d seconds for reactor to stop' %
+                        (self.exitWaitTime // 1000))
                 try:
                     if Debug.quit:
                         logDebug(u'now stopping reactor')
@@ -377,11 +444,13 @@ class MainWindow(KXmlGuiWindow):
                 except ReactorNotRunning:
                     self.exitReady = True
                     if Debug.quit:
-                        logDebug(u'MainWindow.queryExit returns True: It got exception ReactorNotRunning')
+                        logDebug(
+                            u'MainWindow.queryExit returns True: It got exception ReactorNotRunning')
             else:
                 self.exitReady = True
                 if Debug.quit:
-                    logDebug(u'MainWindow.queryExit returns True: Reactor is not running')
+                    logDebug(
+                        u'MainWindow.queryExit returns True: Reactor is not running')
         return bool(self.exitReady)
 
     @staticmethod
@@ -393,14 +462,17 @@ class MainWindow(KXmlGuiWindow):
             if Debug.quit:
                 logDebug(u'aboutToQuit starting')
             if mainWindow.exitWaitTime > 1000.0 or Debug.quit:
-                logDebug(u'reactor stopped after %d ms' % (mainWindow.exitWaitTime ))
+                logDebug(
+                    u'reactor stopped after %d ms' %
+                    (mainWindow.exitWaitTime))
         else:
             if Debug.quit:
                 logDebug(u'aboutToQuit: mainWindow is already None')
         StateSaver.saveAll()
         Internal.app.quit()
         try:
-            # if we are killed while loading, Internal.db may not yet be defined
+            # if we are killed while loading, Internal.db may not yet be
+            # defined
             if Internal.db:
                 Internal.db.close()
         except NameError:
@@ -416,48 +488,67 @@ class MainWindow(KXmlGuiWindow):
 
     def retranslateUi(self):
         """retranslate"""
-        self.actionScoreGame.setText(m18nc('@action:inmenu', "&Score Manual Game"))
-        self.actionScoreGame.setIconText(m18nc('@action:intoolbar', 'Manual Game'))
-        self.actionScoreGame.setHelpText(m18nc('kajongg @info:tooltip', '&Score a manual game.'))
+        self.actionScoreGame.setText(
+            m18nc('@action:inmenu', "&Score Manual Game"))
+        self.actionScoreGame.setIconText(
+            m18nc('@action:intoolbar', 'Manual Game'))
+        self.actionScoreGame.setHelpText(
+            m18nc('kajongg @info:tooltip',
+                  '&Score a manual game.'))
 
         self.actionPlayGame.setText(m18nc('@action:intoolbar', "&Play"))
         self.actionPlayGame.setPriority(QAction.LowPriority)
-        self.actionPlayGame.setHelpText(m18nc('kajongg @info:tooltip', 'Start a new game.'))
+        self.actionPlayGame.setHelpText(
+            m18nc('kajongg @info:tooltip', 'Start a new game.'))
 
         self.actionAbortGame.setText(m18nc('@action:inmenu', "&Abort Game"))
         self.actionAbortGame.setPriority(QAction.LowPriority)
-        self.actionAbortGame.setHelpText(m18nc('kajongg @info:tooltip', 'Abort the current game.'))
+        self.actionAbortGame.setHelpText(
+            m18nc('kajongg @info:tooltip',
+                  'Abort the current game.'))
 
         self.actionQuit.setText(m18nc('@action:inmenu', "&Quit Kajongg"))
         self.actionQuit.setPriority(QAction.LowPriority)
 
         self.actionPlayers.setText(m18nc('@action:intoolbar', "&Players"))
-        self.actionPlayers.setHelpText(m18nc('kajongg @info:tooltip', 'define your players.'))
+        self.actionPlayers.setHelpText(
+            m18nc('kajongg @info:tooltip',
+                  'define your players.'))
 
         self.actionRulesets.setText(m18nc('@action:intoolbar', "&Rulesets"))
-        self.actionRulesets.setHelpText(m18nc('kajongg @info:tooltip', 'customize rulesets.'))
+        self.actionRulesets.setHelpText(
+            m18nc('kajongg @info:tooltip',
+                  'customize rulesets.'))
 
-        self.actionAngle.setText(m18nc('@action:inmenu', "&Change Visual Angle"))
+        self.actionAngle.setText(
+            m18nc('@action:inmenu',
+                  "&Change Visual Angle"))
         self.actionAngle.setIconText(m18nc('@action:intoolbar', "Angle"))
-        self.actionAngle.setHelpText(m18nc('kajongg @info:tooltip', "Change the visual appearance of the tiles."))
+        self.actionAngle.setHelpText(
+            m18nc('kajongg @info:tooltip',
+                  "Change the visual appearance of the tiles."))
 
-        self.actionScoreTable.setText(m18nc('kajongg @action:inmenu', "&Score Table"))
-        self.actionScoreTable.setIconText(m18nc('kajongg @action:intoolbar', "&Scores"))
+        self.actionScoreTable.setText(
+            m18nc('kajongg @action:inmenu', "&Score Table"))
+        self.actionScoreTable.setIconText(
+            m18nc('kajongg @action:intoolbar', "&Scores"))
         self.actionScoreTable.setHelpText(m18nc('kajongg @info:tooltip',
-                "Show or hide the score table for the current game."))
+                                                "Show or hide the score table for the current game."))
 
         self.actionExplain.setText(m18nc('@action:inmenu', "&Explain Scores"))
         self.actionExplain.setIconText(m18nc('@action:intoolbar', "&Explain"))
         self.actionExplain.setHelpText(m18nc('kajongg @info:tooltip',
-                'Explain the scoring for all players in the current game.'))
+                                             'Explain the scoring for all players in the current game.'))
 
         self.actionAutoPlay.setText(m18nc('@action:inmenu', "&Demo Mode"))
         self.actionAutoPlay.setPriority(QAction.LowPriority)
         self.actionAutoPlay.setHelpText(m18nc('kajongg @info:tooltip',
-                'Let the computer take over for you. Start a new local game if needed.'))
+                                              'Let the computer take over for you. Start a new local game if needed.'))
 
         self.actionChat.setText(m18n("C&hat"))
-        self.actionChat.setHelpText(m18nc('kajongg @info:tooltip', 'Chat with the other players.'))
+        self.actionChat.setHelpText(
+            m18nc('kajongg @info:tooltip',
+                  'Chat with the other players.'))
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
@@ -500,7 +591,8 @@ class MainWindow(KXmlGuiWindow):
             centralWidget.setAutoFillBackground(True)
 
     @afterQueuedAnimations
-    def tilesetNameChanged(self, deferredResult, oldValue=None, newValue=None, *args):
+    def tilesetNameChanged(
+            self, deferredResult, oldValue=None, newValue=None, *args):
         if self.centralView:
             with MoveImmediate():
                 if self.scene:
@@ -528,7 +620,10 @@ class MainWindow(KXmlGuiWindow):
                 clsName = actionData.__name__
                 actionData = actionData(scene=self.scene)
                 action.setData(toQVariant(actionData))
-                setattr(self.scene, clsName[0].lower() + clsName[1:], actionData)
+                setattr(
+                    self.scene,
+                    clsName[0].lower() + clsName[1:],
+                    actionData)
             actionData.show()
             actionData.raise_()
         else:

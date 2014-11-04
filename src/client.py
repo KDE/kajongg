@@ -18,7 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import datetime, weakref
+import datetime
+import weakref
 
 from twisted.spread import pb
 from twisted.internet.task import deferLater
@@ -35,11 +36,16 @@ from move import Move
 from animation import animate
 from player import PlayingPlayer
 
-import intelligence, altint
+import intelligence
+import altint
+
 
 class Table(StrMixin):
+
     """defines things common to both ClientTable and ServerTable"""
-    def __init__(self, tableid, ruleset, suspendedAt, running, playOpen, autoPlay, wantedGame):
+
+    def __init__(self, tableid, ruleset, suspendedAt,
+                 running, playOpen, autoPlay, wantedGame):
         self.tableid = tableid
         if isinstance(ruleset, Ruleset):
             self.ruleset = ruleset
@@ -57,12 +63,14 @@ class Table(StrMixin):
         if self.suspendedAt:
             result = m18nc('table status', 'Suspended')
             result += u' ' + unicodeString(datetime.datetime.strptime(self.suspendedAt,
-                '%Y-%m-%dT%H:%M:%S').strftime('%c'))
+                                                                      '%Y-%m-%dT%H:%M:%S').strftime('%c'))
         if self.running:
             result += u' ' + m18nc('table status', 'Running')
         return result or m18nc('table status', 'New')
 
+
 class ClientTable(Table):
+
     """the table as seen by the client"""
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
@@ -70,13 +78,21 @@ class ClientTable(Table):
     def __init__(self, client, tableid, ruleset, gameid, suspendedAt, running,
                  playOpen, autoPlay, wantedGame, playerNames,
                  playersOnline, endValues):
-        Table.__init__(self, tableid, ruleset, suspendedAt, running, playOpen, autoPlay, wantedGame)
+        Table.__init__(
+            self,
+            tableid,
+            ruleset,
+            suspendedAt,
+            running,
+            playOpen,
+            autoPlay,
+            wantedGame)
         self.client = client
         self.gameid = gameid
         self.playerNames = playerNames
         self.playersOnline = playersOnline
         self.endValues = endValues
-        self.myRuleset = None # if set, points to an identical local ruleset
+        self.myRuleset = None  # if set, points to an identical local ruleset
         for myRuleset in Ruleset.availableRulesets():
             if myRuleset == self.ruleset:
                 self.myRuleset = myRuleset
@@ -94,7 +110,7 @@ class ClientTable(Table):
         onlineNames = list(x for x in self.playerNames if self.isOnline(x))
         offlineString = ''
         offlineNames = list(x for x in self.playerNames if x not in onlineNames
-            and not x.startswith(u'Robot'))
+                            and not x.startswith(u'Robot'))
         if offlineNames:
             offlineString = u' offline:' + ','.join(offlineNames)
         return u'%d(%s %s%s)' % (self.tableid, self.ruleset.name, ','.join(onlineNames), offlineString)
@@ -104,7 +120,9 @@ class ClientTable(Table):
         assert self.gameid
         return bool(Query('select 1 from game where id=?', (self.gameid,)).records)
 
+
 class Client(pb.Referenceable):
+
     """interface to the server. This class only implements the logic,
     so we can also use it on the server for robot clients. Compare
     with HumanClient(Client)"""
@@ -149,7 +167,7 @@ class Client(pb.Referenceable):
             if table.tableid == tableid:
                 return table
 
-    def logout(self, dummyResult=None): # pylint: disable=no-self-use
+    def logout(self, dummyResult=None):  # pylint: disable=no-self-use
         """virtual"""
         return succeed(None)
 
@@ -168,10 +186,13 @@ class Client(pb.Referenceable):
 
     def remote_newTables(self, tables):
         """update table list"""
-        newTables = list(ClientTable(self, *x) for x in tables) # pylint: disable=star-args
+        newTables = list(ClientTable(self, *x)
+                         for x in tables)  # pylint: disable=star-args
         self.tables.extend(newTables)
         if Debug.table:
-            logDebug(u'%s got new tables:%s' % (nativeString(self.name), newTables))
+            logDebug(
+                u'%s got new tables:%s' %
+                (nativeString(self.name), newTables))
 
     @staticmethod
     def remote_serverRulesets(hashes):
@@ -185,7 +206,7 @@ class Client(pb.Referenceable):
 
     def tableChanged(self, table):
         """update table list"""
-        newTable = ClientTable(self, *table) # pylint: disable=star-args
+        newTable = ClientTable(self, *table)  # pylint: disable=star-args
         oldTable = self._tableById(newTable.tableid)
         if oldTable:
             self.tables.remove(oldTable)
@@ -203,7 +224,7 @@ class Client(pb.Referenceable):
         in our local data base - we want to use the same gameid everywhere"""
         with Internal.db:
             query = Query('insert into game(id,seed) values(?,?)',
-                      (gameid, self.connection.url), mayFail=True, failSilent=True)
+                          (gameid, self.connection.url), mayFail=True, failSilent=True)
             if query.rowcount() != 1:
                 return Message.NO
         return Message.OK
@@ -224,12 +245,14 @@ class Client(pb.Referenceable):
                 raise Exception('intelligence %s is undefined' % Options.AI)
             self.game.myself.intelligence = aiClass(self.game.myself)
 
-    def readyForGameStart(self, tableid, gameid, wantedGame, playerNames, shouldSave=True, gameClass=None):
+    def readyForGameStart(
+            self, tableid, gameid, wantedGame, playerNames, shouldSave=True, gameClass=None):
         """the game server asks us if we are ready. A robot is always ready."""
         def disagree(about):
             """do not bother to translate this, it should normally not happen"""
             self.game.close()
-            msg = u'The data bases for game %s have different %s' % (self.game.seed, about)
+            msg = u'The data bases for game %s have different %s' % (
+                self.game.seed, about)
             logWarning(msg)
             raise pb.Error(msg)
         if not self.table:
@@ -253,10 +276,12 @@ class Client(pb.Referenceable):
                             player.wind, self.table.endValues[1][player.wind], player.balance))
         else:
             self.game = gameClass(playerNames, self.table.ruleset,
-                gameid=gameid, wantedGame=wantedGame, client=self,
-                playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
+                                  gameid=gameid, wantedGame=wantedGame, client=self,
+                                  playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
         self.game.shouldSave = shouldSave
-        self.__assignIntelligence()  # intelligence variant is not saved for suspended games
+        self.__assignIntelligence()
+                                  # intelligence variant is not saved for
+                                  # suspended games
         self.game.prepareHand()
         return succeed(Message.OK)
 
@@ -345,7 +370,9 @@ class Client(pb.Referenceable):
         if self.game:
             if move.token:
                 if move.token != self.game.handId.token():
-                    logException('wrong token: %s, we have %s' % (move.token, self.game.handId.token()))
+                    logException(
+                        'wrong token: %s, we have %s' %
+                        (move.token, self.game.handId.token()))
         with Duration('Move %s:' % move):
             return self.exec_move(move).addCallback(self.__jellyMessage)
 
@@ -353,7 +380,8 @@ class Client(pb.Referenceable):
         """mirror the move of a player as told by the game server"""
         message = move.message
         if message.needsGame and not self.game:
-            # server already disconnected, see HumanClient.remote_ServerDisconnects
+            # server already disconnected, see
+            # HumanClient.remote_ServerDisconnects
             return succeed(Message.OK)
         action = message.notifyAction if move.notifying else message.clientAction
         game = self.game
@@ -370,16 +398,16 @@ class Client(pb.Referenceable):
 # This example looks for a situation where the single human player may call Chow but one of the
 # robot players calls Pung. See https://bugs.kde.org/show_bug.cgi?id=318981
 #            if game.nextPlayer() == game.myself:
-#                # I am next
+# I am next
 #                if message == Message.Pung and move.notifying:
-#                    # somebody claimed a pung
+# somebody claimed a pung
 #                    if move.player != game.myself:
-#                        # it was not me
+# it was not me
 #                        if game.handctr == 0 and len(game.moves) < 30:
-#                            # early on in the game
+# early on in the game
 #                            game.myself.computeSayable(move, [Message.Chow])
 #                            if game.myself.sayable[Message.Chow]:
-#                                # I may say Chow
+# I may say Chow
 #                                logDebug(u'FOUND EXAMPLE FOR %s IN %s' % (game.myself,
 #                                       game.handId.prompt(withMoveCount=True)))
 
@@ -394,7 +422,8 @@ class Client(pb.Referenceable):
             # 1. user says Chow
             # 2. SelectChow dialog pops up
             # 3. previous animation ends, making animate() callback with current answer
-            # 4. but this answer is Chow, without a selected Chow. This is wrongly sent to server
+            # 4. but this answer is Chow, without a selected Chow. This is
+            # wrongly sent to server
             return answer
         else:
             # return answer only after animation ends. Put answer into
@@ -412,14 +441,16 @@ class Client(pb.Referenceable):
             calledTile = self.game.lastDiscard
         self.game.lastDiscard = None
         self.game.discardedTiles[calledTile.exposed] -= 1
-        assert calledTile in move.meld, '%s %s'% (calledTile, move.meld)
+        assert calledTile in move.meld, '%s %s' % (calledTile, move.meld)
         hadTiles = move.meld[:]
         hadTiles.remove(calledTile)
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
         move.player.lastTile = calledTile.exposed
         move.player.lastSource = 'd'
-        move.exposedMeld = move.player.exposeMeld(hadTiles, calledTile=calledTileItem or calledTile)
+        move.exposedMeld = move.player.exposeMeld(
+            hadTiles,
+            calledTile=calledTileItem or calledTile)
 
         if self.thatWasMe(move.player):
             if move.message != Message.Kong:

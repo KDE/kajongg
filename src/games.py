@@ -23,10 +23,10 @@ import datetime
 from kde import KIcon
 from dialogs import WarningYesNo
 
-from qt import usingQt5, Qt, toQVariant, RealQVariant, variantValue, QAbstractTableModel
-from qt import QDialogButtonBox, QDialog, \
-        QHBoxLayout, QVBoxLayout, QCheckBox, \
-        QItemSelectionModel, QAbstractItemView
+from qt import usingQt5, Qt, toQVariant, RealQVariant, variantValue
+from qt import QAbstractTableModel, QDialogButtonBox, QDialog
+from qt import QHBoxLayout, QVBoxLayout, QCheckBox
+from qt import QItemSelectionModel, QAbstractItemView
 
 from log import logException, m18n, m18nc
 from query import Query
@@ -35,8 +35,11 @@ from statesaver import StateSaver
 from common import Debug, nativeString, unicode
 from modeltest import ModelTest
 
+
 class GamesModel(QAbstractTableModel):
+
     """data for the list of games"""
+
     def __init__(self):
         QAbstractTableModel.__init__(self)
         self._resultRows = []
@@ -68,28 +71,34 @@ class GamesModel(QAbstractTableModel):
         if not (index.isValid() and role == Qt.DisplayRole):
             return toQVariant()
         if role == Qt.DisplayRole:
-            unformatted = unicode(self._resultRows[index.row()][index.column()])
+            unformatted = unicode(
+                self._resultRows[index.row()][index.column()])
             if index.column() == 2:
                 # we do not yet use this for listing remote games but if we do
                 # this translation is needed for robot players
                 names = [m18n(name) for name in unformatted.split('///')]
                 return toQVariant(', '.join(names))
             elif index.column() == 1:
-                dateVal = datetime.datetime.strptime(unformatted, '%Y-%m-%dT%H:%M:%S')
+                dateVal = datetime.datetime.strptime(
+                    unformatted, '%Y-%m-%dT%H:%M:%S')
                 return toQVariant(nativeString(dateVal.strftime('%c')))
             elif index.column() == 0:
                 return toQVariant(int(unformatted))
         with RealQVariant():
             return QAbstractTableModel.data(self, index, role)
 
-    def headerData(self, section, orientation, role):  # pylint: disable=no-self-use
+    def headerData(self, section, orientation, role):
         """for the two visible columns"""
+        # pylint: disable=no-self-use
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return toQVariant((m18n("Started"), m18n("Players"))[section-1])
+            return toQVariant((m18n("Started"), m18n("Players"))[section - 1])
         return toQVariant()
 
+
 class Games(QDialog):
+
     """a dialog for selecting a game"""
+
     def __init__(self, parent=None):
         super(Games, self).__init__(parent)
         self.selectedGame = None
@@ -110,13 +119,16 @@ class Games(QDialog):
 
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
-        self.newButton = self.buttonBox.addButton(m18nc('start a new game', "&New"), QDialogButtonBox.ActionRole)
+        self.newButton = self.buttonBox.addButton(
+            m18nc('start a new game', "&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.accept)
-        self.loadButton = self.buttonBox.addButton(m18n("&Load"), QDialogButtonBox.AcceptRole)
+        self.loadButton = self.buttonBox.addButton(
+            m18n("&Load"), QDialogButtonBox.AcceptRole)
         self.loadButton.clicked.connect(self.loadGame)
         self.loadButton.setIcon(KIcon("document-open"))
-        self.deleteButton = self.buttonBox.addButton(m18n("&Delete"), QDialogButtonBox.ActionRole)
+        self.deleteButton = self.buttonBox.addButton(
+            m18n("&Delete"), QDialogButtonBox.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.deleteButton.clicked.connect(self.delete)
 
@@ -165,15 +177,16 @@ class Games(QDialog):
 
     def setQuery(self):
         """define the query depending on self.OnlyPending"""
-        query = Query("select g.id, g.starttime, " \
-            "p0.name||'///'||p1.name||'///'||p2.name||'///'||p3.name " \
-            "from game g, player p0," \
-            "player p1, player p2, player p3 " \
-            "where seed is null" \
-            " and p0.id=g.p0 and p1.id=g.p1 " \
-            " and p2.id=g.p2 and p3.id=g.p3 " \
-            "%s" \
-            "and exists(select 1 from score where game=g.id)" % \
+        query = Query(
+            "select g.id, g.starttime, "
+            "p0.name||'///'||p1.name||'///'||p2.name||'///'||p3.name "
+            "from game g, player p0,"
+            "player p1, player p2, player p3 "
+            "where seed is null"
+            " and p0.id=g.p0 and p1.id=g.p1 "
+            " and p2.id=g.p2 and p3.id=g.p3 "
+            "%s"
+            "and exists(select 1 from score where game=g.id)" %
             ("and g.endtime is null " if self.onlyPending else ""))
         self.model.setResultset(query.records)
         self.view.hideColumn(0)
@@ -217,13 +230,15 @@ class Games(QDialog):
                 for game in games:
                     Query("DELETE FROM score WHERE game = ?", (game, ))
                     Query("DELETE FROM game WHERE id = ?", (game, ))
-                self.setQuery() # just reload entire table
+                self.setQuery()  # just reload entire table
         allGames = self.view.selectionModel().selectedRows(0)
         deleteGames = list(variantValue(x.data()) for x in allGames)
         if len(deleteGames) == 0:
             # should never happen
             logException('delete: 0 rows selected')
         WarningYesNo(
-            m18n("Do you really want to delete <numid>%1</numid> games?<br>" \
-            "This will be final, you cannot cancel it with the cancel button",
-            len(deleteGames))).addCallback(answered, deleteGames)
+            m18n(
+                "Do you really want to delete <numid>%1</numid> games?<br>"
+                "This will be final, you cannot cancel it with "
+                "the cancel button",
+                len(deleteGames))).addCallback(answered, deleteGames)

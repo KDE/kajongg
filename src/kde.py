@@ -20,11 +20,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 # pylint: disable=unused-import
 
-import os, sys, shutil
+import os
+import sys
+import shutil
 
 from common import Internal, Options, unicode, isPython3
 
-usingKDE = False # pylint: disable=invalid-name
+usingKDE = False  # pylint: disable=invalid-name
 
 try:
     if '--nokde' in sys.argv or '--qt5' in sys.argv:
@@ -41,7 +43,7 @@ try:
         KConfigSkeleton, KDialogButtonBox, KAction, KStandardAction, \
         KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
         KConfigDialog, KDialog
-    usingKDE = True # pylint: disable=invalid-name
+    usingKDE = True  # pylint: disable=invalid-name
     KDialog.NoButton = getattr(KDialog, 'None')
     # see https://bugs.kde.org/show_bug.cgi?id=333683
 except ImportError:
@@ -51,6 +53,7 @@ except ImportError:
         # be available
     except ImportError:
         from kdestub import *  # pylint: disable=wildcard-import
+
 
 def appdataDir():
     """
@@ -66,9 +69,12 @@ def appdataDir():
         # the following code moves an existing kajonggserver.db to .kajonggserver
         # but only if .kajonggserver does not yet exist
         kdehome = os.environ.get('KDEHOME', '~/.kde')
-        oldPath = os.path.expanduser(kdehome + '/share/apps/kajongg/kajonggserver.db')
+        oldPath = os.path.expanduser(
+            kdehome +
+            '/share/apps/kajongg/kajonggserver.db')
         if not os.path.exists(oldPath):
-            oldPath = os.path.expanduser('~/.kde4/share/apps/kajongg/kajonggserver.db')
+            oldPath = os.path.expanduser(
+                '~/.kde4/share/apps/kajongg/kajonggserver.db')
         if os.path.exists(oldPath) and not os.path.exists(serverDir):
             # upgrading an old kajonggserver installation
             os.makedirs(serverDir)
@@ -83,15 +89,18 @@ def appdataDir():
         if not os.path.exists(serverDir):
             # the client wants to place the socket in serverDir
             os.makedirs(serverDir)
-        result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
+        result = os.path.dirname(
+            unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
         return result
+
 
 def cacheDir():
     """the cache directory for this user"""
     if Internal.isServer:
         result = os.path.join(appdataDir(), 'cache')
     else:
-        result = os.path.dirname(unicode(KGlobal.dirs().locateLocal("cache", "")))
+        result = os.path.dirname(
+            unicode(KGlobal.dirs().locateLocal("cache", "")))
         result = os.path.join(result, 'kajongg')
     if not os.path.exists(result):
         try:
@@ -100,11 +109,14 @@ def cacheDir():
             pass
     return result
 
+
 def socketName():
     """client and server process use this socket to talk to each other"""
     serverDir = os.path.expanduser('~/.kajonggserver')
     if not os.path.exists(serverDir):
-        appdataDir() # allocate the directory and possibly move old databases there
+        appdataDir()
+                   # allocate the directory and possibly move old databases
+                   # there
     if Options.socket:
         return Options.socket
     else:
