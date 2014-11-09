@@ -4,10 +4,18 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-2.0+</project_license>
   <name>Kajongg</name>
+  <name xml:lang="de">Kajongg</name>
+  <name xml:lang="nl">Kajongg</name>
+  <name xml:lang="pl">Kajongg</name>
   <name xml:lang="pt">Kajongg</name>
+  <name xml:lang="sk">Kajongg</name>
   <name xml:lang="uk">Kajongg</name>
   <name xml:lang="x-test">xxKajonggxx</name>
   <summary>Mah Jongg</summary>
+  <summary xml:lang="de">Mah Jongg</summary>
+  <summary xml:lang="nl">Mah Jongg</summary>
+  <summary xml:lang="pl">Mah Jongg</summary>
+  <summary xml:lang="sk">Mah Jongg</summary>
   <summary xml:lang="uk">Гра у маджонґ</summary>
   <summary xml:lang="x-test">xxMah Jonggxx</summary>
   <description>
@@ -17,6 +25,9 @@
       computation of scores and for bookkeeping. Or you can use Kajongg to play against any combination of other human players
       or computer players.
     </p>
+    <p xml:lang="nl">Kajongg is het oude Chinese bordspel voor 4 spelers. Kajongg kan op twee verschillende manieren worden gebruikt: de score bijhouden van een handmatig spel waar u speelt zoals u gewend bent en u gebruikt Kajongg voor het berekenen van de scores en voor bijhouden van de boeken. Of u kunt Kajongg gebruiken om tegen elke combinatie van andere menselijke spelers of computerspelers te spelen.</p>
+    <p xml:lang="pl">Kajongg jest starożytną, chińską grą planszową dla 4 graczy. Kajongg można używać na dwa różne sposoby: Punktacja ręcznej gry, gdzie grasz jak zwykle i używasz Kajongg do obliczania punktów. Można też użyć Kajongg do grania przeciwko dowolnej kombinacji innych graczy ludzkich lub sterowanych przez komputer.</p>
+    <p xml:lang="sk">Kajongg je stará čínska dosková hra pre 4 hráčov. Kajongg sa dá použiť dvoma odlišnými spôsobmi: Bodovanie ručnej hry, kde hráte ako vždy a použite Kajongg na výpočet bodov a na účtovníctvo. Alebo môžete použiť Kajongg na hranie proti kombinácii iného ľudského hráča alebo počítačových hráčov.</p>
     <p xml:lang="uk">Kajongg — давня китайська гра на дошці для 4 гравців. Kajongg можна користуватися у два різних способи. Можна зіграти у гру у звичний спосіб, а потім скористатися Kajongg для обчислення рахунків та ведення записів щодо гри. Крім того, ви можете скористатися Kajongg для гри з довільною кількістю інших гравців-людей або комп’ютерних гравців.</p>
     <p xml:lang="x-test">xxKajongg is the ancient Chinese board game for 4 players. Kajongg can be used in two different ways: Scoring a manual game where you play as always and use Kajongg for the computation of scores and for bookkeeping. Or you can use Kajongg to play against any combination of other human players or computer players.xx</p>
   </description>
