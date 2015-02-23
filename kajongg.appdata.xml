@@ -4,6 +4,7 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-2.0+</project_license>
   <name>Kajongg</name>
+  <name xml:lang="bs">Kajongg</name>
   <name xml:lang="ca">Kajongg</name>
   <name xml:lang="cs">Kajongg</name>
   <name xml:lang="da">Kajongg</name>
@@ -26,6 +27,7 @@
   <name xml:lang="x-test">xxKajonggxx</name>
   <name xml:lang="zh-TW">Kajongg</name>
   <summary>Mah Jongg</summary>
+  <summary xml:lang="bs">Mahjongg</summary>
   <summary xml:lang="ca">Mah Jongg</summary>
   <summary xml:lang="cs">Mah Jongg</summary>
   <summary xml:lang="de">Mah Jongg</summary>
