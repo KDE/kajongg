@@ -111,7 +111,7 @@ IF(INSTALL_KAJONGG)
     PYKDE4_ADD_EXECUTABLE(kajonggserver.py kajonggserver)
     kde4_install_icons(${ICON_INSTALL_DIR})
     install(PROGRAMS kajongg.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
-    install(FILES kajongg.appdata.xml DESTINATION ${DATA_INSTALL_DIR}/appdata)
+    install(FILES kajongg.appdata.xml DESTINATION ${SHARE_INSTALL_PREFIX}/appdata)
 ENDIF(INSTALL_KAJONGG)
 
 macro_display_feature_log()
