@@ -607,7 +607,7 @@ class HumanClient(Client):
         if oldDialog and not oldDialog.answered:
             raise Exception('old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
                 str(oldDialog.move),
-                str([x.name for x in oldDialog.buttons]),
+                str([x.message.name for x in oldDialog.buttons]),
                 str(move), str(answers)))
         if not oldDialog or not oldDialog.isVisible():
             # always build a new dialog because if we change its layout before
