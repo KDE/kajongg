@@ -81,6 +81,8 @@ class Sound(object):
                 # checks again at next reenable
                 if msg:
                     logWarning(msg)
+            if Debug.sound:
+                logDebug('ogg123 found:' + Sound.__oggName)
         return Sound.__oggName
 
     @staticmethod
