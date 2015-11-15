@@ -528,32 +528,48 @@ class ServerTable(Table):
 
     def clientDiscarded(self, msg):
         """client told us he discarded a tile. Check for consistency and tell others."""
-        # pylint: disable=too-many-branches
-        # too many branches
         if not self.running:
             return
         player = msg.player
-        game = self.game
-        assert player == game.activePlayer
+        assert player == self.game.activePlayer
         tile = Tile(msg.args[0])
         if tile not in player.concealedTiles:
             self.abort('player %s discarded %s but does not have it' % (player, tile))
             return
-        dangerousText = game.dangerousFor(player, tile)
+        dangerousText = self.game.dangerousFor(player, tile)
         mustPlayDangerous = player.mustPlayDangerous()
-        block = DeferredBlock(self)
         violates = player.violatesOriginalCall(tile)
-        game.hasDiscarded(player, tile)
+        self.game.hasDiscarded(player, tile)
+        block = DeferredBlock(self)
         block.tellAll(player, Message.Discard, tile=tile)
+        block.callback(self._clientDiscarded2, msg, dangerousText, mustPlayDangerous, violates)
+
+    def _clientDiscarded2(self, dummyResults, msg, dangerousText, mustPlayDangerous, violates):
+        """client told us he discarded a tile. Continue, check for calling"""
+        block = DeferredBlock(self)
+        player = msg.player
         if violates:
             if Debug.originalCall:
+                tile = Tile(msg.args[0])
                 logDebug('%s just violated OC with %s' % (player, tile))
             player.mayWin = False
             block.tellAll(player, Message.ViolatesOriginalCall)
-        if game.ruleset.mustDeclareCallingHand and not player.isCalling:
+        block.callback(self._clientDiscarded3, msg, dangerousText, mustPlayDangerous)
+
+    def _clientDiscarded3(self, dummyResults, msg, dangerousText, mustPlayDangerous):
+        """client told us he discarded a tile. Continue, check for calling"""
+        block = DeferredBlock(self)
+        player = msg.player
+        if self.game.ruleset.mustDeclareCallingHand and not player.isCalling:
             if player.hand.callingHands:
                 player.isCalling = True
                 block.tellAll(player, Message.Calling)
+        block.callback(self._clientDiscarded4, msg, dangerousText, mustPlayDangerous)
+
+    def _clientDiscarded4(self, dummyResults, msg, dangerousText, mustPlayDangerous):
+        """client told us he discarded a tile. Continue, check for dangerous game"""
+        block = DeferredBlock(self)
+        player = msg.player
         if dangerousText:
             if mustPlayDangerous and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
@@ -571,7 +587,7 @@ class ServerTable(Table):
             player.isCalling = True
             block.callback(self.clientMadeOriginalCall, msg)
         else:
-            block.callback(self.askForClaims)
+            block.callback(self._askForClaims, msg)
 
     def clientMadeOriginalCall(self, dummyResults, msg):
         """first tell everybody about original call
@@ -581,7 +597,7 @@ class ServerTable(Table):
             logDebug('server.clientMadeOriginalCall: %s' % msg.player)
         block = DeferredBlock(self)
         block.tellAll(msg.player, Message.OriginalCall)
-        block.callback(self.askForClaims)
+        block.callback(self._askForClaims, msg)
 
     def startHand(self, dummyResults=None):
         """all players are ready to start a hand, so do it"""
@@ -790,7 +806,7 @@ class ServerTable(Table):
             answers = [x for x in answers if x.player == nextPlayer or x.answer != Message.MahJongg]
         return answers
 
-    def askForClaims(self, dummyRequests):
+    def _askForClaims(self, dummyRequests, dummyMsg):
         """ask all players if they want to claim"""
         if self.running:
             self.tellOthers(self.game.activePlayer, Message.AskForClaims, self.moved)
