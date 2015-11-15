@@ -539,7 +539,7 @@ class ServerTable(Table):
         if tile not in player.concealedTiles:
             self.abort('player %s discarded %s but does not have it' % (player, tile))
             return
-        txt = game.dangerousFor(player, tile)
+        dangerousText = game.dangerousFor(player, tile)
         mustPlayDangerous = player.mustPlayDangerous()
         block = DeferredBlock(self)
         violates = player.violatesOriginalCall(tile)
@@ -554,18 +554,18 @@ class ServerTable(Table):
             if player.hand.callingHands:
                 player.isCalling = True
                 block.tellAll(player, Message.Calling)
-        if txt:
+        if dangerousText:
             if mustPlayDangerous and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
                     logDebug('%s claims no choice. Discarded %s, keeping %s. %s' % \
-                         (player, tile, ''.join(player.concealedTiles), ' / '.join(txt)))
+                         (player, tile, ''.join(player.concealedTiles), ' / '.join(dangerousText)))
                 player.claimedNoChoice = True
                 block.tellAll(player, Message.NoChoice, tiles=TileList(player.concealedTiles))
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
                     logDebug('%s played dangerous. Discarded %s, keeping %s. %s' % \
-                         (player, tile, ''.join(player.concealedTiles), ' / '.join(txt)))
+                         (player, tile, ''.join(player.concealedTiles), ' / '.join(dangerousText)))
                 block.tellAll(player, Message.DangerousGame, tiles=TileList(player.concealedTiles))
         if msg.answer == Message.OriginalCall:
             player.isCalling = True
