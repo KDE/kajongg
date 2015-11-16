@@ -630,7 +630,7 @@ class Game(object):
         if result:
             if Debug.explain:
                 if not self.belongsToRobotPlayer():
-                    self.debug(result, prevHandId=True)
+                    self.debug(u','.join(x.name for x in result), prevHandId=True)
             self.rotateWinds()
         return bool(result)
 
@@ -680,10 +680,8 @@ class Game(object):
         else:
             logDebug(msg, btIndent=btIndent)
             return
-        handId = unicodeString(
-            self._prevHandId if prevHandId
-            else self.handId.prompt(withMoveCount=True))
-        msg = unicodeString(msg)
+        handId = self._prevHandId if prevHandId else self.handId
+        handId = unicodeString(handId.prompt(withMoveCount=True))
         logDebug(
             u'%s%s: %s' % (prefix, handId, msg),
             withGamePrefix=False,
