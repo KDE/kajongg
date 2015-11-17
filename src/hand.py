@@ -484,6 +484,9 @@ class Hand(object):
             if Debug.hand and cand:
                 self.debug(fmt('callingHands found {cand} for {rule}'))
             candidates.extend(x.concealed for x in cand)
+        # FIXME: we must differentiate between last Tile exposed or concealed.
+        # example:
+        # ./kajongg.py --game=7165/E4 --demo --ruleset=BMJA --playopen --debug=hand
         # sort only for reproducibility
         for tile in sorted(set(candidates)):
             if sum(x.exposed == tile.exposed for x in self.tiles) == 4:
