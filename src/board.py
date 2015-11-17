@@ -494,7 +494,6 @@ class Board(QGraphicsRectItem):
             self.prepareGeometryChange()
             self._tileset = tileset
             self._lightSource = lightSource
-            self._showShadows = showShadows
             self.setGeometry()
             for child in self.childItems():
                 if isinstance(child, (Board, PlayerWind)):
