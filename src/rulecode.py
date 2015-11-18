@@ -1012,6 +1012,8 @@ class EastWonNineTimesInARow(RuleCode):
 
 
 class GatesOfHeaven(StandardMahJongg):
+    """as used for Classical Chinese BMJA"""
+
     cache = ()
 
 # TODO: in BMJA, 111 and 999 must be concealed, we do not check this
@@ -1096,6 +1098,8 @@ class GatesOfHeaven(StandardMahJongg):
 
 
 class NineGates(GatesOfHeaven):
+    """as used for Classical Chinese DMJL"""
+
     pass
 
 class ThirteenOrphans(MJRule):
