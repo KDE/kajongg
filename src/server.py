@@ -675,6 +675,7 @@ class ServerTable(Table):
         if dangerousText:
             if mustPlayDangerous and player.lastSource not in 'dZ':
                 if Debug.dangerousGame:
+                    tile = Tile(msg.args[0])
                     logDebug(u'%s claims no choice. Discarded %s, keeping %s. %s' %
                              (player, tile, ''.join(player.concealedTiles), ' / '.join(dangerousText)))
                 player.claimedNoChoice = True
@@ -685,6 +686,7 @@ class ServerTable(Table):
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
+                    tile = Tile(msg.args[0])
                     logDebug(u'%s played dangerous. Discarded %s, keeping %s. %s' %
                              (player, tile, ''.join(player.concealedTiles), ' / '.join(dangerousText)))
                 block.tellAll(
