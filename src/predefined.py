@@ -233,7 +233,7 @@ class ClassicalChinese(PredefinedRuleset):
             points=20)
         # option internal makes it not show up in the ruleset editor
         self.mjRules.createRule(
-            'Nine Gates', 'FGatesOfHeaven', limits=1,
+            'Nine Gates', 'FNineGates', limits=1,
             description=m18n(
                 'A concealed hand in one color 1112345678999 plus last tile of this suit (from wall or discarded)'))
         self.mjRules.createRule(

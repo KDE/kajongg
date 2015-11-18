@@ -1095,6 +1095,9 @@ class GatesOfHeaven(StandardMahJongg):
         yield tuple(melds), tuple(rest)
 
 
+class NineGates(GatesOfHeaven):
+    pass
+
 class ThirteenOrphans(MJRule):
 
     def computeLastMelds(hand):
