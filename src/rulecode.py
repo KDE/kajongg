@@ -1047,9 +1047,9 @@ class GatesOfHeaven(StandardMahJongg):
         if len(values) != 1:
             return False
         surplus = values[0]
-        if 'pair28' in cls.options:
+        if 'BMJA' in cls.options:
             return 1 < surplus < 9
-        if 'lastExtra' in cls.options:
+        else:
             return hand.lastTile and surplus == hand.lastTile.value
         return True
 
@@ -1068,7 +1068,7 @@ class GatesOfHeaven(StandardMahJongg):
             elif values.count(9) != 3:
                 result = set([9])
             else:
-                if 'pair28' in cls.options:
+                if 'BMJA' in cls.options:
                     result = Tile.minors # pylint: disable=redefined-variable-type
                 else:
                     result = Tile.numbers
