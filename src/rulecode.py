@@ -1100,7 +1100,7 @@ class NineGates(GatesOfHeaven):
         if not cls.maybeCallingOrWon(hand):
             return False
         values = hand.values
-        if len(set(values)) < 9 or values.count(1) != 3 or values.count(9) != 3:
+        if len(set(values)) < 9 or values.count(1) < 3 or values.count(9) < 3:
             return False
         values = list(values[3:-3])
         for value in Tile.minors:
