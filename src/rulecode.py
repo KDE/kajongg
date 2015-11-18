@@ -638,7 +638,7 @@ class TripleKnitting(RuleCode):
     def shouldTry(cls, hand, maxMissing=3):
         if hand.declaredMelds:
             return False
-        tripleWanted = 7 - maxMissing // 3  # count triples
+        tripleWanted = 4 - maxMissing // 3  # count triples
         tripleCount = len(cls.findTriples(hand)[0])
         return tripleCount >= tripleWanted
 
