@@ -391,7 +391,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
             description=originalCall.description)
         del self.mjRules['NineGates']
         self.mjRules.createRule(
-            'Gates of Heaven', 'FGatesOfHeaven||OBMJA', limits=1,
+            'Gates of Heaven', 'FGatesOfHeaven', limits=1,
             description=m18n('All tiles concealed of same color: Values 1112345678999'
                              ' with one pair from 2 to 8 (last tile from wall or discarded)'))
         self.mjRules.createRule(
@@ -458,7 +458,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
             'FCallingHand||Ohand=TripleKnitting',
             limits=0.2)
         self.loserRules.createRule(
-            'Calling for Gates of Heaven', 'FCallingHand||Ohand=GatesofHeaven||OBMJA',
+            'Calling for Gates of Heaven', 'FCallingHand||Ohand=GatesofHeaven',
             limits=0.4)
         self.loserRules.createRule(
             'Calling for Knitting',

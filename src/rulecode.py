@@ -1049,11 +1049,7 @@ class GatesOfHeaven(StandardMahJongg):
         if len(values) != 1:
             return False
         surplus = values[0]
-        if 'BMJA' in cls.options:
-            return 1 < surplus < 9
-        else:
-            return hand.lastTile and surplus == hand.lastTile.value
-        return True
+        return 1 < surplus < 9
 
     def winningTileCandidates(cls, hand):
         result = set()
@@ -1100,7 +1096,21 @@ class GatesOfHeaven(StandardMahJongg):
 class NineGates(GatesOfHeaven):
     """as used for Classical Chinese DMJL"""
 
-    pass
+    def appliesToHand(cls, hand):
+        if not cls.maybeCallingOrWon(hand):
+            return False
+        values = hand.values
+        if len(set(values)) < 9 or values.count(1) != 3 or values.count(9) != 3:
+            return False
+        values = list(values[3:-3])
+        for value in Tile.minors:
+            if value in values:
+                values.remove(value)
+        if len(values) != 1:
+            return False
+        surplus = values[0]
+        return hand.lastTile and surplus == hand.lastTile.value
+
 
 class ThirteenOrphans(MJRule):
 
