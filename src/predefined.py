@@ -229,8 +229,7 @@ class ClassicalChinese(PredefinedRuleset):
         # option internal makes it not show up in the ruleset editor
         self.mjRules.createRule(
             'Nine Gates', 'FGatesOfHeaven||OlastExtra', limits=1,
-                description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 completed '
-                                 'with another tile of the same color (from wall or discarded)'))
+            description=m18n('A concealed hand in one color 1112345678999 plus last tile of this suit (from wall or discarded)'))
         self.mjRules.createRule(
             'Thirteen Orphans', 'FThirteenOrphans||Omayrobhiddenkong', limits=1,
             description=m18n('13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair '
@@ -388,8 +387,8 @@ class ClassicalChineseBMJA(ClassicalChinese):
         del self.mjRules['NineGates']
         self.mjRules.createRule(
             'Gates of Heaven', 'FGatesOfHeaven||Opair28', limits=1,
-                description=m18n('All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and '
-                                 'another tile 2..8 of the same color'))
+                description=m18n('All tiles concealed of same color: Values 1112345678999'
+                                 ' with one pair from 2 to 8 (last tile from wall or discarded)'))
         self.mjRules.createRule('Wriggling Snake', 'FWrigglingSnake', limits=1,
                                 description=m18n('Pair of 1s and a run from 2 to 9 in the same suit with each of the winds'))
         self.mjRules.createRule(
