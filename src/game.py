@@ -615,7 +615,7 @@ class Game(object):
         handId = self._prevHandId if prevHandId else self.handId
         handId = unicodeString(handId.prompt(withMoveCount=True))
         logDebug(
-            u'%s%s: %s' % (prefix, handId, msg),
+            u'%s%s: %s' % (prefix, handId, unicodeString(msg)),
             withGamePrefix=False,
             btIndent=btIndent)
 
