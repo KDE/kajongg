@@ -1002,10 +1002,9 @@ class EastWonNineTimesInARow(RuleCode):
 class GatesOfHeaven(StandardMahJongg):
     cache = ()
 
-# FIXME: computeLastMelds must return a real meld
 # FIXME: in BMJA, 111 and 999 must be concealed, we do not check this
     def computeLastMelds(hand):
-        return [hand.lastTile.single]
+        return [x for x in hand.melds if hand.lastTile in x]
 
     def shouldTry(hand, maxMissing=3):
         if hand.declaredMelds:
