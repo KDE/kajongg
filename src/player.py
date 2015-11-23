@@ -358,7 +358,6 @@ class Player(StrMixin):
         """add to my tiles"""
         assert len(tiles)
         for tile in tiles:
-            assert isinstance(tile, Tile), 'tile:%s' % tile
             if tile.isBonus:
                 self._bonusTiles.append(tile)
             else:
@@ -392,8 +391,6 @@ class Player(StrMixin):
     def computeHand(self, withDiscard=None):
         """returns Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
-        assert isinstance(self.lastTile, (Tile, type(None)))
-        assert isinstance(withDiscard, (Tile, type(None)))
         melds = ['R' + ''.join(str(x) for x in sorted(self._concealedTiles))]
         if withDiscard:
             melds[0] += withDiscard
@@ -483,7 +480,6 @@ class PlayingPlayer(Player):
         melds = concealed[:]
         self.game.winner = self
         if withDiscard:
-            assert isinstance(withDiscard, Tile), withDiscard
             PlayingPlayer.addConcealedTiles(
                 self,
                 [withDiscard])  # this should NOT invoke syncHandBoard
