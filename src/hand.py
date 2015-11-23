@@ -568,7 +568,10 @@ class Hand(object):
                     matchingMJRules = [
                         x for x in matchingMJRules
                         if 'mayrobhiddenkong' in x.options]
-                return sorted(matchingMJRules, key=lambda x: -x.score.total())
+                result = sorted(matchingMJRules, key=lambda x: -x.score.total())
+                if Debug.mahJongg:
+                    self.debug(u'Hand {}: found matching MJRules:{}'.format(self,matchingMJRules))
+                return result
 
     def __arrangements(self):
         """find all legal arrangements"""

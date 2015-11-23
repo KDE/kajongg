@@ -477,6 +477,10 @@ class PlayingPlayer(Player):
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
+        if Debug.mahJongg:
+            self.game.debug('{} declared MJ: concealed={}, withDiscard={}, lastTile={},lastMeld={}'.format(
+                self, concealed, withDiscard, lastTile, lastMeld))
+            self.game.debug('  with hand being {}'.format(self.hand))
         melds = concealed[:]
         self.game.winner = self
         if withDiscard:
@@ -499,6 +503,9 @@ class PlayingPlayer(Player):
         self._concealedMelds = melds
         self._concealedTiles = []
         self._hand = None
+        if Debug.mahJongg:
+            self.game.debug('  hand becomes {}'.format(self.hand))
+            self._hand = None
 
     def __possibleChows(self):
         """returns a unique list of lists with possible claimable chow combinations"""
@@ -571,6 +578,7 @@ class PlayingPlayer(Player):
             if Debug.mahJongg:
                 game.debug('%s may say MJ:%s, active=%s' % (
                     self, list(x for x in game.players), game.activePlayer))
+                game.debug('  with hand {}'.format(hand))
             return MeldList(x for x in hand.melds if not x.isDeclared), withDiscard, hand.lastMeld
 
     def __maySayOriginalCall(self):
