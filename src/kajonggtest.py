@@ -168,7 +168,7 @@ class Server(StrMixin):
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
         assert self.commitId == job.commitId
-        print('starting server for %s' % job)
+        print('starting server for %s in %s' % (job, self.clone.tmpdir))
         cmd = [os.path.join(job.srcDir(), 'kajonggserver.py')]
         if OPTIONS.server3:
             cmd.insert(0, 'python3')
