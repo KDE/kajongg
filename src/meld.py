@@ -273,7 +273,7 @@ class Meld(TileList):
         if len(tiles) == 1:
             if length == 3:
                 self.isPung = True
-            else:
+            elif self.case != 'AAAA':
                 self.isKong = True
             return
         if len(tiles) == 3 and length == 3:
