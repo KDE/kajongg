@@ -151,7 +151,7 @@ class Hand(object):
         self.tilesInHand = TileList(x for x in self.tiles
                                     if x not in declaredTiles)
         self.lenOffset = (len(self.tiles) - 13
-                          - sum(x.isKong for x in self.declaredMelds))
+                          - sum(x.isKong for x in self.melds))
 
         assert len(tileStrings) < 2, tileStrings
         self.__rest = TileList()
