@@ -389,24 +389,24 @@ class Player(StrMixin):
         self._concealedTiles[0] = tileName
         self._hand = None
 
-    def computeHand(self, withTile=None):
+    def computeHand(self, withDiscard=None):
         """returns Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
         assert isinstance(self.lastTile, (Tile, type(None)))
-        assert isinstance(withTile, (Tile, type(None)))
+        assert isinstance(withDiscard, (Tile, type(None)))
         melds = ['R' + ''.join(str(x) for x in sorted(self._concealedTiles))]
-        if withTile:
-            melds[0] += withTile
+        if withDiscard:
+            melds[0] += withDiscard
         if melds[0] == 'R':
             melds = melds[1:]
         melds.extend(str(x) for x in self._exposedMelds)
         melds.extend(str(x) for x in self._concealedMelds)
         melds.extend(str(x) for x in self._bonusTiles)
         melds.append(self.mjString())
-        if withTile or self.lastTile:
+        if withDiscard or self.lastTile:
             melds.append(
                 'L%s%s' %
-                (withTile or self.lastTile, self.lastMeld if self.lastMeld else ''))
+                (withDiscard or self.lastTile, self.lastMeld if self.lastMeld else ''))
         return Hand(self, ' '.join(melds))
 
     def scoringString(self):
@@ -566,7 +566,7 @@ class PlayingPlayer(Player):
             withDiscard = game.lastDiscard
         else:
             withDiscard = None
-        hand = self.computeHand(withTile=withDiscard)
+        hand = self.computeHand(withDiscard)
         if hand.won:
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:

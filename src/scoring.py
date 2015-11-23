@@ -423,7 +423,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             return ''
         return 'L%s%s' % (self.lastTile, self.lastMeld)
 
-    def computeHand(self, dummyWithTile=None):
+    def computeHand(self, dummyWithDiscard=None):
         """returns a Hand object, using a cache"""
         self.lastTile = Internal.scene.computeLastTile()
         self.lastMeld = Internal.scene.computeLastMeld()
