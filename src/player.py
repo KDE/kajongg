@@ -483,6 +483,8 @@ class PlayingPlayer(Player):
             self.game.debug('  with hand being {}'.format(self.hand))
         melds = concealed[:]
         self.game.winner = self
+        assert lastMeld in melds, '%s: melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
+               self._concealedTiles, melds, lastMeld, lastTile, withDiscard)
         if withDiscard:
             PlayingPlayer.addConcealedTiles(
                 self,
@@ -490,8 +492,6 @@ class PlayingPlayer(Player):
             if self.lastSource != 'k':   # robbed the kong
                 self.lastSource = 'd'
             # the last claimed meld is exposed
-            assert lastMeld in melds, '%s: melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
-                self._concealedTiles, melds, lastMeld, lastTile, withDiscard)
             melds.remove(lastMeld)
             lastTile = withDiscard.exposed
             lastMeld = lastMeld.exposed
