@@ -112,7 +112,7 @@ class Hand(object):
         self.ruleCache = {}
         self.__lastTile = None
         self.__lastSource = None
-        self.__announcements = ''
+        self.__announcements = set()
         self.__lastMeld = 0
         self.__lastMelds = MeldList()
         self.tiles = None
@@ -154,7 +154,7 @@ class Hand(object):
                 if len(part) > 1:
                     self.__lastSource = part[1]
                     if len(part) > 2:
-                        self.__announcements = part[2]
+                        self.__announcements = set(part[2])
             elif partId == 'L':
                 if len(part[1:]) > 8:
                     raise Exception(
@@ -424,7 +424,7 @@ class Hand(object):
         parts.append('R' + ''.join(str(x) for x in sorted(
             self.tilesInHand + [addTile])))
         if self.announcements:
-            parts.append('m.' + self.announcements)
+            parts.append('m.' + ''.join(sorted(self.announcements)))
         parts.append('L' + addTile)
         return Hand(self.player, ' '.join(parts).strip(), prevHand=self)
 
@@ -459,28 +459,22 @@ class Hand(object):
             if len(meld) < 3:
                 declaredMelds.remove(meld)
                 tilesInHand.extend(meld.concealed)
-        newParts = []
-        for idx, part in enumerate(self.mjStr.split()):
-            oldPart = part
-            if part[0] == 'm':
-                part = part[:2] + part[2:].replace('k','')
-                # TODO: remove debug output again
-                if part != oldPart:
-                    self.debug('Hand.__sub__ changes m part from {} to {}'.format(oldPart,part))
-                if len(part)<3:
-                    # no announcement left
-                    continue
-            elif part[0] == 'L':
-                if (self.lastTile.isExposed
-                        and self.lastTile.concealed in tilesInHand):
-                    part = 'L' + self.lastTile.concealed
-                else:
-                    continue
-            newParts.append(part)
-        mjStr = ' '.join(newParts)
+        # if we robbed a kong, remove that announcement
+        mjParts = []
+        announcements = self.announcements - set('k')
+        if announcements:
+            mjParts.append('m.' + ''.join(announcements))
+        if (self.lastTile and self.lastTile.isExposed
+                         and self.lastTile.concealed in tilesInHand):
+            # undo exposing lastMeld
+#            msgx = '{}-{}: new L:{}'.format(self, subtractTile, self.lastTile.concealed)
+#            self.debug(msgx)
+#            self.player.game.addCsvTag('sublasttile')
+            mjParts.append('L' + self.lastTile.concealed)
+        mjPart = ' '.join(mjParts)
         rest = 'R' + str(tilesInHand)
         newString = ' '.join(str(x) for x in (
-            declaredMelds, rest, boni, mjStr))
+            declaredMelds, rest, boni, mjPart))
         return Hand(self.player, newString, prevHand=self)
 
     def manualRuleMayApply(self, rule):

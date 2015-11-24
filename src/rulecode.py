@@ -1263,7 +1263,7 @@ class BlessingOfHeaven(RuleCode):
         """for scoring game"""
         return (hand.ownWind == Tile.east
                 and hand.lastSource and hand.lastSource in 'wd'
-                and not set(hand.announcements) - {'a'})
+                and not hand.announcements - {'a'})
 
 
 class BlessingOfEarth(RuleCode):
@@ -1275,7 +1275,7 @@ class BlessingOfEarth(RuleCode):
         """for scoring game"""
         return (hand.ownWind != Tile.east
                 and hand.lastSource and hand.lastSource in 'wd'
-                and not set(hand.announcements) - {'a'})
+                and not hand.announcements - {'a'})
 
 
 class LongHand(RuleCode):
