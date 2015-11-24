@@ -462,8 +462,7 @@ class Hand(object):
         newParts = []
         for idx, part in enumerate(self.mjStr.split()):
             if part[0] == 'm':
-                if len(part) > 1 and part[1] == 'k':
-                    continue
+                continue
             elif part[0] == 'L':
                 if (self.lastTile.isExposed
                         and self.lastTile.concealed in tilesInHand):
