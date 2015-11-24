@@ -94,17 +94,18 @@ class Hand(object):
         if hasattr(self, 'string'):
             # I am from cache
             return
-        self._player = weakref.ref(player)
-        self.indent = prevHand.indent + 1 if prevHand else 0
 
-        # two shortcuts for speed:
+        # shortcuts for speed:
+        self._player = weakref.ref(player)
         self.ruleset = self.player.game.ruleset
         if self.player:
             self.intelligence = self.player.intelligence
         else:
             self.intelligence = AIDefault()
+
         self.string = string
         self.__robbedTile = Tile.unknown
+        self.indent = prevHand.indent + 1 if prevHand else 0
         self.prevHand = prevHand
         self.__won = None
         self.__score = None
