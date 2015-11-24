@@ -413,6 +413,32 @@ class Hand(object):
                 (self.player.tileAvailable(completedHand.lastTile, self)))
         return result
 
+    def newString(self, melds=1, rest=1, lastSource=1, announcements=1, lastTile=1, lastMeld=1):
+        """create string representing a hand. Default is current Hand, but every part
+        can be overridden or excluded by passing None"""
+        if melds == 1:
+            melds = chain(self.melds, self.bonusMelds)
+        if rest == 1:
+            rest = self.__rest
+        if lastSource == 1:
+            lastSource = self.lastSource
+        if announcements == 1:
+            announcements = self.announcements
+        if lastTile == 1:
+            lastTile = self.lastTile
+        if lastMeld == 1:
+            lastMeld = self.__lastMeld
+        parts = list(str(x) for x in sorted(melds))
+        if rest:
+            parts.append('R' + ''.join(str(x) for x in sorted(rest)))
+        if lastSource or announcements:
+            parts.append('m{}{}'.format(
+                    self.lastSource or '.',
+                    ''.join(self.announcements)))
+        if lastTile:
+            parts.append('L{}{}'.format(lastTile, lastMeld if lastMeld else ''))
+        return ' '.join(parts).strip()
+
     def __add__(self, addTile):
         """returns a new Hand built from this one plus addTile"""
         assert addTile.isConcealed, 'addTile %s should be concealed:' % addTile
@@ -426,7 +452,15 @@ class Hand(object):
         if self.announcements:
             parts.append('m.' + ''.join(sorted(self.announcements)))
         parts.append('L' + addTile)
-        return Hand(self.player, ' '.join(parts).strip(), prevHand=self)
+        ns = self.newString(chain(self.declaredMelds, self.bonusMelds),
+            rest=self.tilesInHand + [addTile],
+            lastSource=None,
+            lastTile=addTile,
+            lastMeld=None
+            )
+        result = ' '.join(parts).strip()
+        assert result == ns, 'newString falsch: "{}" <> "{}", parts={}'.format(result, ns, parts)
+        return Hand(self.player, result, prevHand=self)
 
     def __sub__(self, subtractTile):
         """returns a copy of self minus subtractTiles.
