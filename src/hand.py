@@ -116,24 +116,53 @@ class Hand(object):
         self.mjStr = ''
         self.__mjRule = None
         self.ruleCache = {}
+        self.__lastTile = self.__lastSource = self.__announcements = ''
+        self.__lastMeld = 0
+        self.__lastMelds = MeldList()
+        self.tiles = None
+        self.melds = MeldList()
+        self.bonusMelds = MeldList()
+        self.usedRules = None
+        self.__arranged = None
+
+        if Debug.hand:
+            self.debug(fmt(
+                '{callers}: new Hand({id(self)} {string} '
+                '{self.lenOffset} {id(prevHand)})',
+                callers=callers(10, exclude=['__init__'])))
+
+        self.__parseString(string)
+
+        self.__won = self.lenOffset == 1 and self.player.mayWin
+        try:
+            self.__arrange()
+            self.__calculate()
+            self.__arranged = True
+        except Hand.__NotWon:
+            self.__won = False
+            self.__score = Score()
+        finally:
+            if Debug.hand:
+                self.debug(fmt(
+                    'Fixing Hand({id(self)}, {string}, '
+                    '{self.won}, {self.score}'))
+            self._fixed = True
+
+    def __parseString(self, inString):
         tileStrings = []
-        for part in self.string.split():
+        for part in inString.split():
             partId = part[0]
             if partId == 'm':
                 self.mjStr += ' ' + part
             elif partId == 'L':
                 if len(part[1:]) > 8:
                     raise Exception(
-                        'last tile cannot complete a kang:' + self.string)
+                        'last tile cannot complete a kang:' + inString)
                 self.mjStr += ' ' + part
             else:
                 if part != 'R':
                     tileStrings.append(part)
 
-        self.__lastTile = self.__lastSource = self.__announcements = ''
-        self.__lastMeld = 0
-        self.__lastMelds = MeldList()
-        self.melds = MeldList()
         self.bonusMelds, tileStrings = self.__separateBonusMelds(tileStrings)
         tileString = ' '.join(tileStrings)
         self.tiles = TileList(tileString.replace(' ', '').replace('R', ''))
@@ -157,27 +186,6 @@ class Hand(object):
         self.__rest = TileList()
         if len(tileStrings):
             self.__rest.extend(TileList(tileStrings[0][1:]))
-        self.usedRules = None
-        if Debug.hand:
-            self.debug(fmt(
-                '{callers}: new Hand({id(self)} {string} '
-                '{self.lenOffset} {id(prevHand)})',
-                callers=callers(10, exclude=['__init__'])))
-        self.__arranged = None
-        self.__won = self.lenOffset == 1 and self.player.mayWin
-        try:
-            self.__arrange()
-            self.__calculate()
-            self.__arranged = True
-        except Hand.__NotWon:
-            self.__won = False
-            self.__score = Score()
-        finally:
-            if Debug.hand:
-                self.debug(fmt(
-                    'Fixing Hand({id(self)}, {string}, '
-                    '{self.won}, {self.score}'))
-            self._fixed = True
 
     @property
     def arranged(self):
