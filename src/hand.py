@@ -461,8 +461,15 @@ class Hand(object):
                 tilesInHand.extend(meld.concealed)
         newParts = []
         for idx, part in enumerate(self.mjStr.split()):
+            oldPart = part
             if part[0] == 'm':
-                continue
+                part = part[:2] + part[2:].replace('k','')
+                # TODO: remove debug output again
+                if part != oldPart:
+                    self.debug('Hand.__sub__ changes m part from {} to {}'.format(oldPart,part))
+                if len(part)<3:
+                    # no announcement left
+                    continue
             elif part[0] == 'L':
                 if (self.lastTile.isExposed
                         and self.lastTile.concealed in tilesInHand):
