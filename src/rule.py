@@ -972,7 +972,7 @@ class Rule(RuleBase):
 
     def hasNonValueAction(self):
         """Rule has a special action not changing the score directly"""
-        return bool(any(x not in ['lastsource', 'declaration'] for x in self.options))
+        return bool(any(x not in ['lastsource', 'announcements'] for x in self.options))
 
 
 class ParameterRule(RuleBase):

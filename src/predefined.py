@@ -61,7 +61,7 @@ class ClassicalChinese(PredefinedRuleset):
                 description=m18n('Winner said Mah Jong by claiming the 4th tile of a kong another player '
                                  'just declared'), debug=True)
         self.winnerRules.createRule('Mah Jongg with Original Call',
-                                    'FMahJonggWithOriginalCall||Odeclaration=a', doubles=1,
+                                    'FMahJonggWithOriginalCall||Oannouncements=a', doubles=1,
                                     description=m18n(
                                         'Just before the first discard, a player can declare Original Call meaning she needs only one '
                                         'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)'))
@@ -71,7 +71,7 @@ class ClassicalChinese(PredefinedRuleset):
                                  'is declared to be dangerous, and if that tile actually makes somebody win, the discarder '
                                  'pays the winner for all'))
         self.winnerRules.createRule(
-            'Twofold Fortune', 'FTwofoldFortune||Odeclaration=t',
+            'Twofold Fortune', 'FTwofoldFortune||Oannouncements=t',
                 limits=1, description=m18n('Kong after Kong: Declare Kong and a second Kong with the replacement '
                                            'tile and Mah Jong with the second replacement tile'))
         # limit hands:
@@ -376,8 +376,6 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.parameterRules['mustDeclareCallingHand'].parameter = True
 
     def loadRules(self):
-# TODO: we need a separate part for any number of announcements. Both r for robbing kong and a for
-# Original Call can be possible together.
         ClassicalChinese.loadRules(self)
         del self.winnerRules['ZeroPointHand']
         originalCall = self.winnerRules.pop('MahJonggwithOriginalCall')

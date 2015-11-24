@@ -401,7 +401,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             lastSource = 'w'
         else:
             lastSource = 'd'
-        declaration = ''
+        announcements = ''
         rules = [x.rule for x in self.manualRuleBoxes if x.isChecked()]
         for rule in rules:
             options = rule.options
@@ -409,9 +409,9 @@ class ScoringPlayer(VisiblePlayer, Player):
                 if lastSource != '1':
                     # this defines precedences for source of last tile
                     lastSource = options['lastsource']
-            if 'declaration' in options:
-                declaration = options['declaration']
-        return ''.join(['m', lastSource, declaration])
+            if 'announcements' in options:
+                announcements += options['announcements']
+        return ''.join(['m', lastSource, announcements])
 
     def __lastString(self):
         """compile hand info into a string as needed by the scoring engine"""
