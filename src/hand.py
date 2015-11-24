@@ -460,18 +460,10 @@ class Hand(object):
                 declaredMelds.remove(meld)
                 tilesInHand.extend(meld.concealed)
         # if we robbed a kong, remove that announcement
-        mjParts = []
+        mjPart = ''
         announcements = self.announcements - set('k')
         if announcements:
-            mjParts.append('m.' + ''.join(announcements))
-        if (self.lastTile and self.lastTile.isExposed
-                         and self.lastTile.concealed in tilesInHand):
-            # undo exposing lastMeld
-#            msgx = '{}-{}: new L:{}'.format(self, subtractTile, self.lastTile.concealed)
-#            self.debug(msgx)
-#            self.player.game.addCsvTag('sublasttile')
-            mjParts.append('L' + self.lastTile.concealed)
-        mjPart = ' '.join(mjParts)
+            mjPart = 'm.' + ''.join(announcements)
         rest = 'R' + str(tilesInHand)
         newString = ' '.join(str(x) for x in (
             declaredMelds, rest, boni, mjPart))
