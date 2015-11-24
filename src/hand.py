@@ -110,13 +110,16 @@ class Hand(object):
         self.mjStr = ''
         self.__mjRule = None
         self.ruleCache = {}
-        self.__lastTile = self.__lastSource = self.__announcements = ''
+        self.__lastTile = None
+        self.__lastSource = None
+        self.__announcements = ''
         self.__lastMeld = 0
         self.__lastMelds = MeldList()
         self.tiles = None
         self.melds = MeldList()
         self.bonusMelds = MeldList()
         self.usedRules = None
+        self.__rest = TileList()
         self.__arranged = None
 
         if Debug.hand:
@@ -148,11 +151,18 @@ class Hand(object):
             partId = part[0]
             if partId == 'm':
                 self.mjStr += ' ' + part
+                if len(part) > 1:
+                    self.__lastSource = part[1]
+                    if len(part) > 2:
+                        self.__announcements = part[2]
             elif partId == 'L':
                 if len(part[1:]) > 8:
                     raise Exception(
                         'last tile cannot complete a kang:' + inString)
                 self.mjStr += ' ' + part
+                if len(part) > 3:
+                    self.__lastMeld = Meld(part[3:])
+                self.__lastTile = Tile(part[1:3])
             else:
                 if part != 'R':
                     tileStrings.append(part)
@@ -161,14 +171,13 @@ class Hand(object):
         tileString = ' '.join(tileStrings)
         self.tiles = TileList(tileString.replace(' ', '').replace('R', ''))
         self.tiles.sort()
-        self.values = tuple(x.value for x in self.tiles)
-        self.suits = set(x.lowerGroup for x in self.tiles)
         for part in tileStrings[:]:
             if part[:1] != 'R':
                 self.melds.append(Meld(part))
                 tileStrings.remove(part)
-        # those must be set before splitting the rest because the rearrange()
-        # functions need them
+
+        self.values = tuple(x.value for x in self.tiles)
+        self.suits = set(x.lowerGroup for x in self.tiles)
         self.declaredMelds = MeldList(x for x in self.melds if x.isDeclared)
         declaredTiles = list(sum((x for x in self.declaredMelds), []))
         self.tilesInHand = TileList(x for x in self.tiles
@@ -180,6 +189,17 @@ class Hand(object):
         self.__rest = TileList()
         if len(tileStrings):
             self.__rest.extend(TileList(tileStrings[0][1:]))
+
+        if self.__lastTile:
+            assert self.__lastTile.isBonus or self.__lastTile in self.tiles, \
+                'lastTile %s is not in hand %s, mjStr=%s' % (
+                    self.__lastTile, self.string, self.mjStr)
+            if self.__lastSource == 'k':
+                assert self.tiles.count(self.__lastTile.exposed) + \
+                    self.tiles.count(self.__lastTile.concealed) == 1, (
+                        'Robbing kong: I cannot have '
+                        'lastTile %s more than once in %s' % (
+                            self.__lastTile, ' '.join(self.tiles)))
 
     @property
     def arranged(self):
@@ -237,22 +257,16 @@ class Hand(object):
     @property
     def lastTile(self):
         """compute and cache, readonly"""
-        if self.__lastTile == '':
-            self.__setLastTile()
         return self.__lastTile
 
     @property
     def lastSource(self):
         """compute and cache, readonly"""
-        if self.__lastTile == '':
-            self.__setLastTile()
         return self.__lastSource
 
     @property
     def announcements(self):
         """compute and cache, readonly"""
-        if self.__lastTile == '':
-            self.__setLastTile()
         return self.__announcements
 
     @property
@@ -340,35 +354,6 @@ class Hand(object):
                     self.debug(fmt(
                         'exclusive rule {exclusive} does not win: {self}'))
                 raise Hand.__NotWon
-
-    def __setLastTile(self):
-        """sets lastTile, lastSource, announcements"""
-        self.__announcements = ''
-        self.__lastTile = None
-        # not '' because we want to cache the result, see lastTile property
-        self.__lastSource = None
-        parts = self.mjStr.split()
-        for part in parts:
-            if part[0] == 'L':
-                part = part[1:]
-                if len(part) > 2:
-                    self.__lastMeld = Meld(part[2:])
-                self.__lastTile = Tile(part[:2])
-            elif part[0] == 'm':
-                if len(part) > 1:
-                    self.__lastSource = part[1]
-                    if len(part) > 2:
-                        self.__announcements = part[2]
-        if self.__lastTile:
-            assert self.__lastTile.isBonus or self.__lastTile in self.tiles, \
-                'lastTile %s is not in hand %s, mjStr=%s' % (
-                    self.__lastTile, self.string, self.mjStr)
-            if self.__lastSource == 'k':
-                assert self.tiles.count(self.__lastTile.exposed) + \
-                    self.tiles.count(self.__lastTile.concealed) == 1, (
-                        'Robbing kong: I cannot have '
-                        'lastTile %s more than once in %s' % (
-                            self.__lastTile, ' '.join(self.tiles)))
 
     def __setLastMeld(self):
         """sets the shortest possible last meld. This is
