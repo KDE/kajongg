@@ -50,6 +50,11 @@ class RuleCode(object):
 # pylint: disable=no-self-argument, no-self-use, no-value-for-parameter, no-member
 # pylint: disable=too-many-function-args, unused-argument, arguments-differ
 
+class MJRule(RuleCode):
+
+    def computeLastMelds(hand):
+        """returns all possible last melds"""
+
 
 class DragonPungKong(RuleCode):
 
@@ -286,7 +291,8 @@ class AllTerminals(RuleCode):
         return all(x.isTerminal for x in hand.tiles)
 
 
-class StandardMahJongg(RuleCode):
+class StandardMahJongg(MJRule):
+
     cache = ('appliesToHand',)
 
     def computeLastMelds(hand):
@@ -490,7 +496,7 @@ class SquirmingSnake(StandardMahJongg):
         return set()
 
 
-class WrigglingSnake(RuleCode):
+class WrigglingSnake(MJRule):
 
     def shouldTry(hand, maxMissing=3):
         if hand.declaredMelds:
@@ -561,7 +567,7 @@ class CallingHand(RuleCode):
         return False
 
 
-class TripleKnitting(RuleCode):
+class TripleKnitting(MJRule):
 
     def computeLastMelds(cls, hand):
         """returns all possible last melds"""
@@ -667,7 +673,7 @@ class TripleKnitting(RuleCode):
         return tuple(result), tuple(tilesS + tilesB + tilesC)
 
 
-class Knitting(RuleCode):
+class Knitting(MJRule):
 
     def computeLastMelds(cls, hand):
         """returns all possible last melds"""
@@ -775,7 +781,7 @@ class Knitting(RuleCode):
             return result
 
 
-class AllPairHonors(RuleCode):
+class AllPairHonors(MJRule):
 
     def computeLastMelds(hand):
         return [hand.lastTile.pair]
@@ -1084,7 +1090,7 @@ class GatesOfHeaven(StandardMahJongg):
         yield tuple(melds), tuple(rest)
 
 
-class ThirteenOrphans(RuleCode):
+class ThirteenOrphans(MJRule):
 
     def computeLastMelds(hand):
         meldSize = hand.tilesInHand.count(hand.lastTile)

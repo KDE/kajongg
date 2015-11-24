@@ -373,7 +373,7 @@ class Hand(object):
         not yet the final choice, see __applyBestLastMeld"""
         self.__lastMeld = None
         if self.lastTile and self.__won:
-            if self.mjRule and hasattr(self.mjRule, 'computeLastMelds'):
+            if self.mjRule:
                 self.__lastMelds = self.mjRule.computeLastMelds(self)
                 if self.__lastMelds:
                     # syncHandBoard may return nothing
