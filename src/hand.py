@@ -91,10 +91,6 @@ class Hand(object):
 
     def __init__(self, player, string, prevHand=None):
         """evaluate string for player. rules are to be applied in any case"""
-        # silence pylint. This method is time critical, so do not split it
-        # into smaller methods
-        # pylint: disable=too-many-instance-attributes,too-many-branches
-        # pylint: disable=too-many-statements
         if hasattr(self, 'string'):
             # I am from cache
             return
