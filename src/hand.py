@@ -424,7 +424,7 @@ class Hand(object):
         parts.append('R' + ''.join(str(x) for x in sorted(
             self.tilesInHand + [addTile])))
         if self.announcements:
-            parts.append('m' + self.announcements)
+            parts.append('m.' + self.announcements)
         parts.append('L' + addTile)
         return Hand(self.player, ' '.join(parts).strip(), prevHand=self)
 
