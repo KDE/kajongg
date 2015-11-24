@@ -97,11 +97,8 @@ class Hand(object):
 
         # shortcuts for speed:
         self._player = weakref.ref(player)
-        self.ruleset = self.player.game.ruleset
-        if self.player:
-            self.intelligence = self.player.intelligence
-        else:
-            self.intelligence = AIDefault()
+        self.ruleset = player.game.ruleset
+        self.intelligence = player.intelligence if player else AIDefault()
 
         self.string = string
         self.__robbedTile = Tile.unknown
@@ -130,7 +127,7 @@ class Hand(object):
 
         self.__parseString(string)
 
-        self.__won = self.lenOffset == 1 and self.player.mayWin
+        self.__won = self.lenOffset == 1 and player.mayWin
         try:
             self.__arrange()
             self.__calculate()
