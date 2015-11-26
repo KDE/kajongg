@@ -1063,6 +1063,26 @@ class GatesOfHeaven(StandardMahJongg):
                     result = Tile.numbers
         return {Tile(list(hand.suits)[0], x) for x in result}
 
+    def rearrange(hand, rest):
+        melds = []
+        for suit in hand.suits:
+            for value in Tile.numbers:
+                tile = Tile(suit, value).concealed
+                if rest.count(tile) == 3 and tile.isTerminal:
+                    melds.append(tile.pung)
+                    rest.remove(tile)
+                    rest.remove(tile)
+                    rest.remove(tile)
+                elif rest.count(tile) == 2:
+                    melds.append(tile.pair)
+                    rest.remove(tile)
+                    rest.remove(tile)
+                elif rest.count(tile) == 1:
+                    melds.append(tile.single)
+                    rest.remove(tile)
+            break
+        yield tuple(melds), tuple(rest)
+
 
 class ThirteenOrphans(RuleCode):
 
