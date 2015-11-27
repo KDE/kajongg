@@ -68,8 +68,10 @@ def callers(count=1, exclude=None):
     excluding.extend(['callExpressionReceived', 'proto_answer'])
     excluding.extend(['_dataReceived', 'dataReceived', 'gotItem'])
     excluding.extend(['callWithContext', '_doReadOrWrite', 'doRead'])
-    names = list(reversed([x[2] for x in stck[:-2] if x[2] not in excluding]))
-    result = '.'.join(names[-count - 2:])
+    excluding.extend(['callers', 'debug'])
+    names = list(([x[2] for x in stck if x[2] not in excluding]))
+    names = reversed(names[-count:])
+    result = '.'.join(names)
     return '[{}]'.format(result)
 
 
