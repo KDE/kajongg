@@ -610,8 +610,10 @@ class Hand(object):
         if not self.__rest:
             self.melds.sort()
             mjRules = self.__maybeMahjongg()
-            self.__won &= bool(mjRules)
-            if mjRules:
+            if self.won:
+                if not mjRules:
+                    # how could this ever happen?
+                    raise Hand.__NotWon('Long Hand with no rest')
                 self.mjRule = mjRules[0]
             return
         wonHands = []
