@@ -186,15 +186,16 @@ class Hand(object):
         if len(tileStrings):
             self.__rest.extend(TileList(tileStrings[0][1:]))
 
-        if self.__lastTile:
-            assert self.__lastTile.isBonus or self.__lastTile in self.tiles, \
-                'lastTile %s is not in hand %s' % (self.__lastTile, str(self))
+        last = self.__lastTile
+        if last and not last.isBonus:
+            assert last in self.tiles, \
+                'lastTile %s is not in hand %s' % (last, str(self))
             if self.__lastSource == 'k':
-                assert self.tiles.count(self.__lastTile.exposed) + \
-                    self.tiles.count(self.__lastTile.concealed) == 1, (
+                assert self.tiles.count(last.exposed) + \
+                    self.tiles.count(last.concealed) == 1, (
                         'Robbing kong: I cannot have '
                         'lastTile %s more than once in %s' % (
-                            self.__lastTile, ' '.join(self.tiles)))
+                            last, ' '.join(self.tiles)))
 
     @property
     def arranged(self):
