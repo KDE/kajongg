@@ -82,7 +82,13 @@ def fmt(text, **kwargs):
                 parts.append(part)
             else:
                 part2 = part.split('{')
-                parts.append('%s%s:{%s}' % (part2[0], part2[1], part2[1]))
+                if part2[1] in ('callers'):
+                    if part2[0]:
+                        parts.append('%s:{%s}' % (part2[0], part2[1]))
+                    else:
+                        parts.append('{%s}' % part2[1])
+                else:
+                    parts.append('%s%s:{%s}' % (part2[0], part2[1], part2[1]))
         text = ''.join(parts)
     argdict = _getframe(1).f_locals
     argdict.update(kwargs)
