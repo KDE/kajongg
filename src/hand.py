@@ -110,7 +110,7 @@ class Hand(object):
         self.tiles = None
         self.melds = MeldList()
         self.bonusMelds = MeldList()
-        self.usedRules = None
+        self.usedRules = []
         self.__rest = TileList()
         self.__arranged = None
 
