@@ -24,7 +24,7 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 import weakref
 
-from log import dbgIndent, fmt
+from log import dbgIndent, fmt, id4
 from tile import Tile, TileList
 from meld import Meld, MeldList
 from rule import Score, UsedRule
@@ -113,15 +113,15 @@ class Hand(object):
         self.__rest = TileList()
         self.__arranged = None
 
-        if Debug.hand:
-            self.debug(fmt(
-                '{callers}: new Hand({id(self)} {string} '
-                '{self.lenOffset} {id(prevHand)})',
-                callers=callers(10, exclude=['__init__'])))
-
         self.__parseString(string)
-
         self.__won = self.lenOffset == 1 and player.mayWin
+
+        if Debug.hand or Debug.mahJongg:
+            self.debug(fmt('{callers}',
+                callers=callers(10, exclude=['__init__'])))
+            _hideString = string
+            self.debug(fmt('New Hand {_hideString} {self.lenOffset}'))
+
         try:
             self.__arrange()
             self.__calculate()
@@ -134,10 +134,10 @@ class Hand(object):
         finally:
             self._fixed = True
             if Debug.hand:
-                _ = str(self)
+                _hideSelf = str(self)
+                _hideScore = str(self.score)
                 self.debug(fmt(
-                    'Fixing Hand({id(self)}, {_}, '
-                    '{self.won}, {self.score}'))
+                    'Fixing {_hideSelf} {self.won} {_hideScore}'))
 
     def __parseString(self, inString):
         """parse the string passed to Hand()"""
@@ -290,7 +290,11 @@ class Hand(object):
 
     def debug(self, msg):
         """try to use Game.debug so we get a nice prefix"""
-        self.player.game.debug(dbgIndent(self, self.prevHand) + ' ' + msg)
+        idPrefix = id4(self)
+        if self.prevHand:
+            idPrefix += '<{}'.format(id4(self.prevHand))
+        idPrefix = 'Hand({})'.format(idPrefix)
+        self.player.game.debug(' '.join([dbgIndent(self, self.prevHand), idPrefix, msg]))
 
     def __applyRules(self):
         """find out which rules apply, collect in self.usedRules"""
@@ -525,9 +529,9 @@ class Hand(object):
             if hand.won:
                 result.append(hand)
         if Debug.hand:
-            self.debug(
-                fmt('{id(self)} {self} is calling {rules}',
-                    rules=list(x.mjRule.name for x in result)))
+            _hiderules = ', '.join(set(x.mjRule.name for x in result))
+            if _hiderules:
+                self.debug(fmt('Is calling {_hiderules}'))
         return result
 
     @property
@@ -560,7 +564,8 @@ class Hand(object):
                         if 'mayrobhiddenkong' in x.options]
                 result = sorted(matchingMJRules, key=lambda x: -x.score.total())
                 if Debug.mahJongg:
-                    self.debug(u'Hand {}: found matching MJRules:{}'.format(self,matchingMJRules))
+                    self.debug(fmt('{callers} Found {matchingMJRules}',
+                        callers=callers(5, exclude=[])))
                 return result
 
     def __arrangements(self):
