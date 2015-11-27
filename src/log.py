@@ -88,7 +88,12 @@ def fmt(text, **kwargs):
                     else:
                         parts.append('{%s}' % part2[1])
                 else:
-                    parts.append('%s%s:{%s}' % (part2[0], part2[1], part2[1]))
+                    showName = part2[1] + ':'
+                    if showName.startswith('_hide'):
+                        showName = ''
+                    if showName.startswith('self.'):
+                        showName = showName[5:]
+                    parts.append('%s%s{%s}' % (part2[0], showName, part2[1]))
         text = ''.join(parts)
     argdict = _getframe(1).f_locals
     argdict.update(kwargs)
