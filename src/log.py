@@ -115,7 +115,7 @@ def dbgIndent(this, parent):
         return ''
     else:
         pIndent = parent.indent if parent else 0
-        return (u'. ' * (pIndent))[:pIndent] + u'└' + u'─' * (this.indent - pIndent - 1)
+        return (u' │ ' * (pIndent)) + u' ├' + u'─' * (this.indent - pIndent - 1)
 
 
 def __logUnicodeMessage(prio, msg):
