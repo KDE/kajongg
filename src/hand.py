@@ -63,6 +63,7 @@ class Hand(object):
     was used for rearranging the hiden tiles to melds."""
     # pylint: disable=too-many-instance-attributes
 
+    indent = 0
     class __NotWon(UserWarning):  # pylint: disable=invalid-name
 
         """should be won but is not a winning hand"""
@@ -94,7 +95,6 @@ class Hand(object):
 
         self.string = string
         self.__robbedTile = Tile.unknown
-        self.indent = prevHand.indent + 1 if prevHand else 0
         self.prevHand = prevHand
         self.__won = None
         self.__score = None
@@ -119,6 +119,7 @@ class Hand(object):
         if Debug.hand or Debug.mahJongg:
             self.debug(fmt('{callers}',
                 callers=callers(10, exclude=['__init__'])))
+            Hand.indent += 1
             _hideString = string
             self.debug(fmt('New Hand {_hideString} {self.lenOffset}'))
 
@@ -138,6 +139,7 @@ class Hand(object):
                 _hideScore = str(self.score)
                 self.debug(fmt(
                     'Fixing {_hideSelf} {self.won} {_hideScore}'))
+            Hand.indent -= 1
 
     def __parseString(self, inString):
         """parse the string passed to Hand()"""

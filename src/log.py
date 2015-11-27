@@ -72,7 +72,7 @@ class Fmt(string.Formatter):
 Fmt.formatter = Fmt()
 
 def id4(obj):
-    return Fmt.num_encode(id(obj))
+    return '.' if Debug.neutral else Fmt.num_encode(id(obj))
 
 def fmt(text, **kwargs):
     """use the context dict for finding arguments.
