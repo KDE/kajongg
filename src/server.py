@@ -877,8 +877,8 @@ class ServerTable(Table):
         withDiscard = Tile(msg.args[1]) if msg.args[1] else None
         lastMeld = Meld(msg.args[2])
         if self.game.ruleset.mustDeclareCallingHand:
-            assert player.isCalling, '%s %s: concmelds:%s withdiscard:%s lastmeld:%s' % (
-                self.game.handId, player, concealedMelds, withDiscard, lastMeld)
+            assert player.isCalling, '%s %s %s says MJ but never claimed: concmelds:%s withdiscard:%s lastmeld:%s' % (
+                self.game.handId, player.hand, player, concealedMelds, withDiscard, lastMeld)
         discardingPlayer = self.game.activePlayer
         lastMove = next(self.game.lastMoves(withoutNotifications=True))
         robbedTheKong = lastMove.message == Message.DeclaredKong
