@@ -747,6 +747,10 @@ class Hand(object):
         """hand as a string"""
         return self.newString()
 
+    def __unicode__(self):
+        """hand as a string"""
+        return self.newString()
+
     def __repr__(self):
         """the default representation"""
         return 'Hand(%s)' % str(self)
