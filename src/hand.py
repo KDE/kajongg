@@ -628,7 +628,8 @@ class Hand(object):
         # we prefer a won Hand even if a lost Hand might have a higher score
         tryHands = wonHands if wonHands else lostHands
         bestRule, bestVariant, _ = max(tryHands, key=lambda x: x[2])
-        self.mjRule = bestRule
+        if wonHands:
+            self.mjRule = bestRule
         self.melds.extend(bestVariant)
         self.melds.sort()
         self.__rest = []
