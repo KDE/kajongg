@@ -633,8 +633,8 @@ class Hand(object):
         wonHands = []
         lostHands = []
         for mjRule, melds in self.__arrangements():
-            _ = ' '.join(str(x) for x in sorted(
-                chain(self.melds, melds, self.bonusMelds))) + ' ' + self.mjStr
+            _ = self.newString(chain(self.melds, melds, self.bonusMelds),
+                rest=None, lastMeld=None)
             tryHand = Hand(self.player, _, prevHand=self)
             if tryHand.won:
                 tryHand.mjRule = mjRule
