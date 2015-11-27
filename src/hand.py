@@ -134,7 +134,9 @@ class Hand(object):
             self.__arrange()
             self.__calculate()
             self.__arranged = True
-        except Hand.__NotWon:
+        except Hand.__NotWon as notwon:
+            if Debug.mahJongg:
+                self.debug(fmt(notwon.message))
             self.__won = False
             self.__score = Score()
         finally:
@@ -296,7 +298,7 @@ class Hand(object):
 
     def debug(self, msg):
         """try to use Game.debug so we get a nice prefix"""
-        self.player.game.debug(dbgIndent(self, self.prevHand) + msg)
+        self.player.game.debug(dbgIndent(self, self.prevHand) + ' ' + msg)
 
     def __applyRules(self):
         """find out which rules apply, collect in self.usedRules"""
@@ -316,11 +318,8 @@ class Hand(object):
         if self.__won:
             matchingMJRules = self.__maybeMahjongg()
             if not matchingMJRules:
-                if Debug.hand:
-                    self.debug(fmt(
-                        'no matching MJ Rule for {id(self)} {self}'))
                 self.__score = Score()
-                raise Hand.__NotWon
+                raise Hand.__NotWon('no matching MJ Rule')
             self.__mjRule = matchingMJRules[0]
             self.usedRules.append(UsedRule(self.__mjRule))
             self.usedRules.extend(self.matchingWinnerRules())
@@ -348,10 +347,7 @@ class Hand(object):
             self.usedRules = exclusive
             self.__score = self.__totalScore()
             if self.__won and not bool(self.__maybeMahjongg()):
-                if Debug.hand:
-                    self.debug(fmt(
-                        'exclusive rule {exclusive} does not win: {self}'))
-                raise Hand.__NotWon
+                raise Hand.__NotWon(fmt('exclusive rule {exclusive} does not win'))
 
     def __setLastMeld(self):
         """sets the shortest possible last meld. This is
