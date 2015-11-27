@@ -138,11 +138,12 @@ class Hand(object):
             self.__won = False
             self.__score = Score()
         finally:
-            if Debug.hand:
-                self.debug(fmt(
-                    'Fixing Hand({id(self)}, {string}, '
-                    '{self.won}, {self.score}'))
             self._fixed = True
+            if Debug.hand:
+                _ = str(self)
+                self.debug(fmt(
+                    'Fixing Hand({id(self)}, {_}, '
+                    '{self.won}, {self.score}'))
 
     def __parseString(self, inString):
         """parse the string passed to Hand()"""
