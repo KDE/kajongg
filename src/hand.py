@@ -146,6 +146,8 @@ class Hand(object):
             self._fixed = True
 
     def __parseString(self, inString):
+        """parse the string passed to Hand()"""
+        # pylint: disable=too-many-branches
         tileStrings = []
         for part in inString.split():
             partId = part[0]
