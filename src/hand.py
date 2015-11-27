@@ -75,14 +75,6 @@ class Hand(object):
         if cacheKey in cache:
             result = cache[cacheKey]
             player.cacheHits += 1
-            if Debug.hand:
-                result._player = (  # pylint: disable=protected-access
-                    weakref.ref(player))
-                result.debug(
-                    fmt(
-                        '{callers}: cached Hand({id(result)} {string}) '
-                        '{result.lenOffset} {id(prevHand)}',
-                        callers=callers(10, exclude=['__init__'])))
             return result
         player.cacheMisses += 1
         result = object.__new__(cls)
