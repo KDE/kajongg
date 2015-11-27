@@ -107,7 +107,6 @@ class Hand(object):
         self.__won = None
         self.__score = None
         self.__callingHands = None
-        self.mjStr = ''
         self.__mjRule = None
         self.ruleCache = {}
         self.__lastTile = None
@@ -152,7 +151,6 @@ class Hand(object):
         for part in inString.split():
             partId = part[0]
             if partId == 'm':
-                self.mjStr += ' ' + part
                 if len(part) > 1:
                     self.__lastSource = part[1]
                     if len(part) > 2:
@@ -161,14 +159,12 @@ class Hand(object):
                 if len(part[1:]) > 8:
                     raise Exception(
                         'last tile cannot complete a kang:' + inString)
-                self.mjStr += ' ' + part
                 if len(part) > 3:
                     self.__lastMeld = Meld(part[3:])
                 self.__lastTile = Tile(part[1:3])
             else:
                 if part != 'R':
                     tileStrings.append(part)
-
         self.bonusMelds, tileStrings = self.__separateBonusMelds(tileStrings)
         tileString = ' '.join(tileStrings)
         self.tiles = TileList(tileString.replace(' ', '').replace('R', ''))
