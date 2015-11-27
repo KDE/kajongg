@@ -672,7 +672,7 @@ def improve_options():
         OPTIONS.servers = OPTIONS.clients
         OPTIONS.debug.extend(
             'neutral,dangerousGame,explain,originalCall,robbingKong,robotAI,scores,traffic,hand'.split(','))
-    if gitHead() not in ('current', None):
+    if gitHead() not in ('current', None) and not OPTIONS.log:
         OPTIONS.debug.append('git')
     if not OPTIONS.aiVariants:
         OPTIONS.aiVariants = 'Default'
