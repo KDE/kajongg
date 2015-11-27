@@ -446,22 +446,13 @@ class Hand(object):
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
-        parts = [str(self.declaredMelds)]
-        parts.extend(str(x[0]) for x in self.bonusMelds)
-        parts.append('R' + ''.join(str(x) for x in sorted(
-            self.tilesInHand + [addTile])))
-        if self.announcements:
-            parts.append('m.' + ''.join(sorted(self.announcements)))
-        parts.append('L' + addTile)
-        ns = self.newString(chain(self.declaredMelds, self.bonusMelds),
+        ns = self.newString(melds=chain(self.declaredMelds, self.bonusMelds),
             rest=self.tilesInHand + [addTile],
             lastSource=None,
             lastTile=addTile,
             lastMeld=None
             )
-        result = ' '.join(parts).strip()
-        assert result == ns, 'newString falsch: "{}" <> "{}", parts={}'.format(result, ns, parts)
-        return Hand(self.player, result, prevHand=self)
+        return Hand(self.player, ns, prevHand=self)
 
     def __sub__(self, subtractTile):
         """returns a copy of self minus subtractTiles.
