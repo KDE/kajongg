@@ -572,7 +572,8 @@ class Hand(object):
                 return result
 
     def __arrangements(self):
-        """find all legal arrangements"""
+        """find all legal arrangements.
+        Returns a list of tuples with the mjRule and a list of concealed melds"""
         self.__rest.sort()
         result = []
         stdMJ = self.ruleset.standardMJRule
@@ -598,9 +599,7 @@ class Hand(object):
         return result
 
     def __arrange(self):
-        """work hard to always return the variant with the highest Mah Jongg value.
-        Adds melds to self.melds. A rest will be rearranged by
-        standard rules."""
+        """work hard to always return the variant with the highest Mah Jongg value."""
         if any(not x.isKnown for x in self.__rest):
             melds, rest = divmod(len(self.__rest), 3)
             self.melds.extend([Tile.unknown.pung] * melds)
