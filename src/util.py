@@ -61,9 +61,16 @@ def callers(count=1, exclude=None):
     stck = traceback.extract_stack(limit=30)
     excluding = list(exclude) or []
     excluding.extend(['<genexpr>', '__call__', 'run', '<module>', 'runTests'])
-    names = list(x[2] for x in stck[:-2] if x[2] not in excluding)
+    excluding.extend(['_startRunCallbacks', '_runCallbacks', 'remote_move', 'exec_move'])
+    excluding.extend(['proto_message', '_recvMessage', 'remoteMessageReceived'])
+    excluding.extend(['clientAction', 'myAction', 'expressionReceived'])
+    excluding.extend(['callbackIfDone', 'callback', '__gotAnswer'])
+    excluding.extend(['callExpressionReceived', 'proto_answer'])
+    excluding.extend(['_dataReceived', 'dataReceived', 'gotItem'])
+    excluding.extend(['callWithContext', '_doReadOrWrite', 'doRead'])
+    names = list(reversed([x[2] for x in stck[:-2] if x[2] not in excluding]))
     result = '.'.join(names[-count - 2:])
-    return result
+    return '[{}]'.format(result)
 
 
 def elapsedSince(since):
