@@ -426,8 +426,11 @@ def unicodeString(s, encoding='utf-8'):
         return unicode(s)
     elif isinstance(s, unicode):
         return s
-    else:
+    elif hasattr(s, 'decode'):
         return s.decode(encoding)
+    else:
+# auf s5 testen mit  ./kajonggtest.py --game=8001 --ruleset=DMJL --git=a46635d..23aca3b --log --clients=2 --servers=2 --count=4
+        return repr(s)
 
 
 def isStringType(s):
