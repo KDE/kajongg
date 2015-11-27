@@ -194,8 +194,7 @@ class Hand(object):
 
         if self.__lastTile:
             assert self.__lastTile.isBonus or self.__lastTile in self.tiles, \
-                'lastTile %s is not in hand %s, mjStr=%s' % (
-                    self.__lastTile, self.string, self.mjStr)
+                'lastTile %s is not in hand %s' % (self.__lastTile, str(self))
             if self.__lastSource == 'k':
                 assert self.tiles.count(self.__lastTile.exposed) + \
                     self.tiles.count(self.__lastTile.concealed) == 1, (
@@ -759,9 +758,7 @@ class Hand(object):
 
     def __str__(self):
         """hand as a string"""
-        rest = 'REST ' + ''.join(str(x) for x in self.__rest)
-        return ' '.join(str(x) for x in (
-            self.melds, rest, self.bonusMelds, self.mjStr)).replace('  ', ' ')
+        return self.newString()
 
     def __repr__(self):
         """the default representation"""
