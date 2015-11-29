@@ -30,7 +30,7 @@ from twisted.internet.defer import succeed
 from util import gitHead
 from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, m18n
-from common import WINDS, Internal, IntDict, Debug, Options, unicodeString
+from common import WINDS, Internal, IntDict, Debug, Options, unicodeString, unicode
 from common import isPython3
 from query import Query
 from rule import Ruleset
@@ -526,7 +526,7 @@ class Game(object):
         """save computed values to database,
         update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        logMessage = ''
+        logMessage = u''
         for player in self.players:
             if player.hand:
                 manualrules = '||'.join(x.rule.name
@@ -544,8 +544,8 @@ class Game(object):
                     player.handTotal, player.payment, player.balance,
                     self.rotated, self.notRotated),
                 (player.hand.string, manualrules))
-            logMessage += '{player:<12} {hand:>4} {total:>5} {won} | '.format(
-                player=str(player)[:12], hand=player.handTotal,
+            logMessage += u'{player:<12} {hand:>4} {total:>5} {won} | '.format(
+                player=unicode(player)[:12], hand=player.handTotal,
                 total=player.balance,
                 won='WON' if player == self.winner else '   ')
             for usedRule in player.hand.usedRules:
