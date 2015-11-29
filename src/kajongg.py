@@ -120,7 +120,7 @@ def parseOptions():
     if args.isSet('player'):
         Options.player = unicodeString(args.getOption('player'))
     if args.isSet('rounds'):
-        Options.rounds = str(args.getOption('rounds'))
+        Options.rounds = int(args.getOption('rounds'))
     if args.isSet('ai'):
         Options.AI = str(args.getOption('ai'))
     if args.isSet('csv'):

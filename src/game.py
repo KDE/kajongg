@@ -775,7 +775,7 @@ class Game(object):
         if self.handId > last:
             return True
         if Options.rounds:
-            return self.roundsFinished >= 1
+            return self.roundsFinished >= Options.rounds
         elif self.ruleset:
             # while initialising Game, ruleset might be None
             return self.roundsFinished >= self.ruleset.minRounds
