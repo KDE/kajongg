@@ -152,6 +152,8 @@ class HandId(object):
         while num:
             charId = chr(ord('a') + (num - 1) % 26) + charId
             num = (num - 1) // 26
+        if not charId:
+            charId = ' ' # align to the most common case
         wind = (WINDS + 'X')[self.roundsFinished]
         if withSeed:
             seed = self.seed
@@ -161,7 +163,7 @@ class HandId(object):
         result = '%s%s%s%s%s%s' % (
             aiVariant, seed, delim, wind, self.rotated + 1, charId)
         if withMoveCount:
-            result += '/%d' % self.moveCount
+            result += '/%3d' % self.moveCount
         return result
 
     def token(self):
