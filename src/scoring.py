@@ -390,7 +390,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             try:
                 checked = box.isChecked()
                 box.setChecked(not checked)
-                newHand = self.computeHand()
+                newHand = self._computeHand()
             finally:
                 box.setChecked(checked)
         return newHand.score > currentScore
@@ -423,7 +423,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             return ''
         return 'L%s%s' % (self.lastTile, self.lastMeld)
 
-    def computeHand(self, dummyWithDiscard=None):
+    def _computeHand(self):
         """returns a Hand object, using a cache"""
         self.lastTile = Internal.scene.computeLastTile()
         self.lastMeld = Internal.scene.computeLastMeld()
