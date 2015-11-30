@@ -604,18 +604,12 @@ class ServerTable(Table):
                 Message.PickedTile,
                 tile=tile,
                 deadEnd=deadEnd)
-            if tile.isBonus or self.game.playOpen:
-                block.tellOthers(
-                    player,
-                    Message.PickedTile,
-                    tile=tile,
-                    deadEnd=deadEnd)
-            else:
-                block.tellOthers(
-                    player,
-                    Message.PickedTile,
-                    tile=Tile.unknown,
-                    deadEnd=deadEnd)
+            showTile = tile if tile.isBonus or self.game.playOpen else Tile.unknown
+            block.tellOthers(
+                player,
+                Message.PickedTile,
+                tile=showTile,
+                deadEnd=deadEnd)
             block.callback(self.moved)
 
     def pickKongReplacement(self, requests=None):
