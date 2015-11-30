@@ -877,7 +877,7 @@ class ServerTable(Table):
         lastMove = next(self.game.lastMoves(withoutNotifications=True))
         robbedTheKong = lastMove.message == Message.DeclaredKong
         if robbedTheKong:
-            player.lastSource = 'k'
+            player.robsTile()
             withDiscard = lastMove.meld[0].concealed
             lastMove.player.robTileFrom(withDiscard)
         msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)

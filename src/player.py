@@ -684,10 +684,13 @@ class PlayingPlayer(Player):
                 self.visibleTiles[tile] -= 1
                 break
         else:
-            raise Exception('robTile: no meld found with %s' % tile)
+            raise Exception('robTileFrom: no meld found with %s' % tile)
         self.game.lastDiscard = tile.concealed
         self.lastTile = None  # our lastTile has just been robbed
         self._hand = None
+
+    def robsTile(self):
+        self.lastSource = 'k'
 
     def scoreMatchesServer(self, score):
         """do we compute the same score as the server does?"""
