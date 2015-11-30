@@ -703,7 +703,7 @@ class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):
     def clientAction(self, client, move):
         """mirror the action locally"""
         prevMove = next(client.game.lastMoves(only=[Message.DeclaredKong]))
-        prevMove.player.robTile(prevMove.meld[0].concealed)
+        prevMove.player.robTileFrom(prevMove.meld[0].concealed)
         move.player.lastSource = 'k'
         client.game.addCsvTag(
             'robbedKong%s' % prevMove.meld[1],

@@ -143,9 +143,9 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         if self.voice:
             self.voice.speak(text, self.front.rotation())
 
-    def robTile(self, tile):
-        """used for robbing the kong"""
-        PlayingPlayer.robTile(self, tile)
+    def robTileFrom(self, tile):
+        """used for robbing the kong from this player"""
+        PlayingPlayer.robTileFrom(self, tile)
         tile = tile.exposed
         hbTiles = self.handBoard.uiTiles
         lastDiscard = [x for x in hbTiles if x.tile == tile][-1]

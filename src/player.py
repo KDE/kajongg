@@ -674,8 +674,8 @@ class PlayingPlayer(Player):
             return msg, self.name
         self._hand = None
 
-    def robTile(self, tile):
-        """used for robbing the kong"""
+    def robTileFrom(self, tile):
+        """used for robbing the kong from this player"""
         assert tile.isConcealed
         tile = tile.exposed
         for meld in self._exposedMelds:

@@ -615,6 +615,7 @@ class ServerTable(Table):
         """the active player gets a tile from the dead end. Tell all clients."""
         requests = self.prioritize(requests)
         if requests and requests[0].answer == Message.MahJongg:
+            # somebody robs my kong
             requests[0].answer.serverAction(self, requests[0])
         else:
             self.pickTile(requests, deadEnd=True)
@@ -878,7 +879,7 @@ class ServerTable(Table):
         if robbedTheKong:
             player.lastSource = 'k'
             withDiscard = lastMove.meld[0].concealed
-            lastMove.player.robTile(withDiscard)
+            lastMove.player.robTileFrom(withDiscard)
         msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)
         if msgArgs:
             self.abort(*msgArgs)  # pylint: disable=star-args
