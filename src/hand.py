@@ -119,7 +119,7 @@ class Hand(object):
 
         if Debug.hand or Debug.mahJongg:
             self.debug(fmt('{callers}',
-                callers=callers(10, exclude=['__init__'])))
+                callers=callers(exclude=['__init__'])))
             Hand.indent += 1
             _hideString = string
             self.debug(fmt('New Hand {_hideString} {self.lenOffset}'))
@@ -569,7 +569,7 @@ class Hand(object):
                 result = sorted(matchingMJRules, key=lambda x: -x.score.total())
                 if Debug.mahJongg:
                     self.debug(fmt('{callers} Found {matchingMJRules}',
-                        callers=callers(5, exclude=[])))
+                        callers=callers()))
                 return result
 
     def __arrangements(self):
