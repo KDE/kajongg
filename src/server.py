@@ -887,6 +887,7 @@ class ServerTable(Table):
         msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)
         if msgArgs:
             self.abort(*msgArgs)  # pylint: disable=star-args
+            return
         player.declaredMahJongg(
             concealedMelds,
             withDiscard,
