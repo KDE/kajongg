@@ -483,7 +483,7 @@ class PlayingPlayer(Player):
             self.game.debug('  with hand being {}'.format(self.hand))
         melds = concealed[:]
         self.game.winner = self
-        assert lastMeld in melds, '%s: melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
+        assert lastMeld in melds, 'lastMeld not in melds: concealed=%s: melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
                self._concealedTiles, melds, lastMeld, lastTile, withDiscard)
         if withDiscard:
             PlayingPlayer.addConcealedTiles(
