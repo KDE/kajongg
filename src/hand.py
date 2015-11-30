@@ -93,7 +93,6 @@ class Hand(object):
         self._player = weakref.ref(player)
         self.ruleset = player.game.ruleset
         self.intelligence = player.intelligence if player else AIDefault()
-
         self.string = string
         self.__robbedTile = Tile.unknown
         self.prevHand = prevHand
@@ -117,7 +116,7 @@ class Hand(object):
         self.__parseString(string)
         self.__won = self.lenOffset == 1 and player.mayWin
 
-        if Debug.hand or Debug.mahJongg:
+        if Debug.hand or (Debug.mahJongg and self.lenOffset == 1):
             self.debug(fmt('{callers}',
                 callers=callers(exclude=['__init__'])))
             Hand.indent += 1
@@ -135,7 +134,7 @@ class Hand(object):
             self.__score = Score()
         finally:
             self._fixed = True
-            if Debug.hand:
+            if Debug.hand or (Debug.mahJongg and self.lenOffset == 1):
                 _hideSelf = str(self)
                 _hideScore = str(self.score)
                 self.debug(fmt(
