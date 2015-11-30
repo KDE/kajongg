@@ -194,7 +194,6 @@ class ServerGame(PlayingGame):
         for player in self.players:
             player.clearHand()
             # 13 tiles at least, with names as given by wall
-            player.addConcealedTiles(self.wall.deal([None] * 13))
             # compensate boni
             while len(player.concealedTiles) != 13:
                 player.addConcealedTiles(self.wall.deal())
