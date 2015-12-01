@@ -388,23 +388,36 @@ class Player(StrMixin):
         self._concealedTiles[0] = tileName
         self._hand = None
 
-    def _computeHand(self, withDiscard=None):
+    def _computeHand(self):
         """returns Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
         melds = ['R' + ''.join(str(x) for x in sorted(self._concealedTiles))]
-        if withDiscard:
-            melds[0] += withDiscard
         if melds[0] == 'R':
             melds = melds[1:]
         melds.extend(str(x) for x in self._exposedMelds)
         melds.extend(str(x) for x in self._concealedMelds)
         melds.extend(str(x) for x in self._bonusTiles)
         melds.append(self.mjString())
-        if withDiscard or self.lastTile:
+        if self.lastTile:
             melds.append(
                 'L%s%s' %
-                (withDiscard or self.lastTile, self.lastMeld if self.lastMeld else ''))
+                (self.lastTile, self.lastMeld if self.lastMeld else ''))
         return Hand(self, ' '.join(melds))
+
+    def _computeHandWithDiscard(self, discard):
+        """what if"""
+        lastSource = self.lastSource # FIXME: recompute
+        save = (self.lastTile, self.lastSource)
+        try:
+            self.lastSource = lastSource
+            if discard:
+                self.lastTile = discard
+                self._concealedTiles.append(discard)
+            return self._computeHand()
+        finally:
+            self.lastTile, self.lastSource = save
+            if discard:
+                self._concealedTiles = self._concealedTiles[:-1]
 
     def scoringString(self):
         """helper for HandBoard.__str__"""
@@ -569,7 +582,7 @@ class PlayingPlayer(Player):
             withDiscard = game.lastDiscard
         else:
             withDiscard = None
-        hand = self._computeHand(withDiscard)
+        hand = self._computeHandWithDiscard(withDiscard)
         if hand.won:
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:
