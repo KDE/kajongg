@@ -127,8 +127,10 @@ class Server(StrMixin):
         running = Server.allRunningJobs()
         if len(running) >= OPTIONS.clients:
             raise TooManyClients
+        maxClientsPerServer = OPTIONS.clients / OPTIONS.servers
         matchingServers = list(
-            x for x in cls.servers if x.commitId == job.commitId)
+            x for x in cls.servers
+            if x.commitId == job.commitId and len(x.jobs) < maxClientsPerServer)
         if matchingServers:
             result = sorted(matchingServers, key=lambda x: len(x.jobs))[0]
         else:
@@ -511,7 +513,7 @@ def startingDir():
 def getJobs(jobs):
     """fill the queue"""
     try:
-        while len(jobs) < OPTIONS.servers * OPTIONS.clients:
+        while len(jobs) < OPTIONS.clients:
             jobs.append(next(OPTIONS.jobs))
     except StopIteration:
         pass
