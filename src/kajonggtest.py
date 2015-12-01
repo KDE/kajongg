@@ -170,7 +170,7 @@ class Server(StrMixin):
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
         assert self.commitId == job.commitId
-        print('starting server for %s in %s' % (job, self.clone.tmpdir))
+        print('starting server for                  commit=%s in %s' % (job.commitId, self.clone.tmpdir))
         cmd = [os.path.join(job.srcDir(), 'kajonggserver.py')]
         if OPTIONS.server3:
             cmd.insert(0, 'python3')
@@ -298,7 +298,7 @@ class Job(StrMixin):
             cmd.append('--playopen')
         if OPTIONS.debug:
             cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
-        print('starting            %s' % self)
+        print('starting            %s in %s' % (self, self.server.clone.tmpdir))
         if OPTIONS.log:
             self.process = subprocess.Popen(cmd, cwd=self.srcDir(),
                 stdout=self.logFile, stderr=self.logFile)
@@ -315,9 +315,9 @@ class Job(StrMixin):
             self.process = None
             if not silent:
                 print(
-                    '   Game over: %s%s' %
+                    '   Game over        %s%s' %
                     ('Return code: %s ' %
-     result if result else '', self))
+                     result if result else '', self))
             self.server.jobs.remove(self)
 
     @property
