@@ -14,6 +14,7 @@
   <name xml:lang="en-GB">Kajongg</name>
   <name xml:lang="es">Kajongg</name>
   <name xml:lang="et">Kajongg</name>
+  <name xml:lang="fi">Kajongg</name>
   <name xml:lang="gl">Kajongg</name>
   <name xml:lang="it">Kajongg</name>
   <name xml:lang="ko">Kajongg</name>
@@ -40,6 +41,7 @@
   <summary xml:lang="en-GB">Mah Jongg</summary>
   <summary xml:lang="es">Mah Jongg</summary>
   <summary xml:lang="et">Mah Jongg</summary>
+  <summary xml:lang="fi">Mahjong</summary>
   <summary xml:lang="gl">Mah Jongg</summary>
   <summary xml:lang="it">Mah Jongg</summary>
   <summary xml:lang="ko">Mah Jongg</summary>
@@ -71,6 +73,7 @@
     <p xml:lang="en-GB">Kajongg is the ancient Chinese board game for 4 players. Kajongg can be used in two different ways: Scoring a manual game where you play as always and use Kajongg for the computation of scores and for bookkeeping. Or you can use Kajongg to play against any combination of other human players or computer players.</p>
     <p xml:lang="es">Kajongg es un antiguo juego de tablero chino para 4 jugadores. Kajongg puede jugarse de dos maneras distintas: jugar de forma manual y usar Kajongg para los cómputos de la puntuación y las cuentas. O puede usar Kajongg para jugar contra cualquier combinación de jugadores humanos o máquinas.</p>
     <p xml:lang="et">Kajongg on muistne Hiina lauamäng neljale mängijale. Kajonggi võib kasutada kahel viisil: mängu tulemuste määramine käsitsi, millisel juhul mäng käib nagu ikka, ilma arvuti abita, ning Kajonggi kasutatakse tulemuste arvutamiseks ja arvepidamiseks. Teine võimalus Kajonggi kasutada on mängida mis tahes inim- ja arvutimängijate kombinatsiooni vastu.</p>
+    <p xml:lang="fi">Kajongg on vanha kiinalainen lautapeli neljälle pelaajalle. Kajonggia voi pelata kahdella tapaa: voit joko pelata tavalliseen tapaan ja käyttää Kajonggia vain laskemaan pisteet ja pitämään kirjaa, tai voit pelata mitä tahansa muiden ihmispelaajien ja tietokonepelaajien yhdistelmää vastaan.</p>
     <p xml:lang="gl">Kajongg é un antigo xogo de taboleiro chinés para 4 xogadores. Kajongg pódese empregar de dúas maneiras distintas. Podes xogar unha partida manual na que ti xogas como sempre e empregas o Kajongg para que leve a puntuación e as anotacións. Ou podes empregar o Kajongg para xogar contra calquera combinación de xogadores humanos ou informáticos.</p>
     <p xml:lang="it">Kajongg è l'antico gioco cinese da tavolo per quattro giocatori. Kajongg può essere usato in due modi differenti: conteggio dei punti di una partita manuale, in cui giochi come al solito ma utilizzi Kajongg per contare e registrare i punti. Oppure puoi usarlo per giocare contro una qualsiasi combinazione di persone e computer.</p>
     <p xml:lang="ko">Kajongg은 4인용 고대 중국식 보드 게임입니다. 현실 세계의 게임의 점수를 관리하거나, 사람이나 컴퓨터 플레이어로 게임을 즐길 수 있습니다.</p>
