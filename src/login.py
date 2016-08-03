@@ -179,23 +179,23 @@ class Url(unicode):
     @staticmethod
     def __findServerProgram():
         """how should we start the server?"""
-        args = []
+        result = []
         serverPython = 'python3' if Options.server3 else 'python'
         if sys.argv[0].endswith('kajongg.py'):
             tryServer = sys.argv[0].replace('.py', 'server.py')
             if os.path.exists(tryServer):
-                args = [serverPython, tryServer]
+                result = [serverPython, tryServer]
         elif sys.argv[0].endswith('kajongg.pyw'):
             tryServer = sys.argv[0].replace('.pyw', 'server.py')
             if os.path.exists(tryServer):
-                args = [serverPython, tryServer]
+                result = [serverPython, tryServer]
         elif sys.argv[0].endswith('kajongg.exe'):
             tryServer = sys.argv[0].replace('.exe', 'server.exe')
             if os.path.exists(tryServer):
-                args = [tryServer]
+                result = [tryServer]
         else:
-            args = ['kajonggserver']
-        return args
+            result = ['kajonggserver']
+        return result
 
     def __startLocalServer(self):
         """start a local server"""
