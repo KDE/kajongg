@@ -171,7 +171,9 @@ class Server(StrMixin):
         self.jobs.append(job)
         assert self.commitId == job.commitId
         print('starting server for                  commit=%s in %s' % (job.commitId, self.clone.tmpdir))
-        cmd = [os.path.join(job.srcDir(), 'kajonggserver.py')]
+        cmd = [os.path.join(
+            job.srcDir(),
+            'kajonggserver3.py' if OPTIONS.server3 else 'kajonggserver.py')]
         if OPTIONS.server3:
             cmd.insert(0, 'python3')
         elif os.name == 'nt':
