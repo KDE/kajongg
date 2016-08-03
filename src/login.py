@@ -195,6 +195,8 @@ class Url(unicode):
                 result = [tryServer]
         else:
             result = ['kajonggserver']
+        if Debug.connections:
+            logDebug(m18n('trying to start local server %1', result))
         return result
 
     def __startLocalServer(self):
