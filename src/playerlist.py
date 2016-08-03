@@ -24,6 +24,7 @@ from qt import Qt
 from qt import QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox, \
     QTableWidget, QTableWidgetItem
 
+from common import unicode
 from query import Query
 from guiutil import decorateWindow
 from log import m18n, m18nc

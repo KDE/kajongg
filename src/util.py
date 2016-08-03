@@ -39,7 +39,7 @@ if not STDOUTENCODING:
 
 # util must not depend on kde
 
-from common import Debug, isPython3
+from common import Debug, isPython3, unicode
 
 
 def stack(msg, limit=6):
