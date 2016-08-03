@@ -187,7 +187,7 @@ class Client(pb.Referenceable):
     def remote_newTables(self, tables):
         """update table list"""
         newTables = list(ClientTable(self, *x)
-                         for x in tables)  # pylint: disable=star-args
+                         for x in tables)
         self.tables.extend(newTables)
         if Debug.table:
             logDebug(
@@ -206,7 +206,7 @@ class Client(pb.Referenceable):
 
     def tableChanged(self, table):
         """update table list"""
-        newTable = ClientTable(self, *table)  # pylint: disable=star-args
+        newTable = ClientTable(self, *table)
         oldTable = self._tableById(newTable.tableid)
         if oldTable:
             self.tables.remove(oldTable)

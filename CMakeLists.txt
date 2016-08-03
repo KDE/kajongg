@@ -63,6 +63,9 @@ src/rulecode.py
 src/scene.py
 src/scoringdialog.py
 src/scoring.py
+src/user.py
+src/servertable.py
+src/servercommon.py
 src/server.py
 src/sound.py
 src/tables.py

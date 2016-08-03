@@ -474,7 +474,7 @@ class Board(QGraphicsRectItem):
         newY = self.__yWidth * width + self.__yHeight * height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
 
-    def showShadowsChanged(self, oldValue, newValue):
+    def showShadowsChanged(self, dummyOldValue, newValue):
         """set active lightSource"""
         for uiTile in self.uiTiles:
             uiTile.setClippingFlags()
@@ -514,7 +514,9 @@ class Board(QGraphicsRectItem):
             lightSource = self._lightSource
         if showShadows is None:
             showShadows = Internal.Preferences.showShadows
-        if self._tileset != tileset or self._lightSource != lightSource or Internal.Preferences.showShadows != showShadows:
+        if (self._tileset != tileset
+                or self._lightSource != lightSource
+                or Internal.Preferences.showShadows != showShadows):
             self.prepareGeometryChange()
             self._tileset = tileset
             self._lightSource = lightSource
@@ -645,7 +647,7 @@ class CourtBoard(Board):
         xScaleFactor = xAvail / xNeeded
         yScaleFactor = yAvail / yNeeded
         QGraphicsRectItem.setPos(self, newSceneX, newSceneY)
-        Board.setScale(self, min(xScaleFactor, yScaleFactor))
+        self.setScale(min(xScaleFactor, yScaleFactor))
         for uiTile in self.uiTiles:
             uiTile.board.placeTile(uiTile)
 
@@ -734,8 +736,8 @@ class SelectorBoard(CourtBoard):
         offsets = {Tile.dragon: (
             3, 6, Tile.dragons), Tile.flower: (
                 4, 5, Tile.winds), Tile.season: (4, 0, Tile.winds),
-            Tile.wind: (3, 0, Tile.winds), Tile.bamboo: (1, 0, Tile.numbers), Tile.stone: (2, 0, Tile.numbers),
-            Tile.character: (0, 0, Tile.numbers)}
+                   Tile.wind: (3, 0, Tile.winds), Tile.bamboo: (1, 0, Tile.numbers), Tile.stone: (2, 0, Tile.numbers),
+                   Tile.character: (0, 0, Tile.numbers)}
         row, baseColumn, order = offsets[uiTile.tile.lowerGroup]
         column = baseColumn + order.index(uiTile.tile.value)
         uiTile.dark = False

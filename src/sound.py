@@ -56,7 +56,7 @@ class Sound(object):
 
     @staticmethod
     def findOgg():
-        """sets __oggName to exe name or False"""
+        """sets __oggName to exe name or an empty string"""
         if Sound.__oggName is None:
             if os.name == 'nt':
                 parentDirectories = KGlobal.dirs().findDirs(
@@ -76,7 +76,7 @@ class Sound(object):
             if which(oggName):
                 Sound.__oggName = oggName
             else:
-                Sound.__oggName = False
+                Sound.__oggName = ''
                 Internal.Preferences.useSounds = False
                 # checks again at next reenable
                 if msg:
@@ -161,9 +161,9 @@ class Sound(object):
                     Sound.playProcesses.append(process)
                     reactor.callLater(3, Sound.cleanProcesses)
                     reactor.callLater(6, Sound.cleanProcesses)
-        elif False:
-            text = os.path.basename(what)
-            text = os.path.splitext(text)[0]
+#        else:
+#            text = os.path.basename(what)
+#            text = os.path.splitext(text)[0]
             # If this ever works, we need to translate all texts
             # we need package jovie and mbrola voices
             # KSpeech setLanguage de
@@ -174,11 +174,11 @@ class Sound(object):
             # with that name exists
             # getTalkerCodes returns nothing
             # this all feels immature
-            if len(text) == 2 and text[0] in 'sdbcw':
-                text = Tile(text).name()
-            args = ['qdbus', 'org.kde.jovie',
-                    '/KSpeech', 'say', text, '1']
-            subprocess.Popen(args)
+#            if len(text) == 2 and text[0] in 'sdbcw':
+#                text = Tile(text).name()
+#            args = ['qdbus', 'org.kde.jovie',
+#                    '/KSpeech', 'say', text, '1']
+#            subprocess.Popen(args)
 
 
 class Voice(object):
@@ -354,7 +354,8 @@ class Voice(object):
 #        print(self.directory, self.__md5sum)
         existingMd5sum = self.savedmd5Sum()
         md5Name = self.md5FileName()
-        if False:  # TODO: warum ist das in python3 unterschiedlich? self.__md5sum != existingMd5sum:
+        if False: # pylint: disable=using-constant-test
+            # TODO: warum ist das in python3 unterschiedlich? self.__md5sum != existingMd5sum:
             if Debug.sound:
                 if not os.path.exists(md5Name):
                     logDebug(u'creating new %s' % md5Name)

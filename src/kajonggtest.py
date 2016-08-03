@@ -192,7 +192,8 @@ class Server(StrMixin):
         if OPTIONS.qt5:
             cmd.append('--qt5')
         if OPTIONS.log:
-            self.process = subprocess.Popen(cmd, cwd=job.srcDir(),
+            self.process = subprocess.Popen(
+                cmd, cwd=job.srcDir(),
                 stdout=job.logFile, stderr=job.logFile)
         else:
             # reuse this server (otherwise it stops by itself)
@@ -258,16 +259,22 @@ class Job(StrMixin):
         """the path of the directory where the particular test is running"""
         return os.path.join(Clone.clones[self.commitId].tmpdir, 'src')
 
+    def __startProcess(self, cmd):
+        """call Popen"""
+        print('starting            %s in %s' % (self, self.server.clone.tmpdir))
+        if OPTIONS.log:
+            self.process = subprocess.Popen(
+                cmd, cwd=self.srcDir(),
+                stdout=self.logFile, stderr=self.logFile)
+        else:
+            self.process = subprocess.Popen(cmd, cwd=self.srcDir())
+
     def start(self):
         """start this job"""
         self.server = Server(self)
         # never login to the same server twice at the
         # same time with the same player name
         player = self.server.jobs.index(self) + 1
-        if OPTIONS.usePort:
-            socketArg = '--port={sock}'.format(sock=self.server.socketName)
-        else:
-            socketArg = '--socket={sock}'.format(sock=self.server.socketName)
         cmd = [os.path.join(self.srcDir(), 'kajongg.py'),
                '--game={game}'.format(game=self.game),
                '--player={tester} {player}'.format(
@@ -295,12 +302,7 @@ class Job(StrMixin):
             cmd.append('--playopen')
         if OPTIONS.debug:
             cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
-        print('starting            %s in %s' % (self, self.server.clone.tmpdir))
-        if OPTIONS.log:
-            self.process = subprocess.Popen(cmd, cwd=self.srcDir(),
-                stdout=self.logFile, stderr=self.logFile)
-        else:
-            self.process = subprocess.Popen(cmd, cwd=self.srcDir())
+        self.__startProcess(cmd)
         self.started = True
 
     def check(self, silent=False):
@@ -323,7 +325,7 @@ class Job(StrMixin):
         if self.__logFile is None:
             logDir = os.path.expanduser(
                 os.path.join('~', '.kajongg', 'log', str(self.game),
-                self.ruleset, self.aiVariant, '3' if isPython3 else '2'))
+                             self.ruleset, self.aiVariant, '3' if isPython3 else '2'))
             if not os.path.exists(logDir):
                 os.makedirs(logDir)
             logFileName = self.commitId
@@ -393,8 +395,8 @@ def removeInvalidCommits(csvFile):
     csvCommits = set(
         x for x in _ if set(
             x) <= set(
-            '0123456789abcdef') and len(
-                x) >= 7)
+                '0123456789abcdef') and len(
+                    x) >= 7)
     nonExisting = set(csvCommits) - set(onlyExistingCommits(csvCommits))
     if nonExisting:
         print(
@@ -420,11 +422,11 @@ def readGames(csvFile):
     """returns a dict holding a frozenset of games for each variant"""
     if not os.path.exists(csvFile):
         return
-    allRows = neutralize(Csv.reader(csvFile))
-    if not allRows:
+    allRowsGenerator = neutralize(Csv.reader(csvFile))
+    if not allRowsGenerator:
         return
     # we want unique tuples so we can work with sets
-    allRows = set(tuple(x) for x in allRows)
+    allRows = set(tuple(x) for x in allRowsGenerator)
     games = dict()
     # build set of rows for every ai
     for variant in set(tuple(x[:COMMITFIELD]) for x in allRows):
@@ -588,7 +590,8 @@ def doJobs():
 def parse_options():
     """parse options"""
     parser = OptionParser()
-    parser.add_option('', '--gui', dest='gui', action='store_true',
+    parser.add_option(
+        '', '--gui', dest='gui', action='store_true',
         default=False, help='show graphical user interface')
     parser.add_option(
         '', '--23', dest='py23', action='store_true',
@@ -597,36 +600,47 @@ def parse_options():
     parser.add_option(
         '', '--qt5', dest='qt5', action='store_true',
         default=False, help='Force using Qt5')
-    parser.add_option('', '--ruleset', dest='rulesets', default='ALL',
+    parser.add_option(
+        '', '--ruleset', dest='rulesets', default='ALL',
         help='play like a robot using RULESET: comma separated list. If missing, test all rulesets',
         metavar='RULESET')
-    parser.add_option('', '--rounds', dest='rounds',
+    parser.add_option(
+        '', '--rounds', dest='rounds',
         help='play only # ROUNDS per game',
         metavar='ROUNDS')
-    parser.add_option('', '--ai', dest='aiVariants',
+    parser.add_option(
+        '', '--ai', dest='aiVariants',
         default=None, help='use AI variants: comma separated list',
         metavar='AI')
-    parser.add_option('', '--log', dest='log', action='store_true',
+    parser.add_option(
+        '', '--log', dest='log', action='store_true',
         default=False, help='write detailled debug info to ~/.kajongg/log/game/ruleset/commit.'
-                ' This starts a separate server process per job, it sets --servers to --clients.')
-    parser.add_option('', '--game', dest='game',
-        help='start first game with GAMEID, increment for following games.'
-            ' Without this, random values are used.',
+                            ' This starts a separate server process per job, it sets --servers to --clients.')
+    parser.add_option(
+        '', '--game', dest='game',
+        help='start first game with GAMEID, increment for following games.' +
+        ' Without this, random values are used.',
         metavar='GAMEID', type=int, default=0)
-    parser.add_option('', '--count', dest='count',
+    parser.add_option(
+        '', '--count', dest='count',
         help='play COUNT games. Default is unlimited',
         metavar='COUNT', type=int, default=999999999)
-    parser.add_option('', '--playopen', dest='playopen', action='store_true',
+    parser.add_option(
+        '', '--playopen', dest='playopen', action='store_true',
         help='all robots play with visible concealed tiles', default=False)
-    parser.add_option('', '--clients', dest='clients',
+    parser.add_option(
+        '', '--clients', dest='clients',
         help='start a maximum of CLIENTS kajongg instances. Default is 2',
         metavar='CLIENTS', type=int, default=1)
-    parser.add_option('', '--servers', dest='servers',
+    parser.add_option(
+        '', '--servers', dest='servers',
         help='start a maximum of SERVERS kajonggserver instances. Default is 1',
         metavar='SERVERS', type=int, default=1)
-    parser.add_option('', '--git', dest='git',
+    parser.add_option(
+        '', '--git', dest='git',
         help='check all commits: either a comma separated list or a range from..until')
-    parser.add_option('', '--debug', dest='debug',
+    parser.add_option(
+        '', '--debug', dest='debug',
         help=Debug.help())
 
     return parser.parse_args()
@@ -671,13 +685,13 @@ def improve_options():
         OPTIONS.rulesets = usingRulesets
     if OPTIONS.git is not None:
         if '..' in OPTIONS.git:
-            if not '^' in OPTIONS.git:
+            if '^' not in OPTIONS.git:
                 OPTIONS.git = OPTIONS.git.replace('..', '^..')
             commits = subprocess.check_output(
                 'git log --pretty=%h {range}'.format(
                     range=OPTIONS.git).split()).decode()
             OPTIONS.git = list(reversed(list(x.strip()
-                               for x in commits.split('\n') if x.strip())))
+                                             for x in commits.split('\n') if x.strip())))
         else:
             OPTIONS.git = onlyExistingCommits(OPTIONS.git.split(','))
             if not OPTIONS.git:

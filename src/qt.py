@@ -19,10 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 # pylint: disable=unused-import, unused-wildcard-import, wildcard-import
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, wrong-import-position
+
+import sys
 
 import sip
-import sys
 
 from common import isPython3, Internal
 
@@ -35,9 +36,10 @@ if '--qt5' in sys.argv:
         usingQt5 = True
         usingQt4 = False
     except ImportError as exc:
-        Internal.logger.debug('{who}: Cannot import Qt5:{msg}, using Qt4 instead'.format(
-            who='Server' if Internal.isServer else 'Client',
-            msg=exc.message))
+        Internal.logger.debug(
+            '%s: Cannot import Qt5:%s, using Qt4 instead',
+            'Server' if Internal.isServer else 'Client',
+            exc.message)
         from qt4 import *
 else:
     from qt4 import *
@@ -62,7 +64,9 @@ class RealQVariant(object):
 
 if isPython3:
     def toQVariant(obj=None):
+        """PY3 does not need QVariant anymore"""
         return obj
 else:
     def toQVariant(obj=None):
+        """PY3 does not need QVariant anymore"""
         return QVariant(obj)

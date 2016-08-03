@@ -25,7 +25,7 @@ Here we define classes useful for tree views
 from qt import QAbstractItemModel, QModelIndex
 
 
-class TreeItem(object):  # pylint: disable=abstract-class-little-used
+class TreeItem(object):
 
     """generic class for items in a tree"""
 

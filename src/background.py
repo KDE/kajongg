@@ -64,12 +64,12 @@ class Background(object):
             "kmahjonggbackground", "*.desktop", KStandardDirs.Recursive)
         # now we have a list of full paths. Use the base name minus .desktop:
         # put the result into a set, avoiding duplicates
-        backgrounds = set(str(x).rsplit('/')[-1].split('.')[0]
-                          for x in backgroundsAvailableQ)
+        backgrounds = list(set(str(x).rsplit('/')[-1].split('.')[0]
+                               for x in backgroundsAvailableQ))
         if 'default' in backgrounds:
             # we want default to be first in list
             sortedBackgrounds = ['default']
-            sortedBackgrounds.extend(backgrounds - set(['default']))
+            sortedBackgrounds.extend(set(backgrounds) - set(['default']))
             backgrounds = sortedBackgrounds
         return [Background(x) for x in backgrounds]
 
@@ -89,7 +89,8 @@ class Background(object):
                     '\n'.join(str(x)
                               for x in KGlobal.dirs().resourceDirs("kmahjonggbackground"))
                 logException(BackgroundException(m18n(
-                                                 'cannot find any background in the following directories, is libkmahjongg installed?') + directories))
+                    'cannot find any background in the following directories, is libkmahjongg installed?')
+                                                 + directories))
             else:
                 logWarning(
                     m18n(
@@ -123,7 +124,7 @@ class Background(object):
             if self.__graphicspath.isEmpty():
                 logException(BackgroundException(
                     'cannot find kmahjongglib/backgrounds/%s for %s' %
-                        (graphName, self.desktopFileName)))
+                    (graphName, self.desktopFileName)))
 
     def pixmap(self, size):
         """returns a background pixmap or None for isPlain"""
@@ -141,7 +142,7 @@ class Background(object):
                 renderer = QSvgRenderer(self.__graphicspath)
                 if not renderer.isValid():
                     logException(BackgroundException(
-                                 m18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))
+                        m18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))
                 self.__pmap = QPixmap(width, height)
                 self.__pmap.fill(Qt.transparent)
                 painter = QPainter(self.__pmap)

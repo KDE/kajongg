@@ -1,3 +1,4 @@
+#pylint: disable=too-many-lines
 # -*- coding: utf-8 -*-
 
 """Copyright (C) 2009-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
@@ -252,7 +253,7 @@ class Purity(RuleCode):
 class ConcealedTrueColorGame(RuleCode):
 
     def appliesToHand(hand):
-        if len(hand.suits) != 1 or not hand.suits < set(Tile.colors):
+        if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
             return False
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
@@ -337,8 +338,7 @@ class StandardMahJongg(MJRule):
             return {Tile(group, val0 + 1)}
 
     def winningTileCandidates(cls, hand):
-        # pylint:
-        # disable=too-many-locals,too-many-return-statements,too-many-branches,too-many-statements
+        # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches,too-many-statements
         if len(hand.melds) > 7:
             # hope 7 is sufficient, 6 was not
             return set()
@@ -381,13 +381,15 @@ class StandardMahJongg(MJRule):
             values = sorted(x.value for x in result if x.group == group)
             changed = True
             while (changed and len(values) > 2
-                    and values.count(values[0]) == 1
-                    and values.count(values[1]) == 1
-                    and values.count(values[2]) == 1):
+                   and values.count(values[0]) == 1
+                   and values.count(values[1]) == 1
+                   and values.count(values[2]) == 1):
                 changed = False
                 if values[0] + 2 == values[2] and (len(values) == 3 or values[3] > values[0] + 3):
                     # logDebug(u'removing first 3 from %s' % values)
                     meld = Tile(group, values[0]).chow
+                    # pylint: disable=not-an-iterable
+                    # must be a pylint bug. meld is TileList is list
                     for pair in meld:
                         result.remove(pair)
                     melds.append(meld)
@@ -399,12 +401,14 @@ class StandardMahJongg(MJRule):
                     return cls.fillChow(group, values[:2])
             changed = True
             while (changed and len(values) > 2
-                    and values.count(values[-1]) == 1
-                    and values.count(values[-2]) == 1
-                    and values.count(values[-3]) == 1):
+                   and values.count(values[-1]) == 1
+                   and values.count(values[-2]) == 1
+                   and values.count(values[-3]) == 1):
                 changed = False
                 if values[-1] - 2 == values[-3] and (len(values) == 3 or values[-4] < values[-1] - 3):
                     meld = Tile(group, values[-3]).chow
+                    # pylint: disable=not-an-iterable
+                    # must be a pylint bug. meld is TileList is list
                     for pair in meld:
                         result.remove(pair)
                     melds.append(meld)
@@ -481,7 +485,7 @@ class SquirmingSnake(StandardMahJongg):
         std = hand.ruleCache.get(cacheKey, None)
         if std is False:
             return False
-        if len(hand.suits) != 1 or not hand.suits < set(Tile.colors):
+        if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
             return False
         values = hand.values
         if values.count(1) < 3 or values.count(9) < 3:
@@ -550,7 +554,7 @@ class WrigglingSnake(MJRule):
         if Tile.wind not in suits:
             return False
         suits -= {Tile.wind}
-        if len(suits) != 1 or not suits < set(Tile.colors):
+        if len(suits) != 1 or suits >= set(Tile.colors):
             return False
         if hand.values.count(1) != 2:
             return False
@@ -805,7 +809,7 @@ class AllPairHonors(MJRule):
         if len(set(hand.tiles)) != 7:
             return False
         tileCounts = list([len([x for x in hand.tiles if x == y])
-                          for y in hand.tiles])
+                           for y in hand.tiles])
         return set(tileCounts) == set([2])
 
     def winningTileCandidates(cls, hand):
@@ -893,7 +897,7 @@ class LittleThreeDragons(RuleCode):
 
     def appliesToHand(hand):
         lengths = sorted([min(len(x), 3)
-                         for x in hand.melds if x.isDragonMeld])
+                          for x in hand.melds if x.isDragonMeld])
         return lengths == [2, 3, 3]
 
 
@@ -1009,7 +1013,7 @@ class EastWonNineTimesInARow(RuleCode):
 class GatesOfHeaven(StandardMahJongg):
     cache = ()
 
-# FIXME: in BMJA, 111 and 999 must be concealed, we do not check this
+# TODO: in BMJA, 111 and 999 must be concealed, we do not check this
     def computeLastMelds(hand):
         return [x for x in hand.melds if hand.lastTile in x]
 
@@ -1025,7 +1029,7 @@ class GatesOfHeaven(StandardMahJongg):
         return False
 
     def maybeCallingOrWon(hand):
-        if len(hand.suits) != 1 or not hand.suits < set(Tile.colors):
+        if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
             return False
         return not hand.declaredMelds
 
@@ -1059,12 +1063,12 @@ class GatesOfHeaven(StandardMahJongg):
         else:
             # we have something of all values
             if values.count(1) != 3:
-                result = (1,)
+                result = set([1])
             elif values.count(9) != 3:
-                result = (9,)
+                result = set([9])
             else:
                 if 'pair28' in cls.options:
-                    result = Tile.minors
+                    result = Tile.minors # pylint: disable=redefined-variable-type
                 else:
                     result = Tile.numbers
         return {Tile(list(hand.suits)[0], x) for x in result}
@@ -1180,6 +1184,8 @@ class OwnFlower(RuleCode):
         return meld[0].value == hand.ownWind
 
     def mayApplyToMeld(meld):
+        # pylint: disable=unsubscriptable-object
+        # must be a pylint bug. meld is TileList is list
         return meld.isBonus and meld[0].group == Tile.flower
 
 
@@ -1189,6 +1195,8 @@ class OwnSeason(RuleCode):
         return meld[0].value == hand.ownWind
 
     def mayApplyToMeld(meld):
+        # pylint: disable=unsubscriptable-object
+        # must be a pylint bug. meld is TileList is list
         return meld.isBonus and meld[0].group == Tile.season
 
 

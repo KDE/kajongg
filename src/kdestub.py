@@ -24,12 +24,6 @@ python interface to KDE.
 
 """
 
-__all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
-           'KCmdLineOptions', 'i18n', 'i18nc', 'ki18n',
-           'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
-           'KConfigDialog', 'KDialog', 'KLineEdit',
-           'KUser', 'KToggleFullScreenAction', 'KStandardAction',
-           'KXmlGuiWindow', 'KStandardDirs', 'KGlobal', 'KIcon', 'KAction']
 
 import sys
 import os
@@ -42,8 +36,12 @@ if os.name != 'nt':
 import weakref
 from collections import defaultdict
 from argparse import ArgumentParser
+from locale import _parse_localename, getdefaultlocale, setlocale, LC_ALL
+
 
 import sip
+
+# pylint: disable=wrong-import-order
 
 try:
     from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
@@ -52,18 +50,24 @@ except ImportError:
     # pylint: disable=import-error
     from configparser import SafeConfigParser, NoSectionError, NoOptionError
 
-from locale import _parse_localename, getdefaultlocale, setlocale, LC_ALL
-
 # here come the replacements:
 
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
 
-from common import Internal, Debug, ENGLISHDICT, unicodeString
+from common import Internal, Debug, ENGLISHDICT, unicodeString, isPython3
 from util import uniqueList
 from statesaver import StateSaver
 
 import gettext
+
+
+__all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
+           'KCmdLineOptions', 'i18n', 'i18nc', 'ki18n',
+           'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
+           'KConfigDialog', 'KDialog', 'KLineEdit',
+           'KUser', 'KToggleFullScreenAction', 'KStandardAction',
+           'KXmlGuiWindow', 'KStandardDirs', 'KGlobal', 'KIcon', 'KAction']
 
 
 def __insertArgs(translatedTemplate, *args):
@@ -80,7 +84,7 @@ def __insertArgs(translatedTemplate, *args):
     @rtype: C{str}
     """
     if '@' in translatedTemplate:
-        Internal.logger.debug('insertargs:%s' % translatedTemplate)
+        Internal.logger.debug('insertargs:%s', translatedTemplate)
 
     if '\004' in translatedTemplate:
         translatedTemplate = translatedTemplate.split('\004')[1]
@@ -625,10 +629,10 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.statusBar().setObjectName('StatusBar')
         self.menus = {}
         for menu in (
-            (i18n('&Game'), ('scoreGame', 'play', 'abort', 'quit')),
-            (i18n('&View'), ('scoreTable', 'explain')),
-            (i18n('&Settings'), ('players', 'rulesets', 'demoMode', '', 'options_show_statusbar',
-                                 'options_show_toolbar', '', 'options_configure_toolbars', 'options_configure')),
+                (i18n('&Game'), ('scoreGame', 'play', 'abort', 'quit')),
+                (i18n('&View'), ('scoreTable', 'explain')),
+                (i18n('&Settings'), ('players', 'rulesets', 'demoMode', '', 'options_show_statusbar',
+                                     'options_show_toolbar', '', 'options_configure_toolbars', 'options_configure')),
                 (i18n('&Help'), ('help', 'aboutkajongg'))):
             self.menus[menu[0]] = (QMenu(menu[0]), menu[1])
             self.menuBar().addMenu(self.menus[menu[0]][0])
@@ -781,9 +785,9 @@ class KStandardDirs(object):
         exists = os.path.exists(tryThis)
         if Debug.locate:
             if exists:
-                Internal.logger.debug('found: %s' % tryThis)
+                Internal.logger.debug('found: %s', tryThis)
             else:
-                Internal.logger.debug('not found: %s' % tryThis)
+                Internal.logger.debug('not found: %s', tryThis)
         return exists, tryThis
 
     @classmethod
@@ -812,8 +816,9 @@ class KStandardDirs(object):
                     fullPath)
             os.makedirs(os.path.dirname(fullPath))
         if Debug.locate:
-            Internal.logger.debug('locateLocal(%s, %s) returns %s' % (
-                type_, filename, fullPath))
+            Internal.logger.debug(
+                'locateLocal(%s, %s) returns %s',
+                type_, filename, fullPath)
         return fullPath
 
     @classmethod
@@ -870,8 +875,8 @@ class KStandardDirs(object):
         result = cls.findDirs(type_, filename)
         if Debug.locate:
             Internal.logger.debug(
-                'findResourceDir(%s,%s) finds %s' %
-                (type_, filename, result))
+                'findResourceDir(%s,%s) finds %s',
+                type_, filename, result)
         return result
 
 
@@ -1074,8 +1079,12 @@ class KConfig(SafeConfigParser):
             path = KGlobal.dirs().locateLocal("config", "kajonggrc")
         self.path = str(path)
         if os.path.exists(self.path):
-            with codecs.open(self.path, 'rb', encoding='utf-8') as cfgFile:
-                self.readfp(cfgFile)
+            with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
+                # TODO: changed from 'rb' to 'r', test this!
+                if isPython3:
+                    self.read_file(cfgFile)
+                else:
+                    self.readfp(cfgFile) # pylint: disable=deprecated-method
 
     def as_dict(self):
         """a dict of dicts"""
@@ -1105,7 +1114,7 @@ class KConfig(SafeConfigParser):
                 for (key, value) in self._sections[section].items():
                     key = bytes(str(key).encode('utf-8')) # pylint bug, bytes() should not be needed
                     value = str(value).encode('utf-8')
-                    if key == "__name__":
+                    if key == b"__name__":
                         continue
                     if value is not None:
                         key = b"=".join((key, value.replace(b'\n', b'\n\t')))
@@ -1140,7 +1149,7 @@ class KIcon(QIcon):
                     name,
                     extension))
             if not os.path.exists(name):
-                Internal.logger.debug('not found:%s' % name)
+                Internal.logger.debug('not found:%s', name)
                 raise UserWarning('not found:%s' % name)
             QIcon.__init__(self, name)
             return
@@ -1353,8 +1362,8 @@ class AboutKajonggDialog(KDialog):
                                         stdout=subprocess.PIPE).communicate()[0]
             versions = versions.decode().split('\n')
             versions = (x.strip() for x in versions if ': ' in x.strip())
-            versions = dict(x.split(': ') for x in versions)
-            underVersions.append('KDE %s' % versions['KDE'])
+            versionsDict = dict(x.split(': ') for x in versions)
+            underVersions.append('KDE %s' % versionsDict['KDE'])
         except OSError:
             underVersions.append(i18n('KDE (not installed)'))
         underVersions.append('Qt %s' % QT_VERSION_STR)
@@ -1474,12 +1483,12 @@ class KConfigDialog(KDialog):
     dialog = None
     getFunc = {
         'QCheckBox': 'isChecked',
-            'QSlider': 'value',
-            'QLineEdit': 'text'}
+        'QSlider': 'value',
+        'QLineEdit': 'text'}
     setFunc = {
         'QCheckBox': 'setChecked',
-            'QSlider': 'setValue',
-            'QLineEdit': 'setText'}
+        'QSlider': 'setValue',
+        'QLineEdit': 'setText'}
 
     def __init__(self, parent, name, preferences):
         KDialog.__init__(self, parent)
@@ -1574,14 +1583,14 @@ class KConfigDialog(KDialog):
 
     def applySettings(self):
         """Apply pressed"""
-        changed = self.updateButtons()
-        self.updateSettings()
-        self.updateButtons()
+        if self.updateButtons():
+            self.updateSettings()
+            self.updateButtons()
 
     def accept(self):
         """OK pressed"""
-        changed = self.updateButtons()
-        self.updateSettings()
+        if self.updateButtons():
+            self.updateSettings()
         KDialog.accept(self)
 
     def updateButtons(self):

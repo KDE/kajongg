@@ -112,7 +112,7 @@ class SelectPlayers(SelectRuleset):
         unusedNames = allNames - self.__selectedNames()
         with BlockSignals(self.nameWidgets):
             used = set([unicode(x.currentText())
-                       for x in self.nameWidgets if x.manualSelect])
+                        for x in self.nameWidgets if x.manualSelect])
             for combo in self.nameWidgets:
                 if not combo.manualSelect:
                     if unicode(combo.currentText()) in used:
@@ -160,8 +160,7 @@ class ScoringHandBoard(HandBoard):
     def meldVariants(self, tile, lowerHalf):
         """Kong might have variants"""
         result = []
-        meld = self.uiMeldWithTile(
-            tile).meld  # pylint: disable=maybe-no-member
+        meld = self.uiMeldWithTile(tile).meld  # pylint: disable=no-member
         result.append(meld.concealed if lowerHalf else meld.exposed)
         if len(meld) == 4:
             if lowerHalf:
@@ -390,7 +389,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             try:
                 checked = box.isChecked()
                 box.setChecked(not checked)
-                newHand = self._computeHand()
+                newHand = self.computeHand()
             finally:
                 box.setChecked(checked)
         return newHand.score > currentScore
@@ -423,7 +422,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             return ''
         return 'L%s%s' % (self.lastTile, self.lastMeld)
 
-    def _computeHand(self):
+    def computeHand(self):
         """returns a Hand object, using a cache"""
         self.lastTile = Internal.scene.computeLastTile()
         self.lastMeld = Internal.scene.computeLastMeld()

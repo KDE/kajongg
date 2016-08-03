@@ -179,7 +179,7 @@ class RuleModel(TreeModel):
 
     def data(self, index, role):  # pylint: disable=no-self-use
         """get data fom model"""
-        # pylint: disable=too-many-branches
+        # pylint: disable=too-many-branches,redefined-variable-type
         # too many branches
         result = None
         if index.isValid():
@@ -261,7 +261,7 @@ class RuleModel(TreeModel):
         for ridx, ruleList in enumerate(ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
             ruleItems = list([RuleItem(x)
-                             for x in ruleList if not 'internal' in x.options])
+                              for x in ruleList if 'internal' not in x.options])
             self.insertRows(0, ruleItems, listIndex)
 
 
@@ -409,7 +409,7 @@ class RuleTreeView(QTreeView):
             if self.btnRemove and self.btnCopy:
                 self.ruleModel = EditableRuleModel(rulesets, self.name)
             else:
-                self.ruleModel = RuleModel(rulesets, self.name)
+                self.ruleModel = RuleModel(rulesets, self.name) # pylint: disable=redefined-variable-type
             self.setItemDelegateForColumn(
                 1,
                 RightAlignedCheckboxDelegate(

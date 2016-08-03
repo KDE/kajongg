@@ -67,7 +67,7 @@ class Permutations(object):
             if len(groupVariants):
                 variants.append(groupVariants)
         result = []
-        for variant in (sum(x, []) for x in itertools.product(*variants)):  # pylint: disable=star-args
+        for variant in (sum(x, []) for x in itertools.product(*variants)):
             if variant not in result:
                 result.append(variant)
         result = sorted(MeldList(honors + x + boni) for x in result)
@@ -105,9 +105,9 @@ class Permutations(object):
                     result.append(appendValue)
         else:
             result = list([list([tuple([x]) for x in values])])
-        result = tuple(sorted(set(tuple(tuple(sorted(x)) for x in result))))
-        cls.permuteCache[valuesTuple] = result
-        return result
+        tupleResult = tuple(sorted(set(tuple(tuple(sorted(x)) for x in result))))
+        cls.permuteCache[valuesTuple] = tupleResult
+        return tupleResult
 
     colorPermCache = {}
 
@@ -159,7 +159,7 @@ class Permutations(object):
                 allValues = list(x for x in allValues if x > border)
         combinations = list(cls.usefulPermutations(x) for x in groups)
         result = []
-        for variant in list(itertools.product(*combinations)):  # pylint: disable=star-args
+        for variant in list(itertools.product(*combinations)):
             melds = []
             for block in variant:
                 for meld in block:

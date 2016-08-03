@@ -129,7 +129,7 @@ class HandBoard(Board):
         """for debugging messages"""
         return self.player.name
 
-    def showShadowsChanged(self, oldValue, newValue):
+    def showShadowsChanged(self, dummyOldValue, dummyNewValue):
         """Add or remove the shadows."""
         self.setPosition()
 
@@ -148,7 +148,7 @@ class HandBoard(Board):
         self._reload(self.tileset, showShadows=show)
         self.sync()
 
-    def rearrangeMeldsChanged(self, oldValue, newValue):
+    def rearrangeMeldsChanged(self, dummyOldValue, newValue):
         """when True, concealed melds are grouped"""
         self.concealedMeldDistance = (
             self.exposedMeldDistance if newValue else 0.0)
@@ -201,7 +201,7 @@ class HandBoard(Board):
         lowerLen = max(positions) if positions else 0
 # TODO: keep them in the row they are in as long as there is room
         if upperLen < lowerLen:
-            bonusY = 0
+            bonusY = 0.0
             tileLen = upperLen
         else:
             bonusY = self.lowerY
@@ -248,8 +248,9 @@ class HandBoard(Board):
                 # here we simply ignore existing tiles with no matches
                 matches = sorted(
                     matches, key=lambda x:
-                    + abs(newPosition.yoffset - x.yoffset) * 100
-                    + abs(newPosition.xoffset - x.xoffset))
+                    + abs(newPosition.yoffset - x.yoffset) * 100 # pylint: disable=cell-var-from-loop
+                    + abs(newPosition.xoffset - x.xoffset)) # pylint: disable=cell-var-from-loop
+                # pylint is too cautious here. Check with later versions.
                 match = matches[0]
                 result[match] = newPosition
                 oldTiles[match.tile].remove(match)

@@ -26,6 +26,8 @@ on linux in the src directory with Kajongg fully installed.
 Usage: see ../README.windows
 """
 
+# pylint: disable=wrong-import-order, wrong-import-position, import-error
+
 # ==== adapt this part =====
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
@@ -49,9 +51,9 @@ if os.path.exists('build'):
 
 includes = [
     "zope.interface",
-     "twisted.internet",
-     "twisted.internet.protocol",
-     "pkg_resources"]
+    "twisted.internet",
+    "twisted.internet.protocol",
+    "pkg_resources"]
 packages = []
 namespace_packages = ["zope"]
 include_files = ('share',)
@@ -105,8 +107,8 @@ setup(
     version=VERSION,
     description='The classical game of Mah Jongg',
     long_description="This is the classical Mah Jongg for four players. "
-            "If you are looking for the Mah Jongg solitaire please use the "
-            "application kmahjongg.",
+    "If you are looking for the Mah Jongg solitaire please use the "
+    "application kmahjongg.",
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,

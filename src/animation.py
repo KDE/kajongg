@@ -138,7 +138,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             if self.debug or ParallelAnimationGroup.current.debug:
                 logDebug(u'Chaining Animation group %d to %d' %
                          (id(self), id(ParallelAnimationGroup.current)))
-                self.doAfter =  ParallelAnimationGroup.current.doAfter
+                self.doAfter = ParallelAnimationGroup.current.doAfter
                 ParallelAnimationGroup.current.doAfter = list()
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
         else:
@@ -258,19 +258,19 @@ def __afterCurrentAnimationDo(callback, *args, **kwargs):
         callback(None, *args, **kwargs)
 
 
-def afterQueuedAnimations(f):
+def afterQueuedAnimations(doAfter):
     """A decorator"""
 
-    @functools.wraps(f)
+    @functools.wraps(doAfter)
     def doAfterQueuedAnimations(*args, **kwargs):
+        """do this after all queued animations have finished"""
         animate()
-        method = types.MethodType(f, args[0])
+        method = types.MethodType(doAfter, args[0])
         args = args[1:]
-        if isPython3:
-            assert f.__code__.co_varnames[
-                1] == 'deferredResult', f.__qualname__
-        else:
-            assert f.func_code.co_varnames[1] == 'deferredResult', f.__name__
+        varnames = doAfter.__code__.co_varnames if isPython3 else doAfter.func_code.co_varnames
+        assert varnames[1] in ('deferredResult', 'dummyDeferredResult'), \
+            '{} passed {} instead of deferredResult'.format(
+                doAfter.__qualname__ if isPython3 else doAfter.__name__, varnames[1])
         return __afterCurrentAnimationDo(method, *args, **kwargs)
 
     return doAfterQueuedAnimations

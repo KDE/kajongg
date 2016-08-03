@@ -29,7 +29,7 @@ from twisted.spread import pb
 from twisted.cred import credentials
 from twisted.internet.defer import CancelledError
 from twisted.internet.task import deferLater
-from twisted.internet.error import ConnectionRefusedError, TimeoutError, ConnectionLost, DNSLookupError, ConnectError
+import twisted.internet.error
 from twisted.python.failure import Failure
 
 from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
@@ -76,14 +76,14 @@ class Url(unicode):
             # TODO: but host is None, do we ever get here?
             url = host
             if port:
-                url += ':{}'.format(self.port)
+                url += ':{}'.format(port)
         obj = unicode.__new__(cls, url)
         obj.host = host
         obj.port = port
         if Options.port:
             obj.port = int(Options.port)
         if obj.port is None and obj.isLocalHost and not obj.useSocket:
-            obj.port = obj.__findFreePort()
+            obj.port = obj.findFreePort()
         if obj.port is None and not obj.isLocalHost:
             obj.port = Internal.defaultPort
         if Debug.connections:
@@ -97,8 +97,6 @@ class Url(unicode):
             Internal.reactor = reactor
             if Debug.quit:
                 logDebug(u'Installed qt4reactor')
-        return obj
-
         return obj
 
     def __repr__(self):
@@ -126,7 +124,7 @@ class Url(unicode):
         """do server and client run on the same host?"""
         return self.host in ('127.0.0.1', 'localhost')
 
-    def __findFreePort(self):
+    def findFreePort(self):
         """find an unused port on the current system.
         used when we want to start a local server on windows"""
         assert self.isLocalHost
@@ -161,15 +159,16 @@ class Url(unicode):
             # riverbank.computing says module dbus is deprecated
             # for Python 3. And Ubuntu has no package with
             # QtDBus. So we use good old subprocess.
-            stdoutdata, stderrdata = subprocess.Popen(['qdbus',
-                                                       'org.kde.kded',
-                                                       '/modules/networkstatus',
-                                                       'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+            stdoutdata, stderrdata = subprocess.Popen(
+                ['qdbus',
+                 'org.kde.kded',
+                 '/modules/networkstatus',
+                 'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
             stdoutdata = stdoutdata.strip()
             stderrdata = stderrdata.strip()
             if stderrdata == '' and stdoutdata != '4':
                 # pylint: disable=nonstandard-exception
-                raise ConnectError()
+                raise twisted.internet.error.ConnectError()
             # if we have stderrdata, qdbus probably does not provide the
             # service we want, so ignore it
         return result
@@ -570,12 +569,10 @@ class Connection(object):
         Players.createIfUnknown(self.username)
         playerId = Players.allIds[self.username]
         with Internal.db:
-            if Query(
-                'update passwords set password=? where url=? and player=?',
+            if Query('update passwords set password=? where url=? and player=?',
                      (self.password, self.url, playerId)).rowcount() == 0:
-                Query(
-                    'insert into passwords(url,player,password) values(?,?,?)',
-                    (self.url, playerId, self.password))
+                Query('insert into passwords(url,player,password) values(?,?,?)',
+                      (self.url, playerId, self.password))
 
     def __checkExistingConnections(self, dummy=None):
         """do we already have a connection to the wanted URL?"""
@@ -638,24 +635,24 @@ class Connection(object):
             raise CancelledError
         if failure.check(CancelledError):
             pass
-        elif failure.check(TimeoutError):
+        elif failure.check(twisted.internet.error.TimeoutError):
             msg = m18n('Server %1 did not answer', self.url)
-        elif failure.check(ConnectionRefusedError):
+        elif failure.check(twisted.internet.error.ConnectionRefusedError):
             msg = m18n('Server %1 refused connection', self.url)
-        elif failure.check(ConnectionLost):
+        elif failure.check(twisted.internet.error.ConnectionLost):
             msg = m18n('Server %1 does not run a kajongg server', self.url)
-        elif failure.check(DNSLookupError):
+        elif failure.check(twisted.internet.error.DNSLookupError):
             msg = m18n('Address for server %1 cannot be found', self.url)
-        elif failure.check(ConnectError):
+        elif failure.check(twisted.internet.error.ConnectError):
             msg = m18n(
                 'Login to server %1 failed: You have no network connection',
                 self.url)
         else:
-            tb = unicodeString(failure.getTraceback())
+            tracebackString = unicodeString(failure.getTraceback())
             msg = u'Login to server {} failed: {}/{} Callstack:{}'.format(
                 self.url, failure.value.__class__.__name__, failure.getErrorMessage(
                 ),
-                tb)
+                tracebackString)
         # Maybe the server is running but something is wrong with it
         if self.url.useSocket:
             if removeIfExists(socketName()):

@@ -128,6 +128,7 @@ class SetupPreferences(KConfigSkeleton):
         self.addBool('Display', 'uploadVoice', False)
 
     def callTrigger(self, name):
+        """call registered callback for this attribute change"""
         newValue = getattr(self, name)
         if self.__oldValues[name] != newValue:
             if Debug.preferences:

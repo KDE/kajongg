@@ -18,15 +18,15 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+from zope.interface import implements  # pylint: disable=unused-import
+
 from log import m18n, m18nc, logDebug
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug, WINDS
-from common import unicode, nativeString
+from common import nativeString
 from twisted.internet.defer import succeed
 
 from qt import Qt, QMetaObject, variantValue
 from qt import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
-
-from zope.interface import implements  # pylint: disable=unused-import
 
 from dialogs import QuestionYesNo
 from guiutil import decorateWindow
@@ -71,7 +71,7 @@ class FocusRect(QGraphicsRectItem):
             self.refresh()
 
     @afterQueuedAnimations
-    def refresh(self, deferredResult=None):
+    def refresh(self, dummyDeferredResult=None):
         """show/hide on correct position after queued animations end"""
         board = self.board
         if not isAlive(board) or not isAlive(self):
@@ -167,7 +167,8 @@ class GameScene(SceneWithFocusRect):
         self.mainWindow.updateGUI()
         self.mainWindow.adjustView()
 
-    def showShadowsChanged(self, oldValue, newValue):
+    def showShadowsChanged(self, dummyOldValue, dummyNewValue):
+        """if the wanted shadow direction changed, apply that change now"""
         for uiTile in self.graphicsTileItems():
             uiTile.setClippingFlags()
         self.applySettings()

@@ -78,7 +78,7 @@ class Meld(TileList):
             assert value.key == 1 + value.hashTable.index(value) / 2
             assert value.key == TileList.key(value), \
                 'static key:%s current key:%s, static value:%s, current value:%s ' % (
-                value.key, TileList.key(value), value.original, value)
+                    value.key, TileList.key(value), value.original, value)
 
     def __init__(self, newContent=None):
         """init the meld: content can be either
@@ -138,18 +138,20 @@ class Meld(TileList):
                     self,
                     'concealed',
                     Meld(TileList(x.concealed for x in self)))
-                TileList.__setattr__(self, 'declared',
-                                     Meld(TileList([self[0].exposed, self[1].concealed, self[2].concealed, self[3].exposed])))
+                TileList.__setattr__(
+                    self, 'declared',
+                    Meld(TileList([self[0].exposed, self[1].concealed, self[2].concealed, self[3].exposed])))
                 TileList.__setattr__(
                     self,
                     'exposed',
                     Meld(TileList(x.exposed for x in self)))
-                TileList.__setattr__(self, 'exposedClaimed',
-                                     Meld(TileList([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed])))
+                TileList.__setattr__(
+                    self, 'exposedClaimed',
+                    Meld(TileList([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed])))
 
     def __setattr__(self, name, value):
         if (hasattr(self, '_fixed')
-            and not name.endswith('__hasRules')
+                and not name.endswith('__hasRules')
                 and not name.endswith('__hasDoublingRules')):
             raise TypeError
         TileList.__setattr__(self, name, value)
@@ -164,8 +166,9 @@ class Meld(TileList):
         self.__hasRules = any(len(x) for x in chain(
             self.__staticRules.values(), self.__dynamicRules.values()))
 
-        self.__staticDoublingRules[rulesetId] = list(x for x in ruleset.doublingMeldRules
-                                                     if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
+        self.__staticDoublingRules[rulesetId] = list(
+            x for x in ruleset.doublingMeldRules
+            if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
         self.__dynamicDoublingRules[rulesetId] = list(x for x in ruleset.doublingMeldRules
                                                       if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self))
         self.__hasDoublingRules = any(len(x) for x in chain(
@@ -181,7 +184,7 @@ class Meld(TileList):
             self.__prepareRules(ruleset)
         result = self.__staticRules[rulesetId][:]
         result.extend(x for x in self.__dynamicRules[
-                      rulesetId] if x.appliesToMeld(hand, self))
+            rulesetId] if x.appliesToMeld(hand, self))
         return result
 
     def doublingRules(self, hand):
@@ -192,7 +195,7 @@ class Meld(TileList):
             self.__prepareRules(ruleset)
         result = self.__staticDoublingRules[rulesetId][:]
         result.extend(x for x in self.__dynamicDoublingRules[
-                      rulesetId] if x.appliesToMeld(hand, self))
+            rulesetId] if x.appliesToMeld(hand, self))
         return result
 
     def append(self, dummy):
@@ -409,7 +412,7 @@ class MeldList(list):
             list.append(self, newContent)
         elif isinstance(newContent, str):
             list.extend(self, [Meld(x)
-                        for x in newContent.split()])  # pylint: disable=maybe-no-member
+                               for x in newContent.split()])  # pylint: disable=maybe-no-member
         else:
             list.extend(self, [Meld(x) for x in newContent])
         self.sort()

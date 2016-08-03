@@ -21,8 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
 
-from common import Debug, isPython3, WINDS  # pylint: disable=unused-import
 import unittest
+
+from common import Debug, isPython3, WINDS  # pylint: disable=unused-import
 from player import Players
 from game import PlayingGame
 from hand import Hand, Score
@@ -45,7 +46,7 @@ Players.createIfUnknown = str
 
 # RULESETS=RULESETS[:1]
 GAMES = list([PlayingGame(list(tuple([wind, wind]) for wind in WINDS), x)
-             for x in RULESETS])
+              for x in RULESETS])
 PROGRAM = None
 
 
@@ -170,7 +171,7 @@ class Helpers(object):
                 if score.total() != total:
                     result.append('%s %s%s: total %s for %s should be %s' % (
                         id(
-                        hand.player.game.ruleset), hand.player.game.ruleset.name, roofOff,
+                            hand.player.game.ruleset), hand.player.game.ruleset.name, roofOff,
                         score.total(), score.__str__(), total))
                 result.append('hand:%s' % hand)
             result.extend(hand.explain())
@@ -222,7 +223,7 @@ class FalseColorGame(Base):
         self.scoreTest(
             'c1c1c1 c7c7c7 c2c3c4 c5c5 c6c6c6 Lc5c5c5', [Win(32, 3), Win(28)])
         self.scoreTest('c1c2c3 wewewe drdrdr dbdb DgDgDg Ldbdbdb', [
-                       Win(44, 4), Win(38, 2)], winds='wn')
+            Win(44, 4), Win(38, 2)], winds='wn')
         self.scoreTest(
             's1s1s1 wewewe c2c3c4 c5c5 c6c6c6 Lc5c5c5',
             [Win(34),
@@ -233,7 +234,7 @@ class FalseColorGame(Base):
         self.scoreTest(
             'b1B1B1b1 RB2B3B4B5B6B7B8B8B8 DrDr fe ys LDrDrDr', [Win(74, 2), NoWin()])
         self.scoreTest('b1B1B1b1 RB2B2B2B5B6B7B8B8B8 DrDr fe ys LDrDrDr', [
-                       Win(78, 3), Win(72, 1)], winds='we')
+            Win(78, 3), Win(72, 1)], winds='we')
 
 
 class WrigglingSnake(Base):
@@ -267,7 +268,7 @@ class SquirmingSnake(Base):
             [Win(limits=1),
              NoWin()])
         self.scoreTest('c1c1c1 c4c5c6 c9c9c9 c6c7c8 RC2C2 Lc1c1c1c1', [
-                       Win(points=28, doubles=3), NoWin()])
+            Win(points=28, doubles=3), NoWin()])
         self.scoreTest(
             'c1c1c1 c3c4c5 c9c9c9 c6c7c8 RS2S2 Lc1c1c1c1',
             [Win(points=28),
@@ -302,14 +303,14 @@ class Purity(Base):
     def testMe(self):
         self.scoreTest(
             'b1b1b1b1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw LB3B2B3B4',
-                [Win(points=60, doubles=4), NoWin()])
+            [Win(points=60, doubles=4), NoWin()])
         self.scoreTest(
             'b1b1b1 RB3B3B3B6B6B6B8B8B2B2B2 fe fs fn fw LB3', [Win(54, 6), Win(54, 7)])
         self.scoreTest(
             'b1b1b1 RB3B3B3B6B6B8B8B2B2B2 fe fs fn fw LB3', [NoWin(28, 1), NoWin(28, 6)])
         self.scoreTest(
             'c1C1C1c1 c3c3c3 c8c8c8 RC4C5C6C7C7 fs fw ys yw Lc8c8c8c8',
-                [Win(72, 4), Win(72, 2)], winds='we')
+            [Win(72, 4), Win(72, 2)], winds='we')
 
 
 class TrueColorGame(Base):
@@ -319,7 +320,7 @@ class TrueColorGame(Base):
     def testMe(self):
         self.scoreTest(
             'b1b1b1b1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw LB3B2B3B4',
-                [Win(points=60, doubles=4), NoWin()])
+            [Win(points=60, doubles=4), NoWin()])
         self.callingTest(
             'RB1B2B3B4B5B5B6B6B7B7B8B8B8 LB1', ['b1b3b4b6b7b9', ''])
         self.scoreTest(
@@ -336,11 +337,11 @@ class OnlyConcealedMelds(Base):
         self.scoreTest(
             'RB1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys LDrDrDr', [Win(46, 2), NoWin()])
         self.scoreTest('RB1B1B1B2B2B2B4B4B4B7B8B9DrDr fe ys LDrDrDr', [
-                       Win(54, 3), Win(48, 1)], winds='we')
+            Win(54, 3), Win(48, 1)], winds='we')
         self.scoreTest(
             'b1B1B1b1 RB2B3B4B5B6B7B8B8B8DrDr fe ys LDrDrDr', [Win(74, 2), NoWin()])
         self.scoreTest('b1B1B1b1 RB2B2B2B5B6B7B8B8B8DrDr fe ys LDrDrDr', [
-                       Win(78, 3), Win(72, 1)], winds='we')
+            Win(78, 3), Win(72, 1)], winds='we')
 
 
 class LimitHands(Base):
@@ -488,7 +489,7 @@ class AllHonors(Base):
         self.scoreTest(
             'wewewe drdrdr RDrDrDrDb wwwwwwww LDb', [NoWin(32, 4), NoWin(32, 4)])
         self.scoreTest('wewe wswsws RWnWnWn wwwwwwww b1b1 Lwewewe', [
-                       NoWin(30, 2), NoWin(30, 1)], winds='ne')
+            NoWin(30, 2), NoWin(30, 1)], winds='ne')
 
 
 class BuriedTreasure(Base):
@@ -631,7 +632,7 @@ class Rest(Base):
         self.scoreTest(
             'b3B3B3b3 RDbDbDbDrDrDr wewewewe s2s2 Ls2s2s2', [Win(72, 6), Win(68, 5)])
         self.scoreTest('s1s2s3 s1s2s3 b3b3b3 b4b4b4 RB5 fn yn LB5', [
-                       NoWin(12, 1), NoWin(12, 2)], winds='ne')
+            NoWin(12, 1), NoWin(12, 2)], winds='ne')
         self.scoreTest(
             'b3b3b3b3 RDbDbDb drdrdr weWeWewe s2s2 Ls2s2s2', [Win(76, 5), Win(72, 5)])
         self.scoreTest('s2s2s2 s2s3s4 RB1B1B1B1 c9C9C9c9 Ls2s2s3s4', NoWin(42))

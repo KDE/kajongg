@@ -27,6 +27,7 @@ import os
 import logging
 import logging.handlers
 import socket
+import platform
 
 try:
     from sip import unwrapinstance
@@ -34,7 +35,6 @@ except ImportError:
     def unwrapinstance(dummy):
         """if there is no sip, we have no Qt objects anyway"""
         pass
-import platform
 
 # pylint: disable=invalid-name
 if platform.python_version_tuple()[0] == '3':
@@ -143,8 +143,8 @@ Options are: {opt}.
 Options {stropt} take a string argument like {example}.
 --debug=events can get suboptions like in --debug=events:Mouse:Hide
      showing all event messages with 'Mouse' or 'Hide' in them""".format(
-            opt=opt,
-            stropt=', '.join(stringOptions), example=stringExample)
+         opt=opt,
+         stropt=', '.join(stringOptions), example=stringExample)
 
     @staticmethod
     def setOptions(args):
@@ -159,7 +159,7 @@ Options {stropt} take a string argument like {example}.
             if len(parts) == 1:
                 value = True
             else:
-                value = ':'.join(parts[1:])
+                value = ':'.join(parts[1:]) # pylint: disable=redefined-variable-type
             if option not in Debug.__dict__:
                 return '--debug: unknown option %s' % option
             if not isinstance(Debug.__dict__[option], type(value)):
@@ -292,6 +292,7 @@ class __Internal(object):
             except (AttributeError, socket.error):
                 haveDevLog = False
         if not haveDevLog:
+            # pylint: disable=redefined-variable-type
             handler = logging.handlers.RotatingFileHandler(
                 'kajongg.log', maxBytes=100000000, backupCount=10)
         self.logger.addHandler(handler)
@@ -431,7 +432,8 @@ def unicodeString(s, encoding='utf-8'):
     elif hasattr(s, 'decode'):
         return s.decode(encoding)
     else:
-# auf s5 testen mit  ./kajonggtest.py --game=8001 --ruleset=DMJL --git=a46635d..23aca3b --log --clients=2 --servers=2 --count=4
+# TODO: auf s5 testen mit  ./kajonggtest.py --game=8001 --ruleset=DMJL
+# --git=a46635d..23aca3b --log --clients=2 --servers=2 --count=4
         return repr(s)
 
 

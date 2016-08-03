@@ -145,7 +145,7 @@ class PlayerList(QDialog):
             playerId = self._data[name]
             query = Query(
                 "select 1 from game where p0=? or p1=? or p2=? or p3=?",
-                    (playerId, ) * 4)
+                (playerId, ) * 4)
             if len(query.records):
                 Sorry(
                     m18n('This player cannot be deleted. There are games associated with %1.', name))

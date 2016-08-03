@@ -156,7 +156,7 @@ class HandId(object):
             charId = ' ' # align to the most common case
         wind = (WINDS + 'X')[self.roundsFinished]
         if withSeed:
-            seed = self.seed
+            seed = str(self.seed)
         else:
             seed = ''
         delim = '/' if withSeed or withAI else ''
@@ -183,7 +183,7 @@ class HandId(object):
                 (other.roundsFinished, other.rotated, other.notRotated))
 
     def __ne__(self, other):
-        return not self == other
+        return not self == other # pylint: disable=unneeded-not
 
     def __lt__(self, other):
         return (self.roundsFinished, self.rotated, self.notRotated) < (
@@ -436,7 +436,9 @@ class Game(object):
     def sortPlayers(self):
         """sort by wind order. Place ourself at bottom (idx=0)"""
         self.players.sort(key=lambda x: WINDS.index(x.wind))
-        self.activePlayer = self.players[u'E']
+        self.activePlayer = self.players[u'E'] # pylint: disable=invalid-sequence-index
+        # TODO: new class Wind(str) with len==1 and __index__ 0..3 for ESWN
+        # that will make pylint happier
         if Internal.scene:
             if self.belongsToHumanPlayer():
                 while self.players[0] != self.myself:
@@ -454,7 +456,7 @@ class Game(object):
         """save starttime for this game"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         args = list([starttime, self.seed, int(self.autoPlay),
-                    self.ruleset.rulesetId])
+                     self.ruleset.rulesetId])
         args.extend([p.nameid for p in self.players])
         args.append(self.gameid)
         Query("update game set starttime=?,seed=?,autoplay=?,"
@@ -539,10 +541,10 @@ class Game(object):
                 "wind,points,payments, balance,rotated,notrotated) "
                 "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" %
                 (self.gameid, self.handctr, player.nameid,
-                    scoretime, int(player == self.__winner),
-                    WINDS[self.roundsFinished % 4], player.wind,
-                    player.handTotal, player.payment, player.balance,
-                    self.rotated, self.notRotated),
+                 scoretime, int(player == self.__winner),
+                 WINDS[self.roundsFinished % 4], player.wind,
+                 player.handTotal, player.payment, player.balance,
+                 self.rotated, self.notRotated),
                 (player.hand.string, manualrules))
             logMessage += u'{player:<12} {hand:>4} {total:>5} {won} | '.format(
                 player=unicode(player)[:12], hand=player.handTotal,
@@ -632,21 +634,21 @@ class Game(object):
     def loadFromDB(cls, gameid, client=None):
         """load game by game id and return a new Game instance"""
         Internal.logPrefix = 'S' if Internal.isServer else 'C'
-        qGameRecords = Query(
+        records = Query(
             "select p0,p1,p2,p3,ruleset,seed from game where id = ?",
             (gameid,)).records
-        if not qGameRecords:
+        if not records:
             return None
-        qGameRecord = qGameRecords[0]
+        qGameRecord = records[0]
         rulesetId = qGameRecord[4] or 1
         ruleset = Ruleset.cached(rulesetId)
         Players.load()  # we want to make sure we have the current definitions
-        qLastHandRecords = Query(
+        records = Query(
             "select hand,rotated from score where game=? and hand="
             "(select max(hand) from score where game=?)",
             (gameid, gameid)).records
-        if qLastHandRecords:
-            qLastHandRecord = qLastHandRecords[0]
+        if records:
+            qLastHandRecord = records[0]
         else:
             qLastHandRecord = tuple([0, 0])
         qScoreRecords = Query(
@@ -655,7 +657,7 @@ class Game(object):
             (gameid, qLastHandRecord[0])).records
         if not qScoreRecords:
             # this should normally not happen
-            qScoreRecords = tuple([
+            qScoreRecords = list([
                 tuple([qGameRecord[x], WINDS[x], 0, False, 'E'])
                 for x in range(4)])
         if len(qScoreRecords) != 4:
@@ -670,7 +672,6 @@ class Game(object):
         if len(set(x[4] for x in qScoreRecords)) != 1:
             logError(u'game %d inconsistent: All score records for the same '
                      'hand must have the same prevailing wind' % gameid)
-        prevailing = qScoreRecords[0][4]
 
         players = list(tuple([x[1], Game.__getName(x[0])])
                        for x in qScoreRecords)
@@ -691,7 +692,7 @@ class Game(object):
                 player.getsPayment(record[2])
             if record[3]:
                 game.winner = player
-        game.roundsFinished = WINDS.index(prevailing)
+        game.roundsFinished = WINDS.index(qScoreRecords[0][4]) # prevailing wind
         game.handctr += 1
         game.notRotated += 1
         game.maybeRotateWinds()
@@ -881,7 +882,7 @@ class PlayingGame(Game):
             # in server.__prepareNewGame, gameid is None here
             return
         records = Query("select seed from game where id=?", (
-                        self.gameid,)).records
+            self.gameid,)).records
         assert records, 'self.gameid: %s' % self.gameid
         seed = records[0][0]
 
@@ -990,13 +991,13 @@ class PlayingGame(Game):
                 # and have a voice
                 if Debug.sound and player != self.myself:
                     logDebug(u'%s got voice from opponent: %s' % (
-                             player.name, player.voice))
+                        player.name, player.voice))
             else:
                 player.voice = Voice.locate(player.name)
                 if player.voice:
                     if Debug.sound:
                         logDebug(u'%s has own local voice %s' % (
-                                 player.name, player.voice))
+                            player.name, player.voice))
             if player.voice:
                 for voice in Voice.availableVoices():
                     if (voice in available

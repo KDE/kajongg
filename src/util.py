@@ -27,19 +27,19 @@ import os
 import datetime
 import time
 import subprocess
+import gc
 
 from locale import getpreferredencoding
 from sys import stdout
+
+from common import Debug, isPython3, unicode
+
 try:
     STDOUTENCODING = stdout.encoding
 except AttributeError:
     STDOUTENCODING = None
 if not STDOUTENCODING:
-    STDOUTENCODING = getpreferredencoding()
-
-# util must not depend on kde
-
-from common import Debug, isPython3, unicode
+    STDOUTENCODING = getpreferredencoding() # pylint: disable=redefined-variable-type
 
 
 def stack(msg, limit=6):
@@ -69,8 +69,8 @@ def callers(count=5, exclude=None):
     excluding.extend(['_dataReceived', 'dataReceived', 'gotItem'])
     excluding.extend(['callWithContext', '_doReadOrWrite', 'doRead'])
     excluding.extend(['callers', 'debug'])
-    names = list(([x[2] for x in stck if x[2] not in excluding]))
-    names = reversed(names[-count:])
+    _ = list(([x[2] for x in stck if x[2] not in excluding]))
+    names = reversed(_[-count:])
     result = '.'.join(names)
     return '[{}]'.format(result)
 
@@ -104,8 +104,6 @@ def uniqueList(seq):
     seen = set()
     seen_add = seen.add
     return [x for x in seq if x not in seen and not seen_add(x)]
-
-import gc
 
 
 def _getr(slist, olist, seen):
@@ -156,7 +154,6 @@ def kprint(*args, **kwargs):
             arg = repr(arg)
         arg = arg.encode(STDOUTENCODING, 'ignore')
         newArgs.append(arg)
-    # we need * magic: pylint: disable=star-args
     try:
         print(*newArgs, sep=kwargs.get('sep', ' '),
               end=kwargs.get('end', '\n'), file=kwargs.get('file'))
@@ -213,7 +210,7 @@ def checkMemory():
     print('}}} done')
 
     # code like this may help to find specific things
-    if True:
+    if True: # pylint: disable=using-constant-test
         interesting = ('Client', 'Player', 'Game')
         for obj in gc.garbage:
             if hasattr(obj, 'cell_contents'):

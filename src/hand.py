@@ -118,7 +118,7 @@ class Hand(object):
 
         if Debug.hand or (Debug.mahJongg and self.lenOffset == 1):
             self.debug(fmt('{callers}',
-                callers=callers(exclude=['__init__'])))
+                           callers=callers(exclude=['__init__'])))
             Hand.indent += 1
             _hideString = string
             self.debug(fmt('New Hand {_hideString} {self.lenOffset}'))
@@ -426,8 +426,8 @@ class Hand(object):
             parts.append('R' + ''.join(str(x) for x in sorted(rest)))
         if lastSource or announcements:
             parts.append('m{}{}'.format(
-                    self.lastSource or '.',
-                    ''.join(self.announcements)))
+                self.lastSource or '.',
+                ''.join(self.announcements)))
         if lastTile:
             parts.append('L{}{}'.format(lastTile, lastMeld if lastMeld else ''))
         return ' '.join(parts).strip()
@@ -438,13 +438,14 @@ class Hand(object):
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
-        ns = self.newString(melds=chain(self.declaredMelds, self.bonusMelds),
+        newString = self.newString(
+            melds=chain(self.declaredMelds, self.bonusMelds),
             rest=self.tilesInHand + [addTile],
             lastSource=None,
             lastTile=addTile,
             lastMeld=None
             )
-        return Hand(self.player, ns, prevHand=self)
+        return Hand(self.player, newString, prevHand=self)
 
     def __sub__(self, subtractTile):
         """returns a copy of self minus subtractTiles.
@@ -521,10 +522,6 @@ class Hand(object):
                 candis = ''.join(str(x) for x in sorted(cand)) # pylint: disable=unused-variable
                 self.debug(fmt('callingHands found {candis} for {rule}'))
             candidates.extend(x.concealed for x in cand)
-        # FIXME: we must differentiate between last Tile exposed or concealed.
-        # example:
-        # ./kajongg.py --game=7165/E4 --demo --ruleset=BMJA --playopen --debug=hand
-        # sort only for reproducibility
         for tile in sorted(set(candidates)):
             if sum(x.exposed == tile.exposed for x in self.tiles) == 4:
                 continue
@@ -568,7 +565,7 @@ class Hand(object):
                 result = sorted(matchingMJRules, key=lambda x: -x.score.total())
                 if Debug.mahJongg:
                     self.debug(fmt('{callers} Found {matchingMJRules}',
-                        callers=callers()))
+                                   callers=callers()))
                 return result
 
     def __arrangements(self):
@@ -619,7 +616,7 @@ class Hand(object):
         lostHands = []
         for mjRule, melds in self.__arrangements():
             _ = self.newString(chain(self.melds, melds, self.bonusMelds),
-                rest=None, lastMeld=None)
+                               rest=None, lastMeld=None)
             tryHand = Hand(self.player, _, prevHand=self)
             if tryHand.won:
                 tryHand.mjRule = mjRule

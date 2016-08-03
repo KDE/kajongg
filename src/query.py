@@ -470,8 +470,8 @@ class PrepareDB(object):
         """only try to create it if it does not yet exist. Do not use create if not exists because
         we want debug output only if we really create the index"""
         if not Query(
-            "select 1 from sqlite_master where type='index' and name=?", (
-                name,),
+                "select 1 from sqlite_master where type='index' and name=?", (
+                    name,),
                 silent=True).records:
             Query("create index %s on %s" % (name, cmd))
 

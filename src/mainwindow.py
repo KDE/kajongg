@@ -18,18 +18,21 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+# pylint: disable=wrong-import-order, wrong-import-position
+
 import sys
 import os
 import codecs
+from itertools import chain
 
-from log import logError, logDebug, m18n, m18nc
-from common import Options, Internal, isAlive, Debug
 import cgitb
 import tempfile
 import webbrowser
 import logging
-from itertools import chain
+from signal import signal, SIGABRT, SIGINT, SIGTERM
 
+from log import logError, logDebug, m18n, m18nc
+from common import Options, Internal, isAlive, Debug
 
 class MyHook(cgitb.Hook):
 
@@ -78,7 +81,7 @@ from scoring import scoreGame
 from scoringdialog import ScoreTable, ExplainView
 from humanclient import HumanClient
 from rulesetselector import RulesetSelector
-from animation import animate, afterQueuedAnimations, MoveImmediate
+from animation import afterQueuedAnimations, MoveImmediate
 from chat import ChatWindow
 from scene import PlayingScene, ScoringScene
 from configdialog import ConfigDialog
@@ -108,7 +111,6 @@ def cleanExit(*dummyArgs):
         # sys.exit(0)
         MainWindow.aboutToQuit()
 
-from signal import signal, SIGABRT, SIGINT, SIGTERM
 signal(SIGABRT, cleanExit)
 signal(SIGINT, cleanExit)
 signal(SIGTERM, cleanExit)
@@ -413,18 +415,21 @@ class MainWindow(KXmlGuiWindow):
 
     def queryExit(self):
         """see queryClose"""
-        if self.exitReady:
+        def quitDebug(*args, **kwargs):
+            """reducing branches in queryExit"""
             if Debug.quit:
-                logDebug(
-                    u'MainWindow.queryExit returns True because exitReady is set')
+                logDebug(*args, **kwargs)
+
+        if self.exitReady:
+            quitDebug(u'MainWindow.queryExit returns True because exitReady is set')
             return True
         if self.exitConfirmed:
             # now we can get serious
             self.exitReady = False
             for widget in chain(
-                (x.tableList for x in HumanClient.humanClients), [
-                    self.confDialog,
-                    self.rulesetWindow, self.playerWindow]):
+                    (x.tableList for x in HumanClient.humanClients), [
+                        self.confDialog,
+                        self.rulesetWindow, self.playerWindow]):
                 if isAlive(widget):
                     widget.hide()
             if self.exitWaitTime is None:
@@ -436,21 +441,17 @@ class MainWindow(KXmlGuiWindow):
                         u'waiting since %d seconds for reactor to stop' %
                         (self.exitWaitTime // 1000))
                 try:
-                    if Debug.quit:
-                        logDebug(u'now stopping reactor')
+                    quitDebug(u'now stopping reactor')
                     Internal.reactor.stop()
                     assert isAlive(self)
                     QTimer.singleShot(10, self.close)
                 except ReactorNotRunning:
                     self.exitReady = True
-                    if Debug.quit:
-                        logDebug(
-                            u'MainWindow.queryExit returns True: It got exception ReactorNotRunning')
+                    quitDebug(
+                        u'MainWindow.queryExit returns True: It got exception ReactorNotRunning')
             else:
                 self.exitReady = True
-                if Debug.quit:
-                    logDebug(
-                        u'MainWindow.queryExit returns True: Reactor is not running')
+                quitDebug(u'MainWindow.queryExit returns True: Reactor is not running')
         return bool(self.exitReady)
 
     @staticmethod
@@ -583,7 +584,8 @@ class MainWindow(KXmlGuiWindow):
                 view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
     @afterQueuedAnimations
-    def backgroundChanged(self, deferredResult, oldName, newName):
+    def backgroundChanged(self, dummyDeferredResult, dummyOldName, newName):
+        """if the wanted background changed, apply the change now"""
         centralWidget = self.centralWidget()
         if centralWidget:
             self.background = Background(newName)
@@ -592,7 +594,8 @@ class MainWindow(KXmlGuiWindow):
 
     @afterQueuedAnimations
     def tilesetNameChanged(
-            self, deferredResult, oldValue=None, newValue=None, *args):
+            self, dummyDeferredResult, dummyOldValue=None, dummyNewValue=None, *dummyArgs):
+        """if the wanted tileset changed, apply the change now"""
         if self.centralView:
             with MoveImmediate():
                 if self.scene:
@@ -600,7 +603,7 @@ class MainWindow(KXmlGuiWindow):
             self.adjustView()
 
     @afterQueuedAnimations
-    def showSettings(self, deferredResult, dummyChecked=None):
+    def showSettings(self, dummyDeferredResult, dummyChecked=None):
         """show preferences dialog. If it already is visible, do nothing"""
         # This is called by the triggered() signal. So why does KDE
         # not return the bool checked?
@@ -654,7 +657,7 @@ class MainWindow(KXmlGuiWindow):
             scene.updateSceneGUI()
 
     @afterQueuedAnimations
-    def changeAngle(self, deferredResult, dummyButtons=None, dummyModifiers=None):
+    def changeAngle(self, deferredResult, dummyButtons=None, dummyModifiers=None): # pylint: disable=unused-argument
         """change the lightSource"""
         if self.scene:
             with MoveImmediate():

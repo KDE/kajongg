@@ -77,13 +77,14 @@ class Tileset(object):
             # we want default to be first in list
             sortedTilesets = ['default']
             sortedTilesets.extend(tilesets - set(['default']))
-            tilesets = sortedTilesets
+            tilesets = set(sortedTilesets)
         for dontWant in ['alphabet', 'egypt']:
             if dontWant in tilesets:
                 tilesets.remove(dontWant)
         return [Tileset(x) for x in tilesets]
 
-    def __noTilesetFound(self):
+    @staticmethod
+    def __noTilesetFound():
         """No tilesets found"""
         directories = '\n'.join(
             str(x) for x in KGlobal.dirs().resourceDirs("kmahjonggtileset"))
@@ -105,7 +106,7 @@ class Tileset(object):
         if self.path.isEmpty():
             self.path = locateTileset('default.desktop')
             if self.path.isEmpty():
-                self.__noTilesetsFound()
+                self.__noTilesetFound()
             else:
                 logWarning(
                     m18n(
@@ -162,6 +163,7 @@ class Tileset(object):
 
     @staticmethod
     def activeTileset():
+        """the currently wanted tileset. If not yet defined, do so"""
         prefName = Internal.Preferences.tilesetName
         if (not Tileset.__activeTileset
                 or Tileset.__activeTileset.desktopFileName != prefName):

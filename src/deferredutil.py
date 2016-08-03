@@ -28,7 +28,7 @@ from twisted.internet.defer import Deferred
 
 from log import m18nE, logInfo, logDebug, logException
 from message import Message
-from common import Debug, isPython3, StrMixin, unicode, nativeString, nativeStringArgs
+from common import Debug, StrMixin, unicode, nativeString, nativeStringArgs
 from move import Move
 
 
@@ -313,8 +313,9 @@ class DeferredBlock(StrMixin):
                     text = u'%s:' % command
                     answerList = []
                     for answer in sorted(set(x.prettyAnswer() for x in self.requests if x.deferred.command == command)):
-                        answerList.append((answer, list(x for x in self.requests
-                                                        if x.deferred.command == command and answer == x.prettyAnswer())))
+                        answerList.append((answer, list(
+                            x for x in self.requests
+                            if x.deferred.command == command and answer == x.prettyAnswer())))
                     answerList = sorted(answerList, key=lambda x: len(x[1]))
                     answerTexts = []
                     if len(answerList) == 1:
@@ -385,9 +386,13 @@ class DeferredBlock(StrMixin):
 
     def tell(self, about, receivers, command, **kwargs):
         """send info about player 'about' to users 'receivers'"""
-        for kw in ('tile', 'tiles', 'meld', 'melds'):
-            if kw in kwargs:
-                kwargs[kw] = str(kwargs[kw]).encode()
+        def encodeKwargs():
+            """those values are classes like Meld, Tile etc.
+               Convert to str(python2) or bytes(python3"""
+            for keyword in ('tile', 'tiles', 'meld', 'melds'):
+                if keyword in kwargs:
+                    kwargs[keyword] = str(kwargs[keyword]).encode()
+        encodeKwargs()
         if about.__class__.__name__ == 'User':
             about = self.playerForUser(about)
         if not isinstance(receivers, list):

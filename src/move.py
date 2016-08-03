@@ -76,8 +76,8 @@ class Move(StrMixin):
             if isinstance(value, (list, tuple)) and isinstance(value[0], (list, tuple)):
                 oldValue = value
                 tuples = []
-                for t in oldValue:
-                    tuples.append(u''.join(unicodeString(x) for x in t))
+                for oldTuple in oldValue:
+                    tuples.append(u''.join(unicodeString(x) for x in oldTuple))
                 value = u','.join(tuples)
             if Debug.neutral and key == 'gameid':
                 result += u' gameid:GAMEID'

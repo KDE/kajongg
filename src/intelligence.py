@@ -396,7 +396,7 @@ class DiscardCandidates(list):
             self.groupCounts[tile.lowerGroup] += 1
             self.declaredGroupCounts[tile.lowerGroup] += 1
         self.extend(list(TileAI(self, x)
-                    for x in sorted(set(self.hiddenTiles))))
+                         for x in sorted(set(self.hiddenTiles))))
         self.link()
 
     @property

@@ -227,7 +227,7 @@ class Player(StrMixin):
         """a readonly tuple"""
 # TODO: str or what?
         if not self._hand:
-            self._hand = self._computeHand()
+            self._hand = self.computeHand()
         return self._hand
 
     @property
@@ -388,7 +388,7 @@ class Player(StrMixin):
         self._concealedTiles[0] = tileName
         self._hand = None
 
-    def _computeHand(self):
+    def computeHand(self):
         """returns Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
         melds = ['R' + ''.join(str(x) for x in sorted(self._concealedTiles))]
@@ -406,14 +406,14 @@ class Player(StrMixin):
 
     def _computeHandWithDiscard(self, discard):
         """what if"""
-        lastSource = self.lastSource # FIXME: recompute
+        lastSource = self.lastSource # TODO: recompute
         save = (self.lastTile, self.lastSource)
         try:
             self.lastSource = lastSource
             if discard:
                 self.lastTile = discard
                 self._concealedTiles.append(discard)
-            return self._computeHand()
+            return self.computeHand()
         finally:
             self.lastTile, self.lastSource = save
             if discard:
@@ -496,8 +496,9 @@ class PlayingPlayer(Player):
             self.game.debug('  with hand being {}'.format(self.hand))
         melds = concealed[:]
         self.game.winner = self
-        assert lastMeld in melds, 'lastMeld not in melds: concealed=%s: melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
-               self._concealedTiles, melds, lastMeld, lastTile, withDiscard)
+        assert lastMeld in melds, \
+            'lastMeld not in melds: concealed=%s: melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
+                self._concealedTiles, melds, lastMeld, lastTile, withDiscard)
         if withDiscard:
             PlayingPlayer.addConcealedTiles(
                 self,
@@ -654,7 +655,7 @@ class PlayingPlayer(Player):
                     tileName, Tile.unknown)
                 assert src != dst, (
                     self, src, dst, tiles, self._concealedTiles)
-                if not src in self._concealedTiles:
+                if src not in self._concealedTiles:
                     logException('%s: showConcealedTiles(%s): %s not in %s.' %
                                  (self, tiles, src, self._concealedTiles))
                 idx = self._concealedTiles.index(src)
@@ -672,7 +673,7 @@ class PlayingPlayer(Player):
                 if tile == ignoreDiscard:
                     ignoreDiscard = None
                 else:
-                    if not tile in self._concealedTiles:
+                    if tile not in self._concealedTiles:
                         msg = m18nE(
                             '%1 claiming MahJongg: She does not really have tile %2')
                         return msg, self.name, tile
@@ -703,6 +704,7 @@ class PlayingPlayer(Player):
         self._hand = None
 
     def robsTile(self):
+        """True if the player is robbing a tile"""
         self.lastSource = 'k'
 
     def scoreMatchesServer(self, score):

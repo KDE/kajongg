@@ -21,11 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import datetime
 
 from log import m18n, m18nc, m18ncE, logWarning, logException, logDebug
-from sound import Voice, Sound
+from sound import Voice
 from tile import Tile, TileList
 from meld import Meld, MeldList
 from common import Internal, Debug, Options, long
-from common import unicode, unicodeString, StrMixin
+from common import unicode, unicodeString
 from dialogs import Sorry
 
 # pylint: disable=super-init-not-called
@@ -213,13 +213,13 @@ class PungChowMessage(NotifyAtOnceMessage):
                     dangerousMelds)
             if len(dangerousMelds) == 1:
                 txt.append(m18n(
-                           'claiming %1 is dangerous because you will have to discard a dangerous tile',
-                           lastDiscard.name()))
+                    'claiming %1 is dangerous because you will have to discard a dangerous tile',
+                    lastDiscard.name()))
             else:
                 for meld in dangerousMelds:
                     txt.append(m18n(
-                               'claiming %1 for %2 is dangerous because you will have to discard a dangerous tile',
-                               lastDiscard.name(), str(meld)))
+                        'claiming %1 for %2 is dangerous because you will have to discard a dangerous tile',
+                        lastDiscard.name(), str(meld)))
         if not txt:
             txt = [m18n('You may say %1', self.i18nName)]
         return '<br><br>'.join(txt), warn, ''
@@ -368,7 +368,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
             return (m18n(
                 'Discard a tile, declaring Original Call meaning you need only one '
                 'tile to complete the hand and will not alter the hand in any way (except bonus tiles)'),
-                False, '')
+                    False, '')
 
     def clientAction(self, client, move):
         """mirror the original call"""
@@ -414,8 +414,8 @@ class MessageDiscard(ClientMessage, ServerMessage):
             warn = True
         if not txt:
             txt = [m18n('discard the least useful tile')]
-        txt = '<br><br>'.join(txt)
-        return txt, warn, txt
+        txtStr = '<br><br>'.join(txt)
+        return txtStr, warn, txtStr
 
     def clientAction(self, client, move):
         """execute the discard locally"""
@@ -473,8 +473,9 @@ class MessageReadyForGameStart(ServerMessage):
         # move.source are the players in seating order
         # we cannot just use table.playerNames - the seating order is now
         # different (random)
-        return client.readyForGameStart(move.tableid, move.gameid,
-                                        move.wantedGame, move.source, shouldSave=move.shouldSave).addCallback(hideTableList)
+        return client.readyForGameStart(
+            move.tableid, move.gameid,
+            move.wantedGame, move.source, shouldSave=move.shouldSave).addCallback(hideTableList)
 
 
 class MessageNoGameStart(NotifyAtOnceMessage):
@@ -876,6 +877,8 @@ class ChatMessage(object):
 
     def __unicode__(self):
         local = self.localtimestamp()
+        # pylint: disable=no-member
+        # pylint says something about NotImplemented, check with later versions
         return u'statusMessage=%s %02d:%02d:%02d %s: %s' % (
             unicode(self.isStatusMessage),
             local.hour,

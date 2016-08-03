@@ -177,6 +177,7 @@ class ClientDialog(QDialog):
         self.setModal(False)
         self.btnHeight = 0
         self.answered = False
+        self.move = None
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
@@ -215,8 +216,7 @@ class ClientDialog(QDialog):
                 _, _, tileTxt = button.message.toolTip(button, uiTile.tile)
                 if tileTxt:
                     txt.append(tileTxt)
-            txt = '<br><br>'.join(txt)
-            uiTile.setToolTip(txt)
+            uiTile.setToolTip('<br><br>'.join(txt))
         if self.client.game.activePlayer == self.client.game.myself:
             Internal.scene.handSelectorChanged(
                 self.client.game.myself.handBoard)
@@ -379,11 +379,9 @@ class HumanClient(Client):
         self.ruleset = None
         self.beginQuestion = None
         self.tableList = TableList(self)
-        Connection(
-            self).login(
-        ).addCallbacks(
+        Connection(self).login().addCallbacks(
             self.__loggedIn,
-             self.__loginFailed)
+            self.__loginFailed)
 
     @staticmethod
     def shutdownHumanClients(exception=None):
@@ -511,7 +509,7 @@ class HumanClient(Client):
         Client.remote_tableRemoved(self, tableid, message, *args)
         self.__updateTableList()
         if message:
-            if not self.name in args or not message.endswith('has logged out'):
+            if self.name not in args or not message.endswith('has logged out'):
                 logWarning(m18n(message, *args))
 
     def __receiveTables(self, tables):
@@ -534,9 +532,7 @@ class HumanClient(Client):
         def gotRulesets(result):
             """the server sent us the wanted ruleset definitions"""
             for ruleset in result:
-                Ruleset.cached(
-                    ruleset).save(
-                )  # make it known to the cache and save in db
+                Ruleset.cached(ruleset).save()  # make it known to the cache and save in db
             return tables
         rulesetHashes = set(x[1] for x in tables)
         needRulesets = list(
@@ -595,7 +591,7 @@ class HumanClient(Client):
             table.chatWindow.receiveLine(chatLine)
 
     def readyForGameStart(
-        self, tableid, gameid, wantedGame, playerNames, shouldSave=True,
+            self, tableid, gameid, wantedGame, playerNames, shouldSave=True,
             gameClass=None):
         """playerNames are in wind order ESWN"""
         if gameClass is None:
@@ -918,7 +914,7 @@ class HumanClient(Client):
                 logWarning(
                     m18n(
                         'The connection to the server %1 broke, please try again later.',
-                          self.connection.url))
+                        self.connection.url))
                 self.remote_serverDisconnects()
                 return succeed(None)
         else:

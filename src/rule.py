@@ -52,7 +52,7 @@ class Score(object):
         self.limits = type(self.limits)(limits)
 
     unitNames = {m18nE(
-                 'points'): 0,
+        'points'): 0,
                  m18nE('doubles'): 50,
                  m18nE('limits'): 9999}
 
@@ -439,7 +439,7 @@ into a situation where you have to pay a penalty"""))
             query = Query(
                 "select id,hash,name,description from ruleset where hash=?",
                 (nativeString(self.name),
-                 ))
+                ))
         if len(query.records):
             (self.rulesetId, self.__hash, self.name,
              self.description) = query.records[0]
@@ -490,7 +490,7 @@ into a situation where you have to pay a penalty"""))
         """returns a Query object with loaded ruleset"""
         return Query(
             "select ruleset, list, position, name, definition, points, doubles, limits, parameter from rule "
-                "where ruleset=? order by list,position", (self.rulesetId,))
+            "where ruleset=? order by list,position", (self.rulesetId,))
 
     def toList(self):
         """returns entire ruleset encoded in a string"""
@@ -730,7 +730,7 @@ into a situation where you have to pay a penalty"""))
             qData = Query(
                 "select name from ruleset where id=?",
                 (lastUsedId,
-                 )).records
+                )).records
             if qData:
                 lastUsed = qData[0][0]
                 for idx, ruleset in enumerate(result):
@@ -938,7 +938,7 @@ class Rule(RuleBase):
             logException(
                 m18nc(
                     '%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
-                                  self.name, payers, payees, 'payers/payees'))
+                    self.name, payers, payees, 'payers/payees'))
 
     def explain(self, meld):
         """use this rule for scoring"""
@@ -948,8 +948,8 @@ class Rule(RuleBase):
                 value=meld[0].valueName() if meld else '',
                 meldType=meld.typeName() if meld else '',
                 meldName=meld.name() if meld else '',
-                tileName=meld[0].name() if meld else ''
-        ).replace('&', '').replace('  ', ' ').strip(), self.score.contentStr())
+                tileName=meld[0].name() if meld else '').replace(
+                    '&', '').replace('  ', ' ').strip(), self.score.contentStr())
 
     def hashStr(self):
         """
@@ -1034,7 +1034,7 @@ class IntRule(ParameterRule):
         if self.parameter < self.minimum:
             return m18nc(
                 'wrong value for rule', '%1: %2 is too small, minimal value is %3',
-                   m18n(self.name), self.parName, self.minimum)
+                m18n(self.name), self.parName, self.minimum)
 
 
 class BoolRule(ParameterRule):

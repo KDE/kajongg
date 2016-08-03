@@ -18,6 +18,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+# pylint: disable=ungrouped-imports
+
 from qt import Qt, usingQt5, QPointF, toQVariant, variantValue, \
     QSize, QModelIndex, QEvent, QTimer
 from kde import usingKDE
@@ -131,11 +133,11 @@ class ScorePlayerItem(ScoreTreeItem):
                 # point1 - point2) / 16
                 yield (
                     fstep * ((2 - fstep) * fstep - 1) * point_1
-                                + (fstep * fstep * (
-                                    3 * fstep - 5) + 2) * point0
-                                + fstep *
-                                    ((4 - 3 * fstep) * fstep + 1) * point1
-                                + (fstep - 1) * fstep * fstep * point2) / 2
+                    + (fstep * fstep * (
+                        3 * fstep - 5) + 2) * point0
+                    + fstep *
+                    ((4 - 3 * fstep) * fstep + 1) * point1
+                    + (fstep - 1) * fstep * fstep * point2) / 2
         yield points[-2]
 
 
@@ -168,8 +170,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
                         # separately per cell beause the lines spread vertically over two rows: We would
                         # have to draw the lines into one big pixmap and copy
                         # from the into the cells
-                        painter.drawPolyline(
-                            *chart)  # pylint: disable=star-args
+                        painter.drawPolyline(*chart)
             return
         return QStyledItemDelegate.paint(self, painter, option, index)
 
@@ -274,8 +275,7 @@ class ScoreModel(TreeModel):
         data = []
         records = Query(
             'select player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
-                ' from score where game=? order by player,hand', (game.gameid,)).records
-        # pylint: disable=star-args
+            ' from score where game=? order by player,hand', (game.gameid,)).records
         humans = sorted(
             (x for x in game.players if not x.name.startswith(u'Robot')))
         robots = sorted(
@@ -1014,14 +1014,13 @@ class ScoringDialog(QWidget):
         """enable/disable them"""
         # if an exclusive rule has been activated, deactivate it for
         # all other players
-        if isinstance(self.sender(), RuleBox):
-            ruleBox = self.sender()
-            if ruleBox.isChecked() and ruleBox.rule.exclusive():
-                for idx, player in enumerate(self.game.players):
-                    if ruleBox.parentWidget() != self.details[idx]:
-                        for pBox in player.manualRuleBoxes:
-                            if pBox.rule.name == ruleBox.rule.name:
-                                pBox.setChecked(False)
+        ruleBox = self.sender()
+        if isinstance(ruleBox, RuleBox) and ruleBox.isChecked() and ruleBox.rule.exclusive():
+            for idx, player in enumerate(self.game.players):
+                if ruleBox.parentWidget() != self.details[idx]:
+                    for pBox in player.manualRuleBoxes:
+                        if pBox.rule.name == ruleBox.rule.name:
+                            pBox.setChecked(False)
         try:
             newState = bool(self.game.winner.handBoard.uiTiles)
         except AttributeError:
@@ -1074,9 +1073,9 @@ class ScoringDialog(QWidget):
                 if player.handBoard and player.handBoard.uiTiles:
                     spValue.setEnabled(False)
                     nameLabel.setBuddy(wonBox)
-                    for loop in range(10):
+                    for _ in range(10):
                         prevTotal = player.handTotal
-                        handContent = player._computeHand()
+                        handContent = player.computeHand()
                         wonBox.setVisible(handContent.won)
                         if not wonBox.isVisibleTo(self) and wonBox.isChecked():
                             wonBox.setChecked(False)
@@ -1137,7 +1136,7 @@ class ScoringDialog(QWidget):
                 shownTiles.add(tile.tile)
                 self.cbLastTile.addItem(
                     QIcon(tile.pixmapFromSvg(pmSize, withBorders=False)),
-                        '', toQVariant(tile.tile))
+                    '', toQVariant(tile.tile))
                 if indexedTile is tile.tile:
                     restoredIdx = self.cbLastTile.count() - 1
         if not restoredIdx and indexedTile:

@@ -23,7 +23,7 @@ import datetime
 from kde import KIcon
 from dialogs import WarningYesNo
 
-from qt import usingQt5, Qt, toQVariant, RealQVariant, variantValue
+from qt import Qt, toQVariant, RealQVariant, variantValue
 from qt import QAbstractTableModel, QDialogButtonBox, QDialog
 from qt import QHBoxLayout, QVBoxLayout, QCheckBox
 from qt import QItemSelectionModel, QAbstractItemView

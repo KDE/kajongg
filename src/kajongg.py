@@ -19,6 +19,8 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+# pylint: disable=wrong-import-position
+
 # keyboardinterrupt should simply terminate
 # import signal
 # signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -33,7 +35,6 @@ from common import Options, SingleshotOptions, Internal, Debug, unicodeString
 from util import kprint
 
 # do not import modules using twisted before our reactor is running
-
 
 def initRulesets():
     """exits if user only wanted to see available rulesets"""
@@ -184,7 +185,7 @@ if __name__ == "__main__":
     if Options.csv:
         if gitHead() == 'current':
             Internal.logger.debug(
-                'You cannot write to %s with changes uncommitted to git' %
+                'You cannot write to %s with changes uncommitted to git',
                 Options.csv)
             sys.exit(2)
     from mainwindow import MainWindow

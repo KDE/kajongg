@@ -15,9 +15,6 @@
 # pygtk.require().
 #init-hook=
 
-# Profiled execution.
-profile=no
-
 # Add <file or directory> to the black list. It should be a base name, not a
 # path. You may set this option multiple times.
 ignore=CVS
@@ -59,7 +56,7 @@ load-plugins=
 # W0122 exec statement
 # E0211 method has no argument
 # disable=R0903,R0902,W0122
-disable=R0903,E0211,I0011,I0013,too-many-ancestors
+disable=R0903,E0211,I0011,I0013,too-many-ancestors,no-member
 
 
 [REPORTS]
@@ -86,10 +83,6 @@ reports=no
 # (R0004).
 evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
 
-# Add a comment according to your evaluation note. This is used by the global
-# evaluation report (R0004).
-comment=no
-
 # Enable the report(s) with the given id(s).
 #enable-report=
 
@@ -109,10 +102,6 @@ ignore-mixin-members=yes
 # (useful for classes with attributes dynamicaly set).
 ignored-classes=SQLObject,Message,Ruleset,Move,twisted.internet.reactor
 
-# When zope mode is activated, consider the acquired-members option to ignore
-# access to some undefined attributes.
-zope=no
-
 # List of members which are usually get through zope's acquisition mecanism and
 # so shouldn't trigger E0201 when accessed (need zope=yes to be considered).
 acquired-members=REQUEST,acl_users,aq_parent
@@ -129,9 +118,6 @@ acquired-members=REQUEST,acl_users,aq_parent
 # * uses of the global statement
 #
 [BASIC]
-
-# Required attributes for module, separated by a comma
-required-attributes=
 
 # Regular expression which should only match functions or classes name which do
 # not require a docstring
@@ -187,7 +173,7 @@ bad-functions=map,filter,apply,input
 init-import=no
 
 # A regular expression matching names used for dummy variables (i.e. not used).
-dummy-variables-rgx=_|dummy|fget|fset|loop|(dummy[A-Z][a-zA-Z0-9]*)
+dummy-variables-rgx=_|dummy|fget|fset|(dummy[A-Z][a-zA-Z0-9]*)
 
 # List of additional names supposed to be defined in builtins. Remember that
 # you should avoid to define new builtins when possible.
@@ -261,10 +247,6 @@ max-public-methods=40
 # * unreachable code
 #
 [CLASSES]
-
-# List of interface methods to ignore, separated by a comma. This is used for
-# instance to not check methods defines in Zope's Interface base class.
-ignore-iface-methods=isImplementedBy,deferred,extends,names,namesAndDescriptions,queryDescriptionFor,getBases,getDescriptionFor,getDoc,getName,getTaggedValue,getTaggedValueTags,isEqualOrExtendedBy,setTaggedValue,isImplementedByInstancesOf,adaptWith,is_implemented_by
 
 # List of method names used to declare (i.e. assign) instance attributes.
 defining-attr-methods=__init__,__new__,setUp,setupUi,setupActions,setupUILastTileMeld,clearHand,__build

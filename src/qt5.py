@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-# pylint: disable=unused-import
+# pylint: disable=unused-import, no-name-in-module
 
 from PyQt5 import uic
 from PyQt5.QtCore import PYQT_VERSION_STR
@@ -47,7 +47,6 @@ from PyQt5.QtCore import QRectF
 from PyQt5.QtCore import QSize
 from PyQt5.QtCore import QSizeF
 from PyQt5.QtCore import QSocketNotifier
-from qstring import QString
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import QTranslator
 from PyQt5.QtCore import pyqtProperty
@@ -82,8 +81,6 @@ from PyQt5.QtGui import QImageReader
 from PyQt5.QtCore import QItemSelectionModel
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QLineEdit
-KLineEdit = QLineEdit  # pylint: disable=invalid-name
-# TODO: where?
 from PyQt5.QtWidgets import QListWidget
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtWidgets import QListView
@@ -129,7 +126,10 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QValidator
 from PyQt5.QtSvg import QGraphicsSvgItem
 from PyQt5.QtSvg import QSvgRenderer
+from qstring import QString
 
+KLineEdit = QLineEdit  # pylint: disable=invalid-name
+# TODO: where?
 
 def variantValue(variant):
     """convert QVariant to python variable"""

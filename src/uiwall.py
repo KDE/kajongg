@@ -244,7 +244,7 @@ class UIWall(Wall):
         for side in self.__sides:
             side.nameLabel.setFont(font)
 
-    def showShadowsChanged(self, oldValue, newValue):
+    def showShadowsChanged(self, dummyOldValue, dummyNewValue):
         """setting this actually changes the visuals."""
         assert ParallelAnimationGroup.current is None
         self.__resizeHandBoards()
@@ -277,7 +277,7 @@ class UIWall(Wall):
         uiTile.update()
 
     @afterQueuedAnimations
-    def _placeLooseTiles(self, deferredResult):
+    def _placeLooseTiles(self, deferredResult=None):
         """place the last 2 tiles on top of kong box"""
         assert len(self.kongBox) % 2 == 0
         placeCount = len(self.kongBox) // 2

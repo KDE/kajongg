@@ -53,7 +53,6 @@ class TilesetSelector(QWidget):
         self.tileView.setParent(self.tilesetPreview)
         layout = QHBoxLayout(self.tilesetPreview)
         layout.addWidget(self.tileView)
-        # pylint: disable=star-args
         for idx, offsets in enumerate([(0, 0), (0, 1), (1, 0), (1, 1)]):
             self.uiTiles[idx].setBoard(
                 self.board,

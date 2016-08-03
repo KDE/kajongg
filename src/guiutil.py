@@ -27,8 +27,6 @@ from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 
 from kde import KStandardDirs, KIcon
 
-from common import unicode
-
 from log import m18n
 
 

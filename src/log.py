@@ -25,8 +25,6 @@ import string
 from locale import getpreferredencoding
 from sys import _getframe
 
-SERVERMARK = '&&SERVER&&'
-
 # util must not import twisted or we need to change kajongg.py
 
 from common import Internal, Debug, unicode, isPython3, ENGLISHDICT  # pylint: disable=redefined-builtin
@@ -35,6 +33,9 @@ from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead
 from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
+
+
+SERVERMARK = '&&SERVER&&'
 
 
 class Fmt(string.Formatter):
@@ -72,6 +73,7 @@ class Fmt(string.Formatter):
 Fmt.formatter = Fmt()
 
 def id4(obj):
+    """object id for debug messages"""
     return '.' if Debug.neutral else Fmt.num_encode(id(obj))
 
 def fmt(text, **kwargs):
@@ -80,11 +82,11 @@ def fmt(text, **kwargs):
     if '}' in text:
         parts = []
         for part in text.split('}'):
-            if not '{' in part:
+            if '{' not in part:
                 parts.append(part)
             else:
                 part2 = part.split('{')
-                if part2[1] in ('callers'):
+                if part2[1] == 'callers':
                     if part2[0]:
                         parts.append('%s:{%s}' % (part2[0], part2[1]))
                     else:
@@ -103,7 +105,7 @@ def fmt(text, **kwargs):
         # formatter.format will not accept 'self' as keyword
         argdict['SELF'] = argdict['self']
         del argdict['self']
-    return Fmt.formatter.format(text, **argdict)  # pylint: disable=star-args
+    return Fmt.formatter.format(text, **argdict)
 
 
 def translateServerMessage(msg):
@@ -200,7 +202,7 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
         else:
             lower = -showStack - 3
         for line in traceback.format_stack()[lower:-3]:
-            if not 'logException' in line:
+            if 'logException' not in line:
                 __logUnicodeMessage(prio, '  ' + line.strip())
     if showDialog and not Internal.isServer:
         if prio == logging.INFO:

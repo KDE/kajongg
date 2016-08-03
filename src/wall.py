@@ -108,7 +108,7 @@ class Wall(object):
             dealTiles = self.living[:count]
             self.living = self.living[count:]
         return list(self.__nameTile(*x)
-                    for x in zip(dealTiles, tiles))  # pylint: disable=W0142
+                    for x in zip(dealTiles, tiles))
 
     def build(self, shuffleFirst=False):
         """virtual: build visible wall"""

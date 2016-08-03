@@ -43,8 +43,7 @@ class Tile(str):
     value is 1..9 for real suit tiles, -1/0/10/11 for usage in AI, and a char
     for dragons, winds,boni
     """
-    # pylint: disable=too-many-public-methods, abstract-class-not-used,
-    # too-many-instance-attributes
+    # pylint: disable=too-many-public-methods,too-many-instance-attributes
     cache = {}
     hashTable = 'XyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
                 'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \

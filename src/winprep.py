@@ -23,6 +23,8 @@ is where this program resides. Below you find a code
 block that might have to be adapted.
 """
 
+from __future__ import print_function
+
 from subprocess import check_output, call
 from shutil import copy, move, copytree, rmtree
 
@@ -44,7 +46,6 @@ def makeIcon(svgName, icoName):
     resolutions = (16, 24, 32, 40, 48, 64, 96, 128)
     try:
         for resolution in resolutions:
-            pngFile = '{}{}.png'.format(icoName, resolution)
             call(
                 'inkscape -z -e {outfile} -w {resolution} '
                 '-h {resolution} {infile}'.format(
@@ -55,15 +56,16 @@ def makeIcon(svgName, icoName):
             pngFiles=' '.join(pngName(x)
                               for x in resolutions), icoName=icoName).split())
     finally:
-        for resolution in resolutions:
-            if os.path.exists(pngName(resolution)):
-                os.remove(pngName(resolution))
+        for resolution2 in resolutions:
+            # if we re-use resolution, pylint sees a problem ...
+            if os.path.exists(pngName(resolution2)):
+                os.remove(pngName(resolution2))
         os.rmdir(tmpDir)
 
 dataDir = check_output(
-    "kde4-config --expandvars --install data".format(type).split()).strip()
+    "kde4-config --expandvars --install data".split()).strip()
 iconDir = check_output(
-    "kde4-config --expandvars --install icon".format(type).split()).strip()
+    "kde4-config --expandvars --install icon".split()).strip()
 oxy48 = iconDir + '/oxygen/48x48'
 oxy48Cat = oxy48 + '/categories/'
 oxy48Act = oxy48 + '/actions/'
@@ -132,21 +134,20 @@ languages = (
 # languages = ('de', 'zh_TW')
 
 for lang in languages:
-    print 'getting language', lang
+    print('getting language', lang)
     os.makedirs(DEST + '/locale/{}/LC_MESSAGES'.format(lang))
     for directory, filename in (
-        ('kdegames', 'kajongg'), ('kdegames', 'libkmahjongg'),
+            ('kdegames', 'kajongg'), ('kdegames', 'libkmahjongg'),
             ('kdelibs', 'kdelibs4'), ('qt', 'kdeqt')):
         mo_data = check_output(
             'svn cat svn://anonsvn.kde.org/home/kde/'
             'trunk/l10n-kde4/{}/messages/{}/{}.po'.format(
                 lang, directory, filename).split())
-        with open('x.po'.format(filename), 'wb') as outfile:
+        with open('x.po', 'wb') as outfile:
             outfile.write(mo_data)
         call(
             'msgfmt x.po -o {}/locale/{}/LC_MESSAGES/{}.mo'.format(
                 DEST,
                 lang,
-                filename).split(
-            ))
+                filename).split())
         os.remove('x.po')

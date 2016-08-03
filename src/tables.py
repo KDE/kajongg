@@ -88,7 +88,7 @@ class TablesModel(QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
         """score table"""
-        # pylint: disable=too-many-branches,too-many-locals
+        # pylint: disable=too-many-branches,too-many-locals,redefined-variable-type
         result = toQVariant()
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:

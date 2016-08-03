@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-# pylint: disable=unused-import
+# pylint: disable=unused-import, no-name-in-module
 
 from PyQt4 import uic
 from PyQt4.QtCore import QT_VERSION_STR
@@ -47,10 +47,6 @@ from PyQt4.QtCore import QRectF
 from PyQt4.QtCore import QSize
 from PyQt4.QtCore import QSizeF
 from PyQt4.QtCore import QSocketNotifier
-try:
-    from PyQt4.QtCore import QString
-except ImportError:
-    from qstring import QString
 from PyQt4.QtCore import QTimer
 from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import SLOT
@@ -86,7 +82,6 @@ from PyQt4.QtGui import QImageReader
 from PyQt4.QtGui import QItemSelectionModel
 from PyQt4.QtGui import QLabel
 from PyQt4.QtGui import QLineEdit
-KLineEdit = QLineEdit  # pylint: disable=invalid-name
 from PyQt4.QtGui import QListWidget
 from PyQt4.QtGui import QListWidgetItem
 from PyQt4.QtGui import QListView
@@ -132,7 +127,12 @@ from PyQt4.QtGui import QWidget
 from PyQt4.QtGui import QValidator
 from PyQt4.QtSvg import QGraphicsSvgItem
 from PyQt4.QtSvg import QSvgRenderer
+try:
+    from PyQt4.QtCore import QString
+except ImportError:
+    from qstring import QString
 
+KLineEdit = QLineEdit  # pylint: disable=invalid-name
 
 def variantValue(variant):
     """convert QVariant to a python variable"""
