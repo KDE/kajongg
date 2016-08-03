@@ -176,25 +176,31 @@ class Url(unicode):
             # service we want, so ignore it
         return result
 
+    @staticmethod
+    def __findServerProgram():
+        """how should we start the server?"""
+        args = []
+        serverPython = 'python3' if Options.server3 else 'python'
+        if sys.argv[0].endswith('kajongg.py'):
+            tryServer = sys.argv[0].replace('.py', 'server.py')
+            if os.path.exists(tryServer):
+                args = [serverPython, tryServer]
+        elif sys.argv[0].endswith('kajongg.pyw'):
+            tryServer = sys.argv[0].replace('.pyw', 'server.py')
+            if os.path.exists(tryServer):
+                args = [serverPython, tryServer]
+        elif sys.argv[0].endswith('kajongg.exe'):
+            tryServer = sys.argv[0].replace('.exe', 'server.exe')
+            if os.path.exists(tryServer):
+                args = [tryServer]
+        else:
+            args = ['kajonggserver']
+        return args
+
     def __startLocalServer(self):
         """start a local server"""
-        # pylint: disable=too-many-branches
-        serverPython = 'python3' if Options.server3 else 'python'
         try:
-            if sys.argv[0].endswith('kajongg.py'):
-                tryServer = sys.argv[0].replace('.py', 'server.py')
-                if os.path.exists(tryServer):
-                    args = [serverPython, tryServer]
-            elif sys.argv[0].endswith('kajongg.pyw'):
-                tryServer = sys.argv[0].replace('.pyw', 'server.py')
-                if os.path.exists(tryServer):
-                    args = [serverPython, tryServer]
-            elif sys.argv[0].endswith('kajongg.exe'):
-                tryServer = sys.argv[0].replace('.exe', 'server.exe')
-                if os.path.exists(tryServer):
-                    args = [tryServer]
-            else:
-                args = ['kajonggserver']
+            args = self.__findServerProgram()
             if self.useSocket or os.name == 'nt':  # for nt --socket tells the server to bind to 127.0.0.1
                 args.append('--socket=%s' % socketName())
                 if removeIfExists(socketName()):
