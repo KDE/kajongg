@@ -215,7 +215,7 @@ class Options(object):
     csv = None
     continueServer = False
     fixed = False
-    server3 = False
+    server3 = isPython3
 
     def __init__(self):
         raise Exception('Options is not meant to be instantiated')
