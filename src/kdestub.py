@@ -753,10 +753,19 @@ class KStandardDirs(object):
                     dirMap[key] = list(os.path.normpath(x)
                                        for x in dirMap[key])
             else:
-                KStandardDirs.prefix = subprocess.Popen(
-                    ['which', 'kde4-config'],
-                    stdout=subprocess.PIPE).communicate()[0].split(b'/')[1].decode('utf-8')  # TODO: fsencoding
-                KStandardDirs.prefix = '/%s/' % KStandardDirs.prefix
+                kde4configPath = self.which('kde4-config')
+                if kde4configPath:
+                    KStandardDirs.prefix = '/{}/'.format(
+                        kde4configPath.split(b'/')[1].decode('utf-8'))
+                else:
+                    raise Exception('Cannot find kde4-config')
+
+    @staticmethod
+    def which(program):
+        """calls which program"""
+        return subprocess.Popen(
+            ['which', program],
+            stdout=subprocess.PIPE).communicate()[0]
 
     @classmethod
     def kde_default(cls, type_):
