@@ -73,6 +73,10 @@ class Clone(object):
                 temp=self.tmpdir).split()).wait()
             subprocess.Popen('git checkout -q {commitId}'.format(
                 commitId=commitId).split(), cwd=self.tmpdir).wait()
+            if os.path.islink('twisted'):
+                cpCmd = ['ln', '-s', '{}/twisted'.format(os.getcwd()),
+                         '{}/src/twisted'.format(self.tmpdir)]
+                subprocess.Popen(cpCmd).wait()
 
     def remove(self):
         """remove my tmpdir"""
