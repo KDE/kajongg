@@ -146,6 +146,7 @@ class Server(StrMixin):
             self.jobs = []
             self.process = None
             self.socketName = None
+            self.portNumber = None
             self.commitId = job.commitId
             self.clone = Clone(job.commitId)
             self.start(job)
@@ -162,11 +163,6 @@ class Server(StrMixin):
         """start this server"""
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
-        if OPTIONS.usePort:
-            self.socketName = random.randrange(1025, 65000)
-        else:
-            self.socketName = os.path.expanduser(os.path.join('~', '.kajongg',
-                'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))))
         assert self.commitId == job.commitId
         print('starting server for %s' % job)
         cmd = [os.path.join(job.srcDir(), 'kajonggserver.py')]
@@ -177,8 +173,12 @@ class Server(StrMixin):
         else:
             cmd.insert(0, 'python2')
         if OPTIONS.usePort:
-            cmd.append('--port={sock}'.format(sock=self.socketName))
+            self.portNumber = random.randrange(1025, 65000)
+            cmd.append('--port={port}'.format(port=self.portNumber))
         else:
+            self.socketName = os.path.expanduser(
+                os.path.join('~', '.kajongg',
+                             'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))))
             cmd.append('--socket={sock}'.format(sock=self.socketName))
         if OPTIONS.debug:
             cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
@@ -210,7 +210,7 @@ class Server(StrMixin):
                     _ = self.process.wait()
                 except OSError:
                     pass
-            if self.socketName and not OPTIONS.usePort:
+            if self.socketName:
                 removeIfExists(self.socketName)
         Clone.removeUnused()
 
@@ -225,7 +225,10 @@ class Server(StrMixin):
             server.stop()
 
     def __unicode__(self):
-        return u'{} pid={} sock={}'.format(self.commitId, self.process.pid, self.socketName)
+        if self.portNumber:
+            return u'{} pid={} port={}'.format(self.commitId, self.process.pid, self.portNumber)
+        else:
+            return u'{} pid={} sock={}'.format(self.commitId, self.process.pid, self.socketName)
 
 
 class Job(StrMixin):
@@ -258,12 +261,15 @@ class Job(StrMixin):
         else:
             socketArg = '--socket={sock}'.format(sock=self.server.socketName)
         cmd = [os.path.join(self.srcDir(), 'kajongg.py'),
-              '--game={game}'.format(game=self.game),
-              '--socket={sock}'.format(sock=self.server.socketName),
-              '--player={tester} {player}'.format(
-                player=player,
-                tester=u'Tüster'.encode('utf-8')),
-              '--ruleset={ap}'.format(ap=self.ruleset)]
+               '--game={game}'.format(game=self.game),
+               '--player={tester} {player}'.format(
+                   player=player,
+                   tester=u'Tüster'.encode('utf-8')),
+               '--ruleset={ap}'.format(ap=self.ruleset)]
+        if self.server.socketName:
+               cmd.append('--socket={sock}'.format(sock=self.server.socketName))
+        if self.server.portNumber:
+               cmd.append('--port={port}'.format(port=self.server.portNumber))
         if OPTIONS.client3:
             cmd.insert(0, 'python3')
         elif os.name == 'nt':
