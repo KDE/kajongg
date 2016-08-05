@@ -367,8 +367,10 @@ def onlyExistingCommits(commits):
     """filter out non-existing commits"""
     global KNOWNCOMMITS  # pylint: disable=global-statement
     if len(KNOWNCOMMITS) == 0:
-        for branch in subprocess.check_output('git branch'.split(), env={'LANG': 'C'}).split('\n'):
-            if not 'detached' in branch and not 'no branch' in branch:
+        env = os.environ.copy()
+        env['LANG'] = 'C'
+        for branch in subprocess.check_output('git branch'.split(), env=env).split('\n'):
+            if 'detached' not in branch and 'no branch' not in branch:
                 KNOWNCOMMITS |= set(subprocess.check_output(
                     'git log --max-count=200 --pretty=%h {branch}'.format(
                         branch=branch[2:]).split()).split('\n'))
