@@ -26,7 +26,6 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 import os
 import sys
-import csv
 import subprocess
 import random
 import shutil
@@ -38,6 +37,7 @@ from optparse import OptionParser
 
 from common import Debug, StrMixin
 from util import removeIfExists, gitHead, checkMemory
+from compat import Csv, CsvWriter
 
 # fields in row:
 RULESETFIELD = 0
@@ -344,7 +344,7 @@ def neutralize(rows):
     """remove things we do not want to compare"""
     for row in rows:
         for idx, field in enumerate(row):
-            if field.startswith('Tester '):
+            if field.startswith(u'Tester '):
                 row[idx] = 'Tester'
             if 'MEM' in field:
                 parts = field.split(',')
@@ -373,7 +373,7 @@ def removeInvalidCommits(csvFile):
     """remove rows with invalid git commit ids"""
     if not os.path.exists(csvFile):
         return
-    rows = list(csv.reader(open(csvFile, 'rb'), delimiter=';'))
+    rows = list(Csv.reader(csvFile))
     _ = set(x[COMMITFIELD] for x in rows)
     csvCommits = set(
         x for x in _ if set(
@@ -385,7 +385,7 @@ def removeInvalidCommits(csvFile):
         print(
             'removing rows from kajongg.csv for commits %s' %
             ','.join(nonExisting))
-        writer = csv.writer(open(csvFile, 'wb'), delimiter=';')
+        writer = CsvWriter(csvFile)
         for row in rows:
             if row[COMMITFIELD] not in nonExisting:
                 writer.writerow(row)
@@ -405,7 +405,7 @@ def readGames(csvFile):
     """returns a dict holding a frozenset of games for each variant"""
     if not os.path.exists(csvFile):
         return
-    allRows = neutralize(csv.reader(open(csvFile, 'rb'), delimiter=';'))
+    allRows = neutralize(Csv.reader(csvFile))
     if not allRows:
         return
     # we want unique tuples so we can work with sets

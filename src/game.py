@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import datetime
 import weakref
 import os
-import csv
 if os.name != 'nt':
     import resource
 from random import Random
@@ -39,6 +38,7 @@ from sound import Voice
 from wall import Wall
 from move import Move
 from player import Players, Player, PlayingPlayer
+from compat import CsvWriter
 
 
 class CountingRandom(Random):
@@ -880,7 +880,7 @@ class PlayingGame(Game):
         """write game summary to Options.csv"""
         if self.finished() and Options.csv:
             gameWinner = max(self.players, key=lambda x: x.balance)
-            writer = csv.writer(open(Options.csv, 'ab'), delimiter=';')
+            writer = CsvWriter(Options.csv, mode='a')
             if Debug.process and os.name != 'nt':
                 self.csvTags.append('MEM:%s' % resource.getrusage(
                     resource.RUSAGE_SELF).ru_maxrss)
@@ -889,7 +889,7 @@ class PlayingGame(Game):
             row = [self.ruleset.name, Options.AI, gitHead(), str(self.seed),
                    ','.join(self.csvTags)]
             for player in sorted(self.players, key=lambda x: x.name):
-                row.append(player.name.encode('utf-8'))
+                row.append(player.name)
                 row.append(player.balance)
                 row.append(player.wonCount)
                 row.append(1 if player == gameWinner else 0)
