@@ -115,7 +115,12 @@ class Animation(QPropertyAnimation):
 
 class ParallelAnimationGroup(QParallelAnimationGroup):
 
-    """override __init__"""
+    """
+    current is the currently executed group
+    doAfter is a list of Deferred to be called when this group
+    is done. If another group is chained to this one, transfer
+    doAfter to that other group.
+    """
 
     running = []  # we need a reference to active animation groups
     current = None
@@ -128,10 +133,13 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         self.deferred = Deferred()
         self.steps = 0
         self.debug = False
+        self.doAfter = list()
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
                 logDebug(u'Chaining Animation group %d to %d' %
                          (id(self), id(ParallelAnimationGroup.current)))
+                self.doAfter =  ParallelAnimationGroup.current.doAfter
+                ParallelAnimationGroup.current.doAfter = list()
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
         else:
             self.start()
@@ -199,6 +207,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             logDebug(u'Animation group %d done' % id(self))
         if self.deferred:
             self.deferred.callback(None)
+        for after in self.doAfter:
+            after.callback(None)
 
     def fixAllBoards(self):
         """set correct drawing order for all moved tiles"""
@@ -238,7 +248,9 @@ def __afterCurrentAnimationDo(callback, *args, **kwargs):
     animations have finished"""
     current = ParallelAnimationGroup.current
     if current:
-        current.deferred.addCallback(callback, *args, **kwargs)
+        deferred = Deferred()
+        deferred.addCallback(callback, *args, **kwargs)
+        current.doAfter.append(deferred)
         if current.debug:
             logDebug(u'after current animation %d do %s %s' %
                      (id(current), callback, ','.join(args) if args else ''))
