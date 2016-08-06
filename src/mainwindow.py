@@ -652,7 +652,7 @@ class MainWindow(KXmlGuiWindow):
             scene.updateSceneGUI()
 
     @afterQueuedAnimations
-    def changeAngle(self, deferredResult, dummyButtons, dummyModifiers):
+    def changeAngle(self, deferredResult, dummyButtons=None, dummyModifiers=None):
         """change the lightSource"""
         if self.scene:
             with MoveImmediate():
