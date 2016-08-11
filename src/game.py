@@ -144,7 +144,7 @@ class HandId(object):
         stringIdx 0 is the part in front of ..
         stringIdx 1 is the part after ..
         """
-        # pylint: disable=too-many-return-statements
+        # pylint: disable=too-many-return-statements,too-many-branches
         if not string:
             return
         seed = int(string.split('/')[0])
@@ -154,8 +154,10 @@ class HandId(object):
             if stringIdx == 1:
                 self.roundsFinished = 100
             return
-        string = string.split('/')[1]
-        parts = string.split('..')
+        string1 = string.split('/')[1]
+        if not string1:
+            logException('--game=%s must specify the wanted round' % string)
+        parts = string1.split('..')
         if stringIdx == 1 and len(parts) == 2 and parts[1] == '':
             self.roundsFinished = 100
             return
