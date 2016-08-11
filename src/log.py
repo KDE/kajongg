@@ -30,7 +30,7 @@ SERVERMARK = '&&SERVER&&'
 # util must not import twisted or we need to change kajongg.py
 
 from common import Internal, Debug, unicode, isPython3, ENGLISHDICT  # pylint: disable=redefined-builtin
-from common import unicodeString, nativeString, nativeStringArgs
+from common import unicodeString, unicodeStringArgs, nativeString
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead
 from kde import i18n, i18nc
@@ -245,12 +245,15 @@ def m18n(englishText, *args):
 
     @return: The translated text with args inserted.
     @rtype: C{unicode}.
+
+    Since when do args have to be unicode? utf-8
+    encoded fails.
     """
     result = unicodeString(
         i18n(
             nativeString(
                 englishText),
-                        *nativeStringArgs(args)))
+            *unicodeStringArgs(args)))
     if not args:
         ENGLISHDICT[result] = unicodeString(englishText)
     return result
@@ -275,9 +278,8 @@ def m18nc(context, englishText, *args):
     result = unicodeString(
         i18nc(
             context,
-                    nativeString(
-                        englishText),
-                        *nativeStringArgs(args)))
+            nativeString(englishText),
+            *unicodeStringArgs(args)))
     if not args:
         ENGLISHDICT[result] = unicodeString(englishText)
     return result
