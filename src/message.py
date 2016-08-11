@@ -62,6 +62,9 @@ class Message(object):
     def __repr__(self):
         return 'Message.{}'.format(self.name)
 
+    def __lt__(self, other):
+        return self.__class__.__name__ < other.__class__.__name__
+
     @staticmethod
     def jelly(key, value):
         """serialize value for wire transfer. The twisted.pb mechanism with
