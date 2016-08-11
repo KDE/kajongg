@@ -112,7 +112,7 @@ then
 	do
 		test $file = qt4reactor.py && continue
 		echo -n pylint for $file in `pwd`...
-		pylint --reports=n $file
+		pylint3 $file
 		result=$?
 		echo done
 		[ $result -ne 0 ] && break
@@ -120,7 +120,7 @@ then
 	if [ $result -ne 0 ]
 	then
 		echo "trying pylint over all source files"
-		pylint --reports=n *y
+		pylint3 --reports=n *y
 		result=$?
 	fi
 	if [ $result -ne 0 ]
