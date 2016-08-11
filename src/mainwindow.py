@@ -480,6 +480,8 @@ class MainWindow(KXmlGuiWindow):
             pass
         checkMemory()
         logging.shutdown()
+        if Debug.quit:
+            logDebug(u'aboutToQuit ending')
 
     def abortAction(self):
         """abort current game"""
