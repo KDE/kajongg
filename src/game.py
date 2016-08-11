@@ -31,6 +31,7 @@ from twisted.internet.defer import succeed
 from util import stack, gitHead
 from log import logError, logWarning, logException, logDebug, m18n
 from common import WINDS, Internal, IntDict, Debug, Options, unicodeString
+from common import isPython3
 from query import Query
 from rule import Ruleset
 from tile import Tile, elements
@@ -886,8 +887,9 @@ class PlayingGame(Game):
                     resource.RUSAGE_SELF).ru_maxrss)
             if Options.rounds:
                 self.csvTags.append('ROUNDS:%s' % Options.rounds)
-            row = [self.ruleset.name, Options.AI, gitHead(), str(self.seed),
-                   ','.join(self.csvTags)]
+            row = [self.ruleset.name, Options.AI,
+                   gitHead(), '3' if isPython3 else '2',
+                   str(self.seed), ','.join(self.csvTags)]
             for player in sorted(self.players, key=lambda x: x.name):
                 row.append(player.name)
                 row.append(player.balance)
