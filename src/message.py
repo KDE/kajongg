@@ -24,7 +24,7 @@ from log import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice, Sound
 from tile import Tile, TileList
 from meld import Meld, MeldList
-from common import Internal, Debug, long
+from common import Internal, Debug, Options, long
 from common import unicode, unicodeString, StrMixin
 from dialogs import Sorry
 
@@ -612,7 +612,7 @@ class MessageVoiceId(ServerMessage):
 
     def clientAction(self, dummyClient, move):
         """the server gave us a voice id about another player"""
-        if Internal.Preferences.useSounds:
+        if Internal.Preferences.useSounds and Options.gui:
             move.player.voice = Voice.locate(move.source)
             if not move.player.voice:
                 return Message.ClientWantsVoiceData, move.source
@@ -635,7 +635,7 @@ class MessageAssignVoices(ServerMessage):
     """The server tells us that we now got all voice data available"""
 
     def clientAction(self, client, move):
-        if Internal.Preferences.useSounds:
+        if Internal.Preferences.useSounds and Options.gui:
             client.game.assignVoices()
 
 
