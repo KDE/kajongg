@@ -42,7 +42,7 @@ from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Debug, isAlive, english, unicode
-from common import nativeString, unicodeString
+from common import isPython3, nativeString, unicodeString, interpreterName
 from game import Players
 from query import Query
 from statesaver import StateSaver
@@ -85,7 +85,7 @@ class Url(unicode):
         if obj.port is None and obj.isLocalHost and not obj.useSocket:
             obj.port = obj.__findFreePort()
         if obj.port is None and not obj.isLocalHost:
-            obj.port = Options.defaultPort()
+            obj.port = Internal.defaultPort
         if Debug.connections:
             logDebug(repr(obj))
 
@@ -130,7 +130,7 @@ class Url(unicode):
         """find an unused port on the current system.
         used when we want to start a local server on windows"""
         assert self.isLocalHost
-        for port in chain([Options.defaultPort()], range(2000, 19000)):
+        for port in chain([Internal.defaultPort], range(2000, 19000)):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(1)
             try:
@@ -178,22 +178,21 @@ class Url(unicode):
     def __findServerProgram():
         """how should we start the server?"""
         result = []
-        serverPython = 'python3' if Options.server3 else 'python'
         if sys.argv[0].endswith('kajongg.py'):
             tryServer = sys.argv[0].replace('.py', 'server.py')
             if os.path.exists(tryServer):
-                result = [serverPython, tryServer]
+                result = [interpreterName, tryServer]
         elif sys.argv[0].endswith('kajongg.pyw'):
             tryServer = sys.argv[0].replace('.pyw', 'server.py')
             if os.path.exists(tryServer):
-                result = [serverPython, tryServer]
+                result = [interpreterName, tryServer]
         elif sys.argv[0].endswith('kajongg.exe'):
             tryServer = sys.argv[0].replace('.exe', 'server.exe')
             if os.path.exists(tryServer):
                 result = [tryServer]
         else:
             result = ['kajonggserver']
-        if Options.server3:
+        if isPython3:
             result[-1] = result[-1].replace('server', 'server3')
         if Debug.connections:
             logDebug(m18n('trying to start local server %1', result))
@@ -212,7 +211,9 @@ class Url(unicode):
                 args.append('--port=%d' % self.port)
             if self.isLocalGame:
                 args.append(
-                    '--db={}'.format(os.path.normpath(appdataDir() + 'local.db')))
+                    '--db={}'.format(
+                        os.path.normpath(
+                            appdataDir() + 'local{}.db'.format('3' if isPython3 else ''))))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
             if os.name == 'nt':

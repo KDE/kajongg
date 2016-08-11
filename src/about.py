@@ -31,7 +31,7 @@ class About(object):
         self.appName = "kajongg"
         catalog = ""
         homePage = "http://kde.org/applications/games/kajongg/"
-        version = Internal.version
+        version = str(Internal.defaultPort)
         programName = ki18n("Kajongg")
         description = ki18n(
             "Mah Jongg - the ancient Chinese board game for 4 players")

@@ -35,7 +35,7 @@ from tempfile import mkdtemp
 
 from optparse import OptionParser
 
-from common import Debug, StrMixin
+from common import Debug, StrMixin, isPython3, interpreterName
 from util import removeIfExists, gitHead, checkMemory
 from compat import Csv, CsvWriter
 
@@ -173,13 +173,8 @@ class Server(StrMixin):
         print('starting server for %s commit=%s in %s' % (' ' * 16, job.commitId, self.clone.tmpdir))
         cmd = [os.path.join(
             job.srcDir(),
-            'kajonggserver3.py' if OPTIONS.server3 else 'kajonggserver.py')]
-        if OPTIONS.server3:
-            cmd.insert(0, 'python3')
-        elif os.name == 'nt':
-            cmd.insert(0, 'python')
-        else:
-            cmd.insert(0, 'python2')
+            'kajonggserver3.py' if isPython3 else 'kajonggserver.py')]
+        cmd.insert(0, interpreterName)
         if OPTIONS.usePort:
             self.portNumber = random.randrange(1025, 65000)
             cmd.append('--port={port}'.format(port=self.portNumber))
@@ -278,12 +273,7 @@ class Job(StrMixin):
             cmd.append('--socket={sock}'.format(sock=self.server.socketName))
         if self.server.portNumber:
             cmd.append('--port={port}'.format(port=self.server.portNumber))
-        if OPTIONS.client3:
-            cmd.insert(0, 'python3')
-        elif os.name == 'nt':
-            cmd.insert(0, 'python')
-        else:
-            cmd.insert(0, 'python2')
+        cmd.insert(0, interpreterName)
         if OPTIONS.rounds:
             cmd.append('--rounds={rounds}'.format(rounds=OPTIONS.rounds))
         if self.aiVariant != 'Default':
@@ -638,12 +628,6 @@ def parse_options():
         help='check all commits: either a comma separated list or a range from..until')
     parser.add_option('', '--debug', dest='debug',
         help=Debug.help())
-    parser.add_option(
-        '', '--client3', dest='client3', action='store_true', default=False,
-        help='use Python 3 for all clients')
-    parser.add_option(
-        '', '--server3', dest='server3', action='store_true', default=False,
-        help='use Python 3 for all servers')
 
     return parser.parse_args()
 

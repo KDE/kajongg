@@ -43,12 +43,17 @@ if platform.python_version_tuple()[0] == '3':
     bytes = bytes
     long = int
     isPython3 = True
+    interpreterName = 'python3'
 else:
     # pylint: disable=redefined-builtin
     unicode = unicode
     bytes = str
     long = long
     isPython3 = False
+    if os.name == 'nt':
+        interpreterName = 'python'
+    else:
+        interpreterName = 'python2'
 
 WINDS = u'ESWN'
 LIGHTSOURCES = [u'NE', u'NW', u'SW', u'SE']
@@ -220,12 +225,6 @@ class Options(object):
     def __init__(self):
         raise Exception('Options is not meant to be instantiated')
 
-    @staticmethod
-    def defaultPort():
-        """8000 plus version: for version 4.9.5 we use 8409"""
-        parts = Internal.version.split('.')
-        return 8000 + int(parts[0]) * 100 + int(parts[1])
-
 
 class SingleshotOptions(object):
 
@@ -262,7 +261,10 @@ class __Internal(object):
     """
     # pylint: disable=too-many-instance-attributes
     Preferences = None
-    version = '4.13.0'
+    if isPython3:
+        defaultPort = 8300
+    else:
+        defaultPort = 8200
     logPrefix = 'C'
     isServer = False
     scaleScene = True

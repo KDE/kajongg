@@ -1088,7 +1088,7 @@ class KConfig(SafeConfigParser):
             for section in self._sections:
                 filePointer.write(("[%s]\n" % section).encode('utf-8'))
                 for (key, value) in self._sections[section].items():
-                    key = str(key).encode('utf-8')
+                    key = bytes(str(key).encode('utf-8')) # pylint bug, bytes() should not be needed
                     value = str(value).encode('utf-8')
                     if key == "__name__":
                         continue
@@ -1331,7 +1331,7 @@ class AboutKajonggDialog(KDialog):
         hLayout1.addWidget(IconLabel('kajongg', self))
         h1vLayout = QVBoxLayout()
         h1vLayout.addWidget(QLabel('Kajongg'))
-        h1vLayout.addWidget(QLabel(i18n('Version %1', Internal.version)))
+        h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
         underVersions = []
         try:
             versions = subprocess.Popen(['kde4-config', '-v'],

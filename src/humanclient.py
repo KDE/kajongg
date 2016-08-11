@@ -435,7 +435,8 @@ class HumanClient(Client):
         maxGameId = int(maxGameId) if maxGameId else 0
         self.callServer('setClientProperties',
                         Internal.db.identifier,
-                        voiceId, maxGameId, Internal.version).addCallbacks(self.__initTableList, self.__versionError)
+                        voiceId, maxGameId,
+                        Internal.defaultPort).addCallbacks(self.__initTableList, self.__versionError)
 
     def __initTableList(self, dummy):
         """first load of the list. Process options like --demo, --table, --join"""
@@ -891,6 +892,8 @@ class HumanClient(Client):
             if debugArgs[0] == 'setClientProperties':
                 debugArgs[1] = 'DBID'
                 debugArgs[3] = 'GAMEID'
+                if debugArgs[4] >= 8300:
+                    debugArgs[4] -= 300
         if self.game:
             self.game.debug('callServer(%s)' % repr(debugArgs))
         else:

@@ -120,4 +120,4 @@ def socketName():
     if Options.socket:
         return Options.socket
     else:
-        return os.path.normpath('{}/socket{}'.format(serverDir, Options.defaultPort()))
+        return os.path.normpath('{}/socket{}'.format(serverDir, Internal.defaultPort))

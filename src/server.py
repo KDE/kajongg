@@ -1351,7 +1351,7 @@ class User(pb.Avatar):
         self.voiceId = voiceId
         self.maxGameId = maxGameId
         clientVersion = nativeString(clientVersion)
-        serverVersion = Internal.version
+        serverVersion = Internal.defaultPort
         if clientVersion != serverVersion:
             # we assume that versions x.y.* are compatible
             if clientVersion is None:
@@ -1435,7 +1435,7 @@ def parseArgs():
     """as the name says"""
     from optparse import OptionParser
     parser = OptionParser()
-    defaultPort = Options.defaultPort()
+    defaultPort = Internal.defaultPort
     parser.add_option('', '--port', dest='port',
                       help=m18n(
                       'the server will listen on PORT (%d)' %

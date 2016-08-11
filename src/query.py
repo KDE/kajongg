@@ -35,7 +35,7 @@ from kde import appdataDir
 from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug, m18ncE, m18n
 from common import IntDict, Options, Internal, Debug, nativeStringArgs, unicodeString
-
+from common import unicode, isPython3
 
 class QueryException(Exception):
 
@@ -157,7 +157,11 @@ class DBHandle(sqlite3.Connection):
         @return: The full path for kajonggserver.db or kajongg.db.
         @rtype: C{str}
         """
-        name = 'kajonggserver.db' if Internal.isServer else 'kajongg.db'
+        name = 'kajonggserver' if Internal.isServer else 'kajongg'
+        if isPython3:
+            name += '3.db'
+        else:
+            name += '.db'
         return Options.dbPath if Options.dbPath else appdataDir() + name
 
     @property
@@ -371,7 +375,7 @@ class PrepareDB(object):
                 self.createTables()
                 self.__generateDbIdent()
                 Query(
-                    'UPDATE general SET schemaversion=?', (Internal.version,))
+                    'UPDATE general SET schemaversion=?', (Internal.defaultPort,))
         finally:
             Internal.db.close(silent=True)
         if os.path.exists(self.path):
@@ -398,8 +402,12 @@ class PrepareDB(object):
         """upgrade the structure of an existing kajongg database"""
         try:
             Internal.db = DBHandle(self.path)
-            allVersions = list(['4.13.0'])
-            assert allVersions[-1] == Internal.version
+            if isPython3:
+                allVersions = list(['4.13.0', '8300'])
+            else:
+                allVersions = list(['4.13.0', '8200'])
+            assert allVersions[-1] == str(Internal.defaultPort), '{} != {}'.format(
+                allVersions[-1], str(Internal.defaultPort))
             # skip versions before current db versions:
             currentVersion = self.__currentVersion()
             while allVersions and allVersions[0] <= currentVersion:
