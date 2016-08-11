@@ -889,8 +889,8 @@ class HumanClient(Client):
             if debugArgs[0] == 'ping':
                 return
             if debugArgs[0] == 'setClientProperties':
-                debugArgs[1] = u'DBID'
-                debugArgs[3] = u'GAMEID'
+                debugArgs[1] = 'DBID'
+                debugArgs[3] = 'GAMEID'
         if self.game:
             self.game.debug('callServer(%s)' % repr(debugArgs))
         else:
