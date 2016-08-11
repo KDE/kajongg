@@ -91,7 +91,7 @@ class DBCursor(sqlite3.Cursor):
             self.failure = exc
             msg = u'ERROR in %s: %s for %s' % (
                 self.connection.path,
-                exc.message,
+                exc.message if hasattr(exc, 'message') else '',
                 self)
             if mayFail:
                 if not failSilent:
