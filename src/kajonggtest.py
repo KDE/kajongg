@@ -375,11 +375,11 @@ def onlyExistingCommits(commits):
     if len(KNOWNCOMMITS) == 0:
         env = os.environ.copy()
         env['LANG'] = 'C'
-        for branch in subprocess.check_output('git branch'.split(), env=env).split('\n'):
+        for branch in subprocess.check_output(b'git branch'.split(), env=env).decode().split('\n'):
             if 'detached' not in branch and 'no branch' not in branch:
                 KNOWNCOMMITS |= set(subprocess.check_output(
                     'git log --max-count=200 --pretty=%h {branch}'.format(
-                        branch=branch[2:]).split()).split('\n'))
+                        branch=branch[2:]).split()).decode().split('\n'))
     return list(x for x in commits if x in KNOWNCOMMITS)
 
 
@@ -625,7 +625,7 @@ def improve_options():
     cmd = ['python', cmdPath, '--rulesets=']
     OPTIONS.knownRulesets = subprocess.Popen(
         cmd,
-        stdout=subprocess.PIPE).communicate()[0].split('\n')
+        stdout=subprocess.PIPE).communicate()[0].decode().split('\n')
     OPTIONS.knownRulesets = list(x.strip()
                                  for x in OPTIONS.knownRulesets if x.strip())
     if OPTIONS.rulesets == 'ALL':
@@ -658,8 +658,7 @@ def improve_options():
                 OPTIONS.git = OPTIONS.git.replace('..', '^..')
             commits = subprocess.check_output(
                 'git log --pretty=%h {range}'.format(
-                    range=OPTIONS.git).split(
-            ))
+                    range=OPTIONS.git).split()).decode()
             OPTIONS.git = list(reversed(list(x.strip()
                                for x in commits.split('\n') if x.strip())))
         else:
