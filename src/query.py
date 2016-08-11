@@ -415,9 +415,9 @@ class PrepareDB(object):
             for version in allVersions:
                 currentVersion = self.__currentVersion()
                 with Internal.db:  # transaction
-                    getattr(
-                        self, 'updateToVersion%s' %
-                        version.replace('.', '_'))()
+                    updateMethodName = 'updateToVersion{}'.format(version.replace('.', '_'))
+                    if hasattr(self, updateMethodName):
+                        getattr(self, updateMethodName)()
                     Query('UPDATE general SET schemaversion=?', (version,))
                 logInfo(m18n('Database %1 updated from schema %2 to %3',
                              Internal.db.path, currentVersion, version), showDialog=True)
