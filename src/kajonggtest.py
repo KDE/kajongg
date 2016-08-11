@@ -170,7 +170,7 @@ class Server(StrMixin):
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
         assert self.commitId == job.commitId
-        print('starting server for                  commit=%s in %s' % (job.commitId, self.clone.tmpdir))
+        print('starting server for %s commit=%s in %s' % (' ' * 16, job.commitId, self.clone.tmpdir))
         cmd = [os.path.join(
             job.srcDir(),
             'kajonggserver3.py' if OPTIONS.server3 else 'kajonggserver.py')]
@@ -275,9 +275,9 @@ class Job(StrMixin):
                    tester=u'Tüster'.encode('utf-8')),
                '--ruleset={ap}'.format(ap=self.ruleset)]
         if self.server.socketName:
-               cmd.append('--socket={sock}'.format(sock=self.server.socketName))
+            cmd.append('--socket={sock}'.format(sock=self.server.socketName))
         if self.server.portNumber:
-               cmd.append('--port={port}'.format(port=self.server.portNumber))
+            cmd.append('--port={port}'.format(port=self.server.portNumber))
         if OPTIONS.client3:
             cmd.insert(0, 'python3')
         elif os.name == 'nt':
@@ -640,12 +640,10 @@ def parse_options():
         help=Debug.help())
     parser.add_option(
         '', '--client3', dest='client3', action='store_true', default=False,
-        help='use Python 3 for all clients. This will use ports instead of sockets because'
-        ' twisted does not yet support sockets for Python 3')
+        help='use Python 3 for all clients')
     parser.add_option(
         '', '--server3', dest='server3', action='store_true', default=False,
-        help='use Python 3 for all servers. This will use ports instead of sockets because'
-        ' twisted does not yet support sockets for Python 3')
+        help='use Python 3 for all servers')
 
     return parser.parse_args()
 
@@ -722,7 +720,7 @@ def improve_options():
     OPTIONS.jobs = allJobs()
     OPTIONS.games = allGames()
     OPTIONS.jobCount = 0
-    OPTIONS.usePort = os.name == 'nt' or OPTIONS.server3 or OPTIONS.client3
+    OPTIONS.usePort = os.name == 'nt'
 
 
 def allGames():

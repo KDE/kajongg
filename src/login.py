@@ -41,8 +41,8 @@ from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 
 from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
-from common import Internal, Options, SingleshotOptions, Internal, Debug, isAlive, english, unicode
-from common import isPython3, nativeString
+from common import Internal, Options, SingleshotOptions, Debug, isAlive, english, unicode
+from common import nativeString, unicodeString
 from game import Players
 from query import Query
 from statesaver import StateSaver
@@ -114,9 +114,7 @@ class Url(unicode):
         return (
             self.host == '127.0.0.1'
             and os.name != 'nt'
-            and not Options.port
-            and not isPython3
-            and not Options.server3)
+            and not Options.port)
 
     @property
     def isLocalGame(self):
