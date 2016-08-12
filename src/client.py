@@ -28,7 +28,7 @@ from util import Duration
 from log import logDebug, logException, logWarning, m18nc
 from message import Message
 from common import Internal, Debug, Options, StrMixin
-from common import unicodeString, nativeString
+from common import unicodeString, unicode
 from rule import Ruleset
 from game import PlayingGame
 from query import Query
@@ -186,13 +186,11 @@ class Client(pb.Referenceable):
 
     def remote_newTables(self, tables):
         """update table list"""
-        newTables = list(ClientTable(self, *x)
-                         for x in tables)
+        newTables = list(ClientTable(self, *x) for x in tables)
         self.tables.extend(newTables)
         if Debug.table:
-            logDebug(
-                u'%s got new tables:%s' %
-                (nativeString(self.name), newTables))
+            _ = u', '.join(unicode(ClientTable(self, *x)) for x in tables)
+            logDebug(u'%s got new tables:%s' % (self.name, _))
 
     @staticmethod
     def remote_serverRulesets(hashes):
