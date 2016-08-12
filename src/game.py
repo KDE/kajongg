@@ -23,12 +23,12 @@ import weakref
 import os
 if os.name != 'nt':
     import resource
-from random import Random
 from collections import defaultdict
 from functools import total_ordering
 
 from twisted.internet.defer import succeed
-from util import stack, gitHead
+from util import gitHead
+from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, m18n
 from common import WINDS, Internal, IntDict, Debug, Options, unicodeString
 from common import isPython3
@@ -40,79 +40,6 @@ from wall import Wall
 from move import Move
 from player import Players, Player, PlayingPlayer
 from compat import CsvWriter
-
-
-class CountingRandom(Random):
-
-    """counts how often random() is called and prints debug info"""
-
-    def __init__(self, game, value=None):
-        self._game = weakref.ref(game)
-        Random.__init__(self, value)
-        self.count = 0
-
-    @property
-    def game(self):
-        """hide the fact that game is a weakref"""
-        return self._game()
-
-    def random(self):
-        """the central randomizator"""
-        self.count += 1
-        return Random.random(self)
-
-    def seed(self, newSeed=None):
-        self.count = 0
-        if Debug.random:
-            self.game.debug('Random gets seed %s' % newSeed)
-        Random.seed(self, newSeed)
-
-    def shuffle(self, listValue, func=None):
-        """pylint needed for python up to 2.7.5"""
-        # pylint: disable=arguments-differ
-        oldCount = self.count
-        Random.shuffle(self, listValue, func)
-        if Debug.random:
-            self.game.debug(
-                '%d out of %d calls to random by Random.shuffle from %s'
-                % (self.count - oldCount, self.count, stack('')[-2]))
-
-    def randrange(self, start, stop=None, step=1):
-        # pylint: disable=arguments-differ
-        oldCount = self.count
-        result = Random.randrange(self, start, stop, step)
-        if Debug.random:
-            self.game.debug(
-                '%d out of %d calls to random by '
-                'Random.randrange(%d,%s) from %s'
-                % (self.count - oldCount, self.count, start, stop,
-                   stack('')[-2]))
-        return result
-
-    def choice(self, fromList):
-        if len(fromList) == 1:
-            return fromList[0]
-        oldCount = self.count
-        result = Random.choice(self, fromList)
-        if Debug.random:
-            self.game.debug(
-                '%d out of %d calls to random by '
-                'Random.choice(%s) from %s' % (
-                    self.count - oldCount, self.count,
-                    str([str(x) for x in fromList]),
-                    stack('')[-2]))
-        return result
-
-    def sample(self, population, wantedLength):
-        oldCount = self.count
-        result = Random.sample(self, population, wantedLength)
-        if Debug.random:
-            self.game.debug(
-                '%d out of %d calls to random by '
-                'Random.sample(x, %d) from %s' %
-                (self.count - oldCount, self.count, wantedLength,
-                 stack('')[-2]))
-        return result
 
 
 @total_ordering

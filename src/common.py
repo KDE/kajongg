@@ -44,6 +44,7 @@ if platform.python_version_tuple()[0] == '3':
     long = int
     isPython3 = True
     interpreterName = 'python3'
+    xrange = range
 else:
     # pylint: disable=redefined-builtin
     unicode = unicode
@@ -54,6 +55,7 @@ else:
         interpreterName = 'python'
     else:
         interpreterName = 'python2'
+    xrange = xrange
 
 WINDS = u'ESWN'
 LIGHTSOURCES = [u'NE', u'NW', u'SW', u'SE']
