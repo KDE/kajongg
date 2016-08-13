@@ -83,7 +83,8 @@ class Move(StrMixin):
     def prettyKwargs(kwargs):
         """this is also used by the server, but the server does not use class Move"""
         result = u''
-        for key, value in kwargs.items():
+        for key in sorted(kwargs.keys()):
+            value = kwargs[key]
             if key == 'token':
                 continue
             if isinstance(value, (list, tuple)) and isinstance(value[0], (list, tuple)):
