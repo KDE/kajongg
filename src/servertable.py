@@ -527,7 +527,7 @@ class ServerTable(Table):
         block.callback(self._clientDiscarded2, msg, dangerousText, mustPlayDangerous, violates)
 
     def _clientDiscarded2(self, dummyResults, msg, dangerousText, mustPlayDangerous, violates):
-        """client told us he discarded a tile. Continue, check for calling"""
+        """client told us he discarded a tile. Continue, check for violating original call"""
         block = DeferredBlock(self)
         player = msg.player
         if violates:
