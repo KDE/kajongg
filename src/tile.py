@@ -130,7 +130,11 @@ class Tile(str):
         for key in (
                 result, (str(result),), (result.group, result.value),
                 (result[0], result[1])):
-            result.cache[key] = result
+            cls.cache[key] = result
+
+        existing = list([x for x in cls.cache.values() if x.key == result.key])
+        existingIds = set(id(x) for x in existing)
+        assert len(existingIds) == 1, 'new is:{} existing are: {} with ids {}'.format(result, existing, existingIds)
 
         result.exposed = result.concealed = result.swapped = None
         result.single = result.pair = result.pung = None
