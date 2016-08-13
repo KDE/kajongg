@@ -520,7 +520,9 @@ class Hand(object):
         for rule in self.ruleset.mjRules:
             cand = rule.winningTileCandidates(self)
             if Debug.hand and cand:
-                self.debug(fmt('callingHands found {cand} for {rule}'))
+                # Py2 and Py3 show sets differently
+                candis = ''.join(str(x) for x in sorted(cand)) # pylint: disable=unused-variable
+                self.debug(fmt('callingHands found {candis} for {rule}'))
             candidates.extend(x.concealed for x in cand)
         # FIXME: we must differentiate between last Tile exposed or concealed.
         # example:
