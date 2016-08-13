@@ -100,7 +100,10 @@ class Score(object):
         if self.doubles:
             parts.append(m18nc('Kajongg', '%1 doubles', self.doubles))
         if self.limits:
-            parts.append(m18nc('Kajongg', '%1 limits', self.limits))
+            limits = str(self.limits)
+            if limits.endswith('.0'):
+                limits = limits[-2:]
+            parts.append(m18nc('Kajongg', '%1 limits', limits))
         return u' '.join(parts)
 
     def __eq__(self, other):
