@@ -26,7 +26,7 @@ import sys
 import logging
 
 from qt import QObject, usingQt4
-from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions
+from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
 from about import About
 
 from common import Options, SingleshotOptions, Internal, Debug, unicodeString
@@ -170,6 +170,9 @@ if __name__ == "__main__":
         KApplication.setGraphicsSystem('raster')
     APP = KApplication()
     parseOptions()
+
+    if Debug.neutral:
+        KGlobal.locale().setLanguage('en_US')
 
     if Debug.events:
         EVHANDLER = EvHandler()

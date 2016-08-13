@@ -906,6 +906,12 @@ class KLocale(object):
         translator = KDETranslator(app)
         QCoreApplication.installTranslator(translator)
 
+    @staticmethod
+    def setLanguage(lang):
+        """stub"""
+        assert lang == 'en_US', 'KLocale.setLanguage currently only supports en_US'
+        QCoreApplication.installTranslator(None)
+
 
 class KConfigGroup(object):
 
