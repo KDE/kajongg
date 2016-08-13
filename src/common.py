@@ -392,6 +392,12 @@ class IntDict(defaultdict, StrMixin):
                 self.parent[key] -= value
         defaultdict.clear(self)
 
+    def __str__(self):
+        """sort the result for better log comparison"""
+        keys = sorted(self.keys())
+        return ', '.join('{}:{}'.format(
+            str(x), str(self[x])) for x in keys)
+
     def __unicode__(self):
         """sort the result for better log comparison"""
         keys = sorted(self.keys())
