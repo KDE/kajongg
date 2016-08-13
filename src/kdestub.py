@@ -106,7 +106,7 @@ def i18n(englishIn, *args):
     @rtype: C{unicode}
     """
     assert englishIn
-    if KGlobal.translation and englishIn:
+    if not Debug.neutral and KGlobal.translation and englishIn:
         _ = KGlobal.translation.gettext(englishIn)
     else:
         _ = englishIn
