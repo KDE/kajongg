@@ -23,12 +23,13 @@ Read the user manual for a description of the interface to this scoring engine
 
 from itertools import chain
 import weakref
+from hashlib import md5
 
-from log import dbgIndent, fmt, id4
+from log import dbgIndent, Fmt, fmt
 from tile import Tile, TileList
 from meld import Meld, MeldList
 from rule import Score, UsedRule
-from common import Debug
+from common import Debug, isPython3
 from intelligence import AIDefault
 from util import callers
 from message import Message
@@ -292,9 +293,9 @@ class Hand(object):
 
     def debug(self, msg):
         """try to use Game.debug so we get a nice prefix"""
-        idPrefix = id4(self)
+        idPrefix = Fmt.num_encode(hash(self))
         if self.prevHand:
-            idPrefix += '<{}'.format(id4(self.prevHand))
+            idPrefix += '<{}'.format(Fmt.num_encode(hash(self.prevHand)))
         idPrefix = 'Hand({})'.format(idPrefix)
         self.player.game.debug(' '.join([dbgIndent(self, self.prevHand), idPrefix, msg]))
 
@@ -752,3 +753,25 @@ class Hand(object):
     def __repr__(self):
         """the default representation"""
         return 'Hand(%s)' % str(self)
+
+    def __hash__(self):
+        """used for debug logging to identify the hand"""
+        if not hasattr(self, 'string'):
+            return 0
+        md5sum = md5()
+        if isPython3:
+            md5sum.update(self.player.name.encode('utf-8'))
+            md5sum.update(self.string.encode())
+        else:
+            md5sum.update(self.player.name.encode('utf-8'))
+            md5sum.update(self.string)
+        digest = md5sum.digest()
+        assert len(digest) == 16
+        result = 0
+        if isPython3:
+            for part in range(4):
+                result = (result << 8) + digest[part]
+        else:
+            for part in range(4):
+                result = (result << 8) + ord(digest[part])
+        return result
