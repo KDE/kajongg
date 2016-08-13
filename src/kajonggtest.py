@@ -366,9 +366,7 @@ def onlyExistingCommits(commits):
     """filter out non-existing commits"""
     global KNOWNCOMMITS  # pylint: disable=global-statement
     if len(KNOWNCOMMITS) == 0:
-        env = os.environ.copy()
-        env['LANG'] = 'C'
-        for branch in subprocess.check_output(b'git branch'.split(), env=env).decode().split('\n'):
+        for branch in subprocess.check_output(b'git branch'.split()).decode().split('\n'):
             if 'detached' not in branch and 'no branch' not in branch:
                 KNOWNCOMMITS |= set(subprocess.check_output(
                     'git log --max-count=200 --pretty=%h {branch}'.format(
@@ -735,6 +733,9 @@ def main():
     """parse options, play, evaluate results"""
     global OPTIONS  # pylint: disable=global-statement
 
+    # we want only english in the logs because i18n  and friends
+    # behave differently in kde and kdestub
+    os.environ['LANG'] = 'en_US.UTF-8'
     (OPTIONS, args) = parse_options()
     OPTIONS.csv = os.path.expanduser(
         os.path.join('~', '.kajongg', 'kajongg.csv'))
