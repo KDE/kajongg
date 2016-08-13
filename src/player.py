@@ -521,7 +521,7 @@ class PlayingPlayer(Player):
         kongs = []
         if self == self.game.activePlayer:
             # declaring a kong
-            for tileName in set([x for x in self._concealedTiles if not x.isBonus]):
+            for tileName in sorted(set([x for x in self._concealedTiles if not x.isBonus])):
                 if self._concealedTiles.count(tileName) == 4:
                     kongs.append(tileName.kong)
                 elif self._concealedTiles.count(tileName) == 1 and \
@@ -579,7 +579,7 @@ class PlayingPlayer(Player):
 
     def __maySayOriginalCall(self):
         """returns True if Original Call is possible"""
-        for tileName in set(self.concealedTiles):
+        for tileName in sorted(set(self.concealedTiles)):
             newHand = self.hand - tileName
             if newHand.callingHands:
                 if Debug.originalCall:

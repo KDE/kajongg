@@ -212,7 +212,7 @@ class AIDefault(object):
             newHand = candidates.hand - candidate.tile.concealed
             winningTiles = newHand.chancesToWin()
             if winningTiles:
-                for winnerTile in set(winningTiles):
+                for winnerTile in sorted(set(winningTiles)):
                     winnerHand = newHand + winnerTile.concealed
                     if Debug.robotAI:
                         aiInstance.player.game.debug('weighCallingHand %s cand %s winnerTile %s winnerHand %s: %s' % (

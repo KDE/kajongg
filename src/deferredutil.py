@@ -309,10 +309,10 @@ class DeferredBlock(StrMixin):
                     str(self))
             if Debug.deferredBlock:
                 commandText = []
-                for command in set(x.deferred.command for x in self.requests):
+                for command in sorted(set(x.deferred.command for x in self.requests)):
                     text = u'%s:' % command
                     answerList = []
-                    for answer in set(x.prettyAnswer() for x in self.requests if x.deferred.command == command):
+                    for answer in sorted(set(x.prettyAnswer() for x in self.requests if x.deferred.command == command)):
                         answerList.append((answer, list(x for x in self.requests
                                                         if x.deferred.command == command and answer == x.prettyAnswer())))
                     answerList = sorted(answerList, key=lambda x: len(x[1]))

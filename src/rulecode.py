@@ -371,7 +371,7 @@ class StandardMahJongg(RuleCode):
         if maxChows == 0:
             return set(result)
         melds = []
-        for group in hand.suits & set(Tile.colors):
+        for group in sorted(hand.suits & set(Tile.colors)):
             values = sorted(x.value for x in result if x.group == group)
             changed = True
             while (changed and len(values) > 2
@@ -599,7 +599,8 @@ class TripleKnitting(RuleCode):
             rest.remove(triple[1])
             rest.remove(triple[2])
         while len(rest) >= 2:
-            for value in set(x.value for x in rest):
+            for tile in sorted(set(rest)):
+                value = tile.value
                 suits = set(x.group for x in rest if x.value == value)
                 if len(suits) < 2:
                     yield tuple(melds), tuple(rest)
@@ -765,7 +766,7 @@ class Knitting(RuleCode):
     def pairSuits(hand):
         """returns a lowercase string with two suit characters. If no prevalence, returns None"""
         suitCounts = list(len([x for x in hand.tiles if x.lowerGroup == y])
-                          for y in set(Tile.colors))
+                          for y in Tile.colors)
         minSuit = min(suitCounts)
         result = ''.join(
             x for idx,
@@ -827,7 +828,7 @@ class AllPairHonors(RuleCode):
 
     def rearrange(hand, rest):
         melds = []
-        for pair in set(rest) & elements.mAJORS:
+        for pair in sorted(set(rest) & elements.mAJORS):
             while rest.count(pair) >= 2:
                 melds.append(pair.pair)
                 rest.remove(pair)

@@ -51,7 +51,7 @@ class Permutations(object):
     def _variants(self):
         """full Meld lists"""
         honors = []
-        for tile in set(self.tiles):
+        for tile in sorted(set(self.tiles)):
             if tile.isHonor:
                 count = self.tiles.count(tile)
                 if count == 4:
