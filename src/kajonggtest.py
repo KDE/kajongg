@@ -35,7 +35,7 @@ from tempfile import mkdtemp
 
 from optparse import OptionParser
 
-from common import Debug, StrMixin, isPython3, interpreterName, nativeString
+from common import Debug, StrMixin, isPython3, nativeString
 from util import removeIfExists, gitHead, checkMemory
 from compat import Csv, CsvWriter
 
@@ -131,7 +131,9 @@ class Server(StrMixin):
         maxClientsPerServer = OPTIONS.clients / OPTIONS.servers
         matchingServers = list(
             x for x in cls.servers
-            if x.commitId == job.commitId and len(x.jobs) < maxClientsPerServer)
+            if x.commitId == job.commitId
+            and x.pythonVersion == job.pythonVersion
+            and len(x.jobs) < maxClientsPerServer)
         if matchingServers:
             result = sorted(matchingServers, key=lambda x: len(x.jobs))[0]
         else:
@@ -155,6 +157,7 @@ class Server(StrMixin):
             self.socketName = None
             self.portNumber = None
             self.commitId = job.commitId
+            self.pythonVersion = job.pythonVersion
             self.clone = Clone(job.commitId)
             self.start(job)
         else:
@@ -175,7 +178,7 @@ class Server(StrMixin):
         cmd = [os.path.join(
             job.srcDir(),
             'kajonggserver3.py' if isPython3 else 'kajonggserver.py')]
-        cmd.insert(0, interpreterName)
+        cmd.insert(0, 'python{}'.format(self.pythonVersion))
         if OPTIONS.usePort:
             self.portNumber = random.randrange(1025, 65000)
             cmd.append('--port={port}'.format(port=self.portNumber))
@@ -239,7 +242,8 @@ class Job(StrMixin):
 
     """a simple container"""
 
-    def __init__(self, ruleset, aiVariant, commitId, game):
+    def __init__(self, pythonVersion, ruleset, aiVariant, commitId, game):
+        self.pythonVersion = pythonVersion
         self.ruleset = ruleset
         self.aiVariant = aiVariant
         self.commitId = commitId
@@ -274,7 +278,7 @@ class Job(StrMixin):
             cmd.append('--socket={sock}'.format(sock=self.server.socketName))
         if self.server.portNumber:
             cmd.append('--port={port}'.format(port=self.server.portNumber))
-        cmd.insert(0, interpreterName)
+        cmd.insert(0, 'python{}'.format(self.pythonVersion))
         if OPTIONS.rounds:
             cmd.append('--rounds={rounds}'.format(rounds=OPTIONS.rounds))
         if self.aiVariant != 'Default':
@@ -594,7 +598,12 @@ def parse_options():
     parser = OptionParser()
     parser.add_option('', '--gui', dest='gui', action='store_true',
         default=False, help='show graphical user interface')
-    parser.add_option('', '--qt5', dest='qt5', action='store_true',
+    parser.add_option(
+        '', '--23', dest='py23', action='store_true',
+        default=False, help='Use both Python 2 and 3. If you explicitly want to use only one of them'
+                            'use python2 kajonggtest or python3 kajonggtest')
+    parser.add_option(
+        '', '--qt5', dest='qt5', action='store_true',
         default=False, help='Force using Qt5')
     parser.add_option('', '--ruleset', dest='rulesets', default='ALL',
         help='play like a robot using RULESET: comma separated list. If missing, test all rulesets',
@@ -726,8 +735,11 @@ def allJobs():
                     OPTIONS.jobCount += 1
                     if OPTIONS.jobCount > OPTIONS.count:
                         raise StopIteration
-                    yield Job(ruleset, aiVariant, commitId, game)
-
+                    if OPTIONS.py23:
+                        yield Job(2, ruleset, aiVariant, commitId, game)
+                        yield Job(3, ruleset, aiVariant, commitId, game)
+                    else:
+                        yield Job(3 if isPython3 else 2, ruleset, aiVariant, commitId, game)
 
 def main():
     """parse options, play, evaluate results"""
