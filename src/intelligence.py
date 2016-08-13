@@ -221,7 +221,7 @@ class AIDefault(object):
                     candidate.keep -= keep
                     if Debug.robotAI:
                         aiInstance.player.game.debug(
-                            'weighCallingHand %s winnerTile %s: discardCandidate %s keep -= %s' % (
+                            'weighCallingHand %s winnerTile %s: discardCandidate %s keep -= %.4f' % (
                                 newHand, winnerTile, candidate, keep))
                 # more weight if we have several chances to win
                 candidate.keep -= float(len(winningTiles)) / len(
@@ -367,7 +367,7 @@ class TileAI(object):
 
     def __str__(self):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
-        return '%s:=%s%s' % (self.tile, self.keep, dang)
+        return '%s:=%.4f%s' % (self.tile, self.keep, dang)
 
     def __repr__(self):
         return 'TileAI(%s)' % str(self)
