@@ -83,8 +83,6 @@ def __insertArgs(translatedTemplate, *args):
     @return: The formatted translated text.
     @rtype: C{str}
     """
-    if '@' in translatedTemplate:
-        Internal.logger.debug('insertargs:%s', translatedTemplate)
 
     if '\004' in translatedTemplate:
         translatedTemplate = translatedTemplate.split('\004')[1]
