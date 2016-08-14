@@ -344,8 +344,6 @@ class ClientDialog(QDialog):
         if self.answered:
             # sometimes we get this event twice
             return
-        self.timer.stop()
-        self.answered = True
         if button is None:
             button = self.focusWidget()
         if isinstance(button, Message):
@@ -356,6 +354,8 @@ class ClientDialog(QDialog):
         if not self.client.game.myself.sayable[answer]:
             Sorry(m18n('You cannot say %1', answer.i18nName))
             return
+        self.timer.stop()
+        self.answered = True
         Internal.scene.clientDialog = None
         self.deferred.callback(answer)
 
