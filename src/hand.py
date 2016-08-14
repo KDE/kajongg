@@ -132,7 +132,7 @@ class Hand(object):
             self.__arranged = True
         except Hand.__NotWon as notwon:
             if Debug.mahJongg:
-                self.debug(fmt(notwon.message))
+                self.debug(fmt(str(notwon)))
             self.__won = False
             self.__score = Score()
         finally:
