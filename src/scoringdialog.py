@@ -47,7 +47,6 @@ from statesaver import StateSaver
 from query import Query
 from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
 from tree import TreeItem, RootItem, TreeModel
-from tile import Tile
 
 
 class ScoreTreeItem(TreeItem):
@@ -984,8 +983,7 @@ class ScoringDialog(QWidget):
         """returns the currently selected last tile"""
         idx = self.cbLastTile.currentIndex()
         if idx >= 0:
-            # TODO: isn't that already a Tile?
-            return Tile(variantValue(self.cbLastTile.itemData(idx)))
+            return variantValue(self.cbLastTile.itemData(idx))
 
     def clickedPlayerIdx(self, checkbox):
         """the player whose box has been clicked"""
