@@ -177,6 +177,8 @@ class ClientDialog(QDialog):
         self.setModal(False)
         self.btnHeight = 0
         self.answered = False
+        self.move = None
+        self.sorry = None
 
     def keyPressEvent(self, event):
         """ESC selects default answer"""
@@ -344,7 +346,6 @@ class ClientDialog(QDialog):
         if self.answered:
             # sometimes we get this event twice
             return
-        self.timer.stop()
         self.answered = True
         if button is None:
             button = self.focusWidget()
@@ -354,8 +355,14 @@ class ClientDialog(QDialog):
         else:
             answer = button.message
         if not self.client.game.myself.sayable[answer]:
-            Sorry(m18n('You cannot say %1', answer.i18nName))
+            self.proposeAction().setFocus() # go back to default action
+            self.sorry = Sorry(m18n('You cannot say %1', answer.i18nName))
             return
+        self.timer.stop()
+        self.answered = True
+        if self.sorry:
+            self.sorry.cancel()
+        self.sorry = None
         Internal.scene.clientDialog = None
         self.deferred.callback(answer)
 
