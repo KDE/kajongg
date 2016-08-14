@@ -769,7 +769,7 @@ class Knitting(RuleCode):
         minSuit = min(suitCounts)
         result = ''.join(
             x for idx,
-            x in enumerate(set(Tile.colors)) if suitCounts[idx] > minSuit)
+            x in enumerate(Tile.colors) if suitCounts[idx] > minSuit)
         if len(result) == 2:
             return result
 
