@@ -688,8 +688,11 @@ def improve_options():
     if not OPTIONS.aiVariants:
         OPTIONS.aiVariants = 'Default'
     OPTIONS.allAis = OPTIONS.aiVariants.split(',')
-    print('rulesets:', ', '.join(OPTIONS.rulesets))
-    print('AIs:', ' '.join(OPTIONS.allAis))
+    if OPTIONS.count:
+        print('rulesets:', ', '.join(OPTIONS.rulesets))
+        _ = ' '.join(OPTIONS.allAis)
+        if _ != 'Default':
+            print('AIs:', _)
     if OPTIONS.git:
         print('commits:', ' '.join(OPTIONS.git))
         # since we order jobs by game, commit we want one permanent server per
