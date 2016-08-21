@@ -771,9 +771,10 @@ def main():
 
     print()
 
-    doJobs()
-    if OPTIONS.csv:
-        evaluate(readGames(OPTIONS.csv))
+    if OPTIONS.count:
+        doJobs()
+        if OPTIONS.csv:
+            evaluate(readGames(OPTIONS.csv))
 
 
 def cleanup(sig, dummyFrame):
