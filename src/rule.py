@@ -627,8 +627,6 @@ into a situation where you have to pay a penalty"""))
         for rule in sorted(self.allRules, key=Ruleset.ruleKey):
             result.update(rule.hashStr().encode('utf-8'))
         self.__hash = result.hexdigest()
-        # TODO: warum geht fuer HC.newTable ein u'fdfads' als hash vom
-        # Py2-Client zum Server?
 
     def ruleRecord(self, rule):
         """returns the rule as tuple, prepared for use by sql. The first three
