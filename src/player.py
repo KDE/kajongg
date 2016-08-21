@@ -498,8 +498,8 @@ class PlayingPlayer(Player):
         melds = concealed[:]
         self.game.winner = self
         assert lastMeld in melds, \
-            'lastMeld not in melds: concealed=%s: melds=%s lastMeld=%s lastTile=%s withDiscard=%s' % (
-                self._concealedTiles, melds, lastMeld, lastTile, withDiscard)
+            'lastMeld %s not in melds: concealed=%s: melds=%s lastTile=%s withDiscard=%s' % (
+                lastMeld, self._concealedTiles, melds, lastTile, withDiscard)
         if withDiscard:
             PlayingPlayer.addConcealedTiles(
                 self,
