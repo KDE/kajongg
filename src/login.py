@@ -210,9 +210,9 @@ class Url(unicode):
                 args.append('--port=%d' % self.port)
             if self.isLocalGame:
                 args.append(
-                    '--db={}'.format(
+                    u'--db={}'.format(
                         os.path.normpath(
-                            appdataDir() + 'local{}.db'.format('3' if isPython3 else ''))))
+                            appdataDir() + u'local{}.db'.format('3' if isPython3 else ''))))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
             if os.name == 'nt':
