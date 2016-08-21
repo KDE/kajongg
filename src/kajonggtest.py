@@ -486,7 +486,6 @@ def evaluate(games):
     """evaluate games"""
     if not games:
         return
-    commonGames = set()
     for variant, rows in games.items():
         gameIds = set(x[GAMEFIELD] for x in rows)
         if len(gameIds) != len(set(tuple(list(x)[GAMEFIELD:]) for x in rows)):
@@ -498,39 +497,25 @@ def evaluate(games):
                     print(game, end=' ')
             print()
             break
-        commonGames &= gameIds
     printDifferingResults(games.values())
     print()
     print('the 3 robot players always use the Default AI')
     print()
-    print('common games:')
     print('{ruleset:<25} {ai:<20} {games:>5}     {points:>4}                      human'.format(
         ruleset='Ruleset', ai='AI variant', games='games', points='points'))
     for variant, rows in games.items():
         ruleset, aiVariant = variant
-        print(
-            '{ruleset:<25} {ai:<20} {games:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
-            games=len(commonGames)), end=' ')
+        print('{ruleset:<25} {ai:<20} {rows:>5}  '.format(
+            ruleset=ruleset[:25], ai=aiVariant[:20],
+            rows=len(rows)), end=' ')
         for playerIdx in range(4):
-            print('{p:>8}'.format(p=sum(int(x[PLAYERSFIELD + 1 + playerIdx * 4])
-                    for x in rows if x[GAMEFIELD] in commonGames)), end=' ')
-        print()
-    print()
-    print('all games:')
-    for variant, rows in games.items():
-        ruleset, aiVariant = variant
-        if len(rows) > len(commonGames):
             print(
-                '{ruleset:<25} {ai:<20} {rows:>5}  '.format(ruleset=ruleset[:25], ai=aiVariant[:20],
-                rows=len(rows)), end=' ')
-            for playerIdx in range(4):
-                print(
-                    '{p:>8}'.format(
-                        p=sum(
-                            int(x[
-                                PLAYERSFIELD + 1 + playerIdx * 4]) for x in rows)),
-                    end=' ')
-            print()
+                '{p:>8}'.format(
+                    p=sum(
+                        int(x[
+                            PLAYERSFIELD + 1 + playerIdx * 4]) for x in rows)),
+                end=' ')
+        print()
 
 
 def startingDir():
