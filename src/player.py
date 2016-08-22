@@ -552,7 +552,7 @@ class PlayingPlayer(Player):
             # claiming a kong
             discardTile = self.game.lastDiscard.concealed
             if self._concealedTiles.count(discardTile) == 3:
-                # TODO: discard.kong.concealed is aAAa but we need AAAA
+                # discard.kong.concealed is aAAa but we need AAAA
                 kongs.append(Meld(discardTile * 4))
         return kongs
 
