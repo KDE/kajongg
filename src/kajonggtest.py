@@ -431,6 +431,37 @@ def readGames(csvFile):
             x for x in allRows if tuple(x[:COMMITFIELD]) == variant)
     return games
 
+def hasDifferences(rows):
+    """True if rows have unwanted differences"""
+    return (len(set(tuple(list(x)[GAMEFIELD:]) for x in rows))
+            > len(set(tuple(list(x)[:COMMITFIELD]) for x in rows)))
+
+def firstDifference(rows):
+    """reduce to two rows showing a difference"""
+    result = rows
+    last = rows[-1]
+    while hasDifferences(result):
+        last = result[-1]
+        result = result[:-1]
+    return list([result[-1], last])
+
+def closerLook(gameId, gameIdRows):
+    """print detailled info about one difference"""
+    for ruleset in OPTIONS.rulesets:
+        for intelligence in OPTIONS.allAis:
+            shouldBeIdentical = list(x for x in gameIdRows if x[RULESETFIELD] == ruleset and x[AIFIELD] == intelligence)
+            for commit in list(x[COMMITFIELD] for x in shouldBeIdentical):
+                rows2 = list(x for x in shouldBeIdentical if x[COMMITFIELD] == commit)
+                if hasDifferences(rows2):
+                    first = firstDifference(rows2)
+                    print('Game {} {} {} {} has differences between Python2 and Python3'.format(
+                        gameId, ruleset, intelligence, commit))
+            for py23 in '23':
+                rows2 = list(x for x in shouldBeIdentical if x[PYTHON23FIELD] == py23)
+                if hasDifferences(rows2):
+                    first = firstDifference(rows2)
+                    print('Game {} {} {} Python{} has differences between commits {} and {}'.format(
+                        gameId, ruleset, intelligence, py23, first[0][COMMITFIELD], first[1][COMMITFIELD]))
 
 def printDifferingResults(rowLists):
     """if most games get the same result with all tried variants,
@@ -444,15 +475,17 @@ def printDifferingResults(rowLists):
             allGameIds[rowId].append(row)
     differing = []
     for key, value in allGameIds.items():
-        if len(set(tuple(list(x)[GAMEFIELD:]) for x in value)) > len(set(tuple(list(x)[:COMMITFIELD]) for x in value)):
+        if hasDifferences(value):
             differing.append(key)
     if not differing:
         print('no games differ')
-    elif float(len(differing)) / len(allGameIds) < 0.20:
+    else:
         print(
-            'differing games (%d out of %d): %s' % (len(differing), len(allGameIds),
-             ' '.join(sorted(differing, key=int))))
-
+            'differing games (%d out of %d): %s' % (
+                len(differing), len(allGameIds),
+                ' '.join(sorted(differing, key=int))))
+        # now look closer at one example. Differences may be caused by git commits or by py2/p3
+        closerLook(sorted(differing)[0], allGameIds[differing[0]])
 
 def evaluate(games):
     """evaluate games"""
@@ -725,9 +758,9 @@ def main():
 
     removeInvalidCommits(OPTIONS.csv)
 
-    evaluate(readGames(OPTIONS.csv))
-
     improve_options()
+
+    evaluate(readGames(OPTIONS.csv))
 
     errorMessage = Debug.setOptions(','.join(OPTIONS.debug))
     if errorMessage:
