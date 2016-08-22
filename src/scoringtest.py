@@ -731,6 +731,8 @@ class Blessing(Base):
                        [Win(limits=1), NoWin()])
         self.scoreTest('s4s5s6 RS1S1S1B6B6B6B8B8B8 b5b5 fn yn m1 LS1S1S1S1',
                        Win(limits=1))
+        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 b5b5 fn yn m1 Ls4s4s5s6',
+                       [Win(limits=1), NoWin()], myWind=West)
 
 
 class Terminals(Base):

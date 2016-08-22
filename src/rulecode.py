@@ -1277,7 +1277,10 @@ class BlessingOfHeaven(RuleCode):
 class BlessingOfEarth(RuleCode):
 
     def appliesToHand(hand):
-        return hand.ownWind is not East and hand.lastSource == '1'
+        result = hand.ownWind is not East and hand.lastSource == '1'
+        if result:
+            assert hand.lastTile.isExposed, '{}: Blessing of Earth: last tile must be exposed'.format(hand)
+        return result
 
     def selectable(hand):
         """for scoring game"""
