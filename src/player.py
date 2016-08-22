@@ -556,13 +556,13 @@ class PlayingPlayer(Player):
                 kongs.append(Meld(discardTile * 4))
         return kongs
 
-    def __maySayChow(self):
+    def __maySayChow(self, dummyMove):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
         if self == self.game.nextPlayer():
             return self.__possibleChows()
 
-    def __maySayPung(self):
+    def __maySayPung(self, dummyMove):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
         lastDiscard = self.game.lastDiscard
@@ -571,7 +571,7 @@ class PlayingPlayer(Player):
             if self.concealedTiles.count(lastDiscard) >= 2:
                 return MeldList([lastDiscard.pung])
 
-    def __maySayKong(self):
+    def __maySayKong(self, dummyMove):
         """returns answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
         return self.__possibleKongs()
@@ -597,7 +597,7 @@ class PlayingPlayer(Player):
                 game.debug('  with hand {}'.format(hand))
             return MeldList(x for x in hand.melds if not x.isDeclared), withDiscard, hand.lastMeld
 
-    def __maySayOriginalCall(self):
+    def __maySayOriginalCall(self, dummyMove):
         """returns True if Original Call is possible"""
         for tileName in sorted(set(self.concealedTiles)):
             newHand = self.hand - tileName
@@ -608,21 +608,21 @@ class PlayingPlayer(Player):
                         (self, tileName, self.hand))
                 return True
 
+    sayables = {
+        Message.Pung: __maySayPung,
+        Message.Kong: __maySayKong,
+        Message.Chow: __maySayChow,
+        Message.MahJongg: __maySayMahjongg,
+        Message.OriginalCall: __maySayOriginalCall}
+
     def computeSayable(self, move, answers):
         """find out what the player can legally say with this hand"""
         self.sayable = {}
         for message in Message.defined.values():
-            self.sayable[message] = True
-        if Message.Pung in answers:
-            self.sayable[Message.Pung] = self.__maySayPung()
-        if Message.Chow in answers:
-            self.sayable[Message.Chow] = self.__maySayChow()
-        if Message.Kong in answers:
-            self.sayable[Message.Kong] = self.__maySayKong()
-        if Message.MahJongg in answers:
-            self.sayable[Message.MahJongg] = self.__maySayMahjongg(move)
-        if Message.OriginalCall in answers:
-            self.sayable[Message.OriginalCall] = self.__maySayOriginalCall()
+            if message in answers and message in self.sayables:
+                self.sayable[message] = self.sayables[message](self, move)
+            else:
+                self.sayable[message] = True
 
     def maybeDangerous(self, msg):
         """could answering with msg lead to dangerous game?
