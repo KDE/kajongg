@@ -1266,7 +1266,12 @@ class TwofoldFortune(RuleCode):
 class BlessingOfHeaven(RuleCode):
 
     def appliesToHand(hand):
-        return hand.ownWind is East and hand.lastSource is TileSource.East14th
+        if hand.lastSource is not TileSource.East14th:
+            return False
+        if hand.ownWind is not East:
+            return False
+        assert hand.lastTile.isConcealed, '{}: Blessing of Heaven: last tile must be concealed'.format(hand)
+        return True
 
     def selectable(hand):
         """for scoring game"""
@@ -1278,10 +1283,12 @@ class BlessingOfHeaven(RuleCode):
 class BlessingOfEarth(RuleCode):
 
     def appliesToHand(hand):
-        result = hand.ownWind is not East and hand.lastSource is TileSource.East14th
-        if result:
-            assert hand.lastTile.isExposed, '{}: Blessing of Earth: last tile must be exposed'.format(hand)
-        return result
+        if hand.lastSource is not TileSource.East14th:
+            return False
+        if hand.ownWind is East:
+            return False
+        assert hand.lastTile.isExposed, '{}: Blessing of Earth: last tile must be exposed'.format(hand)
+        return True
 
     def selectable(hand):
         """for scoring game"""
