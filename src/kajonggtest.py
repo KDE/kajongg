@@ -373,9 +373,13 @@ def onlyExistingCommits(commits):
         for branch in subprocess.check_output(b'git branch'.split()).decode().split('\n'):
             if 'detached' not in branch and 'no branch' not in branch:
                 KNOWNCOMMITS |= set(subprocess.check_output(
-                    'git log --max-count=200 --pretty=%h {branch}'.format(
+                    'git log --max-count=200 --pretty=%H {branch}'.format(
                         branch=branch[2:]).split()).decode().split('\n'))
-    return list(x for x in commits if x in KNOWNCOMMITS)
+    result = list()
+    for commit in commits:
+        if any(x.startswith(commit) for x in KNOWNCOMMITS):
+            result.append(commit)
+    return result
 
 
 def removeInvalidCommits(csvFile):
