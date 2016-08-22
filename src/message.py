@@ -49,7 +49,6 @@ class Message(object):
         self.shortcut = shortcut
         # do not use a numerical value because that could easier
         # change with software updates
-        Message.defined[self.name] = self
         className = self.__class__.__name__.replace('Message', '')
         msgName = self.name.replace(' ', '')
         assert className == msgName, '%s != %s' % (className, msgName)
@@ -848,6 +847,7 @@ def __scanSelf():
                             raise
                         type.__setattr__(
                             Message, msg.name.replace(' ', ''), msg)
+                        Message.defined[msg.name] = msg
 
 
 class ChatMessage(object):
