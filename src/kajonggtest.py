@@ -484,7 +484,8 @@ def printDifferingResults(rowLists):
                 len(differing), len(allGameIds),
                 ' '.join(sorted(differing, key=int))))
         # now look closer at one example. Differences may be caused by git commits or by py2/p3
-        closerLook(sorted(differing)[0], allGameIds[differing[0]])
+        for gameId in sorted(differing):
+            closerLook(gameId, allGameIds[gameId])
 
 def evaluate(games):
     """evaluate games"""
