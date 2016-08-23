@@ -145,7 +145,7 @@ def __enrichMessage(msg, withGamePrefix=True):
     if Debug.git:
         head = gitHead()
         if head not in ('current', None):
-            result = u'git:{} {}'.format(head, result)
+            result = u'git:{}/p{} {}'.format(head, '3' if isPython3 else '2', result)
     return result
 
 
