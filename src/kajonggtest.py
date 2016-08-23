@@ -353,14 +353,16 @@ def neutralize(rows):
     """remove things we do not want to compare"""
     for row in rows:
         for idx, field in enumerate(row):
+            field = field.replace(' ', '')
             if field.startswith(u'Tester ') or field.startswith(u'Tüster'):
-                row[idx] = 'Tester'
+                field = 'Tester'
             if 'MEM' in field:
                 parts = field.split(',')
                 for part in parts[:]:
                     if part.startswith('MEM'):
                         parts.remove(part)
-                row[idx] = ','.join(parts)
+                field = ','.join(parts)
+            row[idx] = field
         yield row
 
 KNOWNCOMMITS = set()
