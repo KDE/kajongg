@@ -88,14 +88,15 @@ class Clone(object):
     @classmethod
     def removeUnused(cls):
         """remove clones we do not use anymore"""
-        for commitId in cls.clones.keys():
+        for commitId in list(cls.clones.keys()):
+            # guard against "dict changed size during iteration
             if not any(x.commitId == commitId for x in Server.servers):
                 cls.clones[commitId].remove()
 
     @classmethod
     def removeAll(cls):
         """remove all clones even if they are in use"""
-        for cloneKey in cls.clones.keys()[:]:
+        for cloneKey in list(cls.clones.keys()):
             cls.clones[cloneKey].remove()
 
 
