@@ -622,8 +622,19 @@ class Hand(object):
         wonHands = []
         lostHands = []
         for mjRule, melds in self.__arrangements():
-            _ = self.newString(chain(self.melds, melds, self.bonusMelds),
-                               rest=None, lastMeld=None)
+            allMelds = self.melds[:] + list(melds)
+            lastTile = self.lastTile
+            if self.lastSource and self.lastSource.isDiscarded:
+                lastTile = lastTile.exposed
+                lastMelds = sorted(
+                    (x for x in allMelds if not x.isDeclared and lastTile.concealed in x),
+                    key=lambda x: len(x)) # pylint: disable=unnecessary-lambda
+                if lastMelds:
+                    allMelds.remove(lastMelds[0])
+                    allMelds.append(lastMelds[0].exposed)
+            _ = self.newString(
+                chain(allMelds, self.bonusMelds),
+                rest=None, lastTile=lastTile, lastMeld=None)
             tryHand = Hand(self.player, _, prevHand=self)
             if tryHand.won:
                 tryHand.mjRule = mjRule
