@@ -44,11 +44,12 @@ from modeltest import ModelTest
 from rulesetselector import RuleTreeView
 from board import WindLabel, WINDPIXMAPS
 from log import m18n, m18nc
-from common import WINDS, Internal, Debug, unicode
+from common import Internal, Debug, unicode
 from statesaver import StateSaver
 from query import Query
 from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
 from tree import TreeItem, RootItem, TreeModel
+from wind import Wind
 
 
 class ScoreTreeItem(TreeItem):
@@ -320,8 +321,8 @@ class HandResult(object):
         self.notRotated = notRotated
         self.penalty = bool(penalty)
         self.won = won
-        self.prevailing = prevailing
-        self.wind = wind
+        self.prevailing = Wind(prevailing)
+        self.wind = Wind(wind)
         self.points = points
         self.payments = payments
         self.balance = balance
@@ -1052,7 +1053,7 @@ class ScoringDialog(QWidget):
         else:
             for idx, player in enumerate(self.game.players):
                 self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind,
-                                                            player.wind == WINDS[self.game.roundsFinished % 4])])
+                                                            player.wind == self.game.roundWind)])
             self.computeScores()
             self.spValues[0].setFocus()
             self.spValues[0].selectAll()

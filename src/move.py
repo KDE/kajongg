@@ -22,6 +22,7 @@ import weakref
 
 from common import Debug, unicodeString, StrMixin, nativeString
 from message import Message
+from wind import Wind
 from tile import Tile, TileList
 from meld import Meld, MeldList
 
@@ -57,8 +58,20 @@ class Move(StrMixin):
                 self.__setattr__(key, MeldList(nativeString(value)))
             elif key in ('wantedGame', 'score'):
                 self.__setattr__(key, nativeString(value))
+            elif key == 'playerNames':
+                self.__setattr__(key, self.convertWinds(value))
             else:
                 self.__setattr__(key, value)
+
+    @staticmethod
+    def convertWinds(tuples):
+        """convert wind strings to Wind objects"""
+        if isinstance(tuples[0][0], Wind):
+            return tuples
+        result = list()
+        for wind, name in tuples:
+            result.append(tuple([Wind(wind), name]))
+        return result
 
     @property
     def player(self):

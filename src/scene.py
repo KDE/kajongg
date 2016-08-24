@@ -21,8 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from zope.interface import implements  # pylint: disable=unused-import
 
 from log import m18n, m18nc, logDebug
-from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug, WINDS
+from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import nativeString
+from wind import Wind
 from twisted.internet.defer import succeed
 
 from qt import Qt, QMetaObject, variantValue
@@ -521,7 +522,7 @@ class ScoringScene(GameScene):
         mod = event.modifiers()
         key = event.key()
         wind = chr(key % 128)
-        windsX = WINDS + u'X'
+        windsX = ''.join(x.char for x in Wind.all)
         moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players '
                              'with wind ESWN or to the central tile selector (X)', windsX)
         uiTile = self.focusItem()

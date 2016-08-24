@@ -32,7 +32,8 @@ from itertools import chain
 
 from twisted.spread import pb
 
-from common import Debug, WINDS, Internal
+from common import Debug, Internal
+from wind import Wind
 from util import Duration
 from message import Message, ChatMessage
 from log import logDebug, logError, m18nE, m18n, m18ncE
@@ -233,7 +234,7 @@ class ServerTable(Table):
             m18ncE('kajongg, name of robot player, to be translated', u'Robot 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        names = list(tuple([WINDS[idx], name])
+        names = list(tuple([Wind.all4[idx], name])
                      for idx, name in enumerate(names))
         self.client = Client()
                              # Game has a weakref to client, so we must keep
@@ -336,7 +337,7 @@ class ServerTable(Table):
             block.tellPlayer(
                 player, Message.ReadyForGameStart, tableid=self.tableid,
                 gameid=game.gameid, shouldSave=player.shouldSave,
-                wantedGame=game.wantedGame, source=list((x.wind, x.name) for x in game.players))
+                wantedGame=game.wantedGame, playerNames=list((x.wind, x.name) for x in game.players))
         block.callback(self.startGame)
 
     def startGame(self, requests):
@@ -664,7 +665,7 @@ class ServerTable(Table):
         self.game.sortPlayers()
         playerNames = list((x.wind, x.name) for x in self.game.players)
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,
-                     source=playerNames, rotateWinds=rotateWinds, token=token)
+                     playerNames=playerNames, rotateWinds=rotateWinds, token=token)
 
     def abort(self, message, *args):
         """abort the table. Reason: message/args"""

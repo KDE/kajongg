@@ -25,7 +25,8 @@ from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
 from qt import QPushButton, QMessageBox, QComboBox
 
 
-from common import Internal, isAlive, WINDS, unicode
+from common import Internal, isAlive, unicode
+from wind import Wind
 from animation import animate
 from log import logError, logDebug, logWarning, m18n
 from query import Query
@@ -68,7 +69,7 @@ class SelectPlayers(SelectRuleset):
         decorateWindow(self, m18n('Select four players'))
         self.names = None
         self.nameWidgets = []
-        for idx, wind in enumerate(WINDS):
+        for idx, wind in enumerate(Wind.all4):
             cbName = QComboBox()
             cbName.manualSelect = False
             # increase width, we want to see the full window title
@@ -583,11 +584,10 @@ class ScoringGame(Game):
               "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" %
               (self.gameid, self.handctr, player.nameid,
                scoretime, int(player == self.winner),
-               WINDS[self.roundsFinished % 4], player.wind, 0,
+               self.roundWind, player.wind, 0,
                amount, player.balance, self.rotated, self.notRotated),
               (player.hand.string, offense.name))
         Internal.mainWindow.updateGUI()
-
 
 def scoreGame():
     """show all games, select an existing game or create a new game"""
@@ -608,4 +608,4 @@ def scoreGame():
         selectDialog = SelectPlayers()
         if not selectDialog.exec_():
             return
-        return ScoringGame(list(zip(WINDS, selectDialog.names)), selectDialog.cbRuleset.current)
+        return ScoringGame(list(zip(Wind.all4, selectDialog.names)), selectDialog.cbRuleset.current)

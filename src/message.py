@@ -26,6 +26,7 @@ from tile import Tile, TileList
 from meld import Meld, MeldList
 from common import Internal, Debug, Options, long
 from common import unicode, unicodeString
+from wind import Wind
 from dialogs import Sorry
 
 # pylint: disable=super-init-not-called
@@ -72,6 +73,8 @@ class Message(object):
         # pylint: disable=too-many-return-statements
         cls = value.__class__
         if cls in (Tile, TileList, Meld, MeldList):
+            return str(value).encode()
+        elif isinstance(value, Wind):
             return str(value).encode()
         elif isinstance(value, Message):
             return value.name
@@ -433,7 +436,7 @@ class MessageProposeGameId(ServerMessage):
 
     def clientAction(self, client, move):
         """ask the client"""
-        # move.source are the players in seating order
+        # move.playerNames are the players in seating order
         # we cannot just use table.playerNames - the seating order is now
         # different (random)
         return client.reserveGameId(move.gameid)
@@ -470,12 +473,12 @@ class MessageReadyForGameStart(ServerMessage):
                         client.name)
                 client.tableList.hide()
             return result
-        # move.source are the players in seating order
+        # move.playerNames are the players in seating order
         # we cannot just use table.playerNames - the seating order is now
         # different (random)
         return client.readyForGameStart(
             move.tableid, move.gameid,
-            move.wantedGame, move.source, shouldSave=move.shouldSave).addCallback(hideTableList)
+            move.wantedGame, move.playerNames, shouldSave=move.shouldSave).addCallback(hideTableList)
 
 
 class MessageNoGameStart(NotifyAtOnceMessage):
@@ -503,7 +506,7 @@ class MessageReadyForHandStart(ServerMessage):
 
     def clientAction(self, client, move):
         """ask the client"""
-        return client.readyForHandStart(move.source, move.rotateWinds)
+        return client.readyForHandStart(move.playerNames, move.rotateWinds)
 
 
 class MessageInitHand(ServerMessage):

@@ -271,6 +271,7 @@ class Job(StrMixin):
 
     def start(self):
         """start this job"""
+        # pylint: disable=too-many-branches
         self.server = Server(self)
         # never login to the same server twice at the
         # same time with the same player name

@@ -27,6 +27,7 @@ from qt import QString, QSizeF, QSvgRenderer
 from kde import KGlobal, KStandardDirs, KConfig
 from log import logWarning, logException, m18n
 from common import LIGHTSOURCES, Internal
+from wind import East, South, West, North
 
 TILESETVERSIONFORMAT = 1
 
@@ -147,7 +148,7 @@ class Tileset(object):
         # renderer right away
 
         self.svgName = {
-            'wn': 'WIND_1', 'ws': 'WIND_2', 'we': 'WIND_3', 'ww': 'WIND_4',
+            'wn': North.svgName, 'ws': South.svgName, 'we': East.svgName, 'ww': West.svgName,
             'db': 'DRAGON_1', 'dg': 'DRAGON_2', 'dr': 'DRAGON_3'}
         for value in '123456789':
             self.svgName['s%s' % value] = 'ROD_%s' % value

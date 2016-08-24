@@ -57,7 +57,6 @@ else:
         interpreterName = 'python2'
     xrange = xrange
 
-WINDS = u'ESWN'
 LIGHTSOURCES = [u'NE', u'NW', u'SW', u'SE']
 ENGLISHDICT = {}
 

@@ -23,7 +23,8 @@ from __future__ import print_function
 
 import unittest
 
-from common import Debug, isPython3, WINDS  # pylint: disable=unused-import
+from common import Debug, isPython3, unicode  # pylint: disable=unused-import
+from wind import Wind, East, South, West, North
 from player import Players
 from game import PlayingGame
 from hand import Hand, Score
@@ -45,7 +46,7 @@ for _ in RULESETS[2:]:
 Players.createIfUnknown = str
 
 # RULESETS=RULESETS[:1]
-GAMES = list([PlayingGame(list(tuple([wind, wind]) for wind in WINDS), x)
+GAMES = list([PlayingGame(list(tuple([wind, unicode(wind.char)]) for wind in Wind.all4), x)
               for x in RULESETS])
 PROGRAM = None
 
@@ -84,12 +85,14 @@ class NoWin(Expected):
 class Helpers(object):
 
     """for my test classes"""
-    # pylint: disable=no-member
+    # pylint: disable=no-member, too-many-locals
 
-    def scoreTest(self, string, expected, winds=None, totals=None):
+    def scoreTest(self, string, expected, myWind=None, roundWind=None, totals=None):
         """execute one scoreTest test"""
-        if winds is None:
-            winds = 'ee'
+        if myWind is None:
+            myWind = East
+        if roundWind is None:
+            roundWind = East
         for idx, ruleset in enumerate(RULESETS):
             if isinstance(expected, list):
                 expIdx = idx
@@ -103,11 +106,11 @@ class Helpers(object):
             exp.ruleset = ruleset
             variants = []
             game = GAMES[idx]
-            for widx, wind in enumerate(WINDS):
+            for widx, wind in enumerate(Wind.all4):
                 game.players[widx].wind = wind
-            game.winner = game.players[winds[0].upper()]
+            game.winner = game.players[myWind]
             game.myself = game.winner
-            game.roundsFinished = 'eswn'.index(winds[1])
+            game.roundsFinished = roundWind.__index__()
             game.winner.clearCache()
             if Debug.hand:
                 print('')
@@ -200,7 +203,7 @@ class Partials(Base):
         self.scoreTest('drdrdr fe Ldrdrdrdr', [NoWin(8, 1), NoWin(8, 2)])
         self.scoreTest('fe', [NoWin(4), NoWin(4, 1)])
         self.scoreTest('fs fw fe fn', [NoWin(16, 1), NoWin(16, 3)])
-        self.scoreTest('fs ys', [NoWin(8, 1), NoWin(8, 2)], winds='se')
+        self.scoreTest('fs ys', [NoWin(8, 1), NoWin(8, 2)], myWind=South)
         self.scoreTest('drdrdr Ldrdrdrdr', NoWin(4, 1))
 
 
@@ -210,9 +213,9 @@ class ZeroHand(Base):
 
     def testMe(self):
         self.scoreTest('c1c2c3 c7c8c9 b2b3b4 c5c5 s1s2s3 fw yw Lc1c1c2c3',
-                       [Win(points=28, doubles=2), NoWin()], winds='wn')
+                       [Win(points=28, doubles=2), NoWin()], myWind=West, roundWind=North)
         self.scoreTest('c1c2c3 c7c8c9 b2b3b4 drdr s1s2s3 fw yw Lc1c1c2c3',
-                       [Win(points=30, doubles=1), NoWin()], winds='wn')
+                       [Win(points=30, doubles=1), NoWin()], myWind=West, roundWind=North)
 
 
 class FalseColorGame(Base):
@@ -223,18 +226,18 @@ class FalseColorGame(Base):
         self.scoreTest(
             'c1c1c1 c7c7c7 c2c3c4 c5c5 c6c6c6 Lc5c5c5', [Win(32, 3), Win(28)])
         self.scoreTest('c1c2c3 wewewe drdrdr dbdb DgDgDg Ldbdbdb', [
-            Win(44, 4), Win(38, 2)], winds='wn')
+            Win(44, 4), Win(38, 2)], myWind=West, roundWind=North)
         self.scoreTest(
             's1s1s1 wewewe c2c3c4 c5c5 c6c6c6 Lc5c5c5',
             [Win(34),
              Win(30)],
-            winds='wn')
+            myWind=West, roundWind=North)
         self.scoreTest(
             'RB1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys LDrDrDr', [Win(46, 2), NoWin()])
         self.scoreTest(
             'b1B1B1b1 RB2B3B4B5B6B7B8B8B8 DrDr fe ys LDrDrDr', [Win(74, 2), NoWin()])
         self.scoreTest('b1B1B1b1 RB2B2B2B5B6B7B8B8B8 DrDr fe ys LDrDrDr', [
-            Win(78, 3), Win(72, 1)], winds='we')
+            Win(78, 3), Win(72, 1)], myWind=West)
 
 
 class WrigglingSnake(Base):
@@ -310,7 +313,7 @@ class Purity(Base):
             'b1b1b1 RB3B3B3B6B6B8B8B2B2B2 fe fs fn fw LB3', [NoWin(28, 1), NoWin(28, 6)])
         self.scoreTest(
             'c1C1C1c1 c3c3c3 c8c8c8 RC4C5C6C7C7 fs fw ys yw Lc8c8c8c8',
-            [Win(72, 4), Win(72, 2)], winds='we')
+            [Win(72, 4), Win(72, 2)], myWind=West)
 
 
 class TrueColorGame(Base):
@@ -337,11 +340,11 @@ class OnlyConcealedMelds(Base):
         self.scoreTest(
             'RB1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys LDrDrDr', [Win(46, 2), NoWin()])
         self.scoreTest('RB1B1B1B2B2B2B4B4B4B7B8B9DrDr fe ys LDrDrDr', [
-            Win(54, 3), Win(48, 1)], winds='we')
+            Win(54, 3), Win(48, 1)], myWind=West)
         self.scoreTest(
             'b1B1B1b1 RB2B3B4B5B6B7B8B8B8DrDr fe ys LDrDrDr', [Win(74, 2), NoWin()])
         self.scoreTest('b1B1B1b1 RB2B2B2B5B6B7B8B8B8DrDr fe ys LDrDrDr', [
-            Win(78, 3), Win(72, 1)], winds='we')
+            Win(78, 3), Win(72, 1)], myWind=West)
 
 
 class LimitHands(Base):
@@ -489,7 +492,7 @@ class AllHonors(Base):
         self.scoreTest(
             'wewewe drdrdr RDrDrDrDb wwwwwwww LDb', [NoWin(32, 4), NoWin(32, 4)])
         self.scoreTest('wewe wswsws RWnWnWn wwwwwwww b1b1 Lwewewe', [
-            NoWin(30, 2), NoWin(30, 1)], winds='ne')
+            NoWin(30, 2), NoWin(30, 1)], myWind=North)
 
 
 class BuriedTreasure(Base):
@@ -626,13 +629,13 @@ class Rest(Base):
 
     def testMe(self):
         self.scoreTest('s1s1s1s1 s2s2s2 wewe RS3S3S3 s4s4s4 Ls2s2s2s2',
-                       [Win(44, 2), Win(44, 1)], winds='sw')
+                       [Win(44, 2), Win(44, 1)], myWind=South, roundWind=West)
         self.scoreTest('s1s1s1s1 s2s2s2 RWeWeS3S3S3 s4s4s4 me LS3S3S3S3',
-                       [Win(46, 3), Win(46, 1)], winds='sw')
+                       [Win(46, 3), Win(46, 1)], myWind=South, roundWind=West)
         self.scoreTest(
             'b3B3B3b3 RDbDbDbDrDrDr wewewewe s2s2 Ls2s2s2', [Win(72, 6), Win(68, 5)])
         self.scoreTest('s1s2s3 s1s2s3 b3b3b3 b4b4b4 RB5 fn yn LB5', [
-            NoWin(12, 1), NoWin(12, 2)], winds='ne')
+            NoWin(12, 1), NoWin(12, 2)], myWind=North)
         self.scoreTest(
             'b3b3b3b3 RDbDbDb drdrdr weWeWewe s2s2 Ls2s2s2', [Win(76, 5), Win(72, 5)])
         self.scoreTest('s2s2s2 s2s3s4 RB1B1B1B1 c9C9C9c9 Ls2s2s3s4', NoWin(42))
@@ -661,9 +664,9 @@ class Rest(Base):
         self.scoreTest('RB1B1B1B1B2B3B4B5B6B8B8B2B2 fe fs fn fw LB4',
                        [NoWin(28, 1), NoWin(28, 3)])
         self.scoreTest('wewe wswsws RWnWnWn wwwwwwww b1b1b1 mz Lb1b1b1b1',
-                       [Win(54, 6), Win(54, 4)], winds='ne')
+                       [Win(54, 6), Win(54, 4)], myWind=North)
         self.scoreTest('wswsws RWeWeWnWnWnB1B1B1 wwwwwwww mz LB1B1B1B1',
-                       [Win(60, 6), Win(60, 4)], winds='ne')
+                       [Win(60, 6), Win(60, 4)], myWind=North)
         self.scoreTest(
             'RB2B2 b4b4b4 b5b6b7 b7b8b9 c1c1c1 md Lb7b7b8b9', [Win(28), NoWin()])
         self.scoreTest(
@@ -695,9 +698,9 @@ class OriginalCall(Base):
     def testMe(self):
         # in DMJL, b4 would also win:
         self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5B5 fn yn m.a LB5',
-                       [Win(44, 2), Win(42, 3)], winds='ne')
+                       [Win(44, 2), Win(42, 3)], myWind=North)
         self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5 fn yn m.a LB5',
-                       [NoWin(20, 1), NoWin(20, 2)], winds='ne')
+                       [NoWin(20, 1), NoWin(20, 2)], myWind=North)
 
 
 class RobbingKong(Base):
@@ -708,13 +711,13 @@ class RobbingKong(Base):
         # this hand is only possible if the player declared a hidden chow.
         # is that legal?
         self.scoreTest('s1s2s3 s1s2s3 RB6B6B7B7B8B8B5 fn yn m.a LB5',
-                       [NoWin(8, 1), NoWin(8, 2)], winds='ne')
+                       [NoWin(8, 1), NoWin(8, 2)], myWind=North)
         self.scoreTest('s1s2s3 s2s3s4 RB6B6B7B7B8B8B5B5 fn yn mka Ls1s1s2s3',
-                       [Win(28, 4), NoWin()], winds='ne')
+                       [Win(28, 4), NoWin()], myWind=North)
         self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8B5B5 fn yn m.a LS1S1S2S3',
-                       [Win(30, 3), NoWin()], winds='ne')
+                       [Win(30, 3), NoWin()], myWind=North)
         self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 fn yn m.a Ls4s4s5s6',
-                       [NoWin(8, 1), NoWin(8, 2)], winds='ne')
+                       [NoWin(8, 1), NoWin(8, 2)], myWind=North)
 
 
 class Blessing(Base):
@@ -901,7 +904,7 @@ class AllPairHonors(Base):
             'RWeWeS1S1B9B9DgDgDrDrWsWwWw LS1',
             [NoWin(6),
              NoWin(limits=0.2)],
-            winds='wn')
+            myWind=West, roundWind=North)
         self.scoreTest('RWeWeS2S2B9B9DgDgDrDrWsWsWwWw LS2S2S2', NoWin())
         self.scoreTest('RDbDbDgDgDrDrWsWsWnWnS9C1C1C9 LDrDrDr', NoWin())
 

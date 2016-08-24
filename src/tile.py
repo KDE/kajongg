@@ -22,7 +22,7 @@ from __future__ import print_function
 
 from log import m18n, m18nc, logException
 from common import IntDict
-
+from wind import Wind, East, South, West, North
 
 class Tile(str):
 
@@ -40,8 +40,11 @@ class Tile(str):
       - two args: a char and either a char or an int -1..11
 
     group is a char: b=bonus w=wind d=dragon X=unknown
-    value is 1..9 for real suit tiles, -1/0/10/11 for usage in AI, and a char
-    for dragons, winds,boni
+    value is
+        1..9 for real suit tiles
+        -1/0/10/11 for usage in AI
+        Wind for winds and boni
+        bgr for dragons
     """
     # pylint: disable=too-many-public-methods,too-many-instance-attributes
     cache = {}
@@ -72,7 +75,6 @@ class Tile(str):
     dragons = 'bgr'
     white, green, red = dragons
     winds = 'eswn'
-    east, south, west, north = winds
     numbers = range(1, 10)
     terminals = list([1, 9])
     minors = range(2, 9)
@@ -84,6 +86,7 @@ class Tile(str):
     @classmethod
     def __build(cls, *args):
         """build a new Tile object out of args"""
+        # pylint: disable=too-many-statements
         if len(args) == 1:
             arg0, arg1 = args[0]
         else:
@@ -101,13 +104,19 @@ class Tile(str):
         result.isWind = result.lowerGroup == Tile.wind
         result.isHonor = result.isDragon or result.isWind
 
-        if result.isHonor or result.isBonus:
+        result.isTerminal = False
+        result.isNumber = False
+        result.isReal = True
+
+        if result.isWind or result.isBonus:
+            result.value = Wind(result[1])
+            result.char = result[1]
+        elif result.isDragon:
             result.value = result[1]
-            result.isTerminal = False
-            result.isNumber = False
-            result.isReal = True
+            result.char = result.value
         else:
             result.value = ord(result[1]) - 48
+            result.char = result.value
             result.isTerminal = result.value in Tile.terminals
             result.isNumber = True
             result.isReal = result.value in Tile.numbers
@@ -209,10 +218,10 @@ class Tile(str):
             Tile.white: m18nc('kajongg', 'white'),
             Tile.red: m18nc('kajongg', 'red'),
             Tile.green: m18nc('kajongg', 'green'),
-            Tile.east: m18nc('kajongg', 'East'),
-            Tile.south: m18nc('kajongg', 'South'),
-            Tile.west: m18nc('kajongg', 'West'),
-            Tile.north: m18nc('kajongg', 'North')}
+            East: m18nc('kajongg', 'East'),
+            South: m18nc('kajongg', 'South'),
+            West: m18nc('kajongg', 'West'),
+            North: m18nc('kajongg', 'North')}
         for idx in Tile.numbers:
             names[idx] = chr(idx + 48)
         return names[self.value]
@@ -221,10 +230,10 @@ class Tile(str):
         """returns name of a single tile"""
         if self.group.lower() == Tile.wind:
             result = {
-                Tile.east: m18n('East Wind'),
-                Tile.south: m18n('South Wind'),
-                Tile.west: m18n('West Wind'),
-                Tile.north: m18n('North Wind')}[self.value]
+                East: m18n('East Wind'),
+                South: m18n('South Wind'),
+                West: m18n('West Wind'),
+                North: m18n('North Wind')}[self.value]
         else:
             result = m18nc('kajongg tile name', '{group} {value}')
         return result.format(value=self.valueName(), group=self.groupName())
@@ -314,8 +323,8 @@ class Elements(object):
         for tile in self.minors:
             self.occurrence[tile] = 4
         for bonus in Tile.boni:
-            for wind in Tile.winds:
-                self.occurrence[Tile(bonus, wind)] = 1
+            for _ in Tile.winds:
+                self.occurrence[Tile(bonus, _)] = 1
 
     def __filter(self, ruleset):
         """returns element names"""
@@ -333,3 +342,5 @@ class Elements(object):
 Tile.unknown = Tile('Xy')  # must come first
 elements = Elements()  # pylint: disable=invalid-name
 assert not Tile.unknown.isKnown
+for wind in Wind.all4:
+    wind.tile = Tile('w', wind.char.lower())

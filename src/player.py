@@ -22,8 +22,9 @@ import weakref
 from collections import defaultdict
 
 from log import logException, logWarning, m18n, m18nc, m18nE
-from common import WINDS, IntDict, Debug, unicode
+from common import IntDict, Debug, unicode
 from common import StrMixin
+from wind import East
 from query import Query
 from tile import Tile, TileList, elements
 from meld import Meld, MeldList
@@ -133,7 +134,7 @@ class Player(StrMixin):
         self.__name = ''
         Players.createIfUnknown(name)
         self.name = name
-        self.wind = WINDS[0]
+        self.wind = East
         self.intelligence = AIDefault(self)
         self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
         self.handCache = {}
@@ -174,7 +175,7 @@ class Player(StrMixin):
         """write once"""
         assert self.__name == ''
         assert value
-        assert isinstance(value, unicode)
+        assert isinstance(value, unicode), 'Player.name must be unicode but not {}'.format(type(value))
         self.__name = value
 
     @property

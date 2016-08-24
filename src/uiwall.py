@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from common import Internal, ZValues, unicode
+from wind import East
 from qt import QRectF, QPointF, QGraphicsSimpleTextItem, QFontMetrics
 
 from board import PlayerWind, YellowText, Board, rotateCenter
@@ -111,7 +112,7 @@ class UIWall(Wall):
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
             side.windTile = PlayerWind(
-                'E',
+                East,
                 Internal.scene.windTileset,
                 parent=side)
             side.windTile.hide()

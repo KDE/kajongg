@@ -25,7 +25,8 @@ from tileset import Tileset
 from uitile import UITile
 from board import Board, FittingView
 from scene import SceneWithFocusRect
-from common import Internal, WINDS
+from common import Internal
+from wind import Wind
 from guiutil import loadUi
 from animation import MoveImmediate
 
@@ -46,7 +47,7 @@ class TilesetSelector(QWidget):
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(Internal.Preferences.tilesetName)
-        self.uiTiles = [UITile('w' + s) for s in WINDS.lower()]
+        self.uiTiles = [UITile('w' + s.char.lower()) for s in Wind.all4]
         self.board = Board(2, 2, self.tileset)
         self.board.showShadows = True
         self.tileScene.addItem(self.board)

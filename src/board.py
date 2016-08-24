@@ -35,7 +35,8 @@ from message import Message
 
 from util import kprint, stack, uniqueList
 from log import logDebug, logException, m18n, m18nc
-from common import WINDS, LIGHTSOURCES, Internal, Debug, isAlive, unicode
+from common import LIGHTSOURCES, Internal, Debug, isAlive, unicode
+from wind import Wind, East
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -57,8 +58,9 @@ class PlayerWind(QGraphicsEllipseItem):
 
     def __init__(self, name, tileset, roundsFinished=0, parent=None):
         """generate new wind tile"""
+        assert isinstance(name, Wind), 'PlayerWind expects Wind, not {}'.format(type(name))
         if not len(WINDPIXMAPS):
-            WINDPIXMAPS[('E', False)] = None  # avoid recursion
+            WINDPIXMAPS[(East, False)] = None  # avoid recursion
             self.genWINDPIXMAPS()
         QGraphicsEllipseItem.__init__(self)
         if parent:
@@ -75,7 +77,7 @@ class PlayerWind(QGraphicsEllipseItem):
     def genWINDPIXMAPS():
         """prepare wind tiles"""
         tileset = Tileset(Internal.Preferences.windTilesetName)
-        for wind in WINDS:
+        for wind in Wind.all4:
             for prevailing in False, True:
                 pwind = PlayerWind(wind, tileset, prevailing)
                 pMap = QPixmap(40, 40)
@@ -108,14 +110,15 @@ class PlayerWind(QGraphicsEllipseItem):
 
     def setWind(self, name, roundsFinished):
         """change the wind"""
+        assert isinstance(name, Wind) and name.svgName, 'name {}  must be  a real Wind but is {}'.format(
+            name, type(name))
         self.name = name
         if isinstance(roundsFinished, bool):
             self.prevailing = roundsFinished
         else:
-            self.prevailing = name == WINDS[roundsFinished % 4]
+            self.prevailing = name == Wind.all4[roundsFinished % 4]
         self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
-        windtilenr = {'N': 1, 'S': 2, 'E': 3, 'W': 4}
-        self.face.setElementId('WIND_%d' % windtilenr[name])
+        self.face.setElementId(name.svgName)
 
 
 class WindLabel(QLabel):
@@ -138,7 +141,7 @@ class WindLabel(QLabel):
         QLabel.__init__(self, parent)
         self.__wind = None
         if wind is None:
-            wind = 'E'
+            wind = East
         self.__roundsFinished = roundsFinished
         self.wind = wind
 
@@ -158,7 +161,7 @@ class WindLabel(QLabel):
         """update pixmaps"""
         PlayerWind.genWINDPIXMAPS()
         self.setPixmap(WINDPIXMAPS[(self.__wind,
-                                    self.__wind == WINDS[min(self.__roundsFinished, 3)])])
+                                    self.__wind == Wind.all4[min(self.__roundsFinished, 3)])])
 
 
 class Board(QGraphicsRectItem):
@@ -739,7 +742,7 @@ class SelectorBoard(CourtBoard):
                    Tile.wind: (3, 0, Tile.winds), Tile.bamboo: (1, 0, Tile.numbers), Tile.stone: (2, 0, Tile.numbers),
                    Tile.character: (0, 0, Tile.numbers)}
         row, baseColumn, order = offsets[uiTile.tile.lowerGroup]
-        column = baseColumn + order.index(uiTile.tile.value)
+        column = baseColumn + order.index(uiTile.tile.char)
         uiTile.dark = False
         uiTile.setBoard(self, column, row)
 

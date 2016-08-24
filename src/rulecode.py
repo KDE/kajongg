@@ -20,7 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from tile import Tile, elements
 from meld import Meld, MeldList
-from common import IntDict, WINDS
+from common import IntDict
+from wind import East
 from message import Message
 from query import Query
 from permutations import Permutations
@@ -138,7 +139,7 @@ class ConcealedHonorsKong(RuleCode):
 class OwnWindPungKong(RuleCode):
 
     def appliesToMeld(hand, meld):
-        return meld[0].value == hand.ownWind
+        return meld[0].value is hand.ownWind
 
     def mayApplyToMeld(meld):
         """for meld rules which depend on context like hand.ownWind, we want
@@ -152,7 +153,7 @@ class OwnWindPungKong(RuleCode):
 class OwnWindPair(RuleCode):
 
     def appliesToMeld(hand, meld):
-        return meld[0].value == hand.ownWind
+        return meld[0].value is hand.ownWind
 
     def mayApplyToMeld(meld):
         return meld.isPair and meld.isWindMeld
@@ -161,7 +162,7 @@ class OwnWindPair(RuleCode):
 class RoundWindPungKong(RuleCode):
 
     def appliesToMeld(hand, meld):
-        return meld[0].value == hand.roundWind
+        return meld[0].value is hand.roundWind
 
     def mayApplyToMeld(meld):
         return meld.isPungKong and meld.isWindMeld
@@ -170,7 +171,7 @@ class RoundWindPungKong(RuleCode):
 class RoundWindPair(RuleCode):
 
     def appliesToMeld(hand, meld):
-        return meld[0].value == hand.roundWind
+        return meld[0].value is hand.roundWind
 
     def mayApplyToMeld(meld):
         return meld.isPair and meld.isWindMeld
@@ -982,7 +983,7 @@ class ScratchingPole(RuleCode):
 class StandardRotation(RuleCode):
 
     def rotate(game):
-        return game.winner and game.winner.wind != 'E'
+        return game.winner and game.winner.wind is not East
 
 
 class EastWonNineTimesInARow(RuleCode):
@@ -997,12 +998,11 @@ class EastWonNineTimesInARow(RuleCode):
             if game.isScoringGame():
                 # we are only proposing for the last needed Win
                 needWins -= 1
-        if game.winner and game.winner.wind == 'E' and game.notRotated >= needWins:
-            prevailing = WINDS[game.roundsFinished % 4]
+        if game.winner and game.winner.wind is East and game.notRotated >= needWins:
             eastMJCount = int(Query("select count(1) from score "
                                     "where game=%d and won=1 and wind='E' and player=%d "
                                     "and prevailing='%s'" %
-                                    (game.gameid, game.players['E'].nameid, prevailing)).records[0][0])
+                                    (game.gameid, game.players[East].nameid, game.roundWind.char)).records[0][0])
             return eastMJCount == needWins
         return False
 
@@ -1181,7 +1181,7 @@ class ThirteenOrphans(MJRule):
 class OwnFlower(RuleCode):
 
     def appliesToMeld(hand, meld):
-        return meld[0].value == hand.ownWind
+        return meld[0].value is hand.ownWind
 
     def mayApplyToMeld(meld):
         # pylint: disable=unsubscriptable-object
@@ -1192,7 +1192,7 @@ class OwnFlower(RuleCode):
 class OwnSeason(RuleCode):
 
     def appliesToMeld(hand, meld):
-        return meld[0].value == hand.ownWind
+        return meld[0].value is hand.ownWind
 
     def mayApplyToMeld(meld):
         # pylint: disable=unsubscriptable-object
@@ -1203,7 +1203,7 @@ class OwnSeason(RuleCode):
 class OwnFlowerOwnSeason(RuleCode):
 
     def appliesToHand(hand):
-        return sum(x.isBonus and x[0].value == hand.ownWind for x in hand.bonusMelds) == 2
+        return sum(x.isBonus and x[0].value is hand.ownWind for x in hand.bonusMelds) == 2
 
 
 class AllFlowers(RuleCode):
@@ -1265,11 +1265,11 @@ class TwofoldFortune(RuleCode):
 class BlessingOfHeaven(RuleCode):
 
     def appliesToHand(hand):
-        return hand.ownWind == Tile.east and hand.lastSource == '1'
+        return hand.ownWind is East and hand.lastSource == '1'
 
     def selectable(hand):
         """for scoring game"""
-        return (hand.ownWind == Tile.east
+        return (hand.ownWind is East
                 and hand.lastSource and hand.lastSource in 'wd'
                 and not hand.announcements - {'a'})
 
@@ -1277,11 +1277,11 @@ class BlessingOfHeaven(RuleCode):
 class BlessingOfEarth(RuleCode):
 
     def appliesToHand(hand):
-        return hand.ownWind != Tile.east and hand.lastSource == '1'
+        return hand.ownWind is not East and hand.lastSource == '1'
 
     def selectable(hand):
         """for scoring game"""
-        return (hand.ownWind != Tile.east
+        return (hand.ownWind is not East
                 and hand.lastSource and hand.lastSource in 'wd'
                 and not hand.announcements - {'a'})
 

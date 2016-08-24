@@ -61,7 +61,10 @@ class Hand(object):
 
     mjRule is the one out of mjRules with the highest resulting score. Every
     hand gets an mjRule even it is not a wining hand, it is the one which
-    was used for rearranging the hiden tiles to melds."""
+    was used for rearranging the hiden tiles to melds.
+
+    suits include dragons and winds."""
+
     # pylint: disable=too-many-instance-attributes
 
     indent = 0
@@ -209,7 +212,7 @@ class Hand(object):
     @property
     def ownWind(self):
         """for easier usage"""
-        return self.player.wind.lower()
+        return self.player.wind
 
     @property
     def roundWind(self):

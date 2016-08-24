@@ -30,8 +30,9 @@ from twisted.internet.defer import succeed
 from util import gitHead
 from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, m18n
-from common import WINDS, Internal, IntDict, Debug, Options, unicodeString, unicode
+from common import Internal, IntDict, Debug, Options, unicodeString, unicode
 from common import isPython3
+from wind import Wind, East
 from query import Query
 from rule import Ruleset
 from tile import Tile, elements
@@ -95,16 +96,16 @@ class HandId(object):
             self.roundsFinished = 100
             return
         handId = parts[min(stringIdx, len(parts) - 1)]
-        if handId[0] not in WINDS:
-            logException('--game=%s with / must specify the round wind'
-                         % string)
+        if handId[0].lower() not in 'eswn':
+            logException('--game=%s must specify the round wind' % string)
+        handWind = Wind(handId[0])
         ruleset = self.game.ruleset
-        self.roundsFinished = WINDS.index(handId[0])
+        self.roundsFinished = handWind.__index__()
         if self.roundsFinished > ruleset.minRounds:
             logWarning(
                 u'Ruleset %s has %d minimum rounds but you want round %d(%s)'
                 % (ruleset.name, ruleset.minRounds, self.roundsFinished + 1,
-                   handId[0]))
+                   handWind))
             self.roundsFinished = ruleset.minRounds
             return
         self.rotated = int(handId[1]) - 1
@@ -154,7 +155,7 @@ class HandId(object):
             num = (num - 1) // 26
         if not charId:
             charId = ' ' # align to the most common case
-        wind = (WINDS + 'X')[self.roundsFinished]
+        wind = Wind.all4[self.roundsFinished % 4]
         if withSeed:
             seed = str(self.seed)
         else:
@@ -208,6 +209,9 @@ class Game(object):
         """
         # pylint: disable=too-many-statements
         assert self.__class__ != Game, 'Do not directly instantiate Game'
+        for wind, name in names:
+            assert isinstance(wind, Wind), 'Game.__init__ expects Wind objects'
+            assert isinstance(name, (str, unicode)), 'Game.__init__: name must be string and not {}'.format(type(name))
         self.players = Players()
         # if we fail later on in init, at least we can still close the program
         self.myself = None
@@ -329,7 +333,7 @@ class Game(object):
     @property
     def roundWind(self):
         """the round wind for Hand"""
-        return 'eswn'[self.roundsFinished % 4]
+        return Wind.all[self.roundsFinished % 4]
 
     @winner.setter
     def winner(self, value):
@@ -416,17 +420,16 @@ class Game(object):
         """assign random seats to the players and assign winds"""
         self.players.sort(key=lambda x: x.name)
         self.randomGenerator.shuffle(self.players)
-        for player, wind in zip(self.players, WINDS):
+        for player, wind in zip(self.players, Wind.all4):
             player.wind = wind
 
     def __exchangeSeats(self):
         """execute seat exchanges according to the rules"""
-        winds = self.shiftRules.split(',')[(self.roundsFinished - 1) % 4]
-        players = list(self.players[x] for x in winds)
+        winds = list(x for x in self.shiftRules.split(',')[(self.roundsFinished - 1) % 4])
+        players = list(self.players[Wind(x)] for x in winds)
         pairs = list(players[x:x + 2] for x in range(0, len(winds), 2))
         for playerA, playerB in self._mustExchangeSeats(pairs):
             playerA.wind, playerB.wind = playerB.wind, playerA.wind
-        self.sortPlayers()
 
     def _mustExchangeSeats(self, pairs):
         """filter: which player pairs should really swap places?"""
@@ -435,10 +438,8 @@ class Game(object):
 
     def sortPlayers(self):
         """sort by wind order. Place ourself at bottom (idx=0)"""
-        self.players.sort(key=lambda x: WINDS.index(x.wind))
-        self.activePlayer = self.players[u'E'] # pylint: disable=invalid-sequence-index
-        # TODO: new class Wind(str) with len==1 and __index__ 0..3 for ESWN
-        # that will make pylint happier
+        self.players.sort(key=lambda x: x.wind)
+        self.activePlayer = self.players[East]
         if Internal.scene:
             if self.belongsToHumanPlayer():
                 while self.players[0] != self.myself:
@@ -542,7 +543,7 @@ class Game(object):
                 "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" %
                 (self.gameid, self.handctr, player.nameid,
                  scoretime, int(player == self.__winner),
-                 WINDS[self.roundsFinished % 4], player.wind,
+                 self.roundWind.char, player.wind,
                  player.handTotal, player.payment, player.balance,
                  self.rotated, self.notRotated),
                 (player.hand.string, manualrules))
@@ -658,8 +659,8 @@ class Game(object):
         if not qScoreRecords:
             # this should normally not happen
             qScoreRecords = list([
-                tuple([qGameRecord[x], WINDS[x], 0, False, 'E'])
-                for x in range(4)])
+                tuple([qGameRecord[wind], wind.char, 0, False, East.char])
+                for wind in Wind.all4])
         if len(qScoreRecords) != 4:
             logError(u'game %d inconsistent: There should be exactly '
                      '4 score records for the last hand' % gameid)
@@ -673,7 +674,7 @@ class Game(object):
             logError(u'game %d inconsistent: All score records for the same '
                      'hand must have the same prevailing wind' % gameid)
 
-        players = list(tuple([x[1], Game.__getName(x[0])])
+        players = list(tuple([Wind(x[1]), Game.__getName(x[0])])
                        for x in qScoreRecords)
 
         # create the game instance.
@@ -692,7 +693,7 @@ class Game(object):
                 player.getsPayment(record[2])
             if record[3]:
                 game.winner = player
-        game.roundsFinished = WINDS.index(qScoreRecords[0][4]) # prevailing wind
+        game.roundsFinished = Wind(qScoreRecords[0][4]).__index__()
         game.handctr += 1
         game.notRotated += 1
         game.maybeRotateWinds()
@@ -729,7 +730,7 @@ class Game(object):
                                (self.handId, winner, guilty))
                 guilty.hand.usedRules.append((payAction, None))
                 score = winner.handTotal
-                score = score * 6 if winner.wind == 'E' else score * 4
+                score = score * 6 if winner.wind == East else score * 4
                 guilty.getsPayment(-score)
                 winner.getsPayment(score)
                 return
@@ -742,7 +743,7 @@ class Game(object):
                         self.debug('   %s' % (line))
             for player2 in self.players:
                 if id(player1) != id(player2):
-                    if player1.wind == 'E' or player2.wind == 'E':
+                    if player1.wind == East or player2.wind == East:
                         efactor = 2
                     else:
                         efactor = 1
