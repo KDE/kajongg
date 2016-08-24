@@ -600,8 +600,10 @@ class MainWindow(KXmlGuiWindow):
             self.adjustView()
 
     @afterQueuedAnimations
-    def showSettings(self, deferredResult):
+    def showSettings(self, deferredResult, dummyChecked=None):
         """show preferences dialog. If it already is visible, do nothing"""
+        # This is called by the triggered() signal. So why does KDE
+        # not return the bool checked?
         if ConfigDialog.showDialog("settings"):
             return
         # if an animation is running, Qt segfaults somewhere deep
