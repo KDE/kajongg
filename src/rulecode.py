@@ -1065,7 +1065,7 @@ class GatesOfHeaven(StandardMahJongg):
 
     def rearrange(hand, rest):
         melds = []
-        for suit in hand.suits:
+        for suit in hand.suits & set(Tile.colors):
             for value in Tile.numbers:
                 tile = Tile(suit, value).concealed
                 if rest.count(tile) == 3 and tile.isTerminal:
