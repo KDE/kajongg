@@ -34,6 +34,7 @@ from twisted.spread import pb
 
 from common import Debug, Internal
 from wind import Wind
+from tilesource import TileSource
 from util import Duration
 from message import Message, ChatMessage
 from log import logDebug, logError, m18nE, m18n, m18ncE
@@ -553,7 +554,7 @@ class ServerTable(Table):
         block = DeferredBlock(self)
         player = msg.player
         if dangerousText:
-            if mustPlayDangerous and player.lastSource not in 'dZ':
+            if mustPlayDangerous and not player.lastSource.isDiscarded:
                 if Debug.dangerousGame:
                     tile = Tile(msg.args[0])
                     logDebug(u'%s claims no choice. Discarded %s, keeping %s. %s' %
@@ -702,7 +703,7 @@ class ServerTable(Table):
         self.game.activePlayer = player
         if lastDiscard:
             player.lastTile = lastDiscard.exposed
-            player.lastSource = 'd'
+            player.lastSource = TileSource.LivingWallDiscard
         player.exposeMeld(hasTiles, lastDiscard)
         self.game.lastDiscard = None
         block = DeferredBlock(self)
@@ -781,7 +782,7 @@ class ServerTable(Table):
         block = DeferredBlock(self)
         if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
-        if (player.lastSource == 'd'
+        if (player.lastSource is TileSource.LivingWallDiscard
                 and self.game.dangerousFor(discardingPlayer, player.lastTile)
                 and discardingPlayer.playedDangerous):
             player.usedDangerousFrom = discardingPlayer

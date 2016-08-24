@@ -27,6 +27,7 @@ from qt import QPushButton, QMessageBox, QComboBox
 
 from common import Internal, isAlive, unicode
 from wind import Wind
+from tilesource import TileSource
 from animation import animate
 from log import logError, logDebug, logWarning, m18n
 from query import Query
@@ -398,15 +399,15 @@ class ScoringPlayer(VisiblePlayer, Player):
     def __mjstring(self):
         """compile hand info into a string as needed by the scoring engine"""
         if self.lastTile and self.lastTile.isConcealed:
-            lastSource = 'w'
+            lastSource = TileSource.LivingWall.char
         else:
-            lastSource = 'd'
+            lastSource = TileSource.LivingWallDiscard.char
         announcements = set()
         rules = [x.rule for x in self.manualRuleBoxes if x.isChecked()]
         for rule in rules:
             options = rule.options
             if 'lastsource' in options:
-                if lastSource != '1':
+                if lastSource != TileSource.East14th.char:
                     # this defines precedences for source of last tile
                     lastSource = options['lastsource']
             if 'announcements' in options:

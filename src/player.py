@@ -27,6 +27,7 @@ from common import StrMixin
 from wind import East
 from query import Query
 from tile import Tile, TileList, elements
+from tilesource import TileSource
 from meld import Meld, MeldList
 from permutations import Permutations
 from message import Message
@@ -141,7 +142,7 @@ class Player(StrMixin):
         self.cacheHits = 0
         self.cacheMisses = 0
         self.clearHand()
-        self.__lastSource = '1'  # no source: blessing from heaven or earth
+        self.__lastSource = TileSource.East14th
         self.handBoard = None
 
     def __lt__(self, other):
@@ -195,7 +196,7 @@ class Player(StrMixin):
         self.newHandContent = None
         self.originalCallingHand = None
         self.__lastTile = None
-        self.lastSource = '1'
+        self.lastSource = TileSource.East14th
         self.lastMeld = Meld()
         self.__mayWin = True
         self.__payment = 0
@@ -272,10 +273,10 @@ class Player(StrMixin):
     def lastSource(self, lastSource):
         """the source of the last tile the player got"""
         self.__lastSource = lastSource
-        if lastSource == 'd' and not self.game.wall.living:
-            self.__lastSource = 'Z'
-        if lastSource == 'w' and not self.game.wall.living:
-            self.__lastSource = 'z'
+        if lastSource is TileSource.LivingWallDiscard and not self.game.wall.living:
+            self.__lastSource = TileSource.LivingWallEndDiscard
+        if lastSource is TileSource.LivingWall and not self.game.wall.living:
+            self.__lastSource = TileSource.LivingWallEnd
 
     @property
     def nameid(self):
@@ -335,10 +336,10 @@ class Player(StrMixin):
             self.lastTile = tile
         self.addConcealedTiles([tile])
         if deadEnd:
-            self.lastSource = 'e'
+            self.lastSource = TileSource.DeadWall
         else:
             self.game.lastDiscard = None
-            self.lastSource = 'w'
+            self.lastSource = TileSource.LivingWall
         return self.lastTile
 
     def removeTile(self, tile):
@@ -381,7 +382,7 @@ class Player(StrMixin):
     def mjString(self):
         """compile hand info into a string as needed by the scoring engine"""
         announcements = 'a' if self.originalCall else ''
-        return ''.join(['m', self.lastSource, ''.join(announcements)])
+        return ''.join(['m', self.lastSource.char, ''.join(announcements)])
 
     def makeTileKnown(self, tileName):
         """used when somebody else discards a tile"""
@@ -504,8 +505,8 @@ class PlayingPlayer(Player):
             PlayingPlayer.addConcealedTiles(
                 self,
                 [withDiscard])  # this should NOT invoke syncHandBoard
-            if self.lastSource != 'k':   # robbed the kong
-                self.lastSource = 'd'
+            if self.lastSource is not TileSource.RobbedKong:
+                self.lastSource = TileSource.LivingWallDiscard
             # the last claimed meld is exposed
             melds.remove(lastMeld)
             lastTile = withDiscard.exposed
@@ -706,7 +707,7 @@ class PlayingPlayer(Player):
 
     def robsTile(self):
         """True if the player is robbing a tile"""
-        self.lastSource = 'k'
+        self.lastSource = TileSource.RobbedKong
 
     def scoreMatchesServer(self, score):
         """do we compute the same score as the server does?"""

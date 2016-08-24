@@ -27,6 +27,7 @@ from hashlib import md5
 
 from log import dbgIndent, Fmt, fmt
 from tile import Tile, TileList
+from tilesource import TileSource
 from meld import Meld, MeldList
 from rule import Score, UsedRule
 from common import Debug, isPython3
@@ -105,7 +106,7 @@ class Hand(object):
         self.__mjRule = None
         self.ruleCache = {}
         self.__lastTile = None
-        self.__lastSource = None
+        self.__lastSource = TileSource.Unknown
         self.__announcements = set()
         self.__lastMeld = 0
         self.__lastMelds = MeldList()
@@ -152,7 +153,10 @@ class Hand(object):
             partId = part[0]
             if partId == 'm':
                 if len(part) > 1:
-                    self.__lastSource = part[1]
+                    try:
+                        self.__lastSource = TileSource.byChar[part[1]]
+                    except KeyError:
+                        raise Exception('{} has unknown lastTile {}'.format(inString, part[1]))
                     if len(part) > 2:
                         self.__announcements = set(part[2])
             elif partId == 'L':
@@ -192,7 +196,7 @@ class Hand(object):
         if last and not last.isBonus:
             assert last in self.tiles, \
                 'lastTile %s is not in hand %s' % (last, str(self))
-            if self.__lastSource == 'k':
+            if self.__lastSource is TileSource.RobbedKong:
                 assert self.tiles.count(last.exposed) + \
                     self.tiles.count(last.concealed) == 1, (
                         'Robbing kong: I cannot have '
@@ -429,7 +433,7 @@ class Hand(object):
             parts.append('R' + ''.join(str(x) for x in sorted(rest)))
         if lastSource or announcements:
             parts.append('m{}{}'.format(
-                self.lastSource or '.',
+                self.lastSource.char,
                 ''.join(self.announcements)))
         if lastTile:
             parts.append('L{}{}'.format(lastTile, lastMeld if lastMeld else ''))

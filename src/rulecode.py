@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from tile import Tile, elements
+from tilesource import TileSource
 from meld import Meld, MeldList
 from common import IntDict
 from wind import East
@@ -917,47 +918,47 @@ class AllGreen(RuleCode):
 class LastTileFromWall(RuleCode):
 
     def appliesToHand(hand):
-        return hand.lastSource == 'w'
+        return hand.lastSource is TileSource.LivingWall
 
 
 class LastTileFromDeadWall(RuleCode):
 
     def appliesToHand(hand):
-        return hand.lastSource == 'e'
+        return hand.lastSource is TileSource.DeadWall
 
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == 'w'
+        return hand.lastSource is TileSource.LivingWall
 
 
 class IsLastTileFromWall(RuleCode):
 
     def appliesToHand(hand):
-        return hand.lastSource == 'z'
+        return hand.lastSource is TileSource.LivingWallEnd
 
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == 'w'
+        return hand.lastSource is TileSource.LivingWall
 
 
 class IsLastTileFromWallDiscarded(RuleCode):
 
     def appliesToHand(hand):
-        return hand.lastSource == 'Z'
+        return hand.lastSource is TileSource.LivingWallEndDiscard
 
     def selectable(hand):
         """for scoring game"""
-        return hand.lastSource == 'd'
+        return hand.lastSource is TileSource.LivingWallDiscard
 
 
 class RobbingKong(RuleCode):
 
     def appliesToHand(hand):
-        return hand.lastSource == 'k'
+        return hand.lastSource is TileSource.RobbedKong
 
     def selectable(hand):
         """for scoring game"""
-        return (hand.lastSource and hand.lastSource in 'kwd'
+        return (hand.lastSource in (TileSource.RobbedKong, TileSource.LivingWall, TileSource.LivingWallDiscard)
                 and hand.lastTile and hand.lastTile.group.islower()
                 and [x.exposed for x in hand.tiles].count(hand.lastTile.exposed) < 2)
 
@@ -1265,19 +1266,19 @@ class TwofoldFortune(RuleCode):
 class BlessingOfHeaven(RuleCode):
 
     def appliesToHand(hand):
-        return hand.ownWind is East and hand.lastSource == '1'
+        return hand.ownWind is East and hand.lastSource is TileSource.East14th
 
     def selectable(hand):
         """for scoring game"""
         return (hand.ownWind is East
-                and hand.lastSource and hand.lastSource in 'wd'
+                and hand.lastSource in (TileSource.LivingWall, TileSource.LivingWallDiscard)
                 and not hand.announcements - {'a'})
 
 
 class BlessingOfEarth(RuleCode):
 
     def appliesToHand(hand):
-        result = hand.ownWind is not East and hand.lastSource == '1'
+        result = hand.ownWind is not East and hand.lastSource is TileSource.East14th
         if result:
             assert hand.lastTile.isExposed, '{}: Blessing of Earth: last tile must be exposed'.format(hand)
         return result
@@ -1285,7 +1286,7 @@ class BlessingOfEarth(RuleCode):
     def selectable(hand):
         """for scoring game"""
         return (hand.ownWind is not East
-                and hand.lastSource and hand.lastSource in 'wd'
+                and hand.lastSource in (TileSource.LivingWall, TileSource.LivingWallDiscard)
                 and not hand.announcements - {'a'})
 
 

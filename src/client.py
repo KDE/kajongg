@@ -29,6 +29,7 @@ from log import logDebug, logException, logWarning, m18nc
 from message import Message
 from common import Internal, Debug, Options, StrMixin
 from common import unicodeString, unicode
+from tilesource import TileSource
 from rule import Ruleset
 from game import PlayingGame
 from query import Query
@@ -445,7 +446,7 @@ class Client(pb.Referenceable):
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
         move.player.lastTile = calledTile.exposed
-        move.player.lastSource = 'd'
+        move.player.lastSource = TileSource.LivingWallDiscard
         move.exposedMeld = move.player.exposeMeld(
             hadTiles,
             calledTile=calledTileItem or calledTile)
