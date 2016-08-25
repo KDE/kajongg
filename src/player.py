@@ -229,7 +229,7 @@ class Player(StrMixin):
         """a readonly tuple"""
 # TODO: str or what?
         if not self._hand:
-            self._hand = self.computeHand()
+            self._hand = self.__computeHand()
         return self._hand
 
     @property
@@ -390,7 +390,7 @@ class Player(StrMixin):
         self._concealedTiles[0] = tileName
         self._hand = None
 
-    def computeHand(self):
+    def __computeHand(self):
         """returns Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
         melds = list()
@@ -415,7 +415,7 @@ class Player(StrMixin):
             if discard:
                 self.lastTile = discard
                 self._concealedTiles.append(discard)
-            return self.computeHand()
+            return self.__computeHand()
         finally:
             self.lastTile, self.lastSource = save
             if discard:
