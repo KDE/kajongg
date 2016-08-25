@@ -226,10 +226,12 @@ class Player(StrMixin):
 
     @property
     def hand(self):
-        """a readonly tuple"""
-# TODO: str or what?
+        """readonly: the current Hand. Compute if invalidated."""
         if not self._hand:
             self._hand = self.__computeHand()
+        elif Debug.hand:
+            _ = self.__computeHand()
+            assert self._hand == self.__computeHand(), '{} != {}'.format(_, self._hand)
         return self._hand
 
     @property
