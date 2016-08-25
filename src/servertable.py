@@ -201,8 +201,11 @@ class ServerTable(Table):
 
     def __unicode__(self):
         """for debugging output"""
-        onlineNames = list(x.name + (u'(Owner)' if x == self.owner.name else u'')
-                           for x in self.users)
+        if self.users:
+            onlineNames = list(x.name + (u'(Owner)' if self.owner and x == self.owner.name else u'')
+                               for x in self.users)
+        else:
+            onlineNames = list(['no users yet'])
         offlineString = u''
         if self.game:
             offlineNames = list(x.name for x in self.game.players if x.name not in onlineNames
