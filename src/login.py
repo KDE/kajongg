@@ -63,20 +63,15 @@ class Url(unicode):
     # pylint: disable=too-many-public-methods
     # TODO: base content: host:port
     def __new__(cls, url):
+        assert url
         host = None
         port = None
-        if url:
-            urlParts = url.split(':')
-            host = urlParts[0]
-            if english(host) == Query.localServerName:
-                host = '127.0.0.1'
-            if len(urlParts) > 1:
-                port = int(urlParts[1])
-        else:
-            # TODO: but host is None, do we ever get here?
-            url = host
-            if port:
-                url += ':{}'.format(port)
+        urlParts = url.split(':')
+        host = urlParts[0]
+        if english(host) == Query.localServerName:
+            host = '127.0.0.1'
+        if len(urlParts) > 1:
+            port = int(urlParts[1])
         obj = unicode.__new__(cls, url)
         obj.host = host
         obj.port = port
