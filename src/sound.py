@@ -401,7 +401,7 @@ class Voice(object):
     def savedmd5Sum(self):
         """returns the current value of the md5sum file"""
         if os.path.exists(self.md5FileName()):
-            return open(self.md5FileName(), 'rb').readlines()[0].replace(' -', '').strip()
+            return open(self.md5FileName(), 'r').readlines()[0].replace(' -', '').strip()
 
     @property
     def md5sum(self):
