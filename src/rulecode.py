@@ -42,9 +42,16 @@ class RuleCode(object):
 
     All methods in RuleCode classes will automatically be converted
     into staticmethods or classmethods if the 1st arg is named 'cls'.
+
+    winningTileCandidates(cls, hand):
+        All rules for going MahJongg must have such a method.
+        This is used to find all winning hands which only need
+        one tile: The calling hands (after calling)
+
     """
 
     cache = ()
+
 
 # pylint: disable=missing-docstring
 # the class and method names are mostly self explaining, we do not
@@ -1012,7 +1019,11 @@ class EastWonNineTimesInARow(RuleCode):
 
 
 class GatesOfHeaven(StandardMahJongg):
-    """as used for Classical Chinese BMJA"""
+    """as used for Classical Chinese BMJA.
+
+    I believe that when they say a run of 2..8, they must
+    all be concealed
+    """
 
     cache = ()
 
