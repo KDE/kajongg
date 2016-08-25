@@ -141,8 +141,8 @@ class Player(StrMixin):
         self.handCache = {}
         self.cacheHits = 0
         self.cacheMisses = 0
-        self.clearHand()
         self.__lastSource = TileSource.East14th
+        self.clearHand()
         self.handBoard = None
 
     def __lt__(self, other):
@@ -270,13 +270,15 @@ class Player(StrMixin):
         return self.__lastSource
 
     @lastSource.setter
-    def lastSource(self, lastSource):
+    def lastSource(self, value):
         """the source of the last tile the player got"""
-        self.__lastSource = lastSource
-        if lastSource is TileSource.LivingWallDiscard and not self.game.wall.living:
-            self.__lastSource = TileSource.LivingWallEndDiscard
-        if lastSource is TileSource.LivingWall and not self.game.wall.living:
-            self.__lastSource = TileSource.LivingWallEnd
+        if value is TileSource.LivingWallDiscard and not self.game.wall.living:
+            value = TileSource.LivingWallEndDiscard
+        if value is TileSource.LivingWall and not self.game.wall.living:
+            value = TileSource.LivingWallEnd
+        if self.__lastSource != value:
+            self.__lastSource = value
+            self._hand = None
 
     @property
     def nameid(self):
