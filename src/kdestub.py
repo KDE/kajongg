@@ -1078,7 +1078,6 @@ class KConfig(SafeConfigParser):
         self.path = str(path)
         if os.path.exists(self.path):
             with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
-                # TODO: changed from 'rb' to 'r', test this!
                 if isPython3:
                     self.read_file(cfgFile)
                 else:

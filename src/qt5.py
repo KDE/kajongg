@@ -129,7 +129,6 @@ from PyQt5.QtSvg import QSvgRenderer
 from qstring import QString
 
 KLineEdit = QLineEdit  # pylint: disable=invalid-name
-# TODO: where?
 
 def variantValue(variant):
     """convert QVariant to python variable"""

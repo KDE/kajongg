@@ -940,7 +940,6 @@ class CallingHands(Base):
     """diverse calling hands"""
 
     def testMe(self):
-        # TODO: try assigning them to specif rule tests"""
         self.callingTest('s1s1s1s1 b5b6b7 RB1B8C2C2C6C7C8 Lb5', '')
         self.callingTest('WnWn B1 B2 c4c5c6 b6b6b6 b8b8b8 ye yw', ['b3', ''])
         self.callingTest('WnWn B1 B2 dgdgdg b6b6b6 b8b8b8 ye yw', 'b3')

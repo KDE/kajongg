@@ -196,7 +196,6 @@ class ChatWindow(QWidget):
 
     def leave(self):
         """leaving the chat"""
-        # TODO: send "left" message
         self.hide()
 
     def receiveLine(self, chatLine):

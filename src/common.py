@@ -346,7 +346,6 @@ class IntDict(defaultdict, StrMixin):
         return result
 
     def __eq__(self, other):
-        # TODO: could be optimized for speed
         return self.all() == other.all()
 
     def __ne__(self, other):
@@ -437,8 +436,6 @@ def unicodeString(s, encoding='utf-8'):
     elif hasattr(s, 'decode'):
         return s.decode(encoding)
     else:
-# TODO: auf s5 testen mit  ./kajonggtest.py --game=8001 --ruleset=DMJL
-# --git=a46635d..23aca3b --log --clients=2 --servers=2 --count=4
         return repr(s)
 
 

@@ -110,7 +110,7 @@ class PlayerWind(QGraphicsEllipseItem):
 
     def setWind(self, name, roundsFinished):
         """change the wind"""
-        assert isinstance(name, Wind) and name.svgName, 'name {}  must be  a real Wind but is {}'.format(
+        assert isinstance(name, Wind) and name.svgName, 'name {}  must be a real Wind but is {}'.format(
             name, type(name))
         self.name = name
         if isinstance(roundsFinished, bool):
@@ -771,8 +771,6 @@ class SelectorBoard(CourtBoard):
             else:
                 result.append(lowerName.kong)
                 result.append(lowerName.kong.exposedClaimed)
-        # TODO: old bug: move 3 identical hidden chows to east, then move
-        # one of them to south exposed
         if wantedTile.isNumber and wantedTile.value < 8:
             chow2 = scName.nextForChow
             chow3 = chow2.nextForChow
@@ -990,8 +988,6 @@ class DiscardBoard(CourtBoard):
 
     def dropEvent(self, event):
         """drop a uiTile into the discard board"""
-        # TODO: now that tiles are top level scene items, maybe drag them
-        # directly. Draggings melds: QGraphicsItemGroup?
         uiTile = event.mimeData().uiTile
         assert isinstance(uiTile, UITile), uiTile
         uiTile.setPos(event.scenePos() - uiTile.boundingRect().center())
