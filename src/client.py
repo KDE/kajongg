@@ -270,7 +270,7 @@ class Client(pb.Referenceable):
                     disagree('numbers for played hands: Server:%s, Client:%s' % (
                         self.table.endValues[0], self.game.handctr))
                 for player in self.game.players:
-                    if player.balance != self.table.endValues[1][player.wind]:
+                    if player.balance != self.table.endValues[1][player.wind.char]:
                         disagree('balances for wind %s: Server:%s, Client:%s' % (
                             player.wind, self.table.endValues[1][player.wind], player.balance))
         else:

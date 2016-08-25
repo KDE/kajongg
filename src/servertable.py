@@ -130,7 +130,7 @@ class ServerTable(Table):
         online = tuple(bool(x in onlineNames) for x in names)
         if game:
             endValues = game.handctr, dict(
-                (x.wind, x.balance) for x in game.players)
+                (x.wind.char, x.balance) for x in game.players)
         else:
             endValues = None
         if withFullRuleset:
@@ -154,7 +154,7 @@ class ServerTable(Table):
         """sends a chat messages to all clients"""
         if Debug.chat:
             logDebug(u'server sends chat msg %s' % chatLine)
-        if self.suspendedAt:
+        if self.suspendedAt and self.game:
             chatters = []
             for player in self.game.players:
                 chatters.extend(
