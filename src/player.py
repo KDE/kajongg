@@ -393,11 +393,11 @@ class Player(StrMixin):
     def computeHand(self):
         """returns Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
-        melds = ['R' + ''.join(str(x) for x in sorted(self._concealedTiles))]
-        if melds[0] == 'R':
-            melds = melds[1:]
+        melds = list()
         melds.extend(str(x) for x in self._exposedMelds)
         melds.extend(str(x) for x in self._concealedMelds)
+        if self._concealedTiles:
+            melds.append('R' + ''.join(str(x) for x in sorted(self._concealedTiles)))
         melds.extend(str(x) for x in self._bonusTiles)
         melds.append(self.mjString())
         if self.lastTile:
