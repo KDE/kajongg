@@ -351,11 +351,9 @@ class Voice(object):
                 open(os.path.join(self.directory, oggFile), 'rb').read())
         # the md5 stamp goes into the old archive directory 'username'
         self.__md5sum = md5sum.hexdigest()
-#        print(self.directory, self.__md5sum)
         existingMd5sum = self.savedmd5Sum()
         md5Name = self.md5FileName()
-        if False: # pylint: disable=using-constant-test
-            # TODO: warum ist das in python3 unterschiedlich? self.__md5sum != existingMd5sum:
+        if self.__md5sum != existingMd5sum:
             if Debug.sound:
                 if not os.path.exists(md5Name):
                     logDebug(u'creating new %s' % md5Name)
@@ -367,9 +365,12 @@ class Voice(object):
                 open(md5Name, 'wb').write('%s\n' % self.__md5sum)
             except BaseException as exception:
                 logException(
-                    m18n('cannot write <filename>%1</filename>: %2',
-                         md5Name,
-                         str(exception)))
+                    '\n'.join([m18n('cannot write <filename>%1</filename>: %2',
+                                    md5Name,
+                                    str(exception)),
+                               m18n('The voice files have changed, their checksum has changed.'),
+                               m18n('Please reinstall kajongg or do, with sufficient permissions:'),
+                               'cd {} ; cat *.ogg | md5sum > md5sum'.format(self.directory)]))
         if archiveExists:
             archiveIsOlder = os.path.getmtime(
                 md5Name) > os.path.getmtime(self.archiveName())
@@ -400,7 +401,7 @@ class Voice(object):
     def savedmd5Sum(self):
         """returns the current value of the md5sum file"""
         if os.path.exists(self.md5FileName()):
-            return open(self.md5FileName(), 'rb').readlines()[0].strip()
+            return open(self.md5FileName(), 'rb').readlines()[0].replace(' -', '').strip()
 
     @property
     def md5sum(self):
