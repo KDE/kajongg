@@ -526,7 +526,6 @@ class HumanClient(Client):
                 # previously selected ruleset
                 self.tables = list(
                     x for x in self.tables if x.ruleset == self.ruleset)
-                assert self.tables
         if len(self.tables):
             self.__updateTableList()
 
