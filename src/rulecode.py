@@ -1031,7 +1031,7 @@ class GatesOfHeaven(StandardMahJongg):
     def computeLastMelds(hand):
         return [x for x in hand.melds if hand.lastTile in x]
 
-    def shouldTry(hand, maxMissing=3):
+    def shouldTry(hand, maxMissing=None):
         if hand.declaredMelds:
             return False
         for suit in Tile.colors:
@@ -1042,13 +1042,10 @@ class GatesOfHeaven(StandardMahJongg):
                 return True
         return False
 
-    def maybeCallingOrWon(hand):
+    def appliesToHand(cls, hand):
         if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
             return False
-        return not hand.declaredMelds
-
-    def appliesToHand(cls, hand):
-        if not cls.maybeCallingOrWon(hand):
+        if any(len(x) > 2 for x in hand.declaredMelds):
             return False
         values = hand.values
         if len(set(values)) < 9 or values.count(1) != 3 or values.count(9) != 3:
@@ -1063,25 +1060,19 @@ class GatesOfHeaven(StandardMahJongg):
         return 1 < surplus < 9
 
     def winningTileCandidates(cls, hand):
-        result = set()
-        if not cls.maybeCallingOrWon(hand):
-            return result
+        if hand.declaredMelds:
+            return set()
+        if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
+            return set()
         values = hand.values
-        if len(set(values)) == 8:
-            # one minor is missing
-            result = set(Tile.minors) - set(values)
-        else:
-            # we have something of all values
-            if values.count(1) != 3:
-                result = set([1])
-            elif values.count(9) != 3:
-                result = set([9])
-            else:
-                if 'BMJA' in cls.options:
-                    result = Tile.minors # pylint: disable=redefined-variable-type
-                else:
-                    result = Tile.numbers
-        return {Tile(list(hand.suits)[0], x) for x in result}
+        if len(set(values)) < 9:
+            return set()
+        # we have something of all values
+        if values.count(1) != 3 or values.count(9) != 3:
+# TODO: we may get them from the wall but not by claim. Differentiate!
+            return set()
+        for suit in hand.suits:
+            return {Tile(suit, x) for x in Tile.minors}
 
     def rearrange(hand, rest):
         melds = []
@@ -1108,10 +1099,15 @@ class NineGates(GatesOfHeaven):
     """as used for Classical Chinese DMJL"""
 
     def appliesToHand(cls, hand):
-        if not cls.maybeCallingOrWon(hand):
+        """last tile may also be 1 or 9"""
+        if hand.declaredMelds:
+            return False
+        if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
             return False
         values = hand.values
-        if len(set(values)) < 9 or values.count(1) < 3 or values.count(9) < 3:
+        if len(set(values)) < 9:
+            return False
+        if values.count(1) != 3 or values.count(9) != 3:
             return False
         values = list(values[3:-3])
         for value in Tile.minors:
@@ -1121,6 +1117,20 @@ class NineGates(GatesOfHeaven):
             return False
         surplus = values[0]
         return hand.lastTile and surplus == hand.lastTile.value
+
+    def winningTileCandidates(cls, hand):
+        if hand.declaredMelds:
+            return set()
+        if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
+            return set()
+        values = hand.values
+        if len(set(values)) < 9:
+            return set()
+        # we have something of all values
+        if values.count(1) != 3 or values.count(9) != 3:
+            return set()
+        for suit in hand.suits:
+            return {Tile(suit, x) for x in Tile.numbers}
 
 
 class ThirteenOrphans(MJRule):
