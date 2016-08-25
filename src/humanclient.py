@@ -346,7 +346,6 @@ class ClientDialog(QDialog):
         if self.answered:
             # sometimes we get this event twice
             return
-        self.answered = True
         if button is None:
             button = self.focusWidget()
         if isinstance(button, Message):
