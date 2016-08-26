@@ -186,8 +186,6 @@ class Url(unicode):
                 result = [tryServer]
         else:
             result = ['kajonggserver']
-        if isPython3:
-            result[-1] = result[-1].replace('server', 'server3')
         if Debug.connections:
             logDebug(m18n('trying to start local server %1', result))
         return result

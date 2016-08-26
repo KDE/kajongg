@@ -178,7 +178,7 @@ class Server(StrMixin):
         print('starting server for %s commit=%s in %s' % (' ' * 16, job.commitId, self.clone.tmpdir))
         cmd = [os.path.join(
             job.srcDir(),
-            'kajonggserver3.py' if isPython3 else 'kajonggserver.py')]
+            'kajonggserver.py')]
         cmd.insert(0, 'python{}'.format(self.pythonVersion))
         if OPTIONS.usePort:
             self.portNumber = random.randrange(1025, 65000)
@@ -756,7 +756,7 @@ def main():
     """parse options, play, evaluate results"""
     global OPTIONS  # pylint: disable=global-statement
 
-    # we want only english in the logs because i18n  and friends
+    # we want only english in the logs because i18n and friends
     # behave differently in kde and kdestub
     os.environ['LANG'] = 'en_US.UTF-8'
     (OPTIONS, args) = parse_options()
