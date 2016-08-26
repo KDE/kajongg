@@ -464,6 +464,7 @@ class ScoringPlayer(VisiblePlayer, Player):
                     if myMeld == meld:
                         melds.pop(idx)
                         popped = True
+                        break
             if not popped:
                 logDebug(
                     u'%s: %s.removeMeld did not find %s' %
