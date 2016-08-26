@@ -101,9 +101,6 @@ def defineOptions():
     options.add(
         "port <PORT>",
         ki18n("use a dedicated server listening on PORT. Intended only for testing"))
-    options.add(
-        "server3",
-        ki18n("start the server using Python 3. Meant only for testing."))
     options.add("debug <OPTIONS>", ki18n(Debug.help()))
     return options
 
@@ -113,7 +110,6 @@ def parseOptions():
     args = KCmdLineArgs.parsedArgs()
     Internal.app = APP
     Options.playOpen |= args.isSet('playopen')
-    Options.server3 |= args.isSet('server3')
     Options.showRulesets |= args.isSet('rulesets')
     Options.rulesetName = str(args.getOption('ruleset'))
     if args.isSet('host'):
