@@ -472,6 +472,7 @@ class ScoringPlayer(VisiblePlayer, Player):
                 for idx, myMeld in enumerate(melds):
                     if myMeld == meld:
                         popped = melds.pop(idx)
+                        break
             if not popped:
                 logDebug(
                     u'%s: %s.removeMeld did not find %s' %
