@@ -115,6 +115,7 @@ class Debug(object):
     quit = False
     preferences = False
     graphics = False
+    scoring = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

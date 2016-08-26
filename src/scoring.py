@@ -25,7 +25,7 @@ from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
 from qt import QPushButton, QMessageBox, QComboBox
 
 
-from common import Internal, isAlive, unicode
+from common import Internal, isAlive, unicode, Debug
 from wind import Wind
 from tilesource import TileSource
 from animation import animate
@@ -447,10 +447,16 @@ class ScoringPlayer(VisiblePlayer, Player):
         """add meld to this hand in a scoring game"""
         if meld.isBonus:
             self._bonusTiles.append(meld[0])
+            if Debug.scoring:
+                logDebug('{} gets bonus tile {}'.format(self, meld[0]))
         elif meld.isConcealed and not meld.isKong:
             self._concealedMelds.append(meld)
+            if Debug.scoring:
+                logDebug('{} gets concealed meld {}'.format(self, meld))
         else:
             self._exposedMelds.append(meld)
+            if Debug.scoring:
+                logDebug('{} gets exposed meld {}'.format(self, meld))
         self._hand = None
 
     def removeMeld(self, uiMeld):
@@ -458,19 +464,23 @@ class ScoringPlayer(VisiblePlayer, Player):
         meld = uiMeld.meld
         if meld.isBonus:
             self._bonusTiles.remove(meld[0])
+            if Debug.scoring:
+                logDebug('{} loses bonus tile {}'.format(self, meld[0]))
         else:
-            popped = False
+            popped = None
             for melds in [self._concealedMelds, self._exposedMelds]:
                 for idx, myMeld in enumerate(melds):
                     if myMeld == meld:
-                        melds.pop(idx)
-                        popped = True
+                        popped = melds.pop(idx)
             if not popped:
                 logDebug(
                     u'%s: %s.removeMeld did not find %s' %
                     (self.name, self.__class__.__name__, meld), showStack=3)
                 logDebug(u'    concealed: %s' % self._concealedMelds)
                 logDebug(u'      exposed: %s' % self._exposedMelds)
+            else:
+                if Debug.scoring:
+                    logDebug('{} lost meld {}'.format(self, popped))
         self._hand = None
 
 
