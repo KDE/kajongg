@@ -327,7 +327,7 @@ class Job(StrMixin):
         if self.__logFile is None:
             logDir = os.path.expanduser(
                 os.path.join('~', '.kajongg', 'log', str(self.game),
-                             self.ruleset, self.aiVariant, '3' if isPython3 else '2'))
+                             self.ruleset, self.aiVariant, str(self.pythonVersion)))
             if not os.path.exists(logDir):
                 os.makedirs(logDir)
             logFileName = self.commitId
