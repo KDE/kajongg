@@ -106,7 +106,7 @@ trap "rm -rf $MIRROR" 0
 git checkout-index --prefix=$MIRROR/ -af
 cd $MIRROR/src
 
-if test x$skip_pylint != x
+if test x$skip_pylint = x
 then
 	for file in $checkfiles
 	do
