@@ -31,7 +31,6 @@ import random
 import shutil
 import time
 import gc
-from tempfile import mkdtemp
 
 from optparse import OptionParser
 
@@ -54,50 +53,34 @@ OPTIONS = None
 class Clone(object):
 
     """make a temp directory for commitId"""
-    clones = {}
-
-    def __new__(cls, commitId):
-        if commitId in cls.clones:
-            return cls.clones[commitId]
-        return object.__new__(cls)
 
     def __init__(self, commitId):
         self.commitId = commitId
-        self.clones[commitId] = self
         if commitId is 'current':
             self.tmpdir = os.path.abspath('..')
             srcDir = os.path.join(self.tmpdir, 'src')
             assert os.path.exists(srcDir), '{} does not exist'.format(srcDir)
         else:
-            self.tmpdir = mkdtemp(prefix='kajonggtest.{}.'.format(commitId))
-            subprocess.Popen('git clone --local --no-checkout -q .. {temp}'.format(
-                temp=self.tmpdir).split()).wait()
-            subprocess.Popen('git checkout -q {commitId}'.format(
-                commitId=commitId).split(), cwd=self.tmpdir).wait()
-            if os.path.islink('twisted'):
-                cpCmd = ['ln', '-s', '{}/twisted'.format(os.getcwd()),
-                         '{}/src/twisted'.format(self.tmpdir)]
-                subprocess.Popen(cpCmd).wait()
-
-    def remove(self):
-        """remove my tmpdir"""
-        del self.clones[self.commitId]
-        if self.commitId != 'current' and '/tmp/' in self.tmpdir:
-            shutil.rmtree(self.tmpdir)
+            self.tmpdir = os.path.expanduser(os.path.join('~', '.kajongg', '.cache', commitId))
+            if not os.path.exists(self.tmpdir):
+                subprocess.Popen('git clone --shared --no-checkout -q .. {temp}'.format(
+                    temp=self.tmpdir).split()).wait()
+                subprocess.Popen('git checkout -q {commitId}'.format(
+                    commitId=commitId).split(), cwd=self.tmpdir).wait()
+                if os.path.islink('twisted'):
+                    cpCmd = ['ln', '-s', '{}/twisted'.format(os.getcwd()),
+                             '{}/src/twisted'.format(self.tmpdir)]
+                    subprocess.Popen(cpCmd).wait()
 
     @classmethod
-    def removeUnused(cls):
-        """remove clones we do not use anymore"""
-        for commitId in list(cls.clones.keys()):
-            # guard against "dict changed size during iteration
-            if not any(x.commitId == commitId for x in Server.servers):
-                cls.clones[commitId].remove()
+    def cloneDirectory(cls):
+        """the directory for this git commit"""
+        return os.path.expanduser(os.path.join('~', '.kajongg', '.cache'))
 
     @classmethod
-    def removeAll(cls):
-        """remove all clones even if they are in use"""
-        for cloneKey in list(cls.clones.keys()):
-            cls.clones[cloneKey].remove()
+    def commitDirectory(cls, commitId):
+        """the source directory for this git commit"""
+        return os.path.join(cls.cloneDirectory(), commitId)
 
 
 class Client(object):
@@ -221,7 +204,6 @@ class Server(StrMixin):
                     pass
             if self.socketName:
                 removeIfExists(self.socketName)
-        Clone.removeUnused()
 
     @classmethod
     def stopAll(cls):
@@ -258,7 +240,7 @@ class Job(StrMixin):
 
     def srcDir(self):
         """the path of the directory where the particular test is running"""
-        return os.path.join(Clone.clones[self.commitId].tmpdir, 'src')
+        return os.path.join(Clone.commitDirectory(self.commitId), 'src')
 
     def __startProcess(self, cmd):
         """call Popen"""
@@ -408,17 +390,22 @@ def removeInvalidCommits(csvFile):
         for row in rows:
             if row[COMMITFIELD] not in nonExisting:
                 writer.writerow(row)
-    # now remove all logs referencing obsolete commits
-    for dirName, _, fileNames in os.walk('log'):
+    # remove all logs referencing obsolete commits
+    logDir = os.path.expanduser(os.path.join('~', '.kajongg', 'log'))
+    for dirName, _, fileNames in os.walk(logDir):
         for fileName in fileNames:
-            fullName = os.path.join(dirName, fileName)
             if fileName not in KNOWNCOMMITS and fileName != 'current':
-                os.remove(fullName)
+                os.remove(os.path.join(dirName, fileName))
         try:
             os.removedirs(dirName)
         except OSError:
             pass  # not yet empty
 
+    # remove all clones for obsolete commits
+    for commitDir in os.listdir(Clone.cloneDirectory()):
+        if not any(x.startswith(commitDir) for x in KNOWNCOMMITS):
+            removeDir = os.path.join(Clone.cloneDirectory(), commitDir)
+            shutil.rmtree(removeDir)
 
 def readGames(csvFile):
     """returns a dict holding a frozenset of games for each variant"""
@@ -791,7 +778,6 @@ def main():
 def cleanup(sig, dummyFrame):
     """at program end"""
     Server.stopAll()
-    Clone.removeAll()
     sys.exit(sig)
 
 # is one server for two clients.
