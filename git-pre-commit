@@ -105,13 +105,14 @@ trap "rm -rf $MIRROR" 0
 
 git checkout-index --prefix=$MIRROR/ -af
 cd $MIRROR/src
+ln -s /home/wr/src/kajongg/src/twisted twisted
 
 if test x$skip_pylint = x
 then
 	for file in $checkfiles
 	do
 		test $file = qt4reactor.py && continue
-		echo -n pylint for $file in `pwd`...
+		echo -n pylint3 for $file in `pwd`...
 		pylint3 $file
 		result=$?
 		echo done
