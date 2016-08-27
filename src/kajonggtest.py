@@ -106,6 +106,7 @@ class Server(StrMixin):
 
     """represents a kajongg server instance. Called when we want to start a job."""
     servers = []
+    count = 0
 
     def __new__(cls, job):
         """can we reuse an existing server?"""
@@ -166,9 +167,11 @@ class Server(StrMixin):
             self.portNumber = random.randrange(1025, 65000)
             cmd.append('--port={port}'.format(port=self.portNumber))
         else:
+            Server.count += 1
             self.socketName = os.path.expanduser(
                 os.path.join('~', '.kajongg',
-                             'sock{id}.{rnd}'.format(id=id(self), rnd=random.randrange(10000000))))
+                             'sock{commit}.py{py}.{ctr}'.format(
+                                 commit=self.commitId, py=self.pythonVersion, ctr=Server.count)))
             cmd.append('--socket={sock}'.format(sock=self.socketName))
         if OPTIONS.debug:
             cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
