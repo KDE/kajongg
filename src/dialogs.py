@@ -87,7 +87,7 @@ class Prompt(MustChooseKDialog):
                  buttons=KDialog.Ok, caption=None, default=None):
         """buttons is button codes or-ed like KDialog.Ok | KDialog.Cancel. First one is default."""
         if r'\n' in msg:
-            logDebug(r'Fix this! Prompt gets \n in', msg)
+            print(r'*********************** Fix this! Prompt gets \n in', msg)
             msg = msg.replace(r'\n', '\n')
         self.msg = msg
         self.default = default
