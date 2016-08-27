@@ -158,7 +158,6 @@ class Server(StrMixin):
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
         assert self.commitId == job.commitId
-        print('starting server for %s commit=%s in %s' % (' ' * 16, job.commitId, self.clone.tmpdir))
         cmd = [os.path.join(
             job.srcDir(),
             'kajonggserver.py')]
@@ -183,6 +182,7 @@ class Server(StrMixin):
             # reuse this server (otherwise it stops by itself)
             cmd.append('--continue')
             self.process = subprocess.Popen(cmd, cwd=job.srcDir())
+        print('{} started'.format(self))
 
     def stop(self, job=None):
         """maybe stop the server"""
@@ -194,14 +194,12 @@ class Server(StrMixin):
         if len(self.jobs) == 0:
             self.servers.remove(self)
             if self.process:
-                print(
-                    'killing server %s%s' %
-                    (self, ' for {}'.format(job) if job else ''))
                 try:
                     self.process.terminate()
                     _ = self.process.wait()
                 except OSError:
                     pass
+                print('{} killed'.format(self))
             if self.socketName:
                 removeIfExists(self.socketName)
 
@@ -216,10 +214,11 @@ class Server(StrMixin):
             server.stop()
 
     def __unicode__(self):
-        if self.portNumber:
-            return u'{} pid={} port={}'.format(self.commitId, self.process.pid, self.portNumber)
-        else:
-            return u'{} pid={} sock={}'.format(self.commitId, self.process.pid, self.socketName)
+        return u'Server {} Python{}{} {}'.format(
+            self.commitId,
+            self.pythonVersion,
+            ' pid={}'.format(self.process.pid) if Debug.process else u'',
+            'port={}'.format(self.portNumber) if self.portNumber else 'socket={}'.format(self.socketName))
 
 
 class Job(StrMixin):
@@ -244,13 +243,13 @@ class Job(StrMixin):
 
     def __startProcess(self, cmd):
         """call Popen"""
-        print('starting            %s in %s' % (self, self.server.clone.tmpdir))
         if OPTIONS.log:
             self.process = subprocess.Popen(
                 cmd, cwd=self.srcDir(),
                 stdout=self.logFile, stderr=self.logFile)
         else:
             self.process = subprocess.Popen(cmd, cwd=self.srcDir())
+        print('       %s started' % (self))
 
     def start(self):
         """start this job"""
@@ -297,10 +296,7 @@ class Job(StrMixin):
         if result is not None:
             self.process = None
             if not silent:
-                print(
-                    '   Game over        %s%s' %
-                    ('Return code: %s ' %
-                     result if result else '', self))
+                print('       {} done{}'.format(self, 'Return code: {}'.format(result) if result else ''))
             self.server.jobs.remove(self)
 
     @property
@@ -331,8 +327,8 @@ class Job(StrMixin):
         ruleset = self.shortRulesetName()
         aiName = u'AI={}'.format(
             self.aiVariant) if self.aiVariant != u'Default' else u''
-        commit = u'commit={}'.format(self.commitId)
-        return u' '.join([pid, game, ruleset, aiName, commit]).replace('  ', ' ')
+        return u' '.join([
+            self.commitId, 'Python{}'.format(self.pythonVersion), pid, game, ruleset, aiName]).replace('  ', ' ')
 
 
 def neutralize(rows):
