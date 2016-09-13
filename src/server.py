@@ -200,6 +200,9 @@ class ServerGame(PlayingGame):
                 player.addConcealedTiles(self.wall.deal())
         PlayingGame.initHand(self)
 
+    def assignVoices(self):
+        """The server is silent"""
+
 
 class ServerTable(Table):
 
