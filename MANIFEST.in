@@ -7,7 +7,7 @@ include voices/female1/*
 include voices/female2/*
 include voices/male1/*
 include voices/male2/*
-include kajongg.desktop
+include org.kde.kajongg.desktop
 exclude src/*_ui.py
 include doc/*.png
 include doc/index.docbook

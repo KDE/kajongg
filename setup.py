@@ -76,7 +76,7 @@ data_files = [ \
     (kdeDirs['exe'], ['kajongg','kajonggserver', 'kajonggserver3']),
     (os.path.join(kdeDirs['data'], 'kajongg'), app_files),
     (os.path.join(kdeDirs['html'], 'en','kajongg'), doc_files),
-    (kdeDirs['xdgdata-apps'], ['kajongg.desktop']),
+    (kdeDirs['xdgdata-apps'], ['org.kde.kajongg.desktop']),
     ('/usr/share/doc/kajongg/', ['COPYING.DOC']),
     (kdeDirs['iconApps'], ['kajongg.svgz']),
     (kdeDirs['iconActions'], ['games-kajongg-law.svgz'])]
