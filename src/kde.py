@@ -23,13 +23,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import os
 import sys
 import shutil
+import sip
 
 from common import Internal, Options, unicode, isPython3
 
 usingKDE = False  # pylint: disable=invalid-name
 
 try:
-    if '--nokde' in sys.argv or '--qt5' in sys.argv:
+    if '--nokde' in sys.argv or '--qt5' in sys.argv or sip.SIP_VERSION == 0x041201:
         # for now there is no PyKDE5
         raise ImportError
     if isPython3:
