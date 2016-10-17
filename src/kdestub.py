@@ -1157,6 +1157,9 @@ class KIcon(QIcon):
             dirs.addResourceType('appicon', 'icon', 'oxygen/48x48/actions/')
             dirs.addResourceType('appicon', 'icon', 'oxygen/48x48/categories/')
             dirs.addResourceType('appicon', 'icon', 'oxygen/48x48/status/')
+            dirs.addResourceType('appicon', 'icon', 'oxygen/base/48x48/actions/')
+            dirs.addResourceType('appicon', 'icon', 'oxygen/base/48x48/categories/')
+            dirs.addResourceType('appicon', 'icon', 'oxygen/base/48x48/status/')
             dirs.addResourceType('appicon', 'icon', 'hicolor/scalable/apps/')
             dirs.addResourceType(
                 'appicon',
