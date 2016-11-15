@@ -739,7 +739,7 @@ class KStandardDirs(object):
                     os.path.expanduser(home + '/' + value))
             KStandardDirs._baseDirs = defaultdict(list)
             KStandardDirs._baseDirs.update({
-                'data': ['share/kde4/apps'],
+                'data': ['share/kde4/apps', 'share'],
                 'locale':
                     ['local/share/locale',
                      'share/locale-kdelibs4',
