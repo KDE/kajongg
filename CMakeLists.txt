@@ -85,6 +85,7 @@ src/qt.py
 src/qt4.py
 src/qt5.py
 src/configdialog.py
+src/tilesource.py
 src/util.py)
 
 IF(NOT PYQT4_FOUND)
