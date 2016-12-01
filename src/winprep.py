@@ -66,7 +66,7 @@ dataDir = check_output(
     "kde4-config --expandvars --install data".split()).strip()
 iconDir = check_output(
     "kde4-config --expandvars --install icon".split()).strip()
-oxy48 = iconDir + '/oxygen/48x48'
+oxy48 = iconDir + '/oxygen/base/48x48'
 oxy48Cat = oxy48 + '/categories/'
 oxy48Act = oxy48 + '/actions/'
 oxy48Apps = oxy48 + '/apps/'
