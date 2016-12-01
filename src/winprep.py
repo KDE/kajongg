@@ -102,7 +102,7 @@ for png in (
         'go-up', 'go-down', 'go-next', 'go-previous'):
     copy('{}/{}.png'.format(oxy48Act, png), DEST + '/icons')
 
-oggdec = 'oggdecV1.9.9.zip'
+oggdec = 'oggdecV1.10.1.zip'
 try:
     call('wget http://www.rarewares.org/files/ogg/{}'.format(oggdec).split())
     with zipfile.ZipFile(oggdec) as ziparch:
