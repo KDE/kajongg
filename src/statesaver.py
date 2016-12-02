@@ -19,8 +19,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from qt import QString, QObject, QByteArray, QEvent, QSplitter, QHeaderView
+from qt import usingQt5
 
-from common import Internal, isAlive, english
+from common import Internal, isAlive, english, isPython3
 
 
 class StateSaver(QObject):
@@ -51,7 +52,11 @@ class StateSaver(QObject):
     @staticmethod
     def __restore(widget, name):
         """decode the saved string"""
-        state = QByteArray.fromHex(Internal.Preferences[name])
+        if usingQt5 and isPython3:
+            # Qt5 fromHex expects bytes, not str
+            state = QByteArray.fromHex(Internal.Preferences[name].encode())
+        else:
+            state = QByteArray.fromHex(Internal.Preferences[name])
         if state:
             if name.endswith('State'):
                 widget.restoreState(state)

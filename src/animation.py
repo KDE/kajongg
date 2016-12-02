@@ -24,7 +24,7 @@ import types
 from twisted.internet.defer import Deferred, succeed
 
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
-    QAbstractAnimation, QEasingCurve, QVariant
+    QAbstractAnimation, QEasingCurve, QVariant, usingQt5
 
 from common import Internal, Debug, isAlive, isPython3, nativeString
 from log import logDebug
@@ -37,7 +37,11 @@ class Animation(QPropertyAnimation):
     nextAnimations = []
 
     def __init__(self, uiTile, propName, endValue, parent=None):
-        QPropertyAnimation.__init__(self, uiTile, propName, parent)
+        pName = propName
+        if isPython3 and usingQt5:
+            # in this case they want bytes
+            pName = pName.encode()
+        QPropertyAnimation.__init__(self, uiTile, pName, parent)
         QPropertyAnimation.setEndValue(self, endValue)
         duration = Internal.Preferences.animationDuration()
         self.setDuration(duration)
