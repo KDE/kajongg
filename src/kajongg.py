@@ -157,33 +157,32 @@ class EvHandler(QObject):
         EventData(receiver, event)
         return QObject.eventFilter(self, receiver, event)
 
-if __name__ == "__main__":
-    from util import gitHead
+from util import gitHead
 
-    ABOUT = About()
-    KCmdLineArgs.init(sys.argv, ABOUT.about)
-    KCmdLineArgs.addCmdLineOptions(defineOptions())
-    if usingQt4:
-        KApplication.setGraphicsSystem('raster')
-    APP = KApplication()
-    parseOptions()
+ABOUT = About()
+KCmdLineArgs.init(sys.argv, ABOUT.about)
+KCmdLineArgs.addCmdLineOptions(defineOptions())
+if usingQt4:
+    KApplication.setGraphicsSystem('raster')
+APP = KApplication()
+parseOptions()
 
-    if Debug.neutral:
-        KGlobal.locale().setLanguage('en_US')
+if Debug.neutral:
+    KGlobal.locale().setLanguage('en_US')
 
-    if Debug.events:
-        EVHANDLER = EvHandler()
-        APP.installEventFilter(EVHANDLER)
+if Debug.events:
+    EVHANDLER = EvHandler()
+    APP.installEventFilter(EVHANDLER)
 
-    from config import SetupPreferences
-    SetupPreferences()
+from config import SetupPreferences
+SetupPreferences()
 
-    if Options.csv:
-        if gitHead() == 'current':
-            Internal.logger.debug(
-                'You cannot write to %s with changes uncommitted to git',
-                Options.csv)
-            sys.exit(2)
-    from mainwindow import MainWindow
-    MainWindow()
-    Internal.app.exec_()
+if Options.csv:
+    if gitHead() == 'current':
+        Internal.logger.debug(
+            'You cannot write to %s with changes uncommitted to git',
+            Options.csv)
+        sys.exit(2)
+from mainwindow import MainWindow
+MainWindow()
+Internal.app.exec_()
