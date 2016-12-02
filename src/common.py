@@ -51,11 +51,13 @@ else:
     bytes = str
     long = long
     isPython3 = False
-    if os.name == 'nt':
-        interpreterName = 'python'
-    else:
-        interpreterName = 'python2'
+    interpreterName = 'python2'
     xrange = xrange
+if os.name == 'nt':
+    # This is only needed for manual execution, and
+    # we expect python to be the python3 interpreter.
+    # The windows installer will use kajongg.exe and kajonggserver.exe
+    interpreterName = 'python'
 
 LIGHTSOURCES = [u'NE', u'NW', u'SW', u'SE']
 ENGLISHDICT = {}
