@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # pylint: disable=invalid-name, wrong-import-position
 
 import sys
+import os
 
 import sip
 
@@ -30,7 +31,7 @@ from common import isPython3, Internal
 usingQt4 = True  # Default for now
 usingQt5 = False
 
-if '--qt5' in sys.argv:
+if '--qt5' in sys.argv or os.name == 'nt':
     try:
         from qt5 import *
         usingQt5 = True
