@@ -222,6 +222,7 @@ class Url(unicode):
                         'started the local kajongg server: pid=<numid>%1</numid> %2',
                         process.pid, ' '.join(args)))
         except OSError as exc:
+            exc.filename = ' '.join(args)
             logException(exc)
 
     def __serverListening(self):

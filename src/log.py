@@ -185,6 +185,8 @@ def __exceptionToString(exception):
             pass
         else:
             parts.append(unicode(arg))
+    if hasattr(exception, 'filename'):
+        parts.append(exception.filename)
     return u' '.join(parts)
 
 
