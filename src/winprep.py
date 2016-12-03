@@ -25,7 +25,7 @@ block that might have to be adapted.
 
 from __future__ import print_function
 
-from subprocess import check_output, call
+from subprocess import check_output, call, CalledProcessError
 from shutil import copy, move, copytree, rmtree
 
 import os
@@ -136,18 +136,26 @@ languages = (
 for lang in languages:
     print('getting language', lang)
     os.makedirs(DEST + '/locale/{}/LC_MESSAGES'.format(lang))
-    for directory, filename in (
-            ('kdegames', 'kajongg'), ('kdegames', 'libkmahjongg'),
-            ('kdelibs', 'kdelibs4'), ('qt', 'kdeqt')):
-        mo_data = check_output(
-            'svn cat svn://anonsvn.kde.org/home/kde/'
-            'trunk/l10n-kde4/{}/messages/{}/{}.po'.format(
-                lang, directory, filename).split())
-        with open('x.po', 'wb') as outfile:
-            outfile.write(mo_data)
-        call(
-            'msgfmt x.po -o {}/locale/{}/LC_MESSAGES/{}.mo'.format(
-                DEST,
-                lang,
-                filename).split())
-        os.remove('x.po')
+    DEVNULL = open(os.devnull, 'wb')
+    for kde45 in ('l10n-kde4', 'l10n-kf5'):
+        for filename in (
+                'kdegames/kajongg', 'kdegames/libkmahjongg',
+                'kdegames/libkmahjongg5',
+                'kdegames/desktop_kdegames_libkmahjongg',
+                'kdelibs/kdelibs4', 'qt/kdeqt'):
+            try:
+                mo_data = check_output(
+                    'svn cat svn://anonsvn.kde.org/home/kde/'
+                    'trunk/{}/{}/messages/{}.po'.format(
+                        kde45, lang, filename).split(), stderr=DEVNULL)
+                print('found:', lang, kde45, filename)
+                with open('x.po', 'wb') as outfile:
+                    outfile.write(mo_data)
+                call(
+                    'msgfmt x.po -o {}/locale/{}/LC_MESSAGES/{}.mo'.format(
+                        DEST,
+                        lang,
+                        filename.split('/')[1]).split())
+                os.remove('x.po')
+            except CalledProcessError:
+                pass
