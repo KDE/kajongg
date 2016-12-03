@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -22,8 +22,6 @@ Start this in the installation directory of Kajongg: That
 is where this program resides. Below you find a code
 block that might have to be adapted.
 """
-
-from __future__ import print_function
 
 from subprocess import check_output, call, CalledProcessError
 from shutil import copy, move, copytree, rmtree
@@ -66,6 +64,9 @@ dataDir = check_output(
     "kde4-config --expandvars --install data".split()).strip()
 iconDir = check_output(
     "kde4-config --expandvars --install icon".split()).strip()
+dataDir = dataDir.decode()
+iconDir = iconDir.decode()
+
 oxy48 = iconDir + '/oxygen/base/48x48'
 oxy48Cat = oxy48 + '/categories/'
 oxy48Act = oxy48 + '/actions/'
