@@ -65,8 +65,8 @@ excludes = ['tcl', 'tk', 'ttk', 'tkinter', 'Tkconstants', 'Tkinter']
 
 build_exe_options = {
     "packages": packages, "excludes": excludes, "includes": includes,
-    "include_files": include_files, 'icon': 'kajongg.ico',
-    "namespace_packages": namespace_packages, "append_script_to_exe": True, 'silent': False}
+    "include_files": include_files,
+    "namespace_packages": namespace_packages, 'silent': False}
 
 kajExe = Executable('kajongg.py', icon='kajongg.ico', base='Win32GUI',
                     shortcutName='Kajongg', shortcutDir='ProgramMenuFolder')
