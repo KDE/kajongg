@@ -584,7 +584,7 @@ class RulesetSelector(QWidget):
 
     def retranslateUi(self):
         """translate to current language"""
-        self.btnCopy.setText(m18n("Copy"))
-        self.btnCompare.setText(m18nc('Kajongg ruleset comparer', 'Compare'))
-        self.btnRemove.setText(m18n("Remove"))
-        self.btnClose.setText(m18n('Close'))
+        self.btnCopy.setText(m18n("C&opy"))
+        self.btnCompare.setText(m18nc('Kajongg ruleset comparer', 'Co&mpare'))
+        self.btnRemove.setText(m18n('&Remove'))
+        self.btnClose.setText(m18n('&Close'))

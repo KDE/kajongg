@@ -534,7 +534,7 @@ class KStandardAction(object):
 
         action = KAction(mainWindow)
         action.triggered.connect(mainWindow.configureToolBar)
-        action.setText(i18n('Configure Toolbars'))
+        action.setText(i18n('&Configure Toolbars'))
         action.setIcon(KIcon('configure-toolbars'))  # TODO: winprep
         action.setIconText(i18n('Configure toolbars'))
         separator = QAction(Internal.mainWindow)
@@ -543,7 +543,7 @@ class KStandardAction(object):
 
         action = KAction(mainWindow)
         action.triggered.connect(slot)
-        action.setText(i18n('Configure Kajongg'))
+        action.setText(i18n('Configure &Kajongg'))
         action.setIcon(KIcon('configure'))
         action.setIconText(i18n('Configure'))
         actionCollection.addAction('options_configure', action)
@@ -638,11 +638,11 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.setCaption('')
         self.actionHelp = self.kajonggAction(
             "help", "help-contents", startHelp)
-        self.actionHelp.setText(i18nc('@action:inmenu', 'Help'))
+        self.actionHelp.setText(i18nc('@action:inmenu', '&Help'))
         self.actionAboutKajongg = self.kajonggAction(
             'aboutkajongg', 'kajongg', self.aboutKajongg)
         self.actionAboutKajongg.setText(
-            i18nc('@action:inmenu', 'About Kajongg'))
+            i18nc('@action:inmenu', 'About &Kajongg'))
         self.toolBar().setMovable(False)
         self.toolBar().setFloatable(False)
         self.toolBar().setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
