@@ -1137,9 +1137,7 @@ class KIcon(QIcon):
             # we have full control about file and location, no need to search
             extension = 'png'
             if name in ('games-kajongg-law', 'kajongg'):
-                # windows 2000 does not support svg/svgz
-                extension = 'svgz' if 'svgz' in QImageReader.supportedImageFormats(
-                ) else 'ico'
+                extension = 'ico'
             name = os.path.normpath(
                 '{}/share/icons/{}.{}'.format(
                     KStandardDirs.prefix,
