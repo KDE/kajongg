@@ -1,21 +1,33 @@
-Generating the windows installer
+Generating the windows installer *.msi
+--------------------------------------
+
+Rewritten in December 2016
+
+Since kajongg now works with Python3, the windows version
+will not use Python2 anymore.
 
 My setup:
-host system is ubuntu 64
-guest system is windows 7 32
-shared directory (visible for host and guest) "kajongg": a working copy of the git repository
+- host system is ubuntu 16.10 64bit
+- virtualbox guest with windows 7 32bit
+- guest has only Python3.5.2
 
-cd kajongg/src
-./winprep.py # generates a directory "share" with files to be installed
+on the linux host:
+- cd kajongg/src
+- ./winprep.py # generates a directory "share" with files to be installed
 
-when using Python2.7 with PyQt4:
-goto C:\Python27\Lib\site-packages\PyQt4\uic\ and rename the dictionary
-"port_v3" into something else like "port_v3_".
-Reason: http://www.riverbankcomputing.com/pipermail/pyqt/2013-June/032883.html
+in the windows guest:
+- install Python3.5
+- put Python3.5/scripts and Python3.5/DLLs into PATH
+- pip3 install --upgrade pip
+- pip3 install cx_freeze
+- pip3 install twisted
+- pip3 install sip
+- pip3 install PyQt5
+- install pywin32 (right now pip does not offer a 32bit version for Python 3.5, download from sourceforge)
+- install Visual Studio 2015 Community Edition
+- setup a shared directory (visible for host and guest) "kajongg": a working copy of the git repository
+- cd kajongg/src
+- ./kajongg.py must work
+- python setup.py bdist_msi
 
-on Windows, install cx_freeze and everything kajongg needs. python src/kajongg.py
-must work
-
-cd src ; python setup.py bdist_msi
-
-the result is in src/dist
+the result is in kajongg/src/dist
