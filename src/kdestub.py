@@ -1368,6 +1368,7 @@ class AboutKajonggDialog(KDialog):
             underVersions.append(i18n('KDE (not installed)'))
         underVersions.append('Qt %s' % QT_VERSION_STR)
         underVersions.append('PyQt %s' % PYQT_VERSION_STR)
+        underVersions.append('sip %s' % sip.SIP_VERSION_STR)
         underVersions.append(
             'Python {}.{}.{} {}'.format(*sys.version_info[:5]))
         h1vLayout.addWidget(
