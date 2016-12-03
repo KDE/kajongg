@@ -36,6 +36,7 @@ VERSION = "4.13.0"
 # ==========================
 
 import os
+import sys
 import re
 import msilib
 from shutil import rmtree
@@ -56,7 +57,7 @@ includes = [
     "pkg_resources"]
 packages = []
 namespace_packages = ["zope"]
-include_files = ('share',)
+include_files = ('share', os.path.join(sys.base_prefix, 'DLLs', 'sqlite3.dll'))
 
 excludes = ['tcl', 'tk', 'ttk', 'tkinter', 'Tkconstants', 'Tkinter']
 # strangely, excluding modules does not get rid of warnings about missing
