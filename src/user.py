@@ -103,6 +103,9 @@ class User(pb.Avatar):
                                              'Your client has version %1 but you need %2 for this server'),
                                          clientVersion or '<4.9.0',
                                          '.'.join(serverVersion.split('.')[:2]) + '.*'))
+        if Debug.table:
+            logDebug(u'client has dbIdent={} voiceId={} maxGameId={} clientVersion {}'.format(
+                self.dbIdent, self.voiceId, self.maxGameId, clientVersion))
         self.server.sendTables(self)
 
     def perspective_ping(self):
