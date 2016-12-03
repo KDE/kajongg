@@ -79,7 +79,7 @@ class DBCursor(sqlite3.Cursor):
                     break
                 except sqlite3.OperationalError as exc:
                     logDebug(
-                        u'{} failed after {} tries:{}'.format(self, _, exc.message))
+                        u'{} failed after {} tries:{}'.format(self, _, ' '.join(exc.args)))
                     time.sleep(1)
                 else:
                     break
