@@ -50,40 +50,40 @@ class Sound(object):
 
     """the sound interface. Use class variables and class methods,
     thusly ensuring no two instances try to speak"""
-    __oggName = None
+    __oggBinary = None
     playProcesses = []
     lastCleaned = None
 
     @staticmethod
-    def findOgg():
-        """sets __oggName to exe name or an empty string"""
-        if Sound.__oggName is None:
+    def findOggBinary():
+        """sets __oggBinary to exe name or an empty string"""
+        if Sound.__oggBinary is None:
             if os.name == 'nt':
                 parentDirectories = KGlobal.dirs().findDirs(
                     "appdata", "voices")
                 if parentDirectories:
-                    oggName = os.path.join(parentDirectories[0], 'oggdec.exe')
+                    oggBinary = os.path.join(parentDirectories[0], 'oggdec.exe')
                     msg = ''  # we bundle oggdec.exe with the kajongg installer, it must be there
                 else:
                     msg = m18n(
                         'No voices will be heard because the program %1 is missing',
                         'oggdec.exe')
             else:
-                oggName = 'ogg123'
+                oggBinary = 'ogg123'
                 msg = m18n(
                     'No voices will be heard because the program %1 is missing',
-                    oggName)
-            if which(oggName):
-                Sound.__oggName = oggName
+                    oggBinary)
+            if which(oggBinary):
+                Sound.__oggBinary = oggBinary
             else:
-                Sound.__oggName = ''
+                Sound.__oggBinary = ''
                 Internal.Preferences.useSounds = False
                 # checks again at next reenable
                 if msg:
                     logWarning(msg)
             if Debug.sound:
-                logDebug('ogg123 found:' + Sound.__oggName)
-        return Sound.__oggName
+                logDebug('ogg123 found:' + Sound.__oggBinary)
+        return Sound.__oggBinary
 
     @staticmethod
     def cleanProcesses():
@@ -129,8 +129,8 @@ class Sound(object):
                 reactor.callLater(1, Sound.speak, what)
                 return
         if os.path.exists(what):
-            oggName = Sound.findOgg()
-            if oggName:
+            oggBinary = Sound.findOggBinary()
+            if oggBinary:
                 if os.name == 'nt':
                     # convert to .wav, store .wav in cacheDir
                     name, ext = os.path.splitext(what)
@@ -141,7 +141,7 @@ class Sound(object):
                         '{}/{}.wav'.format(cacheDir(),
                                            '_'.join(nameParts)))
                     if not os.path.exists(wavName):
-                        args = [oggName, '-a', '-w', wavName, what]
+                        args = [oggBinary, '-a', '-w', wavName, what]
                         startupinfo = subprocess.STARTUPINFO()
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                         subprocess.call(args, startupinfo=startupinfo)
@@ -152,7 +152,7 @@ class Sound(object):
                     except RuntimeError:
                         pass
                 else:
-                    args = [oggName, '-q', what]
+                    args = [oggBinary, '-q', what]
                     if Debug.sound:
                         game.debug(' '.join(args))
                     process = subprocess.Popen(args)
