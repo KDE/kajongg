@@ -744,7 +744,9 @@ class KStandardDirs(object):
                     ['local/share/locale',
                      'share/locale-kdelibs4',
                      'share/locale'],
-                'appdata': ['share/kde4/apps/kajongg'],
+                'appdata':
+                    ['share/kde4/apps/kajongg',
+                     'share/apps/kajongg'],
                 'icon': ['share/icons'],
             })
             if os.name == 'nt':
