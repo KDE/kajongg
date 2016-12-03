@@ -161,24 +161,6 @@ class Sound(object):
                     Sound.playProcesses.append(process)
                     reactor.callLater(3, Sound.cleanProcesses)
                     reactor.callLater(6, Sound.cleanProcesses)
-#        else:
-#            text = os.path.basename(what)
-#            text = os.path.splitext(text)[0]
-            # If this ever works, we need to translate all texts
-            # we need package jovie and mbrola voices
-            # KSpeech setLanguage de
-            # KSpeech.showManagerDialog lets me define voices but
-            # how do I use them? it is always the same voice,
-            # setDefaultTalker "namefrommanager" does not change anything
-            # although defaultTalker returns what we just set even if no talker
-            # with that name exists
-            # getTalkerCodes returns nothing
-            # this all feels immature
-#            if len(text) == 2 and text[0] in 'sdbcw':
-#                text = Tile(text).name()
-#            args = ['qdbus', 'org.kde.jovie',
-#                    '/KSpeech', 'say', text, '1']
-#            subprocess.Popen(args)
 
 
 class Voice(object):
