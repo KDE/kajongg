@@ -33,6 +33,8 @@ class Wind(object):
     all = list()
     all4 = list()
 
+    tile = None
+
     def __new__(cls, *args):
         if not Wind.all:
             Wind.all = list(object.__new__(cls) for cls in (_East, _South, _West, _North, _NoWind))
@@ -96,7 +98,6 @@ class _East(Wind):
     """East"""
     char = 'E'
     svgName = 'WIND_3'
-    tile = None
     def __index__(self):
         return 0
 
@@ -104,7 +105,6 @@ class _South(Wind):
     """South"""
     char = 'S'
     svgName = 'WIND_2'
-    tile = None
 
     def __index__(self):
         return 1
@@ -113,7 +113,6 @@ class _West(Wind):
     """West"""
     char = 'W'
     svgName = 'WIND_4'
-    tile = None
 
     def __index__(self):
         return 2
@@ -122,7 +121,6 @@ class _North(Wind):
     """North"""
     char = 'N'
     svgName = 'WIND_1'
-    tile = None
 
     def __index__(self):
         return 3
@@ -131,7 +129,6 @@ class _NoWind(Wind):
     """no wind"""
     char = 'X'
     svgName = None
-    tile = None
 
     def __index__(self):
         return 4
