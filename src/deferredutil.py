@@ -279,11 +279,13 @@ class DeferredBlock(StrMixin):
             self.table.abort(msg, request.user.name)
         else:
             msg = m18nE('Error for player %1: %2\n%3')
-            try:
-                traceBack = result.getTraceback()
-            except BaseException:
-                # may happen with twisted 12.3.0
-                traceBack = u'twisted cannot give us a traceback'
+            if hasattr(result, 'traceback'):
+                traceBack = result.traceback
+            else:
+                try:
+                    traceBack = result.getBriefTraceback()
+                except BaseException as exc:
+                    traceBack = u'twisted cannot give us a traceback:{}'.format(exc)
             self.table.abort(
                 msg,
                 request.user.name,

@@ -580,7 +580,7 @@ class Connection(object):
     def loginCommand(self, username):
         """send a login command to server. That might be a normal login
         or adduser/deluser/change passwd encoded in the username"""
-        factory = pb.PBClientFactory()
+        factory = pb.PBClientFactory(unsafeTracebacks=True)
         self.connector = self.url.connect(factory)
         utf8Password = self.dlg.password.encode('utf-8')
         utf8Username = username.encode('utf-8')

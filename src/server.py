@@ -488,23 +488,21 @@ def kajonggServer():
     import predefined  # pylint: disable=unused-variable
     try:
         if Options.socket:
+            # we do not want tracebacks to go from server to client,
+            # please check on the server side instead
+            factory = pb.PBServerFactory(kajonggPortal, unsafeTracebacks=False)
             if os.name == 'nt':
                 if Debug.connections:
                     logDebug(
                         u'local server listening on 127.0.0.1 port %d' %
                         options.port)
-                reactor.listenTCP(
-                    options.port,
-                    pb.PBServerFactory(kajonggPortal),
-                    interface='127.0.0.1')
+                reactor.listenTCP(options.port, factory, interface='127.0.0.1')
             else:
                 if Debug.connections:
                     logDebug(
                         u'local server listening on UNIX socket %s' %
                         Options.socket)
-                reactor.listenUNIX(
-                    Options.socket,
-                    pb.PBServerFactory(kajonggPortal))
+                reactor.listenUNIX(Options.socket, factory)
         else:
             if Debug.connections:
                 logDebug(u'server listening on port %d' % options.port)
