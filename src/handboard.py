@@ -35,7 +35,9 @@ from common import Internal, Debug, isAlive
 class TileAttr(object):
 
     """a helper class for syncing the hand board, holding relevant
-    tile attributes"""
+    tile attributes.
+    xoffset and yoffset are expressed in number of tiles but may be
+    fractional for adding distances between melds"""
 
     def __init__(self, hand, meld=None, idx=None, xoffset=None, yoffset=None):
         if isinstance(hand, UITile):
@@ -191,33 +193,36 @@ class HandBoard(Board):
                 meldX += meldDistance
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
 
-    def newBonusPositions(self, bonusTiles, newTilePositions):
-        """returns list(TileAttr)
-        calculate places for bonus tiles. Put them all in one row,
-        right adjusted. If necessary, extend to the right even
-        outside of our board"""
-        positions = list(x.xoffset for x in newTilePositions if x.yoffset == 0)
-        upperLen = max(positions) if positions else 0
-        positions = list(x.xoffset for x in newTilePositions if x.yoffset != 0)
-        lowerLen = max(positions) if positions else 0
-# TODO: keep them in the row they are in as long as there is room
-        if upperLen < lowerLen:
-            bonusY = 0.0
-            tileLen = upperLen
-        else:
-            bonusY = self.lowerY
-            tileLen = lowerLen
-        tileLen += 1 + self.exposedMeldDistance
-        newBonusTiles = list(self.tileAttrClass(x) for x in bonusTiles)
-        xPos = 13 - len(newBonusTiles)
-        xPos = max(xPos, tileLen)
+    def placeBoniInRow(self, bonusTiles, tilePositions, bonusY):
+        """Try to place bonusTiles in upper or in lower row.
+        tilePositions are the normal tiles, already placed.
+        If there is no space, return None
+
+        returns list(TileAttr)"""
+        positions = list(x.xoffset for x in tilePositions if x.yoffset == bonusY)
+        rightmostTileX = max(positions) if positions else 0
+        xPos = 13 - len(bonusTiles)
+        if xPos < rightmostTileX + 1 + self.exposedMeldDistance:
+            return list()
         result = list()
+        newBonusTiles = list(self.tileAttrClass(x) for x in bonusTiles)
         for bonus in sorted(newBonusTiles, key=lambda x: hash(x.tile)):
             bonus.xoffset, bonus.yoffset = xPos, bonusY
             bonus.dark = False
             result.append(bonus)
             xPos += 1
         return result
+
+    def newBonusPositions(self, bonusTiles, newTilePositions):
+        """returns list(TileAttr)
+        calculate places for bonus tiles. Put them all in one row,
+        right adjusted. If necessary, extend to the right even
+        outside of our board"""
+
+        return (
+            self.placeBoniInRow(bonusTiles, newTilePositions, 0.0)
+            or
+            self.placeBoniInRow(bonusTiles, newTilePositions, self.lowerY))
 
     def calcPlaces(self, tiles):
         """returns a dict. Keys are existing tiles, Values are TileAttr instances.
