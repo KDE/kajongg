@@ -23,11 +23,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import inspect
 
-from qt import Qt, QDialog, QMessageBox, QWidget
+from twisted.internet.defer import Deferred, succeed
 
 from kde import KMessageBox, KDialog
 
-from twisted.internet.defer import Deferred, succeed
+from qt import Qt, QDialog, QMessageBox, QWidget
 
 from common import Options, Internal, isAlive
 

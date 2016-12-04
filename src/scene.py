@@ -20,11 +20,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from zope.interface import implements  # pylint: disable=unused-import
 
+from twisted.internet.defer import succeed
+
 from log import m18n, m18nc, logDebug
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import nativeString
 from wind import Wind
-from twisted.internet.defer import succeed
 
 from qt import Qt, QMetaObject, variantValue
 from qt import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor

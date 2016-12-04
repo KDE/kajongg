@@ -53,7 +53,7 @@ except ImportError:
         # This is where we will try to import PyKDE5 when that will
         # be available
     except ImportError:
-        from kdestub import *  # pylint: disable=wildcard-import
+        from kdestub import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 
 def appdataDir():
