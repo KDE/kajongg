@@ -1348,6 +1348,7 @@ class AboutKajonggDialog(KDialog):
 
     def __init__(self, parent):
         # pylint: disable=too-many-locals, too-many-statements
+        from twisted import __version__
         KDialog.__init__(self, parent)
         self.setCaption(i18n('About Kajongg'))
         self.setButtons(KDialog.Close)
@@ -1370,13 +1371,13 @@ class AboutKajonggDialog(KDialog):
         underVersions.append('Qt %s' % QT_VERSION_STR)
         underVersions.append('PyQt %s' % PYQT_VERSION_STR)
         underVersions.append('sip %s' % sip.SIP_VERSION_STR)
+        underVersions.append('Twisted %s' % __version__)
         underVersions.append(
             'Python {}.{}.{} {}'.format(*sys.version_info[:5]))
         h1vLayout.addWidget(
             QLabel(
                 i18nc(
                     'running under version',
-                    'Under %s' %
                     ', '.join(
                         underVersions))))
         h1vLayout.addWidget(QLabel(i18n('Not using Python KDE bindings')))
