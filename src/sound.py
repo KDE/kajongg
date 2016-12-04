@@ -51,6 +51,7 @@ class Sound(object):
     """the sound interface. Use class variables and class methods,
     thusly ensuring no two instances try to speak"""
     __oggBinary = None
+    __bonusOgg = None
     playProcesses = []
     lastCleaned = None
 
@@ -162,6 +163,23 @@ class Sound(object):
                     reactor.callLater(3, Sound.cleanProcesses)
                     reactor.callLater(6, Sound.cleanProcesses)
 
+    @staticmethod
+    def bonus():
+        """ring some sort of bell, if we find such a file"""
+        if Sound.__bonusOgg is None:
+            Sound.__bonusOgg = ''
+            for oggName in (
+                    '/usr/share/sounds/KDE-Im-Message-In.ogg',
+                    'share/sounds/bonus.ogg'):
+                if os.path.exists(oggName):
+                    Sound.__bonusOgg = oggName
+                    if Debug.sound:
+                        logDebug('Bonus sound found:{}'.format(oggName))
+                    break
+            if Debug.sound and not Sound.__bonusOgg:
+                logDebug('No bonus sound found')
+        if Sound.__bonusOgg:
+            Sound.speak(Sound.__bonusOgg)
 
 class Voice(object):
 

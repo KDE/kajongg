@@ -87,6 +87,12 @@ for tileset in ('alphabet', 'egypt'):
 os.makedirs(DEST + '/kde4/apps/kajongg')
 copytree(dataDir + '/kajongg/voices', DEST + '/kde4/apps/kajongg/voices')
 
+for bellSound in ('/usr/share/sounds/KDE-Im-Message-In.ogg', ):
+    if os.path.exists(bellSound):
+        os.makedirs(DEST + '/sounds')
+        copy(bellSound, DEST + '/sounds/bell.ogg')
+        break
+
 os.makedirs(DEST + '/icons')
 copy(oxy48Cat + 'applications-education.png', DEST + '/icons')
 copy(oxy48Status + 'dialog-information.png', DEST + '/icons')
