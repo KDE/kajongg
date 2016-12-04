@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from common import Internal, ZValues, unicode
-from wind import East
+from wind import Wind, East
 from qt import QRectF, QPointF, QGraphicsSimpleTextItem, QFontMetrics
 
 from board import PlayerWind, YellowText, Board, rotateCenter
@@ -100,6 +100,7 @@ class UIWall(Wall):
         """init and position the wall"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
+        self.initWindMarkers()
         game.wall = self
         Wall.__init__(self, game)
         self.__square = Board(1, 1, Tileset.activeTileset())
@@ -108,13 +109,10 @@ class UIWall(Wall):
         self.__sides = [UIWallSide(
             Tileset.activeTileset(),
             boardRotation, sideLength) for boardRotation in (0, 270, 180, 90)]
-        for side in self.__sides:
+        for idx, side in enumerate(self.__sides):
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
-            side.windTile = PlayerWind(
-                East,
-                Internal.scene.windTileset,
-                parent=side)
+            side.windTile = Wind.all4[idx].marker
             side.windTile.hide()
             side.nameLabel = QGraphicsSimpleTextItem('', side)
             side.message = YellowText(side)
@@ -128,6 +126,13 @@ class UIWall(Wall):
         self.__findOptimalFontHeight()
         Internal.scene.addItem(self.__square)
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
+
+    @staticmethod
+    def initWindMarkers():
+        """the 4 round wind markers on the player walls"""
+        if East.marker is None:
+            for wind in Wind.all4:
+                wind.marker = PlayerWind(wind, Internal.scene.windTileset)
 
     @staticmethod
     def name():
@@ -322,7 +327,9 @@ class UIWall(Wall):
             name.mapToParent(name.boundingRect()).boundingRect().size())
         name.setPos(sideCenter - nameRect.center())
         player.colorizeName()
-        side.windTile.setWind(player.wind, self.game.roundsFinished)
+        side.windTile = Wind.all4[player.wind].marker
+        side.windTile.setParentItem(side)
+        side.windTile.prevailing = self.game.roundsFinished
         side.windTile.resetTransform()
         side.windTile.setPos(
             sideCenter.x() * 1.63,

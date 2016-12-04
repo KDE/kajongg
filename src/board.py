@@ -57,20 +57,21 @@ class PlayerWind(QGraphicsEllipseItem):
 
     """a round wind tile"""
 
-    def __init__(self, name, tileset, roundsFinished=0, parent=None):
+    def __init__(self, wind, tileset, parent=None):
         """generate new wind tile"""
-        assert isinstance(name, Wind), 'PlayerWind expects Wind, not {}'.format(type(name))
         if not len(WINDPIXMAPS):
             WINDPIXMAPS[(East, False)] = None  # avoid recursion
             self.genWINDPIXMAPS()
         QGraphicsEllipseItem.__init__(self)
         if parent:
             self.setParentItem(parent)
-        self.name = name
         self.face = QGraphicsSvgItem()
         self.face.setParentItem(self)
-        self.prevailing = None
-        self.setWind(name, roundsFinished)
+        self.setBrush(QColor('white'))
+        assert isinstance(wind, Wind) and wind.svgName, 'wind {}  must be a real Wind but is {}'.format(
+            wind, type(wind))
+        self.__wind = wind
+        self.face.setElementId(wind.svgName)
         self.tileset = tileset
         self.__sizeFace()
 
@@ -80,7 +81,8 @@ class PlayerWind(QGraphicsEllipseItem):
         tileset = Tileset(Internal.Preferences.windTilesetName)
         for wind in Wind.all4:
             for prevailing in False, True:
-                pwind = PlayerWind(wind, tileset, prevailing)
+                pwind = PlayerWind(wind, tileset)
+                pwind.prevailing = prevailing
                 pMap = QPixmap(40, 40)
                 pMap.fill(Qt.transparent)
                 painter = QPainter(pMap)
@@ -109,17 +111,24 @@ class PlayerWind(QGraphicsEllipseItem):
         self.face.setPos(faceX, faceY)
         self.face.setSharedRenderer(self.tileset.renderer())
 
-    def setWind(self, name, roundsFinished):
-        """change the wind"""
-        assert isinstance(name, Wind) and name.svgName, 'name {}  must be a real Wind but is {}'.format(
-            name, type(name))
-        self.name = name
-        if isinstance(roundsFinished, bool):
-            self.prevailing = roundsFinished
+    @property
+    def wind(self):
+        """the wind in this tile"""
+        return self.__wind
+
+    @property
+    def prevailing(self):
+        """is this the prevailing wind?"""
+        return self.brush() == ROUNDWINDCOLOR
+
+    @prevailing.setter
+    def prevailing(self, value):
+        if isinstance(value, bool):
+            newPrevailing = value
         else:
-            self.prevailing = name == Wind.all4[roundsFinished % 4]
-        self.setBrush(ROUNDWINDCOLOR if self.prevailing else QColor('white'))
-        self.face.setElementId(name.svgName)
+            newPrevailing = self.wind == Wind.all4[value % 4]
+        if self.prevailing != newPrevailing:
+            self.setBrush(ROUNDWINDCOLOR if newPrevailing else QColor('white'))
 
 
 class WindLabel(QLabel):

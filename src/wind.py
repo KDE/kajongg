@@ -34,6 +34,7 @@ class Wind(object):
     all4 = list()
 
     tile = None
+    marker = None
 
     def __new__(cls, *args):
         if not Wind.all:
