@@ -27,6 +27,7 @@ from uitile import UITile
 from meld import Meld, MeldList
 from hand import Hand
 from board import Board
+from sound import Sound
 
 from log import logDebug
 from common import Internal, Debug, isAlive
@@ -448,3 +449,9 @@ class PlayingHandBoard(HandBoard):
         Internal.scene.discardBoard.discardTile(lastDiscard)
         for uiTile in self.uiTiles:
             uiTile.focusable = False
+
+    def addUITile(self, uiTile):
+        """add uiTile to this board"""
+        Board.addUITile(self, uiTile)
+        if uiTile.isBonus and not self.player.game.isScoringGame():
+            Sound.bonus()

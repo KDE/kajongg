@@ -37,7 +37,6 @@ from util import kprint, stack, uniqueList
 from log import logDebug, logException, m18n, m18nc
 from common import LIGHTSOURCES, Internal, Debug, isAlive, unicode
 from wind import Wind, East
-from sound import Sound
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
@@ -610,8 +609,6 @@ class Board(QGraphicsRectItem):
 
     def addUITile(self, uiTile):
         """add uiTile to this board"""
-        if uiTile.isBonus:
-            Sound.bonus()
         self.uiTiles.append(uiTile)
 
     def removeUITile(self, uiTile):
