@@ -579,11 +579,7 @@ class MainWindow(KXmlGuiWindow):
         view, scene = self.centralView, self.scene
         if scene:
             scene.adjustView()
-            oldRect = view.sceneRect()
-            view.setSceneRect(scene.itemsBoundingRect())
-            newRect = view.sceneRect()
-            if oldRect != newRect:
-                view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
+            view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
     @afterQueuedAnimations
     def backgroundChanged(self, dummyDeferredResult, dummyOldName, newName):
