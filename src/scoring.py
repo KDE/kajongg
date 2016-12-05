@@ -41,7 +41,7 @@ from player import Player, Players
 from visible import VisiblePlayer
 from tables import SelectRuleset
 from uiwall import UIWall
-from guiutil import decorateWindow, BlockSignals
+from guiutil import decorateWindow, BlockSignals, rotateCenter
 
 
 class SwapDialog(QMessageBox):

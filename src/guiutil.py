@@ -24,6 +24,7 @@ import os
 
 from qt import uic, toQVariant, variantValue
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
+from qt import QTransform
 
 from kde import KStandardDirs, KIcon
 
@@ -156,3 +157,12 @@ def decorateWindow(window, name=None):
     else:
         window.setWindowTitle(m18n('Kajongg'))
     window.setWindowIcon(KIcon('kajongg'))
+
+
+def rotateCenter(item, angle):
+    """rotates a QGraphicsItem around its center"""
+    center = item.boundingRect().center()
+    centerX, centerY = center.x() * item.scale(), center.y() * item.scale()
+    item.setTransform(QTransform().translate(
+        centerX, centerY).rotate(angle).translate(-centerX, -centerY))
+    return item

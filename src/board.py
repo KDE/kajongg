@@ -22,13 +22,13 @@ from qt import variantValue, Qt, QPointF, QPoint, QRectF, QMimeData, QSize, toQV
 from qt import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
 from qt import QGraphicsView, QGraphicsEllipseItem, QLabel
 from qt import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
-from qt import QFontMetrics, QTransform
+from qt import QFontMetrics
 from qt import QMenu, QCursor
 from qt import QGraphicsSvgItem
 from tileset import Tileset, TileException
 from tile import Tile, elements
 from uitile import UITile, UIMeld
-from guiutil import Painter
+from guiutil import Painter, rotateCenter
 from meld import Meld
 from animation import Animation, MoveImmediate, animate
 from message import Message
@@ -42,15 +42,6 @@ from sound import Sound
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
 WINDPIXMAPS = {}
-
-
-def rotateCenter(item, angle):
-    """rotates a QGraphicsItem around its center"""
-    center = item.boundingRect().center()
-    centerX, centerY = center.x() * item.scale(), center.y() * item.scale()
-    item.setTransform(QTransform().translate(
-        centerX, centerY).rotate(angle).translate(-centerX, -centerY))
-    return item
 
 
 class PlayerWind(QGraphicsEllipseItem):
