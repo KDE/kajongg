@@ -25,6 +25,7 @@ from twisted.internet.defer import Deferred, succeed
 
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve, QVariant, usingQt5
+from qt import pyqtProperty, QGraphicsObject, QGraphicsItem
 
 from common import Internal, Debug, isAlive, isPython3, nativeString
 from log import logDebug
@@ -223,6 +224,83 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if Internal.scene:
             Internal.scene.focusRect.refresh()
         return
+
+
+class AnimatedMixin(object):
+    """for UITile and PlayerWind"""
+
+    def __init__(self):
+        super(AnimatedMixin, self).__init__()
+        self.activeAnimation = dict()  # key is the property name
+        self.queuedAnimations = []
+
+    def _get_pos(self):
+        """getter for property pos"""
+        return QGraphicsObject.pos(self)
+
+    def _set_pos(self, pos):
+        """setter for property pos"""
+        QGraphicsObject.setPos(self, pos)
+
+    pos = pyqtProperty('QPointF', fget=_get_pos, fset=_set_pos)
+
+    def _get_scale(self):
+        """getter for property scale"""
+        return QGraphicsObject.scale(self)
+
+    def _set_scale(self, scale):
+        """setter for property scale"""
+        QGraphicsObject.setScale(self, scale)
+
+    scale = pyqtProperty(float, fget=_get_scale, fset=_set_scale)
+
+    def _get_rotation(self):
+        """getter for property rotation"""
+        return QGraphicsObject.rotation(self)
+
+    def _set_rotation(self, rotation):
+        """setter for property rotation"""
+        QGraphicsObject.setRotation(self, rotation)
+
+    rotation = pyqtProperty(float, fget=_get_rotation, fset=_set_rotation)
+
+    def queuedAnimation(self, propertyName):
+        """return the last queued animation for this tile and propertyName"""
+        for item in reversed(self.queuedAnimations):
+            if item.pName() == propertyName:
+                return item
+
+    def shortcutAnimation(self, animation):
+        """directly set the end value of the animation"""
+        setattr(
+            self,
+            animation.pName(),
+            animation.unpackValue(animation.endValue()))
+        self.queuedAnimations = []
+        self.setDrawingOrder()
+
+    def getValue(self, pName):
+        """gets a property value by not returning a QVariant"""
+        return {'pos': self.pos, 'rotation': self.rotation,
+                'scale': self.scale}[pName]
+
+    def setActiveAnimation(self, animation):
+        """the tile knows which of its properties are currently animated"""
+        self.queuedAnimations = []
+        propName = animation.pName()
+        assert propName not in self.activeAnimation or not isAlive(
+            self.activeAnimation[propName])
+        self.activeAnimation[propName] = animation
+        self.setCacheMode(QGraphicsItem.ItemCoordinateCache)
+
+    def clearActiveAnimation(self, animation):
+        """an animation for this tile has ended.
+        Finalize tile in its new position"""
+        del self.activeAnimation[animation.pName()]
+        self.setDrawingOrder()
+        if not len(self.activeAnimation):
+            self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
+            self.update()
 
 
 class MoveImmediate(object):

@@ -18,19 +18,20 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import QString, Qt, QRectF, QPointF, QSizeF, QSize, pyqtProperty
+from qt import QString, Qt, QRectF, QPointF, QSizeF, QSize
 from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor
 
 from util import stack
 from log import logException, logDebug, id4
 from guiutil import Painter
-from common import LIGHTSOURCES, ZValues, Internal, Debug, isAlive
+from common import LIGHTSOURCES, ZValues, Internal, Debug
 from common import StrMixin
 from tile import Tile
 from meld import Meld
+from animation import AnimatedMixin
 
 
-class UITile(QGraphicsObject, StrMixin):
+class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
 
     """A tile visible on the screen. Every tile is only allocated once
     and then reshuffled and reused for every game.
@@ -41,7 +42,7 @@ class UITile(QGraphicsObject, StrMixin):
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, tile, xoffset=0.0, yoffset=0.0, level=0):
-        QGraphicsObject.__init__(self)
+        super(UITile, self).__init__()
         if not isinstance(tile, Tile):
             tile = Tile(tile)
         self._tile = tile
@@ -56,8 +57,6 @@ class UITile(QGraphicsObject, StrMixin):
         self.__yoffset = yoffset
         self.__dark = False
         self.level = level
-        self.activeAnimation = dict()  # key is the property name
-        self.queuedAnimations = []
 
     def setClippingFlags(self):
         """if we do not show shadows, we need to clip"""
@@ -310,74 +309,6 @@ class UITile(QGraphicsObject, StrMixin):
         """toggle and update display"""
         if value != self.__dark:
             self.__dark = value
-            self.update()
-
-    def _get_pos(self):
-        """getter for property pos"""
-        return QGraphicsObject.pos(self)
-
-    def _set_pos(self, pos):
-        """setter for property pos"""
-        QGraphicsObject.setPos(self, pos)
-
-    pos = pyqtProperty('QPointF', fget=_get_pos, fset=_set_pos)
-
-    def _get_scale(self):
-        """getter for property scale"""
-        return QGraphicsObject.scale(self)
-
-    def _set_scale(self, scale):
-        """setter for property scale"""
-        QGraphicsObject.setScale(self, scale)
-
-    scale = pyqtProperty(float, fget=_get_scale, fset=_set_scale)
-
-    def _get_rotation(self):
-        """getter for property rotation"""
-        return QGraphicsObject.rotation(self)
-
-    def _set_rotation(self, rotation):
-        """setter for property rotation"""
-        QGraphicsObject.setRotation(self, rotation)
-
-    rotation = pyqtProperty(float, fget=_get_rotation, fset=_set_rotation)
-
-    def queuedAnimation(self, propertyName):
-        """return the last queued animation for this tile and propertyName"""
-        for item in reversed(self.queuedAnimations):
-            if item.pName() == propertyName:
-                return item
-
-    def shortcutAnimation(self, animation):
-        """directly set the end value of the animation"""
-        setattr(
-            self,
-            animation.pName(),
-            animation.unpackValue(animation.endValue()))
-        self.queuedAnimations = []
-        self.setDrawingOrder()
-
-    def getValue(self, pName):
-        """gets a property value by not returning a QVariant"""
-        return {'pos': self.pos, 'rotation': self.rotation,
-                'scale': self.scale}[pName]
-
-    def setActiveAnimation(self, animation):
-        """the tile knows which of its properties are currently animated"""
-        self.queuedAnimations = []
-        propName = animation.pName()
-        assert propName not in self.activeAnimation or not isAlive(
-            self.activeAnimation[propName])
-        self.activeAnimation[propName] = animation
-        self.setCacheMode(QGraphicsItem.ItemCoordinateCache)
-
-    def clearActiveAnimation(self, animation):
-        """an animation for this tile has ended.
-        Finalize tile in its new position"""
-        del self.activeAnimation[animation.pName()]
-        self.setDrawingOrder()
-        if not len(self.activeAnimation):
-            self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
             self.update()
 
     @property
