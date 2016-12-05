@@ -1255,7 +1255,7 @@ class ScoringDialog(QWidget):
         self.computeScores()
         self.validate()
         for player in self.game.players:
-            self.game.wall.decoratePlayer(player)
+            player.decorate()
         Internal.mainWindow.updateGUI()
 
     def validate(self):

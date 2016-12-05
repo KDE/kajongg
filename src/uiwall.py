@@ -18,11 +18,11 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from common import Internal, ZValues, unicode
+from common import Internal, ZValues
 from wind import Wind, East
-from qt import QRectF, QPointF, QGraphicsSimpleTextItem, QFontMetrics
+from qt import QPointF, QGraphicsSimpleTextItem, QFontMetrics
 
-from board import PlayerWind, YellowText, Board, rotateCenter
+from board import PlayerWind, YellowText, Board
 from wall import Wall, KongBox
 from tile import Tile
 from tileset import Tileset
@@ -309,30 +309,4 @@ class UIWall(Wall):
     def decorate(self):
         """show player info on the wall"""
         for player in self.game.players:
-            self.decoratePlayer(player)
-
-    def decoratePlayer(self, player):
-        """show player info on the wall"""
-        side = player.front
-        sideCenter = side.center()
-        name = side.nameLabel
-        name.setText(
-            ' - '.join([player.localName,
-                        unicode(player.explainHand().total())]))
-        name.resetTransform()
-        if side.rotation() == 180:
-            rotateCenter(name, 180)
-        nameRect = QRectF()
-        nameRect.setSize(
-            name.mapToParent(name.boundingRect()).boundingRect().size())
-        name.setPos(sideCenter - nameRect.center())
-        player.colorizeName()
-        side.windTile = Wind.all4[player.wind].marker
-        side.windTile.setParentItem(side)
-        side.windTile.prevailing = self.game.roundsFinished
-        side.windTile.resetTransform()
-        side.windTile.setPos(
-            sideCenter.x() * 1.63,
-            sideCenter.y() - side.windTile.rect().height() / 2.5)
-        side.nameLabel.show()
-        side.windTile.show()
+            player.decorate()

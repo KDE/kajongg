@@ -179,8 +179,7 @@ class GameScene(SceneWithFocusRect):
     def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
         if self.game and not self.game.finished():
-            self.game.wall.decoratePlayer(
-                handBoard.player)  # pylint:disable=no-member
+            handBoard.player.decorate()
         # first decorate walls - that will compute player.handBoard for
         # explainView
         if self.explainView:
