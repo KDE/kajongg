@@ -42,7 +42,7 @@ from kde import KDialogButtonBox, KApplication
 from modeltest import ModelTest
 
 from rulesetselector import RuleTreeView
-from board import WindLabel, WINDPIXMAPS
+from board import WindLabel
 from log import m18n, m18nc
 from common import Internal, Debug, unicode
 from statesaver import StateSaver
@@ -1052,8 +1052,8 @@ class ScoringDialog(QWidget):
             self.hide()
         else:
             for idx, player in enumerate(self.game.players):
-                self.windLabels[idx].setPixmap(WINDPIXMAPS[(player.wind,
-                                                            player.wind == self.game.roundWind)])
+                self.windLabels[idx].setPixmap(
+                    WindLabel.pixmaps[(player.wind, player.wind == self.game.roundWind)])
             self.computeScores()
             self.spValues[0].setFocus()
             self.spValues[0].selectAll()
