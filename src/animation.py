@@ -138,8 +138,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             if self.debug or ParallelAnimationGroup.current.debug:
                 logDebug(u'Chaining Animation group %d to %d' %
                          (id(self), id(ParallelAnimationGroup.current)))
-                self.doAfter = ParallelAnimationGroup.current.doAfter
-                ParallelAnimationGroup.current.doAfter = list()
+            self.doAfter = ParallelAnimationGroup.current.doAfter
+            ParallelAnimationGroup.current.doAfter = list()
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
         else:
             self.start()
