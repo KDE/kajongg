@@ -940,8 +940,7 @@ class ScoringDialog(QWidget):
                 if game:
                     self.spValues[idx].setRange(0, game.ruleset.limit or 99999)
                     self.nameLabels[idx].setText(player.localName)
-                    self.windLabels[idx].wind = player.wind
-                    self.windLabels[idx].roundsFinished = game.roundsFinished
+                    self.refreshWindLabels()
                     self.detailTabs.setTabText(idx, player.localName)
                     player.manualRuleBoxes = [RuleBox(x)
                                               for x in game.ruleset.allRules if x.hasSelectable]
@@ -1051,12 +1050,16 @@ class ScoringDialog(QWidget):
         if self.game is None:
             self.hide()
         else:
-            for idx, player in enumerate(self.game.players):
-                self.windLabels[idx].setPixmap(
-                    WindLabel.pixmaps[(player.wind, player.wind == self.game.roundWind)])
+            self.refreshWindLabels()
             self.computeScores()
             self.spValues[0].setFocus()
             self.spValues[0].selectAll()
+
+    def refreshWindLabels(self):
+        """update their wind and prevailing"""
+        for idx, player in enumerate(self.game.players):
+            self.windLabels[idx].wind = player.wind
+            self.windLabels[idx].roundsFinished = self.game.roundsFinished
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
