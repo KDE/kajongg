@@ -30,7 +30,6 @@ from uitile import UITile
 from animation import animate, afterQueuedAnimations, MoveImmediate, \
     ParallelAnimationGroup
 
-
 class UIWallSide(Board):
 
     """a Board representing a wall of tiles"""
@@ -250,7 +249,8 @@ class UIWall(Wall):
         for side in self.__sides:
             side.nameLabel.setFont(font)
 
-    def showShadowsChanged(self, dummyOldValue, dummyNewValue):
+    @afterQueuedAnimations
+    def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue):
         """setting this actually changes the visuals."""
         assert ParallelAnimationGroup.current is None
         self.__resizeHandBoards()

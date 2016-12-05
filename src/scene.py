@@ -169,7 +169,8 @@ class GameScene(SceneWithFocusRect):
         self.mainWindow.updateGUI()
         self.mainWindow.adjustView()
 
-    def showShadowsChanged(self, dummyOldValue, dummyNewValue):
+    @afterQueuedAnimations
+    def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue):
         """if the wanted shadow direction changed, apply that change now"""
         for uiTile in self.graphicsTileItems():
             uiTile.setClippingFlags()
