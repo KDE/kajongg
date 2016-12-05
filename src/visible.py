@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, QBrush, QColor, QRectF
+from qt import Qt, QBrush, QColor, QPointF, QRectF
 
 from log import m18nc
 from message import Message
@@ -27,7 +27,7 @@ from player import Player, PlayingPlayer
 from game import PlayingGame
 from tile import Tile
 from handboard import PlayingHandBoard
-from animation import MoveImmediate
+from animation import MoveImmediate, Animation
 from uiwall import UIWall
 from guiutil import rotateCenter
 from wind import Wind
@@ -87,15 +87,43 @@ class VisiblePlayer(Player):
         name.setPos(sideCenter - nameRect.center())
         self.colorizeName()
         side.windTile = Wind.all4[self.wind].marker
-        side.windTile.setParentItem(side)
+        side.windTile.board = side # TODO: Animation soll,wenn es board nicht gibt, parent nehmen
         side.windTile.prevailing = self.game.roundsFinished
-        side.windTile.resetTransform()
-        side.windTile.setPos(
-            sideCenter.x() * 1.63,
-            sideCenter.y() - side.windTile.rect().height() / 2.5)
+        self.placeTile()
         side.nameLabel.show()
         side.windTile.show()
 
+    def __windPlace(self):
+        """compute all properties for windTile in this board: pos, scale, rotation
+        and return them in a dict"""
+        side = self.front
+        sideCenter = side.center()
+        windTile = Wind.all4[self.wind].marker
+        boardPos = QPointF(
+            sideCenter.x() * 1.63,
+            sideCenter.y() - windTile.boundingRect().height() / 2.0)
+        scenePos = side.mapToScene(boardPos)
+        return {'pos': scenePos, 'rotation': side.sceneRotation()}
+
+    def placeTile(self):
+        """places the windTile in the scene. With direct=False, animate"""
+        windTile = Wind.all4[self.wind].marker
+        for pName, newValue in self.__windPlace().items():
+            animation = windTile.queuedAnimation(pName)
+            if animation:
+                curValue = animation.unpackValue(animation.endValue())
+                if curValue != newValue:
+                    # change a queued animation
+                    animation.setEndValue(newValue)
+            else:
+                animation = windTile.activeAnimation.get(pName, None)
+                if isAlive(animation):
+                    curValue = animation.unpackValue(animation.endValue())
+                else:
+                    curValue = windTile.getValue(pName)
+                if pName != 'scale' or abs(curValue - newValue) > 0.00001:
+                    if curValue != newValue:
+                        Animation(windTile, pName, newValue)
 
 class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 

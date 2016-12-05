@@ -132,6 +132,7 @@ class UIWall(Wall):
         if East.marker is None:
             for wind in Wind.all4:
                 wind.marker = PlayerWind(wind)
+                Internal.scene.addItem(wind.marker)
 
     @staticmethod
     def name():
@@ -250,7 +251,7 @@ class UIWall(Wall):
             side.nameLabel.setFont(font)
 
     @afterQueuedAnimations
-    def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue):
+    def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue): # pylint: disable=unused-argument
         """setting this actually changes the visuals."""
         assert ParallelAnimationGroup.current is None
         self.__resizeHandBoards()
@@ -310,3 +311,4 @@ class UIWall(Wall):
         """show player info on the wall"""
         for player in self.game.players:
             player.decorate()
+        animate() # move the wind markers

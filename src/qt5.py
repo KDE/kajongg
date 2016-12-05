@@ -67,7 +67,6 @@ from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QFormLayout
 from PyQt5.QtWidgets import QFrame
 from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsObject
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsScene

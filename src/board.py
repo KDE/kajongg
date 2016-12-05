@@ -19,10 +19,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from qt import variantValue, Qt, QPointF, QPoint, QRectF, QMimeData, QSize, toQVariant
-from qt import QGraphicsRectItem, QGraphicsItem, QSizePolicy, QFrame, QFont
-from qt import QGraphicsView, QGraphicsEllipseItem, QLabel
+from qt import QGraphicsRectItem, QSizePolicy, QFrame, QFont
+from qt import QGraphicsView, QLabel
 from qt import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
-from qt import QFontMetrics
+from qt import QFontMetrics, QGraphicsObject
 from qt import QMenu, QCursor
 from qt import QGraphicsSvgItem
 from qt import usingQt4
@@ -31,50 +31,39 @@ from tile import Tile, elements
 from uitile import UITile, UIMeld
 from guiutil import Painter, rotateCenter
 from meld import Meld
-from animation import Animation, MoveImmediate, animate
+from animation import Animation, MoveImmediate, animate, AnimatedMixin
 from message import Message
 
 from util import kprint, stack, uniqueList
 from log import logDebug, logException, m18n, m18nc
-from common import LIGHTSOURCES, Internal, Debug, isAlive, unicode
+from common import LIGHTSOURCES, Internal, Debug, isAlive, unicode, StrMixin
+from common import ZValues
 from wind import Wind, East
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
 
-class PlayerWind(QGraphicsEllipseItem):
+class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
 
     """a round wind tile"""
 
     def __init__(self, wind, parent=None):
         """generate new wind tile"""
-        QGraphicsEllipseItem.__init__(self)
-        if parent:
-            self.setParentItem(parent)
-        self.face = QGraphicsSvgItem()
-        self.face.setParentItem(self)
-        self.setBrush(QColor('white'))
+        super(PlayerWind, self).__init__()
+        assert not parent
         assert isinstance(wind, Wind) and wind.svgName, 'wind {}  must be a real Wind but is {}'.format(
             wind, type(wind))
         self.__wind = wind
-        self.face.setElementId(wind.svgName)
-        self.tileset = Internal.scene.windTileset
-        self.__sizeFace()
+        self.tile = wind.tile
+        self.__brush = QColor('white')
 
-    def __sizeFace(self):
-        """size the chinese character depending on the wind tileset"""
-        self.resetTransform()
-        size = self.tileset.faceSize
-        self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
-        diameter = size.height() * 1.1
-        scaleFactor = 0.9
-        facePos = {'traditional': (10, 10), 'default': (15, 10),
-                   'classic': (19, 1), 'jade': (19, 1)}
-        self.setRect(0, 0, diameter, diameter)
-        self.setScale(scaleFactor)
-        faceX, faceY = facePos[self.tileset.desktopFileName]
-        self.face.setPos(faceX, faceY)
-        self.face.setSharedRenderer(self.tileset.renderer())
+    def setDrawingOrder(self):
+        """we want the winds above all others"""
+        if self.activeAnimation.get('pos'):
+            moving = ZValues.moving
+        else:
+            moving = 0
+        self.setZValue(ZValues.marker + moving)
 
     @property
     def wind(self):
@@ -84,7 +73,7 @@ class PlayerWind(QGraphicsEllipseItem):
     @property
     def prevailing(self):
         """is this the prevailing wind?"""
-        return self.brush() == ROUNDWINDCOLOR
+        return self.__brush == ROUNDWINDCOLOR
 
     @prevailing.setter
     def prevailing(self, value):
@@ -92,8 +81,30 @@ class PlayerWind(QGraphicsEllipseItem):
             newPrevailing = value
         else:
             newPrevailing = self.wind == Wind.all4[value % 4]
-        if self.prevailing != newPrevailing:
-            self.setBrush(ROUNDWINDCOLOR if newPrevailing else QColor('white'))
+        self.__brush = ROUNDWINDCOLOR if newPrevailing else QColor('white')
+
+    def paint(self, painter, dummyOption, dummyWidget=None):
+        """paint the marker"""
+        tileset = Internal.scene.windTileset
+        with Painter(painter):
+            painter.setBrush(self.__brush)
+            painter.drawEllipse(self.boundingRect())
+            renderer = tileset.renderer()
+            painter.scale(0.9, 0.9)
+            painter.translate(-5, 8)
+            renderer.render(painter, self.wind.svgName, self.boundingRect())
+
+    def boundingRect(self): # pylint: disable=no-self-use
+        """define the part of the tile we want to see. Do not return QRect()
+        if tileset is not known because that makes QGraphicsscene crash"""
+        tileset = Internal.scene.windTileset
+        size = tileset.faceSize.height() * 1.1
+        return QRectF(QPoint(), QPoint(size, size))
+
+    def __unicode__(self):
+        """for debugging"""
+        return u'Windmarker %s x/y= %.1f/%1f' % (
+            self.tile, self.x(), self.y())
 
 
 class WindLabel(QLabel):

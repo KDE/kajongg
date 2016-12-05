@@ -170,7 +170,7 @@ class GameScene(SceneWithFocusRect):
         self.mainWindow.adjustView()
 
     @afterQueuedAnimations
-    def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue):
+    def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue): # pylint: disable=unused-argument
         """if the wanted shadow direction changed, apply that change now"""
         for uiTile in self.graphicsTileItems():
             uiTile.setClippingFlags()
@@ -214,7 +214,8 @@ class GameScene(SceneWithFocusRect):
             bool(self.game) and Internal.Preferences.showShadows)
         with MoveImmediate():
             for item in self.nonTiles():
-                item.tileset = Tileset.activeTileset()
+                if hasattr(item, 'tileset'):
+                    item.tileset = Tileset.activeTileset()
 
     def prepareHand(self):
         """redecorate wall"""
@@ -275,6 +276,8 @@ class GameScene(SceneWithFocusRect):
         """remove all tiles from scene"""
         for item in self.graphicsTileItems():
             self.removeItem(item)
+        for wind in Wind.all:
+            wind.marker = None
         self.focusRect.hide()
 
 

@@ -68,7 +68,6 @@ from PyQt4.QtGui import QFontMetrics
 from PyQt4.QtGui import QFormLayout
 from PyQt4.QtGui import QFrame
 from PyQt4.QtGui import QGraphicsItem
-from PyQt4.QtGui import QGraphicsEllipseItem
 from PyQt4.QtGui import QGraphicsObject
 from PyQt4.QtGui import QGraphicsRectItem
 from PyQt4.QtGui import QGraphicsScene
