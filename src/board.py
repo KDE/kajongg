@@ -46,7 +46,7 @@ class PlayerWind(QGraphicsEllipseItem):
 
     """a round wind tile"""
 
-    def __init__(self, wind, tileset, parent=None):
+    def __init__(self, wind, parent=None):
         """generate new wind tile"""
         QGraphicsEllipseItem.__init__(self)
         if parent:
@@ -58,7 +58,7 @@ class PlayerWind(QGraphicsEllipseItem):
             wind, type(wind))
         self.__wind = wind
         self.face.setElementId(wind.svgName)
-        self.tileset = tileset
+        self.tileset = Internal.scene.windTileset
         self.__sizeFace()
 
     def __sizeFace(self):
@@ -140,8 +140,7 @@ class WindLabel(QLabel):
 
     def genWindPixmap(self):
         """prepare wind tiles"""
-        tileset = Tileset(Internal.Preferences.windTilesetName)
-        pwind = PlayerWind(self.__wind, tileset)
+        pwind = PlayerWind(self.__wind)
         pwind.prevailing = self.__wind == Wind.all4[min(self.__roundsFinished, 3)]
         pMap = QPixmap(40, 40)
         pMap.fill(Qt.transparent)
@@ -518,7 +517,6 @@ class Board(QGraphicsRectItem):
             self.setGeometry()
             for child in self.childItems():
                 if isinstance(child, (Board, PlayerWind)):
-                    child.tileset = tileset
                     child.lightSource = lightSource
                     child.showShadows = showShadows
             for uiTile in self.uiTiles:

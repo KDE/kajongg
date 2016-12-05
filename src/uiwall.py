@@ -131,7 +131,7 @@ class UIWall(Wall):
         """the 4 round wind markers on the player walls"""
         if East.marker is None:
             for wind in Wind.all4:
-                wind.marker = PlayerWind(wind, Internal.scene.windTileset)
+                wind.marker = PlayerWind(wind)
 
     @staticmethod
     def name():
