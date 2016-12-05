@@ -41,8 +41,6 @@ from wind import Wind, East
 
 ROUNDWINDCOLOR = QColor(235, 235, 173)
 
-WINDPIXMAPS = {}
-
 
 class PlayerWind(QGraphicsEllipseItem):
 
@@ -50,9 +48,6 @@ class PlayerWind(QGraphicsEllipseItem):
 
     def __init__(self, wind, tileset, parent=None):
         """generate new wind tile"""
-        if not len(WINDPIXMAPS):
-            WINDPIXMAPS[(East, False)] = None  # avoid recursion
-            self.genWINDPIXMAPS()
         QGraphicsEllipseItem.__init__(self)
         if parent:
             self.setParentItem(parent)
@@ -65,27 +60,6 @@ class PlayerWind(QGraphicsEllipseItem):
         self.face.setElementId(wind.svgName)
         self.tileset = tileset
         self.__sizeFace()
-
-    @staticmethod
-    def genWINDPIXMAPS():
-        """prepare wind tiles"""
-        tileset = Tileset(Internal.Preferences.windTilesetName)
-        for wind in Wind.all4:
-            for prevailing in False, True:
-                pwind = PlayerWind(wind, tileset)
-                pwind.prevailing = prevailing
-                pMap = QPixmap(40, 40)
-                pMap.fill(Qt.transparent)
-                painter = QPainter(pMap)
-                painter.setRenderHint(QPainter.Antialiasing)
-                painter.scale(0.40, 0.40)
-                pwind.paint(painter, QStyleOptionGraphicsItem())
-                for child in pwind.childItems():
-                    if isinstance(child, QGraphicsSvgItem):
-                        with Painter(painter):
-                            painter.translate(child.mapToParent(0.0, 0.0))
-                            child.paint(painter, QStyleOptionGraphicsItem())
-                WINDPIXMAPS[(wind, prevailing)] = pMap
 
     def __sizeFace(self):
         """size the chinese character depending on the wind tileset"""
@@ -126,6 +100,8 @@ class WindLabel(QLabel):
 
     """QLabel holding the wind tile"""
 
+    pixmaps = {}
+
     @property
     def wind(self):
         """the current wind on this label"""
@@ -160,9 +136,32 @@ class WindLabel(QLabel):
 
     def _refresh(self):
         """update pixmaps"""
-        PlayerWind.genWINDPIXMAPS()
-        self.setPixmap(WINDPIXMAPS[(self.__wind,
-                                    self.__wind == Wind.all4[min(self.__roundsFinished, 3)])])
+        if not len(WindLabel.pixmaps):
+            self.genWindPixmaps()
+        self.setPixmap(WindLabel.pixmaps[(
+            self.__wind,
+            self.__wind == Wind.all4[min(self.__roundsFinished, 3)])])
+
+    @staticmethod
+    def genWindPixmaps():
+        """prepare wind tiles"""
+        tileset = Tileset(Internal.Preferences.windTilesetName)
+        for wind in Wind.all4:
+            for prevailing in False, True:
+                pwind = PlayerWind(wind, tileset)
+                pwind.prevailing = prevailing
+                pMap = QPixmap(40, 40)
+                pMap.fill(Qt.transparent)
+                painter = QPainter(pMap)
+                painter.setRenderHint(QPainter.Antialiasing)
+                painter.scale(0.40, 0.40)
+                pwind.paint(painter, QStyleOptionGraphicsItem())
+                for child in pwind.childItems():
+                    if isinstance(child, QGraphicsSvgItem):
+                        with Painter(painter):
+                            painter.translate(child.mapToParent(0.0, 0.0))
+                            child.paint(painter, QStyleOptionGraphicsItem())
+                WindLabel.pixmaps[(wind, prevailing)] = pMap
 
 
 class Board(QGraphicsRectItem):
