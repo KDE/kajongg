@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 Kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -40,12 +40,12 @@ from common import LIGHTSOURCES, Internal, Debug, isAlive, unicode, StrMixin
 from common import ZValues
 from wind import Wind, East
 
-ROUNDWINDCOLOR = QColor(235, 235, 173)
-
 
 class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
 
     """a round wind tile"""
+
+    roundWindColor = QColor(235, 235, 173)
 
     def __init__(self, wind, parent=None):
         """generate new wind marker"""
@@ -76,7 +76,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
     @property
     def prevailing(self):
         """is this the prevailing wind?"""
-        return self.__brush == ROUNDWINDCOLOR
+        return self.__brush == self.roundWindColor
 
     @prevailing.setter
     def prevailing(self, value):
@@ -84,7 +84,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
             newPrevailing = value
         else:
             newPrevailing = self.wind == Wind.all4[value % 4]
-        self.__brush = ROUNDWINDCOLOR if newPrevailing else QColor('white')
+        self.__brush = self.roundWindColor if newPrevailing else QColor('white')
 
     def paint(self, painter, dummyOption, dummyWidget=None):
         """paint the marker"""
