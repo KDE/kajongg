@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Copyright (C) 2010-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2010-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 partially based on C++ code from:
 Copyright (C) 2006 Mauricio Piacentini <mauricio@tabuleiro.com>

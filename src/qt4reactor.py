@@ -3,7 +3,7 @@
 
 """
 Copyright (c) 2001-2011 Twisted Matrix Laboratories <twisted-python@twistedmatrix.com>
-Copyright (C) 2008-2014 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 Kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
