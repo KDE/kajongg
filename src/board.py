@@ -88,20 +88,17 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
 
     def paint(self, painter, dummyOption, dummyWidget=None):
         """paint the marker"""
-        tileset = Internal.scene.windTileset
         with Painter(painter):
             painter.setBrush(self.__brush)
             painter.drawEllipse(self.boundingRect())
-            renderer = tileset.renderer()
+            renderer = Internal.scene.windTileset.renderer()
             painter.scale(0.9, 0.9)
             painter.translate(-5, 8)
             renderer.render(painter, self.wind.svgName, self.boundingRect())
 
     def boundingRect(self): # pylint: disable=no-self-use
-        """define the part of the tile we want to see. Do not return QRect()
-        if tileset is not known because that makes QGraphicsscene crash"""
-        tileset = Internal.scene.windTileset
-        size = tileset.faceSize.height() * 1.1
+        """define the part of the tile we want to see"""
+        size = Internal.scene.windTileset.faceSize.height() * 1.1
         return QRectF(QPoint(), QPoint(size, size))
 
     def __unicode__(self):
