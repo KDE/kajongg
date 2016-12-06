@@ -28,7 +28,7 @@ from qt import QPropertyAnimation, QParallelAnimationGroup, \
 from qt import pyqtProperty, QGraphicsObject, QGraphicsItem
 
 from common import Internal, Debug, isAlive, isPython3, nativeString
-from log import logDebug
+from log import logDebug, id4
 
 
 class Animation(QPropertyAnimation):
@@ -64,17 +64,19 @@ class Animation(QPropertyAnimation):
         if uiTile.tile in Debug.animation:
             pName = self.pName()
             logDebug(
-                u'%s: change endValue for %s: %s->%s  %s' % (self.ident(), pName, self.formatValue(self.endValue()),
-                                                             self.formatValue(endValue), uiTile))
+                u'%s: change endValue for %s: %s->%s  %s' % (
+                    self.ident(), pName,
+                    self.formatValue(self.endValue()),
+                    self.formatValue(endValue), uiTile))
         QPropertyAnimation.setEndValue(self, endValue)
 
     def ident(self):
         """the identifier to be used in debug messages"""
         pGroup = self.group()
         if pGroup:
-            return '%d/A%d' % (id(pGroup) % 10000, id(self) % 10000)
+            return 'G%s/A%s' % (id4(pGroup), id4(self))
         else:
-            return 'A%d' % (id(self) % 10000)
+            return 'A%s' % id4(self)
 
     def pName(self):
         """
@@ -114,8 +116,12 @@ class Animation(QPropertyAnimation):
 
     def __str__(self):
         """for debug messages"""
-        return '%s: %s->%s for %s' % (self.ident(), self.pName(),
-                                      self.formatValue(self.endValue()), self.targetObject())
+        currentValue = getattr(self.targetObject(), self.pName())
+        return '%s %s: %s->%s for %s' % (
+            self.ident(), self.pName(),
+            self.formatValue(currentValue),
+            self.formatValue(self.endValue()),
+            self.targetObject())
 
 
 class ParallelAnimationGroup(QParallelAnimationGroup):
@@ -141,8 +147,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         self.doAfter = list()
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
-                logDebug(u'Chaining Animation group %d to %d' %
-                         (id(self), id(ParallelAnimationGroup.current)))
+                logDebug(u'Chaining Animation group G%s to G%s' %
+                         (id4(self), id4(ParallelAnimationGroup.current)))
             self.doAfter = ParallelAnimationGroup.current.doAfter
             ParallelAnimationGroup.current.doAfter = list()
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
@@ -191,8 +197,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             self,
             QAbstractAnimation.DeleteWhenStopped)
         if self.debug:
-            logDebug(u'Animation group %d started (%s)' % (
-                id(self), ','.join('A%d' % (id(x) % 10000) for x in self.animations)))
+            logDebug(u'Animation group G%s started (%s)' % (
+                id4(self), ','.join('A%s' % id4(x) for x in self.animations)))
         return succeed(None)
 
     def allFinished(self):
@@ -209,7 +215,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         # if we have a deferred, callback now
         assert self.deferred
         if self.debug:
-            logDebug(u'Animation group %d done' % id(self))
+            logDebug(u'Animation group G%s done' % id4(self))
         if self.deferred:
             self.deferred.callback(None)
         for after in self.doAfter:
@@ -334,8 +340,8 @@ def __afterCurrentAnimationDo(callback, *args, **kwargs):
         deferred.addCallback(callback, *args, **kwargs)
         current.doAfter.append(deferred)
         if current.debug:
-            logDebug(u'after current animation %d do %s %s' %
-                     (id(current), callback, ','.join(args) if args else ''))
+            logDebug(u'after current animation group G%s do %s %s' %
+                     (id4(current), callback, ','.join(args) if args else ''))
     else:
         callback(None, *args, **kwargs)
 
