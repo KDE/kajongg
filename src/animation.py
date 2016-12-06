@@ -49,7 +49,7 @@ class Animation(QPropertyAnimation):
         self.setEasingCurve(QEasingCurve.InOutQuad)
         graphicsObject.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
-        if graphicsObject.tile in Debug.animation:
+        if graphicsObject.name() in Debug.animation:
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
                 logDebug(
@@ -61,7 +61,7 @@ class Animation(QPropertyAnimation):
     def setEndValue(self, endValue):
         """wrapper with debugging code"""
         graphicsObject = self.targetObject()
-        if graphicsObject.tile in Debug.animation:
+        if graphicsObject.name() in Debug.animation:
             pName = self.pName()
             logDebug(
                 u'%s: change endValue for %s: %s->%s  %s' % (
@@ -165,7 +165,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             # if not (game end), we do not want to go on
             for animation in self.animations:
                 graphicsObject = animation.targetObject()
-                if not isAlive(graphicsObject.board):
+                if hasattr(graphicsObject, 'board') and not isAlive(graphicsObject.board):
                     graphicsObject.clearActiveAnimation(animation)
                     self.removeAnimation(animation)
         QParallelAnimationGroup.updateCurrentTime(self, value)
@@ -175,7 +175,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         assert self.state() != QAbstractAnimation.Running
         for animation in self.animations:
             graphicsObject = animation.targetObject()
-            self.debug |= graphicsObject.tile in Debug.animation
+            self.debug |= graphicsObject.name() in Debug.animation
             graphicsObject.setActiveAnimation(animation)
             self.addAnimation(animation)
             propName = animation.pName()

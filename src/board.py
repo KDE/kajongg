@@ -48,14 +48,17 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
     """a round wind tile"""
 
     def __init__(self, wind, parent=None):
-        """generate new wind tile"""
+        """generate new wind marker"""
         super(PlayerWind, self).__init__()
         assert not parent
         assert isinstance(wind, Wind) and wind.svgName, 'wind {}  must be a real Wind but is {}'.format(
             wind, type(wind))
         self.__wind = wind
-        self.tile = wind.tile
         self.__brush = QColor('white')
+
+    def name(self):
+        """for identification in animations"""
+        return self.__wind.tile
 
     def setDrawingOrder(self):
         """we want the winds above all others"""
@@ -67,7 +70,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
 
     @property
     def wind(self):
-        """the wind in this tile"""
+        """our wind"""
         return self.__wind
 
     @property
@@ -104,7 +107,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
     def __unicode__(self):
         """for debugging"""
         return u'Windmarker %s x/y= %.1f/%1f' % (
-            self.tile, self.x(), self.y())
+            self.name(), self.x(), self.y())
 
 
 class WindLabel(QLabel):

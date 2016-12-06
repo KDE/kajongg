@@ -58,6 +58,10 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         self.__dark = False
         self.level = level
 
+    def name(self):
+        """identification for animations"""
+        return self._tile
+
     def setClippingFlags(self):
         """if we do not show shadows, we need to clip"""
         showShadows = Internal.Preferences.showShadows
