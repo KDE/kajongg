@@ -31,7 +31,7 @@ from tile import Tile, elements
 from uitile import UITile, UIMeld
 from guiutil import Painter, rotateCenter
 from meld import Meld
-from animation import Animation, MoveImmediate, animate, AnimatedMixin
+from animation import MoveImmediate, animate, AnimatedMixin
 from message import Message
 
 from util import kprint, stack, uniqueList
@@ -575,8 +575,8 @@ class Board(QGraphicsRectItem):
         """the current face size"""
         return self._tileset.faceSize
 
-    def __tilePlace(self, uiTile):
-        """compute all properties for uiTile in this board: pos, scale, rotation
+    def __tileMovement(self, uiTile):
+        """compute all wanted properties for uiTile in this board: pos, scale, rotation
         and return them in a dict"""
         assert isinstance(uiTile, UITile)
         if not uiTile.scene():
@@ -592,24 +592,9 @@ class Board(QGraphicsRectItem):
         return {'pos': scenePos, 'rotation': self.sceneRotation(), 'scale': self.scale()}
 
     def placeTile(self, uiTile):
-        """places the uiTile in the scene. With direct=False, animate"""
+        """places the uiTile in the scene"""
         assert isinstance(uiTile, UITile)
-        for pName, newValue in self.__tilePlace(uiTile).items():
-            animation = uiTile.queuedAnimation(pName)
-            if animation:
-                curValue = animation.unpackValue(animation.endValue())
-                if curValue != newValue:
-                    # change a queued animation
-                    animation.setEndValue(newValue)
-            else:
-                animation = uiTile.activeAnimation.get(pName, None)
-                if isAlive(animation):
-                    curValue = animation.unpackValue(animation.endValue())
-                else:
-                    curValue = uiTile.getValue(pName)
-                if pName != 'scale' or abs(curValue - newValue) > 0.00001:
-                    if curValue != newValue:
-                        Animation(uiTile, pName, newValue)
+        uiTile.startAnimations(self.__tileMovement(uiTile))
 
     def addUITile(self, uiTile):
         """add uiTile to this board"""

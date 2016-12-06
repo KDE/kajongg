@@ -27,7 +27,7 @@ from player import Player, PlayingPlayer
 from game import PlayingGame
 from tile import Tile
 from handboard import PlayingHandBoard
-from animation import MoveImmediate, Animation
+from animation import MoveImmediate
 from uiwall import UIWall
 from guiutil import rotateCenter
 from wind import Wind
@@ -87,13 +87,12 @@ class VisiblePlayer(Player):
         name.setPos(sideCenter - nameRect.center())
         self.colorizeName()
         side.windTile = Wind.all4[self.wind].marker
-        side.windTile.board = side # TODO: Animation soll,wenn es board nicht gibt, parent nehmen
         side.windTile.prevailing = self.game.roundsFinished
-        self.placeTile()
+        side.windTile.startAnimations(self.__windMovement())
         side.nameLabel.show()
         side.windTile.show()
 
-    def __windPlace(self):
+    def __windMovement(self):
         """compute all properties for windTile in this board: pos, scale, rotation
         and return them in a dict"""
         side = self.front
@@ -105,25 +104,6 @@ class VisiblePlayer(Player):
         scenePos = side.mapToScene(boardPos)
         return {'pos': scenePos, 'rotation': side.sceneRotation()}
 
-    def placeTile(self):
-        """places the windTile in the scene. With direct=False, animate"""
-        windTile = Wind.all4[self.wind].marker
-        for pName, newValue in self.__windPlace().items():
-            animation = windTile.queuedAnimation(pName)
-            if animation:
-                curValue = animation.unpackValue(animation.endValue())
-                if curValue != newValue:
-                    # change a queued animation
-                    animation.setEndValue(newValue)
-            else:
-                animation = windTile.activeAnimation.get(pName, None)
-                if isAlive(animation):
-                    curValue = animation.unpackValue(animation.endValue())
-                else:
-                    curValue = windTile.getValue(pName)
-                if pName != 'scale' or abs(curValue - newValue) > 0.00001:
-                    if curValue != newValue:
-                        Animation(windTile, pName, newValue)
 
 class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 

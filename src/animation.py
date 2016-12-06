@@ -308,6 +308,25 @@ class AnimatedMixin(object):
             self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
             self.update()
 
+    def startAnimations(self, what):
+        """what is a dict. key=property to be animated, value its new endvalue"""
+        for pName, newValue in what.items():
+            animation = self.queuedAnimation(pName)
+            if animation:
+                curValue = animation.unpackValue(animation.endValue())
+                if curValue != newValue:
+                    # change a queued animation
+                    animation.setEndValue(newValue)
+            else:
+                animation = self.activeAnimation.get(pName, None)
+                if isAlive(animation):
+                    curValue = animation.unpackValue(animation.endValue())
+                else:
+                    curValue = self.getValue(pName)
+                if pName != 'scale' or abs(curValue - newValue) > 0.00001:
+                    if curValue != newValue:
+                        Animation(self, pName, newValue)
+
 
 class MoveImmediate(object):
 
