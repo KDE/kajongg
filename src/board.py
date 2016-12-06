@@ -114,8 +114,6 @@ class WindLabel(QLabel):
 
     """QLabel holding the wind tile"""
 
-    pixmaps = {}
-
     @property
     def wind(self):
         """the current wind on this label"""
@@ -138,18 +136,18 @@ class WindLabel(QLabel):
 
     @property
     def roundsFinished(self):
-        """setting roundsFinished also changes pixmaps if needed"""
+        """setting roundsFinished also changes graphics if needed"""
         return self.__roundsFinished
 
     @roundsFinished.setter
     def roundsFinished(self, roundsFinished):
-        """setting roundsFinished also changes pixmaps if needed"""
+        """setting roundsFinished also changes graphics if needed"""
         if self.__roundsFinished != roundsFinished:
             self.__roundsFinished = roundsFinished
             self._refresh()
 
     def _refresh(self):
-        """update pixmaps"""
+        """update graphics"""
         self.setPixmap(self.genWindPixmap())
 
     def genWindPixmap(self):
