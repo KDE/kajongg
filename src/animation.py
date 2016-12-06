@@ -37,20 +37,20 @@ class Animation(QPropertyAnimation):
 
     nextAnimations = []
 
-    def __init__(self, uiTile, propName, endValue, parent=None):
+    def __init__(self, graphicsObject, propName, endValue, parent=None):
         pName = propName
         if isPython3 and usingQt5:
             # in this case they want bytes
             pName = pName.encode()
-        QPropertyAnimation.__init__(self, uiTile, pName, parent)
+        QPropertyAnimation.__init__(self, graphicsObject, pName, parent)
         QPropertyAnimation.setEndValue(self, endValue)
         duration = Internal.Preferences.animationDuration()
         self.setDuration(duration)
         self.setEasingCurve(QEasingCurve.InOutQuad)
-        uiTile.queuedAnimations.append(self)
+        graphicsObject.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
-        if uiTile.tile in Debug.animation:
-            oldAnimation = uiTile.activeAnimation.get(propName, None)
+        if graphicsObject.tile in Debug.animation:
+            oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
                 logDebug(
                     u'new animation %s (after %s is done)' %
@@ -60,14 +60,14 @@ class Animation(QPropertyAnimation):
 
     def setEndValue(self, endValue):
         """wrapper with debugging code"""
-        uiTile = self.targetObject()
-        if uiTile.tile in Debug.animation:
+        graphicsObject = self.targetObject()
+        if graphicsObject.tile in Debug.animation:
             pName = self.pName()
             logDebug(
                 u'%s: change endValue for %s: %s->%s  %s' % (
                     self.ident(), pName,
                     self.formatValue(self.endValue()),
-                    self.formatValue(endValue), uiTile))
+                    self.formatValue(endValue), graphicsObject))
         QPropertyAnimation.setEndValue(self, endValue)
 
     def ident(self):
@@ -164,9 +164,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             # periodically check if the board still exists.
             # if not (game end), we do not want to go on
             for animation in self.animations:
-                uiTile = animation.targetObject()
-                if not isAlive(uiTile.board):
-                    uiTile.clearActiveAnimation(animation)
+                graphicsObject = animation.targetObject()
+                if not isAlive(graphicsObject.board):
+                    graphicsObject.clearActiveAnimation(animation)
                     self.removeAnimation(animation)
         QParallelAnimationGroup.updateCurrentTime(self, value)
 
@@ -174,16 +174,16 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         """start the animation, returning its deferred"""
         assert self.state() != QAbstractAnimation.Running
         for animation in self.animations:
-            uiTile = animation.targetObject()
-            self.debug |= uiTile.tile in Debug.animation
-            uiTile.setActiveAnimation(animation)
+            graphicsObject = animation.targetObject()
+            self.debug |= graphicsObject.tile in Debug.animation
+            graphicsObject.setActiveAnimation(animation)
             self.addAnimation(animation)
             propName = animation.pName()
-            animation.setStartValue(uiTile.getValue(propName))
+            animation.setStartValue(graphicsObject.getValue(propName))
             if propName == 'rotation':
                 # change direction if that makes the difference smaller
                 endValue = animation.unpackEndValue()
-                currValue = uiTile.rotation
+                currValue = graphicsObject.rotation
                 if endValue - currValue > 180:
                     animation.setStartValue(currValue + 360)
                 if currValue - endValue > 180:
@@ -224,9 +224,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
     def fixAllBoards(self):
         """set correct drawing order for all moved graphics objects"""
         for animation in self.children():
-            uiTile = animation.targetObject()
-            if uiTile:
-                uiTile.clearActiveAnimation(animation)
+            graphicsObject = animation.targetObject()
+            if graphicsObject:
+                graphicsObject.clearActiveAnimation(animation)
         if Internal.scene:
             Internal.scene.focusRect.refresh()
         return
