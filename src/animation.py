@@ -222,7 +222,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             after.callback(None)
 
     def fixAllBoards(self):
-        """set correct drawing order for all moved tiles"""
+        """set correct drawing order for all moved graphics objects"""
         for animation in self.children():
             uiTile = animation.targetObject()
             if uiTile:
@@ -271,7 +271,7 @@ class AnimatedMixin(object):
     rotation = pyqtProperty(float, fget=_get_rotation, fset=_set_rotation)
 
     def queuedAnimation(self, propertyName):
-        """return the last queued animation for this tile and propertyName"""
+        """return the last queued animation for this graphics object and propertyName"""
         for item in reversed(self.queuedAnimations):
             if item.pName() == propertyName:
                 return item
@@ -291,7 +291,7 @@ class AnimatedMixin(object):
                 'scale': self.scale}[pName]
 
     def setActiveAnimation(self, animation):
-        """the tile knows which of its properties are currently animated"""
+        """the graphics object knows which of its properties are currently animated"""
         self.queuedAnimations = []
         propName = animation.pName()
         assert propName not in self.activeAnimation or not isAlive(
@@ -300,8 +300,8 @@ class AnimatedMixin(object):
         self.setCacheMode(QGraphicsItem.ItemCoordinateCache)
 
     def clearActiveAnimation(self, animation):
-        """an animation for this tile has ended.
-        Finalize tile in its new position"""
+        """an animation for this graphics object has ended.
+        Finalize graphics object in its new position"""
         del self.activeAnimation[animation.pName()]
         self.setDrawingOrder()
         if not len(self.activeAnimation):
@@ -311,7 +311,7 @@ class AnimatedMixin(object):
 
 class MoveImmediate(object):
 
-    """a helper class for moving tiles with or without animation"""
+    """a helper class for moving graphics objects with or without animation"""
 
     def __init__(self, animateMe=False):
         if Internal.Preferences:
@@ -369,7 +369,7 @@ def animate():
         so callers can attach callbacks to be executed when
         animation is over.
         We do not animate if
-             - we are in a tile drag/drop operation
+             - we are in a graphics object drag/drop operation
              - the user disabled animation
              - there are too many animations in the group so it would be too slow
     """
