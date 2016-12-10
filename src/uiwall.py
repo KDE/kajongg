@@ -44,10 +44,11 @@ class UIWallSide(Board):
         """name for debug messages"""
         game = Internal.scene.game
         if not game:
-            return 'NOGAME'
+            return u'NOGAME'
         for player in game.players:
             if player.front == self:
-                return 'wall %s' % player.name
+                return u'UIWallSide %s' % player.name
+        return  u'UIWallSide'
 
     def center(self):
         """returns the center point of the wall in relation to the
