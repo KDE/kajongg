@@ -22,9 +22,9 @@ from zope.interface import implements  # pylint: disable=unused-import
 
 from twisted.internet.defer import succeed
 
-from log import m18n, m18nc, logDebug
+from log import m18n, m18nc, logDebug, id4
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
-from common import nativeString
+from common import nativeString, StrMixin
 from wind import Wind
 
 from qt import Qt, QMetaObject, variantValue
@@ -42,7 +42,7 @@ from animation import AnimationSpeed, afterQueuedAnimations
 from scoringdialog import ScoringDialog
 
 
-class FocusRect(QGraphicsRectItem):
+class FocusRect(QGraphicsRectItem, StrMixin):
 
     """show a focusRect with blue border around focused tile or meld"""
 
@@ -92,6 +92,10 @@ class FocusRect(QGraphicsRectItem):
         self.setVisible(board.isVisible() and bool(board.focusTile)
                         and board.isEnabled() and board.hasFocus and bool(game) and not game.autoPlay)
 
+
+    def __unicode__(self):
+        """for debugging"""
+        return u'FocusRect {} on {}'.format(id4(self), self.board if self.board else u'NOBOARD')
 
 class SceneWithFocusRect(QGraphicsScene):
 

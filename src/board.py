@@ -164,7 +164,7 @@ class WindLabel(QLabel):
                     child.paint(painter, QStyleOptionGraphicsItem())
         return pMap
 
-class Board(QGraphicsRectItem):
+class Board(QGraphicsRectItem, StrMixin):
 
     """ a board with any number of positioned tiles"""
     # pylint: disable=too-many-instance-attributes
@@ -197,7 +197,11 @@ class Board(QGraphicsRectItem):
     @property
     def name(self):  # pylint: disable=no-self-use
         """default board name, used for debugging messages"""
-        return 'board'
+        return u'board'
+
+    def __unicode__(self):
+        """for debugging"""
+        return self.name
 
     def setVisible(self, value):
         """also update focusRect if it belongs to this board"""

@@ -28,10 +28,11 @@ from qt import QPropertyAnimation, QParallelAnimationGroup, \
 from qt import pyqtProperty, QGraphicsObject, QGraphicsItem
 
 from common import Internal, Debug, isAlive, isPython3, nativeString
+from common import StrMixin
 from log import logDebug, id4
 
 
-class Animation(QPropertyAnimation):
+class Animation(QPropertyAnimation, StrMixin):
 
     """a Qt4 animation with helper methods"""
 
@@ -114,17 +115,17 @@ class Animation(QPropertyAnimation):
         if pName == 'scale':
             return '%.2f' % value
 
-    def __str__(self):
+    def __unicode__(self):
         """for debug messages"""
         currentValue = getattr(self.targetObject(), self.pName())
-        return '%s %s: %s->%s for %s' % (
+        return u'%s %s: %s->%s for %s' % (
             self.ident(), self.pName(),
             self.formatValue(currentValue),
             self.formatValue(self.endValue()),
             self.targetObject())
 
 
-class ParallelAnimationGroup(QParallelAnimationGroup):
+class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
 
     """
     current is the currently executed group
@@ -148,7 +149,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
                 logDebug(u'Chaining Animation group G%s to G%s' %
-                         (id4(self), id4(ParallelAnimationGroup.current)))
+                         (id4(self), ParallelAnimationGroup.current))
             self.doAfter = ParallelAnimationGroup.current.doAfter
             ParallelAnimationGroup.current.doAfter = list()
             ParallelAnimationGroup.current.deferred.addCallback(self.start)
@@ -198,7 +199,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             QAbstractAnimation.DeleteWhenStopped)
         if self.debug:
             logDebug(u'Animation group G%s started with speed %d (%s)' % (
-                id4(self), Internal.Preferences.animationSpeed,
+                self, Internal.Preferences.animationSpeed,
                 ','.join('A%s' % id4(x) for x in self.animations)))
         return succeed(None)
 
@@ -216,7 +217,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         # if we have a deferred, callback now
         assert self.deferred
         if self.debug:
-            logDebug(u'Animation group G%s done' % id4(self))
+            logDebug(u'Animation group G%s done' % self)
         if self.deferred:
             self.deferred.callback(None)
         for after in self.doAfter:
@@ -232,6 +233,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             Internal.scene.focusRect.refresh()
         return
 
+    def __unicode__(self):
+        """for debugging"""
+        return u'G{}'.format(id4(self))
 
 class AnimatedMixin(object):
     """for UITile and PlayerWind"""
@@ -367,7 +371,7 @@ def __afterCurrentAnimationDo(callback, *args, **kwargs):
         current.doAfter.append(deferred)
         if current.debug:
             logDebug(u'after current animation group G%s do %s %s' %
-                     (id4(current), callback, ','.join(args) if args else ''))
+                     (current, callback, ','.join(args) if args else ''))
     else:
         callback(None, *args, **kwargs)
 
