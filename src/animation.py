@@ -50,7 +50,8 @@ class Animation(QPropertyAnimation, StrMixin):
         self.setEasingCurve(QEasingCurve.InOutQuad)
         graphicsObject.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
-        if graphicsObject.name() in Debug.animation or Debug.animation == 'all':
+        self.debug = graphicsObject.name() in Debug.animation or Debug.animation == 'all'
+        if self.debug:
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
                 logDebug(
@@ -144,7 +145,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         Animation.nextAnimations = []
         self.deferred = Deferred()
         self.steps = 0
-        self.debug = False
+        self.debug = any(x.debug for x in self.animations)
         self.doAfter = list()
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
@@ -176,7 +177,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         assert self.state() != QAbstractAnimation.Running
         for animation in self.animations:
             graphicsObject = animation.targetObject()
-            self.debug |= graphicsObject.name() in Debug.animation or Debug.animation == 'all'
             graphicsObject.setActiveAnimation(animation)
             self.addAnimation(animation)
             propName = animation.pName()
