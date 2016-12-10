@@ -38,7 +38,7 @@ from meld import Meld
 from humanclient import HumanClient
 from uitile import UITile
 from uiwall import UIWall
-from animation import MoveImmediate, afterQueuedAnimations
+from animation import AnimationSpeed, afterQueuedAnimations
 from scoringdialog import ScoringDialog
 
 
@@ -202,7 +202,7 @@ class GameScene(SceneWithFocusRect):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            with MoveImmediate():
+            with AnimationSpeed():
                 self.game.wall.decorate()
                 for uiTile in self.game.wall.tiles:
                     if uiTile.board:
@@ -212,7 +212,7 @@ class GameScene(SceneWithFocusRect):
         """apply preferences"""
         self.mainWindow.actionAngle.setEnabled(
             bool(self.game) and Internal.Preferences.showShadows)
-        with MoveImmediate():
+        with AnimationSpeed():
             for item in self.nonTiles():
                 if hasattr(item, 'tileset'):
                     item.tileset = Tileset.activeTileset()
@@ -381,7 +381,7 @@ class PlayingScene(GameScene):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            with MoveImmediate():
+            with AnimationSpeed():
                 self.discardBoard.maximize()
         GameScene.adjustView(self)
 
@@ -560,7 +560,7 @@ class ScoringScene(GameScene):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            with MoveImmediate():
+            with AnimationSpeed():
                 self.selectorBoard.maximize()
         GameScene.adjustView(self)
 

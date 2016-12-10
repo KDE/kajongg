@@ -27,7 +27,7 @@ from player import Player, PlayingPlayer
 from game import PlayingGame
 from tile import Tile
 from handboard import PlayingHandBoard
-from animation import MoveImmediate
+from animation import AnimationSpeed
 from uiwall import UIWall
 from guiutil import rotateCenter
 from wind import Wind
@@ -195,7 +195,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
     def addConcealedTiles(self, uiTiles, animated=True):
         """add to my tiles and sync the hand board"""
-        with MoveImmediate(animated):
+        with AnimationSpeed(speed=Internal.Preferences.animationSpeed if animated else 99):
             PlayingPlayer.addConcealedTiles(
                 self,
                 list(x.tile for x in uiTiles))

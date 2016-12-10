@@ -27,7 +27,7 @@ from wall import Wall, KongBox
 from tile import Tile
 from tileset import Tileset
 from uitile import UITile
-from animation import animate, afterQueuedAnimations, MoveImmediate, \
+from animation import animate, afterQueuedAnimations, AnimationSpeed, \
     ParallelAnimationGroup
 
 class UIWallSide(Board):
@@ -183,10 +183,11 @@ class UIWall(Wall):
             uiTile.tile = Tile.unknown
             uiTile.dark = True
 #        scene = Internal.scene
-# animateBuild = not scene.game.isScoringGame() and not
-# self.game.isFirstHand()
-        animateBuild = False
-        with MoveImmediate(animateBuild):
+# if not scene.game.isScoringGame() and not self.game.isFirstHand():
+#    speed = Internal.preferences.animationSpeed
+# else:
+        speed = 99
+        with AnimationSpeed(speed=speed):
             if shuffleFirst:
                 self.__shuffleTiles()
             for uiTile in self.tiles:
@@ -296,7 +297,7 @@ class UIWall(Wall):
 
     def divide(self):
         """divides a wall, building a living and and a dead end"""
-        with MoveImmediate():
+        with AnimationSpeed():
             Wall.divide(self)
             for uiTile in self.tiles:
                 # update graphics because tiles having been

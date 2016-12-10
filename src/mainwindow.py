@@ -81,7 +81,7 @@ from scoring import scoreGame
 from scoringdialog import ScoreTable, ExplainView
 from humanclient import HumanClient
 from rulesetselector import RulesetSelector
-from animation import afterQueuedAnimations, MoveImmediate
+from animation import afterQueuedAnimations, AnimationSpeed
 from chat import ChatWindow
 from scene import PlayingScene, ScoringScene
 from configdialog import ConfigDialog
@@ -595,7 +595,7 @@ class MainWindow(KXmlGuiWindow):
             self, dummyDeferredResult, dummyOldValue=None, dummyNewValue=None, *dummyArgs):
         """if the wanted tileset changed, apply the change now"""
         if self.centralView:
-            with MoveImmediate():
+            with AnimationSpeed():
                 if self.scene:
                     self.scene.applySettings()
             self.adjustView()
@@ -658,5 +658,5 @@ class MainWindow(KXmlGuiWindow):
     def changeAngle(self, deferredResult, dummyButtons=None, dummyModifiers=None): # pylint: disable=unused-argument
         """change the lightSource"""
         if self.scene:
-            with MoveImmediate():
+            with AnimationSpeed():
                 self.scene.changeAngle()

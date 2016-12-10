@@ -329,16 +329,19 @@ class AnimatedMixin(object):
                         Animation(self, pName, newValue)
 
 
-class MoveImmediate(object):
+class AnimationSpeed(object):
 
-    """a helper class for moving graphics objects with or without animation"""
+    """a helper class for moving graphics with a given speed. 99=immediate."""
 
-    def __init__(self, animateMe=False):
+    def __init__(self, speed=None):
+        if speed is None:
+            speed = 99
         if Internal.Preferences:
-            self.__animateMe = animateMe
+            self.__speed = speed
             self.prevAnimationSpeed = Internal.Preferences.animationSpeed
-            if not animateMe:
-                Internal.Preferences.animationSpeed = 99
+            Internal.Preferences.animationSpeed = speed
+            if Debug.animationSpeed:
+                logDebug('AnimationSpeed sets speed %d' % speed)
 
     def __enter__(self):
         return self
@@ -346,9 +349,12 @@ class MoveImmediate(object):
     def __exit__(self, exc_type, exc_value, trback):
         """reset previous animation speed"""
         if Internal.Preferences:
-            if not self.__animateMe:
+            if self.__speed < 99:
                 animate()
-                Internal.Preferences.animationSpeed = self.prevAnimationSpeed
+            if Debug.animationSpeed:
+                logDebug('AnimationSpeed restores speed %d to %d' % (
+                    Internal.Preferences.animationSpeed, self.prevAnimationSpeed))
+            Internal.Preferences.animationSpeed = self.prevAnimationSpeed
 
 
 def __afterCurrentAnimationDo(callback, *args, **kwargs):

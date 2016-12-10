@@ -28,7 +28,7 @@ from scene import SceneWithFocusRect
 from common import Internal
 from wind import Wind
 from guiutil import loadUi
-from animation import MoveImmediate
+from animation import AnimationSpeed
 
 
 class TilesetSelector(QWidget):
@@ -91,5 +91,5 @@ class TilesetSelector(QWidget):
         self.tilesetAuthor.setText(selTileset.author)
         self.tilesetContact.setText(selTileset.authorEmail)
         self.tilesetDescription.setText(selTileset.description)
-        with MoveImmediate():
+        with AnimationSpeed():
             self.board.tileset = selTileset
