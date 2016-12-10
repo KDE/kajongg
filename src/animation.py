@@ -55,10 +55,10 @@ class Animation(QPropertyAnimation, StrMixin):
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
                 logDebug(
-                    u'new animation %s (after %s is done)' %
+                    u'Animation(%s) (after %s is done)' %
                     (self, oldAnimation.ident()))
             else:
-                logDebug(u'new animation %s' % self)
+                logDebug(u'Animation(%s)' % self)
 
     def setEndValue(self, endValue):
         """wrapper with debugging code"""
@@ -76,7 +76,7 @@ class Animation(QPropertyAnimation, StrMixin):
         """the identifier to be used in debug messages"""
         pGroup = self.group()
         if pGroup:
-            return 'G%s/A%s' % (id4(pGroup), id4(self))
+            return 'G%s/A%s' % (pGroup, id4(self))
         else:
             return 'A%s' % id4(self)
 
@@ -283,6 +283,8 @@ class AnimatedMixin(object):
 
     def shortcutAnimation(self, animation):
         """directly set the end value of the animation"""
+        if animation.debug:
+            logDebug(' Shortcut({})'.format(animation.ident()))
         setattr(
             self,
             animation.pName(),
