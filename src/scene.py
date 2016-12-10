@@ -31,7 +31,7 @@ from qt import Qt, QMetaObject, variantValue
 from qt import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
 
 from dialogs import QuestionYesNo
-from guiutil import decorateWindow
+from guiutil import decorateWindow, sceneRotation
 from board import SelectorBoard, DiscardBoard
 from tileset import Tileset
 from meld import Meld
@@ -83,7 +83,7 @@ class FocusRect(QGraphicsRectItem):
         rect = board.tileFaceRect()
         rect.setWidth(rect.width() * board.focusRectWidth())
         self.setRect(rect)
-        self.setRotation(board.sceneRotation())
+        self.setRotation(sceneRotation(board))
         self.setScale(board.scale())
         if board.focusTile:
             board.focusTile.setFocus()

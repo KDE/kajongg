@@ -32,7 +32,7 @@ from animation import animate
 from log import logError, logDebug, logWarning, m18n
 from query import Query
 from uitile import UITile
-from board import WindLabel, Board, rotateCenter
+from board import WindLabel, Board
 from game import Game
 from games import Games
 from hand import Hand
@@ -41,7 +41,7 @@ from player import Player, Players
 from visible import VisiblePlayer
 from tables import SelectRuleset
 from uiwall import UIWall
-from guiutil import decorateWindow, BlockSignals, rotateCenter
+from guiutil import decorateWindow, BlockSignals, rotateCenter, sceneRotation
 
 
 class SwapDialog(QMessageBox):
@@ -307,7 +307,7 @@ class ScoringHandBoard(HandBoard):
                     center = QPointF(hbCenter)
                     center.setY(center.y() * yFactor)
                     helper.setPos(center - nameRect.center())
-                    if self.sceneRotation() == 180:
+                    if sceneRotation(self) == 180:
                         rotateCenter(helper, 180)
                     helpItems.append(helper)
                 self.__moveHelper = self.scene().createItemGroup(helpItems)

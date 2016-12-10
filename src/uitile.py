@@ -23,7 +23,7 @@ from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor
 
 from util import stack
 from log import logException, logDebug, id4
-from guiutil import Painter
+from guiutil import Painter, sceneRotation
 from common import LIGHTSOURCES, ZValues, Internal, Debug
 from common import StrMixin
 from tile import Tile
@@ -244,7 +244,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
     def sortKey(self, sortDir=Qt.Key_Right):
         """moving order for cursor"""
         dirs = [Qt.Key_Right, Qt.Key_Up, Qt.Key_Left, Qt.Key_Down] * 2
-        sorter = dirs[dirs.index(sortDir) + self.__board.sceneRotation() // 90]
+        sorter = dirs[dirs.index(sortDir) + sceneRotation(self.__board) // 90]
         if sorter == Qt.Key_Down:
             return self.xoffset * 100 + self.yoffset
         elif sorter == Qt.Key_Up:

@@ -160,8 +160,25 @@ def decorateWindow(window, name=None):
 
 
 def rotateCenter(item, angle):
-    """rotates a QGraphicsItem around its center"""
+    """rotates a QGraphicsItem around its center
+    rotateCenter and sceneRotation could be a mixin class but there are so many
+    classes needing this. If and when more QGraphicsItem* classes are changed
+    to QGraphicsObject, those could be moved to GraphicsObject(QGraphicsObject)"""
     center = item.boundingRect().center()
     centerX, centerY = center.x() * item.scale(), center.y() * item.scale()
     item.setTransform(QTransform().translate(
         centerX, centerY).rotate(angle).translate(-centerX, -centerY))
+
+def sceneRotation(item):
+    """the combined rotation of item and all parents in degrees: 0,90,180 or 270"""
+    matrix = item.sceneTransform()
+    matrix = (
+        int(matrix.m11()),
+        int(matrix.m12()),
+        int(matrix.m21()),
+        int(matrix.m22()))
+    rotations = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
+        0, 1, -1, 0): 90, (-1, 0, 0, -1): 180, (0, -1, 1, 0): 270}
+    if matrix not in rotations:
+        raise Exception('matrix unknown:%s' % str(matrix))
+    return rotations[matrix]

@@ -31,6 +31,7 @@ from animation import AnimationSpeed
 from uiwall import UIWall
 from guiutil import rotateCenter
 from wind import Wind
+from guiutil import sceneRotation
 
 
 class VisiblePlayer(Player):
@@ -102,7 +103,7 @@ class VisiblePlayer(Player):
             sideCenter.x() * 1.63,
             sideCenter.y() - windTile.boundingRect().height() / 2.0)
         scenePos = side.mapToScene(boardPos)
-        return {'pos': scenePos, 'rotation': side.sceneRotation()}
+        return {'pos': scenePos, 'rotation': sceneRotation(side)}
 
 
 class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):

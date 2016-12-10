@@ -29,7 +29,7 @@ from qt import usingQt4
 from tileset import Tileset, TileException
 from tile import Tile, elements
 from uitile import UITile, UIMeld
-from guiutil import Painter, rotateCenter
+from guiutil import Painter, rotateCenter, sceneRotation
 from meld import Meld
 from animation import AnimationSpeed, animate, AnimatedMixin
 from message import Message
@@ -390,7 +390,7 @@ class Board(QGraphicsRectItem):
     def rotatedLightSource(self):
         """the light source we need for the original uiTile before it is rotated"""
         lightSourceIndex = LIGHTSOURCES.index(self.lightSource)
-        lightSourceIndex = (lightSourceIndex + self.sceneRotation() // 90) % 4
+        lightSourceIndex = (lightSourceIndex + sceneRotation(self) // 90) % 4
         return LIGHTSOURCES[lightSourceIndex]
 
     def tileFacePos(self):
@@ -405,20 +405,6 @@ class Board(QGraphicsRectItem):
     def tileFaceRect(self):
         """the face rect of a uiTile relative its origin"""
         return QRectF(self.tileFacePos(), self.tileset.faceSize)
-
-    def sceneRotation(self):
-        """the combined rotation of self and all parents"""
-        matrix = self.sceneTransform()
-        matrix = (
-            int(matrix.m11()),
-            int(matrix.m12()),
-            int(matrix.m21()),
-            int(matrix.m22()))
-        rotations = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
-            0, 1, -1, 0): 90, (-1, 0, 0, -1): 180, (0, -1, 1, 0): 270}
-        if matrix not in rotations:
-            raise Exception('matrix unknown:%s' % str(matrix))
-        return rotations[matrix]
 
     def setPos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
         """sets the position in the parent item expressing the position in tile face units.
@@ -472,7 +458,7 @@ class Board(QGraphicsRectItem):
         else:
             offsets = self.tileset.shadowOffsets(
                 self._lightSource,
-                self.sceneRotation())
+                sceneRotation(self))
         newX = self.__xWidth * width + self.__xHeight * height + offsets[0]
         newY = self.__yWidth * width + self.__yHeight * height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
@@ -584,7 +570,7 @@ class Board(QGraphicsRectItem):
             uiTile.yoffset * height) + shiftZ
         scenePos = self.mapToScene(boardPos)
         uiTile.setDrawingOrder()
-        return {'pos': scenePos, 'rotation': self.sceneRotation(), 'scale': self.scale()}
+        return {'pos': scenePos, 'rotation': sceneRotation(self), 'scale': self.scale()}
 
     def placeTile(self, uiTile):
         """places the uiTile in the scene"""
