@@ -165,4 +165,3 @@ def rotateCenter(item, angle):
     centerX, centerY = center.x() * item.scale(), center.y() * item.scale()
     item.setTransform(QTransform().translate(
         centerX, centerY).rotate(angle).translate(-centerX, -centerY))
-    return item
