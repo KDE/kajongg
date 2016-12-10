@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
+from common import StrMixin
 from tile import Tile, elements
 
 
@@ -56,7 +57,7 @@ class KongBox(object):
         return len(self._tiles)
 
 
-class Wall(object):
+class Wall(StrMixin):
 
     """represents the wall with four sides. self.wall[] indexes them
     counter clockwise, 0..3. 0 is bottom.
@@ -141,3 +142,12 @@ class Wall(object):
                 boxTiles[pair * 2]] + \
                 boxTiles[pair * 2 + 2:]
         self.kongBox.fill(boxTiles)
+
+    @staticmethod
+    def name():
+        """name for debug messages"""
+        return u'4sided wall'
+
+    def __unicode__(self):
+        """for debugging"""
+        return self.name()

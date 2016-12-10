@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from common import Internal, ZValues
+from common import Internal, ZValues, StrMixin
 from wind import Wind, East
 from qt import QPointF, QGraphicsSimpleTextItem, QFontMetrics
 
@@ -30,7 +30,7 @@ from uitile import UITile
 from animation import animate, afterQueuedAnimations, AnimationSpeed, \
     ParallelAnimationGroup
 
-class UIWallSide(Board):
+class UIWallSide(Board, StrMixin):
 
     """a Board representing a wall of tiles"""
     penColor = 'red'
@@ -64,6 +64,10 @@ class UIWallSide(Board):
         self.windTile.hide()
         self.nameLabel.hide()
         Board.hide(self)
+
+    def __unicode__(self):
+        """for debugging"""
+        return self.name
 
 
 class UIKongBox(KongBox):
