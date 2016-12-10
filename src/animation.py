@@ -197,8 +197,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
             self,
             QAbstractAnimation.DeleteWhenStopped)
         if self.debug:
-            logDebug(u'Animation group G%s started (%s)' % (
-                id4(self), ','.join('A%s' % id4(x) for x in self.animations)))
+            logDebug(u'Animation group G%s started with speed %d (%s)' % (
+                id4(self), Internal.Preferences.animationSpeed,
+                ','.join('A%s' % id4(x) for x in self.animations)))
         return succeed(None)
 
     def allFinished(self):
