@@ -528,6 +528,8 @@ class WrigglingSnake(MJRule):
         if Tile.wind not in suits or Tile.dragon in suits or len(suits) > 2:
             return set()
         suits -= {Tile.wind}
+        if not suits:
+            return set()
         group = suits.pop()
         values = set(hand.values)
         if len(values) < 12:
