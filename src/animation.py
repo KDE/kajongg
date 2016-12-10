@@ -49,7 +49,7 @@ class Animation(QPropertyAnimation):
         self.setEasingCurve(QEasingCurve.InOutQuad)
         graphicsObject.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
-        if graphicsObject.name() in Debug.animation:
+        if graphicsObject.name() in Debug.animation or Debug.animation == 'all':
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
                 logDebug(
@@ -61,7 +61,7 @@ class Animation(QPropertyAnimation):
     def setEndValue(self, endValue):
         """wrapper with debugging code"""
         graphicsObject = self.targetObject()
-        if graphicsObject.name() in Debug.animation:
+        if graphicsObject.name() in Debug.animation or Debug.animation == 'all':
             pName = self.pName()
             logDebug(
                 u'%s: change endValue for %s: %s->%s  %s' % (
@@ -175,7 +175,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup):
         assert self.state() != QAbstractAnimation.Running
         for animation in self.animations:
             graphicsObject = animation.targetObject()
-            self.debug |= graphicsObject.name() in Debug.animation
+            self.debug |= graphicsObject.name() in Debug.animation or Debug.animation == 'all'
             graphicsObject.setActiveAnimation(animation)
             self.addAnimation(animation)
             propName = animation.pName()
