@@ -509,7 +509,9 @@ class PlayingPlayer(Player):
             PlayingPlayer.addConcealedTiles(
                 self,
                 [withDiscard])  # this should NOT invoke syncHandBoard
-            if self.lastSource is not TileSource.RobbedKong:
+            if len(list(self.game.lastMoves(only=(Message.Discard, )))) == 1:
+                self.lastSource = TileSource.East14th
+            elif self.lastSource is not TileSource.RobbedKong:
                 self.lastSource = TileSource.LivingWallDiscard
             # the last claimed meld is exposed
             melds.remove(lastMeld)

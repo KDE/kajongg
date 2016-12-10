@@ -1327,7 +1327,6 @@ class BlessingOfEarth(RuleCode):
             return False
         if hand.ownWind is East:
             return False
-        assert hand.lastTile.isExposed, '{}: Blessing of Earth: last tile must be exposed'.format(hand)
         return True
 
     def selectable(hand):
