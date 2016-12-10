@@ -20,15 +20,160 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from common import Internal, ZValues, StrMixin
 from wind import Wind, East
-from qt import QPointF, QGraphicsSimpleTextItem, QFontMetrics
+from qt import QPointF, QGraphicsObject, QFontMetrics
+from qt import QPen, QColor, QFont, Qt, QRectF
 
+from guiutil import Painter, sceneRotation
 from board import PlayerWind, YellowText, Board
 from wall import Wall, KongBox
 from tile import Tile
 from tileset import Tileset
 from uitile import UITile
 from animation import animate, afterQueuedAnimations, AnimationSpeed, \
-    ParallelAnimationGroup
+    ParallelAnimationGroup, AnimatedMixin
+
+class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
+
+    """The text written on the wall"""
+
+    sideTexts = list()
+
+    def __init__(self, parent=None):
+        assert parent is None
+        assert len(self.sideTexts) < 4
+        self.__name = 't%d' % len(self.sideTexts)
+        self.sideTexts.append(self)
+        super(SideText, self).__init__()
+        self.hide()
+        Internal.scene.addItem(self)
+        self.__text = u''
+        self.__board = None
+        self.needsRefresh = False
+        self.__color = Qt.black
+        self.__boundingRect = None
+        self.__font = None
+
+    def adaptedFont(self):
+        """Font with the correct point size for the wall"""
+        result = QFont()
+        size = 80
+        result.setPointSize(size)
+        tileHeight = self.board.tileset.faceSize.height()
+        while QFontMetrics(result).ascent() > tileHeight:
+            size -= 1
+            result.setPointSize(size)
+        return result
+
+    @staticmethod
+    def refreshAll():
+        """recompute ourself. Always do this for all for sides
+        together because if two names change place we want the
+        to move simultaneously"""
+        sides = SideText.sideTexts
+        if all(not x.needsRefresh for x in sides):
+            return
+        rotating = False
+        for side in sides:
+            side.show()
+            if not side.needsRefresh:
+                continue
+            side.needsRefresh = False
+            rotating |= sceneRotation(side) != sceneRotation(side.board)
+
+        alreadyMoved = any(x.x() for x in sides)
+        with AnimationSpeed(speed=30 if rotating and alreadyMoved else 99):
+            # first round: just place the winds. Only animate moving them
+            # for later rounds.
+            for side in sides:
+                side.startAnimations(side.placeSideText())
+
+    @staticmethod
+    def removeAll():
+        """from the scene"""
+        for side in SideText.sideTexts:
+            Internal.scene.removeItem(side)
+        SideText.sideTexts = list()
+
+    def placeSideText(self):
+        """returns a dict with new property values for our sidetext
+        which move it onto us"""
+        if not self.board or not self.__text:
+            return {}
+        rotation = sceneRotation(self.board)
+        position = self.board.center()
+        textCenter = self.boundingRect().center()
+        if rotation == 180:
+            rotation = 0
+            position += textCenter
+        else:
+            position -= textCenter
+        return {'pos': self.board.mapToScene(position), 'rotation': rotation, 'scale': self.board.scale()}
+
+    def name(self):
+        """for identification in animations"""
+        return self.__name
+
+    @property
+    def board(self):
+        """the front we are sitting on"""
+        return self.__board
+
+    @board.setter
+    def board(self, value):
+        if self.__board != value:
+            self.__board = value
+            self.__font = self.adaptedFont()
+            self.needsRefresh = True
+
+    @property
+    def color(self):
+        """text color"""
+        return self.__color
+
+    @color.setter
+    def color(self, value):
+        if self.__color != value:
+            self.__color = value
+            self.update()
+
+    @property
+    def text(self):
+        """what we are saying"""
+        return self.__text
+
+    @text.setter
+    def text(self, value):
+        if self.__text != value:
+            self.__text = value
+            self.prepareGeometryChange()
+            self.__boundingRect = QRectF(QFontMetrics(self.__font).boundingRect(self.__text))
+            self.needsRefresh = True
+
+    def setDrawingOrder(self):
+        """we want the winds above all others"""
+        if self.activeAnimation.get('pos'):
+            moving = ZValues.moving
+        else:
+            moving = 0
+        self.setZValue(ZValues.marker + moving)
+
+    def paint(self, painter, dummyOption, dummyWidget=None):
+        """paint the marker"""
+        with Painter(painter):
+            pen = QPen(QColor(self.color))
+            painter.setPen(pen)
+            painter.setFont(self.__font)
+            painter.drawText(0, 0, self.__text)
+
+    def boundingRect(self):
+        """around the text"""
+        return self.__boundingRect or QRectF()
+
+    def __unicode__(self):
+        """for debugging"""
+        return u'sideText %s %s x/y= %.1f/%1f' % (
+            self.name(), self.text, self.x(), self.y())
+
 
 class UIWallSide(Board, StrMixin):
 
@@ -62,7 +207,6 @@ class UIWallSide(Board, StrMixin):
     def hide(self):
         """hide all my parts"""
         self.windTile.hide()
-        self.nameLabel.hide()
         Board.hide(self)
 
     def __unicode__(self):
@@ -118,7 +262,6 @@ class UIWall(Wall):
             side.lightSource = self.lightSource
             side.windTile = Wind.all4[idx].marker
             side.windTile.hide()
-            side.nameLabel = QGraphicsSimpleTextItem('', side)
             side.message = YellowText(side)
             side.message.setZValue(ZValues.popup)
             side.message.setVisible(False)
@@ -127,7 +270,6 @@ class UIWall(Wall):
         self.__sides[3].setPos(xHeight=1)
         self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
         self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1)
-        self.__findOptimalFontHeight()
         Internal.scene.addItem(self.__square)
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
@@ -227,6 +369,7 @@ class UIWall(Wall):
             for side in self.__sides:
                 side.lightSource = lightSource
             self.__setDrawingOrder()
+            SideText.refreshAll()
 
     @property
     def tileset(self):
@@ -239,22 +382,8 @@ class UIWall(Wall):
         if self.tileset != value:
             assert ParallelAnimationGroup.current is None
             self.__square.tileset = value
-            self.__findOptimalFontHeight()
-            for side in self.__sides:
-                side.tileset = value
             self.__resizeHandBoards()
-
-    def __findOptimalFontHeight(self):
-        """for names on walls"""
-        tileHeight = Tileset.activeTileset().faceSize.height()
-        font = self.__sides[0].nameLabel.font()
-        size = 80
-        font.setPointSize(size)
-        while QFontMetrics(font).ascent() > tileHeight:
-            size -= 1
-            font.setPointSize(size)
-        for side in self.__sides:
-            side.nameLabel.setFont(font)
+            SideText.refreshAll()
 
     @afterQueuedAnimations
     def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue): # pylint: disable=unused-argument
@@ -317,4 +446,5 @@ class UIWall(Wall):
         """show player info on the wall"""
         for player in self.game.players:
             player.decorate()
+        SideText.refreshAll()
         animate() # move the wind markers

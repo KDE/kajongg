@@ -40,7 +40,7 @@ from handboard import HandBoard, TileAttr
 from player import Player, Players
 from visible import VisiblePlayer
 from tables import SelectRuleset
-from uiwall import UIWall
+from uiwall import UIWall, SideText
 from guiutil import decorateWindow, BlockSignals, rotateCenter, sceneRotation
 
 
@@ -339,6 +339,8 @@ class ScoringPlayer(VisiblePlayer, Player):
         if self.game and self.game.wall:
             # is None while __del__
             self.front = self.game.wall[self.idx]
+            if hasattr(self, 'sideText'):
+                self.sideText.board = self.front
         if isAlive(self.handBoard):
             self.handBoard.setEnabled(True)
             self.handBoard.showMoveHelper()
@@ -555,6 +557,7 @@ class ScoringGame(Game):
             player.hide()
         if self.wall:
             self.wall.hide()
+        SideText.removeAll()
         return Game.close(self)
 
     @staticmethod

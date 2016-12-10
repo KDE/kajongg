@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, QBrush, QColor, QPointF, QRectF
+from qt import Qt, QPointF
 
 from log import m18nc
 from message import Message
@@ -28,8 +28,7 @@ from game import PlayingGame
 from tile import Tile
 from handboard import PlayingHandBoard
 from animation import AnimationSpeed
-from uiwall import UIWall
-from guiutil import rotateCenter
+from uiwall import UIWall, SideText
 from wind import Wind
 from guiutil import sceneRotation
 
@@ -41,6 +40,8 @@ class VisiblePlayer(Player):
     def __init__(self):
         # pylint: disable=super-init-not-called
         self.__front = self.game.wall[self.idx]
+        self.sideText = SideText()
+        self.sideText.board = self.__front
 
     def hide(self):
         """clear visible data and hide"""
@@ -74,23 +75,13 @@ class VisiblePlayer(Player):
     def decorate(self):
         """show player info on the wall"""
         side = self.front
-        sideCenter = side.center()
-        name = side.nameLabel
-        name.setText(
-            ' - '.join([self.localName,
-                        unicode(self.explainHand().total())]))
-        name.resetTransform()
-        if side.rotation() == 180:
-            rotateCenter(name, 180)
-        nameRect = QRectF()
-        nameRect.setSize(
-            name.mapToParent(name.boundingRect()).boundingRect().size())
-        name.setPos(sideCenter - nameRect.center())
+        self.sideText.text = u' - '.join(
+            [self.localName,
+             unicode(self.explainHand().total())])
         self.colorizeName()
         side.windTile = Wind.all4[self.wind].marker
         side.windTile.prevailing = self.game.roundsFinished
         side.windTile.startAnimations(self.__windMovement())
-        side.nameLabel.show()
         side.windTile.show()
 
     def __windMovement(self):
@@ -145,7 +136,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
     def colorizeName(self):
         """set the color to be used for showing the player name on the wall"""
-        if not isAlive(self.front.nameLabel):
+        if not isAlive(self.sideText):
             return
         if self == self.game.activePlayer and self.game.client:
             color = Qt.blue
@@ -153,7 +144,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             color = Qt.white
         else:
             color = Qt.black
-        self.front.nameLabel.setBrush(QBrush(QColor(color)))
+        self.sideText.color = color
 
     def getsFocus(self, dummyResults=None):
         """give this player focus on his handBoard"""
@@ -279,5 +270,6 @@ class VisiblePlayingGame(PlayingGame):
             scene.mainWindow.actionAutoPlay.setChecked(False)
         scene.startingGame = False
         scene.game = None
+        SideText.removeAll()
         scene.mainWindow.updateGUI()
         return PlayingGame.close(self)

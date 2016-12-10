@@ -446,6 +446,9 @@ class Game(object):
                     self.players = Players(self.players[1:] + self.players[:1])
                 for idx, player in enumerate(self.players):
                     player.front = self.wall[idx]
+                    player.sideText.board = player.front
+                # we want names to move simultaneously
+                self.players[1].sideText.refreshAll()
 
     @staticmethod
     def _newGameId():
