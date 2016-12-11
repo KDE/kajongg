@@ -225,7 +225,7 @@ class HandBoard(Board):
             or
             self.placeBoniInRow(bonusTiles, newTilePositions, self.lowerY))
 
-    def calcPlaces(self, tiles):
+    def placeTiles(self, tiles):
         """returns a dict. Keys are existing tiles, Values are TileAttr instances.
         Values may be None: This is a tile to be removed from the board."""
         oldTiles = dict()
@@ -289,7 +289,7 @@ class HandBoard(Board):
         allTiles = self.uiTiles[:]
         if adding:
             allTiles.extend(adding)
-        self.calcPlaces(allTiles)
+        self.placeTiles(allTiles)
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
@@ -337,7 +337,7 @@ class PlayingHandBoard(HandBoard):
         allTiles = self.uiTiles[:]
         if adding:
             allTiles.extend(adding)
-        newPlaces = self.calcPlaces(allTiles)
+        newPlaces = self.placeTiles(allTiles)
         source = adding if adding else newPlaces.keys()
         focusCandidates = list(x for x in source
                                if x.focusable and x.tile.isConcealed)

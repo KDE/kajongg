@@ -195,7 +195,7 @@ class ScoringHandBoard(HandBoard):
 
     def sync(self, adding=None):  # pylint: disable=unused-argument
         """place all tiles in ScoringHandBoard"""
-        self.calcPlaces(sum(self.uiMelds, []))
+        self.placeTiles(sum(self.uiMelds, []))
 
     def deselect(self, meld):
         """remove meld from old board"""
