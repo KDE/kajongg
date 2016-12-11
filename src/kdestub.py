@@ -55,7 +55,7 @@ except ImportError:
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
 
-from common import Internal, Debug, ENGLISHDICT, unicodeString, isPython3
+from common import Internal, Debug, ENGLISHDICT, unicodeString, isPython3, nativeStringArgs
 from util import uniqueList
 from statesaver import StateSaver
 
@@ -90,6 +90,7 @@ def __insertArgs(translatedTemplate, *args):
     if '%' in result:
         for idx in range(len(args)):
             result = result.replace('%%%d' % (idx + 1), '{%d}' % idx)
+        args = nativeStringArgs(args)
         result = result.format(*args)
     for ignore in ['numid', 'filename', 'interface']:
         result = result.replace('<%s>' % ignore, '')
