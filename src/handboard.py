@@ -226,8 +226,8 @@ class HandBoard(Board):
             self.placeBoniInRow(bonusTiles, newTilePositions, self.lowerY))
 
     def placeTiles(self, tiles):
-        """returns a dict. Keys are existing tiles, Values are TileAttr instances.
-        Values may be None: This is a tile to be removed from the board."""
+        """tiles are all tiles for this board.
+        returns a list of those uiTiles which are placed on the board"""
         oldTiles = dict()
         oldBonusTiles = dict()
         for uiTile in tiles:
@@ -273,7 +273,7 @@ class HandBoard(Board):
             uiTile.setBoard(self, newPos.xoffset, newPos.yoffset)
             uiTile.dark = newPos.dark
             uiTile.focusable = newPos.focusable
-        return result
+        return result.keys()
 
     def _avoidCrossingMovements(self, places):
         """not needed for all HandBoards"""
@@ -337,13 +337,13 @@ class PlayingHandBoard(HandBoard):
         allTiles = self.uiTiles[:]
         if adding:
             allTiles.extend(adding)
-        newPlaces = self.placeTiles(allTiles)
-        source = adding if adding else newPlaces.keys()
+        newTiles = self.placeTiles(allTiles)
+        source = adding if adding else newTiles
         focusCandidates = list(x for x in source
                                if x.focusable and x.tile.isConcealed)
         if not focusCandidates:
             # happens if we just exposed a claimed meld
-            focusCandidates = list(x for x in newPlaces.keys()
+            focusCandidates = list(x for x in newTiles
                                    if x.focusable and x.tile.isConcealed)
         focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
         if focusCandidates:
