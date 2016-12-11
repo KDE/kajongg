@@ -194,7 +194,7 @@ class HandBoard(Board):
                 meldX += meldDistance
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
 
-    def placeBoniInRow(self, bonusTiles, tilePositions, bonusY):
+    def placeBoniInRow(self, bonusTiles, tilePositions, bonusY, keepTogether=True):
         """Try to place bonusTiles in upper or in lower row.
         tilePositions are the normal tiles, already placed.
         If there is no space, return None
@@ -202,11 +202,14 @@ class HandBoard(Board):
         returns list(TileAttr)"""
         positions = list(x.xoffset for x in tilePositions if x.yoffset == bonusY)
         rightmostTileX = max(positions) if positions else 0
-        xPos = 13 - len(bonusTiles)
-        if xPos < rightmostTileX + 1 + self.exposedMeldDistance:
-            return list()
+        placeBoni = bonusTiles[:]
+        while 13 - len(placeBoni) < rightmostTileX + 1 + self.exposedMeldDistance:
+            if keepTogether:
+                return list()
+            placeBoni = placeBoni[:-1]
         result = list()
-        newBonusTiles = list(self.tileAttrClass(x) for x in bonusTiles)
+        xPos = 13 - len(placeBoni)
+        newBonusTiles = list(self.tileAttrClass(x) for x in placeBoni)
         for bonus in sorted(newBonusTiles, key=lambda x: hash(x.tile)):
             bonus.xoffset, bonus.yoffset = xPos, bonusY
             bonus.dark = False
@@ -219,11 +222,21 @@ class HandBoard(Board):
         calculate places for bonus tiles. Put them all in one row,
         right adjusted. If necessary, extend to the right even
         outside of our board"""
-
-        return (
+        if not bonusTiles:
+            return list()
+        bonusTiles = sorted(bonusTiles, key=lambda x: hash(x.tile))
+        result = (
             self.placeBoniInRow(bonusTiles, newTilePositions, 0.0)
             or
             self.placeBoniInRow(bonusTiles, newTilePositions, self.lowerY))
+        if not result:
+            # we cannot place all bonus tiles in the same row!
+            result = self.placeBoniInRow(bonusTiles, newTilePositions, 0.0, keepTogether=False)
+            result.extend(self.placeBoniInRow(
+                bonusTiles[len(result):], newTilePositions, self.lowerY, keepTogether=False))
+
+        assert len(bonusTiles) == len(result)
+        return result
 
     def placeTiles(self, tiles):
         """tiles are all tiles for this board.
