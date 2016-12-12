@@ -125,6 +125,7 @@ class DeferredDialog(Deferred):
     def __init__(self, dlg, modal=True, always=False):
         Deferred.__init__(self)
         self.dlg = dlg
+        self.defaultResult = dlg.returns()
         self.modal = modal
         self.always = always
         if Options.gui:
@@ -145,7 +146,7 @@ class DeferredDialog(Deferred):
             return
         scene = Internal.scene
         if not Options.gui or not isAlive(self.dlg):
-            return self.autoAnswer()
+            return self.clicked()
         autoPlay = scene and scene.game and scene.game.autoPlay
         autoAnswerDelayed = autoPlay and not self.always
         if self.modal and not autoAnswerDelayed:
@@ -155,31 +156,29 @@ class DeferredDialog(Deferred):
         if autoAnswerDelayed:
             Internal.reactor.callLater(
                 Internal.Preferences.animationDuration() / 500.0,
-                self.autoAnswer)
-
-    def autoAnswer(self):
-        """autoPlay gets autoAnswer"""
-        result = self.dlg.returns()
-        if Internal.scene and isAlive(self.dlg):
-            self.dlg.hide()
-        self.dlg = None
-        self.callback(result)
+                self.clicked)
 
     def clicked(self, button=None):
         """we got a reaction"""
-        assert self.dlg
-        if self.dlg:
+        if button is None:
+            # it seems there may be a timing problem where this is called
+            # even after dlg has already been destroyed
+            result = self.defaultResult
+        elif self.dlg:
             result = self.dlg.returns(button)
-            self.dlg.hide()
-            self.dlg = None
-            self.callback(result)
+        self.__removeFromScene()
+        self.callback(result)
 
     def cancel(self):
         """we want no answer, just let the dialog disappear"""
-        if self.dlg:
+        self.__removeFromScene()
+        Deferred.cancel(self)
+
+    def __removeFromScene(self):
+        """remove ourself"""
+        if self.dlg and Internal.scene and isAlive(self.dlg):
             self.dlg.hide()
         self.dlg = None
-        Deferred.cancel(self)
 
 
 class QuestionYesNo(DeferredDialog):
