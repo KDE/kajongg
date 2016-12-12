@@ -22,7 +22,7 @@ from qt import QString, Qt, QRectF, QPointF, QSizeF, QSize, pyqtProperty
 from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor
 
 from util import stack
-from log import logException, logDebug
+from log import logException, logDebug, id4
 from guiutil import Painter
 from common import LIGHTSOURCES, ZValues, Internal, Debug, isAlive
 from common import StrMixin
@@ -69,8 +69,9 @@ class UITile(QGraphicsObject, StrMixin):
 
     def keyPressEvent(self, event):
         """redirect to the board"""
-        assert self == self.board.focusTile, 'id(self):%s, self:%s, focusTile:%s/%s' % \
-            (id(self), self, id(self.board.focusTile), self.board.focusTile)
+        if self is not self.board.focusTile:
+            logDebug('id4(self):%s, self:%s, focusTile:%s/%s' % \
+                (id4(self), self, id4(self.board.focusTile), self.board.focusTile))
         return self.board.keyPressEvent(event)
 
     def __lightDistance(self):
