@@ -74,6 +74,8 @@ Fmt.formatter = Fmt()
 
 def id4(obj):
     """object id for debug messages"""
+    if obj is None:
+        return 'NONE'
     return '.' if Debug.neutral else Fmt.num_encode(id(obj))
 
 def fmt(text, **kwargs):
