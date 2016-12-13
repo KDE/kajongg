@@ -288,6 +288,8 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
             self.__yoffset = yoffset
             placeDirty = True
         if board and placeDirty:
+            if board.scene() and not self.scene():
+                board.scene().addItem(self)
             board.placeTile(self)
 
     @property

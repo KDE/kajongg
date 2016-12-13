@@ -318,6 +318,10 @@ class AnimatedMixin(object):
     def startAnimations(self):
         """move the item to its new place"""
         for pName, newValue in self.moveDict().items():
+            if self.scene() != Internal.scene:
+                # not part of the playing scene, like tiles in tilesetselector
+                setattr(self, pName, newValue)
+                continue
             animation = self.queuedAnimation(pName)
             if animation:
                 curValue = animation.unpackValue(animation.endValue())
