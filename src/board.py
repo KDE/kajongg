@@ -55,10 +55,21 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
             wind, type(wind))
         self.__wind = wind
         self.__brush = QColor('white')
+        self.board = None
 
     def name(self):
         """for identification in animations"""
         return self.__wind.tile
+
+    def moveDict(self):
+        """a dict with attributes for the new position,
+        normally pos, rotation and scale"""
+        sideCenter = self.board.center()
+        boardPos = QPointF(
+            sideCenter.x() * 1.63,
+            sideCenter.y() - self.boundingRect().height() / 2.0)
+        scenePos = self.board.mapToScene(boardPos)
+        return {'pos': scenePos, 'rotation': sceneRotation(self.board)}
 
     def setDrawingOrder(self):
         """we want the winds above all others"""
@@ -515,7 +526,7 @@ class Board(QGraphicsRectItem, StrMixin):
             self._lightSource = lightSource
             self.setGeometry()
             for child in self.childItems():
-                if isinstance(child, (Board, PlayerWind)):
+                if isinstance(child, Board):
                     child.lightSource = lightSource
                     child.showShadows = showShadows
             for uiTile in self.uiTiles:
@@ -560,26 +571,11 @@ class Board(QGraphicsRectItem, StrMixin):
         """the current face size"""
         return self._tileset.faceSize
 
-    def __tileMovement(self, uiTile):
-        """compute all wanted properties for uiTile in this board: pos, scale, rotation
-        and return them in a dict"""
-        assert isinstance(uiTile, UITile)
-        if not uiTile.scene():
-            self.scene().addItem(uiTile)
-        width = self.tileset.faceSize.width()
-        height = self.tileset.faceSize.height()
-        shiftZ = self.shiftZ(uiTile.level)
-        boardPos = QPointF(
-            uiTile.xoffset * width,
-            uiTile.yoffset * height) + shiftZ
-        scenePos = self.mapToScene(boardPos)
-        uiTile.setDrawingOrder()
-        return {'pos': scenePos, 'rotation': sceneRotation(self), 'scale': self.scale()}
-
     def placeTile(self, uiTile):
         """places the uiTile in the scene"""
         assert isinstance(uiTile, UITile)
-        uiTile.startAnimations(self.__tileMovement(uiTile))
+        assert uiTile.board == self
+        uiTile.startAnimations(uiTile.moveDict())
 
     def addUITile(self, uiTile):
         """add uiTile to this board"""

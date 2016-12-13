@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, QPointF
+from qt import Qt
 
 from log import m18nc
 from message import Message
@@ -30,7 +30,6 @@ from handboard import PlayingHandBoard
 from animation import AnimationSpeed
 from uiwall import UIWall, SideText
 from wind import Wind
-from guiutil import sceneRotation
 
 
 class VisiblePlayer(Player):
@@ -81,20 +80,9 @@ class VisiblePlayer(Player):
         self.colorizeName()
         side.windTile = Wind.all4[self.wind].marker
         side.windTile.prevailing = self.game.roundsFinished
-        side.windTile.startAnimations(self.__windMovement())
+        side.windTile.board = self.front
+        side.windTile.startAnimations(side.windTile.moveDict())
         side.windTile.show()
-
-    def __windMovement(self):
-        """compute all properties for windTile in this board: pos, scale, rotation
-        and return them in a dict"""
-        side = self.front
-        sideCenter = side.center()
-        windTile = Wind.all4[self.wind].marker
-        boardPos = QPointF(
-            sideCenter.x() * 1.63,
-            sideCenter.y() - windTile.boundingRect().height() / 2.0)
-        scenePos = side.mapToScene(boardPos)
-        return {'pos': scenePos, 'rotation': sceneRotation(side)}
 
 
 class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):

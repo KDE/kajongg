@@ -85,7 +85,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
             # first round: just place the winds. Only animate moving them
             # for later rounds.
             for side in sides:
-                side.startAnimations(side.placeSideText())
+                side.startAnimations(side.moveDict())
 
     @staticmethod
     def removeAll():
@@ -94,7 +94,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
             Internal.scene.removeItem(side)
         SideText.sideTexts = list()
 
-    def placeSideText(self):
+    def moveDict(self):
         """returns a dict with new property values for our sidetext
         which move it onto us"""
         if not self.board or not self.__text:
@@ -150,7 +150,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
             self.needsRefresh = True
 
     def setDrawingOrder(self):
-        """we want the winds above all others"""
+        """we want the text above all non moving tiles"""
         if self.activeAnimation.get('pos'):
             moving = ZValues.moving
         else:

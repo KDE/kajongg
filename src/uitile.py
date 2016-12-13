@@ -100,6 +100,19 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         """the active tileset"""
         return self.board.tileset if self.board else None
 
+    def moveDict(self):
+        """a dict with attributes for the new position,
+        normally pos, rotation and scale"""
+        assert self.board
+        width = self.tileset.faceSize.width()
+        height = self.tileset.faceSize.height()
+        shiftZ = self.board.shiftZ(self.level)
+        boardPos = QPointF(
+            self.xoffset * width,
+            self.yoffset * height) + shiftZ
+        scenePos = self.board.mapToScene(boardPos)
+        return {'pos': scenePos, 'rotation': sceneRotation(self.board), 'scale': self.board.scale()}
+
     def setDrawingOrder(self):
         """set drawing order for this tile"""
         if self.board:
@@ -287,7 +300,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         """set tile name and update display"""
         if value is not self._tile:
             self._tile = value
-            self.setDrawingOrder()
+            self.setDrawingOrder() # because known tiles are above unknown tiles
             self.update()
 
     @property
