@@ -315,9 +315,9 @@ class AnimatedMixin(object):
             self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
             self.update()
 
-    def startAnimations(self, what):
-        """what is a dict. key=property to be animated, value its new endvalue"""
-        for pName, newValue in what.items():
+    def startAnimations(self):
+        """move the item to its new place"""
+        for pName, newValue in self.moveDict().items():
             animation = self.queuedAnimation(pName)
             if animation:
                 curValue = animation.unpackValue(animation.endValue())
