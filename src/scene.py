@@ -508,7 +508,7 @@ class ScoringScene(GameScene):
         else:
             return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(answered)
 
-    def __moveTile(self, uiTile, wind, lowerHalf):
+    def __moveTile(self, uiTile, wind, toConcealed):
         """the user pressed a wind letter or X for center, wanting to move a uiTile there"""
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
@@ -517,11 +517,11 @@ class ScoringScene(GameScene):
             receiver = self.selectorBoard
         else:
             receiver = self.game.players[wind].handBoard
-        if receiver != currentBoard or bool(lowerHalf) != bool(uiTile.yoffset):
+        if receiver != currentBoard or toConcealed != bool(uiTile.yoffset):
             movingLastMeld = uiTile.tile in self.computeLastMeld()
             if movingLastMeld:
                 self.scoringDialog.clearLastTileCombo()
-            receiver.dropTile(uiTile, lowerHalf)
+            receiver.dropTile(uiTile, toConcealed)
             if movingLastMeld and receiver == currentBoard:
                 self.scoringDialog.fillLastTileCombo()
 
