@@ -237,17 +237,22 @@ class ScoringHandBoard(HandBoard):
         self._noPen()
 
     def dropTile(self, uiTile, lowerHalf):
-        """drop meld or uiTile into lower or upper half of our hand"""
+        """drop uiTile into lower or upper half of our hand"""
         senderBoard = uiTile.board
         newMeld = senderBoard.chooseVariant(uiTile, lowerHalf)
         if not newMeld:
             return False
         uiMeld = senderBoard.assignUITiles(uiTile, newMeld)
-        senderBoard.deselect(uiMeld)
         for uiTile, tile in zip(uiMeld, newMeld):
             uiTile.tile = tile
+        self.dropMeld(uiMeld)
+
+    def dropMeld(self, uiMeld):
+        """drop uiMeld into our hand"""
+        senderBoard = uiMeld[0].board
+        senderBoard.deselect(uiMeld)
         self.uiMelds.append(uiMeld)
-        self.player.addMeld(newMeld)
+        self.player.addMeld(uiMeld.meld)
         self.sync()
         self.hasFocus = senderBoard == self or not senderBoard.uiTiles
         self.checkTiles()

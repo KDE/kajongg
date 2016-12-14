@@ -348,7 +348,7 @@ class Board(QGraphicsRectItem, StrMixin):
     def uiMeldWithTile(self, uiTile):  # pylint: disable=no-self-use
         """returns the UI Meld with uiTile. A Board does not know about melds,
         so default is to return a Meld with only uiTile"""
-        return Meld(uiTile)
+        return UIMeld(uiTile)
 
     def meldVariants(self, uiTile, lowerHalf):  # pylint: disable=no-self-use,unused-argument
         """all possible melds that could be meant by dragging/dropping uiTile"""
@@ -675,14 +675,18 @@ class SelectorBoard(CourtBoard):
 
     def dropTile(self, uiTile, lowerHalf=False):  # pylint: disable=unused-argument
         """drop uiTile into selector board"""
-        senderHand = uiTile.board
+        uiMeld = uiTile.board.uiMeldWithTile(uiTile)
+        self.dropMeld(uiMeld)
+
+    def dropMeld(self, uiMeld):
+        """drop uiMeld into selector board"""
+        senderHand = uiMeld[0].board
         if senderHand == self:
             return
-        meld = uiTile.board.uiMeldWithTile(uiTile)
-        for myTile in meld:
+        for myTile in uiMeld:
             self.__placeAvailable(myTile)
             myTile.focusable = True
-        senderHand.deselect(meld)
+        senderHand.deselect(uiMeld)
         (senderHand if senderHand.uiTiles else self).hasFocus = True
         self._noPen()
         animate()
