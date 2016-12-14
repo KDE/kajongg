@@ -632,7 +632,6 @@ class SelectorBoard(CourtBoard):
 
     def __init__(self):
         CourtBoard.__init__(self, 9, 5)
-        self.lastReceived = None
         self.allSelectorTiles = []
 
     def checkTiles(self):
@@ -680,7 +679,6 @@ class SelectorBoard(CourtBoard):
         if senderHand == self:
             return
         meld = uiTile.board.uiMeldWithTile(uiTile)
-        self.lastReceived = uiTile
         for myTile in meld:
             self.__placeAvailable(myTile)
             myTile.focusable = True
