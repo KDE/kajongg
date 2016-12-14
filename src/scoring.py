@@ -239,12 +239,8 @@ class ScoringHandBoard(HandBoard):
     def dropTile(self, uiTile, lowerHalf):
         """drop meld or uiTile into lower or upper half of our hand"""
         senderBoard = uiTile.board
-        self.checkTiles()
-        senderBoard.checkTiles()
         newMeld = senderBoard.chooseVariant(uiTile, lowerHalf)
         if not newMeld:
-            self.checkTiles()
-            senderBoard.checkTiles()
             return False
         uiMeld = senderBoard.assignUITiles(uiTile, newMeld)
         senderBoard.deselect(uiMeld)
