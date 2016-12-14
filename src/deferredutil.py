@@ -161,15 +161,15 @@ class DeferredBlock(StrMixin):
                     for block in DeferredBlock.blocks:
                         logInfo(str(block))
 
-    def debugPrefix(self, marker=u''):
+    def debugPrefix(self, dbgMarker=u''):
         """prefix for debug message"""
-        return u'T{table} B[{id:>4}] {caller:<15} {marker:<3}(out={out})'.format(
+        return u'T{table} B[{id:>4}] {caller:<15} {dbgMarker:<3}(out={out})'.format(
             table=self.table.tableid, id=id(self) % 10000, caller=self.calledBy[:15],
-            marker=marker, out=self.outstanding)
+            dbgMarker=dbgMarker, out=self.outstanding)
 
-    def debug(self, marker, msg):
+    def debug(self, dbgMarker, msg):
         """standard debug format"""
-        logDebug(u' '.join([self.debugPrefix(marker), msg]))
+        logDebug(u' '.join([self.debugPrefix(dbgMarker), msg]))
 
     def __unicode__(self):
         return u'%s requests=%s outstanding=%d %s callback=%s' % (
