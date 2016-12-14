@@ -103,6 +103,7 @@ class HandBoard(Board):
         self.setAcceptDrops(True)
         Internal.Preferences.addWatch(
             'rearrangeMelds', self.rearrangeMeldsChanged)
+        self.rearrangeMeldsChanged(None, Internal.Preferences.rearrangeMelds)
         Internal.Preferences.addWatch(
             'showShadows', self.showShadowsChanged)
 
