@@ -409,11 +409,11 @@ class IntDict(defaultdict, StrMixin):
 class ZValues(object):
 
     """here we collect all zValues used in Kajongg"""
-    itemLevelFactor = 100000
-    boardLevelFactor = itemLevelFactor * 100
-    marker = boardLevelFactor * 100 + 1
-    moving = marker + 1
-    popup = moving + 1
+    itemZFactor = 100000
+    boardZFactor = itemZFactor * 100
+    markerZ = boardZFactor * 100 + 1
+    movingZ = markerZ + 1
+    popupZ = movingZ + 1
 
 
 def english(i18nstring):

@@ -51,7 +51,7 @@ class FocusRect(QGraphicsRectItem, StrMixin):
         pen = QPen(QColor(Qt.blue))
         pen.setWidth(6)
         self.setPen(pen)
-        self.setZValue(ZValues.marker)
+        self.setZValue(ZValues.markerZ)
         self._board = None
         self.hide()
 

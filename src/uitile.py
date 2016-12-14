@@ -118,16 +118,16 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         if self.board:
             boardLevel = self.board.level
         else:
-            boardLevel = ZValues.boardLevelFactor
-        moving = 0
+            boardLevel = ZValues.boardZFactor
+        movingZ = 0
         # show moving tiles above non-moving tiles
         changePos = self.activeAnimation.get('pos')
         changeRotation = self.activeAnimation.get('rotation')
         changeScale = self.activeAnimation.get('scale')
         # show rotating and scaling tiles above all others
         if changeScale or changeRotation:
-            moving += ZValues.moving
-            moving += ZValues.boardLevelFactor
+            movingZ += ZValues.movingZ
+            movingZ += ZValues.boardZFactor
         elif changePos:
             if self.rotation % 180 == 0:
                 currentY = self.y()
@@ -136,11 +136,11 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
                 currentY = self.x()
                 newY = changePos.unpackEndValue().x()
             if currentY != newY:
-                moving += ZValues.moving
-        self.setZValue(moving +
+                movingZ += ZValues.movingZ
+        self.setZValue(movingZ +
                        boardLevel +
                        (self.level + (2 if self.tile.isKnown else 1))
-                       * ZValues.itemLevelFactor +
+                       * ZValues.itemZFactor +
                        self.__lightDistance())
 
     def boundingRect(self):

@@ -152,10 +152,10 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
     def setDrawingOrder(self):
         """we want the text above all non moving tiles"""
         if self.activeAnimation.get('pos'):
-            moving = ZValues.moving
+            movingZ = ZValues.movingZ
         else:
-            moving = 0
-        self.setZValue(ZValues.marker + moving)
+            movingZ = 0
+        self.setZValue(ZValues.markerZ + movingZ)
 
     def paint(self, painter, dummyOption, dummyWidget=None):
         """paint the marker"""
@@ -252,7 +252,7 @@ class UIWall(Wall):
         game.wall = self
         Wall.__init__(self, game)
         self.__square = Board(1, 1, Tileset.activeTileset())
-        self.__square.setZValue(ZValues.marker)
+        self.__square.setZValue(ZValues.markerZ)
         sideLength = len(self.tiles) // 8
         self.__sides = [UIWallSide(
             Tileset.activeTileset(),
@@ -263,7 +263,7 @@ class UIWall(Wall):
             side.windTile = Wind.all4[idx].marker
             side.windTile.hide()
             side.message = YellowText(side)
-            side.message.setZValue(ZValues.popup)
+            side.message.setZValue(ZValues.popupZ)
             side.message.setVisible(False)
             side.message.setPos(side.center())
         self.__sides[0].setPos(yWidth=sideLength)
@@ -405,7 +405,7 @@ class UIWall(Wall):
             side.level = (
                 levels[
                     side.lightSource][
-                        idx] + 1) * ZValues.boardLevelFactor
+                        idx] + 1) * ZValues.boardZFactor
 
     def __moveDividedTile(self, uiTile, offset):
         """moves a uiTile from the divide hole to its new place"""

@@ -74,10 +74,10 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
     def setDrawingOrder(self):
         """we want the winds above all others"""
         if self.activeAnimation.get('pos'):
-            moving = ZValues.moving
+            movingZ = ZValues.movingZ
         else:
-            moving = 0
-        self.setZValue(ZValues.marker + moving)
+            movingZ = 0
+        self.setZValue(ZValues.markerZ + movingZ)
 
     @property
     def wind(self):
