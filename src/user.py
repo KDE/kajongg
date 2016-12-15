@@ -53,6 +53,8 @@ class User(pb.Avatar, StrMixin):
     def pinged(self):
         """time of last ping or message from user"""
         self.lastPing = datetime.datetime.now()
+        if self.server:
+            self.server.lastPing = self.lastPing
 
     def source(self):
         """how did he connect?"""

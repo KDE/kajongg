@@ -183,9 +183,6 @@ class MJServer(object):
             # no user at all since 30 seconds, but we did already have a user
             self.__stopAfterLastDisconnect()
         for user in self.srvUsers:
-            self.lastPing = max(
-                self.lastPing,
-                user.lastPing) if self.lastPing else user.lastPing
             if elapsedSince(user.lastPing) > 60:
                 logDebug(
                     u'No messages from %s since 60 seconds, clearing connection now' %
