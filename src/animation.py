@@ -349,9 +349,10 @@ class AnimationSpeed(object):
         if Internal.Preferences:
             self.__speed = speed
             self.prevAnimationSpeed = Internal.Preferences.animationSpeed
-            Internal.Preferences.animationSpeed = speed
-            if Debug.animationSpeed:
-                logDebug('AnimationSpeed sets speed %d' % speed)
+            if Internal.Preferences.animationSpeed != speed:
+                Internal.Preferences.animationSpeed = speed
+                if Debug.animationSpeed:
+                    logDebug('AnimationSpeed sets speed %d' % speed)
 
     def __enter__(self):
         return self
@@ -361,10 +362,11 @@ class AnimationSpeed(object):
         if Internal.Preferences:
             if self.__speed < 99:
                 animate()
-            if Debug.animationSpeed:
-                logDebug('AnimationSpeed restores speed %d to %d' % (
-                    Internal.Preferences.animationSpeed, self.prevAnimationSpeed))
-            Internal.Preferences.animationSpeed = self.prevAnimationSpeed
+            if Internal.Preferences.animationSpeed != self.prevAnimationSpeed:
+                if Debug.animationSpeed:
+                    logDebug('AnimationSpeed restores speed %d to %d' % (
+                        Internal.Preferences.animationSpeed, self.prevAnimationSpeed))
+                Internal.Preferences.animationSpeed = self.prevAnimationSpeed
 
 
 def __afterCurrentAnimationDo(callback, *args, **kwargs):
