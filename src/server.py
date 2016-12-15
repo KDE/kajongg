@@ -28,6 +28,7 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 import sys
 import os
 import logging
+import datetime
 from signal import signal, SIGABRT, SIGINT, SIGTERM
 
 from zope.interface import implementer
@@ -139,7 +140,7 @@ class MJServer(object):
         self.tables = {}
         self.srvUsers = list()
         Players.load()
-        self.lastPing = None
+        self.lastPing = datetime.datetime.now()
         self.checkPings()
 
     def chat(self, chatString):
@@ -179,7 +180,7 @@ class MJServer(object):
 
     def checkPings(self):
         """are all clients still alive? If not log them out"""
-        if not self.srvUsers and self.lastPing and elapsedSince(self.lastPing) > 30:
+        if not self.srvUsers and elapsedSince(self.lastPing) > 30:
             # no user at all since 30 seconds, but we did already have a user
             self.__stopAfterLastDisconnect()
         for user in self.srvUsers:
