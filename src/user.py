@@ -28,12 +28,12 @@ import datetime
 from twisted.internet.defer import fail
 from twisted.spread import pb
 
-from common import Internal, Debug, Options, nativeString
+from common import Internal, Debug, Options, nativeString, StrMixin
 from servercommon import srvError
 from log import logDebug, m18nE
 from query import Query
 
-class User(pb.Avatar):
+class User(pb.Avatar, StrMixin):
 
     """the twisted avatar"""
 
