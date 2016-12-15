@@ -575,7 +575,7 @@ class Board(QGraphicsRectItem, StrMixin):
         """places the uiTile in the scene"""
         assert isinstance(uiTile, UITile)
         assert uiTile.board == self
-        uiTile.startAnimations()
+        uiTile.setupAnimations()
 
     def addUITile(self, uiTile):
         """add uiTile to this board"""

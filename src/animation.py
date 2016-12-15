@@ -313,8 +313,9 @@ class AnimatedMixin(object):
             self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
             self.update()
 
-    def startAnimations(self):
-        """move the item to its new place"""
+    def setupAnimations(self):
+        """move the item to its new place. This puts new Animation
+        objects into the queue to be animated by calling animate()"""
         for pName, newValue in self.moveDict().items():
             if self.scene() != Internal.scene:
                 # not part of the playing scene, like tiles in tilesetselector

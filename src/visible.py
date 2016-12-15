@@ -81,7 +81,7 @@ class VisiblePlayer(Player):
         side.windTile = Wind.all4[self.wind].marker
         side.windTile.prevailing = self.game.roundsFinished
         side.windTile.board = self.front
-        side.windTile.startAnimations()
+        side.windTile.setupAnimations()
         side.windTile.show()
 
 

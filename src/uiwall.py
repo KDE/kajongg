@@ -85,7 +85,8 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
             # first round: just place the winds. Only animate moving them
             # for later rounds.
             for side in sides:
-                side.startAnimations()
+                side.setupAnimations()
+        animate()
 
     @staticmethod
     def removeAll():
