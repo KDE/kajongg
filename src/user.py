@@ -79,6 +79,7 @@ class User(pb.Avatar, StrMixin):
     def perspective_setClientProperties(
             self, dbIdent, voiceId, maxGameId, clientVersion=None):
         """perspective_* methods are to be called remotely"""
+        self.pinged()
         self.dbIdent = dbIdent
         self.voiceId = voiceId
         self.maxGameId = maxGameId
@@ -140,6 +141,7 @@ class User(pb.Avatar, StrMixin):
 
     def perspective_chat(self, chatString):
         """perspective_* methods are to be called remotely"""
+        self.pinged()
         return self.server.chat(chatString)
 
     def __unicode__(self):
