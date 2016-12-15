@@ -155,6 +155,12 @@ class ClientMessage(Message):
         table.abort(errMsg)
 
 
+class MessageAbort(ClientMessage):
+
+    """If a client aborts, the server will set the answer for all open requests
+    to Message.AbortMessage"""
+
+
 class NotifyAtOnceMessage(ClientMessage):
 
     """those classes are for messages from clients that might have to be relayed to the

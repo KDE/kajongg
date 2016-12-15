@@ -389,7 +389,7 @@ class MJServer(object):
         for block in DeferredBlock.blocks:
             for request in block.requests:
                 if request.user == user:
-                    block.removeRequest(request)
+                    request.answer = Message.Abort
 
     def loadSuspendedTables(self, user):
         """loads all yet unloaded suspended tables where this
