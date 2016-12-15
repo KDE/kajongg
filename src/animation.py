@@ -138,11 +138,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
     running = []  # we need a reference to active animation groups
     current = None
 
-    def __init__(self, parent=None):
+    def __init__(self, animations, parent=None):
         QParallelAnimationGroup.__init__(self, parent)
-        assert Animation.nextAnimations
-        self.animations = Animation.nextAnimations
-        Animation.nextAnimations = []
+        self.animations = animations
         self.deferred = Deferred()
         self.steps = 0
         self.debug = any(x.debug for x in self.animations)
@@ -406,34 +404,30 @@ def animate():
     """now run all prepared animations. Returns a Deferred
         so callers can attach callbacks to be executed when
         animation is over.
-        We do not animate if
+        We do not animate objects if
              - we are in a graphics object drag/drop operation
              - the user disabled animation
              - there are too many animations in the group so it would be too slow
+             - the object has duration 0
     """
     if Animation.nextAnimations:
-        shortcutMe = (Internal.scene is None
-                      or Internal.mainWindow.centralView.dragObject
-                      or Internal.Preferences.animationSpeed == 99
-                      or len(Animation.nextAnimations) > 1000)
+        shortcutAll = (Internal.scene is None
+                       or Internal.mainWindow.centralView.dragObject
+                       or Internal.Preferences.animationSpeed == 99
+                       or len(Animation.nextAnimations) > 1000)
                 # change 1000 to 100 if we do not want to animate shuffling and
                 # initial deal
-        if not shortcutMe:
-            duration = 0
-            for animation in Animation.nextAnimations:
-                duration = animation.duration()
-                if duration:
-                    break
-            shortcutMe = duration == 0
-        if shortcutMe:
-            for animation in Animation.nextAnimations:
+        for animation in Animation.nextAnimations[:]:
+            if shortcutAll or animation.duration() == 0:
                 animation.targetObject().shortcutAnimation(animation)
-            Animation.nextAnimations = []
+                Animation.nextAnimations.remove(animation)
+        if not Animation.nextAnimations:
             if Internal.scene:
                 Internal.scene.focusRect.refresh()
             return succeed(None)
-        else:
-            return ParallelAnimationGroup().deferred
+        animations = Animation.nextAnimations
+        Animation.nextAnimations = []
+        return ParallelAnimationGroup(animations).deferred
     elif ParallelAnimationGroup.current:
         return ParallelAnimationGroup.current.deferred
     else:
