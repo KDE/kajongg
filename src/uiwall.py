@@ -146,7 +146,11 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
         if self.__text != value:
             self.__text = value
             self.prepareGeometryChange()
-            self.__boundingRect = QRectF(QFontMetrics(self.__font).boundingRect(self.__text))
+            txt = self.__text
+            if ' - ' in txt:
+                # this disables animated movement if only the score changes
+                txt = txt[:txt.rfind(' - ')] + ' - 55'
+            self.__boundingRect = QRectF(QFontMetrics(self.__font).boundingRect(txt))
             self.needsRefresh = True
 
     def setDrawingOrder(self):
