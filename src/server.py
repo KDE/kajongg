@@ -36,6 +36,8 @@ from zope.interface import implementer
 
 def cleanExit(*dummyArgs):
     """we want to cleanly close sqlite3 files"""
+    if Debug.quit:
+        logDebug('cleanExit')
     if Options.socket and os.name != 'nt':
         if os.path.exists(Options.socket):
             os.remove(Options.socket)
@@ -80,6 +82,7 @@ Internal.reactor = reactor
 from player import Players
 from query import Query, initDb
 from log import m18n, m18nE, logDebug, logWarning, logError, SERVERMARK
+from log import logInfo
 from util import elapsedSince
 from message import Message, ChatMessage
 from deferredutil import DeferredBlock
@@ -180,12 +183,17 @@ class MJServer(object):
 
     def checkPings(self):
         """are all clients still alive? If not log them out"""
-        if not self.srvUsers and elapsedSince(self.lastPing) > 30:
+        since = elapsedSince(self.lastPing)
+        if self.srvUsers and since > 30:
+            if Debug.quit:
+                logDebug('no ping since {} seconds but we still have users:{}'.format(
+                    elapsedSince(self.lastPing), self.srvUsers))
+        if not self.srvUsers and since > 30:
             # no user at all since 30 seconds, but we did already have a user
             self.__stopAfterLastDisconnect()
         for user in self.srvUsers:
             if elapsedSince(user.lastPing) > 60:
-                logDebug(
+                logInfo(
                     u'No messages from %s since 60 seconds, clearing connection now' %
                     user.name)
                 user.mind = None

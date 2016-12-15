@@ -874,11 +874,15 @@ class HumanClient(Client):
         """clean visual traces and logout from server"""
         def loggedout(result, connection):
             """end the connection from client side"""
+            if Debug.connections:
+                logDebug('server confirmed logout for {}'.format(self))
             connection.connector.disconnect()
             return result
         if self.connection:
             conn = self.connection
             self.connection = None
+            if Debug.connections:
+                logDebug('sending logout to server for {}'.format(self))
             return self.callServer('logout').addCallback(loggedout, conn)
         else:
             return succeed(None)
