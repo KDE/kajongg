@@ -517,8 +517,9 @@ class ScoringScene(GameScene):
             receiver = self.selectorBoard
         else:
             receiver = self.game.players[wind].handBoard
-        if receiver != currentBoard or toConcealed != bool(uiTile.yoffset):
-            movingLastMeld = uiTile.tile in self.computeLastMeld()
+        movingMeld = currentBoard.uiMeldWithTile(uiTile)
+        if receiver != currentBoard or toConcealed != movingMeld.meld.isConcealed:
+            movingLastMeld = movingMeld.meld == self.computeLastMeld()
             if movingLastMeld:
                 self.scoringDialog.clearLastTileCombo()
             receiver.dropTile(uiTile, toConcealed)
