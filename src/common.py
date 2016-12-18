@@ -88,7 +88,7 @@ class Debug(object):
     process = False
     time = False
     sql = False
-    animation = ''  # 'yeysywynfefsfwfn'
+    animation = ''  # 'yeysywynG87gfefsfwfn' for tiles and G#g for groups where # is the uid
     animationSpeed = False
     robotAI = False
     dangerousGame = False

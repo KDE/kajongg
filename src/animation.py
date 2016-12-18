@@ -55,7 +55,7 @@ class Animation(QPropertyAnimation, StrMixin):
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
                 logDebug(
-                    u'Animation(%s) (after %s is done)' %
+                    u'new Animation(%s) (after %s is done)' %
                     (self, oldAnimation.ident()))
             else:
                 logDebug(u'Animation(%s)' % self)
@@ -74,11 +74,11 @@ class Animation(QPropertyAnimation, StrMixin):
 
     def ident(self):
         """the identifier to be used in debug messages"""
-        pGroup = self.group()
-        if pGroup:
-            return 'G%s/A%s' % (pGroup, id4(self))
+        pGroup = self.group() if isAlive(self) else 'notAlive'
+        if pGroup or not isAlive(self):
+            return '%s/A%s' % (pGroup, id4(self))
         else:
-            return 'A%s' % id4(self)
+            return 'A%s-%s' % (id4(self), self.targetObject().name())
 
     def pName(self):
         """
@@ -86,7 +86,10 @@ class Animation(QPropertyAnimation, StrMixin):
 
         @return: C{str}
         """
-        return nativeString(self.propertyName())
+        if isAlive(self):
+            return nativeString(self.propertyName())
+        else:
+            return 'notAlive'
 
     def unpackValue(self, qvariant):
         """get the wanted value from the QVariant"""
@@ -110,7 +113,7 @@ class Animation(QPropertyAnimation, StrMixin):
             value = self.unpackValue(value)
         pName = self.pName()
         if pName == 'pos':
-            return '%.1f/%.1f' % (value.x(), value.y())
+            return '%.0f/%.0f' % (value.x(), value.y())
         if pName == 'rotation':
             return '%d' % value
         if pName == 'scale':
@@ -118,12 +121,19 @@ class Animation(QPropertyAnimation, StrMixin):
 
     def __unicode__(self):
         """for debug messages"""
-        currentValue = getattr(self.targetObject(), self.pName())
+        if isAlive(self) and isAlive(self.targetObject()):
+            currentValue = getattr(self.targetObject(), self.pName())
+            endValue = self.endValue()
+            targetObject = self.targetObject()
+        else:
+            currentValue = 'notAlive'
+            endValue = 'notAlive'
+            targetObject = 'notAlive'
         return u'%s %s: %s->%s for %s' % (
             self.ident(), self.pName(),
             self.formatValue(currentValue),
-            self.formatValue(self.endValue()),
-            self.targetObject())
+            self.formatValue(endValue),
+            targetObject)
 
 
 class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
@@ -137,13 +147,18 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
 
     running = []  # we need a reference to active animation groups
     current = None
+    clsUid = 0
+
 
     def __init__(self, animations, parent=None):
         QParallelAnimationGroup.__init__(self, parent)
         self.animations = animations
+        self.uid = self.clsUid
+        ParallelAnimationGroup.clsUid += 1
         self.deferred = Deferred()
         self.steps = 0
         self.debug = any(x.debug for x in self.animations)
+        self.debug |= 'G{}g'.format(self.uid) in Debug.animation
         self.doAfter = list()
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
@@ -156,6 +171,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
             self.start()
         ParallelAnimationGroup.running.append(self)
         ParallelAnimationGroup.current = self
+        self.stateChanged.connect(self.showState)
 
     @staticmethod
     def cancelAll():
@@ -165,6 +181,12 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         for group in ParallelAnimationGroup.running:
             if isAlive(group):
                 group.clear()
+
+    def showState(self, newState, oldState):
+        """overrides Qt method"""
+        if self.debug:
+            logDebug('G{}: {} -> {} isAlive:{}'.format(
+                self.uid, self.stateName(oldState), self.stateName(newState), isAlive(self)))
 
     def updateCurrentTime(self, value):
         """count how many steps an animation does."""
@@ -240,9 +262,22 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
             Internal.scene.focusRect.refresh()
         return
 
+    def stateName(self, state=None):
+        """for debug output"""
+        if not isAlive(self):
+            return 'not alive'
+        if state is None:
+            state = self.state()
+        if state == QAbstractAnimation.Stopped:
+            return 'stopped'
+        elif state == QAbstractAnimation.Running:
+            return 'running'
+        else:
+            assert False
+
     def __unicode__(self):
         """for debugging"""
-        return u'G{}'.format(id4(self))
+        return u'G{}({}:{})'.format(self.uid, len(self.animations), self.stateName())
 
 class AnimatedMixin(object):
     """for UITile and PlayerWind"""
@@ -291,7 +326,7 @@ class AnimatedMixin(object):
     def shortcutAnimation(self, animation):
         """directly set the end value of the animation"""
         if animation.debug:
-            logDebug(' Shortcut({})'.format(animation.ident()))
+            logDebug('shortcutAnimation: UTile {}: clear queuedAnimations'.format(self.name()))
         setattr(
             self,
             animation.pName(),
@@ -308,8 +343,15 @@ class AnimatedMixin(object):
         """the graphics object knows which of its properties are currently animated"""
         self.queuedAnimations = []
         propName = animation.pName()
-        assert propName not in self.activeAnimation or not isAlive(
-            self.activeAnimation[propName])
+        if self.name() in Debug.animation:
+            oldAnimation = self.activeAnimation.get(propName, None)
+            if not isAlive(oldAnimation):
+                oldAnimation = None
+            if oldAnimation:
+                logDebug('**** setActiveAnimation {} {}: {} OVERRIDES {}'.format(
+                    self.name(), propName, animation, oldAnimation))
+            else:
+                logDebug('setActiveAnimation {} {}: set {}'.format(self.name(), propName, animation))
         self.activeAnimation[propName] = animation
         self.setCacheMode(QGraphicsItem.ItemCoordinateCache)
 
@@ -317,6 +359,8 @@ class AnimatedMixin(object):
         """an animation for this graphics object has ended.
         Finalize graphics object in its new position"""
         del self.activeAnimation[animation.pName()]
+        if self.name() in Debug.animation:
+            logDebug('UITile {}: clear activeAnimation[{}]'.format(self.name(), animation.pName()))
         self.setDrawingOrder()
         if not len(self.activeAnimation):
             self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
@@ -335,6 +379,9 @@ class AnimatedMixin(object):
                 curValue = animation.unpackValue(animation.endValue())
                 if curValue != newValue:
                     # change a queued animation
+                    if self.name() in Debug.animation:
+                        logDebug('setEndValue for {}: {}: {}->{}'.format(
+                            animation, pName, animation.formatValue(curValue), animation.formatValue(newValue)))
                     animation.setEndValue(newValue)
             else:
                 animation = self.activeAnimation.get(pName, None)
@@ -343,6 +390,7 @@ class AnimatedMixin(object):
                 else:
                     curValue = self.getValue(pName)
                 if pName != 'scale' or abs(curValue - newValue) > 0.00001:
+                    # ignore rounding differences for scale
                     if curValue != newValue:
                         Animation(self, pName, newValue)
 
