@@ -64,6 +64,7 @@ def callers(count=5, exclude=None):
     excluding.extend(['_startRunCallbacks', '_runCallbacks', 'remote_move', 'exec_move'])
     excluding.extend(['proto_message', '_recvMessage', 'remoteMessageReceived'])
     excluding.extend(['clientAction', 'myAction', 'expressionReceived'])
+    excluding.extend(['_read', 'callWithLogger'])
     excluding.extend(['callbackIfDone', 'callback', '__gotAnswer'])
     excluding.extend(['callExpressionReceived', 'proto_answer'])
     excluding.extend(['_dataReceived', 'dataReceived', 'gotItem'])
