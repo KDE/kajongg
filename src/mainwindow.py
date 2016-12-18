@@ -81,7 +81,7 @@ from scoring import scoreGame
 from scoringdialog import ScoreTable, ExplainView
 from humanclient import HumanClient
 from rulesetselector import RulesetSelector
-from animation import afterQueuedAnimations, AnimationSpeed
+from animation import afterQueuedAnimations, AnimationSpeed, ParallelAnimationGroup
 from chat import ChatWindow
 from scene import PlayingScene, ScoringScene
 from configdialog import ConfigDialog
@@ -339,6 +339,7 @@ class MainWindow(KXmlGuiWindow):
     def close(self, dummyResult=None):
         """wrap close() because we call it with a QTimer"""
         if isAlive(self):
+            ParallelAnimationGroup.cancelAll()
             return KXmlGuiWindow.close(self)
 
     def closeEvent(self, event):

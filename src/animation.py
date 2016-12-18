@@ -157,6 +157,15 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         ParallelAnimationGroup.running.append(self)
         ParallelAnimationGroup.current = self
 
+    @staticmethod
+    def cancelAll():
+        """cancel all animations"""
+        if Debug.quit:
+            logDebug('Cancelling all animations')
+        for group in ParallelAnimationGroup.running:
+            if isAlive(group):
+                group.clear()
+
     def updateCurrentTime(self, value):
         """count how many steps an animation does."""
         self.steps += 1
