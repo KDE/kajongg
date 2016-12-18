@@ -192,13 +192,7 @@ class UIWallSide(Board, StrMixin):
     @property
     def name(self):
         """name for debug messages"""
-        game = Internal.scene.game
-        if not game:
-            return u'NOGAME'
-        for player in game.players:
-            if player.front == self:
-                return u'UIWallSide %s' % player.name
-        return  u'UIWallSide'
+        return u'UIWallSide {}'.format(UIWall.sideNames[self.rotation()])
 
     def center(self):
         """returns the center point of the wall in relation to the
@@ -246,6 +240,14 @@ class UIWall(Wall):
 
     """represents the wall with four sides. self.wall[] indexes them
     counter clockwise, 0..3. 0 is bottom."""
+
+    Lower, Right, Upper, Left = range(4)
+    sideAngles = (0, 270, 180, 90)
+    sideNames = {0:'Lower', 1:'Right', 2:'Upper', 3:'Left'}
+    sideNames[270] = 'Right'
+    sideNames[180] = 'Upper'
+    sideNames[90] = 'Left'
+
     tileClass = UITile
     kongBoxClass = UIKongBox
 
@@ -261,7 +263,7 @@ class UIWall(Wall):
         sideLength = len(self.tiles) // 8
         self.__sides = [UIWallSide(
             Tileset.activeTileset(),
-            boardRotation, sideLength) for boardRotation in (0, 270, 180, 90)]
+            boardRotation, sideLength) for boardRotation in self.sideAngles]
         for idx, side in enumerate(self.__sides):
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
@@ -271,10 +273,10 @@ class UIWall(Wall):
             side.message.setZValue(ZValues.popupZ)
             side.message.setVisible(False)
             side.message.setPos(side.center())
-        self.__sides[0].setPos(yWidth=sideLength)
-        self.__sides[3].setPos(xHeight=1)
-        self.__sides[2].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
-        self.__sides[1].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1)
+        self.__sides[self.Lower].setPos(yWidth=sideLength)
+        self.__sides[self.Left].setPos(xHeight=1)
+        self.__sides[self.Upper].setPos(xHeight=1, xWidth=sideLength, yHeight=1)
+        self.__sides[self.Right].setPos(xWidth=sideLength, yWidth=sideLength, yHeight=1)
         Internal.scene.addItem(self.__square)
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
