@@ -54,6 +54,7 @@ class Animation(QPropertyAnimation, StrMixin):
         graphicsObject.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
         self.debug = graphicsObject.name() in Debug.animation or Debug.animation == 'all'
+        self.debug |= 'T{}t'.format(id4(graphicsObject)) in Debug.animation
         if self.debug:
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
