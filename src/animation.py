@@ -37,8 +37,11 @@ class Animation(QPropertyAnimation, StrMixin):
     """a Qt4 animation with helper methods"""
 
     nextAnimations = []
+    clsUid = 0
 
     def __init__(self, graphicsObject, propName, endValue, parent=None):
+        Animation.clsUid += 1
+        self.uid = Animation.clsUid
         pName = propName
         if isPython3 and usingQt5:
             # in this case they want bytes
@@ -153,12 +156,12 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
     def __init__(self, animations, parent=None):
         QParallelAnimationGroup.__init__(self, parent)
         self.animations = animations
-        self.uid = self.clsUid
+        self.uid = ParallelAnimationGroup.clsUid
         ParallelAnimationGroup.clsUid += 1
         self.deferred = Deferred()
         self.steps = 0
         self.debug = any(x.debug for x in self.animations)
-        self.debug |= 'G{}g'.format(self.uid) in Debug.animation
+        self.debug |= 'G{}g'.format(id4(self)) in Debug.animation
         self.doAfter = list()
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:

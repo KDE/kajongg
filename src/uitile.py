@@ -41,10 +41,14 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
 
     # pylint: disable=too-many-instance-attributes
 
+    clsUid = 0
+
     def __init__(self, tile, xoffset=0.0, yoffset=0.0, level=0):
         super(UITile, self).__init__()
         if not isinstance(tile, Tile):
             tile = Tile(tile)
+        UITile.clsUid += 1
+        self.uid = UITile.clsUid
         self._tile = tile
         self._boundingRect = None
         self._cross = False
