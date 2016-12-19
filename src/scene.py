@@ -44,7 +44,11 @@ from scoringdialog import ScoringDialog
 
 class FocusRect(QGraphicsRectItem, StrMixin):
 
-    """show a focusRect with blue border around focused tile or meld"""
+    """show a focusRect with blue border around focused tile or meld.
+    We can NOT do this as a child of the item or the focus rect would
+    have to stay within tile face: The adjacent tile will cover the
+    focus rect because Z order is only relevant for items having the
+    same parent"""
 
     def __init__(self):
         QGraphicsRectItem.__init__(self)
