@@ -408,8 +408,12 @@ class Game(object):
         @todo: Can we pass L{Players} instead of that tuple list?
         """
         if not self.players:
-            self.players = Players(self.playerClass(
-                self, playerNames[x][1]) for x in range(4))
+            self.players = Players()
+            for idx in range(4):
+                # append each separately: Until they have names, the current length of players
+                # is used to assign one of the four walls to the player
+                self.players.append(self.playerClass(
+                    self, playerNames[idx][1]))
         for wind, name in playerNames:
             self.players.byName(name).wind = wind
         if self.client and self.client.name:
