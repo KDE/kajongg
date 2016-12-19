@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
-from common import StrMixin
+from common import StrMixin, Debug
 from tile import Tile, elements
 
 
@@ -69,8 +69,11 @@ class Wall(StrMixin):
     def __init__(self, game):
         """init and position the wall"""
         self._game = weakref.ref(game)  # avoid cycles for garbage collection
+        wallSize = int(Debug.wallSize)
+        if not wallSize:
+            wallSize = elements.count(game.ruleset)
         self.tiles = [self.tileClass(Tile.unknown)
-                      for _ in range(elements.count(game.ruleset))]
+                      for _ in range(wallSize)]
         self.living = None
         self.kongBox = self.kongBoxClass()
         assert len(self.tiles) % 8 == 0
