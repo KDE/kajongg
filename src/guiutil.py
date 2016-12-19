@@ -171,12 +171,13 @@ def rotateCenter(item, angle):
 
 def sceneRotation(item):
     """the combined rotation of item and all parents in degrees: 0,90,180 or 270"""
-    matrix = item.sceneTransform()
+    transform = item.sceneTransform()
     matrix = (
-        int(matrix.m11()),
-        int(matrix.m12()),
-        int(matrix.m21()),
-        int(matrix.m22()))
+        round(transform.m11()),
+        round(transform.m12()),
+        round(transform.m21()),
+        round(transform.m22()))
+    matrix = tuple(1 if x>0 else -1 if x<0 else 0 for x in matrix)
     rotations = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
         0, 1, -1, 0): 90, (-1, 0, 0, -1): 180, (0, -1, 1, 0): 270}
     if matrix not in rotations:
