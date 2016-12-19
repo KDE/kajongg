@@ -67,6 +67,10 @@ class Animation(QPropertyAnimation, StrMixin):
     def setEndValue(self, endValue):
         """wrapper with debugging code"""
         graphicsObject = self.targetObject()
+        if not isAlive(graphicsObject):
+            # may happen when aborting a game because animations are cancelled first,
+            # before the last move from server is executed
+            return
         if graphicsObject.name() in Debug.animation or Debug.animation == 'all':
             pName = self.pName()
             logDebug(
@@ -109,7 +113,8 @@ class Animation(QPropertyAnimation, StrMixin):
 
     def unpackEndValue(self):
         """unpacked end value"""
-        return self.unpackValue(self.endValue())
+        if isAlive(self) and isAlive(self.targetObject()):
+            return self.unpackValue(self.endValue())
 
     def formatValue(self, value):
         """string format the wanted value from qvariant"""

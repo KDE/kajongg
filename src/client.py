@@ -23,12 +23,12 @@ import weakref
 
 from twisted.spread import pb
 from twisted.internet.task import deferLater
-from twisted.internet.defer import Deferred, succeed
+from twisted.internet.defer import Deferred, succeed, fail
 from util import Duration
 from log import logDebug, logException, logWarning, m18nc
 from message import Message
 from common import Internal, Debug, Options, StrMixin
-from common import unicodeString, unicode
+from common import unicodeString, unicode, isAlive
 from tilesource import TileSource
 from rule import Ruleset
 from game import PlayingGame
@@ -353,6 +353,8 @@ class Client(pb.Referenceable):
 
     def remote_move(self, playerName, command, *dummyArgs, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
+        if Internal.scene and not isAlive(Internal.scene):
+            return fail()
         if self.game:
             player = self.game.playerByName(playerName)
         elif playerName:
