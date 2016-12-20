@@ -461,7 +461,7 @@ class UIWall(Wall):
 
     def showWindMarkers(self, dummyDeferred):
         """animate all windMarkers together"""
-        with AnimationSpeed(30):
+        with AnimationSpeed(15):
             for player in self.game.players:
                 side = player.front
                 side.windTile.setupAnimations()

@@ -600,6 +600,8 @@ class Game(object):
             if self.roundsFinished % 4 and self.rotated == 0:
                 # exchange seats between rounds
                 self.__exchangeSeats()
+            if Internal.scene:
+                self.wall.showWindMarkers()
 
     def debug(self, msg, btIndent=None, prevHandId=False):
         """
