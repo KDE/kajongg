@@ -46,15 +46,16 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
     """a round wind tile"""
 
     roundWindColor = QColor(235, 235, 173)
+    whiteColor = QColor('white')
 
     def __init__(self, wind, parent=None):
         """generate new wind marker"""
         super(PlayerWind, self).__init__()
         assert not parent
-        assert isinstance(wind, Wind) and wind.svgName, 'wind {}  must be a real Wind but is {}'.format(
+        assert isinstance(wind, Wind), 'wind {}  must be a real Wind but is {}'.format(
             wind, type(wind))
         self.__wind = wind
-        self.__brush = QColor('white')
+        self.__brush = self.whiteColor
         self.board = None
 
     def name(self):
@@ -87,7 +88,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
     @property
     def prevailing(self):
         """is this the prevailing wind?"""
-        return self.__brush == self.roundWindColor
+        return self.__brush is self.roundWindColor
 
     @prevailing.setter
     def prevailing(self, value):
@@ -95,17 +96,19 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
             newPrevailing = value
         else:
             newPrevailing = self.wind == Wind.all4[value % 4]
-        self.__brush = self.roundWindColor if newPrevailing else QColor('white')
+        self.__brush = self.roundWindColor if newPrevailing else self.whiteColor
 
     def paint(self, painter, dummyOption, dummyWidget=None):
         """paint the marker"""
         with Painter(painter):
             painter.setBrush(self.__brush)
-            painter.drawEllipse(self.boundingRect())
+            size = Internal.scene.windTileset.faceSize.height()
+            ellRect = QRectF(QPoint(), QPoint(size, size))
+            painter.drawEllipse(ellRect)
             renderer = Internal.scene.windTileset.renderer()
-            painter.scale(0.9, 0.9)
-            painter.translate(-5, 8)
-            renderer.render(painter, self.wind.svgName, self.boundingRect())
+            painter.translate(12, 12)
+            painter.scale(0.60, 0.60)
+            renderer.render(painter, self.wind.markerSvgName, self.boundingRect())
 
     def boundingRect(self): # pylint: disable=no-self-use
         """define the part of the tile we want to see"""
