@@ -32,6 +32,7 @@ from uitile import UITile
 from animation import animate, afterQueuedAnimations, AnimationSpeed, \
     ParallelAnimationGroup, AnimatedMixin
 
+
 class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
 
     """The text written on the wall"""
@@ -449,9 +450,19 @@ class UIWall(Wall):
             # move last two tiles onto the dead end:
             return self._placeLooseTiles()
 
-    def decorate(self):
+    @afterQueuedAnimations
+    def decorate(self, deferredResult=None): # pylint: disable=unused-argument
         """show player info on the wall"""
-        for player in self.game.players:
-            player.decorate()
-        SideText.refreshAll()
-        animate() # move the wind markers
+        with AnimationSpeed(80):
+            for player in self.game.players:
+                player.decorate()
+            SideText.refreshAll()
+            animate().addCallback(self.showWindMarkers)
+
+    def showWindMarkers(self, dummyDeferred):
+        """animate all windMarkers together"""
+        with AnimationSpeed(30):
+            for player in self.game.players:
+                side = player.front
+                side.windTile.setupAnimations()
+                side.windTile.show()
