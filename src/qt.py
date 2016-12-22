@@ -28,22 +28,7 @@ import sip
 
 from common import isPython3, Internal
 
-usingQt4 = True  # Default for now
-usingQt5 = False
-
-if '--qt5' in sys.argv or os.name == 'nt':
-    try:
-        from qt5 import *
-        usingQt5 = True
-        usingQt4 = False
-    except ImportError as exc:
-        Internal.logger.debug(
-            '%s: Cannot import Qt5:%s, using Qt4 instead',
-            'Server' if Internal.isServer else 'Client',
-            exc.message)
-        from qt4 import *
-else:
-    from qt4 import *
+from qt5 import *
 
 
 class RealQVariant(object):
@@ -52,16 +37,14 @@ class RealQVariant(object):
     This makes it easier to write code supporting both Qt4 and Qt5"""
 
     def __init__(self):
-        if usingQt5:
-            sip.enableautoconversion(QVariant, False)
+        sip.enableautoconversion(QVariant, False)
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, trback):
         """enable autoconversion again"""
-        if usingQt5:
-            sip.enableautoconversion(QVariant, True)
+        sip.enableautoconversion(QVariant, True)
 
 if isPython3:
     def toQVariant(obj=None):

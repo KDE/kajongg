@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import sys
 import logging
 
-from qt import QObject, usingQt4
+from qt import QObject
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
 from about import About
 
@@ -159,8 +159,6 @@ from util import gitHead
 ABOUT = About()
 KCmdLineArgs.init(sys.argv, ABOUT.about)
 KCmdLineArgs.addCmdLineOptions(defineOptions())
-if usingQt4:
-    KApplication.setGraphicsSystem('raster')
 APP = KApplication()
 parseOptions()
 

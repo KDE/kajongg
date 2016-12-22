@@ -25,7 +25,6 @@ from qt import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen,
 from qt import QFontMetrics, QGraphicsObject
 from qt import QMenu, QCursor
 from qt import QGraphicsSvgItem
-from qt import usingQt4
 from tileset import Tileset, TileException
 from tile import Tile, elements
 from uitile import UITile, UIMeld
@@ -789,17 +788,10 @@ class FittingView(QGraphicsView):
     def wheelEvent(self, event):  # pylint: disable=no-self-use
         """we do not want scrolling for the scene view.
         Instead scrolling down changes perspective like in kmahjongg"""
-        if usingQt4:
-            orientation = event.orientation()
-            if orientation == Qt.Horizontal or event.delta() >= 0:
-                return
-                # do not call ignore() because we do want
-                # to consume this
-        else:
-            angleX = event.angleDelta().x()
-            angleY = event.angleDelta().y()
-            if angleX > 15 or angleY > -50:
-                return
+        angleX = event.angleDelta().x()
+        angleY = event.angleDelta().y()
+        if angleX > 15 or angleY > -50:
+            return
         Internal.mainWindow.changeAngle()
 
     def resizeEvent(self, dummyEvent):

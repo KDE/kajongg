@@ -314,7 +314,7 @@ class EventData(str):
 
     """used for generating a nice string"""
     events = {y: x for x, y in QEvent.__dict__.items() if isinstance(y, int)}
-    # add some old events which still arrive but are not supported by PyQt4
+    # add some old events which still arrive but are not supported by PyQt5
     events[15] = 'Create'
     events[16] = 'Destroy'
     events[20] = 'Quit'

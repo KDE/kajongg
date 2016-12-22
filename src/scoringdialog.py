@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 # pylint: disable=ungrouped-imports
 
-from qt import Qt, usingQt5, QPointF, toQVariant, variantValue, \
+from qt import Qt, QPointF, toQVariant, variantValue, \
     QSize, QModelIndex, QEvent, QTimer
 
 from qt import QColor, QPushButton, QPixmapCache
@@ -456,12 +456,8 @@ class ScoreTable(QWidget):
         self.viewRight.setHorizontalScrollBar(HorizontalScrollBar(self))
         self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
         self.viewRight.setFocusPolicy(Qt.NoFocus)
-        if usingQt5:
-            self.viewRight.header().setSectionsClickable(False)
-            self.viewRight.header().setSectionsMovable(False)
-        else:
-            self.viewRight.header().setClickable(False)
-            self.viewRight.header().setMovable(False)
+        self.viewRight.header().setSectionsClickable(False)
+        self.viewRight.header().setSectionsMovable(False)
         self.viewRight.setSelectionMode(QAbstractItemView.NoSelection)
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Vertical)
@@ -522,10 +518,7 @@ class ScoreTable(QWidget):
             header = view.header()
             header.setStretchLastSection(False)
             view.setAlternatingRowColors(True)
-        if usingQt5:
-            self.viewRight.header().setSectionResizeMode(QHeaderView.Fixed)
-        else:
-            self.viewRight.header().setResizeMode(QHeaderView.Fixed)
+        self.viewRight.header().setSectionResizeMode(QHeaderView.Fixed)
         for col in range(self.viewLeft.header().count()):
             self.viewLeft.header().setSectionHidden(col, col > 0)
             self.viewRight.header().setSectionHidden(col, col == 0)
@@ -637,19 +630,13 @@ class PenaltyBox(QSpinBox):
 
     def validate(self, inputData, pos):
         """check if value is a multiple of parties"""
-        if usingQt5:
-            result, inputData, newPos = QSpinBox.validate(self, inputData, pos)
-        else:
-            result, newPos = QSpinBox.validate(self, inputData, pos)
+        result, inputData, newPos = QSpinBox.validate(self, inputData, pos)
         if result == QValidator.Acceptable:
             if int(inputData) % self.parties != 0:
                 result = QValidator.Intermediate
         if result == QValidator.Acceptable:
             self.prevValue = str(inputData)
-        if usingQt5:
-            return (result, inputData, newPos)
-        else:
-            return (result, newPos)
+        return (result, inputData, newPos)
 
     def fixup(self, data):
         """change input to a legal value"""

@@ -24,7 +24,7 @@ import types
 from twisted.internet.defer import Deferred, succeed
 
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
-    QAbstractAnimation, QEasingCurve, QVariant, usingQt5
+    QAbstractAnimation, QEasingCurve, QVariant
 from qt import pyqtProperty, QGraphicsObject, QGraphicsItem
 
 from common import Internal, Debug, isAlive, isPython3, nativeString
@@ -34,7 +34,7 @@ from log import logDebug, id4
 
 class Animation(QPropertyAnimation, StrMixin):
 
-    """a Qt4 animation with helper methods"""
+    """a Qt animation with helper methods"""
 
     nextAnimations = []
     clsUid = 0
@@ -43,7 +43,7 @@ class Animation(QPropertyAnimation, StrMixin):
         Animation.clsUid += 1
         self.uid = Animation.clsUid
         pName = propName
-        if isPython3 and usingQt5:
+        if isPython3:
             # in this case they want bytes
             pName = pName.encode()
         QPropertyAnimation.__init__(self, graphicsObject, pName, parent)

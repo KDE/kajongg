@@ -51,7 +51,7 @@ def canConvert(variant, variantType):
     Wrapper for Python3 where QVariant.canConvert() does not exist.
 
     @param variant: Any of a lot of different Qt types, and str.
-    @param variantType: C{int}, represents C{PyQt4.QtCore.QVariant.X}
+    @param variantType: C{int}, represents C{PyQt5.QtCore.QVariant.X}
                         where X is something like Font, Color etc.
     """
     if isPython3:
