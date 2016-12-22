@@ -27,33 +27,7 @@ import sip
 
 from common import Internal, Options, unicode, isPython3
 
-usingKDE = False  # pylint: disable=invalid-name
-
-try:
-    if '--nokde' in sys.argv or '--qt5' in sys.argv or sip.SIP_VERSION == 0x041201:
-        # for now there is no PyKDE5
-        raise ImportError
-    if isPython3:
-        # PyKDE4 for python3 is unusable, fall back to qt only
-        # see KDE bug 253123
-        raise ImportError
-    from PyKDE4.kdecore import KUser, KGlobal, KStandardDirs, \
-        KAboutData, KCmdLineArgs, KConfig, KCmdLineOptions
-    from PyKDE4.kdecore import i18n, i18nc, ki18n, KGlobal
-    from PyKDE4.kdeui import KMessageBox, KIcon, KLineEdit, \
-        KConfigSkeleton, KDialogButtonBox, KAction, KStandardAction, \
-        KApplication, KToggleFullScreenAction, KXmlGuiWindow, \
-        KConfigDialog, KDialog
-    usingKDE = True  # pylint: disable=invalid-name
-    KDialog.NoButton = getattr(KDialog, 'None')
-    # see https://bugs.kde.org/show_bug.cgi?id=333683
-except ImportError:
-    try:
-        raise
-        # This is where we will try to import PyKDE5 when that will
-        # be available
-    except ImportError:
-        from kdestub import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from kdestub import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 
 def appdataDir():

@@ -28,7 +28,7 @@ from qt import QDialog, QVBoxLayout, QGridLayout, \
     QLabel, QPushButton, QWidget, \
     QProgressBar, QRadioButton, QSpacerItem, QSizePolicy
 
-from kde import usingKDE, KIcon, KDialog
+from kde import KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 from guiutil import decorateWindow
 from log import m18n, logWarning, logException, logDebug
@@ -661,7 +661,7 @@ class HumanClient(Client):
             # update the balances in the status bar:
             Internal.mainWindow.updateGUI()
         assert not self.game.isFirstHand()
-        return Information(m18n("Ready for next hand?"), modal=usingKDE).addCallback(answered)
+        return Information(m18n("Ready for next hand?"), modal=False).addCallback(answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,

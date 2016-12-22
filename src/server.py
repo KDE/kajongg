@@ -463,8 +463,6 @@ def parseArgs():
         help=m18n('do not terminate local game server after last client disconnects'), default=False)
     parser.add_option('', '--debug', dest='debug',
                       help=Debug.help())
-    parser.add_option('', '--nokde', dest='nokde', action='store_true',
-                      help=m18n('do not use KDE bindings. Only for testing'))
     parser.add_option('', '--qt5', dest='qt5', action='store_true',
                       help=m18n('Force using Qt5. Currently Qt4 is used by default'))
     (options, args) = parser.parse_args()

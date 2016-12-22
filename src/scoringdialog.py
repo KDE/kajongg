@@ -22,10 +22,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from qt import Qt, usingQt5, QPointF, toQVariant, variantValue, \
     QSize, QModelIndex, QEvent, QTimer
-from kde import usingKDE
-
-if usingKDE:
-    from qt import SLOT
 
 from qt import QColor, QPushButton, QPixmapCache
 from qt import QWidget, QLabel, QTabWidget
@@ -734,15 +730,10 @@ class PenaltyDialog(QDialog):
         grid.addWidget(buttonBox, 7, 0, 1, 5)
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         buttonBox.rejected.connect(self.reject)
-        if not usingKDE:
-            self.btnExecute = buttonBox.addButton(
-                m18n("&Execute"),
-                QDialogButtonBox.AcceptRole)
-            self.btnExecute.clicked.connect(self.accept)
-        else:
-            self.btnExecute = buttonBox.addButton(
-                m18n("&Execute"), QDialogButtonBox.AcceptRole,
-                self, SLOT("accept()"))
+        self.btnExecute = buttonBox.addButton(
+            m18n("&Execute"),
+            QDialogButtonBox.AcceptRole)
+        self.btnExecute.clicked.connect(self.accept)
         self.crimeChanged()
         StateSaver(self)
 
