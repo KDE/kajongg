@@ -49,39 +49,41 @@ PLAYERSFIELD = 6
 
 OPTIONS = None
 
+KNOWNCOMMITS = set()
 
 class Clone(object):
 
     """make a temp directory for commitId"""
 
+    cacheDirectory = os.path.expanduser(os.path.join('~', '.kajongg', '.cache'))
+
     def __init__(self, commitId):
         self.commitId = commitId
-        if commitId is 'current':
-            self.tmpdir = os.path.abspath('..')
-            srcDir = os.path.join(self.tmpdir, 'src')
-            assert os.path.exists(srcDir), '{} does not exist'.format(srcDir)
-        else:
-            self.tmpdir = os.path.expanduser(os.path.join('~', '.kajongg', '.cache', commitId))
-            if not os.path.exists(self.tmpdir):
+        if commitId != 'current':
+            tmpdir = os.path.expanduser(os.path.join(self.cacheDirectory, commitId))
+            if not os.path.exists(tmpdir):
                 subprocess.Popen('git clone --shared --no-checkout -q .. {temp}'.format(
-                    temp=self.tmpdir).split()).wait()
+                    temp=tmpdir).split()).wait()
                 subprocess.Popen('git checkout -q {commitId}'.format(
-                    commitId=commitId).split(), cwd=self.tmpdir).wait()
-                if os.path.islink('twisted'):
-                    cpCmd = ['ln', '-s', '{}/twisted'.format(os.getcwd()),
-                             '{}/src/twisted'.format(self.tmpdir)]
-                    subprocess.Popen(cpCmd).wait()
+                    commitId=commitId).split(), cwd=tmpdir).wait()
 
-    @classmethod
-    def cloneDirectory(cls):
-        """the directory for this git commit"""
-        return os.path.expanduser(os.path.join('~', '.kajongg', '.cache'))
-
-    @classmethod
-    def commitDirectory(cls, commitId):
+    def sourceDirectory(self):
         """the source directory for this git commit"""
-        return os.path.join(cls.cloneDirectory(), commitId)
+        if self.commitId == 'current':
+            tmpdir = os.path.abspath('..')
+            result = os.path.join(tmpdir, 'src')
+        else:
+            result = os.path.join(self.cacheDirectory, self.commitId, 'src')
+        assert os.path.exists(result), '{} does not exist'.format(result)
+        return result
 
+    @classmethod
+    def removeObsolete(cls):
+        """remove all clones for obsolete commits"""
+        for commitDir in os.listdir(cls.cacheDirectory):
+            if not any(x.startswith(commitDir) for x in KNOWNCOMMITS):
+                removeDir = os.path.join(cls.cacheDirectory, commitDir)
+                shutil.rmtree(removeDir)
 
 class Client(object):
 
@@ -147,7 +149,6 @@ class Server(StrMixin):
             self.start(job)
         else:
             self.jobs.append(job)
-        job.server = self
 
     @classmethod
     def allRunningJobs(cls):
@@ -156,9 +157,11 @@ class Server(StrMixin):
 
     def start(self, job):
         """start this server"""
+        job.server = self
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
-        assert self.commitId == job.commitId
+        assert self.commitId == job.commitId, 'Server.commitId {} != Job.commitId {}'.format(
+            self.commitId, job.commitId)
         cmd = [os.path.join(
             job.srcDir(),
             'kajonggserver.py')]
@@ -242,7 +245,9 @@ class Job(StrMixin):
 
     def srcDir(self):
         """the path of the directory where the particular test is running"""
-        return os.path.join(Clone.commitDirectory(self.commitId), 'src')
+        assert self.server, 'Job {} has no server'.format(self)
+        assert self.server.clone, 'Job {} has no server.clone'.format(self)
+        return self.server.clone.sourceDirectory()
 
     def __startProcess(self, cmd):
         """call Popen"""
@@ -350,8 +355,6 @@ def neutralize(rows):
             row[idx] = field
         yield row
 
-KNOWNCOMMITS = set()
-
 
 def onlyExistingCommits(commits):
     """filter out non-existing commits"""
@@ -400,11 +403,7 @@ def removeInvalidCommits(csvFile):
         except OSError:
             pass  # not yet empty
 
-    # remove all clones for obsolete commits
-    for commitDir in os.listdir(Clone.cloneDirectory()):
-        if not any(x.startswith(commitDir) for x in KNOWNCOMMITS):
-            removeDir = os.path.join(Clone.cloneDirectory(), commitDir)
-            shutil.rmtree(removeDir)
+    Clone.removeObsolete()
 
 def readGames(csvFile):
     """returns a dict holding a frozenset of games for each variant"""
@@ -566,7 +565,8 @@ def doJobs():
                 break
             for job in running:
                 if not job.started:
-                    job.server.jobs.remove(job)
+                    if job.server:
+                        job.server.jobs.remove(job)
                 else:
                     job.check()
                     if job.process:
