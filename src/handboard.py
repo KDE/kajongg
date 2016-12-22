@@ -210,7 +210,7 @@ class HandBoard(Board):
         result = list()
         xPos = 13 - len(placeBoni)
         newBonusTiles = list(self.tileAttrClass(x) for x in placeBoni)
-        for bonus in sorted(newBonusTiles, key=lambda x: hash(x.tile)):
+        for bonus in sorted(newBonusTiles, key=lambda x: x.tile.key):
             bonus.xoffset, bonus.yoffset = xPos, bonusY
             bonus.dark = False
             result.append(bonus)
