@@ -128,7 +128,7 @@ class Background(object):
 
     def pixmap(self, size):
         """returns a background pixmap or None for isPlain"""
-        self.__pmap = None
+        self.__pmap = QBrush()
         if not self.isPlain:
             width = size.width()
             height = size.height()
