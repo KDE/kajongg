@@ -212,7 +212,7 @@ class HandBoard(Board):
         xPos = 13 - len(newBonusTiles)
         xPos = max(xPos, tileLen)
         result = list()
-        for bonus in sorted(newBonusTiles, key=lambda x: hash(x.tile)):
+        for bonus in sorted(newBonusTiles, key=lambda x: x.tile.key):
             bonus.xoffset, bonus.yoffset = xPos, bonusY
             bonus.dark = False
             result.append(bonus)
