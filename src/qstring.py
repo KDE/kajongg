@@ -29,6 +29,8 @@ class QString(unicode):
     def __new__(cls, value=None):
         if value is None:
             return unicode.__new__(cls)
+        elif isinstance(value, unicode):
+            return unicode.__new__(cls, value)
         else:
             return unicode.__new__(cls, nativeString(value))
 
