@@ -160,11 +160,7 @@ class DeferredDialog(Deferred):
 
     def clicked(self, button=None):
         """we got a reaction"""
-        if button is None:
-            # it seems there may be a timing problem where this is called
-            # even after dlg has already been destroyed
-            result = self.defaultResult
-        elif self.dlg:
+        if self.dlg:
             result = self.dlg.returns(button)
         self.__removeFromScene()
         self.callback(result)
