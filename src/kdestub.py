@@ -1720,7 +1720,7 @@ class KEditToolBar(KDialog):
         self.downAction.clicked.connect(self.downButton)
 
         top_layout = QVBoxLayout(self)
-        top_layout.setMargin(0)
+        top_layout.setContentsMargins(0, 0, 0, 0)
         list_layout = QHBoxLayout()
 
         inactive_layout = QVBoxLayout()
