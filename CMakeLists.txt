@@ -1,20 +1,21 @@
+cmake_minimum_required(VERSION 3.5)
+    
 # search packages used by KDE
 IF(NOT KDE4_FOUND)
      find_package(KDE4 REQUIRED)
 ENDIF(NOT KDE4_FOUND)
 include(FindPythonLibrary)
-include(FindPyQt4)
 include(FindPyKDE4)
-include(FindSqlite)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules )
 find_package(Twisted REQUIRED)
+find_package(PyQt5 REQUIRED)
 
 # The name of the project
 # cmake does not really support python projects...
 #project(kajongg python) # FIXME this is currently a C++ project and requires a C++ compilier.
 set(PROJECT_NAME kajongg)
-set(PROGRAM_VERSION 4.6.0)
+set(PROGRAM_VERSION 16.12)
 
 add_subdirectory( voices )
 add_subdirectory( doc )
@@ -80,34 +81,23 @@ src/wall.py
 src/uiwall.py
 src/visible.py
 src/log.py
-src/qstring.py
 src/qt.py
-src/qt4.py
-src/qt5.py
 src/configdialog.py
 src/tilesource.py
 src/util.py)
 
-IF(NOT PYQT4_FOUND)
-    macro_log_feature(PYQT4_FOUND "PyQt4" "PyQt4 was not found. It is needed by kajongg to run. (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://www.riverbankcomputing.co.uk/software/pyqt/intro" FALSE "" "")
-ENDIF(NOT PYQT4_FOUND)
-
-IF(NOT PYKDE4_FOUND)
-    macro_log_feature(PYKDE4_FOUND "PyKDE4" "PyKDE4 was not found. It is needed by kajongg to run. (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://websvn.kde.org/trunk/KDE/kdebindings/python/pykde4/" FALSE "" "")
-ENDIF(NOT PYKDE4_FOUND)
-
-IF(NOT SQLITE_FOUND)
-    macro_log_feature(SQLITE_FOUND "SQLite" "SQLite was not found. It is needed by kajongg to run. (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://www.sqlite.org/" FALSE "" "")
-ENDIF(NOT SQLITE_FOUND)
+IF(NOT PYQT5_FOUND)
+    macro_log_feature(PYQT4_FOUND "PyQt5" "PyQt5 was not found. It is needed by kajongg to run. (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://www.riverbankcomputing.co.uk/software/pyqt/intro" FALSE "" "")
+ENDIF(NOT PYQT5_FOUND)
 
 IF(NOT TWISTED_FOUND)
     MESSAGE("Twisted was not found. It is needed by kajongg to run.")
     macro_log_feature(TWISTED_FOUND "Twisted" "Twisted was not found. It is needed by kajongg to run. (Use -DINSTALL_KAJONGG=TRUE to install anyway)" "http://www.twistedmatrix.com/" FALSE "" "")
 ENDIF(NOT TWISTED_FOUND)
 
-IF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND AND TWISTED_FOUND)
+IF(PYQT5_FOUND AND TWISTED_FOUND)
     SET(INSTALL_KAJONGG TRUE)
-ENDIF(PYQT4_FOUND AND PYKDE4_FOUND AND SQLITE_FOUND AND TWISTED_FOUND)
+ENDIF(PYQT5_FOUND AND TWISTED_FOUND)
 
 IF(INSTALL_KAJONGG)
     PYKDE4_INSTALL_PYTHON_FILES(${SRCFILES})

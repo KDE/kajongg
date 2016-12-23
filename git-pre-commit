@@ -131,8 +131,7 @@ then
 	fi
 fi
 ./scoringtest.py
-python2 ./kajongg.py --demo --rounds=1
-python3 ./kajongg.py --demo --rounds=1
+./kajongg.py --demo --rounds=1
 
 result=$?
 if [ $result -ne 0 ]
