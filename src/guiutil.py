@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import os
 
-from qt import uic, toQVariant, variantValue
+from qt import uic
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 from qt import QTransform
 
@@ -75,8 +75,7 @@ class ListComboBox(QComboBox):
     @property
     def items(self):
         """combo box items"""
-        return [variantValue(self.itemData(idx))
-                for idx in range(self.count())]
+        return [self.itemData(idx) for idx in range(self.count())]
 
     @items.setter
     def items(self, items):
@@ -84,7 +83,7 @@ class ListComboBox(QComboBox):
         self.clear()
         if items:
             for item in items:
-                self.addItem(m18n(item.name), toQVariant(item))
+                self.addItem(m18n(item.name), item)
 
     def findItem(self, search):
         """returns the index or -1 of not found """
@@ -100,7 +99,7 @@ class ListComboBox(QComboBox):
     @property
     def current(self):
         """current item"""
-        return variantValue(self.itemData(self.currentIndex()))
+        return self.itemData(self.currentIndex())
 
     @current.setter
     def current(self, item):
@@ -177,7 +176,7 @@ def sceneRotation(item):
         round(transform.m12()),
         round(transform.m21()),
         round(transform.m22()))
-    matrix = tuple(1 if x>0 else -1 if x<0 else 0 for x in matrix)
+    matrix = tuple(1 if x > 0 else -1 if x < 0 else 0 for x in matrix)
     rotations = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
         0, 1, -1, 0): 90, (-1, 0, 0, -1): 180, (0, -1, 1, 0): 270}
     if matrix not in rotations:

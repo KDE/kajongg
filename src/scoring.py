@@ -25,7 +25,7 @@ from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
 from qt import QPushButton, QMessageBox, QComboBox
 
 
-from common import Internal, isAlive, unicode, Debug
+from common import Internal, isAlive, Debug
 from wind import Wind
 from tilesource import TileSource
 from animation import animate
@@ -102,7 +102,7 @@ class SelectPlayers(SelectRuleset):
 
     def __selectedNames(self):
         """A set with the currently selected names"""
-        return set(list(unicode(cbName.currentText()) for cbName in self.nameWidgets))
+        return set(list(cbName.currentText() for cbName in self.nameWidgets))
 
     def slotValidate(self):
         """try to find 4 different players and update status of the Ok button"""
@@ -113,17 +113,17 @@ class SelectPlayers(SelectRuleset):
         allNames = set(Players.humanNames.values())
         unusedNames = allNames - self.__selectedNames()
         with BlockSignals(self.nameWidgets):
-            used = set([unicode(x.currentText())
+            used = set([x.currentText()
                         for x in self.nameWidgets if x.manualSelect])
             for combo in self.nameWidgets:
                 if not combo.manualSelect:
-                    if unicode(combo.currentText()) in used:
+                    if combo.currentText() in used:
                         comboName = unusedNames.pop()
                         combo.clear()
                         combo.addItems([comboName])
-                        used.add(unicode(combo.currentText()))
+                        used.add(combo.currentText())
             for combo in self.nameWidgets:
-                comboName = unicode(combo.currentText())
+                comboName = combo.currentText()
                 combo.clear()
                 combo.addItems([comboName])
                 combo.addItems(sorted(
@@ -131,7 +131,7 @@ class SelectPlayers(SelectRuleset):
                 combo.setCurrentIndex(0)
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
             len(self.__selectedNames()) == 4)
-        self.names = list(unicode(cbName.currentText())
+        self.names = list(cbName.currentText()
                           for cbName in self.nameWidgets)
 
 

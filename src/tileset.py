@@ -23,7 +23,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import QString, QSizeF, QSvgRenderer
+from qt import QSizeF, QSvgRenderer
 from kde import KGlobal, KStandardDirs, KConfig
 from log import logWarning, logException, m18n
 from common import LIGHTSOURCES, Internal
@@ -40,11 +40,11 @@ class TileException(Exception):
 
 def locateTileset(which):
     """locate the file with a tileset"""
-    path = KStandardDirs.locate("kmahjonggtileset", QString(which))
+    path = KStandardDirs.locate("kmahjonggtileset", which)
     if path is None:
         logException(TileException('cannot find kmahjonggtileset %s' %
                                    (which)))
-    return QString(path)
+    return path
 
 
 class Tileset(object):
@@ -60,7 +60,7 @@ class Tileset(object):
         if not Tileset.catalogDefined:
             KGlobal.dirs().addResourceType(
                 "kmahjonggtileset",
-                "data", QString("kmahjongglib/tilesets"))
+                "data", "kmahjongglib/tilesets")
             KGlobal.locale().insertCatalog("libkmahjongglib")
             Tileset.catalogDefined = True
 
@@ -104,9 +104,9 @@ class Tileset(object):
         self.__shadowOffsets = None
         self.defineCatalog()
         self.path = locateTileset(desktopFileName + '.desktop')
-        if self.path.isEmpty():
+        if not self.path:
             self.path = locateTileset('default.desktop')
-            if self.path.isEmpty():
+            if not self.path:
                 self.__noTilesetFound()
             else:
                 logWarning(
@@ -139,7 +139,7 @@ class Tileset(object):
 
         graphName = group.readEntry("FileName")
         self.__graphicspath = locateTileset(graphName)
-        if self.__graphicspath.isEmpty():
+        if not self.__graphicspath:
             logException(
                 TileException('cannot find kmahjongglib/tilesets/%s for %s' %
                               (graphName, self.desktopFileName)))

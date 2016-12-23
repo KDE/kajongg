@@ -20,8 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
 
-from common import unicode, bytes  # pylint: disable=redefined-builtin
-
 # pylint: disable=invalid-name
 
 class Wind(object):
@@ -88,9 +86,6 @@ class Wind(object):
 
     def __str__(self):
         return str(self.char)
-
-    def __unicode__(self):
-        return unicode(self.char)
 
     def __repr__(self):
         return str(self)

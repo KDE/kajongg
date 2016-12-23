@@ -27,7 +27,6 @@ import os
 import logging
 import logging.handlers
 import socket
-import platform
 
 try:
     from sip import unwrapinstance
@@ -37,27 +36,14 @@ except ImportError:
         pass
 
 # pylint: disable=invalid-name
-if platform.python_version_tuple()[0] == '3':
-    # pylint: disable=redefined-builtin
-    unicode = str  # pylint: disable=W0622
-    bytes = bytes
-    long = int
-    isPython3 = True
-    interpreterName = 'python3'
-    xrange = range
-else:
-    # pylint: disable=redefined-builtin
-    unicode = unicode
-    bytes = str
-    long = long
-    isPython3 = False
-    interpreterName = 'python2'
-    xrange = xrange
+
 if os.name == 'nt':
     # This is only needed for manual execution, and
     # we expect python to be the python3 interpreter.
     # The windows installer will use kajongg.exe and kajonggserver.exe
     interpreterName = 'python'
+else:
+    interpreterName = 'python3'
 
 LIGHTSOURCES = [u'NE', u'NW', u'SW', u'SE']
 ENGLISHDICT = {}
@@ -191,8 +177,8 @@ class FixedClass(type):
 class StrMixin(object):
 
     """
-    A mixin defining defaults for __str__ and __repr__,
-    using __unicode__.
+    A mixin defining a default for __repr__,
+    using __str__.
     """
 
     def __str__(self):
@@ -265,10 +251,7 @@ class __Internal(object):
     """
     # pylint: disable=too-many-instance-attributes
     Preferences = None
-    if isPython3:
-        defaultPort = 8300
-    else:
-        defaultPort = 8200
+    defaultPort = 8300
     logPrefix = 'C'
     isServer = False
     scaleScene = True
@@ -400,12 +383,6 @@ class IntDict(defaultdict, StrMixin):
         return ', '.join('{}:{}'.format(
             str(x), str(self[x])) for x in keys)
 
-    def __unicode__(self):
-        """sort the result for better log comparison"""
-        keys = sorted(self.keys())
-        return u', '.join('{}:{}'.format(
-            unicodeString(x), unicodeString(self[x])) for x in keys)
-
 
 class ZValues(object):
 
@@ -424,17 +401,17 @@ def english(i18nstring):
 
 def unicodeString(s, encoding='utf-8'):
     """
-    If s is not unicode, make it so.
+    If s is not str, make it so.
 
     @param s: The original string or None.
-    @type s: C{QString}, C{unicode}, C{str} or C{bytes}
-    @rtype: C{unicode} or None.
+    @type s: C{str} or C{bytes}
+    @rtype: C{str} or None.
     """
     if s is None:
         return s
-    if s.__class__.__name__ == 'QString':  # avoid import of QString
-        return unicode(s)
-    elif isinstance(s, unicode):
+#    if s.__class__.__name__ == 'QString':  # avoid import of QString
+#        return str(s)
+    elif isinstance(s, str):
         return s
     elif hasattr(s, 'decode'):
         return s.decode(encoding)
@@ -443,51 +420,41 @@ def unicodeString(s, encoding='utf-8'):
 
 
 def isStringType(s):
-    """Returns True for QString, QByteArray, str, bytes, unicode."""
-    if s.__class__.__name__ in ('QString', 'QByteArray'):
-        return True
-    return isinstance(s, (bytes, unicode))
+    """Returns True for str, bytes."""
+    # TODO: eliminate
+#    if s.__class__.__name__ in ('QString', 'QByteArray'):
+#        return True
+    return isinstance(s, (bytes, str))
 
 
 def nativeString(s, encoding='utf-8'):
     """
     Code inspired by twisted.python.compat.
 
-    Convert C{QByteArray}, C{QString}, C{bytes} or C{unicode}
+    Convert C{QByteArray}, C{QString} or C{bytes}
     to the native C{str} type, using the given encoding if
     conversion is necessary.
 
     @param s: The original string or None.
-    @type s: C{QByteArray}, C{QString}, C{unicode}, C{str} or C{bytes}
+    @type s: C{QByteArray}, C{QString}, C{str} or C{bytes}
     @param encoding: The encoding for the given string, if it is
-                not of type C{unicode}. Default is utf-8.
+                not of type C{str}. Default is utf-8.
     @returns: The string.
     @rtype: C{str}
 
     @raise UnicodeError: The input string is not encodable/decodable.
     @raise TypeError: The input is not of string type.
     """
-    if s is None:
-        return s
-    if s.__class__.__name__ == 'QString':  # avoid import of QString
-        s = unicode(s)
-    if s.__class__.__name__ == 'QByteArray':  # avoid import of QByteArray
-        s = bytes(s)
     if not isStringType(s):
         return s
-    if isPython3:
-        if isinstance(s, bytes):
-            return s.decode(encoding)
-        else:
-            # Ensure we're limited to the given encoding subset:
-            s.encode(encoding)
+    if s.__class__.__name__ == 'QByteArray':
+        return bytes(s).decode(encoding)
+    elif isinstance(s, bytes):
+        return s.decode(encoding)
     else:
-        if isinstance(s, unicode):
-            return s.encode(encoding)
-        else:
-            # Ensure we're limited to the given encoding subset:
-            s.decode(encoding)
-    return s
+        # Ensure we're limited to the given encoding subset:
+        s.encode(encoding)
+        return s
 
 
 def nativeStringArgs(args, encoding='utf-8'):
@@ -507,7 +474,7 @@ def nativeStringArgs(args, encoding='utf-8'):
 
 def unicodeStringArgs(args, encoding='utf-8'):
     """
-    Convert string elements of a tuple to C{unicode},
+    Convert string elements of a tuple to C{str},
     Those elements which are not of some string type are left alone.
     For acceptable string types see L{common.nativeString}.
 

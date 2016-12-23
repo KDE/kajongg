@@ -24,44 +24,13 @@
 """
 
 import sip
-from qt import QObject, Qt, toQVariant, QAbstractItemModel, QModelIndex, \
-    QPersistentModelIndex, QVariant
-
-from common import isPython3
+from qt import QObject, Qt, QAbstractItemModel, QModelIndex, \
+    QPersistentModelIndex
 
 # pylint: skip-file
 
-
 def isValid(variant):
-    if isPython3:
-        return (variant is not None)
-    else:
-        return variant.isValid()
-
-
-def toInt(variant):
-    if isPython3:
-        return variant
-    else:
-        return variant.toInt()[0]
-
-
-def canConvert(variant, variantType):
-    """
-    Wrapper for Python3 where QVariant.canConvert() does not exist.
-
-    @param variant: Any of a lot of different Qt types, and str.
-    @param variantType: C{int}, represents C{PyQt5.QtCore.QVariant.X}
-                        where X is something like Font, Color etc.
-    """
-    if isPython3:
-        shortTypeName = variant.__class__.__name__.split('.')[-1][1:]
-        if shortTypeName not in QVariant.__dict__:
-            if isinstance(variant, str) and variantType == QVariant.String:
-                return True
-        return QVariant.__dict__[shortTypeName] == variantType
-    else:
-        return variant.canConvert(variantType)
+    return (variant is not None)
 
 
 class ModelTest(QObject):
@@ -112,7 +81,7 @@ class ModelTest(QObject):
         assert(self.model.buddy(QModelIndex()) == QModelIndex())
         self.model.canFetchMore(QModelIndex())
         assert(self.model.columnCount(QModelIndex()) >= 0)
-        assert(self.model.data(QModelIndex(), Qt.DisplayRole) == toQVariant())
+        assert(self.model.data(QModelIndex(), Qt.DisplayRole) is None)
         self.fetchingMore = True
         self.model.fetchMore(QModelIndex())
         self.fetchingMore = False
@@ -124,16 +93,16 @@ class ModelTest(QObject):
         self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole)
         self.model.index(0, 0, QModelIndex())
         self.model.itemData(QModelIndex())
-        cache = toQVariant()
+        cache = None
         self.model.match(QModelIndex(), -1, cache)
         self.model.mimeTypes()
         assert(self.model.parent(QModelIndex()) == QModelIndex())
         assert(self.model.rowCount(QModelIndex()) >= 0)
-        variant = toQVariant()
+        variant = None
         self.model.setData(QModelIndex(), variant, -1)
-        self.model.setHeaderData(-1, Qt.Horizontal, toQVariant())
-        self.model.setHeaderData(0, Qt.Horizontal, toQVariant())
-        self.model.setHeaderData(999999, Qt.Horizontal, toQVariant())
+        self.model.setHeaderData(-1, Qt.Horizontal, None)
+        self.model.setHeaderData(0, Qt.Horizontal, None)
+        self.model.setHeaderData(999999, Qt.Horizontal, None)
         self.model.sibling(0, 0, QModelIndex())
         self.model.span(QModelIndex())
         self.model.supportedDropActions()
@@ -277,13 +246,13 @@ class ModelTest(QObject):
         if self.model.rowCount(QModelIndex()) == 0:
             return
 
-        # A valid index should have a valid QVariant data
+        # A valid index should have a valid data
         assert isValid(self.model.index(0, 0, QModelIndex()))
 
         # shouldn't be able to set data on an invalid index
         assert(
             self.model.setData(QModelIndex(),
-                               toQVariant("foo"),
+                               "foo",
                                Qt.DisplayRole) == False)
 
         # General Purpose roles that should return a QString
@@ -293,21 +262,21 @@ class ModelTest(QObject):
                              QModelIndex()),
             Qt.ToolTipRole)
         if isValid(variant):
-            assert canConvert(variant, QVariant.String)
+            assert isinstance(variant, str) # TODO: oder bytes?
         variant = self.model.data(
             self.model.index(0,
                              0,
                              QModelIndex()),
             Qt.StatusTipRole)
         if isValid(variant):
-            assert canConvert(variant, QVariant.String)
+            assert isinstance(variant, str) # TODO: oder bytes?
         variant = self.model.data(
             self.model.index(0,
                              0,
                              QModelIndex()),
             Qt.WhatsThisRole)
         if isValid(variant):
-            assert canConvert(variant, QVariant.String)
+            assert isinstance(variant, str) # TODO: oder bytes?
 
         # General Purpose roles that should return a QSize
         variant = self.model.data(
@@ -316,7 +285,7 @@ class ModelTest(QObject):
                              QModelIndex()),
             Qt.SizeHintRole)
         if isValid(variant):
-            assert canConvert(variant, QVariant.Size)
+            assert isinstance(variant, QSize)
         # General Purpose roles that should return a QFont
         variant = self.model.data(
             self.model.index(0,
@@ -324,7 +293,7 @@ class ModelTest(QObject):
                              QModelIndex()),
             Qt.FontRole)
         if isValid(variant):
-            assert canConvert(variant, QVariant.Font)
+            assert isinstance(variant, QFont)
 
         # Check that the alignment is one we know about
         variant = self.model.data(
@@ -333,7 +302,7 @@ class ModelTest(QObject):
                              QModelIndex()),
             Qt.TextAlignmentRole)
         if isValid(variant):
-            alignment = toInt(variant)
+            alignment = variant
             assert(
                 alignment == (alignment & int(Qt.AlignHorizontal_Mask | Qt.AlignVertical_Mask)))
 
@@ -344,22 +313,21 @@ class ModelTest(QObject):
                              QModelIndex()),
             Qt.ForegroundRole)
         if isValid(variant):
-            print('found foregroundrole', variant)
-            assert canConvert(variant, QVariant.Color)
+            assert isinstance(variant, QColor)
         variant = self.model.data(
             self.model.index(0,
                              0,
                              QModelIndex()),
             Qt.BackgroundColorRole)
         if isValid(variant):
-            assert canConvert(variant, QVariant.Color)
+            assert isinstance(variant, QColor)
         variant = self.model.data(
             self.model.index(0,
                              0,
                              QModelIndex()),
             Qt.TextColorRole)
         if isValid(variant):
-            assert canConvert(variant, QVariant.Color)
+            assert isinstance(variant, QColor)
 
         # Check that the "check state" is one we know about.
         variant = self.model.data(
@@ -368,7 +336,7 @@ class ModelTest(QObject):
                              QModelIndex()),
             Qt.CheckStateRole)
         if isValid(variant):
-            state = toInt(variant)
+            state = variant
             assert(state == Qt.Unchecked or
                    state == Qt.PartiallyChecked or
                    state == Qt.Checked)

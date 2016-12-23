@@ -27,7 +27,7 @@ from sys import _getframe
 
 # util must not import twisted or we need to change kajongg.py
 
-from common import Internal, Debug, unicode, isPython3, ENGLISHDICT  # pylint: disable=redefined-builtin
+from common import Internal, Debug, ENGLISHDICT  # pylint: disable=redefined-builtin
 from common import unicodeString, unicodeStringArgs, nativeString
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead
@@ -132,14 +132,13 @@ def dbgIndent(this, parent):
 
 
 def __logUnicodeMessage(prio, msg):
-    """if we can encode the unicode msg to ascii, do so.
-    Otherwise convert the unicode object into an utf-8 encoded
+    """if we can encode the str msg to ascii, do so.
+    Otherwise convert the str object into an utf-8 encoded
     str object.
-    The logger module would log the unicode object with the
+    The logger module would log the str object with the
     marker feff at the beginning of every message, we do not want that."""
     msg = msg.encode(getpreferredencoding(), 'ignore')[:4000]
-    if isPython3:
-        msg = msg.decode()
+    msg = msg.decode()
     Internal.logger.log(prio, msg)
 
 
@@ -148,10 +147,10 @@ def __enrichMessage(msg, withGamePrefix=True):
     Add some optional prefixes to msg: S/C, process id, time, git commit.
 
     @param msg: The original message.
-    @type msg: C{unicode}
+    @type msg: C{str}
     @param withGamePrefix: If set, prepend the game prefix.
     @type withGamePrefix: C{Boolean}
-    @rtype: C{unicode}
+    @rtype: C{str}
     """
     result = msg  # set the default
     if withGamePrefix and Internal.logPrefix:
@@ -164,7 +163,7 @@ def __enrichMessage(msg, withGamePrefix=True):
     if Debug.git:
         head = gitHead()
         if head not in ('current', None):
-            result = u'git:{}/p{} {}'.format(head, '3' if isPython3 else '2', result)
+            result = u'git:{}/p3 {}'.format(head, result)
     return result
 
 
@@ -175,7 +174,7 @@ def __exceptionToString(exception):
     @param exception: The exception to be logged.
     @type exception: C{Exception}
 
-    @rtype: C{unicode}
+    @rtype: C{str}
     """
     parts = []
     for arg in exception.args:
@@ -188,7 +187,7 @@ def __exceptionToString(exception):
         elif arg is None:
             pass
         else:
-            parts.append(unicode(arg))
+            parts.append(str(arg))
     if hasattr(exception, 'filename'):
         parts.append(exception.filename)
     return u' '.join(parts)
@@ -253,15 +252,15 @@ def m18n(englishText, *args):
     Wrapper around i18n.
 
     @param englishText : The text template.
-    @type englishText: C{str} (utf-8)  or C{unicode}.
+    @type englishText: C{str}
 
     @param args : Arguments for the text template.
     @type args: A list or tuple of strings.
 
     @return: The translated text with args inserted.
-    @rtype: C{unicode}.
+    @rtype: C{str}.
 
-    Since when do args have to be unicode? utf-8
+    Since when do args have to be str? utf-8
     encoded fails.
     """
     result = unicodeString(
@@ -282,13 +281,13 @@ def m18nc(context, englishText, *args):
     @param context: The context for this string.
     @type context: C{str}
     @param englishText : The text template.
-    @type englishText: C{str} (utf-8) or C{unicode}.
+    @type englishText: C{str}
 
     @param args : Arguments for the text template.
     @type args: A list or tuple of strings.
 
     @return: The translated text with args inserted.
-    @rtype: C{unicode}.
+    @rtype: C{str}.
     """
     result = unicodeString(
         i18nc(

@@ -32,7 +32,7 @@ import gc
 from locale import getpreferredencoding
 from sys import stdout
 
-from common import Debug, isPython3, unicode
+from common import Debug
 
 try:
     STDOUTENCODING = stdout.encoding
@@ -141,7 +141,7 @@ def get_all_objects():
 
 def kprint(*args, **kwargs):
     """
-    A wrapper around print, always encoding unicode to something
+    A wrapper around print, always encoding str to something
     sensible for the konsole.
 
     @param args: anything
@@ -257,22 +257,21 @@ def gitHead():
 
 def xToUtf8(msg, args=None):
     """makes sure msg and all args are utf-8"""
-    if isPython3:
-        if args is not None:
-            return msg, args
-        else:
-            return msg
-    if isinstance(msg, unicode):
+    if args is not None:
+        return msg, args
+    else:
+        return msg
+    if isinstance(msg, str):
         msg = msg.encode('utf-8')
-    elif not isinstance(msg, str):
-        msg = unicode(msg).encode('utf-8')
+    elif not isinstance(msg, bytes):
+        msg = str(msg).encode('utf-8')
     if args is not None:
         args = list(args[:])
         for idx, arg in enumerate(args):
-            if isinstance(arg, unicode):
+            if isinstance(arg, str):
                 args[idx] = arg.encode('utf-8')
-            elif not isinstance(arg, str):
-                args[idx] = unicode(arg).encode('utf-8')
+            elif not isinstance(arg, bytes):
+                args[idx] = str(arg).encode('utf-8')
         return msg, args
     else:
         return msg

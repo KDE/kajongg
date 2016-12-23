@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, toQVariant, QAbstractTableModel, QModelIndex
+from qt import Qt, QAbstractTableModel, QModelIndex
 from qt import QLabel, QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
 from log import m18n, m18nc
@@ -53,30 +53,28 @@ class DifferModel(QAbstractTableModel):
     def data(self, index, role=Qt.DisplayRole):
         """get from model"""
         if not index.isValid() or not 0 <= index.row() < len(self.diffs):
-            return toQVariant()
+            return
         diff = self.diffs[index.row()]
         column = index.column()
         if role == Qt.DisplayRole:
-            return toQVariant(diff[column])
+            return diff[column]
         elif role == Qt.TextAlignmentRole:
-            return toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
-        return toQVariant()
+            return int(Qt.AlignLeft | Qt.AlignVCenter)
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
-                return toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
+                return int(Qt.AlignLeft | Qt.AlignVCenter)
         if role != Qt.DisplayRole:
-            return toQVariant()
+            return
         if orientation == Qt.Horizontal:
             if section == 0:
-                return toQVariant(m18nc('Kajongg', 'Rule'))
+                return m18nc('Kajongg', 'Rule')
             if section == 1:
-                return toQVariant(m18n(self.view.cbRuleset1.current.name))
+                return m18n(self.view.cbRuleset1.current.name)
             if section == 2:
-                return toQVariant(m18n(self.view.cbRuleset2.current.name))
-            return toQVariant()
+                return m18n(self.view.cbRuleset2.current.name)
 
 
 class RulesetDiffer(QDialog):

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -23,7 +23,7 @@ from __future__ import print_function
 
 import unittest
 
-from common import Debug, isPython3, unicode  # pylint: disable=unused-import
+from common import Debug  # pylint: disable=unused-import
 from wind import Wind, East, South, West, North
 from player import Players
 from game import PlayingGame
@@ -46,7 +46,7 @@ for _ in RULESETS[2:]:
 Players.createIfUnknown = str
 
 # RULESETS=RULESETS[:1]
-GAMES = list([PlayingGame(list(tuple([wind, unicode(wind.char)]) for wind in Wind.all4), x)
+GAMES = list([PlayingGame(list(tuple([wind, str(wind.char)]) for wind in Wind.all4), x)
               for x in RULESETS])
 PROGRAM = None
 
@@ -182,10 +182,7 @@ class Helpers(object):
                 'base=%d,doubles=%d,total=%d' %
                 (score.points, score.doubles, hand.total()))
             result.append('')
-        if isPython3:
-            return '\n'.join(result)
-        else:
-            return '\n'.join(x.encode('utf-8') for x in result)
+        return '\n'.join(result)
 
 # pylint: disable=missing-docstring, too-many-public-methods
 

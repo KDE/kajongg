@@ -22,7 +22,7 @@ this python code:
 """
 
 from qt import Qt, QPainter, QBrush, QPalette, QPixmapCache, QPixmap
-from qt import QString, QSvgRenderer
+from qt import QSvgRenderer
 from kde import KGlobal, KStandardDirs, KConfig
 
 from log import logWarning, logException, m18n
@@ -38,8 +38,7 @@ class BackgroundException(Exception):
 
 def locatebackground(which):
     """locate the file with a background"""
-    return QString(KStandardDirs.locate("kmahjonggbackground",
-                                        QString(which)))
+    return KStandardDirs.locate("kmahjonggbackground", which)
 
 
 class Background(object):
@@ -52,7 +51,7 @@ class Background(object):
         """whatever this does"""
         if not Background.catalogDefined:
             KGlobal.dirs().addResourceType("kmahjonggbackground",
-                                           "data", QString("kmahjongglib/backgrounds"))
+                                           "data", "kmahjongglib/backgrounds")
             KGlobal.locale().insertCatalog("libkmahjongglib")
             Background.catalogDefined = True
 
@@ -82,9 +81,9 @@ class Background(object):
         self.defineCatalog()
         self.desktopFileName = desktopFileName
         self.path = locatebackground(desktopFileName + '.desktop')
-        if self.path.isEmpty():
+        if not self.path:
             self.path = locatebackground('default.desktop')
-            if self.path.isEmpty():
+            if not self.path:
                 directories = '\n\n' + \
                     '\n'.join(str(x)
                               for x in KGlobal.dirs().resourceDirs("kmahjonggbackground"))
@@ -111,17 +110,20 @@ class Background(object):
 
         self.tiled = group.readEntry('Tiled') == '1'
         if self.tiled:
-            self.imageWidth, entryOk = group.readEntry('Width').toInt()
-            if not entryOk:
+            try:
+                # TODO: das except testen
+                self.imageWidth = int(group.readEntry('Width'))
+            except Exception:
                 raise Exception('cannot scan Width from background file')
-            self.imageHeight, entryOk = group.readEntry('Height').toInt()
-            if not entryOk:
+            try:
+                self.imageHeight = int(group.readEntry('Height'))
+            except:
                 raise Exception('cannot scan Height from background file')
         self.isPlain = bool(group.readEntry('Plain'))
         if not self.isPlain:
-            graphName = QString(group.readEntry("FileName"))
+            graphName = group.readEntry("FileName")
             self.__graphicspath = locatebackground(graphName)
-            if self.__graphicspath.isEmpty():
+            if not self.__graphicspath:
                 logException(BackgroundException(
                     'cannot find kmahjongglib/backgrounds/%s for %s' %
                     (graphName, self.desktopFileName)))
@@ -135,8 +137,7 @@ class Background(object):
             if self.tiled:
                 width = self.imageWidth
                 height = self.imageHeight
-            cachekey = QString(u'{name}W{width}H{height}'.format(
-                name=self.name, width=width, height=height))
+            cachekey = '{name}W{width}H{height}'.format(name=self.name, width=width, height=height)
             self.__pmap = QPixmapCache.find(cachekey)
             if not self.__pmap:
                 renderer = QSvgRenderer(self.__graphicspath)

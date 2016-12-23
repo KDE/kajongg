@@ -23,7 +23,7 @@ import datetime
 from kde import KIcon
 from dialogs import WarningYesNo
 
-from qt import Qt, toQVariant, RealQVariant, variantValue
+from qt import Qt
 from qt import QAbstractTableModel, QDialogButtonBox, QDialog
 from qt import QHBoxLayout, QVBoxLayout, QCheckBox
 from qt import QItemSelectionModel, QAbstractItemView
@@ -32,7 +32,7 @@ from log import logException, m18n, m18nc
 from query import Query
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
-from common import Debug, nativeString, unicode
+from common import Debug, nativeString
 from modeltest import ModelTest
 
 
@@ -69,30 +69,28 @@ class GamesModel(QAbstractTableModel):
         if role is None:
             role = Qt.DisplayRole
         if not (index.isValid() and role == Qt.DisplayRole):
-            return toQVariant()
+            return
         if role == Qt.DisplayRole:
-            unformatted = unicode(
-                self._resultRows[index.row()][index.column()])
+            unformatted = str(
+                self._resultRows[index.row()][index.column()]) # TODO: brauche ich str?
             if index.column() == 2:
                 # we do not yet use this for listing remote games but if we do
                 # this translation is needed for robot players
                 names = [m18n(name) for name in unformatted.split('///')]
-                return toQVariant(', '.join(names))
+                return ', '.join(names)
             elif index.column() == 1:
                 dateVal = datetime.datetime.strptime(
                     unformatted, '%Y-%m-%dT%H:%M:%S')
-                return toQVariant(nativeString(dateVal.strftime('%c')))
+                return nativeString(dateVal.strftime('%c'))
             elif index.column() == 0:
-                return toQVariant(int(unformatted))
-        with RealQVariant():
-            return QAbstractTableModel.data(self, index, role)
+                return int(unformatted)
+        return QAbstractTableModel.data(self, index, role)
 
     def headerData(self, section, orientation, role):
         """for the two visible columns"""
         # pylint: disable=no-self-use
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return toQVariant((m18n("Started"), m18n("Players"))[section - 1])
-        return toQVariant()
+            return (m18n("Started"), m18n("Players"))[section - 1]
 
 
 class Games(QDialog):
@@ -195,7 +193,7 @@ class Games(QDialog):
         """returns the model index for game"""
         for row in range(self.model.rowCount()):
             idx = self.model.index(row, 0)
-            if variantValue(self.model.data(idx, 0)) == game:
+            if self.model.data(idx, 0) == game:
                 return idx
         return self.model.index(0, 0)
 
@@ -203,7 +201,7 @@ class Games(QDialog):
         """returns the game id of the selected game"""
         rows = self.selection.selectedRows()
         if rows:
-            return variantValue(self.model.data(rows[0], 0))
+            return self.model.data(rows[0], 0)
         else:
             return 0
 
@@ -232,7 +230,7 @@ class Games(QDialog):
                     Query("DELETE FROM game WHERE id = ?", (game, ))
                 self.setQuery()  # just reload entire table
         allGames = self.view.selectionModel().selectedRows(0)
-        deleteGames = list(variantValue(x.data()) for x in allGames)
+        deleteGames = list(x.data() for x in allGames)
         if len(deleteGames) == 0:
             # should never happen
             logException('delete: 0 rows selected')

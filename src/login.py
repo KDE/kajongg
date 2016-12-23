@@ -41,8 +41,8 @@ from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 
 from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
-from common import Internal, Options, SingleshotOptions, Debug, isAlive, english, unicode
-from common import isPython3, nativeString, unicodeString, interpreterName
+from common import Internal, Options, SingleshotOptions, Debug, isAlive, english
+from common import nativeString, unicodeString, interpreterName
 from game import Players
 from query import Query
 from statesaver import StateSaver
@@ -57,7 +57,7 @@ class LoginAborted(Exception):
     pass
 
 
-class Url(unicode):
+class Url(str):
 
     """holds connection related attributes: host, port, socketname"""
     # pylint: disable=too-many-public-methods
@@ -72,7 +72,7 @@ class Url(unicode):
             host = '127.0.0.1'
         if len(urlParts) > 1:
             port = int(urlParts[1])
-        obj = unicode.__new__(cls, url)
+        obj = str.__new__(cls, url)
         obj.host = host
         obj.port = port
         if Options.port:
@@ -205,7 +205,7 @@ class Url(unicode):
                 args.append(
                     u'--db={}'.format(
                         os.path.normpath(
-                            appdataDir() + u'local{}.db'.format('3' if isPython3 else ''))))
+                            appdataDir() + u'local3.db')))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
             if os.name == 'nt':
@@ -370,8 +370,8 @@ class LoginDlg(QDialog):
 
     def userChanged(self, text):
         """the username has been changed, lookup password"""
-        text = unicode(text)
-        if text == u'':
+        assert isinstance(text, str) # TODO: remove
+        if text == '':
             self.edPassword.clear()
             return
         passw = None
@@ -386,17 +386,17 @@ class LoginDlg(QDialog):
     @property
     def url(self):
         """abstracts the url of the dialog"""
-        return english(unicode(self.cbServer.currentText()))
+        return english(self.cbServer.currentText())
 
     @property
     def username(self):
         """abstracts the username of the dialog"""
-        return unicode(self.cbUser.currentText())
+        return self.cbUser.currentText()
 
     @property
     def password(self):
         """abstracts the password of the dialog"""
-        return unicode(self.edPassword.text())
+        return self.edPassword.text()
 
     @password.setter
     def password(self, password):
@@ -457,7 +457,7 @@ class AddUserDialog(MustChooseKDialog):
     @property
     def username(self):
         """abstracts the username of the dialog"""
-        return unicode(self.lbUser.text())
+        return self.lbUser.text()
 
     @username.setter
     def username(self, username):
@@ -467,7 +467,7 @@ class AddUserDialog(MustChooseKDialog):
     @property
     def password(self):
         """abstracts the password of the dialog"""
-        return unicode(self.edPassword.text())
+        return self.edPassword.text()
 
     @password.setter
     def password(self, password):
@@ -528,7 +528,7 @@ class Connection(object):
         if self.url.isLocalHost:
             # we have localhost if we play a Local Game: client and server are identical,
             # we have no security concerns about creating a new account
-            Players.createIfUnknown(unicode(self.dlg.cbUser.currentText()))
+            Players.createIfUnknown(self.dlg.cbUser.currentText())
 
     def __startServer(self, result):
         """if needed"""
@@ -596,9 +596,8 @@ class Connection(object):
                                  self.dlg.password).exec_():
                 raise CancelledError
             Players.createIfUnknown(self.username)
-        # TODO: are dlg.username/password always unicode?
-        assert isinstance(self.dlg.username, unicode), self.dlg.username
-        assert isinstance(self.dlg.password, unicode), self.dlg.password
+        assert isinstance(self.dlg.username, str), self.dlg.username # TODO: remove
+        assert isinstance(self.dlg.password, str), self.dlg.password
         adduserCmd = SERVERMARK.join(
             ['adduser', self.dlg.username, self.dlg.password])
         return self.loginCommand(adduserCmd)

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -121,8 +120,6 @@ class DBPasswordChecker(object):
                 logDebug(m18n(template, cred.username))
             return fail(credError.UnauthorizedLogin(srvMessage(template, cred.username)))
         userid, password = query.records[0]
-        # checkPassword uses md5 which cannot handle unicode strings (python
-        # 2.7)
         defer1 = maybeDeferred(cred.checkPassword, password.encode('utf-8'))
         defer1.addCallback(DBPasswordChecker._checkedPassword, userid)
         return defer1

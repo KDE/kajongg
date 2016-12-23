@@ -60,7 +60,7 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from qt import Qt, toQVariant, variantValue, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
+    from qt import Qt, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
     from qt import QWidget, QGridLayout, QAction
 except ImportError as importError:
     NOTFOUND.append('Please install PyQt5: %s' % importError)
@@ -179,8 +179,8 @@ class MainWindow(KXmlGuiWindow):
             self.actionChat.setChecked(False)
             self.actionExplain.setChecked(False)
             self.actionScoreTable.setChecked(False)
-            self.actionExplain.setData(toQVariant(ExplainView))
-            self.actionScoreTable.setData(toQVariant(ScoreTable))
+            self.actionExplain.setData(ExplainView)
+            self.actionScoreTable.setData(ScoreTable)
         self._scene = value
         self.centralView.setScene(value)
         self.adjustView()
@@ -221,7 +221,7 @@ class MainWindow(KXmlGuiWindow):
             res.setShortcut(Qt.CTRL + shortcut)
             res.setShortcutContext(Qt.ApplicationShortcut)
         if PYQT_VERSION_STR != '4.5.2' or actionData is not None:
-            res.setData(toQVariant(actionData))
+            res.setData(actionData)
         return res
 
     def _kajonggToggleAction(self, name, icon, shortcut=None, actionData=None):
@@ -624,12 +624,12 @@ class MainWindow(KXmlGuiWindow):
         """user has toggled widget visibility with an action"""
         assert self.scene
         action = self.sender()
-        actionData = variantValue(action.data())
+        actionData = action.data()
         if checked:
             if isinstance(actionData, type):
                 clsName = actionData.__name__
                 actionData = actionData(scene=self.scene)
-                action.setData(toQVariant(actionData))
+                action.setData(actionData)
                 setattr(
                     self.scene,
                     clsName[0].lower() + clsName[1:],

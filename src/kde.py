@@ -25,7 +25,7 @@ import sys
 import shutil
 import sip
 
-from common import Internal, Options, unicode, isPython3
+from common import Internal, Options
 
 from kdestub import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
@@ -65,7 +65,7 @@ def appdataDir():
             # the client wants to place the socket in serverDir
             os.makedirs(serverDir)
         result = os.path.dirname(
-            unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
+            KGlobal.dirs().locateLocal("appdata", "")) + '/'
         return result
 
 
@@ -75,7 +75,7 @@ def cacheDir():
         result = os.path.join(appdataDir(), 'cache')
     else:
         result = os.path.dirname(
-            unicode(KGlobal.dirs().locateLocal("cache", "")))
+            KGlobal.dirs().locateLocal("cache", ""))
         result = os.path.join(result, 'kajongg')
     if not os.path.exists(result):
         try:

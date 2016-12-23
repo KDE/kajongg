@@ -21,13 +21,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import functools
 import types
 
-from twisted.internet.defer import Deferred, succeed
+from twisted.internet.defer import Deferred, succeed, fail
 
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
-    QAbstractAnimation, QEasingCurve, QVariant
+    QAbstractAnimation, QEasingCurve
 from qt import pyqtProperty, QGraphicsObject, QGraphicsItem
 
-from common import Internal, Debug, isAlive, isPython3, nativeString
+from common import Internal, Debug, isAlive
 from common import StrMixin
 from log import logDebug, id4
 
@@ -43,10 +43,7 @@ class Animation(QPropertyAnimation, StrMixin):
         Animation.clsUid += 1
         self.uid = Animation.clsUid
         pName = propName
-        if isPython3:
-            # in this case they want bytes
-            pName = pName.encode()
-        QPropertyAnimation.__init__(self, graphicsObject, pName, parent)
+        QPropertyAnimation.__init__(self, graphicsObject, pName.encode(), parent)
         QPropertyAnimation.setEndValue(self, endValue)
         duration = Internal.Preferences.animationDuration()
         self.setDuration(duration)
@@ -72,7 +69,7 @@ class Animation(QPropertyAnimation, StrMixin):
             # before the last move from server is executed
             return
         if graphicsObject.name() in Debug.animation or Debug.animation == 'all':
-            pName = self.pName()
+            pName = self.pName().decode()
             logDebug(
                 u'%s: change endValue for %s: %s->%s  %s' % (
                     self.ident(), pName,
@@ -95,31 +92,12 @@ class Animation(QPropertyAnimation, StrMixin):
         @return: C{str}
         """
         if isAlive(self):
-            return nativeString(self.propertyName())
+            return bytes(self.propertyName()).decode()
         else:
             return 'notAlive'
 
-    def unpackValue(self, qvariant):
-        """get the wanted value from the QVariant"""
-        if not isinstance(qvariant, QVariant):
-            return qvariant  # is already autoconverted
-        pName = self.pName()
-        if pName == 'pos':
-            return qvariant.toPointF()
-        if pName == 'rotation':
-            return qvariant.toInt()[0]
-        elif pName == 'scale':
-            return qvariant.toFloat()[0]
-
-    def unpackEndValue(self):
-        """unpacked end value"""
-        if isAlive(self) and isAlive(self.targetObject()):
-            return self.unpackValue(self.endValue())
-
     def formatValue(self, value):
         """string format the wanted value from qvariant"""
-        if isinstance(value, QVariant):
-            value = self.unpackValue(value)
         pName = self.pName()
         if pName == 'pos':
             return '%.0f/%.0f' % (value.x(), value.y())
@@ -212,16 +190,20 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
 
     def start(self, dummyResults='DIREKT'):
         """start the animation, returning its deferred"""
+        if not isAlive(self):
+            return fail()
         assert self.state() != QAbstractAnimation.Running
         for animation in self.animations:
             graphicsObject = animation.targetObject()
+            if not isAlive(animation) or not isAlive(graphicsObject):
+                return fail()
             graphicsObject.setActiveAnimation(animation)
             self.addAnimation(animation)
             propName = animation.pName()
             animation.setStartValue(graphicsObject.getValue(propName))
             if propName == 'rotation':
                 # change direction if that makes the difference smaller
-                endValue = animation.unpackEndValue()
+                endValue = animation.endValue()
                 currValue = graphicsObject.rotation
                 if endValue - currValue > 180:
                     animation.setStartValue(currValue + 360)
@@ -336,15 +318,12 @@ class AnimatedMixin(object):
         """directly set the end value of the animation"""
         if animation.debug:
             logDebug('shortcutAnimation: UTile {}: clear queuedAnimations'.format(self.name()))
-        setattr(
-            self,
-            animation.pName(),
-            animation.unpackValue(animation.endValue()))
+        setattr(self, animation.pName(), animation.endValue())
         self.queuedAnimations = []
         self.setDrawingOrder()
 
     def getValue(self, pName):
-        """gets a property value by not returning a QVariant"""
+        """gets a current property value"""
         return {'pos': self.pos, 'rotation': self.rotation,
                 'scale': self.scale}[pName]
 
@@ -385,7 +364,7 @@ class AnimatedMixin(object):
                 continue
             animation = self.queuedAnimation(pName)
             if animation:
-                curValue = animation.unpackValue(animation.endValue())
+                curValue = animation.endValue()
                 if curValue != newValue:
                     # change a queued animation
                     if self.name() in Debug.animation:
@@ -395,7 +374,7 @@ class AnimatedMixin(object):
             else:
                 animation = self.activeAnimation.get(pName, None)
                 if isAlive(animation):
-                    curValue = animation.unpackValue(animation.endValue())
+                    curValue = animation.endValue()
                 else:
                     curValue = self.getValue(pName)
                 if pName != 'scale' or abs(curValue - newValue) > 0.00001:
@@ -458,10 +437,10 @@ def afterQueuedAnimations(doAfter):
         animate()
         method = types.MethodType(doAfter, args[0])
         args = args[1:]
-        varnames = doAfter.__code__.co_varnames if isPython3 else doAfter.func_code.co_varnames
+        varnames = doAfter.__code__.co_varnames
         assert varnames[1] in ('deferredResult', 'dummyDeferredResult'), \
             '{} passed {} instead of deferredResult'.format(
-                doAfter.__qualname__ if isPython3 else doAfter.__name__, varnames[1])
+                doAfter.__qualname__, varnames[1])
         return __afterCurrentAnimationDo(method, *args, **kwargs)
 
     return doAfterQueuedAnimations

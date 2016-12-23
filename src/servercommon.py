@@ -18,7 +18,6 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from common import unicode
 from log import SERVERMARK
 
 def srvMessage(*args):
@@ -31,7 +30,7 @@ def srvMessage(*args):
     """
     strArgs = []
     for arg in args:
-        if isinstance(arg, unicode):
+        if isinstance(arg, str):
             arg = arg.encode('utf-8')
         else:
             arg = str(arg).encode('utf-8')

@@ -25,14 +25,13 @@ from math import log as _log
 
 from util import stack
 from common import Debug
-from common import isPython3, xrange
 
 
 class CountingRandom(Random):
 
     """counts how often random() is called and prints debug info"""
 
-    # pylint: disable=redefined-builtin, invalid-name
+    # pylint: disable=invalid-name
 
     def __init__(self, game, value=None):
         self._game = weakref.ref(game)
@@ -57,7 +56,7 @@ class CountingRandom(Random):
 
     def __randrange(self, start, stop=None, step=1, _int=int):
         """This is taken and simplified from 2.7 because 3.2 changed,
-        resulting in different values for randint.
+        resulting in different values for randrange.
 
         Choose a random item from range(start, stop[, step]).
         """
@@ -82,15 +81,11 @@ class CountingRandom(Random):
             if istart <= result <= istop:
                 return result
 
-    if isPython3:
-        def seed(self, newSeed=None, version=1): # pylint: disable=arguments-differ
-            self.__seed(newSeed)
-            Random.seed(self, newSeed, version)
-    else:
-        def seed(self, newSeed=None): # pylint: disable=arguments-differ
-            self.__seed(newSeed)
-            Random.seed(self, newSeed)
+    def seed(self, newSeed=None, version=1):
+        self.__seed(newSeed)
+        Random.seed(self, newSeed, version)
 
+    # pylint: disable=redefined-builtin
     def _randbelow(self, n, int=int, maxsize=1<<BPF, type=type,
                    Method=_MethodType, BuiltinMethod=_BuiltinMethodType):
         "Return a random int in the range [0,n).  Raises ValueError if n==0."
@@ -102,8 +97,7 @@ class CountingRandom(Random):
             r = getrandbits(k)
         return r
 
-    def randrange(self, start, stop=None, step=1):
-        # pylint: disable=arguments-differ
+    def randrange(self, start, stop=None, step=1, _int=int):
         oldCount = self.count
         result = self.__randrange(start, stop, step)
         if Debug.random:
@@ -131,6 +125,7 @@ class CountingRandom(Random):
         return result
 
     def sample(self, population, wantedLength):
+        """add debug output to sample"""
         oldCount = self.count
         result = self.__sample(population, wantedLength)
         if Debug.random:
@@ -143,8 +138,7 @@ class CountingRandom(Random):
 
 
     def shuffle(self, listValue, func=None):
-        """pylint needed for python up to 2.7.5"""
-        # pylint: disable=arguments-differ
+        """add debug output to shuffle"""
         oldCount = self.count
         self.__shuffle(listValue, func)
         if Debug.random:
@@ -166,7 +160,7 @@ class CountingRandom(Random):
         if random is None:
             random = self.random
         _int = int
-        for i in reversed(xrange(1, len(x))):
+        for i in reversed(range(1, len(x))):
             # pick an element in x[:i+1] with which to exchange x[i]
             j = _int(random() * (i+1))
             x[i], x[j] = x[j], x[i]
@@ -184,9 +178,9 @@ class CountingRandom(Random):
         population contains repeats, then each occurrence is a possible
         selection in the sample.
 
-        To choose a sample in a range of integers, use xrange as an argument.
+        To choose a sample in a range of integers, use range as an argument.
         This is especially fast and space efficient for sampling from a
-        large population:   sample(xrange(10000000), 60)
+        large population:   sample(range(10000000), 60)
 
         taken from python2.7 because 3.5 does something different with
         different results
@@ -215,7 +209,7 @@ class CountingRandom(Random):
             # An n-length list is smaller than a k-length set, or this is a
             # mapping type so the other algorithm wouldn't work.
             pool = list(population)
-            for i in xrange(k):         # invariant:  non-selected at [0,n-i)
+            for i in range(k):         # invariant:  non-selected at [0,n-i)
                 j = _int(random() * (n-i))
                 result[i] = pool[j]
                 pool[j] = pool[n-i-1]   # move non-selected item into vacancy
@@ -223,7 +217,7 @@ class CountingRandom(Random):
             try:
                 selected = set()
                 selected_add = selected.add
-                for i in xrange(k):
+                for i in range(k):
                     j = _int(random() * n)
                     while j in selected:
                         j = _int(random() * n)

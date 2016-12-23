@@ -28,7 +28,7 @@ from util import Duration
 from log import logDebug, logException, logWarning, m18nc
 from message import Message
 from common import Internal, Debug, Options, StrMixin
-from common import unicodeString, unicode, isAlive
+from common import unicodeString, isAlive
 from tilesource import TileSource
 from rule import Ruleset
 from game import PlayingGame
@@ -190,7 +190,7 @@ class Client(pb.Referenceable):
         newTables = list(ClientTable(self, *x) for x in tables)
         self.tables.extend(newTables)
         if Debug.table:
-            _ = u', '.join(unicode(ClientTable(self, *x)) for x in tables)
+            _ = u', '.join(str(ClientTable(self, *x)) for x in tables)
             logDebug(u'%s got new tables:%s' % (self.name, _))
 
     @staticmethod

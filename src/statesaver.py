@@ -18,9 +18,9 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import QString, QObject, QByteArray, QEvent, QSplitter, QHeaderView
+from qt import QObject, QByteArray, QEvent, QSplitter, QHeaderView
 
-from common import Internal, isAlive, english, isPython3
+from common import Internal, isAlive, english
 
 
 class StateSaver(QObject):
@@ -51,11 +51,7 @@ class StateSaver(QObject):
     @staticmethod
     def __restore(widget, name):
         """decode the saved string"""
-        if isPython3:
-            # Qt5 fromHex expects bytes, not str
-            state = QByteArray.fromHex(Internal.Preferences[name].encode())
-        else:
-            state = QByteArray.fromHex(Internal.Preferences[name])
+        state = QByteArray.fromHex(Internal.Preferences[name].encode())
         if state:
             if name.endswith('State'):
                 widget.restoreState(state)
@@ -109,13 +105,16 @@ class StateSaver(QObject):
             saver.save()
         Internal.Preferences.writeConfig()
 
+    @staticmethod
+    def stateStr(state):
+        """convert hex string to str"""
+        return str(bytes(state.toHex()).decode())
+
     def save(self):
         """writes the state into Preferences, but does not save"""
         for name, widget in self.widgets:
             if isAlive(widget):
                 if hasattr(widget, 'saveState'):
-                    Internal.Preferences[name + 'State'] = QString(
-                        widget.saveState().toHex())
+                    Internal.Preferences[name + 'State'] = self.stateStr(widget.saveState())
                 if hasattr(widget, 'saveGeometry'):
-                    Internal.Preferences[name + 'Geometry'] = QString(
-                        widget.saveGeometry().toHex())
+                    Internal.Preferences[name + 'Geometry'] = self.stateStr(widget.saveGeometry())

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from log import m18n, m18nc
 from common import Internal
 
-from qt import Qt, QString, QWidget, QSlider, QHBoxLayout, QLabel
+from qt import Qt, QWidget, QSlider, QHBoxLayout, QLabel
 from qt import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 
 from kde import KConfigDialog
@@ -102,7 +102,7 @@ class ConfigDialog(KConfigDialog):  # pylint: disable=too-many-public-methods
     def __init__(self, parent, name):
         # pylint: disable=super-init-not-called
         KConfigDialog.__init__(
-            self, parent, QString(name), Internal.Preferences)
+            self, parent, name, Internal.Preferences)
         StateSaver(self)
         self.pages = [
             self.addPage(

@@ -24,8 +24,8 @@ from log import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice
 from tile import Tile, TileList
 from meld import Meld, MeldList
-from common import Internal, Debug, Options, long
-from common import unicode, unicodeString
+from common import Internal, Debug, Options
+from common import unicodeString
 from wind import Wind
 from dialogs import Sorry
 
@@ -85,7 +85,7 @@ class Message(object):
         elif isinstance(value, dict):
             return dict((Message.jelly('key', x[0]), Message.jelly('value', x[1])) for x in value.items())
         else:
-            if not isinstance(value, (int, long, bytes, unicode, float, type(None))):
+            if not isinstance(value, (int, bytes, str, float, type(None))):
                 raise Exception(
                     'callRemote got illegal arg: %s %s(%s)' %
                     (key, type(value), str(value)))
@@ -889,7 +889,7 @@ class ChatMessage(object):
         # pylint: disable=no-member
         # pylint says something about NotImplemented, check with later versions
         return u'statusMessage=%s %02d:%02d:%02d %s: %s' % (
-            unicode(self.isStatusMessage),
+            str(self.isStatusMessage),
             local.hour,
             local.minute,
             local.second,

@@ -30,7 +30,7 @@ from tile import Tile, TileList
 from tilesource import TileSource
 from meld import Meld, MeldList
 from rule import Score, UsedRule
-from common import Debug, isPython3
+from common import Debug
 from intelligence import AIDefault
 from util import callers
 from message import Message
@@ -774,19 +774,11 @@ class Hand(object):
         if not hasattr(self, 'string'):
             return 0
         md5sum = md5()
-        if isPython3:
-            md5sum.update(self.player.name.encode('utf-8'))
-            md5sum.update(self.string.encode())
-        else:
-            md5sum.update(self.player.name.encode('utf-8'))
-            md5sum.update(self.string)
+        md5sum.update(self.player.name.encode('utf-8'))
+        md5sum.update(self.string.encode())
         digest = md5sum.digest()
         assert len(digest) == 16
         result = 0
-        if isPython3:
-            for part in range(4):
-                result = (result << 8) + digest[part]
-        else:
-            for part in range(4):
-                result = (result << 8) + ord(digest[part])
+        for part in range(4):
+            result = (result << 8) + digest[part]
         return result

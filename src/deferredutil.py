@@ -28,7 +28,7 @@ from twisted.internet.defer import Deferred
 
 from log import m18nE, logInfo, logDebug, logException
 from message import Message
-from common import Debug, StrMixin, unicode, nativeString, nativeStringArgs
+from common import Debug, StrMixin, nativeString, nativeStringArgs
 from move import Move
 
 
@@ -92,20 +92,20 @@ class Request(StrMixin):
         """my age in full seconds"""
         return int((datetime.datetime.now() - self.startTime).total_seconds())
 
-    def __unicode__(self):
+    def __str__(self):
         cmd = self.deferred.command
         if self.answer:
-            answer = unicode(self.answer)
+            answer = str(self.answer) # TODO: needed?
         else:
             answer = u'OPEN'
-        result = u''
+        result = ''
         if Debug.deferredBlock:
-            result += u'[{id:>4}] '.format(id=id(self) % 10000)
-        result += u'{cmd}->{cls}({receiver:<10}): {answer}'.format(
+            result += '[{id:>4}] '.format(id=id(self) % 10000)
+        result += '{cmd}->{cls}({receiver:<10}): {answer}'.format(
             cls=self.user.__class__.__name__, cmd=cmd, receiver=self.user.name,
             answer=answer)
         if self.age():
-            result += u' after {} sec'.format(self.age())
+            result += ' after {} sec'.format(self.age())
         return result
 
     def prettyAnswer(self):
@@ -171,10 +171,10 @@ class DeferredBlock(StrMixin):
         """standard debug format"""
         logDebug(u' '.join([self.debugPrefix(dbgMarker), msg]))
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s requests=%s outstanding=%d %s callback=%s' % (
             self.debugPrefix(),
-            u'[' + u','.join(unicode(x) for x in self.requests) + u']',
+            u'[' + u','.join(str(x) for x in self.requests) + u']',
             self.outstanding,
             u'is completed' if self.completed else u'not completed',
             self.prettyCallback())
@@ -225,7 +225,7 @@ class DeferredBlock(StrMixin):
         if not request.answer:
             self.outstanding -= 1
         if Debug.deferredBlock:
-            self.debug(u'-:%d' % self.outstanding, unicode(request))
+            self.debug(u'-:%d' % self.outstanding, str(request)) # TODO: auch ohne?
         self.callbackIfDone()
 
     def callback(self, method, *args):
@@ -295,7 +295,7 @@ class DeferredBlock(StrMixin):
     def logBug(self, msg):
         """log msg and raise exception"""
         for request in self.requests:
-            logDebug(unicode(request))
+            logDebug(str(request)) # TODO:
         logException(msg)
 
     def callbackIfDone(self):
@@ -390,7 +390,7 @@ class DeferredBlock(StrMixin):
         """send info about player 'about' to users 'receivers'"""
         def encodeKwargs():
             """those values are classes like Meld, Tile etc.
-               Convert to str(python2) or bytes(python3"""
+               Convert to bytes"""
             for keyword in ('tile', 'tiles', 'meld', 'melds'):
                 if keyword in kwargs:
                     kwargs[keyword] = str(kwargs[keyword]).encode()

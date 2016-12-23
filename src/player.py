@@ -22,7 +22,7 @@ import weakref
 from collections import defaultdict
 
 from log import logException, logWarning, m18n, m18nc, m18nE
-from common import IntDict, Debug, unicode
+from common import IntDict, Debug
 from common import StrMixin
 from wind import East
 from query import Query
@@ -167,7 +167,7 @@ class Player(StrMixin):
         """
         The name of the player, can be changed only once.
 
-        @type: C{unicode}
+        @type: C{str}
         """
         return self.__name
 
@@ -176,7 +176,7 @@ class Player(StrMixin):
         """write once"""
         assert self.__name == ''
         assert value
-        assert isinstance(value, unicode), 'Player.name must be unicode but not {}'.format(type(value))
+        assert isinstance(value, str), 'Player.name must be str but not {}'.format(type(value))
         self.__name = value
 
     @property

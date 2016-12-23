@@ -24,8 +24,6 @@ Read the user manual for a description of the interface to this scoring engine
 import types
 from hashlib import md5
 
-from qt import QVariant
-
 from common import Internal, Debug, english  # pylint: disable=redefined-builtin
 from common import unicodeString, StrMixin, nativeString, nativeStringArgs
 from log import m18n, m18nc, m18nE, logException, logDebug
@@ -63,8 +61,6 @@ class Score(object):
     def change(self, unitName, value):
         """sets value for unitName. If changed, return True"""
         oldValue = self.__getattribute__(unitName)
-        if isinstance(value, QVariant):
-            value = value.toString()
         newValue = type(oldValue)(value)
         if newValue == oldValue:
             return False, None
@@ -783,7 +779,7 @@ class RuleBase(StrMixin):
         all that is needed to hash this rule
 
         @return: The unique hash string
-        @rtype: unicode
+        @rtype: str
         """
         return u''
 
@@ -955,7 +951,7 @@ class Rule(RuleBase):
         database congestion low.
 
         @return: The unique hash string
-        @rtype: unicode
+        @rtype: str
         """
         return u'%s: %s %s' % (self.name, self.definition, self.score)
 
@@ -1000,7 +996,7 @@ class ParameterRule(RuleBase):
         database congestion low.
 
         @return: The unique hash string
-        @rtype: unicode
+        @rtype: str
         """
         result = u'%s: %s %s' % (self.name, self.definition, self.parameter)
         return result

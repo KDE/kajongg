@@ -20,17 +20,16 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import Qt, toQVariant, variantValue, QSize
+from qt import Qt, QSize
 from qt import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
 from qt import QModelIndex
-from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, \
-    IntRule, BoolRule, StrRule
+from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, BoolRule
 from util import uniqueList
 from log import m18n, m18nc
 from differ import RulesetDiffer
-from common import Debug, english, unicode
+from common import Debug, english
 from tree import TreeItem, RootItem, TreeModel
 from kde import KApplication
 from dialogs import Sorry
@@ -134,7 +133,7 @@ class RuleItem(RuleTreeItem):
             else:
                 if not hasattr(content.score, str(column)):
                     column = colNames[column]
-                return unicode(getattr(content.score, column))
+                return str(getattr(content.score, column)) # TODO: geht das auch ohne?
         return ''
 
     def tooltip(self):
@@ -187,9 +186,9 @@ class RuleModel(TreeModel):
             if role in (Qt.DisplayRole, Qt.EditRole):
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and isinstance(item.rawContent, BoolRule):
-                        return toQVariant('')
+                        return ''
                 showValue = item.content(index.column())
-                if isinstance(showValue, unicode) and showValue.endswith('.0'):
+                if isinstance(showValue, str) and showValue.endswith('.0'):
                     try:
                         showValue = str(int(float(showValue)))
                     except ValueError:
@@ -215,7 +214,7 @@ class RuleModel(TreeModel):
                 tip = u'<b></b>%s<b></b>' % m18n(
                     item.tooltip()) if item else u''
                 result = tip
-        return toQVariant(result)
+        return result
 
     @staticmethod
     def isCheckboxCell(index):
@@ -232,16 +231,14 @@ class RuleModel(TreeModel):
             return
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             if section >= self.rootItem.columnCount():
-                return toQVariant()
-            result = variantValue(self.rootItem.content(section))
+                return
+            result = self.rootItem.content(section)
             if result == 'doubles':
                 result = 'x2'
             return m18n(result)
         elif role == Qt.TextAlignmentRole:
             leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
-            return toQVariant(int(leftRight | Qt.AlignVCenter))
-        else:
-            return toQVariant()
+            return int(leftRight | Qt.AlignVCenter)
 
     def appendRuleset(self, ruleset):
         """append ruleset to the model"""
@@ -276,32 +273,32 @@ class EditableRuleModel(RuleModel):
         """change rule data in the model"""
         dirty, message = False, None
         if column == 0:
-            name = unicode(value)
+            name = str(value) # TODO: geht das auch ohne?
             if content.name != english(name):
                 dirty = True
                 content.name = english(name)
         elif column == 1 and isinstance(content, ParameterRule):
             oldParameter = content.parameter
             if isinstance(content, IntRule):
-                if content.parameter != value.toInt()[0]:
+                if content.parameter != value: # TODO: testen, war toInt()[0]
                     dirty = True
-                    content.parameter = value.toInt()[0]
+                    content.parameter = value
             elif isinstance(content, BoolRule):
                 return False, ''
             elif isinstance(content, StrRule):
-                if content.parameter != unicode(value):
+                if content.parameter != str(value): # TODO: ohne?
                     dirty = True
-                    content.parameter = unicode(value)
+                    content.parameter = str(value)
             else:
-                if content.parameter != unicode(value):
+                if content.parameter != str(value):
                     dirty = True
-                    content.parameter = unicode(value)
+                    content.parameter = str(value)
             message = content.validate()
             if message:
                 content.parameter = oldParameter
                 dirty = False
         else:
-            unitName = str(self.rootItem.content(column).toString())
+            unitName = self.rootItem.content(column)
             dirty, message = content.score.change(unitName, value)
         return dirty, message
 
@@ -318,7 +315,7 @@ class EditableRuleModel(RuleModel):
             content = item.rawContent
             if role == Qt.EditRole:
                 if isinstance(content, Ruleset) and column == 0:
-                    name = unicode(value)
+                    name = str(value) # TODO:
                     oldName = content.name
                     content.rename(english(name))
                     dirty = oldName != content.name

@@ -27,7 +27,7 @@ from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import nativeString, StrMixin
 from wind import Wind
 
-from qt import Qt, QMetaObject, variantValue
+from qt import Qt, QMetaObject
 from qt import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
 
 from dialogs import QuestionYesNo
@@ -610,6 +610,5 @@ class ScoringScene(GameScene):
             cbLastMeld = self.scoringDialog.cbLastMeld
             idx = cbLastMeld.currentIndex()
             if idx >= 0:
-                return Meld(nativeString(
-                    variantValue(cbLastMeld.itemData(idx))))
+                return Meld(nativeString(cbLastMeld.itemData(idx)))
         return Meld()

@@ -19,7 +19,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 # See the user manual for a description of how to define rulesets.
 # Names and descriptions must be english and may only contain ascii chars.
-# Because kdecore.i18n() only accepts 8bit characters, no unicode.
 # The KDE translation teams will "automatically" translate name and
 # description into many languages.
 

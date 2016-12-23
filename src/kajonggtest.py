@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -34,7 +34,7 @@ import gc
 
 from optparse import OptionParser
 
-from common import Debug, StrMixin, isPython3, nativeString
+from common import Debug, StrMixin, nativeString
 from util import removeIfExists, gitHead, checkMemory
 from compat import Csv, CsvWriter
 
@@ -582,10 +582,6 @@ def parse_options():
         '', '--gui', dest='gui', action='store_true',
         default=False, help='show graphical user interface')
     parser.add_option(
-        '', '--23', dest='py23', action='store_true',
-        default=False, help='Use both Python 2 and 3. If you explicitly want to use only one of them'
-                            'use python2 kajonggtest or python3 kajonggtest')
-    parser.add_option(
         '', '--qt5', dest='qt5', action='store_true',
         default=False, help='Force using Qt5')
     parser.add_option(
@@ -641,7 +637,7 @@ def improve_options():
         OPTIONS.servers = 1
 
     cmdPath = os.path.join(startingDir(), 'kajongg.py')
-    cmd = ['python', cmdPath, '--rulesets=']
+    cmd = ['python3', cmdPath, '--rulesets=']
     OPTIONS.knownRulesets = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE).communicate()[0].decode().split('\n')
@@ -732,11 +728,7 @@ def allJobs():
                     OPTIONS.jobCount += 1
                     if OPTIONS.jobCount > OPTIONS.count:
                         raise StopIteration
-                    if OPTIONS.py23:
-                        yield Job(2, ruleset, aiVariant, commitId, game)
-                        yield Job(3, ruleset, aiVariant, commitId, game)
-                    else:
-                        yield Job(3 if isPython3 else 2, ruleset, aiVariant, commitId, game)
+                    yield Job(3, ruleset, aiVariant, commitId, game)
 
 def main():
     """parse options, play, evaluate results"""

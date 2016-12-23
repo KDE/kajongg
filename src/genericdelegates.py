@@ -12,7 +12,7 @@ Copyright (C) 2008-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
  the GNU General Public License for more details.
 """
 
-from qt import Qt, RealQVariant, variantValue, QSize, QRect, QEvent
+from qt import Qt, QSize, QRect, QEvent
 from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
     QStyleOptionViewItem, QApplication
 
@@ -40,8 +40,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
         else:
             role = QPalette.AlternateBase if index.row() % 2 else QPalette.Base
         self.label.setBackgroundRole(role)
-        with RealQVariant():
-            text = variantValue(index.model().data(index, Qt.DisplayRole))
+        text = index.model().data(index, Qt.DisplayRole)
         self.label.setText(text)
         self.label.setFixedSize(option.rect.size())
         with Painter(painter):
@@ -50,8 +49,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
 
     def sizeHint(self, option, index):
         """compute size for the final formatted richtext"""
-        with RealQVariant():
-            text = variantValue(index.model().data(index))
+        text = index.model().data(index)
         self.document.setDefaultFont(option.font)
         self.document.setHtml(text)
         return QSize(self.document.idealWidth() + 5,
@@ -98,8 +96,7 @@ http://qt-project.org/faq/answer/how_can_i_align_the_checkboxes_in_a_view"""
             return False
         # make sure that we have a check state
         value = index.data(Qt.CheckStateRole)
-        if not isinstance(value, int) and not value.isValid():
-            # in Python3, we get the python3 data type int
+        if not isinstance(value, int):
             return False
         # make sure that we have the right event type
         if event.type() == QEvent.MouseButtonRelease:
@@ -118,7 +115,6 @@ http://qt-project.org/faq/answer/how_can_i_align_the_checkboxes_in_a_view"""
                 return False
         else:
             return False
-        value = variantValue(value)
         if value == Qt.Checked:
             state = Qt.Unchecked
         else:

@@ -35,7 +35,6 @@ from kde import appdataDir
 from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug, m18ncE, m18n
 from common import IntDict, Options, Internal, Debug, nativeStringArgs, unicodeString
-from common import unicode, isPython3
 
 class QueryException(Exception):
 
@@ -158,10 +157,7 @@ class DBHandle(sqlite3.Connection):
         @rtype: C{str}
         """
         name = 'kajonggserver' if Internal.isServer else 'kajongg'
-        if isPython3:
-            name += '3.db'
-        else:
-            name += '.db'
+        name += '3.db'
         return Options.dbPath if Options.dbPath else appdataDir() + name
 
     @property
@@ -393,8 +389,7 @@ class PrepareDB(object):
         @rtype: C{str}
         """
         if Internal.db.tableHasField('general', 'schemaversion'):
-            return str(Query('select schemaversion from general').records[0][0])
-            # Query returns unicode
+            return Query('select schemaversion from general').records[0][0]
         else:
             return '1.1.1'
 
@@ -402,10 +397,7 @@ class PrepareDB(object):
         """upgrade the structure of an existing kajongg database"""
         try:
             Internal.db = DBHandle(self.path)
-            if isPython3:
-                allVersions = list(['4.13.0', '8300'])
-            else:
-                allVersions = list(['4.13.0', '8200'])
+            allVersions = list(['4.13.0', '8300'])
             assert allVersions[-1] == str(Internal.defaultPort), '{} != {}'.format(
                 allVersions[-1], str(Internal.defaultPort))
             # skip versions before current db versions:
@@ -536,7 +528,7 @@ class PrepareDB(object):
                                   "and definition not like 'bool%' "
                                   "and definition<>'' "
                                   "and definition not like 'XEAST9X%'").records
-        usedRegexRulesets = list(unicode(x[0]) for x in usedRegexRulesets)
+        usedRegexRulesets = list(str(x[0]) for x in usedRegexRulesets) # TODO: geht das auch ohne str?
         if not usedRegexRulesets:
             return
         openRegexGames = Query("select id from game "

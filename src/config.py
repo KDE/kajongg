@@ -23,7 +23,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from collections import defaultdict
 
-from qt import QString
 from kde import KConfigSkeleton
 from log import logException, logDebug
 from common import Internal, Debug
@@ -53,12 +52,11 @@ class StringParameter(Parameter):
         if default is None:
             default = ''
         Parameter.__init__(self, group, name, default)
-        self.value = QString()
+        self.value = ''
 
     def add(self, skeleton):
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItemString(
-            self.name, self.value, QString(self.default or ''))
+        self.item = skeleton.addItemString(self.name, self.value, self.default or '')
 
     def itemValue(self):
         """returns the value of this item"""

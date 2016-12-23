@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import variantValue, Qt, QPointF, QPoint, QRectF, QMimeData, QSize, toQVariant
+from qt import Qt, QPointF, QPoint, QRectF, QMimeData, QSize
 from qt import QGraphicsRectItem, QSizePolicy, QFrame, QFont
 from qt import QGraphicsView, QLabel
 from qt import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen, QBrush
@@ -35,7 +35,7 @@ from message import Message
 
 from util import kprint, stack, uniqueList
 from log import logDebug, logException, m18n, m18nc
-from common import LIGHTSOURCES, Internal, Debug, isAlive, unicode, StrMixin
+from common import LIGHTSOURCES, Internal, Debug, isAlive, StrMixin
 from common import ZValues
 from wind import Wind, East
 
@@ -114,7 +114,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
         size = Internal.scene.windTileset.faceSize.height() * 1.1
         return QRectF(QPoint(), QPoint(size, size))
 
-    def __unicode__(self):
+    def __str__(self):
         """for debugging"""
         return u'Windmarker %s x/y= %.1f/%1f' % (
             self.name(), self.x(), self.y())
@@ -314,7 +314,7 @@ class Board(QGraphicsRectItem, StrMixin):
         charArrows = m18nc(
             'kajongg:arrow keys hjkl like in konqueror',
             'hjklHJKL')
-        key = unicode(event.text())
+        key = event.text()
         if key and key in charArrows:
             key = Board.arrows[charArrows.index(key) % 4]
         return key
@@ -365,7 +365,7 @@ class Board(QGraphicsRectItem, StrMixin):
             menu = QMenu(m18n('Choose from'))
             for idx, variant in enumerate(variants):
                 action = menu.addAction(variant.typeName())
-                action.setData(toQVariant(idx))
+                action.setData(idx)
             if Internal.scene.mainWindow.centralView.dragObject:
                 menuPoint = QCursor.pos()
             else:
@@ -376,7 +376,7 @@ class Board(QGraphicsRectItem, StrMixin):
             action = menu.exec_(menuPoint)
             if not action:
                 return None
-            idx = variantValue(action.data())
+            idx = action.data()
         return variants[idx]
 
     def dragEnterEvent(self, dummyEvent):

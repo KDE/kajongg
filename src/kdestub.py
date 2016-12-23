@@ -43,19 +43,14 @@ import sip
 
 # pylint: disable=wrong-import-order
 
-try:
-    from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
-except ImportError:
-    # gone with python3.4
-    # pylint: disable=import-error
-    from configparser import SafeConfigParser, NoSectionError, NoOptionError
+from configparser import SafeConfigParser, NoSectionError, NoOptionError
 
 # here come the replacements:
 
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
 
-from common import Internal, Debug, ENGLISHDICT, unicodeString, isPython3, nativeStringArgs
+from common import Internal, Debug, ENGLISHDICT, unicodeString, nativeStringArgs
 from util import uniqueList
 from statesaver import StateSaver
 
@@ -106,7 +101,7 @@ def i18n(englishIn, *args):
     @param englishIn: The english template.
     @type englishIn: C{str}
     @return: The translated text, args included.
-    @rtype: C{unicode}
+    @rtype: C{str}
     """
     assert englishIn
     if not Debug.neutral and KGlobal.translation and englishIn:
@@ -130,7 +125,7 @@ def i18nc(context, englishIn, *args):
     @param englishIn: The english template.
     @type englishIn: C{str}
     @return: The translated text, args included.
-    @rtype: C{unicode}
+    @rtype: C{str}
     """
     # The \004 trick is taken from kdecore/localization/gettext.h,
     # definition of pgettext_aux"""
@@ -896,11 +891,6 @@ class KDETranslator(QTranslator):
         search for translateQt in kdelibs/kdecore/localization"""
         return i18n(sourceText)
 
-    @staticmethod
-    def isEmpty():
-        """stub"""
-        return False
-
 
 class KLocale(object):
 
@@ -912,12 +902,10 @@ class KLocale(object):
     @staticmethod
     def initQtTranslator(app):
         """stub"""
-        if isPython3 and sip.SIP_VERSION < 0x041004:
+        if sip.SIP_VERSION < 0x041004:
             # This needs sip 4.16.4 and Qt 4/5 from Oct 28 2014 or later
-            # TODO: check for updated PyQt versions as soon as they are released.
             # Older versions segfault when KDETranslator.translate is called
-            raise Exception(
-                'Kajongg needs sip v4.16.4 or higher when running without KDE libraries')
+            raise Exception('Kajongg needs sip v4.16.4 or higher')
         translator = KDETranslator(app)
         QCoreApplication.installTranslator(translator)
 
@@ -939,13 +927,10 @@ class KConfigGroup(object):
     def __default(self, name):
         """defer computation of Languages until really needed"""
         if self.groupName == 'Locale' and name == 'Language':
-            return QString(self.__availableLanguages())
+            return self.__availableLanguages()
 
     def readEntry(self, name, default=None):
-        """get an entry from this group.
-        If default is passed, the original returns QVariant, else QString.
-        To make things easier, we never accept a default and
-        always return QString"""
+        """get an entry from this group."""
         assert default is None
         try:
             items = self.config().items(self.groupName)
@@ -958,16 +943,16 @@ class KConfigGroup(object):
             for language in KGlobal.config().group('Locale').readEntry('Language').split(':'):
                 key = '%s[%s]' % (name, language)
                 if key in i18nItems:
-                    return QString(i18nItems[key])
+                    return i18nItems[key]
         if name in items:
             if self.groupName == 'Locale' and name == 'Language':
                 languages = list(x for x in items[name].split(
                     ':') if self.__isLanguageInstalled(x))
                 if languages:
-                    return QString(':'.join(languages))
+                    return ':'.join(languages)
                 else:
-                    return QString(self.__availableLanguages())
-            return QString(items[name])
+                    return self.__availableLanguages()
+            return items[name]
         return self.__default(name)
 
     @classmethod
@@ -1069,7 +1054,7 @@ class KConfig(SafeConfigParser):
     This mimics KDE KConfig but can also be used like any SafeConfigParser but
     without support for a default section.
     We Override write() with a variant which does not put spaces
-    around the '=' delimiter. This is configurable in Python3.3,
+    around the '=' delimiter. This is configurable in Python3.3,  # TODO: remove
     so after kajongg is ported to Python3, this can be removed"""
 
     SimpleConfig = 1
@@ -1081,10 +1066,7 @@ class KConfig(SafeConfigParser):
         self.path = str(path)
         if os.path.exists(self.path):
             with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
-                if isPython3:
-                    self.read_file(cfgFile)
-                else:
-                    self.readfp(cfgFile) # pylint: disable=deprecated-method
+                self.read_file(cfgFile)
 
     def as_dict(self):
         """a dict of dicts"""

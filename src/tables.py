@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 
-from qt import Qt, toQVariant, QAbstractTableModel
+from qt import Qt, QAbstractTableModel
 from qt import QDialog, QDialogButtonBox, QWidget
 from qt import QHBoxLayout, QVBoxLayout, QAbstractItemView
 from qt import QItemSelectionModel, QGridLayout, QColor, QPalette
@@ -55,13 +55,13 @@ class TablesModel(QAbstractTableModel):
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
                 if section in [3, 4]:
-                    return toQVariant(int(Qt.AlignLeft))
+                    return int(Qt.AlignLeft)
                 else:
-                    return toQVariant(int(Qt.AlignHCenter | Qt.AlignVCenter))
+                    return int(Qt.AlignHCenter | Qt.AlignVCenter)
         if role != Qt.DisplayRole:
-            return toQVariant()
+            return
         if orientation != Qt.Horizontal:
-            return toQVariant(int(section + 1))
+            return int(section + 1)
         result = ''
         if section < 5:
             result = [m18n('Table'),
@@ -70,7 +70,7 @@ class TablesModel(QAbstractTableModel):
                       m18nc('table status',
                             'Status'),
                       m18n('Ruleset')][section]
-        return toQVariant(result)
+        return result
 
     def rowCount(self, parent=None):
         """how many tables are in the model?"""
@@ -89,16 +89,16 @@ class TablesModel(QAbstractTableModel):
     def data(self, index, role=Qt.DisplayRole):
         """score table"""
         # pylint: disable=too-many-branches,too-many-locals,redefined-variable-type
-        result = toQVariant()
+        result = None
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
-                result = toQVariant(int(Qt.AlignHCenter | Qt.AlignVCenter))
+                result = int(Qt.AlignHCenter | Qt.AlignVCenter)
             else:
-                result = toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
+                result = int(Qt.AlignLeft | Qt.AlignVCenter)
         if index.isValid() and (0 <= index.row() < len(self.tables)):
             table = self.tables[index.row()]
             if role == Qt.DisplayRole and index.column() in (0, 1):
-                result = toQVariant(table.tableid)
+                result = table.tableid
             elif role == Qt.DisplayRole and index.column() == 2:
                 players = []
                 zipped = list(zip(table.playerNames, table.playersOnline))
@@ -126,7 +126,7 @@ class TablesModel(QAbstractTableModel):
                         name +
                         '</nobr>')
                 names = ''.join(players)
-                result = toQVariant(names)
+                result = names
             elif role == Qt.DisplayRole and index.column() == 3:
                 status = table.status()
                 if table.suspendedAt:
@@ -136,17 +136,14 @@ class TablesModel(QAbstractTableModel):
                     status = u'Suspended'
                 else:
                     dateVal = u''
-                result = toQVariant(m18nc('table status', status) + dateVal)
+                result = m18nc('table status', status) + dateVal
             elif index.column() == 4:
                 if role == Qt.DisplayRole:
-                    result = toQVariant(
-                        m18n((
-                            table.myRuleset if table.myRuleset
-                            else table.ruleset).name))
+                    result = m18n((table.myRuleset if table.myRuleset else table.ruleset).name)
                 elif role == Qt.ForegroundRole:
                     palette = KApplication.palette()
                     color = palette.windowText() if table.myRuleset else 'red'
-                    result = toQVariant(QColor(color))
+                    result = QColor(color)
         return result
 
 

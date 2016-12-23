@@ -22,7 +22,7 @@ from qt import Qt
 
 from log import m18nc
 from message import Message
-from common import Internal, isAlive, unicode
+from common import Internal, isAlive
 from player import Player, PlayingPlayer
 from game import PlayingGame
 from tile import Tile
@@ -74,9 +74,7 @@ class VisiblePlayer(Player):
     def decorate(self):
         """show player info on the wall"""
         side = self.front
-        self.sideText.text = u' - '.join(
-            [self.localName,
-             unicode(self.explainHand().total())])
+        self.sideText.text = '{} - {}'.format(self.localName, self.explainHand().total())
         self.colorizeName()
         side.windTile = Wind.all4[self.wind].marker
         side.windTile.prevailing = self.game.roundsFinished
@@ -142,8 +140,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         if msg != Message.NoClaim:
             self.speak(msg.name.lower())
             yellow = self.front.message
-            yellow.setText(
-                '  '.join([unicode(yellow.msg), m18nc('kajongg', msg.name)]))
+            yellow.setText('{}  {}'.format(yellow.msg, m18nc('kajongg', msg.name)))
             yellow.setVisible(True)
 
     def hidePopup(self):

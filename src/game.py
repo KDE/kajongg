@@ -30,8 +30,7 @@ from twisted.internet.defer import succeed
 from util import gitHead
 from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, m18n
-from common import Internal, IntDict, Debug, Options, unicodeString, unicode
-from common import isPython3
+from common import Internal, IntDict, Debug, Options, unicodeString
 from wind import Wind, East
 from query import Query
 from rule import Ruleset
@@ -211,7 +210,7 @@ class Game(object):
         assert self.__class__ != Game, 'Do not directly instantiate Game'
         for wind, name in names:
             assert isinstance(wind, Wind), 'Game.__init__ expects Wind objects'
-            assert isinstance(name, (str, unicode)), 'Game.__init__: name must be string and not {}'.format(type(name))
+            assert isinstance(name, str), 'Game.__init__: name must be string and not {}'.format(type(name))
         self.players = Players()
         # if we fail later on in init, at least we can still close the program
         self.myself = None
@@ -404,7 +403,7 @@ class Game(object):
         The server tells us the seating order and player names.
 
         @param playerNames: A list of 4 tuples. Each tuple holds wind and name.
-        @type playerNames: The tuple contents must be C{unicode}
+        @type playerNames: The tuple contents must be C{str}
         @todo: Can we pass L{Players} instead of that tuple list?
         """
         if not self.players:
@@ -555,7 +554,7 @@ class Game(object):
                  self.rotated, self.notRotated),
                 (player.hand.string, manualrules))
             logMessage += u'{player:<12} {hand:>4} {total:>5} {won} | '.format(
-                player=unicode(player)[:12], hand=player.handTotal,
+                player=str(player)[:12], hand=player.handTotal,
                 total=player.balance,
                 won='WON' if player == self.winner else '   ')
             for usedRule in player.hand.usedRules:
@@ -828,7 +827,7 @@ class PlayingGame(Game):
             if Options.rounds:
                 self.csvTags.append('ROUNDS:%s' % Options.rounds)
             row = [self.ruleset.name, Options.AI,
-                   gitHead(), '3' if isPython3 else '2',
+                   gitHead(), '3',
                    str(self.seed), ','.join(self.csvTags)]
             for player in sorted(self.players, key=lambda x: x.name):
                 row.append(player.name)

@@ -24,7 +24,6 @@ from qt import Qt
 from qt import QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox, \
     QTableWidget, QTableWidgetItem
 
-from common import unicode
 from query import Query
 from guiutil import decorateWindow
 from log import m18n, m18nc
@@ -110,12 +109,11 @@ class PlayerList(QDialog):
 
     def itemChanged(self, item):
         """this must be new because editing is disabled for others"""
-        currentName = unicode(item.text())
+        currentName = item.text()
         if currentName in self._data:
             Sorry(m18n('Player %1 already exists', currentName))
             self.setFocus()
-            del self._data[
-                unicode(self.table.item(self.table.currentRow(), 0).text())]
+            del self._data[self.table.item(self.table.currentRow(), 0).text()]
             self.updateTable(currentName=currentName)
             return
         query = Query('insert into player(name) values(?)', (currentName, ))
@@ -141,7 +139,7 @@ class PlayerList(QDialog):
         items = self.table.selectedItems()
         currentRow = self.table.currentRow()
         if len(items):
-            name = unicode(items[0].text())
+            name = items[0].text()
             playerId = self._data[name]
             query = Query(
                 "select 1 from game where p0=? or p1=? or p2=? or p3=?",

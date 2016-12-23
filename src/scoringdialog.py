@@ -20,8 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 # pylint: disable=ungrouped-imports
 
-from qt import Qt, QPointF, toQVariant, variantValue, \
-    QSize, QModelIndex, QEvent, QTimer
+from qt import Qt, QPointF, QSize, QModelIndex, QEvent, QTimer
 
 from qt import QColor, QPushButton, QPixmapCache
 from qt import QWidget, QLabel, QTabWidget
@@ -40,7 +39,7 @@ from modeltest import ModelTest
 from rulesetselector import RuleTreeView
 from board import WindLabel
 from log import m18n, m18nc
-from common import Internal, Debug, unicode
+from common import Internal, Debug
 from statesaver import StateSaver
 from query import Query
 from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
@@ -199,7 +198,7 @@ class ScoreModel(TreeModel):
         """score table"""
         # pylint: disable=too-many-return-statements
         if not index.isValid():
-            return toQVariant()
+            return
         column = index.column()
         item = index.internalPointer()
         if role is None:
@@ -216,36 +215,35 @@ class ScoreModel(TreeModel):
                         content = str(content.payments)
                     else:
                         content = str(content.balance)
-                return toQVariant(content)
+                return content
             else:
                 if column > 0:
-                    return toQVariant('')
+                    return ''
                 else:
-                    return toQVariant(item.content(0))
+                    return item.content(0)
         if role == Qt.TextAlignmentRole:
             if index.column() == 0:
-                return toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
+                return int(Qt.AlignLeft | Qt.AlignVCenter)
             else:
-                return toQVariant(int(Qt.AlignRight | Qt.AlignVCenter))
+                return int(Qt.AlignRight | Qt.AlignVCenter)
         if role == Qt.FontRole:
             return QFont('Monospaced')
         if role == Qt.ForegroundRole:
             if isinstance(item, ScorePlayerItem) and item.parent.row() == 3:
                 content = item.content(column)
                 if not isinstance(content, HandResult):
-                    return toQVariant(QBrush(ScoreItemDelegate.colors[index.row()]))
+                    return QBrush(ScoreItemDelegate.colors[index.row()])
         if column > 0 and isinstance(item, ScorePlayerItem):
             content = item.content(column)
             # pylint: disable=maybe-no-member
             # pylint thinks content is a str
             if role == Qt.BackgroundRole:
                 if content and content.won:
-                    return toQVariant(QColor(165, 255, 165))
+                    return QColor(165, 255, 165)
             if role == Qt.ToolTipRole:
                 englishHints = content.manualrules.split('||')
                 tooltip = '<br />'.join(m18n(x) for x in englishHints)
-                return toQVariant(tooltip)
-        return toQVariant()
+                return tooltip
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
@@ -261,10 +259,9 @@ class ScoreModel(TreeModel):
                     return handResult.handId()
         elif role == Qt.TextAlignmentRole:
             if section == 0:
-                return toQVariant(int(Qt.AlignLeft | Qt.AlignVCenter))
+                return int(Qt.AlignLeft | Qt.AlignVCenter)
             else:
-                return toQVariant(int(Qt.AlignRight | Qt.AlignVCenter))
-        return toQVariant()
+                return int(Qt.AlignRight | Qt.AlignVCenter)
 
     def loadData(self):
         """loads all data from the data base into a 2D matrix formatted like the wanted tree"""
@@ -614,7 +611,7 @@ class ExplainView(QListView):
                 if pLines:
                     pLines.append('')
                 lines.extend(pLines)
-        if 'xxx'.join(lines) != 'xxx'.join(unicode(x) for x in self.model.stringList()):
+        if 'xxx'.join(lines) != 'xxx'.join(str(x) for x in self.model.stringList()): # TODO: ohne?
             # QStringListModel does not optimize identical lists away, so we do
             self.model.setStringList(lines)
 
@@ -961,7 +958,7 @@ class ScoringDialog(QWidget):
         """returns the currently selected last tile"""
         idx = self.cbLastTile.currentIndex()
         if idx >= 0:
-            return variantValue(self.cbLastTile.itemData(idx))
+            return self.cbLastTile.itemData(idx)
 
     def clickedPlayerIdx(self, checkbox):
         """the player whose box has been clicked"""
@@ -1102,7 +1099,7 @@ class ScoringDialog(QWidget):
         idx = self.cbLastTile.currentIndex()
         if idx < 0:
             idx = 0
-        indexedTile = variantValue(self.cbLastTile.itemData(idx))
+        indexedTile = self.cbLastTile.itemData(idx)
         restoredIdx = None
         self.cbLastTile.clear()
         if not winnerTiles:
@@ -1118,14 +1115,14 @@ class ScoringDialog(QWidget):
                 shownTiles.add(tile.tile)
                 self.cbLastTile.addItem(
                     QIcon(tile.pixmapFromSvg(pmSize, withBorders=False)),
-                    '', toQVariant(tile.tile))
+                    '', tile.tile)
                 if indexedTile is tile.tile:
                     restoredIdx = self.cbLastTile.count() - 1
         if not restoredIdx and indexedTile:
             # try again, maybe the tile changed between concealed and exposed
             indexedTile = indexedTile.exposed
             for idx in range(self.cbLastTile.count()):
-                if indexedTile is variantValue(self.cbLastTile.itemData(idx)).exposed:
+                if indexedTile is self.cbLastTile.itemData(idx).exposed:
                     restoredIdx = idx
                     break
         if not restoredIdx:
@@ -1168,22 +1165,21 @@ class ScoringDialog(QWidget):
                                    winner.handBoard.tilesByElement(element)
                                    [0].pixmapFromSvg(QSize(faceWidth, faceHeight), withBorders=False))
                 painter.translate(QPointF(faceWidth, 0.0))
-            self.cbLastMeld.addItem(QIcon(pixMap), '', toQVariant(str(meld)))
+            self.cbLastMeld.addItem(QIcon(pixMap), '', str(meld))
             if indexedMeld == str(meld):
                 restoredIdx = self.cbLastMeld.count() - 1
         if not restoredIdx and indexedMeld:
             # try again, maybe the meld changed between concealed and exposed
             indexedMeld = indexedMeld.lower()
             for idx in range(self.cbLastMeld.count()):
-                meldContent = str(variantValue(self.cbLastMeld.itemData(idx)))
+                meldContent = str(self.cbLastMeld.itemData(idx))
                 if indexedMeld == meldContent.lower():
                     restoredIdx = idx
                     if lastTile not in meldContent:
                         lastTile = lastTile.swapped
                         assert lastTile in meldContent
                         with BlockSignals(self.cbLastTile):  # we want to continue right here
-                            idx = self.cbLastTile.findData(
-                                toQVariant(lastTile))
+                            idx = self.cbLastTile.findData(lastTile)
                             self.cbLastTile.setCurrentIndex(idx)
                     break
         if not restoredIdx:
@@ -1200,7 +1196,7 @@ class ScoringDialog(QWidget):
             idx = self.cbLastMeld.currentIndex()
             if idx < 0:
                 idx = 0
-            indexedMeld = str(variantValue(self.cbLastMeld.itemData(idx)))
+            indexedMeld = str(self.cbLastMeld.itemData(idx))
             self.cbLastMeld.clear()
             self.__meldPixMaps = []
             if not self.game.winner:
@@ -1213,10 +1209,7 @@ class ScoringDialog(QWidget):
             assert len(winnerMelds), 'lastTile %s missing in %s' % (
                 lastTile, self.game.winner.hand.melds)
             if len(winnerMelds) == 1:
-                self.cbLastMeld.addItem(
-                    QIcon(),
-                    '',
-                    toQVariant(str(winnerMelds[0])))
+                self.cbLastMeld.addItem(QIcon(), '', str(winnerMelds[0]))
                 self.cbLastMeld.setCurrentIndex(0)
                 return
             showCombo = True

@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import QString, Qt, QRectF, QPointF, QSizeF, QSize
+from qt import Qt, QRectF, QPointF, QSizeF, QSize
 from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor
 
 from util import stack
@@ -135,10 +135,10 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         elif changePos:
             if self.rotation % 180 == 0:
                 currentY = self.y()
-                newY = changePos.unpackEndValue().y()
+                newY = changePos.endValue().y()
             else:
                 currentY = self.x()
-                newY = changePos.unpackEndValue().x()
+                newY = changePos.endValue().x()
             if currentY != newY:
                 movingZ += ZValues.movingZ
         self.setZValue(movingZ +
@@ -169,9 +169,9 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
     def __elementId(self):
         """returns the SVG element id of the tile"""
         if not Internal.Preferences.showShadows:
-            return QString("TILE_2")
+            return "TILE_2"
         lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
-        return QString("TILE_{}".format(lightSourceIndex % 4 + 1))
+        return "TILE_{}".format(lightSourceIndex % 4 + 1)
 
     def paint(self, painter, dummyOption, dummyWidget=None):
         """paint the entire tile.
