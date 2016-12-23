@@ -1047,7 +1047,7 @@ class BoolRule(ParameterRule):
 
 class StrRule(ParameterRule):
 
-    """for str parameters. Duck typing with Rule"""
+    """for str parameters. Duck typing with Rule. Currently not used."""
     prefix = 'str'
 
     def __init__(self, name, definition, description, parameter):

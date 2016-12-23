@@ -21,11 +21,15 @@
 ## WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 ##
 #############################################################################
+
+There are several variations of python ports for this script floating
+around, it seemed easier to me to maintain one for myself
 """
 
 import sip
-from qt import QObject, Qt, QAbstractItemModel, QModelIndex, \
-    QPersistentModelIndex
+from qt import QObject, Qt, QAbstractItemModel, QModelIndex
+from qt import QPersistentModelIndex, QFont, QColor, QSize
+from common import isAlive
 
 # pylint: skip-file
 
@@ -236,6 +240,22 @@ class ModelTest(QObject):
         # parent's children correctly specify their parent
         self.checkChildren(QModelIndex())
 
+    def testRoleDataType(self, role, expectedType):
+        """Tests implementation if model.data() for role"""
+        model = self.model
+        result = model.data(model.index(0, 0, QModelIndex()), role)
+        if result is not None and not isinstance(result, expectedType):
+            raise Exception('returned data type is {}, should be {}'.format(
+                type(result), expectedType))
+
+    def testRoleDataValues(self, role, asserter):
+        """Tests implementation if model.data() for role.
+        asserter is a function returning True or False"""
+        model = self.model
+        result = model.data(model.index(0, 0, QModelIndex()), role)
+        if result is not None and not asserter(result):
+            raise Exception('returned value {} is wrong')
+
     def data(self):
         """
         Tests self.model's implementation of QAbstractItemModel::data()
@@ -256,93 +276,30 @@ class ModelTest(QObject):
                                Qt.DisplayRole) == False)
 
         # General Purpose roles that should return a QString
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.ToolTipRole)
-        if isValid(variant):
-            assert isinstance(variant, str) # TODO: oder bytes?
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.StatusTipRole)
-        if isValid(variant):
-            assert isinstance(variant, str) # TODO: oder bytes?
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.WhatsThisRole)
-        if isValid(variant):
-            assert isinstance(variant, str) # TODO: oder bytes?
-
-        # General Purpose roles that should return a QSize
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.SizeHintRole)
-        if isValid(variant):
-            assert isinstance(variant, QSize)
-        # General Purpose roles that should return a QFont
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.FontRole)
-        if isValid(variant):
-            assert isinstance(variant, QFont)
+        self.testRoleDataType(Qt.ToolTipRole, str)
+        self.testRoleDataType(Qt.StatusTipRole, str)
+        self.testRoleDataType(Qt.WhatsThisRole, str)
+        self.testRoleDataType(Qt.SizeHintRole, QSize)
+        self.testRoleDataType(Qt.FontRole, QFont)
+        self.testRoleDataType(Qt.ForegroundRole, QColor)
+        self.testRoleDataType(Qt.BackgroundColorRole, QColor)
+        self.testRoleDataType(Qt.TextColorRole, QColor)
 
         # Check that the alignment is one we know about
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.TextAlignmentRole)
-        if isValid(variant):
-            alignment = variant
-            assert(
-                alignment == (alignment & int(Qt.AlignHorizontal_Mask | Qt.AlignVertical_Mask)))
+        self.testRoleDataValues(
+            Qt.TextAlignmentRole,
+            lambda x: x == (x & int(Qt.AlignHorizontal_Mask | Qt.AlignVertical_Mask)))
 
         # General Purpose roles that should return a QColor
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.ForegroundRole)
-        if isValid(variant):
-            assert isinstance(variant, QColor)
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.BackgroundColorRole)
-        if isValid(variant):
-            assert isinstance(variant, QColor)
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.TextColorRole)
-        if isValid(variant):
-            assert isinstance(variant, QColor)
-
         # Check that the "check state" is one we know about.
-        variant = self.model.data(
-            self.model.index(0,
-                             0,
-                             QModelIndex()),
-            Qt.CheckStateRole)
-        if isValid(variant):
-            state = variant
-            assert(state == Qt.Unchecked or
-                   state == Qt.PartiallyChecked or
-                   state == Qt.Checked)
+        self.testRoleDataValues(
+            Qt.CheckStateRole,
+            lambda x: x in (Qt.Unchecked, Qt.PartiallyChecked, Qt.Checked))
 
     def runAllTests(self):
         """run all tests after the model changed"""
+        if not isAlive(self):
+            return
         if self.fetchingMore:
             return
         self.nonDestructiveBasicTest()

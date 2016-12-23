@@ -133,7 +133,8 @@ class RuleItem(RuleTreeItem):
             else:
                 if not hasattr(content.score, str(column)):
                     column = colNames[column]
-                return str(getattr(content.score, column)) # TODO: geht das auch ohne?
+                return str(getattr(content.score, column))
+                # we need str() here, otherwise undefined values appear as '0' instead as empty
         return ''
 
     def tooltip(self):
@@ -273,26 +274,17 @@ class EditableRuleModel(RuleModel):
         """change rule data in the model"""
         dirty, message = False, None
         if column == 0:
-            name = str(value) # TODO: geht das auch ohne?
-            if content.name != english(name):
+            if content.name != english(value):
                 dirty = True
-                content.name = english(name)
+                content.name = english(value)
         elif column == 1 and isinstance(content, ParameterRule):
             oldParameter = content.parameter
-            if isinstance(content, IntRule):
-                if content.parameter != value: # TODO: testen, war toInt()[0]
+            if isinstance(content, BoolRule):
+                return False, ''
+            else:
+                if content.parameter != value:
                     dirty = True
                     content.parameter = value
-            elif isinstance(content, BoolRule):
-                return False, ''
-            elif isinstance(content, StrRule):
-                if content.parameter != str(value): # TODO: ohne?
-                    dirty = True
-                    content.parameter = str(value)
-            else:
-                if content.parameter != str(value):
-                    dirty = True
-                    content.parameter = str(value)
             message = content.validate()
             if message:
                 content.parameter = oldParameter
@@ -315,9 +307,8 @@ class EditableRuleModel(RuleModel):
             content = item.rawContent
             if role == Qt.EditRole:
                 if isinstance(content, Ruleset) and column == 0:
-                    name = str(value) # TODO:
                     oldName = content.name
-                    content.rename(english(name))
+                    content.rename(english(value))
                     dirty = oldName != content.name
                 elif isinstance(content, RuleBase):
                     dirty, message = self.__setRuleData(column, content, value)

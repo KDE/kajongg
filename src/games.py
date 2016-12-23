@@ -23,7 +23,7 @@ import datetime
 from kde import KIcon
 from dialogs import WarningYesNo
 
-from qt import Qt
+from qt import Qt, QModelIndex
 from qt import QAbstractTableModel, QDialogButtonBox, QDialog
 from qt import QHBoxLayout, QVBoxLayout, QCheckBox
 from qt import QItemSelectionModel, QAbstractItemView
@@ -48,8 +48,11 @@ class GamesModel(QAbstractTableModel):
         """including the hidden col 0"""
         return 3
 
-    def rowCount(self, dummyParent=None):
+    def rowCount(self, parent=None):
         """how many games"""
+        if parent and parent.isValid():
+            # we have only top level items
+            return 0
         return len(self._resultRows)
 
     def setResultset(self, rows):
@@ -60,8 +63,13 @@ class GamesModel(QAbstractTableModel):
         finally:
             self.endResetModel()
 
-    def index(self, row, column, dummyParent=None):
+    def index(self, row, column, parent=None):
         """helper"""
+        if (row < 0
+                or column < 0
+                or row >= self.rowCount(parent)
+                or column >= self.columnCount(parent)):
+            return QModelIndex()
         return self.createIndex(row, column, 0)
 
     def data(self, index, role=None):
