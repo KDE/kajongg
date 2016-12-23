@@ -459,7 +459,7 @@ class UIWall(Wall):
             SideText.refreshAll()
             animate().addCallback(self.showWindMarkers)
 
-    def showWindMarkers(self, dummyDeferred):
+    def showWindMarkers(self, dummyDeferred=None):
         """animate all windMarkers together"""
         with AnimationSpeed(15):
             for player in self.game.players:
