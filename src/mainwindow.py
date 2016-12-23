@@ -263,7 +263,7 @@ class MainWindow(KXmlGuiWindow):
         self.actionPlayGame = self.kajonggAction(
             "play",
             "arrow-right",
-            self.playingScene,
+            self.playGame,
             Qt.Key_N)
         self.actionAbortGame = self.kajonggAction(
             "abort",
@@ -316,6 +316,12 @@ class MainWindow(KXmlGuiWindow):
         self.actionAutoPlay.toggled.connect(self._toggleDemoMode)
         self.actionAutoPlay.setChecked(Internal.autoPlay)
         QMetaObject.connectSlotsByName(self)
+
+    def playGame(self):
+        """manual wish for a new game"""
+        if not Internal.autoPlay:
+            # only if no demo game is running
+            self.playingScene()
 
     def playingScene(self):
         """play a computer game: log into a server and show its tables"""
