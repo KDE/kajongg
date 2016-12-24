@@ -88,7 +88,7 @@ class Score(object):
     def __repr__(self):
         return 'Score(%s)' % str(self)
 
-    def contentStr(self):
+    def i18nStr(self):
         """make score readable for humans, i18n"""
         parts = []
         if self.points:
@@ -943,7 +943,7 @@ class Rule(RuleBase):
                 meldType=meld.typeName() if meld else '',
                 meldName=meld.name() if meld else '',
                 tileName=meld[0].name() if meld else '').replace(
-                    '&', '').replace('  ', ' ').strip(), self.score.contentStr())
+                    '&', '').replace('  ', ' ').strip(), self.score.i18nStr())
 
     def hashStr(self):
         """
@@ -955,9 +955,9 @@ class Rule(RuleBase):
         """
         return '%s: %s %s' % (self.name, self.definition, self.score)
 
-    def contentStr(self):
+    def i18nStr(self):
         """returns a human readable string with the content"""
-        return self.score.contentStr()
+        return self.score.i18nStr()
 
     @staticmethod
     def exclusive():
@@ -1001,7 +1001,7 @@ class ParameterRule(RuleBase):
         result = '%s: %s %s' % (self.name, self.definition, self.parameter)
         return result
 
-    def contentStr(self):
+    def i18nStr(self):
         """returns a human readable string with the content"""
         return str(self.parameter)
 

@@ -169,9 +169,9 @@ class RulesetDiffer(QDialog):
         rightRuleset.load()
         for rule1, rule2 in leftRuleset.diff(rightRuleset):
             name = m18n(rule1.name if rule1 else rule2.name)
-            left = rule1.contentStr() if rule1 else m18nc(
+            left = rule1.i18nStr() if rule1 else m18nc(
                 'Kajongg-Rule', 'not defined')
-            right = rule2.contentStr() if rule2 else m18nc(
+            right = rule2.i18nStr() if rule2 else m18nc(
                 'Kajongg-Rule', 'not defined')
             formatted.append((name, left, right))
             if rule1 and rule2 and rule1.definition != rule2.definition:
