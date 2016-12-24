@@ -178,8 +178,6 @@ class Server(StrMixin):
             cmd.append('--socket={sock}'.format(sock=self.socketName))
         if OPTIONS.debug:
             cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
-        if OPTIONS.qt5:
-            cmd.append('--qt5')
         if OPTIONS.log:
             self.process = subprocess.Popen(
                 cmd, cwd=job.srcDir(),
@@ -287,8 +285,6 @@ class Job(StrMixin):
             cmd.append('--demo')
         else:
             cmd.append('--nogui')
-        if OPTIONS.qt5:
-            cmd.append('--qt5')
         if OPTIONS.playopen:
             cmd.append('--playopen')
         if OPTIONS.debug:
@@ -581,9 +577,6 @@ def parse_options():
     parser.add_option(
         '', '--gui', dest='gui', action='store_true',
         default=False, help='show graphical user interface')
-    parser.add_option(
-        '', '--qt5', dest='qt5', action='store_true',
-        default=False, help='Force using Qt5')
     parser.add_option(
         '', '--ruleset', dest='rulesets', default='ALL',
         help='play like a robot using RULESET: comma separated list. If missing, test all rulesets',

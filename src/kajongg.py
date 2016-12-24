@@ -90,9 +90,6 @@ def defineOptions():
         "nogui",
         ki18n("show no graphical user interface. Intended only for testing"))
     options.add(
-        "qt5",
-        ki18n("Force using Qt5. Currently Qt4 is used by default on Linux and Qt5 on Windows"))
-    options.add(
         "socket <SOCKET>",
         ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
     options.add(
