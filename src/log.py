@@ -30,7 +30,7 @@ from sys import _getframe
 from common import Internal, Debug, ENGLISHDICT  # pylint: disable=redefined-builtin
 from common import unicodeString, unicodeStringArgs, nativeString
 from qt import Qt, QEvent
-from util import elapsedSince, traceback, gitHead
+from util import elapsedSince, traceback, gitHead, callers
 from kde import i18n, i18nc
 from dialogs import Sorry, Information, NoPrompt
 
@@ -164,6 +164,8 @@ def __enrichMessage(msg, withGamePrefix=True):
         head = gitHead()
         if head not in ('current', None):
             result = 'git:{}/p3 {}'.format(head, result)
+    if int(Debug.callers):
+        result = '  ' + result
     return result
 
 
@@ -209,6 +211,8 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
         for line in traceback.format_stack()[lower:-3]:
             if 'logException' not in line:
                 __logUnicodeMessage(prio, '  ' + line.strip())
+    if int(Debug.callers):
+        __logUnicodeMessage(prio, callers(int(Debug.callers)))
     if showDialog and not Internal.isServer:
         if prio == logging.INFO:
             return Information(msg)

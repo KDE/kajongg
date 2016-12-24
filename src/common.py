@@ -98,6 +98,7 @@ class Debug(object):
     delayChow = False
     locate = False
     neutral = False  # only neutral comparable debug output
+    callers = '0'
     git = False
     ruleCache = False
     quit = False
