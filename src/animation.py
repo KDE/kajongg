@@ -317,7 +317,7 @@ class AnimatedMixin(object):
     def shortcutAnimation(self, animation):
         """directly set the end value of the animation"""
         if animation.debug:
-            logDebug('shortcutAnimation: UTile {}: clear queuedAnimations'.format(self.name()))
+            logDebug('shortcut {}: UTile {}: clear queuedAnimations'.format(animation, self.name()))
         setattr(self, animation.pName(), animation.endValue())
         self.queuedAnimations = []
         self.setDrawingOrder()
