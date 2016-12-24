@@ -183,7 +183,7 @@ class MainWindow(KXmlGuiWindow):
             self.actionScoreTable.setData(ScoreTable)
         self._scene = value
         self.centralView.setScene(value)
-        self.adjustView()
+        self.adjustMainView()
         self.updateGUI()
         self.actionChat.setEnabled(isinstance(value, PlayingScene))
         self.actionExplain.setEnabled(value is not None)
@@ -254,7 +254,7 @@ class MainWindow(KXmlGuiWindow):
         self.centralView.setFocusPolicy(Qt.StrongFocus)
         self.background = None  # just for pylint
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
-        self.adjustView()
+        self.adjustMainView()
         self.actionScoreGame = self.kajonggAction(
             "scoreGame",
             "draw-freehand",
@@ -578,14 +578,14 @@ class MainWindow(KXmlGuiWindow):
             self.rulesetWindow = RulesetSelector()
         self.rulesetWindow.show()
 
-    def adjustView(self):
+    def adjustMainView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if not Internal.scaleScene or not isAlive(self):
             return
         view, scene = self.centralView, self.scene
         if scene:
-            scene.adjustView()
+            scene.adjustSceneView()
             view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
     @afterQueuedAnimations
@@ -605,7 +605,7 @@ class MainWindow(KXmlGuiWindow):
             with AnimationSpeed():
                 if self.scene:
                     self.scene.applySettings()
-            self.adjustView()
+            self.adjustMainView()
 
     @afterQueuedAnimations
     def showSettings(self, dummyDeferredResult, dummyChecked=None):

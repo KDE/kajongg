@@ -234,7 +234,7 @@ class VisiblePlayingGame(PlayingGame):
         PlayingGame.__init__(
             self, names, ruleset, gameid, wantedGame=wantedGame,
             client=client, playOpen=playOpen, autoPlay=autoPlay)
-#        Internal.mainWindow.adjustView()
+#        Internal.mainWindow.adjustMainView()
 #        Internal.mainWindow.updateGUI()
         self.wall.decorate()
 

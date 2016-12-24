@@ -509,7 +509,7 @@ class ScoringGame(Game):
         scene.selectorBoard.load(self)
         self.prepareHand()
         self.initHand()
-        Internal.scene.mainWindow.adjustView()
+        Internal.scene.mainWindow.adjustMainView()
         Internal.scene.mainWindow.updateGUI()
         self.wall.decorate()
         self.throwDices()

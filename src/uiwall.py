@@ -403,7 +403,7 @@ class UIWall(Wall):
         """we are really calling _setRect() too often. But at least it works"""
         for player in self.game.players:
             player.handBoard.computeRect()
-        Internal.mainWindow.adjustView()
+        Internal.mainWindow.adjustMainView()
 
     def __setDrawingOrder(self, dummyResults=None):
         """set drawing order of the wall"""

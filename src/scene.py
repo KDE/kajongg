@@ -175,7 +175,7 @@ class GameScene(SceneWithFocusRect):
                     self.explainView.hide()
                 self.mainWindow.scene = None
         self.mainWindow.updateGUI()
-        self.mainWindow.adjustView()
+        self.mainWindow.adjustMainView()
 
     @afterQueuedAnimations
     def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue): # pylint: disable=unused-argument
@@ -206,7 +206,7 @@ class GameScene(SceneWithFocusRect):
         """abort current game"""
         # to be implemented by children
 
-    def adjustView(self):
+    def adjustSceneView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
@@ -254,7 +254,7 @@ class GameScene(SceneWithFocusRect):
         """change the lightSource"""
         self.game.wall.lightSource = self.newLightSource()
         self.focusRect.refresh()
-        self.mainWindow.adjustView()
+        self.mainWindow.adjustMainView()
 
     def __showBalance(self):
         """show the player balances in the status bar"""
@@ -350,7 +350,7 @@ class PlayingScene(GameScene):
         self.discardBoard = DiscardBoard()
         self.addItem(self.discardBoard)
 
-        self.adjustView()
+        self.adjustSceneView()
 
     def showWall(self):
         """shows the wall according to the game rules (length may vary)"""
@@ -385,13 +385,13 @@ class PlayingScene(GameScene):
                 self.clientDialog.keyPressEvent(event)
         GameScene.keyPressEvent(self, event)
 
-    def adjustView(self):
+    def adjustSceneView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
             with AnimationSpeed():
                 self.discardBoard.maximize()
-        GameScene.adjustView(self)
+        GameScene.adjustSceneView(self)
 
     @property
     def startingGame(self):
@@ -565,13 +565,13 @@ class ScoringScene(GameScene):
                     return
         GameScene.keyPressEvent(self, event)
 
-    def adjustView(self):
+    def adjustSceneView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
             with AnimationSpeed():
                 self.selectorBoard.maximize()
-        GameScene.adjustView(self)
+        GameScene.adjustSceneView(self)
 
     def prepareHand(self):
         """redecorate wall"""
