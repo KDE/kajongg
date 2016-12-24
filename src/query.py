@@ -514,37 +514,6 @@ class PrepareDB(object):
               'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback')
         Query('drop table gameback')
 
-    @staticmethod
-    def stopGamesWithRegex():
-        """we do not support Regex rules anymore.
-        Mark all games using them as finished - until somebody
-        complains. So for now always return False"""
-        if not Internal.db.hasTable('usedrule'):
-            return
-        usedRegexRulesets = Query("select distinct ruleset from usedrule "
-                                  "where definition not like 'F%' "
-                                  "and definition not like 'O%' "
-                                  "and definition not like 'int%' "
-                                  "and definition not like 'bool%' "
-                                  "and definition<>'' "
-                                  "and definition not like 'XEAST9X%'").records
-        usedRegexRulesets = list(str(x[0]) for x in usedRegexRulesets) # TODO: geht das auch ohne str?
-        if not usedRegexRulesets:
-            return
-        openRegexGames = Query("select id from game "
-                               "where endtime is null "
-                               "and ruleset in (%s)" % ','.join(usedRegexRulesets)).records
-        openRegexGames = list(x[0] for x in openRegexGames)
-        if not openRegexGames:
-            return
-        logInfo(
-            'Marking games using rules with regular expressions as finished: %s' %
-            openRegexGames)
-        for openGame in openRegexGames:
-            endtime = datetime.datetime.now().replace(
-                microsecond=0).isoformat()
-            Query('update game set endtime=? where id=?', (endtime, openGame))
-
     def removeUsedRuleset(self):
         """eliminate usedruleset and usedrule"""
         if Internal.db.hasTable('usedruleset'):
@@ -610,7 +579,6 @@ class PrepareDB(object):
         if not Internal.db.tableHasField('score', 'notrotated'):
             Query('ALTER TABLE score add notrotated integer default 0')
         self.removeUsedRuleset()
-        self.stopGamesWithRegex()
 
     @staticmethod
     def __generateDbIdent():
