@@ -82,7 +82,7 @@ class Move(StrMixin):
     @staticmethod
     def prettyKwargs(kwargs):
         """this is also used by the server, but the server does not use class Move"""
-        result = u''
+        result = ''
         for key in sorted(kwargs.keys()):
             value = kwargs[key]
             if key == 'token':
@@ -91,22 +91,22 @@ class Move(StrMixin):
                 oldValue = value
                 tuples = []
                 for oldTuple in oldValue:
-                    tuples.append(u''.join(unicodeString(x) for x in oldTuple))
-                value = u','.join(tuples)
+                    tuples.append(''.join(unicodeString(x) for x in oldTuple))
+                value = ','.join(tuples)
             if Debug.neutral and key == 'gameid':
-                result += u' gameid:GAMEID'
+                result += ' gameid:GAMEID'
             elif isinstance(value, bool) and value:
-                result += u' %s' % key
+                result += ' %s' % key
             elif isinstance(value, bool):
                 pass
             elif isinstance(value, bytes):
-                result += u' %s:%s' % (key, unicodeString(value))
+                result += ' %s:%s' % (key, unicodeString(value))
             else:
-                result += u' %s:%s' % (key, value)
-        for old, new in ((u"('", u"("), (u"')", u")"), (u" '", u""),
-                         (u"',", u","), (u"[(", u"("), (u"])", u")")):
+                result += ' %s:%s' % (key, value)
+        for old, new in (("('", "("), ("')", ")"), (" '", ""),
+                         ("',", ","), ("[(", "("), ("])", ")")):
             result = result.replace(old, new)
         return result
 
     def __unicode__(self):
-        return u'%s %s%s' % (self.player, self.message, Move.prettyKwargs(self.kwargs))
+        return '%s %s%s' % (self.player, self.message, Move.prettyKwargs(self.kwargs))

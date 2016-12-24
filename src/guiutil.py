@@ -152,7 +152,7 @@ class BlockSignals(object):
 def decorateWindow(window, name=None):
     """standard Kajongg window title and icon"""
     if name:
-        window.setWindowTitle(u'{} – {}'.format(name, m18n('Kajongg')))
+        window.setWindowTitle('{} – {}'.format(name, m18n('Kajongg')))
     else:
         window.setWindowTitle(m18n('Kajongg'))
     window.setWindowIcon(KIcon('kajongg'))

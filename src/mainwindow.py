@@ -102,12 +102,12 @@ def cleanExit(*dummyArgs):
     """close sqlite3 files before quitting"""
     if isAlive(Internal.mainWindow):
         if Debug.quit:
-            logDebug(u'cleanExit calling mainWindow.close')
+            logDebug('cleanExit calling mainWindow.close')
         Internal.mainWindow.close()
     else:
         # this must be very early or very late
         if Debug.quit:
-            logDebug(u'cleanExit calling sys.exit(0)')
+            logDebug('cleanExit calling sys.exit(0)')
         # sys.exit(0)
         MainWindow.aboutToQuit()
 
@@ -390,9 +390,9 @@ class MainWindow(KXmlGuiWindow):
             self.exitConfirmed = bool(result)
             if Debug.quit:
                 if self.exitConfirmed:
-                    logDebug(u'mainWindow.queryClose confirmed')
+                    logDebug('mainWindow.queryClose confirmed')
                 else:
-                    logDebug(u'mainWindow.queryClose not confirmed')
+                    logDebug('mainWindow.queryClose not confirmed')
             # start closing again. This time no question will appear, the game
             # is already aborted
             if self.exitConfirmed:
@@ -404,7 +404,7 @@ class MainWindow(KXmlGuiWindow):
         def cancelled(result):
             """just do nothing"""
             if Debug.quit:
-                logDebug(u'mainWindow.queryClose.cancelled: {}'.format(result))
+                logDebug('mainWindow.queryClose.cancelled: {}'.format(result))
             self.exitConfirmed = None
         if self.exitConfirmed is False:
             # user is currently being asked
@@ -417,7 +417,7 @@ class MainWindow(KXmlGuiWindow):
                 self.exitConfirmed = True
                 if Debug.quit:
                     logDebug(
-                        u'MainWindow.queryClose not asking, exitConfirmed=True')
+                        'MainWindow.queryClose not asking, exitConfirmed=True')
         return True
 
     def queryExit(self):
@@ -428,7 +428,7 @@ class MainWindow(KXmlGuiWindow):
                 logDebug(*args, **kwargs)
 
         if self.exitReady:
-            quitDebug(u'MainWindow.queryExit returns True because exitReady is set')
+            quitDebug('MainWindow.queryExit returns True because exitReady is set')
             return True
         if self.exitConfirmed:
             # now we can get serious
@@ -445,20 +445,20 @@ class MainWindow(KXmlGuiWindow):
                 self.exitWaitTime += 10
                 if self.exitWaitTime % 1000 == 0:
                     logDebug(
-                        u'waiting since %d seconds for reactor to stop' %
+                        'waiting since %d seconds for reactor to stop' %
                         (self.exitWaitTime // 1000))
                 try:
-                    quitDebug(u'now stopping reactor')
+                    quitDebug('now stopping reactor')
                     Internal.reactor.stop()
                     assert isAlive(self)
                     QTimer.singleShot(10, self.close)
                 except ReactorNotRunning:
                     self.exitReady = True
                     quitDebug(
-                        u'MainWindow.queryExit returns True: It got exception ReactorNotRunning')
+                        'MainWindow.queryExit returns True: It got exception ReactorNotRunning')
             else:
                 self.exitReady = True
-                quitDebug(u'MainWindow.queryExit returns True: Reactor is not running')
+                quitDebug('MainWindow.queryExit returns True: Reactor is not running')
         return bool(self.exitReady)
 
     @staticmethod
@@ -468,14 +468,14 @@ class MainWindow(KXmlGuiWindow):
         Internal.mainWindow = None
         if mainWindow:
             if Debug.quit:
-                logDebug(u'aboutToQuit starting')
+                logDebug('aboutToQuit starting')
             if mainWindow.exitWaitTime > 1000.0 or Debug.quit:
                 logDebug(
-                    u'reactor stopped after %d ms' %
+                    'reactor stopped after %d ms' %
                     (mainWindow.exitWaitTime))
         else:
             if Debug.quit:
-                logDebug(u'aboutToQuit: mainWindow is already None')
+                logDebug('aboutToQuit: mainWindow is already None')
         StateSaver.saveAll()
         Internal.app.quit()
         try:
@@ -488,18 +488,18 @@ class MainWindow(KXmlGuiWindow):
         checkMemory()
         logging.shutdown()
         if Debug.quit:
-            logDebug(u'aboutToQuit ending')
+            logDebug('aboutToQuit ending')
 
     def abortAction(self):
         """abort current game"""
         if Debug.quit:
-            logDebug(u'mainWindow.abortAction invoked')
+            logDebug('mainWindow.abortAction invoked')
         return self.scene.abort()
 
     def retranslateUi(self):
         """retranslate"""
         self.actionScoreGame.setText(
-            m18nc('@action:inmenu', "&Score Manual Game"))
+            m18nc('@action:inmen', "&Score Manual Game"))
         self.actionScoreGame.setIconText(
             m18nc('@action:intoolbar', 'Manual Game'))
         self.actionScoreGame.setHelpText(
@@ -511,13 +511,13 @@ class MainWindow(KXmlGuiWindow):
         self.actionPlayGame.setHelpText(
             m18nc('kajongg @info:tooltip', 'Start a new game.'))
 
-        self.actionAbortGame.setText(m18nc('@action:inmenu', "&Abort Game"))
+        self.actionAbortGame.setText(m18nc('@action:inmen', "&Abort Game"))
         self.actionAbortGame.setPriority(QAction.LowPriority)
         self.actionAbortGame.setHelpText(
             m18nc('kajongg @info:tooltip',
                   'Abort the current game.'))
 
-        self.actionQuit.setText(m18nc('@action:inmenu', "&Quit Kajongg"))
+        self.actionQuit.setText(m18nc('@action:inmen', "&Quit Kajongg"))
         self.actionQuit.setPriority(QAction.LowPriority)
 
         self.actionPlayers.setText(m18nc('@action:intoolbar', "&Players"))
@@ -531,7 +531,7 @@ class MainWindow(KXmlGuiWindow):
                   'customize rulesets.'))
 
         self.actionAngle.setText(
-            m18nc('@action:inmenu',
+            m18nc('@action:inmen',
                   "&Change Visual Angle"))
         self.actionAngle.setIconText(m18nc('@action:intoolbar', "Angle"))
         self.actionAngle.setHelpText(
@@ -539,18 +539,18 @@ class MainWindow(KXmlGuiWindow):
                   "Change the visual appearance of the tiles."))
 
         self.actionScoreTable.setText(
-            m18nc('kajongg @action:inmenu', "&Score Table"))
+            m18nc('kajongg @action:inmen', "&Score Table"))
         self.actionScoreTable.setIconText(
             m18nc('kajongg @action:intoolbar', "&Scores"))
         self.actionScoreTable.setHelpText(m18nc('kajongg @info:tooltip',
                                                 "Show or hide the score table for the current game."))
 
-        self.actionExplain.setText(m18nc('@action:inmenu', "&Explain Scores"))
+        self.actionExplain.setText(m18nc('@action:inmen', "&Explain Scores"))
         self.actionExplain.setIconText(m18nc('@action:intoolbar', "&Explain"))
         self.actionExplain.setHelpText(m18nc('kajongg @info:tooltip',
                                              'Explain the scoring for all players in the current game.'))
 
-        self.actionAutoPlay.setText(m18nc('@action:inmenu', "&Demo Mode"))
+        self.actionAutoPlay.setText(m18nc('@action:inmen', "&Demo Mode"))
         self.actionAutoPlay.setPriority(QAction.LowPriority)
         self.actionAutoPlay.setHelpText(m18nc('kajongg @info:tooltip',
                                               'Let the computer take over for you. Start a new local game if needed.'))

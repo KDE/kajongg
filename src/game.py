@@ -101,7 +101,7 @@ class HandId(object):
         self.roundsFinished = handWind.__index__()
         if self.roundsFinished > ruleset.minRounds:
             logWarning(
-                u'Ruleset %s has %d minimum rounds but you want round %d(%s)'
+                'Ruleset %s has %d minimum rounds but you want round %d(%s)'
                 % (ruleset.name, ruleset.minRounds, self.roundsFinished + 1,
                    handWind))
             self.roundsFinished = ruleset.minRounds
@@ -109,16 +109,16 @@ class HandId(object):
         self.rotated = int(handId[1]) - 1
         if self.rotated > 3:
             logWarning(
-                u'You want %d rotations, reducing to maximum of 3' %
+                'You want %d rotations, reducing to maximum of 3' %
                 self.rotated)
             self.rotated = 3
             return
         for char in handId[2:]:
             if char < 'a':
-                logWarning(u'you want %s, changed to a' % char)
+                logWarning('you want %s, changed to a' % char)
                 char = 'a'
             if char > 'z':
-                logWarning(u'you want %s, changed to z' % char)
+                logWarning('you want %s, changed to z' % char)
                 char = 'z'
             self.notRotated = self.notRotated * 26 + ord(char) - ord('a') + 1
 
@@ -534,7 +534,7 @@ class Game(object):
         """save computed values to database,
         update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        logMessage = u''
+        logMessage = ''
         for player in self.players:
             if player.hand:
                 manualrules = '||'.join(x.rule.name
@@ -552,7 +552,7 @@ class Game(object):
                  player.handTotal, player.payment, player.balance,
                  self.rotated, self.notRotated),
                 (player.hand.string, manualrules))
-            logMessage += u'{player:<12} {hand:>4} {total:>5} {won} | '.format(
+            logMessage += '{player:<12} {hand:>4} {total:>5} {won} | '.format(
                 player=str(player)[:12], hand=player.handTotal,
                 total=player.balance,
                 won='WON' if player == self.winner else '   ')
@@ -570,7 +570,7 @@ class Game(object):
         if result:
             if Debug.explain:
                 if not self.belongsToRobotPlayer():
-                    self.debug(u','.join(x.name for x in result), prevHandId=True)
+                    self.debug(','.join(x.name for x in result), prevHandId=True)
             self.rotateWinds()
         return bool(result)
 
@@ -614,18 +614,18 @@ class Game(object):
         @type prevHandId: C{bool}
         """
         if self.belongsToRobotPlayer():
-            prefix = u'R'
+            prefix = 'R'
         elif self.belongsToHumanPlayer():
-            prefix = u'C'
+            prefix = 'C'
         elif self.belongsToGameServer():
-            prefix = u'S'
+            prefix = 'S'
         else:
             logDebug(msg, btIndent=btIndent)
             return
         handId = self._prevHandId if prevHandId else self.handId
         handId = unicodeString(handId.prompt(withMoveCount=True))
         logDebug(
-            u'%s%s: %s' % (prefix, handId, unicodeString(msg)),
+            '%s%s: %s' % (prefix, handId, unicodeString(msg)),
             withGamePrefix=False,
             btIndent=btIndent)
 
@@ -669,7 +669,7 @@ class Game(object):
                 tuple([qGameRecord[wind], wind.char, 0, False, East.char])
                 for wind in Wind.all4])
         if len(qScoreRecords) != 4:
-            logError(u'game %d inconsistent: There should be exactly '
+            logError('game %d inconsistent: There should be exactly '
                      '4 score records for the last hand' % gameid)
 
         # after loading SQL, prepare values.
@@ -678,7 +678,7 @@ class Game(object):
         # did not, we get no record here. Should we try to fix this or
         # exclude such a game from the list of resumable games?
         if len(set(x[4] for x in qScoreRecords)) != 1:
-            logError(u'game %d inconsistent: All score records for the same '
+            logError('game %d inconsistent: All score records for the same '
                      'hand must have the same prevailing wind' % gameid)
 
         players = list(tuple([Wind(x[1]), Game.__getName(x[0])])
@@ -694,7 +694,7 @@ class Game(object):
             player = game.players.byId(playerid)
             if not player:
                 logError(
-                    u'game %d inconsistent: player %d missing in game table' %
+                    'game %d inconsistent: player %d missing in game table' %
                     (gameid, playerid))
             else:
                 player.getsPayment(record[2])
@@ -809,11 +809,11 @@ class PlayingGame(Game):
             myself.voice = Voice.locate(myself.name)
             if myself.voice:
                 if Debug.sound:
-                    logDebug(u'myself %s gets voice %s' % (
+                    logDebug('myself %s gets voice %s' % (
                         myself.name, myself.voice))
             else:
                 if Debug.sound:
-                    logDebug(u'myself %s gets no voice' % (myself.name))
+                    logDebug('myself %s gets no voice' % (myself.name))
 
     def writeCsv(self):
         """write game summary to Options.csv"""
@@ -998,13 +998,13 @@ class PlayingGame(Game):
                 # remote human player sent her voice, or we are human
                 # and have a voice
                 if Debug.sound and player != self.myself:
-                    logDebug(u'%s got voice from opponent: %s' % (
+                    logDebug('%s got voice from opponent: %s' % (
                         player.name, player.voice))
             else:
                 player.voice = Voice.locate(player.name)
                 if player.voice:
                     if Debug.sound:
-                        logDebug(u'%s has own local voice %s' % (
+                        logDebug('%s has own local voice %s' % (
                             player.name, player.voice))
             if player.voice:
                 for voice in Voice.availableVoices():
@@ -1023,7 +1023,7 @@ class PlayingGame(Game):
                 player.voice = predefined.pop(0)
                 if Debug.sound:
                     logDebug(
-                        u'%s gets one of the still available voices %s' % (
+                        '%s gets one of the still available voices %s' % (
                             player.name, player.voice))
 
     def dangerousFor(self, forPlayer, tile):

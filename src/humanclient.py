@@ -432,7 +432,7 @@ class HumanClient(Client):
                 voiceId = voice.md5sum
             if Debug.sound and voiceId:
                 logDebug(
-                    u'%s sends own voice %s to server' %
+                    '%s sends own voice %s to server' %
                     (self.name, voiceId))
         maxGameId = Query('select max(id) from game').records[0][0]
         maxGameId = int(maxGameId) if maxGameId else 0
@@ -450,7 +450,7 @@ class HumanClient(Client):
                 self.__showTables).addErrback(self.tableError)
             if Debug.table:
                 logDebug(
-                    u'%s: --table lets us open an new table %d' %
+                    '%s: --table lets us open an new table %d' %
                     (self.name, SingleshotOptions.table))
             SingleshotOptions.table = False
         elif SingleshotOptions.join:
@@ -459,7 +459,7 @@ class HumanClient(Client):
                 self.__showTables).addErrback(self.tableError)
             if Debug.table:
                 logDebug(
-                    u'%s: --join lets us join table %s' %
+                    '%s: --join lets us join table %s' %
                     (self.name, self._tableById(SingleshotOptions.join)))
             SingleshotOptions.join = False
         elif not self.game and (Internal.autoPlay or (not self.tables and self.hasLocalServer())):
@@ -587,7 +587,7 @@ class HumanClient(Client):
         """others chat to me"""
         chatLine = ChatMessage(data)
         if Debug.chat:
-            logDebug(u'got chatLine: %s' % chatLine)
+            logDebug('got chatLine: %s' % chatLine)
         table = self._tableById(chatLine.tableid)
         if not chatLine.isStatusMessage and not table.chatWindow:
             ChatWindow(table)
@@ -622,7 +622,7 @@ class HumanClient(Client):
         def cancelled(dummy):
             """the user does not want to start now. Back to table list"""
             if Debug.table:
-                logDebug(u'%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
+                logDebug('%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
                     self.name, self._tableById(tableid)))
             self.table = None
             self.beginQuestion = None
@@ -630,7 +630,7 @@ class HumanClient(Client):
                 self.__updateTableList()
                 self.tableList.show()
             return Message.NoGameStart
-        if sum(not x[1].startswith(u'Robot ') for x in playerNames) == 1:
+        if sum(not x[1].startswith('Robot ') for x in playerNames) == 1:
             # we play against 3 robots and we already told the server to start:
             # no need to ask again
             return clientReady()
@@ -784,7 +784,7 @@ class HumanClient(Client):
         Remove visual traces depending on that connection."""
         if Debug.connections and result:
             logDebug(
-                u'server %s disconnects: %s' %
+                'server %s disconnects: %s' %
                 (self.connection.url, result))
         self.connection = None
         game = self.game
@@ -804,7 +804,7 @@ class HumanClient(Client):
         """perspective calls us back"""
         if self.connection and (Debug.traffic or Debug.connections):
             logDebug(
-                u'perspective notifies disconnect: %s' %
+                'perspective notifies disconnect: %s' %
                 self.connection.url)
         self.remote_serverDisconnects()
 
@@ -901,7 +901,7 @@ class HumanClient(Client):
         if self.game:
             self.game.debug('callServer(%s)' % repr(debugArgs))
         else:
-            logDebug(u'callServer(%s)' % repr(debugArgs))
+            logDebug('callServer(%s)' % repr(debugArgs))
 
     def callServer(self, *args):
         """if we are online, call server"""

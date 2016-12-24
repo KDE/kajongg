@@ -130,12 +130,12 @@ class TablesModel(QAbstractTableModel):
             elif role == Qt.DisplayRole and index.column() == 3:
                 status = table.status()
                 if table.suspendedAt:
-                    dateVal = u' ' + unicodeString(datetime.datetime.strptime(
+                    dateVal = ' ' + unicodeString(datetime.datetime.strptime(
                         table.suspendedAt,
                         '%Y-%m-%dT%H:%M:%S').strftime('%c'))
-                    status = u'Suspended'
+                    status = 'Suspended'
                 else:
-                    dateVal = u''
+                    dateVal = ''
                 result = m18nc('table status', status) + dateVal
             elif index.column() == 4:
                 if role == Qt.DisplayRole:
@@ -347,7 +347,7 @@ class TableList(QWidget):
         self.chatButton.setEnabled(
             not running and hasTable
             and self.client.name in table.playerNames
-            and sum(x.startswith(u'Robot ') for x in table.playerNames) < 3)
+            and sum(x.startswith('Robot ') for x in table.playerNames) < 3)
         if self.chatButton.isEnabled():
             self.chatButton.setToolTip(m18n(
                 "Chat with others on this table"))
@@ -439,7 +439,7 @@ class TableList(QWidget):
         if Debug.table:
             for table in tables:
                 if table.gameid and not table.gameExistsLocally():
-                    logDebug(u'Table %s does not exist locally' % table)
+                    logDebug('Table %s does not exist locally' % table)
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
         tables.sort(key=lambda x: x.tableid)
         preselectTableId = self.__preselectTableId(tables)

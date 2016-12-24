@@ -130,7 +130,7 @@ class SetupPreferences(KConfigSkeleton):
         newValue = getattr(self, name)
         if self.__oldValues[name] != newValue:
             if Debug.preferences:
-                logDebug(u'{}: {} -> {} calling {}'.format(
+                logDebug('{}: {} -> {} calling {}'.format(
                     name,
                     self.__oldValues[name],
                     newValue,

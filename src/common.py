@@ -45,7 +45,7 @@ if os.name == 'nt':
 else:
     interpreterName = 'python3'
 
-LIGHTSOURCES = [u'NE', u'NW', u'SW', u'SE']
+LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 ENGLISHDICT = {}
 
 

@@ -56,10 +56,10 @@ class Animation(QPropertyAnimation, StrMixin):
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
                 logDebug(
-                    u'new Animation(%s) (after %s is done)' %
+                    'new Animation(%s) (after %s is done)' %
                     (self, oldAnimation.ident()))
             else:
-                logDebug(u'Animation(%s)' % self)
+                logDebug('Animation(%s)' % self)
 
     def setEndValue(self, endValue):
         """wrapper with debugging code"""
@@ -71,7 +71,7 @@ class Animation(QPropertyAnimation, StrMixin):
         if graphicsObject.name() in Debug.animation or Debug.animation == 'all':
             pName = self.pName().decode()
             logDebug(
-                u'%s: change endValue for %s: %s->%s  %s' % (
+                '%s: change endValue for %s: %s->%s  %s' % (
                     self.ident(), pName,
                     self.formatValue(self.endValue()),
                     self.formatValue(endValue), graphicsObject))
@@ -116,7 +116,7 @@ class Animation(QPropertyAnimation, StrMixin):
             currentValue = 'notAlive'
             endValue = 'notAlive'
             targetObject = 'notAlive'
-        return u'%s %s: %s->%s for %s' % (
+        return '%s %s: %s->%s for %s' % (
             self.ident(), self.pName(),
             self.formatValue(currentValue),
             self.formatValue(endValue),
@@ -149,7 +149,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         self.doAfter = list()
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
-                logDebug(u'Chaining Animation group G%s to G%s' %
+                logDebug('Chaining Animation group G%s to G%s' %
                          (id4(self), ParallelAnimationGroup.current))
             self.doAfter = ParallelAnimationGroup.current.doAfter
             ParallelAnimationGroup.current.doAfter = list()
@@ -218,7 +218,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
             self,
             QAbstractAnimation.DeleteWhenStopped)
         if self.debug:
-            logDebug(u'Animation group G%s started with speed %d (%s)' % (
+            logDebug('Animation group G%s started with speed %d (%s)' % (
                 self, Internal.Preferences.animationSpeed,
                 ','.join('A%s' % id4(x) for x in self.animations)))
         return succeed(None)
@@ -232,12 +232,12 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         if Debug.animationSpeed and self.duration():
             perSecond = self.steps * 1000.0 / self.duration()
             if perSecond < 50:
-                logDebug(u'%d steps for %d animations, %.1f/sec' %
+                logDebug('%d steps for %d animations, %.1f/sec' %
                          (self.steps, len(self.children()), perSecond))
         # if we have a deferred, callback now
         assert self.deferred
         if self.debug:
-            logDebug(u'Animation group G%s done' % self)
+            logDebug('Animation group G%s done' % self)
         if self.deferred:
             self.deferred.callback(None)
         for after in self.doAfter:
@@ -268,7 +268,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
 
     def __unicode__(self):
         """for debugging"""
-        return u'G{}({}:{})'.format(self.uid, len(self.animations), self.stateName())
+        return 'G{}({}:{})'.format(self.uid, len(self.animations), self.stateName())
 
 class AnimatedMixin(object):
     """for UITile and PlayerWind"""
@@ -422,7 +422,7 @@ def __afterCurrentAnimationDo(callback, *args, **kwargs):
         deferred.addCallback(callback, *args, **kwargs)
         current.doAfter.append(deferred)
         if current.debug:
-            logDebug(u'after current animation group G%s do %s %s' %
+            logDebug('after current animation group G%s do %s %s' %
                      (current, callback, ','.join(args) if args else ''))
     else:
         callback(None, *args, **kwargs)

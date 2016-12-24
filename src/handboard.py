@@ -55,7 +55,7 @@ class TileAttr(object):
             # dark and focusable are different in a ScoringHandBoard
             self.focusable = self.setFocusable(hand, meld, idx)
             if self.tile in Debug.focusable:
-                logDebug(u'TileAttr %s:%s' % (self.tile, self.focusable))
+                logDebug('TileAttr %s:%s' % (self.tile, self.focusable))
 
     def setDark(self):
         """should the tile appear darker?"""

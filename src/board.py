@@ -116,7 +116,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
 
     def __str__(self):
         """for debugging"""
-        return u'Windmarker %s x/y= %.1f/%1f' % (
+        return 'Windmarker %s x/y= %.1f/%1f' % (
             self.name(), self.x(), self.y())
 
 
@@ -210,7 +210,7 @@ class Board(QGraphicsRectItem, StrMixin):
     @property
     def name(self):  # pylint: disable=no-self-use
         """default board name, used for debugging messages"""
-        return u'board'
+        return 'board'
 
     def __unicode__(self):
         """for debugging"""
@@ -267,7 +267,7 @@ class Board(QGraphicsRectItem, StrMixin):
             self.__prevPos = uiTile.sortKey()
         self._focusTile = uiTile
         if self._focusTile and self._focusTile.tile in Debug.focusable:
-            logDebug(u'%s: new focus uiTile %s from %s' % (
+            logDebug('%s: new focus uiTile %s from %s' % (
                 self.name, self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
         if self.hasFocus:
             self.scene().focusBoard = self

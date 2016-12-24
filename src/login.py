@@ -91,7 +91,7 @@ class Url(str):
             reactor.runReturn(installSignalHandlers=False)
             Internal.reactor = reactor
             if Debug.quit:
-                logDebug(u'Installed qtreactor')
+                logDebug('Installed qtreactor')
         return obj
 
     def __repr__(self):
@@ -143,7 +143,7 @@ class Url(str):
                 if waiting == 0:
                     self.__startLocalServer()
                 elif waiting > 30:
-                    logDebug(u'Game %s: Server %s not available after 30 seconds, aborting' % (
+                    logDebug('Game %s: Server %s not available after 30 seconds, aborting' % (
                         SingleshotOptions.game, self))
                     raise CancelledError
                 return deferLater(Internal.reactor, 1, self.startServer, result, waiting + 1)
@@ -203,9 +203,9 @@ class Url(str):
                 args.append('--port=%d' % self.port)
             if self.isLocalGame:
                 args.append(
-                    u'--db={}'.format(
+                    '--db={}'.format(
                         os.path.normpath(
-                            appdataDir() + u'local3.db')))
+                            appdataDir() + 'local3.db')))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
             if os.name == 'nt':
@@ -642,7 +642,7 @@ class Connection(object):
                 self.url)
         else:
             tracebackString = unicodeString(failure.getTraceback())
-            msg = u'Login to server {} failed: {}/{} Callstack:{}'.format(
+            msg = 'Login to server {} failed: {}/{} Callstack:{}'.format(
                 self.url, failure.value.__class__.__name__, failure.getErrorMessage(
                 ),
                 tracebackString)
@@ -651,7 +651,7 @@ class Connection(object):
             if removeIfExists(socketName()):
                 logInfo(
                     m18n('removed stale socket <filename>%1</filename>', socketName()))
-            msg += u'\n\n\n' + m18n('Please try again')
+            msg += '\n\n\n' + m18n('Please try again')
         self.dlg = None
         if msg:
             logWarning(msg)

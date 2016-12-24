@@ -271,9 +271,9 @@ class ScoreModel(TreeModel):
             'select player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
             ' from score where game=? order by player,hand', (game.gameid,)).records
         humans = sorted(
-            (x for x in game.players if not x.name.startswith(u'Robot')))
+            (x for x in game.players if not x.name.startswith('Robot')))
         robots = sorted(
-            (x for x in game.players if x.name.startswith(u'Robot')))
+            (x for x in game.players if x.name.startswith('Robot')))
         data = list(tuple([player.localName, [HandResult(*x[1:]) for x in records
                                               if x[0] == player.nameid]]) for player in humans + robots)
         self.__findMinMaxChartPoints(data)

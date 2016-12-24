@@ -44,7 +44,7 @@ class Wind(object):
             if isinstance(windIdent, bytes):
                 windIdx = b'eswn'.index(windIdent.lower())
             else:
-                windIdx = u'eswn'.index(windIdent.lower())
+                windIdx = 'eswn'.index(windIdent.lower())
             return Wind.all[windIdx]
         assert len(args) == 0 and cls is not Wind, 'Wind() must have exactly one argument'
 

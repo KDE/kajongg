@@ -112,7 +112,7 @@ class Prompt(MustChooseKDialog):
         return button in (KDialog.Yes, KDialog.Ok)
 
     def __unicode__(self):
-        return u'Prompt({})'.format(self.msg)
+        return 'Prompt({})'.format(self.msg)
 
     def __str__(self):
         return 'Prompt({})'.format(self.msg.encode('utf-8'))

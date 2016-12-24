@@ -113,7 +113,7 @@ class ServerTable(Table):
         self.client = None
         server.tables[self.tableid] = self
         if Debug.table:
-            logDebug(u'new table %s' % self)
+            logDebug('new table %s' % self)
 
     def hasName(self, name):
         """returns True if one of the players in the game is named 'name'"""
@@ -146,14 +146,14 @@ class ServerTable(Table):
         number of humans before suspending"""
         result = 4
         if self.suspendedAt:
-            result -= sum(x.name.startswith(u'Robot ')
+            result -= sum(x.name.startswith('Robot ')
                           for x in self.game.players)
         return result
 
     def sendChatMessage(self, chatLine):
         """sends a chat messages to all clients"""
         if Debug.chat:
-            logDebug(u'server sends chat msg %s' % chatLine)
+            logDebug('server sends chat msg %s' % chatLine)
         if self.suspendedAt and self.game:
             chatters = []
             for player in self.game.players:
@@ -172,7 +172,7 @@ class ServerTable(Table):
             raise srvError(pb.Error, m18nE('All seats are already taken'))
         self.users.append(user)
         if Debug.table:
-            logDebug(u'%s seated on table %s' % (user.name, self))
+            logDebug('%s seated on table %s' % (user.name, self))
         self.sendChatMessage(ChatMessage(self.tableid, user.name,
                                          m18nE('takes a seat'), isStatusMessage=True))
 
@@ -188,31 +188,31 @@ class ServerTable(Table):
                 if self.users:
                     self.owner = self.users[0]
                     if Debug.table:
-                        logDebug(u'%s leaves table %d, %s is the new owner' % (
+                        logDebug('%s leaves table %d, %s is the new owner' % (
                             user.name, self.tableid, self.owner))
                 else:
                     if Debug.table:
-                        logDebug(u'%s leaves table %d, table is now empty' % (
+                        logDebug('%s leaves table %d, table is now empty' % (
                             user.name, self.tableid))
             else:
                 if Debug.table:
-                    logDebug(u'%s leaves table %d, %s stays owner' % (
+                    logDebug('%s leaves table %d, %s stays owner' % (
                         user.name, self.tableid, self.owner))
 
     def __unicode__(self):
         """for debugging output"""
         if self.users:
-            onlineNames = list(x.name + (u'(Owner)' if self.owner and x == self.owner.name else u'')
+            onlineNames = list(x.name + ('(Owner)' if self.owner and x == self.owner.name else '')
                                for x in self.users)
         else:
             onlineNames = list(['no users yet'])
-        offlineString = u''
+        offlineString = ''
         if self.game:
             offlineNames = list(x.name for x in self.game.players if x.name not in onlineNames
-                                and not x.name.startswith(u'Robot'))
+                                and not x.name.startswith('Robot'))
             if offlineNames:
-                offlineString = u' offline:' + u','.join(offlineNames)
-        return u'%d(%s%s)' % (self.tableid, u','.join(onlineNames), offlineString)
+                offlineString = ' offline:' + ','.join(offlineNames)
+        return '%d(%s%s)' % (self.tableid, ','.join(onlineNames), offlineString)
 
     def calcGameId(self):
         """based upon the max gameids we got from the clients, propose
@@ -231,11 +231,11 @@ class ServerTable(Table):
         robotNames = [
             m18ncE(
                 'kajongg, name of robot player, to be translated',
-                u'Robot 1'),
+                'Robot 1'),
             m18ncE(
                 'kajongg, name of robot player, to be translated',
-                u'Robot 2'),
-            m18ncE('kajongg, name of robot player, to be translated', u'Robot 3')]
+                'Robot 2'),
+            m18ncE('kajongg, name of robot player, to be translated', 'Robot 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
         names = list(tuple([Wind.all4[idx], name])
@@ -352,16 +352,16 @@ class ServerTable(Table):
                 if Debug.table:
                     if not userRequests:
                         logDebug(
-                            u'Server.startGame: found no request for user %s' %
+                            'Server.startGame: found no request for user %s' %
                             user.name)
                     else:
                         logDebug(
-                            u'Server.startGame: %s said NoGameStart' %
+                            'Server.startGame: %s said NoGameStart' %
                             user.name)
                 self.game = None
                 return
         if Debug.table:
-            logDebug(u'Game starts on table %s' % self)
+            logDebug('Game starts on table %s' % self)
         elementIter = iter(elements.all(self.game.ruleset))
         wallSize = len(self.game.wall.tiles)
         self.game.wall.tiles = []
@@ -384,7 +384,7 @@ class ServerTable(Table):
         if foreigners:
             if Debug.table:
                 logDebug(
-                    u'make running table %s invisible for %s' %
+                    'make running table %s invisible for %s' %
                     (self, ','.join(str(x) for x in foreigners)))
             for srvUser in foreigners:
                 self.server.callRemote(
@@ -408,7 +408,7 @@ class ServerTable(Table):
                 # send it to other human players:
                 others = [x for x in humanPlayers if x != player]
                 if Debug.sound:
-                    logDebug(u'telling other human players that %s has voiceId %s' % (
+                    logDebug('telling other human players that %s has voiceId %s' % (
                         player.name, remote.voiceId))
                 block.tell(
                     player,
@@ -432,7 +432,7 @@ class ServerTable(Table):
                 voiceFor.voice = Voice(voiceId)
                 if Debug.sound:
                     logDebug(
-                        u'client %s wants voice data %s for %s' %
+                        'client %s wants voice data %s for %s' %
                         (request.user.name, request.args[0], voiceFor))
                 voiceDataRequests.append((request.user, voiceFor))
                 if not voiceFor.voice.oggFiles():
@@ -455,7 +455,7 @@ class ServerTable(Table):
             if content:
                 if Debug.sound:
                     logDebug(
-                        u'server got voice data %s for %s from client' %
+                        'server got voice data %s for %s from client' %
                         (voiceFor.voice, voiceFor.name))
                 block.tell(
                     voiceFor,
@@ -464,7 +464,7 @@ class ServerTable(Table):
                     md5sum=voice.md5sum,
                     source=content)
             elif Debug.sound:
-                logDebug(u'server got empty voice data %s for %s from client' % (
+                logDebug('server got empty voice data %s for %s from client' % (
                     voice, voiceFor.name))
         block.callback(self.assignVoices)
 
@@ -519,7 +519,7 @@ class ServerTable(Table):
         tile = Tile(msg.args[0])
         if tile not in player.concealedTiles:
             self.abort(
-                u'player %s discarded %s but does not have it' %
+                'player %s discarded %s but does not have it' %
                 (player, tile))
             return
         dangerousText = self.game.dangerousFor(player, tile)
@@ -537,7 +537,7 @@ class ServerTable(Table):
         if violates:
             if Debug.originalCall:
                 tile = Tile(msg.args[0])
-                logDebug(u'%s just violated OC with %s' % (player, tile))
+                logDebug('%s just violated OC with %s' % (player, tile))
             player.mayWin = False
             block.tellAll(player, Message.ViolatesOriginalCall)
         block.callback(self._clientDiscarded3, msg, dangerousText, mustPlayDangerous)
@@ -560,7 +560,7 @@ class ServerTable(Table):
             if mustPlayDangerous and not player.lastSource.isDiscarded:
                 if Debug.dangerousGame:
                     tile = Tile(msg.args[0])
-                    logDebug(u'%s claims no choice. Discarded %s, keeping %s. %s' %
+                    logDebug('%s claims no choice. Discarded %s, keeping %s. %s' %
                              (player, tile, ''.join(player.concealedTiles), ' / '.join(dangerousText)))
                 player.claimedNoChoice = True
                 block.tellAll(
@@ -571,7 +571,7 @@ class ServerTable(Table):
                 player.playedDangerous = True
                 if Debug.dangerousGame:
                     tile = Tile(msg.args[0])
-                    logDebug(u'%s played dangerous. Discarded %s, keeping %s. %s' %
+                    logDebug('%s played dangerous. Discarded %s, keeping %s. %s' %
                              (player, tile, ''.join(player.concealedTiles), ' / '.join(dangerousText)))
                 block.tellAll(
                     player,
@@ -588,7 +588,7 @@ class ServerTable(Table):
         and then treat the implicit discard"""
         msg.player.originalCall = True
         if Debug.originalCall:
-            logDebug(u'server.clientMadeOriginalCall: %s' % msg.player)
+            logDebug('server.clientMadeOriginalCall: %s' % msg.player)
         block = DeferredBlock(self)
         block.tellAll(msg.player, Message.OriginalCall)
         block.callback(self._askForClaims, msg)
@@ -649,7 +649,7 @@ class ServerTable(Table):
         for block in DeferredBlock.blocks:
             if block.table == self:
                 logError(
-                    u'request left from previous hand: %s' %
+                    'request left from previous hand: %s' %
                     block.outstandingUnicode())
         token = self.game.handId.prompt(
             withAI=False)  # we need to send the old token until the
@@ -663,7 +663,7 @@ class ServerTable(Table):
                 self.game.seed)
             if Debug.process and os.name != 'nt':
                 logDebug(
-                    u'MEM:%s' %
+                    'MEM:%s' %
                     resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             return
         self.game.sortPlayers()
@@ -715,7 +715,7 @@ class ServerTable(Table):
                 and discardingPlayer.playedDangerous):
             player.usedDangerousFrom = discardingPlayer
             if Debug.dangerousGame:
-                logDebug(u'%s claims dangerous tile %s discarded by %s' %
+                logDebug('%s claims dangerous tile %s discarded by %s' %
                          (player, lastDiscard, discardingPlayer))
             block.tellAll(
                 player,
@@ -735,11 +735,11 @@ class ServerTable(Table):
             args = (player.name, str(kongMeld))
             logDebug(m18n(msg, *args))
             logDebug(
-                u'declareKong:concealedTiles:%s' %
+                'declareKong:concealedTiles:%s' %
                 ''.join(player.concealedTiles))
-            logDebug(u'declareKong:concealedMelds:%s' %
+            logDebug('declareKong:concealedMelds:%s' %
                      ' '.join(str(x) for x in player.concealedMelds))
-            logDebug(u'declareKong:exposedMelds:%s' %
+            logDebug('declareKong:exposedMelds:%s' %
                      ' '.join(str(x) for x in player.exposedMelds))
             self.abort(msg, *args)
             return
@@ -790,7 +790,7 @@ class ServerTable(Table):
                 and discardingPlayer.playedDangerous):
             player.usedDangerousFrom = discardingPlayer
             if Debug.dangerousGame:
-                logDebug(u'%s wins with dangerous tile %s from %s' %
+                logDebug('%s wins with dangerous tile %s from %s' %
                          (player, self.game.lastDiscard, discardingPlayer))
             block.tellAll(
                 player,
@@ -866,7 +866,7 @@ class ServerTable(Table):
         if not answers:
             return
         for answer in answers:
-            msg = u'<-  %s' % answer
+            msg = '<-  %s' % answer
             if Debug.traffic:
                 logDebug(msg)
             with Duration(msg):
@@ -878,7 +878,7 @@ class ServerTable(Table):
         if Debug.stack:
             stck = traceback.extract_stack()
             if len(stck) > 30:
-                logDebug(u'stack size:%d' % len(stck))
+                logDebug('stack size:%d' % len(stck))
                 logDebug(stck)
         answers = self.processAnswers(requests)
         if not answers:

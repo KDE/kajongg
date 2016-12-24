@@ -149,7 +149,7 @@ class Wall(StrMixin):
     @staticmethod
     def name():
         """name for debug messages"""
-        return u'4sided wall'
+        return '4sided wall'
 
     def __unicode__(self):
         """for debugging"""

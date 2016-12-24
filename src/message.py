@@ -135,7 +135,7 @@ class ClientMessage(Message):
 
     def toolTip(self, dummyButton, dummyTile):
         """returns text and warning flag for button and text for tile for button and text for tile"""
-        txt = u'toolTip is not defined for %s' % self.name
+        txt = 'toolTip is not defined for %s' % self.name
         logWarning(txt)
         return txt, True, ''
 
@@ -385,7 +385,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
             player.originalCallingHand = player.hand
             if Debug.originalCall:
                 logDebug(
-                    u'%s gets originalCallingHand:%s' %
+                    '%s gets originalCallingHand:%s' %
                     (player, player.originalCallingHand))
         player.originalCall = True
         client.game.addCsvTag('originalCall')
@@ -474,7 +474,7 @@ class MessageReadyForGameStart(ServerMessage):
             if result == Message.OK and client.tableList and client.tableList.isVisible():
                 if Debug.table:
                     logDebug(
-                        u'%s hiding table list because game started' %
+                        '%s hiding table list because game started' %
                         client.name)
                 client.tableList.hide()
             return result
@@ -613,7 +613,7 @@ class MessageViolatesOriginalCall(ServerMessage):
         move.player.popupMsg(self)
         move.player.mayWin = False
         if Debug.originalCall:
-            logDebug(u'%s: cleared mayWin' % move.player)
+            logDebug('%s: cleared mayWin' % move.player)
         return client.ask(move, [Message.OK])
 
 
@@ -638,7 +638,7 @@ class MessageVoiceData(ServerMessage):
         """server sent us voice sounds about somebody else"""
         move.player.voice = Voice(move.md5sum, move.source)
         if Debug.sound:
-            logDebug(u'%s gets voice data %s from server, language=%s' % (
+            logDebug('%s gets voice data %s from server, language=%s' % (
                 move.player, move.player.voice, move.player.voice.language()))
 
 
@@ -664,7 +664,7 @@ class MessageServerWantsVoiceData(ServerMessage):
     def clientAction(self, dummyClient, move):
         """send voice sounds as requested to server"""
         if Debug.sound:
-            logDebug(u'%s: send wanted voice data %s to server' % (
+            logDebug('%s: send wanted voice data %s to server' % (
                 move.player, move.player.voice))
         return Message.ServerGetsVoiceData, move.player.voice.archiveContent
 
@@ -679,10 +679,10 @@ class MessageServerGetsVoiceData(ClientMessage):
         voice.archiveContent = msg.args[0]
         if Debug.sound:
             if voice.oggFiles():
-                logDebug(u'%s: server got wanted voice data %s' % (
+                logDebug('%s: server got wanted voice data %s' % (
                     msg.player, voice))
             else:
-                logDebug(u'%s: server got empty voice data %s (arg0=%s)' % (
+                logDebug('%s: server got empty voice data %s (arg0=%s)' % (
                     msg.player, voice, repr(msg.args[0][:100])))
 
 
@@ -777,7 +777,7 @@ class MessageUsedDangerousFrom(ServerMessage):
         fromPlayer = client.game.playerByName(move.source)
         move.player.usedDangerousFrom = fromPlayer
         if Debug.dangerousGame:
-            logDebug(u'%s claimed a dangerous tile discarded by %s' %
+            logDebug('%s claimed a dangerous tile discarded by %s' %
                      (move.player, fromPlayer))
 
 
@@ -849,7 +849,7 @@ def __scanSelf():
                         try:
                             msg = glob()
                         except Exception:
-                            logDebug(u'cannot instantiate %s' % glob.__name__)
+                            logDebug('cannot instantiate %s' % glob.__name__)
                             raise
                         type.__setattr__(
                             Message, msg.name.replace(' ', ''), msg)
@@ -888,7 +888,7 @@ class ChatMessage(object):
         local = self.localtimestamp()
         # pylint: disable=no-member
         # pylint says something about NotImplemented, check with later versions
-        return u'statusMessage=%s %02d:%02d:%02d %s: %s' % (
+        return 'statusMessage=%s %02d:%02d:%02d %s: %s' % (
             str(self.isStatusMessage),
             local.hour,
             local.minute,

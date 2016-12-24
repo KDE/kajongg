@@ -103,19 +103,19 @@ class DBPasswordChecker(object):
         cred.username = cred.username.decode('utf-8')
         args = cred.username.split(SERVERMARK)
         if len(args) > 1:
-            if args[0] == u'adduser':
+            if args[0] == 'adduser':
                 cred.username = args[1]
                 password = args[2]
                 query = Query(
                     'insert or ignore into player(name,password) values(?,?)',
                     (cred.username,
                      password))
-            elif args[1] == u'deluser':
+            elif args[1] == 'deluser':
                 pass
         query = Query(
             'select id, password from player where name=?', (cred.username,))
         if not len(query.records):
-            template = u'Wrong username: %1'
+            template = 'Wrong username: %1'
             if Debug.connections:
                 logDebug(m18n(template, cred.username))
             return fail(credError.UnauthorizedLogin(srvMessage(template, cred.username)))
@@ -147,7 +147,7 @@ class MJServer(object):
         """a client sent us a chat message"""
         chatLine = ChatMessage(chatString)
         if Debug.chat:
-            logDebug(u'server got chat message %s' % chatLine)
+            logDebug('server got chat message %s' % chatLine)
         self.tables[chatLine.tableid].sendChatMessage(chatLine)
 
     def login(self, user):
@@ -173,7 +173,7 @@ class MJServer(object):
             try:
                 reactor.stop()
                 if Debug.connections:
-                    logDebug(u'local server terminates from %s. Reason: last client disconnected' % (
+                    logDebug('local server terminates from %s. Reason: last client disconnected' % (
                         Options.socket))
             except ReactorNotRunning:
                 pass
@@ -191,7 +191,7 @@ class MJServer(object):
         for user in self.srvUsers:
             if elapsedSince(user.lastPing) > 60:
                 logInfo(
-                    u'No messages from %s since 60 seconds, clearing connection now' %
+                    'No messages from %s since 60 seconds, clearing connection now' %
                     user.name)
                 user.mind = None
                 self.logout(user)
@@ -215,7 +215,7 @@ class MJServer(object):
             data = list(x.asSimpleList() for x in tables)
             if Debug.table:
                 logDebug(
-                    u'sending %d tables to %s: %s' %
+                    'sending %d tables to %s: %s' %
                     (len(tables), user.name, data))
             return self.callRemote(user, 'newTables', data)
         else:
@@ -298,7 +298,7 @@ class MJServer(object):
             source=table.asSimpleList())
         if len(table.users) == table.maxSeats():
             if Debug.table:
-                logDebug(u'Table %s: All seats taken, starting' % table)
+                logDebug('Table %s: All seats taken, starting' % table)
 
             def startTable(dummy):
                 """now all players know about our join"""
@@ -344,8 +344,8 @@ class MJServer(object):
         message = message or ''
         if Debug.connections or reason == 'abort':
             logDebug(
-                u'%s%s ' % (('%s:' % table.game.seed) if table.game else '',
-                            m18n(message, *args)), withGamePrefix=None)
+                '%s%s ' % (('%s:' % table.game.seed) if table.game else '',
+                           m18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
             del self.tables[table.tableid]
             if reason == 'silent':
@@ -359,7 +359,7 @@ class MJServer(object):
                 table.delUser(user)
             if Debug.table:
                 logDebug(
-                    u'removing table %d: %s %s' %
+                    'removing table %d: %s %s' %
                     (table.tableid, m18n(message, *args), reason))
         if table.game:
             table.game.close()
@@ -433,7 +433,7 @@ class MJRealm(object):
         avatar.server = self.server
         avatar.attached(mind)
         if Debug.connections:
-            logDebug(u'Connection from %s ' % avatar.source())
+            logDebug('Connection from %s ' % avatar.source())
         return pb.IPerspective, avatar, lambda a=avatar: a.detached(mind)
 
 
@@ -493,18 +493,18 @@ def kajonggServer():
             if os.name == 'nt':
                 if Debug.connections:
                     logDebug(
-                        u'local server listening on 127.0.0.1 port %d' %
+                        'local server listening on 127.0.0.1 port %d' %
                         options.port)
                 reactor.listenTCP(options.port, factory, interface='127.0.0.1')
             else:
                 if Debug.connections:
                     logDebug(
-                        u'local server listening on UNIX socket %s' %
+                        'local server listening on UNIX socket %s' %
                         Options.socket)
                 reactor.listenUNIX(Options.socket, factory)
         else:
             if Debug.connections:
-                logDebug(u'server listening on port %d' % options.port)
+                logDebug('server listening on port %d' % options.port)
             reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError as errObj:
         logWarning(errObj)

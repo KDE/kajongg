@@ -197,7 +197,7 @@ class Voice(object):
         self.__md5sum = None
         if not os.path.split(directory)[0]:
             if Debug.sound:
-                logDebug(u'place voice %s in %s' % (directory, cacheDir()))
+                logDebug('place voice %s in %s' % (directory, cacheDir()))
             directory = os.path.join(cacheDir(), directory)
         self.directory = directory
         self.__setArchiveContent(content)
@@ -249,7 +249,7 @@ class Voice(object):
             result = sorted(
                 result, key=lambda x: prefLanguages.get(x.language(), 9999))
             if Debug.sound:
-                logDebug(u'found voices:%s' % [str(x) for x in result])
+                logDebug('found voices:%s' % [str(x) for x in result])
             Voice.__availableVoices = result
         return Voice.__availableVoices
 
@@ -262,17 +262,17 @@ class Voice(object):
             if name == voice.md5sum:
                 if Debug.sound:
                     logDebug(
-                        u'locate found %s by md5sum in %s' %
+                        'locate found %s by md5sum in %s' %
                         (name, voice.directory))
                 return voice
             elif name == dirname and voice.language() == 'local':
                 if Debug.sound:
                     logDebug(
-                        u'locate found %s by name in %s' %
+                        'locate found %s by name in %s' %
                         (name, voice.directory))
                 return voice
         if Debug.sound:
-            logDebug(u'%s not found' % (name))
+            logDebug('%s not found' % (name))
 
     def buildSubvoice(self, oggName, side):
         """side is 'left' or 'right'."""
@@ -298,11 +298,11 @@ class Voice(object):
             if callResult:
                 if Debug.sound:
                     logDebug(
-                        u'failed to build subvoice %s: return code=%s' %
+                        'failed to build subvoice %s: return code=%s' %
                         (angleName, callResult))
                 return stdName
             if Debug.sound:
-                logDebug(u'built subvoice %s' % angleName)
+                logDebug('built subvoice %s' % angleName)
         return angleName
 
     def localTextName(self, text, angle):
@@ -321,7 +321,7 @@ class Voice(object):
         fileName = self.localTextName(text, angle)
         if not os.path.exists(fileName):
             if Debug.sound:
-                logDebug(u'Voice.speak: fileName %s not found' % fileName)
+                logDebug('Voice.speak: fileName %s not found' % fileName)
         Sound.speak(fileName)
 
     def oggFiles(self):
@@ -343,7 +343,7 @@ class Voice(object):
             removeIfExists(self.archiveName())
             removeIfExists(md5FileName)
             self.__md5sum = None
-            logDebug(u'no ogg files in %s' % self)
+            logDebug('no ogg files in %s' % self)
             return
         md5sum = md5()
         for oggFile in ogg:
@@ -356,10 +356,10 @@ class Voice(object):
         if self.__md5sum != existingMd5sum:
             if Debug.sound:
                 if not os.path.exists(md5Name):
-                    logDebug(u'creating new %s' % md5Name)
+                    logDebug('creating new %s' % md5Name)
                 else:
                     logDebug(
-                        u'md5sum %s changed, rewriting %s with %s' %
+                        'md5sum %s changed, rewriting %s with %s' %
                         (existingMd5sum, md5Name, self.__md5sum))
             try:
                 open(md5Name, 'wb').write('%s\n' % self.__md5sum)
@@ -419,7 +419,7 @@ class Voice(object):
         tarFile = tarfile.open(mode='r|bz2', fileobj=filelike)
         tarFile.extractall(path=self.directory)
         if Debug.sound:
-            logDebug(u'extracted archive into %s' % self.directory)
+            logDebug('extracted archive into %s' % self.directory)
         tarFile.close()
         filelike.close()
 

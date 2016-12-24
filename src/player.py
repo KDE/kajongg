@@ -58,7 +58,7 @@ class Players(list, StrMixin):
         return list.__getitem__(self, index)
 
     def __unicode__(self):
-        return u', '.join(list(u'%s: %s' % (x.name, x.wind) for x in self))
+        return ', '.join(list('%s: %s' % (x.name, x.wind) for x in self))
 
     def byId(self, playerid):
         """lookup the player by id"""
@@ -84,7 +84,7 @@ class Players(list, StrMixin):
         for nameid, name in Query("select id,name from player").records:
             Players.allIds[name] = nameid
             Players.allNames[nameid] = name
-            if not name.startswith(u'Robot'):
+            if not name.startswith('Robot'):
                 Players.humanNames[nameid] = name
 
     @staticmethod
@@ -328,7 +328,7 @@ class Player(StrMixin):
         self.__payment = 0
 
     def __unicode__(self):
-        return u'{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
+        return '{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
 
     def pickedTile(self, deadEnd, tileName=None):
         """got a tile from wall"""
@@ -726,7 +726,7 @@ class PlayingPlayer(Player):
         self.game.debug('%s localScore:%s' % (self, self.hand))
         self.game.debug('%s serverScore:%s' % (self, score))
         logWarning(
-            u'Game %s: client and server disagree about scoring, see logfile for details' %
+            'Game %s: client and server disagree about scoring, see logfile for details' %
             self.game.seed)
         return False
 

@@ -78,7 +78,7 @@ class DBCursor(sqlite3.Cursor):
                     break
                 except sqlite3.OperationalError as exc:
                     logDebug(
-                        u'{} failed after {} tries:{}'.format(self, _, ' '.join(exc.args)))
+                        '{} failed after {} tries:{}'.format(self, _, ' '.join(exc.args)))
                     time.sleep(1)
                 else:
                     break
@@ -88,7 +88,7 @@ class DBCursor(sqlite3.Cursor):
             self.failure = None
         except sqlite3.Error as exc:
             self.failure = exc
-            msg = u'ERROR in %s: %s for %s' % (
+            msg = 'ERROR in %s: %s for %s' % (
                 self.connection.path,
                 exc.message if hasattr(exc, 'message') else '',
                 self)
@@ -126,27 +126,27 @@ class DBHandle(sqlite3.Connection):
             sqlite3.Connection.__init__(self, self.path, timeout=10.0)
         except sqlite3.Error as exc:
             logException(
-                u'opening %s: %s' %
+                'opening %s: %s' %
                 (unicodeString(self.path), exc.message))
         if self.hasTable('general'):
             cursor = self.cursor()
             cursor.execute('select ident from general')
             self.identifier = cursor.fetchone()[0]
         if Debug.sql:
-            logDebug(u'Opened %s with identifier %s' % (
+            logDebug('Opened %s with identifier %s' % (
                 unicodeString(self.path), self.identifier))
 
     def __enter__(self):
         self.inTransaction = datetime.datetime.now()
         if Debug.sql:
-            logDebug(u'starting transaction')
+            logDebug('starting transaction')
         return sqlite3.Connection.__enter__(self)
 
     def __exit__(self, *args):
         self.inTransaction = None
         sqlite3.Connection.__exit__(self, *args)
         if Debug.sql:
-            logDebug(u'finished transaction')
+            logDebug('finished transaction')
 
     @staticmethod
     def dbPath():
@@ -167,7 +167,7 @@ class DBHandle(sqlite3.Connection):
         name = stack[-3]
         if name in ('__exit__', '__init__'):
             name = stack[-4]
-        return u'%s on %s (%x)' % (name, unicodeString(self.path), id(self))
+        return '%s on %s (%x)' % (name, unicodeString(self.path), id(self))
 
     def commit(self, silent=None):
         """commit and log it"""
@@ -176,7 +176,7 @@ class DBHandle(sqlite3.Connection):
         except sqlite3.Error as exc:
             if not silent:
                 logWarning(
-                    u'%s cannot commit: %s :' %
+                    '%s cannot commit: %s :' %
                     (self.name, exc.message))
 
     def rollback(self, silent=None):
@@ -184,18 +184,18 @@ class DBHandle(sqlite3.Connection):
         try:
             sqlite3.Connection.rollback(self)
             if not silent and Debug.sql:
-                logDebug(u'%x rollbacked transaction' % id(self))
+                logDebug('%x rollbacked transaction' % id(self))
         except sqlite3.Error as exc:
-            logWarning(u'%s cannot rollback: %s' % (self.name, exc.message))
+            logWarning('%s cannot rollback: %s' % (self.name, exc.message))
 
     def close(self, silent=False):
         """just for logging"""
         if not silent and (Debug.sql or Debug.quit):
             if self is Internal.db:
-                logDebug(u'Closing Internal.db: %s' % unicodeString(self.path))
+                logDebug('Closing Internal.db: %s' % unicodeString(self.path))
             else:
                 logDebug(
-                    u'Closing DBHandle %s: %s' %
+                    'Closing DBHandle %s: %s' %
                     (self, unicodeString(self.path)))
         if self is Internal.db:
             Internal.db = None
@@ -263,7 +263,7 @@ class Query(object):
             self.failure = None
             self.records = list()
         if self.records and Debug.sql:
-            logDebug(u'result set:{}'.format(self.records))
+            logDebug('result set:{}'.format(self.records))
 
     def __str__(self):
         return '{} {}'.format(self.statement,
@@ -415,7 +415,7 @@ class PrepareDB(object):
                              Internal.db.path, currentVersion, version), showDialog=True)
         except sqlite3.Error as exc:
             logException(
-                u'opening %s: %s' %
+                'opening %s: %s' %
                 (unicodeString(self.path), exc.message))
         finally:
             Internal.db.close(silent=True)
@@ -590,5 +590,5 @@ class PrepareDB(object):
             Query("INSERT INTO general(ident) values(?)", (dbIdent,))
             if Debug.sql:
                 logDebug(
-                    u'generated new dbIdent %s for %s' %
+                    'generated new dbIdent %s for %s' %
                     (dbIdent, Internal.db.path))

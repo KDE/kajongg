@@ -395,7 +395,7 @@ class StandardMahJongg(MJRule):
                    and values.count(values[2]) == 1):
                 changed = False
                 if values[0] + 2 == values[2] and (len(values) == 3 or values[3] > values[0] + 3):
-                    # logDebug(u'removing first 3 from %s' % values)
+                    # logDebug('removing first 3 from %s' % values)
                     meld = Tile(group, values[0]).chow
                     # pylint: disable=not-an-iterable
                     # must be a pylint bug. meld is TileList is list
@@ -405,7 +405,7 @@ class StandardMahJongg(MJRule):
                     values = values[3:]
                     changed = True
                 elif values[0] + 1 == values[1] and values[2] > values[0] + 2:
-                    # logDebug(u'found incomplete chow at start of %s' %
+                    # logDebug('found incomplete chow at start of %s' %
                     # values)
                     return cls.fillChow(group, values[:2])
             changed = True
@@ -424,7 +424,7 @@ class StandardMahJongg(MJRule):
                     values = values[:-3]
                     changed = True
                 elif values[-1] - 1 == values[-2] and values[-3] < values[-1] - 2:
-                    # logDebug(u'found incomplete chow at end of %s' % values)
+                    # logDebug('found incomplete chow at end of %s' % values)
                     return cls.fillChow(group, values[-2:])
 
             if len(values) % 3 == 0:
@@ -435,15 +435,15 @@ class StandardMahJongg(MJRule):
             valueSet = set(values)
             if len(values) == 4 and len(values) == len(valueSet):
                 if values[0] + 3 == values[-1]:
-                    # logDebug(u'seq4 in %s' % hand.tilesInHand)
+                    # logDebug('seq4 in %s' % hand.tilesInHand)
                     return {Tile(group, values[0]), Tile(group, values[-1])}
             if len(values) == 7 and len(values) == len(valueSet):
                 if values[0] + 6 == values[6]:
-                    # logDebug(u'seq7 in %s' % hand.tilesInHand)
+                    # logDebug('seq7 in %s' % hand.tilesInHand)
                     return {Tile(group, values[x]) for x in (0, 3, 6)}
             if len(values) == 1:
                 # only a pair of this value is possible
-                # logDebug(u'need pair')
+                # logDebug('need pair')
                 return {Tile(group, values[0]).concealed}
             if len(valueSet) == 1:
                 # no chow reachable, only pair/pung
@@ -460,7 +460,7 @@ class StandardMahJongg(MJRule):
                 if maxChows == 0:
                     # not a calling hand
                     return set()
-                # logDebug(u'return fillChow for %s' % values)
+                # logDebug('return fillChow for %s' % values)
                 return cls.fillChow(group, values)
             if (len(values) == 4 and len(valueSet) == 2
                     and values[0] == values[1] and values[2] == values[3]):

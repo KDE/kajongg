@@ -285,7 +285,7 @@ class CaptionMixin(object):
         """append app name"""
         if caption:
             if not caption.endswith(i18n('Kajongg')):
-                caption += u' – {}'.format(i18n('Kajongg'))
+                caption += ' – {}'.format(i18n('Kajongg'))
         else:
             caption = i18n('Kajongg')
         self.setWindowTitle(caption)
@@ -516,14 +516,14 @@ class KStandardAction(object):
         mainWindow.actionStatusBar.setEnabled(True)
         mainWindow.actionStatusBar.toggled.connect(mainWindow.toggleStatusBar)
         mainWindow.actionStatusBar.setText(
-            i18nc('@action:inmenu', "Show St&atusbar"))
+            i18nc('@action:inmen', "Show St&atusbar"))
         mainWindow.actionToolBar = mainWindow.kajonggAction(
             'options_show_toolbar', None)
         mainWindow.actionToolBar.setCheckable(True)
         mainWindow.actionToolBar.setEnabled(True)
         mainWindow.actionToolBar.toggled.connect(mainWindow.toggleToolBar)
         mainWindow.actionToolBar.setText(
-            i18nc('@action:inmenu', "Show &Toolbar"))
+            i18nc('@action:inmen', "Show &Toolbar"))
 
         actionCollection.addAction('', separator)
 
@@ -633,11 +633,11 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.setCaption('')
         self.actionHelp = self.kajonggAction(
             "help", "help-contents", startHelp)
-        self.actionHelp.setText(i18nc('@action:inmenu', '&Help'))
+        self.actionHelp.setText(i18nc('@action:inmen', '&Help'))
         self.actionAboutKajongg = self.kajonggAction(
             'aboutkajongg', 'kajongg', self.aboutKajongg)
         self.actionAboutKajongg.setText(
-            i18nc('@action:inmenu', 'About &Kajongg'))
+            i18nc('@action:inmen', 'About &Kajongg'))
         self.toolBar().setMovable(False)
         self.toolBar().setFloatable(False)
         self.toolBar().setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
@@ -1406,7 +1406,7 @@ class AboutKajonggDialog(KDialog):
         authorLayout.addWidget(titleLabel)
 
         for name, description, mail in data.authors():
-            label = QLabel(u'{name} <a href="mailto:{mail}">{mail}</a>: {description}'.format(
+            label = QLabel('{name} <a href="mailto:{mail}">{mail}</a>: {description}'.format(
                 name=name, mail=mail, description=description))
             label.setOpenExternalLinks(True)
             authorLayout.addWidget(label)

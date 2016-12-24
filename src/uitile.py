@@ -344,7 +344,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         """redirect and generate Debug output"""
         if self.tile in Debug.focusable:
             newStr = 'focusable' if value else 'unfocusable'
-            logDebug(u'%s: %s from %s' % (newStr, self.tile, stack('')[-2]))
+            logDebug('%s: %s from %s' % (newStr, self.tile, stack('')[-2]))
         self.setFlag(QGraphicsItem.ItemIsFocusable, value)
 
     @property
@@ -380,17 +380,17 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
 
     def __unicode__(self):
         """printable string with tile"""
-        rotation = u' rot%d' % self.rotation if self.rotation else u''
-        scale = u' scale=%.2f' % self.scale if self.scale != 1 else u''
-        level = u' level=%d' % self.level if self.level else u''
+        rotation = ' rot%d' % self.rotation if self.rotation else ''
+        scale = ' scale=%.2f' % self.scale if self.scale != 1 else ''
+        level = ' level=%d' % self.level if self.level else ''
         if self.boundingRect():
             size = self.boundingRect()
-            size = u' %.2dx%.2d' % (size.width(), size.height())
+            size = ' %.2dx%.2d' % (size.width(), size.height())
         else:
-            size = u''
-        return u'%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
+            size = ''
+        return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
             (self.tile,
-             self.board.name if self.board else u'None', id(self) % 10000,
+             self.board.name if self.board else 'None', id(self) % 10000,
              self.xoffset, self.x(), self.yoffset,
              self.y(), self.zValue(), size, rotation, scale, level)
 

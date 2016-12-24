@@ -128,7 +128,7 @@ def dbgIndent(this, parent):
         return ''
     else:
         pIndent = parent.indent if parent else 0
-        return (u' │ ' * (pIndent)) + u' ├' + u'─' * (this.indent - pIndent - 1)
+        return (' │ ' * (pIndent)) + ' ├' + '─' * (this.indent - pIndent - 1)
 
 
 def __logUnicodeMessage(prio, msg):
@@ -154,16 +154,16 @@ def __enrichMessage(msg, withGamePrefix=True):
     """
     result = msg  # set the default
     if withGamePrefix and Internal.logPrefix:
-        result = u'{prefix}{process}: {msg}'.format(
+        result = '{prefix}{process}: {msg}'.format(
             prefix=Internal.logPrefix,
             process=os.getpid() if Debug.process else '',
             msg=msg)
     if Debug.time:
-        result = u'{:08.4f} {}'.format(elapsedSince(Debug.time), result)
+        result = '{:08.4f} {}'.format(elapsedSince(Debug.time), result)
     if Debug.git:
         head = gitHead()
         if head not in ('current', None):
-            result = u'git:{}/p3 {}'.format(head, result)
+            result = 'git:{}/p3 {}'.format(head, result)
     return result
 
 
@@ -183,14 +183,14 @@ def __exceptionToString(exception):
             # but I do not know what it does differently with gettext and if
             # I can do the same with the python gettext module
             parts.append(
-                u'[Errno {}] {}'.format(arg.errno, m18n(arg.strerror)))
+                '[Errno {}] {}'.format(arg.errno, m18n(arg.strerror)))
         elif arg is None:
             pass
         else:
             parts.append(str(arg))
     if hasattr(exception, 'filename'):
         parts.append(exception.filename)
-    return u' '.join(parts)
+    return ' '.join(parts)
 
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
@@ -343,17 +343,17 @@ class EventData(str):
                     value += ':%s' % eventText
             if value:
                 value = '(%s)' % value
-            msg = u'%s%s->%s' % (name, value, receiver)
+            msg = '%s%s->%s' % (name, value, receiver)
             if hasattr(receiver, 'text'):
                 if receiver.__class__.__name__ != 'QAbstractSpinBox':
                     # accessing QAbstractSpinBox.text() gives a segfault
-                    msg += u'(%s)' % receiver.text()
+                    msg += '(%s)' % receiver.text()
             elif hasattr(receiver, 'objectName'):
-                msg += u'(%s)' % receiver.objectName()
+                msg += '(%s)' % receiver.objectName()
         else:
             msg = 'unknown event:%s' % event.type()
         if prefix:
-            msg = u': '.join([prefix, msg])
+            msg = ': '.join([prefix, msg])
         if 'all' in Debug.events or any(x in msg for x in Debug.events.split(':')):
             logDebug(msg)
         return msg

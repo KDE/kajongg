@@ -73,7 +73,7 @@ class User(pb.Avatar, StrMixin):
         """override pb.Avatar.detached"""
         if Debug.connections:
             logDebug(
-                u'%s: connection detached from %s' %
+                '%s: connection detached from %s' %
                 (self, self.source()))
         self.server.logout(self)
         self.mind = None
@@ -107,7 +107,7 @@ class User(pb.Avatar, StrMixin):
                                          clientVersion or '<4.9.0',
                                          '.'.join(serverVersion.split('.')[:2]) + '.*'))
         if Debug.table:
-            logDebug(u'client has dbIdent={} voiceId={} maxGameId={} clientVersion {}'.format(
+            logDebug('client has dbIdent={} voiceId={} maxGameId={} clientVersion {}'.format(
                 self.dbIdent, self.voiceId, self.maxGameId, clientVersion))
         self.server.sendTables(self)
 

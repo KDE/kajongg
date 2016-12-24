@@ -100,7 +100,7 @@ class Score(object):
             if limits.endswith('.0'):
                 limits = limits[-2:]
             parts.append(m18nc('Kajongg', '%1 limits', limits))
-        return u' '.join(parts)
+        return ' '.join(parts)
 
     def __eq__(self, other):
         """ == comparison """
@@ -223,7 +223,7 @@ class RuleList(list):
         """shortcut for simpler definition of predefined rulesets"""
         name = unicodeString(name)
         definition = unicodeString(definition)
-        defParts = definition.split(u'||')
+        defParts = definition.split('||')
         rule = None
         description = kwargs.get('description', '')
         for cls in [IntRule, BoolRule, StrRule]:
@@ -245,9 +245,9 @@ class RuleList(list):
                 ruleClassName = parts1[1] + 'Rule'
                 if ruleClassName not in RuleBase.ruleClasses:
                     logDebug(
-                        u'we want %s, definition:%s' %
+                        'we want %s, definition:%s' %
                         (ruleClassName, definition))
-                    logDebug(u'we have %s' % RuleBase.ruleClasses.keys())
+                    logDebug('we have %s' % RuleBase.ruleClasses.keys())
                 ruleType.limitHand = RuleBase.ruleClasses[ruleClassName]
         self.add(rule)
 
@@ -781,7 +781,7 @@ class RuleBase(StrMixin):
         @return: The unique hash string
         @rtype: str
         """
-        return u''
+        return ''
 
     def __unicode__(self):
         return self.hashStr()
@@ -953,7 +953,7 @@ class Rule(RuleBase):
         @return: The unique hash string
         @rtype: str
         """
-        return u'%s: %s %s' % (self.name, self.definition, self.score)
+        return '%s: %s %s' % (self.name, self.definition, self.score)
 
     def contentStr(self):
         """returns a human readable string with the content"""
@@ -998,7 +998,7 @@ class ParameterRule(RuleBase):
         @return: The unique hash string
         @rtype: str
         """
-        result = u'%s: %s %s' % (self.name, self.definition, self.parameter)
+        result = '%s: %s %s' % (self.name, self.definition, self.parameter)
         return result
 
     def contentStr(self):

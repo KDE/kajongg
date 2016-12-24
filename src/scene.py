@@ -69,7 +69,7 @@ class FocusRect(QGraphicsRectItem, StrMixin):
         """assign and show/hide as needed"""
         if value and not isAlive(value):
             logDebug(
-                u'assigning focusRect to a non-alive board %s/%s' %
+                'assigning focusRect to a non-alive board %s/%s' %
                 (type(value), value))
             return
         if value:
@@ -99,7 +99,7 @@ class FocusRect(QGraphicsRectItem, StrMixin):
 
     def __unicode__(self):
         """for debugging"""
-        return u'FocusRect {} on {}'.format(id4(self), self.board if self.board else u'NOBOARD')
+        return 'FocusRect {} on {}'.format(id4(self), self.board if self.board else 'NOBOARD')
 
 class SceneWithFocusRect(QGraphicsScene):
 
@@ -432,8 +432,8 @@ class PlayingScene(GameScene):
         if not game:
             connections = list(
                 x.connection for x in HumanClient.humanClients if x.connection)
-            title = u', '.join(u'{name}/{url}'.format(name=x.username, url=x.url)
-                               for x in connections)
+            title = ', '.join('{name}/{url}'.format(name=x.username, url=x.url)
+                              for x in connections)
             if title:
                 decorateWindow(mainWindow, title)
         else:
@@ -503,7 +503,7 @@ class ScoringScene(GameScene):
                 self.game = None
             return result
         if Debug.quit:
-            logDebug(u'ScoringScene.abort invoked')
+            logDebug('ScoringScene.abort invoked')
         if not self.game:
             return succeed(True)
         elif self.game.finished():

@@ -218,10 +218,10 @@ class Server(StrMixin):
             server.stop()
 
     def __unicode__(self):
-        return u'Server {} Python{}{} {}'.format(
+        return 'Server {} Python{}{} {}'.format(
             self.commitId,
             self.pythonVersion,
-            ' pid={}'.format(self.process.pid) if Debug.process else u'',
+            ' pid={}'.format(self.process.pid) if Debug.process else '',
             'port={}'.format(self.portNumber) if self.portNumber else 'socket={}'.format(self.socketName))
 
 
@@ -268,7 +268,7 @@ class Job(StrMixin):
                '--game={game}'.format(game=self.game),
                '--player={tester} {player}'.format(
                    player=player,
-                   tester=nativeString(u'Tüster')),
+                   tester=nativeString('Tüster')),
                '--ruleset={ap}'.format(ap=self.ruleset)]
         if self.server.socketName:
             cmd.append('--socket={sock}'.format(sock=self.server.socketName))
@@ -325,13 +325,13 @@ class Job(StrMixin):
                 return self.ruleset[prefix - 1:]
 
     def __unicode__(self):
-        pid = u'pid={}'.format(
-            self.process.pid) if self.process and Debug.process else u''
-        game = u'game={}'.format(self.game)
+        pid = 'pid={}'.format(
+            self.process.pid) if self.process and Debug.process else ''
+        game = 'game={}'.format(self.game)
         ruleset = self.shortRulesetName()
-        aiName = u'AI={}'.format(
-            self.aiVariant) if self.aiVariant != u'Default' else u''
-        return u' '.join([
+        aiName = 'AI={}'.format(
+            self.aiVariant) if self.aiVariant != 'Default' else ''
+        return ' '.join([
             self.commitId, 'Python{}'.format(self.pythonVersion), pid, game, ruleset, aiName]).replace('  ', ' ')
 
 
@@ -340,7 +340,7 @@ def neutralize(rows):
     for row in rows:
         for idx, field in enumerate(row):
             field = field.replace(' ', '')
-            if field.startswith(u'Tester ') or field.startswith(u'Tüster'):
+            if field.startswith('Tester ') or field.startswith('Tüster'):
                 field = 'Tester'
             if 'MEM' in field:
                 parts = field.split(',')

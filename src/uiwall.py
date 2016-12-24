@@ -47,7 +47,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
         super(SideText, self).__init__()
         self.hide()
         Internal.scene.addItem(self)
-        self.__text = u''
+        self.__text = ''
         self.__board = None
         self.needsRefresh = False
         self.__color = Qt.black
@@ -177,7 +177,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
 
     def __unicode__(self):
         """for debugging"""
-        return u'sideText %s %s x/y= %.1f/%1f' % (
+        return 'sideText %s %s x/y= %.1f/%1f' % (
             self.name(), self.text, self.x(), self.y())
 
 
@@ -193,7 +193,7 @@ class UIWallSide(Board, StrMixin):
     @property
     def name(self):
         """name for debug messages"""
-        return u'UIWallSide {}'.format(UIWall.sideNames[self.rotation()])
+        return 'UIWallSide {}'.format(UIWall.sideNames[self.rotation()])
 
     def center(self):
         """returns the center point of the wall in relation to the
