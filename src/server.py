@@ -92,7 +92,7 @@ from servertable import ServerTable, ServerGame
 
 
 @implementer(checkers.ICredentialsChecker)
-class DBPasswordChecker(object):
+class DBPasswordChecker:
 
     """checks against our sqlite3 databases"""
     credentialInterfaces = (credentials.IUsernamePassword,
@@ -132,7 +132,7 @@ class DBPasswordChecker(object):
         return userid
 
 
-class MJServer(object):
+class MJServer:
 
     """the real mah jongg server"""
 
@@ -418,7 +418,7 @@ class MJServer(object):
 
 
 @implementer(portal.IRealm)
-class MJRealm(object):
+class MJRealm:
 
     """connects mind and server"""
 

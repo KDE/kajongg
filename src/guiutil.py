@@ -110,7 +110,7 @@ class ListComboBox(QComboBox):
         self.setCurrentIndex(newIdx)
 
 
-class Painter(object):
+class Painter:
 
     """a helper class for painting: saves/restores painter"""
 
@@ -127,7 +127,7 @@ class Painter(object):
         self.painter.restore()
 
 
-class BlockSignals(object):
+class BlockSignals:
 
     """a helper class for temporary blocking of Qt signals"""
 

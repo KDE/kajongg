@@ -35,7 +35,7 @@ from dialogs import Sorry
 # will be called anyway
 
 
-class Message(object):
+class Message:
 
     """those are the message types between client and server. They have no state
     i.e. they never hold real attributes. They only describe the message and actions upon it"""

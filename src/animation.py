@@ -271,7 +271,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         """for debugging"""
         return 'G{}({}:{})'.format(self.uid, len(self.animations), self.stateName())
 
-class AnimatedMixin(object):
+class AnimatedMixin:
     """for UITile and PlayerWind"""
 
     def __init__(self):
@@ -384,7 +384,7 @@ class AnimatedMixin(object):
                         Animation(self, pName, newValue)
 
 
-class AnimationSpeed(object):
+class AnimationSpeed:
 
     """a helper class for moving graphics with a given speed. 99=immediate."""
 

@@ -141,7 +141,7 @@ def i18nc(context, englishIn, *args):
     return unicodeString(result)
 
 
-class OptionHelper(object):
+class OptionHelper:
 
     """stub"""
 
@@ -174,7 +174,7 @@ class OptionHelper(object):
         return ''
 
 
-class KCmdLineArgs(object):
+class KCmdLineArgs:
 
     """stub"""
     options = None
@@ -228,7 +228,7 @@ class KCmdLineOptions(list):
             action='store_true')
 
 
-class KAboutData(object):
+class KAboutData:
 
     """stub"""
     License_GPL = 1
@@ -284,7 +284,7 @@ class KApplication(QApplication):
         return QApplication.instance()
 
 
-class CaptionMixin(object):
+class CaptionMixin:
 
     """used by KDialog and KXmlGuiWindow"""
 
@@ -343,7 +343,7 @@ class IconLabel(QLabel):
             QStyle.PM_MessageBoxIconSize, option, dialog)))
 
 
-class KMessageBox(object):
+class KMessageBox:
 
     """again only what we need"""
     NoExec = 1
@@ -476,7 +476,7 @@ class KDialog(CaptionMixin, QDialog):
         return QApplication.style().pixelMetric(QStyle.PM_DefaultChildMargin)
 
 
-class KUser(object):
+class KUser:
 
     """only the things kajongg needs"""
 
@@ -508,7 +508,7 @@ class KToggleFullScreenAction(QAction):
         """stub"""
 
 
-class KStandardAction(object):
+class KStandardAction:
 
     """stub"""
     @classmethod
@@ -551,7 +551,7 @@ class KStandardAction(object):
         actionCollection.addAction('options_configure', action)
 
 
-class KActionCollection(object):
+class KActionCollection:
 
     """stub"""
 
@@ -571,7 +571,7 @@ class KActionCollection(object):
         return self.__actions
 
 
-class MyStatusBarItem(object):
+class MyStatusBarItem:
 
     """one of the four player items"""
 
@@ -719,7 +719,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
             event.ignore()
 
 
-class KStandardDirs(object):
+class KStandardDirs:
 
     """as far as we need it. """
     _localBaseDirs = None
@@ -899,7 +899,7 @@ class KDETranslator(QTranslator):
         return i18n(sourceText)
 
 
-class KLocale(object):
+class KLocale:
 
     """as far as we need it"""
     @staticmethod
@@ -923,7 +923,7 @@ class KLocale(object):
         QCoreApplication.installTranslator(None)
 
 
-class KConfigGroup(object):
+class KConfigGroup:
 
     """mimic KConfigGroup as far as we need it"""
 
@@ -1007,7 +1007,7 @@ class KConfigGroup(object):
         return bool(KGlobal.dirs().findResourceDir("locale", relpath))
 
 
-class KGlobal(object):
+class KGlobal:
 
     """stub"""
 
@@ -1176,7 +1176,7 @@ class KAction(QAction):
         self.__helpText = text
 
 
-class KConfigSkeletonItem(object):
+class KConfigSkeletonItem:
 
     """one preferences setting used by KOnfigSkeleton"""
 

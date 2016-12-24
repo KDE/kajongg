@@ -25,7 +25,7 @@ from common import IntDict, Debug
 from tile import Tile
 
 
-class AIDefault(object):
+class AIDefault:
 
     """all AI code should go in here"""
 

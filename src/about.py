@@ -23,7 +23,7 @@ from kde import ki18n, KAboutData
 from common import Internal
 
 
-class About(object):
+class About:
 
     """we need persistancy but do not want to spoil global name space"""
 

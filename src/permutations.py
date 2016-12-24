@@ -27,7 +27,7 @@ from tile import Tile
 from meld import Meld, MeldList
 
 
-class Permutations(object):
+class Permutations:
 
     """creates permutations for building melds out of single tiles.
     NEVER returns Kongs!"""

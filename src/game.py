@@ -189,7 +189,7 @@ class HandId(object):
             other.roundsFinished, other.rotated, other.notRotated)
 
 
-class Game(object):
+class Game:
 
     """the game without GUI"""
     # pylint: disable=too-many-instance-attributes

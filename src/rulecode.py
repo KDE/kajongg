@@ -28,7 +28,7 @@ from query import Query
 from permutations import Permutations
 
 
-class RuleCode(object):
+class RuleCode:
 
     """Parent for all RuleCode classes. A RuleCode class can be used to
     define the behaviour of a Rule. Classes Rule and RuleCode

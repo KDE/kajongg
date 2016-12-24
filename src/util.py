@@ -140,7 +140,7 @@ def get_all_objects():
     return olist
 
 
-class Duration(object):
+class Duration:
 
     """a helper class for checking code execution duration"""
 
@@ -250,7 +250,7 @@ def xToUtf8(msg, args=None):
         return msg
 
 
-class CsvWriter(object):
+class CsvWriter:
     """hide differences between Python 2 and 3"""
     def __init__(self, filename, mode='w'):
         self.outfile = open(filename, mode)
@@ -265,7 +265,7 @@ class CsvWriter(object):
         """clean up"""
         self.outfile.close()
 
-class Csv(object):
+class Csv:
     """hide differences between Python 2 and 3"""
 
     delimiter = ';'

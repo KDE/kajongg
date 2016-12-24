@@ -299,7 +299,7 @@ class TileList(list):
         return str(''.join(self))
 
 
-class Elements(object):
+class Elements:
 
     """represents all elements"""
     # pylint: disable=too-many-instance-attributes

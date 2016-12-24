@@ -51,7 +51,7 @@ OPTIONS = None
 
 KNOWNCOMMITS = set()
 
-class Clone(object):
+class Clone:
 
     """make a temp directory for commitId"""
 
@@ -85,7 +85,7 @@ class Clone(object):
                 removeDir = os.path.join(cls.cacheDirectory, commitDir)
                 shutil.rmtree(removeDir)
 
-class Client(object):
+class Client:
 
     """a simple container, assigning process to job"""
 

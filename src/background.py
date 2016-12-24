@@ -41,7 +41,7 @@ def locatebackground(which):
     return KStandardDirs.locate("kmahjonggbackground", which)
 
 
-class Background(object):
+class Background:
 
     """represents a background"""
     catalogDefined = False

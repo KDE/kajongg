@@ -47,7 +47,7 @@ def locateTileset(which):
     return path
 
 
-class Tileset(object):
+class Tileset:
 
     """represents a complete tileset"""
     # pylint: disable=too-many-instance-attributes

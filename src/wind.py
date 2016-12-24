@@ -22,7 +22,7 @@ from __future__ import print_function
 
 # pylint: disable=invalid-name
 
-class Wind(object):
+class Wind:
     """we want to use an wind for indices.
 
     char is the wind as a char (native string)

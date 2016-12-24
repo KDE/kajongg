@@ -271,7 +271,7 @@ class UsedRule(object):
         return 'UsedRule(%s)' % str(self)
 
 
-class Ruleset(object):
+class Ruleset:
 
     """holds a full set of rules: meldRules,handRules,winnerRules.
 

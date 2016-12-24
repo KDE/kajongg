@@ -30,7 +30,7 @@ class WallEmpty(Exception):
     pass
 
 
-class KongBox(object):
+class KongBox:
 
     """a non-ui kong box"""
 

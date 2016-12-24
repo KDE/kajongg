@@ -46,7 +46,7 @@ from tile import Tile
         # self.audio.play()
 
 
-class Sound(object):
+class Sound:
 
     """the sound interface. Use class variables and class methods,
     thusly ensuring no two instances try to speak"""

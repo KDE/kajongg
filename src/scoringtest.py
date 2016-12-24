@@ -51,7 +51,7 @@ GAMES = list([PlayingGame(list(tuple([wind, str(wind.char)]) for wind in Wind.al
 PROGRAM = None
 
 
-class Expected(object):
+class Expected:
 
     """define what we expect from test"""
 
@@ -82,7 +82,7 @@ class NoWin(Expected):
         Expected.__init__(self, False, points, doubles, limits)
 
 
-class Helpers(object):
+class Helpers:
 
     """for my test classes"""
     # pylint: disable=no-member, too-many-locals

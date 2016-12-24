@@ -28,7 +28,7 @@ from log import logException, logDebug
 from common import Internal, Debug
 
 
-class Parameter(object):
+class Parameter:
 
     """helper class for defining configuration parameters"""
 

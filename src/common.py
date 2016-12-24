@@ -64,7 +64,7 @@ def isAlive(qobj):
         return True
 
 
-class Debug(object):
+class Debug:
 
     """holds flags for debugging output. At a later time we might
     want to add command line parameters for initialisation, and
@@ -175,7 +175,7 @@ class FixedClass(type):
             type.__setattr__(cls, key, value)
 
 
-class StrMixin(object):
+class StrMixin:
 
     """
     A mixin defining a default for __repr__,
@@ -191,7 +191,7 @@ class StrMixin(object):
             content=self.__str__())
 
 
-class Options(object):
+class Options:
 
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
@@ -217,7 +217,7 @@ class Options(object):
         raise Exception('Options is not meant to be instantiated')
 
 
-class SingleshotOptions(object):
+class SingleshotOptions:
 
     """Options which are cleared after having been used once"""
     table = False
@@ -225,7 +225,7 @@ class SingleshotOptions(object):
     game = None
 
 
-class __Internal(object):
+class __Internal:
 
     """
     Global things.
@@ -385,7 +385,7 @@ class IntDict(defaultdict, StrMixin):
             str(x), str(self[x])) for x in keys)
 
 
-class ZValues(object):
+class ZValues:
 
     """here we collect all zValues used in Kajongg"""
     itemZFactor = 100000

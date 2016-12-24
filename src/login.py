@@ -475,7 +475,7 @@ class AddUserDialog(MustChooseKDialog):
         self.edPassword.setText(password)
 
 
-class Connection(object):
+class Connection:
 
     """creates a connection to server"""
 

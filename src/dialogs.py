@@ -32,7 +32,7 @@ from qt import Qt, QDialog, QMessageBox, QWidget
 from common import Options, Internal, isAlive
 
 
-class IgnoreEscape(object):
+class IgnoreEscape:
 
     """as the name says. Use as a mixin for dialogs"""
 

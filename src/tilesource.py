@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
 
-class TileSource(object):
+class TileSource:
     """
     some constants
     """
@@ -33,7 +33,7 @@ class TileSource(object):
     def __repr__(self):
         return str(self)
 
-    class SourceClass(object):
+    class SourceClass:
         """Defines defaults"""
         isDiscarded = False
 

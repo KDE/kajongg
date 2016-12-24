@@ -220,7 +220,7 @@ class DBHandle(sqlite3.Connection):
         return any(x[0] == field for x in cursor.description)
 
 
-class Query(object):
+class Query:
 
     """a wrapper arout python sqlite3, adding logging and some exception handling.
     For selecting queries we fill a list with ALL records which is never much.
@@ -291,7 +291,7 @@ def initDb():
     return True
 
 
-class PrepareDB(object):
+class PrepareDB:
 
     """create or upgrade DB if needed"""
     schema = {}

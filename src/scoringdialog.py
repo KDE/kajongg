@@ -302,7 +302,7 @@ class ScoreModel(TreeModel):
         self.maxY += 2
 
 
-class HandResult(object):
+class HandResult:
 
     """holds the results of a hand for the scoring table"""
     # pylint: disable=too-many-arguments
