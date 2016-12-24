@@ -32,7 +32,6 @@ from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
 from about import About
 
 from common import Options, SingleshotOptions, Internal, Debug, unicodeString
-from util import kprint
 
 # do not import modules using twisted before our reactor is running
 
@@ -44,7 +43,7 @@ def initRulesets():
         rulesets = dict((x.name, x) for x in Ruleset.selectableRulesets())
         if Options.showRulesets:
             for name in rulesets:
-                kprint(name)
+                print(name)
             Internal.db.close()
             sys.exit(0)
         elif Options.rulesetName in rulesets:

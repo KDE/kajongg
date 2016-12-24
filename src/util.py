@@ -25,7 +25,6 @@ from __future__ import print_function
 import traceback
 import os
 import datetime
-import time
 import subprocess
 import gc
 import csv
@@ -71,7 +70,7 @@ def callers(count=5, exclude=None):
     excluding.extend(['callExpressionReceived', 'proto_answer'])
     excluding.extend(['_dataReceived', 'dataReceived', 'gotItem'])
     excluding.extend(['callWithContext', '_doReadOrWrite', 'doRead'])
-    excluding.extend(['callers', 'debug'])
+    excluding.extend(['callers', 'debug', 'logMessage', 'logDebug'])
     _ = list(([x[2] for x in stck if x[2] not in excluding]))
     names = reversed(_[-count:])
     result = '.'.join(names)
@@ -139,34 +138,6 @@ def get_all_objects():
     # _getr does the real work.
     _getr(gcl, olist, seen)
     return olist
-
-
-def kprint(*args, **kwargs):
-    """
-    A wrapper around print, always encoding str to something
-    sensible for the konsole.
-
-    @param args: anything
-    @param kwargs: anything
-    """
-    newArgs = []
-    for arg in args:
-        try:
-            arg = arg.decode('utf-8')
-        except BaseException:
-            arg = repr(arg)
-        arg = arg.encode(STDOUTENCODING, 'ignore')
-        newArgs.append(arg)
-    try:
-        print(*newArgs, sep=kwargs.get('sep', ' '),
-              end=kwargs.get('end', '\n'), file=kwargs.get('file'))
-    except IOError as exception:
-        # very big konsole, busy system: sometimes Python says
-        # resource temporarily not available
-        time.sleep(0.1)
-        print(exception)
-        print(*newArgs, sep=kwargs.get('sep', ' '),
-              end=kwargs.get('end', '\n'), file=kwargs.get('file'))
 
 
 class Duration(object):

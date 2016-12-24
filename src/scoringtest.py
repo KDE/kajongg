@@ -122,9 +122,9 @@ class Helpers(object):
                 variant.won == isinstance(exp, Win) and score == exp.score,
                 self.dumpCase(variant, exp, total=None))
 # activate depending on what you are testing
-#            kprint(string, 'expected:', expected.__str__()), variant
-#            kprint(ruleset.name.encode('utf-8'))
-#            kprint('\n'.join(variant.explain).encode('ut-f8'))
+#            print(string, 'expected:', expected.__str__()), variant
+#            print(ruleset.name.encode('utf-8'))
+#            print('\n'.join(variant.explain).encode('ut-f8'))
             if totals:
                 self.assertTrue(score.total() == totals[idx], '\n'.join(
                     self.dumpCase(x, exp, totals[idx]) for x in variants))

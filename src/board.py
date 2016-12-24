@@ -33,7 +33,7 @@ from meld import Meld
 from animation import AnimationSpeed, animate, AnimatedMixin
 from message import Message
 
-from util import kprint, stack, uniqueList
+from util import stack, uniqueList
 from log import logDebug, logException, m18n, m18nc
 from common import LIGHTSOURCES, Internal, Debug, isAlive, StrMixin
 from common import ZValues
@@ -833,7 +833,7 @@ class FittingView(QGraphicsView):
         if tiles:
             if event.modifiers() & Qt.ShiftModifier:
                 for uiTile in tiles:
-                    kprint(
+                    print(
                         '%s: board.level:%s' %
                         (str(uiTile), uiTile.board.level))
             board = tiles[0].board
