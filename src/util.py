@@ -28,6 +28,8 @@ import datetime
 import time
 import subprocess
 import gc
+import csv
+
 
 from locale import getpreferredencoding
 from sys import stdout
@@ -275,3 +277,29 @@ def xToUtf8(msg, args=None):
         return msg, args
     else:
         return msg
+
+
+class CsvWriter(object):
+    """hide differences between Python 2 and 3"""
+    def __init__(self, filename, mode='w'):
+        self.outfile = open(filename, mode)
+        self.__writer = csv.writer(self.outfile, delimiter=Csv.delimiter)
+
+    def writerow(self, row):
+        """write one row"""
+        self.__writer.writerow(list(
+            cell if isinstance(cell, str) else str(cell) for cell in row))
+
+    def __del__(self):
+        """clean up"""
+        self.outfile.close()
+
+class Csv(object):
+    """hide differences between Python 2 and 3"""
+
+    delimiter = ';'
+
+    @staticmethod
+    def reader(filename):
+        """returns a generator for decoded strings"""
+        return csv.reader(open(filename, 'r', encoding='utf-8'), delimiter=Csv.delimiter)

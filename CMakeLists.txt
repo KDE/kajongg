@@ -35,7 +35,6 @@ src/intelligence.py
 src/altint.py
 src/common.py
 src/wind.py
-src/compat.py
 src/rand.py
 src/config.py
 src/kdestub.py

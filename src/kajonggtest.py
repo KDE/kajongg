@@ -36,7 +36,7 @@ from optparse import OptionParser
 
 from common import Debug, StrMixin, nativeString
 from util import removeIfExists, gitHead, checkMemory
-from compat import Csv, CsvWriter
+from util import Csv, CsvWriter
 
 # fields in row:
 RULESETFIELD = 0

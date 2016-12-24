@@ -27,7 +27,7 @@ from collections import defaultdict
 from functools import total_ordering
 
 from twisted.internet.defer import succeed
-from util import gitHead
+from util import gitHead, CsvWriter
 from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, m18n
 from common import Internal, IntDict, Debug, Options, unicodeString
@@ -39,7 +39,6 @@ from sound import Voice
 from wall import Wall
 from move import Move
 from player import Players, Player, PlayingPlayer
-from compat import CsvWriter
 
 
 @total_ordering
