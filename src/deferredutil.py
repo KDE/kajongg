@@ -178,8 +178,8 @@ class DeferredBlock(StrMixin):
             'is completed' if self.completed else 'not completed',
             self.prettyCallback())
 
-    def outstandingUnicode(self):
-        """like __unicode__ but only with outstanding answers"""
+    def outstandingStr(self):
+        """like __str__ but only with outstanding answers"""
         return '%s callback=%s:%s' % (self.calledBy, self.prettyCallback(),
                                       '[' + ','.join(str(x) for x in self.requests if not x.answer) + ']')
 

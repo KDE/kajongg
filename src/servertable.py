@@ -649,7 +649,7 @@ class ServerTable(Table):
             if block.table == self:
                 logError(
                     'request left from previous hand: %s' %
-                    block.outstandingUnicode())
+                    block.outstandingStr())
         token = self.game.handId.prompt(
             withAI=False)  # we need to send the old token until the
                                    # clients started the new hand
