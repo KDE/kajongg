@@ -71,7 +71,7 @@ class VisiblePlayer(Player):
         """update display of handBoard. Set Focus to tileName."""
         self.handBoard.sync(adding)
 
-    def decorate(self):
+    def showInfo(self):
         """show player info on the wall"""
         side = self.front
         self.sideText.text = '{} - {}'.format(self.localName, self.explainHand().total())
@@ -236,7 +236,7 @@ class VisiblePlayingGame(PlayingGame):
             client=client, playOpen=playOpen, autoPlay=autoPlay)
 #        Internal.mainWindow.adjustMainView()
 #        Internal.mainWindow.updateGUI()
-        self.wall.decorate()
+        self.wall.decorate4()
 
     def close(self):
         """close the game"""

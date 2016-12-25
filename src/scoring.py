@@ -511,7 +511,7 @@ class ScoringGame(Game):
         self.initHand()
         Internal.scene.mainWindow.adjustMainView()
         Internal.scene.mainWindow.updateGUI()
-        self.wall.decorate()
+        self.wall.decorate4()
         self.throwDices()
 
     @Game.seed.getter

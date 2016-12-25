@@ -451,11 +451,11 @@ class UIWall(Wall):
             return self._placeLooseTiles()
 
     @afterQueuedAnimations
-    def decorate(self, deferredResult=None): # pylint: disable=unused-argument
+    def decorate4(self, deferredResult=None): # pylint: disable=unused-argument
         """show player info on the wall"""
         with AnimationSpeed(80):
             for player in self.game.players:
-                player.decorate()
+                player.showInfo()
             SideText.refreshAll()
             animate().addCallback(self.showWindMarkers)
 

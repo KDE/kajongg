@@ -200,7 +200,7 @@ class PungChowMessage(NotifyAtOnceMessage):
         NotifyAtOnceMessage.__init__(self, name=name, shortcut=shortcut)
 
     def toolTip(self, button, dummyTile):
-        """decorate the action button which will send this message"""
+        """for the action button which will send this message"""
         myself = button.client.game.myself
         maySay = myself.sayable[self]
         if not maySay:
@@ -268,7 +268,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
             table.declareKong(msg.player, Meld(msg.args[0]))
 
     def toolTip(self, button, dummyTile):
-        """decorate the action button which will send this message"""
+        """for the action button which will send this message"""
         myself = button.client.game.myself
         maySay = myself.sayable[self]
         if not maySay:
@@ -363,7 +363,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
         table.clientDiscarded(msg)
 
     def toolTip(self, button, tile):
-        """decorate the action button which will send this message"""
+        """for the action button which will send this message"""
         assert isinstance(tile, Tile), tile
         myself = button.client.game.myself
         isCalling = bool((myself.hand - tile).callingHands)
@@ -407,7 +407,7 @@ class MessageDiscard(ClientMessage, ServerMessage):
         table.clientDiscarded(msg)
 
     def toolTip(self, button, tile):
-        """decorate the action button which will send this message"""
+        """for the action button which will send this message"""
         assert isinstance(tile, Tile), tile
         game = button.client.game
         myself = game.myself

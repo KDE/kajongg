@@ -187,7 +187,7 @@ class GameScene(SceneWithFocusRect):
     def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
         if self.game and not self.game.finished():
-            handBoard.player.decorate()
+            handBoard.player.showInfo()
         # first decorate walls - that will compute player.handBoard for
         # explainView
         if self.explainView:
@@ -211,7 +211,7 @@ class GameScene(SceneWithFocusRect):
         without having to scroll"""
         if self.game:
             with AnimationSpeed():
-                self.game.wall.decorate()
+                self.game.wall.decorate4()
                 for uiTile in self.game.wall.tiles:
                     if uiTile.board:
                         uiTile.board.placeTile(uiTile)
@@ -229,7 +229,7 @@ class GameScene(SceneWithFocusRect):
         """redecorate wall"""
         self.mainWindow.updateGUI()
         if self.game:
-            self.game.wall.decorate()
+            self.game.wall.decorate4()
 
     def updateSceneGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""

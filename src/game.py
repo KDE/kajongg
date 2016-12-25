@@ -705,7 +705,7 @@ class Game:
         game.notRotated += 1
         game.maybeRotateWinds()
         game.sortPlayers()
-        game.wall.decorate()
+        game.wall.decorate4()
         return game
 
     def finished(self):

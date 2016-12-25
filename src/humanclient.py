@@ -129,7 +129,7 @@ class DlgButton(QPushButton):
         self.client = parent.client
         self.setText(message.buttonCaption())
 
-    def decorate(self, uiTile):
+    def setMeaning(self, uiTile):
         """give me caption, shortcut, tooltip, icon"""
         txt, warn, _ = self.message.toolTip(
             self, uiTile.tile if uiTile else None)
@@ -210,7 +210,7 @@ class ClientDialog(QDialog):
         if not self.client.game:
             return
         for button in self.buttons:
-            button.decorate(self.client.game.myself.handBoard.focusTile)
+            button.setMeaning(self.client.game.myself.handBoard.focusTile)
         for uiTile in self.client.game.myself.handBoard.lowerHalfTiles():
             txt = []
             for button in self.buttons:

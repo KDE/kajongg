@@ -121,7 +121,7 @@ class Wall(StrMixin):
         """to be done only for UIWall"""
         pass
 
-    def decorate(self, deferredResult=None): # pylint: disable=unused-argument
+    def decorate4(self, deferredResult=None): # pylint: disable=unused-argument
         """virtual: show player info on the wall"""
 
     def hide(self):
