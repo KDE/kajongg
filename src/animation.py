@@ -116,11 +116,12 @@ class Animation(QPropertyAnimation, StrMixin):
             currentValue = 'notAlive'
             endValue = 'notAlive'
             targetObject = 'notAlive'
-        return '%s %s: %s->%s for %s' % (
+        return '%s %s: %s->%s for %s duration=%dms' % (
             self.ident(), self.pName(),
             self.formatValue(currentValue),
             self.formatValue(endValue),
-            targetObject)
+            targetObject,
+            self.duration())
 
 
 class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
@@ -218,7 +219,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
             self,
             QAbstractAnimation.DeleteWhenStopped)
         if self.debug:
-            logDebug('Animation group G%s started with speed %d (%s)' % (
+            logDebug('%s started with speed %d (%s)' % (
                 self, Internal.Preferences.animationSpeed,
                 ','.join('A%s' % id4(x) for x in self.animations)))
         return succeed(None)
@@ -237,7 +238,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         # if we have a deferred, callback now
         assert self.deferred
         if self.debug:
-            logDebug('Animation group G%s done' % self)
+            logDebug('Done: {}'.format(self))
         if self.deferred:
             self.deferred.callback(None)
         for after in self.doAfter:
