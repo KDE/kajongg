@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from common import Internal, ZValues, StrMixin
+from common import Internal, ZValues, StrMixin, Speeds
 from wind import Wind, East
 from qt import QPointF, QGraphicsObject, QFontMetrics
 from qt import QPen, QColor, QFont, Qt, QRectF
@@ -82,7 +82,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
             rotating |= sceneRotation(side) != sceneRotation(side.board)
 
         alreadyMoved = any(x.x() for x in sides)
-        with AnimationSpeed(speed=30 if rotating and alreadyMoved else 99):
+        with AnimationSpeed(speed=Speeds.windMarker if rotating and alreadyMoved else 99):
             # first round: just place the winds. Only animate moving them
             # for later rounds.
             for side in sides:
@@ -453,7 +453,7 @@ class UIWall(Wall):
     @afterQueuedAnimations
     def decorate4(self, deferredResult=None): # pylint: disable=unused-argument
         """show player info on the wall"""
-        with AnimationSpeed(80):
+        with AnimationSpeed(Speeds.sideText):
             for player in self.game.players:
                 player.showInfo()
             SideText.refreshAll()
@@ -461,7 +461,7 @@ class UIWall(Wall):
 
     def showWindMarkers(self, dummyDeferred=None):
         """animate all windMarkers together"""
-        with AnimationSpeed(15):
+        with AnimationSpeed(Speeds.windMarker):
             for player in self.game.players:
                 side = player.front
                 side.windTile.setupAnimations()
