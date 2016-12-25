@@ -317,16 +317,15 @@ class EventData(str):
 
     """used for generating a nice string"""
     events = {y: x for x, y in QEvent.__dict__.items() if isinstance(y, int)}
-    # add some old events which still arrive but are not supported by PyQt5
-    events[15] = 'Create'
-    events[16] = 'Destroy'
-    events[20] = 'Quit'
-    events[22] = 'ThreadChange'
-    events[67] = 'ChildInsertedRequest'
-    events[70] = 'ChildInserted'
-    events[152] = 'AcceptDropsChange'
-    events[154] = 'Windows:ZeroTimer'
-    events[178] = 'ContentsRectChange'
+    # those are not documented for qevent but appear in corelib/kernel/qtcoreevent.h
+    extra = {
+        15: 'Create',
+        16: 'Destroy',
+        20: 'Quit',
+        152: 'AcceptDropsChange',
+        154: 'Windows:ZeroTimer'
+    }
+    events.update(extra)
     keys = {y: x for x, y in Qt.__dict__.items() if isinstance(y, int)}
 
     def __new__(cls, receiver, event, prefix=None):
