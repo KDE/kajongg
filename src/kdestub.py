@@ -187,6 +187,14 @@ class KCmdLineArgs(object):
         if '--help' in sys.argv:
             KCmdLineOptions.parser.parse_args()
             KCmdLineOptions.parser.print_help()
+        definitions = list(x[0].split()[0] for x in cls.options.options)
+        definitions = definitions + list('no' + x for x in definitions)
+        for arg in sys.argv[1:]:
+            if not (
+                    arg.startswith('--') or
+                    any(arg[2:].startswith(x) for x in definitions)):
+                print('unrecognized argument:{} '.format(arg))
+                sys.exit(2)
         return cls.options
 
     @classmethod
