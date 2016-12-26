@@ -132,13 +132,11 @@ class ServerTable(Table, StrMixin):
                 (x.wind.char, x.balance) for x in game.players)
         else:
             endValues = None
-        if withFullRuleset:
-            ruleset = self.ruleset.toList()
-        else:
-            ruleset = self.ruleset.hash
-        return list(
-            [self.tableid, ruleset, game.gameid if game else None, self.suspendedAt, self.running,
-             self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues])
+        return list([
+            self.tableid,
+            self.ruleset.toList() if withFullRuleset else self.ruleset.hash,
+            game.gameid if game else None, self.suspendedAt, self.running,
+            self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues])
 
     def maxSeats(self):
         """for a new game: 4. For a suspended game: The
