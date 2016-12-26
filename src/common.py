@@ -407,26 +407,6 @@ def english(i18nstring):
     return ENGLISHDICT.get(i18nstring, i18nstring)
 
 
-def unicodeString(s, encoding='utf-8'):
-    """
-    If s is not str, make it so.
-
-    @param s: The original string or None.
-    @type s: C{str} or C{bytes}
-    @rtype: C{str} or None.
-    """
-    if s is None:
-        return s
-#    if s.__class__.__name__ == 'QString':  # avoid import of QString
-#        return str(s)
-    elif isinstance(s, str):
-        return s
-    elif hasattr(s, 'decode'):
-        return s.decode(encoding)
-    else:
-        return repr(s)
-
-
 def isStringType(s):
     """Returns True for str, bytes."""
     # TODO: eliminate
@@ -480,16 +460,3 @@ def nativeStringArgs(args, encoding='utf-8'):
                   if isStringType(x) else x for x in args))
 
 
-def unicodeStringArgs(args, encoding='utf-8'):
-    """
-    Convert string elements of a tuple to C{str},
-    Those elements which are not of some string type are left alone.
-    For acceptable string types see L{common.nativeString}.
-
-    @param s: None or a string to convert to C{str} if necessary.
-    @param encoding: The encoding for the strings. Default is utf-8.
-    @returns: A tuple with the converted strings.
-    @rtype: C{tuple}
-    """
-    return tuple((unicodeString(x, encoding)
-                  if isStringType(x) else x for x in args))

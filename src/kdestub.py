@@ -50,7 +50,7 @@ from configparser import SafeConfigParser, NoSectionError, NoOptionError
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
 
-from common import Internal, Debug, ENGLISHDICT, unicodeString, nativeStringArgs
+from common import Internal, Debug, ENGLISHDICT, nativeStringArgs
 from util import uniqueList
 from statesaver import StateSaver
 
@@ -109,7 +109,7 @@ def i18n(englishIn, *args):
         _ = englishIn
     ENGLISHDICT[_] = englishIn
     result = __insertArgs(_, *args)
-    return unicodeString(result)
+    return result
 
 ki18n = i18n  # pylint: disable=invalid-name
 
@@ -138,7 +138,7 @@ def i18nc(context, englishIn, *args):
         result = i18n(englishIn, *args)
     else:
         result = i18n(withContext, *args)
-    return unicodeString(result)
+    return result
 
 
 class OptionHelper:

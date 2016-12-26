@@ -31,8 +31,7 @@ from qt import QObject
 from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
 from about import About
 
-from common import Options, SingleshotOptions, Internal, Debug, unicodeString
-
+from common import Options, SingleshotOptions, Internal, Debug
 # do not import modules using twisted before our reactor is running
 
 def initRulesets():
@@ -108,7 +107,7 @@ def parseOptions():
     if args.isSet('host'):
         Options.host = str(args.getOption('host'))
     if args.isSet('player'):
-        Options.player = unicodeString(args.getOption('player'))
+        Options.player = args.getOption('player')
     if args.isSet('rounds'):
         Options.rounds = int(args.getOption('rounds'))
     if args.isSet('ai'):

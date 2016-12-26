@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
-from common import Debug, unicodeString, StrMixin, nativeString
+from common import Debug, StrMixin, nativeString
 from message import Message
 from wind import Wind
 from tile import Tile, TileList
@@ -91,7 +91,7 @@ class Move(StrMixin):
                 oldValue = value
                 tuples = []
                 for oldTuple in oldValue:
-                    tuples.append(''.join(unicodeString(x) for x in oldTuple))
+                    tuples.append(''.join(str(x) for x in oldTuple))
                 value = ','.join(tuples)
             if Debug.neutral and key == 'gameid':
                 result += ' gameid:GAMEID'
@@ -100,7 +100,7 @@ class Move(StrMixin):
             elif isinstance(value, bool):
                 pass
             elif isinstance(value, bytes):
-                result += ' %s:%s' % (key, unicodeString(value))
+                result += ' %s:%s' % (key, value.decode())
             else:
                 result += ' %s:%s' % (key, value)
         for old, new in (("('", "("), ("')", ")"), (" '", ""),

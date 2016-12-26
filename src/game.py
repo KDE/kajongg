@@ -30,7 +30,7 @@ from twisted.internet.defer import succeed
 from util import gitHead, CsvWriter
 from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, m18n
-from common import Internal, IntDict, Debug, Options, unicodeString
+from common import Internal, IntDict, Debug, Options
 from common import StrMixin
 from wind import Wind, East
 from query import Query
@@ -621,9 +621,9 @@ class Game:
             logDebug(msg, btIndent=btIndent)
             return
         handId = self._prevHandId if prevHandId else self.handId
-        handId = unicodeString(handId.prompt(withMoveCount=True))
+        handId = handId.prompt(withMoveCount=True)
         logDebug(
-            '%s%s: %s' % (prefix, handId, unicodeString(msg)),
+            '%s%s: %s' % (prefix, handId, msg),
             withGamePrefix=False,
             btIndent=btIndent)
 

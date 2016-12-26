@@ -28,7 +28,7 @@ from util import Duration
 from log import logDebug, logException, logWarning, m18nc
 from message import Message
 from common import Internal, Debug, Options, StrMixin
-from common import unicodeString, isAlive
+from common import isAlive
 from tilesource import TileSource
 from rule import Ruleset
 from game import PlayingGame
@@ -63,8 +63,9 @@ class Table(StrMixin):
         result = ''
         if self.suspendedAt:
             result = m18nc('table status', 'Suspended')
-            result += ' ' + unicodeString(datetime.datetime.strptime(self.suspendedAt,
-                                                                     '%Y-%m-%dT%H:%M:%S').strftime('%c'))
+            result += ' ' + datetime.datetime.strptime(
+                self.suspendedAt,
+                '%Y-%m-%dT%H:%M:%S').strftime('%c')
         if self.running:
             result += ' ' + m18nc('table status', 'Running')
         return result or m18nc('table status', 'New')

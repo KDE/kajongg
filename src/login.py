@@ -42,7 +42,7 @@ from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Debug, isAlive, english
-from common import unicodeString, interpreterName
+from common import interpreterName
 from common import StrMixin
 from game import Players
 from query import Query
@@ -643,11 +643,10 @@ class Connection:
                 'Login to server %1 failed: You have no network connection',
                 self.url)
         else:
-            tracebackString = unicodeString(failure.getTraceback())
             msg = 'Login to server {} failed: {}/{} Callstack:{}'.format(
                 self.url, failure.value.__class__.__name__, failure.getErrorMessage(
                 ),
-                tracebackString)
+                failure.getTraceback())
         # Maybe the server is running but something is wrong with it
         if self.url.useSocket:
             if removeIfExists(socketName()):

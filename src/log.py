@@ -28,7 +28,7 @@ from sys import _getframe
 # util must not import twisted or we need to change kajongg.py
 
 from common import Internal, Debug, ENGLISHDICT  # pylint: disable=redefined-builtin
-from common import unicodeString, unicodeStringArgs, nativeString
+from common import nativeString
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead, callers
 from kde import i18n, i18nc
@@ -200,7 +200,6 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     # pylint: disable=R0912
     if isinstance(msg, Exception):
         msg = __exceptionToString(msg)
-    msg = unicodeString(msg)
     msg = translateServerMessage(msg)
     __logUnicodeMessage(prio, __enrichMessage(msg, withGamePrefix))
     if showStack:
@@ -267,13 +266,9 @@ def m18n(englishText, *args):
     Since when do args have to be str? utf-8
     encoded fails.
     """
-    result = unicodeString(
-        i18n(
-            nativeString(
-                englishText),
-            *unicodeStringArgs(args)))
+    result = i18n(englishText, *args)
     if not args:
-        ENGLISHDICT[result] = unicodeString(englishText)
+        ENGLISHDICT[result] = englishText
     return result
 
 
@@ -293,24 +288,20 @@ def m18nc(context, englishText, *args):
     @return: The translated text with args inserted.
     @rtype: C{str}.
     """
-    result = unicodeString(
-        i18nc(
-            context,
-            nativeString(englishText),
-            *unicodeStringArgs(args)))
+    result = i18nc(context, englishText, *args)
     if not args:
-        ENGLISHDICT[result] = unicodeString(englishText)
+        ENGLISHDICT[result] = englishText
     return result
 
 
 def m18nE(englishText):
     """use this if you want to get the english text right now but still have the string translated"""
-    return unicodeString(englishText)
+    return englishText
 
 
 def m18ncE(dummyContext, englishText):
     """use this if you want to get the english text right now but still have the string translated"""
-    return unicodeString(englishText)
+    return englishText
 
 
 class EventData(str):

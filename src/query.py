@@ -34,7 +34,7 @@ import sqlite3
 from kde import appdataDir
 from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug, m18ncE, m18n
-from common import IntDict, Options, Internal, Debug, nativeStringArgs, unicodeString
+from common import IntDict, Options, Internal, Debug, nativeStringArgs
 
 class QueryException(Exception):
 
@@ -116,7 +116,7 @@ class DBHandle(sqlite3.Connection):
 
     # pylint: disable=no-member
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         assert Internal.db is None, id(self)
         Internal.db = self
         self.inTransaction = None
@@ -127,14 +127,14 @@ class DBHandle(sqlite3.Connection):
         except sqlite3.Error as exc:
             logException(
                 'opening %s: %s' %
-                (unicodeString(self.path), exc.message))
+                (self.path, exc.message))
         if self.hasTable('general'):
             cursor = self.cursor()
             cursor.execute('select ident from general')
             self.identifier = cursor.fetchone()[0]
         if Debug.sql:
             logDebug('Opened %s with identifier %s' % (
-                unicodeString(self.path), self.identifier))
+                self.path, self.identifier))
 
     def __enter__(self):
         self.inTransaction = datetime.datetime.now()
@@ -167,7 +167,7 @@ class DBHandle(sqlite3.Connection):
         name = stack[-3]
         if name in ('__exit__', '__init__'):
             name = stack[-4]
-        return '%s on %s (%x)' % (name, unicodeString(self.path), id(self))
+        return '%s on %s (%x)' % (name, self.path, id(self))
 
     def commit(self, silent=None):
         """commit and log it"""
@@ -192,11 +192,9 @@ class DBHandle(sqlite3.Connection):
         """just for logging"""
         if not silent and (Debug.sql or Debug.quit):
             if self is Internal.db:
-                logDebug('Closing Internal.db: %s' % unicodeString(self.path))
+                logDebug('Closing Internal.db: %s' % self.path)
             else:
-                logDebug(
-                    'Closing DBHandle %s: %s' %
-                    (self, unicodeString(self.path)))
+                logDebug('Closing DBHandle %s: %s' % (self, self.path))
         if self is Internal.db:
             Internal.db = None
         try:
@@ -414,9 +412,7 @@ class PrepareDB:
                 logInfo(m18n('Database %1 updated from schema %2 to %3',
                              Internal.db.path, currentVersion, version), showDialog=True)
         except sqlite3.Error as exc:
-            logException(
-                'opening %s: %s' %
-                (unicodeString(self.path), exc.message))
+            logException('opening %s: %s' % (self.path, exc.message))
         finally:
             Internal.db.close(silent=True)
 

@@ -25,7 +25,7 @@ import types
 from hashlib import md5
 
 from common import Internal, Debug, english  # pylint: disable=redefined-builtin
-from common import unicodeString, StrMixin, nativeString, nativeStringArgs
+from common import StrMixin, nativeString, nativeStringArgs
 from log import m18n, m18nc, m18nE, logException, logDebug
 from query import Query
 
@@ -216,10 +216,8 @@ class RuleList(list):
                 rule.key(), self[rule.key()].definition, rule.name, rule.definition))
         self[rule.key()] = rule
 
-    def createRule(self, name, definition='', **kwargs):
+    def createRule(self, name: str, definition: str='', **kwargs):
         """shortcut for simpler definition of predefined rulesets"""
-        name = unicodeString(name)
-        definition = unicodeString(definition)
         defParts = definition.split('||')
         rule = None
         description = kwargs.get('description', '')
@@ -747,12 +745,12 @@ class RuleBase(StrMixin):
     options = {}
     ruleClasses = {}
 
-    def __init__(self, name, definition, description):
-        self.__name = unicodeString(name)
-        self.definition = unicodeString(definition)
-        self.description = unicodeString(description)
+    def __init__(self, name: str, definition: str, description: str):
         self.hasSelectable = False
         self.ruleClasses[self.__class__.__name__] = self.__class__
+        self.__name = name
+        self.definition = definition
+        self.description = description
 
     @property
     def name(self):
