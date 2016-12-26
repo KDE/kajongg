@@ -1059,10 +1059,7 @@ class KConfig(ConfigParser):
 
     """Parse KDE config files.
     This mimics KDE KConfig but can also be used like any ConfigParser but
-    without support for a default section.
-    We Override write() with a variant which does not put spaces
-    around the '=' delimiter. This is configurable in Python3.3,  # TODO: remove
-    so after kajongg is ported to Python3, this can be removed"""
+    without support for a default section."""
 
     def __init__(self, path=None):
         ConfigParser.__init__(self)
@@ -1072,14 +1069,6 @@ class KConfig(ConfigParser):
         if os.path.exists(self.path):
             with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
                 self.read_file(cfgFile)
-
-    def as_dict(self):
-        """a dict of dicts"""
-        result = dict(self._sections)
-        for key in result:
-            result[key] = dict(self._defaults, **result[key])
-            result[key].pop('__name__', None)
-        return result
 
     def optionxform(self, value):
         """KDE needs upper/lowercase distinction"""
@@ -1091,23 +1080,10 @@ class KConfig(ConfigParser):
             self.add_section(section)
         self.set(section, option, str(value))
 
-    def writeToFile(self, fileName=None):
+    def writeToFile(self):
         """Write an .ini-format representation of the configuration state."""
-        if fileName is None:
-            fileName = self.path
-        with open(fileName, 'wb') as filePointer:
-            for section in self._sections:
-                filePointer.write(("[%s]\n" % section).encode('utf-8'))
-                for (key, value) in self._sections[section].items():
-                    key = bytes(str(key).encode('utf-8')) # pylint bug, bytes() should not be needed
-                    value = str(value).encode('utf-8')
-                    if key == b"__name__":
-                        continue
-                    if value is not None:
-                        key = b"=".join((key, value.replace(b'\n', b'\n\t')))
-                    filePointer.write(key)
-                    filePointer.write(b'\n')
-                filePointer.write(b'\n')
+        with open(self.path, 'w') as filePointer:
+            self.write(filePointer, space_around_delimiters=False)
 
     def group(self, groupName):
         """just like KConfig"""
