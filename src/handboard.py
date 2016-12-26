@@ -30,10 +30,10 @@ from board import Board
 from sound import Sound
 
 from log import logDebug
-from common import Internal, Debug, isAlive
+from common import Internal, Debug, isAlive, StrMixin
 
 
-class TileAttr(object):
+class TileAttr(StrMixin):
 
     """a helper class for syncing the hand board, holding relevant
     tile attributes.
@@ -80,9 +80,6 @@ class TileAttr(object):
             (self.tile, self.xoffset, self.yoffset,
              ' dark' if self.dark else '',
              ' focusable' if self.focusable else ''))
-
-    def __repr__(self):
-        return 'TileAttr(%s)' % str(self)
 
 
 class HandBoard(Board):

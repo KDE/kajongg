@@ -217,7 +217,7 @@ class Server(StrMixin):
                 server.jobs)
             server.stop()
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Server {} Python{}{} {}'.format(
             self.commitId,
             self.pythonVersion,
@@ -324,7 +324,7 @@ class Job(StrMixin):
             if sum(x.startswith(self.ruleset[:prefix]) for x in names) == 1:
                 return self.ruleset[prefix - 1:]
 
-    def __unicode__(self):
+    def __str__(self):
         pid = 'pid={}'.format(
             self.process.pid) if self.process and Debug.process else ''
         game = 'game={}'.format(self.game)

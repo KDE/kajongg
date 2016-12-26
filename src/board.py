@@ -116,7 +116,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
 
     def __str__(self):
         """for debugging"""
-        return 'Windmarker %s x/y= %.1f/%1f' % (
+        return 'WindMarker(%s x/y= %.1f/%1f)' % (
             self.name(), self.x(), self.y())
 
 
@@ -212,7 +212,7 @@ class Board(QGraphicsRectItem, StrMixin):
         """default board name, used for debugging messages"""
         return 'board'
 
-    def __unicode__(self):
+    def __str__(self):
         """for debugging"""
         return self.name
 

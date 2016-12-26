@@ -30,13 +30,13 @@ from tile import Tile, TileList
 from tilesource import TileSource
 from meld import Meld, MeldList
 from rule import Score, UsedRule
-from common import Debug
+from common import Debug, StrMixin
 from intelligence import AIDefault
 from util import callers
 from message import Message
 
 
-class Hand(object):
+class Hand(StrMixin):
 
     """represent the hand to be evaluated.
 
@@ -760,14 +760,6 @@ class Hand(object):
     def __str__(self):
         """hand as a string"""
         return self.newString()
-
-    def __unicode__(self):
-        """hand as a string"""
-        return self.newString()
-
-    def __repr__(self):
-        """the default representation"""
-        return 'Hand(%s)' % str(self)
 
     def __hash__(self):
         """used for debug logging to identify the hand"""

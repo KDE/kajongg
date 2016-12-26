@@ -108,5 +108,5 @@ class Move(StrMixin):
             result = result.replace(old, new)
         return result
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s %s%s' % (self.player, self.message, Move.prettyKwargs(self.kwargs))

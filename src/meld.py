@@ -25,10 +25,11 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 
 from log import m18nc
+from common import StrMixin
 from tile import Tile, TileList, elements
 
 
-class Meld(TileList):
+class Meld(TileList, StrMixin):
 
     """represents a meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
@@ -322,10 +323,6 @@ class Meld(TileList):
         if self[0].key == other[0].key:
             return len(self) > len(other)
         return self[0].key < other[0].key
-
-    def __repr__(self):
-        """the default representation"""
-        return 'Meld(%s)' % str(self)
 
     def typeName(self):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""

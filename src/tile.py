@@ -21,10 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from __future__ import print_function
 
 from log import m18n, m18nc, logException
-from common import IntDict
+from common import IntDict, StrMixin
 from wind import Wind, East, South, West, North
 
-class Tile(str):
+class Tile(str, StrMixin):
 
     """
     A single tile, represented as a string of length 2.
@@ -192,10 +192,6 @@ class Tile(str):
 
     def capitalize(self):
         raise TypeError
-
-    def __repr__(self):
-        """default representation"""
-        return 'Tile(%s)' % str(self)
 
     def meld(self, size):
         """returns a meld of size. Those attributes are set

@@ -145,7 +145,7 @@ class User(pb.Avatar, StrMixin):
         self.pinged()
         return self.server.chat(chatString)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 

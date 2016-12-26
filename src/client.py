@@ -69,6 +69,9 @@ class Table(StrMixin):
             result += ' ' + m18nc('table status', 'Running')
         return result or m18nc('table status', 'New')
 
+    def __str__(self):
+        return 'Table({})'.format(self.tableid)
+
 
 class ClientTable(Table):
 
@@ -107,7 +110,7 @@ class ClientTable(Table):
                 return self.playersOnline[idx]
         return False
 
-    def __unicode__(self):
+    def __str__(self):
         onlineNames = list(x for x in self.playerNames if self.isOnline(x))
         offlineString = ''
         offlineNames = list(x for x in self.playerNames if x not in onlineNames

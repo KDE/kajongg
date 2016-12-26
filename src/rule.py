@@ -30,7 +30,7 @@ from log import m18n, m18nc, m18nE, logException, logDebug
 from query import Query
 
 
-class Score(object):
+class Score(StrMixin):
 
     """holds all parts contributing to a score. It has two use cases:
     1. for defining what a rules does: either points or doubles or limits, holding never more than one unit
@@ -84,9 +84,6 @@ class Score(object):
         if self.limits:
             parts.append('limits=%f' % self.limits)
         return ' '.join(parts)
-
-    def __repr__(self):
-        return 'Score(%s)' % str(self)
 
     def i18nStr(self):
         """make score readable for humans, i18n"""
@@ -237,7 +234,7 @@ class RuleList(list):
         if not rule:
             if 'parameter' in kwargs:
                 del kwargs['parameter']
-            ruleType = type(str(ruleKey(name)) + 'Rule', (Rule, ), {})
+            ruleType = type(ruleKey(name) + 'Rule', (Rule, ), {})
             rule = ruleType(name, definition, **kwargs)
             if defParts[0] == 'FCallingHand':
                 parts1 = defParts[1].split('=')
@@ -252,7 +249,7 @@ class RuleList(list):
         self.add(rule)
 
 
-class UsedRule(object):
+class UsedRule(StrMixin):
 
     """use this in scoring, never change class Rule.
     If the rule has been used for a meld, pass it"""
@@ -266,9 +263,6 @@ class UsedRule(object):
         if self.meld:
             result += ' ' + str(self.meld)
         return result
-
-    def __repr__(self):
-        return 'UsedRule(%s)' % str(self)
 
 
 class Ruleset:
@@ -610,17 +604,12 @@ into a situation where you have to pay a penalty"""))
             Query("DELETE FROM rule WHERE ruleset=?", (self.rulesetId,))
             Query("DELETE FROM ruleset WHERE id=?", (self.rulesetId,))
 
-    @staticmethod
-    def ruleKey(rule):
-        """needed for sorting the rules"""
-        return rule.__unicode__()
-
     def __computeHash(self):
         """compute the hash for this ruleset using all rules but not name and
         description of the ruleset"""
         self.load()
         result = md5()
-        for rule in sorted(self.allRules, key=Ruleset.ruleKey):
+        for rule in sorted(self.allRules, key=Rule.__str__):
             result.update(rule.hashStr().encode('utf-8'))
         self.__hash = result.hexdigest()
 
@@ -783,7 +772,7 @@ class RuleBase(StrMixin):
         """
         return ''
 
-    def __unicode__(self):
+    def __str__(self):
         return self.hashStr()
 
 

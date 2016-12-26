@@ -31,6 +31,7 @@ from util import gitHead, CsvWriter
 from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, m18n
 from common import Internal, IntDict, Debug, Options, unicodeString
+from common import StrMixin
 from wind import Wind, East
 from query import Query
 from rule import Ruleset
@@ -42,7 +43,7 @@ from player import Players, Player, PlayingPlayer
 
 
 @total_ordering
-class HandId(object):
+class HandId(StrMixin):
 
     """handle a string representing a hand Id"""
 
@@ -172,9 +173,6 @@ class HandId(object):
 
     def __str__(self):
         return self.prompt()
-
-    def __repr__(self):
-        return 'HandId({})'.format(self.prompt())
 
     def __eq__(self, other):
         return (other

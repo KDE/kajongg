@@ -175,9 +175,9 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
         """around the text"""
         return self.__boundingRect or QRectF()
 
-    def __unicode__(self):
+    def __str__(self):
         """for debugging"""
-        return 'sideText %s %s x/y= %.1f/%1f' % (
+        return 'SideText(%s %s x/y= %.1f/%1f)' % (
             self.name(), self.text, self.x(), self.y())
 
 
@@ -209,7 +209,7 @@ class UIWallSide(Board, StrMixin):
         self.windTile.hide()
         Board.hide(self)
 
-    def __unicode__(self):
+    def __str__(self):
         """for debugging"""
         return self.name
 

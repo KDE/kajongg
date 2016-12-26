@@ -85,10 +85,10 @@ class Wind:
         return self.__index__()
 
     def __str__(self):
-        return str(self.char)
+        return self.char
 
     def __repr__(self):
-        return str(self)
+        return 'Wind.{}'.format(self.char)
 
 class _East(Wind):
     """East"""

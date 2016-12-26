@@ -378,7 +378,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
             if self.__board:
                 self.__board.placeTile(self)
 
-    def __unicode__(self):
+    def __str__(self):
         """printable string with tile"""
         rotation = ' rot%d' % self.rotation if self.rotation else ''
         scale = ' scale=%.2f' % self.scale if self.scale != 1 else ''

@@ -151,6 +151,6 @@ class Wall(StrMixin):
         """name for debug messages"""
         return '4sided wall'
 
-    def __unicode__(self):
+    def __str__(self):
         """for debugging"""
         return self.name()

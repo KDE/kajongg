@@ -27,7 +27,7 @@ from hashlib import md5
 if os.name == 'nt':
     import winsound  # pylint: disable=import-error
 
-from common import Debug, Internal, nativeString
+from common import Debug, Internal, nativeString, StrMixin
 from util import which, removeIfExists, uniqueList, elapsedSince
 from log import logWarning, m18n, logDebug, logException
 
@@ -181,7 +181,7 @@ class Sound:
         if Sound.__bonusOgg:
             Sound.speak(Sound.__bonusOgg)
 
-class Voice(object):
+class Voice(StrMixin):
 
     """this administers voice sounds.
 
@@ -204,9 +204,6 @@ class Voice(object):
 
     def __str__(self):
         return self.directory
-
-    def __repr__(self):
-        return "<Voice: %s>" % self
 
     def language(self):
         """the language code of this voice. Locally defined voices

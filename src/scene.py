@@ -97,9 +97,9 @@ class FocusRect(QGraphicsRectItem, StrMixin):
                         and board.isEnabled() and board.hasFocus and bool(game) and not game.autoPlay)
 
 
-    def __unicode__(self):
+    def __str__(self):
         """for debugging"""
-        return 'FocusRect {} on {}'.format(id4(self), self.board if self.board else 'NOBOARD')
+        return 'FocusRect({} on {})'.format(id4(self), self.board if self.board else 'NOBOARD')
 
 class SceneWithFocusRect(QGraphicsScene):
 

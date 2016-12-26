@@ -27,8 +27,7 @@ from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve
 from qt import pyqtProperty, QGraphicsObject, QGraphicsItem
 
-from common import Internal, Debug, isAlive
-from common import StrMixin
+from common import Internal, Debug, isAlive, StrMixin
 from log import logDebug, id4
 
 
@@ -106,7 +105,7 @@ class Animation(QPropertyAnimation, StrMixin):
         if pName == 'scale':
             return '%.2f' % value
 
-    def __unicode__(self):
+    def __str__(self): # TODO: hier auch duration zeigen
         """for debug messages"""
         if isAlive(self) and isAlive(self.targetObject()):
             currentValue = getattr(self.targetObject(), self.pName())
@@ -267,7 +266,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         else:
             assert False
 
-    def __unicode__(self):
+    def __str__(self):
         """for debugging"""
         return 'G{}({}:{})'.format(self.uid, len(self.animations), self.stateName())
 

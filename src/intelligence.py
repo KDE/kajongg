@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import weakref
 
 from message import Message
-from common import IntDict, Debug
+from common import IntDict, Debug, StrMixin
 from tile import Tile
 
 
@@ -331,7 +331,7 @@ class AIDefault:
 #        return result
 
 
-class TileAI(object):
+class TileAI(StrMixin):
 
     """holds a few AI related tile properties"""
     # pylint: disable=too-many-instance-attributes
@@ -368,9 +368,6 @@ class TileAI(object):
     def __str__(self):
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
         return '%s:=%.4f%s' % (self.tile, self.keep, dang)
-
-    def __repr__(self):
-        return 'TileAI(%s)' % str(self)
 
 
 class DiscardCandidates(list):

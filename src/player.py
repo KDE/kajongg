@@ -57,7 +57,7 @@ class Players(list, StrMixin):
                 return player
         return list.__getitem__(self, index)
 
-    def __unicode__(self):
+    def __str__(self):
         return ', '.join(list('%s: %s' % (x.name, x.wind) for x in self))
 
     def byId(self, playerid):
@@ -327,7 +327,7 @@ class Player(StrMixin):
         assert payment == 0
         self.__payment = 0
 
-    def __unicode__(self):
+    def __str__(self):
         return '{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
 
     def pickedTile(self, deadEnd, tileName=None):

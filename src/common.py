@@ -179,16 +179,18 @@ class StrMixin:
 
     """
     A mixin defining a default for __repr__,
-    using __str__.
+    using __str__. If __str__ is not defined, this runs
+    into recursion. But I see no easy way without too much
+    runtime overhead to check for this beforehand.
     """
 
-    def __str__(self):
-        return nativeString(self.__unicode__())
-
     def __repr__(self):
-        return '{cls}({content})'.format(
-            cls=self.__class__.__name__,
-            content=self.__str__())
+        clsName = self.__class__.__name__
+        content = str(self)
+        if content.startswith(clsName):
+            return content
+        else:
+            return '{cls}({content})'.format(cls=clsName, content=content)
 
 
 class Options:

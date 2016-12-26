@@ -31,7 +31,7 @@ from itertools import chain
 
 from twisted.spread import pb
 
-from common import Debug, Internal
+from common import Debug, Internal, StrMixin
 from wind import Wind
 from tilesource import TileSource
 from util import Duration
@@ -86,7 +86,7 @@ class ServerGame(PlayingGame):
         PlayingGame.initHand(self)
 
 
-class ServerTable(Table):
+class ServerTable(Table, StrMixin):
 
     """a table on the game server"""
     # pylint: disable=too-many-arguments
@@ -198,7 +198,7 @@ class ServerTable(Table):
                     logDebug('%s leaves table %d, %s stays owner' % (
                         user.name, self.tableid, self.owner))
 
-    def __unicode__(self):
+    def __str__(self):
         """for debugging output"""
         if self.users:
             onlineNames = list(x.name + ('(Owner)' if self.owner and x == self.owner.name else '')

@@ -24,8 +24,7 @@ from log import m18n, m18nc, m18ncE, logWarning, logException, logDebug
 from sound import Voice
 from tile import Tile, TileList
 from meld import Meld, MeldList
-from common import Internal, Debug, Options
-from common import unicodeString
+from common import Internal, Debug, Options, StrMixin
 from wind import Wind
 from dialogs import Sorry
 
@@ -55,9 +54,6 @@ class Message:
 
     def __str__(self):
         return self.name
-
-    def __unicode__(self):
-        return unicodeString(self.name)
 
     def __repr__(self):
         return 'Message.{}'.format(self.name)
@@ -856,7 +852,7 @@ def __scanSelf():
                         Message.defined[msg.name] = msg
 
 
-class ChatMessage(object):
+class ChatMessage(StrMixin):
 
     """holds relevant info about a chat message"""
 
@@ -884,12 +880,14 @@ class ChatMessage(object):
             self.timestamp)
         return result + (now - utcnow)
 
-    def __unicode__(self):
+    def __str__(self):
         local = self.localtimestamp()
         # pylint: disable=no-member
         # pylint says something about NotImplemented, check with later versions
-        return 'statusMessage=%s %02d:%02d:%02d %s: %s' % (
-            str(self.isStatusMessage),
+        _ = m18n(self.message)
+        if self.isStatusMessage:
+            _ = '[{}]'.format(_)
+        return '%02d:%02d:%02d %s: %s' % (
             local.hour,
             local.minute,
             local.second,

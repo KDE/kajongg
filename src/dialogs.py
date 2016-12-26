@@ -29,7 +29,7 @@ from kde import KMessageBox, KDialog
 
 from qt import Qt, QDialog, QMessageBox, QWidget
 
-from common import Options, Internal, isAlive
+from common import Options, Internal, isAlive, StrMixin
 
 
 class IgnoreEscape:
@@ -79,7 +79,7 @@ class MustChooseKDialog(KDialogIgnoringEscape):
             event.ignore()
 
 
-class Prompt(MustChooseKDialog):
+class Prompt(MustChooseKDialog, StrMixin):
 
     """common code for things like QuestionYesNo, Information"""
 
@@ -111,11 +111,8 @@ class Prompt(MustChooseKDialog):
             button = self.default
         return button in (KDialog.Yes, KDialog.Ok)
 
-    def __unicode__(self):
-        return 'Prompt({})'.format(self.msg)
-
     def __str__(self):
-        return 'Prompt({})'.format(self.msg.encode('utf-8'))
+        return self.msg
 
 
 class DeferredDialog(Deferred):

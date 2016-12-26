@@ -42,7 +42,8 @@ from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
 from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Debug, isAlive, english
-from common import nativeString, unicodeString, interpreterName
+from common import unicodeString, interpreterName
+from common import StrMixin
 from game import Players
 from query import Query
 from statesaver import StateSaver
@@ -57,7 +58,7 @@ class LoginAborted(Exception):
     pass
 
 
-class Url(str):
+class Url(str, StrMixin):
 
     """holds connection related attributes: host, port, socketname"""
     # pylint: disable=too-many-public-methods
@@ -94,12 +95,13 @@ class Url(str):
                 logDebug('Installed qtreactor')
         return obj
 
-    def __repr__(self):
+    def __str__(self):
         """show all info"""
+        selfStr = super(Url, self).__str__()
         if self.useSocket:
-            return 'Url({} socket={})'.format(self, socketName())
+            return 'Url({} socket={})'.format(selfStr, socketName())
         else:
-            return 'Url({} host={} port={})'.format(self, nativeString(self.host), self.port)
+            return 'Url({} host={} port={})'.format(selfStr, self.host, self.port)
 
     @property
     def useSocket(self):

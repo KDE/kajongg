@@ -28,10 +28,10 @@ class TileSource:
     byChar = dict()
 
     def __str__(self):
-        return str(self.char)
+        return self.char
 
     def __repr__(self):
-        return str(self)
+        return 'TileSource.{}'.format(self.__class__.__name__)
 
     class SourceClass:
         """Defines defaults"""
