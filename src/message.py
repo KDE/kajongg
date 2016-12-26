@@ -68,9 +68,9 @@ class Message:
         # pylint: disable=too-many-return-statements
         cls = value.__class__
         if cls in (Tile, TileList, Meld, MeldList):
-            return str(value).encode()
+            return str(value)
         elif isinstance(value, Wind):
-            return str(value).encode()
+            return str(value)
         elif isinstance(value, Message):
             return value.name
         elif isinstance(value, (list, tuple)):

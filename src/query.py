@@ -34,7 +34,7 @@ import sqlite3
 from kde import appdataDir
 from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug, m18ncE, m18n
-from common import IntDict, Options, Internal, Debug, nativeStringArgs
+from common import IntDict, Options, Internal, Debug
 
 class QueryException(Exception):
 
@@ -104,8 +104,7 @@ class DBCursor(sqlite3.Cursor):
     def __str__(self):
         """the statement"""
         if self.parameters is not None:
-            native = nativeStringArgs(self.parameters)
-            return "{cmd} [{args}]".format(cmd=self.statement, args=native)
+            return "{cmd} [{args}]".format(cmd=self.statement, args=self.parameters)
         else:
             return self.statement
 

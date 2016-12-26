@@ -27,7 +27,7 @@ from twisted.internet.defer import Deferred
 
 from log import m18nE, logInfo, logDebug, logException
 from message import Message
-from common import Debug, StrMixin, nativeString, nativeStringArgs
+from common import Debug, StrMixin
 from move import Move
 
 
@@ -73,13 +73,13 @@ class Request(StrMixin):
     def gotAnswer(self, rawAnswer):
         """convert the wired answer into something more useful"""
         if isinstance(rawAnswer, tuple):
-            answer = nativeString(rawAnswer[0])
+            answer = rawAnswer[0]
             if isinstance(rawAnswer[1], tuple):
-                self.args = nativeStringArgs(rawAnswer[1])
+                self.args = rawAnswer[1]
             else:
-                self.args = nativeStringArgs([rawAnswer[1]])
+                self.args = [rawAnswer[1]]
         else:
-            answer = nativeString(rawAnswer)
+            answer = rawAnswer
             self.args = None
         if answer in Message.defined:
             self.answer = Message.defined[answer]

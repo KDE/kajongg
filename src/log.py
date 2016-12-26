@@ -28,7 +28,6 @@ from sys import _getframe
 # util must not import twisted or we need to change kajongg.py
 
 from common import Internal, Debug, ENGLISHDICT  # pylint: disable=redefined-builtin
-from common import nativeString
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead, callers
 from kde import i18n, i18nc
@@ -244,10 +243,10 @@ def logWarning(msg, withGamePrefix=True):
     return logMessage(msg, logging.WARNING, True, withGamePrefix=withGamePrefix)
 
 
-def logException(exception, withGamePrefix=True):
+def logException(exception: str, withGamePrefix=True):
     """logs error message and re-raises exception"""
     logError(exception, withGamePrefix=withGamePrefix)
-    raise Exception(nativeString(exception))
+    raise Exception(exception)
 
 
 def m18n(englishText, *args):

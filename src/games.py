@@ -32,7 +32,7 @@ from log import logException, m18n, m18nc
 from query import Query
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
-from common import Debug, nativeString
+from common import Debug
 from modeltest import ModelTest
 
 
@@ -89,7 +89,7 @@ class GamesModel(QAbstractTableModel):
             elif index.column() == 1:
                 dateVal = datetime.datetime.strptime(
                     unformatted, '%Y-%m-%dT%H:%M:%S')
-                return nativeString(dateVal.strftime('%c'))
+                return dateVal.strftime('%c')
             elif index.column() == 0:
                 return int(unformatted)
         return QAbstractTableModel.data(self, index, role)

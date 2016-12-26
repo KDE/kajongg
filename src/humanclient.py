@@ -35,7 +35,6 @@ from log import m18n, logWarning, logException, logDebug
 from message import Message, ChatMessage
 from chat import ChatWindow
 from common import Options, SingleshotOptions, Internal, Debug, isAlive
-from common import nativeString, nativeStringArgs
 from query import Query
 from board import Board
 from client import Client, ClientTable
@@ -754,10 +753,8 @@ class HumanClient(Client):
             '%s %s %s %s' %
             (self.game.myself.name if self.game else 'NOGAME', answer, move, answers))
 
-    def remote_abort(self, tableid, message, *args):
+    def remote_abort(self, tableid, message: str, *args):
         """the server aborted this game"""
-        message = nativeString(message)
-        args = nativeStringArgs(args)
         if self.table and self.table.tableid == tableid:
             # translate Robot to Roboter:
             if self.game:
