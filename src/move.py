@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
-from common import Debug, StrMixin
+from common import Debug, StrMixin, Internal
 from message import Message
 from wind import Wind
 from tile import Tile, TileList
@@ -45,31 +45,29 @@ class Move(StrMixin):
         self.score = None
         self.lastMeld = None
         for key, value in kwargs.items():
-            if isinstance(value, bytes):
-                value = value.decode('utf-8')
-            assert value != 'None'
+            assert not isinstance(value, bytes), 'value is bytes:{}'.format(repr(value))
             if value is None:
                 self.__setattr__(key, None)
-            elif key.lower().endswith('tile'):
-                self.__setattr__(key, Tile(value))
-            elif key.lower().endswith('tiles'):
-                self.__setattr__(key, TileList(value))
-            elif key.lower().endswith('meld'):
-                self.__setattr__(key, Meld(value))
-            elif key.lower().endswith('melds'):
-                self.__setattr__(key, MeldList(value))
-            elif key in ('wantedGame', 'score'):
-                self.__setattr__(key, value)
-            elif key == 'playerNames':
-                self.__setattr__(key, self.convertWinds(value))
             else:
-                self.__setattr__(key, value)
+                if key.lower().endswith('tile'):
+                    self.__setattr__(key, Tile(value))
+                elif key.lower().endswith('tiles'):
+                    self.__setattr__(key, TileList(value))
+                elif key.lower().endswith('meld'):
+                    self.__setattr__(key, Meld(value))
+                elif key.lower().endswith('melds'):
+                    self.__setattr__(key, MeldList(value))
+                elif key == 'playerNames':
+                    if Internal.isServer:
+                        self.__setattr__(key, value)
+                    else:
+                        self.__setattr__(key, self.__convertWinds(value))
+                else:
+                    self.__setattr__(key, value)
 
     @staticmethod
-    def convertWinds(tuples):
+    def __convertWinds(tuples):
         """convert wind strings to Wind objects"""
-        if isinstance(tuples[0][0], Wind):
-            return tuples
         result = list()
         for wind, name in tuples:
             result.append(tuple([Wind(wind), name]))

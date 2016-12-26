@@ -41,10 +41,7 @@ class Wind:
         if len(args) == 1:
             windIdent = args[0]
             assert cls is Wind, '{}({}) is illegal'.format(cls.__name__, windIdent)
-            if isinstance(windIdent, bytes):
-                windIdx = b'eswn'.index(windIdent.lower())
-            else:
-                windIdx = 'eswn'.index(windIdent.lower())
+            windIdx = 'eswn'.index(windIdent.lower())
             return Wind.all[windIdx]
         assert len(args) == 0 and cls is not Wind, 'Wind() must have exactly one argument'
 
