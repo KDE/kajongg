@@ -395,7 +395,7 @@ class PrepareDB:
         """upgrade the structure of an existing kajongg database"""
         try:
             Internal.db = DBHandle(self.path)
-            allVersions = list(['4.13.0', '8300'])
+            allVersions = list(['4.13.0', '8300', '8301'])
             assert allVersions[-1] == str(Internal.defaultPort), '{} != {}'.format(
                 allVersions[-1], str(Internal.defaultPort))
             # skip versions before current db versions:

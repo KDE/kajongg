@@ -254,7 +254,7 @@ class __Internal:
     """
     # pylint: disable=too-many-instance-attributes
     Preferences = None
-    defaultPort = 8300
+    defaultPort = 8301
     logPrefix = 'C'
     isServer = False
     scaleScene = True
