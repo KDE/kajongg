@@ -43,7 +43,7 @@ import sip
 
 # pylint: disable=wrong-import-order
 
-from configparser import SafeConfigParser, NoSectionError, NoOptionError
+from configparser import ConfigParser, NoSectionError, NoOptionError
 
 # here come the replacements:
 
@@ -1055,17 +1055,17 @@ class KGlobal:
         return cls.configInstance
 
 
-class KConfig(SafeConfigParser):
+class KConfig(ConfigParser):
 
     """Parse KDE config files.
-    This mimics KDE KConfig but can also be used like any SafeConfigParser but
+    This mimics KDE KConfig but can also be used like any ConfigParser but
     without support for a default section.
     We Override write() with a variant which does not put spaces
     around the '=' delimiter. This is configurable in Python3.3,  # TODO: remove
     so after kajongg is ported to Python3, this can be removed"""
 
     def __init__(self, path=None):
-        SafeConfigParser.__init__(self)
+        ConfigParser.__init__(self)
         if path is None:
             path = KGlobal.dirs().locateLocal("config", "kajonggrc")
         self.path = str(path)
