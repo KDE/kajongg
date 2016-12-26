@@ -27,7 +27,7 @@ from hashlib import md5
 if os.name == 'nt':
     import winsound  # pylint: disable=import-error
 
-from common import Debug, Internal, nativeString, StrMixin
+from common import Debug, Internal, StrMixin
 from util import which, removeIfExists, uniqueList, elapsedSince
 from log import logWarning, m18n, logDebug, logException
 
@@ -234,7 +234,6 @@ class Voice(StrMixin):
         if not Voice.__availableVoices:
             result = []
             for parentDirectory in KGlobal.dirs().findDirs("appdata", "voices"):
-                parentDirectory = nativeString(parentDirectory)
                 for (dirpath, _, _) in os.walk(parentDirectory, followlinks=True):
                     if os.path.exists(os.path.join(dirpath, 's1.ogg')):
                         result.append(Voice(dirpath))

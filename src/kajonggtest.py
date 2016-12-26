@@ -34,7 +34,7 @@ import gc
 
 from optparse import OptionParser
 
-from common import Debug, StrMixin, nativeString
+from common import Debug, StrMixin
 from util import removeIfExists, gitHead, checkMemory
 from util import Csv, CsvWriter
 
@@ -268,7 +268,7 @@ class Job(StrMixin):
                '--game={game}'.format(game=self.game),
                '--player={tester} {player}'.format(
                    player=player,
-                   tester=nativeString('Tüster')),
+                   tester='Tüster'),
                '--ruleset={ap}'.format(ap=self.ruleset)]
         if self.server.socketName:
             cmd.append('--socket={sock}'.format(sock=self.server.socketName))

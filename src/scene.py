@@ -24,7 +24,7 @@ from twisted.internet.defer import succeed
 
 from log import m18n, m18nc, logDebug, id4
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
-from common import nativeString, StrMixin
+from common import StrMixin
 from wind import Wind
 
 from qt import Qt, QMetaObject
@@ -610,5 +610,5 @@ class ScoringScene(GameScene):
             cbLastMeld = self.scoringDialog.cbLastMeld
             idx = cbLastMeld.currentIndex()
             if idx >= 0:
-                return Meld(nativeString(cbLastMeld.itemData(idx)))
+                return Meld(cbLastMeld.itemData(idx))
         return Meld()

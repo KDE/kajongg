@@ -27,7 +27,7 @@ import datetime
 from twisted.internet.defer import fail
 from twisted.spread import pb
 
-from common import Internal, Debug, Options, nativeString, StrMixin
+from common import Internal, Debug, Options, StrMixin
 from servercommon import srvError
 from log import logDebug, m18nE
 from query import Query
@@ -84,7 +84,6 @@ class User(pb.Avatar, StrMixin):
         self.dbIdent = dbIdent
         self.voiceId = voiceId
         self.maxGameId = maxGameId
-        clientVersion = nativeString(clientVersion)
         serverVersion = Internal.defaultPort
         if clientVersion != serverVersion:
             # we assume that versions x.y.* are compatible
@@ -127,9 +126,8 @@ class User(pb.Avatar, StrMixin):
         return self.server.leaveTable(self, tableid)
 
     def perspective_newTable(
-            self, ruleset, playOpen, autoPlay, wantedGame, tableId=None):
+            self, ruleset, playOpen, autoPlay, wantedGame: str, tableId=None):
         """perspective_* methods are to be called remotely"""
-        wantedGame = nativeString(wantedGame)
         return self.server.newTable(self, ruleset, playOpen, autoPlay, wantedGame, tableId)
 
     def perspective_startGame(self, tableid):

@@ -25,7 +25,7 @@ import types
 from hashlib import md5
 
 from common import Internal, Debug, english  # pylint: disable=redefined-builtin
-from common import StrMixin, nativeString, nativeStringArgs
+from common import StrMixin
 from log import m18n, m18nc, m18nE, logException, logDebug
 from query import Query
 
@@ -416,18 +416,14 @@ into a situation where you have to pay a penalty"""))
                 "select id,hash,name,description from ruleset where id=?", (self.name,))
         elif isinstance(self.name, list):
             # we got the rules over the wire
-            self.rawRules = (nativeStringArgs(x) for x in self.name[1:])
+            self.rawRules = self.name[1:]
             (self.rulesetId, self.__hash, self.name,
              self.description) = self.name[0]
-            self.__hash = nativeString(self.__hash)
             self.load()
                       # load raw rules at once, rules from db only when needed
             return
         else:
-            query = Query(
-                "select id,hash,name,description from ruleset where hash=?",
-                (nativeString(self.name),
-                ))
+            query = Query("select id,hash,name,description from ruleset where hash=?", (self.name,))
         if len(query.records):
             (self.rulesetId, self.__hash, self.name,
              self.description) = query.records[0]

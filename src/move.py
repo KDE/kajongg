@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import weakref
 
-from common import Debug, StrMixin, nativeString
+from common import Debug, StrMixin
 from message import Message
 from wind import Wind
 from tile import Tile, TileList
@@ -35,7 +35,7 @@ class Move(StrMixin):
         if isinstance(command, Message):
             self.message = command
         else:
-            self.message = Message.defined[nativeString(command)]
+            self.message = Message.defined[command]
         self.table = None
         self.notifying = False
         self._player = weakref.ref(player) if player else None
@@ -45,19 +45,21 @@ class Move(StrMixin):
         self.score = None
         self.lastMeld = None
         for key, value in kwargs.items():
+            if isinstance(value, bytes):
+                value = value.decode('utf-8')
             assert value != 'None'
             if value is None:
                 self.__setattr__(key, None)
             elif key.lower().endswith('tile'):
-                self.__setattr__(key, Tile(nativeString(value)))
+                self.__setattr__(key, Tile(value))
             elif key.lower().endswith('tiles'):
-                self.__setattr__(key, TileList(nativeString(value)))
+                self.__setattr__(key, TileList(value))
             elif key.lower().endswith('meld'):
-                self.__setattr__(key, Meld(nativeString(value)))
+                self.__setattr__(key, Meld(value))
             elif key.lower().endswith('melds'):
-                self.__setattr__(key, MeldList(nativeString(value)))
+                self.__setattr__(key, MeldList(value))
             elif key in ('wantedGame', 'score'):
-                self.__setattr__(key, nativeString(value))
+                self.__setattr__(key, value)
             elif key == 'playerNames':
                 self.__setattr__(key, self.convertWinds(value))
             else:
