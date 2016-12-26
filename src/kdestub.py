@@ -1064,9 +1064,7 @@ class KConfig(SafeConfigParser):
     around the '=' delimiter. This is configurable in Python3.3,  # TODO: remove
     so after kajongg is ported to Python3, this can be removed"""
 
-    SimpleConfig = 1
-
-    def __init__(self, path=None, dummyVariant=None):
+    def __init__(self, path=None):
         SafeConfigParser.__init__(self)
         if path is None:
             path = KGlobal.dirs().locateLocal("config", "kajonggrc")

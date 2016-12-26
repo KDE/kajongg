@@ -117,7 +117,7 @@ class Tileset:
         else:
             self.desktopFileName = desktopFileName
         self.darkenerAlpha = 120 if self.desktopFileName == 'jade' else 50
-        tileconfig = KConfig(self.path, KConfig.SimpleConfig)
+        tileconfig = KConfig(self.path)
         group = tileconfig.group("KMahjonggTileset")
 
         self.name = group.readEntry("Name") or m18n("unknown tileset")
