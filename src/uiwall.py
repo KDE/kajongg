@@ -29,8 +29,8 @@ from wall import Wall, KongBox
 from tile import Tile
 from tileset import Tileset
 from uitile import UITile
-from animation import animate, afterQueuedAnimations, AnimationSpeed, \
-    ParallelAnimationGroup, AnimatedMixin
+from animation import animate, afterQueuedAnimations, AnimationSpeed
+from animation import ParallelAnimationGroup, AnimatedMixin, animateAndDo
 
 
 class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
@@ -347,7 +347,7 @@ class UIWall(Wall):
                 self.__shuffleTiles()
             for uiTile in self.tiles:
                 uiTile.focusable = False
-            return animate().addCallback(self.__placeWallTiles)
+            return animateAndDo(self.__placeWallTiles)
 
     def __placeWallTiles(self, dummyResult=None):
         """place all wall tiles"""
@@ -450,19 +450,23 @@ class UIWall(Wall):
             # move last two tiles onto the dead end:
             return self._placeLooseTiles()
 
-    @afterQueuedAnimations
     def decorate4(self, deferredResult=None): # pylint: disable=unused-argument
-        """show player info on the wall"""
-        with AnimationSpeed(Speeds.sideText):
-            for player in self.game.players:
-                player.showInfo()
-            SideText.refreshAll()
-            animate().addCallback(self.showWindMarkers)
+        """show player info on the wall. The caller must ensure
+        all are moved simultaneously and at which speed by using
+        AnimationSpeed."""
+        for player in self.game.players:
+            player.showInfo()
+        SideText.refreshAll()
+        with AnimationSpeed():
+            # already queued animations keep their speed, only the windMarkeres
+            # are moved without animation
+            animateAndDo(self.showWindMarkers)
 
     def showWindMarkers(self, dummyDeferred=None):
-        """animate all windMarkers together"""
-        with AnimationSpeed(Speeds.windMarker):
-            for player in self.game.players:
-                side = player.front
-                side.windTile.setupAnimations()
-                side.windTile.show()
+        """animate all windMarkers. The caller must ensure
+        all are moved simultaneously and at which speed
+        by using AnimationSpeed."""
+        for player in self.game.players:
+            side = player.front
+            side.windTile.setupAnimations()
+            side.windTile.show()

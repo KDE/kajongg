@@ -31,7 +31,7 @@ from util import gitHead, CsvWriter
 from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, m18n
 from common import Internal, IntDict, Debug, Options
-from common import StrMixin
+from common import StrMixin, Speeds
 from wind import Wind, East
 from query import Query
 from rule import Ruleset
@@ -40,6 +40,7 @@ from sound import Voice
 from wall import Wall
 from move import Move
 from player import Players, Player, PlayingPlayer
+from animation import animate, AnimationSpeed
 
 
 @total_ordering
@@ -597,7 +598,8 @@ class Game:
                 # exchange seats between rounds
                 self.__exchangeSeats()
             if Internal.scene:
-                self.wall.showWindMarkers()
+                with AnimationSpeed(Speeds.windMarker):
+                    self.wall.showWindMarkers()
 
     def debug(self, msg, btIndent=None, prevHandId=False):
         """
@@ -703,7 +705,7 @@ class Game:
         game.notRotated += 1
         game.maybeRotateWinds()
         game.sortPlayers()
-        game.wall.decorate4()
+        animate().addCallback(game.wall.decorate4)
         return game
 
     def finished(self):

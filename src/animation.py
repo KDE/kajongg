@@ -456,6 +456,7 @@ def animate():
              - there are too many animations in the group so it would be too slow
              - the object has duration 0
     """
+    # TODO: merge with animateAndDo
     if Animation.nextAnimations:
         shortcutAll = (Internal.scene is None
                        or Internal.mainWindow.centralView.dragObject
@@ -478,3 +479,15 @@ def animate():
         return ParallelAnimationGroup.current.deferred
     else:
         return succeed(None)
+
+def doCallbackWithSpeed(result, speed, callback, *args, **kwargs):
+    """as the name says"""
+    with AnimationSpeed(speed):
+        callback(result, *args, **kwargs)
+
+def animateAndDo(callback, *args, **kwargs):
+    """if we want the next animations to have the same speed as the current group,
+    do not use animate().addCallback() because speed would not be kept"""
+    result = animate()
+    result.addCallback(doCallbackWithSpeed, Internal.Preferences.animationSpeed, callback, *args, **kwargs)
+    return result
