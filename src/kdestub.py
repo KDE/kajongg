@@ -795,8 +795,6 @@ class KStandardDirs:
     @classmethod
     def locate(cls, type_, filename):
         """see KStandardDirs doc"""
-        type_ = str(type_)
-        filename = str(filename)
         found, path = cls.__tryPath(cls._localBaseDirs[type_], filename)
         if found:
             return path
@@ -808,8 +806,6 @@ class KStandardDirs:
     @classmethod
     def locateLocal(cls, type_, filename):
         """see KStandardDirs doc"""
-        type_ = str(type_)
-        filename = str(filename)
         fullPath = os.path.join(cls._localBaseDirs[type_], filename)
         if not os.path.exists(os.path.dirname(fullPath)):
             if Debug.locate:
@@ -826,17 +822,13 @@ class KStandardDirs:
     @classmethod
     def addResourceType(cls, type_, basetype, relativename):
         """see KStandardDirs doc"""
-        type_ = str(type_)
-        basetype = str(basetype)
-        relativename = str(relativename)
         for baseDir in cls._baseDirs[basetype]:
-            cls._baseDirs[str(type_)].append(
+            cls._baseDirs[type_].append(
                 os.path.normpath(os.path.join(baseDir, relativename)))
 
     @classmethod
     def resourceDirs(cls, type_):
         """see KStandardDirs doc"""
-        type_ = str(type_)
         result = [cls._localBaseDirs[type_]]
         result.extend(cls._baseDirs[type_])
         return list(x for x in result if x is not None)
@@ -845,8 +837,6 @@ class KStandardDirs:
     def findDirs(cls, type_, reldir):
         """Tries to find all directories whose names consist of the specified type and a relative path"""
         result = []
-        type_ = str(type_)
-        reldir = str(reldir)
         found, path = cls.__tryPath(cls._localBaseDirs[type_], reldir)
         if found:
             result.append(path)
@@ -860,8 +850,6 @@ class KStandardDirs:
     def findAllResources(cls, type_, filter_, dummyRecursive):
         """Return all resources with the specified type. Recursion is not implemented."""
         dirs = cls.findDirs(type_, '')
-        type_ = str(type_)
-        filter_ = str(filter_)
         assert filter_ == '*.desktop'  # nothing else we need
         result = []
         for directory in dirs:
@@ -1016,10 +1004,8 @@ class KGlobal:
         cls.dirInstance = KStandardDirs()
         cls.localeInstance = KLocale()
         cls.configInstance = KConfig()
-        languages = str(
-            cls.configInstance.group(
-                'Locale').readEntry(
-                    'Language'))
+        languages = cls.configInstance.group('Locale').readEntry('Language')
+        assert isinstance(languages, str)
         if languages:
             languages = languages.split(':')
         else:
@@ -1064,7 +1050,7 @@ class KConfig(ConfigParser):
         ConfigParser.__init__(self)
         if path is None:
             path = KGlobal.dirs().locateLocal("config", "kajonggrc")
-        self.path = str(path)
+        self.path = path
         if os.path.exists(self.path):
             with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
                 self.read_file(cfgFile)
@@ -1268,7 +1254,7 @@ class KConfigSkeleton(QObject):
         """a dict of dicts"""
         result = defaultdict(dict)
         for item in self.items:
-            result[str(item.group)][str(item.key)] = item.value()
+            result[item.group][item.key] = item.value()
         return result
 
     def setCurrentGroup(self, group):
@@ -1504,7 +1490,7 @@ class KConfigDialog(KDialog):
         starts with kcfg_"""
         result = []
         for child in widget.children():
-            if str(child.objectName()).startswith('kcfg_'):
+            if child.objectName().startswith('kcfg_'):
                 result.append(child)
             else:
                 result.extend(cls.allChildren(child))
@@ -1529,7 +1515,7 @@ class KConfigDialog(KDialog):
         self.iconList.setMinimumWidth(neededIconWidth)
         for child in self.allChildren(self):
             self.configWidgets[
-                str(child.objectName()).replace('kcfg_', '')] = child
+                child.objectName().replace('kcfg_', '')] = child
             if isinstance(child, QCheckBox):
                 child.stateChanged.connect(self.updateButtons)
             elif isinstance(child, QSlider):
