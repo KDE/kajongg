@@ -60,7 +60,7 @@ import gettext
 __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
            'KCmdLineOptions', 'i18n', 'i18nc', 'ki18n',
            'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
-           'KConfigDialog', 'KDialog', 'KLineEdit',
+           'KConfigDialog', 'KDialog',
            'KUser', 'KToggleFullScreenAction', 'KStandardAction',
            'KXmlGuiWindow', 'KStandardDirs', 'KGlobal', 'KIcon', 'KAction']
 
@@ -1541,7 +1541,7 @@ class KConfigDialog(KDialog):
                 child.stateChanged.connect(self.updateButtons)
             elif isinstance(child, QSlider):
                 child.valueChanged.connect(self.updateButtons)
-            elif isinstance(child, KLineEdit):
+            elif isinstance(child, QLineEdit):
                 child.textChanged.connect(self.updateButtons)
         self.updateButtons()
         return configTab

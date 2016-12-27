@@ -124,5 +124,3 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QValidator
 from PyQt5.QtSvg import QGraphicsSvgItem
 from PyQt5.QtSvg import QSvgRenderer
-
-KLineEdit = QLineEdit  # pylint: disable=invalid-name

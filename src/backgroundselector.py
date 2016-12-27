@@ -19,8 +19,8 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import QWidget
-from kde import KLineEdit, KConfig
+from qt import QWidget, QLineEdit
+from kde import KConfig
 from background import Background
 from common import Internal
 from guiutil import loadUi
@@ -34,7 +34,7 @@ class BackgroundSelector(QWidget):
     def __init__(self, parent):
         super(BackgroundSelector, self).__init__(parent)
         loadUi(self)
-        self.kcfg_backgroundName = KLineEdit(self)
+        self.kcfg_backgroundName = QLineEdit(self)
         self.kcfg_backgroundName.setVisible(False)
         self.kcfg_backgroundName.setObjectName('kcfg_backgroundName')
         self.setUp()

@@ -19,8 +19,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import QWidget, QHBoxLayout
-from kde import KLineEdit
+from qt import QWidget, QHBoxLayout, QLineEdit
 from tileset import Tileset
 from uitile import UITile
 from board import Board, FittingView
@@ -39,7 +38,7 @@ class TilesetSelector(QWidget):
         super(TilesetSelector, self).__init__(parent)
 
         loadUi(self)
-        self.kcfg_tilesetName = KLineEdit(self)
+        self.kcfg_tilesetName = QLineEdit(self)
         self.kcfg_tilesetName.setVisible(False)
         self.kcfg_tilesetName.setObjectName('kcfg_tilesetName')
 
