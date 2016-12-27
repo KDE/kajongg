@@ -1167,10 +1167,6 @@ class KConfigSkeletonItem:
         """default getter"""
         return self._value
 
-    def pythonValue(self):
-        """default getter"""
-        return self._value
-
     def setValue(self, value):
         """default setter"""
         if self._value != value:
@@ -1208,9 +1204,6 @@ class ItemString(KConfigSkeletonItem):
         if value == '':
             value = default
         KConfigSkeletonItem.__init__(self, skeleton, key, value, default)
-
-    def pythonValue(self):
-        return str(self._value)
 
 
 class ItemInt(KConfigSkeletonItem):
@@ -1268,14 +1261,14 @@ class KConfigSkeleton(QObject):
     def writeConfig(self):
         """to the same file name"""
         for item in self.items:
-            self.config.setValue(item.group, item.key, item.pythonValue())
+            self.config.setValue(item.group, item.key, item.value())
         self.config.writeToFile()
 
     def as_dict(self):
         """a dict of dicts"""
         result = defaultdict(dict)
         for item in self.items:
-            result[str(item.group)][str(item.key)] = item.pythonValue()
+            result[str(item.group)][str(item.key)] = item.value()
         return result
 
     def setCurrentGroup(self, group):
