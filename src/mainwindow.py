@@ -220,7 +220,7 @@ class MainWindow(KXmlGuiWindow):
         if shortcut:
             res.setShortcut(Qt.CTRL + shortcut)
             res.setShortcutContext(Qt.ApplicationShortcut)
-        if PYQT_VERSION_STR != '4.5.2' or actionData is not None:
+        if actionData is not None:
             res.setData(actionData)
         return res
 
