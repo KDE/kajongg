@@ -37,7 +37,7 @@ from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
     QSizePolicy, QWidget
 
 from kde import KUser, KDialog, KDialogButtonBox, appdataDir, socketName
-from dialogs import DeferredDialog, QuestionYesNo, MustChooseKDialog
+from dialogs import DeferredDialog, QuestionYesNo
 
 from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
 from util import removeIfExists, which
@@ -406,13 +406,13 @@ class LoginDlg(QDialog):
         self.edPassword.setText(password)
 
 
-class AddUserDialog(MustChooseKDialog):
+class AddUserDialog(KDialog):
 
     """add a user account on a server: This dialog asks for the needed attributes"""
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, url, username, password):
-        MustChooseKDialog.__init__(self)
+        KDialog.__init__(self)
         decorateWindow(self, m18n('Create User Account'))
         self.setButtons(KDialog.ButtonCode(KDialog.Ok | KDialog.Cancel))
         vbox = QVBoxLayout()
