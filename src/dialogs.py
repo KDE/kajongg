@@ -53,7 +53,9 @@ class KDialogIgnoringEscape(KDialog, IgnoreEscape):
 
 class MustChooseKDialog(KDialogIgnoringEscape):
 
-    """this dialog can only be closed if a choice has been done"""
+    """this dialog can only be closed if a choice has been done. Currently,
+    the self.chosen thing is not used, code removed.
+    So this dialog can only be closed by calling accept() or reject()"""
 
     def __init__(self):
         parent = Internal.mainWindow  # default
@@ -69,14 +71,10 @@ class MustChooseKDialog(KDialogIgnoringEscape):
         if not isAlive(parent):
             parent = None
         KDialogIgnoringEscape.__init__(self, parent)
-        self.chosen = None
 
-    def closeEvent(self, event):
-        """allow close only if a choice has been done"""
-        if self.chosen is not None:
-            event.accept()
-        else:
-            event.ignore()
+    def closeEvent(self, event): # pylint: disable=no-self-use
+        """self.chosen is currently not used, never allow this"""
+        event.ignore()
 
 
 class Prompt(MustChooseKDialog, StrMixin):
