@@ -297,15 +297,15 @@ class LoginDlg(QDialog):
 
     def setupUi(self):
         """create all Ui elements but do not fill them"""
-        buttonBox = KDialogButtonBox(self)
-        buttonBox.setStandardButtons(
+        self.buttonBox = KDialogButtonBox(self)
+        self.buttonBox.setStandardButtons(
             QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
         # Ubuntu 11.10 unity is a bit strange - without this, it sets focus on
         # the cancel button (which it shows on the left). I found no obvious
         # way to use setDefault and setAutoDefault for fixing this.
-        buttonBox.button(QDialogButtonBox.Ok).setFocus(True)
-        buttonBox.accepted.connect(self.accept)
-        buttonBox.rejected.connect(self.reject)
+        self.buttonBox.button(QDialogButtonBox.Ok).setFocus(True)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
         vbox = QVBoxLayout(self)
         self.grid = QFormLayout()
         self.cbServer = QComboBox()
@@ -320,7 +320,7 @@ class LoginDlg(QDialog):
         self.cbRuleset = ListComboBox()
         self.grid.addRow(m18nc('kajongg', 'Ruleset:'), self.cbRuleset)
         vbox.addLayout(self.grid)
-        vbox.addWidget(buttonBox)
+        vbox.addWidget(self.buttonBox)
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         self.cbUser.setSizePolicy(pol)
@@ -347,7 +347,7 @@ class LoginDlg(QDialog):
                 userIdx = self.cbUser.findText(userNames[0])
                 if userIdx >= 0:
                     self.cbUser.setCurrentIndex(userIdx)
-        showPW = not Url(self.url).isLocalHost
+        showPW = bool(self.url) and not Url(self.url).isLocalHost
         self.grid.labelForField(self.edPassword).setVisible(showPW)
         self.edPassword.setVisible(showPW)
         self.grid.labelForField(
@@ -360,6 +360,7 @@ class LoginDlg(QDialog):
                 self.cbRuleset.items = [Options.ruleset]
             else:
                 self.cbRuleset.items = Ruleset.selectableRulesets(self.url)
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(bool(self.url))
 
     def __defineRuleset(self):
         """find out what ruleset to use"""
