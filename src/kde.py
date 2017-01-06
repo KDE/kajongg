@@ -25,7 +25,7 @@ import sys
 import shutil
 import sip
 
-from common import Internal, Options, unicode, isPython3
+from common import Internal, Options, unicodeString, isPython3
 
 usingKDE = False  # pylint: disable=invalid-name
 
@@ -91,7 +91,7 @@ def appdataDir():
             # the client wants to place the socket in serverDir
             os.makedirs(serverDir)
         result = os.path.dirname(
-            unicode(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
+            unicodeString(KGlobal.dirs().locateLocal("appdata", ""))) + '/'
         return result
 
 
@@ -101,7 +101,7 @@ def cacheDir():
         result = os.path.join(appdataDir(), 'cache')
     else:
         result = os.path.dirname(
-            unicode(KGlobal.dirs().locateLocal("cache", "")))
+            unicodeString(KGlobal.dirs().locateLocal("cache", "")))
         result = os.path.join(result, 'kajongg')
     if not os.path.exists(result):
         try:
