@@ -1105,18 +1105,7 @@ class KIcon(QIcon):
         dirs = KGlobal.dirs()
         if not KIcon.initDone:
             KIcon.initDone = True
-            dirs.addResourceType('appicon', 'data', 'kajongg/pics/')
-            dirs.addResourceType('appicon', 'icon', 'oxygen/48x48/actions/')
-            dirs.addResourceType('appicon', 'icon', 'oxygen/48x48/categories/')
-            dirs.addResourceType('appicon', 'icon', 'oxygen/48x48/status/')
-            dirs.addResourceType('appicon', 'icon', 'oxygen/base/48x48/actions/')
-            dirs.addResourceType('appicon', 'icon', 'oxygen/base/48x48/categories/')
-            dirs.addResourceType('appicon', 'icon', 'oxygen/base/48x48/status/')
-            dirs.addResourceType('appicon', 'icon', 'hicolor/scalable/apps/')
-            dirs.addResourceType(
-                'appicon',
-                'icon',
-                'hicolor/scalable/actions/')
+            self.initStyle()
         for suffix in ('png', 'svgz', 'svg', 'xpm'):
             result = dirs.locate('appicon', '.'.join([name, suffix]))
             if result:
@@ -1124,6 +1113,37 @@ class KIcon(QIcon):
                 break
         QIcon.__init__(self, name)
 
+    @staticmethod
+    def initStyle():
+        """adds resources for the current style"""
+        dirs = KGlobal.dirs()
+        dirs.addResourceType('appicon', 'data', 'kajongg/pics/')
+        conf = KConfig('~/.config/kdeglobals')
+        iconStyle = conf.group('Icons').readEntry('Theme').lower()
+        if iconStyle is None:
+            iconStyle = 'oxygen' if os.name == 'nt' else 'breeze'
+        if Debug.locate:
+            Internal.logger.debug('Using style %s for icons', iconStyle)
+        iconDirs = ()
+        if iconStyle == 'oxygen':
+            iconDirs = (
+                'oxygen/48x48/actions/',
+                'oxygen/48x48/categories/',
+                'oxygen/48x48/status/',
+                'oxygen/base/48x48/actions/',
+                'oxygen/base/48x48/categories/',
+                'oxygen/base/48x48/status/',
+                'hicolor/scalable/apps/',
+                'hicolor/scalable/actions/')
+        elif iconStyle.lower() == 'breeze':
+            iconDirs = (
+                'breeze/actions/22/',
+                'breeze/categories/32/',
+                'breeze/status/22/',
+                'hicolor/scalable/apps/',
+                'hicolor/scalable/actions/')
+        for _ in iconDirs:
+            dirs.addResourceType('appicon', 'icon', _)
 
 class KAction(QAction):
 
