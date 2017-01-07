@@ -1050,7 +1050,7 @@ class KConfig(ConfigParser):
     without support for a default section."""
 
     def __init__(self, path=None):
-        ConfigParser.__init__(self)
+        ConfigParser.__init__(self, delimiters=('=', ))
         if path is None:
             path = KGlobal.dirs().locateLocal("config", "kajonggrc")
         self.path = path
