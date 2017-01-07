@@ -1053,7 +1053,7 @@ class KConfig(ConfigParser):
         ConfigParser.__init__(self, delimiters=('=', ))
         if path is None:
             path = KGlobal.dirs().locateLocal("config", "kajonggrc")
-        self.path = path
+        self.path = os.path.expanduser(path)
         if os.path.exists(self.path):
             with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
                 self.read_file(cfgFile)
