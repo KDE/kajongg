@@ -785,11 +785,6 @@ class KStandardDirs:
             return False, None
         tryThis = os.path.join(*args)
         exists = os.path.exists(tryThis)
-        if Debug.locate:
-            if exists:
-                Internal.logger.debug('found: %s', tryThis)
-            else:
-                Internal.logger.debug('not found: %s', tryThis)
         return exists, tryThis
 
     @classmethod
@@ -797,11 +792,17 @@ class KStandardDirs:
         """see KStandardDirs doc"""
         found, path = cls.__tryPath(cls._localBaseDirs[type_], filename)
         if found:
+            if Debug.locate:
+                Internal.logger.debug('%s %s: found %s', type_, filename, path)
             return path
         for baseDir in cls._baseDirs[type_]:
             found, path = cls.__tryPath(cls.prefix, baseDir, filename)
             if found:
+                if Debug.locate:
+                    Internal.logger.debug('%s %s: found %s', type_, filename, path)
                 return path
+        if Debug.locate:
+            Internal.logger.debug('%s %s: not found', type_, filename)
 
     @classmethod
     def locateLocal(cls, type_, filename):
@@ -844,6 +845,8 @@ class KStandardDirs:
             found, path = cls.__tryPath(cls.prefix, baseDir, reldir)
             if found:
                 result.append(path)
+        if Debug.locate:
+            Internal.logger.debug('%s %s: found directories %s', type_, reldir, result)
         return result
 
     @classmethod
