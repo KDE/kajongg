@@ -936,7 +936,7 @@ class KConfigGroup:
     def __default(self, name):
         """defer computation of Languages until really needed"""
         if self.groupName == 'Locale' and name == 'Language':
-            return self.availableLanguages()
+            return QLocale().name()
 
     def readEntry(self, name, default=None):
         """get an entry from this group."""
@@ -960,7 +960,7 @@ class KConfigGroup:
                 if languages:
                     return ':'.join(languages)
                 else:
-                    return self.availableLanguages()
+                    return QLocale().name()
             return items[name]
         return self.__default(name)
 
