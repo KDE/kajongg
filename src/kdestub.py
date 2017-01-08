@@ -924,7 +924,7 @@ class KConfigGroup:
     def __default(self, name):
         """defer computation of Languages until really needed"""
         if self.groupName == 'Locale' and name == 'Language':
-            return self.__availableLanguages()
+            return self.availableLanguages()
 
     def readEntry(self, name, default=None):
         """get an entry from this group."""
@@ -948,7 +948,7 @@ class KConfigGroup:
                 if languages:
                     return ':'.join(languages)
                 else:
-                    return self.__availableLanguages()
+                    return self.availableLanguages()
             return items[name]
         return self.__default(name)
 
@@ -962,7 +962,7 @@ class KConfigGroup:
                     yield lang.split('_')[0]
 
     @classmethod
-    def __availableLanguages(cls):
+    def availableLanguages(cls):
         """see python lib, getdefaultlocale (which only returns the first one)"""
         localenames = [getdefaultlocale()[0]]
         for variable in ('LANGUAGE', 'LC_ALL', 'LC_MESSAGES', 'LANG'):
@@ -977,6 +977,10 @@ class KConfigGroup:
                     localenames.append(localename)
         languages = list(_parse_localename(x)[0]
                          for x in localenames if len(x))
+        for resourceDir in  KGlobal.dirs().findResourceDir('locale', ''):
+            for sysLanguage in os.listdir(resourceDir):
+                if cls.__isLanguageInstalledForKajongg(sysLanguage):
+                    languages.append(sysLanguage)
         if languages:
             languages = uniqueList(cls.__extendRegionLanguages(languages))
             languages = list(
