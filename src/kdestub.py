@@ -1249,7 +1249,7 @@ class KConfigSkeleton(QObject):
         QObject.__init__(self)
         self.currentGroup = None
         self.items = []
-        self.config = KConfig()
+        self.config = KGlobal.config()
         self.addBool('MainWindow', 'toolBarVisible', True)
         self.addString(
             'MainWindow',
