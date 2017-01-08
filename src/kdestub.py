@@ -50,7 +50,7 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
 
-from common import Internal, Debug, ENGLISHDICT
+from common import Internal, Debug, ENGLISHDICT, isAlive
 from util import uniqueList
 from statesaver import StateSaver
 
@@ -440,8 +440,12 @@ class KDialog(CaptionMixin, QDialog):
         if KDialog.RestoreDefaults & buttonMask:
             self.buttonBox.button(
                 KDialog.RestoreDefaults).setText(i18n('&Defaults'))
+            self.buttonBox.button(KDialog.RestoreDefaults).clicked.connect(self.restoreDefaults)
         if KDialog.Help & buttonMask:
             self.buttonBox.button(KDialog.Help).clicked.connect(startHelp)
+
+    def restoreDefaults(self):
+        """virtual"""
 
     def setMainWidget(self, widget):
         """see KDialog.setMainWidget"""
@@ -633,13 +637,16 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
                 (i18n('&View'), ('scoreTable', 'explain')),
                 (i18n('&Settings'), ('players', 'rulesets', 'demoMode', '', 'options_show_statusbar',
                                      'options_show_toolbar', '', 'options_configure_toolbars', 'options_configure')),
-                (i18n('&Help'), ('help', 'aboutkajongg'))):
+                (i18n('&Help'), ('help', 'language', 'aboutkajongg'))):
             self.menus[menu[0]] = (QMenu(menu[0]), menu[1])
             self.menuBar().addMenu(self.menus[menu[0]][0])
         self.setCaption('')
         self.actionHelp = self.kajonggAction(
             "help", "help-contents", startHelp)
         self.actionHelp.setText(i18nc('@action:inmen', '&Help'))
+        self.actionLanguage = self.kajonggAction(
+            "language", "preferences-desktop-locale", self.selectLanguage)
+        self.actionLanguage.setText(i18nc('@action:inmen', 'Switch Application &Language'))
         self.actionAboutKajongg = self.kajonggAction(
             'aboutkajongg', 'kajongg', self.aboutKajongg)
         self.actionAboutKajongg.setText(
@@ -696,6 +703,11 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
     def kajonggAction(
             self, name, icon, slot=None, shortcut=None, actionData=None):
         """this is defined in MainWindow(KXmlGuiWindow)"""
+
+    @staticmethod
+    def selectLanguage():
+        """show an about dialog"""
+        KSwitchLanguageDialog(Internal.mainWindow).exec_()
 
     @staticmethod
     def aboutKajongg():
@@ -990,6 +1002,12 @@ class KConfigGroup:
         return ':'.join(languages)
 
     @classmethod
+    def availableLanguages_(cls):
+        """like availableLanguages but only those with a _"""
+        languages = cls.availableLanguages().split(':')
+        return ':'.join(x for x in languages if '_' in x)
+
+    @classmethod
     def __isLanguageInstalled(cls, lang):
         """is any translation available for lang?"""
         return bool(KGlobal.dirs().findDirs('locale', lang))
@@ -1137,6 +1155,7 @@ class KIcon(QIcon):
                 'oxygen/base/48x48/actions/',
                 'oxygen/base/48x48/categories/',
                 'oxygen/base/48x48/status/',
+                'oxygen/base/48x48/apps/',
                 'hicolor/scalable/apps/',
                 'hicolor/scalable/actions/')
         elif iconStyle.lower() == 'breeze':
@@ -1144,6 +1163,7 @@ class KIcon(QIcon):
                 'breeze/actions/22/',
                 'breeze/categories/32/',
                 'breeze/status/22/',
+                'breeze/apps/32',
                 'hicolor/scalable/apps/',
                 'hicolor/scalable/actions/')
         for _ in iconDirs:
@@ -1310,8 +1330,179 @@ class KConfigSkeleton(QObject):
         return result
 
 
-class AboutKajonggDialog(KDialog):
+class KSwitchLanguageDialog(KDialog):
+    """select application language"""
 
+    def __init__(self, parent):
+        super(KSwitchLanguageDialog, self).__init__(parent)
+        self.languageRows = dict()
+        self.languageButtons = list()
+        self.setCaption(i18n('Switch Application Language'))
+        self.widget = QWidget()
+        topLayout = QVBoxLayout()
+        self.widget.setLayout(topLayout)
+
+        topLayout.addWidget(QLabel(i18n("Please choose the language which should be used for this application:")))
+
+        languageHorizontalLayout = QHBoxLayout()
+        topLayout.addLayout(languageHorizontalLayout)
+
+        self.languagesLayout = QGridLayout()
+        languageHorizontalLayout.addLayout(self.languagesLayout)
+        languageHorizontalLayout.addStretch()
+
+        defined = KGlobal.config().group(
+            'Locale').readEntry('Language').split(':')
+        if not defined:
+            defined = [QLocale.name()]
+        for idx, _ in enumerate(defined):
+            self.addLanguageButton(_, isPrimaryLanguage=idx == 0)
+
+        addButtonHorizontalLayout = QHBoxLayout()
+        topLayout.addLayout(addButtonHorizontalLayout)
+
+        addLangButton = QPushButton(i18n("Add Fallback Language"), self)
+        addLangButton.clicked.connect(self.slotAddLanguageButton)
+        addButtonHorizontalLayout.addWidget(addLangButton)
+        addButtonHorizontalLayout.addStretch()
+
+        topLayout.addStretch(10)
+
+        self.setButtons(KDialog.Ok | KDialog.Cancel | KDialog.RestoreDefaults)
+        self.setMainWidget(self.widget)
+
+    def addLanguageButton(self, languageCode, isPrimaryLanguage):
+        """add button for language"""
+        labelText = i18n("Primary language:") if isPrimaryLanguage else i18n("Fallback language:")
+        languageButton = KLanguageButton('', self.widget)
+        languageButton.current = languageCode
+
+        removeButton = None
+        if not isPrimaryLanguage:
+            removeButton = QPushButton(i18n("Remove"))
+            removeButton.clicked.connect(self.removeButtonClicked)
+
+        languageButton.setToolTip(
+            i18n("This is the main application language which will be used first, before any other languages.")
+            if isPrimaryLanguage else
+            i18n("This is the language which will be used if any previous "
+                 "languages do not contain a proper translation."))
+
+        numRows = self.languagesLayout.rowCount()
+
+        languageLabel = QLabel(labelText)
+        self.languagesLayout.addWidget(languageLabel, numRows + 1, 1, Qt.AlignLeft)
+        self.languagesLayout.addWidget(languageButton.button, numRows + 1, 2, Qt.AlignLeft)
+
+        if not isPrimaryLanguage:
+            self.languagesLayout.addWidget(removeButton, numRows + 1, 3, Qt.AlignLeft)
+            removeButton.show()
+            self.languageRows[removeButton] = tuple([languageLabel, languageButton])
+
+        self.languageRows[languageButton] = tuple([languageLabel, languageButton])
+        self.languageButtons.append(languageButton)
+
+    def accept(self):
+        """OK"""
+        newValue = ':'.join(x.current for x in self.languageButtons)
+        KGlobal.config().setValue('Locale', 'Language', newValue)
+        super(KSwitchLanguageDialog, self).accept()
+
+    def slotAddLanguageButton(self):
+        """adding a new button with en_US as it should always be present"""
+        self.addLanguageButton('en_US', len(self.languageButtons) == 0)
+
+    def languageOnButtonChanged(self, newTxt):
+        """TODO: """
+
+    def restoreDefaults(self):
+        """reset values to default"""
+        keys = list(x for x in self.languageRows.keys() if isinstance(x, KLanguageButton))
+        for _ in keys:
+            self.removeLanguage(_)
+        for removeButton in self.languageRows.keys():
+            if isAlive(removeButton):
+                removeButton.deleteLater()
+        self.languageRows = dict()
+        self.addLanguageButton(QLocale().name(), True)
+
+    def removeButtonClicked(self):
+        """remove this language"""
+        self.removeLanguage(self.sender())
+
+    def removeLanguage(self, button):
+        """remove this language"""
+        label, languageButton = self.languageRows[button]
+        label.deleteLater()
+        languageButton.deleteLater()
+        button.deleteLater()
+        del self.languageRows[languageButton]
+        self.languageButtons.remove(languageButton)
+
+
+class KLanguageButton(QWidget):
+    """A language button for KSwitchLanguageDialog"""
+
+    def __init__(self, txt, parent=None):
+        super(KLanguageButton, self).__init__(parent)
+        self.button = QPushButton(txt)
+        self.popup = QMenu()
+        self.button.setMenu(self.popup)
+        self.setText(txt)
+        self.__currentItem = None
+        for _ in KConfigGroup.availableLanguages_().split(':'):
+            self.addLanguage(_)
+        self.popup.triggered.connect(self.slotTriggered)
+        self.popup.show()
+        self.button.show()
+        self.show()
+
+    def deleteLater(self):
+        """self and children"""
+        self.button.deleteLater()
+        self.popup.deleteLater()
+        QWidget.deleteLater(self)
+
+    def setText(self, txt):
+        """proxy: sets the button text"""
+        self.button.setText(txt)
+
+
+    def addLanguage(self, languageCode):
+        """add language to popup"""
+        text = languageCode
+        locale = QLocale(languageCode)
+        if locale != QLocale.c():
+            text = locale.nativeLanguageName()
+
+        action = QAction(QIcon(), text, self)
+        action.setData(languageCode)
+        self.popup.addAction(action)
+
+    @property
+    def current(self):
+        """current languageCode"""
+        return self.__currentItem
+
+    @current.setter
+    def current(self, languageCode):
+        """point to languageCode"""
+        action = self.findAction(languageCode)
+        self.__currentItem = action.data()
+        self.button.setText(action.text())
+
+    def slotTriggered(self, action):
+        """another language has been selected from the popup"""
+        self.current = action.data()
+
+    def findAction(self, data):
+        """find action by name"""
+        for action in self.popup.actions():
+            if action.data() == data:
+                return action
+
+
+class AboutKajonggDialog(KDialog):
     """about kajongg dialog"""
 
     def __init__(self, parent):

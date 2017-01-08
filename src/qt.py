@@ -48,6 +48,7 @@ from PyQt5.QtCore import QSizeF
 from PyQt5.QtCore import QSocketNotifier
 from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import QTranslator
+from PyQt5.QtCore import QLocale
 from PyQt5.QtCore import pyqtProperty
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QAbstractItemView
