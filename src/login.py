@@ -148,18 +148,16 @@ class Url(str, StrMixin):
                         SingleshotOptions.game, self))
                     raise CancelledError
                 return deferLater(Internal.reactor, 1, self.startServer, result, waiting + 1)
-        elif which('XXqdbus'):
-            # TODO: use twisted process because we must have a timeout. If the qdbus service
-            # does not answer, qdbus waits for 25 seconds.
-            # the state of QtDBus is unclear to me.
-            # riverbank.computing says module dbus is deprecated
-            # for Python 3. And Ubuntu has no package with
-            # QtDBus. So we use good old subprocess.
-            stdoutdata, stderrdata = subprocess.Popen(
-                ['qdbus',
-                 'org.kde.kded',
-                 '/modules/networkstatus',
-                 'org.kde.Solid.Networking.status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+        elif which('qdbus'):
+            try:
+                stdoutdata, stderrdata = subprocess.Popen(
+                    ['qdbus',
+                     'org.kde.kded',
+                     '/modules/networkstatus',
+                     'org.kde.Solid.Networking.status'],
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate(timeout=1)
+            except subprocess.TimeoutExpired:
+                raise twisted.internet.error.ConnectError()
             stdoutdata = stdoutdata.strip()
             stderrdata = stderrdata.strip()
             if stderrdata == '' and stdoutdata != '4':
