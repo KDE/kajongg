@@ -138,8 +138,8 @@ class Tileset:
                                        (tileversion, TILESETVERSIONFORMAT)))
 
         graphName = group.readEntry("FileName")
-        self.__graphicspath = locateTileset(graphName)
-        if not self.__graphicspath:
+        self.graphicsPath = locateTileset(graphName)
+        if not self.graphicsPath:
             logException(
                 TileException('cannot find kmahjongglib/tilesets/%s for %s' %
                               (graphName, self.desktopFileName)))
@@ -182,12 +182,12 @@ class Tileset:
     def renderer(self):
         """initialise the svg renderer with the selected svg file"""
         if self.__renderer is None:
-            self.__renderer = QSvgRenderer(self.__graphicspath)
+            self.__renderer = QSvgRenderer(self.graphicsPath)
             if not self.__renderer.isValid():
                 logException(TileException(
                     m18n(
                         'file <filename>%1</filename> contains no valid SVG'),
-                    self.__graphicspath))
+                    self.graphicsPath))
             distance = 0
             if self.desktopFileName == 'classic':
                 distance = 2

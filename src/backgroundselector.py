@@ -52,6 +52,7 @@ class BackgroundSelector(QWidget):
             self.backgroundNameChanged)
         self.backgroundList = Background.backgroundsAvailable()
         for aset in self.backgroundList:
+            # TODO: backgroundList is not unique
             self.backgroundNameList.addItem(aset.name)
         self.kcfg_backgroundName.setText(Internal.Preferences.backgroundName)
 

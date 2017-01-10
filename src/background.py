@@ -119,8 +119,8 @@ class Background:
         self.isPlain = bool(group.readEntry('Plain'))
         if not self.isPlain:
             graphName = group.readEntry("FileName")
-            self.__graphicspath = locatebackground(graphName)
-            if not self.__graphicspath:
+            self.graphicsPath = locatebackground(graphName)
+            if not self.graphicsPath:
                 logException(BackgroundException(
                     'cannot find kmahjongglib/backgrounds/%s for %s' %
                     (graphName, self.desktopFileName)))
@@ -137,10 +137,10 @@ class Background:
             cachekey = '{name}W{width}H{height}'.format(name=self.name, width=width, height=height)
             self.__pmap = QPixmapCache.find(cachekey)
             if not self.__pmap:
-                renderer = QSvgRenderer(self.__graphicspath)
+                renderer = QSvgRenderer(self.graphicsPath)
                 if not renderer.isValid():
                     logException(BackgroundException(
-                        m18n('file <filename>%1</filename> contains no valid SVG', self.__graphicspath)))
+                        m18n('file <filename>%1</filename> contains no valid SVG', self.graphicsPath)))
                 self.__pmap = QPixmap(width, height)
                 self.__pmap.fill(Qt.transparent)
                 painter = QPainter(self.__pmap)
