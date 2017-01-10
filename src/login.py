@@ -97,11 +97,10 @@ class Url(str, StrMixin):
 
     def __str__(self):
         """show all info"""
-        selfStr = super(Url, self).__str__()
         if self.useSocket:
-            return 'Url({} socket={})'.format(selfStr, socketName())
+            return socketName()
         else:
-            return 'Url({} host={} port={})'.format(selfStr, self.host, self.port)
+            return '{}:{}'.format(self.host, self.port)
 
     @property
     def useSocket(self):
