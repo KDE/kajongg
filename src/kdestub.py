@@ -1423,9 +1423,6 @@ class KSwitchLanguageDialog(KDialog):
         """adding a new button with en_US as it should always be present"""
         self.addLanguageButton('en_US', len(self.languageButtons) == 0)
 
-    def languageOnButtonChanged(self, newTxt):
-        """TODO: """
-
     def restoreDefaults(self):
         """reset values to default"""
         keys = list(x for x in self.languageRows.keys() if isinstance(x, KLanguageButton))
