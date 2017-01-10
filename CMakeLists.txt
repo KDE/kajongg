@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8.12)
 set(PYTHON_MIN_VERSION "3.5.0")
 set(QT_MIN_VERSION "5.2")
 set(KF5_MIN_VERSION "5.15.0")
-set(TWISTED_MIN_VERSION "14.6.0")
+set(TWISTED_MIN_VERSION "16.6.0")
 
 find_package(ECM 1.2.0 REQUIRED NO_MODULE)
     
