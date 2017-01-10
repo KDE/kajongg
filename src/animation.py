@@ -124,8 +124,15 @@ class Animation(QPropertyAnimation, StrMixin):
 
     @staticmethod
     def removeImmediateAnimations():
-        """execute and remove immediate moves from the list"""
+        """execute and remove immediate moves from the list
+        We do not animate objects if
+             - we are in a graphics object drag/drop operation
+             - the user disabled animation
+             - there are too many animations in the group so it would be too slow
+             - the object has duration 0
+        """
         if Animation.nextAnimations:
+            needRefresh = False
             shortcutAll = (Internal.scene is None
                            or Internal.mainWindow.centralView.dragObject
                            or Internal.Preferences.animationSpeed == 99
@@ -136,6 +143,9 @@ class Animation(QPropertyAnimation, StrMixin):
                 if shortcutAll or animation.duration() == 0:
                     animation.targetObject().shortcutAnimation(animation)
                     Animation.nextAnimations.remove(animation)
+                    needRefresh = True
+            if needRefresh and Internal.scene:
+                Internal.scene.focusRect.refresh()
 
 class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
 
@@ -448,20 +458,13 @@ def animate():
     """now run all prepared animations. Returns a Deferred
         so callers can attach callbacks to be executed when
         animation is over.
-        We do not animate objects if
-             - we are in a graphics object drag/drop operation
-             - the user disabled animation
-             - there are too many animations in the group so it would be too slow
-             - the object has duration 0
     """
     # TODO: merge with animateAndDo
     if Animation.nextAnimations:
         Animation.removeImmediateAnimations()
-        if not Animation.nextAnimations:
-            if Internal.scene:
-                Internal.scene.focusRect.refresh()
-            return succeed(None)
         animations = Animation.nextAnimations
+        if not animations:
+            return succeed(None)
         Animation.nextAnimations = []
         return ParallelAnimationGroup(animations).deferred
     elif ParallelAnimationGroup.current:
