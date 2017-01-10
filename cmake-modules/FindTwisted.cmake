@@ -16,10 +16,20 @@ ELSE(TWISTED_FOUND)
 
   GET_FILENAME_COMPONENT(_cmake_module_path ${CMAKE_CURRENT_LIST_FILE}  PATH)
 
-  EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} ${_cmake_module_path}/FindTwisted.py OUTPUT_VARIABLE twisted)
-  IF(twisted)
-    SET(TWISTED_FOUND TRUE)
-  ENDIF(twisted)
+  EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE}
+  	${_cmake_module_path}/FindTwisted.py
+	OUTPUT_VARIABLE twisted_config)
+
+  IF(twisted_config)
+    STRING(REGEX MATCH "twisted_version:([^\n]+).*$" _dummy ${twisted_config})
+    SET(TWISTED_VERSION "${CMAKE_MATCH_1}" CACHE STRING "Twisted's version as a human-readable string")
+    IF(TWISTED_VERSION VERSION_LESS TWISTED_MIN_VERSION)
+      set(TWISTED_VERSION_COMPATIBLE FALSE)
+    ELSE()
+      set(TWISTED_VERSION_COMPATIBLE TRUE)
+      SET(TWISTED_FOUND TRUE)
+    ENDIF()
+  ENDIF(twisted_config)
 
   IF(TWISTED_FOUND)
     IF(NOT TWISTED_FIND_QUIETLY)

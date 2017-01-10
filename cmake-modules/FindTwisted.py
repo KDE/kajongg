@@ -6,8 +6,12 @@ Redistribution and use is allowed according to the terms of the BSD license.
 For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 """
 
+import sys
+
 try:
     from twisted.spread import pb
 except:
-    exit(1)
-print "Groovy"
+    print('twisted_version:{}'.format('0.0.0'))
+    sys.exit(0)
+from twisted import __version__
+print('twisted_version:{}'.format(__version__))
