@@ -65,11 +65,11 @@ class Background:
         # put the result into a set, avoiding duplicates
         backgrounds = list(set(str(x).rsplit('/')[-1].split('.')[0]
                                for x in backgroundsAvailableQ))
-        if 'default' in backgrounds:
-            # we want default to be first in list
-            sortedBackgrounds = ['default']
-            sortedBackgrounds.extend(set(backgrounds) - set(['default']))
-            backgrounds = sortedBackgrounds
+        # There may be a default desktop file pointing to the same svg as some other desktop file.
+        # If so we want to suppress the default entry, or the user visible list would show the default name twice
+        nonDefaultSvgNames = list(Background(x).graphicsPath for x in backgrounds if x != 'default')
+        if 'default' in backgrounds and Background('default').graphicsPath in nonDefaultSvgNames:
+            backgrounds.remove('default')
         return [Background(x) for x in backgrounds]
 
     def __init__(self, desktopFileName=None):
@@ -77,6 +77,7 @@ class Background:
             desktopFileName = 'default'
         self.__svg = None
         self.__pmap = None
+        self.graphicsPath = None
         QPixmapCache.setCacheLimit(20480)  # the chinese landscape needs much
         self.defineCatalog()
         self.desktopFileName = desktopFileName
