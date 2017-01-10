@@ -413,35 +413,19 @@ class AnimationSpeed:
                 Internal.Preferences.animationSpeed = self.prevAnimationSpeed
 
 
-def __afterCurrentAnimationDo(callback, *args, **kwargs):
-    """a helper, delaying some action until all active
-    animations have finished"""
-    current = ParallelAnimationGroup.current
-    if current:
-        deferred = Deferred()
-        deferred.addCallback(callback, *args, **kwargs)
-        current.doAfter.append(deferred)
-        if current.debug:
-            logDebug('after current animation group G%s do %s %s' %
-                     (current, callback, ','.join(args) if args else ''))
-    else:
-        callback(None, *args, **kwargs)
-
-
 def afterQueuedAnimations(doAfter):
     """A decorator"""
 
     @functools.wraps(doAfter)
     def doAfterQueuedAnimations(*args, **kwargs):
         """do this after all queued animations have finished"""
-        animate()
         method = types.MethodType(doAfter, args[0])
         args = args[1:]
         varnames = doAfter.__code__.co_varnames
         assert varnames[1] in ('deferredResult', 'dummyDeferredResult'), \
             '{} passed {} instead of deferredResult'.format(
                 doAfter.__qualname__, varnames[1])
-        return __afterCurrentAnimationDo(method, *args, **kwargs)
+        animateAndDo(method, *args, **kwargs)
 
     return doAfterQueuedAnimations
 
@@ -489,5 +473,7 @@ def animateAndDo(callback, *args, **kwargs):
     """if we want the next animations to have the same speed as the current group,
     do not use animate().addCallback() because speed would not be kept"""
     result = animate()
-    result.addCallback(doCallbackWithSpeed, Internal.Preferences.animationSpeed, callback, *args, **kwargs)
+    if Internal.Preferences:
+        # we might be called very early
+        result.addCallback(doCallbackWithSpeed, Internal.Preferences.animationSpeed, callback, *args, **kwargs)
     return result
