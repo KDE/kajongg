@@ -122,6 +122,20 @@ class Animation(QPropertyAnimation, StrMixin):
             targetObject,
             self.duration())
 
+    @staticmethod
+    def removeImmediateAnimations():
+        """execute and remove immediate moves from the list"""
+        if Animation.nextAnimations:
+            shortcutAll = (Internal.scene is None
+                           or Internal.mainWindow.centralView.dragObject
+                           or Internal.Preferences.animationSpeed == 99
+                           or len(Animation.nextAnimations) > 1000)
+                    # change 1000 to 100 if we do not want to animate shuffling and
+                    # initial deal
+            for animation in Animation.nextAnimations[:]:
+                if shortcutAll or animation.duration() == 0:
+                    animation.targetObject().shortcutAnimation(animation)
+                    Animation.nextAnimations.remove(animation)
 
 class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
 
@@ -442,16 +456,7 @@ def animate():
     """
     # TODO: merge with animateAndDo
     if Animation.nextAnimations:
-        shortcutAll = (Internal.scene is None
-                       or Internal.mainWindow.centralView.dragObject
-                       or Internal.Preferences.animationSpeed == 99
-                       or len(Animation.nextAnimations) > 1000)
-                # change 1000 to 100 if we do not want to animate shuffling and
-                # initial deal
-        for animation in Animation.nextAnimations[:]:
-            if shortcutAll or animation.duration() == 0:
-                animation.targetObject().shortcutAnimation(animation)
-                Animation.nextAnimations.remove(animation)
+        Animation.removeImmediateAnimations()
         if not Animation.nextAnimations:
             if Internal.scene:
                 Internal.scene.focusRect.refresh()
