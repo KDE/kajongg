@@ -130,7 +130,7 @@ class Tileset:
                 "no E-Mail address available")
 
         # Version control
-        tileversion = int(group.readEntry("VersionFormat")) or 0
+        tileversion = group.readInteger("VersionFormat", default=0)
         # Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if tileversion > TILESETVERSIONFORMAT:

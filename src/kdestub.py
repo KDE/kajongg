@@ -933,18 +933,19 @@ class KConfigGroup:
         self.config = weakref.ref(config)
         self.groupName = groupName
 
-    def __default(self, name):
+    def __default(self, name, default):
         """defer computation of Languages until really needed"""
+        if default is not None:
+            return default
         if self.groupName == 'Locale' and name == 'Language':
             return QLocale().name()
 
     def readEntry(self, name, default=None):
         """get an entry from this group."""
-        assert default is None
         try:
             items = self.config().items(self.groupName)
         except NoSectionError:
-            return self.__default(name)
+            return self.__default(name, default)
         items = dict((x for x in items if x[0].startswith(name)))
         i18nItems = dict(
             (x for x in items.items() if x[0].startswith(name + '[')))
@@ -962,7 +963,17 @@ class KConfigGroup:
                 else:
                     return QLocale().name()
             return items[name]
-        return self.__default(name)
+        return self.__default(name, default)
+
+    def readInteger(self, name, default=None):
+        """calls readEntry and returns it as an int or raises an Exception."""
+        try:
+            return int(self.readEntry(name, default))
+        except Exception:
+            raise Exception('cannot parse group {} in {}: {}={}'.format(
+                self.groupName, self.config().path, name,
+                self.readEntry(name, default)
+                ))
 
     @classmethod
     def __extendRegionLanguages(cls, languages):

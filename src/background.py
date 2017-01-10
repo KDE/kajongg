@@ -101,7 +101,7 @@ class Background:
         self.name = group.readEntry("Name") or m18n("unknown background")
 
         # Version control
-        backgroundversion = int(group.readEntry("VersionFormat")) or 0
+        backgroundversion = group.readInteger("VersionFormat", default=0)
         # Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if backgroundversion > BACKGROUNDVERSIONFORMAT:
@@ -111,14 +111,11 @@ class Background:
         self.tiled = group.readEntry('Tiled') == '1'
         if self.tiled:
             try:
-                # TODO: das except testen
-                self.imageWidth = int(group.readEntry('Width'))
-            except Exception:
-                raise Exception('cannot scan Width from background file')
-            try:
-                self.imageHeight = int(group.readEntry('Height'))
-            except:
-                raise Exception('cannot scan Height from background file')
+                self.imageWidth = group.readInteger('Width')
+                self.imageHeight = group.readInteger('Height')
+            except Exception as exc:
+                logException(exc) # TODO: simplify if we switch to twisted logger
+                raise
         self.isPlain = bool(group.readEntry('Plain'))
         if not self.isPlain:
             graphName = group.readEntry("FileName")
