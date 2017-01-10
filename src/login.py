@@ -62,7 +62,6 @@ class Url(str, StrMixin):
 
     """holds connection related attributes: host, port, socketname"""
     # pylint: disable=too-many-public-methods
-    # TODO: base content: host:port
     def __new__(cls, url):
         assert url
         host = None
@@ -370,7 +369,6 @@ class LoginDlg(QDialog):
 
     def userChanged(self, text):
         """the username has been changed, lookup password"""
-        assert isinstance(text, str) # TODO: remove
         if text == '':
             self.edPassword.clear()
             return
@@ -596,8 +594,6 @@ class Connection:
                                  self.dlg.password).exec_():
                 raise CancelledError
             Players.createIfUnknown(self.username)
-        assert isinstance(self.dlg.username, str), self.dlg.username # TODO: remove
-        assert isinstance(self.dlg.password, str), self.dlg.password
         adduserCmd = SERVERMARK.join(
             ['adduser', self.dlg.username, self.dlg.password])
         return self.loginCommand(adduserCmd)
