@@ -108,7 +108,6 @@ def i18n(englishIn, *args):
     @return: The translated text, args included.
     @rtype: C{unicode}
     """
-    assert englishIn
     if not Debug.neutral and KGlobal.translation and englishIn:
         _ = KGlobal.translation.gettext(englishIn)
     else:
