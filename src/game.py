@@ -40,7 +40,7 @@ from sound import Voice
 from wall import Wall
 from move import Move
 from player import Players, Player, PlayingPlayer
-from animation import animate, AnimationSpeed
+from animation import animateAndDo, AnimationSpeed
 
 
 @total_ordering
@@ -705,7 +705,7 @@ class Game:
         game.notRotated += 1
         game.maybeRotateWinds()
         game.sortPlayers()
-        animate().addCallback(game.wall.decorate4)
+        animateAndDo(game.wall.decorate4)
         return game
 
     def finished(self):

@@ -34,7 +34,7 @@ from rule import Ruleset
 from game import PlayingGame
 from query import Query
 from move import Move
-from animation import animate
+from animation import animate, animateAndDo
 from player import PlayingPlayer
 
 import intelligence
@@ -471,7 +471,7 @@ class Client(pb.Referenceable):
         # only when all animations ended, our handboard gets focus. Otherwise
         # we would see a blue focusRect in the handboard even when a tile
         # ist still moving from the discardboard to the handboard.
-        animate().addCallback(move.player.getsFocus)
+        animateAndDo(move.player.getsFocus)
         possibleAnswers = [Message.Discard, Message.Kong, Message.MahJongg]
         if not move.player.discarded:
             possibleAnswers.append(Message.OriginalCall)
