@@ -459,18 +459,15 @@ def animate():
         so callers can attach callbacks to be executed when
         animation is over.
     """
-    # TODO: merge with animateAndDo
     if Animation.nextAnimations:
         Animation.removeImmediateAnimations()
         animations = Animation.nextAnimations
-        if not animations:
-            return succeed(None)
-        Animation.nextAnimations = []
-        return ParallelAnimationGroup(animations).deferred
+        if animations:
+            Animation.nextAnimations = []
+            return ParallelAnimationGroup(animations).deferred
     elif ParallelAnimationGroup.current:
         return ParallelAnimationGroup.current.deferred
-    else:
-        return succeed(None)
+    return succeed(None)
 
 def doCallbackWithSpeed(result, speed, callback, *args, **kwargs):
     """as the name says"""
