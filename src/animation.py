@@ -105,7 +105,7 @@ class Animation(QPropertyAnimation, StrMixin):
         if pName == 'scale':
             return '%.2f' % value
 
-    def __str__(self): # TODO: hier auch duration zeigen
+    def __str__(self):
         """for debug messages"""
         if isAlive(self) and isAlive(self.targetObject()):
             currentValue = getattr(self.targetObject(), self.pName())
