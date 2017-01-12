@@ -25,7 +25,7 @@ from util import stack
 from log import logException, logDebug, id4
 from guiutil import Painter, sceneRotation
 from common import LIGHTSOURCES, ZValues, Internal, Debug
-from common import StrMixin
+from common import StrMixin, isAlive
 from tile import Tile
 from meld import Meld
 from animation import AnimatedMixin
@@ -119,6 +119,8 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
 
     def setDrawingOrder(self):
         """set drawing order for this tile"""
+        if not isAlive(self):
+            return
         if self.board:
             boardLevel = self.board.level
         else:
