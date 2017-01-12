@@ -222,11 +222,7 @@ class Game:
         self.roundsFinished = 0
         self._currentHandId = None
         self._prevHandId = None
-        self.randomGenerator = CountingRandom(self)
         self.wantedGame = wantedGame
-        self._setHandSeed()
-        self.activePlayer = None
-        self.__winner = None
         self.moves = []
         self.gameid = gameid
         self.playOpen = False
@@ -241,6 +237,10 @@ class Game:
         # tile names are always lowercase
         self.dangerousTiles = list()
         self.csvTags = []
+        self.randomGenerator = CountingRandom(self)
+        self._setHandSeed()
+        self.activePlayer = None
+        self.__winner = None
         self._setGameId()
         self.__useRuleset(ruleset)
         # shift rules taken from the OEMC 2005 rules

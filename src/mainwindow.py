@@ -60,7 +60,7 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from qt import Qt, QEvent, QMetaObject, PYQT_VERSION_STR, QTimer
+    from qt import Qt, QEvent, QMetaObject, QTimer
     from qt import QWidget, QGridLayout, QAction
 except ImportError as importError:
     NOTFOUND.append('Please install PyQt5: %s' % importError)
