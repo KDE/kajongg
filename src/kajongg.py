@@ -36,7 +36,8 @@ from common import Options, SingleshotOptions, Internal, Debug
 
 def initRulesets():
     """exits if user only wanted to see available rulesets"""
-    import predefined  # pylint: disable=unused-variable
+    import predefined
+    predefined.load()
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
         rulesets = dict((x.name, x) for x in Ruleset.selectableRulesets())

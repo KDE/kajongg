@@ -497,7 +497,10 @@ class ClassicalChineseBMJA(ClassicalChinese):
             'FCallingHand||Ohand=Purity',
             doubles=3)
 
-# add new predefined rulesets here
-if not PredefinedRuleset.classes:
+def load():
+    """load predefined rulesets.
+    add new predefined rulesets here.
+    """
+    assert not PredefinedRuleset.classes
     PredefinedRuleset.classes.add(ClassicalChineseDMJL)
     PredefinedRuleset.classes.add(ClassicalChineseBMJA)

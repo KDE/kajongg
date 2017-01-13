@@ -484,7 +484,8 @@ def kajonggServer():
     realm = MJRealm()
     realm.server = MJServer()
     kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
-    import predefined  # pylint: disable=unused-variable
+    import predefined
+    predefined.load()
     try:
         if Options.socket:
             # we do not want tracebacks to go from server to client,
