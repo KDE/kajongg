@@ -705,7 +705,8 @@ class Game:
         game.notRotated += 1
         game.maybeRotateWinds()
         game.sortPlayers()
-        animateAndDo(game.wall.decorate4)
+        with AnimationSpeed(Speeds.windMarker):
+            animateAndDo(game.wall.decorate4)
         return game
 
     def finished(self):

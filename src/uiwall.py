@@ -453,14 +453,15 @@ class UIWall(Wall):
     def decorate4(self, deferredResult=None): # pylint: disable=unused-argument
         """show player info on the wall. The caller must ensure
         all are moved simultaneously and at which speed by using
-        AnimationSpeed."""
-        for player in self.game.players:
-            player.showInfo()
-        SideText.refreshAll()
+        AnimationSpeed.
+        already queued animations keep their speed, only the windMarkeres
+        are moved without animation.
+        """
         with AnimationSpeed():
-            # already queued animations keep their speed, only the windMarkeres
-            # are moved without animation
-            animateAndDo(self.showWindMarkers)
+            for player in self.game.players:
+                player.showInfo()
+            SideText.refreshAll()
+        animateAndDo(self.showWindMarkers)
 
     def showWindMarkers(self, dummyDeferred=None):
         """animate all windMarkers. The caller must ensure

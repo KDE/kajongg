@@ -24,7 +24,7 @@ from twisted.internet.defer import succeed
 
 from log import m18n, m18nc, logDebug, id4
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
-from common import StrMixin
+from common import StrMixin, Speeds
 from wind import Wind
 
 from qt import Qt, QMetaObject
@@ -229,7 +229,8 @@ class GameScene(SceneWithFocusRect):
         """redecorate wall"""
         self.mainWindow.updateGUI()
         if self.game:
-            self.game.wall.decorate4()
+            with AnimationSpeed(Speeds.windMarker):
+                self.game.wall.decorate4()
 
     def updateSceneGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""
