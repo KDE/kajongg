@@ -19,22 +19,43 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 import weakref
-from random import Random, BPF, _MethodType, _BuiltinMethodType
+from random import Random
 
-from util import stack
+from util import callers
 from common import Debug
+
+class CountRandomCalls:
+
+    """a helper class for logging count of random calls"""
+
+    def __init__(self, rnd, what):
+        self.rnd = rnd
+        self.what = what
+        self.oldCount = CountingRandom.count
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, trback):
+        if Debug.random:
+            self.rnd.game.debug(
+                '{} out of {} calls to random by {} from {}'.format(
+                    CountingRandom.count - self.oldCount,
+                    CountingRandom.count,
+                    self.what,
+                    callers()))
 
 
 class CountingRandom(Random):
 
     """counts how often random() is called and prints debug info"""
 
-    # pylint: disable=invalid-name
+    count = 0
 
     def __init__(self, game, value=None):
         self._game = weakref.ref(game)
         Random.__init__(self, value)
-        self.count = 0
+        CountingRandom.count = 0
 
     @property
     def game(self):
@@ -43,68 +64,34 @@ class CountingRandom(Random):
 
     def random(self):
         """the central randomizator"""
-        self.count += 1
+        CountingRandom.count += 1
         return Random.random(self)
 
     def seed(self, newSeed=None, version=2):
-        self.count = 0
+        CountingRandom.count = 0
         Random.seed(self, newSeed, version)
         if Debug.random:
             self.game.debug('Random gets seed %s' % newSeed)
 
-    # pylint: disable=redefined-builtin
-    def _randbelow(self, n, int=int, maxsize=1<<BPF, type=type,
-                   Method=_MethodType, BuiltinMethod=_BuiltinMethodType):
-        "Return a random int in the range [0,n).  Raises ValueError if n==0."
-
-        getrandbits = self.getrandbits
-        k = n.bit_length()  # don't use (n-1) here because n can be 1
-        r = getrandbits(k)          # 0 <= r < 2**k
-        while r >= n:
-            r = getrandbits(k)
-        return r
-
     def randrange(self, start, stop=None, step=1, _int=int):
-        oldCount = self.count
-        result = Random.randrange(self, start, stop, step)
-        if Debug.random:
-            self.game.debug(
-                '%d out of %d calls to random by '
-                'Random.randrange(%d,%s) from %s'
-                % (self.count - oldCount, self.count, start, stop,
-                   stack('')[-2]))
-        return result
+        with CountRandomCalls(self, 'randrange({},{},step={})'.format(
+            start, stop, step)):
+            return Random.randrange(self, start, stop, step)
 
     def choice(self, fromList):
         """Choose a random element from a non-empty sequence."""
-        oldCount = self.count
-        result = Random.choice(self, fromList)
-        if Debug.random:
-            self.game.debug(
-                '%d out of %d calls to random by '
-                'Random.choice(%s) from %s' % (
-                    self.count - oldCount, self.count,
-                    str([str(x) for x in fromList]),
-                    stack('')[-2]))
-        return result
+        if len(fromList) == 1:
+            return fromList[0]
+        with CountRandomCalls(self, 'choice({})'.format(
+            fromList)):
+            return Random.choice(self, fromList)
 
     def sample(self, population, wantedLength):
         """add debug output to sample"""
-        oldCount = self.count
-        result = Random.sample(self, population, wantedLength)
-        if Debug.random:
-            self.game.debug(
-                '%d out of %d calls to random by '
-                'Random.sample(x, %d) from %s' %
-                (self.count - oldCount, self.count, wantedLength,
-                 stack('')[-2]))
-        return result
+        with CountRandomCalls(self, 'sample({}, {})'.format(population, wantedLength)):
+            return Random.sample(self, population, wantedLength)
 
     def shuffle(self, listValue, func=None):
         """add debug output to shuffle"""
-        oldCount = self.count
-        Random.shuffle(self, listValue, func)
-        if Debug.random:
-            self.game.debug(
-                '%d out of %d calls to random by Random.shuffle from %s'
-                % (self.count - oldCount, self.count, stack('')[-2]))
+        with CountRandomCalls(self, 'shuffle({})'.format(listValue)):
+            Random.shuffle(self, listValue, func)
