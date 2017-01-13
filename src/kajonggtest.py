@@ -200,7 +200,7 @@ class Server(StrMixin):
             if self.process:
                 try:
                     self.process.terminate()
-                    _ = self.process.wait()
+                    self.process.wait()
                 except OSError:
                     pass
                 print('{} killed'.format(self))

@@ -10,7 +10,8 @@ import sys
 
 try:
     from twisted.spread import pb
-except:
+    _ = pb
+except BaseException:
     print('twisted_version:{}'.format('0.0.0'))
     sys.exit(0)
 from twisted import __version__

@@ -35,16 +35,13 @@ from shutil import copytree, rmtree
 
 
 import re
-import os, sys
-
-if not hasattr(sys, 'version_info') or sys.version_info < (2, 6, 0, 'final'):
-    raise SystemExit, "Kajongg requires python 2.6 or later."
+import os
 
 # Adapt this range: =======================================================
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
 URL = "http://www.kde.org/applications/games/kajongg/"
-VERSION = "4.13.0"
+VERSION = "17.04"
 
 # =======================================================
 
@@ -53,7 +50,7 @@ VERSION = "4.13.0"
 
 (AUTHOR, EMAIL) = re.match('^(.*?)\s*<(.*)>$', FULLAUTHOR).groups()
 
-os.umask(0022) # files should be readable and executable by everybody
+os.umask(0o0022) # files should be readable and executable by everybody
 
 kdeDirs = {}
 for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'html':
@@ -93,7 +90,7 @@ class KmjBuild(build):
     def run(self):
         for binary in ['kajongg','kajonggserver', 'kajonggserver3']:
             open(binary, 'w').write('#!/bin/sh\nexec %skajongg/%s.py $*\n' % (kdeDirs['data'], binary))
-            os.chmod(binary, 0755 )
+            os.chmod(binary, 0o0755 )
         call(['cp hisc-apps-kajongg.svgz kajongg.svgz'], shell=True)
         call(['cp hisc-action-games-kajongg-law.svgz games-kajongg-law.svgz'], shell=True)
         build.run(self)

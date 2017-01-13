@@ -124,8 +124,7 @@ class Hand(StrMixin):
             self.debug(fmt('{callers}',
                            callers=callers(exclude=['__init__'])))
             Hand.indent += 1
-            _hideString = string
-            self.debug(fmt('New Hand {_hideString} {self.lenOffset}'))
+            self.debug('New Hand {} {}'.format(string, self.lenOffset))
 
         try:
             self.__arrange()
@@ -139,10 +138,7 @@ class Hand(StrMixin):
         finally:
             self._fixed = True
             if Debug.hand or (Debug.mahJongg and self.lenOffset == 1):
-                _hideSelf = str(self)
-                _hideScore = str(self.score)
-                self.debug(fmt(
-                    'Fixing {_hideSelf} {self.won} {_hideScore}'))
+                self.debug('Fixing {} {} {}'.format(self, self.won, self.score))
             Hand.indent -= 1
 
     def __parseString(self, inString):
@@ -527,7 +523,7 @@ class Hand(StrMixin):
             if Debug.hand and cand:
                 # Py2 and Py3 show sets differently
                 candis = ''.join(str(x) for x in sorted(cand)) # pylint: disable=unused-variable
-                self.debug(fmt('callingHands found {candis} for {rule}'))
+                self.debug('callingHands found {} for {}'.format(candis, rule))
             candidates.extend(x.concealed for x in cand)
         for tile in sorted(set(candidates)):
             if sum(x.exposed == tile.exposed for x in self.tiles) == 4:
