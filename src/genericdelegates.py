@@ -19,6 +19,18 @@ from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
 from guiutil import Painter
 
 
+class ZeroEmptyColumnDelegate(QStyledItemDelegate):
+
+    """Display 0 or 0.00 as empty"""
+
+    def displayText(self, value, locale):
+        """Display 0 or 0.00 as empty"""
+        if isinstance(value, int) and value == 0:
+            return ''
+        if isinstance(value, float) and value == 0.0:
+            return ''
+        return super(ZeroEmptyColumnDelegate, self).displayText(value, locale)
+
 class RichTextColumnDelegate(QStyledItemDelegate):
 
     """enables rich text in a view"""

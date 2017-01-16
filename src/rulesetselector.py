@@ -34,7 +34,7 @@ from tree import TreeItem, RootItem, TreeModel
 from kde import KApplication
 from dialogs import Sorry
 from modeltest import ModelTest
-from genericdelegates import RightAlignedCheckboxDelegate
+from genericdelegates import RightAlignedCheckboxDelegate, ZeroEmptyColumnDelegate
 from statesaver import StateSaver
 from guiutil import decorateWindow
 
@@ -133,8 +133,7 @@ class RuleItem(RuleTreeItem):
             else:
                 if not hasattr(content.score, str(column)):
                     column = colNames[column]
-                return str(getattr(content.score, column))
-                # we need str() here, otherwise undefined values appear as '0' instead as empty
+                return getattr(content.score, column)
         return ''
 
     def tooltip(self):
@@ -403,6 +402,8 @@ class RuleTreeView(QTreeView):
                 RightAlignedCheckboxDelegate(
                     self,
                     self.ruleModel.isCheckboxCell))
+            for  col in (1, 2, 3):
+                self.setItemDelegateForColumn(col, ZeroEmptyColumnDelegate(self))
             self.setModel(self.ruleModel)
             if Debug.modelTest:
                 self.ruleModelTest = ModelTest(self.ruleModel, self)
