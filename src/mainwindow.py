@@ -71,6 +71,12 @@ except ImportError as importError:
     NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
 
 try:
+    from twisted.spread import pb
+except ImportError as importError:
+    NOTFOUND.append('Package python3-twisted is missing or too old (I need 16.6.0): %s' % importError)
+
+
+try:
     from kde import KIcon, KAction, KApplication, KToggleFullScreenAction, \
         KXmlGuiWindow, KStandardAction
 
