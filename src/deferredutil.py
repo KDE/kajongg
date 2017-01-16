@@ -25,7 +25,7 @@ import weakref
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
 
-from log import m18nE, logInfo, logDebug, logException
+from log import m18nE, logInfo, logDebug, logException, id4
 from message import Message
 from common import Debug, StrMixin
 from move import Move
@@ -99,7 +99,7 @@ class Request(StrMixin):
             answer = 'OPEN'
         result = ''
         if Debug.deferredBlock:
-            result += '[{id:>4}] '.format(id=id(self) % 10000)
+            result += '[{id4:>4}] '.format(id4=id4(self))
         result += '{cmd}->{cls}({receiver:<10}): {answer}'.format(
             cls=self.user.__class__.__name__, cmd=cmd, receiver=self.user.name,
             answer=answer)
@@ -121,7 +121,7 @@ class Request(StrMixin):
         """for debug output"""
         result = ''
         if Debug.deferredBlock:
-            result += '[{id:>4}] '.format(id=id(self) % 10000)
+            result += '[{id4:>4}] '.format(id4=id4(self))
         result += '{cmd:<12}<-{cls:>6}({receiver:<10}): ANS={answer}'.format(
             cls=self.user.__class__.__name__,
             answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.user.name)
@@ -162,8 +162,8 @@ class DeferredBlock(StrMixin):
 
     def debugPrefix(self, dbgMarker=''):
         """prefix for debug message"""
-        return 'T{table} B[{id:>4}] {caller:<15} {dbgMarker:<3}(out={out})'.format(
-            table=self.table.tableid, id=id(self) % 10000, caller=self.calledBy[:15],
+        return 'T{table} B[{id4:>4}] {caller:<15} {dbgMarker:<3}(out={out})'.format(
+            table=self.table.tableid, id4=id4(self), caller=self.calledBy[:15],
             dbgMarker=dbgMarker, out=self.outstanding)
 
     def debug(self, dbgMarker, msg):
@@ -212,9 +212,9 @@ class DeferredBlock(StrMixin):
                 request)
         if Debug.deferredBlock:
             notifying = ' notifying' if deferred.notifying else ''
-            rqString = '[{id:>4}] {cmd}{notifying} {about}->{cls:>6}({receiver:<10})'.format(
+            rqString = '[{id4:>4}] {cmd}{notifying} {about}->{cls:>6}({receiver:<10})'.format(
                 cls=user.__class__.__name__,
-                id=id(request) % 10000, cmd=deferred.command, receiver=user.name,
+                id4=id4(request), cmd=deferred.command, receiver=user.name,
                 about=about.name if about else '', notifying=notifying)
             self.debug('+:%d' % len(self.requests), rqString)
 

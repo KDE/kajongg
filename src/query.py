@@ -33,7 +33,7 @@ import sqlite3
 
 from kde import appdataDir
 from util import Duration
-from log import logInfo, logWarning, logException, logError, logDebug, m18ncE, m18n
+from log import logInfo, logWarning, logException, logError, logDebug, m18ncE, m18n, id4
 from common import IntDict, Options, Internal, Debug
 
 class QueryException(Exception):
@@ -166,7 +166,7 @@ class DBHandle(sqlite3.Connection):
         name = stack[-3]
         if name in ('__exit__', '__init__'):
             name = stack[-4]
-        return '%s on %s (%x)' % (name, self.path, id(self))
+        return '%s on %s (%x)' % (name, self.path, id4(self))
 
     def commit(self, silent=None):
         """commit and log it"""
