@@ -70,28 +70,29 @@ try:
 except ImportError as importError:
     NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
 
-from kde import KIcon, KAction, KApplication, KToggleFullScreenAction, \
-    KXmlGuiWindow, KStandardAction
+try:
+    from kde import KIcon, KAction, KApplication, KToggleFullScreenAction, \
+        KXmlGuiWindow, KStandardAction
 
-from board import FittingView
-from playerlist import PlayerList
-from tileset import Tileset
-from background import Background
-from scoring import scoreGame
-from scoringdialog import ScoreTable, ExplainView
-from humanclient import HumanClient
-from rulesetselector import RulesetSelector
-from animation import afterQueuedAnimations, AnimationSpeed, ParallelAnimationGroup
-from chat import ChatWindow
-from scene import PlayingScene, ScoringScene
-from configdialog import ConfigDialog
-from statesaver import StateSaver
-from util import checkMemory
-from twisted.internet.error import ReactorNotRunning
+    from board import FittingView
+    from playerlist import PlayerList
+    from tileset import Tileset
+    from background import Background
+    from scoring import scoreGame
+    from scoringdialog import ScoreTable, ExplainView
+    from humanclient import HumanClient
+    from rulesetselector import RulesetSelector
+    from animation import afterQueuedAnimations, AnimationSpeed, ParallelAnimationGroup
+    from chat import ChatWindow
+    from scene import PlayingScene, ScoringScene
+    from configdialog import ConfigDialog
+    from statesaver import StateSaver
+    from util import checkMemory
+    from twisted.internet.error import ReactorNotRunning
 
-# except ImportError as importError:
-# NOTFOUND.append('Kajongg is not correctly installed: modules: %s' %
-# importError)
+except ImportError as importError:
+    NOTFOUND.append('Kajongg is not correctly installed: modules: %s' %
+        importError)
 
 if len(NOTFOUND):
     logError("\n".join(" * %s" % s for s in NOTFOUND), showStack=False)
