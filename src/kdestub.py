@@ -306,7 +306,7 @@ def getDocUrl(languages):
         """if status 404, try the next fallback language"""
         return getDocUrl(fallbacks) if factory.status == '404' else url
     host = 'docs.kde.org'
-    path = '/stable/{}/kdegames/kajongg/index.html'.format(languages[0])
+    path = '?application=kajongg&language={}'.format(languages[0])
     url = 'http://' + host + path
     factory = client.HTTPClientFactory(url)
     factory.protocol = client.HTTPPageGetter
