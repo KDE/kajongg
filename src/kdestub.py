@@ -259,7 +259,7 @@ class KAboutData:
     def licenseFile():
         """which may currently only be 1: GPL_V2"""
         for path in ('COPYING', '../COPYING',
-                     '%s/share/kde4/apps/LICENSES/GPL_V2' % KStandardDirs.prefix):
+                     '%s/share/kf5/licenses/GPL_V2' % KStandardDirs.prefix):
             path = os.path.abspath(path)
             if os.path.exists(path):
                 return path
