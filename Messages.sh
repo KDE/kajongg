@@ -4,7 +4,7 @@
 # extract messages from *.py
 
 # currently, the .pot lives at
-# http://websvn.kde.org/trunk/l10n-kde4/templates/messages/playground-games/kajongg.pot
+# http://websvn.kde.org/trunk/l10n-kf5/templates/messages/kdegames/kajongg.pot
 
 ${EXTRACTRC:-extractrc} src/*.ui src/*.rc >> rc.cpp
 
