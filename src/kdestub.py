@@ -1614,7 +1614,7 @@ class LicenseDialog(KDialog):
         self.setCaption(i18n("License Agreement"))
         self.setButtons(KDialog.Close)
         self.buttonBox.setFocus()
-        licenseText = open(KGlobal.aboutData.licenseFile(), 'rb').read()
+        licenseText = open(KGlobal.aboutData.licenseFile(), 'r').read()
         self.licenseBrowser = QTextBrowser()
         self.licenseBrowser.setLineWrapMode(QTextEdit.NoWrap)
         self.licenseBrowser.setText(licenseText)
