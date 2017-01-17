@@ -740,6 +740,7 @@ class KStandardDirs:
 
     def __init__(self):
         if KStandardDirs._baseDirs is None:
+            KStandardDirs.prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
             KStandardDirs._localBaseDirs = defaultdict(str)
             KStandardDirs._localBaseDirs.update({
                 'cache': '/var/tmp/kdecache-wr',
@@ -764,19 +765,10 @@ class KStandardDirs:
                 'icon': ['share/icons'],
             })
             if os.name == 'nt':
-                cwd = os.path.split(os.path.abspath(sys.argv[0]))[0]
-                KStandardDirs.prefix = cwd
                 dirMap = KStandardDirs._baseDirs
                 for key in dirMap:
                     dirMap[key] = list(os.path.normpath(x)
                                        for x in dirMap[key])
-            else:
-                kde4configPath = self.which('kde4-config')
-                if kde4configPath:
-                    KStandardDirs.prefix = '/{}/'.format(
-                        kde4configPath.split(b'/')[1].decode('utf-8'))
-                else:
-                    raise Exception('Cannot find kde4-config')
 
     @staticmethod
     def which(program):
