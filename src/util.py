@@ -274,3 +274,8 @@ class Csv:
     def reader(filename):
         """returns a generator for decoded strings"""
         return csv.reader(open(filename, 'r', encoding='utf-8'), delimiter=Csv.delimiter)
+
+def popenReadlines(args):
+    """runs a subprocess and returns stdout as a list of unicode encodes lines"""
+    result = subprocess.Popen(args, universal_newlines=True, stdout=subprocess.PIPE).communicate()[0]
+    return (x.strip() for x in result.split('\n') if x.strip())

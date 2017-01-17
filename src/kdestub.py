@@ -51,7 +51,7 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 from qt import *
 
 from common import Internal, Debug, ENGLISHDICT, isAlive
-from util import uniqueList
+from util import uniqueList, popenReadlines
 from statesaver import StateSaver
 
 import gettext
@@ -1527,11 +1527,8 @@ class AboutKajonggDialog(KDialog):
         h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
         underVersions = []
         try:
-            versions = subprocess.Popen(['kde4-config', '-v'],
-                                        stdout=subprocess.PIPE).communicate()[0]
-            versions = versions.decode().split('\n')
-            versions = (x.strip() for x in versions if ': ' in x.strip())
-            versionsDict = dict(x.split(': ') for x in versions)
+            versions = popenReadlines(['kde4-config', '-v'])
+            versionsDict = dict(x.split(': ') for x in versions if ':' in x)
             underVersions.append('KDE %s' % versionsDict['KDE'])
         except OSError:
             underVersions.append(i18n('KDE (not installed)'))
