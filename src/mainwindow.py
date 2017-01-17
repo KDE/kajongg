@@ -71,7 +71,8 @@ except ImportError as importError:
     NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
 
 try:
-    from twisted.spread import pb
+    from twisted.spread import pb # pylint: disable=unused-import
+    from twisted.internet.error import ReactorNotRunning
 except ImportError as importError:
     NOTFOUND.append('Package python3-twisted is missing or too old (I need 16.6.0): %s' % importError)
 
@@ -94,11 +95,10 @@ try:
     from configdialog import ConfigDialog
     from statesaver import StateSaver
     from util import checkMemory
-    from twisted.internet.error import ReactorNotRunning
 
 except ImportError as importError:
     NOTFOUND.append('Kajongg is not correctly installed: modules: %s' %
-        importError)
+                    importError)
 
 if len(NOTFOUND):
     logError("\n".join(" * %s" % s for s in NOTFOUND), showStack=False)
