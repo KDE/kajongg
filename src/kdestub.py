@@ -1143,12 +1143,19 @@ class KIcon(QIcon):
         """adds resources for the current style"""
         dirs = KGlobal.dirs()
         dirs.addResourceType('appicon', 'data', 'kajongg/pics/')
-        conf = KConfig('~/.config/kdeglobals')
-        iconStyle = conf.group('Icons').readEntry('Theme').lower()
-        if iconStyle is None:
-            iconStyle = 'oxygen' if os.name == 'nt' else 'breeze'
+        iconStyle = 'oxygen' if os.name == 'nt' else 'breeze' # default
+        debugSource = 'FIXED DEFAULT'
+        kdeglobals = QStandardPaths.locate(QStandardPaths.GenericConfigLocation, 'kdeglobals')
+        if kdeglobals:
+            try:
+                conf = KConfig(kdeglobals)
+                iconStyle = conf.group('Icons').readEntry('Theme').lower()
+                debugSource = kdeglobals
+            except BaseException:
+                pass # if Theme is not defined, stay with default. Or should
+                # I check the other config files in qtPath too?
         if Debug.locate:
-            Internal.logger.debug('Using style %s for icons', iconStyle)
+            Internal.logger.debug('Using style %s for icons from %s', iconStyle, debugSource)
         iconDirs = ()
         if iconStyle == 'oxygen':
             iconDirs = (

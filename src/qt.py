@@ -29,6 +29,7 @@ from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtCore import QByteArray
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtCore import QLibraryInfo
+from PyQt5.QtCore import QStandardPaths
 from PyQt5.QtCore import QEasingCurve
 from PyQt5.QtCore import QEvent
 from PyQt5.QtCore import QEventLoop
