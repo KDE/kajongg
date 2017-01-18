@@ -36,7 +36,7 @@ class About:
         description = ki18n(
             "Mah Jongg - the ancient Chinese board game for 4 players")
         kajongglicense = KAboutData.License_GPL
-        kajonggcopyright = ki18n("(C) 2008-2016 Wolfgang Rohdewald")
+        kajonggcopyright = "(C) 2008-2016 Wolfgang Rohdewald"
         aboutText = ki18n("This is the classical Mah Jongg for four players. "
                           "If you are looking for Mah Jongg solitaire please "
                           "use the application kmahjongg.")
@@ -45,6 +45,6 @@ class About:
                                 version, description, kajongglicense,
                                 kajonggcopyright, aboutText, homePage)
         self.about.addAuthor(
-            ki18n("Wolfgang Rohdewald"),
+            "Wolfgang Rohdewald",
             ki18n("Original author"),
             "wolfgang@rohdewald.de")

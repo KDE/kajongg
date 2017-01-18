@@ -94,7 +94,7 @@ def defineOptions():
     options.add(
         "port <PORT>",
         ki18n("use a dedicated server listening on PORT. Intended only for testing"))
-    options.add("debug <OPTIONS>", ki18n(Debug.help()))
+    options.add("debug <OPTIONS>", Debug.help())
     return options
 
 

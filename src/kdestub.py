@@ -1539,10 +1539,10 @@ class AboutKajonggDialog(KDialog):
             'Python {}.{}.{} {}'.format(*sys.version_info[:5]))
         h1vLayout.addWidget(
             QLabel(
-                i18nc(
-                    'running under version',
-                    ', '.join(
-                        underVersions))))
+                i18nc('kajongg',
+                      'Using versions %1',
+                      ', '.join(
+                          underVersions))))
         h1vLayout.addWidget(QLabel(i18n('Not using Python KDE bindings')))
         hLayout1.addLayout(h1vLayout)
         spacerItem = QSpacerItem(
