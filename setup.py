@@ -64,9 +64,9 @@ for ignFile in os.listdir('src'):
         os.remove(os.path.join('src', ignFile))
 
 data_files = [ \
-    (kdeDirs['exe'], ['kajongg','kajonggserver', 'kajonggserver3']),
+    (kdeDirs['exe'], ['kajongg', 'kajonggserver']),
     (os.path.join(kdeDirs['data'], 'kajongg'), app_files),
-    (os.path.join(kdeDirs['html'], 'en','kajongg'), doc_files),
+    (os.path.join(kdeDirs['html'], 'en', 'kajongg'), doc_files),
     (kdeDirs['xdgdata-apps'], ['org.kde.kajongg.desktop']),
     ('/usr/share/doc/kajongg/', ['COPYING.DOC']),
     (kdeDirs['iconApps'], ['kajongg.svgz']),
@@ -82,7 +82,7 @@ extra = {}
 class KmjBuild(build):
 
     def run(self):
-        for binary in ['kajongg','kajonggserver', 'kajonggserver3']:
+        for binary in ['kajongg', 'kajonggserver', 'kajonggserver3']:
             open(binary, 'w').write('#!/bin/sh\nexec %skajongg/%s.py $*\n' % (kdeDirs['data'], binary))
             os.chmod(binary, 0o0755 )
         call(['cp hisc-apps-kajongg.svgz kajongg.svgz'], shell=True)
