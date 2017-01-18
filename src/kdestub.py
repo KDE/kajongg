@@ -270,7 +270,14 @@ class KApplication(QApplication):
     """stub"""
 
     def __init__(self):
+        assert not Internal.isServer, 'KApplication is not supported for the server'
         QApplication.__init__(self, sys.argv)
+
+        # Qt uses sys.argv[0] as application name
+        # which is used by QStandardPaths - if we start kajongg.py directly,
+        # the search path would look like /usr/share/kajongg.py/
+        self.setApplicationName('kajongg')
+
         if os.name == 'nt':
             # on Linux, QCoreApplication initializes locale but not on Windows.
             # This is actually documented for QCoreApplication
