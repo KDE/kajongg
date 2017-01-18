@@ -30,6 +30,8 @@ import os
 import zipfile
 import tempfile
 
+from qt import QStandardPaths
+
 # pylint:disable=invalid-name
 
 
@@ -60,11 +62,8 @@ def makeIcon(svgName, icoName):
                 os.remove(pngName(resolution2))
         os.rmdir(tmpDir)
 
-dataDir = check_output(
-    "kde4-config --expandvars --install data".split()).strip()
 iconDir = check_output(
-    "kde4-config --expandvars --install icon".split()).strip()
-dataDir = dataDir.decode()
+    "kf5-config --expandvars --install icon".split()).strip()
 iconDir = iconDir.decode()
 
 oxy48 = iconDir + '/oxygen/base/48x48'
@@ -77,15 +76,16 @@ DEST = 'share'
 if os.path.exists(DEST):
     rmtree(DEST)
 
-targetDir = DEST + '/kde4/apps/kmahjongglib'
-os.makedirs(DEST + '/kde4/apps')
-copytree(dataDir + '/kmahjongglib', targetDir)
+targetDir = DEST + '/kmahjongglib'
+kmjLibDir = QStandardPaths.locate(QStandardPaths.AppDataLocation, 'kmahjongglib', QStandardPaths.LocateDirectory)
+copytree(kmjLibDir, targetDir)
 for tileset in ('alphabet', 'egypt'):
     for extension in ('copyright', 'desktop', 'svgz'):
         os.remove(targetDir + '/tilesets/{}.{}'.format(tileset, extension))
 
-os.makedirs(DEST + '/kde4/apps/kajongg')
-copytree(dataDir + '/kajongg/voices', DEST + '/kde4/apps/kajongg/voices')
+os.makedirs(DEST + '/kajongg')
+voiceDir = QStandardPaths.locate(QStandardPaths.AppDataLocation, 'kajongg/voices', QStandardPaths.LocateDirectory)
+copytree(voiceDir, DEST + '/kajongg/voices')
 
 for bellSound in ('/usr/share/sounds/KDE-Im-Message-In.ogg', ):
     if os.path.exists(bellSound):
@@ -116,14 +116,14 @@ try:
         ziparch.extract('oggdec.exe')
 finally:
     os.remove(oggdec)
-move('oggdec.exe', DEST + '/kde4/apps/kajongg/voices')
+move('oggdec.exe', DEST + '/kajongg/voices')
 
-copy('backgroundselector.ui', DEST + '/kde4/apps/kajongg')
-copy('tilesetselector.ui', DEST + '/kde4/apps/kajongg')
+copy('backgroundselector.ui', DEST + '/kajongg')
+copy('tilesetselector.ui', DEST + '/kajongg')
 
-copy('../hisc-apps-kajongg.svgz', DEST + '/icons/kajongg.svgz')
+copy('../icons/sc-apps-kajongg.svgz', DEST + '/icons/kajongg.svgz')
 
-makeIcon('../hisc-apps-kajongg.svgz', 'kajongg')
+makeIcon('../icons/sc-apps-kajongg.svgz', 'kajongg')
 makeIcon(
     iconDir +
     '/hicolor/scalable/actions/games-kajongg-law.svgz',
@@ -132,7 +132,7 @@ copy('kajongg.ico', DEST + '/icons')
 copy('games-kajongg-law.ico', DEST + '/icons')
 
 # select sufficiently complete languages from
-# http://l10n.kde.org/stats/gui/trunk-kde4/po/kajongg.po/
+# https://websvn.kde.org/trunk/l10n-kf5
 languages = (
     'bs', 'ca', 'da', 'de', 'en_GB', 'es', 'et', 'fr', 'gl', 'it', 'kk',
     'km', 'nl', 'nb', 'nds',
@@ -144,25 +144,23 @@ for lang in languages:
     print('getting language', lang)
     os.makedirs(DEST + '/locale/{}/LC_MESSAGES'.format(lang))
     DEVNULL = open(os.devnull, 'wb')
-    for kde45 in ('l10n-kde4', 'l10n-kf5'):
-        for filename in (
-                'kdegames/kajongg', 'kdegames/libkmahjongg',
-                'kdegames/libkmahjongg5',
-                'kdegames/desktop_kdegames_libkmahjongg',
-                'kdelibs/kdelibs4', 'qt/kdeqt'):
-            try:
-                mo_data = check_output(
-                    'svn cat svn://anonsvn.kde.org/home/kde/'
-                    'trunk/{}/{}/messages/{}.po'.format(
-                        kde45, lang, filename).split(), stderr=DEVNULL)
-                print('found:', lang, kde45, filename)
-                with open('x.po', 'wb') as outfile:
-                    outfile.write(mo_data)
-                call(
-                    'msgfmt x.po -o {}/locale/{}/LC_MESSAGES/{}.mo'.format(
-                        DEST,
-                        lang,
-                        filename.split('/')[1]).split())
-                os.remove('x.po')
-            except CalledProcessError:
-                pass
+    for filename in (
+            'kdegames/kajongg',
+            'kdegames/libkmahjongg5',
+            'kdegames/desktop_kdegames_libkmahjongg'):
+        try:
+            mo_data = check_output(
+                'svn cat svn://anonsvn.kde.org/home/kde/'
+                'trunk/l10n-kf5/{}/messages/{}.po'.format(
+                    lang, filename).split(), stderr=DEVNULL)
+            print('found:', lang, filename)
+            with open('x.po', 'wb') as outfile:
+                outfile.write(mo_data)
+            call(
+                'msgfmt x.po -o {}/locale/{}/LC_MESSAGES/{}.mo'.format(
+                    DEST,
+                    lang,
+                    filename.split('/')[1]).split())
+            os.remove('x.po')
+        except CalledProcessError:
+            print('not found:', lang, filename)
