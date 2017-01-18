@@ -539,7 +539,7 @@ class KStandardAction:
 
         action = KAction(mainWindow)
         action.triggered.connect(mainWindow.configureToolBar)
-        action.setText(i18n('&Configure Toolbars'))
+        action.setText(i18n('Configure Tool&bars...'))
         action.setIcon(KIcon('configure-toolbars'))  # TODO: winprep
         action.setIconText(i18n('Configure toolbars'))
         separator = QAction(Internal.mainWindow)
@@ -646,7 +646,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.actionHelp.setText(i18nc('@action:inmenu', '&Help'))
         self.actionLanguage = self.kajonggAction(
             "language", "preferences-desktop-locale", self.selectLanguage)
-        self.actionLanguage.setText(i18nc('@action:inmenu', 'Switch Application &Language'))
+        self.actionLanguage.setText(i18n('Switch Application Language'))
         self.actionAboutKajongg = self.kajonggAction(
             'aboutkajongg', 'kajongg', self.aboutKajongg)
         self.actionAboutKajongg.setText(
