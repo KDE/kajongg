@@ -157,7 +157,7 @@ class DBHandle(sqlite3.Connection):
         """
         name = 'kajonggserver' if Internal.isServer else 'kajongg'
         name += '3.db'
-        return Options.dbPath if Options.dbPath else appdataDir() + name
+        return Options.dbPath if Options.dbPath else os.path.join(appdataDir(), name)
 
     @property
     def name(self):

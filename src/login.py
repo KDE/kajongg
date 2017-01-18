@@ -203,7 +203,7 @@ class Url(str, StrMixin):
                 args.append(
                     '--db={}'.format(
                         os.path.normpath(
-                            appdataDir() + 'local3.db')))
+                            os.path.join(appdataDir(), 'local3.db'))))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
             if os.name == 'nt':

@@ -63,7 +63,7 @@ def appdataDir():
             # the client wants to place the socket in serverDir
             os.makedirs(serverDir)
         result = os.path.dirname(
-            KGlobal.dirs().locateLocal("appdata", "")) + '/'
+            KGlobal.dirs().locateLocal("appdata", ""))
         return result
 
 
