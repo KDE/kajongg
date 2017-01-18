@@ -180,7 +180,7 @@ def __exceptionToString(exception):
     parts = []
     for arg in exception.args:
         if hasattr(arg, 'strerror'):
-            # when using pykde4, this is already translated at this point
+            # when using py kde 4, this is already translated at this point
             # but I do not know what it does differently with gettext and if
             # I can do the same with the python gettext module
             parts.append(

@@ -133,7 +133,7 @@ def i18nc(context, englishIn, *args):
     else:
         _ = withContext
     if '\004' in _:
-        # found no translation with context
+        # found no translation with context, so try without context
         result = i18n(englishIn, *args)
     else:
         result = i18n(withContext, *args)
@@ -888,6 +888,7 @@ class KDETranslator(QTranslator):
     def translate(dummyContext, sourceText,
                   dummyDisambiguation, dummyNumerus=-1):
         """for now this seems to translate all we need, otherwise
+        add some m18ncE for the missing things or
         search for translateQt in kdelibs/kdecore/localization"""
         return i18n(sourceText)
 
