@@ -23,8 +23,9 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from qt import QSizeF, QSvgRenderer
-from kde import KGlobal, KStandardDirs, KConfig
+import os
+from qt import QSizeF, QSvgRenderer, QStandardPaths
+from kde import KGlobal, KConfig
 from log import logWarning, logException, m18n
 from common import LIGHTSOURCES, Internal
 from wind import East, South, West, North
@@ -40,7 +41,7 @@ class TileException(Exception):
 
 def locateTileset(which):
     """locate the file with a tileset"""
-    path = KStandardDirs.locate("kmahjonggtileset", which)
+    path = QStandardPaths.locate(QStandardPaths.GenericDataLocation, 'kmahjongglib/tilesets/' + which)
     if path is None:
         logException(TileException('cannot find kmahjonggtileset %s' %
                                    (which)))
@@ -58,22 +59,27 @@ class Tileset:
     def defineCatalog():
         """whatever this does"""
         if not Tileset.catalogDefined:
-            KGlobal.dirs().addResourceType(
-                "kmahjonggtileset",
-                "data", "kmahjongglib/tilesets")
             KGlobal.locale().insertCatalog("libkmahjongglib")
             Tileset.catalogDefined = True
+
+    @staticmethod
+    def __directories():
+        """where to look for backgrounds"""
+        return QStandardPaths.locateAll(
+            QStandardPaths.GenericDataLocation,
+            'kmahjongglib/tilesets', QStandardPaths.LocateDirectory)
 
     @staticmethod
     def tilesAvailable():
         """returns all available tile sets"""
         Tileset.defineCatalog()
-        tilesAvailableQ = KGlobal.dirs().findAllResources(
-            "kmahjonggtileset", "*.desktop", KStandardDirs.Recursive)
-        # now we have a list of full paths. Use the base name minus .desktop
-        # put result into a set, avoiding duplicates
-        tilesets = set(str(x).rsplit('/')[-1].split('.')[0]
-                       for x in tilesAvailableQ)
+        tilesetDirectories = Tileset.__directories()
+        tilesetList = list()
+        for _ in tilesetDirectories:
+            tilesetList.extend(x for x in os.listdir(_) if x.endswith('.desktop'))
+        # now we have a list of full paths. Use the base name minus .desktop:
+        # put the result into a set, avoiding duplicates
+        tilesets = set(x.rsplit('/')[-1].split('.')[0] for x in tilesetList)
         if 'default' in tilesets:
             # we want default to be first in list
             sortedTilesets = ['default']
@@ -87,9 +93,7 @@ class Tileset:
     @staticmethod
     def __noTilesetFound():
         """No tilesets found"""
-        directories = '\n'.join(
-            str(x) for x in KGlobal.dirs().resourceDirs("kmahjonggtileset"))
-        directories = '\n\n' + directories
+        directories = '\n\n' + '\n'.join(Tileset.__directories())
         logException(
             TileException(m18n(
                 'cannot find any tileset in the following directories, '

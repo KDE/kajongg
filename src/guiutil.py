@@ -22,11 +22,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import os
 
-from qt import uic
+from qt import uic, QStandardPaths
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 from qt import QTransform
 
-from kde import KStandardDirs, KIcon
+from kde import KIcon
 
 from log import m18n
 
@@ -38,7 +38,7 @@ def loadUi(base):
     if os.path.exists(name):
         directory = os.getcwd()
     else:
-        directory = os.path.dirname(str(KStandardDirs.locate("appdata", name)))
+        directory = os.path.dirname(QStandardPaths.locate("appdata", name))
     uic.loadUi(os.path.join(directory, name), base)
 
 

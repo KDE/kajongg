@@ -31,6 +31,8 @@ from common import Debug, Internal, StrMixin
 from util import which, removeIfExists, uniqueList, elapsedSince
 from log import logWarning, m18n, logDebug, logException
 
+from qt import QStandardPaths
+
 from kde import KGlobal, cacheDir
 
 from tile import Tile
@@ -60,10 +62,9 @@ class Sound:
         """sets __oggBinary to exe name or an empty string"""
         if Sound.__oggBinary is None:
             if os.name == 'nt':
-                parentDirectories = KGlobal.dirs().findDirs(
-                    "appdata", "voices")
-                if parentDirectories:
-                    oggBinary = os.path.join(parentDirectories[0], 'oggdec.exe')
+                parentDirectory = QStandardPaths.locate(QStandardPaths.AppDataLocation, 'voices')
+                if parentDirectory:
+                    oggBinary = os.path.join(parentDirectory, 'oggdec.exe')
                     msg = ''  # we bundle oggdec.exe with the kajongg installer, it must be there
                 else:
                     msg = m18n(
@@ -233,7 +234,8 @@ class Voice(StrMixin):
         """a list of all voice directories"""
         if not Voice.__availableVoices:
             result = []
-            for parentDirectory in KGlobal.dirs().findDirs("appdata", "voices"):
+            for parentDirectory in QStandardPaths.locateAll(
+                    QStandardPaths.AppDataLocation, 'voices', QStandardPaths.LocateDirectory):
                 for (dirpath, _, _) in os.walk(parentDirectory, followlinks=True):
                     if os.path.exists(os.path.join(dirpath, 's1.ogg')):
                         result.append(Voice(dirpath))

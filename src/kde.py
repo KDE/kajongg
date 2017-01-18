@@ -27,6 +27,7 @@ from common import Internal, Options
 
 from kdestub import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
+from qt import QStandardPaths
 
 def appdataDir():
     """
@@ -62,8 +63,11 @@ def appdataDir():
         if not os.path.exists(serverDir):
             # the client wants to place the socket in serverDir
             os.makedirs(serverDir)
-        result = os.path.dirname(
-            KGlobal.dirs().locateLocal("appdata", ""))
+        result = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+        # this may end with kajongg.py or .pyw or whatever, so fix that:
+        result = os.path.join(os.path.dirname(result), 'kajongg')
+        if not os.path.exists(result):
+            os.makedirs(result)
         return result
 
 

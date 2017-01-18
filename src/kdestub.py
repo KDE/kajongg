@@ -62,7 +62,7 @@ __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
            'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
            'KConfigDialog', 'KDialog',
            'KUser', 'KToggleFullScreenAction', 'KStandardAction',
-           'KXmlGuiWindow', 'KStandardDirs', 'KGlobal', 'KIcon', 'KAction']
+           'KXmlGuiWindow', 'KGlobal', 'KIcon', 'KAction']
 
 
 def __insertArgs(translatedTemplate, *args):
@@ -259,7 +259,7 @@ class KAboutData:
     def licenseFile():
         """which may currently only be 1: GPL_V2"""
         for path in ('COPYING', '../COPYING',
-                     '%s/share/kf5/licenses/GPL_V2' % KStandardDirs.prefix):
+                     '%s/share/kf5/licenses/GPL_V2' % KGlobal.prefix):
             path = os.path.abspath(path)
             if os.path.exists(path):
                 return path
@@ -730,152 +730,6 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
             event.ignore()
 
 
-class KStandardDirs:
-
-    """as far as we need it. """
-    _localBaseDirs = None
-    _baseDirs = None
-    prefix = None
-    Recursive = 1
-
-    def __init__(self):
-        if KStandardDirs._baseDirs is None:
-            KStandardDirs.prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
-            KStandardDirs._localBaseDirs = defaultdict(str)
-            KStandardDirs._localBaseDirs.update({
-                'data': 'share/apps',
-                'config': 'share/config',
-                'appdata': 'share/apps/kajongg',
-            })
-            home = os.environ.get('KDEHOME', '~/.kde')
-            for key, value in KStandardDirs._localBaseDirs.items():
-                KStandardDirs._localBaseDirs[key] = os.path.normpath(
-                    os.path.expanduser(home + '/' + value))
-            KStandardDirs._baseDirs = defaultdict(list)
-            KStandardDirs._baseDirs.update({
-                'data': ['share/kde4/apps', 'share'],
-                'locale':
-                    ['local/share/locale',
-                     'share/locale-kdelibs4',
-                     'share/locale'],
-                'appdata':
-                    ['share/kde4/apps/kajongg',
-                     'share/apps/kajongg'],
-                'icon': ['share/icons'],
-            })
-            if os.name == 'nt':
-                dirMap = KStandardDirs._baseDirs
-                for key in dirMap:
-                    dirMap[key] = list(os.path.normpath(x)
-                                       for x in dirMap[key])
-
-    @staticmethod
-    def which(program):
-        """calls which program"""
-        return subprocess.Popen(
-            ['which', program],
-            stdout=subprocess.PIPE).communicate()[0]
-
-    @classmethod
-    def kde_default(cls, type_):
-        """the default relative paths for standard resource types"""
-
-    @classmethod
-    def __tryPath(cls, *args):
-        """try this path. Returns result and full actual path"""
-        if args[0] == '':
-            # happens because we use a defaultdict(str) for localBaseDirs
-            return False, None
-        tryThis = os.path.join(*args)
-        exists = os.path.exists(tryThis)
-        return exists, tryThis
-
-    @classmethod
-    def locate(cls, type_, filename):
-        """see KStandardDirs doc"""
-        found, path = cls.__tryPath(cls._localBaseDirs[type_], filename)
-        if found:
-            if Debug.locate:
-                Internal.logger.debug('%s %s: found %s', type_, filename, path)
-            return path
-        for baseDir in cls._baseDirs[type_]:
-            found, path = cls.__tryPath(cls.prefix, baseDir, filename)
-            if found:
-                if Debug.locate:
-                    Internal.logger.debug('%s %s: found %s', type_, filename, path)
-                return path
-        if Debug.locate:
-            Internal.logger.debug('%s %s: not found', type_, filename)
-
-    @classmethod
-    def locateLocal(cls, type_, filename):
-        """see KStandardDirs doc"""
-        fullPath = os.path.join(cls._localBaseDirs[type_], filename)
-        if not os.path.exists(os.path.dirname(fullPath)):
-            if Debug.locate:
-                Internal.logger.debug(
-                    'locateLocal creates missing dir %s',
-                    fullPath)
-            os.makedirs(os.path.dirname(fullPath))
-        if Debug.locate:
-            Internal.logger.debug(
-                'locateLocal(%s, %s) returns %s',
-                type_, filename, fullPath)
-        return fullPath
-
-    @classmethod
-    def addResourceType(cls, type_, basetype, relativename):
-        """see KStandardDirs doc"""
-        for baseDir in cls._baseDirs[basetype]:
-            cls._baseDirs[type_].append(
-                os.path.normpath(os.path.join(baseDir, relativename)))
-
-    @classmethod
-    def resourceDirs(cls, type_):
-        """see KStandardDirs doc"""
-        result = [cls._localBaseDirs[type_]]
-        result.extend(cls._baseDirs[type_])
-        return list(x for x in result if x is not None)
-
-    @classmethod
-    def findDirs(cls, type_, reldir):
-        """Tries to find all directories whose names consist of the specified type and a relative path"""
-        result = []
-        found, path = cls.__tryPath(cls._localBaseDirs[type_], reldir)
-        if found:
-            result.append(path)
-        for baseDir in cls._baseDirs[type_]:
-            found, path = cls.__tryPath(cls.prefix, baseDir, reldir)
-            if found:
-                result.append(path)
-        if Debug.locate:
-            Internal.logger.debug('%s %s: found directories %s', type_, reldir, result)
-        return result
-
-    @classmethod
-    def findAllResources(cls, type_, filter_, dummyRecursive):
-        """Return all resources with the specified type. Recursion is not implemented."""
-        dirs = cls.findDirs(type_, '')
-        assert filter_ == '*.desktop'  # nothing else we need
-        result = []
-        for directory in dirs:
-            result.extend(
-                x for x in os.listdir(
-                    directory) if x.endswith(
-                        '.desktop'))
-        return result
-
-    @classmethod
-    def findResourceDir(cls, type_, filename):
-        """tries to find the directory the file is in"""
-        result = cls.findDirs(type_, filename)
-        if Debug.locate:
-            Internal.logger.debug(
-                'findResourceDir(%s,%s) finds %s',
-                type_, filename, result)
-        return result
-
-
 class KDETranslator(QTranslator):
 
     """we also want Qt-only strings translated. Make Qt call this
@@ -915,6 +769,11 @@ class KLocale:
         """stub"""
         assert lang == 'en_US', 'KLocale.setLanguage currently only supports en_US'
         QCoreApplication.installTranslator(None)
+
+    @staticmethod
+    def localeDirectories():
+        """hard coded paths to i18n directories, all are searched"""
+        return ('/usr/local/share/locale', '/usr/share/locale')
 
 
 class KConfigGroup:
@@ -992,7 +851,7 @@ class KConfigGroup:
                     localenames.append(localename)
         languages = list(_parse_localename(x)[0]
                          for x in localenames if len(x))
-        for resourceDir in  KGlobal.dirs().findResourceDir('locale', ''):
+        for resourceDir in KLocale.localeDirectories():
             for sysLanguage in os.listdir(resourceDir):
                 if cls.__isLanguageInstalledForKajongg(sysLanguage):
                     languages.append(sysLanguage)
@@ -1013,13 +872,18 @@ class KConfigGroup:
     @classmethod
     def __isLanguageInstalled(cls, lang):
         """is any translation available for lang?"""
-        return bool(KGlobal.dirs().findDirs('locale', lang))
+        for directory in KLocale.localeDirectories():
+            if os.path.exists(os.path.join(directory, lang)):
+                return True
+        return False
 
     @classmethod
     def __isLanguageInstalledForKajongg(cls, lang):
         """see kdelibs, KCatalog::catalogLocaleDir"""
-        relpath = '{lang}/LC_MESSAGES/kajongg.mo'.format(lang=lang)
-        return bool(KGlobal.dirs().findResourceDir("locale", relpath))
+        for directory in KLocale.localeDirectories():
+            if os.path.exists(os.path.join(directory, lang, 'LC_MESSAGES', 'kajongg.mo')):
+                return True
+        return False
 
 
 class KGlobal:
@@ -1029,14 +893,14 @@ class KGlobal:
     @classmethod
     def initStatic(cls):
         """init class members"""
-        cls.dirInstance = KStandardDirs()
+        cls.prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
         cls.localeInstance = KLocale()
         cls.configInstance = KConfig()
         cls.translation = gettext.NullTranslations()
         languages = cls.configInstance.group('Locale').readEntry('Language')
         if languages:
             languages = languages.split(':')
-            for resourceDir in KGlobal.dirs().findResourceDir('locale', ''):
+            for resourceDir in KLocale.localeDirectories():
                 for language in languages:
                     for context in ('kajongg', 'libkmahjongg', 'kxmlgui5', 'kconfigwidgets5', 'kdialog', 'libc'):
                         try:
@@ -1046,11 +910,6 @@ class KGlobal:
                             # no translation for language/domain available
                             pass
         cls.translation.install()
-
-    @classmethod
-    def dirs(cls):
-        """stub"""
-        return cls.dirInstance
 
     @classmethod
     def locale(cls):
@@ -1072,7 +931,8 @@ class KConfig(ConfigParser):
     def __init__(self, path=None):
         ConfigParser.__init__(self, delimiters=('=', ))
         if path is None:
-            path = KGlobal.dirs().locateLocal("config", "kajonggrc")
+            path = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
+            path = os.path.join(path, 'kajonggrc')
         self.path = os.path.expanduser(path)
         if os.path.exists(self.path):
             with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:

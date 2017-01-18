@@ -24,7 +24,6 @@ Here we define classes useful for tree views
 
 from qt import QAbstractItemModel, QModelIndex
 
-
 class TreeItem:
 
     """generic class for items in a tree"""

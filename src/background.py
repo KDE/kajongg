@@ -21,9 +21,11 @@ this python code:
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+import os
+
 from qt import Qt, QPainter, QBrush, QPalette, QPixmapCache, QPixmap
-from qt import QSvgRenderer
-from kde import KGlobal, KStandardDirs, KConfig
+from qt import QSvgRenderer, QStandardPaths
+from kde import KGlobal, KConfig
 
 from log import logWarning, logException, m18n
 
@@ -38,7 +40,7 @@ class BackgroundException(Exception):
 
 def locatebackground(which):
     """locate the file with a background"""
-    return KStandardDirs.locate("kmahjonggbackground", which)
+    return QStandardPaths.locate(QStandardPaths.GenericDataLocation, 'kmahjongglib/backgrounds/' + which)
 
 
 class Background:
@@ -50,21 +52,29 @@ class Background:
     def defineCatalog():
         """whatever this does"""
         if not Background.catalogDefined:
-            KGlobal.dirs().addResourceType("kmahjonggbackground",
-                                           "data", "kmahjongglib/backgrounds")
             KGlobal.locale().insertCatalog("libkmahjongglib")
             Background.catalogDefined = True
+
+    @staticmethod
+    def __directories():
+        """where to look for backgrounds"""
+        return QStandardPaths.locateAll(
+            QStandardPaths.GenericDataLocation,
+            'kmahjongglib/backgrounds',
+            QStandardPaths.LocateDirectory)
 
     @staticmethod
     def backgroundsAvailable():
         """returns all available backgrounds"""
         Background.defineCatalog()
-        backgroundsAvailableQ = KGlobal.dirs().findAllResources(
-            "kmahjonggbackground", "*.desktop", KStandardDirs.Recursive)
+        backgroundDirectories = Background.__directories()
+        backgrounds = list()
+        for _ in backgroundDirectories:
+            backgrounds.extend(x for x in os.listdir(_) if x.endswith('.desktop'))
         # now we have a list of full paths. Use the base name minus .desktop:
         # put the result into a set, avoiding duplicates
-        backgrounds = list(set(str(x).rsplit('/')[-1].split('.')[0]
-                               for x in backgroundsAvailableQ))
+        backgrounds = list(set(x.rsplit('/')[-1].split('.')[0]
+                               for x in backgrounds))
         # There may be a default desktop file pointing to the same svg as some other desktop file.
         # If so we want to suppress the default entry, or the user visible list would show the default name twice
         nonDefaultSvgNames = list(Background(x).graphicsPath for x in backgrounds if x != 'default')
@@ -85,9 +95,7 @@ class Background:
         if not self.path:
             self.path = locatebackground('default.desktop')
             if not self.path:
-                directories = '\n\n' + \
-                    '\n'.join(str(x)
-                              for x in KGlobal.dirs().resourceDirs("kmahjonggbackground"))
+                directories = '\n\n' + '\n'.join(self.__directories())
                 logException(BackgroundException(m18n(
                     'cannot find any background in the following directories, is libkmahjongg installed?')
                                                  + directories))
