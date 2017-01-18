@@ -26,13 +26,7 @@ block that might have to be adapted.
 
 from distutils.core import setup
 from distutils.command.build import build
-from distutils.spawn import find_executable, spawn
-from distutils.debug import DEBUG
-
 from subprocess import call
-from shutil import copytree, rmtree
-
-
 
 import re
 import os
