@@ -1032,16 +1032,11 @@ class KGlobal:
         cls.dirInstance = KStandardDirs()
         cls.localeInstance = KLocale()
         cls.configInstance = KConfig()
+        cls.translation = gettext.NullTranslations()
         languages = cls.configInstance.group('Locale').readEntry('Language')
-        assert isinstance(languages, str)
         if languages:
             languages = languages.split(':')
-        else:
-            languages = None
-        resourceDirs = KGlobal.dirs().findResourceDir('locale', '')
-        cls.translation = gettext.NullTranslations()
-        if languages:
-            for resourceDir in resourceDirs:
+            for resourceDir in KGlobal.dirs().findResourceDir('locale', ''):
                 for language in languages:
                     for context in ('kajongg', 'libkmahjongg', 'kxmlgui5', 'kconfigwidgets5', 'kdialog', 'libc'):
                         try:
