@@ -1454,11 +1454,11 @@ class AboutKajonggDialog(KDialog):
         h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
         underVersions = []
         try:
-            versions = popenReadlines(['kde4-config', '-v'])
+            versions = popenReadlines(['kf5-config', '-v'])
             versionsDict = dict(x.split(': ') for x in versions if ':' in x)
-            underVersions.append('KDE %s' % versionsDict['KDE'])
+            underVersions.append('KDE Frameworks %s' % versionsDict['KDE Frameworks'])
         except OSError:
-            underVersions.append(i18n('KDE (not installed)'))
+            underVersions.append(i18n('KDE Frameworks (not installed or not usable)'))
         underVersions.append('Qt %s' % QT_VERSION_STR)
         underVersions.append('PyQt %s' % PYQT_VERSION_STR)
         underVersions.append('sip %s' % sip.SIP_VERSION_STR)
