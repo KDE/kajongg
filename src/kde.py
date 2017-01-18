@@ -47,7 +47,7 @@ def appdataDir():
             '/share/apps/kajongg/kajonggserver.db')
         if not os.path.exists(oldPath):
             oldPath = os.path.expanduser(
-                '~/.kde4/share/apps/kajongg/kajonggserver.db')
+                '~/.kde' +'4/share/apps/kajongg/kajonggserver.db')
         if os.path.exists(oldPath) and not os.path.exists(serverDir):
             # upgrading an old kajonggserver installation
             os.makedirs(serverDir)
