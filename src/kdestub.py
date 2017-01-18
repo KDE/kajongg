@@ -1043,7 +1043,7 @@ class KGlobal:
         if languages:
             for resourceDir in resourceDirs:
                 for language in languages:
-                    for context in ('kajongg', 'libkmahjongg', 'kdelibs4', 'libphonon', 'kio4', 'kdeqt', 'libc'):
+                    for context in ('kajongg', 'libkmahjongg', 'kxmlgui5', 'kconfigwidgets5', 'kdialog', 'libc'):
                         try:
                             cls.translation.add_fallback(gettext.translation(
                                 context, resourceDir, languages=[language]))
