@@ -48,7 +48,7 @@ os.umask(0o0022) # files should be readable and executable by everybody
 
 kdeDirs = {}
 for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'html':
-    kdeDirs[type] = os.popen("kde4-config --expandvars --install %s" % type).read().strip()
+    kdeDirs[type] = os.popen("kf5-config --expandvars --install %s" % type).read().strip()
 kdeDirs['iconApps'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'apps')
 kdeDirs['iconActions'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'actions')
 
@@ -82,11 +82,11 @@ extra = {}
 class KmjBuild(build):
 
     def run(self):
-        for binary in ['kajongg', 'kajonggserver', 'kajonggserver3']:
+        for binary in ['kajongg', 'kajonggserver']:
             open(binary, 'w').write('#!/bin/sh\nexec %skajongg/%s.py $*\n' % (kdeDirs['data'], binary))
             os.chmod(binary, 0o0755 )
-        call(['cp hisc-apps-kajongg.svgz kajongg.svgz'], shell=True)
-        call(['cp hisc-action-games-kajongg-law.svgz games-kajongg-law.svgz'], shell=True)
+        call(['cp sc-apps-kajongg.svgz kajongg.svgz'], shell=True)
+        call(['cp sc-action-games-kajongg-law.svgz games-kajongg-law.svgz'], shell=True)
         build.run(self)
 
 setup(name='Kajongg',
