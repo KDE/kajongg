@@ -124,9 +124,13 @@ class DBHandle(sqlite3.Connection):
         try:
             sqlite3.Connection.__init__(self, self.path, timeout=10.0)
         except sqlite3.Error as exc:
-            logException(
-                'opening %s: %s' %
-                (self.path, exc.message))
+            if hasattr(exc, 'message'):
+                msg = exc.message
+            elif hasattr(exc, 'args'):
+                msg = ' '.join(exc.args)
+            else:
+                msg = ''
+            logException('opening %s: %s' % (self.path, msg))
         if self.hasTable('general'):
             cursor = self.cursor()
             cursor.execute('select ident from general')
