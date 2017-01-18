@@ -25,7 +25,7 @@ import os
 
 from qt import Qt, QPainter, QBrush, QPalette, QPixmapCache, QPixmap
 from qt import QSvgRenderer, QStandardPaths
-from kde import KGlobal, KConfig
+from kde import KConfig
 
 from log import logWarning, logException, m18n
 
@@ -46,14 +46,6 @@ def locatebackground(which):
 class Background:
 
     """represents a background"""
-    catalogDefined = False
-
-    @staticmethod
-    def defineCatalog():
-        """whatever this does"""
-        if not Background.catalogDefined:
-            KGlobal.locale().insertCatalog("libkmahjongglib")
-            Background.catalogDefined = True
 
     @staticmethod
     def __directories():
@@ -66,7 +58,6 @@ class Background:
     @staticmethod
     def backgroundsAvailable():
         """returns all available backgrounds"""
-        Background.defineCatalog()
         backgroundDirectories = Background.__directories()
         backgrounds = list()
         for _ in backgroundDirectories:
@@ -89,7 +80,6 @@ class Background:
         self.__pmap = None
         self.graphicsPath = None
         QPixmapCache.setCacheLimit(20480)  # the chinese landscape needs much
-        self.defineCatalog()
         self.desktopFileName = desktopFileName
         self.path = locatebackground(desktopFileName + '.desktop')
         if not self.path:

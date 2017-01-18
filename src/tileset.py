@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import os
 from qt import QSizeF, QSvgRenderer, QStandardPaths
-from kde import KGlobal, KConfig
+from kde import KConfig
 from log import logWarning, logException, m18n
 from common import LIGHTSOURCES, Internal
 from wind import East, South, West, North
@@ -52,15 +52,7 @@ class Tileset:
 
     """represents a complete tileset"""
     # pylint: disable=too-many-instance-attributes
-    catalogDefined = False
     __activeTileset = None
-
-    @staticmethod
-    def defineCatalog():
-        """whatever this does"""
-        if not Tileset.catalogDefined:
-            KGlobal.locale().insertCatalog("libkmahjongglib")
-            Tileset.catalogDefined = True
 
     @staticmethod
     def __directories():
@@ -72,7 +64,6 @@ class Tileset:
     @staticmethod
     def tilesAvailable():
         """returns all available tile sets"""
-        Tileset.defineCatalog()
         tilesetDirectories = Tileset.__directories()
         tilesetList = list()
         for _ in tilesetDirectories:
@@ -106,7 +97,6 @@ class Tileset:
         self.faceSize = None
         self.__renderer = None
         self.__shadowOffsets = None
-        self.defineCatalog()
         self.path = locateTileset(desktopFileName + '.desktop')
         if not self.path:
             self.path = locateTileset('default.desktop')

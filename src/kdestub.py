@@ -755,11 +755,7 @@ class KDETranslator(QTranslator):
 
 
 class KLocale:
-
-    """as far as we need it"""
-    @staticmethod
-    def insertCatalog(dummy):
-        """to be done for translation, I suppose"""
+    """a few statics"""
 
     @staticmethod
     def initQtTranslator(app):
