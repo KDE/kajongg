@@ -743,7 +743,6 @@ class KStandardDirs:
             KStandardDirs.prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
             KStandardDirs._localBaseDirs = defaultdict(str)
             KStandardDirs._localBaseDirs.update({
-                'cache': '/var/tmp/kdecache-wr',
                 'data': 'share/apps',
                 'config': 'share/config',
                 'appdata': 'share/apps/kajongg',

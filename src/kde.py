@@ -69,17 +69,9 @@ def appdataDir():
 
 def cacheDir():
     """the cache directory for this user"""
-    if Internal.isServer:
-        result = os.path.join(appdataDir(), 'cache')
-    else:
-        result = os.path.dirname(
-            KGlobal.dirs().locateLocal("cache", ""))
-        result = os.path.join(result, 'kajongg')
+    result = os.path.join(appdataDir(), '.cache')
     if not os.path.exists(result):
-        try:
-            os.makedirs(result)
-        except OSError:
-            pass
+        os.makedirs(result)
     return result
 
 
