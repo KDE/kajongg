@@ -344,7 +344,7 @@ class IntDict(defaultdict, StrMixin):
     def count(self, countFilter=None):
         """how many tiles defined by countFilter do we hold?
         countFilter is an iterator of element names. No countFilter: Take all
-        So count(['we','ws']) should return 8"""
+        So count(['we', 'ws']) should return 8"""
         return sum((defaultdict.get(self, x) or 0)
                    for x in countFilter or self)
 
@@ -352,7 +352,7 @@ class IntDict(defaultdict, StrMixin):
         """returns a list of all tiles defined by countFilter,
         each tile multiplied by its occurrence.
         countFilter is an iterator of element names. No countFilter: take all
-        So all(['we','fs']) should return ['we', 'we', 'we', 'we', 'fs']"""
+        So all(['we', 'fs']) should return ['we', 'we', 'we', 'we', 'fs']"""
         result = []
         for element in countFilter or self:
             result.extend([element] * self[element])
