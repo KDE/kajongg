@@ -27,7 +27,7 @@ from qt import QWidget, QHBoxLayout, QVBoxLayout, \
 from qt import QModelIndex
 from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, BoolRule
 from util import uniqueList
-from log import m18n, m18nc
+from log import m18n, m18nc, m18ncE
 from differ import RulesetDiffer
 from common import Debug, english
 from tree import TreeItem, RootItem, TreeModel
@@ -78,7 +78,7 @@ class RulesetItem(RuleTreeItem):
     def content(self, column):
         """return content stored in this item"""
         if column == 0:
-            return m18n(self.rawContent.name)
+            return self.rawContent.name
         return ''
 
     def columnCount(self):
@@ -103,7 +103,7 @@ class RuleListItem(RuleTreeItem):
     def content(self, column):
         """return content stored in this item"""
         if column == 0:
-            return m18n(self.rawContent.name)
+            return self.rawContent.name
         return ''
 
     def tooltip(self):
@@ -125,7 +125,7 @@ class RuleItem(RuleTreeItem):
         colNames = self.parent.parent.parent.rawContent
         content = self.rawContent
         if column == 0:
-            return m18n(content.name)
+            return content.name
         else:
             if isinstance(content, ParameterRule):
                 if column == 1:
@@ -234,8 +234,9 @@ class RuleModel(TreeModel):
                 return
             result = self.rootItem.content(section)
             if result == 'doubles':
-                result = 'x2'
-            return m18n(result)
+                return 'x2'
+            else:
+                return m18nc('kajongg', result)
         elif role == Qt.TextAlignmentRole:
             leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
             return int(leftRight | Qt.AlignVCenter)
@@ -510,8 +511,8 @@ class RulesetSelector(QWidget):
         self.btnCompare = QPushButton()
         self.btnClose = QPushButton()
         self.rulesetView = RuleTreeView(
-            m18nc('kajongg',
-                  'Rule'),
+            m18ncE('kajongg',
+                   'Rule'),
             self.btnCopy,
             self.btnRemove,
             self.btnCompare)

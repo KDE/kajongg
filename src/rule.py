@@ -26,7 +26,7 @@ from hashlib import md5
 
 from common import Internal, Debug, english  # pylint: disable=redefined-builtin
 from common import StrMixin
-from log import m18n, m18nc, m18nE, logException, logDebug
+from log import m18n, m18nc, m18nE, m18ncE, logException, logDebug
 from query import Query
 
 
@@ -51,8 +51,8 @@ class Score(StrMixin):
 
     unitNames = {m18nE(
         'points'): 0,
-                 m18nE('doubles'): 50,
-                 m18nE('limits'): 9999}
+                 m18ncE('kajongg', 'doubles'): 50,
+                 m18ncE('kajongg', 'limits'): 9999}
 
     def clear(self):
         """set all to 0"""
