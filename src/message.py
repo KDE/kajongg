@@ -44,13 +44,20 @@ class Message:
     def __init__(self, name=None, shortcut=None):
         """those are the english values"""
         self.name = name or self.__class__.__name__.replace('Message', '')
-        self.i18nName = self.name
+        self.__i18nName = None
         self.shortcut = shortcut
         # do not use a numerical value because that could easier
         # change with software updates
         className = self.__class__.__name__.replace('Message', '')
         msgName = self.name.replace(' ', '')
         assert className == msgName, '%s != %s' % (className, msgName)
+
+    @property
+    def i18nName(self):
+        """only translate when needed - most messages never need this"""
+        if self.__i18nName is None:
+            self.__i18nName = m18nc('kajongg', self.name)
+        return self.__i18nName
 
     def __str__(self):
         return self.name
@@ -119,7 +126,6 @@ class ClientMessage(Message):
 
     def __init__(self, name=None, shortcut=None):
         Message.__init__(self, name, shortcut)
-        self.i18nName = m18nc('kajongg', self.name)
 
     def buttonCaption(self):
         """localized, with a & for the shortcut"""
