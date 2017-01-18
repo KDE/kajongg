@@ -1309,7 +1309,7 @@ class AboutKajonggDialog(KDialog):
         h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
         underVersions = []
         try:
-            versions = popenReadlines(['kf5-config', '-v'])
+            versions = popenReadlines('kf5-config -v')
             versionsDict = dict(x.split(': ') for x in versions if ':' in x)
             underVersions.append('KDE Frameworks %s' % versionsDict['KDE Frameworks'])
         except OSError:

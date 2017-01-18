@@ -213,19 +213,11 @@ def gitHead():
     if not os.path.exists(os.path.join('..', '.git')):
         return None
     subprocess.Popen(['git', 'update-index', '-q', '--refresh'])
-    _ = subprocess.Popen(
-        ['git',
-         'diff-index',
-         '--name-only',
-         'HEAD',
-         '--'],
-        stdout=subprocess.PIPE).communicate()[0]
-    uncommitted = list(x.strip() for x in _.split(b'\n') if len(x.strip()))
+    uncommitted = list(popenReadlines('git diff-index --name-only HEAD --'))
     if uncommitted:
         return 'current'
-    result = subprocess.Popen(['git', 'log', '-1', '--format="%h"'],
-                              stdout=subprocess.PIPE).communicate()[0]
-    return result.split(b'\n')[0].replace(b'"', b'')[:15].decode()
+    else:
+        return next(popenReadlines('git log -1 --format=%h'))
 
 
 def xToUtf8(msg, args=None):
@@ -277,5 +269,7 @@ class Csv:
 
 def popenReadlines(args):
     """runs a subprocess and returns stdout as a list of unicode encodes lines"""
+    if isinstance(args, str):
+        args = args.split()
     result = subprocess.Popen(args, universal_newlines=True, stdout=subprocess.PIPE).communicate()[0]
     return (x.strip() for x in result.split('\n') if x.strip())

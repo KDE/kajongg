@@ -36,7 +36,7 @@ from optparse import OptionParser
 
 from common import Debug, StrMixin
 from util import removeIfExists, gitHead, checkMemory
-from util import Csv, CsvWriter
+from util import Csv, CsvWriter, popenReadlines
 
 # fields in row:
 RULESETFIELD = 0
@@ -630,12 +630,8 @@ def improve_options():
         OPTIONS.servers = 1
 
     cmdPath = os.path.join(startingDir(), 'kajongg.py')
-    cmd = ['python3', cmdPath, '--rulesets=']
-    OPTIONS.knownRulesets = subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE).communicate()[0].decode().split('\n')
-    OPTIONS.knownRulesets = list(x.strip()
-                                 for x in OPTIONS.knownRulesets if x.strip())
+    cmd = ['python3', cmdPath, '--rulesets']
+    OPTIONS.knownRulesets = list(popenReadlines(cmd))
     if OPTIONS.rulesets == 'ALL':
         OPTIONS.rulesets = OPTIONS.knownRulesets
     else:
