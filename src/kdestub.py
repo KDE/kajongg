@@ -1102,82 +1102,10 @@ class KConfig(ConfigParser):
         """just like KConfig"""
         return KConfigGroup(self, groupName)
 
+def KIcon(name=None):  # pylint: disable=invalid-name
+    """simple wrapper"""
+    return QIcon.fromTheme(name)
 
-class KIcon(QIcon):
-
-    """stub"""
-    initDone = False
-
-    def __init__(self, name=None):
-        if name is None:
-            QIcon.__init__(self)
-            return
-        if os.name == 'nt':
-            # we have full control about file and location, no need to search
-            extension = 'png'
-            if name in ('games-kajongg-law', 'kajongg'):
-                extension = 'ico'
-            name = os.path.normpath(
-                '{}/share/icons/{}.{}'.format(
-                    KStandardDirs.prefix,
-                    name,
-                    extension))
-            if not os.path.exists(name):
-                Internal.logger.debug('not found:%s', name)
-                raise UserWarning('not found:%s' % name)
-            QIcon.__init__(self, name)
-            return
-        dirs = KGlobal.dirs()
-        if not KIcon.initDone:
-            KIcon.initDone = True
-            self.initStyle()
-        for suffix in ('png', 'svgz', 'svg', 'xpm'):
-            result = dirs.locate('appicon', '.'.join([name, suffix]))
-            if result:
-                name = result
-                break
-        QIcon.__init__(self, name)
-
-    @staticmethod
-    def initStyle():
-        """adds resources for the current style"""
-        dirs = KGlobal.dirs()
-        dirs.addResourceType('appicon', 'data', 'kajongg/pics/')
-        iconStyle = 'oxygen' if os.name == 'nt' else 'breeze' # default
-        debugSource = 'FIXED DEFAULT'
-        kdeglobals = QStandardPaths.locate(QStandardPaths.GenericConfigLocation, 'kdeglobals')
-        if kdeglobals:
-            try:
-                conf = KConfig(kdeglobals)
-                iconStyle = conf.group('Icons').readEntry('Theme').lower()
-                debugSource = kdeglobals
-            except BaseException:
-                pass # if Theme is not defined, stay with default. Or should
-                # I check the other config files in qtPath too?
-        if Debug.locate:
-            Internal.logger.debug('Using style %s for icons from %s', iconStyle, debugSource)
-        iconDirs = ()
-        if iconStyle == 'oxygen':
-            iconDirs = (
-                'oxygen/48x48/actions/',
-                'oxygen/48x48/categories/',
-                'oxygen/48x48/status/',
-                'oxygen/base/48x48/actions/',
-                'oxygen/base/48x48/categories/',
-                'oxygen/base/48x48/status/',
-                'oxygen/base/48x48/apps/',
-                'hicolor/scalable/apps/',
-                'hicolor/scalable/actions/')
-        elif iconStyle.lower() == 'breeze':
-            iconDirs = (
-                'breeze/actions/22/',
-                'breeze/categories/32/',
-                'breeze/status/22/',
-                'breeze/apps/32',
-                'hicolor/scalable/apps/',
-                'hicolor/scalable/actions/')
-        for _ in iconDirs:
-            dirs.addResourceType('appicon', 'icon', _)
 
 class KAction(QAction):
 
