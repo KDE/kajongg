@@ -506,7 +506,7 @@ class MainWindow(KXmlGuiWindow):
     def retranslateUi(self):
         """retranslate"""
         self.actionScoreGame.setText(
-            m18nc('@action:inmen', "&Score Manual Game"))
+            m18nc('@action:inmenu', "&Score Manual Game"))
         self.actionScoreGame.setIconText(
             m18nc('@action:intoolbar', 'Manual Game'))
         self.actionScoreGame.setHelpText(
@@ -518,13 +518,13 @@ class MainWindow(KXmlGuiWindow):
         self.actionPlayGame.setHelpText(
             m18nc('kajongg @info:tooltip', 'Start a new game.'))
 
-        self.actionAbortGame.setText(m18nc('@action:inmen', "&Abort Game"))
+        self.actionAbortGame.setText(m18nc('@action:inmenu', "&Abort Game"))
         self.actionAbortGame.setPriority(QAction.LowPriority)
         self.actionAbortGame.setHelpText(
             m18nc('kajongg @info:tooltip',
                   'Abort the current game.'))
 
-        self.actionQuit.setText(m18nc('@action:inmen', "&Quit Kajongg"))
+        self.actionQuit.setText(m18nc('@action:inmenu', "&Quit Kajongg"))
         self.actionQuit.setPriority(QAction.LowPriority)
 
         self.actionPlayers.setText(m18nc('@action:intoolbar', "&Players"))
@@ -538,7 +538,7 @@ class MainWindow(KXmlGuiWindow):
                   'customize rulesets.'))
 
         self.actionAngle.setText(
-            m18nc('@action:inmen',
+            m18nc('@action:inmenu',
                   "&Change Visual Angle"))
         self.actionAngle.setIconText(m18nc('@action:intoolbar', "Angle"))
         self.actionAngle.setHelpText(
@@ -546,18 +546,18 @@ class MainWindow(KXmlGuiWindow):
                   "Change the visual appearance of the tiles."))
 
         self.actionScoreTable.setText(
-            m18nc('kajongg @action:inmen', "&Score Table"))
+            m18nc('kajongg @action:inmenu', "&Score Table"))
         self.actionScoreTable.setIconText(
             m18nc('kajongg @action:intoolbar', "&Scores"))
         self.actionScoreTable.setHelpText(m18nc('kajongg @info:tooltip',
                                                 "Show or hide the score table for the current game."))
 
-        self.actionExplain.setText(m18nc('@action:inmen', "&Explain Scores"))
+        self.actionExplain.setText(m18nc('@action:inmenu', "&Explain Scores"))
         self.actionExplain.setIconText(m18nc('@action:intoolbar', "&Explain"))
         self.actionExplain.setHelpText(m18nc('kajongg @info:tooltip',
                                              'Explain the scoring for all players in the current game.'))
 
-        self.actionAutoPlay.setText(m18nc('@action:inmen', "&Demo Mode"))
+        self.actionAutoPlay.setText(m18nc('@action:inmenu', "&Demo Mode"))
         self.actionAutoPlay.setPriority(QAction.LowPriority)
         self.actionAutoPlay.setHelpText(m18nc('kajongg @info:tooltip',
                                               'Let the computer take over for you. Start a new local game if needed.'))

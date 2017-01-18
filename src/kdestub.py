@@ -526,14 +526,14 @@ class KStandardAction:
         mainWindow.actionStatusBar.setEnabled(True)
         mainWindow.actionStatusBar.toggled.connect(mainWindow.toggleStatusBar)
         mainWindow.actionStatusBar.setText(
-            i18nc('@action:inmen', "Show St&atusbar"))
+            i18nc('@action:inmenu', "Show St&atusbar"))
         mainWindow.actionToolBar = mainWindow.kajonggAction(
             'options_show_toolbar', None)
         mainWindow.actionToolBar.setCheckable(True)
         mainWindow.actionToolBar.setEnabled(True)
         mainWindow.actionToolBar.toggled.connect(mainWindow.toggleToolBar)
         mainWindow.actionToolBar.setText(
-            i18nc('@action:inmen', "Show &Toolbar"))
+            i18nc('@action:inmenu', "Show &Toolbar"))
 
         actionCollection.addAction('', separator)
 
@@ -643,14 +643,14 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.setCaption('')
         self.actionHelp = self.kajonggAction(
             "help", "help-contents", startHelp)
-        self.actionHelp.setText(i18nc('@action:inmen', '&Help'))
+        self.actionHelp.setText(i18nc('@action:inmenu', '&Help'))
         self.actionLanguage = self.kajonggAction(
             "language", "preferences-desktop-locale", self.selectLanguage)
-        self.actionLanguage.setText(i18nc('@action:inmen', 'Switch Application &Language'))
+        self.actionLanguage.setText(i18nc('@action:inmenu', 'Switch Application &Language'))
         self.actionAboutKajongg = self.kajonggAction(
             'aboutkajongg', 'kajongg', self.aboutKajongg)
         self.actionAboutKajongg.setText(
-            i18nc('@action:inmen', 'About &Kajongg'))
+            i18nc('@action:inmenu', 'About &Kajongg'))
         self.toolBar().setMovable(False)
         self.toolBar().setFloatable(False)
         self.toolBar().setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
