@@ -258,13 +258,13 @@ class LoginDlg(QDialog):
     def __init__(self):
         """self.servers is a list of tuples containing server and last playername"""
         QDialog.__init__(self, None)
-        decorateWindow(self, m18n('Login'))
+        decorateWindow(self, m18nc('kajongg', 'Login'))
         self.setupUi()
 
-        localName = m18n(Query.localServerName)
+        localName = m18nc('kajongg name for local game server', Query.localServerName)
         self.servers = Query(
             'select url,lastname from server order by lasttime desc').records
-        servers = [m18n(x[0]) for x in self.servers]
+        servers = list(x[0] for x in self.servers if x[0] != Query.localServerName)
         # the first server combobox item should be default: either the last used server
         # or localName for autoPlay
         if localName not in servers:
