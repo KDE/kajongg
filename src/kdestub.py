@@ -62,7 +62,7 @@ __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
            'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
            'KConfigDialog', 'KDialog',
            'KUser', 'KToggleFullScreenAction', 'KStandardAction',
-           'KXmlGuiWindow', 'KGlobal', 'KIcon', 'KAction']
+           'KXmlGuiWindow', 'KGlobal', 'KIcon']
 
 
 def __insertArgs(translatedTemplate, *args):
@@ -561,7 +561,7 @@ class KStandardAction:
 
         actionCollection.addAction('', separator)
 
-        action = KAction(mainWindow)
+        action = QAction(mainWindow)
         action.triggered.connect(mainWindow.configureToolBar)
         action.setText(i18n('Configure Tool&bars...'))
         action.setIcon(KIcon('configure-toolbars'))  # TODO: winprep
@@ -570,7 +570,7 @@ class KStandardAction:
         separator.setSeparator(True)
         actionCollection.addAction('options_configure_toolbars', action)
 
-        action = KAction(mainWindow)
+        action = QAction(mainWindow)
         action.triggered.connect(slot)
         action.setText(i18n('Configure &Kajongg'))
         action.setIcon(KIcon('configure'))
@@ -982,19 +982,6 @@ class KConfig(ConfigParser):
 def KIcon(name=None):  # pylint: disable=invalid-name
     """simple wrapper"""
     return QIcon.fromTheme(name)
-
-
-class KAction(QAction):
-
-    """stub"""
-
-    def __init__(self, *args, **kwargs):
-        QAction.__init__(self, *args, **kwargs)
-        self.__helpText = None
-
-    def setHelpText(self, text):
-        """stub"""
-        self.__helpText = text
 
 
 class KConfigSkeletonItem:

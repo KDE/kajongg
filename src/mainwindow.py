@@ -78,7 +78,7 @@ except ImportError as importError:
 
 
 try:
-    from kde import KIcon, KAction, KToggleFullScreenAction, \
+    from kde import KIcon, KToggleFullScreenAction, \
         KXmlGuiWindow, KStandardAction
 
     from board import FittingView
@@ -218,7 +218,7 @@ class MainWindow(KXmlGuiWindow):
     def kajonggAction(
             self, name, icon, slot=None, shortcut=None, actionData=None):
         """simplify defining actions"""
-        res = KAction(self)
+        res = QAction(self)
         if icon:
             res.setIcon(KIcon(icon))
         if slot:
@@ -509,18 +509,18 @@ class MainWindow(KXmlGuiWindow):
             m18nc('@action:inmenu', "&Score Manual Game"))
         self.actionScoreGame.setIconText(
             m18nc('@action:intoolbar', 'Manual Game'))
-        self.actionScoreGame.setHelpText(
+        self.actionScoreGame.setWhatsThis(
             m18nc('kajongg @info:tooltip',
                   '&Score a manual game.'))
 
         self.actionPlayGame.setText(m18nc('@action:intoolbar', "&Play"))
         self.actionPlayGame.setPriority(QAction.LowPriority)
-        self.actionPlayGame.setHelpText(
+        self.actionPlayGame.setWhatsThis(
             m18nc('kajongg @info:tooltip', 'Start a new game.'))
 
         self.actionAbortGame.setText(m18nc('@action:inmenu', "&Abort Game"))
         self.actionAbortGame.setPriority(QAction.LowPriority)
-        self.actionAbortGame.setHelpText(
+        self.actionAbortGame.setWhatsThis(
             m18nc('kajongg @info:tooltip',
                   'Abort the current game.'))
 
@@ -528,12 +528,12 @@ class MainWindow(KXmlGuiWindow):
         self.actionQuit.setPriority(QAction.LowPriority)
 
         self.actionPlayers.setText(m18nc('@action:intoolbar', "&Players"))
-        self.actionPlayers.setHelpText(
+        self.actionPlayers.setWhatsThis(
             m18nc('kajongg @info:tooltip',
                   'define your players.'))
 
         self.actionRulesets.setText(m18nc('@action:intoolbar', "&Rulesets"))
-        self.actionRulesets.setHelpText(
+        self.actionRulesets.setWhatsThis(
             m18nc('kajongg @info:tooltip',
                   'customize rulesets.'))
 
@@ -541,7 +541,7 @@ class MainWindow(KXmlGuiWindow):
             m18nc('@action:inmenu',
                   "&Change Visual Angle"))
         self.actionAngle.setIconText(m18nc('@action:intoolbar', "Angle"))
-        self.actionAngle.setHelpText(
+        self.actionAngle.setWhatsThis(
             m18nc('kajongg @info:tooltip',
                   "Change the visual appearance of the tiles."))
 
@@ -549,21 +549,21 @@ class MainWindow(KXmlGuiWindow):
             m18nc('kajongg @action:inmenu', "&Score Table"))
         self.actionScoreTable.setIconText(
             m18nc('kajongg @action:intoolbar', "&Scores"))
-        self.actionScoreTable.setHelpText(m18nc('kajongg @info:tooltip',
-                                                "Show or hide the score table for the current game."))
+        self.actionScoreTable.setWhatsThis(m18nc('kajongg @info:tooltip',
+                                                 "Show or hide the score table for the current game."))
 
         self.actionExplain.setText(m18nc('@action:inmenu', "&Explain Scores"))
         self.actionExplain.setIconText(m18nc('@action:intoolbar', "&Explain"))
-        self.actionExplain.setHelpText(m18nc('kajongg @info:tooltip',
-                                             'Explain the scoring for all players in the current game.'))
+        self.actionExplain.setWhatsThis(m18nc('kajongg @info:tooltip',
+                                              'Explain the scoring for all players in the current game.'))
 
         self.actionAutoPlay.setText(m18nc('@action:inmenu', "&Demo Mode"))
         self.actionAutoPlay.setPriority(QAction.LowPriority)
-        self.actionAutoPlay.setHelpText(m18nc('kajongg @info:tooltip',
-                                              'Let the computer take over for you. Start a new local game if needed.'))
+        self.actionAutoPlay.setWhatsThis(m18nc('kajongg @info:tooltip',
+                                               'Let the computer take over for you. Start a new local game if needed.'))
 
         self.actionChat.setText(m18n("C&hat"))
-        self.actionChat.setHelpText(
+        self.actionChat.setWhatsThis(
             m18nc('kajongg @info:tooltip',
                   'Chat with the other players.'))
 
