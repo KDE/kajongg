@@ -328,7 +328,7 @@ def getDocUrl(languages):
     host = 'docs.kde.org'
     path = '?application=kajongg&language={}'.format(languages[0])
     url = 'http://' + host + path
-    factory = client.HTTPClientFactory(url)
+    factory = client.HTTPClientFactory(url.encode('ascii'))
     factory.protocol = client.HTTPPageGetter
     factory.protocol.handleEndHeaders = lambda x: x
     Internal.reactor.connectTCP(host, 80, factory)
