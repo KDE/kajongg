@@ -216,7 +216,7 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
         if prio == logging.INFO:
             return Information(msg)
         else:
-            return Sorry(msg)
+            return Sorry(msg, always=True)
     return NoPrompt(msg)
 
 

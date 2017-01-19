@@ -207,10 +207,10 @@ class Sorry(DeferredDialog):
 
     """wrapper, see class Prompt"""
 
-    def __init__(self, msg, modal=True, caption=None):
+    def __init__(self, msg, modal=True, caption=None, always=False):
         dialog = Prompt(msg, icon=QMessageBox.Information,
                         buttons=KDialog.Ok, caption=caption or 'Sorry')
-        DeferredDialog.__init__(self, dialog, modal=modal)
+        DeferredDialog.__init__(self, dialog, modal=modal, always=always)
 
 
 def NoPrompt(dummyMsg):
