@@ -199,6 +199,7 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     # pylint: disable=R0912
     if isinstance(msg, Exception):
         msg = __exceptionToString(msg)
+    msg = str(msg)
     msg = translateServerMessage(msg)
     __logUnicodeMessage(prio, __enrichMessage(msg, withGamePrefix))
     if showStack:

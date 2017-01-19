@@ -28,7 +28,7 @@ from qt import QPropertyAnimation, QParallelAnimationGroup, \
 from qt import pyqtProperty, QGraphicsObject, QGraphicsItem
 
 from common import Internal, Debug, isAlive, StrMixin
-from log import logDebug, id4
+from log import logDebug, logException, id4
 
 
 class Animation(QPropertyAnimation, StrMixin):
@@ -167,6 +167,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         self.uid = ParallelAnimationGroup.clsUid
         ParallelAnimationGroup.clsUid += 1
         self.deferred = Deferred()
+        self.deferred.addErrback(logException)
         self.steps = 0
         self.debug = any(x.debug for x in self.animations)
         self.debug |= 'G{}g'.format(id4(self)) in Debug.animation
@@ -177,7 +178,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
                          (id4(self), ParallelAnimationGroup.current))
             self.doAfter = ParallelAnimationGroup.current.doAfter
             ParallelAnimationGroup.current.doAfter = list()
-            ParallelAnimationGroup.current.deferred.addCallback(self.start)
+            ParallelAnimationGroup.current.deferred.addCallback(self.start).addErrback(logException)
         else:
             self.start()
         ParallelAnimationGroup.running.append(self)
@@ -245,7 +246,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
             logDebug('%s started with speed %d (%s)' % (
                 self, Internal.Preferences.animationSpeed,
                 ','.join('A%s' % id4(x) for x in self.animations)))
-        return succeed(None)
+        return succeed(None).addErrback(logException)
 
     def allFinished(self):
         """all animations have finished. Cleanup and callback"""
@@ -467,7 +468,7 @@ def animate():
             return ParallelAnimationGroup(animations).deferred
     elif ParallelAnimationGroup.current:
         return ParallelAnimationGroup.current.deferred
-    return succeed(None)
+    return succeed(None).addErrback(logException)
 
 def doCallbackWithSpeed(result, speed, callback, *args, **kwargs):
     """as the name says"""
@@ -480,5 +481,7 @@ def animateAndDo(callback, *args, **kwargs):
     result = animate()
     if Internal.Preferences:
         # we might be called very early
-        result.addCallback(doCallbackWithSpeed, Internal.Preferences.animationSpeed, callback, *args, **kwargs)
+        result.addCallback(
+            doCallbackWithSpeed, Internal.Preferences.animationSpeed,
+            callback, *args, **kwargs).addErrback(logException)
     return result
