@@ -39,20 +39,15 @@ class TileException(Exception):
     pass
 
 
-def locateTileset(which):
-    """locate the file with a tileset"""
-    path = QStandardPaths.locate(QStandardPaths.GenericDataLocation, 'kmahjongglib/tilesets/' + which)
-    if path is None:
-        logException(TileException('cannot find kmahjonggtileset %s' %
-                                   (which)))
-    return path
-
-
 class Tileset:
 
     """represents a complete tileset"""
     # pylint: disable=too-many-instance-attributes
-    __activeTileset = None
+
+    cache = {}
+
+    def __new__(cls, name):
+        return cls.cache.get(name) or cls.cache.get(cls.__name(name)) or cls.__build(name)
 
     @staticmethod
     def __directories():
@@ -62,24 +57,30 @@ class Tileset:
             'kmahjongglib/tilesets', QStandardPaths.LocateDirectory)
 
     @staticmethod
-    def tilesAvailable():
-        """returns all available tile sets"""
+    def locate(which):
+        """locate the file with a tileset"""
+        for directory in Tileset.__directories():
+            path = os.path.join(directory, which)
+            if os.path.exists(path):
+                return path
+        logException(TileException('cannot find kmahjonggtileset %s' %
+                                   (which)))
+
+    @staticmethod
+    def loadAll():
+        """loads all available tile sets into cache"""
         tilesetDirectories = Tileset.__directories()
-        tilesetList = list()
-        for _ in tilesetDirectories:
-            tilesetList.extend(x for x in os.listdir(_) if x.endswith('.desktop'))
-        # now we have a list of full paths. Use the base name minus .desktop:
-        # put the result into a set, avoiding duplicates
-        tilesets = set(x.rsplit('/')[-1].split('.')[0] for x in tilesetList)
-        if 'default' in tilesets:
-            # we want default to be first in list
-            sortedTilesets = ['default']
-            sortedTilesets.extend(tilesets - set(['default']))
-            tilesets = set(sortedTilesets)
-        for dontWant in ['alphabet', 'egypt']:
-            if dontWant in tilesets:
-                tilesets.remove(dontWant)
-        return [Tileset(x) for x in tilesets]
+        for directory in tilesetDirectories:
+            for name in os.listdir(directory):
+                if name.endswith('.desktop'):
+                    if not name.endswith('alphabet.desktop') and not name.endswith('egypt.desktop'):
+                        Tileset(os.path.join(directory, name))
+
+    @classmethod
+    def available(cls):
+        """ready for the selector dialog, default first"""
+        cls.loadAll()
+        return sorted(set(cls.cache.values()), key=lambda x: x.desktopFileName != 'default')
 
     @staticmethod
     def __noTilesetFound():
@@ -90,26 +91,39 @@ class Tileset:
                 'cannot find any tileset in the following directories, '
                 'is libkmahjongg installed?') + directories))
 
-    def __init__(self, desktopFileName=None):
-        if desktopFileName is None:
-            desktopFileName = 'default'
+    @staticmethod
+    def __name(path):
+        """extract the name from path: this is the filename minus the .desktop ending"""
+        return os.path.split(path)[1].replace('.desktop', '')
+
+    @classmethod
+    def __build(cls, name):
+        """build a new Tileset. name is either a full file path or a desktop tileset name. None stands for 'default'."""
+        result = object.__new__(cls)
+        if os.path.exists(name):
+            result.path = name
+            result.desktopFileName = cls.__name(name)
+        else:
+            result.desktopFileName = name or 'default'
+            result.path = cls.locate(result.desktopFileName + '.desktop')
+            if not result.path:
+                result.path = cls.locate('default.desktop')
+                result.desktopFileName = 'default'
+                if not result.path:
+                    cls.__noTilesetFound()
+                else:
+                    logWarning(m18n('cannot find tileset %1, using default', name))
+
+        cls.cache[result.desktopFileName] = result
+        cls.cache[result.path] = result
+        return result
+
+    def __init__(self, dummyName):
+        """continue __build"""
         self.tileSize = None
         self.faceSize = None
         self.__renderer = None
         self.__shadowOffsets = None
-        self.path = locateTileset(desktopFileName + '.desktop')
-        if not self.path:
-            self.path = locateTileset('default.desktop')
-            if not self.path:
-                self.__noTilesetFound()
-            else:
-                logWarning(
-                    m18n(
-                        'cannot find tileset %1, using default',
-                        desktopFileName))
-                self.desktopFileName = 'default'
-        else:
-            self.desktopFileName = desktopFileName
         self.darkenerAlpha = 120 if self.desktopFileName == 'jade' else 50
         tileconfig = KConfig(self.path)
         group = tileconfig.group("KMahjonggTileset")
@@ -132,7 +146,7 @@ class Tileset:
                                        (tileversion, TILESETVERSIONFORMAT)))
 
         graphName = group.readEntry("FileName")
-        self.graphicsPath = locateTileset(graphName)
+        self.graphicsPath = Tileset.locate(graphName)
         if not self.graphicsPath:
             logException(
                 TileException('cannot find kmahjongglib/tilesets/%s for %s' %
@@ -159,11 +173,7 @@ class Tileset:
     @staticmethod
     def current():
         """the currently wanted tileset. If not yet defined, do so"""
-        prefName = Internal.Preferences.tilesetName
-        if (not Tileset.__activeTileset
-                or Tileset.__activeTileset.desktopFileName != prefName):
-            Tileset.__activeTileset = Tileset(prefName)
-        return Tileset.__activeTileset
+        return Tileset(Internal.Preferences.tilesetName)
 
     def shadowWidth(self):
         """the size of border plus shadow"""

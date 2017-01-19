@@ -69,7 +69,10 @@ class TilesetSelector(QWidget):
 
         self.tilesetNameList.currentRowChanged.connect(self.tilesetRowChanged)
         self.kcfg_tilesetName.textChanged.connect(self.tilesetNameChanged)
-        self.tilesetList = Tileset.tilesAvailable()
+
+        Tileset.loadAll()
+        # list default tileset first
+        self.tilesetList = Tileset.available()
         for aset in self.tilesetList:
             self.tilesetNameList.addItem(aset.name)
         self.kcfg_tilesetName.setText(Internal.Preferences.tilesetName)
