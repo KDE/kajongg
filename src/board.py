@@ -596,7 +596,7 @@ class CourtBoard(Board):
     penColor = 'green'
 
     def __init__(self, width, height):
-        Board.__init__(self, width, height, Tileset.activeTileset())
+        Board.__init__(self, width, height, Tileset.current())
         self.setAcceptDrops(True)
 
     def maximize(self):

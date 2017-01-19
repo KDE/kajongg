@@ -157,7 +157,7 @@ class Tileset:
             (id(self), self.desktopFileName, id(self.desktopFileName))
 
     @staticmethod
-    def activeTileset():
+    def current():
         """the currently wanted tileset. If not yet defined, do so"""
         prefName = Internal.Preferences.tilesetName
         if (not Tileset.__activeTileset

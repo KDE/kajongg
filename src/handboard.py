@@ -95,7 +95,7 @@ class HandBoard(Board):
         self.exposedMeldDistance = 0.15
         self.concealedMeldDistance = 0.0
         self.lowerY = 1.0
-        Board.__init__(self, 15.6, 2.0, Tileset.activeTileset())
+        Board.__init__(self, 15.6, 2.0, Tileset.current())
         self.isHandBoard = True
         self.tileDragEnabled = False
         self.setParentItem(player.front)

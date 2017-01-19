@@ -223,7 +223,7 @@ class GameScene(SceneWithFocusRect):
         with AnimationSpeed():
             for item in self.nonTiles():
                 if hasattr(item, 'tileset'):
-                    item.tileset = Tileset.activeTileset()
+                    item.tileset = Tileset.current()
 
     def prepareHand(self):
         """redecorate wall"""

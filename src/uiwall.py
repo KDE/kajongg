@@ -259,11 +259,11 @@ class UIWall(Wall):
         self.initWindMarkers()
         game.wall = self
         Wall.__init__(self, game)
-        self.__square = Board(1, 1, Tileset.activeTileset())
+        self.__square = Board(1, 1, Tileset.current())
         self.__square.setZValue(ZValues.markerZ)
         sideLength = len(self.tiles) // 8
         self.__sides = [UIWallSide(
-            Tileset.activeTileset(),
+            Tileset.current(),
             boardRotation, sideLength) for boardRotation in self.sideAngles]
         for idx, side in enumerate(self.__sides):
             side.setParentItem(self.__square)
