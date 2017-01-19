@@ -460,14 +460,16 @@ class KDialog(CaptionMixin, QDialog):
             return
         self.buttonBox.setStandardButtons(buttonMask)
         if KDialog.Ok & buttonMask:
-            self.buttonBox.button(KDialog.Ok).setText(qi18nc('KStandardGuiItem', '&OK'))
+            self.buttonBox.button(KDialog.Ok).setText(i18n('&OK'))
         if KDialog.Apply & buttonMask:
-            self.buttonBox.button(KDialog.Apply).setText(qi18nc('KStandardGuiItem', '&Apply'))
+            self.buttonBox.button(KDialog.Apply).setText(i18n('&Apply'))
         if KDialog.Cancel & buttonMask:
-            self.buttonBox.button(KDialog.Cancel).setText(qi18nc('KStandardGuiItem', '&Cancel'))
+            self.buttonBox.button(KDialog.Cancel).setText(i18n('&Cancel'))
+        if KDialog.Help & buttonMask:
+            self.buttonBox.button(KDialog.Help).setText(i18n('&Help'))
         if KDialog.RestoreDefaults & buttonMask:
             self.buttonBox.button(
-                KDialog.RestoreDefaults).setText(qi18nc('KStandardGuiItem', '&Defaults'))
+                KDialog.RestoreDefaults).setText(i18n('&Defaults'))
             self.buttonBox.button(KDialog.RestoreDefaults).clicked.connect(self.restoreDefaults)
         if KDialog.Help & buttonMask:
             self.buttonBox.button(KDialog.Help).clicked.connect(startHelp)
