@@ -318,35 +318,41 @@ class CaptionMixin:
         self.setWindowIcon(KIcon('kajongg'))
 
 
-def getDocUrl(languages):
-    """returns the best match for the online user manual"""
-    from twisted.web import client
-
-    def processResult(dummyResult, fallbacks):
-        """if status 404, try the next fallback language"""
-        return getDocUrl(fallbacks) if factory.status == '404' else url
-    host = 'docs.kde.org'
-    path = '?application=kajongg&language={}'.format(languages[0])
-    url = 'http://' + host + path
-    factory = client.HTTPClientFactory(url.encode('ascii'))
-    factory.protocol = client.HTTPPageGetter
-    factory.protocol.handleEndHeaders = lambda x: x
-    Internal.reactor.connectTCP(host, 80, factory)
-    factory.deferred.addCallback(processResult, languages[1:])
-    return factory.deferred
 
 
-def startHelp():
-    """start the KDE help center for kajongg or go to docs.kde.org"""
-    try:
-        subprocess.Popen(['khelpcenter', 'help:/kajongg/index.html'])
-    except OSError:
-        def gotUrl(url):
-            """now we know where the manual is"""
-            webbrowser.open(url)
-        languages = KGlobal.config().group(
-            'Locale').readEntry('Language').split(':')
-        getDocUrl(languages).addCallback(gotUrl)
+class Help:
+    """Interface to the KDE help system"""
+
+    @staticmethod
+    def __getDocUrl(languages):
+        """returns the best match for the online user manual"""
+        from twisted.web import client
+
+        def processResult(dummyResult, fallbacks):
+            """if status 404, try the next fallback language"""
+            return Help.__getDocUrl(fallbacks) if factory.status == '404' else url
+        host = 'docs.kde.org'
+        path = '?application=kajongg&language={}'.format(languages[0])
+        url = 'http://' + host + path
+        factory = client.HTTPClientFactory(url.encode('ascii'))
+        factory.protocol = client.HTTPPageGetter
+        factory.protocol.handleEndHeaders = lambda x: x
+        Internal.reactor.connectTCP(host, 80, factory)
+        factory.deferred.addCallback(processResult, languages[1:])
+        return factory.deferred
+
+    @staticmethod
+    def start():
+        """start the KDE help center for kajongg or go to docs.kde.org"""
+        try:
+            subprocess.Popen(['khelpcenter', 'help:/kajongg/index.html'])
+        except OSError:
+            def gotUrl(url):
+                """now we know where the manual is"""
+                webbrowser.open(url)
+            languages = KGlobal.config().group(
+                'Locale').readEntry('Language').split(':')
+            Help.__getDocUrl(languages).addCallback(gotUrl)
 
 
 class IconLabel(QLabel):
@@ -466,7 +472,7 @@ class KDialog(CaptionMixin, QDialog):
                 KDialog.RestoreDefaults).setText(i18n('&Defaults'))
             self.buttonBox.button(KDialog.RestoreDefaults).clicked.connect(self.restoreDefaults)
         if KDialog.Help & buttonMask:
-            self.buttonBox.button(KDialog.Help).clicked.connect(startHelp)
+            self.buttonBox.button(KDialog.Help).clicked.connect(Help.start)
 
     def restoreDefaults(self):
         """virtual"""
@@ -665,8 +671,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
             self.menus[menu[0]] = (QMenu(menu[0]), menu[1])
             self.menuBar().addMenu(self.menus[menu[0]][0])
         self.setCaption('')
-        self.actionHelp = self.kajonggAction(
-            "help", "help-contents", startHelp)
+        self.actionHelp = self.kajonggAction("help", "help-contents", Help.start)
         self.actionHelp.setText(i18nc('@action:inmenu', '&Help'))
         self.actionLanguage = self.kajonggAction(
             "language", "preferences-desktop-locale", self.selectLanguage)
