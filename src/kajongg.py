@@ -159,7 +159,7 @@ APP = KApplication()
 parseOptions()
 
 if Debug.neutral:
-    KGlobal.locale().setLanguage('en_US')
+    KGlobal.translation = None
 
 if Debug.events:
     EVHANDLER = EvHandler()

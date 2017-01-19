@@ -102,7 +102,7 @@ def i18n(englishIn, *args):
     @return: The translated text, args included.
     @rtype: C{str}
     """
-    if not Debug.neutral and KGlobal.translation and englishIn:
+    if KGlobal.translation and englishIn:
         _ = KGlobal.translation.gettext(englishIn)
     else:
         _ = englishIn
@@ -127,18 +127,22 @@ def i18nc(context, englishIn, *args):
     """
     # The \004 trick is taken from kdecore/localization/gettext.h,
     # definition of pgettext_aux"""
+    if not KGlobal.translation:
+        return __insertArgs(englishIn, *args)
     withContext = '\004'.join([context, englishIn])
-    if KGlobal.translation:
-        _ = KGlobal.translation.gettext(withContext)
-    else:
-        _ = withContext
-    if '\004' in _:
-        # found no translation with context, so try without context
-        result = i18n(englishIn, *args)
-    else:
-        result = i18n(withContext, *args)
-    return result
+    _ = KGlobal.translation.gettext(withContext)
+    if _ == withContext:
+        # try again without context
+        _ = KGlobal.translation.gettext(englishIn)
+    return __insertArgs(_, *args)
 
+def qi18nc(context, englishIn, *args):
+    """This uses the Qt translation files"""
+    if Internal.app is None:
+        _ = englishIn
+    else:
+        _ = Internal.app.translate(context, englishIn)
+    return __insertArgs(_, *args)
 
 class OptionHelper:
 
@@ -282,11 +286,26 @@ class KApplication(QApplication):
             # on Linux, QCoreApplication initializes locale but not on Windows.
             # This is actually documented for QCoreApplication
             setlocale(LC_ALL, '')
-        KLocale.initQtTranslator(self)
+
+        self.initQtTranslator()
+
+    def installTranslatorFile(self, qmName):
+        """qmName is a full path to a .qm file"""
+        if os.path.exists(qmName):
+            translator = KDETranslator(self)
+            translator.load(qmName)
+
+    def initQtTranslator(self):
+        """load translators using Qt .qm files"""
+        for language in reversed(list(KConfigGroup.extendRegionLanguages(KGlobal.currentLanguages()))):
+            self.installTranslatorFile(os.path.join(
+                QLibraryInfo.location(QLibraryInfo.TranslationsPath), 'qtbase_{}.qm'.format(language)))
+            self.installTranslatorFile('/usr/share/locale/{}/LC_MESSAGES/kwidgetsaddons5_qt.qm'.format(language))
 
     @staticmethod
     def kApplication():
         """the global app instance"""
+        # TODO: geht das alles mit nur Internal.app ?
         return QApplication.instance()
 
 
@@ -440,13 +459,15 @@ class KDialog(CaptionMixin, QDialog):
             self.buttonBox.clear()
             return
         self.buttonBox.setStandardButtons(buttonMask)
+        if KDialog.Ok & buttonMask:
+            self.buttonBox.button(KDialog.Ok).setText(qi18nc('KStandardGuiItem', '&OK'))
         if KDialog.Apply & buttonMask:
-            self.buttonBox.button(KDialog.Apply).setText(i18n('&Apply'))
+            self.buttonBox.button(KDialog.Apply).setText(qi18nc('KStandardGuiItem', '&Apply'))
         if KDialog.Cancel & buttonMask:
-            self.buttonBox.button(KDialog.Cancel).setText(i18n('&Cancel'))
+            self.buttonBox.button(KDialog.Cancel).setText(qi18nc('KStandardGuiItem', '&Cancel'))
         if KDialog.RestoreDefaults & buttonMask:
             self.buttonBox.button(
-                KDialog.RestoreDefaults).setText(i18n('&Defaults'))
+                KDialog.RestoreDefaults).setText(qi18nc('KStandardGuiItem', '&Defaults'))
             self.buttonBox.button(KDialog.RestoreDefaults).clicked.connect(self.restoreDefaults)
         if KDialog.Help & buttonMask:
             self.buttonBox.button(KDialog.Help).clicked.connect(startHelp)
@@ -740,38 +761,26 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
 class KDETranslator(QTranslator):
 
     """we also want Qt-only strings translated. Make Qt call this
-    translator for its own strings"""
+    translator for its own strings. Use this with qi18nc()"""
 
     def __init__(self, parent):
         QTranslator.__init__(self, parent)
 
-    @staticmethod
-    def translate(dummyContext, sourceText,
-                  dummyDisambiguation, dummyNumerus=-1):
-        """for now this seems to translate all we need, otherwise
-        add some m18ncE for the missing things or
-        search for translateQt in kdelibs/kdecore/localization"""
-        return i18n(sourceText)
+    def translate(self, context, text, disambiguation, numerus=-1):
+        """context should be the class name defined by qt5 or kf5"""
+        if Debug.neutral:
+            return text
+        result = QTranslator.translate(self, context, text, disambiguation, numerus)
+        if not result:
+            # for kwidgetsaddons5_qt locale de, KStandardGuiItem '&OK' returns an empty string.
+            # but this works for other languages like uk, catalan, ptbr and zh_TW.
+            # What is different with German? The .po source seems OK, just like the others.
+            result = text
+        return result
 
 
 class KLocale:
     """a few statics"""
-
-    @staticmethod
-    def initQtTranslator(app):
-        """stub"""
-        if sip.SIP_VERSION < 0x041004:
-            # This needs sip 4.16.4 and Qt 4/5 from Oct 28 2014 or later
-            # Older versions segfault when KDETranslator.translate is called
-            raise Exception('Kajongg needs sip v4.16.4 or higher')
-        translator = KDETranslator(app)
-        QCoreApplication.installTranslator(translator)
-
-    @staticmethod
-    def setLanguage(lang):
-        """stub"""
-        assert lang == 'en_US', 'KLocale.setLanguage currently only supports en_US'
-        QCoreApplication.installTranslator(None)
 
     @staticmethod
     def localeDirectories():
@@ -804,7 +813,9 @@ class KConfigGroup:
         i18nItems = dict(
             (x for x in items.items() if x[0].startswith(name + '[')))
         if i18nItems:
-            for language in KGlobal.config().group('Locale').readEntry('Language').split(':'):
+            languages = KGlobal.config().group('Locale').readEntry('Language').split(':')
+            languages = list(x.split('_')[0] for x in languages)
+            for language in languages:
                 key = '%s[%s]' % (name, language)
                 if key in i18nItems:
                     return i18nItems[key]
@@ -830,7 +841,7 @@ class KConfigGroup:
                 ))
 
     @classmethod
-    def __extendRegionLanguages(cls, languages):
+    def extendRegionLanguages(cls, languages):
         """for de_DE, return de_DE, de"""
         for lang in languages:
             if lang is not None:
@@ -855,11 +866,11 @@ class KConfigGroup:
         languages = list(_parse_localename(x)[0]
                          for x in localenames if len(x))
         for resourceDir in KLocale.localeDirectories():
-            for sysLanguage in os.listdir(resourceDir):
+            for sysLanguage in sorted(os.listdir(resourceDir)):
                 if cls.__isLanguageInstalledForKajongg(sysLanguage):
                     languages.append(sysLanguage)
         if languages:
-            languages = uniqueList(cls.__extendRegionLanguages(languages))
+            languages = uniqueList(cls.extendRegionLanguages(languages))
             languages = list(
                 x for x in languages if cls.__isLanguageInstalled(x))
         if 'en_US' not in languages:
@@ -868,9 +879,12 @@ class KConfigGroup:
 
     @classmethod
     def availableLanguages_(cls):
-        """like availableLanguages but only those with a _"""
-        languages = cls.availableLanguages().split(':')
-        return ':'.join(x for x in languages if '_' in x)
+        """like availableLanguages but if xx_yy exists, exclude xx"""
+        languages = set(cls.availableLanguages().split(':'))
+        for _ in list(languages):
+            if '_' in _ and _[:2] in languages:
+                languages.remove(_[:2])
+        return ':'.join(sorted(languages))
 
     @classmethod
     def __isLanguageInstalled(cls, lang):
@@ -894,24 +908,33 @@ class KGlobal:
     """stub"""
 
     @classmethod
+    def currentLanguages(cls):
+        """the currently used languages, primary first"""
+        languages = cls.configInstance.group('Locale').readEntry('Language')
+        if not languages:
+            return list()
+        languages = languages.split(':')
+        if 'en_US' in languages:
+            languages.remove('en_US')
+        return languages
+
+    @classmethod
     def initStatic(cls):
         """init class members"""
         cls.prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
         cls.localeInstance = KLocale()
         cls.configInstance = KConfig()
         cls.translation = gettext.NullTranslations()
-        languages = cls.configInstance.group('Locale').readEntry('Language')
-        if languages:
-            languages = languages.split(':')
-            for resourceDir in KLocale.localeDirectories():
-                for language in languages:
-                    for context in ('kajongg', 'libkmahjongg', 'kxmlgui5', 'kconfigwidgets5', 'kdialog', 'libc'):
-                        try:
-                            cls.translation.add_fallback(gettext.translation(
-                                context, resourceDir, languages=[language]))
-                        except IOError:
-                            # no translation for language/domain available
-                            pass
+        for language in cls.currentLanguages():
+            for context in ('kajongg', 'libkmahjongg5', 'kxmlgui5', 'kconfigwidgets5', 'libc'):
+                directories = KLocale.localeDirectories()
+                for resourceDir in directories:
+                    try:
+                        cls.translation.add_fallback(gettext.translation(
+                            context, resourceDir, languages=[language]))
+                        break
+                    except IOError:
+                        pass
         cls.translation.install()
 
     @classmethod

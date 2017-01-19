@@ -307,7 +307,7 @@ class EventData(str):
 
     """used for generating a nice string"""
     events = {y: x for x, y in QEvent.__dict__.items() if isinstance(y, int)}
-    # those are not documented for qevent but appear in corelib/kernel/qtcoreevent.h
+    # those are not documented for qevent but appear in Qt5Core/qcoreevent.h
     extra = {
         15: 'Create',
         16: 'Destroy',
