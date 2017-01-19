@@ -78,7 +78,7 @@ except ImportError as importError:
 
 
 try:
-    from kde import KIcon, KAction, KApplication, KToggleFullScreenAction, \
+    from kde import KIcon, KAction, KToggleFullScreenAction, \
         KXmlGuiWindow, KStandardAction
 
     from board import FittingView
@@ -203,7 +203,7 @@ class MainWindow(KXmlGuiWindow):
                         # we want space to the right for the buttons
         # the default is too small. Use at least 2/3 of screen height and 1/2
         # of screen width:
-        available = KApplication.kApplication().desktop().availableGeometry()
+        available = Internal.app.desktop().availableGeometry()
         height = max(result.height(), available.height() * 2 // 3)
         width = max(result.width(), available.width() // 2)
         result.setHeight(height)

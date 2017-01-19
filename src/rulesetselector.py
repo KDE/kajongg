@@ -29,9 +29,8 @@ from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, BoolRule
 from util import uniqueList
 from log import m18n, m18nc, m18ncE
 from differ import RulesetDiffer
-from common import Debug, english
+from common import Debug, english, Internal
 from tree import TreeItem, RootItem, TreeModel
-from kde import KApplication
 from dialogs import Sorry
 from modeltest import ModelTest
 from genericdelegates import RightAlignedCheckboxDelegate, ZeroEmptyColumnDelegate
@@ -541,7 +540,7 @@ class RulesetSelector(QWidget):
         """we never want a horizontal scrollbar for player names,
         we always want to see them in full"""
         result = QWidget.sizeHint(self)
-        available = KApplication.kApplication().desktop().availableGeometry()
+        available = Internal.app.desktop().availableGeometry()
         height = max(result.height(), available.height() * 2 // 3)
         width = max(result.width(), available.width() // 2)
         return QSize(width, height)

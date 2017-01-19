@@ -25,9 +25,8 @@ from log import m18n, logDebug
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
 from message import ChatMessage
-from common import Debug
+from common import Debug, Internal
 from modeltest import ModelTest
-from kde import KApplication
 
 
 class ChatModel(QAbstractTableModel):
@@ -87,7 +86,7 @@ class ChatModel(QAbstractTableModel):
             elif role == Qt.DisplayRole and index.column() == 2:
                 result = m18n(chatLine.message)
             elif role == Qt.ForegroundRole and index.column() == 2:
-                palette = KApplication.palette() # pylint: disable=no-member
+                palette = Internal.app.palette() # pylint: disable=no-member
                 color = 'blue' if chatLine.isStatusMessage else palette.windowText(
                 )
                 result = QColor(color)

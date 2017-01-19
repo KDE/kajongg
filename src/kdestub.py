@@ -302,12 +302,6 @@ class KApplication(QApplication):
                 QLibraryInfo.location(QLibraryInfo.TranslationsPath), 'qtbase_{}.qm'.format(language)))
             self.installTranslatorFile('/usr/share/locale/{}/LC_MESSAGES/kwidgetsaddons5_qt.qm'.format(language))
 
-    @staticmethod
-    def kApplication():
-        """the global app instance"""
-        # TODO: geht das alles mit nur Internal.app ?
-        return QApplication.instance()
-
 
 class CaptionMixin:
 
@@ -405,7 +399,7 @@ class KMessageBox:
             messageLabel.setOpenExternalLinks(True)
         messageLabel.setTextInteractionFlags(flags)
 
-        desktop = KApplication.kApplication().desktop().availableGeometry()
+        desktop = Internal.app.desktop().availableGeometry()
         if messageLabel.sizeHint().width() > desktop.width() * 0.5:
             messageLabel.setWordWrap(True)
 

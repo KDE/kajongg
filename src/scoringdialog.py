@@ -480,7 +480,7 @@ class ScoreTable(QWidget):
         result.setWidth(result.height() * 3 / 2)
         # the default is too small. Use at least 2/5 of screen height and 1/4
         # of screen width:
-        available = KApplication.kApplication().desktop().availableGeometry()
+        available = Internal.app.desktop().availableGeometry()
         height = max(result.height(), available.height() * 2 / 5)
         width = max(result.width(), available.width() / 4)
         result.setHeight(height)
