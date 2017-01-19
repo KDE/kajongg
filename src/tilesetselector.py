@@ -80,6 +80,7 @@ class TilesetSelector(QWidget):
         for idx, aset in enumerate(self.tilesetList):
             if aset.desktopFileName == name:
                 igrindex = idx
+                break
         self.tilesetNameList.setCurrentRow(igrindex)
 
     def tilesetRowChanged(self):
