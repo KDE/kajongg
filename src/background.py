@@ -47,54 +47,85 @@ class Background:
 
     """represents a background"""
 
+    cache = {}
+
+    def __new__(cls, name):
+        return cls.cache.get(name) or cls.cache.get(cls.__name(name)) or cls.__build(name)
+
     @staticmethod
     def __directories():
         """where to look for backgrounds"""
         return QStandardPaths.locateAll(
             QStandardPaths.GenericDataLocation,
-            'kmahjongglib/backgrounds',
-            QStandardPaths.LocateDirectory)
+            'kmahjongglib/backgrounds', QStandardPaths.LocateDirectory)
 
     @staticmethod
-    def backgroundsAvailable():
-        """returns all available backgrounds"""
-        backgroundDirectories = Background.__directories()
-        backgrounds = list()
-        for _ in backgroundDirectories:
-            backgrounds.extend(x for x in os.listdir(_) if x.endswith('.desktop'))
-        # now we have a list of full paths. Use the base name minus .desktop:
-        # put the result into a set, avoiding duplicates
-        backgrounds = list(set(x.rsplit('/')[-1].split('.')[0]
-                               for x in backgrounds))
-        # There may be a default desktop file pointing to the same svg as some other desktop file.
-        # If so we want to suppress the default entry, or the user visible list would show the default name twice
-        nonDefaultSvgNames = list(Background(x).graphicsPath for x in backgrounds if x != 'default')
-        if 'default' in backgrounds and Background('default').graphicsPath in nonDefaultSvgNames:
-            backgrounds.remove('default')
-        return [Background(x) for x in backgrounds]
+    def locate(which):
+        """locate the file with a background"""
+        for directory in Background.__directories():
+            path = os.path.join(directory, which)
+            if os.path.exists(path):
+                return path
+        logException(BackgroundException('cannot find mah jongg background %s' %
+                                   (which)))
 
-    def __init__(self, desktopFileName=None):
-        if desktopFileName is None:
-            desktopFileName = 'default'
+    @staticmethod
+    def loadAll():
+        """loads all available backgrounds into cache"""
+        backgroundDirectories = Background.__directories()
+        for directory in backgroundDirectories:
+            for name in os.listdir(directory):
+                if name.endswith('.desktop'):
+                    Background(os.path.join(directory, name))
+
+    @classmethod
+    def available(cls):
+        """ready for the selector dialog, default first"""
+        cls.loadAll()
+        return sorted(set(cls.cache.values()), key=lambda x: x.desktopFileName != 'default')
+
+    @staticmethod
+    def __noBackgroundFound():
+        """No backgrounds found"""
+        directories = '\n\n' + '\n'.join(Background.__directories())
+        logException(
+            BackgroundException(m18n(
+                'cannot find any backgrounds in the following directories, '
+                'is libkmahjongg installed?') + directories))
+
+    @staticmethod
+    def __name(path):
+        """extract the name from path: this is the filename minus the .desktop ending"""
+        return os.path.split(path)[1].replace('.desktop', '')
+
+    @classmethod
+    def __build(cls, name):
+        """build a new Background. name is either a full file path or a desktop tileset name. None stands for 'default'."""
+        result = object.__new__(cls)
+        if os.path.exists(name):
+            result.path = name
+            result.desktopFileName = cls.__name(name)
+        else:
+            result.desktopFileName = name or 'default'
+            result.path = cls.locate(result.desktopFileName + '.desktop')
+            if not result.path:
+                result.path = cls.locate('default.desktop')
+                result.desktopFileName = 'default'
+                if not result.path:
+                    cls.__noBackgroundFound()
+                else:
+                    logWarning(m18n('cannot find background %1, using default', name))
+
+        cls.cache[result.desktopFileName] = result
+        cls.cache[result.path] = result
+        return result
+
+    def __init__(self, dummyName):
+        """continue __build"""
         self.__svg = None
         self.__pmap = None
         self.graphicsPath = None
         QPixmapCache.setCacheLimit(20480)  # the chinese landscape needs much
-        self.desktopFileName = desktopFileName
-        self.path = locatebackground(desktopFileName + '.desktop')
-        if not self.path:
-            self.path = locatebackground('default.desktop')
-            if not self.path:
-                directories = '\n\n' + '\n'.join(self.__directories())
-                logException(BackgroundException(m18n(
-                    'cannot find any background in the following directories, is libkmahjongg installed?')
-                                                 + directories))
-            else:
-                logWarning(
-                    m18n(
-                        'cannot find background %1, using default',
-                        desktopFileName))
-                self.desktopFileName = 'default'
         config = KConfig(self.path)
         group = config.group("KMahjonggBackground")
         self.name = group.readEntry("Name") or m18n("unknown background")

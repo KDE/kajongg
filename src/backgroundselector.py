@@ -50,7 +50,7 @@ class BackgroundSelector(QWidget):
             self.backgroundRowChanged)
         self.kcfg_backgroundName.textChanged.connect(
             self.backgroundNameChanged)
-        self.backgroundList = Background.backgroundsAvailable()
+        self.backgroundList = Background.available()
         for aset in self.backgroundList:
             self.backgroundNameList.addItem(aset.name)
         self.kcfg_backgroundName.setText(Internal.Preferences.backgroundName)
