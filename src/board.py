@@ -25,7 +25,7 @@ from qt import QColor, QPainter, QDrag, QPixmap, QStyleOptionGraphicsItem, QPen,
 from qt import QFontMetrics, QGraphicsObject
 from qt import QMenu, QCursor
 from qt import QGraphicsSvgItem
-from tileset import Tileset, TileException
+from tileset import Tileset
 from tile import Tile, elements
 from uitile import UITile, UIMeld
 from guiutil import Painter, rotateCenter, sceneRotation
@@ -496,10 +496,7 @@ class Board(QGraphicsRectItem, StrMixin):
         """set active lightSource"""
         if self._lightSource != lightSource:
             if lightSource not in LIGHTSOURCES:
-                logException(
-                    TileException(
-                        'lightSource %s illegal' %
-                        lightSource))
+                logException('lightSource %s illegal' % lightSource)
             self._reload(self.tileset, lightSource)
 
     @property

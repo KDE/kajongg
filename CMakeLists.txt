@@ -38,6 +38,7 @@ set(SRCFILES
     src/permutations.py
     src/about.py
     src/animation.py
+    src/mjresource.py
     src/background.py
     src/backgroundselector.py
     src/board.py

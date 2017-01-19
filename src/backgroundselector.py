@@ -20,11 +20,9 @@
 """
 
 from qt import QWidget, QLineEdit
-from kde import KConfig
 from background import Background
 from common import Internal
 from guiutil import loadUi
-from log import m18n
 
 
 class BackgroundSelector(QWidget):
@@ -61,6 +59,7 @@ class BackgroundSelector(QWidget):
         for idx, aset in enumerate(self.backgroundList):
             if aset.desktopFileName == name:
                 igrindex = idx
+                break
         self.backgroundNameList.setCurrentRow(igrindex)
 
     def backgroundRowChanged(self):
@@ -68,18 +67,8 @@ class BackgroundSelector(QWidget):
         selBackground = self.backgroundList[
             self.backgroundNameList.currentRow()]
         self.kcfg_backgroundName.setText(selBackground.desktopFileName)
-
-        config = KConfig(selBackground.path)
-        group = config.group("KMahjonggBackground")
-
-        author = group.readEntry("Author") or m18n("unknown author")
-        description = group.readEntry("Description") or ""
-        authorEmail = group.readEntry(
-            "AuthorEmail") or m18n(
-                "no E-Mail address available")
-
-        self.backgroundAuthor.setText(author)
-        self.backgroundContact.setText(authorEmail)
-        self.backgroundDescription.setText(description)
+        self.backgroundAuthor.setText(selBackground.author)
+        self.backgroundContact.setText(selBackground.authorEmail)
+        self.backgroundDescription.setText(selBackground.description)
         selBackground.setPalette(self.backgroundPreview)
         self.backgroundPreview.setAutoFillBackground(True)

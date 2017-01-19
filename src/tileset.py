@@ -23,134 +23,38 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-import os
-from qt import QSizeF, QSvgRenderer, QStandardPaths
-from kde import KConfig
-from log import logWarning, logException, m18n
+from qt import QSizeF, QSvgRenderer
+from log import logException, m18n
+from mjresource import Resource
+
 from common import LIGHTSOURCES, Internal
 from wind import East, South, West, North
 
-TILESETVERSIONFORMAT = 1
 
-
-class TileException(Exception):
-
-    """will be thrown if the tileset cannot be loaded"""
-    pass
-
-
-class Tileset:
+class Tileset(Resource):
 
     """represents a complete tileset"""
     # pylint: disable=too-many-instance-attributes
 
+    resourceName = 'tileset'
+    configGroupName = 'KMahjonggTileset'
     cache = {}
 
-    def __new__(cls, name):
-        return cls.cache.get(name) or cls.cache.get(cls.__name(name)) or cls.__build(name)
-
-    @staticmethod
-    def __directories():
-        """where to look for backgrounds"""
-        return QStandardPaths.locateAll(
-            QStandardPaths.GenericDataLocation,
-            'kmahjongglib/tilesets', QStandardPaths.LocateDirectory)
-
-    @staticmethod
-    def locate(which):
-        """locate the file with a tileset"""
-        for directory in Tileset.__directories():
-            path = os.path.join(directory, which)
-            if os.path.exists(path):
-                return path
-        logException(TileException('cannot find kmahjonggtileset %s' %
-                                   (which)))
-
-    @staticmethod
-    def loadAll():
-        """loads all available tile sets into cache"""
-        tilesetDirectories = Tileset.__directories()
-        for directory in tilesetDirectories:
-            for name in os.listdir(directory):
-                if name.endswith('.desktop'):
-                    if not name.endswith('alphabet.desktop') and not name.endswith('egypt.desktop'):
-                        Tileset(os.path.join(directory, name))
-
-    @classmethod
-    def available(cls):
-        """ready for the selector dialog, default first"""
-        cls.loadAll()
-        return sorted(set(cls.cache.values()), key=lambda x: x.desktopFileName != 'default')
-
-    @staticmethod
-    def __noTilesetFound():
-        """No tilesets found"""
-        directories = '\n\n' + '\n'.join(Tileset.__directories())
-        logException(
-            TileException(m18n(
-                'cannot find any tileset in the following directories, '
-                'is libkmahjongg installed?') + directories))
-
-    @staticmethod
-    def __name(path):
-        """extract the name from path: this is the filename minus the .desktop ending"""
-        return os.path.split(path)[1].replace('.desktop', '')
-
-    @classmethod
-    def __build(cls, name):
-        """build a new Tileset. name is either a full file path or a desktop tileset name. None stands for 'default'."""
-        result = object.__new__(cls)
-        if os.path.exists(name):
-            result.path = name
-            result.desktopFileName = cls.__name(name)
-        else:
-            result.desktopFileName = name or 'default'
-            result.path = cls.locate(result.desktopFileName + '.desktop')
-            if not result.path:
-                result.path = cls.locate('default.desktop')
-                result.desktopFileName = 'default'
-                if not result.path:
-                    cls.__noTilesetFound()
-                else:
-                    logWarning(m18n('cannot find tileset %1, using default', name))
-
-        cls.cache[result.desktopFileName] = result
-        cls.cache[result.path] = result
-        return result
-
-    def __init__(self, dummyName):
+    def __init__(self, name):
         """continue __build"""
+        super(Tileset, self).__init__(name)
         self.tileSize = None
         self.faceSize = None
         self.__renderer = None
         self.__shadowOffsets = None
         self.darkenerAlpha = 120 if self.desktopFileName == 'jade' else 50
-        tileconfig = KConfig(self.path)
-        group = tileconfig.group("KMahjonggTileset")
 
-        self.name = group.readEntry("Name") or m18n("unknown tileset")
-        self.author = group.readEntry("Author") or m18n("unknown author")
-        self.description = group.readEntry(
-            "Description") or m18n(
-                "no description available")
-        self.authorEmail = group.readEntry(
-            "AuthorEmail") or m18n(
-                "no E-Mail address available")
-
-        # Version control
-        tileversion = group.readInteger("VersionFormat", default=0)
-        # Format is increased when we have incompatible changes, meaning that
-        # older clients are not able to use the remaining information safely
-        if tileversion > TILESETVERSIONFORMAT:
-            logException(TileException('tileversion file / program: %d/%d' %
-                                       (tileversion, TILESETVERSIONFORMAT)))
-
-        graphName = group.readEntry("FileName")
+        graphName = self.group.readEntry("FileName")
         self.graphicsPath = Tileset.locate(graphName)
         if not self.graphicsPath:
             logException(
-                TileException('cannot find kmahjongglib/tilesets/%s for %s' %
-                              (graphName, self.desktopFileName)))
+                'cannot find kmahjongglib/tilesets/%s for %s' %
+                (graphName, self.desktopFileName))
         self.renderer()
         # now that we get the sizes from the svg, we need the
         # renderer right away
@@ -188,10 +92,10 @@ class Tileset:
         if self.__renderer is None:
             self.__renderer = QSvgRenderer(self.graphicsPath)
             if not self.__renderer.isValid():
-                logException(TileException(
+                logException(
                     m18n(
                         'file <filename>%1</filename> contains no valid SVG'),
-                    self.graphicsPath))
+                    self.graphicsPath)
             distance = 0
             if self.desktopFileName == 'classic':
                 distance = 2
