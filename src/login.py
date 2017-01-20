@@ -635,7 +635,7 @@ class Connection:
                 ),
                 failure.getTraceback())
         # Maybe the server is running but something is wrong with it
-        if self.url.useSocket:
+        if self.url and self.url.useSocket:
             if removeIfExists(socketName()):
                 logInfo(
                     i18n('removed stale socket <filename>%1</filename>', socketName()))

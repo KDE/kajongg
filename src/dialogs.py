@@ -158,6 +158,8 @@ class DeferredDialog(Deferred):
         """we got a reaction"""
         if self.dlg:
             result = self.dlg.returns(button)
+        else:
+            result = None
         self.__removeFromScene()
         self.callback(result)
 
