@@ -62,27 +62,21 @@ class Sound:
         """sets __oggBinary to exe name or an empty string"""
         if Sound.__oggBinary is None:
             if os.name == 'nt':
-                parentDirectory = QStandardPaths.locate(QStandardPaths.AppDataLocation, 'voices')
-                if parentDirectory:
-                    oggBinary = os.path.join(parentDirectory, 'oggdec.exe')
-                    msg = ''  # we bundle oggdec.exe with the kajongg installer, it must be there
-                else:
-                    msg = m18n(
-                        'No voices will be heard because the program %1 is missing',
-                        'oggdec.exe')
+                Sound.__oggBinary = os.path.join('share', 'kajongg', 'voices', 'oggdec.exe')
+                msg = ''  # we bundle oggdec.exe with the kajongg installer, it must be there
             else:
                 oggBinary = 'ogg123'
                 msg = m18n(
                     'No voices will be heard because the program %1 is missing',
                     oggBinary)
-            if which(oggBinary):
-                Sound.__oggBinary = oggBinary
-            else:
-                Sound.__oggBinary = ''
-                Internal.Preferences.useSounds = False
-                # checks again at next reenable
-                if msg:
-                    logWarning(msg)
+                if which(oggBinary):
+                    Sound.__oggBinary = oggBinary
+                else:
+                    Sound.__oggBinary = ''
+                    Internal.Preferences.useSounds = False
+                    # checks again at next reenable
+                    if msg:
+                        logWarning(msg)
             if Debug.sound:
                 logDebug('ogg123 found:' + Sound.__oggBinary)
         return Sound.__oggBinary
@@ -119,6 +113,7 @@ class Sound:
     @staticmethod
     def speak(what):
         """this is what the user of this module will call."""
+        # pylint: disable=too-many-branches
         if not Internal.Preferences.useSounds:
             return
         game = Internal.scene.game
@@ -136,17 +131,22 @@ class Sound:
                 if os.name == 'nt':
                     # convert to .wav, store .wav in cacheDir
                     name, ext = os.path.splitext(what)
-                    assert ext == '.ogg'
-                    nameParts = os.path.normpath(name).split(os.sep)
-                    nameParts = nameParts[nameParts.index('voices') + 1:]
+                    assert ext == '.ogg', 'what: {} name: {} ext: {}'.format(what, name, ext)
+                    if 'bell' in name:
+                        nameParts = ['bell']
+                    else:
+                        nameParts = os.path.normpath(name).split(os.sep)
+                        nameParts = nameParts[nameParts.index('voices') + 1:]
                     wavName = os.path.normpath(
                         '{}/{}.wav'.format(cacheDir(),
                                            '_'.join(nameParts)))
                     if not os.path.exists(wavName):
-                        args = [oggBinary, '-a', '-w', wavName, what]
+                        args = [oggBinary, '-a', '-w', wavName, os.path.normpath(what)]
                         startupinfo = subprocess.STARTUPINFO()
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                         subprocess.call(args, startupinfo=startupinfo)
+                        if Debug.sound:
+                            logDebug('converted {} to wav {}'.format(what, wavName))
                     try:
                         winsound.PlaySound(
                             wavName,
@@ -171,7 +171,7 @@ class Sound:
             Sound.__bonusOgg = ''
             for oggName in (
                     '/usr/share/sounds/KDE-Im-Message-In.ogg',
-                    'share/sounds/bonus.ogg'):
+                    'share/sounds/bell.ogg'):
                 if os.path.exists(oggName):
                     Sound.__bonusOgg = oggName
                     if Debug.sound:
@@ -234,8 +234,10 @@ class Voice(StrMixin):
         """a list of all voice directories"""
         if not Voice.__availableVoices:
             result = []
-            for parentDirectory in QStandardPaths.locateAll(
-                    QStandardPaths.AppDataLocation, 'voices', QStandardPaths.LocateDirectory):
+            directories = QStandardPaths.locateAll(
+                QStandardPaths.AppDataLocation, 'voices', QStandardPaths.LocateDirectory)
+            directories.insert(0, os.path.join('share', 'kajongg', 'voices'))
+            for parentDirectory in directories:
                 for (dirpath, _, _) in os.walk(parentDirectory, followlinks=True):
                     if os.path.exists(os.path.join(dirpath, 's1.ogg')):
                         result.append(Voice(dirpath))
@@ -270,7 +272,7 @@ class Voice(StrMixin):
                         (name, voice.directory))
                 return voice
         if Debug.sound:
-            logDebug('%s not found' % (name))
+            logDebug('Personal sound for %s not found' % (name))
 
     def buildSubvoice(self, oggName, side):
         """side is 'left' or 'right'."""
