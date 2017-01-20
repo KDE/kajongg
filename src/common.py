@@ -265,6 +265,7 @@ class __Internal:
     game = None
     autoPlay = False
     logger = None
+    kajonggrc = None
 
     def __init__(self):
         """init the loggers"""

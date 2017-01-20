@@ -264,7 +264,7 @@ class Help:
             def gotUrl(url):
                 """now we know where the manual is"""
                 webbrowser.open(url)
-            languages = KGlobal.config().group(
+            languages = Internal.kajonggrc.group(
                 'Locale').readEntry('Language').split(':')
             Help.__getDocUrl(languages).addCallback(gotUrl)
 
@@ -698,7 +698,7 @@ class KConfigGroup:
         i18nItems = dict(
             (x for x in items.items() if x[0].startswith(name + '[')))
         if i18nItems:
-            languages = KGlobal.config().group('Locale').readEntry('Language').split(':')
+            languages = Internal.kajonggrc.group('Locale').readEntry('Language').split(':')
             languages = list(x.split('_')[0] for x in languages)
             for language in languages:
                 key = '%s[%s]' % (name, language)
@@ -733,7 +733,7 @@ class KGlobal:
     @classmethod
     def currentLanguages(cls):
         """the currently used languages, primary first"""
-        languages = cls.configInstance.group('Locale').readEntry('Language')
+        languages = Internal.kajonggrc.group('Locale').readEntry('Language')
         if not languages:
             return list()
         languages = languages.split(':')
@@ -745,13 +745,8 @@ class KGlobal:
     def initStatic(cls):
         """init class members"""
         cls.prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
-        cls.configInstance = KConfig()
+        Internal.kajonggrc = KConfig()
         MLocale.installTranslations(cls.currentLanguages())
-
-    @classmethod
-    def config(cls):
-        """stub"""
-        return cls.configInstance
 
 
 class KConfig(ConfigParser):
@@ -824,7 +819,7 @@ class KConfigSkeletonItem:
     def getFromConfig(self):
         """if not there, use default"""
         try:
-            self._value = self.skeleton.config.get(self.group, self.key)
+            self._value = Internal.kajonggrc.get(self.group, self.key)
         except (NoSectionError, NoOptionError):
             self._value = self.default
 
@@ -839,7 +834,7 @@ class ItemBool(KConfigSkeletonItem):
     def getFromConfig(self):
         """if not there, use default"""
         try:
-            self._value = self.skeleton.config.getboolean(self.group, self.key)
+            self._value = Internal.kajonggrc.getboolean(self.group, self.key)
         except (NoSectionError, NoOptionError):
             self._value = self.default
 
@@ -866,7 +861,7 @@ class ItemInt(KConfigSkeletonItem):
     def getFromConfig(self):
         """if not there, use default"""
         try:
-            self._value = self.skeleton.config.getint(self.group, self.key)
+            self._value = Internal.kajonggrc.getint(self.group, self.key)
         except (NoSectionError, NoOptionError):
             self._value = self.default
 
@@ -888,7 +883,6 @@ class KConfigSkeleton(QObject):
         QObject.__init__(self)
         self.currentGroup = None
         self.items = []
-        self.config = KGlobal.config()
         self.addBool('MainWindow', 'toolBarVisible', True)
         self.addString(
             'MainWindow',
@@ -909,8 +903,8 @@ class KConfigSkeleton(QObject):
     def writeConfig(self):
         """to the same file name"""
         for item in self.items:
-            self.config.setValue(item.group, item.key, item.value())
-        self.config.writeToFile()
+            Internal.kajonggrc.setValue(item.group, item.key, item.value())
+        Internal.kajonggrc.writeToFile()
 
     def as_dict(self):
         """a dict of dicts"""
@@ -966,7 +960,7 @@ class KSwitchLanguageDialog(KDialog):
         languageHorizontalLayout.addLayout(self.languagesLayout)
         languageHorizontalLayout.addStretch()
 
-        defined = KGlobal.config().group(
+        defined = Internal.kajonggrc.group(
             'Locale').readEntry('Language').split(':')
         if not defined:
             defined = [QLocale.name()]
@@ -1020,7 +1014,7 @@ class KSwitchLanguageDialog(KDialog):
     def accept(self):
         """OK"""
         newValue = ':'.join(x.current for x in self.languageButtons)
-        KGlobal.config().setValue('Locale', 'Language', newValue)
+        Internal.kajonggrc.setValue('Locale', 'Language', newValue)
         super(KSwitchLanguageDialog, self).accept()
 
     def slotAddLanguageButton(self):

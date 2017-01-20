@@ -33,7 +33,7 @@ from log import logWarning, i18n, logDebug, logException
 
 from qt import QStandardPaths
 
-from kde import KGlobal, cacheDir
+from kde import cacheDir
 
 from tile import Tile
 
@@ -241,7 +241,7 @@ class Voice(StrMixin):
                 for (dirpath, _, _) in os.walk(parentDirectory, followlinks=True):
                     if os.path.exists(os.path.join(dirpath, 's1.ogg')):
                         result.append(Voice(dirpath))
-            group = KGlobal.config().group('Locale')
+            group = Internal.kajonggrc.group('Locale')
             prefLanguages = uniqueList(
                 ':'.join(['local', str(group.readEntry('Language')), 'en_US']).split(':'))
             prefLanguages = dict((x[1], x[0])
