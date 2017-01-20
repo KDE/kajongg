@@ -46,8 +46,6 @@ else:
     interpreterName = 'python3'
 
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
-ENGLISHDICT = {}
-
 
 def isAlive(qobj):
     """is the underlying C++ object still valid?
@@ -402,7 +400,3 @@ class Speeds:
     """some fixed animation speeds"""
     windMarker = 20
     sideText = 60
-
-def english(i18nstring):
-    """translate back from local language"""
-    return ENGLISHDICT.get(i18nstring, i18nstring)

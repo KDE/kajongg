@@ -24,10 +24,10 @@ Read the user manual for a description of the interface to this scoring engine
 import types
 from hashlib import md5
 
-from common import Internal, Debug, english  # pylint: disable=redefined-builtin
+from common import Internal, Debug
 from common import StrMixin
 from log import logException, logDebug
-from mi18n import i18n, i18nc, i18nE, i18ncE
+from mi18n import i18n, i18nc, i18nE, i18ncE, english
 from query import Query
 
 

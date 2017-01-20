@@ -37,12 +37,12 @@ from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
     QSizePolicy, QWidget
 
 from kde import KUser, KDialog, KDialogButtonBox, appdataDir, socketName
-from mi18n import i18n, i18nc
+from mi18n import i18n, i18nc, english
 from dialogs import DeferredDialog, QuestionYesNo
 
 from log import logWarning, logException, logInfo, logDebug, SERVERMARK
 from util import removeIfExists, which
-from common import Internal, Options, SingleshotOptions, Debug, isAlive, english
+from common import Internal, Options, SingleshotOptions, Debug, isAlive
 from common import interpreterName
 from common import StrMixin
 from game import Players

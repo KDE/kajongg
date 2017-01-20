@@ -36,7 +36,7 @@ from locale import _parse_localename, getdefaultlocale, setlocale, LC_ALL
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
 
-from common import Internal, Debug, ENGLISHDICT
+from common import Internal, Debug
 from util import uniqueList
 
 import gettext
@@ -44,6 +44,8 @@ import gettext
 
 __all__ = ['i18n', 'i18nc', 'qi18nc', 'i18nE', 'i18ncE', 'KDETranslator', 'MLocale']
 
+
+ENGLISHDICT = {}
 
 def __insertArgs(translatedTemplate, *args):
     """
@@ -134,6 +136,9 @@ def i18ncE(dummyContext, englishText):
     """use this if you want to get the english text right now but still have the string translated"""
     return englishText
 
+def english(i18nstring):
+    """translate back from local language"""
+    return ENGLISHDICT.get(i18nstring, i18nstring)
 
 
 class KDETranslator(QTranslator):
