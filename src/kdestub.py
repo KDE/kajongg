@@ -58,7 +58,7 @@ import gettext
 
 
 __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
-           'KCmdLineOptions', 'i18n', 'i18nc', 'ki18n',
+           'KCmdLineOptions', 'i18n', 'i18nc', 'i18nE', 'i18ncE', 'ki18n',
            'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
            'KConfigDialog', 'KDialog',
            'KUser', 'KToggleFullScreenAction', 'KStandardAction',
@@ -146,6 +146,16 @@ def qi18nc(context, englishIn, *args):
     else:
         _ = Internal.app.translate(context, englishIn)
     return __insertArgs(_, *args)
+
+def i18nE(englishText):
+    """use this if you want to get the english text right now but still have the string translated"""
+    return englishText
+
+
+def i18ncE(dummyContext, englishText):
+    """use this if you want to get the english text right now but still have the string translated"""
+    return englishText
+
 
 class OptionHelper:
 

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
 from qt import QSizeF, QSvgRenderer
-from log import logException, m18n
+from log import logException, i18n
 from mjresource import Resource
 
 from common import LIGHTSOURCES, Internal
@@ -93,7 +93,7 @@ class Tileset(Resource):
             self.__renderer = QSvgRenderer(self.graphicsPath)
             if not self.__renderer.isValid():
                 logException(
-                    m18n(
+                    i18n(
                         'file <filename>%1</filename> contains no valid SVG'),
                     self.graphicsPath)
             distance = 0

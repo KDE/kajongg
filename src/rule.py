@@ -26,7 +26,8 @@ from hashlib import md5
 
 from common import Internal, Debug, english  # pylint: disable=redefined-builtin
 from common import StrMixin
-from log import m18n, m18nc, m18nE, m18ncE, logException, logDebug
+from log import logException, logDebug
+from kde import i18n, i18nc, i18nE, i18ncE
 from query import Query
 
 
@@ -49,10 +50,10 @@ class Score(StrMixin):
         self.doubles = type(self.doubles)(doubles)
         self.limits = type(self.limits)(limits)
 
-    unitNames = {m18nE(
+    unitNames = {i18nE(
         'points'): 0,
-                 m18ncE('kajongg', 'doubles'): 50,
-                 m18ncE('kajongg', 'limits'): 9999}
+                 i18ncE('kajongg', 'doubles'): 50,
+                 i18ncE('kajongg', 'limits'): 9999}
 
     def clear(self):
         """set all to 0"""
@@ -89,14 +90,14 @@ class Score(StrMixin):
         """make score readable for humans, i18n"""
         parts = []
         if self.points:
-            parts.append(m18nc('Kajongg', '%1 points', self.points))
+            parts.append(i18nc('Kajongg', '%1 points', self.points))
         if self.doubles:
-            parts.append(m18nc('Kajongg', '%1 doubles', self.doubles))
+            parts.append(i18nc('Kajongg', '%1 doubles', self.doubles))
         if self.limits:
             limits = str(self.limits)
             if limits.endswith('.0'):
                 limits = limits[-2:]
-            parts.append(m18nc('Kajongg', '%1 limits', limits))
+            parts.append(i18nc('Kajongg', '%1 limits', limits))
         return ' '.join(parts)
 
     def __eq__(self, other):
@@ -340,19 +341,19 @@ class Ruleset:
         self.doublingMeldRules = []
         self.doublingHandRules = []
         self.standardMJRule = None
-        self.meldRules = RuleList(1, m18n('Meld Rules'),
-                                  m18n('Meld rules are applied to single melds independent of the rest of the hand'))
-        self.handRules = RuleList(2, m18n('Hand Rules'),
-                                  m18n('Hand rules are applied to the entire hand, for all players'))
-        self.winnerRules = RuleList(3, m18n('Winner Rules'),
-                                    m18n('Winner rules are applied to the entire hand but only for the winner'))
-        self.loserRules = RuleList(33, m18n('Loser Rules'),
-                                   m18n('Loser rules are applied to the entire hand but only for non-winners'))
-        self.mjRules = RuleList(4, m18n('Mah Jongg Rules'),
-                                m18n('Only hands matching a Mah Jongg rule can win'))
-        self.parameterRules = RuleList(999, m18nc('kajongg', 'Options'),
-                                       m18n('Here we have several special game related options'))
-        self.penaltyRules = RuleList(9999, m18n('Penalties'), m18n(
+        self.meldRules = RuleList(1, i18n('Meld Rules'),
+                                  i18n('Meld rules are applied to single melds independent of the rest of the hand'))
+        self.handRules = RuleList(2, i18n('Hand Rules'),
+                                  i18n('Hand rules are applied to the entire hand, for all players'))
+        self.winnerRules = RuleList(3, i18n('Winner Rules'),
+                                    i18n('Winner rules are applied to the entire hand but only for the winner'))
+        self.loserRules = RuleList(33, i18n('Loser Rules'),
+                                   i18n('Loser rules are applied to the entire hand but only for non-winners'))
+        self.mjRules = RuleList(4, i18n('Mah Jongg Rules'),
+                                i18n('Only hands matching a Mah Jongg rule can win'))
+        self.parameterRules = RuleList(999, i18nc('kajongg', 'Options'),
+                                       i18n('Here we have several special game related options'))
+        self.penaltyRules = RuleList(9999, i18n('Penalties'), i18n(
             """Penalties are applied manually by the user. They are only used for scoring games.
 When playing against the computer or over the net, Kajongg will never let you get
 into a situation where you have to pay a penalty"""))
@@ -549,9 +550,9 @@ into a situation where you have to pay a penalty"""))
             copyNr = 1
             while self.nameExists(newName):
                 copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
-                newName = m18nc(
+                newName = i18nc(
                     'Ruleset._newKey:%1 is empty or space plus number',
-                    'Copy%1 of %2', copyStr, m18n(self.name))
+                    'Copy%1 of %2', copyStr, i18n(self.name))
                 copyNr += 1
         return newId, newName
 
@@ -913,13 +914,13 @@ class Rule(RuleBase):
         payees = int(self.options.get('payees', 1))
         if not 2 <= payers + payees <= 4:
             logException(
-                m18nc(
+                i18nc(
                     '%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                     self.name, payers, payees, 'payers/payees'))
 
     def explain(self, meld):
         """use this rule for scoring"""
-        return '%s: %s' % (m18n(
+        return '%s: %s' % (i18n(
             self.explainTemplate if self.explainTemplate else self.name).format(
                 group=meld[0].groupName() if meld else '',
                 value=meld[0].valueName() if meld else '',
@@ -1009,9 +1010,9 @@ class IntRule(ParameterRule):
     def validate(self):
         """is the rule valid?"""
         if self.parameter < self.minimum:
-            return m18nc(
+            return i18nc(
                 'wrong value for rule', '%1: %2 is too small, minimal value is %3',
-                m18n(self.name), self.parName, self.minimum)
+                i18n(self.name), self.parName, self.minimum)
 
 
 class BoolRule(ParameterRule):

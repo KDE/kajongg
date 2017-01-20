@@ -18,6 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
+from kde import i18n, i18nc
 from kde import KIcon
 from dialogs import Sorry
 from qt import Qt
@@ -26,7 +27,6 @@ from qt import QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox, \
 
 from query import Query
 from guiutil import decorateWindow
-from log import m18n, m18nc
 from statesaver import StateSaver
 
 
@@ -49,13 +49,13 @@ class PlayerList(QDialog):
             QDialogButtonBox.Close)  # Close has the Rejected role
         self.buttonBox.rejected.connect(self.accept)
         self.newButton = self.buttonBox.addButton(
-            m18nc('define a new player',
+            i18nc('define a new player',
                   "&New"),
             QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.slotInsert)
         self.deleteButton = self.buttonBox.addButton(
-            m18n("&Delete"), QDialogButtonBox.ActionRole)
+            i18n("&Delete"), QDialogButtonBox.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.deleteButton.clicked.connect(self.delete)
 
@@ -65,7 +65,7 @@ class PlayerList(QDialog):
         layout.addWidget(self.table)
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
-        decorateWindow(self, m18n("Players"))
+        decorateWindow(self, i18n("Players"))
         self.setObjectName('Players')
 
     def showEvent(self, dummyEvent):
@@ -91,7 +91,7 @@ class PlayerList(QDialog):
         self._data = data
         table.setColumnCount(1)
         table.setRowCount(len(self._data))
-        table.setHorizontalHeaderLabels([m18n("Player")])
+        table.setHorizontalHeaderLabels([i18n("Player")])
         table.setSelectionBehavior(QTableWidget.SelectRows)
         table.setSelectionMode(QTableWidget.SingleSelection)
         selectedItem = None
@@ -111,7 +111,7 @@ class PlayerList(QDialog):
         """this must be new because editing is disabled for others"""
         currentName = item.text()
         if currentName in self._data:
-            Sorry(m18n('Player %1 already exists', currentName))
+            Sorry(i18n('Player %1 already exists', currentName))
             self.setFocus()
             del self._data[self.table.item(self.table.currentRow(), 0).text()]
             self.updateTable(currentName=currentName)
@@ -119,7 +119,7 @@ class PlayerList(QDialog):
         query = Query('insert into player(name) values(?)', (currentName, ))
         if query.failure:
             Sorry(
-                m18n(
+                i18n(
                     'Error while adding player %1: %2',
                     currentName,
                     query.failure.message))
@@ -146,7 +146,7 @@ class PlayerList(QDialog):
                 (playerId, ) * 4)
             if len(query.records):
                 Sorry(
-                    m18n('This player cannot be deleted. There are games associated with %1.', name))
+                    i18n('This player cannot be deleted. There are games associated with %1.', name))
                 return
             Query("delete from player where name=?", (name,))
             self.updateTable()

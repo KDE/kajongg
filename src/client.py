@@ -25,7 +25,8 @@ from twisted.spread import pb
 from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed, fail
 from util import Duration
-from log import logDebug, logException, logWarning, m18nc
+from log import logDebug, logException, logWarning
+from kde import i18nc
 from message import Message
 from common import Internal, Debug, Options, StrMixin
 from common import isAlive
@@ -62,13 +63,13 @@ class Table(StrMixin):
         """a status string"""
         result = ''
         if self.suspendedAt:
-            result = m18nc('table status', 'Suspended')
+            result = i18nc('table status', 'Suspended')
             result += ' ' + datetime.datetime.strptime(
                 self.suspendedAt,
                 '%Y-%m-%dT%H:%M:%S').strftime('%c')
         if self.running:
-            result += ' ' + m18nc('table status', 'Running')
-        return result or m18nc('table status', 'New')
+            result += ' ' + i18nc('table status', 'Running')
+        return result or i18nc('table status', 'New')
 
     def __str__(self):
         return 'Table({})'.format(self.tableid)

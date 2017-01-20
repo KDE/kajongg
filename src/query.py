@@ -31,9 +31,10 @@ import random
 from collections import defaultdict
 import sqlite3
 
+from kde import i18n, i18ncE
 from kde import appdataDir
 from util import Duration
-from log import logInfo, logWarning, logException, logError, logDebug, m18ncE, m18n, id4
+from log import logInfo, logWarning, logException, logError, logDebug, id4
 from common import IntDict, Options, Internal, Debug
 
 class QueryException(Exception):
@@ -228,7 +229,7 @@ class Query:
     Every record is a list of all fields. q.records[0][1] is record 0, field 1.
     """
 
-    localServerName = m18ncE(
+    localServerName = i18ncE(
         'kajongg name for local game server',
         'Local Game')
 
@@ -412,7 +413,7 @@ class PrepareDB:
                     if hasattr(self, updateMethodName):
                         getattr(self, updateMethodName)()
                     Query('UPDATE general SET schemaversion=?', (version,))
-                logInfo(m18n('Database %1 updated from schema %2 to %3',
+                logInfo(i18n('Database %1 updated from schema %2 to %3',
                              Internal.db.path, currentVersion, version), showDialog=True)
         except sqlite3.Error as exc:
             logException('opening %s: %s' % (self.path, exc.message))

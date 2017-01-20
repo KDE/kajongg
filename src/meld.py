@@ -24,7 +24,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 from itertools import chain
 
-from log import m18nc
+from kde import i18nc
 from common import StrMixin
 from tile import Tile, TileList, elements
 
@@ -328,34 +328,34 @@ class Meld(TileList, StrMixin):
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""
         # pylint: disable=too-many-return-statements
         if self.isBonus:
-            return m18nc('kajongg meld type', 'Bonus')
+            return i18nc('kajongg meld type', 'Bonus')
         elif self.isSingle:
-            return m18nc('kajongg meld type', '&single')
+            return i18nc('kajongg meld type', '&single')
         elif self.isPair:
-            return m18nc('kajongg meld type', '&pair')
+            return i18nc('kajongg meld type', '&pair')
         elif self.isChow:
-            return m18nc('kajongg meld type', '&chow')
+            return i18nc('kajongg meld type', '&chow')
         elif self.isPung:
-            return m18nc('kajongg meld type', 'p&ung')
+            return i18nc('kajongg meld type', 'p&ung')
         elif self.isClaimedKong:
-            return m18nc('kajongg meld type', 'c&laimed kong')
+            return i18nc('kajongg meld type', 'c&laimed kong')
         elif self.isKong:
-            return m18nc('kajongg meld type', 'k&ong')
+            return i18nc('kajongg meld type', 'k&ong')
         else:
-            return m18nc('kajongg meld type', 'rest of tiles')
+            return i18nc('kajongg meld type', 'rest of tiles')
 
     def __stateName(self):
         """the translated name of the state"""
         if self.isBonus or self.isClaimedKong:
             return ''
         elif self.isExposed:
-            return m18nc('kajongg meld state', 'Exposed')
+            return i18nc('kajongg meld state', 'Exposed')
         else:
-            return m18nc('kajongg meld state', 'Concealed')
+            return i18nc('kajongg meld state', 'Concealed')
 
     def name(self):
         """the long name"""
-        result = m18nc(
+        result = i18nc(
             'kajongg meld name, do not translate parameter names',
             '{state} {meldType} {name}')
         return result.format(

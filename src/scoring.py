@@ -29,7 +29,7 @@ from common import Internal, isAlive, Debug
 from wind import Wind
 from tilesource import TileSource
 from animation import animate
-from log import logError, logDebug, logWarning, m18n
+from log import logError, logDebug, logWarning, i18n
 from query import Query
 from uitile import UITile
 from board import WindLabel, Board
@@ -50,13 +50,13 @@ class SwapDialog(QMessageBox):
 
     def __init__(self, swappers):
         QMessageBox.__init__(self)
-        decorateWindow(self, m18n("Swap Seats"))
+        decorateWindow(self, i18n("Swap Seats"))
         self.setText(
-            m18n("By the rules, %1 and %2 should now exchange their seats. ",
+            i18n("By the rules, %1 and %2 should now exchange their seats. ",
                  swappers[0].name, swappers[1].name))
-        self.yesAnswer = QPushButton(m18n("&Exchange"))
+        self.yesAnswer = QPushButton(i18n("&Exchange"))
         self.addButton(self.yesAnswer, QMessageBox.YesRole)
-        self.noAnswer = QPushButton(m18n("&Keep seat"))
+        self.noAnswer = QPushButton(i18n("&Keep seat"))
         self.addButton(self.noAnswer, QMessageBox.NoRole)
 
 
@@ -67,7 +67,7 @@ class SelectPlayers(SelectRuleset):
     def __init__(self):
         SelectRuleset.__init__(self)
         Players.load()
-        decorateWindow(self, m18n('Select four players'))
+        decorateWindow(self, i18n('Select four players'))
         self.names = None
         self.nameWidgets = []
         for idx, wind in enumerate(Wind.all4):
@@ -298,8 +298,8 @@ class ScoringHandBoard(HandBoard):
                     hbCenter.x() * 1,
                     1)
                 helpItems = [splitter]
-                for name, yFactor in [(m18n('Move Exposed Tiles Here'), 0.5),
-                                      (m18n('Move Concealed Tiles Here'), 1.5)]:
+                for name, yFactor in [(i18n('Move Exposed Tiles Here'), 0.5),
+                                      (i18n('Move Concealed Tiles Here'), 1.5)]:
                     helper = QGraphicsSimpleTextItem(name, self)
                     helper.setScale(3)
                     nameRect = QRectF()
@@ -610,7 +610,7 @@ def scoreGame():
     Players.load()
     if len(Players.humanNames) < 4:
         logWarning(
-            m18n('Please define four players in <interface>Settings|Players</interface>'))
+            i18n('Please define four players in <interface>Settings|Players</interface>'))
         return
     gameSelector = Games(Internal.mainWindow)
     selected = None

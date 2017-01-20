@@ -27,10 +27,10 @@ from sys import _getframe
 
 # util must not import twisted or we need to change kajongg.py
 
-from common import Internal, Debug, ENGLISHDICT  # pylint: disable=redefined-builtin
+from common import Internal, Debug # pylint: disable=redefined-builtin
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead, callers
-from kde import i18n, i18nc
+from kde import i18n
 from dialogs import Sorry, Information, NoPrompt
 
 
@@ -117,7 +117,7 @@ def translateServerMessage(msg):
     string is always english. Here we unpack and translate it into the
     client language."""
     if msg.find(SERVERMARK) >= 0:
-        return m18n(*tuple(msg.split(SERVERMARK)[1:-1]))
+        return i18n(*tuple(msg.split(SERVERMARK)[1:-1]))
     return msg
 
 
@@ -184,7 +184,7 @@ def __exceptionToString(exception):
             # but I do not know what it does differently with gettext and if
             # I can do the same with the python gettext module
             parts.append(
-                '[Errno {}] {}'.format(arg.errno, m18n(arg.strerror)))
+                '[Errno {}] {}'.format(arg.errno, i18n(arg.strerror)))
         elif arg is None:
             pass
         else:
@@ -248,60 +248,6 @@ def logException(exception: str, withGamePrefix=True):
     """logs error message and re-raises exception"""
     logError(exception, withGamePrefix=withGamePrefix)
     raise Exception(exception)
-
-
-def m18n(englishText, *args):
-    """
-    Wrapper around i18n.
-
-    @param englishText : The text template.
-    @type englishText: C{str}
-
-    @param args : Arguments for the text template.
-    @type args: A list or tuple of strings.
-
-    @return: The translated text with args inserted.
-    @rtype: C{str}.
-
-    Since when do args have to be str? utf-8
-    encoded fails.
-    """
-    result = i18n(englishText, *args)
-    if not args:
-        ENGLISHDICT[result] = englishText
-    return result
-
-
-def m18nc(context, englishText, *args):
-    """
-    Wrapper around i18n. i18n only accepts and returns
-    native strings.
-
-    @param context: The context for this string.
-    @type context: C{str}
-    @param englishText : The text template.
-    @type englishText: C{str}
-
-    @param args : Arguments for the text template.
-    @type args: A list or tuple of strings.
-
-    @return: The translated text with args inserted.
-    @rtype: C{str}.
-    """
-    result = i18nc(context, englishText, *args)
-    if not args:
-        ENGLISHDICT[result] = englishText
-    return result
-
-
-def m18nE(englishText):
-    """use this if you want to get the english text right now but still have the string translated"""
-    return englishText
-
-
-def m18ncE(dummyContext, englishText):
-    """use this if you want to get the english text right now but still have the string translated"""
-    return englishText
 
 
 class EventData(str):

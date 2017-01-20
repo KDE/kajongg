@@ -128,7 +128,7 @@ class Debug:
         allOptions = sorted(boolOptions + stringOptions)
         opt = '\n'.join(
             ', '.join(optYielder(allOptions)).split(' SEPARATOR, '))
-        # TODO: ki18n for this string. First move i18n out of kdestub so we can import it here
+        # TODO: ki18n for this string. First move i18n out of kde so we can import it here
         return """set debug options. Pass a comma separated list of options.
 Options are: {opt}.
 Options {stropt} take a string argument like {example}.

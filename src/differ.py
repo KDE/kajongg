@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from qt import Qt, QAbstractTableModel, QModelIndex
 from qt import QLabel, QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
-from log import m18n, m18nc
+from kde import i18n, i18nc
 from statesaver import StateSaver
 from guiutil import ListComboBox, MJTableView, decorateWindow
 from guiutil import BlockSignals
@@ -70,11 +70,11 @@ class DifferModel(QAbstractTableModel):
             return
         if orientation == Qt.Horizontal:
             if section == 0:
-                return m18nc('Kajongg', 'Rule')
+                return i18nc('Kajongg', 'Rule')
             if section == 1:
-                return m18n(self.view.cbRuleset1.current.name)
+                return i18n(self.view.cbRuleset1.current.name)
             if section == 2:
-                return m18n(self.view.cbRuleset2.current.name)
+                return i18n(self.view.cbRuleset2.current.name)
 
 
 class RulesetDiffer(QDialog):
@@ -127,7 +127,7 @@ class RulesetDiffer(QDialog):
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
 
-        decorateWindow(self, m18n("Compare"))
+        decorateWindow(self, i18n("Compare"))
         self.setObjectName('RulesetDiffer')
 
         self.cbRuleset1.currentIndexChanged.connect(self.leftRulesetChanged)
@@ -168,10 +168,10 @@ class RulesetDiffer(QDialog):
         leftRuleset.load()
         rightRuleset.load()
         for rule1, rule2 in leftRuleset.diff(rightRuleset):
-            name = m18n(rule1.name if rule1 else rule2.name)
-            left = rule1.i18nStr() if rule1 else m18nc(
+            name = i18n(rule1.name if rule1 else rule2.name)
+            left = rule1.i18nStr() if rule1 else i18nc(
                 'Kajongg-Rule', 'not defined')
-            right = rule2.i18nStr() if rule2 else m18nc(
+            right = rule2.i18nStr() if rule2 else i18nc(
                 'Kajongg-Rule', 'not defined')
             formatted.append((name, left, right))
             if rule1 and rule2 and rule1.definition != rule2.definition:

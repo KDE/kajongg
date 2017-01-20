@@ -31,7 +31,7 @@ from qt import QDialog, QVBoxLayout, QGridLayout, \
 from kde import KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 from guiutil import decorateWindow
-from log import m18n, logWarning, logException, logDebug
+from log import i18n, logWarning, logException, logDebug
 from message import Message, ChatMessage
 from chat import ChatWindow
 from common import Options, SingleshotOptions, Internal, Debug, isAlive
@@ -58,7 +58,7 @@ class SelectChow(KDialogIgnoringEscape):
         self.selectedChow = None
         self.deferred = deferred
         layout = QVBoxLayout()
-        label = QLabel(m18n('Which chow do you want to expose?'))
+        label = QLabel(i18n('Which chow do you want to expose?'))
         layout.addWidget(label)
         layout.setAlignment(label, Qt.AlignHCenter)
         self.buttons = []
@@ -96,7 +96,7 @@ class SelectKong(KDialogIgnoringEscape):
         self.selectedKong = None
         self.deferred = deferred
         layout = QVBoxLayout()
-        label = QLabel(m18n('Which kong do you want to declare?'))
+        label = QLabel(i18n('Which kong do you want to declare?'))
         layout.addWidget(label)
         layout.setAlignment(label, Qt.AlignHCenter)
         self.buttons = []
@@ -163,7 +163,7 @@ class ClientDialog(QDialog):
 
     def __init__(self, client, parent=None):
         QDialog.__init__(self, parent)
-        decorateWindow(self, m18n('Choose'))
+        decorateWindow(self, i18n('Choose'))
         self.setObjectName('ClientDialog')
         self.client = client
         self.layout = QGridLayout(self)
@@ -355,7 +355,7 @@ class ClientDialog(QDialog):
             answer = button.message
         if not self.client.game.myself.sayable[answer]:
             self.proposeAction().setFocus() # go back to default action
-            self.sorry = Sorry(m18n('You cannot say %1', answer.i18nName))
+            self.sorry = Sorry(i18n('You cannot say %1', answer.i18nName))
             return
         self.timer.stop()
         self.answered = True
@@ -516,7 +516,7 @@ class HumanClient(Client):
         self.__updateTableList()
         if message:
             if self.name not in args or not message.endswith('has logged out'):
-                logWarning(m18n(message, *args))
+                logWarning(i18n(message, *args))
 
     def __receiveTables(self, tables):
         """now we already know all rulesets for those tables"""
@@ -579,7 +579,7 @@ class HumanClient(Client):
                                 return game.close()
                         if self.beginQuestion:
                             self.beginQuestion.cancel()
-                        Sorry(m18n('Player %1 has left the table', name)).addCallback(
+                        Sorry(i18n('Player %1 has left the table', name)).addCallback(
                             sorried).addCallback(self.showTableList)
                         break
         self.__updateTableList()
@@ -642,7 +642,7 @@ class HumanClient(Client):
             raise pb.Error(
                 'client.readyForGameStart: tableid %d unknown' %
                 tableid)
-        msg = m18n(
+        msg = i18n(
             "The game on table <numid>%1</numid> can begin. Are you ready to play now?",
             tableid)
         self.beginQuestion = QuestionYesNo(msg, modal=False, caption=self.name).addCallback(
@@ -662,7 +662,7 @@ class HumanClient(Client):
             # update the balances in the status bar:
             Internal.mainWindow.updateGUI()
         assert not self.game.isFirstHand()
-        return Information(m18n("Ready for next hand?"), modal=False).addCallback(answered)
+        return Information(i18n("Ready for next hand?"), modal=False).addCallback(answered)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
@@ -761,7 +761,7 @@ class HumanClient(Client):
             # translate Robot to Roboter:
             if self.game:
                 args = self.game.players.translatePlayerNames(args)
-            logWarning(m18n(message, *args))
+            logWarning(i18n(message, *args))
             if self.game:
                 self.game.close()
 
@@ -776,7 +776,7 @@ class HumanClient(Client):
         if Internal.scene:
             # update the balances in the status bar:
             Internal.scene.mainWindow.updateGUI()
-        Information(m18n(message, *args)).addCallback(yes)
+        Information(i18n(message, *args)).addCallback(yes)
 
     def remote_serverDisconnects(self, result=None):
         """we logged out or or lost connection to the server.
@@ -919,7 +919,7 @@ class HumanClient(Client):
                 return self.connection.perspective.callRemote(*args).addErrback(callServerError)
             except pb.DeadReferenceError:
                 logWarning(
-                    m18n(
+                    i18n(
                         'The connection to the server %1 broke, please try again later.',
                         self.connection.url))
                 self.remote_serverDisconnects()

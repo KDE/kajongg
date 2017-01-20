@@ -25,8 +25,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import os
 from qt import QStandardPaths
+from log import logWarning, logException
 from kde import KConfig
-from log import logWarning, logException, m18n
+from kde import i18n
 
 RESOURCEFORMAT = 1 # as long as backgrounds and tilesets are synchronous in their versions
 
@@ -62,7 +63,7 @@ class Resource:
             path = os.path.join(directory, which)
             if os.path.exists(path):
                 return path
-        logException('cannot find kmahjongg%s %s in %s' % (cls.resourceName, which,  cls.__directories()))
+        logException('cannot find kmahjongg%s %s in %s' % (cls.resourceName, which, cls.__directories()))
 
     @classmethod
     def loadAll(cls):
@@ -85,7 +86,7 @@ class Resource:
         """No resources found"""
         directories = '\n\n' + '\n'.join(cls.__directories())
         logException(
-            m18n(
+            i18n(
                 'cannot find any %1 in the following directories, '
                 'is libkmahjongg installed?', cls.resourceName) + directories) # TODO: nicht schoen
 
@@ -110,7 +111,7 @@ class Resource:
                 if not result.path:
                     cls.__noTilesetFound()
                 else:
-                    logWarning(m18n('cannot find %1, using default', name))
+                    logWarning(i18n('cannot find %1, using default', name))
 
         cls.cache[result.desktopFileName] = result
         cls.cache[result.path] = result
@@ -120,13 +121,13 @@ class Resource:
         """continue __build"""
         self.group = KConfig(self.path).group(self.configGroupName)
 
-        self.name = self.group.readEntry("Name") or m18n("unknown name")
-        self.author = self.group.readEntry("Author") or m18n("unknown author")
+        self.name = self.group.readEntry("Name") or i18n("unknown name")
+        self.author = self.group.readEntry("Author") or i18n("unknown author")
         self.description = self.group.readEntry(
-            "Description") or m18n(
+            "Description") or i18n(
                 "no description available")
         self.authorEmail = self.group.readEntry(
-            "AuthorEmail") or m18n(
+            "AuthorEmail") or i18n(
                 "no E-Mail address available")
 
         # Version control

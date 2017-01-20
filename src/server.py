@@ -80,8 +80,8 @@ Internal.reactor = reactor
 
 from player import Players
 from query import Query, initDb
-from log import m18n, m18nE, logDebug, logWarning, logError, SERVERMARK
-from log import logInfo
+from log import logDebug, logWarning, logError, logInfo, SERVERMARK
+from kde import i18n, i18nE
 from util import elapsedSince
 from message import Message, ChatMessage
 from deferredutil import DeferredBlock
@@ -117,7 +117,7 @@ class DBPasswordChecker:
         if not len(query.records):
             template = 'Wrong username: %1'
             if Debug.connections:
-                logDebug(m18n(template, cred.username))
+                logDebug(i18n(template, cred.username))
             return fail(credError.UnauthorizedLogin(srvMessage(template, cred.username)))
         userid, password = query.records[0]
         defer1 = maybeDeferred(cred.checkPassword, password.encode('utf-8'))
@@ -128,7 +128,7 @@ class DBPasswordChecker:
     def _checkedPassword(matched, userid):
         """after the password has been checked"""
         if not matched:
-            return fail(credError.UnauthorizedLogin(srvMessage(m18nE('Wrong password'))))
+            return fail(credError.UnauthorizedLogin(srvMessage(i18nE('Wrong password'))))
         return userid
 
 
@@ -226,7 +226,7 @@ class MJServer:
         if tableid not in self.tables:
             raise srvError(
                 pb.Error,
-                m18nE('table with id <numid>%1</numid> not found'),
+                i18nE('table with id <numid>%1</numid> not found'),
                 tableid)
         return self.tables[tableid]
 
@@ -345,7 +345,7 @@ class MJServer:
         if Debug.connections or reason == 'abort':
             logDebug(
                 '%s%s ' % (('%s:' % table.game.seed) if table.game else '',
-                           m18n(message, *args)), withGamePrefix=None)
+                           i18n(message, *args)), withGamePrefix=None)
         if table.tableid in self.tables:
             del self.tables[table.tableid]
             if reason == 'silent':
@@ -360,7 +360,7 @@ class MJServer:
             if Debug.table:
                 logDebug(
                     'removing table %d: %s %s' %
-                    (table.tableid, m18n(message, *args), reason))
+                    (table.tableid, i18n(message, *args), reason))
         if table.game:
             table.game.close()
 
@@ -373,7 +373,7 @@ class MJServer:
             self.leaveTable(
                 user,
                 tableid,
-                m18nE('Player %1 has logged out'),
+                i18nE('Player %1 has logged out'),
                 user.name)
         # wait a moment. We want the leaveTable message to arrive everywhere before
         # we say serverDisconnects. Sometimes the order was reversed.
@@ -443,26 +443,26 @@ def parseArgs():
     parser = OptionParser()
     defaultPort = Internal.defaultPort
     parser.add_option('', '--port', dest='port',
-                      help=m18n(
+                      help=i18n(
                           'the server will listen on PORT (%d)' %
                           defaultPort),
                       type=int, default=defaultPort)
     parser.add_option('', '--socket', dest='socket',
-                      help=m18n('the server will listen on SOCKET'), default=None)
+                      help=i18n('the server will listen on SOCKET'), default=None)
     parser.add_option(
         '',
         '--db',
         dest='dbpath',
-        help=m18n('name of the database'),
+        help=i18n('name of the database'),
         default=None)
     parser.add_option(
         '', '--continue', dest='continueServer', action='store_true',
-        help=m18n('do not terminate local game server after last client disconnects'), default=False)
+        help=i18n('do not terminate local game server after last client disconnects'), default=False)
     parser.add_option('', '--debug', dest='debug',
                       help=Debug.help())
     (options, args) = parser.parse_args()
     if args and ''.join(args):
-        logWarning(m18n('unrecognized arguments:%1', ' '.join(args)))
+        logWarning(i18n('unrecognized arguments:%1', ' '.join(args)))
         sys.exit(2)
     Options.continueServer |= options.continueServer
     if options.dbpath:

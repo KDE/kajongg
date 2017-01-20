@@ -31,7 +31,7 @@ import webbrowser
 import logging
 from signal import signal, SIGABRT, SIGINT, SIGTERM
 
-from log import logError, logDebug, m18n, m18nc
+from log import logError, logDebug
 from common import Options, Internal, isAlive, Debug
 
 class MyHook(cgitb.Hook):
@@ -78,6 +78,7 @@ except ImportError as importError:
 
 
 try:
+    from kde import i18n, i18nc
     from kde import KIcon, KToggleFullScreenAction, \
         KXmlGuiWindow, KStandardAction
 
@@ -519,65 +520,65 @@ class MainWindow(KXmlGuiWindow):
     def retranslateUi(self):
         """retranslate"""
         self.actionScoreGame.setText(
-            m18nc('@action:inmenu', "&Score Manual Game"))
+            i18nc('@action:inmenu', "&Score Manual Game"))
         self.actionScoreGame.setIconText(
-            m18nc('@action:intoolbar', 'Manual Game'))
+            i18nc('@action:intoolbar', 'Manual Game'))
         self.actionScoreGame.setWhatsThis(
-            m18nc('kajongg @info:tooltip',
+            i18nc('kajongg @info:tooltip',
                   '&Score a manual game.'))
 
-        self.actionPlayGame.setText(m18nc('@action:intoolbar', "&Play"))
+        self.actionPlayGame.setText(i18nc('@action:intoolbar', "&Play"))
         self.actionPlayGame.setPriority(QAction.LowPriority)
         self.actionPlayGame.setWhatsThis(
-            m18nc('kajongg @info:tooltip', 'Start a new game.'))
+            i18nc('kajongg @info:tooltip', 'Start a new game.'))
 
-        self.actionAbortGame.setText(m18nc('@action:inmenu', "&Abort Game"))
+        self.actionAbortGame.setText(i18nc('@action:inmenu', "&Abort Game"))
         self.actionAbortGame.setPriority(QAction.LowPriority)
         self.actionAbortGame.setWhatsThis(
-            m18nc('kajongg @info:tooltip',
+            i18nc('kajongg @info:tooltip',
                   'Abort the current game.'))
 
-        self.actionQuit.setText(m18nc('@action:inmenu', "&Quit Kajongg"))
+        self.actionQuit.setText(i18nc('@action:inmenu', "&Quit Kajongg"))
         self.actionQuit.setPriority(QAction.LowPriority)
 
-        self.actionPlayers.setText(m18nc('@action:intoolbar', "&Players"))
+        self.actionPlayers.setText(i18nc('@action:intoolbar', "&Players"))
         self.actionPlayers.setWhatsThis(
-            m18nc('kajongg @info:tooltip',
+            i18nc('kajongg @info:tooltip',
                   'define your players.'))
 
-        self.actionRulesets.setText(m18nc('@action:intoolbar', "&Rulesets"))
+        self.actionRulesets.setText(i18nc('@action:intoolbar', "&Rulesets"))
         self.actionRulesets.setWhatsThis(
-            m18nc('kajongg @info:tooltip',
+            i18nc('kajongg @info:tooltip',
                   'customize rulesets.'))
 
         self.actionAngle.setText(
-            m18nc('@action:inmenu',
+            i18nc('@action:inmenu',
                   "&Change Visual Angle"))
-        self.actionAngle.setIconText(m18nc('@action:intoolbar', "Angle"))
+        self.actionAngle.setIconText(i18nc('@action:intoolbar', "Angle"))
         self.actionAngle.setWhatsThis(
-            m18nc('kajongg @info:tooltip',
+            i18nc('kajongg @info:tooltip',
                   "Change the visual appearance of the tiles."))
 
         self.actionScoreTable.setText(
-            m18nc('kajongg @action:inmenu', "&Score Table"))
+            i18nc('kajongg @action:inmenu', "&Score Table"))
         self.actionScoreTable.setIconText(
-            m18nc('kajongg @action:intoolbar', "&Scores"))
-        self.actionScoreTable.setWhatsThis(m18nc('kajongg @info:tooltip',
+            i18nc('kajongg @action:intoolbar', "&Scores"))
+        self.actionScoreTable.setWhatsThis(i18nc('kajongg @info:tooltip',
                                                  "Show or hide the score table for the current game."))
 
-        self.actionExplain.setText(m18nc('@action:inmenu', "&Explain Scores"))
-        self.actionExplain.setIconText(m18nc('@action:intoolbar', "&Explain"))
-        self.actionExplain.setWhatsThis(m18nc('kajongg @info:tooltip',
+        self.actionExplain.setText(i18nc('@action:inmenu', "&Explain Scores"))
+        self.actionExplain.setIconText(i18nc('@action:intoolbar', "&Explain"))
+        self.actionExplain.setWhatsThis(i18nc('kajongg @info:tooltip',
                                               'Explain the scoring for all players in the current game.'))
 
-        self.actionAutoPlay.setText(m18nc('@action:inmenu', "&Demo Mode"))
+        self.actionAutoPlay.setText(i18nc('@action:inmenu', "&Demo Mode"))
         self.actionAutoPlay.setPriority(QAction.LowPriority)
-        self.actionAutoPlay.setWhatsThis(m18nc('kajongg @info:tooltip',
+        self.actionAutoPlay.setWhatsThis(i18nc('kajongg @info:tooltip',
                                                'Let the computer take over for you. Start a new local game if needed.'))
 
-        self.actionChat.setText(m18n("C&hat"))
+        self.actionChat.setText(i18n("C&hat"))
         self.actionChat.setWhatsThis(
-            m18nc('kajongg @info:tooltip',
+            i18nc('kajongg @info:tooltip',
                   'Chat with the other players.'))
 
     def changeEvent(self, event):

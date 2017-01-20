@@ -29,7 +29,7 @@ if os.name == 'nt':
 
 from common import Debug, Internal, StrMixin
 from util import which, removeIfExists, uniqueList, elapsedSince
-from log import logWarning, m18n, logDebug, logException
+from log import logWarning, i18n, logDebug, logException
 
 from qt import QStandardPaths
 
@@ -66,7 +66,7 @@ class Sound:
                 msg = ''  # we bundle oggdec.exe with the kajongg installer, it must be there
             else:
                 oggBinary = 'ogg123'
-                msg = m18n(
+                msg = i18n(
                     'No voices will be heard because the program %1 is missing',
                     oggBinary)
                 if which(oggBinary):
@@ -365,11 +365,11 @@ class Voice(StrMixin):
                 open(md5Name, 'wb').write('%s\n' % self.__md5sum)
             except BaseException as exception:
                 logException(
-                    '\n'.join([m18n('cannot write <filename>%1</filename>: %2',
+                    '\n'.join([i18n('cannot write <filename>%1</filename>: %2',
                                     md5Name,
                                     str(exception)),
-                               m18n('The voice files have changed, their checksum has changed.'),
-                               m18n('Please reinstall kajongg or do, with sufficient permissions:'),
+                               i18n('The voice files have changed, their checksum has changed.'),
+                               i18n('Please reinstall kajongg or do, with sufficient permissions:'),
                                'cd {} ; cat *.ogg | md5sum > md5sum'.format(self.directory)]))
         if archiveExists:
             archiveIsOlder = os.path.getmtime(

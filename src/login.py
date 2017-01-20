@@ -37,9 +37,10 @@ from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
     QSizePolicy, QWidget
 
 from kde import KUser, KDialog, KDialogButtonBox, appdataDir, socketName
+from kde import i18n, i18nc
 from dialogs import DeferredDialog, QuestionYesNo
 
-from log import logWarning, logException, logInfo, logDebug, m18n, m18nc, SERVERMARK
+from log import logWarning, logException, logInfo, logDebug, SERVERMARK
 from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Debug, isAlive, english
 from common import interpreterName
@@ -177,7 +178,7 @@ class Url(str, StrMixin):
         else:
             result = ['kajonggserver']
         if Debug.connections:
-            logDebug(m18n('trying to start local server %1', result))
+            logDebug(i18n('trying to start local server %1', result))
         return result
 
     def __startLocalServer(self):
@@ -188,7 +189,7 @@ class Url(str, StrMixin):
                 args.append('--socket=%s' % socketName())
                 if removeIfExists(socketName()):
                     logInfo(
-                        m18n('removed stale socket <filename>%1</filename>', socketName()))
+                        i18n('removed stale socket <filename>%1</filename>', socketName()))
             if not self.useSocket:
                 args.append('--port=%d' % self.port)
             if self.isLocalGame:
@@ -208,7 +209,7 @@ class Url(str, StrMixin):
                 startupinfo=startupinfo)  # , shell=os.name == 'nt')
             if Debug.connections:
                 logDebug(
-                    m18n(
+                    i18n(
                         'started the local kajongg server: pid=<numid>%1</numid> %2',
                         process.pid, ' '.join(args)))
         except OSError as exc:
@@ -250,10 +251,10 @@ class LoginDlg(QDialog):
     def __init__(self):
         """self.servers is a list of tuples containing server and last playername"""
         QDialog.__init__(self, None)
-        decorateWindow(self, m18nc('kajongg', 'Login'))
+        decorateWindow(self, i18nc('kajongg', 'Login'))
         self.setupUi()
 
-        localName = m18nc('kajongg name for local game server', Query.localServerName)
+        localName = i18nc('kajongg name for local game server', Query.localServerName)
         self.servers = Query(
             'select url,lastname from server order by lasttime desc').records
         servers = list(x[0] for x in self.servers if x[0] != Query.localServerName)
@@ -298,15 +299,15 @@ class LoginDlg(QDialog):
         self.grid = QFormLayout()
         self.cbServer = QComboBox()
         self.cbServer.setEditable(True)
-        self.grid.addRow(m18n('Game server:'), self.cbServer)
+        self.grid.addRow(i18n('Game server:'), self.cbServer)
         self.cbUser = QComboBox()
         self.cbUser.setEditable(True)
-        self.grid.addRow(m18n('Username:'), self.cbUser)
+        self.grid.addRow(i18n('Username:'), self.cbUser)
         self.edPassword = QLineEdit()
         self.edPassword.setEchoMode(QLineEdit.PasswordEchoOnEdit)
-        self.grid.addRow(m18n('Password:'), self.edPassword)
+        self.grid.addRow(i18n('Password:'), self.edPassword)
         self.cbRuleset = ListComboBox()
-        self.grid.addRow(m18nc('kajongg', 'Ruleset:'), self.cbRuleset)
+        self.grid.addRow(i18nc('kajongg', 'Ruleset:'), self.cbRuleset)
         vbox.addLayout(self.grid)
         vbox.addWidget(self.buttonBox)
         pol = QSizePolicy()
@@ -401,21 +402,21 @@ class AddUserDialog(KDialog):
 
     def __init__(self, url, username, password):
         KDialog.__init__(self)
-        decorateWindow(self, m18n('Create User Account'))
+        decorateWindow(self, i18n('Create User Account'))
         self.setButtons(KDialog.ButtonCode(KDialog.Ok | KDialog.Cancel))
         vbox = QVBoxLayout()
         grid = QFormLayout()
         self.lbServer = QLabel()
         self.lbServer.setText(url)
-        grid.addRow(m18n('Game server:'), self.lbServer)
+        grid.addRow(i18n('Game server:'), self.lbServer)
         self.lbUser = QLabel()
-        grid.addRow(m18n('Username:'), self.lbUser)
+        grid.addRow(i18n('Username:'), self.lbUser)
         self.edPassword = QLineEdit()
         self.edPassword.setEchoMode(QLineEdit.PasswordEchoOnEdit)
-        grid.addRow(m18n('Password:'), self.edPassword)
+        grid.addRow(i18n('Password:'), self.edPassword)
         self.edPassword2 = QLineEdit()
         self.edPassword2.setEchoMode(QLineEdit.PasswordEchoOnEdit)
-        grid.addRow(m18n('Repeat password:'), self.edPassword2)
+        grid.addRow(i18n('Repeat password:'), self.edPassword2)
         vbox.addLayout(grid)
         widget = QWidget(self)
         widget.setLayout(vbox)
@@ -563,7 +564,7 @@ class Connection:
         for client in self.client.humanClients:
             if client.connection and client.connection.url == self.url:
                 logWarning(
-                    m18n('You are already connected to server %1', self.url))
+                    i18n('You are already connected to server %1', self.url))
                 client.tableList.activateWindow()
                 raise CancelledError
 
@@ -603,7 +604,7 @@ class Connection:
             if self.url.isLocalHost:
                 return answered(True)
             else:
-                msg = m18nc('USER is not known on SERVER',
+                msg = i18nc('USER is not known on SERVER',
                             '%1 is not known on %2, do you want to open an account?', self.dlg.username, self.url.host)
                 return QuestionYesNo(msg).addCallback(answered)
         else:
@@ -617,15 +618,15 @@ class Connection:
         if failure.check(CancelledError):
             pass
         elif failure.check(twisted.internet.error.TimeoutError):
-            msg = m18n('Server %1 did not answer', self.url)
+            msg = i18n('Server %1 did not answer', self.url)
         elif failure.check(twisted.internet.error.ConnectionRefusedError):
-            msg = m18n('Server %1 refused connection', self.url)
+            msg = i18n('Server %1 refused connection', self.url)
         elif failure.check(twisted.internet.error.ConnectionLost):
-            msg = m18n('Server %1 does not run a kajongg server', self.url)
+            msg = i18n('Server %1 does not run a kajongg server', self.url)
         elif failure.check(twisted.internet.error.DNSLookupError):
-            msg = m18n('Address for server %1 cannot be found', self.url)
+            msg = i18n('Address for server %1 cannot be found', self.url)
         elif failure.check(twisted.internet.error.ConnectError):
-            msg = m18n(
+            msg = i18n(
                 'Login to server %1 failed: You have no network connection',
                 self.url)
         else:
@@ -637,8 +638,8 @@ class Connection:
         if self.url.useSocket:
             if removeIfExists(socketName()):
                 logInfo(
-                    m18n('removed stale socket <filename>%1</filename>', socketName()))
-            msg += '\n\n\n' + m18n('Please try again')
+                    i18n('removed stale socket <filename>%1</filename>', socketName()))
+            msg += '\n\n\n' + i18n('Please try again')
         self.dlg = None
         if msg:
             logWarning(msg)

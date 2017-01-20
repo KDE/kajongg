@@ -28,7 +28,7 @@ from qt import QTransform
 
 from kde import KIcon
 
-from log import m18n
+from log import i18n
 
 
 def loadUi(base):
@@ -85,7 +85,7 @@ class ListComboBox(QComboBox):
         self.clear()
         if items:
             for item in items:
-                self.addItem(m18n(item.name), item)
+                self.addItem(i18n(item.name), item)
 
     def findItem(self, search):
         """returns the index or -1 of not found """
@@ -154,9 +154,9 @@ class BlockSignals:
 def decorateWindow(window, name=None):
     """standard Kajongg window title and icon"""
     if name:
-        window.setWindowTitle('{} – {}'.format(name, m18n('Kajongg')))
+        window.setWindowTitle('{} – {}'.format(name, i18n('Kajongg')))
     else:
-        window.setWindowTitle(m18n('Kajongg'))
+        window.setWindowTitle(i18n('Kajongg'))
     window.setWindowIcon(KIcon('kajongg'))
 
 

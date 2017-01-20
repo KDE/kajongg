@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # description into many languages.
 
 from rule import PredefinedRuleset
-from log import m18nE, m18n
+from kde import i18nE, i18n
 
 
 class ClassicalChinese(PredefinedRuleset):
@@ -35,11 +35,11 @@ class ClassicalChinese(PredefinedRuleset):
     def __init__(self, name=None):
         PredefinedRuleset.__init__(
             self,
-            name or m18nE('Classical Chinese standard'))
+            name or i18nE('Classical Chinese standard'))
 
     def _initRuleset(self):
         """sets the description"""
-        self.description = m18n('Classical Chinese')
+        self.description = i18n('Classical Chinese')
 
     def addManualRules(self):
         """those are actually winner rules but in the kajongg scoring mode they must be selected manually"""
@@ -47,46 +47,46 @@ class ClassicalChinese(PredefinedRuleset):
         self.winnerRules.createRule(
             'Last Tile Taken from Dead Wall',
             'FLastTileFromDeadWall||Olastsource=e', doubles=1,
-            description=m18n('The dead wall is also called kong box: The last 16 tiles of the wall '
+            description=i18n('The dead wall is also called kong box: The last 16 tiles of the wall '
                              'used as source of replacement tiles'))
         self.winnerRules.createRule(
             'Last Tile is Last Tile of Wall',
             'FIsLastTileFromWall||Olastsource=z', doubles=1,
-            description=m18n('Winner said Mah Jong with the last tile taken from the living end of the wall'))
+            description=i18n('Winner said Mah Jong with the last tile taken from the living end of the wall'))
         self.winnerRules.createRule(
             'Last Tile is Last Tile of Wall Discarded',
             'FIsLastTileFromWallDiscarded||Olastsource=Z', doubles=1,
-            description=m18n('Winner said Mah Jong by claiming the last tile taken from the living end of the '
+            description=i18n('Winner said Mah Jong by claiming the last tile taken from the living end of the '
                              'wall, discarded by another player'))
         self.winnerRules.createRule(
             'Robbing the Kong', r'FRobbingKong||Olastsource=k', doubles=1,
-            description=m18n('Winner said Mah Jong by claiming the 4th tile of a kong another player '
+            description=i18n('Winner said Mah Jong by claiming the 4th tile of a kong another player '
                              'just declared'), debug=True)
         self.winnerRules.createRule(
             'Mah Jongg with Original Call',
             'FMahJonggWithOriginalCall||Oannouncements=a', doubles=1,
-            description=m18n(
+            description=i18n(
                 'Just before the first discard, a player can declare Original Call meaning she needs only one '
                 'tile to complete the hand and announces she will not alter the hand in any way (except bonus tiles)'))
         self.winnerRules.createRule(
             'Dangerous Game', 'FDangerousGame||Opayforall',
-            description=m18n('In some situations discarding a tile that has a high chance to help somebody to win '
+            description=i18n('In some situations discarding a tile that has a high chance to help somebody to win '
                              'is declared to be dangerous, and if that tile actually makes somebody win, the discarder '
                              'pays the winner for all'))
         self.winnerRules.createRule(
             'Twofold Fortune', 'FTwofoldFortune||Oannouncements=t',
-            limits=1, description=m18n('Kong after Kong: Declare Kong and a second Kong with the replacement '
+            limits=1, description=i18n('Kong after Kong: Declare Kong and a second Kong with the replacement '
                                        'tile and Mah Jong with the second replacement tile'))
         # limit hands:
         self.winnerRules.createRule(
             'Blessing of Heaven', 'FBlessingOfHeaven||Olastsource=1', limits=1,
-            description=m18n('East says Mah Jong with the unmodified dealt tiles'))
+            description=i18n('East says Mah Jong with the unmodified dealt tiles'))
         self.winnerRules.createRule(
             'Blessing of Earth', 'FBlessingOfEarth||Olastsource=1', limits=1,
-            description=m18n('South, West or North says Mah Jong with the first tile discarded by East'))
+            description=i18n('South, West or North says Mah Jong with the first tile discarded by East'))
         self.winnerRules.createRule(
             'East won nine times in a row', 'FEastWonNineTimesInARow||Orotate', limits=1,
-            description=m18n('If that happens, East gets a limit score and the winds rotate'))
+            description=i18n('If that happens, East gets a limit score and the winds rotate'))
 
     def addPenaltyRules(self):
         """as the name says"""
@@ -108,7 +108,7 @@ class ClassicalChinese(PredefinedRuleset):
             doubles=1)
         self.handRules.createRule(
             'Long Hand', r'FLongHand||Oabsolute', points=0,
-            description=m18n('The hand contains too many tiles'))
+            description=i18n('The hand contains too many tiles'))
 
     def addParameterRules(self):
         """as the name says"""
@@ -125,28 +125,28 @@ class ClassicalChinese(PredefinedRuleset):
             parameter=500)
         self.parameterRules.createRule(
             'Play with the roof off', 'boolroofOff', parameter=False,
-            description=m18n('Play with no upper scoring limit'))
+            description=i18n('Play with no upper scoring limit'))
         self.parameterRules.createRule(
             'Claim Timeout',
             'intclaimTimeout',
             parameter=10)
         self.parameterRules.createRule(
             'Size of Kong Box', 'intkongBoxSize', parameter=16,
-            description=m18n('The Kong Box is used for replacement tiles when declaring kongs'))
+            description=i18n('The Kong Box is used for replacement tiles when declaring kongs'))
         self.parameterRules.createRule(
             'Play with Bonus Tiles', 'boolwithBonusTiles', parameter=True,
-            description=m18n('Bonus tiles increase the luck factor'))
+            description=i18n('Bonus tiles increase the luck factor'))
         self.parameterRules.createRule(
             'Minimum number of rounds in game',
             'intminRounds',
             parameter=4)
         self.parameterRules.createRule(
             'number of allowed chows', 'intmaxChows', parameter=4,
-            description=m18n('The number of chows a player may build'))
+            description=i18n('The number of chows a player may build'))
         self.parameterRules.createRule(
             'must declare calling hand',
             'boolmustDeclareCallingHand', parameter=False,
-            description=m18n('Mah Jongg is only allowed after having declared to have a calling hand'))
+            description=i18n('Mah Jongg is only allowed after having declared to have a calling hand'))
         self.parameterRules.createRule(
             'Standard Rotation',
             'FStandardRotation||Orotate||Ointernal')
@@ -175,7 +175,7 @@ class ClassicalChinese(PredefinedRuleset):
 
         self.winnerRules.createRule(
             'Zero Point Hand', 'FZeroPointHand', doubles=1,
-            description=m18n('The hand has 0 basis points excluding bonus tiles'))
+            description=i18n('The hand has 0 basis points excluding bonus tiles'))
         self.winnerRules.createRule('No Chow', 'FNoChow', doubles=1)
         self.winnerRules.createRule(
             'Only Concealed Melds',
@@ -183,45 +183,45 @@ class ClassicalChinese(PredefinedRuleset):
             doubles=1)
         self.winnerRules.createRule(
             'False Color Game', 'FFalseColorGame', doubles=1,
-            description=m18n('Only same-colored tiles (only bamboo/stone/character) '
+            description=i18n('Only same-colored tiles (only bamboo/stone/character) '
                              'plus any number of winds and dragons'))
         self.winnerRules.createRule(
             'True Color Game', 'FTrueColorGame', doubles=3,
-            description=m18n('Only same-colored tiles (only bamboo/stone/character)'))
+            description=i18n('Only same-colored tiles (only bamboo/stone/character)'))
         self.winnerRules.createRule(
             'Concealed True Color Game', 'FConcealedTrueColorGame',
-            limits=1, description=m18n('All tiles concealed and of the same suit, no honors'))
+            limits=1, description=i18n('All tiles concealed and of the same suit, no honors'))
         self.winnerRules.createRule(
             'Only Terminals and Honors', 'FOnlyMajors', doubles=1,
-            description=m18n('Only winds, dragons, 1 and 9'))
+            description=i18n('Only winds, dragons, 1 and 9'))
         self.winnerRules.createRule('Only Honors', 'FOnlyHonors', limits=1,
-                                    description=m18n('Only winds and dragons'))
+                                    description=i18n('Only winds and dragons'))
         self.winnerRules.createRule(
             'Hidden Treasure', 'FHiddenTreasure', limits=1,
-            description=m18n('Only hidden Pungs or Kongs, last tile from wall'))
+            description=i18n('Only hidden Pungs or Kongs, last tile from wall'))
         self.winnerRules.createRule(
             'Heads and Tails', 'FAllTerminals', limits=1,
-            description=m18n('Only 1 and 9'))
+            description=i18n('Only 1 and 9'))
         self.winnerRules.createRule(
             'Fourfold Plenty', 'FFourfoldPlenty', limits=1,
-            description=m18n('4 Kongs'))
+            description=i18n('4 Kongs'))
         self.winnerRules.createRule(
             'Three Great Scholars', 'FThreeGreatScholars', limits=1,
-            description=m18n('3 Pungs or Kongs of dragons'))
+            description=i18n('3 Pungs or Kongs of dragons'))
         self.winnerRules.createRule('Four Blessings Hovering over the Door',
                                     'FFourBlessingsHoveringOverTheDoor', limits=1,
-                                    description=m18n('4 Pungs or Kongs of winds'))
+                                    description=i18n('4 Pungs or Kongs of winds'))
         self.winnerRules.createRule('Imperial Jade', 'FAllGreen', limits=1,
-                                    description=m18n('Only green tiles: Green dragon and Bamboo 2,3,4,6,8'))
+                                    description=i18n('Only green tiles: Green dragon and Bamboo 2,3,4,6,8'))
         self.winnerRules.createRule('Gathering the Plum Blossom from the Roof',
                                     'FGatheringPlumBlossomFromRoof', limits=1,
-                                    description=m18n('Mah Jong with stone 5 from the dead wall'))
+                                    description=i18n('Mah Jong with stone 5 from the dead wall'))
         self.winnerRules.createRule(
             'Plucking the Moon from the Bottom of the Sea', 'FPluckingMoon', limits=1,
-            description=m18n('Mah Jong with the last tile from the wall being a stone 1'))
+            description=i18n('Mah Jong with the last tile from the wall being a stone 1'))
         self.winnerRules.createRule(
             'Scratching a Carrying Pole', 'FScratchingPole', limits=1,
-            description=m18n('Robbing the Kong of bamboo 2'))
+            description=i18n('Robbing the Kong of bamboo 2'))
 
         # only hands matching an mjRule can win. Keep this list as short as
         # possible. If a special hand matches the standard pattern, do not put it here
@@ -233,11 +233,11 @@ class ClassicalChinese(PredefinedRuleset):
         # option internal makes it not show up in the ruleset editor
         self.mjRules.createRule(
             'Nine Gates', 'FNineGates', limits=1,
-            description=m18n(
+            description=i18n(
                 'A concealed hand in one color 1112345678999 plus last tile of this suit (from wall or discarded)'))
         self.mjRules.createRule(
             'Thirteen Orphans', 'FThirteenOrphans||Omayrobhiddenkong', limits=1,
-            description=m18n('13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair '
+            description=i18n('13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair '
                              'with one of them'))
 
         # doubling melds:
@@ -308,12 +308,12 @@ class ClassicalChineseDMJL(ClassicalChinese):
     def __init__(self, name=None):
         ClassicalChinese.__init__(
             self,
-            name or m18nE('Classical Chinese DMJL'))
+            name or i18nE('Classical Chinese DMJL'))
 
     def _initRuleset(self):
         """sets the description"""
         ClassicalChinese._initRuleset(self)
-        self.description = m18n(
+        self.description = i18n(
             'Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.')
 
     def loadRules(self):
@@ -322,19 +322,19 @@ class ClassicalChineseDMJL(ClassicalChinese):
         # tiles are ordered
         self.mjRules.createRule(
             'Squirming Snake', 'FSquirmingSnake', limits=1,
-            description=m18n('All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two '
+            description=i18n('All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two '
                              'Chows of the remaining values'))
         self.handRules.createRule(
             'Little Three Dragons', 'FLittleThreeDragons', doubles=1,
-            description=m18n('2 Pungs or Kongs of dragons and 1 pair of dragons'))
+            description=i18n('2 Pungs or Kongs of dragons and 1 pair of dragons'))
         self.handRules.createRule(
             'Big Three Dragons', 'FBigThreeDragons', doubles=2,
-            description=m18n('3 Pungs or Kongs of dragons'))
+            description=i18n('3 Pungs or Kongs of dragons'))
         self.handRules.createRule(
             'Little Four Joys', 'FLittleFourJoys', doubles=1,
-            description=m18n('3 Pungs or Kongs of winds and 1 pair of winds'))
+            description=i18n('3 Pungs or Kongs of winds and 1 pair of winds'))
         self.handRules.createRule('Big Four Joys', 'FBigFourJoys', doubles=2,
-                                  description=m18n('4 Pungs or Kongs of winds'))
+                                  description=i18n('4 Pungs or Kongs of winds'))
 
         self.winnerRules['OnlyHonors'].doubles = 2
 
@@ -365,12 +365,12 @@ class ClassicalChineseBMJA(ClassicalChinese):
     def __init__(self, name=None):
         ClassicalChinese.__init__(
             self,
-            name or m18nE('Classical Chinese BMJA'))
+            name or i18nE('Classical Chinese BMJA'))
 
     def _initRuleset(self):
         """sets the description"""
         ClassicalChinese._initRuleset(self)
-        self.description = m18n(
+        self.description = i18n(
             'Classical Chinese as defined by the British Mah-Jong Association')
 
     def addParameterRules(self):
@@ -391,19 +391,19 @@ class ClassicalChineseBMJA(ClassicalChinese):
         del self.mjRules['NineGates']
         self.mjRules.createRule(
             'Gates of Heaven', 'FGatesOfHeaven', limits=1,
-            description=m18n('All tiles concealed of same color: Values 1112345678999'
+            description=i18n('All tiles concealed of same color: Values 1112345678999'
                              ' with one pair from 2 to 8 (last tile from wall or discarded)'))
         self.mjRules.createRule(
             'Wriggling Snake', 'FWrigglingSnake', limits=1,
-            description=m18n('Pair of 1s and a run from 2 to 9 in the same suit with each of the winds'))
+            description=i18n('Pair of 1s and a run from 2 to 9 in the same suit with each of the winds'))
         self.mjRules.createRule(
             'Triple Knitting', 'FTripleKnitting', limits=0.5,
-            description=m18n('Four sets of three tiles in the different suits and a pair: No Winds or Dragons'))
+            description=i18n('Four sets of three tiles in the different suits and a pair: No Winds or Dragons'))
         self.mjRules.createRule('Knitting', 'FKnitting', limits=0.5,
-                                description=m18n('7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons'))
+                                description=i18n('7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons'))
         self.mjRules.createRule(
             'All pair honors', 'FAllPairHonors', limits=0.5,
-            description=m18n('7 pairs of 1s/9s/Winds/Dragons'))
+            description=i18n('7 pairs of 1s/9s/Winds/Dragons'))
         del self.handRules['OwnFlowerandOwnSeason']
         del self.handRules['ThreeConcealedPongs']
         self.meldRules.createRule('Own Flower', 'FOwnFlower', doubles=1)
@@ -420,12 +420,12 @@ class ClassicalChineseBMJA(ClassicalChinese):
         del self.winnerRules['ThreeGreatScholars']
         self.winnerRules.createRule(
             'Buried Treasure', 'FBuriedTreasure', limits=1,
-            description=m18n('Concealed pungs of one suit with winds/dragons and a pair'))
+            description=i18n('Concealed pungs of one suit with winds/dragons and a pair'))
         self.winnerRules.createRule('Purity', 'FPurity', doubles=3,
-                                    description=m18n('Only same-colored tiles (no chows, dragons or winds)'))
+                                    description=i18n('Only same-colored tiles (no chows, dragons or winds)'))
         self.winnerRules.createRule(
             'Three Great Scholars', 'FThreeGreatScholars||Onochow', limits=1,
-            description=m18n('3 Pungs or Kongs of dragons plus any pung/kong and a pair'))
+            description=i18n('3 Pungs or Kongs of dragons plus any pung/kong and a pair'))
         orphans = self.mjRules.pop('ThirteenOrphans')
         self.mjRules.createRule(
             'The 13 Unique Wonders',

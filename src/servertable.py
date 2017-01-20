@@ -36,7 +36,8 @@ from wind import Wind
 from tilesource import TileSource
 from util import Duration
 from message import Message, ChatMessage
-from log import logDebug, logError, m18nE, m18n, m18ncE
+from log import logDebug, logError
+from kde import i18nE, i18n, i18ncE
 from deferredutil import DeferredBlock
 from tile import Tile, TileList, elements
 from meld import Meld, MeldList
@@ -164,14 +165,14 @@ class ServerTable(Table, StrMixin):
     def addUser(self, user):
         """add user to this table"""
         if user.name in list(x.name for x in self.users):
-            raise srvError(pb.Error, m18nE('You already joined this table'))
+            raise srvError(pb.Error, i18nE('You already joined this table'))
         if len(self.users) == self.maxSeats():
-            raise srvError(pb.Error, m18nE('All seats are already taken'))
+            raise srvError(pb.Error, i18nE('All seats are already taken'))
         self.users.append(user)
         if Debug.table:
             logDebug('%s seated on table %s' % (user.name, self))
         self.sendChatMessage(ChatMessage(self.tableid, user.name,
-                                         m18nE('takes a seat'), isStatusMessage=True))
+                                         i18nE('takes a seat'), isStatusMessage=True))
 
     def delUser(self, user):
         """remove user from this table"""
@@ -179,7 +180,7 @@ class ServerTable(Table, StrMixin):
             self.running = False
             self.users.remove(user)
             self.sendChatMessage(ChatMessage(self.tableid, user.name,
-                                             m18nE('leaves the table'), isStatusMessage=True))
+                                             i18nE('leaves the table'), isStatusMessage=True))
             if user is self.owner:
                 # silently pass ownership
                 if self.users:
@@ -226,13 +227,13 @@ class ServerTable(Table, StrMixin):
         # the server and all databases save the english name but we
         # want to make sure a translation exists for the client GUI
         robotNames = [
-            m18ncE(
+            i18ncE(
                 'kajongg, name of robot player, to be translated',
                 'Robot 1'),
-            m18ncE(
+            i18ncE(
                 'kajongg, name of robot player, to be translated',
                 'Robot 2'),
-            m18ncE('kajongg, name of robot player, to be translated', 'Robot 3')]
+            i18ncE('kajongg, name of robot player, to be translated', 'Robot 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
         names = list(tuple([Wind.all4[idx], name])
@@ -285,7 +286,7 @@ class ServerTable(Table, StrMixin):
         """the table initiator told us he wants to start the game"""
         if len(self.users) < self.maxSeats() and self.owner != user:
             raise srvError(pb.Error,
-                           m18nE(
+                           i18nE(
                                'Only the initiator %1 can start this game, you are %2'),
                            self.owner.name, user.name)
         if self.suspendedAt:
@@ -656,7 +657,7 @@ class ServerTable(Table, StrMixin):
             self.server.removeTable(
                 self,
                 'gameOver',
-                m18nE('Game <numid>%1</numid> is over!'),
+                i18nE('Game <numid>%1</numid> is over!'),
                 self.game.seed)
             if Debug.process and os.name != 'nt':
                 logDebug(
@@ -685,11 +686,11 @@ class ServerTable(Table, StrMixin):
         hasTiles = hasTiles.without(lastDiscard)
         meld = Meld(meldTiles)
         if len(meld) != 4 and not (meld.isPair or meld.isPungKong or meld.isChow):
-            msg = m18nE('%1 wrongly said %2 for meld %3')
+            msg = i18nE('%1 wrongly said %2 for meld %3')
             self.abort(msg, player.name, claim.name, str(meld))
             return
         if not player.hasConcealedTiles(hasTiles):
-            msg = m18nE(
+            msg = i18nE(
                 '%1 wrongly said %2: claims to have concealed tiles %3 but only has %4')
             self.abort(
                 msg,
@@ -728,9 +729,9 @@ class ServerTable(Table, StrMixin):
         """player declares a Kong, meldTiles is a list"""
         kongMeld = Meld(meldTiles)
         if not player.hasConcealedTiles(kongMeld) and kongMeld[0].exposed.pung not in player.exposedMelds:
-            msg = m18nE('declareKong:%1 wrongly said Kong for meld %2')
+            msg = i18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, str(kongMeld))
-            logDebug(m18n(msg, *args))
+            logDebug(i18n(msg, *args))
             logDebug(
                 'declareKong:concealedTiles:%s' %
                 ''.join(player.concealedTiles))
@@ -776,7 +777,7 @@ class ServerTable(Table, StrMixin):
             player.lastTile,
             lastMeld)
         if not player.hand.won:
-            msg = m18nE('%1 claiming MahJongg: This is not a winning hand: %2')
+            msg = i18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.hand.string)
             return
         block = DeferredBlock(self)

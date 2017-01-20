@@ -20,15 +20,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 
-from kde import KIcon
-from dialogs import WarningYesNo
-
 from qt import Qt, QModelIndex
 from qt import QAbstractTableModel, QDialogButtonBox, QDialog
 from qt import QHBoxLayout, QVBoxLayout, QCheckBox
 from qt import QItemSelectionModel, QAbstractItemView
 
-from log import logException, m18n, m18nc
+from dialogs import WarningYesNo
+from kde import KIcon
+from kde import i18n, i18nc
+from log import logException
 from query import Query
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
@@ -84,7 +84,7 @@ class GamesModel(QAbstractTableModel):
             if index.column() == 2:
                 # we do not yet use this for listing remote games but if we do
                 # this translation is needed for robot players
-                names = [m18n(name) for name in unformatted.split('///')]
+                names = [i18n(name) for name in unformatted.split('///')]
                 return ', '.join(names)
             elif index.column() == 1:
                 dateVal = datetime.datetime.strptime(
@@ -98,7 +98,7 @@ class GamesModel(QAbstractTableModel):
         """for the two visible columns"""
         # pylint: disable=no-self-use
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return (m18n("Started"), m18n("Players"))[section - 1]
+            return (i18n("Started"), i18n("Players"))[section - 1]
 
 
 class Games(QDialog):
@@ -109,7 +109,7 @@ class Games(QDialog):
         super(Games, self).__init__(parent)
         self.selectedGame = None
         self.onlyPending = True
-        decorateWindow(self, m18nc('kajongg', 'Games'))
+        decorateWindow(self, i18nc('kajongg', 'Games'))
         self.setObjectName('Games')
         self.resize(700, 400)
         self.model = GamesModel()
@@ -126,19 +126,19 @@ class Games(QDialog):
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         self.newButton = self.buttonBox.addButton(
-            m18nc('start a new game', "&New"), QDialogButtonBox.ActionRole)
+            i18nc('start a new game', "&New"), QDialogButtonBox.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.accept)
         self.loadButton = self.buttonBox.addButton(
-            m18n("&Load"), QDialogButtonBox.AcceptRole)
+            i18n("&Load"), QDialogButtonBox.AcceptRole)
         self.loadButton.clicked.connect(self.loadGame)
         self.loadButton.setIcon(KIcon("document-open"))
         self.deleteButton = self.buttonBox.addButton(
-            m18n("&Delete"), QDialogButtonBox.ActionRole)
+            i18n("&Delete"), QDialogButtonBox.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.deleteButton.clicked.connect(self.delete)
 
-        chkPending = QCheckBox(m18n("Show only pending games"), self)
+        chkPending = QCheckBox(i18n("Show only pending games"), self)
         chkPending.setChecked(True)
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(chkPending)
@@ -243,7 +243,7 @@ class Games(QDialog):
             # should never happen
             logException('delete: 0 rows selected')
         WarningYesNo(
-            m18n(
+            i18n(
                 "Do you really want to delete <numid>%1</numid> games?<br>"
                 "This will be final, you cannot cancel it with "
                 "the cancel button",

@@ -38,7 +38,7 @@ from modeltest import ModelTest
 
 from rulesetselector import RuleTreeView
 from board import WindLabel
-from log import m18n, m18nc
+from kde import i18n, i18nc
 from common import Internal, Debug
 from statesaver import StateSaver
 from query import Query
@@ -85,7 +85,7 @@ class ScoreGroupItem(ScoreTreeItem):
 
     def content(self, column):
         """return content stored in this item"""
-        return m18n(self.rawContent)
+        return i18n(self.rawContent)
 
 
 class ScorePlayerItem(ScoreTreeItem):
@@ -98,7 +98,7 @@ class ScorePlayerItem(ScoreTreeItem):
     def content(self, column):
         """return the content stored in this node"""
         if column == 0:
-            return m18n(self.rawContent[0])
+            return i18n(self.rawContent[0])
         else:
             try:
                 return self.hands()[column - 1]
@@ -242,14 +242,14 @@ class ScoreModel(TreeModel):
                     return QColor(165, 255, 165)
             if role == Qt.ToolTipRole:
                 englishHints = content.manualrules.split('||')
-                tooltip = '<br />'.join(m18n(x) for x in englishHints)
+                tooltip = '<br />'.join(i18n(x) for x in englishHints)
                 return tooltip
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             if section == 0:
-                return m18n('Round/Hand')
+                return i18n('Round/Hand')
             child1 = self.rootItem.children[0]
             if child1 and child1.children:
                 child1 = child1.children[0]
@@ -279,8 +279,8 @@ class ScoreModel(TreeModel):
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         groupIndex = self.index(self.rootItem.childCount(), 0, parent)
-        groupNames = [m18nc('kajongg', 'Score'), m18nc('kajongg', 'Payments'),
-                      m18nc('kajongg', 'Balance'), m18nc('kajongg', 'Chart')]
+        groupNames = [i18nc('kajongg', 'Score'), i18nc('kajongg', 'Payments'),
+                      i18nc('kajongg', 'Balance'), i18nc('kajongg', 'Chart')]
         for idx, groupName in enumerate(groupNames):
             self.insertRows(idx, list([ScoreGroupItem(groupName)]), groupIndex)
             listIndex = self.index(idx, 0, groupIndex)
@@ -426,7 +426,7 @@ class ScoreTable(QWidget):
         self.scene = scene
         self.scoreModel = None
         self.scoreModelTest = None
-        decorateWindow(self, m18nc('kajongg', 'Scores'))
+        decorateWindow(self, i18nc('kajongg', 'Scores'))
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.setMouseTracking(True)
         self.__tableFields = ['prevailing', 'won', 'wind',
@@ -468,7 +468,7 @@ class ScoreTable(QWidget):
         self.scoreLayout.addLayout(leftLayout)
         self.scoreLayout.addWidget(self.viewRight)
         self.splitter.addWidget(scoreWidget)
-        self.ruleTree = RuleTreeView(m18nc('kajongg', 'Used Rules'))
+        self.ruleTree = RuleTreeView(i18nc('kajongg', 'Used Rules'))
         self.splitter.addWidget(self.ruleTree)
         # this shows just one line for the ruleTree - so we just see the
         # name of the ruleset:
@@ -502,9 +502,9 @@ class ScoreTable(QWidget):
             expandGroups = [True, False, True, True]
         gameid = str(self.game.seed or self.game.gameid)
         if self.game.finished():
-            title = m18n('Final scores for game <numid>%1</numid>', gameid)
+            title = i18n('Final scores for game <numid>%1</numid>', gameid)
         else:
-            title = m18n('Scores for game <numid>%1</numid>', gameid)
+            title = i18n('Scores for game <numid>%1</numid>', gameid)
         decorateWindow(self, title)
         self.ruleTree.rulesets = list([self.game.ruleset])
         self.scoreModel = ScoreModel(self)
@@ -572,7 +572,7 @@ class ExplainView(QListView):
     def __init__(self, scene):
         QListView.__init__(self)
         self.scene = scene
-        decorateWindow(self, m18n('Explain Scores').replace('&', ''))
+        decorateWindow(self, i18n('Explain Scores').replace('&', ''))
         self.setGeometry(0, 0, 300, 400)
         self.model = QStringListModel()
         self.setModel(self.model)
@@ -588,10 +588,10 @@ class ExplainView(QListView):
         """refresh for new values"""
         lines = []
         if self.game is None:
-            lines.append(m18n('There is no active game'))
+            lines.append(i18n('There is no active game'))
         else:
-            i18nName = m18n(self.game.ruleset.name)
-            lines.append(m18n('%1', i18nName))
+            i18nName = i18n(self.game.ruleset.name)
+            lines.append(i18n('%1', i18nName))
             lines.append('')
             for player in self.game.players:
                 pLines = []
@@ -604,7 +604,7 @@ class ExplainView(QListView):
                             pLines.append('- ' + line)
                 elif player.handTotal:
                     pLines.append(
-                        m18n(
+                        i18n(
                             'Manual score for %1: %2 points',
                             player.localName,
                             player.handTotal))
@@ -655,7 +655,7 @@ class RuleBox(QCheckBox):
     """additional attribute: ruleId"""
 
     def __init__(self, rule):
-        QCheckBox.__init__(self, m18n(rule.name))
+        QCheckBox.__init__(self, i18n(rule.name))
         self.rule = rule
 
     def setApplicable(self, applicable):
@@ -672,21 +672,21 @@ class PenaltyDialog(QDialog):
     def __init__(self, game):
         """selection for this player, tiles are the still available tiles"""
         QDialog.__init__(self, None)
-        decorateWindow(self, m18n("Penalty"))
+        decorateWindow(self, i18n("Penalty"))
         self.game = game
         grid = QGridLayout(self)
-        lblOffense = QLabel(m18n('Offense:'))
+        lblOffense = QLabel(i18n('Offense:'))
         crimes = list(
             [x for x in game.ruleset.penaltyRules if not ('absolute' in x.options and game.winner)])
         self.cbCrime = ListComboBox(crimes)
         lblOffense.setBuddy(self.cbCrime)
         grid.addWidget(lblOffense, 0, 0)
         grid.addWidget(self.cbCrime, 0, 1, 1, 4)
-        lblPenalty = QLabel(m18n('Total Penalty'))
+        lblPenalty = QLabel(i18n('Total Penalty'))
         self.spPenalty = PenaltyBox(2)
         self.spPenalty.setRange(0, 9999)
         lblPenalty.setBuddy(self.spPenalty)
-        self.lblUnits = QLabel(m18n('points'))
+        self.lblUnits = QLabel(i18n('points'))
         grid.addWidget(lblPenalty, 1, 0)
         grid.addWidget(self.spPenalty, 1, 1)
         grid.addWidget(self.lblUnits, 1, 2)
@@ -715,7 +715,7 @@ class PenaltyDialog(QDialog):
         buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
         buttonBox.rejected.connect(self.reject)
         self.btnExecute = buttonBox.addButton(
-            m18n("&Execute"),
+            i18n("&Execute"),
             QDialogButtonBox.AcceptRole)
         self.btnExecute.clicked.connect(self.accept)
         self.crimeChanged()
@@ -769,7 +769,7 @@ class PenaltyDialog(QDialog):
         self.spPenalty.setValue(-offense.score.points)
         self.spPenalty.parties = max(payers, payees)
         self.spPenalty.setSingleStep(10)
-        self.lblUnits.setText(m18n('points'))
+        self.lblUnits.setText(i18n('points'))
         self.playerChanged()
         self.penaltyChanged()
 
@@ -790,12 +790,12 @@ class PenaltyDialog(QDialog):
                 if idx < count:
                     if pList == self.payers:
                         player.lblPayment.setText(
-                            m18nc(
+                            i18nc(
                                 'penalty dialog, appears behind paying player combobox',
                                 'pays %1 points', -amount))
                     else:
                         player.lblPayment.setText(
-                            m18nc(
+                            i18nc(
                                 'penalty dialog, appears behind profiting player combobox',
                                 'gets %1 points', amount))
 
@@ -808,7 +808,7 @@ class ScoringDialog(QWidget):
     def __init__(self, scene):
         QWidget.__init__(self)
         self.scene = scene
-        decorateWindow(self, m18n('Scoring for this Hand'))
+        decorateWindow(self, i18n('Scoring for this Hand'))
         self.nameLabels = [None] * 4
         self.spValues = [None] * 4
         self.windLabels = [None] * 4
@@ -820,20 +820,20 @@ class ScoringDialog(QWidget):
         grid = QGridLayout(self)
         pGrid = QGridLayout()
         grid.addLayout(pGrid, 0, 0, 2, 1)
-        pGrid.addWidget(QLabel(m18nc('kajongg', "Player")), 0, 0)
-        pGrid.addWidget(QLabel(m18nc('kajongg', "Wind")), 0, 1)
-        pGrid.addWidget(QLabel(m18nc('kajongg', 'Score')), 0, 2)
-        pGrid.addWidget(QLabel(m18n("Winner")), 0, 3)
+        pGrid.addWidget(QLabel(i18nc('kajongg', "Player")), 0, 0)
+        pGrid.addWidget(QLabel(i18nc('kajongg', "Wind")), 0, 1)
+        pGrid.addWidget(QLabel(i18nc('kajongg', 'Score')), 0, 2)
+        pGrid.addWidget(QLabel(i18n("Winner")), 0, 3)
         self.detailTabs = QTabWidget()
         self.detailTabs.setDocumentMode(True)
         pGrid.addWidget(self.detailTabs, 0, 4, 8, 1)
         for idx in range(4):
             self.setupUiForPlayer(pGrid, idx)
-        self.draw = QCheckBox(m18nc('kajongg', 'Draw'))
+        self.draw = QCheckBox(i18nc('kajongg', 'Draw'))
         self.draw.clicked.connect(self.wonChanged)
-        btnPenalties = QPushButton(m18n("&Penalties"))
+        btnPenalties = QPushButton(i18n("&Penalties"))
         btnPenalties.clicked.connect(self.penalty)
-        self.btnSave = QPushButton(m18n('&Save Hand'))
+        self.btnSave = QPushButton(i18n('&Save Hand'))
         self.btnSave.clicked.connect(self.game.nextScoringHand)
         self.btnSave.setEnabled(False)
         self.setupUILastTileMeld(pGrid)
@@ -855,7 +855,7 @@ class ScoringDialog(QWidget):
 
     def setupUILastTileMeld(self, pGrid):
         """setup UI elements for last tile and last meld"""
-        self.lblLastTile = QLabel(m18n('&Last Tile:'))
+        self.lblLastTile = QLabel(i18n('&Last Tile:'))
         self.cbLastTile = QComboBox()
         self.cbLastTile.setMinimumContentsLength(1)
         vpol = QSizePolicy()
@@ -864,7 +864,7 @@ class ScoringDialog(QWidget):
         self.cbLastTile.setSizeAdjustPolicy(
             QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
-        self.lblLastMeld = QLabel(m18n('L&ast Meld:'))
+        self.lblLastMeld = QLabel(i18n('L&ast Meld:'))
         self.prevLastTile = None
         self.cbLastMeld = QComboBox()
         self.cbLastMeld.setMinimumContentsLength(1)

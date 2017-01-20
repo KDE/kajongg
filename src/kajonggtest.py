@@ -724,7 +724,7 @@ def main():
     global OPTIONS  # pylint: disable=global-statement
 
     # we want only english in the logs because i18n and friends
-    # behave differently in kde and kdestub
+    # behave differently in kde and kde
     os.environ['LANG'] = 'en_US.UTF-8'
     (OPTIONS, args) = parse_options()
     OPTIONS.csv = os.path.expanduser(

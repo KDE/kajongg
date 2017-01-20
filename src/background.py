@@ -24,7 +24,7 @@ this python code:
 from qt import Qt, QPainter, QBrush, QPalette, QPixmapCache, QPixmap
 from qt import QSvgRenderer
 
-from log import logException, m18n
+from log import logException, i18n
 from mjresource import Resource
 
 
@@ -76,7 +76,7 @@ class Background(Resource):
                 renderer = QSvgRenderer(self.graphicsPath)
                 if not renderer.isValid():
                     logException(
-                        m18n('file <filename>%1</filename> contains no valid SVG', self.graphicsPath))
+                        i18n('file <filename>%1</filename> contains no valid SVG', self.graphicsPath))
                 self.__pmap = QPixmap(width, height)
                 self.__pmap.fill(Qt.transparent)
                 painter = QPainter(self.__pmap)

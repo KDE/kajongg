@@ -27,7 +27,7 @@ from qt import QWidget, QHBoxLayout, QVBoxLayout, \
 from qt import QModelIndex
 from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, BoolRule
 from util import uniqueList
-from log import m18n, m18nc, m18ncE
+from kde import i18n, i18nc, i18ncE
 from differ import RulesetDiffer
 from common import Debug, english, Internal
 from tree import TreeItem, RootItem, TreeModel
@@ -108,8 +108,8 @@ class RuleListItem(RuleTreeItem):
     def tooltip(self):
         """tooltip for a list item explaining the usage of this list"""
         ruleset = self.ruleset()
-        return '<b>' + m18n(ruleset.name) + '</b><br><br>' + \
-            m18n(self.rawContent.description)
+        return '<b>' + i18n(ruleset.name) + '</b><br><br>' + \
+            i18n(self.rawContent.description)
 
 
 class RuleItem(RuleTreeItem):
@@ -139,10 +139,10 @@ class RuleItem(RuleTreeItem):
         """tooltip for rule: just the name of the ruleset"""
         ruleset = self.ruleset()
         if self.rawContent.description:
-            return '<b>' + m18n(ruleset.name) + '</b><br><br>' + \
-                m18n(self.rawContent.description)
+            return '<b>' + i18n(ruleset.name) + '</b><br><br>' + \
+                i18n(self.rawContent.description)
         else:
-            return m18n(ruleset.name)
+            return i18n(ruleset.name)
 
 
 class RuleModel(TreeModel):
@@ -210,7 +210,7 @@ class RuleModel(TreeModel):
                     font.setItalic(True)
                     result = font
             elif role == Qt.ToolTipRole:
-                tip = '<b></b>%s<b></b>' % m18n(
+                tip = '<b></b>%s<b></b>' % i18n(
                     item.tooltip()) if item else ''
                 result = tip
         return result
@@ -235,7 +235,7 @@ class RuleModel(TreeModel):
             if result == 'doubles':
                 return 'x2'
             else:
-                return m18nc('kajongg', result)
+                return i18nc('kajongg', result)
         elif role == Qt.TextAlignmentRole:
             leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
             return int(leftRight | Qt.AlignVCenter)
@@ -493,7 +493,7 @@ class RulesetSelector(QWidget):
 
     def setupUi(self):
         """layout the window"""
-        decorateWindow(self, m18n('Customize rulesets'))
+        decorateWindow(self, i18n('Customize rulesets'))
         self.setObjectName('Rulesets')
         hlayout = QHBoxLayout(self)
         v1layout = QVBoxLayout()
@@ -510,7 +510,7 @@ class RulesetSelector(QWidget):
         self.btnCompare = QPushButton()
         self.btnClose = QPushButton()
         self.rulesetView = RuleTreeView(
-            m18ncE('kajongg',
+            i18ncE('kajongg',
                    'Rule'),
             self.btnCopy,
             self.btnRemove,
@@ -568,7 +568,7 @@ class RulesetSelector(QWidget):
 
     def retranslateUi(self):
         """translate to current language"""
-        self.btnCopy.setText(m18n("C&opy"))
-        self.btnCompare.setText(m18nc('Kajongg ruleset comparer', 'Co&mpare'))
-        self.btnRemove.setText(m18n('&Remove'))
-        self.btnClose.setText(m18n('&Close'))
+        self.btnCopy.setText(i18n("C&opy"))
+        self.btnCompare.setText(i18nc('Kajongg ruleset comparer', 'Co&mpare'))
+        self.btnRemove.setText(i18n('&Remove'))
+        self.btnClose.setText(i18n('&Close'))

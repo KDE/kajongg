@@ -25,7 +25,8 @@ import weakref
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
 
-from log import m18nE, logInfo, logDebug, logException, id4
+from log import logInfo, logDebug, logException, id4
+from kde import i18nE
 from message import Message
 from common import Debug, StrMixin
 from move import Move
@@ -274,10 +275,10 @@ class DeferredBlock(StrMixin):
         if request in self.requests:
             self.removeRequest(request)
         if result.type in [pb.PBConnectionLost]:
-            msg = m18nE('The game server lost connection to player %1')
+            msg = i18nE('The game server lost connection to player %1')
             self.table.abort(msg, request.user.name)
         else:
-            msg = m18nE('Error for player %1: %2\n%3')
+            msg = i18nE('Error for player %1: %2\n%3')
             if hasattr(result, 'traceback'):
                 traceBack = result.traceback
             else:
@@ -430,7 +431,7 @@ class DeferredBlock(StrMixin):
                 defer.notifying = 'notifying' in kwargs
                 self.__addRequest(defer, rec, about)
             else:
-                msg = m18nE('The game server lost connection to player %1')
+                msg = i18nE('The game server lost connection to player %1')
                 self.table.abort(msg, rec.name)
             if isClient:
                 localDeferreds.append(defer)

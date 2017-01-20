@@ -20,7 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from __future__ import print_function
 
-from log import m18n, m18nc, logException
+from log import logException
+from kde import i18n, i18nc
 from common import IntDict, StrMixin
 from wind import Wind, East, South, West, North
 
@@ -201,27 +202,27 @@ class Tile(str, StrMixin):
     def groupName(self):
         """the name of the group this tile is of"""
         names = {
-            Tile.hidden: m18nc('kajongg', 'hidden'),
-            Tile.stone: m18nc('kajongg', 'stone'),
-            Tile.bamboo: m18nc('kajongg', 'bamboo'),
-            Tile.character: m18nc('kajongg', 'character'),
-            Tile.wind: m18nc('kajongg', 'wind'),
-            Tile.dragon: m18nc('kajongg', 'dragon'),
-            Tile.flower: m18nc('kajongg', 'flower'),
-            Tile.season: m18nc('kajongg', 'season')}
+            Tile.hidden: i18nc('kajongg', 'hidden'),
+            Tile.stone: i18nc('kajongg', 'stone'),
+            Tile.bamboo: i18nc('kajongg', 'bamboo'),
+            Tile.character: i18nc('kajongg', 'character'),
+            Tile.wind: i18nc('kajongg', 'wind'),
+            Tile.dragon: i18nc('kajongg', 'dragon'),
+            Tile.flower: i18nc('kajongg', 'flower'),
+            Tile.season: i18nc('kajongg', 'season')}
         return names[self.lowerGroup]
 
     def valueName(self):
         """the name of the value this tile has"""
         names = {
-            'y': m18nc('kajongg', 'tile'),
-            Tile.white: m18nc('kajongg', 'white'),
-            Tile.red: m18nc('kajongg', 'red'),
-            Tile.green: m18nc('kajongg', 'green'),
-            East: m18nc('kajongg', 'East'),
-            South: m18nc('kajongg', 'South'),
-            West: m18nc('kajongg', 'West'),
-            North: m18nc('kajongg', 'North')}
+            'y': i18nc('kajongg', 'tile'),
+            Tile.white: i18nc('kajongg', 'white'),
+            Tile.red: i18nc('kajongg', 'red'),
+            Tile.green: i18nc('kajongg', 'green'),
+            East: i18nc('kajongg', 'East'),
+            South: i18nc('kajongg', 'South'),
+            West: i18nc('kajongg', 'West'),
+            North: i18nc('kajongg', 'North')}
         for idx in Tile.numbers:
             names[idx] = chr(idx + 48)
         return names[self.value]
@@ -230,12 +231,12 @@ class Tile(str, StrMixin):
         """returns name of a single tile"""
         if self.group.lower() == Tile.wind:
             result = {
-                East: m18n('East Wind'),
-                South: m18n('South Wind'),
-                West: m18n('West Wind'),
-                North: m18n('North Wind')}[self.value]
+                East: i18n('East Wind'),
+                South: i18n('South Wind'),
+                West: i18n('West Wind'),
+                North: i18n('North Wind')}[self.value]
         else:
-            result = m18nc('kajongg tile name', '{group} {value}')
+            result = i18nc('kajongg tile name', '{group} {value}')
         return result.format(value=self.valueName(), group=self.groupName())
 
     def __lt__(self, other):

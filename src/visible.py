@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from qt import Qt
 
-from log import m18nc
+from kde import i18nc
 from message import Message
 from common import Internal, isAlive
 from player import Player, PlayingPlayer
@@ -140,7 +140,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         if msg != Message.NoClaim:
             self.speak(msg.name.lower())
             yellow = self.front.message
-            yellow.setText('{}  {}'.format(yellow.msg, m18nc('kajongg', msg.name)))
+            yellow.setText('{}  {}'.format(yellow.msg, i18nc('kajongg', msg.name)))
             yellow.setVisible(True)
 
     def hidePopup(self):

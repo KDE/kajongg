@@ -22,7 +22,8 @@ from zope.interface import implements  # pylint: disable=unused-import
 
 from twisted.internet.defer import succeed
 
-from log import m18n, m18nc, logDebug, id4
+from log import logDebug, id4
+from kde import i18n, i18nc
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import StrMixin, Speeds
 from wind import Wind
@@ -375,7 +376,7 @@ class PlayingScene(GameScene):
             self.game = None
             return succeed(True)
         else:
-            return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(
+            return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(
                 gotAnswer, autoPlaying)
 
     def keyPressEvent(self, event):
@@ -511,7 +512,7 @@ class ScoringScene(GameScene):
             self.game = None
             return succeed(True)
         else:
-            return QuestionYesNo(m18n("Do you really want to abort this game?"), always=True).addCallback(answered)
+            return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(answered)
 
     def __moveTile(self, uiTile, wind, toConcealed):
         """the user pressed a wind letter or X for center, wanting to move a uiTile there"""
@@ -537,7 +538,7 @@ class ScoringScene(GameScene):
         key = event.key()
         wind = chr(key % 128)
         windsX = ''.join(x.char for x in Wind.all)
-        moveCommands = m18nc('kajongg:keyboard commands for moving tiles to the players '
+        moveCommands = i18nc('kajongg:keyboard commands for moving tiles to the players '
                              'with wind ESWN or to the central tile selector (X)', windsX)
         uiTile = self.focusItem()
         if wind in moveCommands:

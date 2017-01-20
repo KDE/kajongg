@@ -20,7 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import datetime
 
-from log import m18n, m18nc, m18ncE, logWarning, logException, logDebug
+from log import logWarning, logException, logDebug
+from kde import i18n, i18nc, i18ncE
 from sound import Voice
 from tile import Tile, TileList
 from meld import Meld, MeldList
@@ -56,7 +57,7 @@ class Message:
     def i18nName(self):
         """only translate when needed - most messages never need this"""
         if self.__i18nName is None:
-            self.__i18nName = m18nc('kajongg', self.name)
+            self.__i18nName = i18nc('kajongg', self.name)
         return self.__i18nName
 
     def __str__(self):
@@ -129,7 +130,7 @@ class ClientMessage(Message):
 
     def buttonCaption(self):
         """localized, with a & for the shortcut"""
-        i18nShortcut = m18nc(
+        i18nShortcut = i18nc(
             'kajongg game dialog:Key for ' +
             self.name,
             self.shortcut)
@@ -211,7 +212,7 @@ class PungChowMessage(NotifyAtOnceMessage):
         warn = False
         if myself.originalCall and myself.mayWin:
             warn = True
-            txt.append(m18n('saying %1 violates Original Call',
+            txt.append(i18n('saying %1 violates Original Call',
                             self.i18nName))
         dangerousMelds = myself.maybeDangerous(self)
         if dangerousMelds:
@@ -222,16 +223,16 @@ class PungChowMessage(NotifyAtOnceMessage):
                     'only some claimable melds are dangerous: %s' %
                     dangerousMelds)
             if len(dangerousMelds) == 1:
-                txt.append(m18n(
+                txt.append(i18n(
                     'claiming %1 is dangerous because you will have to discard a dangerous tile',
                     lastDiscard.name()))
             else:
                 for meld in dangerousMelds:
-                    txt.append(m18n(
+                    txt.append(i18n(
                         'claiming %1 for %2 is dangerous because you will have to discard a dangerous tile',
                         lastDiscard.name(), str(meld)))
         if not txt:
-            txt = [m18n('You may say %1', self.i18nName)]
+            txt = [i18n('You may say %1', self.i18nName)]
         return '<br><br>'.join(txt), warn, ''
 
 
@@ -241,8 +242,8 @@ class MessagePung(PungChowMessage, ServerMessage):
 
     def __init__(self):
         PungChowMessage.__init__(self,
-                                 name=m18ncE('kajongg', 'Pung'),
-                                 shortcut=m18ncE('kajongg game dialog:Key for Pung', 'P'))
+                                 name=i18ncE('kajongg', 'Pung'),
+                                 shortcut=i18ncE('kajongg game dialog:Key for Pung', 'P'))
 
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
@@ -259,8 +260,8 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
 
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
-                                     name=m18ncE('kajongg', 'Kong'),
-                                     shortcut=m18ncE('kajongg game dialog:Key for Kong', 'K'))
+                                     name=i18ncE('kajongg', 'Kong'),
+                                     shortcut=i18ncE('kajongg game dialog:Key for Kong', 'K'))
 
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
@@ -280,10 +281,10 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
         if myself.originalCall and myself.mayWin:
             warn = True
             txt.append(
-                m18n('saying Kong for %1 violates Original Call',
+                i18n('saying Kong for %1 violates Original Call',
                      Tile(maySay[0][0]).name()))
         if not txt:
-            txt = [m18n('You may say Kong for %1', Tile(maySay[0][0]).name())]
+            txt = [i18n('You may say Kong for %1', Tile(maySay[0][0]).name())]
         return '<br><br>'.join(txt), warn, ''
 
     def clientAction(self, client, move):
@@ -300,8 +301,8 @@ class MessageChow(PungChowMessage, ServerMessage):
 
     def __init__(self):
         PungChowMessage.__init__(self,
-                                 name=m18ncE('kajongg', 'Chow'),
-                                 shortcut=m18ncE('kajongg game dialog:Key for Chow', 'C'))
+                                 name=i18ncE('kajongg', 'Chow'),
+                                 shortcut=i18ncE('kajongg game dialog:Key for Chow', 'C'))
 
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
@@ -334,8 +335,8 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
 
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
-                                     name=m18ncE('kajongg', 'Mah Jongg'),
-                                     shortcut=m18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
+                                     name=i18ncE('kajongg', 'Mah Jongg'),
+                                     shortcut=i18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
 
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
@@ -343,7 +344,7 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
 
     def toolTip(self, dummyButton, dummyTile):
         """returns text and warning flag for button and text for tile"""
-        return m18n('Press here and you win'), False, ''
+        return i18n('Press here and you win'), False, ''
 
     def clientAction(self, dummyClient, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
@@ -357,8 +358,8 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
 
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
-                                     name=m18ncE('kajongg', 'Original Call'),
-                                     shortcut=m18ncE('kajongg game dialog:Key for Original Call', 'O'))
+                                     name=i18ncE('kajongg', 'Original Call'),
+                                     shortcut=i18ncE('kajongg game dialog:Key for Original Call', 'O'))
 
     def serverAction(self, table, msg):
         """the server tells all others"""
@@ -370,12 +371,12 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
         myself = button.client.game.myself
         isCalling = bool((myself.hand - tile).callingHands)
         if not isCalling:
-            txt = m18n(
+            txt = i18n(
                 'discarding %1 and declaring Original Call makes this hand unwinnable',
                 tile.name())
             return txt, True, txt
         else:
-            return (m18n(
+            return (i18n(
                 'Discard a tile, declaring Original Call meaning you need only one '
                 'tile to complete the hand and will not alter the hand in any way (except bonus tiles)'),
                     False, '')
@@ -401,8 +402,8 @@ class MessageDiscard(ClientMessage, ServerMessage):
 
     def __init__(self):
         ClientMessage.__init__(self,
-                               name=m18ncE('kajongg', 'Discard'),
-                               shortcut=m18ncE('kajongg game dialog:Key for Discard', 'D'))
+                               name=i18ncE('kajongg', 'Discard'),
+                               shortcut=i18ncE('kajongg game dialog:Key for Discard', 'D'))
 
     def serverAction(self, table, msg):
         """the server mirrors that action"""
@@ -417,13 +418,13 @@ class MessageDiscard(ClientMessage, ServerMessage):
         warn = False
         if myself.violatesOriginalCall(tile):
             txt.append(
-                m18n('discarding %1 violates Original Call', tile.name()))
+                i18n('discarding %1 violates Original Call', tile.name()))
             warn = True
         if game.dangerousFor(myself, tile):
-            txt.append(m18n('discarding %1 is Dangerous Game', tile.name()))
+            txt.append(i18n('discarding %1 is Dangerous Game', tile.name()))
             warn = True
         if not txt:
-            txt = [m18n('discard the least useful tile')]
+            txt = [i18n('discard the least useful tile')]
         txtStr = '<br><br>'.join(txt)
         return txtStr, warn, txtStr
 
@@ -495,7 +496,7 @@ class MessageNoGameStart(NotifyAtOnceMessage):
 
     def notifyAction(self, client, move):
         if client.beginQuestion or client.game:
-            Sorry(m18n('%1 is not ready to start the game', move.player.name))
+            Sorry(i18n('%1 is not ready to start the game', move.player.name))
         if client.beginQuestion:
             client.beginQuestion.cancel()
         elif client.game:
@@ -529,7 +530,7 @@ class MessageInitHand(ServerMessage):
         scene = Internal.scene
         if scene:
             scene.mainWindow.setWindowTitle(
-                m18n(
+                i18n(
                     'Kajongg <numid>%1</numid>',
                     client.game.handId.seed))
             scene.discardBoard.setRandomPlaces(client.game.randomGenerator)
@@ -607,7 +608,7 @@ class MessageViolatesOriginalCall(ServerMessage):
     def __init__(self):
         ServerMessage.__init__(
             self,
-            name=m18ncE('kajongg',
+            name=i18ncE('kajongg',
                         'Violates Original Call'))
 
     def clientAction(self, client, move):
@@ -737,7 +738,7 @@ class MessageDangerousGame(ServerMessage):
     """the game server tells us who played dangerous game"""
 
     def __init__(self):
-        ServerMessage.__init__(self, name=m18ncE('kajongg', 'Dangerous Game'))
+        ServerMessage.__init__(self, name=i18ncE('kajongg', 'Dangerous Game'))
 
     def clientAction(self, client, move):
         """mirror the dangerous game action locally"""
@@ -751,7 +752,7 @@ class MessageNoChoice(ServerMessage):
     """the game server tells us who had no choice avoiding dangerous game"""
 
     def __init__(self):
-        ServerMessage.__init__(self, name=m18ncE('kajongg', 'No Choice'))
+        ServerMessage.__init__(self, name=i18ncE('kajongg', 'No Choice'))
         self.move = None
 
     def clientAction(self, client, move):
@@ -811,12 +812,12 @@ class MessageOK(ClientMessage):
 
     def __init__(self):
         ClientMessage.__init__(self,
-                               name=m18ncE('kajongg', 'OK'),
-                               shortcut=m18ncE('kajongg game dialog:Key for OK', 'O'))
+                               name=i18ncE('kajongg', 'OK'),
+                               shortcut=i18ncE('kajongg game dialog:Key for OK', 'O'))
 
     def toolTip(self, dummyButton, dummyTile):
         """returns text and warning flag for button and text for tile for button and text for tile"""
-        return m18n('Confirm that you saw the message'), False, ''
+        return i18n('Confirm that you saw the message'), False, ''
 
 
 class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
@@ -825,12 +826,12 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
 
     def __init__(self):
         NotifyAtOnceMessage.__init__(self,
-                                     name=m18ncE('kajongg', 'No Claim'),
-                                     shortcut=m18ncE('kajongg game dialog:Key for No claim', 'N'))
+                                     name=i18ncE('kajongg', 'No Claim'),
+                                     shortcut=i18ncE('kajongg game dialog:Key for No claim', 'N'))
 
     def toolTip(self, dummyButton, dummyTile):
         """returns text and warning flag for button and text for tile for button and text for tile"""
-        return m18n('You cannot or do not want to claim this tile'), False, ''
+        return i18n('You cannot or do not want to claim this tile'), False, ''
 
     @classmethod
     def receivers(cls, request):
@@ -890,7 +891,7 @@ class ChatMessage(StrMixin):
         local = self.localtimestamp()
         # pylint: disable=no-member
         # pylint says something about NotImplemented, check with later versions
-        _ = m18n(self.message)
+        _ = i18n(self.message)
         if self.isStatusMessage:
             _ = '[{}]'.format(_)
         return '%02d:%02d:%02d %s: %s' % (
@@ -898,7 +899,7 @@ class ChatMessage(StrMixin):
             local.minute,
             local.second,
             self.fromUser,
-            m18n(self.message))
+            i18n(self.message))
 
     def asList(self):
         """encode me for network transfer"""

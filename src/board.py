@@ -34,7 +34,8 @@ from animation import AnimationSpeed, animate, AnimatedMixin
 from message import Message
 
 from util import stack, uniqueList
-from log import logDebug, logException, m18n, m18nc
+from log import logDebug, logException, i18n
+from kde import i18nc
 from common import LIGHTSOURCES, Internal, Debug, isAlive, StrMixin
 from common import ZValues
 from wind import Wind, East
@@ -311,7 +312,7 @@ class Board(QGraphicsRectItem, StrMixin):
         key = event.key()
         if key in Board.arrows:
             return key
-        charArrows = m18nc(
+        charArrows = i18nc(
             'kajongg:arrow keys hjkl like in konqueror',
             'hjklHJKL')
         key = event.text()
@@ -362,7 +363,7 @@ class Board(QGraphicsRectItem, StrMixin):
         variants = self.meldVariants(uiTile, lowerHalf)
         idx = 0
         if len(variants) > 1:
-            menu = QMenu(m18n('Choose from'))
+            menu = QMenu(i18n('Choose from'))
             for idx, variant in enumerate(variants):
                 action = menu.addAction(variant.typeName())
                 action.setData(idx)

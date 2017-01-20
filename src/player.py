@@ -21,7 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import weakref
 from collections import defaultdict
 
-from log import logException, logWarning, m18n, m18nc, m18nE
+from log import logException, logWarning
+from kde import i18n, i18nc, i18nE
 from common import IntDict, Debug
 from common import StrMixin
 from wind import East
@@ -290,7 +291,7 @@ class Player(StrMixin):
     @property
     def localName(self):
         """the localized name of this player"""
-        return m18nc('kajongg, name of robot player, to be translated', self.name)
+        return i18nc('kajongg, name of robot player, to be translated', self.name)
 
     @property
     def handTotal(self):
@@ -682,7 +683,7 @@ class PlayingPlayer(Player):
                     ignoreDiscard = None
                 else:
                     if tile not in self._concealedTiles:
-                        msg = m18nE(
+                        msg = i18nE(
                             '%1 claiming MahJongg: She does not really have tile %2')
                         return msg, self.name, tile
                     self._concealedTiles.remove(tile)
@@ -691,7 +692,7 @@ class PlayingPlayer(Player):
             else:
                 self._exposedMelds.append(meld)
         if self._concealedTiles:
-            msg = m18nE(
+            msg = i18nE(
                 '%1 claiming MahJongg: She did not pass all concealed tiles to the server')
             return msg, self.name
         self._hand = None
@@ -802,7 +803,7 @@ class PlayingPlayer(Player):
         if expMeldCount >= 3:
             if all(x in elements.greenHandTiles for x in self.visibleTiles):
                 dangerous.append((elements.greenHandTiles,
-                                  m18n('Player %1 has 3 or 4 exposed melds, all are green', pName)))
+                                  i18n('Player %1 has 3 or 4 exposed melds, all are green', pName)))
             group = list(defaultdict.keys(self.visibleTiles))[0].group
             # see http://www.logilab.org/ticket/23986
             assert group.islower(), self.visibleTiles
@@ -811,10 +812,10 @@ class PlayingPlayer(Player):
                     suitTiles = set([Tile(group, x) for x in Tile.numbers])
                     if self.visibleTiles.count(suitTiles) >= 9:
                         dangerous.append(
-                            (suitTiles, m18n('Player %1 may try a True Color Game', pName)))
+                            (suitTiles, i18n('Player %1 may try a True Color Game', pName)))
                 elif all(x.value in Tile.terminals for x in self.visibleTiles):
                     dangerous.append((elements.terminals,
-                                      m18n('Player %1 may try an All Terminals Game', pName)))
+                                      i18n('Player %1 may try an All Terminals Game', pName)))
         if expMeldCount >= 2:
             windMelds = sum(self.visibleTiles[x] >= 3 for x in elements.winds)
             dragonMelds = sum(
@@ -827,11 +828,11 @@ class PlayingPlayer(Player):
             if windsDangerous:
                 dangerous.append(
                     (set(x for x in elements.winds if x not in self.visibleTiles),
-                     m18n('Player %1 exposed many winds', pName)))
+                     i18n('Player %1 exposed many winds', pName)))
             if dragonsDangerous:
                 dangerous.append(
                     (set(x for x in elements.dragons if x not in self.visibleTiles),
-                     m18n('Player %1 exposed many dragons', pName)))
+                     i18n('Player %1 exposed many dragons', pName)))
         self.dangerousTiles = dangerous
         if dangerous and Debug.dangerousGame:
             self.game.debug('dangerous:%s' % dangerous)

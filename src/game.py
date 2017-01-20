@@ -29,7 +29,7 @@ from functools import total_ordering
 from twisted.internet.defer import succeed
 from util import gitHead, CsvWriter
 from rand import CountingRandom
-from log import logError, logWarning, logException, logDebug, m18n
+from log import logError, logWarning, logException, logDebug, i18n
 from common import Internal, IntDict, Debug, Options
 from common import StrMixin, Speeds
 from wind import Wind, East
@@ -539,7 +539,7 @@ class Game:
                 manualrules = '||'.join(x.rule.name
                                         for x in player.hand.usedRules)
             else:
-                manualrules = m18n('Score computed manually')
+                manualrules = i18n('Score computed manually')
             Query(
                 "INSERT INTO SCORE "
                 "(game,hand,data,manualrules,player,scoretime,won,prevailing,"
@@ -636,7 +636,7 @@ class Game:
         try:
             return Players.allNames[playerid]
         except KeyError:
-            return m18n('Player %1 not known', playerid)
+            return i18n('Player %1 not known', playerid)
 
     @classmethod
     def loadFromDB(cls, gameid, client=None):
@@ -1065,7 +1065,7 @@ class PlayingGame(Game):
             # see http://www.logilab.org/ticket/23986
             invisibleTiles = set(x for x in allTiles
                                  if x not in self.visibleTiles)
-            msg = m18n('Short living wall: Tile is invisible, hence dangerous')
+            msg = i18n('Short living wall: Tile is invisible, hence dangerous')
             self.dangerousTiles = list(
                 x for x in self.dangerousTiles if x[1] != msg)
             self.dangerousTiles.append((invisibleTiles, msg))

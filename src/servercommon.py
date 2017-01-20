@@ -22,7 +22,7 @@ from log import SERVERMARK
 
 def srvMessage(*args):
     """
-    concatenate all args needed for m18n encoded in one string.
+    concatenate all args needed for i18n encoded in one string.
     For an explanation see util.translateServerMessage.
 
     @returns: The string to be wired.

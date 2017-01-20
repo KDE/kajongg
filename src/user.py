@@ -29,7 +29,8 @@ from twisted.spread import pb
 
 from common import Internal, Debug, Options, StrMixin
 from servercommon import srvError
-from log import logDebug, m18nE
+from log import logDebug
+from kde import i18nE
 from query import Query
 
 class User(pb.Avatar, StrMixin):
@@ -90,7 +91,7 @@ class User(pb.Avatar, StrMixin):
             if clientVersion is None:
                 # client passed no version info
                 return fail(srvError(pb.Error,
-                                     m18nE(
+                                     i18nE(
                                          'Your client has a version older than 4.9.0 but you need %1 for this server'),
                                      serverVersion))
             else:
@@ -100,7 +101,7 @@ class User(pb.Avatar, StrMixin):
                                     if x[0] == x[1]])
                 if commonDigits < 2:
                     return fail(srvError(pb.Error,
-                                         m18nE(
+                                         i18nE(
                                              'Your client has version %1 but you need %2 for this server'),
                                          clientVersion or '<4.9.0',
                                          '.'.join(serverVersion.split('.')[:2]) + '.*'))

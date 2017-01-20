@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from qt import Qt, QAbstractTableModel, QModelIndex, QSize
 from qt import QWidget, QLineEdit, QVBoxLayout, QColor, QAbstractItemView
 
-from log import m18n, logDebug
+from log import i18n, logDebug
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
 from message import ChatMessage
@@ -51,7 +51,7 @@ class ChatModel(QAbstractTableModel):
             return
         result = ''
         if section < self.columnCount():
-            result = [m18n('Time'), m18n('Player'), m18n('Message')][section]
+            result = [i18n('Time'), i18n('Player'), i18n('Message')][section]
         return result
 
     def rowCount(self, parent=None):
@@ -84,7 +84,7 @@ class ChatModel(QAbstractTableModel):
             elif role == Qt.DisplayRole and index.column() == 1:
                 result = chatLine.fromUser
             elif role == Qt.DisplayRole and index.column() == 2:
-                result = m18n(chatLine.message)
+                result = i18n(chatLine.message)
             elif role == Qt.ForegroundRole and index.column() == 2:
                 palette = Internal.app.palette() # pylint: disable=no-member
                 color = 'blue' if chatLine.isStatusMessage else palette.windowText(
@@ -130,7 +130,7 @@ class ChatWindow(QWidget):
         self.table = table or scene.game.client.table
         self.table.chatWindow = self
         self.setObjectName('chatWindow')
-        title = m18n(
+        title = i18n(
             'Chat on table %1 at %2',
             self.table.tableid,
             self.table.client.connection.url)

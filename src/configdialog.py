@@ -21,13 +21,13 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from log import m18n, m18nc
 from common import Internal
 
 from qt import Qt, QWidget, QSlider, QHBoxLayout, QLabel
 from qt import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 
 from kde import KConfigDialog
+from kde import i18n, i18nc
 
 from statesaver import StateSaver
 from tilesetselector import TilesetSelector
@@ -50,28 +50,28 @@ class PlayConfigTab(QWidget):
         vlayout = QVBoxLayout(self)
         vlayout.setContentsMargins(0, 0, 0, 0)
         sliderLayout = QHBoxLayout()
-        self.kcfg_showShadows = QCheckBox(m18n('Show tile shadows'), self)
+        self.kcfg_showShadows = QCheckBox(i18n('Show tile shadows'), self)
         self.kcfg_showShadows.setObjectName('kcfg_showShadows')
         self.kcfg_rearrangeMelds = QCheckBox(
-            m18n('Rearrange undisclosed tiles to melds'), self)
+            i18n('Rearrange undisclosed tiles to melds'), self)
         self.kcfg_rearrangeMelds.setObjectName('kcfg_rearrangeMelds')
-        self.kcfg_showOnlyPossibleActions = QCheckBox(m18n(
+        self.kcfg_showOnlyPossibleActions = QCheckBox(i18n(
             'Show only possible actions'))
         self.kcfg_showOnlyPossibleActions.setObjectName(
             'kcfg_showOnlyPossibleActions')
-        self.kcfg_propose = QCheckBox(m18n('Propose what to do'))
+        self.kcfg_propose = QCheckBox(i18n('Propose what to do'))
         self.kcfg_propose.setObjectName('kcfg_propose')
         self.kcfg_animationSpeed = QSlider(self)
         self.kcfg_animationSpeed.setObjectName('kcfg_animationSpeed')
         self.kcfg_animationSpeed.setOrientation(Qt.Horizontal)
         self.kcfg_animationSpeed.setSingleStep(1)
-        lblSpeed = QLabel(m18n('Animation speed:'))
+        lblSpeed = QLabel(i18n('Animation speed:'))
         lblSpeed.setBuddy(self.kcfg_animationSpeed)
         sliderLayout.addWidget(lblSpeed)
         sliderLayout.addWidget(self.kcfg_animationSpeed)
-        self.kcfg_useSounds = QCheckBox(m18n('Use sounds if available'), self)
+        self.kcfg_useSounds = QCheckBox(i18n('Use sounds if available'), self)
         self.kcfg_useSounds.setObjectName('kcfg_useSounds')
-        self.kcfg_uploadVoice = QCheckBox(m18n(
+        self.kcfg_uploadVoice = QCheckBox(i18n(
             'Let others hear my voice'), self)
         self.kcfg_uploadVoice.setObjectName('kcfg_uploadVoice')
         pol = QSizePolicy()
@@ -107,13 +107,13 @@ class ConfigDialog(KConfigDialog):  # pylint: disable=too-many-public-methods
         self.pages = [
             self.addPage(
                 PlayConfigTab(self),
-                m18nc('kajongg', 'Play'), "arrow-right"),
+                i18nc('kajongg', 'Play'), "arrow-right"),
             self.addPage(
                 TilesetSelector(self),
-                m18n("Tiles"), "games-config-tiles"),
+                i18n("Tiles"), "games-config-tiles"),
             self.addPage(
                 BackgroundSelector(self),
-                m18n("Backgrounds"), "games-config-background")]
+                i18n("Backgrounds"), "games-config-background")]
 
     def keyPressEvent(self, event):
         """The four tabs can be selected with CTRL-1 .. CTRL-4"""
