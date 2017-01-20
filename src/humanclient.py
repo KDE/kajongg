@@ -126,6 +126,7 @@ class DlgButton(QPushButton):
         QPushButton.__init__(self, parent)
         self.message = message
         self.client = parent.client
+        self.setMinimumHeight(25)
         self.setText(message.buttonCaption())
 
     def setMeaning(self, uiTile):
@@ -167,6 +168,7 @@ class ClientDialog(QDialog):
         self.client = client
         self.layout = QGridLayout(self)
         self.progressBar = QProgressBar()
+        self.progressBar.setMinimumHeight(25)
         self.timer = QTimer()
         if not client.game.autoPlay:
             self.timer.timeout.connect(self.timeout)
