@@ -38,6 +38,8 @@ from common import Debug, StrMixin
 from util import removeIfExists, gitHead, checkMemory
 from util import Csv, CsvWriter, popenReadlines
 
+from kde import cacheDir
+
 # fields in row:
 RULESETFIELD = 0
 AIFIELD = 1
@@ -55,12 +57,10 @@ class Clone:
 
     """make a temp directory for commitId"""
 
-    cacheDirectory = os.path.expanduser(os.path.join('~', '.kajongg', '.cache'))
-
     def __init__(self, commitId):
         self.commitId = commitId
         if commitId != 'current':
-            tmpdir = os.path.expanduser(os.path.join(self.cacheDirectory, commitId))
+            tmpdir = os.path.expanduser(os.path.join(cacheDir(), commitId))
             if not os.path.exists(tmpdir):
                 subprocess.Popen('git clone --shared --no-checkout -q .. {temp}'.format(
                     temp=tmpdir).split()).wait()
@@ -73,16 +73,16 @@ class Clone:
             tmpdir = os.path.abspath('..')
             result = os.path.join(tmpdir, 'src')
         else:
-            result = os.path.join(self.cacheDirectory, self.commitId, 'src')
+            result = os.path.join(cacheDir(), self.commitId, 'src')
         assert os.path.exists(result), '{} does not exist'.format(result)
         return result
 
     @classmethod
     def removeObsolete(cls):
         """remove all clones for obsolete commits"""
-        for commitDir in os.listdir(cls.cacheDirectory):
+        for commitDir in os.listdir(cacheDir()):
             if not any(x.startswith(commitDir) for x in KNOWNCOMMITS):
-                removeDir = os.path.join(cls.cacheDirectory, commitDir)
+                removeDir = os.path.join(cacheDir(), commitDir)
                 shutil.rmtree(removeDir)
 
 class Client:
