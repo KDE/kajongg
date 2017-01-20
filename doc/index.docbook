@@ -3,7 +3,7 @@
 <!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
   <!ENTITY kajongg  "<application>Kajongg</application>">
   <!ENTITY kappname "&kajongg;">
-  <!ENTITY kappversion "4.13.0"><!--Application version. Use this variable everywhere it is needed.-->
+  <!ENTITY kappversion "17.04"><!--Application version. Use this variable everywhere it is needed.-->
   <!ENTITY package "kdegames">  <!-- do not change this! -->
   <!ENTITY % English "INCLUDE" > <!-- change language only here -->
   <!ENTITY % addindex "IGNORE"> <!-- do not change this! -->
@@ -50,7 +50,7 @@
 <legalnotice>&FDLNotice;</legalnotice>
 
 <date>2014-02-20</date><!-- Date of (re)writing, or update.-->
-<releaseinfo>&kappversion; (&kde; 4.13)</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
+<releaseinfo>&kappversion; (&kde; 17.04)</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
 
 <!--Short description of this document. Do not change unless necessary!-->
 <abstract>
@@ -667,7 +667,7 @@ of the &kde; Fundamentals.
 		This is how you can generate voices yourself. There is a separate folder for every voice. There are two groups of voices
 		with different places in the file system:
 		<itemizedlist><listitem><para>
-			Predefined voices for every language. They live in a folder like <filename class="directory">/usr/share/kde4/apps/kajongg/voices/LANG</filename> where
+			Predefined voices for every language. They live in a folder like <filename class="directory">/usr/share/kajongg/voices/LANG</filename> where
 			LANG is the code for your language. The voice directories directly under <filename class="directory">.../kajongg/voices/</filename> are the US-english
 			versions. Predefined voices are randomly assigned to players. Those voices have names like <literal>"male1 male2 female1 female2"</literal> but those names do not matter, the user will never see them. Also, it makes no sense to define more than four predefined voices per language.
 		</para></listitem><listitem><para>
@@ -948,7 +948,6 @@ Full Screen Mode
 
 <appendix id="problems"><title>Known problems</title>
         <itemizedlist>
-                <listitem><para>It is not yet possible for the player herself to open an account on the game server.</para></listitem>
                 <listitem><para>In playing mode, penalties are not yet possible.</para></listitem>
                 <listitem><para>The computer players are still rather stupid.</para></listitem>
         </itemizedlist>
@@ -984,10 +983,10 @@ Full Screen Mode
 	</para>
 
 	<para>
-		Program Copyright &copy; 2009, 2010, 2011, 2012 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Program Copyright &copy; 2009-2017 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
 	</para>
 	<para>
-		Documentation Copyright &copy; 2009, 2010, 2011, 2012 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Documentation Copyright &copy; 2009-2017 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
 	</para>
 
 <!-- !!!do not change ANYTHING after this line!!!! -->
@@ -1026,13 +1025,11 @@ In both cases you will manually have to make sure that some other required packa
 contain these requirements. &kajongg; needs: (corresponding debian packages in parentheses)
 </para>
 <itemizedlist>
-	<listitem><para>the KDE4 games library (libkdegames5)</para></listitem>
-	<listitem><para>Python 2.6 or higher (python)</para></listitem>
-	<listitem><para>QT4.4 or higher (libqt4-core, libqt4-gui, libqt4-svg, libqt4-sql, libqt4-sql-sqlite)</para></listitem>
-	<listitem><para>the python bindings for QT4  (python-qt4, python-qt4-sql)</para></listitem>
-	<listitem><para>the python bindings for KDE4 (python-kde4)</para></listitem>
-        <listitem><para>the python twisted library (python-twisted-core)</para></listitem>
-        <listitem><para>sqlite3 (libsqlite3-0)</para></listitem>
+	<listitem><para>Python 3.5 or higher (python)</para></listitem>
+	<listitem><para>QT5.7 or higher</para></listitem>
+	<listitem><para>the python bindings for QT5  (python3-pyqt5)</para></listitem>
+    <listitem><para>the python twisted library 16.6.0 or  higher (python3-twisted)</para></listitem>
+    <listitem><para>sqlite3 (libsqlite3-0)</para></listitem>
 </itemizedlist>
 
 </appendix>
