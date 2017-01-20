@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # import signal
 # signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
+import os
 import logging
 
 from qt import QObject
@@ -151,6 +152,12 @@ class EvHandler(QObject):
         return QObject.eventFilter(self, receiver, event)
 
 from util import gitHead
+
+if os.name == 'nt':
+    _ = os.path.dirname(os.path.realpath(__file__))
+    if _.endswith('.zip'):
+        # cx_freeze
+        os.chdir(os.path.dirname(_))
 
 ABOUT = About()
 KCmdLineArgs.init(sys.argv, ABOUT.about)

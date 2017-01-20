@@ -32,7 +32,7 @@ Usage: see ../README.windows
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
 URL = "http://www.kde.org/applications/games/kajongg/"
-VERSION = "16.08"
+VERSION = "17.04"
 # ==========================
 
 import os

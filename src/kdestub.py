@@ -786,7 +786,7 @@ class KLocale:
     @staticmethod
     def localeDirectories():
         """hard coded paths to i18n directories, all are searched"""
-        return ('/usr/local/share/locale', '/usr/share/locale')
+        return (x for x in ('share/locale', '/usr/local/share/locale', '/usr/share/locale') if os.path.exists(x))
 
 
 class KConfigGroup:
@@ -986,7 +986,10 @@ class KConfig(ConfigParser):
 
 def KIcon(name=None):  # pylint: disable=invalid-name
     """simple wrapper"""
-    return QIcon.fromTheme(name)
+    if os.name == 'nt':
+        return QIcon(os.path.join('share', 'icons', name) if name else None)
+    else:
+        return QIcon.fromTheme(name)
 
 
 class KConfigSkeletonItem:
@@ -1291,7 +1294,10 @@ class KLanguageButton(QWidget):
     @current.setter
     def current(self, languageCode):
         """point to languageCode"""
-        action = self.findAction(languageCode)
+        action = (
+            self.findAction(languageCode)
+            or self.findAction(languageCode.split('_')[0])
+            or self.popup.actions()[0])
         self.__currentItem = action.data()
         self.button.setText(action.text())
 

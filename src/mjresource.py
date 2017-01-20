@@ -49,9 +49,11 @@ class Resource:
     @classmethod
     def __directories(cls):
         """where to look for resources"""
-        return QStandardPaths.locateAll(
+        result = QStandardPaths.locateAll(
             QStandardPaths.GenericDataLocation,
             'kmahjongglib/{}s'.format(cls.resourceName), QStandardPaths.LocateDirectory)
+        result.insert(0, os.path.join('share', 'kmahjongglib', '{}s'.format(cls.resourceName)))
+        return (x for x in result if os.path.exists(x))
 
     @classmethod
     def locate(cls, which):
@@ -60,7 +62,7 @@ class Resource:
             path = os.path.join(directory, which)
             if os.path.exists(path):
                 return path
-        logException('cannot find kmahjongg%s %s' % (cls.resourceName, which))
+        logException('cannot find kmahjongg%s %s in %s' % (cls.resourceName, which,  cls.__directories()))
 
     @classmethod
     def loadAll(cls):

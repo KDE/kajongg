@@ -98,6 +98,8 @@ copy(oxy48Cat + 'applications-education.png', DEST + '/icons')
 copy(oxy48Status + 'dialog-information.png', DEST + '/icons')
 copy(oxy48Status + 'dialog-warning.png', DEST + '/icons')
 copy(oxy48Apps + 'preferences-plugin-script.png', DEST + '/icons')
+copy(oxy48Apps + 'preferences-desktop-locale.png', DEST + '/icons')
+
 
 for png in (
         'application-exit', 'games-config-background', 'arrow-right',

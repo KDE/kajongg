@@ -37,8 +37,10 @@ def loadUi(base):
     name = base.__class__.__name__.lower() + '.ui'
     if os.path.exists(name):
         directory = os.getcwd()
+    elif os.path.exists('share/kajongg/{}'.format(name)):
+        directory = 'share/kajongg'
     else:
-        directory = os.path.dirname(QStandardPaths.locate("appdata", name))
+        directory = os.path.dirname(QStandardPaths.locate(QStandardPaths.AppDataLocation, name))
     uic.loadUi(os.path.join(directory, name), base)
 
 
