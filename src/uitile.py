@@ -128,8 +128,14 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         movingZ = 0
         # show moving tiles above non-moving tiles
         changePos = self.activeAnimation.get('pos')
+        if changePos and not isAlive(changePos):
+            return
         changeRotation = self.activeAnimation.get('rotation')
+        if changeRotation and not isAlive(changeRotation):
+            return
         changeScale = self.activeAnimation.get('scale')
+        if changeScale and not isAlive(changeScale):
+            return
         # show rotating and scaling tiles above all others
         if changeScale or changeRotation:
             movingZ += ZValues.movingZ
