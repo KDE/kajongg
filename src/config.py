@@ -56,7 +56,7 @@ class StringParameter(Parameter):
 
     def add(self, skeleton):
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItemString(self.name, self.value, self.default or '')
+        self.item = skeleton.addItem(self.name, self.value, self.default or '')
 
     def itemValue(self):
         """returns the value of this item"""
@@ -75,7 +75,7 @@ class BoolParameter(Parameter):
 
     def add(self, skeleton):
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItemBool(self.name, self.value, self.default)
+        self.item = skeleton.addItem(self.name, self.value, self.default)
 
 
 class IntParameter(Parameter):
@@ -94,7 +94,7 @@ class IntParameter(Parameter):
 
     def add(self, skeleton):
         """add this parameter to the skeleton"""
-        self.item = skeleton.addItemInt(self.name, self.value, self.default)
+        self.item = skeleton.addItem(self.name, self.value, self.default)
         if self.minValue is not None:
             self.item.setMinValue(self.minValue)
         if self.maxValue is not None:

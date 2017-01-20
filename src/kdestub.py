@@ -917,23 +917,17 @@ class KConfigSkeleton(QObject):
         """to be used by following add* calls"""
         self.currentGroup = group
 
-    def addItemString(self, key, value, default=None):
+    def addItem(self, key, value, default=None):
         """add a string preference"""
-        result = ItemString(self, key, value, default)
-        result.getFromConfig()
-        self.items.append(result)
-        return result
-
-    def addItemBool(self, key, value, default=False):
-        """add a boolean preference"""
-        result = ItemBool(self, key, value, default)
-        result.getFromConfig()
-        self.items.append(result)
-        return result
-
-    def addItemInt(self, key, value, default=0):
-        """add an integer preference"""
-        result = ItemInt(self, key, value, default)
+        if isinstance(value, bool):
+            cls = ItemBool
+        elif isinstance(value, int):
+            cls = ItemInt
+        elif isinstance(value, str):
+            cls = ItemString
+        else:
+            raise Exception('addiItem accepts only bool, int, str but not {}/{}'.format(type(value), value))
+        result = cls(self, key, value, default)
         result.getFromConfig()
         self.items.append(result)
         return result
