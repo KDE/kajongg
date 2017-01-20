@@ -29,7 +29,7 @@ import os
 import logging
 
 from qt import QObject
-from kde import ki18n, KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
+from kde import i18n, KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
 from about import About
 
 from common import Options, SingleshotOptions, Internal, Debug
@@ -69,32 +69,32 @@ def defineOptions():
     options = KCmdLineOptions()
     options.add(
         "playopen",
-        ki18n("all robots play with visible concealed tiles"))
-    options.add("demo", ki18n("start with demo mode"))
-    options.add("host <HOST>", ki18n("login to HOST"))
-    options.add("table <TABLE>", ki18n("start new TABLE"))
-    options.add("join <TABLE>", ki18n("join TABLE "))
-    options.add("ruleset <RULESET>", ki18n("use ruleset without asking"))
+        i18n("all robots play with visible concealed tiles"))
+    options.add("demo", i18n("start with demo mode"))
+    options.add("host <HOST>", i18n("login to HOST"))
+    options.add("table <TABLE>", i18n("start new TABLE"))
+    options.add("join <TABLE>", i18n("join TABLE "))
+    options.add("ruleset <RULESET>", i18n("use ruleset without asking"))
     options.add(
         "rounds <ROUNDS>",
-        ki18n("play one ROUNDS rounds per game. Only for debugging!"))
-    options.add("player <PLAYER>", ki18n("prefer PLAYER for next login"))
+        i18n("play one ROUNDS rounds per game. Only for debugging!"))
+    options.add("player <PLAYER>", i18n("prefer PLAYER for next login"))
     options.add(
         "ai <AI>",
-        ki18n("use AI variant for human player in demo mode"))
-    options.add("csv <CSV>", ki18n("write statistics to CSV"))
-    options.add("rulesets", ki18n("show all available rulesets"))
+        i18n("use AI variant for human player in demo mode"))
+    options.add("csv <CSV>", i18n("write statistics to CSV"))
+    options.add("rulesets", i18n("show all available rulesets"))
     options.add("game <seed(/(firsthand)(..(lasthand))>",
-                ki18n("for testing purposes: Initializes the random generator"), "0")
+                i18n("for testing purposes: Initializes the random generator"), "0")
     options.add(
         "nogui",
-        ki18n("show no graphical user interface. Intended only for testing"))
+        i18n("show no graphical user interface. Intended only for testing"))
     options.add(
         "socket <SOCKET>",
-        ki18n("use a dedicated server listening on SOCKET. Intended only for testing"))
+        i18n("use a dedicated server listening on SOCKET. Intended only for testing"))
     options.add(
         "port <PORT>",
-        ki18n("use a dedicated server listening on PORT. Intended only for testing"))
+        i18n("use a dedicated server listening on PORT. Intended only for testing"))
     options.add("debug <OPTIONS>", Debug.help())
     return options
 

@@ -10,10 +10,10 @@ ${EXTRACTRC:-extractrc} src/*.ui src/*.rc >> rc.cpp
 
 ${XGETTEXT:-xgettext} \
 		-ci18n --from-code=UTF-8 --language=Python -k \
-		-kki18n:1 -ki18n:1 -ki18nc:1c,2 -ki18np:1,2 \
+		-ki18n:1 -ki18nc:1c,2 -ki18np:1,2 \
 		-ki18ncp:1c,2,3 -ktr2i18n:1 \
 		-kI18N_NOOP:1 -kI18N_NOOP2:1c,2 \
-		-kaliasLocale -kki18n:1 -kki18nc:1c,2 -kki18np:1,2 -kki18ncp:1c,2,3 \
+		-kaliasLocale \
 		-kcreateRule:1 \
 		--no-wrap --msgid-bugs-address=wolfgang@rohdewald.de -o${podir:-.}/kajongg.pot \
 		rc.cpp `find . -name \*.py`

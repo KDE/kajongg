@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from kde import ki18n, KAboutData
+from kde import i18n, KAboutData
 
 from common import Internal
 
@@ -32,19 +32,19 @@ class About:
         catalog = ""
         homePage = "http://kde.org/applications/games/kajongg/"
         version = str(Internal.defaultPort)
-        programName = ki18n("Kajongg")
-        description = ki18n(
+        programName = i18n("Kajongg")
+        description = i18n(
             "Mah Jongg - the ancient Chinese board game for 4 players")
         kajongglicense = KAboutData.License_GPL
         kajonggcopyright = "(C) 2008-2016 Wolfgang Rohdewald"
-        aboutText = ki18n("This is the classical Mah Jongg for four players. "
-                          "If you are looking for Mah Jongg solitaire please "
-                          "use the application kmahjongg.")
+        aboutText = i18n("This is the classical Mah Jongg for four players. "
+                         "If you are looking for Mah Jongg solitaire please "
+                         "use the application kmahjongg.")
 
         self.about = KAboutData(self.appName, catalog, programName,
                                 version, description, kajongglicense,
                                 kajonggcopyright, aboutText, homePage)
         self.about.addAuthor(
             "Wolfgang Rohdewald",
-            ki18n("Original author"),
+            i18n("Original author"),
             "wolfgang@rohdewald.de")

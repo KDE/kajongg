@@ -58,7 +58,7 @@ import gettext
 
 
 __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
-           'KCmdLineOptions', 'i18n', 'i18nc', 'i18nE', 'i18ncE', 'ki18n',
+           'KCmdLineOptions', 'i18n', 'i18nc', 'i18nE', 'i18ncE',
            'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
            'KConfigDialog', 'KDialog',
            'KUser', 'KToggleFullScreenAction', 'KStandardAction',
@@ -110,8 +110,6 @@ def i18n(englishIn, *args):
         ENGLISHDICT[_] = englishIn
     result = __insertArgs(_, *args)
     return result
-
-ki18n = i18n  # pylint: disable=invalid-name
 
 
 def i18nc(context, englishIn, *args):
