@@ -84,14 +84,6 @@ class Url(str, StrMixin):
         if Debug.connections:
             logDebug(repr(obj))
 
-        if Internal.reactor is None:
-            import qtreactor
-            qtreactor.install()
-            from twisted.internet import reactor
-            reactor.runReturn(installSignalHandlers=False)
-            Internal.reactor = reactor
-            if Debug.quit:
-                logDebug('Installed qtreactor')
         return obj
 
     def __str__(self):

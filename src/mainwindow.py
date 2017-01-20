@@ -146,6 +146,7 @@ class MainWindow(KXmlGuiWindow):
         self.playerWindow = None
         self.rulesetWindow = None
         self.confDialog = None
+        self.__installReactor()
         if Options.gui:
             KStandardAction.preferences(
                 self.showSettings,
@@ -169,6 +170,18 @@ class MainWindow(KXmlGuiWindow):
             self.show()
         else:
             HumanClient()
+
+    @staticmethod
+    def __installReactor():
+        """install the twisted reactor"""
+        if Internal.reactor is None:
+            import qtreactor
+            qtreactor.install()
+            from twisted.internet import reactor
+            reactor.runReturn(installSignalHandlers=False)
+            Internal.reactor = reactor
+            if Debug.quit:
+                logDebug('Installed qtreactor')
 
     @property
     def scene(self):
