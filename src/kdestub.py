@@ -106,7 +106,8 @@ def i18n(englishIn, *args):
         _ = KGlobal.translation.gettext(englishIn)
     else:
         _ = englishIn
-    ENGLISHDICT[_] = englishIn
+    if not args:
+        ENGLISHDICT[_] = englishIn
     result = __insertArgs(_, *args)
     return result
 
@@ -134,6 +135,8 @@ def i18nc(context, englishIn, *args):
     if _ == withContext:
         # try again without context
         _ = KGlobal.translation.gettext(englishIn)
+    if not args:
+        ENGLISHDICT[_] = englishIn
     return __insertArgs(_, *args)
 
 def qi18nc(context, englishIn, *args):
