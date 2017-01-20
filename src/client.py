@@ -26,7 +26,7 @@ from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed, fail
 from util import Duration
 from log import logDebug, logException, logWarning
-from kde import i18nc
+from mi18n import i18nc
 from message import Message
 from common import Internal, Debug, Options, StrMixin
 from common import isAlive

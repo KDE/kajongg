@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from qt import Qt, QAbstractTableModel, QModelIndex
 from qt import QLabel, QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
-from kde import i18n, i18nc
+from mi18n import i18n, i18nc
 from statesaver import StateSaver
 from guiutil import ListComboBox, MJTableView, decorateWindow
 from guiutil import BlockSignals

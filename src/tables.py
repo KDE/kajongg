@@ -25,7 +25,7 @@ from qt import QDialog, QDialogButtonBox, QWidget
 from qt import QHBoxLayout, QVBoxLayout, QAbstractItemView
 from qt import QItemSelectionModel, QGridLayout, QColor, QPalette
 
-from kde import i18n, i18nc, i18nE
+from mi18n import i18n, i18nc, i18nE
 from kde import KApplication, KIcon, KDialogButtonBox
 
 from genericdelegates import RichTextColumnDelegate

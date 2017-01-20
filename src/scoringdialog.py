@@ -38,7 +38,7 @@ from modeltest import ModelTest
 
 from rulesetselector import RuleTreeView
 from board import WindLabel
-from kde import i18n, i18nc
+from mi18n import i18n, i18nc
 from common import Internal, Debug
 from statesaver import StateSaver
 from query import Query

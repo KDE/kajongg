@@ -37,7 +37,7 @@ from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
     QSizePolicy, QWidget
 
 from kde import KUser, KDialog, KDialogButtonBox, appdataDir, socketName
-from kde import i18n, i18nc
+from mi18n import i18n, i18nc
 from dialogs import DeferredDialog, QuestionYesNo
 
 from log import logWarning, logException, logInfo, logDebug, SERVERMARK

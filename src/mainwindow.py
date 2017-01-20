@@ -78,7 +78,7 @@ except ImportError as importError:
 
 
 try:
-    from kde import i18n, i18nc
+    from mi18n import i18n, i18nc
     from kde import KIcon, KToggleFullScreenAction, \
         KXmlGuiWindow, KStandardAction
 

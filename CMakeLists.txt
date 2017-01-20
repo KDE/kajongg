@@ -62,6 +62,7 @@ set(SRCFILES
     src/genericdelegates.py
     src/guiutil.py
     src/humanclient.py
+    src/mi18n.py
     src/login.py
     src/kde.py
     src/dialogs.py

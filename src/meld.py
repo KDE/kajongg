@@ -24,7 +24,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 from itertools import chain
 
-from kde import i18nc
+from mi18n import i18nc
 from common import StrMixin
 from tile import Tile, TileList, elements
 

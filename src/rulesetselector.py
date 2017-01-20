@@ -27,7 +27,7 @@ from qt import QWidget, QHBoxLayout, QVBoxLayout, \
 from qt import QModelIndex
 from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, BoolRule
 from util import uniqueList
-from kde import i18n, i18nc, i18ncE
+from mi18n import i18n, i18nc, i18ncE
 from differ import RulesetDiffer
 from common import Debug, english, Internal
 from tree import TreeItem, RootItem, TreeModel

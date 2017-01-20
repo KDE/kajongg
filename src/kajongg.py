@@ -29,7 +29,8 @@ import os
 import logging
 
 from qt import QObject
-from kde import i18n, KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
+from kde import KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
+from mi18n import i18n
 from about import About
 
 from common import Options, SingleshotOptions, Internal, Debug

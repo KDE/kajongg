@@ -27,7 +27,7 @@ from qt import QItemSelectionModel, QAbstractItemView
 
 from dialogs import WarningYesNo
 from kde import KIcon
-from kde import i18n, i18nc
+from mi18n import i18n, i18nc
 from log import logException
 from query import Query
 from guiutil import MJTableView, decorateWindow

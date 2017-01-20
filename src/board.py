@@ -34,8 +34,8 @@ from animation import AnimationSpeed, animate, AnimatedMixin
 from message import Message
 
 from util import stack, uniqueList
-from log import logDebug, logException, i18n
-from kde import i18nc
+from log import logDebug, logException
+from mi18n import i18n, i18nc
 from common import LIGHTSOURCES, Internal, Debug, isAlive, StrMixin
 from common import ZValues
 from wind import Wind, East

@@ -30,7 +30,7 @@ from sys import _getframe
 from common import Internal, Debug # pylint: disable=redefined-builtin
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead, callers
-from kde import i18n
+from mi18n import i18n
 from dialogs import Sorry, Information, NoPrompt
 
 

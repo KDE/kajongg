@@ -37,7 +37,7 @@ from tilesource import TileSource
 from util import Duration
 from message import Message, ChatMessage
 from log import logDebug, logError
-from kde import i18nE, i18n, i18ncE
+from mi18n import i18nE, i18n, i18ncE
 from deferredutil import DeferredBlock
 from tile import Tile, TileList, elements
 from meld import Meld, MeldList

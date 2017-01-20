@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from __future__ import print_function
 
 from log import logException
-from kde import i18n, i18nc
+from mi18n import i18n, i18nc
 from common import IntDict, StrMixin
 from wind import Wind, East, South, West, North
 

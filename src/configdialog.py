@@ -27,7 +27,7 @@ from qt import Qt, QWidget, QSlider, QHBoxLayout, QLabel
 from qt import QVBoxLayout, QSpacerItem, QSizePolicy, QCheckBox
 
 from kde import KConfigDialog
-from kde import i18n, i18nc
+from mi18n import i18n, i18nc
 
 from statesaver import StateSaver
 from tilesetselector import TilesetSelector

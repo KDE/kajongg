@@ -81,7 +81,7 @@ Internal.reactor = reactor
 from player import Players
 from query import Query, initDb
 from log import logDebug, logWarning, logError, logInfo, SERVERMARK
-from kde import i18n, i18nE
+from mi18n import i18n, i18nE
 from util import elapsedSince
 from message import Message, ChatMessage
 from deferredutil import DeferredBlock

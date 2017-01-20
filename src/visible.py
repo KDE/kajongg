@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from qt import Qt
 
-from kde import i18nc
+from mi18n import i18nc
 from message import Message
 from common import Internal, isAlive
 from player import Player, PlayingPlayer

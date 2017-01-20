@@ -18,7 +18,7 @@ along with this program if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-from kde import i18n, i18nc
+from mi18n import i18n, i18nc
 from kde import KIcon
 from dialogs import Sorry
 from qt import Qt

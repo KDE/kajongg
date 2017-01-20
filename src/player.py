@@ -22,7 +22,7 @@ import weakref
 from collections import defaultdict
 
 from log import logException, logWarning
-from kde import i18n, i18nc, i18nE
+from mi18n import i18n, i18nc, i18nE
 from common import IntDict, Debug
 from common import StrMixin
 from wind import East

@@ -27,7 +27,7 @@ import os
 from qt import QStandardPaths
 from log import logWarning, logException
 from kde import KConfig
-from kde import i18n
+from mi18n import i18n
 
 RESOURCEFORMAT = 1 # as long as backgrounds and tilesets are synchronous in their versions
 

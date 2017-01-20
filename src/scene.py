@@ -23,7 +23,7 @@ from zope.interface import implements  # pylint: disable=unused-import
 from twisted.internet.defer import succeed
 
 from log import logDebug, id4
-from kde import i18n, i18nc
+from mi18n import i18n, i18nc
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import StrMixin, Speeds
 from wind import Wind
