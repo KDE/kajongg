@@ -27,7 +27,7 @@ in the windows guest:
 - install Visual Studio 2015 Community Edition
 - setup a shared directory (visible for host and guest) "kajongg": a working copy of the git repository
 - cd kajongg/src
-- ./kajongg.py must work
+- python kajongg.py must work
 - python setup.py bdist_msi
 
 the result is in kajongg/src/dist
