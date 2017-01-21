@@ -69,7 +69,7 @@ build_exe_options = {
     "namespace_packages": namespace_packages, 'silent': False}
 
 kajExe = Executable('kajongg.py', icon='kajongg.ico', base='Win32GUI',
-                    shortcutName='Kajongg', shortcutDir='ProgramMenuFolder')
+                    shortcutName='kajongg', shortcutDir='ProgramMenuFolder')
 kajServer = Executable('kajonggserver.py', icon='kajongg.ico')
 executables = [kajExe, kajServer]
 
@@ -104,7 +104,7 @@ class bdist_msi(windist.bdist_msi):
 
 setup(
     cmdclass={'bdist_msi': bdist_msi},  # define custom build class
-    name='Kajongg',
+    name='kajongg',
     version=VERSION,
     description='The classical game of Mah Jongg',
     long_description="This is the classical Mah Jongg for four players. "
@@ -113,7 +113,7 @@ setup(
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
-    download_url='http://www.kde-apps.org/content/download.php?content=103206&id=1',
+    download_url='https://www.linux-apps.com/p/1109453/',
     options={"build_exe": build_exe_options},
     executables=executables,
     license=LICENSE)

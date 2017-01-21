@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (C) 2008-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
+Copyright (C) 2008-2017 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 Kajongg is free software you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class KmjBuild(build):
         call(['cp sc-action-games-kajongg-law.svgz games-kajongg-law.svgz'], shell=True)
         build.run(self)
 
-setup(name='Kajongg',
+setup(name='kajongg',
     version=VERSION,
     description='The classical game of Mah Jongg',
     long_description="This is the classical Mah Jongg for four players. "
@@ -98,7 +98,7 @@ setup(name='Kajongg',
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
-    download_url='http://www.kde-apps.org/content/download.php?content=103206&id=1',
+    download_url='https://www.linux-apps.com/p/1109453/',
     data_files=data_files,
     cmdclass = { 'build' : KmjBuild },  # define custom build class
     license=LICENSE,
