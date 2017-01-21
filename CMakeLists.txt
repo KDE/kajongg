@@ -120,6 +120,6 @@ KDE_ADD_PYTHON_EXECUTABLE(kajonggserver.py kajonggserver)
 install(FILES ${DATAFILES} DESTINATION ${DATA_INSTALL_DIR}/kajongg)
 
 install(PROGRAMS org.kde.kajongg.desktop DESTINATION ${KDE_INSTALL_APPDIR})
-install(FILES org.kde.kajongg.appdata.xml DESTINATION ${KDE_INSTALL_METAINFODIR}/metainfo)
+install(FILES org.kde.kajongg.appdata.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
