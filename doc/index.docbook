@@ -1026,8 +1026,8 @@ contain these requirements. &kajongg; needs: (corresponding debian packages in p
 </para>
 <itemizedlist>
 	<listitem><para>Python 3.5 or higher (python)</para></listitem>
-	<listitem><para>QT5.7 or higher</para></listitem>
-	<listitem><para>the python bindings for QT5  (python3-pyqt5)</para></listitem>
+	<listitem><para>Qt5.7 or higher</para></listitem>
+	<listitem><para>the python bindings for Qt5  (python3-pyqt5)</para></listitem>
     <listitem><para>the python twisted library 16.6.0 or  higher (python3-twisted)</para></listitem>
     <listitem><para>sqlite3 (libsqlite3-0)</para></listitem>
 </itemizedlist>
