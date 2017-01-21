@@ -266,9 +266,8 @@
             selecting any other host or by manually entering a new host name and by specifying your password for that host. The last used password will be
             proposed.
         </para><para>
-	    The easiest way is to use the game server at
-	    <ulink url="http://www.kde.org/applications/games/kajongg/">kajongg.org</ulink>. &kajongg; will show this one in the list of possible game servers.
-	    Please note that for now <ulink url="http://www.kde.org/applications/games/kajongg/">kajongg.org</ulink> only offers a game server but no web page or any other services.
+	    The easiest way is to use the game server at <literal>kajongg.org</literal>. &kajongg; will show this one in the list of possible game servers.
+	    Please note that this server only offers a game server but no web page or any other services.
         </para><para>
 	  If you do not have an account on the game server with the name you entered, you will be asked if you want to open an account. If you say yes, you will get a
 	  new dialog where you can enter the wanted password twice. Your account will be created automatically.
@@ -282,10 +281,10 @@
 	  the ruleset differently. Also, if the name of your local ruleset is displayed, it is displayed in black. If however you have no identical ruleset, the name
 	  appears in red, and you can use the button <guibutton>Compare</guibutton> to compare it with your own rulesets.
         </para><para>
-	   If you do not use <ulink url="http://www.kde.org/applications/games/kajongg/">kajongg.org</ulink> or any other existing game server, you can start your own &kajongg;  game server in two different ways:
+	   If you do not use <literal>kajongg.org</literal> or any other existing game server, you can start your own &kajongg;  game server in two different ways:
             <itemizedlist><listitem><para>
-                connect to the server "localhost". This is your own computer. If you do this and no game server is running, it will be started automatically. And when
-                you stop playing, the server will be stopped too.
+	         connect to the server <literal>localhost</literal>. This is your own computer. If you do this and no game server is running, it will be started automatically. And when
+		 you stop playing, the server will be stopped too. This differs from selecting <literal>Local Game</literal>, the latter does not allow connections from other computers.
             </para></listitem><listitem><para>
                 manually start a server on any computer you want. All you need to do is go to a command line and start
             the program <literal>kajonggserver</literal>. Entering <literal>kajonggserver --help</literal>
@@ -293,17 +292,16 @@
             </para></listitem></itemizedlist>
         </para><para>
             In both cases you need to tell the other players  how they can reach your game server. They need the &URL; or simply an IP address and the port your server is
-            listening on. This might be something like <literal>mypc.dyndns.org:8409</literal> where <literal>8409</literal> is the port. Of course you need to configure your firewall such that the remote
+            listening on. This might be something like <literal>mypc.dyndns.org:8301</literal> where <literal>8301</literal> is the port. Of course you need to configure your firewall such that the remote
             player can reach that port. The communication will be encrypted.
 	    </para><para>
-	    The server computes its default port from its version number.
-	    If &kajongg; has version 4.9.5, port 8409 will be used: 8000 plus first version digit * 100 plus middle version digit.
+	    For the port number, please see <guimenu>Help</guimenu> <guimenuitem>About Kajongg</guimenuitem>. The Protocol version is the port number. For &kajongg; 17.04 this is 8301.
 	    If the player enters no port for the wanted game server, the client computes the port in the same way.
-	    So if a computer runs several game servers with different program versions, you should normally reach the correct game server automatically.
+	    So if a computer runs several game servers with different protocol versions, you should normally reach the correct game server automatically.
 	    Anyway the game server and the client will make sure that their versions are compatible and warn you otherwise.
          </para><para>
-            If you encounter possible bugs, you might want to use the option <literal>--debug=traffic</literal>. This will show you, on the console where the game server has been started,
-            what messages are flowing between the game server and the clients.
+            If you encounter possible bugs, you might want to use the option <literal>kajongg --debug=traffic</literal>. This will show you, on the console where the game server has been started,
+            what messages are flowing between the game server and the clients. For more options, see <literal>kajongg --help</literal>
         </para>
         <sect2 id="playing-caveats">
         <title>Caveats</title>
@@ -351,7 +349,7 @@
     </para></sect2><sect2><title>Bonus tiles</title>
     <para>A game can contain eight bonus tiles (unless the rules exclude them). They are exposed separately on the right side of the player region
       as they are never used for building melds. They do however generate bonus points.</para>
-      <para>If a player gets a bonus tile, she will automatically also get a replacement tile from the wall.</para></sect2>
+      <para>If a player gets a bonus tile, she will automatically also get a replacement tile from the wall. And a bell rings.</para></sect2>
       <sect2><title>Scoring</title><para>
 	At the end of a hand, the score for each player is computed. First, basis points are counted like 2 points for a simple exposed pung or 20 points
 	for winning. Next, another set of rules is applied - those rules can double the points like one double for a meld of dragons. When the score for
@@ -1013,24 +1011,29 @@ Full Screen Mode
 <appendix id="installation">
 <title>Installation</title>
 <para>
-Use the .deb package from <ulink url="http://www.kde-apps.org/content/show.php/kajongg?content=103206"></ulink>. If it does not work for you, you can download kajongg-x-y.tar.gz from the same address and then do:
-
-<programlisting>
-tar xfz kajongg-x-y.tar.gz
-cd kajongg-x-y
-./setup.py install
-</programlisting>
-</para><para>
-In both cases you will manually have to make sure that some other required packages are installed. The debian package does not yet
-contain these requirements. &kajongg; needs: (corresponding debian packages in parentheses)
+For Linux: Your distribution should have it packaged for you.
 </para>
+<para>
+For Windows: Please see <ulink url="https://www.linux-apps.com/p/1109453/"></ulink> for a Windows installer.
+</para>
+<para>
+If you want to download the source and install manually:
 <itemizedlist>
-	<listitem><para>Python 3.5 or higher (python)</para></listitem>
-	<listitem><para>Qt5.7 or higher</para></listitem>
-	<listitem><para>the python bindings for Qt5  (python3-pyqt5)</para></listitem>
-    <listitem><para>the python twisted library 16.6.0 or  higher (python3-twisted)</para></listitem>
-    <listitem><para>sqlite3 (libsqlite3-0)</para></listitem>
+<listitem><para> <literal>git clone git://anongit.kde.org/kajongg</literal> </para></listitem>
+<listitem><para> For Linux: <literal>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal> </para></listitem>
+<listitem><para> For Windows: Please read README.windows </para></listitem>
 </itemizedlist>
+</para>
+<para>
+Kajongg depends on those packages: (debian package names in parentheses)
+<itemizedlist>
+	<listitem><para>Python 3.5 or higher (python3)</para></listitem>
+	<listitem><para>Qt5.7 or higher (python3-pyqt5 and python3-pyqt5.qtsvg)</para></listitem>
+	<listitem><para>the python bindings for Qt5  (python3-pyqt5)</para></listitem>
+        <listitem><para>the python twisted library 16.6.0 or higher (python3-twisted)</para></listitem>
+        <listitem><para>sqlite3 (libsqlite3-0)</para></listitem>
+</itemizedlist>
+</para>
 
 </appendix>
 
