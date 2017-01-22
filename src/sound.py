@@ -192,6 +192,7 @@ class Voice(StrMixin):
     only sense to cache the voice in a tarfile at source."""
 
     __availableVoices = None
+    md5sumLength = 32 # magical constant
 
     def __init__(self, directory, content=None):
         """give this name a voice"""
@@ -211,7 +212,7 @@ class Voice(StrMixin):
         have no language code and return 'local'.
         remote voices received from other clients return 'remote',
         they always get predecence."""
-        if len(self.directory) == 32:
+        if len(self.directory) == self.md5sumLength:
             if os.path.split(self.directory)[1] == self.md5sum:
                 return 'remote'
         if 'HOME' in os.environ:
@@ -403,7 +404,7 @@ class Voice(StrMixin):
         if os.path.exists(self.md5FileName()):
             try:
                 line = open(self.md5FileName(), 'r').readlines()[0].replace(' -', '').strip()
-                if len(line) == 32:
+                if len(line) == self.md5sumLength:
                     return line
                 else:
                     logWarning('{} has wrong content: {}'.format(self.md5FileName(), line))
