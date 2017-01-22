@@ -2,9 +2,6 @@
 <!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
 <!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
   <!ENTITY kajongg  "<application>Kajongg</application>">
-  <!ENTITY kappname "&kajongg;">
-  <!ENTITY kappversion "17.04"><!--Application version. Use this variable everywhere it is needed.-->
-  <!ENTITY package "kdegames">  <!-- do not change this! -->
   <!ENTITY % English "INCLUDE" > <!-- change language only here -->
   <!ENTITY % addindex "IGNORE"> <!-- do not change this! -->
   <!ENTITY s1 "s1">
@@ -49,12 +46,12 @@
 </authorgroup>
 <legalnotice>&FDLNotice;</legalnotice>
 
-<date>2014-02-20</date><!-- Date of (re)writing, or update.-->
-<releaseinfo>&kappversion; (&kde; 17.04)</releaseinfo><!-- Application version number. Use the variable definitions within header to change this value.-->
+<date>2017-01-20</date><!-- Date of (re)writing, or update.-->
+<releaseinfo>Applications 17.04</releaseinfo>
 
 <!--Short description of this document. Do not change unless necessary!-->
 <abstract>
-	<para>This documentation describes the game of &kajongg; version &kappversion;</para>
+	<para>This documentation describes the game of &kajongg;</para>
 </abstract>
 
 <!--List of relevant keywords-->
@@ -423,6 +420,28 @@
 				</menuchoice></term>
 				<listitem><para><action>Quits</action> &kajongg;.</para></listitem>
 			</varlistentry>
+			<varlistentry id="view-chat">
+				<term><menuchoice>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>H</keycap></keycombo></shortcut>
+					<guimenu>View</guimenu>
+					<guimenuitem>Chat</guimenuitem>
+				</menuchoice></term>
+				<listitem><para><action>Chat</action></para>
+				<screenshot>
+					<screeninfo>Chat Window</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase>Chat Window</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para>
+				Lets you chat with the other players.
+				</para></listitem>
+			</varlistentry>
                         <varlistentry id="view-scoretable">
                                 <term><menuchoice>
 					<shortcut><keycombo action="simul">&Ctrl;<keycap>T</keycap></keycombo></shortcut>
@@ -472,27 +491,13 @@
 				Explains how the score for the current hand was computed.
 				</para></listitem>
 			</varlistentry>
-			<varlistentry id="view-chat">
+			<varlistentry>
 				<term><menuchoice>
-					<shortcut><keycombo action="simul">&Ctrl;<keycap>H</keycap></keycombo></shortcut>
+					<shortcut><keycombo action="simul">&Ctrl;<keycap>F</keycap></keycombo></shortcut>
 					<guimenu>View</guimenu>
-					<guimenuitem>Chat</guimenuitem>
+					<guimenuitem>Full Screen Mode</guimenuitem>
 				</menuchoice></term>
-				<listitem><para><action>Chat</action></para>
-				<screenshot>
-					<screeninfo>Chat Window</screeninfo>
-					<mediaobject>
-						<imageobject>
-						<imagedata fileref="chat.png" format="PNG"/>
-						</imageobject>
-						<textobject>
-						<phrase>Chat Window</phrase>
-						</textobject>
-					</mediaobject>
-				</screenshot>
-				<para>
-				Lets you chat with the other players.
-				</para></listitem>
+				<listitem><para><action>Switches between full screen mode and normal mode.</action></para></listitem>
 			</varlistentry>
 
 			<varlistentry>
@@ -530,14 +535,6 @@
 					<guimenuitem>Demo Mode</guimenuitem>
 				</menuchoice></term>
 				<listitem><para><action>Enables or disables the Demo Mode. See <link linkend="play">here</link> for details.</action></para></listitem>
-			</varlistentry>
-			<varlistentry>
-				<term><menuchoice>
-					<shortcut><keycombo action="simul">&Ctrl;<keycap>F</keycap></keycombo></shortcut>
-					<guimenu>Settings</guimenu>
-					<guimenuitem>Full Screen Mode</guimenuitem>
-				</menuchoice></term>
-				<listitem><para><action>Switches between full screen mode and normal mode.</action></para></listitem>
 			</varlistentry>
 		</variablelist>
 
