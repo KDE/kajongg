@@ -11,6 +11,7 @@ ${EXTRACTRC:-extractrc} src/*.ui src/*.rc >> rc.cpp
 ${XGETTEXT:-xgettext} \
 		-ci18n --from-code=UTF-8 --language=Python -k \
 		-ki18n:1 -ki18nc:1c,2 -ki18np:1,2 \
+                -ki18nE:1 -ki18ncE:1c,2 \
 		-ki18ncp:1c,2,3 -ktr2i18n:1 \
 		-kI18N_NOOP:1 -kI18N_NOOP2:1c,2 \
 		-kaliasLocale \
