@@ -401,7 +401,14 @@ class Voice(StrMixin):
     def savedmd5Sum(self):
         """returns the current value of the md5sum file"""
         if os.path.exists(self.md5FileName()):
-            return open(self.md5FileName(), 'r').readlines()[0].replace(' -', '').strip()
+            try:
+                line = open(self.md5FileName(), 'r').readlines()[0].replace(' -', '').strip()
+                if len(line) == 32:
+                    return line
+                else:
+                    logWarning('{} has wrong content: {}'.format(self.md5FileName(), line))
+            except BaseException as exc:
+                logWarning('{} has wrong content: {}'.format(self.md5FileName(), exc))
 
     @property
     def md5sum(self):
