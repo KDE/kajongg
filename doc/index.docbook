@@ -493,7 +493,7 @@
 			</varlistentry>
 			<varlistentry>
 				<term><menuchoice>
-					<shortcut><keycombo action="simul">&Ctrl;<keycap>F</keycap></keycombo></shortcut>
+					<shortcut><keycombo action="simul">&Ctrl;&Shift;<keycap>F</keycap></keycombo></shortcut>
 					<guimenu>View</guimenu>
 					<guimenuitem>Full Screen Mode</guimenuitem>
 				</menuchoice></term>
