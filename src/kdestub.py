@@ -578,8 +578,8 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.menus = {}
         for menu in (
                 (i18n('&Game'), ('scoreGame', 'play', 'abort', 'quit')),
-                (i18n('&View'), ('scoreTable', 'explain')),
-                (i18n('&Settings'), ('players', 'rulesets', 'demoMode', '', 'options_show_statusbar',
+                (i18n('&View'), ('scoreTable', 'explain', 'chat')),
+                (i18n('&Settings'), ('players', 'rulesets', 'angle', 'demoMode', '', 'options_show_statusbar',
                                      'options_show_toolbar', '', 'options_configure_toolbars', 'options_configure')),
                 (i18n('&Help'), ('help', 'language', 'aboutkajongg'))):
             self.menus[menu[0]] = (QMenu(menu[0]), menu[1])
