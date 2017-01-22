@@ -362,7 +362,7 @@ class Voice(StrMixin):
                         'md5sum %s changed, rewriting %s with %s' %
                         (existingMd5sum, md5Name, self.__md5sum))
             try:
-                open(md5Name, 'wb').write('%s\n' % self.__md5sum)
+                open(md5Name, 'w').write('%s\n' % self.__md5sum)
             except BaseException as exception:
                 logException(
                     '\n'.join([i18n('cannot write <filename>%1</filename>: %2',
