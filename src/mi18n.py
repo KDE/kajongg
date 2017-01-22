@@ -42,6 +42,11 @@ from util import uniqueList
 import gettext
 
 
+try:
+    from kdepaths import LOCALEPATH
+except ImportError:
+    LOCALEPATH = None
+
 __all__ = ['i18n', 'i18nc', 'qi18nc', 'i18nE', 'i18ncE', 'KDETranslator', 'MLocale']
 
 
@@ -195,7 +200,10 @@ class MLocale:
     @staticmethod
     def localeDirectories():
         """hard coded paths to i18n directories, all are searched"""
-        return (x for x in ('share/locale', '/usr/local/share/locale', '/usr/share/locale') if os.path.exists(x))
+        result = list(x for x in ('share/locale', '/usr/local/share/locale', '/usr/share/locale') if os.path.exists(x))
+        if LOCALEPATH and os.path.exists(LOCALEPATH):
+            result.insert(0, LOCALEPATH)
+        return result
 
 
     @staticmethod

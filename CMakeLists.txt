@@ -113,7 +113,11 @@ find_package(KF5KMahjongglib REQUIRED)
 # I expanded those macros, reducing to what we actually need. No Windows support here yet.
 # Those macros come from ./cmake-modules/KDEPython.cmake
 
+
+configure_file(src/kdepaths.py.in src/kdepaths.py)
+
 KDE_INSTALL_PYTHON_FILES(${SRCFILES} src/kajongg.py src/kajonggserver.py)
+KDE_INSTALL_PYTHON_FILES(${CMAKE_CURRENT_BINARY_DIR}/src/kdepaths.py)
 KDE_ADD_PYTHON_EXECUTABLE(kajongg.py kajongg)
 KDE_ADD_PYTHON_EXECUTABLE(kajonggserver.py kajonggserver)
 
