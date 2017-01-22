@@ -423,16 +423,6 @@
 				</menuchoice></term>
 				<listitem><para><action>Quits</action> &kajongg;.</para></listitem>
 			</varlistentry>
-
-			<varlistentry id="view-scoring">
-                                <term><menuchoice>
-					<shortcut><keycombo action="simul">&Ctrl;<keycap>S</keycap></keycombo></shortcut>
-                                        <guimenu>View</guimenu>
-                                        <guimenuitem>Show Scoring Editor</guimenuitem>
-                                </menuchoice></term>
-                                <listitem><para><action>Scoring Dialog</action>:  Show or hide the scoring dialog. This dialog is explained <link linkend="enterhand">here</link>.
-                        </para></listitem>
-                        </varlistentry>
                         <varlistentry id="view-scoretable">
                                 <term><menuchoice>
 					<shortcut><keycombo action="simul">&Ctrl;<keycap>T</keycap></keycombo></shortcut>
