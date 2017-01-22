@@ -79,8 +79,7 @@ except ImportError as importError:
 
 try:
     from mi18n import i18n, i18nc
-    from kde import KIcon, KToggleFullScreenAction, \
-        KXmlGuiWindow, KStandardAction
+    from kde import KIcon, KXmlGuiWindow, KStandardAction
 
     from board import FittingView
     from playerlist import PlayerList
@@ -253,7 +252,8 @@ class MainWindow(KXmlGuiWindow):
             shortcut=shortcut,
             actionData=actionData)
         res.setCheckable(True)
-        res.toggled.connect(self._toggleWidget)
+        if actionData is not None:
+            res.toggled.connect(self._toggleWidget)
         return res
 
     def setupUi(self):
@@ -312,13 +312,6 @@ class MainWindow(KXmlGuiWindow):
             self.changeAngle,
             Qt.Key_G)
         self.actionAngle.setEnabled(False)
-        self.actionFullscreen = KToggleFullScreenAction(
-            self.actionCollection())
-        self.actionFullscreen.setShortcut(Qt.CTRL + Qt.Key_F)
-        self.actionFullscreen.setShortcutContext(Qt.ApplicationShortcut)
-        self.actionFullscreen.setWindow(self)
-        self.actionCollection().addAction("fullscreen", self.actionFullscreen)
-        self.actionFullscreen.toggled.connect(self.fullScreen)
         self.actionScoreTable = self._kajonggToggleAction(
             "scoreTable", "format-list-ordered",
             Qt.Key_T, actionData=ScoreTable)
@@ -327,6 +320,9 @@ class MainWindow(KXmlGuiWindow):
             "explain", "applications-education",
             Qt.Key_E, actionData=ExplainView)
         self.actionExplain.setEnabled(False)
+        self.actionFullscreen = self._kajonggToggleAction(
+            "fullscreen", "view-fullscreen", shortcut=Qt.Key_F + Qt.ShiftModifier)
+        self.actionFullscreen.toggled.connect(self.fullScreen)
         self.actionAutoPlay = self.kajonggAction(
             "demoMode",
             "arrow-right-double",
@@ -361,7 +357,10 @@ class MainWindow(KXmlGuiWindow):
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""
-        self.actionFullscreen.setFullScreen(self, toggle)
+        if toggle:
+            self.setWindowState(self.windowState() | Qt.WindowFullScreen)
+        else:
+            self.setWindowState(self.windowState() & ~Qt.WindowFullScreen)
 
     def close(self, dummyResult=None):
         """wrap close() because we call it with a QTimer"""
@@ -558,6 +557,10 @@ class MainWindow(KXmlGuiWindow):
         self.actionAngle.setWhatsThis(
             i18nc('kajongg @info:tooltip',
                   "Change the visual appearance of the tiles."))
+
+        self.actionFullscreen.setText(
+            i18nc('@action:inmenu',
+                  "F&ull Screen Mode"))
 
         self.actionScoreTable.setText(
             i18nc('kajongg @action:inmenu', "&Score Table"))

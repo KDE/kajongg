@@ -59,7 +59,7 @@ __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
            'KCmdLineOptions',
            'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
            'KConfigDialog', 'KDialog',
-           'KUser', 'KToggleFullScreenAction', 'KStandardAction',
+           'KUser', 'KStandardAction',
            'KXmlGuiWindow', 'KGlobal', 'KIcon']
 
 
@@ -444,17 +444,6 @@ class KUser:
         return getpass.getuser()
 
 
-class KToggleFullScreenAction(QAction):
-
-    """stub"""
-
-    def __init__(self, *dummyArgs):
-        QAction.__init__(self, Internal.mainWindow)
-
-    def setWindow(self, window):
-        """stub"""
-
-
 class KStandardAction:
 
     """stub"""
@@ -582,7 +571,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         # creates the menu entries. This only defines which action goes into which main menu.
         for menu, menuItems in (
                 (i18n('&Game'), ('scoreGame', 'play', 'abort', 'quit')),
-                (i18n('&View'), ('scoreTable', 'explain', 'chat')),
+                (i18n('&View'), ('scoreTable', 'explain', 'chat', 'fullscreen')),
                 (i18n('&Settings'), ('players', 'rulesets', 'angle', 'demoMode', '', 'options_show_statusbar',
                                      'options_show_toolbar', '', 'options_configure_toolbars', 'options_configure')),
                 (i18n('&Help'), ('help', 'language', 'aboutkajongg'))):
@@ -609,6 +598,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.toolBar().setVisible(Internal.Preferences.toolBarVisible)
         self.actionStatusBar.setChecked(self.statusBar().isVisible())
         self.actionToolBar.setChecked(self.toolBar().isVisible())
+        self.actionFullscreen.setChecked(self.windowState() & Qt.WindowFullScreen)
         QMainWindow.showEvent(self, event)
 
     def hideEvent(self, event):
