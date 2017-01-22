@@ -576,14 +576,18 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.setStatusBar(KStatusBar(self))
         self.statusBar().setObjectName('StatusBar')
         self.menus = {}
-        for menu in (
+        # the menuItems are added to the main  menu by KActionCollection.addAction
+        # their order is not defined by this here but by the order in which MainWindow
+        # creates the menu entries. This only defines which action goes into which main menu.
+        for menu, menuItems in (
                 (i18n('&Game'), ('scoreGame', 'play', 'abort', 'quit')),
                 (i18n('&View'), ('scoreTable', 'explain', 'chat')),
                 (i18n('&Settings'), ('players', 'rulesets', 'angle', 'demoMode', '', 'options_show_statusbar',
                                      'options_show_toolbar', '', 'options_configure_toolbars', 'options_configure')),
                 (i18n('&Help'), ('help', 'language', 'aboutkajongg'))):
-            self.menus[menu[0]] = (QMenu(menu[0]), menu[1])
-            self.menuBar().addMenu(self.menus[menu[0]][0])
+            mainMenu = QMenu(menu)
+            self.menus[menu] = (mainMenu, menuItems)
+            self.menuBar().addMenu(mainMenu)
         self.setCaption('')
         self.actionHelp = self.kajonggAction("help", "help-contents", Help.start)
         self.actionHelp.setText(i18nc('@action:inmenu', '&Help'))
