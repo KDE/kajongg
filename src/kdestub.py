@@ -512,6 +512,7 @@ class KActionCollection:
         for content in self.mainWindow.menus.values():
             if name in content[1]:
                 content[0].addAction(action)
+                break
 
     def actions(self):
         """the actions in this collection"""
