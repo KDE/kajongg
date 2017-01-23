@@ -208,6 +208,7 @@ class KApplication(QApplication):
         if os.path.exists(qmName):
             translator = KDETranslator(self)
             translator.load(qmName)
+            self.installTranslator(translator)
 
     def initQtTranslator(self):
         """load translators using Qt .qm files"""

@@ -163,7 +163,7 @@ class KDETranslator(QTranslator):
             # for kwidgetsaddons5_qt locale de, KStandardGuiItem '&OK' returns an empty string.
             # but this works for other languages like uk, catalan, ptbr and zh_TW.
             # What is different with German? The .po source seems OK, just like the others.
-            result = text
+            result = i18n(text)
         return result
 
 
