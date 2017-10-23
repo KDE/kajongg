@@ -104,6 +104,7 @@ class Debug:
     graphics = False
     scoring = False
     wallSize = '0'
+    i18n = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')

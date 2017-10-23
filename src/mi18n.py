@@ -188,12 +188,19 @@ class MLocale:
         for language in languages:
             for context in ('kajongg', 'libkmahjongg5', 'kxmlgui5', 'kconfigwidgets5', 'libc'):
                 directories = cls.localeDirectories()
+                if Debug.i18n:
+                    Internal.logger.debug('Searching translations in {}'.format(' '.join(directories)))
                 for resourceDir in directories:
                     try:
                         cls.translation.add_fallback(gettext.translation(
                             context, resourceDir, languages=[language]))
+                        if Debug.i18n:
+                            Internal.logger.debug('Found {} translation for {} in {}'.format(
+                                language, context, resourceDir))
                         break
-                    except IOError:
+                    except IOError as e:
+                        if Debug.i18n:
+                            Internal.logger.debug(str(e))
                         pass
         cls.translation.install()
 
@@ -201,6 +208,9 @@ class MLocale:
     def localeDirectories():
         """hard coded paths to i18n directories, all are searched"""
         result = list(x for x in ('share/locale', '/usr/local/share/locale', '/usr/share/locale') if os.path.exists(x))
+        if not result and Debug.i18n:
+            Internal.logger.debug('no locale path found. We have:{}'.format(os.listdir('.')))
+
         if LOCALEPATH and os.path.exists(LOCALEPATH):
             result.insert(0, LOCALEPATH)
         return result
@@ -229,8 +239,12 @@ class MLocale:
                     localenames.extend(localename.split(':'))
                 else:
                     localenames.append(localename)
+        if Debug.i18n:
+            Internal.logger.debug('localenames: {}'.format(','.join(localenames)))
         languages = list(_parse_localename(x)[0]
                          for x in localenames if len(x))
+        if Debug.i18n:
+            Internal.logger.debug('languages: {}'.format(','.join(languages)))
         for resourceDir in cls.localeDirectories():
             for sysLanguage in sorted(os.listdir(resourceDir)):
                 if cls.__isLanguageInstalledForKajongg(sysLanguage):
@@ -241,6 +255,8 @@ class MLocale:
                 x for x in languages if cls.isLanguageInstalled(x))
         if 'en_US' not in languages:
             languages.extend(['en_US', 'en'])
+        if Debug.i18n:
+            Internal.logger.debug('languages available: {}'.format(':'.join(languages)))
         return ':'.join(languages)
 
     @classmethod
@@ -264,8 +280,13 @@ class MLocale:
     def __isLanguageInstalledForKajongg(cls, lang):
         """see kdelibs, KCatalog::catalogLocaleDir"""
         for directory in cls.localeDirectories():
-            if os.path.exists(os.path.join(directory, lang, 'LC_MESSAGES', 'kajongg.mo')):
+            _ = os.path.join(directory, lang, 'LC_MESSAGES', 'kajongg.mo')
+            if os.path.exists(_):
+                if Debug.i18n:
+                    Internal.logger.debug('language {} installed in {}'.format(lang, _))
                 return True
+        if Debug.i18n:
+            Internal.logger.debug('I am in {}. language {} not installed in {}'.format(os.getcwd(), lang, ','.join(cls.localeDirectories())))
         return False
 
 MLocale.initStatic()
