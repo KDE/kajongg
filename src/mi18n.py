@@ -26,6 +26,7 @@ python interface to KDE.
 
 
 import os
+import sys
 from locale import _parse_localename, getdefaultlocale, setlocale, LC_ALL
 
 
@@ -207,7 +208,10 @@ class MLocale:
     @staticmethod
     def localeDirectories():
         """hard coded paths to i18n directories, all are searched"""
-        result = list(x for x in ('share/locale', '/usr/local/share/locale', '/usr/share/locale') if os.path.exists(x))
+        candidates = (
+            'share/locale', '/usr/local/share/locale', '/usr/share/locale',
+            os.path.join(os.path.dirname(sys.argv[0]), 'share/locale'))
+        result = list(x for x in candidates if os.path.exists(x))
         if not result and Debug.i18n:
             Internal.logger.debug('no locale path found. We have:{}'.format(os.listdir('.')))
 
