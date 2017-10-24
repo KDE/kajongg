@@ -335,7 +335,7 @@ class __Internal:
 
     def __init__(self):
         """init the loggers"""
-        logName = os.path.basename(sys.argv[0]).replace('.py', '') + '.log'
+        logName = os.path.basename(sys.argv[0]).replace('.py', '').replace('.exe', '')  + '.log'
         self.logger = logging.getLogger(logName)
         if os.name == 'nt':
             haveDevLog = False
