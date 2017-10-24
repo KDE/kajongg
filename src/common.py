@@ -348,7 +348,7 @@ class __Internal:
         if not haveDevLog:
             # pylint: disable=redefined-variable-type
             handler = logging.handlers.RotatingFileHandler(
-                'kajongg.log', maxBytes=100000000, backupCount=10)
+                logName, maxBytes=100000000, backupCount=10)
         self.logger.addHandler(handler)
         self.logger.addHandler(logging.StreamHandler(sys.stderr))
         self.logger.setLevel(logging.DEBUG)
