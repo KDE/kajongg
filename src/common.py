@@ -335,6 +335,8 @@ class __Internal:
 
     def __init__(self):
         """init the loggers"""
+        global Internal
+        Internal = self
         logName = os.path.basename(sys.argv[0]).replace('.py', '').replace('.exe', '')  + '.log'
         self.logger = logging.getLogger(logName)
         if os.name == 'nt':
@@ -347,6 +349,7 @@ class __Internal:
                 haveDevLog = False
         if not haveDevLog:
             # pylint: disable=redefined-variable-type
+            logName = os.path.join(appdataDir(), logName)
             handler = logging.handlers.RotatingFileHandler(
                 logName, maxBytes=100000000, backupCount=10)
         self.logger.addHandler(handler)
@@ -355,7 +358,7 @@ class __Internal:
         formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
         handler.setFormatter(formatter)
 
-Internal = __Internal()
+__Internal()
 
 
 class IntDict(defaultdict, StrMixin):
