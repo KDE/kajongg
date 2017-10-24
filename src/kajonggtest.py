@@ -34,11 +34,9 @@ import gc
 
 from optparse import OptionParser
 
-from common import Debug, StrMixin
+from common import Debug, StrMixin, cacheDir
 from util import removeIfExists, gitHead, checkMemory
 from util import Csv, CsvWriter, popenReadlines
-
-from kde import cacheDir
 
 # fields in row:
 RULESETFIELD = 0

@@ -32,10 +32,9 @@ from collections import defaultdict
 import sqlite3
 
 from mi18n import i18n, i18ncE
-from kde import appdataDir
 from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug, id4
-from common import IntDict, Options, Internal, Debug
+from common import IntDict, Options, Internal, Debug, appdataDir
 
 class QueryException(Exception):
 

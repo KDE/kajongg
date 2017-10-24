@@ -24,10 +24,12 @@ from collections import defaultdict
 import datetime
 import sys
 import os
+import shutil
 import logging
 import logging.handlers
 import socket
 
+from qt import QStandardPaths
 try:
     from sip import unwrapinstance
 except ImportError:
@@ -60,6 +62,69 @@ def isAlive(qobj):
         return False
     else:
         return True
+
+
+def appdataDir():
+    """
+    The per user directory with kajongg application information like the database.
+
+    @return: The directory path.
+    @rtype: C{str}.
+    """
+    serverDir = os.path.expanduser('~/.kajonggserver/')
+    if Internal.isServer:
+        # the server might or might not have KDE installed, so to be on
+        # the safe side we use our own .kajonggserver directory
+        # the following code moves an existing kajonggserver.db to .kajonggserver
+        # but only if .kajonggserver does not yet exist
+        kdehome = os.environ.get('KDEHOME', '~/.kde')
+        oldPath = os.path.expanduser(
+            kdehome +
+            '/share/apps/kajongg/kajonggserver.db')
+        if not os.path.exists(oldPath):
+            oldPath = os.path.expanduser(
+                '~/.kde' +'4/share/apps/kajongg/kajonggserver.db')
+        if os.path.exists(oldPath) and not os.path.exists(serverDir):
+            # upgrading an old kajonggserver installation
+            os.makedirs(serverDir)
+            shutil.move(oldPath, serverDir)
+        if not os.path.exists(serverDir):
+            try:
+                os.makedirs(serverDir)
+            except OSError:
+                pass
+        return serverDir
+    else:
+        if not os.path.exists(serverDir):
+            # the client wants to place the socket in serverDir
+            os.makedirs(serverDir)
+        result = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+        # this may end with kajongg.py or .pyw or whatever, so fix that:
+        result = os.path.join(os.path.dirname(result), 'kajongg')
+        if not os.path.exists(result):
+            os.makedirs(result)
+        return result
+
+
+def cacheDir():
+    """the cache directory for this user"""
+    result = os.path.join(appdataDir(), '.cache')
+    if not os.path.exists(result):
+        os.makedirs(result)
+    return result
+
+
+def socketName():
+    """client and server process use this socket to talk to each other"""
+    serverDir = os.path.expanduser('~/.kajonggserver')
+    if not os.path.exists(serverDir):
+        appdataDir()
+                   # allocate the directory and possibly move old databases
+                   # there
+    if Options.socket:
+        return Options.socket
+    else:
+        return os.path.normpath('{}/socket{}'.format(serverDir, Internal.defaultPort))
 
 
 class Debug:

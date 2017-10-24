@@ -36,7 +36,7 @@ from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
     QLabel, QComboBox, QLineEdit, QFormLayout, \
     QSizePolicy, QWidget
 
-from kde import KUser, KDialog, KDialogButtonBox, appdataDir, socketName
+from kde import KUser, KDialog, KDialogButtonBox
 from mi18n import i18n, i18nc, english
 from dialogs import DeferredDialog, QuestionYesNo
 
@@ -45,6 +45,7 @@ from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Debug, isAlive
 from common import interpreterName
 from common import StrMixin
+from common import appdataDir, socketName
 from game import Players
 from query import Query
 from statesaver import StateSaver

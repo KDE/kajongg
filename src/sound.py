@@ -27,13 +27,11 @@ from hashlib import md5
 if os.name == 'nt':
     import winsound  # pylint: disable=import-error
 
-from common import Debug, Internal, StrMixin
+from common import Debug, Internal, StrMixin, cacheDir
 from util import which, removeIfExists, uniqueList, elapsedSince
 from log import logWarning, i18n, logDebug, logException
 
 from qt import QStandardPaths
-
-from kde import cacheDir
 
 from tile import Tile
 
