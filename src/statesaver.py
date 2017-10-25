@@ -52,6 +52,7 @@ class StateSaver(QObject):
     @staticmethod
     def __restore(widget, name):
         """decode the saved string"""
+        # pylint: disable=unsubscriptable-object
         state = QByteArray.fromHex(Internal.Preferences[name].encode())
         if state:
             if name.endswith('State'):
@@ -115,6 +116,7 @@ class StateSaver(QObject):
         """writes the state into Preferences, but does not save"""
         for name, widget in self.widgets:
             if isAlive(widget):
+                # pylint: disable=unsupported-assignment-operation
                 if hasattr(widget, 'saveState'):
                     Internal.Preferences[name + 'State'] = self.stateStr(widget.saveState())
                 if hasattr(widget, 'saveGeometry'):

@@ -175,7 +175,7 @@ class RuleModel(TreeModel):
 
     def data(self, index, role):  # pylint: disable=no-self-use
         """get data fom model"""
-        # pylint: disable=too-many-branches,redefined-variable-type
+        # pylint: disable=too-many-branches
         # too many branches
         result = None
         if index.isValid():
@@ -393,7 +393,7 @@ class RuleTreeView(QTreeView):
             if self.btnRemove and self.btnCopy:
                 self.ruleModel = EditableRuleModel(rulesets, self.name)
             else:
-                self.ruleModel = RuleModel(rulesets, self.name) # pylint: disable=redefined-variable-type
+                self.ruleModel = RuleModel(rulesets, self.name)
             self.setItemDelegateForColumn(
                 1,
                 RightAlignedCheckboxDelegate(

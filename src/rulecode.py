@@ -1333,7 +1333,7 @@ class BlessingOfEarth(RuleCode):
 class LongHand(RuleCode):
 
     def appliesToHand(hand):
-        return (not hand.won and hand.lenOffset > 0) or hand.lenOffset > 1
+        return hand.lenOffset > 0 if not hand.won else hand.lenOffset > 1
 
 
 class FalseDiscardForMJ(RuleCode):

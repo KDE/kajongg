@@ -40,7 +40,7 @@ try:
 except AttributeError:
     STDOUTENCODING = None
 if not STDOUTENCODING:
-    STDOUTENCODING = getpreferredencoding() # pylint: disable=redefined-variable-type
+    STDOUTENCODING = getpreferredencoding()
 
 
 def stack(msg, limit=6):

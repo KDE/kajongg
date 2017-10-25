@@ -217,7 +217,7 @@ class RuleList(list):
                 rule.key(), self[rule.key()].definition, rule.name, rule.definition))
         self[rule.key()] = rule
 
-    def createRule(self, name: str, definition: str='', **kwargs):
+    def createRule(self, name: str, definition: str = '', **kwargs):
         """shortcut for simpler definition of predefined rulesets"""
         defParts = definition.split('||')
         rule = None

@@ -146,5 +146,3 @@ class User(pb.Avatar, StrMixin):
 
     def __str__(self):
         return self.name
-
-

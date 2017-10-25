@@ -869,8 +869,8 @@ class PlayingGame(Game):
                 self.prevActivePlayer.hidePopup()
             self.__activePlayer = player
             if Internal.scene:  # mark the name of the active player in blue
-                for player in self.players:
-                    player.colorizeName()
+                for _ in self.players:
+                    _.colorizeName()
 
     def prepareHand(self):
         """prepares the next hand"""

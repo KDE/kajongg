@@ -836,19 +836,20 @@ def __scanSelf():
     generate a class variable Message.msg where msg is the name (without spaces)
     of the message. Example: 'Message.NoClaim'.
     Those will be used as stateless constants. Also add them to dict Message.defined, but with spaces."""
-    if not Message.defined:
-        for glob in globals().values():
-            if hasattr(glob, "__mro__"):
-                if glob.__mro__[-2] == Message and len(glob.__mro__) > 2:
-                    if glob.__name__.startswith('Message'):
-                        try:
-                            msg = glob()
-                        except Exception:
-                            logDebug('cannot instantiate %s' % glob.__name__)
-                            raise
-                        type.__setattr__(
-                            Message, msg.name.replace(' ', ''), msg)
-                        Message.defined[msg.name] = msg
+    if Message.defined:
+        return
+    for glob in globals().values():
+        if hasattr(glob, "__mro__"):
+            if glob.__mro__[-2] == Message and len(glob.__mro__) > 2:
+                if glob.__name__.startswith('Message'):
+                    try:
+                        msg = glob()
+                    except Exception:
+                        logDebug('cannot instantiate %s' % glob.__name__)
+                        raise
+                    type.__setattr__(
+                        Message, msg.name.replace(' ', ''), msg)
+                    Message.defined[msg.name] = msg
 
 
 class ChatMessage(StrMixin):

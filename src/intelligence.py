@@ -161,6 +161,7 @@ class AIDefault:
     @staticmethod
     def weighSpecialGames(unusedAiInstance, candidates):
         """like color game, many dragons, many winds"""
+        # pylint: disable=too-many-nested-blocks
         for candidate in candidates:
             tile = candidate.tile
             groupCount = candidates.groupCounts[tile.group]

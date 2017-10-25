@@ -42,6 +42,8 @@ except ImportError:
 
 # pylint: disable=invalid-name
 
+Internal = None
+
 if os.name == 'nt':
     # This is only needed for manual execution, and
     # we expect python to be the python3 interpreter.
@@ -216,7 +218,7 @@ Options {stropt} take a string argument like {example}.
             if len(parts) == 1:
                 value = True
             else:
-                value = ':'.join(parts[1:]) # pylint: disable=redefined-variable-type
+                value = ':'.join(parts[1:])
             if option not in Debug.__dict__:
                 return '--debug: unknown option %s' % option
             if not isinstance(Debug.__dict__[option], type(value)):
@@ -336,7 +338,7 @@ class __Internal:
 
     def __init__(self):
         """init the loggers"""
-        global Internal
+        global Internal # pylint: disable=global-statement
         Internal = self
         logName = os.path.basename(sys.argv[0]).replace('.py', '').replace('.exe', '')  + '.log'
         self.logger = logging.getLogger(logName)
@@ -349,7 +351,6 @@ class __Internal:
             except (AttributeError, socket.error):
                 haveDevLog = False
         if not haveDevLog:
-            # pylint: disable=redefined-variable-type
             logName = os.path.join(appdataDir(), logName)
             print('Logging into {}'.format(logName))
             handler = logging.handlers.RotatingFileHandler(

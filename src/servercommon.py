@@ -42,5 +42,3 @@ def srvMessage(*args):
 def srvError(cls, *args):
     """raise an exception, passing args as a single string"""
     raise cls(srvMessage(*args))
-
-

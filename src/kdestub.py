@@ -1005,10 +1005,10 @@ class KSwitchLanguageDialog(KDialog):
 
     def restoreDefaults(self):
         """reset values to default"""
-        keys = list(x for x in self.languageRows.keys() if isinstance(x, KLanguageButton))
+        keys = list(x for x in self.languageRows if isinstance(x, KLanguageButton))
         for _ in keys:
             self.removeLanguage(_)
-        for removeButton in self.languageRows.keys():
+        for removeButton in self.languageRows:
             if isAlive(removeButton):
                 removeButton.deleteLater()
         self.languageRows = dict()

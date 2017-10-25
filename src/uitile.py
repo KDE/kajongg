@@ -273,9 +273,9 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         if sorter == Qt.Key_Down:
             return self.xoffset * 100 + self.yoffset
         elif sorter == Qt.Key_Up:
-            return -self.xoffset * 100 - self.yoffset
+            return -(self.xoffset * 100 + self.yoffset)
         elif sorter == Qt.Key_Left:
-            return -self.yoffset * 100 - self.xoffset
+            return -(self.yoffset * 100 + self.xoffset)
         return self.yoffset * 100 + self.xoffset
 
     def setBoard(self, board, xoffset=None, yoffset=None, level=0):

@@ -244,8 +244,8 @@ class ScoringHandBoard(HandBoard):
         if not newMeld:
             return False
         uiMeld = senderBoard.assignUITiles(uiTile, newMeld)
-        for uiTile, tile in zip(uiMeld, newMeld):
-            uiTile.tile = tile
+        for uitile, tile in zip(uiMeld, newMeld):
+            uitile.tile = tile
         self.dropMeld(uiMeld)
 
     def dropMeld(self, uiMeld):

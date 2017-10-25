@@ -98,7 +98,7 @@ class GamesModel(QAbstractTableModel):
         """for the two visible columns"""
         # pylint: disable=no-self-use
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return (i18n("Started"), i18n("Players"))[section - 1]
+            return i18n('Players') if section == 2 else i18n('Started')
 
 
 class Games(QDialog):
