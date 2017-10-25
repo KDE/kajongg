@@ -213,7 +213,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
                     self.removeAnimation(animation)
         QParallelAnimationGroup.updateCurrentTime(self, value)
 
-    def start(self, dummyResults='DIREKT'):
+    def start(self, unusedResults='DIREKT'):
         """start the animation, returning its deferred"""
         if not isAlive(self):
             return fail()
@@ -447,7 +447,7 @@ def afterQueuedAnimations(doAfter):
         method = types.MethodType(doAfter, args[0])
         args = args[1:]
         varnames = doAfter.__code__.co_varnames
-        assert varnames[1] in ('deferredResult', 'dummyDeferredResult'), \
+        assert varnames[1] in ('deferredResult', 'unusedDeferredResult'), \
             '{} passed {} instead of deferredResult'.format(
                 doAfter.__qualname__, varnames[1])
         animateAndDo(method, *args, **kwargs)

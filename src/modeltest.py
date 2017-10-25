@@ -313,7 +313,7 @@ class ModelTest(QObject):
         self.parent()
         self.data()
 
-    def rowsAboutToBeInserted(self, parent, start, dummyEnd):
+    def rowsAboutToBeInserted(self, parent, start, unusedEnd):
         """
         Store what is about to be inserted to make sure it actually happens
         """

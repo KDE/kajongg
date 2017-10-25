@@ -466,7 +466,7 @@ class ServerTable(Table, StrMixin):
                     voice, voiceFor.name))
         block.callback(self.assignVoices)
 
-    def assignVoices(self, dummyResults=None):
+    def assignVoices(self, unusedResults=None):
         """now all human players have all voice data needed"""
         humanPlayers = [
             x for x in self.game.players if isinstance(self.remotes[x], User)]
@@ -474,7 +474,7 @@ class ServerTable(Table, StrMixin):
         block.tell(None, humanPlayers, Message.AssignVoices)
         block.callback(self.startHand)
 
-    def pickTile(self, dummyResults=None, deadEnd=False):
+    def pickTile(self, unusedResults=None, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
         if not self.running:
             return
@@ -528,7 +528,7 @@ class ServerTable(Table, StrMixin):
         block.tellAll(player, Message.Discard, tile=tile)
         block.callback(self._clientDiscarded2, msg, dangerousText, mustPlayDangerous, violates)
 
-    def _clientDiscarded2(self, dummyResults, msg, dangerousText, mustPlayDangerous, violates):
+    def _clientDiscarded2(self, unusedResults, msg, dangerousText, mustPlayDangerous, violates):
         """client told us he discarded a tile. Continue, check for violating original call"""
         block = DeferredBlock(self)
         player = msg.player
@@ -540,7 +540,7 @@ class ServerTable(Table, StrMixin):
             block.tellAll(player, Message.ViolatesOriginalCall)
         block.callback(self._clientDiscarded3, msg, dangerousText, mustPlayDangerous)
 
-    def _clientDiscarded3(self, dummyResults, msg, dangerousText, mustPlayDangerous):
+    def _clientDiscarded3(self, unusedResults, msg, dangerousText, mustPlayDangerous):
         """client told us he discarded a tile. Continue, check for calling"""
         block = DeferredBlock(self)
         player = msg.player
@@ -550,7 +550,7 @@ class ServerTable(Table, StrMixin):
                 block.tellAll(player, Message.Calling)
         block.callback(self._clientDiscarded4, msg, dangerousText, mustPlayDangerous)
 
-    def _clientDiscarded4(self, dummyResults, msg, dangerousText, mustPlayDangerous):
+    def _clientDiscarded4(self, unusedResults, msg, dangerousText, mustPlayDangerous):
         """client told us he discarded a tile. Continue, check for dangerous game"""
         block = DeferredBlock(self)
         player = msg.player
@@ -581,7 +581,7 @@ class ServerTable(Table, StrMixin):
         else:
             block.callback(self._askForClaims, msg)
 
-    def clientMadeOriginalCall(self, dummyResults, msg):
+    def clientMadeOriginalCall(self, unusedResults, msg):
         """first tell everybody about original call
         and then treat the implicit discard"""
         msg.player.originalCall = True
@@ -591,7 +591,7 @@ class ServerTable(Table, StrMixin):
         block.tellAll(msg.player, Message.OriginalCall)
         block.callback(self._askForClaims, msg)
 
-    def startHand(self, dummyResults=None):
+    def startHand(self, unusedResults=None):
         """all players are ready to start a hand, so do it"""
         if self.running:
             self.game.prepareHand()
@@ -600,7 +600,7 @@ class ServerTable(Table, StrMixin):
                                  divideAt=self.game.divideAt)
             block.callback(self.divided)
 
-    def divided(self, dummyResults=None):
+    def divided(self, unusedResults=None):
         """the wall is now divided for all clients"""
         if not self.running:
             return
@@ -615,7 +615,7 @@ class ServerTable(Table, StrMixin):
                            tiles=TileList(chain(tiles, player.bonusTiles)))
         block.callback(self.dealt)
 
-    def endHand(self, dummyResults=None):
+    def endHand(self, unusedResults=None):
         """hand is over, show all concealed tiles to all players"""
         if not self.running:
             return
@@ -632,14 +632,14 @@ class ServerTable(Table, StrMixin):
                         tiles=TileList(player.concealedTiles))
             block.callback(self.saveHand)
 
-    def saveHand(self, dummyResults=None):
+    def saveHand(self, unusedResults=None):
         """save the hand to the database and proceed to next hand"""
         if not self.running:
             return
         self.tellAll(None, Message.SaveHand, self.nextHand)
         self.game.saveHand()
 
-    def nextHand(self, dummyResults):
+    def nextHand(self, unusedResults):
         """next hand: maybe rotate"""
         if not self.running:
             return
@@ -799,7 +799,7 @@ class ServerTable(Table, StrMixin):
             lastMeld=lastMeld, withDiscardTile=withDiscard)
         block.callback(self.endHand)
 
-    def dealt(self, dummyResults):
+    def dealt(self, unusedResults):
         """all tiles are dealt, ask east to discard a tile"""
         if self.running:
             self.tellAll(
@@ -848,7 +848,7 @@ class ServerTable(Table, StrMixin):
                 x for x in answers if x.player == nextPlayer or x.answer != Message.MahJongg]
         return answers
 
-    def _askForClaims(self, dummyRequests, dummyMsg):
+    def _askForClaims(self, unusedRequests, unusedMsg):
         """ask all players if they want to claim"""
         if self.running:
             self.tellOthers(

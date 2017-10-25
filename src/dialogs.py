@@ -215,6 +215,6 @@ class Sorry(DeferredDialog):
         DeferredDialog.__init__(self, dialog, modal=modal, always=always)
 
 
-def NoPrompt(dummyMsg):
+def NoPrompt(unusedMsg):
     """we just want to be able to add callbacks even if non-interactive"""
     return succeed(None)

@@ -33,7 +33,7 @@ from signal import signal, SIGABRT, SIGINT, SIGTERM
 from zope.interface import implementer
 
 
-def cleanExit(*dummyArgs):
+def cleanExit(*unusedArgs): # pylint: disable=unused-argument
     """we want to cleanly close sqlite3 files"""
     if Debug.quit:
         logDebug('cleanExit')
@@ -254,10 +254,10 @@ class MJServer:
                 gotRuleset).addCallback(
                     self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
 
-    def __newTable(self, dummy, user, ruleset,
+    def __newTable(self, unused, user, ruleset,
                    playOpen, autoPlay, wantedGame, tableId=None):
         """now we know the ruleset"""
-        def sent(dummy):
+        def sent(unused):
             """new table sent to user who created it"""
             return table.tableid
         table = ServerTable(
@@ -300,7 +300,7 @@ class MJServer:
             if Debug.table:
                 logDebug('Table %s: All seats taken, starting' % table)
 
-            def startTable(dummy):
+            def startTable(unused):
                 """now all players know about our join"""
                 table.readyForGameStart(table.owner)
             block.callback(startTable)

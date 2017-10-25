@@ -80,7 +80,7 @@ class TablesModel(QAbstractTableModel):
             return 0
         return len(self.tables)
 
-    def columnCount(self, dummyParent=None):  # pylint: disable=no-self-use
+    def columnCount(self, unusedParent=None):  # pylint: disable=no-self-use
         """for now we only have id (invisible), id (visible), players,
         status, ruleset.name.
         id(invisible) always holds the real id, also 1000 for suspended tables.
@@ -243,7 +243,7 @@ class TableList(QWidget):
         StateSaver(self, self.view.horizontalHeader())
         self.updateButtonsForTable(None)
 
-    def hideEvent(self, dummyEvent):  # pylint: disable=no-self-use
+    def hideEvent(self, unusedEvent):  # pylint: disable=no-self-use
         """table window hides"""
         scene = Internal.scene
         if scene:
@@ -357,7 +357,7 @@ class TableList(QWidget):
                 "For chatting with others on this table, "
                 "please first take a seat"))
 
-    def selectionChanged(self, selected, dummyDeselected):
+    def selectionChanged(self, selected, unusedDeselected):
         """update button states according to selection"""
         if selected.indexes():
             self.selectTable(selected.indexes()[0].row())

@@ -68,7 +68,7 @@ class PlayerList(QDialog):
         decorateWindow(self, i18n("Players"))
         self.setObjectName('Players')
 
-    def showEvent(self, dummyEvent):
+    def showEvent(self, unusedEvent):
         """adapt view to content"""
         StateSaver(self, self.table)
 

@@ -36,7 +36,7 @@ except ImportError:
     try:
         from sip import unwrapinstance
     except ImportError:
-        def unwrapinstance(dummy):
+        def unwrapinstance(unused):
             """if there is no sip, we have no Qt objects anyway"""
             pass
 

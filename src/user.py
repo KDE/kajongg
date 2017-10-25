@@ -69,7 +69,7 @@ class User(pb.Avatar, StrMixin):
         self.mind = mind
         self.server.login(self)
 
-    def detached(self, dummyMind):
+    def detached(self, unusedMind):
         """override pb.Avatar.detached"""
         if Debug.connections:
             logDebug(

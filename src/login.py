@@ -281,7 +281,7 @@ class LoginDlg(QDialog):
         self.serverChanged()
         StateSaver(self)
 
-    def returns(self, dummyButton=None):
+    def returns(self, unusedButton=None):
         """login data returned by this dialog"""
         return (Url(self.url), self.username, self.password, self.__defineRuleset())
 
@@ -316,7 +316,7 @@ class LoginDlg(QDialog):
         self.cbUser.setSizePolicy(pol)
         self.__port = None
 
-    def serverChanged(self, dummyText=None):
+    def serverChanged(self, unusedText=None):
         """the user selected a different server"""
         records = Query('select player.name from player, passwords '
                         'where passwords.url=? and passwords.player = player.id', (self.url,)).records
@@ -434,7 +434,7 @@ class AddUserDialog(KDialog):
         self.passwordChanged()
         self.edPassword2.setFocus()
 
-    def passwordChanged(self, dummyText=None):
+    def passwordChanged(self, unusedText=None):
         """password changed"""
         self.validate()
 
@@ -526,7 +526,7 @@ class Connection:
         """if needed"""
         return self.url.startServer(result)
 
-    def __loginToServer(self, dummy=None):
+    def __loginToServer(self, unused=None):
         """login to server"""
         return self.loginCommand(self.username).addErrback(self._loginFailed)
 
@@ -560,7 +560,7 @@ class Connection:
                 Query('insert into passwords(url,player,password) values(?,?,?)',
                       (self.url, playerId, self.password))
 
-    def __checkExistingConnections(self, dummy=None):
+    def __checkExistingConnections(self, unused=None):
         """do we already have a connection to the wanted URL?"""
         for client in self.client.humanClients:
             if client.connection and client.connection.url == self.url:
@@ -646,7 +646,7 @@ class Connection:
             logWarning(msg)
         raise CancelledError
 
-    def pingLater(self, dummyResult=None):
+    def pingLater(self, unusedResult=None):
         """ping the server every 5 seconds"""
         Internal.reactor.callLater(5, self.ping)
 

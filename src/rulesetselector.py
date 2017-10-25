@@ -164,12 +164,12 @@ class RuleModel(TreeModel):
         rootData.extend(unitNames)
         self.rootItem = RuleRootItem(rootData)
 
-    def canFetchMore(self, dummyParent=None):
+    def canFetchMore(self, unusedParent=None):
         """did we already load the rules? We only want to do that
         when the config tab with rulesets is actually shown"""
         return not self.loaded
 
-    def fetchMore(self, dummyParent=None):
+    def fetchMore(self, unusedParent=None):
         """load the rules"""
         for ruleset in self.rulesets:
             self.appendRuleset(ruleset)
@@ -379,7 +379,7 @@ class RuleTreeView(QTreeView):
         self.rulesets = []  # nasty: this generates self.ruleModel
         self.differs = []
 
-    def dataChanged(self, dummyIndex1, dummyIndex2, dummyRoles=None):
+    def dataChanged(self, unusedIndex1, unusedIndex2, unusedRoles=None):
         """gets called if the model has changed: Update all differs"""
         for differ in self.differs:
             differ.rulesetChanged()
@@ -409,7 +409,7 @@ class RuleTreeView(QTreeView):
                 self.ruleModelTest = ModelTest(self.ruleModel, self)
             self.show()
 
-    def selectionChanged(self, selected, dummyDeselected=None):
+    def selectionChanged(self, selected, unusedDeselected=None):
         """update editing buttons"""
         enableCopy = enableRemove = enableCompare = False
         if selected.indexes():
@@ -428,7 +428,7 @@ class RuleTreeView(QTreeView):
         if self.btnCompare:
             self.btnCompare.setEnabled(enableCompare)
 
-    def showEvent(self, dummyEvent):
+    def showEvent(self, unusedEvent):
         """reload the models when the view comes into sight"""
         # default: make sure the name column is wide enough
         if self.ruleModel.canFetchMore():
@@ -550,7 +550,7 @@ class RulesetSelector(QWidget):
         we always want to see them in full"""
         return self.sizeHint()
 
-    def showEvent(self, dummyEvent):
+    def showEvent(self, unusedEvent):
         """reload the rulesets"""
         self.refresh()
 

@@ -199,23 +199,23 @@ class Meld(TileList, StrMixin):
             rulesetId] if x.appliesToMeld(hand, self))
         return result
 
-    def append(self, dummy):
+    def append(self, unused):
         """we want to be immutable"""
         raise TypeError
 
-    def extend(self, dummy):
+    def extend(self, unused):
         """we want to be immutable"""
         raise TypeError
 
-    def insert(self, dummy):
+    def insert(self, unused):
         """we want to be immutable"""
         raise TypeError
 
-    def pop(self, dummy):
+    def pop(self, unused):
         """we want to be immutable"""
         raise TypeError
 
-    def remove(self, dummy):
+    def remove(self, unused):
         """we want to be immutable"""
         raise TypeError
 

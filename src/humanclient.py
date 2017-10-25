@@ -75,7 +75,7 @@ class SelectChow(KDialogIgnoringEscape):
             if chow == propose:
                 self.buttons[idx].setFocus()
 
-    def toggled(self, dummyChecked):
+    def toggled(self, unusedChecked):
         """a radiobutton has been toggled"""
         button = self.sender()
         if button.isChecked():
@@ -109,7 +109,7 @@ class SelectKong(KDialogIgnoringEscape):
         widget.setLayout(layout)
         self.setMainWidget(widget)
 
-    def toggled(self, dummyChecked):
+    def toggled(self, unusedChecked):
         """a radiobutton has been toggled"""
         button = self.sender()
         if button.isChecked():
@@ -325,7 +325,7 @@ class ClientDialog(QDialog):
         geometry.setHeight(int(height))
         self.setGeometry(geometry)
 
-    def showEvent(self, dummyEvent):
+    def showEvent(self, unusedEvent):
         """try to place the dialog such that it does not cover interesting information"""
         self.placeInField()
 
@@ -365,7 +365,7 @@ class ClientDialog(QDialog):
         Internal.scene.clientDialog = None
         self.deferred.callback(answer)
 
-    def selectedAnswer(self, dummyChecked):
+    def selectedAnswer(self, unusedChecked):
         """the user clicked one of the buttons"""
         game = self.client.game
         if game and not game.autoPlay:
@@ -398,7 +398,7 @@ class HumanClient(Client):
             """return True if clients is cleaned"""
             return len(clients) == 0 or (exception and clients == [exception])
 
-        def disconnectedClient(dummyResult, client):
+        def disconnectedClient(unusedResult, client):
             """now the client is really disconnected from the server"""
             if client in clients:
                 # HumanClient.serverDisconnects also removes it!
@@ -442,7 +442,7 @@ class HumanClient(Client):
                         voiceId, maxGameId,
                         Internal.defaultPort).addCallbacks(self.__initTableList, self.__versionError)
 
-    def __initTableList(self, dummy):
+    def __initTableList(self, unused):
         """first load of the list. Process options like --demo, --table, --join"""
         self.showTableList()
         if SingleshotOptions.table:
@@ -470,7 +470,7 @@ class HumanClient(Client):
             self.__showTables()
 
     @staticmethod
-    def __loginFailed(dummy):
+    def __loginFailed(unused):
         """as the name says"""
         if Internal.scene:
             Internal.scene.startingGame = False
@@ -497,13 +497,13 @@ class HumanClient(Client):
         if self.tableList:
             self.tableList.loadTables(self.tables)
 
-    def __showTables(self, dummy=None):
+    def __showTables(self, unused=None):
         """load and show tables. We may be used as a callback. In that case,
         clientTables is the id of a new table - which we do not need here"""
         self.tableList.loadTables(self.tables)
         self.tableList.show()
 
-    def showTableList(self, dummy=None):
+    def showTableList(self, unused=None):
         """allocate it if needed"""
         if not self.tableList:
             self.tableList = TableList(self)
@@ -571,7 +571,7 @@ class HumanClient(Client):
                 # others will then automatically leave too
                 for name in oldTable.playerNames:
                     if name != self.name and not newTable.isOnline(name):
-                        def sorried(dummy):
+                        def sorried(unused):
                             """user ack"""
                             game = self.game
                             if game:
@@ -620,7 +620,7 @@ class HumanClient(Client):
             else:
                 return Message.NoGameStart
 
-        def cancelled(dummy):
+        def cancelled(unused):
             """the user does not want to start now. Back to table list"""
             if Debug.table:
                 logDebug('%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
@@ -651,7 +651,7 @@ class HumanClient(Client):
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """playerNames are in wind order ESWN. Never called for first hand."""
-        def answered(dummy=None):
+        def answered(unused=None):
             """called after the client player said yes, I am ready"""
             if self.connection:
                 return Client.readyForHandStart(self, playerNames, rotateWinds)
@@ -767,7 +767,7 @@ class HumanClient(Client):
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
-        def yes(dummy):
+        def yes(unused):
             """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
@@ -799,7 +799,7 @@ class HumanClient(Client):
         if scene and game and scene.game == game:
             scene.game = None
 
-    def serverDisconnected(self, dummyReference):
+    def serverDisconnected(self, unusedReference):
         """perspective calls us back"""
         if self.connection and (Debug.traffic or Debug.connections):
             logDebug(
@@ -869,7 +869,7 @@ class HumanClient(Client):
             table = self.tableList.selectedTable()
         self.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
-    def logout(self, dummyResult=None):
+    def logout(self, unusedResult=None):
         """clean visual traces and logout from server"""
         def loggedout(result, connection):
             """end the connection from client side"""

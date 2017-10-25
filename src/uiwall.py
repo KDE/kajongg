@@ -163,7 +163,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
             movingZ = 0
         self.setZValue(ZValues.markerZ + movingZ)
 
-    def paint(self, painter, dummyOption, dummyWidget=None):
+    def paint(self, painter, unusedOption, unusedWidget=None):
         """paint the marker"""
         with Painter(painter):
             pen = QPen(QColor(self.color))
@@ -349,7 +349,7 @@ class UIWall(Wall):
                 uiTile.focusable = False
             return animateAndDo(self.__placeWallTiles)
 
-    def __placeWallTiles(self, dummyResult=None):
+    def __placeWallTiles(self, unusedResult=None):
         """place all wall tiles"""
         tileIter = iter(self.tiles)
         tilesPerSide = len(self.tiles) // 4
@@ -394,18 +394,18 @@ class UIWall(Wall):
             SideText.refreshAll()
 
     @afterQueuedAnimations
-    def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue): # pylint: disable=unused-argument
+    def showShadowsChanged(self, deferredResult, unusedOldValue, unusedNewValue): # pylint: disable=unused-argument
         """setting this actually changes the visuals."""
         assert ParallelAnimationGroup.current is None
         self.__resizeHandBoards()
 
-    def __resizeHandBoards(self, dummyResults=None):
+    def __resizeHandBoards(self, unusedResults=None):
         """we are really calling _setRect() too often. But at least it works"""
         for player in self.game.players:
             player.handBoard.computeRect()
         Internal.mainWindow.adjustMainView()
 
-    def __setDrawingOrder(self, dummyResults=None):
+    def __setDrawingOrder(self, unusedResults=None):
         """set drawing order of the wall"""
         levels = {'NW': (2, 3, 1, 0), 'NE': (
             3, 1, 0, 2), 'SE': (1, 0, 2, 3), 'SW': (0, 2, 3, 1)}
@@ -463,7 +463,7 @@ class UIWall(Wall):
             SideText.refreshAll()
         animateAndDo(self.showWindMarkers)
 
-    def showWindMarkers(self, dummyDeferred=None):
+    def showWindMarkers(self, unusedDeferred=None):
         """animate all windMarkers. The caller must ensure
         all are moved simultaneously and at which speed
         by using AnimationSpeed."""

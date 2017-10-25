@@ -97,7 +97,7 @@ class SelectPlayers(SelectRuleset):
                                  % playerId)
         self.slotValidate()
 
-    def showEvent(self, dummyEvent):
+    def showEvent(self, unusedEvent):
         """start with player 0"""
         self.nameWidgets[0].setFocus()
 
@@ -144,7 +144,7 @@ class ScoringTileAttr(TileAttr):
         """should the tile appear darker?"""
         return self.yoffset or self.tile.isConcealed
 
-    def setFocusable(self, dummyHand, dummyMeld, idx):
+    def setFocusable(self, unusedHand, unusedMeld, idx):
         """in a scoring handboard, only the first tile of a meld is focusable"""
         return idx == 0
 

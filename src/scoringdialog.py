@@ -400,11 +400,11 @@ class HorizontalScrollBar(QScrollBar):
         QScrollBar.__init__(self, parent)
         self.scoreTable = scoreTable
 
-    def showEvent(self, dummyEvent):
+    def showEvent(self, unusedEvent):
         """adjust the left view"""
         self.scoreTable.adaptLeftViewHeight()
 
-    def hideEvent(self, dummyEvent):
+    def hideEvent(self, unusedEvent):
         """adjust the left view"""
         self.scoreTable.viewRight.header().setOffset(
             0)  # we should not have to do this...
@@ -545,7 +545,7 @@ class ScoreTable(QWidget):
         scrollBar = self.viewRight.horizontalScrollBar()
         scrollBar.setValue(scrollBar.maximum())
 
-    def showEvent(self, dummyEvent):
+    def showEvent(self, unusedEvent):
         """Only now the views and scrollbars have useful sizes, so we can compute the spacer
         for the left view"""
         self.adaptLeftViewHeight()

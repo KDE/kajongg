@@ -64,7 +64,7 @@ class TileAttr(StrMixin):
         else:
             return not self.tile.isKnown
 
-    def setFocusable(self, hand, meld, dummyIdx):
+    def setFocusable(self, hand, meld, unusedIdx):
         """is it focusable?"""
         player = hand.player
         return (
@@ -130,7 +130,7 @@ class HandBoard(Board):
         """for debugging messages"""
         return self.player.name
 
-    def showShadowsChanged(self, dummyOldValue, dummyNewValue):
+    def showShadowsChanged(self, unusedOldValue, unusedNewValue):
         """Add or remove the shadows."""
         self.setPosition()
 
@@ -149,7 +149,7 @@ class HandBoard(Board):
         self._reload(self.tileset, showShadows=show)
         self.sync()
 
-    def rearrangeMeldsChanged(self, dummyOldValue, newValue):
+    def rearrangeMeldsChanged(self, unusedOldValue, newValue):
         """when True, concealed melds are grouped"""
         self.concealedMeldDistance = (
             self.exposedMeldDistance if newValue else 0.0)

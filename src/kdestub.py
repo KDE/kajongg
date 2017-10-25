@@ -246,7 +246,7 @@ class Help:
         """returns the best match for the online user manual"""
         from twisted.web import client
 
-        def processResult(dummyResult, fallbacks):
+        def processResult(unusedResult, fallbacks):
             """if status 404, try the next fallback language"""
             return Help.__getDocUrl(fallbacks) if factory.status == '404' else url
         host = 'docs.kde.org'
@@ -295,7 +295,7 @@ class KMessageBox:
 
     @staticmethod
     def createKMessageBox(
-            dialog, icon, text, dummyStrlist, dummyAsk, dummyCheckboxReturn, options):
+            dialog, icon, text, unusedStrlist, unusedAsk, unusedCheckboxReturn, options):
         """translated as far as needed from kmessagegox.cpp"""
         # pylint: disable=too-many-locals
         mainLayout = QVBoxLayout()
@@ -1292,7 +1292,7 @@ class KConfigDialog(KDialog):
             cls.dialog.show()
             return cls.dialog
 
-    def showEvent(self, dummyEvent):
+    def showEvent(self, unusedEvent):
         """if the settings dialog shows, remember current values
         and show them in the widgets"""
         self.orgPref = self.preferences.as_dict()

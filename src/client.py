@@ -173,7 +173,7 @@ class Client(pb.Referenceable):
             if table.tableid == tableid:
                 return table
 
-    def logout(self, dummyResult=None):  # pylint: disable=no-self-use
+    def logout(self, unusedResult=None):  # pylint: disable=no-self-use
         """virtual"""
         return succeed(None)
 
@@ -217,7 +217,7 @@ class Client(pb.Referenceable):
             self.tables.append(newTable)
         return oldTable, newTable
 
-    def remote_tableRemoved(self, tableid, dummyMsg, *dummyMsgArgs):
+    def remote_tableRemoved(self, tableid, unusedMsg, *unusedMsgArgs): # pylint: disable=unused-argument
         """update table list"""
         table = self._tableById(tableid)
         if table:
@@ -356,7 +356,7 @@ class Client(pb.Referenceable):
         else:
             return Message.jelly(value, value)
 
-    def remote_move(self, playerName, command, *dummyArgs, **kwargs):
+    def remote_move(self, playerName, command, *unusedArgs, **kwargs): # pylint: disable=unused-argument
         """the server sends us info or a question and always wants us to answer"""
         if Internal.scene and not isAlive(Internal.scene):
             return fail()

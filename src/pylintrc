@@ -29,6 +29,7 @@ cache-size=500
 # usually to register additional checkers.
 load-plugins=
 
+jobs=6
 
 [MESSAGES CONTROL]
 
@@ -173,7 +174,9 @@ bad-functions=map,filter,apply,input
 init-import=no
 
 # A regular expression matching names used for dummy variables (i.e. not used).
-dummy-variables-rgx=_|dummy|fget|fset|(dummy[A-Z][a-zA-Z0-9]*)
+dummy-variables-rgx=_|dummy|fget|fset|(dummy[A-Z][a-zA-Z0-9]*?$)
+
+ignored-argument-names=_.*|^unused_|unused|(^unused[A-Z].*?$)
 
 # List of additional names supposed to be defined in builtins. Remember that
 # you should avoid to define new builtins when possible.

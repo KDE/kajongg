@@ -181,7 +181,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
         return "TILE_{}".format(lightSourceIndex % 4 + 1)
 
-    def paint(self, painter, dummyOption, dummyWidget=None):
+    def paint(self, painter, unusedOption, unusedWidget=None):
         """paint the entire tile.
         I tried to cache a pixmap for the tile and darkener but without face,
         but that actually made it slower."""

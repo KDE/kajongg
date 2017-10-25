@@ -753,7 +753,7 @@ def main():
             evaluate(readGames(OPTIONS.csv))
 
 
-def cleanup(sig, dummyFrame):
+def cleanup(sig, unusedFrame):
     """at program end"""
     Server.stopAll()
     sys.exit(sig)

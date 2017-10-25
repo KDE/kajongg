@@ -380,7 +380,7 @@ class Player(StrMixin):
         """virtual: colorize Name on wall"""
         pass
 
-    def getsFocus(self, dummyResults=None):
+    def getsFocus(self, unusedResults=None):
         """virtual: player gets focus on his hand"""
         pass
 
@@ -563,13 +563,13 @@ class PlayingPlayer(Player):
                 kongs.append(Meld(discardTile * 4))
         return kongs
 
-    def __maySayChow(self, dummyMove):
+    def __maySayChow(self, unusedMove):
         """returns answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
         if self == self.game.nextPlayer():
             return self.__possibleChows()
 
-    def __maySayPung(self, dummyMove):
+    def __maySayPung(self, unusedMove):
         """returns answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
         lastDiscard = self.game.lastDiscard
@@ -578,7 +578,7 @@ class PlayingPlayer(Player):
             if self.concealedTiles.count(lastDiscard) >= 2:
                 return MeldList([lastDiscard.pung])
 
-    def __maySayKong(self, dummyMove):
+    def __maySayKong(self, unusedMove):
         """returns answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
         return self.__possibleKongs()
@@ -604,7 +604,7 @@ class PlayingPlayer(Player):
                 game.debug('  with hand {}'.format(hand))
             return MeldList(x for x in hand.melds if not x.isDeclared), withDiscard, hand.lastMeld
 
-    def __maySayOriginalCall(self, dummyMove):
+    def __maySayOriginalCall(self, unusedMove):
         """returns True if Original Call is possible"""
         for tileName in sorted(set(self.concealedTiles)):
             newHand = self.hand - tileName

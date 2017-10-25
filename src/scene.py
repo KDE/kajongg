@@ -78,7 +78,7 @@ class FocusRect(QGraphicsRectItem, StrMixin):
             self.refresh()
 
     @afterQueuedAnimations
-    def refresh(self, dummyDeferredResult=None):
+    def refresh(self, unusedDeferredResult=None):
         """show/hide on correct position after queued animations end"""
         board = self.board
         if not isAlive(board) or not isAlive(self):
@@ -179,7 +179,7 @@ class GameScene(SceneWithFocusRect):
         self.mainWindow.adjustMainView()
 
     @afterQueuedAnimations
-    def showShadowsChanged(self, deferredResult, dummyOldValue, dummyNewValue): # pylint: disable=unused-argument
+    def showShadowsChanged(self, deferredResult, unusedOldValue, unusedNewValue): # pylint: disable=unused-argument
         """if the wanted shadow direction changed, apply that change now"""
         for uiTile in self.graphicsTileItems():
             uiTile.setClippingFlags()
@@ -332,7 +332,7 @@ class PlayingScene(GameScene):
             self._clientDialog.hide()
         self._clientDialog = value
 
-    def resizeEvent(self, dummyEvent):
+    def resizeEvent(self, unusedEvent):
         """main window changed size"""
         if self.clientDialog:
             self.clientDialog.placeInField()

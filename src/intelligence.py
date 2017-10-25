@@ -49,7 +49,7 @@ class AIDefault:
         return self.__class__.__name__[2:]
 
     @staticmethod
-    def weighSameColors(dummyAiInstance, candidates):
+    def weighSameColors(unusedAiInstance, candidates):
         """weigh tiles of same group against each other"""
         for candidate in candidates:
             if candidate.group in Tile.colors:
@@ -105,7 +105,7 @@ class AIDefault:
         return candidates
 
     @staticmethod
-    def alternativeFilter(dummyAiInstance, candidates):
+    def alternativeFilter(unusedAiInstance, candidates):
         """if the alternative AI only adds tests without changing
         default filters, you can override this one to minimize
         the source size of the alternative AI"""
@@ -159,7 +159,7 @@ class AIDefault:
         return candidates
 
     @staticmethod
-    def weighSpecialGames(dummyAiInstance, candidates):
+    def weighSpecialGames(unusedAiInstance, candidates):
         """like color game, many dragons, many winds"""
         for candidate in candidates:
             tile = candidate.tile

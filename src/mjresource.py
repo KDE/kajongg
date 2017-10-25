@@ -117,7 +117,7 @@ class Resource:
         cls.cache[result.path] = result
         return result
 
-    def __init__(self, dummyName):
+    def __init__(self, unusedName):
         """continue __build"""
         self.group = KConfig(self.path).group(self.configGroupName)
 

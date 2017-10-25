@@ -105,7 +105,7 @@ if len(NOTFOUND):
     sys.exit(3)
 
 
-def cleanExit(*dummyArgs):
+def cleanExit(*unusedArgs): # pylint: disable=unused-argument
     """close sqlite3 files before quitting"""
     if isAlive(Internal.mainWindow):
         if Debug.quit:
@@ -362,7 +362,7 @@ class MainWindow(KXmlGuiWindow):
         else:
             self.setWindowState(self.windowState() & ~Qt.WindowFullScreen)
 
-    def close(self, dummyResult=None):
+    def close(self, unusedResult=None):
         """wrap close() because we call it with a QTimer"""
         if isAlive(self):
             ParallelAnimationGroup.cancelAll()
@@ -613,7 +613,7 @@ class MainWindow(KXmlGuiWindow):
             view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
 
     @afterQueuedAnimations
-    def backgroundChanged(self, dummyDeferredResult, dummyOldName, newName):
+    def backgroundChanged(self, unusedDeferredResult, unusedOldName, newName):
         """if the wanted background changed, apply the change now"""
         centralWidget = self.centralWidget()
         if centralWidget:
@@ -623,7 +623,7 @@ class MainWindow(KXmlGuiWindow):
 
     @afterQueuedAnimations
     def tilesetNameChanged(
-            self, dummyDeferredResult, dummyOldValue=None, dummyNewValue=None, *dummyArgs):
+            self, unusedDeferredResult, unusedOldValue=None, unusedNewValue=None, *unusedArgs): # pylint: disable=unused-argument
         """if the wanted tileset changed, apply the change now"""
         if self.centralView:
             with AnimationSpeed():
@@ -632,7 +632,7 @@ class MainWindow(KXmlGuiWindow):
             self.adjustMainView()
 
     @afterQueuedAnimations
-    def showSettings(self, dummyDeferredResult, dummyChecked=None):
+    def showSettings(self, unusedDeferredResult, unusedChecked=None):
         """show preferences dialog. If it already is visible, do nothing"""
         # This is called by the triggered() signal. So why does KDE
         # not return the bool checked?
@@ -686,7 +686,7 @@ class MainWindow(KXmlGuiWindow):
             scene.updateSceneGUI()
 
     @afterQueuedAnimations
-    def changeAngle(self, deferredResult, dummyButtons=None, dummyModifiers=None): # pylint: disable=unused-argument
+    def changeAngle(self, deferredResult, unusedButtons=None, unusedModifiers=None): # pylint: disable=unused-argument
         """change the lightSource"""
         if self.scene:
             with AnimationSpeed():

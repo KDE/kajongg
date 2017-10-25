@@ -61,7 +61,7 @@ class ChatModel(QAbstractTableModel):
             return 0
         return len(self.chatLines)
 
-    def columnCount(self, dummyParent=None):  # pylint: disable=no-self-use
+    def columnCount(self, unusedParent=None):  # pylint: disable=no-self-use
         """for now we only have time, who, message"""
         return 3
 

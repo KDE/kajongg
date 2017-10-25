@@ -98,7 +98,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
             newPrevailing = self.wind == Wind.all4[value % 4]
         self.__brush = self.roundWindColor if newPrevailing else self.whiteColor
 
-    def paint(self, painter, dummyOption, dummyWidget=None):
+    def paint(self, painter, unusedOption, unusedWidget=None):
         """paint the marker"""
         with Painter(painter):
             painter.setBrush(self.__brush)
@@ -380,11 +380,11 @@ class Board(QGraphicsRectItem, StrMixin):
             idx = action.data()
         return variants[idx]
 
-    def dragEnterEvent(self, dummyEvent):
+    def dragEnterEvent(self, unusedEvent):
         """drag enters the HandBoard: highlight it"""
         self.setPen(QPen(QColor(self.penColor)))
 
-    def dragLeaveEvent(self, dummyEvent):
+    def dragLeaveEvent(self, unusedEvent):
         """drag leaves the HandBoard"""
         self._noPen()
 
@@ -481,7 +481,7 @@ class Board(QGraphicsRectItem, StrMixin):
         newY = self.__yWidth * width + self.__yHeight * height + offsets[1]
         QGraphicsRectItem.setPos(self, newX, newY)
 
-    def showShadowsChanged(self, dummyOldValue, newValue):
+    def showShadowsChanged(self, unusedOldValue, newValue):
         """set active lightSource"""
         for uiTile in self.uiTiles:
             uiTile.setClippingFlags()
@@ -795,7 +795,7 @@ class FittingView(QGraphicsView):
             return
         Internal.mainWindow.changeAngle()
 
-    def resizeEvent(self, dummyEvent):
+    def resizeEvent(self, unusedEvent):
         """scale the scene and its background for new view size"""
         Internal.Preferences.callTrigger(
             'tilesetName')  # this redraws and resizes
@@ -918,7 +918,7 @@ class YellowText(QGraphicsRectItem):
         else:
             self.moveBy(xOffset, yOffset)
 
-    def paint(self, painter, dummyOption, dummyWidget):
+    def paint(self, painter, unusedOption, unusedWidget):
         """override predefined paint"""
         painter.setFont(self.font)
         painter.fillRect(self.rect(), QBrush(QColor('yellow')))

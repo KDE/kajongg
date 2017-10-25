@@ -130,7 +130,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             color = Qt.black
         self.sideText.color = color
 
-    def getsFocus(self, dummyResults=None):
+    def getsFocus(self, unusedResults=None):
         """give this player focus on his handBoard"""
         self.handBoard.setEnabled(True)
         self.handBoard.hasFocus = True

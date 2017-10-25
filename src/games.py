@@ -44,7 +44,7 @@ class GamesModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self)
         self._resultRows = []
 
-    def columnCount(self, dummyParent=None):   # pylint: disable=no-self-use
+    def columnCount(self, unusedParent=None):   # pylint: disable=no-self-use
         """including the hidden col 0"""
         return 3
 
@@ -156,7 +156,7 @@ class Games(QDialog):
         self.view.doubleClicked.connect(self.loadGame)
         chkPending.stateChanged.connect(self.pendingOrNot)
 
-    def showEvent(self, dummyEvent):
+    def showEvent(self, unusedEvent):
         """only now get the data set. Not doing this in__init__ would eventually
         make it easier to subclass from some generic TableEditor class"""
         self.setQuery()
