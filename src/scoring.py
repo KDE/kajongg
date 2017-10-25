@@ -84,7 +84,7 @@ class SelectPlayers(SelectRuleset):
 
         query = Query(
             "select p0,p1,p2,p3 from game where seed is null and game.id = (select max(id) from game)")
-        if len(query.records):
+        if query.records:
             with BlockSignals(self.nameWidgets):
                 for cbName, playerId in zip(self.nameWidgets, query.records[0]):
                     try:

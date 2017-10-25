@@ -312,9 +312,9 @@ class Meld(TileList, StrMixin):
 
     def __lt__(self, other):
         """used for sorting. Smaller value is shown first."""
-        if len(other) == 0:
+        if not other:
             return False
-        if len(self) == 0:
+        if not self:
             return True
         if self.isDeclared and not other.isDeclared:
             return True
@@ -427,7 +427,7 @@ class MeldList(list):
         return TileList(sum(self, []))
 
     def __str__(self):
-        if len(self):
+        if self:
             return ' '.join(str(x) for x in self)
         else:
             return ''

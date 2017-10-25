@@ -271,7 +271,7 @@ class HandBoard(Board):
                 match = matches[0]
                 result[match] = newPosition
                 oldTiles[match.tile].remove(match)
-                if not len(oldTiles[match.tile]):
+                if not oldTiles[match.tile]:
                     del oldTiles[match.tile]
         for newBonusPosition in self.newBonusPositions(
                 list(x for x in tiles if x.isBonus), newPositions):

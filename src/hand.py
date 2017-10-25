@@ -185,7 +185,7 @@ class Hand(StrMixin):
 
         assert len(tileStrings) < 2, tileStrings
         self.__rest = TileList()
-        if len(tileStrings):
+        if tileStrings:
             self.__rest.extend(TileList(tileStrings[0][1:]))
 
         last = self.__lastTile

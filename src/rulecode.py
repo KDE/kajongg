@@ -1179,7 +1179,7 @@ class ThirteenOrphans(MJRule):
             return set()
         handTiles = set(x.exposed for x in hand.tiles)
         missing = elements.majors - handTiles
-        if len(missing) == 0:
+        if not missing:
             # if all 13 tiles are there, we need any one of them:
             return elements.majors
         else:

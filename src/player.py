@@ -154,7 +154,7 @@ class Player(StrMixin):
 
     def clearCache(self):
         """clears the cache with Hands"""
-        if Debug.hand and len(self.handCache):
+        if Debug.hand and self.handCache:
             self.game.debug(
                 '%s: cache hits:%d misses:%d' %
                 (self, self.cacheHits, self.cacheMisses))
@@ -363,7 +363,7 @@ class Player(StrMixin):
 
     def addConcealedTiles(self, tiles, animated=False):  # pylint: disable=unused-argument
         """add to my tiles"""
-        assert len(tiles)
+        assert tiles
         for tile in tiles:
             if tile.isBonus:
                 self._bonusTiles.append(tile)

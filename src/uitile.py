@@ -426,7 +426,7 @@ class UIMeld(list):
             self.extend(newContent)
         elif isinstance(newContent, UITile):
             self.append(newContent)
-        assert len(self), newContent
+        assert self, newContent
 
     @property
     def meld(self):

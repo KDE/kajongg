@@ -43,7 +43,7 @@ class Wind:
             assert cls is Wind, '{}({}) is illegal'.format(cls.__name__, windIdent)
             windIdx = 'eswn'.index(windIdent.lower())
             return Wind.all[windIdx]
-        assert len(args) == 0 and cls is not Wind, 'Wind() must have exactly one argument'
+        assert not args and cls is not Wind, 'Wind() must have exactly one argument'
 
         for result in Wind.all:
             if isinstance(result, cls):

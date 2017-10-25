@@ -1206,7 +1206,7 @@ class ScoringDialog(QWidget):
             lastTile = Internal.scene.computeLastTile()
             winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4
                            and lastTile in m]
-            assert len(winnerMelds), 'lastTile %s missing in %s' % (
+            assert winnerMelds, 'lastTile %s missing in %s' % (
                 lastTile, self.game.winner.hand.melds)
             if len(winnerMelds) == 1:
                 self.cbLastMeld.addItem(QIcon(), '', str(winnerMelds[0]))

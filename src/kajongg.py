@@ -56,7 +56,7 @@ def initRulesets():
         else:
             matches = list(x for x in rulesets if Options.rulesetName in x)
             if len(matches) != 1:
-                if len(matches) == 0:
+                if not matches:
                     msg = 'Ruleset %s is unknown' % Options.rulesetName
                 else:
                     msg = 'Ruleset %s is ambiguous: %s' % (

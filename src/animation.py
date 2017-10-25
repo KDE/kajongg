@@ -375,7 +375,7 @@ class AnimatedMixin:
         if self.name() in Debug.animation:
             logDebug('UITile {}: clear activeAnimation[{}]'.format(self.name(), animation.pName()))
         self.setDrawingOrder()
-        if not len(self.activeAnimation):
+        if not self.activeAnimation:
             self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
             self.update()
 

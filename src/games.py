@@ -239,7 +239,7 @@ class Games(QDialog):
                 self.setQuery()  # just reload entire table
         allGames = self.view.selectionModel().selectedRows(0)
         deleteGames = list(x.data() for x in allGames)
-        if len(deleteGames) == 0:
+        if not deleteGames:
             # should never happen
             logException('delete: 0 rows selected')
         WarningYesNo(

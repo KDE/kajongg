@@ -425,7 +425,7 @@ into a situation where you have to pay a penalty"""))
             return
         else:
             query = Query("select id,hash,name,description from ruleset where hash=?", (self.name,))
-        if len(query.records):
+        if query.records:
             (self.rulesetId, self.__hash, self.name,
              self.description) = query.records[0]
         else:

@@ -64,7 +64,7 @@ class Permutations:
             gTiles = list(x for x in self.tiles if x.group == group)
             groupVariants = self.__colorVariants(
                 group, list(x.value for x in gTiles))
-            if len(groupVariants):
+            if groupVariants:
                 variants.append(groupVariants)
         result = []
         for variant in (sum(x, []) for x in itertools.product(*variants)):
@@ -97,7 +97,7 @@ class Permutations:
                 rest = values[:]
                 for tile in meld:
                     rest.remove(tile)
-                if len(rest):
+                if rest:
                     permuteRest = cls.permute(tuple(rest))
                     for combi in permuteRest:
                         result.append(tuple(list(appendValue) + list(combi)))

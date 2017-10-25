@@ -114,7 +114,7 @@ class DBPasswordChecker:
                 pass
         query = Query(
             'select id, password from player where name=?', (cred.username,))
-        if not len(query.records):
+        if not query.records:
             template = 'Wrong username: %1'
             if Debug.connections:
                 logDebug(i18n(template, cred.username))
@@ -211,7 +211,7 @@ class MJServer:
         if tables is None:
             tables = list(x for x in self.tables.values()
                           if not x.running and (not x.suspendedAt or x.hasName(user.name)))
-        if len(tables):
+        if tables:
             data = list(x.asSimpleList() for x in tables)
             if Debug.table:
                 logDebug(

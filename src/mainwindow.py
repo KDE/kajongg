@@ -100,7 +100,7 @@ except ImportError as importError:
     NOTFOUND.append('Kajongg is not correctly installed: modules: %s' %
                     importError)
 
-if len(NOTFOUND):
+if NOTFOUND:
     logError("\n".join(" * %s" % s for s in NOTFOUND), showStack=False)
     sys.exit(3)
 

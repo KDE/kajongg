@@ -527,12 +527,12 @@ class HumanClient(Client):
                 # previously selected ruleset
                 self.tables = list(
                     x for x in self.tables if x.ruleset == self.ruleset)
-        if len(self.tables):
+        if self.tables:
             self.__updateTableList()
 
     def remote_newTables(self, tables):
         """update table list"""
-        assert len(tables)
+        assert tables
 
         def gotRulesets(result):
             """the server sent us the wanted ruleset definitions"""

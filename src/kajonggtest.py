@@ -125,7 +125,7 @@ class Server(StrMixin):
             if len(cls.servers) >= OPTIONS.servers:
                 # maybe we can kill a server without jobs?
                 for server in cls.servers:
-                    if len(server.jobs) == 0:
+                    if not server.jobs:
                         server.stop()
                         break  # we only need to stop one server
                 else:
@@ -193,7 +193,7 @@ class Server(StrMixin):
             return
         if job:
             self.jobs.remove(job)
-        if len(self.jobs) == 0:
+        if not self.jobs:
             self.servers.remove(self)
             if self.process:
                 try:
@@ -211,7 +211,7 @@ class Server(StrMixin):
         for server in cls.servers:
             for job in server.jobs[:]:
                 server.stop(job)
-            assert len(server.jobs) == 0, 'stopAll expects no server jobs but found {}'.format(
+            assert not server.jobs, 'stopAll expects no server jobs but found {}'.format(
                 server.jobs)
             server.stop()
 
@@ -353,7 +353,7 @@ def neutralize(rows):
 def onlyExistingCommits(commits):
     """filter out non-existing commits"""
     global KNOWNCOMMITS  # pylint: disable=global-statement
-    if len(KNOWNCOMMITS) == 0:
+    if not KNOWNCOMMITS:
         for branch in subprocess.check_output(b'git branch'.split()).decode().split('\n'):
             if 'detached' not in branch and 'no branch' not in branch:
                 KNOWNCOMMITS |= set(subprocess.check_output(
@@ -638,7 +638,7 @@ def improve_options():
         wrong = False
         for ruleset in wantedRulesets:
             matches = list(x for x in OPTIONS.knownRulesets if ruleset in x)
-            if len(matches) == 0:
+            if not matches:
                 print('ruleset', ruleset, 'is not known', end=' ')
                 wrong = True
             elif len(matches) > 1:

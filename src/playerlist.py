@@ -75,7 +75,7 @@ class PlayerList(QDialog):
     @staticmethod
     def sortKey(text):
         """display order in Table"""
-        if len(text) == 0:
+        if not text:
             return 'zzzzzzzzzzzz'
         else:
             return text.upper()
@@ -131,20 +131,20 @@ class PlayerList(QDialog):
         self.updateTable(data=self._data, currentName='')
         for row in range(len(self._data)):
             item = self.table.item(row, 0)
-            if len(item.text()) == 0:
+            if not item.text():
                 self.table.editItem(item)
 
     def delete(self):
         """delete selected entries"""
         items = self.table.selectedItems()
         currentRow = self.table.currentRow()
-        if len(items):
+        if items:
             name = items[0].text()
             playerId = self._data[name]
             query = Query(
                 "select 1 from game where p0=? or p1=? or p2=? or p3=?",
                 (playerId, ) * 4)
-            if len(query.records):
+            if query.records:
                 Sorry(
                     i18n('This player cannot be deleted. There are games associated with %1.', name))
                 return
