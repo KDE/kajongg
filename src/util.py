@@ -217,25 +217,6 @@ def gitHead():
     return 'current' if uncommitted else next(popenReadlines('git log -1 --format=%h'))
 
 
-def xToUtf8(msg, args=None):
-    """makes sure msg and all args are utf-8"""
-    return (msg, args) if args is not None else msg
-# TODO: dead code
-    if isinstance(msg, str):
-        msg = msg.encode('utf-8')
-    elif not isinstance(msg, bytes):
-        msg = str(msg).encode('utf-8')
-    if args is not None:
-        args = list(args[:])
-        for idx, arg in enumerate(args):
-            if isinstance(arg, str):
-                args[idx] = arg.encode('utf-8')
-            elif not isinstance(arg, bytes):
-                args[idx] = str(arg).encode('utf-8')
-        return msg, args
-    return msg
-
-
 class CsvWriter:
     """hide differences between Python 2 and 3"""
     def __init__(self, filename, mode='w'):
