@@ -91,10 +91,9 @@ class Wall(StrMixin):
         assert isinstance(element, Tile), element
         if isinstance(tile, Tile):
             return element
-        else:
-            # tile is UITile
-            tile.tile = element
-            return tile
+        # tile is UITile
+        tile.tile = element
+        return tile
 
     def deal(self, tiles=None, deadEnd=False):
         """deal tiles. May raise WallEmpty.

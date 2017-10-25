@@ -81,8 +81,7 @@ class Animation(QPropertyAnimation, StrMixin):
         pGroup = self.group() if isAlive(self) else 'notAlive'
         if pGroup or not isAlive(self):
             return '%s/A%s' % (pGroup, id4(self))
-        else:
-            return 'A%s-%s' % (id4(self), self.targetObject().name())
+        return 'A%s-%s' % (id4(self), self.targetObject().name())
 
     def pName(self):
         """
@@ -90,10 +89,9 @@ class Animation(QPropertyAnimation, StrMixin):
 
         @return: C{str}
         """
-        if isAlive(self):
-            return bytes(self.propertyName()).decode()
-        else:
+        if not isAlive(self):
             return 'notAlive'
+        return bytes(self.propertyName()).decode()
 
     def formatValue(self, value):
         """string format the wanted value from qvariant"""

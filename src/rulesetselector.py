@@ -56,8 +56,7 @@ class RuleTreeItem(TreeItem):
         """can be different for every rule"""
         if hasattr(self, 'colCount'):
             return self.colCount  # pylint: disable=no-member
-        else:
-            return len(self.rawContent)
+        return len(self.rawContent)
 
     def ruleset(self):
         """returns the ruleset containing this item"""
@@ -141,8 +140,7 @@ class RuleItem(RuleTreeItem):
         if self.rawContent.description:
             return '<b>' + i18n(ruleset.name) + '</b><br><br>' + \
                 i18n(self.rawContent.description)
-        else:
-            return i18n(ruleset.name)
+        return i18n(ruleset.name)
 
 
 class RuleModel(TreeModel):
@@ -234,8 +232,7 @@ class RuleModel(TreeModel):
             result = self.rootItem.content(section)
             if result == 'doubles':
                 return 'x2'
-            else:
-                return i18nc('kajongg', result)
+            return i18nc('kajongg', result)
         elif role == Qt.TextAlignmentRole:
             leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
             return int(leftRight | Qt.AlignVCenter)

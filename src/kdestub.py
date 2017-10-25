@@ -77,8 +77,7 @@ class OptionHelper:
         """did the user specify this option?"""
         if any(x[0].startswith('no%s' % option) for x in self.options):
             return not any(x.startswith('--no%s' % option) for x in sys.argv)
-        else:
-            return any(x.startswith('--%s' % option) for x in sys.argv)
+        return any(x.startswith('--%s' % option) for x in sys.argv)
 
     @staticmethod
     def getOption(option):
@@ -86,16 +85,10 @@ class OptionHelper:
         for arg in sys.argv:
             if arg.startswith('--%s' % option):
                 parts = arg.split('=')
-                if len(parts) > 1:
-                    return parts[1]
-                else:
-                    return True
+                return parts[1] if len(parts) > 1 else True
             if arg.startswith('--no%s' % option):
                 parts = arg.split('=')
-                if len(parts) > 1:
-                    return parts[1]
-                else:
-                    return False
+                return parts[1] if len(parts) > 1 else False
         return ''
 
 
@@ -438,9 +431,7 @@ class KUser:
         """stub"""
         if os.name == 'nt':
             return self.loginName()
-        else:
-            return pwd.getpwnam(self.loginName()).pw_gecos.replace(',', '')
-        return None
+        return pwd.getpwnam(self.loginName()).pw_gecos.replace(',', '')
 
     @staticmethod
     def loginName():
@@ -709,8 +700,7 @@ class KConfigGroup:
                     ':') if MLocale.isLanguageInstalled(x))
                 if languages:
                     return ':'.join(languages)
-                else:
-                    return QLocale().name()
+                return QLocale().name()
             return items[name]
         return self.__default(name, default)
 
@@ -787,8 +777,7 @@ def KIcon(name=None):  # pylint: disable=invalid-name
     """simple wrapper"""
     if os.name == 'nt':
         return QIcon(os.path.join('share', 'icons', name) if name else None)
-    else:
-        return QIcon.fromTheme(name)
+    return QIcon.fromTheme(name)
 
 
 class KConfigSkeletonItem:

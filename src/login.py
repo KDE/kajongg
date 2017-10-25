@@ -90,10 +90,7 @@ class Url(str, StrMixin):
 
     def __str__(self):
         """show all info"""
-        if self.useSocket:
-            return socketName()
-        else:
-            return '{}:{}'.format(self.host, self.port)
+        return socketName() if self.useSocket else '{}:{}'.format(self.host, self.port)
 
     @property
     def useSocket(self):
@@ -240,9 +237,8 @@ class Url(str, StrMixin):
         """returns a twisted connector"""
         if self.useSocket:
             return Internal.reactor.connectUNIX(socketName(), factory, timeout=5)
-        else:
-            host = self.host
-            return Internal.reactor.connectTCP(host, self.port, factory, timeout=5)
+        host = self.host
+        return Internal.reactor.connectTCP(host, self.port, factory, timeout=5)
 
 
 class LoginDlg(QDialog):
@@ -358,8 +354,7 @@ class LoginDlg(QDialog):
             return Options.ruleset
         elif Internal.autoPlay or bool(Options.host):
             return Ruleset.selectableRulesets()[0]
-        else:
-            return self.cbRuleset.current
+        return self.cbRuleset.current
 
     def userChanged(self, text):
         """the username has been changed, lookup password"""
@@ -596,20 +591,15 @@ class Connection:
         """login failed"""
         def answered(result):
             """user finally answered our question"""
-            if result:
-                return self.__adduser()
-            else:
-                return Failure(CancelledError())
+            return self.__adduser() if result else Failure(CancelledError())
         message = failure.getErrorMessage()
         if 'Wrong username' in message:
             if self.url.isLocalHost:
                 return answered(True)
-            else:
-                msg = i18nc('USER is not known on SERVER',
-                            '%1 is not known on %2, do you want to open an account?', self.dlg.username, self.url.host)
-                return QuestionYesNo(msg).addCallback(answered)
-        else:
-            return self._loginReallyFailed(failure)
+            msg = i18nc('USER is not known on SERVER',
+                        '%1 is not known on %2, do you want to open an account?', self.dlg.username, self.url.host)
+            return QuestionYesNo(msg).addCallback(answered)
+        return self._loginReallyFailed(failure)
 
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""

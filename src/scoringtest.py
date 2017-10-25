@@ -60,10 +60,7 @@ class Expected:
         self.score = Score(points, doubles, limits)
 
     def __str__(self):
-        if self.won:
-            return 'Won with %s' % self.score
-        else:
-            return 'Lost with %s' % self.score
+        return 'Won with %s' % self.score if self.won else 'Lost with %s' % self.score
 
 
 class Win(Expected):

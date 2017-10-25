@@ -59,10 +59,7 @@ class TileAttr(StrMixin):
 
     def setDark(self):
         """should the tile appear darker?"""
-        if self.yoffset == 0:
-            return self.tile.isConcealed
-        else:
-            return not self.tile.isKnown
+        return self.tile.isConcealed if self.yoffset == 0 else not self.tile.isKnown
 
     def setFocusable(self, hand, meld, unusedIdx):
         """is it focusable?"""

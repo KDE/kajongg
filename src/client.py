@@ -351,10 +351,7 @@ class Client(pb.Referenceable):
     @staticmethod
     def __jellyMessage(value):
         """the Message classes are not pb.copyable, convert them into their names"""
-        if value is None:
-            return Message.OK.name
-        else:
-            return Message.jelly(value, value)
+        return Message.OK.name if value is None else Message.jelly(value, value)
 
     def remote_move(self, playerName, command, *unusedArgs, **kwargs): # pylint: disable=unused-argument
         """the server sends us info or a question and always wants us to answer"""
@@ -431,10 +428,9 @@ class Client(pb.Referenceable):
             # 4. but this answer is Chow, without a selected Chow. This is
             # wrongly sent to server
             return answer
-        else:
-            # return answer only after animation ends. Put answer into
-            # the Deferred returned by animate().
-            return animate().addCallback(lambda x: answer)
+        # return answer only after animation ends. Put answer into
+        # the Deferred returned by animate().
+        return animate().addCallback(lambda x: answer)
 
     def claimed(self, move):
         """somebody claimed a discarded tile"""

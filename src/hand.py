@@ -658,9 +658,8 @@ class Hand(StrMixin):
             return True
         elif not (self.arranged and self.won) and other.won:
             return False
-        else:
-            return (self.intelligence.handValue(self)
-                    > self.intelligence.handValue(other))
+        return (self.intelligence.handValue(self)
+                > self.intelligence.handValue(other))
 
     def __lt__(self, other):
         """compares hand values"""

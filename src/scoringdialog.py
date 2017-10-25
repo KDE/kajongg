@@ -217,15 +217,9 @@ class ScoreModel(TreeModel):
                         content = str(content.balance)
                 return content
             else:
-                if column > 0:
-                    return ''
-                else:
-                    return item.content(0)
+                return '' if column > 0 else item.content(0)
         if role == Qt.TextAlignmentRole:
-            if index.column() == 0:
-                return int(Qt.AlignLeft | Qt.AlignVCenter)
-            else:
-                return int(Qt.AlignRight | Qt.AlignVCenter)
+            return int(Qt.AlignLeft | Qt.AlignVCenter) if index.column() == 0 else int(Qt.AlignRight | Qt.AlignVCenter)
         if role == Qt.FontRole:
             return QFont('Monospaced')
         if role == Qt.ForegroundRole:
@@ -258,10 +252,7 @@ class ScoreModel(TreeModel):
                 if not handResult.penalty:
                     return handResult.handId()
         elif role == Qt.TextAlignmentRole:
-            if section == 0:
-                return int(Qt.AlignLeft | Qt.AlignVCenter)
-            else:
-                return int(Qt.AlignRight | Qt.AlignVCenter)
+            return int(Qt.AlignLeft | Qt.AlignVCenter) if section == 0 else int(Qt.AlignRight | Qt.AlignVCenter)
 
     def loadData(self):
         """loads all data from the data base into a 2D matrix formatted like the wanted tree"""

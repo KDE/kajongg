@@ -191,8 +191,7 @@ class NotifyAtOnceMessage(ClientMessage):
         game = request.block.table.game
         if game:
             return list(x for x in game.players if x != request.player)
-        else:
-            return []
+        return []
 
 
 class PungChowMessage(NotifyAtOnceMessage):
@@ -289,10 +288,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
 
     def clientAction(self, client, move):
         """mirror kong call"""
-        if client.game.lastDiscard:
-            return client.claimed(move)
-        else:
-            return client.declared(move)
+        return client.claimed(move) if client.game.lastDiscard else client.declared(move)
 
 
 class MessageChow(PungChowMessage, ServerMessage):
@@ -375,11 +371,10 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
                 'discarding %1 and declaring Original Call makes this hand unwinnable',
                 tile.name())
             return txt, True, txt
-        else:
-            return (i18n(
-                'Discard a tile, declaring Original Call meaning you need only one '
-                'tile to complete the hand and will not alter the hand in any way (except bonus tiles)'),
-                    False, '')
+        return (i18n(
+            'Discard a tile, declaring Original Call meaning you need only one '
+            'tile to complete the hand and will not alter the hand in any way (except bonus tiles)'),
+                False, '')
 
     def clientAction(self, client, move):
         """mirror the original call"""
@@ -586,10 +581,7 @@ class MessagePickedTile(ServerMessage):
         assert move.player.pickedTile(move.deadEnd, tileName=move.tile) == move.tile, \
             (move.player.lastTile, move.tile)
         if client.thatWasMe(move.player):
-            if move.tile.isBonus:
-                return Message.Bonus, move.tile
-            else:
-                return client.myAction(move)
+            return (Message.Bonus, move.tile) if move.tile.isBonus else client.myAction(move)
 
 
 class MessageActivePlayer(ServerMessage):

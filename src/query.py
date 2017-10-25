@@ -105,8 +105,7 @@ class DBCursor(sqlite3.Cursor):
         """the statement"""
         if self.parameters is not None:
             return "{cmd} [{args}]".format(cmd=self.statement, args=self.parameters)
-        else:
-            return self.statement
+        return self.statement
 
 
 class DBHandle(sqlite3.Connection):
@@ -272,10 +271,7 @@ class Query:
 
     def rowcount(self):
         """how many rows were affected?"""
-        if self.cursor:
-            return self.cursor.rowcount
-        else:
-            return 0
+        return self.cursor.rowcount if self.cursor else 0
 
 
 def initDb():
@@ -391,8 +387,7 @@ class PrepareDB:
         """
         if Internal.db.tableHasField('general', 'schemaversion'):
             return Query('select schemaversion from general').records[0][0]
-        else:
-            return '1.1.1'
+        return '1.1.1'
 
     def __upgrade(self):
         """upgrade the structure of an existing kajongg database"""

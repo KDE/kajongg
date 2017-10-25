@@ -208,10 +208,7 @@ class Games(QDialog):
     def __getSelectedGame(self):
         """returns the game id of the selected game"""
         rows = self.selection.selectedRows()
-        if rows:
-            return self.model.data(rows[0], 0)
-        else:
-            return 0
+        return self.model.data(rows[0], 0) if rows else 0
 
     def pendingOrNot(self, chosen):
         """do we want to see all games or only pending games?"""

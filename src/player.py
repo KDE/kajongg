@@ -296,10 +296,7 @@ class Player(StrMixin):
     @property
     def handTotal(self):
         """the hand total of this player for the final scoring"""
-        if not self.game.winner:
-            return 0
-        else:
-            return self.hand.total()
+        return 0 if not self.game.winner else self.hand.total()
 
     @property
     def balance(self):
@@ -637,8 +634,7 @@ class PlayingPlayer(Player):
         where a meld is represented by a list of 2char strings"""
         if msg in (Message.Chow, Message.Pung, Message.Kong):
             return [x for x in self.sayable[msg] if self.mustPlayDangerous(x)]
-        else:
-            return []
+        return []
 
     def hasConcealedTiles(self, tiles, within=None):
         """do I have those concealed tiles?"""

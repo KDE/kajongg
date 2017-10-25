@@ -276,8 +276,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
             return -self.xoffset * 100 - self.yoffset
         elif sorter == Qt.Key_Left:
             return -self.yoffset * 100 - self.xoffset
-        else:
-            return self.yoffset * 100 + self.xoffset
+        return self.yoffset * 100 + self.xoffset
 
     def setBoard(self, board, xoffset=None, yoffset=None, level=0):
         """change Position of tile in board"""

@@ -375,9 +375,8 @@ class PlayingScene(GameScene):
         if self.game.finished():
             self.game = None
             return succeed(True)
-        else:
-            return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(
-                gotAnswer, autoPlaying)
+        return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(
+            gotAnswer, autoPlaying)
 
     def keyPressEvent(self, event):
         """if we have a clientDialog, pass event to it"""
@@ -511,8 +510,7 @@ class ScoringScene(GameScene):
         elif self.game.finished():
             self.game = None
             return succeed(True)
-        else:
-            return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(answered)
+        return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(answered)
 
     def __moveTile(self, uiTile, wind, toConcealed):
         """the user pressed a wind letter or X for center, wanting to move a uiTile there"""

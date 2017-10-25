@@ -57,8 +57,7 @@ class TablesModel(QAbstractTableModel):
             if orientation == Qt.Horizontal:
                 if section in [3, 4]:
                     return int(Qt.AlignLeft)
-                else:
-                    return int(Qt.AlignHCenter | Qt.AlignVCenter)
+                return int(Qt.AlignHCenter | Qt.AlignVCenter)
         if role != Qt.DisplayRole:
             return
         if orientation != Qt.Horizontal:

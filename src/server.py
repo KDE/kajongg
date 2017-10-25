@@ -249,10 +249,9 @@ class MJServer:
                                      tableId, self.tables[tableId])))
         if Ruleset.hashIsKnown(ruleset):
             return self.__newTable(None, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
-        else:
-            return self.callRemote(user, 'needRuleset', ruleset).addCallback(
-                gotRuleset).addCallback(
-                    self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
+        return self.callRemote(user, 'needRuleset', ruleset).addCallback(
+            gotRuleset).addCallback(
+                self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
 
     def __newTable(self, unused, user, ruleset,
                    playOpen, autoPlay, wantedGame, tableId=None):

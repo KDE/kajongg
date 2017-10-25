@@ -62,8 +62,7 @@ class Fmt(string.Formatter):
                 return 'None'
             elif Debug.neutral:
                 return '....'
-            else:
-                return Fmt.num_encode(id(kwargs[idpar]))
+            return Fmt.num_encode(id(kwargs[idpar]))
         elif key == 'self':
             return kwargs['SELF']
         else:
@@ -125,9 +124,8 @@ def dbgIndent(this, parent):
     """show messages indented"""
     if this.indent == 0:
         return ''
-    else:
-        pIndent = parent.indent if parent else 0
-        return (' │ ' * (pIndent)) + ' ├' + '─' * (this.indent - pIndent - 1)
+    pIndent = parent.indent if parent else 0
+    return (' │ ' * (pIndent)) + ' ├' + '─' * (this.indent - pIndent - 1)
 
 
 def __logUnicodeMessage(prio, msg):
@@ -213,10 +211,7 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     if int(Debug.callers):
         __logUnicodeMessage(prio, callers(int(Debug.callers)))
     if showDialog and not Internal.isServer:
-        if prio == logging.INFO:
-            return Information(msg)
-        else:
-            return Sorry(msg, always=True)
+        return Information(msg) if prio == logging.INFO else Sorry(msg, always=True)
     return NoPrompt(msg)
 
 

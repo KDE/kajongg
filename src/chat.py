@@ -43,8 +43,7 @@ class ChatModel(QAbstractTableModel):
             if orientation == Qt.Horizontal:
                 if section == 1:
                     return int(Qt.AlignRight)
-                else:
-                    return int(Qt.AlignLeft)
+                return int(Qt.AlignLeft)
         if orientation != Qt.Horizontal:
             return int(section + 1)
         if role != Qt.DisplayRole:
@@ -71,8 +70,7 @@ class ChatModel(QAbstractTableModel):
         if role == Qt.TextAlignmentRole:
             if index.column() == 1:
                 return int(Qt.AlignRight)
-            else:
-                return int(Qt.AlignLeft)
+            return int(Qt.AlignLeft)
         if index.isValid() and (0 <= index.row() < len(self.chatLines)):
             chatLine = self.chatLines[index.row()]
             if role == Qt.DisplayRole and index.column() == 0:

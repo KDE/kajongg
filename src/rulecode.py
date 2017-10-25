@@ -518,10 +518,7 @@ class WrigglingSnake(MJRule):
                 and all(not x.isChow for x in hand.declaredMelds))
 
     def computeLastMelds(hand):
-        if hand.lastTile.value == 1:
-            return [hand.lastTile.pair]
-        else:
-            return [hand.lastTile.single]
+        return [hand.lastTile.pair] if hand.lastTile.value == 1 else [hand.lastTile.single]
 
     def winningTileCandidates(hand):
         suits = hand.suits.copy()
@@ -539,12 +536,10 @@ class WrigglingSnake(MJRule):
             if hand.values.count(1) < 2:
                 # and the pair of 1 is incomplete too
                 return set()
-            else:
-                return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) \
-                    - set([x.exposed for x in hand.tiles])
-        else:
-            # pair of 1 is not complete
-            return set([Tile(group, '1')])
+            return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) \
+                - set([x.exposed for x in hand.tiles])
+        # pair of 1 is not complete
+        return set([Tile(group, '1')])
 
     def rearrange(hand, rest):
         melds = []
@@ -1182,9 +1177,8 @@ class ThirteenOrphans(MJRule):
         if not missing:
             # if all 13 tiles are there, we need any one of them:
             return elements.majors
-        else:
-            assert len(missing) == 1
-            return missing
+        assert len(missing) == 1
+        return missing
 
     def shouldTry(hand, maxMissing=4):
         # TODO: look at how many tiles there still are on the wall

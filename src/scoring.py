@@ -270,10 +270,7 @@ class ScoringHandBoard(HandBoard):
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
         meld = self.uiMeldWithTile(self.focusTile)
-        if meld:
-            return len(meld)
-        else:
-            return 1
+        return len(meld) if meld else 1
 
     def addUITile(self, uiTile):
         Board.addUITile(self, uiTile)
@@ -358,8 +355,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         if self.hasManualScore():
             spValue = Internal.scene.scoringDialog.spValues[self.idx]
             return spValue.value()
-        else:
-            return self.hand.total()
+        return self.hand.total()
 
     def hasManualScore(self):
         """True if no tiles are assigned to this player"""

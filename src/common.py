@@ -126,8 +126,7 @@ def socketName():
                    # there
     if Options.socket:
         return Options.socket
-    else:
-        return os.path.normpath('{}/socket{}'.format(serverDir, Internal.defaultPort))
+    return os.path.normpath('{}/socket{}'.format(serverDir, Internal.defaultPort))
 
 
 class Debug:
@@ -257,8 +256,7 @@ class StrMixin:
         content = str(self)
         if content.startswith(clsName):
             return content
-        else:
-            return '{cls}({content})'.format(cls=clsName, content=content)
+        return '{cls}({content})'.format(cls=clsName, content=content)
 
 
 class Options:

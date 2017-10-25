@@ -75,10 +75,7 @@ class PlayerList(QDialog):
     @staticmethod
     def sortKey(text):
         """display order in Table"""
-        if not text:
-            return 'zzzzzzzzzzzz'
-        else:
-            return text.upper()
+        return text.upper() if text else 'zzzzzzzzzzzz'
 
     def updateTable(self, data=None, currentName=None):
         """fills self.table from DB"""

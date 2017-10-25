@@ -243,8 +243,7 @@ class Meld(TileList, StrMixin):
             return True
         elif len(self) == 4:
             return self.case[1:3].islower()
-        else:
-            return False
+        return False
 
     def __setMeldType(self):
         """compute meld type. Except knitting melds."""
@@ -341,8 +340,7 @@ class Meld(TileList, StrMixin):
             return i18nc('kajongg meld type', 'c&laimed kong')
         elif self.isKong:
             return i18nc('kajongg meld type', 'k&ong')
-        else:
-            return i18nc('kajongg meld type', 'rest of tiles')
+        return i18nc('kajongg meld type', 'rest of tiles')
 
     def __stateName(self):
         """the translated name of the state"""
@@ -350,8 +348,7 @@ class Meld(TileList, StrMixin):
             return ''
         elif self.isExposed:
             return i18nc('kajongg meld state', 'Exposed')
-        else:
-            return i18nc('kajongg meld state', 'Concealed')
+        return i18nc('kajongg meld state', 'Concealed')
 
     def name(self):
         """the long name"""
@@ -429,7 +426,6 @@ class MeldList(list):
     def __str__(self):
         if self:
             return ' '.join(str(x) for x in self)
-        else:
-            return ''
+        return ''
 
 Meld.cacheMeldsInTiles()

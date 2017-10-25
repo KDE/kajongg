@@ -617,8 +617,7 @@ class HumanClient(Client):
             if self.connection and result:
                 # still connected and yes, we are
                 return clientReady()
-            else:
-                return Message.NoGameStart
+            return Message.NoGameStart
 
         def cancelled(unused):
             """the user does not want to start now. Back to table list"""
@@ -746,8 +745,7 @@ class HumanClient(Client):
             # this does not specify any tiles, the server does not need this. Robot players
             # also return None in this case.
             return answer
-        else:
-            return answer, args
+        return answer, args
 
     def __answerError(self, answer, move, answers):
         """an error happened while determining the answer to server"""

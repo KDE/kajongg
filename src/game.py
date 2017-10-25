@@ -974,12 +974,9 @@ class PlayingGame(Game):
 
     def _mustExchangeSeats(self, pairs):
         """filter: which player pairs should really swap places?"""
-        if self.belongsToPlayer():
-            # if we are a client in a remote game, the server swaps and tells
-            # us the new places
-            return []
-        else:
-            return pairs
+        # if we are a client in a remote game, the server swaps and tells
+        # us the new places
+        return [] if self.belongsToPlayer() else pairs
 
     def _scanGameOption(self):
         """scan the --game option and go to start of wanted hand"""

@@ -38,10 +38,9 @@ class Permutations:
         cacheKey = tuple(x.key for x in tiles)
         if cacheKey in cls.cache:
             return cls.cache[cacheKey]
-        else:
-            result = object.__new__(cls)
-            cls.cache[cacheKey] = result
-            return result
+        result = object.__new__(cls)
+        cls.cache[cacheKey] = result
+        return result
 
     def __init__(self, tiles):
         self.tiles = tiles
