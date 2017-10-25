@@ -22,8 +22,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 from __future__ import print_function
 
 import signal
-signal.signal(signal.SIGINT, signal.SIG_DFL)
-
 import os
 import sys
 import subprocess
@@ -37,6 +35,8 @@ from optparse import OptionParser
 from common import Debug, StrMixin, cacheDir
 from util import removeIfExists, gitHead, checkMemory
 from util import Csv, CsvWriter, popenReadlines
+
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 # fields in row:
 RULESETFIELD = 0

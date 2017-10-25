@@ -24,8 +24,6 @@ import subprocess
 import datetime
 from io import BytesIO
 from hashlib import md5
-if os.name == 'nt':
-    import winsound  # pylint: disable=import-error
 
 from common import Debug, Internal, StrMixin, cacheDir
 from util import which, removeIfExists, uniqueList, elapsedSince
@@ -44,6 +42,9 @@ from tile import Tile
         # Phonon.createPath(self.audio, self.audioOutput)
         # self.audio.enqueue(Phonon.MediaSource(wavName))
         # self.audio.play()
+
+if os.name == 'nt':
+    import winsound  # pylint: disable=import-error
 
 
 class Sound:

@@ -31,12 +31,9 @@ import subprocess
 import getpass
 import webbrowser
 import codecs
-if os.name != 'nt':
-    import pwd
 import weakref
 from collections import defaultdict
 from argparse import ArgumentParser
-
 
 try:
     from PyQt5 import sip
@@ -57,6 +54,9 @@ from mi18n import MLocale, KDETranslator, i18n, i18nc
 from common import Internal, isAlive
 from util import popenReadlines
 from statesaver import StateSaver
+
+if os.name != 'nt':
+    import pwd
 
 __all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
            'KCmdLineOptions',

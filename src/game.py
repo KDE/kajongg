@@ -21,8 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 import datetime
 import weakref
 import os
-if os.name != 'nt':
-    import resource
 from collections import defaultdict
 from functools import total_ordering
 
@@ -41,6 +39,9 @@ from wall import Wall
 from move import Move
 from player import Players, Player, PlayingPlayer
 from animation import animateAndDo, AnimationSpeed
+
+if os.name != 'nt':
+    import resource
 
 
 @total_ordering

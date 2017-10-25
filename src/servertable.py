@@ -25,10 +25,7 @@ O'Reilly Media, Inc., ISBN 0-596-10032-9
 import os
 import random
 import traceback
-if os.name != 'nt':
-    import resource
 from itertools import chain
-
 from twisted.spread import pb
 
 from common import Debug, Internal, StrMixin
@@ -48,6 +45,10 @@ from sound import Voice
 from servercommon import srvError
 from user import User
 from game import PlayingGame
+
+if os.name != 'nt':
+    import resource
+
 
 class ServerGame(PlayingGame):
 
@@ -895,4 +896,3 @@ class ServerTable(Table, StrMixin):
         block.tellOthers(player, command, **kwargs)
         block.callback(callback)
         return block
-
