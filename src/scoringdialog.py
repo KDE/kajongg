@@ -555,6 +555,10 @@ class ScoreTable(QWidget):
         if height:
             self.leftLayout.addSpacing(height)
 
+    def closeEvent(self, unusedEvent):  # pylint: disable=no-self-use
+        """update action button state"""
+        Internal.mainWindow.actionScoreTable.setChecked(False)
+
 
 class ExplainView(QListView):
 
@@ -605,6 +609,10 @@ class ExplainView(QListView):
         if 'xxx'.join(lines) != 'xxx'.join(str(x) for x in self.model.stringList()): # TODO: ohne?
             # QStringListModel does not optimize identical lists away, so we do
             self.model.setStringList(lines)
+
+    def closeEvent(self, unusedEvent):  # pylint: disable=no-self-use
+        """update action button state"""
+        Internal.mainWindow.actionExplain.setChecked(False)
 
 
 class PenaltyBox(QSpinBox):
