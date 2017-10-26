@@ -217,7 +217,7 @@ class Client(pb.Referenceable):
             self.tables.append(newTable)
         return oldTable, newTable
 
-    def remote_tableRemoved(self, tableid, unusedMsg, *unusedMsgArgs): # pylint: disable=unused-argument
+    def remote_tableRemoved(self, tableid, message, *args):  # pylint: disable=unused-argument
         """update table list"""
         table = self._tableById(tableid)
         if table:

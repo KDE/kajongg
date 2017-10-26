@@ -353,9 +353,9 @@ class Board(QGraphicsRectItem, StrMixin):
         so default is to return a Meld with only uiTile"""
         return UIMeld(uiTile)
 
-    def meldVariants(self, uiTile, lowerHalf):  # pylint: disable=no-self-use,unused-argument
+    def meldVariants(self, tile, lowerHalf):  # pylint: disable=no-self-use,unused-argument
         """all possible melds that could be meant by dragging/dropping uiTile"""
-        return [Meld(uiTile)]
+        return [Meld(tile)]
 
     def chooseVariant(self, uiTile, lowerHalf=False):
         """make the user choose from a list of possible melds for the target.
@@ -721,11 +721,11 @@ class SelectorBoard(CourtBoard):
         uiTile.dark = False
         uiTile.setBoard(self, column, row)
 
-    def meldVariants(self, uiTile, lowerHalf):
+    def meldVariants(self, tile, lowerHalf):
         """returns a list of possible variants based on meld. Those are logical melds."""
         # pylint: disable=too-many-locals
-        assert isinstance(uiTile, UITile)
-        wantedTile = uiTile.tile
+        assert isinstance(tile, UITile)
+        wantedTile = tile.tile
         for selectorTile in self.uiTiles:
             selectorTile.tile = selectorTile.tile.exposed
         lowerName = wantedTile.exposed

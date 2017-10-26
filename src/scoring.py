@@ -144,7 +144,7 @@ class ScoringTileAttr(TileAttr):
         """should the tile appear darker?"""
         return self.yoffset or self.tile.isConcealed
 
-    def setFocusable(self, unusedHand, unusedMeld, idx):
+    def setFocusable(self, hand, meld, idx):
         """in a scoring handboard, only the first tile of a meld is focusable"""
         return idx == 0
 

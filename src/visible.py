@@ -149,10 +149,10 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             self.front.message.msg = ''
             self.front.message.setVisible(False)
 
-    def speak(self, text):
+    def speak(self, txt):
         """speak if we have a voice"""
         if self.voice:
-            self.voice.speak(text, self.front.rotation())
+            self.voice.speak(txt, self.front.rotation())
 
     def robTileFrom(self, tile):
         """used for robbing the kong from this player"""
@@ -168,13 +168,13 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         assert lastDiscard.tile.isConcealed
         self.syncHandBoard()
 
-    def addConcealedTiles(self, uiTiles, animated=True):
+    def addConcealedTiles(self, tiles, animated=True):
         """add to my tiles and sync the hand board"""
         with AnimationSpeed(speed=Internal.Preferences.animationSpeed if animated else 99):
             PlayingPlayer.addConcealedTiles(
                 self,
-                list(x.tile for x in uiTiles))
-            self.syncHandBoard(uiTiles)
+                list(x.tile for x in tiles))
+            self.syncHandBoard(tiles)
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show

@@ -67,31 +67,30 @@ class CountingRandom(Random):
         CountingRandom.count += 1
         return Random.random(self)
 
-    def seed(self, newSeed=None, version=2):
+    def seed(self, a=None, version=2):
         CountingRandom.count = 0
-        Random.seed(self, newSeed, version)
+        Random.seed(self, a, version)
         if Debug.random:
-            self.game.debug('Random gets seed %s' % newSeed)
+            self.game.debug('Random gets seed %s' % a)
 
     def randrange(self, start, stop=None, step=1, _int=int):
         with CountRandomCalls(self, 'randrange({},{},step={})'.format(
             start, stop, step)):
             return Random.randrange(self, start, stop, step)
 
-    def choice(self, fromList):
+    def choice(self, seq):
         """Choose a random element from a non-empty sequence."""
-        if len(fromList) == 1:
-            return fromList[0]
-        with CountRandomCalls(self, 'choice({})'.format(
-            fromList)):
-            return Random.choice(self, fromList)
+        if len(seq) == 1:
+            return seq[0]
+        with CountRandomCalls(self, 'choice({})'.format(seq)):
+            return Random.choice(self, seq)
 
-    def sample(self, population, wantedLength):
-        """add debug output to sample"""
-        with CountRandomCalls(self, 'sample({}, {})'.format(population, wantedLength)):
-            return Random.sample(self, population, wantedLength)
+    def sample(self, population, k):
+        """add debug output to sample. Chooses k unique random elements"""
+        with CountRandomCalls(self, 'sample({}, {})'.format(population, k)):
+            return Random.sample(self, population, k)
 
-    def shuffle(self, listValue, func=None):
-        """add debug output to shuffle"""
-        with CountRandomCalls(self, 'shuffle({})'.format(listValue)):
-            Random.shuffle(self, listValue, func)
+    def shuffle(self, x, random=None):
+        """add debug output to shuffle. Shuffles list x in place."""
+        with CountRandomCalls(self, 'shuffle({})'.format(x)):
+            Random.shuffle(self, x, random)

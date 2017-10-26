@@ -386,10 +386,10 @@ class Player(StrMixin):
         announcements = 'a' if self.originalCall else ''
         return ''.join(['m', self.lastSource.char, ''.join(announcements)])
 
-    def makeTileKnown(self, tileName):
+    def makeTileKnown(self, tile):
         """used when somebody else discards a tile"""
         assert not self._concealedTiles[0].isKnown
-        self._concealedTiles[0] = tileName
+        self._concealedTiles[0] = tile
         self._hand = None
 
     def __computeHand(self):

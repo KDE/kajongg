@@ -754,9 +754,9 @@ class KConfig(ConfigParser):
             with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
                 self.read_file(cfgFile)
 
-    def optionxform(self, value):
+    def optionxform(self, optionstr):
         """KDE needs upper/lowercase distinction"""
-        return value
+        return optionstr
 
     def setValue(self, section, option, value):
         """like set but add missing section"""

@@ -61,7 +61,7 @@ class TileAttr(StrMixin):
         """should the tile appear darker?"""
         return self.tile.isConcealed if self.yoffset == 0 else not self.tile.isKnown
 
-    def setFocusable(self, hand, meld, unusedIdx):
+    def setFocusable(self, hand, meld, idx): # pylint: disable=unused-argument
         """is it focusable?"""
         player = hand.player
         return (
@@ -127,7 +127,7 @@ class HandBoard(Board):
         """for debugging messages"""
         return self.player.name
 
-    def showShadowsChanged(self, unusedOldValue, unusedNewValue):
+    def showShadowsChanged(self, unusedOldValue, newValue):
         """Add or remove the shadows."""
         self.setPosition()
 

@@ -114,7 +114,7 @@ class ServerMessage(Message):
     sendScore = False
     needsGame = True   # message only applies to an existing game
 
-    def clientAction(self, unusedClient, move):
+    def clientAction(self, client, move): # pylint: disable=unused-argument
         """default client action: none - this is a virtual class"""
         logException(
             'clientAction is not defined for %s. msg:%s' %
@@ -136,13 +136,13 @@ class ClientMessage(Message):
             self.shortcut)
         return self.i18nName.replace(i18nShortcut, '&' + i18nShortcut, 1)
 
-    def toolTip(self, unusedButton, unusedTile):
+    def toolTip(self, button, tile): # pylint: disable=unused-argument
         """returns text and warning flag for button and text for tile for button and text for tile"""
         txt = 'toolTip is not defined for %s' % self.name
         logWarning(txt)
         return txt, True, ''
 
-    def serverAction(self, unusedTable, msg):
+    def serverAction(self, table, msg): # pylint: disable=unused-argument
         """default server action: none - this is a virtual class"""
         logException(
             'serverAction is not defined for %s. msg:%s' %
@@ -179,7 +179,7 @@ class NotifyAtOnceMessage(ClientMessage):
     def __init__(self, name=None, shortcut=None):
         ClientMessage.__init__(self, name, shortcut)
 
-    def notifyAction(self, unusedClient, move):
+    def notifyAction(self, client, move): # pylint: disable=unused-argument
         """the default action for immediate notifications"""
         move.player.popupMsg(self)
 
@@ -201,7 +201,7 @@ class PungChowMessage(NotifyAtOnceMessage):
     def __init__(self, name=None, shortcut=None):
         NotifyAtOnceMessage.__init__(self, name=name, shortcut=shortcut)
 
-    def toolTip(self, button, unusedTile):
+    def toolTip(self, button, tile): # pylint: disable=unused-argument
         """for the action button which will send this message"""
         myself = button.client.game.myself
         maySay = myself.sayable[self]
@@ -269,7 +269,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
         else:
             table.declareKong(msg.player, Meld(msg.args[0]))
 
-    def toolTip(self, button, unusedTile):
+    def toolTip(self, button, tile):
         """for the action button which will send this message"""
         myself = button.client.game.myself
         maySay = myself.sayable[self]
@@ -338,11 +338,11 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
         """the server mirrors that and tells all others"""
         table.claimMahJongg(msg)
 
-    def toolTip(self, unusedButton, unusedTile):
+    def toolTip(self, button, tile): # pylint: disable=unused-argument
         """returns text and warning flag for button and text for tile"""
         return i18n('Press here and you win'), False, ''
 
-    def clientAction(self, unusedClient, move):
+    def clientAction(self, client, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
         return move.player.declaredMahJongg(move.melds, move.withDiscardTile,
                                             move.lastTile, move.lastMeld)
@@ -545,7 +545,7 @@ class MessageShowConcealedTiles(ServerMessage):
 
     """the game server assigns tiles to player"""
 
-    def clientAction(self, unusedClient, move):
+    def clientAction(self, client, move):
         """set tiles for player"""
         return move.player.showConcealedTiles(move.tiles, move.show)
 
@@ -617,7 +617,7 @@ class MessageVoiceId(ServerMessage):
     """we got a voice id from the server. If we have no sounds for
     this voice, ask the server"""
 
-    def clientAction(self, unusedClient, move):
+    def clientAction(self, client, move):
         """the server gave us a voice id about another player"""
         if Internal.Preferences.useSounds and Options.gui:
             move.player.voice = Voice.locate(move.source)
@@ -629,7 +629,7 @@ class MessageVoiceData(ServerMessage):
 
     """we got voice sounds from the server, assign them to the player voice"""
 
-    def clientAction(self, unusedClient, move):
+    def clientAction(self, client, move):
         """server sent us voice sounds about somebody else"""
         move.player.voice = Voice(move.md5sum, move.source)
         if Debug.sound:
@@ -656,7 +656,7 @@ class MessageServerWantsVoiceData(ServerMessage):
 
     """The server wants voice sounds from a client"""
 
-    def clientAction(self, unusedClient, move):
+    def clientAction(self, client, move):
         """send voice sounds as requested to server"""
         if Debug.sound:
             logDebug('%s: send wanted voice data %s to server' % (
@@ -668,7 +668,7 @@ class MessageServerGetsVoiceData(ClientMessage):
 
     """The server gets voice sounds from a client"""
 
-    def serverAction(self, unusedTable, msg):
+    def serverAction(self, table, msg): # pylint: disable=unused-argument
         """save voice sounds on the server"""
         voice = msg.player.voice
         voice.archiveContent = msg.args[0]
@@ -787,7 +787,7 @@ class MessageError(ServerMessage):
     """a client errors"""
     needsGame = False
 
-    def clientAction(self, unusedClient, move):
+    def clientAction(self, client, move):
         """show the error message from server"""
         return logWarning(move.source)
 
@@ -807,7 +807,7 @@ class MessageOK(ClientMessage):
                                name=i18ncE('kajongg', 'OK'),
                                shortcut=i18ncE('kajongg game dialog:Key for OK', 'O'))
 
-    def toolTip(self, unusedButton, unusedTile):
+    def toolTip(self, button, tile): # pylint: disable=unused-argument
         """returns text and warning flag for button and text for tile for button and text for tile"""
         return i18n('Confirm that you saw the message'), False, ''
 
@@ -821,7 +821,7 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
                                      name=i18ncE('kajongg', 'No Claim'),
                                      shortcut=i18ncE('kajongg game dialog:Key for No claim', 'N'))
 
-    def toolTip(self, unusedButton, unusedTile):
+    def toolTip(self, button, tile): # pylint: disable=unused-argument
         """returns text and warning flag for button and text for tile for button and text for tile"""
         return i18n('You cannot or do not want to claim this tile'), False, ''
 
