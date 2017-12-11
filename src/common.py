@@ -352,7 +352,6 @@ class __Internal:
                 haveDevLog = False
         if not haveDevLog:
             logName = os.path.join(appdataDir(), logName)
-            print('Logging into {}'.format(logName))
             handler = logging.handlers.RotatingFileHandler(
                 logName, maxBytes=100000000, backupCount=10)
         self.logger.addHandler(handler)
