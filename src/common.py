@@ -105,7 +105,11 @@ def appdataDir():
             os.makedirs(serverDir)
         result = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
         # this may end with kajongg.py or .pyw or whatever, so fix that:
-        result = os.path.join(os.path.dirname(result), 'kajongg')
+        if not os.path.isdir(result):
+            result = os.path.dirname(result)
+        if not result.endswith('kajongg'):
+            # when called first, QApplication.applicationName is not yet set
+            result = result + '/kajongg'
         if not os.path.exists(result):
             os.makedirs(result)
         return result
