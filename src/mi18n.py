@@ -237,7 +237,7 @@ class MLocale:
             try:
                 localename = os.environ[variable]
                 if localename is None:
-                    print(variable, 'is None')
+                    raise Exception('{} is None'.format(variable))
             except KeyError:
                 continue
             else:
