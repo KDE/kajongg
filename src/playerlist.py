@@ -20,11 +20,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from mi18n import i18n, i18nc
 from kde import KIcon
-from dialogs import Sorry
+from dialogs import Sorry, QuestionYesNo
 from qt import Qt
 from qt import QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox, \
     QTableWidget, QTableWidgetItem
 
+from common import Internal
 from query import Query
 from guiutil import decorateWindow
 from statesaver import StateSaver
@@ -131,23 +132,50 @@ class PlayerList(QDialog):
             if not item.text():
                 self.table.editItem(item)
 
+    @staticmethod
+    def __deletePlayer(playerId):
+        """delete this player and all associated games"""
+        with Internal.db: # transaction
+            Query("delete from score where player=?", (playerId, ))
+            Query("delete from game where p0=? or p1=? or p2=? or p3=?", (playerId, ) * 4)
+            Query("delete from player where id=?", (playerId,))
+
     def delete(self):
-        """delete selected entries"""
-        items = self.table.selectedItems()
-        currentRow = self.table.currentRow()
-        if items:
-            name = items[0].text()
-            playerId = self._data[name]
-            query = Query(
-                "select 1 from game where p0=? or p1=? or p2=? or p3=?",
-                (playerId, ) * 4)
-            if query.records:
-                Sorry(
-                    i18n('This player cannot be deleted. There are games associated with %1.', name))
-                return
-            Query("delete from player where name=?", (name,))
+        """delete selected entry"""
+        def answered(result):
+            """coming from QuestionYesNo"""
+            if result is True:
+                self.__deletePlayer(playerId)
+            cleanup()
+        def cleanup():
+            """update table view"""
             self.updateTable()
-        self.table.setCurrentCell(min(currentRow, len(self._data) - 1), 0)
+            self.table.setCurrentCell(min(currentRow, len(self._data) - 1), 0)
+            # the main window gets focus after QuestionYesNo
+            self.activateWindow()
+
+        items = self.table.selectedItems()
+        if not items:
+            return
+        currentRow = self.table.currentRow()
+        assert len(items) == 1
+        name = items[0].text()
+        playerId = self._data[name]
+
+        fullCount = int(Query(
+            "select count(1) from game where p0=? or p1=? or p2=? or p3=?",
+            (playerId, ) * 4).records[0][0])
+        if not fullCount:
+            self.__deletePlayer(playerId)
+            cleanup()
+        else:
+            finishedCount = int(Query(
+                "select count(1) from game where (p0=? or p1=? or p2=? or p3=?) and endtime is not null",
+                (playerId, ) * 4).records[0][0])
+            QuestionYesNo(i18n(
+                'There are %1 finished and %2 unfinished games for %3, delete %3 anyway?'
+                '  This will also delete all games played by %3!',
+                finishedCount, fullCount - finishedCount, name)).addBoth(answered)
 
     def keyPressEvent(self, event):
         """use insert/delete keys for insert/delete"""
