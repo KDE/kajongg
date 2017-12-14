@@ -57,50 +57,11 @@ from statesaver import StateSaver
 if os.name != 'nt':
     import pwd
 
-__all__ = ['KAboutData', 'KApplication', 'KConfig',
+__all__ = ['KApplication', 'KConfig',
            'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
            'KConfigDialog', 'KDialog',
            'KUser', 'KStandardAction',
            'KXmlGuiWindow', 'KGlobal', 'KIcon']
-
-
-class KAboutData:
-
-    """stub"""
-    License_GPL = 1
-
-    def __init__(self, appname, catalog, programName, version, description,
-                 kajLicense, kajCopyright, aboutText, homePage):
-        # pylint: disable=too-many-arguments
-        KGlobal.aboutData = self
-        self.appname = appname
-        self.catalog = catalog
-        self.programName = programName
-        self.version = version
-        self.description = description
-        self.kajLicense = kajLicense
-        self.kajCopyright = kajCopyright
-        self.aboutText = aboutText
-        self.homePage = homePage
-        self._authors = []
-
-    def addAuthor(self, name, description, mailAdress):
-        """authors to be shown on about page"""
-        self._authors.append((name, description, mailAdress))
-
-    def authors(self):
-        """stub"""
-        return self._authors
-
-    @staticmethod
-    def licenseFile():
-        """which may currently only be 1: GPL_V2"""
-        prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
-        for path in ('COPYING', '../COPYING',
-                     '%s/share/kf5/licenses/GPL_V2' % prefix):
-            path = os.path.abspath(path)
-            if os.path.exists(path):
-                return path
 
 
 class KApplication(QApplication):
@@ -1022,6 +983,10 @@ class AboutKajonggDialog(KDialog):
         h1vLayout.addWidget(QLabel('Kajongg'))
         h1vLayout.addWidget(QLabel(i18n('Version: %1', data.version)))
         h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
+        authors = ((
+            "Wolfgang Rohdewald",
+            i18n("Original author"),
+            "wolfgang@rohdewald.de"), )
         underVersions = []
         try:
             versions = popenReadlines('kf5-config -v')
@@ -1058,13 +1023,18 @@ class AboutKajonggDialog(KDialog):
         aboutLabel.setWordWrap(True)
         aboutLabel.setOpenExternalLinks(True)
         aboutLabel.setText(
-            '<br /><br />'.join([data.description, data.aboutText,
-                                 data.kajCopyright,
-                                 '<a href="{link}">{link}</a>'.format(link=data.homePage)]))
+            '<br /><br />'.join([
+                i18n("Mah Jongg - the ancient Chinese board game for 4 players"),
+                i18n("This is the classical Mah Jongg for four players. "
+                     "If you are looking for Mah Jongg solitaire please "
+                     "use the application kmahjongg."),
+                "(C) 2008-2017 Wolfgang Rohdewald",
+                '<a href="{link}">{link}</a>'.format(
+                    link='http://kde.org/applications/games/kajongg/')]))
         licenseLabel = QLabel()
         licenseLabel.setText(
             '<a href="file://{link}">GNU General Public License Version 2</a>'.format(
-                link=data.licenseFile()))
+                link=self.licenseFile()))
         licenseLabel.linkActivated.connect(self.showLicense)
         aboutLayout.addWidget(aboutLabel)
         aboutLayout.addWidget(licenseLabel)
@@ -1082,7 +1052,7 @@ class AboutKajonggDialog(KDialog):
         titleLabel = QLabel(i18n('Authors:'))
         authorLayout.addWidget(titleLabel)
 
-        for name, description, mail in data.authors():
+        for name, description, mail in authors:
             label = QLabel('{name} <a href="mailto:{mail}">{mail}</a>: {description}'.format(
                 name=name, mail=mail, description=description))
             label.setOpenExternalLinks(True)
@@ -1102,22 +1072,32 @@ class AboutKajonggDialog(KDialog):
         self.buttonBox.setFocus()
 
     @staticmethod
-    def showLicense():
+    def licenseFile():
+        """which may currently only be 1: GPL_V2"""
+        prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
+        for path in ('COPYING', '../COPYING',
+                     '%s/share/kf5/licenses/GPL_V2' % prefix):
+            path = os.path.abspath(path)
+            if os.path.exists(path):
+                return path
+
+    @classmethod
+    def showLicense(cls):
         """as the name says"""
-        LicenseDialog(Internal.mainWindow).exec_()
+        LicenseDialog(Internal.mainWindow, cls.licenseFile()).exec_()
 
 
 class LicenseDialog(KDialog):
 
     """see kaboutapplicationdialog.cpp"""
 
-    def __init__(self, parent):
+    def __init__(self, parent, licenseFile):
         KDialog.__init__(self, parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.setCaption(i18n("License Agreement"))
         self.setButtons(KDialog.Close)
         self.buttonBox.setFocus()
-        licenseText = open(KGlobal.aboutData.licenseFile(), 'r').read()
+        licenseText = open(licenseFile, 'r').read()
         self.licenseBrowser = QTextBrowser()
         self.licenseBrowser.setLineWrapMode(QTextEdit.NoWrap)
         self.licenseBrowser.setText(licenseText)
