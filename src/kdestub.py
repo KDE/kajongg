@@ -177,8 +177,9 @@ class KAboutData:
     @staticmethod
     def licenseFile():
         """which may currently only be 1: GPL_V2"""
+        prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
         for path in ('COPYING', '../COPYING',
-                     '%s/share/kf5/licenses/GPL_V2' % KGlobal.prefix):
+                     '%s/share/kf5/licenses/GPL_V2' % prefix):
             path = os.path.abspath(path)
             if os.path.exists(path):
                 return path
@@ -736,10 +737,8 @@ class KGlobal:
     @classmethod
     def initStatic(cls):
         """init class members"""
-        cls.prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
         Internal.kajonggrc = KConfig()
         MLocale.installTranslations(cls.currentLanguages())
-
 
 class KConfig(ConfigParser):
 
