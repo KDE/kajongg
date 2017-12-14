@@ -171,6 +171,8 @@ class KDETranslator(QTranslator):
 class MLocale:
     """xxxx"""
 
+    __cached_availableLanguages = None
+
     @classmethod
     def initStatic(cls):
         """init class attributes"""
@@ -252,6 +254,8 @@ class MLocale:
     @classmethod
     def availableLanguages(cls):
         """see python lib, getdefaultlocale (which only returns the first one)"""
+        if cls.__cached_availableLanguages:
+            return cls.__cached_availableLanguages
         localenames = cls.get_localenames()
         languages = list()
         for _ in localenames:
@@ -274,7 +278,8 @@ class MLocale:
             languages.extend(['en_US', 'en'])
         if Debug.i18n:
             Internal.logger.debug('languages available: %s', ':'.join(languages) if languages else None)
-        return ':'.join(languages)
+        cls.__cached_availableLanguages = ':'.join(languages)
+        return cls.__cached_availableLanguages
 
     @classmethod
     def availableLanguages_(cls):
