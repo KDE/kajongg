@@ -31,8 +31,8 @@ import logging
 from qt import QObject
 from PyQt5.QtGui import QGuiApplication
 from PyQt5 import QtCore
-from kde import KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
-from mi18n import i18n
+from kde import KApplication, KCmdLineArgs, KCmdLineOptions
+from mi18n import i18n, MLocale
 from about import About
 
 from common import Options, SingleshotOptions, Internal, Debug
@@ -172,7 +172,7 @@ if hasattr(QGuiApplication, 'setDesktopFileName'):
     QGuiApplication.setDesktopFileName('org.kde.kajongg')
 
 if Debug.neutral:
-    KGlobal.translation = None
+    MLocale.translation = None
 
 if Debug.events:
     EVHANDLER = EvHandler()
