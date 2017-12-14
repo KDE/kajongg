@@ -105,7 +105,6 @@ def defineOptions():
 def parseOptions():
     """parse command line options and save the values"""
     args = KCmdLineArgs.parsedArgs()
-    Internal.app = APP
     Options.playOpen |= args.isSet('playopen')
     Options.showRulesets |= args.isSet('rulesets')
     Options.rulesetName = str(args.getOption('ruleset'))
@@ -165,7 +164,6 @@ if os.name == 'nt':
 ABOUT = About()
 KCmdLineArgs.init(sys.argv, ABOUT.about)
 KCmdLineArgs.addCmdLineOptions(defineOptions())
-APP = KApplication()
 parseOptions()
 
 if hasattr(QGuiApplication, 'setDesktopFileName'):
@@ -173,10 +171,11 @@ if hasattr(QGuiApplication, 'setDesktopFileName'):
 
 if Debug.neutral:
     MLocale.translation = None
+Internal.app = KApplication()
 
 if Debug.events:
     EVHANDLER = EvHandler()
-    APP.installEventFilter(EVHANDLER)
+    Internal.app.installEventFilter(EVHANDLER)
 
 from config import SetupPreferences
 SetupPreferences()
