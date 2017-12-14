@@ -235,6 +235,14 @@ Options {stropt} take a string argument like {example}.
         if Debug.time:
             Debug.time = datetime.datetime.now()
 
+    @staticmethod
+    def str():
+        """__str__ does not work with class objects"""
+        result = []
+        for option in Debug.__dict__:
+            if not option.startswith('_'):
+                result.append('{}={}'.format(option, getattr(Debug, option)))
+        return ' '.join(result)
 
 class FixedClass(type):
 
@@ -290,6 +298,16 @@ class Options:
     def __init__(self):
         raise Exception('Options is not meant to be instantiated')
 
+    @staticmethod
+    def str():
+        """__str__ does not work with class objects"""
+        result = []
+        for option in Options.__dict__:
+            if not option.startswith('_'):
+                value = getattr(Options, option)
+                if isinstance(value, (bool, int, str)):
+                    result.append('{}={}'.format(option, value))
+        return ' '.join(result)
 
 class SingleshotOptions:
 

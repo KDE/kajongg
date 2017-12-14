@@ -28,12 +28,11 @@ import sys
 import os
 import logging
 
-from qt import QObject
 from PyQt5.QtGui import QGuiApplication
 from PyQt5 import QtCore
-from kde import KApplication, KCmdLineArgs, KCmdLineOptions
+from qt import QObject, QCommandLineParser, QCommandLineOption
+from kde import KApplication
 from mi18n import i18n, MLocale
-from about import About
 
 from common import Options, SingleshotOptions, Internal, Debug
 # do not import modules using twisted before our reactor is running
@@ -67,75 +66,81 @@ def initRulesets():
             Options.ruleset = rulesets[matches[0]]
 
 
-def defineOptions():
-    """this is the KDE way. Compare with kajonggserver.py"""
-    options = KCmdLineOptions()
-    options.add(
-        "playopen",
-        i18n("all robots play with visible concealed tiles"))
-    options.add("demo", i18n("start with demo mode"))
-    options.add("host <HOST>", i18n("login to HOST"))
-    options.add("table <TABLE>", i18n("start new TABLE"))
-    options.add("join <TABLE>", i18n("join TABLE "))
-    options.add("ruleset <RULESET>", i18n("use ruleset without asking"))
-    options.add(
-        "rounds <ROUNDS>",
-        i18n("play one ROUNDS rounds per game. Only for debugging!"))
-    options.add("player <PLAYER>", i18n("prefer PLAYER for next login"))
-    options.add(
-        "ai <AI>",
-        i18n("use AI variant for human player in demo mode"))
-    options.add("csv <CSV>", i18n("write statistics to CSV"))
-    options.add("rulesets", i18n("show all available rulesets"))
-    options.add("game <seed(/(firsthand)(..(lasthand))>",
-                i18n("for testing purposes: Initializes the random generator"), "0")
-    options.add(
-        "nogui",
-        i18n("show no graphical user interface. Intended only for testing"))
-    options.add(
-        "socket <SOCKET>",
-        i18n("use a dedicated server listening on SOCKET. Intended only for testing"))
-    options.add(
-        "port <PORT>",
-        i18n("use a dedicated server listening on PORT. Intended only for testing"))
-    options.add("debug <OPTIONS>", Debug.help())
-    return options
+class CommandLineOption(QCommandLineOption):
+    """add some helping attributes"""
+    def __init__(self, *args, optName=None, argType=None, singleshot=False):
+        QCommandLineOption.__init__(self, *args)
+        if argType is None:
+            if len(args) == 2:
+                argType = bool
+            else:
+                argType = str
+        self.argType = argType
+        self.optName = optName or args[0]
+        self.singleshot = singleshot
 
+def defineOptions():
+    """define command line options"""
+    parser = QCommandLineParser()
+    options = []
+    def option(*args, optName=None, argType=None, singleshot=False):
+        """helper"""
+        opt = CommandLineOption(*args, optName=optName, argType=argType, singleshot=singleshot)
+        options.append(opt)
+        parser.addOption(opt)
+
+    parser.setApplicationDescription(i18n('Mah Jongg - the ancient Chinese board game for 4 players'))
+
+    parser.addHelpOption()
+    parser.addVersionOption()
+    option('playopen', i18n('all robots play with visible concealed tiles'), optName='playOpen')
+    option('demo', i18n('start with demo mode'))
+    option('host', i18n("login to HOST"), 'HOST', '')
+    option('table', i18n('start new TABLE'), 'TABLE', '1', argType=int, singleshot=True)
+    option('join', i18n('join TABLE'), 'TABLE', '1', argType=int, singleshot=True)
+    option('ruleset', i18n('use RULESET without asking'), 'RULESET', '', optName='rulesetName')
+    option('rounds', i18n('play only ROUNDS rounds per game. Only for debugging!'), 'ROUNDS', '4', argType=int)
+    option('player', i18n('prefer PLAYER for next login'), 'PLAYER', '')
+    option('ai', i18n('use AI variant for human player in demo mode'), 'AI', '', optName='AI')
+    option('csv', i18n('write statistics to CSV'), 'CSV', '')
+    option('rulesets', i18n('show all available rulesets'), optName='showRulesets')
+    option('game', i18n('for testing purposes: Initializes the random generator'),
+           'seed(/firsthand)(..(lasthand))', '0')
+    option('nogui', i18n('show no graphical user interface. Intended only for testing'), optName='gui')
+    option('socket', i18n('use a dedicated server listening on SOCKET. Intended only for testing'), 'SOCKET', '')
+    option('port', i18n('use a dedicated server listening on PORT. Intended only for testing'), 'PORT', '')
+    option('debug', Debug.help(), 'DEBUG', '')
+    return parser, options
 
 def parseOptions():
     """parse command line options and save the values"""
-    args = KCmdLineArgs.parsedArgs()
-    Options.playOpen |= args.isSet('playopen')
-    Options.showRulesets |= args.isSet('rulesets')
-    Options.rulesetName = str(args.getOption('ruleset'))
-    if args.isSet('host'):
-        Options.host = str(args.getOption('host'))
-    if args.isSet('player'):
-        Options.player = args.getOption('player')
-    if args.isSet('rounds'):
-        Options.rounds = int(args.getOption('rounds'))
-    if args.isSet('ai'):
-        Options.AI = str(args.getOption('ai'))
-    if args.isSet('csv'):
-        Options.csv = str(args.getOption('csv'))
-    if args.isSet('socket'):
-        Options.socket = str(args.getOption('socket'))
-    if args.isSet('port'):
-        Options.port = str(args.getOption('port'))
-    SingleshotOptions.game = str(args.getOption('game'))
-    Options.gui |= args.isSet('gui')
-    if args.isSet('table'):
-        SingleshotOptions.table = int(args.getOption('table'))
-    if args.isSet('join'):
-        SingleshotOptions.join = int(args.getOption('join'))
-    Options.demo |= args.isSet('demo')
+    Options.gui = True
+    parser, options = defineOptions()
+    parser.process(Internal.app)
+    for option in options:
+        if parser.isSet(option):
+            value = parser.value(option)
+            if option.optName == 'debug':
+                msg = Debug.setOptions(value)
+                if msg:
+                    Internal.logger.debug(msg)
+                    logging.shutdown()
+                    sys.exit(2)
+                continue
+            if option.optName in SingleshotOptions.__dict__:
+                target = SingleshotOptions
+            else:
+                target = Options
+            if option.argType is bool:
+                setattr(target, option.optName, not option.names()[0].startswith('no'))
+            elif option.argType is int:
+                setattr(target, option.optName, int(value))
+            else:
+                setattr(target, option.optName, value)
+
     Options.demo |= not Options.gui
     Internal.autoPlay = Options.demo
-    msg = Debug.setOptions(str(args.getOption('debug')))
-    if msg:
-        Internal.logger.debug(msg)
-        logging.shutdown()
-        sys.exit(2)
+
     from query import initDb
     if not initDb():
         raise SystemExit('Cannot initialize database')
@@ -161,9 +166,7 @@ if os.name == 'nt':
         # cx_freeze
         os.chdir(os.path.dirname(_))
 
-ABOUT = About()
-KCmdLineArgs.init(sys.argv, ABOUT.about)
-KCmdLineArgs.addCmdLineOptions(defineOptions())
+Internal.app = KApplication()
 parseOptions()
 
 if hasattr(QGuiApplication, 'setDesktopFileName'):
@@ -171,7 +174,6 @@ if hasattr(QGuiApplication, 'setDesktopFileName'):
 
 if Debug.neutral:
     MLocale.translation = None
-Internal.app = KApplication()
 
 if Debug.events:
     EVHANDLER = EvHandler()

@@ -28,6 +28,8 @@ from PyQt5.QtCore import QAbstractItemModel
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtCore import QByteArray
 from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtCore import QCommandLineParser
+from PyQt5.QtCore import QCommandLineOption
 from PyQt5.QtCore import QLibraryInfo
 from PyQt5.QtCore import QStandardPaths
 from PyQt5.QtCore import QEasingCurve

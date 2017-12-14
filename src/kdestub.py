@@ -33,7 +33,6 @@ import webbrowser
 import codecs
 import weakref
 from collections import defaultdict
-from argparse import ArgumentParser
 
 try:
     from PyQt5 import sip
@@ -58,92 +57,11 @@ from statesaver import StateSaver
 if os.name != 'nt':
     import pwd
 
-__all__ = ['KAboutData', 'KApplication', 'KCmdLineArgs', 'KConfig',
-           'KCmdLineOptions',
+__all__ = ['KAboutData', 'KApplication', 'KConfig',
            'KMessageBox', 'KConfigSkeleton', 'KDialogButtonBox',
            'KConfigDialog', 'KDialog',
            'KUser', 'KStandardAction',
            'KXmlGuiWindow', 'KGlobal', 'KIcon']
-
-
-class OptionHelper:
-
-    """stub"""
-
-    def __init__(self, options):
-        self.options = options
-
-    def isSet(self, option):
-        """did the user specify this option?"""
-        if any(x[0].startswith('no%s' % option) for x in self.options):
-            return not any(x.startswith('--no%s' % option) for x in sys.argv)
-        return any(x.startswith('--%s' % option) for x in sys.argv)
-
-    @staticmethod
-    def getOption(option):
-        """try to mimic KDE logic as far as we need it"""
-        for arg in sys.argv:
-            if arg.startswith('--%s' % option):
-                parts = arg.split('=')
-                return parts[1] if len(parts) > 1 else True
-            if arg.startswith('--no%s' % option):
-                parts = arg.split('=')
-                return parts[1] if len(parts) > 1 else False
-        return ''
-
-
-class KCmdLineArgs:
-
-    """stub"""
-    options = None
-    argv = None
-    about = None
-
-    @classmethod
-    def parsedArgs(cls):
-        """stub"""
-        if '--help' in sys.argv:
-            KCmdLineOptions.parser.parse_args()
-            KCmdLineOptions.parser.print_help()
-        definitions = list(x[0].split()[0] for x in cls.options.options)
-        definitions = definitions + list('no' + x for x in definitions)
-        for arg in sys.argv[1:]:
-            if not (
-                    arg.startswith('--') or
-                    any(arg[2:].startswith(x) for x in definitions)):
-                print('unrecognized argument:{} '.format(arg))
-                sys.exit(2)
-        return cls.options
-
-    @classmethod
-    def init(cls, argv, about):
-        """stub"""
-        cls.argv = argv
-        cls.about = about
-
-    @classmethod
-    def addCmdLineOptions(cls, options):
-        """stub"""
-        cls.options = OptionHelper(options)
-
-
-class KCmdLineOptions(list):
-
-    """stub"""
-    parser = ArgumentParser()
-
-    def __init__(self):
-        list.__init__(self)
-
-    def add(self, definition, helptext, default=None):
-        """stub"""
-        self.append((definition, helptext, default))
-        # self.parser is currently only used for generating --help text
-        self.parser.add_argument(
-            '--' + definition,
-            dest=definition,
-            help=helptext,
-            action='store_true')
 
 
 class KAboutData:
@@ -197,6 +115,7 @@ class KApplication(QApplication):
         # which is used by QStandardPaths - if we start kajongg.py directly,
         # the search path would look like /usr/share/kajongg.py/
         self.setApplicationName('kajongg')
+        self.setApplicationVersion(str(Internal.defaultPort))
 
         self.initQtTranslator()
 
