@@ -272,7 +272,7 @@ class Options:
     __metaclass__ = FixedClass
     demo = False
     showRulesets = False
-    rulesetName = None	 # will only be set by command line --ruleset
+    rulesetName = None  # will only be set by command line --ruleset
     ruleset = None       # from rulesetName
     rounds = None
     host = None
