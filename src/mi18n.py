@@ -265,11 +265,17 @@ class MLocale:
             if _[0]:
                 languages.append(_[0])
         if Debug.i18n:
-            Internal.logger.debug('languages: %s', ','.join(languages) if languages else None)
+            Internal.logger.debug('languages from locale: %s', ','.join(languages) if languages else None)
         for resourceDir in cls.localeDirectories():
             for sysLanguage in sorted(os.listdir(resourceDir)):
                 if cls.__isLanguageInstalledForKajongg(sysLanguage):
                     languages.append(sysLanguage)
+            if sysLanguage not in languages:
+                if Debug.i18n:
+                    Internal.logger.debug(
+                        'I am in %s. language %s not installed in %s',
+                        os.getcwd(), sysLanguage, ','.join(cls.localeDirectories()))
+
         if languages:
             languages = uniqueList(cls.extendRegionLanguages(languages))
             languages = list(
@@ -307,10 +313,6 @@ class MLocale:
                 if Debug.i18n:
                     Internal.logger.debug('language %s installed in %s', lang, _)
                 return True
-        if Debug.i18n:
-            Internal.logger.debug(
-                'I am in %s. language %s not installed in %s',
-                os.getcwd(), lang, ','.join(cls.localeDirectories()))
         return False
 
 MLocale.initStatic()

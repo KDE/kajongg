@@ -51,7 +51,7 @@ from qt import *
 
 from mi18n import MLocale, KDETranslator, i18n, i18nc
 
-from common import Internal, isAlive
+from common import Internal, isAlive, Debug
 from util import popenReadlines
 from statesaver import StateSaver
 
@@ -205,6 +205,9 @@ class KApplication(QApplication):
             translator = KDETranslator(self)
             translator.load(qmName)
             self.installTranslator(translator)
+            if Debug.i18n:
+                Internal.logger.debug('Installed Qt translator from %s', qmName)
+
 
     def initQtTranslator(self):
         """load translators using Qt .qm files"""
