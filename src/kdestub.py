@@ -966,8 +966,6 @@ class AboutKajonggDialog(KDialog):
         # pylint: disable=too-many-locals, too-many-statements
         from twisted import __version__
 
-        data = KGlobal.aboutData
-
         KDialog.__init__(self, parent)
         self.setCaption(i18n('About Kajongg'))
         self.setButtons(KDialog.Close)
@@ -976,7 +974,11 @@ class AboutKajonggDialog(KDialog):
         hLayout1.addWidget(IconLabel('kajongg', self))
         h1vLayout = QVBoxLayout()
         h1vLayout.addWidget(QLabel('Kajongg'))
-        h1vLayout.addWidget(QLabel(i18n('Version: %1', data.version)))
+        try:
+            from appversion import VERSION
+        except ImportError:
+            VERSION = "Unknown"
+        h1vLayout.addWidget(QLabel(i18n('Version: %1', VERSION)))
         h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
         authors = ((
             "Wolfgang Rohdewald",
@@ -1001,7 +1003,7 @@ class AboutKajonggDialog(KDialog):
                       'Using versions %1',
                       ', '.join(
                           underVersions))))
-        h1vLayout.addWidget(QLabel(i18n('Not using Python KDE bindings')))
+        h1vLayout.addWidget(QLabel(i18n('Not using broken Python KDE bindings')))
         hLayout1.addLayout(h1vLayout)
         spacerItem = QSpacerItem(
             20,
