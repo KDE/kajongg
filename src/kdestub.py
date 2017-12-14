@@ -212,7 +212,7 @@ class KApplication(QApplication):
 
     def initQtTranslator(self):
         """load translators using Qt .qm files"""
-        for language in reversed(list(MLocale.extendRegionLanguages(KGlobal.currentLanguages()))):
+        for language in reversed(list(MLocale.extendRegionLanguages(MLocale.currentLanguages()))):
             self.installTranslatorFile(os.path.join(
                 QLibraryInfo.location(QLibraryInfo.TranslationsPath), 'qtbase_{}.qm'.format(language)))
             self.installTranslatorFile('/usr/share/locale/{}/LC_MESSAGES/kwidgetsaddons5_qt.qm'.format(language))
@@ -724,21 +724,10 @@ class KGlobal:
     """stub"""
 
     @classmethod
-    def currentLanguages(cls):
-        """the currently used languages, primary first"""
-        languages = Internal.kajonggrc.group('Locale').readEntry('Language')
-        if not languages:
-            return list()
-        languages = languages.split(':')
-        if 'en_US' in languages:
-            languages.remove('en_US')
-        return languages
-
-    @classmethod
     def initStatic(cls):
         """init class members"""
         Internal.kajonggrc = KConfig()
-        MLocale.installTranslations(cls.currentLanguages())
+        MLocale.installTranslations(MLocale.currentLanguages())
 
 class KConfig(ConfigParser):
 

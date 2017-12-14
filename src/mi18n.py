@@ -218,6 +218,16 @@ class MLocale:
             result.insert(0, LOCALEPATH)
         return result
 
+    @classmethod
+    def currentLanguages(cls):
+        """the currently used languages, primary first"""
+        languages = Internal.kajonggrc.group('Locale').readEntry('Language')
+        if not languages:
+            return list()
+        languages = languages.split(':')
+        if 'en_US' in languages:
+            languages.remove('en_US')
+        return languages
 
     @staticmethod
     def extendRegionLanguages(languages):
