@@ -98,6 +98,9 @@ class KApplication(QApplication):
         for _ in self.translators:
             self.removeTranslator(_)
         self.translators = []
+        _ = KDETranslator(self)
+        self.translators.append(_)
+        self.installTranslator(_)
         for language in reversed(list(MLocale.extendRegionLanguages(MLocale.currentLanguages()))):
             self.installTranslatorFile(os.path.join(
                 QLibraryInfo.location(QLibraryInfo.TranslationsPath), 'qtbase_{}.qm'.format(language)))

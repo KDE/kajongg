@@ -160,12 +160,16 @@ class KDETranslator(QTranslator):
         if Debug.neutral:
             return text
         result = QTranslator.translate(self, context, text, disambiguation, numerus)
-        if not result:
-            # for kwidgetsaddons5_qt locale de, KStandardGuiItem '&OK' returns an empty string.
-            # but this works for other languages like uk, catalan, ptbr and zh_TW.
-            # What is different with German? The .po source seems OK, just like the others.
-            result = i18n(text)
-        return result
+        if result:
+            return result
+        if not MLocale.currentLanguages():
+            # when starting kajongg.py, qt5 loads translators for the system default
+            # language. I do not know how to avoid that. And I cannot delete
+            # translators I do not own. So if we want no translation, just return text.
+            # But we still need to install our own QTranslator overriding the ones
+            # mentioned above. It will never find a translation, so we come here.
+            assert Internal.app.translators == [self]
+            return text
 
 
 class MLocale:
