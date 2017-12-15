@@ -175,6 +175,10 @@ if hasattr(QGuiApplication, 'setDesktopFileName'):
 if Debug.neutral:
     MLocale.translation = None
 
+if Debug.locate:
+    # this has been read before Debug.locate is set
+    Internal.logger.debug('Configuration in %s', Internal.kajonggrc.path)
+
 if Debug.events:
     EVHANDLER = EvHandler()
     Internal.app.installEventFilter(EVHANDLER)
