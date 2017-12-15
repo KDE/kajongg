@@ -316,6 +316,8 @@ class MLocale:
     @classmethod
     def isLanguageInstalled(cls, lang):  # TODO: should be is Available
         """is any translation available for lang?"""
+        if lang == 'en_US':
+            return True
         for directory in cls.localeDirectories():
             if os.path.exists(os.path.join(directory, lang)):
                 return True
