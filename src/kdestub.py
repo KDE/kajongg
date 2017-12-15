@@ -616,7 +616,6 @@ class KGlobal:
     def initStatic(cls):
         """init class members"""
         Internal.kajonggrc = KConfig()
-        MLocale.installTranslations(MLocale.currentLanguages())
 
 class KConfig(ConfigParser):
 

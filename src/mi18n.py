@@ -90,8 +90,8 @@ def i18n(englishIn, *args):
     @return: The translated text, args included.
     @rtype: C{str}
     """
-    if MLocale.translation and englishIn:
-        _ = MLocale.translation.gettext(englishIn)
+    if not Debug.neutral and englishIn:
+        _ = MLocale.gettext(englishIn)
     else:
         _ = englishIn
     if not args:
@@ -114,13 +114,13 @@ def i18nc(context, englishIn, *args):
     """
     # The \004 trick is taken from kdecore/localization/gettext.h,
     # definition of pgettext_aux"""
-    if not MLocale.translation:
+    if Debug.neutral:
         return __insertArgs(englishIn, *args)
     withContext = '\004'.join([context, englishIn])
-    _ = MLocale.translation.gettext(withContext)
+    _ = MLocale.gettext(withContext)
     if _ == withContext:
         # try again without context
-        _ = MLocale.translation.gettext(englishIn)
+        _ = MLocale.gettext(englishIn)
     if not args:
         ENGLISHDICT[_] = englishIn
     return __insertArgs(_, *args)
@@ -177,21 +177,26 @@ class MLocale:
 
     __cached_availableLanguages = None
 
-    @classmethod
-    def initStatic(cls):
-        """init class attributes"""
-        if hasattr(cls, 'translation'):
-            return
+    translation = None
 
+    @classmethod
+    def gettext(cls, txt):
+        """with lazy installation of languages"""
+        if cls.translation is None:
+            cls.installTranslations()
+        return cls.translation.gettext(txt)
+
+    @classmethod
+    def installTranslations(cls):
+        """install translations"""
         if os.name == 'nt':
             # on Linux, QCoreApplication initializes locale but not on Windows.
             # This is actually documented for QCoreApplication
             setlocale(LC_ALL, '')
-
-    @classmethod
-    def installTranslations(cls, languages):
-        """install translations for languages"""  # TODO: auch Qt
+        languages = cls.currentLanguages()
         cls.translation = gettext.NullTranslations()
+        if Debug.i18n:
+            Internal.logger.debug('Trying to install translations for %s', ','.join(languages))
         for language in languages:
             for context in ('kajongg', 'libkmahjongg5', 'kxmlgui5', 'kconfigwidgets5', 'libc'):
                 directories = cls.localeDirectories()
@@ -326,5 +331,3 @@ class MLocale:
                     Internal.logger.debug('language %s installed in %s', lang, _)
                 return True
         return False
-
-MLocale.initStatic()
