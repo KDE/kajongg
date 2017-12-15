@@ -75,6 +75,8 @@ class KApplication(QApplication):
         # Qt uses sys.argv[0] as application name
         # which is used by QStandardPaths - if we start kajongg.py directly,
         # the search path would look like /usr/share/kajongg.py/
+
+        self.translators = []
         self.setApplicationName('kajongg')
         self.setApplicationVersion(str(Internal.defaultPort))
 
@@ -86,12 +88,16 @@ class KApplication(QApplication):
             translator = KDETranslator(self)
             translator.load(qmName)
             self.installTranslator(translator)
+            self.translators.append(translator)
             if Debug.i18n:
                 Internal.logger.debug('Installed Qt translator from %s', qmName)
 
 
     def initQtTranslator(self):
         """load translators using Qt .qm files"""
+        for _ in self.translators:
+            self.removeTranslator(_)
+        self.translators = []
         for language in reversed(list(MLocale.extendRegionLanguages(MLocale.currentLanguages()))):
             self.installTranslatorFile(os.path.join(
                 QLibraryInfo.location(QLibraryInfo.TranslationsPath), 'qtbase_{}.qm'.format(language)))
