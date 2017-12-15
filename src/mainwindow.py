@@ -34,6 +34,7 @@ from signal import signal, SIGABRT, SIGINT, SIGTERM
 from log import logError, logDebug
 from common import Options, Internal, isAlive, Debug
 
+
 class MyHook(cgitb.Hook):
 
     """override the standard cgitb hook: invoke the browser"""
@@ -57,6 +58,7 @@ class MyHook(cgitb.Hook):
 
 # sys.excepthook = MyHook()
 
+
 NOTFOUND = []
 
 try:
@@ -69,6 +71,7 @@ try:
     from zope.interface import implements  # pylint: disable=unused-import
 except ImportError as importError:
     NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
+
 
 try:
     from twisted.spread import pb # pylint: disable=unused-import
@@ -622,8 +625,9 @@ class MainWindow(KXmlGuiWindow):
             centralWidget.setAutoFillBackground(True)
 
     @afterQueuedAnimations
-    def tilesetNameChanged(
-            self, unusedDeferredResult, unusedOldValue=None, unusedNewValue=None, *unusedArgs): # pylint: disable=unused-argument
+    def tilesetNameChanged(  # pylint: disable=unused-argument
+            self, unusedDeferredResult, unusedOldValue=None,
+            unusedNewValue=None, *unusedArgs):
         """if the wanted tileset changed, apply the change now"""
         if self.centralView:
             with AnimationSpeed():

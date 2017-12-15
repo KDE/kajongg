@@ -145,6 +145,7 @@ class Animation(QPropertyAnimation, StrMixin):
             if needRefresh and Internal.scene:
                 Internal.scene.focusRect.refresh()
 
+
 class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
 
     """
@@ -157,8 +158,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
     running = []  # we need a reference to active animation groups
     current = None
     clsUid = 0
-
-
     def __init__(self, animations, parent=None):
         QParallelAnimationGroup.__init__(self, parent)
         self.animations = animations
@@ -292,6 +291,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
     def __str__(self):
         """for debugging"""
         return 'G{}({}:{})'.format(self.uid, len(self.animations), self.stateName())
+
 
 class AnimatedMixin:
     """for UITile and PlayerWind"""
@@ -468,10 +468,12 @@ def animate():
         return ParallelAnimationGroup.current.deferred
     return succeed(None).addErrback(logException)
 
+
 def doCallbackWithSpeed(result, speed, callback, *args, **kwargs):
     """as the name says"""
     with AnimationSpeed(speed):
         callback(result, *args, **kwargs)
+
 
 def animateAndDo(callback, *args, **kwargs):
     """if we want the next animations to have the same speed as the current group,

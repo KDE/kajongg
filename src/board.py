@@ -110,7 +110,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
             painter.scale(0.60, 0.60)
             renderer.render(painter, self.wind.markerSvgName, self.boundingRect())
 
-    def boundingRect(self): # pylint: disable=no-self-use
+    def boundingRect(self):  # pylint: disable=no-self-use
         """define the part of the tile we want to see"""
         size = int(Internal.scene.windTileset.faceSize.height() * 1.1)
         return QRectF(QPoint(), QPoint(size, size))
@@ -177,6 +177,7 @@ class WindLabel(QLabel):
                     painter.translate(child.mapToParent(0.0, 0.0))
                     child.paint(painter, QStyleOptionGraphicsItem())
         return pMap
+
 
 class Board(QGraphicsRectItem, StrMixin):
 

@@ -784,9 +784,7 @@ class Knitting(MJRule):
         suitCounts = list(len([x for x in hand.tiles if x.lowerGroup == y])
                           for y in Tile.colors)
         minSuit = min(suitCounts)
-        result = ''.join(
-            x for idx,
-            x in enumerate(Tile.colors) if suitCounts[idx] > minSuit)
+        result = ''.join(x for idx, x in enumerate(Tile.colors) if suitCounts[idx] > minSuit)
         if len(result) == 2:
             return result
 

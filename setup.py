@@ -87,10 +87,11 @@ class KmjBuild(build):
     def run(self):
         for binary in ['kajongg', 'kajonggserver']:
             open(binary, 'w').write('#!/bin/sh\nexec %skajongg/%s.py $*\n' % (kdeDirs['data'], binary))
-            os.chmod(binary, 0o0755 )
+            os.chmod(binary, 0o0755)
         call(['cp sc-apps-kajongg.svgz kajongg.svgz'], shell=True)
         call(['cp sc-action-games-kajongg-law.svgz games-kajongg-law.svgz'], shell=True)
         build.run(self)
+
 
 setup(name='kajongg',
     version=VERSION,

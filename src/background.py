@@ -50,7 +50,7 @@ class Background(Resource):
                 self.imageWidth = self.group.readInteger('Width')
                 self.imageHeight = self.group.readInteger('Height')
             except Exception as exc:
-                logException(exc) # TODO: simplify if we switch to twisted logger
+                logException(exc)  # TODO: simplify if we switch to twisted logger
                 raise
         self.isPlain = bool(self.group.readEntry('Plain'))
         if not self.isPlain:

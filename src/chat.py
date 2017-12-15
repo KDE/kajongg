@@ -84,7 +84,7 @@ class ChatModel(QAbstractTableModel):
             elif role == Qt.DisplayRole and index.column() == 2:
                 result = i18n(chatLine.message)
             elif role == Qt.ForegroundRole and index.column() == 2:
-                palette = Internal.app.palette() # pylint: disable=no-member
+                palette = Internal.app.palette()  # pylint: disable=no-member
                 color = 'blue' if chatLine.isStatusMessage else palette.windowText(
                 )
                 result = QColor(color)
