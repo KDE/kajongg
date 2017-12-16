@@ -273,7 +273,7 @@ class Board(QGraphicsRectItem, StrMixin):
         the next list element.
         respect board orientation: Right Arrow should always move right
         relative to the screen, not relative to the board"""
-        return sorted([x for x in self.uiTiles if x.focusable], key=lambda x: x.sortKey(sortDir))
+        return sorted((x for x in self.uiTiles if x.focusable), key=lambda x: x.sortKey(sortDir))
 
     @property
     def hasFocus(self):

@@ -533,7 +533,7 @@ class PlayingPlayer(Player):
         kongs = []
         if self == self.game.activePlayer:
             # declaring a kong
-            for tileName in sorted(set([x for x in self._concealedTiles if not x.isBonus])):
+            for tileName in sorted({x for x in self._concealedTiles if not x.isBonus}):
                 if self._concealedTiles.count(tileName) == 4:
                     kongs.append(tileName.kong)
                 elif self._concealedTiles.count(tileName) == 1 and \
@@ -794,7 +794,7 @@ class PlayingPlayer(Player):
             assert group.islower(), self.visibleTiles
             if group in Tile.colors:
                 if all(x.group == group for x in self.visibleTiles):
-                    suitTiles = set([Tile(group, x) for x in Tile.numbers])
+                    suitTiles = {Tile(group, x) for x in Tile.numbers}
                     if self.visibleTiles.count(suitTiles) >= 9:
                         dangerous.append(
                             (suitTiles, i18n('Player %1 may try a True Color Game', pName)))

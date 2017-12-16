@@ -439,7 +439,7 @@ class StandardMahJongg(MJRule):
                 continue
             singles = {x for x in valueSet
                        if values.count(x) == 1
-                       and not set([x - 1, x - 2, x + 1, x + 2]) & valueSet}
+                       and not {x - 1, x - 2, x + 1, x + 2} & valueSet}
             isolated += len(singles)
             if isolated > 1:
                 # this is not a calling hand
@@ -525,10 +525,10 @@ class WrigglingSnake(MJRule):
             if hand.values.count(1) < 2:
                 # and the pair of 1 is incomplete too
                 return set()
-            return (elements.winds | set([Tile(group, x) for x in range(2, 10)])) \
-                - set([x.exposed for x in hand.tiles])
+            return (elements.winds | {Tile(group, x) for x in range(2, 10)}) \
+                - {x.exposed for x in hand.tiles}
         # pair of 1 is not complete
-        return set([Tile(group, '1')])
+        return {Tile(group, '1')}
 
     def rearrange(hand, rest):
         melds = []
@@ -724,9 +724,9 @@ class Knitting(MJRule):
             return set()
         assert len(singleTile) == 1
         singleTile = singleTile[0]
-        otherSuit = (hand.suits - set([singleTile.lowerGroup])).pop()
+        otherSuit = (hand.suits - {singleTile.lowerGroup}).pop()
         otherTile = Tile(otherSuit, singleTile.value).concealed
-        return set([otherTile])
+        return {otherTile}
 
     def rearrange(cls, hand, rest):
         melds = []
@@ -797,9 +797,7 @@ class AllPairHonors(MJRule):
             return False
         if len(set(hand.tiles)) != 7:
             return False
-        tileCounts = list([len([x for x in hand.tiles if x == y])
-                           for y in hand.tiles])
-        return set(tileCounts) == set([2])
+        return {len([x for x in hand.tiles if x == y]) for y in hand.tiles} == {2}
 
     def winningTileCandidates(cls, hand):
         if not cls.maybeCallingOrWon(hand):
@@ -878,16 +876,14 @@ class BigFourJoys(RuleCode):
 class LittleFourJoys(RuleCode):
 
     def appliesToHand(hand):
-        lengths = sorted([min(len(x), 3) for x in hand.melds if x.isWindMeld])
+        lengths = sorted(min(len(x), 3) for x in hand.melds if x.isWindMeld)
         return lengths == [2, 3, 3, 3]
 
 
 class LittleThreeDragons(RuleCode):
 
     def appliesToHand(hand):
-        lengths = sorted([min(len(x), 3)
-                          for x in hand.melds if x.isDragonMeld])
-        return lengths == [2, 3, 3]
+        return sorted(min(len(x), 3) for x in hand.melds if x.isDragonMeld) == [2, 3, 3]
 
 
 class FourBlessingsHoveringOverTheDoor(RuleCode):

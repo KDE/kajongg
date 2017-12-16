@@ -384,12 +384,11 @@ class TableList(QWidget):
         """copy chatWindows from the old table list which will be
         thrown away"""
         if self.view.model():
-            chatWindows = dict((x.tableid, x.chatWindow)
-                               for x in self.view.model().tables)
+            chatWindows = {x.tableid: x.chatWindow for x in self.view.model().tables}
             unusedWindows = {x.chatWindow for x in self.view.model().tables}
             for table in tables:
                 table.chatWindow = chatWindows.get(table.tableid, None)
-                unusedWindows -= set([table.chatWindow])
+                unusedWindows -= {table.chatWindow}
             for unusedWindow in unusedWindows:
                 if unusedWindow:
                     unusedWindow.hide()

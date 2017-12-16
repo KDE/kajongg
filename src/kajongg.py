@@ -32,7 +32,7 @@ def initRulesets():
     predefined.load()
     if Options.showRulesets or Options.rulesetName:
         from rule import Ruleset
-        rulesets = dict((x.name, x) for x in Ruleset.selectableRulesets())
+        rulesets = {x.name: x for x in Ruleset.selectableRulesets()}
         if Options.showRulesets:
             for name in rulesets:
                 print(name)

@@ -273,7 +273,7 @@ class TileList(list):
         values = {x.value for x in self if x.group == group}
         chows = []
         for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
-            subset = set([tile.value + x for x in offsets])
+            subset = {tile.value + x for x in offsets}
             if subset <= values:
                 chow = TileList(Tile(group, x) for x in sorted(subset))
                 if chow not in chows:

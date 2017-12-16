@@ -566,9 +566,8 @@ class KConfigGroup:
             items = self.config().items(self.groupName)
         except NoSectionError:
             return self.__default(name, default)
-        items = dict((x for x in items if x[0].startswith(name)))
-        i18nItems = dict(
-            (x for x in items.items() if x[0].startswith(name + '[')))
+        items = {x: y for x, y in items if x.startswith(name)}
+        i18nItems = {x: y for x, y in items.items() if x.startswith(name + '[')}
         if i18nItems:
             languages = Internal.kajonggrc.group('Locale').readEntry('Language').split(':')
             languages = [x.split('_')[0] for x in languages]

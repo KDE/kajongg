@@ -698,8 +698,8 @@ into a situation where you have to pay a penalty"""))
     def diff(self, other):
         """return a list of tuples. Every tuple holds one or two rules: tuple[0] is from self, tuple[1] is from other"""
         result = []
-        leftDict = dict((x.name, x) for x in self.allRules)
-        rightDict = dict((x.name, x) for x in other.allRules)
+        leftDict = {x.name: x for x in self.allRules}
+        rightDict = {x.name: x for x in other.allRules}
         left = set(leftDict.keys())
         right = set(rightDict.keys())
         for rule in left & right:

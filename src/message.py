@@ -76,7 +76,7 @@ class Message:
                     return value[0].name
             return type(value)([Message.jelly(key, x) for x in value])
         elif isinstance(value, dict):
-            return dict((Message.jelly('key', x[0]), Message.jelly('value', x[1])) for x in value.items())
+            return {Message.jelly('key', x): Message.jelly('value', y) for x, y in value.items()}
         else:
             if not isinstance(value, (int, bytes, str, float, type(None))):
                 raise Exception(

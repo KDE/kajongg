@@ -119,8 +119,7 @@ class ServerTable(Table, StrMixin):
             names = tuple(x.name for x in self.users)
         online = tuple(bool(x in onlineNames) for x in names)
         if game:
-            endValues = game.handctr, dict(
-                (x.wind.char, x.balance) for x in game.players)
+            endValues = game.handctr, {x.wind.char: x.balance for x in game.players}
         else:
             endValues = None
         return list([

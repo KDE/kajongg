@@ -103,8 +103,7 @@ class SelectPlayers(SelectRuleset):
         allNames = set(Players.humanNames.values())
         unusedNames = allNames - self.__selectedNames()
         with BlockSignals(self.nameWidgets):
-            used = set([x.currentText()
-                        for x in self.nameWidgets if x.manualSelect])
+            used = {x.currentText() for x in self.nameWidgets if x.manualSelect}
             for combo in self.nameWidgets:
                 if not combo.manualSelect:
                     if combo.currentText() in used:
@@ -117,7 +116,7 @@ class SelectPlayers(SelectRuleset):
                 combo.clear()
                 combo.addItems([comboName])
                 combo.addItems(sorted(
-                    allNames - self.__selectedNames() - set([comboName])))
+                    allNames - self.__selectedNames() - {comboName}))
                 combo.setCurrentIndex(0)
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
             len(self.__selectedNames()) == 4)
