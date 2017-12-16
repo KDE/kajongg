@@ -165,7 +165,7 @@ class DBHandle(sqlite3.Connection):
     @property
     def name(self):
         """get name for log messages. Readonly."""
-        stack = list(x[2] for x in traceback.extract_stack())
+        stack = [x[2] for x in traceback.extract_stack()]
         name = stack[-3]
         if name in ('__exit__', '__init__'):
             name = stack[-4]

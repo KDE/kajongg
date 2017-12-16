@@ -46,8 +46,7 @@ for _ in RULESETS[2:]:
 Players.createIfUnknown = str
 
 # RULESETS=RULESETS[:1]
-GAMES = list([PlayingGame(list(tuple([wind, str(wind.char)]) for wind in Wind.all4), x)
-              for x in RULESETS])
+GAMES = [PlayingGame([tuple([wind, str(wind.char)]) for wind in Wind.all4], x) for x in RULESETS]
 PROGRAM = None
 
 

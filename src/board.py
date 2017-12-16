@@ -240,8 +240,7 @@ class Board(QGraphicsRectItem, StrMixin):
         if focusCandidates:
             firstCandidate = focusCandidates[0]
             if self._focusTile not in focusCandidates:
-                focusCandidates = list(
-                    x for x in focusCandidates if x.sortKey() >= self.__prevPos)
+                focusCandidates = [x for x in focusCandidates if x.sortKey() >= self.__prevPos]
                 focusCandidates.append(firstCandidate)
                 self.focusTile = focusCandidates[0]
 
@@ -337,9 +336,9 @@ class Board(QGraphicsRectItem, StrMixin):
             # has no focusable tiles. Like after declaring
             # Original Call.
             oldPos = self.focusTile.xoffset, self.focusTile.yoffset
-            tiles = list(
+            tiles = [
                 x for x in tiles if (x.xoffset,
-                                     x.yoffset) != oldPos or x == self.focusTile)
+                                     x.yoffset) != oldPos or x == self.focusTile]
             assert tiles, [str(x) for x in self.uiTiles]
             tiles.append(tiles[0])
             self.focusTile = tiles[tiles.index(self.focusTile) + 1]
@@ -404,7 +403,7 @@ class Board(QGraphicsRectItem, StrMixin):
 
     def tilesByElement(self, element):
         """returns all child items holding a uiTile for element"""
-        return list(x for x in self.uiTiles if x.tile is element)
+        return [x for x in self.uiTiles if x.tile is element]
 
     def rotatedLightSource(self):
         """the light source we need for the original uiTile before it is rotated"""
@@ -644,8 +643,7 @@ class SelectorBoard(CourtBoard):
         for uiTile in self.uiTiles:
             uiTile.setBoard(None)
         self.uiTiles = []
-        self.allSelectorTiles = list(UITile(x)
-                                     for x in elements.all(game.ruleset))
+        self.allSelectorTiles = [UITile(x) for x in elements.all(game.ruleset)]
         self.refill()
 
     def refill(self):
@@ -697,9 +695,9 @@ class SelectorBoard(CourtBoard):
         assert isinstance(uiTile, UITile), uiTile
         result = UIMeld(uiTile)
         for tile in meld[1:]:
-            baseTiles = list(
+            baseTiles = [
                 x for x in self.tilesByElement(
-                    tile.exposed) if x not in result)
+                    tile.exposed) if x not in result]
             result.append(baseTiles[0])
         return result
 

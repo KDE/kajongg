@@ -113,10 +113,11 @@ class ClientTable(Table):
         return False
 
     def __str__(self):
-        onlineNames = list(x for x in self.playerNames if self.isOnline(x))
+        onlineNames = [x for x in self.playerNames if self.isOnline(x)]
         offlineString = ''
-        offlineNames = list(x for x in self.playerNames if x not in onlineNames
-                            and not x.startswith('Robot'))
+        offlineNames = [
+            x for x in self.playerNames if x not in onlineNames
+            and not x.startswith('Robot')]
         if offlineNames:
             offlineString = ' offline:' + ','.join(offlineNames)
         return '%d(%s %s%s)' % (self.tableid, self.ruleset.name, ','.join(onlineNames), offlineString)
@@ -192,7 +193,7 @@ class Client(pb.Referenceable):
 
     def remote_newTables(self, tables):
         """update table list"""
-        newTables = list(ClientTable(self, *x) for x in tables)
+        newTables = [ClientTable(self, *x) for x in tables]
         self.tables.extend(newTables)
         if Debug.table:
             _ = ', '.join(str(ClientTable(self, *x)) for x in tables)
@@ -206,7 +207,7 @@ class Client(pb.Referenceable):
         the server always only sends the hash and the client then says "I do
         not know this ruleset, please send definition", but that would mean
         more changes to the client code"""
-        return list(x for x in hashes if not Ruleset.hashIsKnown(x))
+        return [x for x in hashes if not Ruleset.hashIsKnown(x)]
 
     def tableChanged(self, table):
         """update table list"""

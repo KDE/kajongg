@@ -582,15 +582,14 @@ class KConfigGroup:
             (x for x in items.items() if x[0].startswith(name + '[')))
         if i18nItems:
             languages = Internal.kajonggrc.group('Locale').readEntry('Language').split(':')
-            languages = list(x.split('_')[0] for x in languages)
+            languages = [x.split('_')[0] for x in languages]
             for language in languages:
                 key = '%s[%s]' % (name, language)
                 if key in i18nItems:
                     return i18nItems[key]
         if name in items:
             if self.groupName == 'Locale' and name == 'Language':
-                languages = list(x for x in items[name].split(
-                    ':') if MLocale.isLanguageInstalled(x))
+                languages = [x for x in items[name].split(':') if MLocale.isLanguageInstalled(x)]
                 if languages:
                     return ':'.join(languages)
                 return QLocale().name()
@@ -884,9 +883,9 @@ class KSwitchLanguageDialog(KDialog):
 
     def restoreDefaults(self):
         """reset values to default"""
-        keys = list(x for x in self.languageRows if isinstance(x, KLanguageButton))
-        for _ in keys:
-            self.removeLanguage(_)
+        for _ in self.languageRows:
+            if isinstance(_, KLanguageButton):
+                self.removeLanguage(_)
         for removeButton in self.languageRows:
             if isAlive(removeButton):
                 removeButton.deleteLater()
@@ -1213,7 +1212,7 @@ class KConfigDialog(KDialog):
         self.iconList.addItem(item)
         self.tabSpace.addWidget(configTab)
         self.iconList.setIconSize(QSize(80, 80))
-        icons = list(self.iconList.item(x) for x in range(len(self.iconList)))
+        icons = [self.iconList.item(x) for x in range(len(self.iconList))]
         neededIconWidth = max(self.iconList.visualItemRect(x).width()
                               for x in icons)
         margins = self.iconList.contentsMargins()
@@ -1507,9 +1506,8 @@ class KEditToolBar(KDialog):
             ).actions(
             ).items(
             )}
-        activeNames = list(names[x] for x in activeActions)
         Internal.Preferences.toolBarActions = ','.join(
-            activeNames)  # pylint: disable=attribute-defined-outside-init
+            names[x] for x in activeActions)  # pylint: disable=attribute-defined-outside-init
         Internal.mainWindow.refreshToolBar()
 
 KGlobal.initStatic()

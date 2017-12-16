@@ -460,10 +460,8 @@ into a situation where you have to pay a penalty"""))
             self.__setParametersFrom(
                 sorted(PredefinedRuleset.rulesets(),
                        key=lambda x: len(self.diff(x)))[0])
-        self.doublingMeldRules = list(
-            x for x in self.meldRules if x.score.doubles)
-        self.doublingHandRules = list(
-            x for x in self.handRules if x.score.doubles)
+        self.doublingMeldRules = [x for x in self.meldRules if x.score.doubles]
+        self.doublingHandRules = [x for x in self.handRules if x.score.doubles]
         for mjRule in self.mjRules:
             if mjRule.__class__.__name__ == 'StandardMahJonggRule':
                 self.standardMJRule = mjRule
@@ -507,7 +505,7 @@ into a situation where you have to pay a penalty"""))
 
     def findUniqueOption(self, action):
         """return first rule with option"""
-        rulesWithAction = list(x for x in self.allRules if action in x.options)
+        rulesWithAction = [x for x in self.allRules if action in x.options]
         assert len(rulesWithAction) < 2, '%s has too many matching rules for %s' % (
             str(self), action)
         if rulesWithAction:
@@ -516,8 +514,7 @@ into a situation where you have to pay a penalty"""))
     def filterRules(self, attrName):
         """returns all my Rule classes having attribute attrName"""
         if attrName not in self.__filteredLists:
-            self.__filteredLists[attrName] = list(
-                x for x in self.allRules if hasattr(x, attrName))
+            self.__filteredLists[attrName] = [x for x in self.allRules if hasattr(x, attrName)]
         return self.__filteredLists[attrName]
 
     @staticmethod
@@ -666,7 +663,7 @@ into a situation where you have to pay a penalty"""))
                 failSilent=True)
             cmd = 'INSERT INTO rule(ruleset, list, position, name, definition, ' \
                 'points, doubles, limits, parameter) VALUES(?,?,?,?,?,?,?,?,?)'
-            args = list(self.ruleRecord(x) for x in self.allRules)
+            args = [self.ruleRecord(x) for x in self.allRules]
             Query(cmd, args)
 
     @staticmethod
@@ -1052,8 +1049,8 @@ class PredefinedRuleset(Ruleset):
     def rulesets():
         """a list of instances for all predefined rulesets"""
         if PredefinedRuleset.preRulesets is None:
-            PredefinedRuleset.preRulesets = list(x()
-                                                 for x in sorted(PredefinedRuleset.classes, key=lambda x: x.__name__))
+            PredefinedRuleset.preRulesets = [
+                x() for x in sorted(PredefinedRuleset.classes, key=lambda x: x.__name__)]
         return PredefinedRuleset.preRulesets
 
     def rules(self):

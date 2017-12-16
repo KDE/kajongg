@@ -235,7 +235,7 @@ class Games(QDialog):
                     Query("DELETE FROM game WHERE id = ?", (game, ))
                 self.setQuery()  # just reload entire table
         allGames = self.view.selectionModel().selectedRows(0)
-        deleteGames = list(x.data() for x in allGames)
+        deleteGames = [x.data() for x in allGames]
         if not deleteGames:
             # should never happen
             logException('delete: 0 rows selected')

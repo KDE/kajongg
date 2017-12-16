@@ -254,7 +254,7 @@ class LoginDlg(QDialog):
         localName = i18nc('kajongg name for local game server', Query.localServerName)
         self.servers = Query(
             'select url,lastname from server order by lasttime desc').records
-        servers = list(x[0] for x in self.servers if x[0] != Query.localServerName)
+        servers = [x[0] for x in self.servers if x[0] != Query.localServerName]
         # the first server combobox item should be default: either the last used server
         # or localName for autoPlay
         if localName not in servers:
@@ -316,7 +316,7 @@ class LoginDlg(QDialog):
         """the user selected a different server"""
         records = Query('select player.name from player, passwords '
                         'where passwords.url=? and passwords.player = player.id', (self.url,)).records
-        players = list(x[0] for x in records)
+        players = [x[0] for x in records]
         preferPlayer = Options.player
         if preferPlayer:
             if preferPlayer in players:

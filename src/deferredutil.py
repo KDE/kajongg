@@ -315,9 +315,9 @@ class DeferredBlock(StrMixin):
                     text = '%s:' % command
                     answerList = []
                     for answer in sorted(set(x.prettyAnswer() for x in self.requests if x.deferred.command == command)):
-                        answerList.append((answer, list(
+                        answerList.append((answer, [
                             x for x in self.requests
-                            if x.deferred.command == command and answer == x.prettyAnswer())))
+                            if x.deferred.command == command and answer == x.prettyAnswer()]))
                     answerList = sorted(answerList, key=lambda x: len(x[1]))
                     answerTexts = []
                     if len(answerList) == 1:

@@ -165,7 +165,7 @@ class HandBoard(Board):
     def lowerHalfTiles(self):
         """returns a list with all single tiles of the lower half melds
         without boni"""
-        return list(x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus)
+        return [x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus]
 
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
@@ -194,7 +194,7 @@ class HandBoard(Board):
         If there is no space, return None
 
         returns list(TileAttr)"""
-        positions = list(x.xoffset for x in tilePositions if x.yoffset == bonusY)
+        positions = [x.xoffset for x in tilePositions if x.yoffset == bonusY]
         rightmostTileX = max(positions) if positions else 0
         placeBoni = bonusTiles[:]
         while 13 - len(placeBoni) < rightmostTileX + 1 + self.exposedMeldDistance:
@@ -203,7 +203,7 @@ class HandBoard(Board):
             placeBoni = placeBoni[:-1]
         result = list()
         xPos = 13 - len(placeBoni)
-        newBonusTiles = list(self.tileAttrClass(x) for x in placeBoni)
+        newBonusTiles = [self.tileAttrClass(x) for x in placeBoni]
         for bonus in sorted(newBonusTiles, key=lambda x: x.tile.key):
             bonus.xoffset, bonus.yoffset = xPos, bonusY
             bonus.dark = False
@@ -271,7 +271,7 @@ class HandBoard(Board):
                 if not oldTiles[match.tile]:
                     del oldTiles[match.tile]
         for newBonusPosition in self.newBonusPositions(
-                list(x for x in tiles if x.isBonus), newPositions):
+                [x for x in tiles if x.isBonus], newPositions):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
         self._avoidCrossingMovements(result)
         for uiTile, newPos in result.items():
@@ -346,12 +346,10 @@ class PlayingHandBoard(HandBoard):
             allTiles.extend(adding)
         newTiles = self.placeTiles(allTiles)
         source = adding if adding else newTiles
-        focusCandidates = list(x for x in source
-                               if x.focusable and x.tile.isConcealed)
+        focusCandidates = [x for x in source if x.focusable and x.tile.isConcealed]
         if not focusCandidates:
             # happens if we just exposed a claimed meld
-            focusCandidates = list(x for x in newTiles
-                                   if x.focusable and x.tile.isConcealed)
+            focusCandidates = [x for x in newTiles if x.focusable and x.tile.isConcealed]
         focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
         if focusCandidates:
             self.focusTile = focusCandidates[0]
@@ -395,10 +393,10 @@ class PlayingHandBoard(HandBoard):
                     items = [x for x in movingPlaces.items()
                              if x[1].tile is element]
                     if len(items) > 1:
-                        oldList = sorted(list(x[0] for x in items),
+                        oldList = sorted((x[0] for x in items),
                                          key=lambda x:
                                          bool(x.board != self) * 1000 + x.xoffset)
-                        newList = sorted(list(x[1] for x in items),
+                        newList = sorted((x[1] for x in items),
                                          key=lambda x: x.xoffset)
                         for idx, oldTile in enumerate(oldList):
                             places[oldTile] = newList[idx]

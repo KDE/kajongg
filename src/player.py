@@ -59,7 +59,7 @@ class Players(list, StrMixin):
         return list.__getitem__(self, index)
 
     def __str__(self):
-        return ', '.join(list('%s: %s' % (x.name, x.wind) for x in self))
+        return ', '.join('%s: %s' % (x.name, x.wind) for x in self)
 
     def byId(self, playerid):
         """lookup the player by id"""
@@ -103,7 +103,7 @@ class Players(list, StrMixin):
         """for a list of names, translates those names which are english
         player names into the local language"""
         known = set(x.name for x in self)
-        return list(self.byName(x).localName if x in known else x for x in names)
+        return [self.byName(x).localName if x in known else x for x in names]
 
 
 class Player(StrMixin):
@@ -597,7 +597,7 @@ class PlayingPlayer(Player):
                                (self, move.player, move.exposedMeld))
             if Debug.mahJongg:
                 game.debug('%s may say MJ:%s, active=%s' % (
-                    self, list(x for x in game.players), game.activePlayer))
+                    self, [x for x in game.players], game.activePlayer))
                 game.debug('  with hand {}'.format(hand))
             return MeldList(x for x in hand.melds if not x.isDeclared), withDiscard, hand.lastMeld
 
@@ -740,7 +740,7 @@ class PlayingPlayer(Player):
             # declaring a kong is never dangerous because we get
             # an unknown replacement
             return False
-        afterExposed = list(x.exposed for x in self._concealedTiles)
+        afterExposed = [x.exposed for x in self._concealedTiles]
         if exposing:
             exposing = exposing[:]
             if self.game.lastDiscard:

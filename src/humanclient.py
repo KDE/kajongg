@@ -230,7 +230,7 @@ class ClientDialog(QDialog):
 
     def messages(self):
         """a list of all messages returned by the declared buttons"""
-        return list(x.message for x in self.buttons)
+        return [x.message for x in self.buttons]
 
     def proposeAction(self):
         """either intelligently or first button by default. May also
@@ -525,8 +525,7 @@ class HumanClient(Client):
             if self.hasLocalServer():
                 # when playing a local game, only show pending tables with
                 # previously selected ruleset
-                self.tables = list(
-                    x for x in self.tables if x.ruleset == self.ruleset)
+                self.tables = [x for x in self.tables if x.ruleset == self.ruleset]
         if self.tables:
             self.__updateTableList()
 
@@ -540,8 +539,7 @@ class HumanClient(Client):
                 Ruleset.cached(ruleset).save()  # make it known to the cache and save in db
             return tables
         rulesetHashes = set(x[1] for x in tables)
-        needRulesets = list(
-            x for x in rulesetHashes if not Ruleset.hashIsKnown(x))
+        needRulesets = [x for x in rulesetHashes if not Ruleset.hashIsKnown(x)]
         if needRulesets:
             self.callServer(
                 'needRulesets',

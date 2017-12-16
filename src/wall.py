@@ -110,8 +110,7 @@ class Wall(StrMixin):
                 raise WallEmpty
             dealTiles = self.living[:count]
             self.living = self.living[count:]
-        return list(self.__nameTile(*x)
-                    for x in zip(dealTiles, tiles))
+        return [self.__nameTile(*x) for x in zip(dealTiles, tiles)]
 
     def build(self, shuffleFirst=False):
         """virtual: build visible wall"""

@@ -329,22 +329,19 @@ class Hand(StrMixin):
         else:  # not self.won
             loserRules = self.__matchingRules(self.ruleset.loserRules)
             if loserRules:
-                self.usedRules.extend(list(UsedRule(x) for x in loserRules))
+                self.usedRules.extend(UsedRule(x) for x in loserRules)
                 self.__score = self.__totalScore()
         self.__checkHasExclusiveRules()
 
     def matchingWinnerRules(self):
         """returns a list of matching winner rules"""
-        matching = list(
-            UsedRule(x)
-            for x in self.__matchingRules(self.ruleset.winnerRules))
+        matching = [UsedRule(x) for x in self.__matchingRules(self.ruleset.winnerRules)]
         limitRule = self.maxLimitRule(matching)
         return [limitRule] if limitRule else matching
 
     def __checkHasExclusiveRules(self):
         """if we have one, remove all others"""
-        exclusive = list(x for x in self.usedRules
-                         if 'absolute' in x.rule.options)
+        exclusive = [x for x in self.usedRules if 'absolute' in x.rule.options]
         if exclusive:
             self.usedRules = exclusive
             self.__score = self.__totalScore()
@@ -389,7 +386,7 @@ class Hand(StrMixin):
         if totals:
             totals = sorted(totals)  # sort by totalScore
             maxScore = totals[-1][0]
-            totals = list(x[1] for x in totals if x[0] == maxScore)
+            totals = [x[1] for x in totals if x[0] == maxScore]
             # now we have a list of only lastMelds reaching maximum score
             if prev not in totals or self.__lastMeld not in totals:
                 if Debug.explain and prev not in totals:
@@ -424,7 +421,7 @@ class Hand(StrMixin):
             lastTile = self.lastTile
         if lastMeld == 1:
             lastMeld = self.__lastMeld
-        parts = list(str(x) for x in sorted(melds))
+        parts = [str(x) for x in sorted(melds)]
         if rest:
             parts.append('R' + ''.join(str(x) for x in sorted(rest)))
         if lastSource or announcements:
@@ -677,14 +674,14 @@ class Hand(StrMixin):
 
     def __matchingRules(self, rules):
         """return all matching rules for this hand"""
-        return list(rule for rule in rules if rule.appliesToHand(self))
+        return [rule for rule in rules if rule.appliesToHand(self)]
 
     @staticmethod
     def maxLimitRule(usedRules):
         """returns the rule with the highest limit score or None"""
         result = None
         maxLimit = 0
-        usedRules = list(x for x in usedRules if x.rule.score.limits)
+        usedRules = [x for x in usedRules if x.rule.score.limits]
         for usedRule in usedRules:
             score = usedRule.rule.score
             if score.limits > maxLimit:

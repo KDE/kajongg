@@ -100,8 +100,8 @@ class RulesetDiffer(QDialog):
                 if left == right and left.name == right.name:
                     # rightRulesets.remove(right) this is wrong because it
                     # removes the first ruleset with the same hash
-                    rightRulesets = list(
-                        x for x in rightRulesets if id(x) != id(right))
+                    rightRulesets = [
+                        x for x in rightRulesets if id(x) != id(right)]
         self.leftRulesets = leftRulesets
         self.rightRulesets = rightRulesets
         self.model = None
@@ -154,8 +154,8 @@ class RulesetDiffer(QDialog):
         """order the right rulesets by similarity to current left ruleset.
         Similarity is defined by the length of the diff list."""
         leftRuleset = self.cbRuleset1.current
-        diffPairs = sorted([(len(x.diff(leftRuleset)), x)
-                            for x in self.rightRulesets])
+        diffPairs = sorted((len(x.diff(leftRuleset)), x)
+                           for x in self.rightRulesets)
         combo = self.cbRuleset2
         with BlockSignals(combo):
             combo.items = [x[1] for x in diffPairs]

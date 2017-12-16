@@ -93,9 +93,9 @@ class AIDefault:
             else:
                 filterName = aiFilter.__name__
             if Debug.robotAI:
-                prevWeights = list((x.tile, x.keep) for x in candidates)
+                prevWeights = ((x.tile, x.keep) for x in candidates)
                 candidates = aiFilter(self, candidates)
-                newWeights = list((x.tile, x.keep) for x in candidates)
+                newWeights = ((x.tile, x.keep) for x in candidates)
                 for oldW, newW in zip(prevWeights, newWeights):
                     if oldW != newW:
                         game.debug('%s: %s: %.3f->%.3f' % (
@@ -383,7 +383,7 @@ class DiscardCandidates(list):
         if Debug.robotAI:
             player.game.debug('DiscardCandidates for hand %s are %s' % (
                 hand, hand.tilesInHand))
-        self.hiddenTiles = list(x.exposed for x in hand.tilesInHand)
+        self.hiddenTiles = [x.exposed for x in hand.tilesInHand]
         self.groupCounts = IntDict()
                                    # counts for tile groups (sbcdw), exposed
                                    # and concealed
@@ -393,8 +393,7 @@ class DiscardCandidates(list):
         for tile in sum((x for x in hand.declaredMelds), []):
             self.groupCounts[tile.lowerGroup] += 1
             self.declaredGroupCounts[tile.lowerGroup] += 1
-        self.extend(list(TileAI(self, x)
-                         for x in sorted(set(self.hiddenTiles))))
+        self.extend(TileAI(self, x) for x in sorted(set(self.hiddenTiles)))
         self.link()
 
     @property

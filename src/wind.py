@@ -36,7 +36,7 @@ class Wind:
 
     def __new__(cls, *args):
         if not Wind.all:
-            Wind.all = list(object.__new__(cls) for cls in (_East, _South, _West, _North, _NoWind))
+            Wind.all = [object.__new__(cls) for cls in (_East, _South, _West, _North, _NoWind)]
             Wind.all4 = list(Wind.all[:4])
         if len(args) == 1:
             windIdent = args[0]

@@ -57,12 +57,11 @@ class Permutations:
                     honors.append(tile.single)
                     count -= 1
                 honors.append(tile.meld(count))
-        boni = list(x.single for x in self.tiles if x.isBonus)
+        boni = [x.single for x in self.tiles if x.isBonus]
         variants = []
         for group in Tile.colors.upper():
-            gTiles = list(x for x in self.tiles if x.group == group)
-            groupVariants = self.__colorVariants(
-                group, list(x.value for x in gTiles))
+            gTiles = [x for x in self.tiles if x.group == group]
+            groupVariants = self.__colorVariants(group, [x.value for x in gTiles])
             if groupVariants:
                 variants.append(groupVariants)
         result = []
@@ -152,13 +151,13 @@ class Permutations:
         vSet = set(allValues)
         groups = []
         for border in sorted(x + 1 for x in sorted(vSet) if x + 1 not in vSet):
-            content = list(x for x in allValues if x < border)
+            content = [x for x in allValues if x < border]
             if content:
                 groups.append(content)
-                allValues = list(x for x in allValues if x > border)
-        combinations = list(cls.usefulPermutations(x) for x in groups)
+                allValues = [x for x in allValues if x > border]
+        combinations = [cls.usefulPermutations(x) for x in groups]
         result = []
-        for variant in list(itertools.product(*combinations)):
+        for variant in itertools.product(*combinations):
             melds = []
             for block in variant:
                 for meld in block:

@@ -431,10 +431,8 @@ class PlayingScene(GameScene):
         game = self.game
         mainWindow = self.mainWindow
         if not game:
-            connections = list(
-                x.connection for x in HumanClient.humanClients if x.connection)
-            title = ', '.join('{name}/{url}'.format(name=x.username, url=x.url)
-                              for x in connections)
+            connections = [x.connection for x in HumanClient.humanClients if x.connection]
+            title = ', '.join('{name}/{url}'.format(name=x.username, url=x.url) for x in connections)
             if title:
                 decorateWindow(mainWindow, title)
         else:
@@ -546,8 +544,7 @@ class ScoringScene(GameScene):
             return True
         if key == Qt.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
-            tabItems.extend(
-                list(p.handBoard for p in self.game.players if p.handBoard.uiTiles))
+            tabItems.extend(p.handBoard for p in self.game.players if p.handBoard.uiTiles)
             tabItems.append(tabItems[0])
             currentBoard = uiTile.board
             currIdx = 0

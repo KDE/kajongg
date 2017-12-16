@@ -160,18 +160,20 @@ class Meld(TileList, StrMixin):
     def __prepareRules(self, ruleset):
         """prepare rules from ruleset"""
         rulesetId = id(ruleset)
-        self.__staticRules[rulesetId] = list(x for x in ruleset.meldRules
-                                             if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
-        self.__dynamicRules[rulesetId] = list(x for x in ruleset.meldRules
-                                              if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self))
+        self.__staticRules[rulesetId] = [
+            x for x in ruleset.meldRules
+            if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self)]
+        self.__dynamicRules[rulesetId] = [
+            x for x in ruleset.meldRules
+            if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self)]
         self.__hasRules = any(len(x) for x in chain(
             self.__staticRules.values(), self.__dynamicRules.values()))
 
-        self.__staticDoublingRules[rulesetId] = list(
+        self.__staticDoublingRules[rulesetId] = [
             x for x in ruleset.doublingMeldRules
-            if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self))
-        self.__dynamicDoublingRules[rulesetId] = list(x for x in ruleset.doublingMeldRules
-                                                      if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self))
+            if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self)]
+        self.__dynamicDoublingRules[rulesetId] = [x for x in ruleset.doublingMeldRules
+                                                  if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self)]
         self.__hasDoublingRules = any(len(x) for x in chain(
             self.__staticDoublingRules.values(), self.__dynamicDoublingRules.values()))
 

@@ -353,7 +353,7 @@ class StandardMahJongg(MJRule):
             return set()
         if not hand.tilesInHand:
             return set()
-        inHand = list(x.exposed for x in hand.tilesInHand)
+        inHand = [x.exposed for x in hand.tilesInHand]
         result = inHand[:]
         pairs = 0
         isolated = 0
@@ -430,7 +430,7 @@ class StandardMahJongg(MJRule):
             if len(values) % 3 == 0:
                 # adding a 4th, 7th or 10th tile with this color can not let us win,
                 # so we can exclude this color from the candidates
-                result = list(x for x in result if x.group != group)
+                result = [x for x in result if x.group != group]
                 continue
             valueSet = set(values)
             if len(values) == 4 and len(values) == len(valueSet):
@@ -571,7 +571,7 @@ class CallingHand(RuleCode):
 
     def appliesToHand(cls, hand):
         for callHand in hand.callingHands:
-            used = list(x.rule.__class__ for x in callHand.usedRules)
+            used = (x.rule.__class__ for x in callHand.usedRules)
             if cls.limitHand in used:
                 return True
         return False
@@ -585,7 +585,7 @@ class TripleKnitting(MJRule):
             return
         triples, rest = cls.findTriples(hand)
         assert len(rest) == 2
-        triples = list(triples)
+        triples = [triples]
         triples.append(rest)
         return [Meld(x) for x in triples if hand.lastTile in x]
 
@@ -666,12 +666,9 @@ class TripleKnitting(MJRule):
             if len(hand.declaredMelds) > 1:
                 return (Meld(), None)
         result = []
-        tilesS = list(
-            x.concealed for x in hand.tiles if x.lowerGroup == Tile.stone)
-        tilesB = list(
-            x.concealed for x in hand.tiles if x.lowerGroup == Tile.bamboo)
-        tilesC = list(
-            x.concealed for x in hand.tiles if x.lowerGroup == Tile.character)
+        tilesS = [x.concealed for x in hand.tiles if x.lowerGroup == Tile.stone]
+        tilesB = [x.concealed for x in hand.tiles if x.lowerGroup == Tile.bamboo]
+        tilesC = [x.concealed for x in hand.tiles if x.lowerGroup == Tile.character]
         for tileS in tilesS[:]:
             tileB = Tile(Tile.bamboo, tileS.value).concealed
             tileC = Tile(Tile.character, tileS.value).concealed
@@ -766,8 +763,8 @@ class Knitting(MJRule):
         suits = cls.pairSuits(hand)
         if not suits:
             return [], []
-        tiles0 = list(x for x in pairs if x.lowerGroup == suits[0])
-        tiles1 = list(x for x in pairs if x.lowerGroup == suits[1])
+        tiles0 = [x for x in pairs if x.lowerGroup == suits[0]]
+        tiles1 = [x for x in pairs if x.lowerGroup == suits[1]]
         for tile0 in tiles0[:]:
             if tile0.isExposed:
                 tile1 = Tile(suits[1], tile0.value)
@@ -781,8 +778,7 @@ class Knitting(MJRule):
 
     def pairSuits(hand):
         """returns a lowercase string with two suit characters. If no prevalence, returns None"""
-        suitCounts = list(len([x for x in hand.tiles if x.lowerGroup == y])
-                          for y in Tile.colors)
+        suitCounts = [len([x for x in hand.tiles if x.lowerGroup == y]) for y in Tile.colors]
         minSuit = min(suitCounts)
         result = ''.join(x for idx, x in enumerate(Tile.colors) if suitCounts[idx] > minSuit)
         if len(result) == 2:
@@ -819,7 +815,7 @@ class AllPairHonors(MJRule):
     def winningTileCandidates(cls, hand):
         if not cls.maybeCallingOrWon(hand):
             return set()
-        single = list(x for x in hand.tiles if hand.tiles.count(x) == 1)
+        single = [x for x in hand.tiles if hand.tiles.count(x) == 1]
         if len(single) != 1:
             return set()
         return set(single)
@@ -827,7 +823,7 @@ class AllPairHonors(MJRule):
     def shouldTry(hand, maxMissing=4):
         if hand.declaredMelds:
             return False
-        tiles = list(x.exposed for x in hand.tiles)
+        tiles = [x.exposed for x in hand.tiles]
         pairCount = kongCount = 0
         for tile in elements.majors:
             count = tiles.count(tile)
@@ -1031,8 +1027,7 @@ class GatesOfHeaven(StandardMahJongg):
             return False
         for suit in Tile.colors:
             count19 = sum(x.isTerminal for x in hand.tiles)
-            suitCount = len(
-                list(x for x in hand.tiles if x.lowerGroup == suit))
+            suitCount = len([x for x in hand.tiles if x.lowerGroup == suit])
             if suitCount > 10 and count19 > 4:
                 return True
         return False

@@ -103,7 +103,7 @@ class SelectPlayers(SelectRuleset):
 
     def __selectedNames(self):
         """A set with the currently selected names"""
-        return set(list(cbName.currentText() for cbName in self.nameWidgets))
+        return set(cbName.currentText() for cbName in self.nameWidgets)
 
     def slotValidate(self):
         """try to find 4 different players and update status of the Ok button"""
@@ -132,8 +132,7 @@ class SelectPlayers(SelectRuleset):
                 combo.setCurrentIndex(0)
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
             len(self.__selectedNames()) == 4)
-        self.names = list(cbName.currentText()
-                          for cbName in self.nameWidgets)
+        self.names = [cbName.currentText() for cbName in self.nameWidgets]
 
 
 class ScoringTileAttr(TileAttr):
@@ -436,12 +435,11 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def sortRulesByX(self, rules):
         """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
-        withMelds = list(x for x in rules if x.meld)
-        withoutMelds = list(x for x in rules if x not in withMelds)
-        tuples = list(tuple([x, self.handBoard.findUIMeld(x.meld)])
-                      for x in withMelds)
+        withMelds = [x for x in rules if x.meld]
+        withoutMelds = [x for x in rules if x not in withMelds]
+        tuples = [tuple([x, self.handBoard.findUIMeld(x.meld)]) for x in withMelds]
         tuples = sorted(tuples, key=lambda x: x[1][0].sortKey())
-        return list(x[0] for x in tuples) + withoutMelds
+        return [x[0] for x in tuples] + withoutMelds
 
     def addMeld(self, meld):
         """add meld to this hand in a scoring game"""
@@ -586,7 +584,7 @@ class ScoringGame(Game):
         # I do not understand the logic of the exec return value. The yes button returns 0
         # and the no button returns 1. According to the C++ doc, the return value is an
         # opaque value that should not be used."""
-        return list(x for x in pairs if SwapDialog(x).exec_() == 0)
+        return [x for x in pairs if SwapDialog(x).exec_() == 0]
 
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""

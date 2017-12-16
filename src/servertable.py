@@ -165,7 +165,7 @@ class ServerTable(Table, StrMixin):
 
     def addUser(self, user):
         """add user to this table"""
-        if user.name in list(x.name for x in self.users):
+        if user.name in (x.name for x in self.users):
             raise srvError(pb.Error, i18nE('You already joined this table'))
         if len(self.users) == self.maxSeats():
             raise srvError(pb.Error, i18nE('All seats are already taken'))
@@ -201,14 +201,14 @@ class ServerTable(Table, StrMixin):
     def __str__(self):
         """for debugging output"""
         if self.users:
-            onlineNames = list(x.name + ('(Owner)' if self.owner and x == self.owner.name else '')
-                               for x in self.users)
+            onlineNames = [x.name + ('(Owner)' if self.owner and x == self.owner.name else '')
+                           for x in self.users]
         else:
-            onlineNames = list(['no users yet'])
+            onlineNames = ['no users yet']
         offlineString = ''
         if self.game:
-            offlineNames = list(x.name for x in self.game.players if x.name not in onlineNames
-                                and not x.name.startswith('Robot'))
+            offlineNames = [x.name for x in self.game.players if x.name not in onlineNames
+                            and not x.name.startswith('Robot')]
             if offlineNames:
                 offlineString = ' offline:' + ','.join(offlineNames)
         return '%d(%s%s)' % (self.tableid, ','.join(onlineNames), offlineString)
@@ -224,7 +224,7 @@ class ServerTable(Table, StrMixin):
 
     def __prepareNewGame(self):
         """returns a new game object"""
-        names = list(x.name for x in self.users)
+        names = [x.name for x in self.users]
         # the server and all databases save the english name but we
         # want to make sure a translation exists for the client GUI
         robotNames = [
@@ -237,8 +237,7 @@ class ServerTable(Table, StrMixin):
             i18ncE('kajongg, name of robot player, to be translated', 'Robot 3')]
         while len(names) < 4:
             names.append(robotNames[3 - len(names)])
-        names = list(tuple([Wind.all4[idx], name])
-                     for idx, name in enumerate(names))
+        names = [tuple([Wind.all4[idx], name]) for idx, name in enumerate(names)]
         self.client = Client()
                              # Game has a weakref to client, so we must keep
                              # it!
@@ -340,13 +339,13 @@ class ServerTable(Table, StrMixin):
             block.tellPlayer(
                 player, Message.ReadyForGameStart, tableid=self.tableid,
                 gameid=game.gameid, shouldSave=player.shouldSave,
-                wantedGame=game.wantedGame, playerNames=list((x.wind, x.name) for x in game.players))
+                wantedGame=game.wantedGame, playerNames=[(x.wind, x.name) for x in game.players])
         block.callback(self.startGame)
 
     def startGame(self, requests):
         """if all players said ready, start the game"""
         for user in self.users:
-            userRequests = list(x for x in requests if x.user == user)
+            userRequests = [x for x in requests if x.user == user]
             if not userRequests or userRequests[0].answer == Message.NoGameStart:
                 if Debug.table:
                     if not userRequests:
@@ -378,8 +377,7 @@ class ServerTable(Table, StrMixin):
             for tableid in self.server.tablesWith(user):
                 if tableid != self.tableid:
                     self.server.leaveTable(user, tableid)
-        foreigners = list(
-            x for x in self.server.srvUsers if x not in self.users)
+        foreigners = [x for x in self.server.srvUsers if x not in self.users]
         if foreigners:
             if Debug.table:
                 logDebug(
@@ -666,7 +664,7 @@ class ServerTable(Table, StrMixin):
                     resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             return
         self.game.sortPlayers()
-        playerNames = list((x.wind, x.name) for x in self.game.players)
+        playerNames = [(x.wind, x.name) for x in self.game.players]
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,
                      playerNames=playerNames, rotateWinds=rotateWinds, token=token)
 

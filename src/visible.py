@@ -171,9 +171,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
     def addConcealedTiles(self, tiles, animated=True):
         """add to my tiles and sync the hand board"""
         with AnimationSpeed(speed=Internal.Preferences.animationSpeed if animated else 99):
-            PlayingPlayer.addConcealedTiles(
-                self,
-                list(x.tile for x in tiles))
+            PlayingPlayer.addConcealedTiles(self, [x.tile for x in tiles])
             self.syncHandBoard(tiles)
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):

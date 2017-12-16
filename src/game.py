@@ -427,9 +427,9 @@ class Game:
 
     def __exchangeSeats(self):
         """execute seat exchanges according to the rules"""
-        winds = list(x for x in self.shiftRules.split(',')[(self.roundsFinished - 1) % 4])
-        players = list(self.players[Wind(x)] for x in winds)
-        pairs = list(players[x:x + 2] for x in range(0, len(winds), 2))
+        winds = [x for x in self.shiftRules.split(',')[(self.roundsFinished - 1) % 4]]
+        players = [self.players[Wind(x)] for x in winds]
+        pairs = [players[x:x + 2] for x in range(0, len(winds), 2)]
         for playerA, playerB in self._mustExchangeSeats(pairs):
             playerA.wind, playerB.wind = playerB.wind, playerA.wind
 
@@ -565,8 +565,7 @@ class Game:
 
     def maybeRotateWinds(self):
         """rules which make winds rotate"""
-        result = list(x for x in self.ruleset.filterRules('rotate')
-                      if x.rotate(self))
+        result = [x for x in self.ruleset.filterRules('rotate') if x.rotate(self)]
         if result:
             if Debug.explain:
                 if not self.belongsToRobotPlayer():
@@ -682,8 +681,7 @@ class Game:
             logError('game %d inconsistent: All score records for the same '
                      'hand must have the same prevailing wind' % gameid)
 
-        players = list(tuple([Wind(x[1]), Game.__getName(x[0])])
-                       for x in qScoreRecords)
+        players = [tuple([Wind(x[1]), Game.__getName(x[0])]) for x in qScoreRecords]
 
         # create the game instance.
         game = cls(players, ruleset, gameid=gameid, client=client,
@@ -1064,8 +1062,7 @@ class PlayingGame(Game):
             invisibleTiles = set(x for x in allTiles
                                  if x not in self.visibleTiles)
             msg = i18n('Short living wall: Tile is invisible, hence dangerous')
-            self.dangerousTiles = list(
-                x for x in self.dangerousTiles if x[1] != msg)
+            self.dangerousTiles = [x for x in self.dangerousTiles if x[1] != msg]
             self.dangerousTiles.append((invisibleTiles, msg))
 
     def appendMove(self, player, command, kwargs):

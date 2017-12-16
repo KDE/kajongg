@@ -209,10 +209,11 @@ class MJServer:
         """send tables to user. If tables is None, he gets all new tables and those
         suspended tables he was sitting on"""
         if tables is None:
-            tables = list(x for x in self.tables.values()
-                          if not x.running and (not x.suspendedAt or x.hasName(user.name)))
+            tables = [
+                x for x in self.tables.values()
+                if not x.running and (not x.suspendedAt or x.hasName(user.name))]
         if tables:
-            data = list(x.asSimpleList() for x in tables)
+            data = [x.asSimpleList() for x in tables]
             if Debug.table:
                 logDebug(
                     'sending %d tables to %s: %s' %
@@ -309,7 +310,7 @@ class MJServer:
 
     def tablesWith(self, user):
         """table ids with user, except table 'without'"""
-        return list(x.tableid for x in self.tables.values() if user in x.users)
+        return [x.tableid for x in self.tables.values() if user in x.users]
 
     def leaveTable(self, user, tableid, message=None, *args):
         """user leaves table. If no human user is left on a new table, remove it"""

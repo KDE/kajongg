@@ -219,7 +219,7 @@ class MLocale:
         candidates = (
             'share/locale', '/usr/local/share/locale', '/usr/share/locale',
             os.path.join(os.path.dirname(sys.argv[0]), 'share/locale'))
-        result = list(x for x in candidates if os.path.exists(x))
+        result = [x for x in candidates if os.path.exists(x)]
         if not result and Debug.i18n:
             Internal.logger.debug('no locale path found. We have:%s', os.listdir('.'))
 
@@ -295,8 +295,7 @@ class MLocale:
 
         if languages:
             languages = uniqueList(cls.extendRegionLanguages(languages))
-            languages = list(
-                x for x in languages if cls.isLanguageInstalled(x))
+            languages = [x for x in languages if cls.isLanguageInstalled(x)]
         if 'en_US' not in languages:
             languages.extend(['en_US', 'en'])
         if Debug.i18n:

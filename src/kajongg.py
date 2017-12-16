@@ -53,7 +53,7 @@ def initRulesets():
             # we have an exact match
             Options.ruleset = rulesets[Options.rulesetName]
         else:
-            matches = list(x for x in rulesets if Options.rulesetName in x)
+            matches = [x for x in rulesets if Options.rulesetName in x]
             if len(matches) != 1:
                 if not matches:
                     msg = 'Ruleset %s is unknown' % Options.rulesetName

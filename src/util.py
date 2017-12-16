@@ -225,7 +225,7 @@ class CsvWriter:
 
     def writerow(self, row):
         """write one row"""
-        self.__writer.writerow(list(str(cell) for cell in row))
+        self.__writer.writerow([str(cell) for cell in row])
 
     def __del__(self):
         """clean up"""

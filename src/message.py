@@ -190,7 +190,7 @@ class NotifyAtOnceMessage(ClientMessage):
         # default: tell all except the source of the notification
         game = request.block.table.game
         if game:
-            return list(x for x in game.players if x != request.player)
+            return [x for x in game.players if x != request.player]
         return []
 
 
@@ -500,7 +500,7 @@ class MessageNoGameStart(NotifyAtOnceMessage):
     @classmethod
     def receivers(cls, request):
         """notification is not needed for those who already said no game"""
-        return list(x.player for x in request.block.requests if x.answer != Message.NoGameStart)
+        return [x.player for x in request.block.requests if x.answer != Message.NoGameStart]
 
 
 class MessageReadyForHandStart(ServerMessage):
@@ -828,7 +828,7 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
     @classmethod
     def receivers(cls, request):
         """no Claim notifications are not needed for those who already answered"""
-        return list(x.player for x in request.block.requests if x.answer is None)
+        return [x.player for x in request.block.requests if x.answer is None]
 
 
 def __scanSelf():

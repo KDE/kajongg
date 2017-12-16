@@ -188,11 +188,11 @@ class ScoreModel(TreeModel):
         chartHeight = float(rect.height()) * 4
         yScale = chartHeight / (self.minY - self.maxY)
         yOffset = rect.height() * index.row()
-        yValues = list(playerItem.chartPoints(index.column(), self.steps))
-        yValues = [(y - self.maxY) * yScale - yOffset for y in yValues]
+        _ = (playerItem.chartPoints(index.column(), self.steps))
+        yValues = [(y - self.maxY) * yScale - yOffset for y in _]
         stepX = float(rect.width()) / self.steps
-        xValues = list(x * stepX for x in range(self.steps + 1))
-        return list(QPointF(x, y) for x, y in zip(xValues, yValues))
+        xValues = [x * stepX for x in range(self.steps + 1)]
+        return [QPointF(x, y) for x, y in zip(xValues, yValues)]
 
     def data(self, index, role=None):  # pylint: disable=no-self-use,too-many-branches
         """score table"""
@@ -265,8 +265,8 @@ class ScoreModel(TreeModel):
             (x for x in game.players if not x.name.startswith('Robot')))
         robots = sorted(
             (x for x in game.players if x.name.startswith('Robot')))
-        data = list(tuple([player.localName, [HandResult(*x[1:]) for x in records
-                                              if x[0] == player.nameid]]) for player in humans + robots)
+        data = [tuple([player.localName, [HandResult(*x[1:]) for x in records
+                                          if x[0] == player.nameid]]) for player in humans + robots]
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         groupIndex = self.index(self.rootItem.childCount(), 0, parent)
@@ -325,8 +325,8 @@ class HandResult:
     def roundHand(self, allHands):
         """the nth hand in the current round, starting with 1"""
         idx = allHands.index(self)
-        allHands = list(reversed(allHands[:idx]))
-        allHands = list(x for x in allHands if not x.penalty)
+        _ = reversed(allHands[:idx])
+        allHands = [x for x in _ if not x.penalty]
         if not allHands:
             return 1
         for idx, hand in enumerate(allHands):

@@ -115,11 +115,11 @@ class Server(StrMixin):
         if len(running) >= OPTIONS.clients:
             raise TooManyClients
         maxClientsPerServer = OPTIONS.clients / OPTIONS.servers
-        matchingServers = list(
+        matchingServers = [
             x for x in cls.servers
             if x.commitId == job.commitId
             and x.pythonVersion == job.pythonVersion
-            and len(x.jobs) < maxClientsPerServer)
+            and len(x.jobs) < maxClientsPerServer]
         if matchingServers:
             result = sorted(matchingServers, key=lambda x: len(x.jobs))[0]
         else:
@@ -434,15 +434,15 @@ def closerLook(gameId, gameIdRows):
     """print detailled info about one difference"""
     for ruleset in OPTIONS.rulesets:
         for intelligence in OPTIONS.allAis:
-            shouldBeIdentical = list(x for x in gameIdRows if x[RULESETFIELD] == ruleset and x[AIFIELD] == intelligence)
-            for commit in list(x[COMMITFIELD] for x in shouldBeIdentical):
-                rows2 = list(x for x in shouldBeIdentical if x[COMMITFIELD] == commit)
+            shouldBeIdentical = [x for x in gameIdRows if x[RULESETFIELD] == ruleset and x[AIFIELD] == intelligence]
+            for commit in (x[COMMITFIELD] for x in shouldBeIdentical):
+                rows2 = [x for x in shouldBeIdentical if x[COMMITFIELD] == commit]
                 if hasDifferences(rows2):
                     first = firstDifference(rows2)
                     print('Game {} {} {} {} has differences between Python2 and Python3'.format(
                         gameId, ruleset, intelligence, commit))
             for py23 in '23':
-                rows2 = list(x for x in shouldBeIdentical if x[PYTHON23FIELD] == py23)
+                rows2 = [x for x in shouldBeIdentical if x[PYTHON23FIELD] == py23]
                 if hasDifferences(rows2):
                     first = firstDifference(rows2)
                     print('Game {} {} {} Python{} has differences between commits {} and {}'.format(
@@ -638,13 +638,12 @@ def improve_options():
         usingRulesets = []
         wrong = False
         for ruleset in wantedRulesets:
-            matches = list(x for x in OPTIONS.knownRulesets if ruleset in x)
+            matches = [x for x in OPTIONS.knownRulesets if ruleset in x]
             if not matches:
                 print('ruleset', ruleset, 'is not known', end=' ')
                 wrong = True
             elif len(matches) > 1:
-                exactMatch = list(
-                    x for x in OPTIONS.knownRulesets if ruleset == x)
+                exactMatch = [x for x in OPTIONS.knownRulesets if ruleset == x]
                 if len(exactMatch) == 1:
                     usingRulesets.append(exactMatch[0])
                 else:
@@ -662,8 +661,7 @@ def improve_options():
             commits = subprocess.check_output(
                 'git log --pretty=%h {range}'.format(
                     range=OPTIONS.git).split()).decode()
-            OPTIONS.git = list(reversed(list(x.strip()
-                                             for x in commits.split('\n') if x.strip())))
+            OPTIONS.git = [reversed(x.strip() for x in commits.split('\n') if x.strip())]
         else:
             OPTIONS.git = onlyExistingCommits(OPTIONS.git.split(','))
             if not OPTIONS.git:

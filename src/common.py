@@ -191,7 +191,7 @@ class Debug:
                 yield opt
                 if idx < len(options) - 1 and idx % 5 == 4:
                     yield 'SEPARATOR'
-        options = list(x for x in Debug.__dict__ if not x.startswith('_'))
+        options = [x for x in Debug.__dict__ if not x.startswith('_')]
         boolOptions = sorted(x for x in options
                              if isinstance(Debug.__dict__[x], bool))
         stringOptions = sorted(x for x in options
