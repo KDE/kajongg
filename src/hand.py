@@ -113,7 +113,7 @@ class Hand(StrMixin):
             self.debug(fmt('{callers}',
                            callers=callers(exclude=['__init__'])))
             Hand.indent += 1
-            self.debug('New Hand {} {}'.format(string, self.lenOffset))
+            self.debug('New Hand {} lenOffset={}'.format(string, self.lenOffset))
 
         try:
             self.__arrange()
@@ -127,7 +127,7 @@ class Hand(StrMixin):
         finally:
             self._fixed = True
             if Debug.hand or (Debug.mahJongg and self.lenOffset == 1):
-                self.debug('Fixing {} {} {}'.format(self, self.won, self.score))
+                self.debug('Fixing {} {}{}'.format(self, 'won ' if self.won else '', self.score))
             Hand.indent -= 1
 
     def __parseString(self, inString):
