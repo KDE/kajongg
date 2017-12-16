@@ -286,11 +286,6 @@ class Ruleset:
     misses = 0
 
     @staticmethod
-    def clearCache():
-        """clears the cache with Rulesets"""
-        Ruleset.cache.clear()
-
-    @staticmethod
     def cached(name):
         """If a Ruleset instance is never changed, we can use a cache"""
         if isinstance(name, list):
