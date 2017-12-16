@@ -123,7 +123,7 @@ class Tile(str, StrMixin):
             cls.cache[key] = result
 
         existing = list([x for x in cls.cache.values() if x.key == result.key])
-        existingIds = set(id(x) for x in existing)
+        existingIds = {id(x) for x in existing}
         assert len(existingIds) == 1, 'new is:{} existing are: {} with ids {}'.format(result, existing, existingIds)
 
         result.exposed = result.concealed = result.swapped = None
@@ -270,7 +270,7 @@ class TileList(list):
         if tile.lowerGroup not in Tile.colors:
             return []
         group = tile.group
-        values = set(x.value for x in self if x.group == group)
+        values = {x.value for x in self if x.group == group}
         chows = []
         for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
             subset = set([tile.value + x for x in offsets])

@@ -527,7 +527,7 @@ class HumanClient(Client):
             for ruleset in result:
                 Ruleset.cached(ruleset).save()  # make it known to the cache and save in db
             return tables
-        rulesetHashes = set(x[1] for x in tables)
+        rulesetHashes = {x[1] for x in tables}
         needRulesets = [x for x in rulesetHashes if not Ruleset.hashIsKnown(x)]
         if needRulesets:
             self.callServer(

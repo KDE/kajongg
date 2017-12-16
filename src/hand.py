@@ -164,7 +164,7 @@ class Hand(StrMixin):
                 tileStrings.remove(part)
 
         self.values = tuple(x.value for x in self.tiles)
-        self.suits = set(x.lowerGroup for x in self.tiles)
+        self.suits = {x.lowerGroup for x in self.tiles}
         self.declaredMelds = MeldList(x for x in self.melds if x.isDeclared)
         declaredTiles = list(sum((x for x in self.declaredMelds), []))
         self.tilesInHand = TileList(x for x in self.tiles
@@ -518,7 +518,7 @@ class Hand(StrMixin):
             if hand.won:
                 result.append(hand)
         if Debug.hand:
-            _hiderules = ', '.join(set(x.mjRule.name for x in result))
+            _hiderules = ', '.join({x.mjRule.name for x in result})
             if _hiderules:
                 self.debug(fmt('Is calling {_hiderules}'))
         return result

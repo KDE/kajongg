@@ -361,12 +361,12 @@ def removeInvalidCommits(csvFile):
     if not os.path.exists(csvFile):
         return
     rows = list(Csv.reader(csvFile))
-    _ = set(x[COMMITFIELD] for x in rows)
-    csvCommits = set(
+    _ = {x[COMMITFIELD] for x in rows}
+    csvCommits = {
         x for x in _ if set(
             x) <= set(
                 '0123456789abcdef') and len(
-                    x) >= 7)
+                    x) >= 7}
     nonExisting = set(csvCommits) - set(onlyExistingCommits(csvCommits))
     if nonExisting:
         print(
@@ -397,18 +397,18 @@ def readGames(csvFile):
     if not allRowsGenerator:
         return
     # we want unique tuples so we can work with sets
-    allRows = set(tuple(x) for x in allRowsGenerator)
+    allRows = {tuple(x) for x in allRowsGenerator}
     games = dict()
     # build set of rows for every ai
-    for variant in set(tuple(x[:COMMITFIELD]) for x in allRows):
+    for variant in {tuple(x[:COMMITFIELD]) for x in allRows}:
         games[variant] = frozenset(
             x for x in allRows if tuple(x[:COMMITFIELD]) == variant)
     return games
 
 def hasDifferences(rows):
     """True if rows have unwanted differences"""
-    return (len(set(tuple(list(x)[GAMEFIELD:]) for x in rows))
-            > len(set(tuple(list(x)[:COMMITFIELD]) for x in rows)))
+    return (len({tuple(list(x)[GAMEFIELD:]) for x in rows})
+            > len({tuple(list(x)[:COMMITFIELD]) for x in rows}))
 
 def firstDifference(rows):
     """reduce to two rows showing a difference"""
@@ -467,13 +467,13 @@ def evaluate(games):
     if not games:
         return
     for variant, rows in games.items():
-        gameIds = set(x[GAMEFIELD] for x in rows)
-        if len(gameIds) != len(set(tuple(list(x)[GAMEFIELD:]) for x in rows)):
+        gameIds = {x[GAMEFIELD] for x in rows}
+        if len(gameIds) != len({tuple(list(x)[GAMEFIELD:]) for x in rows}):
             print(
                 'ruleset "%s" AI "%s" has different rows for games' %
                 (variant[0], variant[1]), end=' ')
             for game in sorted(gameIds, key=int):
-                if len(set(tuple(x[GAMEFIELD:] for x in rows if x[GAMEFIELD] == game))) > 1:
+                if len({tuple(x[GAMEFIELD:] for x in rows if x[GAMEFIELD] == game)}) > 1:
                     print(game, end=' ')
             print()
             break

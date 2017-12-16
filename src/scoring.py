@@ -92,7 +92,7 @@ class SelectPlayers(SelectRuleset):
 
     def __selectedNames(self):
         """A set with the currently selected names"""
-        return set(cbName.currentText() for cbName in self.nameWidgets)
+        return {cbName.currentText() for cbName in self.nameWidgets}
 
     def slotValidate(self):
         """try to find 4 different players and update status of the Ok button"""

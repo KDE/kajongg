@@ -433,8 +433,8 @@ into a situation where you have to pay a penalty"""))
         self.loadRules()
         self.__setParametersFrom(self)
         for ruleList in self.ruleLists:
-            assert len(ruleList) == len(set(x.key()
-                                            for x in ruleList)), '%s has non-unique key' % ruleList.name
+            assert len(ruleList) == len({x.key()
+                                         for x in ruleList}), '%s has non-unique key' % ruleList.name
             for rule in ruleList:
                 if hasattr(rule, 'score'):
                     rule.score.ruleset = self

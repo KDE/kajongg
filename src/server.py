@@ -223,7 +223,7 @@ class MJServer:
     def generateTableId(self):
         """generates a new table id: the first free one"""
         usedIds = set(self.tables or [0])
-        availableIds = set(x for x in range(1, 2 + max(usedIds)))
+        availableIds = {x for x in range(1, 2 + max(usedIds))}
         return min(availableIds - usedIds)
 
     def newTable(self, user, ruleset, playOpen,

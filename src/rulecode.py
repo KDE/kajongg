@@ -437,9 +437,9 @@ class StandardMahJongg(MJRule):
             if len(valueSet) == 1:
                 # no chow reachable, only pair/pung
                 continue
-            singles = set(x for x in valueSet
-                          if values.count(x) == 1
-                          and not set([x - 1, x - 2, x + 1, x + 2]) & valueSet)
+            singles = {x for x in valueSet
+                       if values.count(x) == 1
+                       and not set([x - 1, x - 2, x + 1, x + 2]) & valueSet}
             isolated += len(singles)
             if isolated > 1:
                 # this is not a calling hand
@@ -503,7 +503,7 @@ class WrigglingSnake(MJRule):
     def shouldTry(hand, maxMissing=3):
         if hand.declaredMelds:
             return False
-        return (len(set(x.exposed for x in hand.tiles)) + maxMissing > 12
+        return (len({x.exposed for x in hand.tiles}) + maxMissing > 12
                 and all(not x.isChow for x in hand.declaredMelds))
 
     def computeLastMelds(hand):
@@ -606,7 +606,7 @@ class TripleKnitting(MJRule):
         while len(rest) >= 2:
             for tile in sorted(set(rest)):
                 value = tile.value
-                suits = set(x.group for x in rest if x.value == value)
+                suits = {x.group for x in rest if x.value == value}
                 if len(suits) < 2:
                     yield tuple(melds), tuple(rest)
                     return
@@ -899,7 +899,7 @@ class FourBlessingsHoveringOverTheDoor(RuleCode):
 class AllGreen(RuleCode):
 
     def appliesToHand(hand):
-        return set(x.exposed for x in hand.tiles) < elements.greenHandTiles
+        return {x.exposed for x in hand.tiles} < elements.greenHandTiles
 
 
 class LastTileFromWall(RuleCode):
@@ -1146,7 +1146,7 @@ class ThirteenOrphans(MJRule):
         return result
 
     def appliesToHand(hand):
-        return set(x.exposed for x in hand.tiles) == elements.majors
+        return {x.exposed for x in hand.tiles} == elements.majors
 
     def winningTileCandidates(cls, hand):
         if any(x in hand.values for x in Tile.minors):
@@ -1154,7 +1154,7 @@ class ThirteenOrphans(MJRule):
             return set()
         if not cls.shouldTry(hand, 1):
             return set()
-        handTiles = set(x.exposed for x in hand.tiles)
+        handTiles = {x.exposed for x in hand.tiles}
         missing = elements.majors - handTiles
         if not missing:
             # if all 13 tiles are there, we need any one of them:
@@ -1166,7 +1166,7 @@ class ThirteenOrphans(MJRule):
         # TODO: look at how many tiles there still are on the wall
         if hand.declaredMelds:
             return False
-        handTiles = set(x.exposed for x in hand.tiles)
+        handTiles = {x.exposed for x in hand.tiles}
         missing = elements.majors - handTiles
         if len(missing) > maxMissing:
             return False
@@ -1179,7 +1179,7 @@ class ThirteenOrphans(MJRule):
         hand = candidates.hand
         if not cls.shouldTry(hand):
             return candidates
-        handTiles = set(x.exposed for x in hand.tiles)
+        handTiles = {x.exposed for x in hand.tiles}
         missing = elements.majors - handTiles
         havePair = False
         keep = (6 - len(missing)) * 5

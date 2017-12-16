@@ -386,7 +386,7 @@ class TableList(QWidget):
         if self.view.model():
             chatWindows = dict((x.tableid, x.chatWindow)
                                for x in self.view.model().tables)
-            unusedWindows = set(x.chatWindow for x in self.view.model().tables)
+            unusedWindows = {x.chatWindow for x in self.view.model().tables}
             for table in tables:
                 table.chatWindow = chatWindows.get(table.tableid, None)
                 unusedWindows -= set([table.chatWindow])
@@ -409,8 +409,8 @@ class TableList(QWidget):
             self.requestedNewTable = False
             model = self.view.model()
             if model:
-                oldIds = set(x.tableid for x in model.tables)
-                newIds = sorted(list(set(x.tableid for x in tables) - oldIds))
+                oldIds = {x.tableid for x in model.tables}
+                newIds = sorted({x.tableid for x in tables} - oldIds)
                 if newIds:
                     return newIds[0]
         if self.selectedTable():

@@ -92,7 +92,7 @@ class Meld(TileList, StrMixin):
             self.__setMeldType()
             self.isPungKong = self.isPung or self.isKong
             self.isDeclared = self.isExposed or self.isKong
-            groups = set(x.group.lower() for x in self)
+            groups = {x.group.lower() for x in self}
             if len(groups) == 1:
                 self.group = self[0].group
                 self.lowerGroup = self.group.lower()
@@ -268,16 +268,16 @@ class Meld(TileList, StrMixin):
                 self.isKong = True
             return
         if len(tiles) == 3 and length == 3:
-            if len(set(x.value for x in tiles)) == 1:
+            if len({x.value for x in tiles}) == 1:
                 if self.case in ('aaa', 'AAA'):
-                    if len(set(x.group for x in tiles)) == 3:
+                    if len({x.group for x in tiles}) == 3:
                         if all(x.lowerGroup in Tile.colors for x in tiles):
                             self.isKnitted = True
                             return
-        groups = set(x.group for x in self)
-        if len(groups) > 2 or len(set(x.lower() for x in groups)) > 1:
+        groups = {x.group for x in self}
+        if len(groups) > 2 or len({x.lower() for x in groups}) > 1:
             raise UserWarning('Meld %s is malformed' % self)
-        values = set(x.value for x in self)
+        values = {x.value for x in self}
         if length == 4:
             if len(values) > 1:
                 raise UserWarning('Meld %s is malformed' % self)

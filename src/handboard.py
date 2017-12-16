@@ -378,7 +378,7 @@ class PlayingHandBoard(HandBoard):
                          and x[0].yoffset == yOld
                          and x[1] and x[1].yoffset == yNew
                          and not x[0].isBonus]
-                for element in set(x[1].tile for x in items):
+                for element in {x[1].tile for x in items}:
                     items = [x for x in movingPlaces.items()
                              if x[1].tile is element]
                     if len(items) > 1:

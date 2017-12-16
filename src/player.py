@@ -91,7 +91,7 @@ class Players(list, StrMixin):
     def translatePlayerNames(self, names):
         """for a list of names, translates those names which are english
         player names into the local language"""
-        known = set(x.name for x in self)
+        known = {x.name for x in self}
         return [self.byName(x).localName if x in known else x for x in names]
 
 
@@ -812,11 +812,11 @@ class PlayingPlayer(Player):
             dragonsDangerous = dragonsDangerous or dragonMelds >= 2
             if windsDangerous:
                 dangerous.append(
-                    (set(x for x in elements.winds if x not in self.visibleTiles),
+                    ({x for x in elements.winds if x not in self.visibleTiles},
                      i18n('Player %1 exposed many winds', pName)))
             if dragonsDangerous:
                 dangerous.append(
-                    (set(x for x in elements.dragons if x not in self.visibleTiles),
+                    ({x for x in elements.dragons if x not in self.visibleTiles},
                      i18n('Player %1 exposed many dragons', pName)))
         self.dangerousTiles = dangerous
         if dangerous and Debug.dangerousGame:

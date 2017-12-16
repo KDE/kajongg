@@ -666,7 +666,7 @@ class Game:
         # default value. If the server saved a score entry but our client
         # did not, we get no record here. Should we try to fix this or
         # exclude such a game from the list of resumable games?
-        if len(set(x[4] for x in qScoreRecords)) != 1:
+        if len({x[4] for x in qScoreRecords}) != 1:
             logError('game %d inconsistent: All score records for the same '
                      'hand must have the same prevailing wind' % gameid)
 
@@ -1048,8 +1048,7 @@ class PlayingGame(Game):
             for tile in allTiles:
                 assert isinstance(tile, Tile), tile
             # see https://www.logilab.org/ticket/23986
-            invisibleTiles = set(x for x in allTiles
-                                 if x not in self.visibleTiles)
+            invisibleTiles = {x for x in allTiles if x not in self.visibleTiles}
             msg = i18n('Short living wall: Tile is invisible, hence dangerous')
             self.dangerousTiles = [x for x in self.dangerousTiles if x[1] != msg]
             self.dangerousTiles.append((invisibleTiles, msg))
