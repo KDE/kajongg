@@ -4,9 +4,6 @@
 
 SPDX-License-Identifier: GPL-2.0
 
-
-
-
 Read the user manual for a description of the interface to this scoring engine
 """
 
@@ -221,7 +218,7 @@ class Meld(TileList, StrMixin):
         return tiles
 
     def __setitem__(self, index, value):
-        """sets a tile in the meld"""
+        """set a tile in the meld"""
         raise TypeError
 
     def __delitem__(self, index):

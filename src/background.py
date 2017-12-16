@@ -51,7 +51,7 @@ class Background(Resource):
                     (graphName, self.desktopFileName))
 
     def pixmap(self, size):
-        """returns a background pixmap or None for isPlain"""
+        """return a background pixmap or None for isPlain"""
         self.__pmap = QBrush()
         if not self.isPlain:
             width = size.width()
@@ -78,7 +78,7 @@ class Background(Resource):
         return QBrush(self.pixmap(size))
 
     def setPalette(self, onto):
-        """sets a background palette for widget onto"""
+        """set a background palette for widget onto"""
         palette = QPalette()
         mybrush = self.brush(onto.size())
         palette.setBrush(QPalette.Window, mybrush)

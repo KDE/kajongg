@@ -52,7 +52,7 @@ class RuleCode:
 class MJRule(RuleCode):
 
     def computeLastMelds(hand):
-        """returns all possible last melds"""
+        """return all possible last melds"""
 
 
 class DragonPungKong(RuleCode):
@@ -295,7 +295,7 @@ class StandardMahJongg(MJRule):
     cache = ('appliesToHand',)
 
     def computeLastMelds(hand):
-        """returns all possible last melds"""
+        """return all possible last melds"""
         return MeldList(x for x in hand.melds if hand.lastTile in x and len(x) < 4)
 
     def appliesToHand(hand):
@@ -569,7 +569,7 @@ class CallingHand(RuleCode):
 class TripleKnitting(MJRule):
 
     def computeLastMelds(cls, hand):
-        """returns all possible last melds"""
+        """return all possible last melds"""
         if not hand.lastTile:
             return
         triples, rest = cls.findTriples(hand)
@@ -649,7 +649,7 @@ class TripleKnitting(MJRule):
         return tripleCount >= tripleWanted
 
     def findTriples(cls, hand):
-        """returns a list of triple knitted melds, including the mj triple.
+        """return a list of triple knitted melds, including the mj triple.
         Also returns the remaining untripled tiles"""
         if hand.declaredMelds:
             if len(hand.declaredMelds) > 1:
@@ -672,7 +672,7 @@ class TripleKnitting(MJRule):
 class Knitting(MJRule):
 
     def computeLastMelds(cls, hand):
-        """returns all possible last melds"""
+        """return all possible last melds"""
         if not hand.lastTile:
             return []
         couples, rest = cls.findCouples(hand)
@@ -740,7 +740,7 @@ class Knitting(MJRule):
         yield tuple(melds), tuple(rest)
 
     def findCouples(cls, hand, pairs=None):
-        """returns a list of tuples, including the mj couple.
+        """return a list of tuples, including the mj couple.
         Also returns the remaining uncoupled tiles IF they
         are of the wanted suits"""
         if hand.declaredMelds:
@@ -766,7 +766,7 @@ class Knitting(MJRule):
         return result, tiles0 + tiles1
 
     def pairSuits(hand):
-        """returns a lowercase string with two suit characters. If no prevalence, returns None"""
+        """return a lowercase string with two suit characters. If no prevalence, returns None"""
         suitCounts = [len([x for x in hand.tiles if x.lowerGroup == y]) for y in Tile.colors]
         minSuit = min(suitCounts)
         result = ''.join(x for idx, x in enumerate(Tile.colors) if suitCounts[idx] > minSuit)

@@ -77,7 +77,7 @@ class ListComboBox(QComboBox):
                 self.addItem(i18n(item.name), item)
 
     def findItem(self, search):
-        """returns the index or -1 of not found """
+        """return the index or -1 of not found """
         for idx, item in enumerate(self.items):
             if item == search:
                 return idx

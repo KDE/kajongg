@@ -118,7 +118,7 @@ class Help:
 
     @staticmethod
     def __getDocUrl(languages):
-        """returns the best match for the online user manual"""
+        """return the best match for the online user manual"""
         from twisted.web import client
 
         def processResult(unusedResult, fallbacks):
@@ -283,7 +283,7 @@ class KDialog(CaptionMixin, QDialog):
         self.layout().addWidget(self.buttonBox)
 
     def button(self, buttonCode):
-        """returns the matching button"""
+        """return the matching button"""
         return self.buttonBox.button(buttonCode)
 
     @staticmethod

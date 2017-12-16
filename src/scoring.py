@@ -166,7 +166,7 @@ class ScoringHandBoard(HandBoard):
         return self.uiMeldWithTile(uiTile)[0]
 
     def uiMeldWithTile(self, uiTile):
-        """returns the meld with uiTile"""
+        """return the meld with uiTile"""
         for myMeld in self.uiMelds:
             if uiTile in myMeld:
                 return myMeld
@@ -334,7 +334,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         self.manualRuleBoxes = []
 
     def explainHand(self):
-        """returns the hand to be explained"""
+        """return the hand to be explained"""
         return self.hand
 
     @property
@@ -413,7 +413,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         return 'L%s%s' % (self.lastTile, self.lastMeld)
 
     def computeHand(self):
-        """returns a Hand object, using a cache"""
+        """return a Hand object, using a cache"""
         self.lastTile = Internal.scene.computeLastTile()
         self.lastMeld = Internal.scene.computeLastMeld()
         string = ' '.join(

@@ -46,7 +46,7 @@ class Score(StrMixin):
         self.points = self.doubles = self.limits = 0
 
     def change(self, unitName, value):
-        """sets value for unitName. If changed, return True"""
+        """set value for unitName. If changed, return True"""
         oldValue = self.__getattribute__(unitName)
         newValue = type(oldValue)(value)
         if newValue == oldValue:
@@ -389,7 +389,7 @@ into a situation where you have to pay a penalty"""))
 
     @staticmethod
     def hashIsKnown(value):
-        """returns False or True"""
+        """return False or True"""
         result = any(x.hash == value for x in PredefinedRuleset.rulesets())
         if not result:
             query = Query("select id from ruleset where hash=?", (value,))
@@ -418,7 +418,7 @@ into a situation where you have to pay a penalty"""))
             raise Exception('ruleset %s not found' % self.name)
 
     def __setParametersFrom(self, fromRuleset):
-        """sets attributes for parameters defined in fromRuleset.
+        """set attributes for parameters defined in fromRuleset.
         Does NOT overwrite already set parameters: Silently ignore them"""
         for par in fromRuleset.parameterRules:
             if isinstance(par, ParameterRule):
@@ -456,13 +456,13 @@ into a situation where you have to pay a penalty"""))
         return self
 
     def __loadQuery(self):
-        """returns a Query object with loaded ruleset"""
+        """return a Query object with loaded ruleset"""
         return Query(
             "select ruleset, list, position, name, definition, points, doubles, limits, parameter from rule "
             "where ruleset=? order by list,position", (self.rulesetId,))
 
     def toList(self):
-        """returns entire ruleset encoded in a string"""
+        """return entire ruleset encoded in a string"""
         self.load()
         result = [[self.rulesetId, self.hash, self.name, self.description]]
         result.extend(self.ruleRecord(x) for x in self.allRules)
@@ -498,14 +498,14 @@ into a situation where you have to pay a penalty"""))
             return rulesWithAction[0]
 
     def filterRules(self, attrName):
-        """returns all my Rule classes having attribute attrName"""
+        """return all my Rule classes having attribute attrName"""
         if attrName not in self.__filteredLists:
             self.__filteredLists[attrName] = [x for x in self.allRules if hasattr(x, attrName)]
         return self.__filteredLists[attrName]
 
     @staticmethod
     def newId(minus=False):
-        """returns an unused ruleset id. This is not multi user safe."""
+        """return an unused ruleset id. This is not multi user safe."""
         func = 'min(id)-1' if minus else 'max(id)+1'
         result = -1 if minus else 1
         records = Query("select %s from ruleset" % func).records
@@ -540,7 +540,7 @@ into a situation where you have to pay a penalty"""))
         return newId, newName
 
     def clone(self):
-        """returns a clone of self, unloaded"""
+        """return a clone of self, unloaded"""
         return Ruleset(self.rulesetId)
 
     def __str__(self):
@@ -592,7 +592,7 @@ into a situation where you have to pay a penalty"""))
         self.__hash = result.hexdigest()
 
     def ruleRecord(self, rule):
-        """returns the rule as tuple, prepared for use by sql. The first three
+        """return the rule as tuple, prepared for use by sql. The first three
         fields are the primary key."""
         score = rule.score
         ruleList = None
@@ -654,7 +654,7 @@ into a situation where you have to pay a penalty"""))
 
     @staticmethod
     def availableRulesets():
-        """returns all rulesets defined in the database plus all predefined rulesets"""
+        """return all rulesets defined in the database plus all predefined rulesets"""
         templateIds = (x[0]
                        for x in Query("SELECT id FROM ruleset WHERE id<0").records)
         result = [Ruleset(x) for x in templateIds]
@@ -665,7 +665,7 @@ into a situation where you have to pay a penalty"""))
 
     @staticmethod
     def selectableRulesets(server=None):
-        """returns all selectable rulesets for a new game.
+        """return all selectable rulesets for a new game.
         server is used to find the last ruleset used by us on that server, this
         ruleset will returned first in the list."""
         result = Ruleset.availableRulesets()
@@ -923,7 +923,7 @@ class Rule(RuleBase):
         return '%s: %s %s' % (self.name, self.definition, self.score)
 
     def i18nStr(self):
-        """returns a human readable string with the content"""
+        """return a human readable string with the content"""
         return self.score.i18nStr()
 
     @staticmethod
@@ -969,7 +969,7 @@ class ParameterRule(RuleBase):
         return result
 
     def i18nStr(self):
-        """returns a human readable string with the content"""
+        """return a human readable string with the content"""
         return str(self.parameter)
 
 

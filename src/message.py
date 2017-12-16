@@ -126,7 +126,7 @@ class ClientMessage(Message):
         return self.i18nName.replace(i18nShortcut, '&' + i18nShortcut, 1)
 
     def toolTip(self, button, tile): # pylint: disable=unused-argument
-        """returns text and warning flag for button and text for tile for button and text for tile"""
+        """return text and warning flag for button and text for tile for button and text for tile"""
         txt = 'toolTip is not defined for %s' % self.name
         logWarning(txt)
         return txt, True, ''
@@ -328,7 +328,7 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
         table.claimMahJongg(msg)
 
     def toolTip(self, button, tile): # pylint: disable=unused-argument
-        """returns text and warning flag for button and text for tile"""
+        """return text and warning flag for button and text for tile"""
         return i18n('Press here and you win'), False, ''
 
     def clientAction(self, client, move):
@@ -797,7 +797,7 @@ class MessageOK(ClientMessage):
                                shortcut=i18ncE('kajongg game dialog:Key for OK', 'O'))
 
     def toolTip(self, button, tile): # pylint: disable=unused-argument
-        """returns text and warning flag for button and text for tile for button and text for tile"""
+        """return text and warning flag for button and text for tile for button and text for tile"""
         return i18n('Confirm that you saw the message'), False, ''
 
 
@@ -811,7 +811,7 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
                                      shortcut=i18ncE('kajongg game dialog:Key for No claim', 'N'))
 
     def toolTip(self, button, tile): # pylint: disable=unused-argument
-        """returns text and warning flag for button and text for tile for button and text for tile"""
+        """return text and warning flag for button and text for tile for button and text for tile"""
         return i18n('You cannot or do not want to claim this tile'), False, ''
 
     @classmethod

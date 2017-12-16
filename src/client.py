@@ -112,7 +112,7 @@ class ClientTable(Table):
         return '%d(%s %s%s)' % (self.tableid, self.ruleset.name, ','.join(onlineNames), offlineString)
 
     def gameExistsLocally(self):
-        """does the game exist in the data base of the client?"""
+        """True if the game exists in the data base of the client"""
         assert self.gameid
         return bool(Query('select 1 from game where id=?', (self.gameid,)).records)
 
@@ -158,7 +158,7 @@ class Client(pb.Referenceable):
                 Internal.scene.mainWindow.updateGUI()
 
     def _tableById(self, tableid):
-        """returns table with tableid"""
+        """return table with tableid"""
         for table in self.tables:
             if table.tableid == tableid:
                 return table
@@ -318,8 +318,8 @@ class Client(pb.Referenceable):
         return result
 
     def ask(self, move, answers):
-        """this is where the robot AI should go.
-        sends answer and one parameter to server"""
+        """place the robot AI here.
+        send answer and one parameter to server"""
         delay = 0.0
         delayStep = 0.1
         myself = self.game.myself
@@ -333,7 +333,7 @@ class Client(pb.Referenceable):
         return succeed(result)
 
     def thatWasMe(self, player):
-        """returns True if player == myself"""
+        """return True if player == myself"""
         if not self.game:
             return False
         return player == self.game.myself

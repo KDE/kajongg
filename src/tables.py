@@ -351,7 +351,7 @@ class TableList(QWidget):
             self.selectTable(selected.indexes()[0].row())
 
     def selectedTable(self):
-        """returns the selected table"""
+        """return the selected table"""
         if self.view.selectionModel():
             index = self.view.selectionModel().currentIndex()
             if index.isValid() and self.view.model():

@@ -223,7 +223,7 @@ class Url(str, StrMixin):
             return False
 
     def connect(self, factory):
-        """returns a twisted connector"""
+        """return a twisted connector"""
         if self.useSocket:
             return Internal.reactor.connectUNIX(socketName(), factory, timeout=5)
         host = self.host

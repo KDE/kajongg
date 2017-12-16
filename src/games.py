@@ -187,7 +187,7 @@ class Games(QDialog):
         self.view.hideColumn(0)
 
     def __idxForGame(self, game):
-        """returns the model index for game"""
+        """return the model index for game"""
         for row in range(self.model.rowCount()):
             idx = self.model.index(row, 0)
             if self.model.data(idx, 0) == game:
@@ -195,7 +195,7 @@ class Games(QDialog):
         return self.model.index(0, 0)
 
     def __getSelectedGame(self):
-        """returns the game id of the selected game"""
+        """return the game id of the selected game"""
         rows = self.selection.selectedRows()
         return self.model.data(rows[0], 0) if rows else 0
 

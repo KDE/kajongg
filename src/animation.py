@@ -181,7 +181,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
                 group.clear()
 
     def showState(self, newState, oldState):
-        """overrides Qt method"""
+        """override Qt method"""
         if self.debug:
             logDebug('G{}: {} -> {} isAlive:{}'.format(
                 self.uid, self.stateName(oldState), self.stateName(newState), isAlive(self)))
@@ -335,7 +335,7 @@ class AnimatedMixin:
         self.setDrawingOrder()
 
     def getValue(self, pName):
-        """gets a current property value"""
+        """get a current property value"""
         return {'pos': self.pos, 'rotation': self.rotation,
                 'scale': self.scale}[pName]
 

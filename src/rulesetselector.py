@@ -48,7 +48,7 @@ class RuleTreeItem(TreeItem):
         return len(self.rawContent)
 
     def ruleset(self):
-        """returns the ruleset containing this item"""
+        """return the ruleset containing this item"""
         item = self
         while not isinstance(item.rawContent, Ruleset):
             item = item.parent
@@ -365,7 +365,7 @@ class RuleTreeView(QTreeView):
         self.differs = []
 
     def dataChanged(self, unusedIndex1, unusedIndex2, unusedRoles=None):
-        """gets called if the model has changed: Update all differs"""
+        """get called if the model has changed: Update all differs"""
         for differ in self.differs:
             differ.rulesetChanged()
 
@@ -429,7 +429,7 @@ class RuleTreeView(QTreeView):
             self.resizeColumnToContents(col)
 
     def selectedRow(self):
-        """returns the currently selected row index (with column 0)"""
+        """return the currently selected row index (with column 0)"""
         rows = self.selectionModel().selectedRows()
         if len(rows) == 1:
             return rows[0]

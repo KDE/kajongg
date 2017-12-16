@@ -268,7 +268,7 @@ class Board(QGraphicsRectItem, StrMixin):
         QGraphicsRectItem.setEnabled(self, enabled)
 
     def _focusableTiles(self, sortDir=Qt.Key_Right):
-        """returns a list of all tiles in this board sorted such that
+        """return a list of all tiles in this board sorted such that
         moving in the sortDir direction corresponds to going to
         the next list element.
         respect board orientation: Right Arrow should always move right
@@ -284,7 +284,7 @@ class Board(QGraphicsRectItem, StrMixin):
 
     @hasFocus.setter
     def hasFocus(self, value):
-        """sets focus on this board"""
+        """set focus on this board"""
         if isAlive(self):
             scene = self.scene()
             if isAlive(scene):
@@ -297,7 +297,7 @@ class Board(QGraphicsRectItem, StrMixin):
 
     @staticmethod
     def mapChar2Arrow(event):
-        """maps the keys hjkl to arrows like in vi and konqueror"""
+        """map the keys hjkl to arrows like in vi and konqueror"""
         key = event.key()
         if key in Board.arrows:
             return key
@@ -338,7 +338,7 @@ class Board(QGraphicsRectItem, StrMixin):
         return uiTile
 
     def uiMeldWithTile(self, uiTile):  # pylint: disable=no-self-use
-        """returns the UI Meld with uiTile. A Board does not know about melds,
+        """return the UI Meld with uiTile. A Board does not know about melds,
         so default is to return a Meld with only uiTile"""
         return UIMeld(uiTile)
 
@@ -391,7 +391,7 @@ class Board(QGraphicsRectItem, StrMixin):
                 return uiTile
 
     def tilesByElement(self, element):
-        """returns all child items holding a uiTile for element"""
+        """return all child items holding a uiTile for element"""
         return [x for x in self.uiTiles if x.tile is element]
 
     def rotatedLightSource(self):
@@ -414,7 +414,7 @@ class Board(QGraphicsRectItem, StrMixin):
         return QRectF(self.tileFacePos(), self.tileset.faceSize)
 
     def setPos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
-        """sets the position in the parent item expressing the position in tile face units.
+        """set the position in the parent item expressing the position in tile face units.
         The X position is xWidth*facewidth + xHeight*faceheight, analog for Y"""
         self.__xWidth = xWidth
         self.__xHeight = xHeight
@@ -710,7 +710,7 @@ class SelectorBoard(CourtBoard):
         uiTile.setBoard(self, column, row)
 
     def meldVariants(self, tile, lowerHalf):
-        """returns a list of possible variants based on meld. Those are logical melds."""
+        """return a list of possible variants based on meld. Those are logical melds."""
         # pylint: disable=too-many-locals
         assert isinstance(tile, UITile)
         wantedTile = tile.tile
@@ -859,7 +859,7 @@ class FittingView(QGraphicsView):
         return QGraphicsView.mouseMoveEvent(self, event)
 
     def drag(self, uiTile):
-        """returns a drag object"""
+        """return a drag object"""
         drag = QDrag(self)
         mimeData = MimeData(uiTile)
         drag.setMimeData(mimeData)

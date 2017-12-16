@@ -152,7 +152,7 @@ class HandBoard(Board):
         return self.player.scoringString()
 
     def lowerHalfTiles(self):
-        """returns a list with all single tiles of the lower half melds
+        """return a list with all single tiles of the lower half melds
         without boni"""
         return [x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus]
 
@@ -160,7 +160,7 @@ class HandBoard(Board):
         """a list of melds for the hand as it should look after sync"""
 
     def newTilePositions(self):
-        """returns list(TileAttr) for all tiles except bonus tiles.
+        """return list(TileAttr) for all tiles except bonus tiles.
         The tiles are not associated to any board."""
         result = list()
         newUpperMelds = list(self.player.exposedMelds)
@@ -201,7 +201,7 @@ class HandBoard(Board):
         return result
 
     def newBonusPositions(self, bonusTiles, newTilePositions):
-        """returns list(TileAttr)
+        """return list(TileAttr)
         calculate places for bonus tiles. Put them all in one row,
         right adjusted. If necessary, extend to the right even
         outside of our board"""

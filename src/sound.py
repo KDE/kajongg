@@ -47,7 +47,7 @@ class Sound:
 
     @staticmethod
     def findOggBinary():
-        """sets __oggBinary to exe name or an empty string"""
+        """set __oggBinary to exe name or an empty string"""
         if Sound.__oggBinary is None:
             if os.name == 'nt':
                 Sound.__oggBinary = os.path.join('share', 'kajongg', 'voices', 'oggdec.exe')
@@ -244,7 +244,7 @@ class Voice(StrMixin):
 
     @staticmethod
     def locate(name):
-        """returns Voice or None if no foreign or local voice matches.
+        """return Voice or None if no foreign or local voice matches.
         In other words never return a predefined voice"""
         for voice in Voice.availableVoices():
             dirname = os.path.split(voice.directory)[-1]
@@ -388,7 +388,7 @@ class Voice(StrMixin):
         return os.path.join(self.directory, 'md5sum')
 
     def savedmd5Sum(self):
-        """returns the current value of the md5sum file"""
+        """return the current value of the md5sum file"""
         if os.path.exists(self.md5FileName()):
             try:
                 line = open(self.md5FileName(), 'r').readlines()[0].replace(' -', '').strip()

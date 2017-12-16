@@ -323,7 +323,7 @@ class Hand(StrMixin):
         self.__checkHasExclusiveRules()
 
     def matchingWinnerRules(self):
-        """returns a list of matching winner rules"""
+        """return a list of matching winner rules"""
         matching = [UsedRule(x) for x in self.__matchingRules(self.ruleset.winnerRules)]
         limitRule = self.maxLimitRule(matching)
         return [limitRule] if limitRule else matching
@@ -338,7 +338,7 @@ class Hand(StrMixin):
                 raise Hand.__NotWon(fmt('exclusive rule {exclusive} does not win'))
 
     def __setLastMeld(self):
-        """sets the shortest possible last meld. This is
+        """set the shortest possible last meld. This is
         not yet the final choice, see __applyBestLastMeld"""
         self.__lastMeld = None
         if self.lastTile and self.__won:
@@ -422,7 +422,7 @@ class Hand(StrMixin):
         return ' '.join(parts).strip()
 
     def __add__(self, addTile):
-        """returns a new Hand built from this one plus addTile"""
+        """return a new Hand built from this one plus addTile"""
         assert addTile.isConcealed, 'addTile %s should be concealed:' % addTile
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
@@ -437,7 +437,7 @@ class Hand(StrMixin):
         return Hand(self.player, newString, prevHand=self)
 
     def __sub__(self, subtractTile):
-        """returns a copy of self minus subtractTiles.
+        """return a copy of self minus subtractTiles.
         Case of subtractTile (hidden or exposed) is ignored.
         subtractTile must either be undeclared or part of
         lastMeld. Exposed melds of length<3 will be hidden."""
@@ -478,7 +478,7 @@ class Hand(StrMixin):
         return Hand(self.player, newString, prevHand=self)
 
     def manualRuleMayApply(self, rule):
-        """returns True if rule has selectable() and applies to this hand"""
+        """return True if rule has selectable() and applies to this hand"""
         if self.__won and rule in self.ruleset.loserRules:
             return False
         if not self.__won and rule in self.ruleset.winnerRules:
@@ -667,7 +667,7 @@ class Hand(StrMixin):
 
     @staticmethod
     def maxLimitRule(usedRules):
-        """returns the rule with the highest limit score or None"""
+        """return the rule with the highest limit score or None"""
         result = None
         maxLimit = 0
         usedRules = [x for x in usedRules if x.rule.score.limits]

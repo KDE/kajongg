@@ -33,7 +33,7 @@ if not STDOUTENCODING:
 
 
 def stack(msg, limit=6):
-    """returns a list of lines with msg as prefix"""
+    """return a list of lines with msg as prefix"""
     result = []
     for idx, values in enumerate(
             traceback.extract_stack(limit=limit + 2)[:-2]):
@@ -47,7 +47,7 @@ def stack(msg, limit=6):
 
 
 def callers(count=5, exclude=None):
-    """returns the name of the calling method"""
+    """return the name of the calling method"""
     stck = traceback.extract_stack(limit=30)
     excluding = list(exclude) if exclude else []
     excluding.extend(['<genexpr>', '__call__', 'run', '<module>', 'runTests'])
@@ -67,7 +67,7 @@ def callers(count=5, exclude=None):
 
 
 def elapsedSince(since):
-    """returns seconds since since"""
+    """return seconds since since"""
     delta = datetime.datetime.now() - since
     return float(
         delta.microseconds
@@ -75,7 +75,7 @@ def elapsedSince(since):
 
 
 def which(program):
-    """returns the full path for the binary or None"""
+    """return the full path for the binary or None"""
     for path in os.environ['PATH'].split(os.pathsep):
         fullName = os.path.join(path, program)
         if os.path.exists(fullName):
@@ -227,7 +227,7 @@ class Csv:
 
     @staticmethod
     def reader(filename):
-        """returns a generator for decoded strings"""
+        """return a generator for decoded strings"""
         return csv.reader(open(filename, 'r', encoding='utf-8'), delimiter=Csv.delimiter)
 
 def popenReadlines(args):

@@ -59,7 +59,7 @@ class HandId(StrMixin):
         self.game.notRotated = self.notRotated
 
     def __scanHandId(self, string, stringIdx):
-        """gets the --game option.
+        """get the --game option.
         stringIdx 0 is the part in front of ..
         stringIdx 1 is the part after ..
         """
@@ -764,7 +764,7 @@ class Game:
                 yield move
 
     def throwDices(self):
-        """sets random living and kongBox
+        """set random living and kongBox
         sets divideAt: an index for the wall break"""
         breakWall = self.randomGenerator.randrange(4)
         sideLength = len(self.wall.tiles) // 4
@@ -901,7 +901,7 @@ class PlayingGame(Game):
             Game._saveScores(self)
 
     def nextPlayer(self, current=None):
-        """returns the player after current or after activePlayer"""
+        """return the player after current or after activePlayer"""
         if not current:
             current = self.activePlayer
         pIdx = self.players.index(current)
@@ -1013,7 +1013,7 @@ class PlayingGame(Game):
                             player.name, player.voice))
 
     def dangerousFor(self, forPlayer, tile):
-        """returns a list of explaining texts if discarding tile
+        """return a list of explaining texts if discarding tile
         would be Dangerous game for forPlayer. One text for each
         reason - there might be more than one"""
         assert isinstance(tile, Tile), tile

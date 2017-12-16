@@ -155,7 +155,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         return self._boundingRect
 
     def facePos(self):
-        """returns the face position relative to the tile
+        """return the face position relative to the tile
         depend on tileset, lightSource and shadow"""
         return self.board.tileFacePos()
 
@@ -164,7 +164,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         return self.tile.isKnown
 
     def __elementId(self):
-        """returns the SVG element id of the tile"""
+        """return the SVG element id of the tile"""
         if not Internal.Preferences.showShadows:
             return "TILE_2"
         lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
@@ -206,7 +206,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
             painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
 
     def pixmapFromSvg(self, pmapSize=None, withBorders=None):
-        """returns a pixmap with default size as given in SVG
+        """return a pixmap with default size as given in SVG
         and optional borders/shadows"""
         if withBorders is None:
             withBorders = Internal.Preferences.showShadows
@@ -418,5 +418,5 @@ class UIMeld(list):
 
     @property
     def meld(self):
-        """returns a logical meld"""
+        """return a logical meld"""
         return Meld(x.tile for x in self)

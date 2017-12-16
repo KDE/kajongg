@@ -65,7 +65,7 @@ class RootItem(TreeItem):
         return self.rawContent[column]
 
     def columnCount(self):  # pylint: disable=no-self-use
-        """is 1 always correct? No, inherit from RootItem"""
+        """Always return 1. is 1 always correct? No, inherit from RootItem"""
         return 1
 
 
@@ -116,7 +116,7 @@ class TreeModel(QAbstractItemModel):
         return QModelIndex()
 
     def itemForIndex(self, index):
-        """returns the item at index"""
+        """return the item at index"""
         if index.isValid():
             item = index.internalPointer()
             if item:

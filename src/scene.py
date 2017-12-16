@@ -264,11 +264,11 @@ class GameScene(SceneWithFocusRect):
                     sBar.removeItem(idx)
 
     def graphicsTileItems(self):
-        """returns all UITile in the scene"""
+        """return all UITile in the scene"""
         return (x for x in self.items() if isinstance(x, UITile))
 
     def nonTiles(self):
-        """returns all other items in the scene"""
+        """return all other items in the scene"""
         return (x for x in self.items() if not isinstance(x, UITile))
 
     def removeTiles(self):

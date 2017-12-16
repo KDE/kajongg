@@ -5,9 +5,6 @@ Copyright (C) 2008-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
 SPDX-License-Identifier: GPL-2.0
 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-
-
 """
 
 from mi18n import i18n, i18nc

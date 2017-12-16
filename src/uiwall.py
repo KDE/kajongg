@@ -86,7 +86,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
         SideText.sideTexts = list()
 
     def moveDict(self):
-        """returns a dict with new property values for our sidetext
+        """return a dict with new property values for our sidetext
         which move it onto us"""
         if not self.board or not self.__text:
             return {}
@@ -185,7 +185,7 @@ class UIWallSide(Board, StrMixin):
         return 'UIWallSide {}'.format(UIWall.sideNames[self.rotation()])
 
     def center(self):
-        """returns the center point of the wall in relation to the
+        """return the center point of the wall in relation to the
         faces of the upper level"""
         faceRect = self.tileFaceRect()
         result = faceRect.topLeft() + self.shiftZ(1) + \

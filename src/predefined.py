@@ -27,7 +27,7 @@ class ClassicalChinese(PredefinedRuleset):
             name or i18nE('Classical Chinese standard'))
 
     def _initRuleset(self):
-        """sets the description"""
+        """set the description"""
         self.description = i18n('Classical Chinese')
 
     def addManualRules(self):
@@ -300,7 +300,7 @@ class ClassicalChineseDMJL(ClassicalChinese):
             name or i18nE('Classical Chinese DMJL'))
 
     def _initRuleset(self):
-        """sets the description"""
+        """set the description"""
         ClassicalChinese._initRuleset(self)
         self.description = i18n(
             'Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.')
@@ -357,7 +357,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
             name or i18nE('Classical Chinese BMJA'))
 
     def _initRuleset(self):
-        """sets the description"""
+        """set the description"""
         ClassicalChinese._initRuleset(self)
         self.description = i18n(
             'Classical Chinese as defined by the British Mah-Jong Association')

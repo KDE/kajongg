@@ -173,7 +173,7 @@ class ScoreModel(TreeModel):
         self.loadData()
 
     def chart(self, rect, index, playerItem):
-        """returns list(QPointF) for a player in a specific tree cell"""
+        """return list(QPointF) for a player in a specific tree cell"""
         chartHeight = float(rect.height()) * 4
         yScale = chartHeight / (self.minY - self.maxY)
         yOffset = rect.height() * index.row()
@@ -943,7 +943,7 @@ class ScoringDialog(QWidget):
         self.slotInputChanged()
 
     def computeLastTile(self):
-        """returns the currently selected last tile"""
+        """return the currently selected last tile"""
         idx = self.cbLastTile.currentIndex()
         if idx >= 0:
             return self.cbLastTile.itemData(idx)

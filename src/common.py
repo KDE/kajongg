@@ -430,7 +430,7 @@ class IntDict(defaultdict, StrMixin):
                    for x in countFilter or self)
 
     def all(self, countFilter=None):
-        """returns a list of all tiles defined by countFilter,
+        """return a list of all tiles defined by countFilter,
         each tile multiplied by its occurrence.
         countFilter is an iterator of element names. No countFilter: take all
         So all(['we', 'fs']) should return ['we', 'we', 'we', 'we', 'fs']"""

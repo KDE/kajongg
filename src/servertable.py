@@ -58,7 +58,7 @@ class ServerGame(PlayingGame):
         self.shouldSave = True
 
     def throwDices(self):
-        """sets random living and kongBox
+        """set random living and kongBox
         sets divideAt: an index for the wall break"""
         self.wall.tiles.sort()
         self.randomGenerator.shuffle(self.wall.tiles)
@@ -106,7 +106,7 @@ class ServerTable(Table, StrMixin):
             logDebug('new table %s' % self)
 
     def hasName(self, name):
-        """returns True if one of the players in the game is named 'name'"""
+        """return True if one of the players in the game is named 'name'"""
         return bool(self.game) and any(x.name == name for x in self.game.players)
 
     def asSimpleList(self, withFullRuleset=False):
@@ -212,7 +212,7 @@ class ServerTable(Table, StrMixin):
         return max(gameIds) + 1
 
     def __prepareNewGame(self):
-        """returns a new game object"""
+        """return a new game object"""
         names = [x.name for x in self.users]
         # the server and all databases save the english name but we
         # want to make sure a translation exists for the client GUI
@@ -806,7 +806,7 @@ class ServerTable(Table, StrMixin):
                 self.pickTile)
 
     def prioritize(self, requests):
-        """returns only requests we want to execute"""
+        """return only requests we want to execute"""
         if not self.running:
             return
         answers = [

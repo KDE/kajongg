@@ -29,7 +29,7 @@ class Parameter:
         self.item = None
 
     def itemValue(self):
-        """returns the value of this item"""
+        """return the value of this item"""
         return self.item.value()
 
 
@@ -48,7 +48,7 @@ class StringParameter(Parameter):
         self.item = skeleton.addItem(self.name, self.value, self.default or '')
 
     def itemValue(self):
-        """returns the value of this item"""
+        """return the value of this item"""
         return str(self.item.value())
 
 

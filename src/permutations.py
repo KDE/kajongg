@@ -4,9 +4,6 @@
 
 SPDX-License-Identifier: GPL-2.0
 
-
-
-
 Read the user manual for a description of the interface to this scoring engine
 """
 
@@ -62,7 +59,7 @@ class Permutations:
 
     @classmethod
     def permute(cls, valuesTuple):
-        """returns all groupings into melds.
+        """return all groupings into melds.
         values is a tuple of int, range 1..9"""
         assert isinstance(valuesTuple, tuple)
         if valuesTuple in cls.permuteCache:

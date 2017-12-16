@@ -184,7 +184,7 @@ class Tile(str, StrMixin):
         raise TypeError
 
     def meld(self, size):
-        """returns a meld of size. Those attributes are set
+        """return a meld of size. Those attributes are set
         in Meld.cacheMeldsInTiles"""
         return getattr(self, ('single', 'pair', 'pung', 'kong')[size - 1])
 
@@ -217,7 +217,7 @@ class Tile(str, StrMixin):
         return names[self.value]
 
     def name(self):
-        """returns name of a single tile"""
+        """return name of a single tile"""
         if self.group.lower() == Tile.wind:
             result = {
                 East: i18n('East Wind'),
@@ -264,7 +264,7 @@ class TileList(list):
         return TileList(sorted(self))
 
     def hasChows(self, tile):
-        """returns my chows with tileName"""
+        """return my chows with tileName"""
         if tile not in self:
             return []
         if tile.lowerGroup not in Tile.colors:
@@ -317,7 +317,7 @@ class Elements:
                 self.occurrence[Tile(bonus, _)] = 1
 
     def __filter(self, ruleset):
-        """returns element names"""
+        """return element names"""
         return (x for x in self.occurrence
                 if ruleset.withBonusTiles or (not x.isBonus))
 

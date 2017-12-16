@@ -59,7 +59,7 @@ class AIDefault:
     def selectDiscard(self, hand):
         # pylint: disable=too-many-branches, R0915
         # disable warning about too many branches
-        """returns exactly one tile for discard.
+        """return exactly one tile for discard.
         Much of this is just trial and success - trying to get as much AI
         as possible with limited computing resources, it stands on
         no theoretical basis"""
@@ -438,7 +438,7 @@ class DiscardCandidates(list):
             this.next2 = None
 
     def best(self):
-        """returns the candidate with the lowest value"""
+        """return the candidate with the lowest value"""
         lowest = min(x.keep for x in self)
         candidates = sorted(x for x in self if x.keep == lowest)
         result = self.player.game.randomGenerator.choice(

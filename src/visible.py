@@ -95,7 +95,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
                 ) and self == self.game.myself)
 
     def explainHand(self):
-        """returns the hand to be explained. Same as current unless we need to discard.
+        """return the hand to be explained. Same as current unless we need to discard.
         In that case, make an educated guess about the discard.
         For player==game.myself, use the focused tile."""
         hand = self.hand

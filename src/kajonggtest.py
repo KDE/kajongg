@@ -390,7 +390,7 @@ def removeInvalidCommits(csvFile):
     Clone.removeObsolete()
 
 def readGames(csvFile):
-    """returns a dict holding a frozenset of games for each variant"""
+    """return a dict holding a frozenset of games for each variant"""
     if not os.path.exists(csvFile):
         return
     allRowsGenerator = neutralize(Csv.reader(csvFile))
