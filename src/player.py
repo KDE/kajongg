@@ -13,7 +13,7 @@ from collections import defaultdict
 from log import logException, logWarning
 from mi18n import i18n, i18nc, i18nE
 from common import IntDict, Debug
-from common import StrMixin
+from common import StrMixin, Internal
 from wind import East
 from query import Query
 from tile import Tile, TileList, elements
@@ -22,7 +22,7 @@ from meld import Meld, MeldList
 from permutations import Permutations
 from message import Message
 from hand import Hand
-from intelligence import AIDefault
+from intelligence import AIDefaultAI
 
 
 class Players(list, StrMixin):
@@ -80,6 +80,14 @@ class Players(list, StrMixin):
     @staticmethod
     def createIfUnknown(name):
         """create player in database if not there yet"""
+        if not Internal.db:
+            # kajonggtest
+            nameid = len(Players.allIds) + 1
+            Players.allIds[name] = nameid
+            Players.allNames[nameid] = name
+            if not name.startswith('Robot'):
+                Players.humanNames[nameid] = name
+
         if name not in Players.allNames.values():
             Players.load()  # maybe somebody else already added it
             if name not in Players.allNames.values():
@@ -126,7 +134,7 @@ class Player(StrMixin):
         Players.createIfUnknown(name)
         self.name = name
         self.wind = East
-        self.intelligence = AIDefault(self)
+        self.intelligence = AIDefaultAI(self)
         self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
         self.handCache = {}
         self.cacheHits = 0

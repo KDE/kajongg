@@ -279,7 +279,7 @@ class Options:
     port = None
     playOpen = False
     gui = False
-    AI = 'Default'
+    AI = 'DefaultAI'
     csv = None
     continueServer = False
     fixed = False

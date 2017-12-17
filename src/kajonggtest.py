@@ -23,19 +23,11 @@ from optparse import OptionParser
 from locale import getdefaultlocale
 
 from common import Debug, StrMixin, cacheDir
-from util import removeIfExists, gitHead, checkMemory
-from util import Csv, CsvWriter, popenReadlines
+from util import removeIfExists, gitHead, checkMemory, popenReadlines
+from kajcsv import Csv, CsvRow, CsvWriter
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-# fields in row:
-RULESETFIELD = 0
-AIFIELD = 1
-COMMITFIELD = 2
-PYTHON23FIELD = 3
-GAMEFIELD = 4
-TAGSFIELD = 5
-PLAYERSFIELD = 6
 
 OPTIONS = None
 
@@ -265,7 +257,7 @@ class Job(StrMixin):
         cmd.insert(0, 'python{}'.format(self.pythonVersion))
         if OPTIONS.rounds:
             cmd.append('--rounds={rounds}'.format(rounds=OPTIONS.rounds))
-        if self.aiVariant != 'Default':
+        if self.aiVariant != 'DefaultAI':
             cmd.append('--ai={ai}'.format(ai=self.aiVariant))
         if OPTIONS.csv:
             cmd.append('--csv={csv}'.format(csv=OPTIONS.csv))
@@ -318,184 +310,143 @@ class Job(StrMixin):
         game = 'game={}'.format(self.game)
         ruleset = self.shortRulesetName()
         aiName = 'AI={}'.format(
-            self.aiVariant) if self.aiVariant != 'Default' else ''
+            self.aiVariant) if self.aiVariant != 'DefaultAI' else ''
         return ' '.join([
             self.commitId, 'Python{}'.format(self.pythonVersion), pid, game, ruleset, aiName]).replace('  ', ' ')
 
 
-def neutralize(rows):
-    """remove things we do not want to compare"""
-    for row in rows:
-        for idx, field in enumerate(row):
-            field = field.replace(' ', '')
-            if field.startswith('Tester ') or field.startswith('Tüster'):
-                field = 'Tester'
-            if 'MEM' in field:
-                parts = field.split(',')
-                for part in parts[:]:
-                    if part.startswith('MEM'):
-                        parts.remove(part)
-                field = ','.join(parts)
-            row[idx] = field
-        yield row
 
 
-def onlyExistingCommits(commits):
-    """filter out non-existing commits"""
-    global KNOWNCOMMITS  # pylint: disable=global-statement
-    if not KNOWNCOMMITS:
-        for branch in subprocess.check_output(b'git branch'.split()).decode().split('\n'):
-            if 'detached' not in branch and 'no branch' not in branch:
-                KNOWNCOMMITS |= set(subprocess.check_output(
-                    'git log --max-count=200 --pretty=%H {branch}'.format(
-                        branch=branch[2:]).split()).decode().split('\n'))
-    result = list()
-    for commit in commits:
-        if any(x.startswith(commit) for x in KNOWNCOMMITS):
-            result.append(commit)
-    return result
-
-
-def removeInvalidCommits(csvFile):
-    """remove rows with invalid git commit ids"""
-    if not os.path.exists(csvFile):
-        return
-    rows = list(Csv.reader(csvFile))
-    _ = {x[COMMITFIELD] for x in rows}
-    csvCommits = {
-        x for x in _ if set(
-            x) <= set(
-                '0123456789abcdef') and len(
-                    x) >= 7}
-    nonExisting = set(csvCommits) - set(onlyExistingCommits(csvCommits))
-    if nonExisting:
-        print(
-            'removing rows from kajongg.csv for commits %s' %
-            ','.join(nonExisting))
-        writer = CsvWriter(csvFile)
-        for row in rows:
-            if row[COMMITFIELD] not in nonExisting:
-                writer.writerow(row)
-    # remove all logs referencing obsolete commits
+def cleanup_data(csv):
+    """remove all data referencing obsolete commits"""
     logDir = os.path.expanduser(os.path.join('~', '.kajongg', 'log'))
+    knownCommits = csv.commits()
     for dirName, _, fileNames in os.walk(logDir):
         for fileName in fileNames:
-            if fileName not in KNOWNCOMMITS and fileName != 'current':
+            if fileName not in knownCommits and fileName != 'current':
                 os.remove(os.path.join(dirName, fileName))
         try:
             os.removedirs(dirName)
         except OSError:
             pass  # not yet empty
-
     Clone.removeObsolete()
 
-def readGames(csvFile):
-    """return a dict holding a frozenset of games for each variant"""
-    if not os.path.exists(csvFile):
-        return
-    allRowsGenerator = neutralize(Csv.reader(csvFile))
-    if not allRowsGenerator:
-        return
-    # we want unique tuples so we can work with sets
-    allRows = {tuple(x) for x in allRowsGenerator}
-    games = dict()
-    # build set of rows for every ai
-    for variant in {tuple(x[:COMMITFIELD]) for x in allRows}:
-        games[variant] = frozenset(
-            x for x in allRows if tuple(x[:COMMITFIELD]) == variant)
-    return games
+def pairs(data):
+    """return all consecutive pairs"""
+    prev = None
+    for _ in data:
+        if prev:
+            yield prev, _
+        prev = _
 
-def hasDifferences(rows):
-    """True if rows have unwanted differences"""
-    return (len({tuple(list(x)[GAMEFIELD:]) for x in rows})
-            > len({tuple(list(x)[:COMMITFIELD]) for x in rows}))
 
-def firstDifference(rows):
-    """reduce to two rows showing a difference"""
-    result = rows
-    last = rows[-1]
-    while hasDifferences(result):
-        last = result[-1]
-        result = result[:-1]
-    return list([result[-1], last])
+class CSV(StrMixin):
+    """represent kajongg.csv"""
 
-def closerLook(gameId, gameIdRows):
-    """print detailled info about one difference"""
-    for ruleset in OPTIONS.rulesets:
-        for intelligence in OPTIONS.allAis:
-            shouldBeIdentical = [x for x in gameIdRows if x[RULESETFIELD] == ruleset and x[AIFIELD] == intelligence]
-            for commit in (x[COMMITFIELD] for x in shouldBeIdentical):
-                rows2 = [x for x in shouldBeIdentical if x[COMMITFIELD] == commit]
-                if hasDifferences(rows2):
-                    first = firstDifference(rows2)
-                    print('Game {} {} {} {} has differences between Python2 and Python3'.format(
-                        gameId, ruleset, intelligence, commit))
-            for py23 in '23':
-                rows2 = [x for x in shouldBeIdentical if x[PYTHON23FIELD] == py23]
-                if hasDifferences(rows2):
-                    first = firstDifference(rows2)
-                    print('Game {} {} {} Python{} has differences between commits {} and {}'.format(
-                        gameId, ruleset, intelligence, py23, first[0][COMMITFIELD], first[1][COMMITFIELD]))
+    knownCommits = None
 
-def printDifferingResults(rowLists):
-    """if most games get the same result with all tried variants,
-    dump those games that do not"""
-    allGameIds = {}
-    for rows in rowLists:
-        for row in rows:
-            rowId = row[GAMEFIELD]
-            if rowId not in allGameIds:
-                allGameIds[rowId] = []
-            allGameIds[rowId].append(row)
-    differing = []
-    for key, value in allGameIds.items():
-        if hasDifferences(value):
-            differing.append(key)
-    if not differing:
-        print('no games differ')
-    else:
-        print(
-            'differing games (%d out of %d): %s' % (
-                len(differing), len(allGameIds),
-                ' '.join(sorted(differing, key=int))))
-        # now look closer at one example. Differences may be caused by git commits or by py2/p3
-        for gameId in sorted(differing):
-            closerLook(gameId, allGameIds[gameId])
+    def __init__(self):
+        self.findKnownCommits()
+        self.rows = []
+        if os.path.exists(OPTIONS.csv):
+            self.rows = list(sorted({CsvRow(x) for x in Csv.reader(OPTIONS.csv)}))
+        self.removeInvalidCommits()
 
-def evaluate(games):
-    """evaluate games"""
-    if not games:
-        return
-    for variant, rows in games.items():
-        gameIds = {x[GAMEFIELD] for x in rows}
-        if len(gameIds) != len({tuple(list(x)[GAMEFIELD:]) for x in rows}):
+    def neutralize(self):
+        """remove things we do not want to compare"""
+        for row in self.rows:
+            row.neutralize()
+
+    def commits(self):
+        """return set of all our commit ids"""
+        # TODO: sorted by date
+        return {x.commit for x in self.rows}
+
+    def games(self):
+        """return a sorted unique list of all games"""
+        return sorted({x.game for x in self.rows})
+
+    @classmethod
+    def findKnownCommits(cls):
+        """find known commits"""
+        if cls.knownCommits is None:
+            cls.knownCommits = set()
+            for branch in subprocess.check_output(b'git branch'.split()).decode().split('\n'):
+                if 'detached' not in branch and 'no branch' not in branch:
+                    cls.knownCommits |= set(subprocess.check_output(
+                        'git log --max-count=400 --pretty=%H {branch}'.format(
+                            branch=branch[2:]).split()).decode().split('\n'))
+
+    @classmethod
+    def onlyExistingCommits(cls, commits):
+        """return a set with only  existing commits"""
+        result = set()
+        for commit in commits:
+            if any(x.startswith(commit) for x in cls.knownCommits):
+                result.add(commit)
+        return result
+
+    def removeInvalidCommits(self):
+        """remove rows with invalid git commit ids"""
+        csvCommits = {x.commit for x in self.rows}
+        csvCommits = {
+            x for x in csvCommits if set(
+                x) <= set(
+                    '0123456789abcdef') and len(
+                        x) >= 7}
+        nonExisting = csvCommits - self.onlyExistingCommits(set(x.commit for x in self.rows))
+        if nonExisting:
             print(
-                'ruleset "%s" AI "%s" has different rows for games' %
-                (variant[0], variant[1]), end=' ')
-            for game in sorted(gameIds, key=int):
-                if len({tuple(x[GAMEFIELD:] for x in rows if x[GAMEFIELD] == game)}) > 1:
-                    print(game, end=' ')
-            print()
-            break
-    printDifferingResults(games.values())
-    print()
-    print('the 3 robot players always use the Default AI')
-    print()
-    print('{ruleset:<25} {ai:<20} {games:>5}     {points:>4}                      human'.format(
-        ruleset='Ruleset', ai='AI variant', games='games', points='points'))
-    for variant, rows in games.items():
-        ruleset, aiVariant = variant
-        print('{ruleset:<25} {ai:<20} {rows:>5}  '.format(
-            ruleset=ruleset[:25], ai=aiVariant[:20],
-            rows=len(rows)), end=' ')
-        for playerIdx in range(4):
-            print(
-                '{p:>8}'.format(
-                    p=sum(
-                        int(x[
-                            PLAYERSFIELD + 1 + playerIdx * 4]) for x in rows)),
-                end=' ')
-        print()
+                'removing rows from kajongg.csv for commits %s' %
+                ','.join(nonExisting))
+            self.rows = [x for x in self.rows if x.commit not in nonExisting]
+            self.write()
+
+    def write(self):
+        """write new csv file"""
+        writer = CsvWriter(OPTIONS.csv)
+        for row in self.rows:
+            writer.writerow(row)
+        del writer
+
+    def evaluate(self):
+        """evaluate the data. Show differences as helpful as possible"""
+        for ruleset, aiVariant, game in {(x.ruleset, x.aiVariant, x.game) for x in self.rows}:
+            rows = list(reversed(sorted(
+                x for x in self.rows
+                if ruleset == x.ruleset and aiVariant == x.aiVariant and game == x.game)))
+            for fixedField in (CsvRow.fields.PY_VERSION, CsvRow.fields.COMMIT):
+                for fixedValue in set(x[fixedField] for x in rows):
+                    checkRows = [x for x in rows if x[fixedField] == fixedValue]
+                    for warned in self.compareRows(checkRows):
+                        rows.remove(warned)
+        self.compareRows(rows)
+
+    @staticmethod
+    def compareRows(rows):
+        """in absence of differences, there should be only one row.
+        return a list of rows which appeared in warnings"""
+        if not rows:
+            return []
+        msgHeader = None
+        result = []
+        ruleset = rows[0].ruleset
+        aiVariant = rows[0].aiVariant
+        game = rows[0].game
+        differences = []
+        for pair in pairs(rows):
+            causes = pair[1].differs_for(pair[0])
+            if causes:
+                differences.append(tuple([pair[0], pair[1], causes]))
+        for difference in sorted(differences, key=lambda x: len(x[2])):
+            if not set(difference[:2]) & set(result):
+                if msgHeader is None:
+                    msgHeader = 'looking at game={} ruleset={} AI={}'.format(
+                        game, ruleset, aiVariant)
+                    print(msgHeader)
+                print('   {} {}'.format(*difference[2]))
+                result.extend(difference[:2])
+        return result
 
 
 def startingDir():
@@ -578,6 +529,10 @@ def parse_options():
         default=None, help='use AI variants: comma separated list',
         metavar='AI')
     parser.add_option(
+        '', '--python', dest='pyVersions',
+        default=None, help='use python versions: comma separated list',
+        metavar='PY_VERSION')
+    parser.add_option(
         '', '--log', dest='log', action='store_true',
         default=False, help='write detailled debug info to ~/.kajongg/log/game/ruleset/commit.'
                             ' This starts a separate server process per job, it sets --servers to --clients.')
@@ -650,9 +605,10 @@ def improve_options():
             commits = subprocess.check_output(
                 'git log --pretty=%h {range}'.format(
                     range=OPTIONS.git).split()).decode()
-            OPTIONS.git = [reversed(x.strip() for x in commits.split('\n') if x.strip())]
+            _ = list(x.strip() for x in commits.split('\n') if x.strip())
+            OPTIONS.git = list(reversed(_))
         else:
-            OPTIONS.git = onlyExistingCommits(OPTIONS.git.split(','))
+            OPTIONS.git = CSV.onlyExistingCommits(OPTIONS.git.split(','))
             if not OPTIONS.git:
                 sys.exit(1)
     if OPTIONS.debug is None:
@@ -666,12 +622,16 @@ def improve_options():
     if gitHead() not in ('current', None) and not OPTIONS.log:
         OPTIONS.debug.append('git')
     if not OPTIONS.aiVariants:
-        OPTIONS.aiVariants = 'Default'
+        OPTIONS.aiVariants = 'DefaultAI'
+    if OPTIONS.pyVersions:
+        OPTIONS.pyVersions = OPTIONS.pyVersions.split(',')
+    else:
+        OPTIONS.pyVersions = ['3']
     OPTIONS.allAis = OPTIONS.aiVariants.split(',')
     if OPTIONS.count:
         print('rulesets:', ', '.join(OPTIONS.rulesets))
         _ = ' '.join(OPTIONS.allAis)
-        if _ != 'Default':
+        if _ != 'DefaultAI':
             print('AIs:', _)
     if OPTIONS.git:
         print('commits:', ' '.join(OPTIONS.git))
@@ -696,14 +656,16 @@ def allGames():
 
 def allJobs():
     """a generator returning Job instances"""
+    # pylint: disable=too-many-nested-blocks
     for game in OPTIONS.games:
         for commitId in OPTIONS.git or ['current']:
             for ruleset in OPTIONS.rulesets:
                 for aiVariant in OPTIONS.allAis:
-                    OPTIONS.jobCount += 1
-                    if OPTIONS.jobCount > OPTIONS.count:
-                        raise StopIteration
-                    yield Job(3, ruleset, aiVariant, commitId, game)
+                    for pyVersion in OPTIONS.pyVersions:
+                        OPTIONS.jobCount += 1
+                        if OPTIONS.jobCount > OPTIONS.count:
+                            raise StopIteration
+                        yield Job(pyVersion, ruleset, aiVariant, commitId, game)
 
 def main():
     """parse options, play, evaluate results"""
@@ -723,11 +685,11 @@ def main():
     if not os.path.exists(os.path.dirname(OPTIONS.csv)):
         os.makedirs(os.path.dirname(OPTIONS.csv))
 
-    removeInvalidCommits(OPTIONS.csv)
+    csv = CSV()
 
     improve_options()
 
-    evaluate(readGames(OPTIONS.csv))
+    csv.evaluate()
 
     errorMessage = Debug.setOptions(','.join(OPTIONS.debug))
     if errorMessage:
@@ -743,8 +705,7 @@ def main():
     if OPTIONS.count:
         doJobs()
         if OPTIONS.csv:
-            evaluate(readGames(OPTIONS.csv))
-
+            CSV().evaluate()
 
 def cleanup(sig, unusedFrame):
     """at program end"""

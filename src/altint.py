@@ -7,4 +7,4 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-# from intelligence import AIDefault
+# from intelligence import AIDefaultAI

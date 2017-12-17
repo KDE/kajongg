@@ -20,7 +20,7 @@ from tilesource import TileSource
 from meld import Meld, MeldList
 from rule import Score, UsedRule
 from common import Debug, StrMixin
-from intelligence import AIDefault
+from intelligence import AIDefaultAI
 from util import callers
 from message import Message
 
@@ -85,7 +85,7 @@ class Hand(StrMixin):
         # shortcuts for speed:
         self._player = weakref.ref(player)
         self.ruleset = player.game.ruleset
-        self.intelligence = player.intelligence if player else AIDefault()
+        self.intelligence = player.intelligence if player else AIDefaultAI()
         self.string = string
         self.__robbedTile = Tile.unknown
         self.prevHand = prevHand

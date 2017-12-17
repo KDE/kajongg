@@ -10,11 +10,13 @@ SPDX-License-Identifier: GPL-2.0
 import datetime
 import weakref
 import os
+import sys
 from collections import defaultdict
 from functools import total_ordering
 
 from twisted.internet.defer import succeed
-from util import gitHead, CsvWriter
+from util import gitHead
+from kajcsv import CsvRow
 from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, i18n
 from common import Internal, IntDict, Debug, Options
@@ -121,7 +123,7 @@ class HandId(StrMixin):
         @param withSeed: If set, include the seed used for the
         random generator.
         @type  withSeed: C{Boolean}
-        @param withAI:   If set and AI != Default: include AI name for
+        @param withAI:   If set and AI != DefaultAI: include AI name for
         human players.
         @type  withAI:   C{Boolean}
         @param withMoveCount:   If set, include the current count of moves.
@@ -134,8 +136,8 @@ class HandId(StrMixin):
             if self.game.myself:
                 aiName = self.game.myself.intelligence.name()
             else:
-                aiName = 'Default'
-            if aiName != 'Default':
+                aiName = 'DefaultAI'
+            if aiName != 'DefaultAI':
                 aiVariant = aiName + '/'
         num = self.notRotated
         assert isinstance(num, int), num
@@ -808,22 +810,25 @@ class PlayingGame(Game):
         """write game summary to Options.csv"""
         if self.finished() and Options.csv:
             gameWinner = max(self.players, key=lambda x: x.balance)
-            writer = CsvWriter(Options.csv, mode='a')
             if Debug.process and os.name != 'nt':
                 self.csvTags.append('MEM:%s' % resource.getrusage(
                     resource.RUSAGE_SELF).ru_maxrss)
             if Options.rounds:
                 self.csvTags.append('ROUNDS:%s' % Options.rounds)
-            row = [self.ruleset.name, Options.AI,
-                   gitHead(), '3',
-                   str(self.seed), ','.join(self.csvTags)]
+            _ = CsvRow.fields
+            row = [''] * CsvRow.fields.PLAYERS
+            row[_.GAME] = str(self.seed)
+            row[_.RULESET] = self.ruleset.name
+            row[_.AI] = Options.AI
+            row[_.COMMIT] = gitHead()
+            row[_.PY_VERSION] = '{}.{}'.format(*sys.version_info[:2])
+            row[_.TAGS] = ','.join(self.csvTags)
             for player in sorted(self.players, key=lambda x: x.name):
                 row.append(player.name)
                 row.append(player.balance)
                 row.append(player.wonCount)
                 row.append(1 if player == gameWinner else 0)
-            writer.writerow(row)
-            del writer
+            CsvRow(row).write()
 
     def close(self):
         """log off from the server and return a Deferred"""

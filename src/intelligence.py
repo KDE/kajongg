@@ -14,7 +14,7 @@ from common import IntDict, Debug, StrMixin
 from tile import Tile
 
 
-class AIDefault:
+class AIDefaultAI:
 
     """all AI code should go in here"""
 
