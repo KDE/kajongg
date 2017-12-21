@@ -357,7 +357,8 @@ class MainWindow(KXmlGuiWindow):
     def close(self, unusedResult=None):
         """wrap close() because we call it with a QTimer"""
         if isAlive(self):
-            ParallelAnimationGroup.cancelAll()
+            if Options.gui:
+                ParallelAnimationGroup.cancelAll()
             return KXmlGuiWindow.close(self)
 
     def closeEvent(self, event):
