@@ -260,11 +260,10 @@ class StrMixin:
         return '{cls}({content})'.format(cls=clsName, content=content)
 
 
-class Options:
+class Options(metaclass=FixedClass):
 
     """they are never saved in a config file. Some of them
     can be defined on the command line."""
-    __metaclass__ = FixedClass
     demo = False
     showRulesets = False
     rulesetName = None  # will only be set by command line --ruleset
