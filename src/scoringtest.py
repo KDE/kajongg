@@ -8,8 +8,6 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from __future__ import print_function
-
 import unittest
 
 from common import Debug  # pylint: disable=unused-import

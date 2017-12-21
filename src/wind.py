@@ -7,8 +7,6 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from __future__ import print_function
-
 # pylint: disable=invalid-name
 
 class Wind:

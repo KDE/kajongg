@@ -10,7 +10,6 @@ SPDX-License-Identifier: GPL-2.0
 # util must not import from log because util should not
 # depend on kde.py
 
-from __future__ import print_function
 import traceback
 import os
 import datetime

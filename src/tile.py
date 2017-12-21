@@ -7,8 +7,6 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from __future__ import print_function
-
 from log import logException
 from mi18n import i18n, i18nc
 from common import IntDict, StrMixin
