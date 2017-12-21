@@ -783,6 +783,8 @@ class HumanClient(Client):
         scene = Internal.scene
         if scene and game and scene.game == game:
             scene.game = None
+        if not Options.gui:
+            Internal.mainWindow.close()
 
     def serverDisconnected(self, unusedReference):
         """perspective calls us back"""
