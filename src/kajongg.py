@@ -29,6 +29,7 @@ import os
 import logging
 
 from qt import QObject
+from PyQt5.QtGui import QGuiApplication
 from kde import KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
 from mi18n import i18n
 from about import About
@@ -165,6 +166,9 @@ KCmdLineArgs.init(sys.argv, ABOUT.about)
 KCmdLineArgs.addCmdLineOptions(defineOptions())
 APP = KApplication()
 parseOptions()
+
+if hasattr(QGuiApplication, 'setDesktopFileName'):
+    QGuiApplication.setDesktopFileName('org.kde.kajongg')
 
 if Debug.neutral:
     KGlobal.translation = None

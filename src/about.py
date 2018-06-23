@@ -26,7 +26,7 @@ from common import Internal
 
 class About:
 
-    """we need persistancy but do not want to spoil global name space"""
+    """we need persistency but do not want to spoil global name space"""
 
     def __init__(self):
         self.appName = "kajongg"
