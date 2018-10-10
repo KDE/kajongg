@@ -1,7 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Kajongg
-Name[ast]=Kajongg
 Name[bs]=Kajongg
 Name[ca]=Kajongg
 Name[ca@valencia]=Kajongg
@@ -49,7 +48,6 @@ Name[x-test]=xxKajonggxx
 Name[zh_CN]=Kajongg
 Name[zh_TW]=Kajongg
 Comment=The ancient Chinese board game for 4 players
-Comment[ast]=El xuegu de mesa chinu vieyu pa 4 xugadores
 Comment[bs]=Drevna kineska igra na ploči za 4 igrača
 Comment[ca]=L'antic joc de taula xinés per a quatre jugadors
 Comment[ca@valencia]=L'antic joc de taula xinés per a quatre jugadors
@@ -93,7 +91,6 @@ Comment[x-test]=xxThe ancient Chinese board game for 4 playersxx
 Comment[zh_CN]=中国传统的四人桌上游戏
 Comment[zh_TW]=古老的中國四人遊戲
 GenericName=Mah Jongg
-GenericName[ast]=Mah Jongg
 GenericName[bs]=Mahjongg
 GenericName[ca]=Mah Jongg
 GenericName[ca@valencia]=Mah Jongg
