@@ -106,6 +106,7 @@
   </description>
   <url type="bugtracker">https://bugs.kde.org/enter_bug.cgi?format=guided&amp;product=kajongg</url>
   <url type="help">https://docs.kde.org/?application=kajongg</url>
+  <url type="donation">https://www.kde.org/community/donations/?app=kajongg&amp;source=appdata</url>
   <screenshots>
     <screenshot type="default">
       <image>http://kde.org/images/screenshots/kajongg.png</image>
