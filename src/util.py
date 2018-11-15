@@ -111,12 +111,12 @@ def uniqueList(seq):
 def _getr(slist, olist, seen):
     """Recursively expand slist's objects into olist, using seen to track
     already processed objects."""
-    for elment in slist:
-        if id(elment) in seen:
+    for element in slist:
+        if id(element) in seen:
             continue
-        seen[id(elment)] = None
-        olist.append(elment)
-        tlist = gc.get_referents(elment)
+        seen[id(element)] = None
+        olist.append(element)
+        tlist = gc.get_referents(element)
         if tlist:
             _getr(tlist, olist, seen)
 

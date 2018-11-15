@@ -779,7 +779,7 @@ class HumanClient(Client):
         Information(i18n(message, *args)).addCallback(yes)
 
     def remote_serverDisconnects(self, result=None):
-        """we logged out or or lost connection to the server.
+        """we logged out or lost connection to the server.
         Remove visual traces depending on that connection."""
         if Debug.connections and result:
             logDebug(

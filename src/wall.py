@@ -128,7 +128,7 @@ class Wall(StrMixin):
         """virtual: hide all four walls and their decorators"""
 
     def divide(self):
-        """divides a wall, building a living and and a dead end"""
+        """divides a wall, building a living end and a dead end"""
         # neutralise the different directions of winds and removal of wall
         # tiles
         assert self.game.divideAt is not None

@@ -1288,7 +1288,7 @@ class KConfigDialog(KDialog):
             return cls.dialog
 
     def showEvent(self, dummyEvent):
-        """if the settings dialog shows, rememeber current values
+        """if the settings dialog shows, remember current values
         and show them in the widgets"""
         self.orgPref = self.preferences.as_dict()
         self.updateWidgets()

@@ -438,7 +438,7 @@ class UIWall(Wall):
             self.__moveDividedTile(self.kongBox[-2], first)
 
     def divide(self):
-        """divides a wall, building a living and and a dead end"""
+        """divides a wall, building a living end and a dead end"""
         with AnimationSpeed():
             Wall.divide(self)
             for uiTile in self.tiles:

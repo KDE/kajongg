@@ -491,7 +491,7 @@ class Game:
         return int(self.wantedGame.split('/')[0])
 
     def _setHandSeed(self):  # TODO: move this to PlayingGame
-        """set seed to a reproducable value, independent of what happend
+        """set seed to a reproducible value, independent of what happened
         in previous hands/rounds.
         This makes it easier to reproduce game situations
         in later hands without having to exactly replay all previous hands"""

@@ -400,7 +400,7 @@ class Hand(StrMixin):
                 self.__applyRules()
 
     def chancesToWin(self):
-        """count the physical tiles that make us win and still seem availabe"""
+        """count the physical tiles that make us win and still seem available"""
         assert self.lenOffset == 0
         result = []
         for completedHand in self.callingHands:
