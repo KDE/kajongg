@@ -110,6 +110,12 @@
   <screenshots>
     <screenshot type="default">
       <caption>Playing Kajongg</caption>
+      <caption xml:lang="ca">Jugant al Kajongg</caption>
+      <caption xml:lang="de">Kajongg spielen</caption>
+      <caption xml:lang="nl">Kajongg spelen</caption>
+      <caption xml:lang="pt">Jogo do Kajongg</caption>
+      <caption xml:lang="uk">Гра у Kajongg</caption>
+      <caption xml:lang="x-test">xxPlaying Kajonggxx</caption>
       <image>http://kde.org/images/screenshots/kajongg.png</image>
     </screenshot>
   </screenshots>
