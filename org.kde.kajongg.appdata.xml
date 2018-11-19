@@ -111,6 +111,7 @@
     <screenshot type="default">
       <caption>Playing Kajongg</caption>
       <caption xml:lang="ca">Jugant al Kajongg</caption>
+      <caption xml:lang="ca-valencia">Jugant al Kajongg</caption>
       <caption xml:lang="de">Kajongg spielen</caption>
       <caption xml:lang="gl">Xogando a Kajongg</caption>
       <caption xml:lang="nl">Kajongg spelen</caption>
