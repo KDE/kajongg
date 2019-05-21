@@ -2,7 +2,7 @@
 
 project(kajongg)
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.5)
 set(PYTHON_MIN_VERSION "3.5.0")
 set(QT_MIN_VERSION "5.2")
 set(KF5_MIN_VERSION "5.15.0")
