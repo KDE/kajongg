@@ -38,38 +38,6 @@
   <name xml:lang="zh-CN">Kajongg</name>
   <name xml:lang="zh-TW">Kajongg</name>
   <summary>Mahjong tile game from China</summary>
-  <summary xml:lang="bs">Mahjongg</summary>
-  <summary xml:lang="ca">Mah Jongg</summary>
-  <summary xml:lang="ca-valencia">Mah Jongg</summary>
-  <summary xml:lang="cs">Mah Jongg</summary>
-  <summary xml:lang="de">Mah Jongg</summary>
-  <summary xml:lang="en-GB">Mah Jongg</summary>
-  <summary xml:lang="es">Mah Jongg</summary>
-  <summary xml:lang="et">Mah Jongg</summary>
-  <summary xml:lang="fi">Mahjong</summary>
-  <summary xml:lang="fr">Mah Jongg</summary>
-  <summary xml:lang="gl">Mah Jongg</summary>
-  <summary xml:lang="id">Mah Jongg</summary>
-  <summary xml:lang="it">Mah Jongg</summary>
-  <summary xml:lang="ko">Mah Jongg</summary>
-  <summary xml:lang="nl">Mah Jongg</summary>
-  <summary xml:lang="nn">Mah Jongg</summary>
-  <summary xml:lang="pl">Mah Jongg</summary>
-  <summary xml:lang="pt">Mah Jongg</summary>
-  <summary xml:lang="pt-BR">Mah Jongg</summary>
-  <summary xml:lang="ru">Классический Маджонг</summary>
-  <summary xml:lang="sk">Mah Jongg</summary>
-  <summary xml:lang="sl">Mah Jongg</summary>
-  <summary xml:lang="sr">Маџонг</summary>
-  <summary xml:lang="sr-Latn">Madžong</summary>
-  <summary xml:lang="sr-ijekavian">Маџонг</summary>
-  <summary xml:lang="sr-ijekavianlatin">Madžong</summary>
-  <summary xml:lang="sv">Mah Jong</summary>
-  <summary xml:lang="tr">Mah Jongg</summary>
-  <summary xml:lang="uk">Гра у маджонґ</summary>
-  <summary xml:lang="x-test">xxMah Jonggxx</summary>
-  <summary xml:lang="zh-CN">麻将</summary>
-  <summary xml:lang="zh-TW">麻將遊戲</summary>
   <description>
     <p>
       Kajongg is the ancient Chinese board game for 4 players.
