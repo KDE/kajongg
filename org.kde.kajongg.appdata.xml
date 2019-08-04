@@ -41,6 +41,7 @@
   <summary xml:lang="ca">Joc de fitxes Mahjong de la Xina</summary>
   <summary xml:lang="ca-valencia">Joc de fitxes Mahjong de la Xina</summary>
   <summary xml:lang="de">Mahjong-Spiel aus China</summary>
+  <summary xml:lang="en-GB">Mahjong tile game from China</summary>
   <summary xml:lang="es">Juego de fichas Mahjong originario de China</summary>
   <summary xml:lang="fr">Jeu de tuiles Mahjong originaire de Chine</summary>
   <summary xml:lang="gl">Xogo de teselas Mahjong da China</summary>
@@ -51,6 +52,7 @@
   <summary xml:lang="pl">Gra przy użyciu Mahjong z Chin</summary>
   <summary xml:lang="pt">Jogo de peças de Mahjong da China</summary>
   <summary xml:lang="pt-BR">Jogo de peças Mahjong da China</summary>
+  <summary xml:lang="sk">Mahjong, dlaždicová hra z Číny</summary>
   <summary xml:lang="sv">Mahjong-brickspel från Kina</summary>
   <summary xml:lang="uk">Китайська гра плитками маджонґ</summary>
   <summary xml:lang="x-test">xxMahjong tile game from Chinaxx</summary>
@@ -112,6 +114,7 @@
       <caption xml:lang="pl">Granie w Kajongg</caption>
       <caption xml:lang="pt">Jogo do Kajongg</caption>
       <caption xml:lang="pt-BR">Jogando Kajongg</caption>
+      <caption xml:lang="sk">Hranie Kajongg</caption>
       <caption xml:lang="sv">Spela Kajongg</caption>
       <caption xml:lang="uk">Гра у Kajongg</caption>
       <caption xml:lang="x-test">xxPlaying Kajonggxx</caption>
