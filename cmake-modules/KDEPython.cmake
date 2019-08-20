@@ -36,6 +36,7 @@ macro(PYTHON_INSTALL SOURCE_FILE DESTINATION_DIR)
     get_filename_component(_filename ${SOURCE_FILE} NAME)
     get_filename_component(_filenamebase ${SOURCE_FILE} NAME_WE)
     get_filename_component(_basepath ${SOURCE_FILE} PATH)
+    file(RELATIVE_PATH _relativefilename ${CMAKE_SOURCE_DIR} ${_absfilename})
 
     set(_bin_py ${CMAKE_CURRENT_BINARY_DIR}/${_basepath}/${_filename})
 
@@ -47,7 +48,8 @@ macro(PYTHON_INSTALL SOURCE_FILE DESTINATION_DIR)
     # Setting because it will be displayed later, in compile_python_files
     set(_message "Byte-compiling ${_bin_py} to ${_bin_pyc}")
 
-    string(REPLACE "/" "_" _rule_name "${_basepath}/${_bin_pyc}")
+    string(REPLACE "/" "_" _rule_name "${_relativefilename}_rule")
+    string(REPLACE " " "_" _rule_name "${_rule_name}")
     add_custom_target("${_rule_name}" ALL)
 
     get_filename_component(_abs_bin_py ${_bin_py} ABSOLUTE)
