@@ -34,13 +34,13 @@ import os
 # Adapt this range: =======================================================
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
-URL = "http://www.kde.org/applications/games/kajongg/"
+URL = "https://kde.org/applications/games/org.kde.kajongg"
 VERSION = "17.04"
 
 # =======================================================
 
 # This most certainly does not run on Windows. We do not care for now.
-# at least all / in paths would have to be changeds
+# at least all / in paths would have to be changed
 
 (AUTHOR, EMAIL) = re.match('^(.*?)\s*<(.*)>$', FULLAUTHOR).groups()
 

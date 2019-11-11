@@ -113,7 +113,7 @@ for png in (
 
 oggdec = 'oggdecV1.10.1.zip'
 try:
-    call('wget http://www.rarewares.org/files/ogg/{}'.format(oggdec).split())
+    call('wget https://www.rarewares.org/files/ogg/{}'.format(oggdec).split())
     with zipfile.ZipFile(oggdec) as ziparch:
         ziparch.extract('oggdec.exe')
 finally:

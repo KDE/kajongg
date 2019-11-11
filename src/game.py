@@ -1062,7 +1062,7 @@ class PlayingGame(Game):
                         if not x.isBonus]
             for tile in allTiles:
                 assert isinstance(tile, Tile), tile
-            # see http://www.logilab.org/ticket/23986
+            # see https://www.logilab.org/ticket/23986
             invisibleTiles = set(x for x in allTiles
                                  if x not in self.visibleTiles)
             msg = i18n('Short living wall: Tile is invisible, hence dangerous')

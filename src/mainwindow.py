@@ -44,7 +44,7 @@ class MyHook(cgitb.Hook):
             prefix='bt_',
             text=True)[1]
         # cgitb can only handle ascii, work around that.
-        # See http://bugs.python.org/issue22746
+        # See https://bugs.python.org/issue22746
         cgitb.Hook.__init__(self, file=codecs.open(self.tmpFileName, 'w',
                                                    encoding='latin-1', errors='xmlcharrefreplace'))
 
@@ -133,7 +133,7 @@ class MainWindow(KXmlGuiWindow):
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self):
-        # see http://lists.kde.org/?l=kde-games-devel&m=120071267328984&w=2
+        # see https://marc.info/?l=kde-games-devel&m=120071267328984&w=2
         super(MainWindow, self).__init__()
         Internal.app.aboutToQuit.connect(self.aboutToQuit)
         self.exitConfirmed = None

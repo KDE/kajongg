@@ -31,7 +31,7 @@ Usage: see ../README.windows
 # ==== adapt this part =====
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
-URL = "http://www.kde.org/applications/games/kajongg/"
+URL = "https://www.kde.org/applications/games/kajongg/"
 VERSION = "17.04"
 # ==========================
 

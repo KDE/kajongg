@@ -248,7 +248,7 @@ class Help:
             return Help.__getDocUrl(fallbacks) if factory.status == '404' else url
         host = 'docs.kde.org'
         path = '?application=kajongg&language={}'.format(languages[0])
-        url = 'http://' + host + path
+        url = 'https://' + host + path
         factory = client.HTTPClientFactory(url.encode('ascii'))
         factory.protocol = client.HTTPPageGetter
         factory.protocol.handleEndHeaders = lambda x: x
@@ -1170,7 +1170,7 @@ class AboutKajonggDialog(KDialog):
         authorWidget = QWidget()
         authorLayout = QVBoxLayout()
         bugsLabel = QLabel(
-            i18n('Please use <a href="http://bugs.kde.org">http://bugs.kde.org</a> to report bugs.'))
+            i18n('Please use <a href="https://bugs.kde.org">https://bugs.kde.org</a> to report bugs.'))
         bugsLabel.setContentsMargins(0, 2, 0, 4)
         bugsLabel.setOpenExternalLinks(True)
         authorLayout.addWidget(bugsLabel)

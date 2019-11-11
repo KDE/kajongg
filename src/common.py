@@ -379,7 +379,7 @@ class IntDict(defaultdict, StrMixin):
         IntDict is not identical to that of defaultdict"""
         result = IntDict(self.parent)
         defaultdict.update(result, self)
-        # see http://www.logilab.org/ticket/23986
+        # see https://www.logilab.org/ticket/23986
         return result
 
     def __add__(self, other):

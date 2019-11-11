@@ -455,7 +455,7 @@ class ModelTest(QObject):
                 # assert( index.model() == self.model )
                 # This raises an error that is not part of the qbzr code.
                 # see
-                # http://www.opensubscriber.com/message/pyqt@riverbankcomputing.com/10335500.html
+                # https://www.riverbankcomputing.com/pipermail/pyqt/2011-February/029300.html
                 assert(index.row() == row)
                 assert(index.column() == column)
                 # While you can technically return a QVariant usually this is a sign

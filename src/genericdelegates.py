@@ -71,7 +71,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
 class RightAlignedCheckboxDelegate(QStyledItemDelegate):
 
     """as the name says. From
-http://qt-project.org/faq/answer/how_can_i_align_the_checkboxes_in_a_view"""
+https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
 
     def __init__(self, parent, cellFilter):
         super(RightAlignedCheckboxDelegate, self).__init__(parent)
