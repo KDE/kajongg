@@ -5,7 +5,7 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 #
-# Python Twisted website: http://www.twistedmatrix.com
+# Python Twisted website: https://www.twistedmatrix.com
 #
 # Find the installed version of Python Twisted
 
