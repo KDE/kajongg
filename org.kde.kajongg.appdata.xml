@@ -55,6 +55,7 @@
   <summary xml:lang="pt">Jogo de peças de Mahjong da China</summary>
   <summary xml:lang="pt-BR">Jogo de peças Mahjong da China</summary>
   <summary xml:lang="sk">Dlaždicová hra z Číny Mahjong</summary>
+  <summary xml:lang="sl">Mahjong je kitajska namizna igra</summary>
   <summary xml:lang="sv">Mahjong-brickspel från Kina</summary>
   <summary xml:lang="uk">Китайська гра плитками маджонґ</summary>
   <summary xml:lang="x-test">xxMahjong tile game from Chinaxx</summary>
@@ -85,7 +86,7 @@
     <p xml:lang="pt">O Kajongg é o antigo jogo chinês de tabuleiro para 4 jogadores. O Kajongg pode ser usado de duas diferentes formas: A pontuação de um jogo manual, onde poderá jogar como sempre, e usar o Kajongg como calculadora de pontos e para registo posterior. Poderá ainda usar o Kajongg para jogar contra uma combinação qualquer de outros jogadores humanos ou por computador.</p>
     <p xml:lang="pt-BR">O Kajongg é o antigo jogo de tabuleiro chinês para 4 jogadores. O Kajongg pode ser usado de duas diferentes formas: A pontuação de um jogo manual, onde poderá jogar como sempre, e usar o Kajongg como calculadora de pontos e para registro posterior. Poderá ainda usar o Kajongg para jogar contra uma combinação qualquer de outros jogadores humanos ou por computador.</p>
     <p xml:lang="sk">Kajongg je stará čínska dosková hra pre 4 hráčov. Kajongg sa dá použiť dvoma odlišnými spôsobmi: Bodovanie ručnej hry, kde hráte ako vždy a použite Kajongg na výpočet bodov a na účtovníctvo. Alebo môžete použiť Kajongg na hranie proti kombinácii iného ľudského hráča alebo počítačových hráčov.</p>
-    <p xml:lang="sl">Kajongg je starodavna kitajska namizna igra za štiri igralce. Kajongg lahko uporabite na dva načina: kot vmesnik za ročno igro, kjer igrate kot običajno in uporabite Kajongg za izračun rezultatov in njihovo shranjevanje ali pa kot vmesnik za igro proti katerikoli kombinaciji človeških ali računalniških igralcev. </p>
+    <p xml:lang="sl">Kajongg je starodavna kitajska namizna igra za štiri igralce. Kajongg lahko uporabite na dva načina: kot vmesnik za ročno igro, kjer igrate kot običajno in uporabite Kajongg za izračun rezultatov in njihovo shranjevanje ali pa kot vmesnik za igro proti katerikoli kombinaciji človeških ali računalniških igralcev.</p>
     <p xml:lang="sr">Каџонг је древна кинеска игра на табли за четири играча. Каџонг се може користити на два начина. Један је оцењивање ручне игре, где играте као и обично док вам Каџонг служи за израчунавање резултата и праћење. Или можете у Каџонгу заиграти против комбинације других људских и рачунарских играча.</p>
     <p xml:lang="sr-Latn">Kadžong je drevna kineska igra na tabli za četiri igrača. Kadžong se može koristiti na dva načina. Jedan je ocenjivanje ručne igre, gde igrate kao i obično dok vam Kadžong služi za izračunavanje rezultata i praćenje. Ili možete u Kadžongu zaigrati protiv kombinacije drugih ljudskih i računarskih igrača.</p>
     <p xml:lang="sr-ijekavian">Каџонг је древна кинеска игра на табли за четири играча. Каџонг се може користити на два начина. Један је оцењивање ручне игре, где играте као и обично док вам Каџонг служи за израчунавање резултата и праћење. Или можете у Каџонгу заиграти против комбинације других људских и рачунарских играча.</p>
@@ -120,6 +121,7 @@
       <caption xml:lang="pt">Jogo do Kajongg</caption>
       <caption xml:lang="pt-BR">Jogando Kajongg</caption>
       <caption xml:lang="sk">Hranie Kajongg</caption>
+      <caption xml:lang="sl">Igra Kajongg</caption>
       <caption xml:lang="sv">Spela Kajongg</caption>
       <caption xml:lang="uk">Гра у Kajongg</caption>
       <caption xml:lang="x-test">xxPlaying Kajonggxx</caption>
