@@ -30,6 +30,7 @@ import logging
 
 from qt import QObject
 from PyQt5.QtGui import QGuiApplication
+from PyQt5 import QtCore
 from kde import KApplication, KCmdLineArgs, KCmdLineOptions, KGlobal
 from mi18n import i18n
 from about import About
@@ -187,5 +188,6 @@ if Options.csv:
             Options.csv)
         sys.exit(2)
 from mainwindow import MainWindow
+QGuiApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 MainWindow()
 Internal.app.exec_()
