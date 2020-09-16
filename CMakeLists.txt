@@ -18,8 +18,6 @@ find_package(Qt5 ${QT_MIN_VERSION} REQUIRED NO_MODULE COMPONENTS Core Gui Svg Wi
 find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS Config DocTools)
 
 include(FeatureSummary)
-include(ECMPackageConfigHelpers)
-include(ECMSetupVersion)
 include(KDEInstallDirs)
 include(ECMInstallIcons)
 include(KDECMakeSettings)
