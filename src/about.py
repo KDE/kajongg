@@ -31,7 +31,7 @@ class About:
     def __init__(self):
         self.appName = "kajongg"
         catalog = ""
-        homePage = "https://kde.org/applications/games/kajongg/"
+        homePage = "https://kde.org/applications/games/org.kde.kajongg"
         version = str(Internal.defaultPort)
         programName = i18n("Kajongg")
         description = i18n(

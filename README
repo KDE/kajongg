@@ -42,10 +42,10 @@ does not affect existing games.
 
 You can always get the current source code from here:
 
-git clone git://anongit.kde.org/kajongg
+git clone https://anongit.kde.org/kajongg.git
 or see online here: [url]https://commits.kde.org/kajongg[/url]
 
-Please also visit [url]http://kde.org/applications/games/kajongg/[/url]
+Please also visit [url]https://kde.org/applications/games/org.kde.kajongg[/url]
 
 If you want to send me bug reports, please either use the kajongg
 menu commmand Help / Report Bug or mail me directly to the Mail

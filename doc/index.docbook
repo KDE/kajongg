@@ -992,8 +992,8 @@ Full Screen Mode
 		  This is the ultimate reference for Classical Chinese Mah Jong as played in the Western world. It can give you valuable hints about game strategies.</para></listitem>
 		<listitem><para>Mah-Jong by Gwyn Headley and Yvonne Seeley, 3rd edition, 2008, A &amp; C Black Publishers Ltd., London. This book is a very easy to use reference, concentrating
 		  on the rules as used in Great Britain, defined by the BMJA (The British Mah Jong Association).</para></listitem>
-		<listitem><para><ulink url="http://en.wikipedia.org/wiki/Mahjong"></ulink></para></listitem>
-		<listitem><para><ulink url="http://de.wikipedia.org/wiki/Mahjongg"></ulink></para></listitem>
+		<listitem><para><ulink url="https://en.wikipedia.org/wiki/Mahjong"></ulink></para></listitem>
+		<listitem><para><ulink url="https://de.wikipedia.org/wiki/Mahjongg"></ulink></para></listitem>
         </itemizedlist>
 </appendix>
 
@@ -1008,7 +1008,7 @@ For Windows: Please see <ulink url="https://www.linux-apps.com/p/1109453/"></uli
 <para>
 If you want to download the source and install manually:
 <itemizedlist>
-<listitem><para> <literal>git clone git://anongit.kde.org/kajongg</literal> </para></listitem>
+<listitem><para> <literal>git clone https://anongit.kde.org/kajongg.git</literal> </para></listitem>
 <listitem><para> For Linux: <literal>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal> </para></listitem>
 <listitem><para> For Windows: Please read README.windows </para></listitem>
 </itemizedlist>

@@ -1,10 +1,10 @@
 #!/bin/sh
-# http://www.gnu.org/software/autoconf/manual/gettext/xgettext-Invocation.html
-# http://api.kde.org/4.0-api/kdelibs-apidocs/kdecore/html/classKLocalizedString.html
+# https://www.gnu.org/software/gettext/manual/html_node/gettext-Invocation.html#gettext-Invocation
+# https://api.kde.org/frameworks/ki18n/html/prg_guide.html
 # extract messages from *.py
 
 # currently, the .pot lives at
-# http://websvn.kde.org/trunk/l10n-kf5/templates/messages/kdegames/kajongg.pot
+# https://websvn.kde.org/trunk/l10n-kf5/templates/messages/kajongg/kajongg.pot
 
 ${EXTRACTRC:-extractrc} src/*.ui src/*.rc >> rc.cpp
 
