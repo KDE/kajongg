@@ -35,7 +35,10 @@ import os
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
 URL = "https://kde.org/applications/games/org.kde.kajongg"
-VERSION = "17.04"
+try:
+    from appversion import VERSION
+except ImportError:
+    VERSION = "Unknown"
 
 # =======================================================
 

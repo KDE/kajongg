@@ -1,7 +1,13 @@
 # vim: set expandtab shiftwidth=4 softtabstop=4:
 cmake_minimum_required (VERSION 3.5)
 
-project(kajongg)
+# Release Service version, managed by release script
+set(RELEASE_SERVICE_VERSION_MAJOR "20")
+set(RELEASE_SERVICE_VERSION_MINOR "11")
+set(RELEASE_SERVICE_VERSION_MICRO "70")
+set(RELEASE_SERVICE_VERSION "${RELEASE_SERVICE_VERSION_MAJOR}.${RELEASE_SERVICE_VERSION_MINOR}.${RELEASE_SERVICE_VERSION_MICRO}")
+
+project(kajongg VERSION ${RELEASE_SERVICE_VERSION})
 
 set(PYTHON_MIN_VERSION "3.5.0")
 set(QT_MIN_VERSION "5.2")
@@ -111,11 +117,14 @@ find_package(KF5KMahjongglib REQUIRED)
 # I expanded those macros, reducing to what we actually need. No Windows support here yet.
 # Those macros come from ./cmake-modules/KDEPython.cmake
 
-
+# generating appversion.py 2x, once for toplevel setup ,once for app in src/ itself
+configure_file(src/appversion.py.in appversion.py)
+configure_file(src/appversion.py.in src/appversion.py)
 configure_file(src/kdepaths.py.in src/kdepaths.py)
 
 KDE_INSTALL_PYTHON_FILES(${SRCFILES} src/kajongg.py src/kajonggserver.py)
 KDE_INSTALL_PYTHON_FILES(${CMAKE_CURRENT_BINARY_DIR}/src/kdepaths.py)
+KDE_INSTALL_PYTHON_FILES(${CMAKE_CURRENT_BINARY_DIR}/src/appversion.py)
 KDE_ADD_PYTHON_EXECUTABLE(kajongg.py kajongg)
 KDE_ADD_PYTHON_EXECUTABLE(kajonggserver.py kajonggserver)
 

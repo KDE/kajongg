@@ -22,6 +22,10 @@ from kde import KAboutData
 from mi18n import i18n
 
 from common import Internal
+try:
+    from appversion import VERSION
+except ImportError:
+    VERSION = "Unknown"
 
 
 class About:
@@ -32,7 +36,7 @@ class About:
         self.appName = "kajongg"
         catalog = ""
         homePage = "https://kde.org/applications/games/org.kde.kajongg"
-        version = str(Internal.defaultPort)
+        version = VERSION
         programName = i18n("Kajongg")
         description = i18n(
             "Mah Jongg - the ancient Chinese board game for 4 players")

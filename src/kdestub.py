@@ -1107,6 +1107,9 @@ class AboutKajonggDialog(KDialog):
     def __init__(self, parent):
         # pylint: disable=too-many-locals, too-many-statements
         from twisted import __version__
+
+        data = KGlobal.aboutData
+
         KDialog.__init__(self, parent)
         self.setCaption(i18n('About Kajongg'))
         self.setButtons(KDialog.Close)
@@ -1115,6 +1118,7 @@ class AboutKajonggDialog(KDialog):
         hLayout1.addWidget(IconLabel('kajongg', self))
         h1vLayout = QVBoxLayout()
         h1vLayout.addWidget(QLabel('Kajongg'))
+        h1vLayout.addWidget(QLabel(i18n('Version: %1', data.version)))
         h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
         underVersions = []
         try:
@@ -1145,8 +1149,6 @@ class AboutKajonggDialog(KDialog):
         hLayout1.addItem(spacerItem)
         vLayout.addLayout(hLayout1)
         tabWidget = QTabWidget()
-
-        data = KGlobal.aboutData
 
         aboutWidget = QWidget()
         aboutLayout = QVBoxLayout()
