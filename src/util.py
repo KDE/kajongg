@@ -271,5 +271,7 @@ def popenReadlines(args):
     """runs a subprocess and returns stdout as a list of unicode encodes lines"""
     if isinstance(args, str):
         args = args.split()
-    result = subprocess.Popen(args, universal_newlines=True, stdout=subprocess.PIPE).communicate()[0]
+    my_env = os.environ.copy()
+    my_env["LANG"] = "C"
+    result = subprocess.Popen(args, universal_newlines=True, stdout=subprocess.PIPE, env=my_env).communicate()[0]
     return (x.strip() for x in result.split('\n') if x.strip())
