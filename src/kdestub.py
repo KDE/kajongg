@@ -38,7 +38,10 @@ from collections import defaultdict
 from argparse import ArgumentParser
 
 
-import sip
+try:
+    from PyQt5 import sip
+except ImportError:
+    import sip
 
 # pylint: disable=wrong-import-order
 

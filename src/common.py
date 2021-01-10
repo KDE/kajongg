@@ -31,11 +31,14 @@ import socket
 
 from qt import QStandardPaths
 try:
-    from sip import unwrapinstance
+    from PyQt5.sip import unwrapinstance
 except ImportError:
-    def unwrapinstance(dummy):
-        """if there is no sip, we have no Qt objects anyway"""
-        pass
+    try:
+        from sip import unwrapinstance
+    except ImportError:
+        def unwrapinstance(dummy):
+            """if there is no sip, we have no Qt objects anyway"""
+            pass
 
 # pylint: disable=invalid-name
 

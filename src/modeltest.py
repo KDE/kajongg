@@ -26,7 +26,10 @@ There are several variations of python ports for this script floating
 around, it seemed easier to me to maintain one for myself
 """
 
-import sip
+try:
+    from PyQt5 import sip
+except ImportError:
+    import sip
 from qt import QObject, Qt, QAbstractItemModel, QModelIndex
 from qt import QPersistentModelIndex, QFont, QColor, QSize
 from common import isAlive
