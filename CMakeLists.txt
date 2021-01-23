@@ -128,7 +128,7 @@ KDE_INSTALL_PYTHON_FILES(${CMAKE_CURRENT_BINARY_DIR}/src/appversion.py)
 KDE_ADD_PYTHON_EXECUTABLE(kajongg.py kajongg)
 KDE_ADD_PYTHON_EXECUTABLE(kajonggserver.py kajonggserver)
 
-install(FILES ${DATAFILES} DESTINATION ${DATA_INSTALL_DIR}/kajongg)
+install(FILES ${DATAFILES} DESTINATION ${KDE_INSTALL_DATADIR}/kajongg)
 
 install(PROGRAMS org.kde.kajongg.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 install(FILES org.kde.kajongg.appdata.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
