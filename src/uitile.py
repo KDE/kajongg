@@ -211,11 +211,11 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         if withBorders is None:
             withBorders = Internal.Preferences.showShadows
         if withBorders:
-            wantSize = self.tileset.tileSize.toSize()
+            originalSize = self.tileset.tileSize.toSize()
         else:
-            wantSize = self.tileset.faceSize.toSize()
+            originalSize = self.tileset.faceSize.toSize()
         if not pmapSize:
-            pmapSize = wantSize
+            pmapSize = originalSize
         result = QPixmap(pmapSize)
         result.fill(Qt.transparent)
         painter = QPainter(result)
@@ -224,8 +224,8 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
                 'painter is not active. Wanted size: %s' %
                 str(pmapSize))
         try:
-            xScale = float(pmapSize.width()) / wantSize.width()
-            yScale = float(pmapSize.height()) / wantSize.height()
+            xScale = float(pmapSize.width()) / originalSize.width()
+            yScale = float(pmapSize.height()) / originalSize.height()
         except ZeroDivisionError:
             xScale = 1
             yScale = 1
