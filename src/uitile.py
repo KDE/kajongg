@@ -205,7 +205,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
             painter.drawLine(QPointF(0.0, 0.0), QPointF(width, height))
             painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
 
-    def pixmapFromSvg(self, pmapSize=None, withBorders=None):
+    def pixmapFromSvg(self, pmapSize, withBorders=None):
         """return a pixmap with default size as given in SVG
         and optional borders/shadows"""
         if withBorders is None:
@@ -214,8 +214,6 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
             originalSize = self.tileset.tileSize.toSize()
         else:
             originalSize = self.tileset.faceSize.toSize()
-        if not pmapSize:
-            pmapSize = originalSize
         result = QPixmap(pmapSize)
         result.fill(Qt.transparent)
         painter = QPainter(result)
