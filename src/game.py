@@ -80,9 +80,6 @@ class HandId(StrMixin):
             logException('--game=%s must specify the wanted round' % string)
         parts = string1.split('..')
         if len(parts) == 2:
-            if stringIdx == 1 and parts[1] == '':
-                self.roundsFinished = 100
-                return
             if stringIdx == 0 and parts[0] == '':
                 return
             if stringIdx == 1 and parts[1] == '':
