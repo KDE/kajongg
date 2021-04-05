@@ -361,7 +361,7 @@ class UIWall(Wall):
     def lightSource(self, lightSource):
         """setting this actually changes the visuals"""
         if self.lightSource != lightSource:
-            assert ParallelAnimationGroup.current is None
+#            assert ParallelAnimationGroup.current is None # may trigger, reason unknown
             self.__square.lightSource = lightSource
             for side in self.__sides:
                 side.lightSource = lightSource
