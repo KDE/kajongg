@@ -72,47 +72,57 @@ class Tileset(Resource):
         """the size of border plus shadow"""
         return self.tileSize.width() - self.faceSize.width()
 
+    def __initRenderer(self):
+        """initialize and cache values"""
+        self.__renderer = QSvgRenderer(self.graphicsPath)
+        if not self.__renderer.isValid():
+            logException(
+                i18n(
+                    'file <filename>%1</filename> contains no valid SVG'),
+                self.graphicsPath)
+        distance = 0
+        if self.desktopFileName == 'classic':
+            distance = 2
+        distanceSize = QSizeF(distance, distance)
+        self.faceSize = self.__renderer.boundsOnElement(
+            'BAMBOO_1').size() + distanceSize
+        self.tileSize = self.__renderer.boundsOnElement(
+            'TILE_2').size() + distanceSize
+        if not Internal.scaleScene:
+            self.faceSize /= 2
+            self.tileSize /= 2
+        shW = self.shadowWidth()
+        shH = self.shadowHeight()
+        self.__shadowOffsets = [
+            [(-shW, 0), (0, 0), (0, shH), (-shH, shW)],
+            [(0, 0), (shH, 0), (shW, shH), (0, shW)],
+            [(0, -shH), (shH, -shW), (shW, 0), (0, 0)],
+            [(-shW, -shH), (0, -shW), (0, 0), (-shH, 0)]]
+
     def shadowHeight(self):
         """the size of border plus shadow"""
+        if self.__renderer is None:
+            self.__initRenderer()
         return self.tileSize.height() - self.faceSize.height()
 
     def renderer(self):
         """initialise the svg renderer with the selected svg file"""
         if self.__renderer is None:
-            self.__renderer = QSvgRenderer(self.graphicsPath)
-            if not self.__renderer.isValid():
-                logException(
-                    i18n(
-                        'file <filename>%1</filename> contains no valid SVG'),
-                    self.graphicsPath)
-            distance = 0
-            if self.desktopFileName == 'classic':
-                distance = 2
-            distanceSize = QSizeF(distance, distance)
-            self.faceSize = self.__renderer.boundsOnElement(
-                'BAMBOO_1').size() + distanceSize
-            self.tileSize = self.__renderer.boundsOnElement(
-                'TILE_2').size() + distanceSize
-            if not Internal.scaleScene:
-                self.faceSize /= 2
-                self.tileSize /= 2
-            shW = self.shadowWidth()
-            shH = self.shadowHeight()
-            self.__shadowOffsets = [
-                [(-shW, 0), (0, 0), (0, shH), (-shH, shW)],
-                [(0, 0), (shH, 0), (shW, shH), (0, shW)],
-                [(0, -shH), (shH, -shW), (shW, 0), (0, 0)],
-                [(-shW, -shH), (0, -shW), (0, 0), (-shH, 0)]]
+            self.__initRenderer()
         return self.__renderer
 
     def shadowOffsets(self, lightSource, rotation):
         """real offset of the shadow on the screen"""
         if not Internal.Preferences.showShadows:
             return (0, 0)
+        if self.__renderer is None:
+            self.__initRenderer()
         lightSourceIndex = LIGHTSOURCES.index(lightSource)
         return self.__shadowOffsets[lightSourceIndex][rotation // 90]
 
     def tileFaceRelation(self):
         """return how much bigger the tile is than the face"""
+        if self.__renderer is None:
+            self.__initRenderer()
         return (self.tileSize.width() / self.faceSize.width(),
                 self.tileSize.height() / self.faceSize.height())
