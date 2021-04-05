@@ -79,14 +79,15 @@ class HandId(StrMixin):
         if not string1:
             logException('--game=%s must specify the wanted round' % string)
         parts = string1.split('..')
-        if stringIdx == 1 and len(parts) == 2 and parts[1] == '':
-            self.roundsFinished = 100
-            return
-        if stringIdx == 0 and len(parts) == 2 and parts[0] == '':
-            return
-        if stringIdx == 1 and len(parts) == 2 and parts[1] == '':
-            self.roundsFinished = 100
-            return
+        if len(parts) == 2:
+            if stringIdx == 1 and parts[1] == '':
+                self.roundsFinished = 100
+                return
+            if stringIdx == 0 and parts[0] == '':
+                return
+            if stringIdx == 1 and parts[1] == '':
+                self.roundsFinished = 100
+                return
         handId = parts[min(stringIdx, len(parts) - 1)]
         if handId[0].lower() not in 'eswn':
             logException('--game=%s must specify the round wind' % string)
