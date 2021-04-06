@@ -399,31 +399,36 @@ class DeferredBlock(StrMixin):
             self.table.game.appendMove(about, command, kwargs)
         localDeferreds = []
         for rec in self.__convertReceivers(receivers):
+
             isClient = rec.__class__.__name__.endswith('Client')
-            if Debug.traffic and not isClient:
-                message = '-> {receiver:<15} about {about} {command}{kwargs}'.format(
-                    receiver=rec.name[:15], about=about, command=command,
-                    kwargs=Move.prettyKwargs(kwargs))
-                logDebug(message)
             if isClient:
                 defer = Deferred()
                 defer.addCallback(rec.remote_move, command, **kwargs)
+                defer.command = command.name
+                defer.notifying = 'notifying' in kwargs
+                self.__addRequest(defer, rec, about)
+                localDeferreds.append(defer)
             else:
+                if Debug.traffic:
+                    message = '-> {receiver:<15} about {about} {command}{kwargs}'.format(
+                        receiver=rec.name[:15], about=about, command=command,
+                        kwargs=Move.prettyKwargs(kwargs))
+                    logDebug(message)
                 defer = self.table.server.callRemote(
                     rec,
                     'move',
                     aboutName,
                     command.name,
                     **kwargs)
-            if defer:
-                defer.command = command.name
-                defer.notifying = 'notifying' in kwargs
-                self.__addRequest(defer, rec, about)
-            else:
-                msg = i18nE('The game server lost connection to player %1')
-                self.table.abort(msg, rec.name)
-            if isClient:
-                localDeferreds.append(defer)
+                if defer:
+                    defer.command = command.name
+                    defer.notifying = 'notifying' in kwargs
+                    self.__addRequest(defer, rec, about)
+                else:
+                    msg = i18nE('The game server lost connection to player %1')
+                    self.table.abort(msg, rec.name)
+
+
         for defer in localDeferreds:
             defer.callback(aboutName)  # callback needs an argument !
 
