@@ -391,6 +391,17 @@ class Player(StrMixin):
         self._concealedTiles[0] = tile
         self._hand = None
 
+    def __computeLastInfo(self):
+        """compile info about last tile and last meld into a list of strings"""
+        result = []
+        if self.lastTile:
+# TODO assert, dass lastTile in _concealedTiles oder in _exposedMelds ist
+# and (self.lastTile in self._concealedTiles or self.lastTile in :
+            result.append(
+                'L%s%s' %
+                (self.lastTile, self.lastMeld if self.lastMeld else ''))
+        return result
+
     def __computeHand(self):
         """return Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
@@ -401,10 +412,7 @@ class Player(StrMixin):
             melds.append('R' + ''.join(str(x) for x in sorted(self._concealedTiles)))
         melds.extend(str(x) for x in self._bonusTiles)
         melds.append(self.mjString())
-        if self.lastTile:
-            melds.append(
-                'L%s%s' %
-                (self.lastTile, self.lastMeld if self.lastMeld else ''))
+        melds.extend(self.__computeLastInfo())
         return Hand(self, ' '.join(melds))
 
     def _computeHandWithDiscard(self, discard):
