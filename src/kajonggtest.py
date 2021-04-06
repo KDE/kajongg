@@ -409,6 +409,7 @@ class CSV(StrMixin):
 
     def evaluate(self):
         """evaluate the data. Show differences as helpful as possible"""
+        found_difference = False
         for ruleset, aiVariant, game in {(x.ruleset, x.aiVariant, x.game) for x in self.rows}:
             rows = list(reversed(sorted(
                 x for x in self.rows
@@ -417,8 +418,12 @@ class CSV(StrMixin):
                 for fixedValue in set(x[fixedField] for x in rows):
                     checkRows = [x for x in rows if x[fixedField] == fixedValue]
                     for warned in self.compareRows(checkRows):
+                        found_difference = True
                         rows.remove(warned)
+            found_difference |= len(self.compareRows(rows)) > 0
             self.compareRows(rows)
+        if not found_difference:
+            print('found no differences in {}'.format(OPTIONS.csv))
 
     @staticmethod
     def compareRows(rows):
