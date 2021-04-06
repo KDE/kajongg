@@ -237,6 +237,7 @@ class ServerTable(Table, StrMixin):
         for result in self.users:
             if result.name == player.name:
                 return result
+        return None
 
     def __connectPlayers(self):
         """connects client instances with the game players"""
@@ -807,7 +808,7 @@ class ServerTable(Table, StrMixin):
     def prioritize(self, requests):
         """return only requests we want to execute"""
         if not self.running:
-            return
+            return None
         answers = [
             x for x in requests if x.answer not in [
                 Message.NoClaim,
@@ -846,10 +847,10 @@ class ServerTable(Table, StrMixin):
     def processAnswers(self, requests):
         """a player did something"""
         if not self.running:
-            return
+            return None
         answers = self.prioritize(requests)
         if not answers:
-            return
+            return None
         for answer in answers:
             msg = '<-  %s' % answer
             if Debug.traffic:

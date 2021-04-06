@@ -42,15 +42,16 @@ class DifferModel(QAbstractTableModel):
     def data(self, index, role=Qt.DisplayRole):
         """get from model"""
         if not index.isValid():
-            return
+            return None
         if not 0 <= index.row() < len(self.diffs):
-            return
+            return None
         diff = self.diffs[index.row()]
         column = index.column()
         if role == Qt.DisplayRole:
             return diff[column]
         elif role == Qt.TextAlignmentRole:
             return int(Qt.AlignLeft | Qt.AlignVCenter)
+        return None
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
@@ -58,7 +59,7 @@ class DifferModel(QAbstractTableModel):
             if orientation == Qt.Horizontal:
                 return int(Qt.AlignLeft | Qt.AlignVCenter)
         if role != Qt.DisplayRole:
-            return
+            return None
         if orientation == Qt.Horizontal:
             if section == 0:
                 return i18nc('Kajongg', 'Rule')
@@ -66,6 +67,7 @@ class DifferModel(QAbstractTableModel):
                 return i18n(self.view.cbRuleset1.current.name)
             if section == 2:
                 return i18n(self.view.cbRuleset2.current.name)
+        return None
 
 
 class RulesetDiffer(QDialog):

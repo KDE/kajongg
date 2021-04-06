@@ -556,6 +556,7 @@ class Hand(StrMixin):
                     self.debug(fmt('{callers} Found {matchingMJRules}',
                                    callers=callers()))
                 return result
+        return None
 
     def __arrangements(self):
         """find all legal arrangements.

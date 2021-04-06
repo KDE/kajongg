@@ -66,7 +66,7 @@ class GamesModel(QAbstractTableModel):
         if role is None:
             role = Qt.DisplayRole
         if not (index.isValid() and role == Qt.DisplayRole):
-            return
+            return None
         if role == Qt.DisplayRole:
             unformatted = str(
                 self._resultRows[index.row()][index.column()]) # TODO: brauche ich str?
@@ -88,6 +88,7 @@ class GamesModel(QAbstractTableModel):
         # pylint: disable=no-self-use
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return i18n('Players') if section == 2 else i18n('Started')
+        return None
 
 
 class Games(QDialog):

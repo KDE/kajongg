@@ -48,7 +48,7 @@ class TablesModel(QAbstractTableModel):
                     return int(Qt.AlignLeft)
                 return int(Qt.AlignHCenter | Qt.AlignVCenter)
         if role != Qt.DisplayRole:
-            return
+            return None
         if orientation != Qt.Horizontal:
             return int(section + 1)
         result = ''
@@ -356,6 +356,7 @@ class TableList(QWidget):
             index = self.view.selectionModel().currentIndex()
             if index.isValid() and self.view.model():
                 return self.view.model().tables[index.row()]
+        return None
 
     def compareRuleset(self):
         """compare the ruleset of this table against ours"""

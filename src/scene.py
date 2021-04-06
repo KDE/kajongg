@@ -541,6 +541,7 @@ class ScoringScene(GameScene):
                 currIdx += 1
             tabItems[currIdx + 1].hasFocus = True
             return True
+        return False
 
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""
@@ -588,6 +589,7 @@ class ScoringScene(GameScene):
         if self.scoringDialog:
             # is None while ScoringGame is created
             return self.scoringDialog.computeLastTile()
+        return None
 
     def computeLastMeld(self):
         """compile hand info into a string as needed by the scoring engine"""

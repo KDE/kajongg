@@ -156,7 +156,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
                         # have to draw the lines into one big pixmap and copy
                         # from the into the cells
                         painter.drawPolyline(*chart)
-            return
+            return None
         return QStyledItemDelegate.paint(self, painter, option, index)
 
 
@@ -187,7 +187,7 @@ class ScoreModel(TreeModel):
         """score table"""
         # pylint: disable=too-many-return-statements
         if not index.isValid():
-            return
+            return None
         column = index.column()
         item = index.internalPointer()
         if role is None:
@@ -227,6 +227,7 @@ class ScoreModel(TreeModel):
                 englishHints = content.manualrules.split('||')
                 tooltip = '<br />'.join(i18n(x) for x in englishHints)
                 return tooltip
+        return None
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
@@ -242,6 +243,7 @@ class ScoreModel(TreeModel):
                     return handResult.handId()
         elif role == Qt.TextAlignmentRole:
             return int(Qt.AlignLeft | Qt.AlignVCenter) if section == 0 else int(Qt.AlignRight | Qt.AlignVCenter)
+        return None
 
     def loadData(self):
         """loads all data from the data base into a 2D matrix formatted like the wanted tree"""
@@ -947,6 +949,7 @@ class ScoringDialog(QWidget):
         idx = self.cbLastTile.currentIndex()
         if idx >= 0:
             return self.cbLastTile.itemData(idx)
+        return None
 
     def clickedPlayerIdx(self, checkbox):
         """the player whose box has been clicked"""
@@ -954,6 +957,7 @@ class ScoringDialog(QWidget):
             if checkbox == self.wonBoxes[idx]:
                 return idx
         assert False
+        return None
 
     def wonChanged(self):
         """if a new winner has been defined, uncheck any previous winner"""

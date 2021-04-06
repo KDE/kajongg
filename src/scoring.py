@@ -169,12 +169,14 @@ class ScoringHandBoard(HandBoard):
         for myMeld in self.uiMelds:
             if uiTile in myMeld:
                 return myMeld
+        return None
 
     def findUIMeld(self, meld):
         """find the first UIMeld matching the logical meld"""
         for result in self.uiMelds:
             if result.meld == meld:
                 return result
+        return None
 
     def assignUITiles(self, uiTile, meld):  # pylint: disable=unused-argument
         """generate a UIMeld. First uiTile is given, the rest should be as defined by meld"""
@@ -233,7 +235,7 @@ class ScoringHandBoard(HandBoard):
         uiMeld = senderBoard.assignUITiles(uiTile, newMeld)
         for uitile, tile in zip(uiMeld, newMeld):
             uitile.tile = tile
-        self.dropMeld(uiMeld)
+        return self.dropMeld(uiMeld)
 
     def dropMeld(self, uiMeld):
         """drop uiMeld into our hand"""
@@ -594,11 +596,11 @@ def scoreGame():
     if len(Players.humanNames) < 4:
         logWarning(
             i18n('Please define four players in <interface>Settings|Players</interface>'))
-        return
+        return None
     gameSelector = Games(Internal.mainWindow)
     selected = None
     if not gameSelector.exec_():
-        return
+        return None
     selected = gameSelector.selectedGame
     gameSelector.close()
     if selected is not None:
@@ -606,5 +608,5 @@ def scoreGame():
     else:
         selectDialog = SelectPlayers()
         if not selectDialog.exec_():
-            return
+            return None
         return ScoringGame(list(zip(Wind.all4, selectDialog.names)), selectDialog.cbRuleset.current)

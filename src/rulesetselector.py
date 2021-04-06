@@ -214,10 +214,10 @@ class RuleModel(TreeModel):
         """tell the view about the wanted headers"""
         if Qt is None:
             # happens when kajongg exits unexpectedly
-            return
+            return None
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             if section >= self.rootItem.columnCount():
-                return
+                return None
             result = self.rootItem.content(section)
             if result == 'doubles':
                 return 'x2'
@@ -225,6 +225,7 @@ class RuleModel(TreeModel):
         elif role == Qt.TextAlignmentRole:
             leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
             return int(leftRight | Qt.AlignVCenter)
+        return None
 
     def appendRuleset(self, ruleset):
         """append ruleset to the model"""
@@ -431,8 +432,7 @@ class RuleTreeView(QTreeView):
     def selectedRow(self):
         """return the currently selected row index (with column 0)"""
         rows = self.selectionModel().selectedRows()
-        if len(rows) == 1:
-            return rows[0]
+        return rows[0] if len(rows) == 1 else None
 
     def copyRow(self):
         """copy a ruleset"""

@@ -184,6 +184,7 @@ class CsvRow(StrMixin):
                     _ = '{} {}'.format(cause.name, self.data(cause))
                     same.append(_)
             return ', '.join(differing), ', '.join(same)
+        return None
 
     def neutralize(self):
         """for comparisons"""

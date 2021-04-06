@@ -571,7 +571,7 @@ class TripleKnitting(MJRule):
     def computeLastMelds(cls, hand):
         """return all possible last melds"""
         if not hand.lastTile:
-            return
+            return None
         triples, rest = cls.findTriples(hand)
         assert len(rest) == 2
         triples = [triples]
@@ -772,6 +772,7 @@ class Knitting(MJRule):
         result = ''.join(x for idx, x in enumerate(Tile.colors) if suitCounts[idx] > minSuit)
         if len(result) == 2:
             return result
+        return None
 
 
 class AllPairHonors(MJRule):

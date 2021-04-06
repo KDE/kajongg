@@ -105,8 +105,7 @@ class HandBoard(Board):
     @property
     def player(self):
         """player is readonly and never None"""
-        if self._player:
-            return self._player()
+        return self._player() if self._player else None
 
     # this is ordered such that pylint does not complain about
     # identical code in board.py
@@ -158,6 +157,7 @@ class HandBoard(Board):
 
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
+        return []
 
     def newTilePositions(self):
         """return list(TileAttr) for all tiles except bonus tiles.

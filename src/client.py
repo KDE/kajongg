@@ -137,6 +137,7 @@ class Client(pb.Referenceable):
         """hide weakref"""
         if self._table:
             return self._table()
+        return None
 
     @table.setter
     def table(self, value):
@@ -162,6 +163,7 @@ class Client(pb.Referenceable):
         for table in self.tables:
             if table.tableid == tableid:
                 return table
+        return None
 
     def logout(self, unusedResult=None):  # pylint: disable=no-self-use
         """virtual"""
@@ -230,6 +232,7 @@ class Client(pb.Referenceable):
             for key, value in module.__dict__.items():
                 if key == 'AI' + aiName:
                     return value
+        return None
 
     def __assignIntelligence(self):
         """assign intelligence to myself. All players already have default intelligence."""
@@ -452,6 +455,7 @@ class Client(pb.Referenceable):
             # even here we ask: if our discard is claimed we need time
             # to notice - think 3 robots or network timing differences
             return self.ask(move, [Message.OK])
+        return None
 
     def myAction(self, move):
         """ask myself what I want to do after picking or claiming a tile"""

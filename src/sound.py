@@ -261,6 +261,7 @@ class Voice(StrMixin):
                 return voice
         if Debug.sound:
             logDebug('Personal sound for %s not found' % (name))
+        return None
 
     def buildSubvoice(self, oggName, side):
         """side is 'left' or 'right'."""
@@ -316,6 +317,7 @@ class Voice(StrMixin):
         """a list of all found ogg files"""
         if os.path.exists(self.directory):
             return sorted(x for x in os.listdir(self.directory) if x.endswith('.ogg'))
+        return []
 
     def __computeMd5sum(self):
         """update md5sum file. If it changed, return True.
@@ -397,6 +399,7 @@ class Voice(StrMixin):
                     logWarning('{} has wrong content: {}'.format(self.md5FileName(), line))
             except BaseException as exc:
                 logWarning('{} has wrong content: {}'.format(self.md5FileName(), exc))
+        return None
 
     @property
     def md5sum(self):
@@ -424,6 +427,7 @@ class Voice(StrMixin):
         self.__buildArchive()
         if os.path.exists(self.archiveName()):
             return open(self.archiveName(), 'rb').read()
+        return None
 
     @archiveContent.setter
     def archiveContent(self, content):

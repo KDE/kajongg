@@ -56,6 +56,7 @@ class Players(list, StrMixin):
             if player.nameid == playerid:
                 return player
         logException("no player has id %d" % playerid)
+        return None
 
     def byName(self, playerName):
         """lookup the player by name"""
@@ -65,6 +66,7 @@ class Players(list, StrMixin):
         logException(
             "no player has name %s - we have %s" %
             (playerName, [x.name for x in self]))
+        return None
 
     @staticmethod
     def load():
@@ -180,8 +182,7 @@ class Player(StrMixin):
     @property
     def game(self):
         """hide the fact that this is a weakref"""
-        if self._game:
-            return self._game()
+        return self._game() if self._game else None
 
     def clearHand(self):
         """clear player attributes concerning the current hand"""
@@ -564,8 +565,7 @@ class PlayingPlayer(Player):
     def __maySayChow(self, unusedMove):
         """return answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
-        if self == self.game.nextPlayer():
-            return self.__possibleChows()
+        return self.__possibleChows() if self == self.game.nextPlayer() else None
 
     def __maySayPung(self, unusedMove):
         """return answer arguments for the server if calling pung is possible.
@@ -575,6 +575,7 @@ class PlayingPlayer(Player):
             assert lastDiscard.isConcealed, lastDiscard
             if self.concealedTiles.count(lastDiscard) >= 2:
                 return MeldList([lastDiscard.pung])
+        return None
 
     def __maySayKong(self, unusedMove):
         """return answer arguments for the server if calling or declaring kong is possible.
@@ -601,6 +602,7 @@ class PlayingPlayer(Player):
                     self, [x for x in game.players], game.activePlayer))
                 game.debug('  with hand {}'.format(hand))
             return MeldList(x for x in hand.melds if not x.isDeclared), withDiscard, hand.lastMeld
+        return None
 
     def __maySayOriginalCall(self, unusedMove):
         """return True if Original Call is possible"""
@@ -612,6 +614,7 @@ class PlayingPlayer(Player):
                         '%s may say Original Call by discarding %s from %s' %
                         (self, tileName, self.hand))
                 return True
+        return False
 
     sayables = {
         Message.Pung: __maySayPung,
@@ -693,6 +696,7 @@ class PlayingPlayer(Player):
                 '%1 claiming MahJongg: She did not pass all concealed tiles to the server')
             return msg, self.name
         self._hand = None
+        return None
 
     def robTileFrom(self, tile):
         """used for robbing the kong from this player"""

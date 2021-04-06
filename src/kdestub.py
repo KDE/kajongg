@@ -559,6 +559,7 @@ class KConfigGroup:
             return default
         if self.groupName == 'Locale' and name == 'Language':
             return QLocale().name()
+        return None
 
     def readEntry(self, name, default=None):
         """get an entry from this group."""
@@ -957,6 +958,7 @@ class KLanguageButton(QWidget):
         for action in self.popup.actions():
             if action.data() == data:
                 return action
+        return None
 
 
 class AboutKajonggDialog(KDialog):
@@ -1077,6 +1079,7 @@ class AboutKajonggDialog(KDialog):
             path = os.path.abspath(path)
             if os.path.exists(path):
                 return path
+        return None
 
     @classmethod
     def showLicense(cls):
@@ -1167,6 +1170,7 @@ class KConfigDialog(KDialog):
             cls.dialog.updateButtons()
             cls.dialog.show()
             return cls.dialog
+        return None
 
     def showEvent(self, unusedEvent):
         """if the settings dialog shows, remember current values

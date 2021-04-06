@@ -145,6 +145,7 @@ class ClientMessage(Message):
         errMsg = '%s said %s but is not the active player' % (
             msg.player, msg.answer.i18nName)
         table.abort(errMsg)
+        return False
 
 
 class MessageAbort(ClientMessage):
@@ -485,6 +486,7 @@ class MessageNoGameStart(NotifyAtOnceMessage):
             client.beginQuestion.cancel()
         elif client.game:
             return client.game.close()
+        return None
 
     @classmethod
     def receivers(cls, request):
@@ -571,6 +573,7 @@ class MessagePickedTile(ServerMessage):
             (move.player.lastTile, move.tile)
         if client.thatWasMe(move.player):
             return (Message.Bonus, move.tile) if move.tile.isBonus else client.myAction(move)
+        return None
 
 
 class MessageActivePlayer(ServerMessage):
@@ -612,6 +615,7 @@ class MessageVoiceId(ServerMessage):
             move.player.voice = Voice.locate(move.source)
             if not move.player.voice:
                 return Message.ClientWantsVoiceData, move.source
+        return None
 
 
 class MessageVoiceData(ServerMessage):
@@ -684,8 +688,7 @@ class MessageDeclaredKong(ServerMessage):
                 move.player.showConcealedTiles(move.meld[3])
             prompts = [Message.NoClaim, Message.MahJongg]
         move.exposedMeld = move.player.exposeMeld(move.meld)
-        if prompts:
-            return client.ask(move, prompts)
+        return client.ask(move, prompts) if prompts else None
 
 
 class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):

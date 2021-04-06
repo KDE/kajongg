@@ -389,6 +389,7 @@ class Board(QGraphicsRectItem, StrMixin):
         for uiTile in self.uiTiles:
             if (uiTile.xoffset, uiTile.yoffset, uiTile.level) == (xoffset, yoffset, level):
                 return uiTile
+        return None
 
     def tilesByElement(self, element):
         """return all child items holding a uiTile for element"""
@@ -856,7 +857,7 @@ class FittingView(QGraphicsView):
                 self.dragObject = self.drag(tilePressed)
                 self.dragObject.exec_(Qt.MoveAction)
                 self.dragObject = None
-                return
+                return None
         return QGraphicsView.mouseMoveEvent(self, event)
 
     def drag(self, uiTile):

@@ -154,6 +154,7 @@ class MJServer:
             except (pb.DeadReferenceError, pb.PBConnectionLost):
                 user.mind = None
                 self.logout(user)
+        return None
 
     @staticmethod
     def __stopAfterLastDisconnect():

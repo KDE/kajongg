@@ -98,6 +98,7 @@ class User(pb.Avatar, StrMixin):
             logDebug('client has dbIdent={} voiceId={} maxGameId={} clientVersion {}'.format(
                 self.dbIdent, self.voiceId, self.maxGameId, clientVersion))
         self.server.sendTables(self)
+        return None
 
     def perspective_ping(self):
         """perspective_* methods are to be called remotely"""

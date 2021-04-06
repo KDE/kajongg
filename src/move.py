@@ -65,8 +65,7 @@ class Move(StrMixin):
     @property
     def player(self):
         """hide weakref"""
-        if self._player:
-            return self._player()
+        return self._player() if self._player else None
 
     @staticmethod
     def prettyKwargs(kwargs):

@@ -158,7 +158,8 @@ class KDETranslator(QTranslator):
             # But we still need to install our own QTranslator overriding the ones
             # mentioned above. It will never find a translation, so we come here.
             assert Internal.app.translators == [self]
-            return text
+        return text
+        
 
 
 class MLocale:

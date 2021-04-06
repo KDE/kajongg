@@ -53,6 +53,7 @@ class Resource:
             if os.path.exists(path):
                 return path
         logException('cannot find kmahjongg%s %s in %s' % (cls.resourceName, which, cls.__directories()))
+        return None
 
     @classmethod
     def loadAll(cls):

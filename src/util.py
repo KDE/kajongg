@@ -78,6 +78,7 @@ def which(program):
         fullName = os.path.join(path, program)
         if os.path.exists(fullName):
             return fullName
+    return None
 
 
 def removeIfExists(filename):

@@ -200,7 +200,7 @@ Options {stropt} take a string argument like {example}.
         """args comes from the command line. Put this in the Debug class.
         If something goes wrong, return an error message."""
         if not args:
-            return
+            return None
         Debug.argString = args
         for arg in args.split(','):
             parts = arg.split(':')
@@ -220,6 +220,7 @@ Options {stropt} take a string argument like {example}.
                 type.__setattr__(Debug, option, value)
         if Debug.time:
             Debug.time = datetime.datetime.now()
+        return None
 
     @staticmethod
     def str():

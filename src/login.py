@@ -111,6 +111,7 @@ class Url(str, StrMixin):
             except socket.error:
                 return port
         logException('cannot find a free port')
+        return None
 
     def startServer(self, result, waiting=0):
         """make sure we have a running local server or network connectivity"""

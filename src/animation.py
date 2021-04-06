@@ -91,6 +91,7 @@ class Animation(QPropertyAnimation, StrMixin):
             return '%d' % value
         if pName == 'scale':
             return '%.2f' % value
+        return 'formatValue: unexpected {}={}'.format(pName, value)
 
     def __str__(self):
         """for debug messages"""
@@ -262,7 +263,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
                 graphicsObject.clearActiveAnimation(animation)
         if Internal.scene:
             Internal.scene.focusRect.refresh()
-        return
 
     def stateName(self, state=None):
         """for debug output"""
@@ -276,6 +276,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
             return 'running'
         else:
             assert False
+            return None
 
     def __str__(self):
         """for debugging"""
@@ -325,6 +326,7 @@ class AnimatedMixin:
         for item in reversed(self.queuedAnimations):
             if item.pName() == propertyName:
                 return item
+        return None
 
     def shortcutAnimation(self, animation):
         """directly set the end value of the animation"""

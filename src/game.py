@@ -113,6 +113,7 @@ class HandId(StrMixin):
                 logWarning('you want %s, changed to z' % char)
                 char = 'z'
             self.notRotated = self.notRotated * 26 + ord(char) - ord('a') + 1
+        return
 
     def prompt(self, withSeed=True, withAI=True, withMoveCount=False):
         """
@@ -268,8 +269,7 @@ class Game:
     @property
     def client(self):
         """hide weakref"""
-        if self._client:
-            return self._client()
+        return self._client() if self._client else None
 
     @client.setter
     def client(self, value):
@@ -358,6 +358,7 @@ class Game:
             if myPlayer.name == playerName:
                 return myPlayer
         logException('Move references unknown player %s' % playerName)
+        return None
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
@@ -708,6 +709,7 @@ class Game:
         elif self.ruleset:
             # while initialising Game, ruleset might be None
             return self.roundsFinished >= self.ruleset.minRounds
+        return None
 
     def __payHand(self):
         """pay the scores"""

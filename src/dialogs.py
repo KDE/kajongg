@@ -128,7 +128,7 @@ class DeferredDialog(Deferred):
     def __execute(self):
         """now do the actual action"""
         if self.dlg is None:
-            return
+            return None
         scene = Internal.scene
         if not Options.gui or not isAlive(self.dlg):
             return self.clicked()
@@ -142,6 +142,7 @@ class DeferredDialog(Deferred):
             Internal.reactor.callLater(
                 Internal.Preferences.animationDuration() / 500.0,
                 self.clicked)
+        return None
 
     def clicked(self, button=None):
         """we got a reaction"""

@@ -360,6 +360,7 @@ class MainWindow(KXmlGuiWindow):
             if Options.gui:
                 ParallelAnimationGroup.cancelAll()
             return KXmlGuiWindow.close(self)
+        return True  # is closed
 
     def closeEvent(self, event):
         KXmlGuiWindow.closeEvent(self, event)

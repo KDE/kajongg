@@ -39,26 +39,22 @@ class Request(StrMixin):
     @property
     def block(self):
         """hide weakref"""
-        if self._block:
-            return self._block()
+        return self._block() if self._block else None
 
     @property
     def user(self):
         """hide weakref"""
-        if self._user:
-            return self._user()
+        return self._user() if self._user else None
 
     @property
     def about(self):
         """hide weakref"""
-        if self._about:
-            return self._about()
+        return self._about() if self._about else None
 
     @property
     def player(self):
         """hide weakref"""
-        if self._player:
-            return self._player()
+        return self._player() if self._player else None
 
     def gotAnswer(self, rawAnswer):
         """convert the wired answer into something more useful"""
@@ -352,6 +348,7 @@ class DeferredBlock(StrMixin):
             for player in self.table.game.players:
                 if user.name == player.name:
                     return player
+        return None
 
     @staticmethod
     def __enrichMessage(game, about, command, kwargs):

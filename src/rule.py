@@ -491,6 +491,7 @@ into a situation where you have to pay a penalty"""))
             str(self), action)
         if rulesWithAction:
             return rulesWithAction[0]
+        return None
 
     def filterRules(self, attrName):
         """return all my Rule classes having attribute attrName"""
@@ -559,6 +560,7 @@ into a situation where you have to pay a penalty"""))
             if rule in ruleList:
                 return ruleList
         assert False
+        return None
 
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
@@ -991,6 +993,7 @@ class IntRule(ParameterRule):
             return i18nc(
                 'wrong value for rule', '%1: %2 is too small, minimal value is %3',
                 i18n(self.name), self.parName, self.minimum)
+        return None
 
 
 class BoolRule(ParameterRule):

@@ -564,6 +564,7 @@ class HumanClient(Client):
                             if game:
                                 self.game = None
                                 return game.close()
+                            return None
                         if self.beginQuestion:
                             self.beginQuestion.cancel()
                         Sorry(i18n('Player %1 has left the table', name)).addCallback(
@@ -639,11 +640,10 @@ class HumanClient(Client):
         """playerNames are in wind order ESWN. Never called for first hand."""
         def answered(unused=None):
             """called after the client player said yes, I am ready"""
-            if self.connection:
-                return Client.readyForHandStart(self, playerNames, rotateWinds)
+            return Client.readyForHandStart(self, playerNames, rotateWinds) if self.connection else None
         if not self.connection:
             # disconnected meanwhile
-            return
+            return None
         if Options.gui:
             # update the balances in the status bar:
             Internal.mainWindow.updateGUI()
@@ -901,8 +901,7 @@ class HumanClient(Client):
                 def callServerError(result):
                     """if serverDisconnected has been called meanwhile, just ignore msg about
                     connection lost in a non-clean fashion"""
-                    if self.connection:
-                        return result
+                    return result if self.connection else None
                 return self.connection.perspective.callRemote(*args).addErrback(callServerError)
             except pb.DeadReferenceError:
                 logWarning(

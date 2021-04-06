@@ -301,6 +301,7 @@ class Job(StrMixin):
         for prefix in range(100):
             if sum(x.startswith(self.ruleset[:prefix]) for x in names) == 1:
                 return self.ruleset[prefix - 1:]
+        return None
 
     def __str__(self):
         pid = 'pid={}'.format(

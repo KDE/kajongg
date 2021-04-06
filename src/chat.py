@@ -36,7 +36,7 @@ class ChatModel(QAbstractTableModel):
         if orientation != Qt.Horizontal:
             return int(section + 1)
         if role != Qt.DisplayRole:
-            return
+            return None
         result = ''
         if section < self.columnCount():
             result = [i18n('Time'), i18n('Player'), i18n('Message')][section]

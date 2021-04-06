@@ -30,8 +30,7 @@ class AIDefaultAI:
     @property
     def player(self):
         """hide weakref"""
-        if self._player:
-            return self._player()
+        return self._player() if self._player else None
 
     def name(self):
         """return our name"""
@@ -275,12 +274,14 @@ class AIDefaultAI:
                             break
                     if not belongsToPair:
                         return chow
+        return None
 
     def selectKong(self, kongs):
         """selects a kong to be declared. Having more than one undeclared kong is quite improbable"""
         for kong in kongs:
             if not self.player.mustPlayDangerous(kong):
                 return kong
+        return None
 
     def handValue(self, hand):
         """compute the value of a hand.
@@ -388,14 +389,12 @@ class DiscardCandidates(list):
     @property
     def player(self):
         """hide weakref"""
-        if self._player:
-            return self._player()
+        return self._player() if self._player else None
 
     @property
     def hand(self):
         """hide weakref"""
-        if self._hand:
-            return self._hand()
+        return self._hand() if self._hand else None
 
     def link(self):
         """define values for candidate.prev and candidate.next"""
