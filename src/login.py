@@ -46,7 +46,6 @@ from rule import Ruleset
 class LoginAborted(Exception):
 
     """the user aborted the login"""
-    pass
 
 
 class Url(str, StrMixin):

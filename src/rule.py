@@ -1036,7 +1036,6 @@ class PredefinedRuleset(Ruleset):
 
     def rules(self):
         """here the predefined rulesets can define their rules"""
-        pass
 
     def clone(self):
         """return a clone, unloaded"""

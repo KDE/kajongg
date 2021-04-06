@@ -638,7 +638,6 @@ class MessageAssignVoices(ServerMessage):
 class MessageClientWantsVoiceData(ClientMessage):
 
     """This client wants voice sounds"""
-    pass
 
 
 class MessageServerWantsVoiceData(ServerMessage):
@@ -784,7 +783,6 @@ class MessageError(ServerMessage):
 class MessageNO(ClientMessage):
 
     """a client says no"""
-    pass
 
 
 class MessageOK(ClientMessage):

@@ -16,7 +16,6 @@ from tile import Tile, elements
 class WallEmpty(Exception):
 
     """exception when trying to get a tile off the empty wall"""
-    pass
 
 
 class KongBox:
@@ -106,7 +105,6 @@ class Wall(StrMixin):
 
     def _placeLooseTiles(self, deferredResult=None):
         """to be done only for UIWall"""
-        pass
 
     def decorate4(self, deferredResult=None): # pylint: disable=unused-argument
         """virtual: show player info on the wall"""

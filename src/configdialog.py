@@ -81,7 +81,6 @@ class PlayConfigTab(QWidget):
 
     def retranslateUi(self):
         """translate to current language"""
-        pass
 
 
 class ConfigDialog(KConfigDialog):  # pylint: disable=too-many-public-methods

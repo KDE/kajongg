@@ -273,7 +273,6 @@ class HandBoard(Board):
 
     def _avoidCrossingMovements(self, places):
         """not needed for all HandBoards"""
-        pass
 
     def sync(self, adding=None):
         """place all tiles in HandBoard.

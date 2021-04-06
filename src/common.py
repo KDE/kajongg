@@ -25,7 +25,6 @@ except ImportError:
     except ImportError:
         def unwrapinstance(unused):
             """if there is no sip, we have no Qt objects anyway"""
-            pass
 
 # pylint: disable=invalid-name
 

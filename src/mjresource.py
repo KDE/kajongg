@@ -133,4 +133,3 @@ class Resource:
     @staticmethod
     def current():
         """the currently wanted tileset. If not yet defined, do so"""
-        pass

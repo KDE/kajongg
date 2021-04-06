@@ -296,7 +296,6 @@ class Game:
 
     def _scanGameOption(self):
         """this is only done for PlayingGame"""
-        pass
 
     @property
     def lastDiscard(self):
@@ -843,7 +842,6 @@ class PlayingGame(Game):
 
     def _setGameId(self):
         """do nothing, we already went through the game id reservation"""
-        pass
 
     @property
     def activePlayer(self):

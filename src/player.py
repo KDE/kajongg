@@ -370,15 +370,12 @@ class Player(StrMixin):
 
     def syncHandBoard(self, adding=None):
         """virtual: synchronize display"""
-        pass
 
     def colorizeName(self):
         """virtual: colorize Name on wall"""
-        pass
 
     def getsFocus(self, unusedResults=None):
         """virtual: player gets focus on his hand"""
-        pass
 
     def mjString(self):
         """compile hand info into a string as needed by the scoring engine"""
@@ -489,15 +486,12 @@ class PlayingPlayer(Player):
 
     def popupMsg(self, msg):
         """virtual: show popup on display"""
-        pass
 
     def hidePopup(self):
         """virtual: hide popup on display"""
-        pass
 
     def speak(self, txt):
         """only a visible playing player can speak"""
-        pass
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""

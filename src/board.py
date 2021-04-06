@@ -627,7 +627,6 @@ class SelectorBoard(CourtBoard):
 
     def checkTiles(self):
         """does not apply"""
-        pass
 
     def load(self, game):
         """load the tiles according to game.ruleset"""
