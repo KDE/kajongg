@@ -34,7 +34,7 @@ class TablesModel(QAbstractTableModel):
     """a model for our tables"""
 
     def __init__(self, tables, parent=None):
-        super(TablesModel, self).__init__(parent)
+        super().__init__(parent)
         self.tables = tables
         assert isinstance(tables, list)
 
@@ -164,7 +164,7 @@ class TableList(QWidget):
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, client):
-        super(TableList, self).__init__(None)
+        super().__init__(None)
         self.autoStarted = False
         self.client = client
         self.setObjectName('TableList')

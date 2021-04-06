@@ -85,7 +85,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
     def clearHand(self):
         """clears attributes related to current hand"""
-        super(VisiblePlayingPlayer, self).clearHand()
+        super().clearHand()
         if self.game and self.game.wall:
             # is None while __del__
             self.front = self.game.wall[self.idx]

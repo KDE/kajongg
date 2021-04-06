@@ -136,7 +136,7 @@ class RuleModel(TreeModel):
     """a model for our rule table"""
 
     def __init__(self, rulesets, title, parent=None):
-        super(RuleModel, self).__init__(parent)
+        super().__init__(parent)
         self.rulesets = rulesets
         self.loaded = False
         unitNames = list()
@@ -470,7 +470,7 @@ class RulesetSelector(QWidget):
     """presents all available rulesets with previews"""
 
     def __init__(self, parent=None):
-        super(RulesetSelector, self).__init__(parent)
+        super().__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setupUi()
 

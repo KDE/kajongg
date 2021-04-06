@@ -165,7 +165,7 @@ class ScoreModel(TreeModel):
     steps = 30  # how fine do we want the stepping in the chart spline
 
     def __init__(self, parent=None):
-        super(ScoreModel, self).__init__(parent)
+        super().__init__(parent)
         self.scoreTable = parent
         self.rootItem = ScoreRootItem(None)
         self.minY = self.maxY = None
@@ -401,7 +401,7 @@ class ScoreTable(QWidget):
     finished. To achieve this we keep our own reference to game."""
 
     def __init__(self, scene):
-        super(ScoreTable, self).__init__(None)
+        super().__init__(None)
         self.setObjectName('ScoreTable')
         self.scene = scene
         self.scoreModel = None

@@ -19,7 +19,7 @@ class BackgroundSelector(QWidget):
     """presents all available backgrounds with previews"""
 
     def __init__(self, parent):
-        super(BackgroundSelector, self).__init__(parent)
+        super().__init__(parent)
         loadUi(self)
         self.kcfg_backgroundName = QLineEdit(self)
         self.kcfg_backgroundName.setVisible(False)

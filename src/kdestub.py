@@ -792,7 +792,7 @@ class KSwitchLanguageDialog(KDialog):
     """select application language"""
 
     def __init__(self, parent):
-        super(KSwitchLanguageDialog, self).__init__(parent)
+        super().__init__(parent)
         self.languageRows = dict()
         self.languageButtons = list()
         self.setCaption(i18n('Switch Application Language'))
@@ -864,7 +864,7 @@ class KSwitchLanguageDialog(KDialog):
         """OK"""
         newValue = ':'.join(x.current for x in self.languageButtons)
         Internal.kajonggrc.setValue('Locale', 'Language', newValue)
-        super(KSwitchLanguageDialog, self).accept()
+        super().accept()
 
     def slotAddLanguageButton(self):
         """adding a new button with en_US as it should always be present"""
@@ -899,7 +899,7 @@ class KLanguageButton(QWidget):
     """A language button for KSwitchLanguageDialog"""
 
     def __init__(self, txt, parent=None):
-        super(KLanguageButton, self).__init__(parent)
+        super().__init__(parent)
         self.button = QPushButton(txt)
         self.popup = QMenu()
         self.button.setMenu(self.popup)

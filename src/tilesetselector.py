@@ -24,7 +24,7 @@ class TilesetSelector(QWidget):
     """presents all available tiles with previews"""
 
     def __init__(self, parent):
-        super(TilesetSelector, self).__init__(parent)
+        super().__init__(parent)
 
         loadUi(self)
         self.kcfg_tilesetName = QLineEdit(self)

@@ -23,7 +23,7 @@ class DifferModel(QAbstractTableModel):
     """a model for our ruleset differ"""
 
     def __init__(self, diffs, view):
-        super(DifferModel, self).__init__()
+        super().__init__()
         self.diffs = diffs
         self.view = view
 

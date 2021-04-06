@@ -136,7 +136,7 @@ class GameScene(SceneWithFocusRect):
         Internal.scene = self
         self.mainWindow = parent
         self._game = None
-        super(GameScene, self).__init__()
+        super().__init__()
 
         self.scoreTable = None
         self.explainView = None
@@ -289,7 +289,7 @@ class PlayingScene(GameScene):
         self.__startingGame = True
         self._clientDialog = None
 
-        super(PlayingScene, self).__init__(parent)
+        super().__init__(parent)
 
     @GameScene.game.setter
     def game(self, value):  # pylint: disable=arguments-differ
@@ -454,7 +454,7 @@ class ScoringScene(GameScene):
 
     def __init__(self, parent=None):
         self.scoringDialog = None
-        super(ScoringScene, self).__init__(parent)
+        super().__init__(parent)
         self.selectorBoard.hasFocus = True
 
     @GameScene.game.setter

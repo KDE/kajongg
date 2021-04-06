@@ -23,7 +23,7 @@ class ZeroEmptyColumnDelegate(QStyledItemDelegate):
             return ''
         if isinstance(value, float) and value == 0.0:
             return ''
-        return super(ZeroEmptyColumnDelegate, self).displayText(value, locale)
+        return super().displayText(value, locale)
 
 class RichTextColumnDelegate(QStyledItemDelegate):
 
@@ -32,7 +32,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
     document = None
 
     def __init__(self, parent=None):
-        super(RichTextColumnDelegate, self).__init__(parent)
+        super().__init__(parent)
         if self.label is None:
             self.label = QLabel()
             self.label.setIndent(5)
@@ -68,7 +68,7 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
 https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
 
     def __init__(self, parent, cellFilter):
-        super(RightAlignedCheckboxDelegate, self).__init__(parent)
+        super().__init__(parent)
         self.cellFilter = cellFilter
 
     @staticmethod

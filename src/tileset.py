@@ -31,7 +31,7 @@ class Tileset(Resource):
 
     def __init__(self, name):
         """continue __build"""
-        super(Tileset, self).__init__(name)
+        super().__init__(name)
         self.tileSize = None
         self.faceSize = None
         self.__renderer = None

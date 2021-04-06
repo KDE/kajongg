@@ -126,7 +126,7 @@ class MainWindow(KXmlGuiWindow):
 
     def __init__(self):
         # see https://marc.info/?l=kde-games-devel&m=120071267328984&w=2
-        super(MainWindow, self).__init__()
+        super().__init__()
         Internal.app.aboutToQuit.connect(self.aboutToQuit)
         self.exitConfirmed = None
         self.exitReady = None

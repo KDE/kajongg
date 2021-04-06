@@ -23,7 +23,7 @@ class ChatModel(QAbstractTableModel):
     """a model for the chat view"""
 
     def __init__(self, parent=None):
-        super(ChatModel, self).__init__(parent)
+        super().__init__(parent)
         self.chatLines = []
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):  # pylint: disable=no-self-use
@@ -112,7 +112,7 @@ class ChatWindow(QWidget):
     """a widget for showing chat messages"""
 
     def __init__(self, scene=None, table=None):
-        super(ChatWindow, self).__init__(None)
+        super().__init__(None)
         self.scene = scene
         self.table = table or scene.game.client.table
         self.table.chatWindow = self

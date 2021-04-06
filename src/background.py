@@ -27,7 +27,7 @@ class Background(Resource):
 
     def __init__(self, name):
         """continue __build"""
-        super(Background, self).__init__(name)
+        super().__init__(name)
         self.__svg = None
         self.__pmap = None
         self.graphicsPath = None

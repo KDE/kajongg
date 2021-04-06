@@ -30,7 +30,7 @@ class PlayConfigTab(QWidget):
     """Display Config tab"""
 
     def __init__(self, parent):
-        super(PlayConfigTab, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi()
 
     def setupUi(self):

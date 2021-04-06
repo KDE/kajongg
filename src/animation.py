@@ -286,7 +286,7 @@ class AnimatedMixin:
     """for UITile and PlayerWind"""
 
     def __init__(self):
-        super(AnimatedMixin, self).__init__()
+        super().__init__()
         self.activeAnimation = dict()  # key is the property name
         self.queuedAnimations = []
 

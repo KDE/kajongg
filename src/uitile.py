@@ -33,7 +33,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
     clsUid = 0
 
     def __init__(self, tile, xoffset=0.0, yoffset=0.0, level=0):
-        super(UITile, self).__init__()
+        super().__init__()
         if not isinstance(tile, Tile):
             tile = Tile(tile)
         UITile.clsUid += 1

@@ -39,7 +39,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
 
     def __init__(self, wind, parent=None):
         """generate new wind marker"""
-        super(PlayerWind, self).__init__()
+        super().__init__()
         assert not parent
         assert isinstance(wind, Wind), 'wind {}  must be a real Wind but is {}'.format(
             wind, type(wind))

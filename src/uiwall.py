@@ -33,7 +33,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
         assert len(self.sideTexts) < 4
         self.__name = 't%d' % len(self.sideTexts)
         self.sideTexts.append(self)
-        super(SideText, self).__init__()
+        super().__init__()
         self.hide()
         Internal.scene.addItem(self)
         self.__text = ''

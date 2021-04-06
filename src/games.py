@@ -96,7 +96,7 @@ class Games(QDialog):
     """a dialog for selecting a game"""
 
     def __init__(self, parent=None):
-        super(Games, self).__init__(parent)
+        super().__init__(parent)
         self.selectedGame = None
         self.onlyPending = True
         decorateWindow(self, i18nc("@title:window", "Games"))
