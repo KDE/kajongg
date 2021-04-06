@@ -217,6 +217,8 @@ class Player(StrMixin):
         """temp for debugging"""
         assert isinstance(value, (Tile, type(None))), value
         self.__lastTile = value
+        if value is None:
+            self.lastMeld = Meld()
 
     def invalidateHand(self):
         """some source for the computation of current hand changed"""
