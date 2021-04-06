@@ -601,7 +601,7 @@ def improve_options():
             if '^' not in OPTIONS.git:
                 OPTIONS.git = OPTIONS.git.replace('..', '^..')
             commits = subprocess.check_output(
-                'git log --pretty=%h {range}'.format(
+                'git log --grep _SILENT --invert-grep --pretty=%h {range}'.format(
                     range=OPTIONS.git).split()).decode()
             _ = list(x.strip() for x in commits.split('\n') if x.strip())
             OPTIONS.git = list(reversed(_))
