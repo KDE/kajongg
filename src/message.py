@@ -66,23 +66,22 @@ class Message:
         cls = value.__class__
         if cls in (Tile, TileList, Meld, MeldList):
             return str(value)
-        elif isinstance(value, Wind):
+        if isinstance(value, Wind):
             return str(value)
-        elif isinstance(value, Message):
+        if isinstance(value, Message):
             return value.name
-        elif isinstance(value, (list, tuple)):
+        if isinstance(value, (list, tuple)):
             if isinstance(value, tuple) and isinstance(value[0], Message):
                 if value[1] is None or value[1] == []:
                     return value[0].name
             return type(value)([Message.jelly(key, x) for x in value])
-        elif isinstance(value, dict):
+        if isinstance(value, dict):
             return {Message.jelly('key', x): Message.jelly('value', y) for x, y in value.items()}
-        else:
-            if not isinstance(value, (int, bytes, str, float, type(None))):
-                raise Exception(
-                    'callRemote got illegal arg: %s %s(%s)' %
-                    (key, type(value), str(value)))
-            return value
+        if not isinstance(value, (int, bytes, str, float, type(None))):
+            raise Exception(
+                'callRemote got illegal arg: %s %s(%s)' %
+                (key, type(value), str(value)))
+        return value
 
     @staticmethod
     def jellyAll(args, kwargs):

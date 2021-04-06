@@ -75,11 +75,11 @@ class GamesModel(QAbstractTableModel):
                 # this translation is needed for robot players
                 names = [i18n(name) for name in unformatted.split('///')]
                 return ', '.join(names)
-            elif index.column() == 1:
+            if index.column() == 1:
                 dateVal = datetime.datetime.strptime(
                     unformatted, '%Y-%m-%dT%H:%M:%S')
                 return dateVal.strftime('%c')
-            elif index.column() == 0:
+            if index.column() == 0:
                 return int(unformatted)
         return QAbstractTableModel.data(self, index, role)
 

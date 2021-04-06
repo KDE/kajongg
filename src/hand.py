@@ -643,7 +643,7 @@ class Hand(StrMixin):
             return True
         if self.won and not (other.arranged and other.won):
             return True
-        elif not (self.arranged and self.won) and other.won:
+        if not (self.arranged and self.won) and other.won:
             return False
         return (self.intelligence.handValue(self)
                 > self.intelligence.handValue(other))

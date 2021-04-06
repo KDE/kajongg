@@ -49,7 +49,7 @@ class DifferModel(QAbstractTableModel):
         column = index.column()
         if role == Qt.DisplayRole:
             return diff[column]
-        elif role == Qt.TextAlignmentRole:
+        if role == Qt.TextAlignmentRole:
             return int(Qt.AlignLeft | Qt.AlignVCenter)
         return None
 

@@ -331,9 +331,8 @@ class StandardMahJongg(MJRule):
             if val0 == 8:
                 return {Tile(group, val0 - 1)}
             return {Tile(group, val0 - 1), Tile(group, val0 + 2)}
-        else:
-            assert val0 + 2 == val1, 'group:%s values:%s' % (group, values)
-            return {Tile(group, val0 + 1)}
+        assert val0 + 2 == val1, 'group:%s values:%s' % (group, values)
+        return {Tile(group, val0 + 1)}
 
     def winningTileCandidates(cls, hand):
         # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches,too-many-statements
@@ -520,7 +519,7 @@ class WrigglingSnake(MJRule):
         values = set(hand.values)
         if len(values) < 12:
             return set()
-        elif len(values) == 12:
+        if len(values) == 12:
             # one of 2..9 or a wind is missing
             if hand.values.count(1) < 2:
                 # and the pair of 1 is incomplete too

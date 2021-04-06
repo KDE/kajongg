@@ -113,14 +113,13 @@ class RuleItem(RuleTreeItem):
         content = self.rawContent
         if column == 0:
             return content.name
+        if isinstance(content, ParameterRule):
+            if column == 1:
+                return content.parameter
         else:
-            if isinstance(content, ParameterRule):
-                if column == 1:
-                    return content.parameter
-            else:
-                if not hasattr(content.score, str(column)):
-                    column = colNames[column]
-                return getattr(content.score, column)
+            if not hasattr(content.score, str(column)):
+                column = colNames[column]
+            return getattr(content.score, column)
         return ''
 
     def tooltip(self):
@@ -222,7 +221,7 @@ class RuleModel(TreeModel):
             if result == 'doubles':
                 return 'x2'
             return i18nc('kajongg', result)
-        elif role == Qt.TextAlignmentRole:
+        if role == Qt.TextAlignmentRole:
             leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
             return int(leftRight | Qt.AlignVCenter)
         return None
@@ -266,10 +265,9 @@ class EditableRuleModel(RuleModel):
             oldParameter = content.parameter
             if isinstance(content, BoolRule):
                 return False, ''
-            else:
-                if content.parameter != value:
-                    dirty = True
-                    content.parameter = value
+            if content.parameter != value:
+                dirty = True
+                content.parameter = value
             message = content.validate()
             if message:
                 content.parameter = oldParameter

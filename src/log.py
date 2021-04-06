@@ -49,13 +49,12 @@ class Fmt(string.Formatter):
                 idpar = 'SELF'
             if kwargs[idpar] is None:
                 return 'None'
-            elif Debug.neutral:
+            if Debug.neutral:
                 return '....'
             return Fmt.num_encode(id(kwargs[idpar]))
-        elif key == 'self':
+        if key == 'self':
             return kwargs['SELF']
-        else:
-            return kwargs[key]
+        return kwargs[key]
 
 Fmt.formatter = Fmt()
 

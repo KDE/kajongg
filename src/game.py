@@ -706,7 +706,7 @@ class Game:
             return True
         if Options.rounds:
             return self.roundsFinished >= Options.rounds
-        elif self.ruleset:
+        if self.ruleset:
             # while initialising Game, ruleset might be None
             return self.roundsFinished >= self.ruleset.minRounds
         return None

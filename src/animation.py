@@ -272,11 +272,10 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
             state = self.state()
         if state == QAbstractAnimation.Stopped:
             return 'stopped'
-        elif state == QAbstractAnimation.Running:
+        if state == QAbstractAnimation.Running:
             return 'running'
-        else:
-            assert False
-            return None
+        assert False
+        return None
 
     def __str__(self):
         """for debugging"""

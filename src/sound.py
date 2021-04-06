@@ -253,7 +253,7 @@ class Voice(StrMixin):
                         'locate found %s by md5sum in %s' %
                         (name, voice.directory))
                 return voice
-            elif name == dirname and voice.language() == 'local':
+            if name == dirname and voice.language() == 'local':
                 if Debug.sound:
                     logDebug(
                         'locate found %s by name in %s' %
@@ -395,8 +395,7 @@ class Voice(StrMixin):
                 line = open(self.md5FileName(), 'r').readlines()[0].replace(' -', '').strip()
                 if len(line) == self.md5sumLength:
                     return line
-                else:
-                    logWarning('{} has wrong content: {}'.format(self.md5FileName(), line))
+                logWarning('{} has wrong content: {}'.format(self.md5FileName(), line))
             except BaseException as exc:
                 logWarning('{} has wrong content: {}'.format(self.md5FileName(), exc))
         return None

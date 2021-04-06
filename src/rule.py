@@ -786,23 +786,21 @@ class Rule(RuleBase):
                         (id(hand) %
                          10000, cacheKey, result))
                 return result
-            else:
-                if Debug.ruleCache:
-                    if hand.ruleCache[cacheKey] != func(*args):
-                        hand.player.game.debug(
-                            'cacheKey=%s rule=%s func:%s args:%s' %
-                            (cacheKey, srcClass, func, args))
-                        hand.player.game.debug(
-                            '  hand:%s/%s' %
-                            (id(hand), hand))
-                        hand.player.game.debug(
-                            '  cached:%s ' %
-                            str(hand.ruleCache[cacheKey]))
-                        hand.player.game.debug(
-                            '    real:%s ' %
-                            str(func(*args)))
-                return hand.ruleCache[cacheKey]
-            return result
+            if Debug.ruleCache:
+                if hand.ruleCache[cacheKey] != func(*args):
+                    hand.player.game.debug(
+                        'cacheKey=%s rule=%s func:%s args:%s' %
+                        (cacheKey, srcClass, func, args))
+                    hand.player.game.debug(
+                        '  hand:%s/%s' %
+                        (id(hand), hand))
+                    hand.player.game.debug(
+                        '  cached:%s ' %
+                        str(hand.ruleCache[cacheKey]))
+                    hand.player.game.debug(
+                        '    real:%s ' %
+                        str(func(*args)))
+            return hand.ruleCache[cacheKey]
         return classmethod(wrapper) if clsMethod else staticmethod(wrapper)
 
     def __init__(self, name, definition='', points=0, doubles=0, limits=0,

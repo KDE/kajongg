@@ -870,8 +870,7 @@ class HumanClient(Client):
             if Debug.connections:
                 logDebug('sending logout to server for {}'.format(self))
             return self.callServer('logout').addCallback(loggedout, conn)
-        else:
-            return succeed(None)
+        return succeed(None)
 
     def __logCallServer(self, *args):
         """for Debug.traffic"""

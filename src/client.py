@@ -412,7 +412,7 @@ class Client(pb.Referenceable):
             # before the animated tile reaches its end position
             animate()
             return answer
-        elif message == Message.AskForClaims:
+        if message == Message.AskForClaims:
             # no need to start an animation. If we did the below standard clause, this is what
             # could happen:
             # 1. user says Chow

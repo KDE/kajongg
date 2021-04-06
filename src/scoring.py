@@ -605,8 +605,7 @@ def scoreGame():
     gameSelector.close()
     if selected is not None:
         return ScoringGame.loadFromDB(selected)
-    else:
-        selectDialog = SelectPlayers()
-        if not selectDialog.exec_():
-            return None
-        return ScoringGame(list(zip(Wind.all4, selectDialog.names)), selectDialog.cbRuleset.current)
+    selectDialog = SelectPlayers()
+    if not selectDialog.exec_():
+        return None
+    return ScoringGame(list(zip(Wind.all4, selectDialog.names)), selectDialog.cbRuleset.current)

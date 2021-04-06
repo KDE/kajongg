@@ -264,9 +264,9 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         sorter = dirs[dirs.index(sortDir) + sceneRotation(self.__board) // 90]
         if sorter == Qt.Key_Down:
             return self.xoffset * 100 + self.yoffset
-        elif sorter == Qt.Key_Up:
+        if sorter == Qt.Key_Up:
             return -(self.xoffset * 100 + self.yoffset)
-        elif sorter == Qt.Key_Left:
+        if sorter == Qt.Key_Left:
             return -(self.yoffset * 100 + self.xoffset)
         return self.yoffset * 100 + self.xoffset
 

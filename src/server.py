@@ -209,8 +209,7 @@ class MJServer:
                     'sending %d tables to %s: %s' %
                     (len(tables), user.name, data))
             return self.callRemote(user, 'newTables', data)
-        else:
-            return succeed([])
+        return succeed([])
 
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""

@@ -232,22 +232,21 @@ class DeferredBlock(StrMixin):
                 if Debug.deferredBlock:
                     self.debug('IGN', request.pretty())
                 return
-            else:
-                request.gotAnswer(result)
-                if hasattr(request.user, 'pinged'):
-                    # a Client (for robots) does not have it
-                    request.user.pinged()
-                if Debug.deferredBlock:
-                    self.debug('ANS', request.pretty())
-                if hasattr(request.answer, 'notifyAction'):
-                    block = DeferredBlock(self.table, temp=True)
-                    receivers = request.answer.receivers(request)
-                    if receivers:
-                        block.tell(
-                            request.player,
-                            receivers,
-                            request.answer,
-                            notifying=True)
+            request.gotAnswer(result)
+            if hasattr(request.user, 'pinged'):
+                # a Client (for robots) does not have it
+                request.user.pinged()
+            if Debug.deferredBlock:
+                self.debug('ANS', request.pretty())
+            if hasattr(request.answer, 'notifyAction'):
+                block = DeferredBlock(self.table, temp=True)
+                receivers = request.answer.receivers(request)
+                if receivers:
+                    block.tell(
+                        request.player,
+                        receivers,
+                        request.answer,
+                        notifying=True)
             self.outstanding -= 1
             assert self.outstanding >= 0, '__gotAnswer: outstanding %d' % self.outstanding
             self.callbackIfDone()

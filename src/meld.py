@@ -229,7 +229,7 @@ class Meld(TileList, StrMixin):
         """meld state: exposed or not"""
         if self.case.islower():
             return True
-        elif len(self) == 4:
+        if len(self) == 4:
             return self.case[1:3].islower()
         return False
 
@@ -316,17 +316,17 @@ class Meld(TileList, StrMixin):
         # pylint: disable=too-many-return-statements
         if self.isBonus:
             return i18nc('kajongg meld type', 'Bonus')
-        elif self.isSingle:
+        if self.isSingle:
             return i18nc('kajongg meld type', '&single')
-        elif self.isPair:
+        if self.isPair:
             return i18nc('kajongg meld type', '&pair')
-        elif self.isChow:
+        if self.isChow:
             return i18nc('kajongg meld type', '&chow')
-        elif self.isPung:
+        if self.isPung:
             return i18nc('kajongg meld type', 'p&ung')
-        elif self.isClaimedKong:
+        if self.isClaimedKong:
             return i18nc('kajongg meld type', 'c&laimed kong')
-        elif self.isKong:
+        if self.isKong:
             return i18nc('kajongg meld type', 'k&ong')
         return i18nc('kajongg meld type', 'rest of tiles')
 
@@ -334,7 +334,7 @@ class Meld(TileList, StrMixin):
         """the translated name of the state"""
         if self.isBonus or self.isClaimedKong:
             return ''
-        elif self.isExposed:
+        if self.isExposed:
             return i18nc('kajongg meld state', 'Exposed')
         return i18nc('kajongg meld state', 'Concealed')
 

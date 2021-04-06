@@ -119,15 +119,14 @@ class Url(str, StrMixin):
             # just wait for that server to appear
             if self.__serverListening():
                 return result
-            else:
-                if waiting == 0:
-                    self.__startLocalServer()
-                elif waiting > 30:
-                    logDebug('Game %s: Server %s not available after 30 seconds, aborting' % (
-                        SingleshotOptions.game, self))
-                    raise CancelledError
-                return deferLater(Internal.reactor, 1, self.startServer, result, waiting + 1)
-        elif which('qdbus'):
+            if waiting == 0:
+                self.__startLocalServer()
+            elif waiting > 30:
+                logDebug('Game %s: Server %s not available after 30 seconds, aborting' % (
+                    SingleshotOptions.game, self))
+                raise CancelledError
+            return deferLater(Internal.reactor, 1, self.startServer, result, waiting + 1)
+        if which('qdbus'):
             try:
                 stdoutdata, stderrdata = subprocess.Popen(
                     ['qdbus',
@@ -341,7 +340,7 @@ class LoginDlg(QDialog):
         """find out what ruleset to use"""
         if Options.ruleset:
             return Options.ruleset
-        elif Internal.autoPlay or bool(Options.host):
+        if Internal.autoPlay or bool(Options.host):
             return Ruleset.selectableRulesets()[0]
         return self.cbRuleset.current
 

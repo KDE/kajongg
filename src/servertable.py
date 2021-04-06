@@ -312,7 +312,7 @@ class ServerTable(Table, StrMixin):
                 if msg.answer == Message.NO:
                     self.proposeGameId(gameid + 1)
                     return
-                elif msg.answer != Message.OK:
+                if msg.answer != Message.OK:
                     raise srvError(
                         pb.Error,
                         'collectGameIdAnswers got neither NO nor OK')

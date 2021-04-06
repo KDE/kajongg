@@ -88,13 +88,12 @@ class ScorePlayerItem(ScoreTreeItem):
         """return the content stored in this node"""
         if column == 0:
             return i18n(self.rawContent[0])
-        else:
-            try:
-                return self.hands()[column - 1]
-            except IndexError:
-                # we have a penalty but no hand yet. Should
-                # not happen in practical use
-                return None
+        try:
+            return self.hands()[column - 1]
+        except IndexError:
+            # we have a penalty but no hand yet. Should
+            # not happen in practical use
+            return None
 
     def hands(self):
         """a small helper"""
@@ -205,8 +204,7 @@ class ScoreModel(TreeModel):
                     else:
                         content = str(content.balance)
                 return content
-            else:
-                return '' if column > 0 else item.content(0)
+            return '' if column > 0 else item.content(0)
         if role == Qt.TextAlignmentRole:
             return int(Qt.AlignLeft | Qt.AlignVCenter) if index.column() == 0 else int(Qt.AlignRight | Qt.AlignVCenter)
         if role == Qt.FontRole:
