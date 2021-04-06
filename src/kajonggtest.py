@@ -418,7 +418,7 @@ class CSV(StrMixin):
                     checkRows = [x for x in rows if x[fixedField] == fixedValue]
                     for warned in self.compareRows(checkRows):
                         rows.remove(warned)
-        self.compareRows(rows)
+            self.compareRows(rows)
 
     @staticmethod
     def compareRows(rows):
