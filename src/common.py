@@ -55,7 +55,7 @@ def isAlive(qobj):
         return True
 
 
-def appdataDir():
+def serverAppdataDir():
     """
     The per user directory with kajongg application information like the database.
 
@@ -63,42 +63,60 @@ def appdataDir():
     @rtype: C{str}.
     """
     serverDir = os.path.expanduser('~/.kajonggserver/')
-    if Internal.isServer:
-        # the server might or might not have KDE installed, so to be on
-        # the safe side we use our own .kajonggserver directory
-        # the following code moves an existing kajonggserver.db to .kajonggserver
-        # but only if .kajonggserver does not yet exist
-        kdehome = os.environ.get('KDEHOME', '~/.kde')
+    # the server might or might not have KDE installed, so to be on
+    # the safe side we use our own .kajonggserver directory
+    # the following code moves an existing kajonggserver.db to .kajonggserver
+    # but only if .kajonggserver does not yet exist
+    kdehome = os.environ.get('KDEHOME', '~/.kde')
+    oldPath = os.path.expanduser(
+        kdehome +
+        '/share/apps/kajongg/kajonggserver.db')
+    if not os.path.exists(oldPath):
         oldPath = os.path.expanduser(
-            kdehome +
-            '/share/apps/kajongg/kajonggserver.db')
-        if not os.path.exists(oldPath):
-            oldPath = os.path.expanduser(
-                '~/.kde' +'4/share/apps/kajongg/kajonggserver.db')
-        if os.path.exists(oldPath) and not os.path.exists(serverDir):
-            # upgrading an old kajonggserver installation
+            '~/.kde' +'4/share/apps/kajongg/kajonggserver.db')
+    if os.path.exists(oldPath) and not os.path.exists(serverDir):
+        # upgrading an old kajonggserver installation
+        os.makedirs(serverDir)
+        shutil.move(oldPath, serverDir)
+    if not os.path.exists(serverDir):
+        try:
             os.makedirs(serverDir)
-            shutil.move(oldPath, serverDir)
-        if not os.path.exists(serverDir):
-            try:
-                os.makedirs(serverDir)
-            except OSError:
-                pass
-        return serverDir
-    else:
-        if not os.path.exists(serverDir):
-            # the client wants to place the socket in serverDir
-            os.makedirs(serverDir)
-        result = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-        # this may end with kajongg.py or .pyw or whatever, so fix that:
-        if not os.path.isdir(result):
-            result = os.path.dirname(result)
-        if not result.endswith('kajongg'):
-            # when called first, QApplication.applicationName is not yet set
-            result = result + '/kajongg'
-        if not os.path.exists(result):
-            os.makedirs(result)
-        return result
+        except OSError:
+            pass
+    return serverDir
+
+
+def clientAppdataDir():
+    """
+    The per user directory with kajongg application information like the database.
+
+    @return: The directory path.
+    @rtype: C{str}.
+    """
+    serverDir = os.path.expanduser('~/.kajonggserver/')
+    if not os.path.exists(serverDir):
+        # the client wants to place the socket in serverDir
+        os.makedirs(serverDir)
+    result = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+    # this may end with kajongg.py or .pyw or whatever, so fix that:
+    if not os.path.isdir(result):
+        result = os.path.dirname(result)
+    if not result.endswith('kajongg'):
+        # when called first, QApplication.applicationName is not yet set
+        result = result + '/kajongg'
+    if not os.path.exists(result):
+        os.makedirs(result)
+    return result
+
+
+def appdataDir():
+    """
+    The per user directory with kajongg application information like the database.
+
+    @return: The directory path.
+    @rtype: C{str}.
+    """
+    return serverAppdataDir() if Internal.isServer else clientAppdataDir()
 
 
 def cacheDir():
