@@ -159,7 +159,7 @@ class KDETranslator(QTranslator):
             # mentioned above. It will never find a translation, so we come here.
             assert Internal.app.translators == [self]
         return text
-        
+
 
 
 class MLocale:
