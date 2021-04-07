@@ -440,8 +440,7 @@ class HumanClient(Client):
                 self.__showTables).addErrback(self.tableError)
             if Debug.table:
                 logDebug(
-                    '%s: --table lets us open an new table %d' %
-                    (self.name, SingleshotOptions.table))
+                    '%s: --table lets us open a new table' % self.name)
             SingleshotOptions.table = False
         elif SingleshotOptions.join:
             Internal.autoPlay = False
