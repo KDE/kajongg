@@ -342,7 +342,7 @@ def pairs(data):
 class CSV(StrMixin):
     """represent kajongg.csv"""
 
-    knownCommits = None
+    knownCommits = []
 
     def __init__(self):
         self.findKnownCommits()
@@ -368,7 +368,7 @@ class CSV(StrMixin):
     @classmethod
     def findKnownCommits(cls):
         """find known commits"""
-        if cls.knownCommits is None:
+        if not cls.knownCommits:
             cls.knownCommits = set()
             for branch in subprocess.check_output(b'git branch'.split()).decode().split('\n'):
                 if 'detached' not in branch and 'no branch' not in branch:

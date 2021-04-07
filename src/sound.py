@@ -179,7 +179,7 @@ class Voice(StrMixin):
     destination, no tarfile is written, only the content. It makes
     only sense to cache the voice in a tarfile at source."""
 
-    __availableVoices = None
+    __availableVoices = []
     md5sumLength = 32 # magical constant
 
     def __init__(self, directory, content=None):

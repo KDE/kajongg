@@ -1022,7 +1022,7 @@ class PredefinedRuleset(Ruleset):
     """special code for loading rules from program code instead of from the database"""
 
     classes = set()  # only those will be playable
-    preRulesets = None
+    preRulesets = []
 
     def __init__(self, name=None):
         Ruleset.__init__(self, name or 'general predefined ruleset')
@@ -1030,7 +1030,7 @@ class PredefinedRuleset(Ruleset):
     @staticmethod
     def rulesets():
         """a list of instances for all predefined rulesets"""
-        if PredefinedRuleset.preRulesets is None:
+        if not PredefinedRuleset.preRulesets:
             PredefinedRuleset.preRulesets = [
                 x() for x in sorted(PredefinedRuleset.classes, key=lambda x: x.__name__)]
         return PredefinedRuleset.preRulesets
