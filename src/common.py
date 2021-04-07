@@ -257,8 +257,7 @@ class FixedClass(type):
         if cls.fixed:
             raise SystemExit('{cls}.{key} may not be changed'.format(
                 cls=cls.__name__, key=key))
-        else:
-            type.__setattr__(cls, key, value)
+        type.__setattr__(cls, key, value)
 
 
 class StrMixin:

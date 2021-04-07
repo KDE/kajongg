@@ -155,8 +155,7 @@ class Duration:
                     diff.microseconds)
                 if self.bug:
                     raise UserWarning(msg)
-                else:
-                    print(msg)
+                print(msg)
 
 
 def checkMemory():

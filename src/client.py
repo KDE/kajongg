@@ -300,7 +300,7 @@ class Client(pb.Referenceable):
             # latest move first
             if move.message == Message.Discard:
                 break
-            elif move.message == Message.NoClaim and move.notifying:
+            if move.message == Message.NoClaim and move.notifying:
                 noClaimCount += 1
                 if noClaimCount == 2:
                     if Debug.delayChow:
