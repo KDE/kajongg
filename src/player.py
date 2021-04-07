@@ -351,9 +351,9 @@ class Player(StrMixin):
         else:
             try:
                 self._concealedTiles.remove(tile)
-            except ValueError:
+            except ValueError as _:
                 raise Exception('removeTile(%s): tile not in concealed %s' %
-                                (tile, ''.join(self._concealedTiles)))
+                                (tile, ''.join(self._concealedTiles))) from _
         if tile is self.lastTile:
             self.lastTile = None
         self._hand = None

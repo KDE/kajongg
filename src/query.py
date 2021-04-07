@@ -85,7 +85,7 @@ class DBCursor(sqlite3.Cursor):
             else:
                 if not failSilent:
                     logError(msg)
-                raise QueryException(msg)
+                raise QueryException(msg) from exc
             return
 
     def __str__(self):

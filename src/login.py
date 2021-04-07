@@ -134,12 +134,11 @@ class Url(str, StrMixin):
                      '/modules/networkstatus',
                      'org.kde.Solid.Networking.status'],
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate(timeout=1)
-            except subprocess.TimeoutExpired:
-                raise twisted.internet.error.ConnectError()
+            except subprocess.TimeoutExpired as _:
+                raise twisted.internet.error.ConnectError() from _
             stdoutdata = stdoutdata.strip()
             stderrdata = stderrdata.strip()
             if stderrdata == '' and stdoutdata != '4':
-                # pylint: disable=nonstandard-exception
                 raise twisted.internet.error.ConnectError()
             # if we have stderrdata, qdbus probably does not provide the
             # service we want, so ignore it

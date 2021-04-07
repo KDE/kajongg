@@ -140,8 +140,8 @@ class Hand(StrMixin):
                 if len(part) > 1:
                     try:
                         self.__lastSource = TileSource.byChar[part[1]]
-                    except KeyError:
-                        raise Exception('{} has unknown lastTile {}'.format(inString, part[1]))
+                    except KeyError as _:
+                        raise Exception('{} has unknown lastTile {}'.format(inString, part[1])) from _
                     if len(part) > 2:
                         self.__announcements = set(part[2])
             elif partId == 'L':
