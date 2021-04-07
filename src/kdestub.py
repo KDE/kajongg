@@ -330,15 +330,13 @@ class KStandardAction:
         mainWindow = Internal.mainWindow
         separator = QAction(Internal.mainWindow)
         separator.setSeparator(True)
-        mainWindow.actionStatusBar = mainWindow.kajonggAction(
-            'options_show_statusbar', None)
+        mainWindow.actionStatusBar = Action(mainWindow, 'options_show_statusbar', None)
         mainWindow.actionStatusBar.setCheckable(True)
         mainWindow.actionStatusBar.setEnabled(True)
         mainWindow.actionStatusBar.toggled.connect(mainWindow.toggleStatusBar)
         mainWindow.actionStatusBar.setText(
             i18nc('@action:inmenu', "Show St&atusbar"))
-        mainWindow.actionToolBar = mainWindow.kajonggAction(
-            'options_show_toolbar', None)
+        mainWindow.actionToolBar = Action(mainWindow, 'options_show_toolbar', None)
         mainWindow.actionToolBar.setCheckable(True)
         mainWindow.actionToolBar.setEnabled(True)
         mainWindow.actionToolBar.toggled.connect(mainWindow.toggleToolBar)
@@ -456,12 +454,12 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
             self.menus[menu] = (mainMenu, menuItems)
             self.menuBar().addMenu(mainMenu)
         self.setCaption('')
-        self.actionHelp = self.kajonggAction("help", "help-contents", Help.start)
+        self.actionHelp = Action(self, "help", "help-contents", Help.start)
         self.actionHelp.setText(i18nc('@action:inmenu', '&Help'))
-        self.actionLanguage = self.kajonggAction(
+        self.actionLanguage = Action(self,
             "language", "preferences-desktop-locale", self.selectLanguage)
         self.actionLanguage.setText(i18n('Switch Application Language'))
-        self.actionAboutKajongg = self.kajonggAction(
+        self.actionAboutKajongg = Action(self,
             'aboutkajongg', 'kajongg', self.aboutKajongg)
         self.actionAboutKajongg.setText(
             i18nc('@action:inmenu', 'About &Kajongg'))
@@ -514,10 +512,6 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
     def toolBar(self):
         """stub"""
         return self._toolBar
-
-    def kajonggAction(
-            self, name, icon, slot=None, shortcut=None, actionData=None):
-        """this is defined in MainWindow(KXmlGuiWindow)"""
 
     @staticmethod
     def selectLanguage():
@@ -645,6 +639,23 @@ def KIcon(name=None):  # pylint: disable=invalid-name
     if os.name == 'nt':
         return QIcon(os.path.join('share', 'icons', name) if name else None)
     return QIcon.fromTheme(name)
+
+
+class Action(QAction):
+
+    def __init__(self, parent, name, icon, slot=None, shortcut=None, actionData=None):
+        super().__init__(parent)
+        if icon:
+            self.setIcon(KIcon(icon))
+        if slot:
+            self.triggered.connect(slot)
+        if parent:
+            parent.actionCollection().addAction(name, self)
+        if shortcut:
+            self.setShortcut(Qt.CTRL + shortcut)
+            self.setShortcutContext(Qt.ApplicationShortcut)
+        if actionData is not None:
+            self.setData(actionData)
 
 
 class KConfigSkeletonItem:

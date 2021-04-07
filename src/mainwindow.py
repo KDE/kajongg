@@ -71,7 +71,7 @@ except ImportError as importError:
 
 try:
     from mi18n import i18n, i18nc
-    from kde import KIcon, KXmlGuiWindow, KStandardAction
+    from kde import KXmlGuiWindow, KStandardAction
 
     from board import FittingView
     from playerlist import PlayerList
@@ -87,6 +87,7 @@ try:
     from configdialog import ConfigDialog
     from statesaver import StateSaver
     from util import checkMemory
+    from kdestub import Action
 
 except ImportError as importError:
     NOTFOUND.append('Kajongg is not correctly installed: modules: %s' %
@@ -220,25 +221,9 @@ class MainWindow(KXmlGuiWindow):
         self.centralView.resizeEvent(True)
         KXmlGuiWindow.showEvent(self, event)
 
-    def kajonggAction(
-            self, name, icon, slot=None, shortcut=None, actionData=None):
-        """simplify defining actions"""
-        res = QAction(self)
-        if icon:
-            res.setIcon(KIcon(icon))
-        if slot:
-            res.triggered.connect(slot)
-        self.actionCollection().addAction(name, res)
-        if shortcut:
-            res.setShortcut(Qt.CTRL + shortcut)
-            res.setShortcutContext(Qt.ApplicationShortcut)
-        if actionData is not None:
-            res.setData(actionData)
-        return res
-
     def _kajonggToggleAction(self, name, icon, shortcut=None, actionData=None):
         """a checkable action"""
-        res = self.kajonggAction(
+        res = Action(self,
             name,
             icon,
             shortcut=shortcut,
@@ -268,37 +253,44 @@ class MainWindow(KXmlGuiWindow):
         self.background = None  # just for pylint
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
         self.adjustMainView()
-        self.actionScoreGame = self.kajonggAction(
+        self.actionScoreGame = Action(
+            self,
             "scoreGame",
             "draw-freehand",
             self.scoringScene,
             Qt.Key_C)
-        self.actionPlayGame = self.kajonggAction(
+        self.actionPlayGame = Action(
+            self,
             "play",
             "arrow-right",
             self.playGame,
             Qt.Key_N)
-        self.actionAbortGame = self.kajonggAction(
+        self.actionAbortGame = Action(
+            self,
             "abort",
             "dialog-close",
             self.abortAction,
             Qt.Key_W)
         self.actionAbortGame.setEnabled(False)
-        self.actionQuit = self.kajonggAction(
+        self.actionQuit = Action(
+            self,
             "quit",
             "application-exit",
             self.close,
             Qt.Key_Q)
-        self.actionPlayers = self.kajonggAction(
+        self.actionPlayers = Action(
+            self,
             "players", "im-user", self.slotPlayers)
-        self.actionRulesets = self.kajonggAction(
+        self.actionRulesets = Action(
+            self,
             "rulesets",
             "games-kajongg-law",
             self.slotRulesets)
         self.actionChat = self._kajonggToggleAction("chat", "call-start",
                                                     shortcut=Qt.Key_H, actionData=ChatWindow)
         self.actionChat.setEnabled(False)
-        self.actionAngle = self.kajonggAction(
+        self.actionAngle = Action(
+            self,
             "angle",
             "object-rotate-left",
             self.changeAngle,
@@ -315,7 +307,8 @@ class MainWindow(KXmlGuiWindow):
         self.actionFullscreen = self._kajonggToggleAction(
             "fullscreen", "view-fullscreen", shortcut=Qt.Key_F + Qt.ShiftModifier)
         self.actionFullscreen.toggled.connect(self.fullScreen)
-        self.actionAutoPlay = self.kajonggAction(
+        self.actionAutoPlay = Action(
+            self,
             "demoMode",
             "arrow-right-double",
             None,
