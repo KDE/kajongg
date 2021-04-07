@@ -437,7 +437,7 @@ class DeferredBlock(StrMixin):
         self.tell(
             player,
             list(
-                [x for x in self.table.game.players if x.name != player.name]),
+                x for x in self.table.game.players if x.name != player.name),
             command,
             **kwargs)
 

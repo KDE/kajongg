@@ -58,7 +58,7 @@ def callers(count=5, exclude=None):
     excluding.extend(['_dataReceived', 'dataReceived', 'gotItem'])
     excluding.extend(['callWithContext', '_doReadOrWrite', 'doRead'])
     excluding.extend(['callers', 'debug', 'logMessage', 'logDebug'])
-    _ = list(([x[2] for x in stck if x[2] not in excluding]))
+    _ = list(x[2] for x in stck if x[2] not in excluding)
     names = reversed(_[-count:])
     result = '.'.join(names)
     return '[{}]'.format(result)

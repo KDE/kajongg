@@ -85,7 +85,7 @@ class ListComboBox(QComboBox):
 
     def names(self):
         """a list with all item names"""
-        return list([x.name for x in self.items])
+        return list(x.name for x in self.items)
 
     @property
     def current(self):

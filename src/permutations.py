@@ -88,7 +88,8 @@ class Permutations:
                 else:
                     result.append(appendValue)
         else:
-            result = list([list([tuple([x]) for x in values])])
+            result = list([list([tuple([x]) for x in values])])  # pylint: disable=consider-using-generator
+            # the solution proposed by pylint creates something unusable
         tupleResult = tuple(sorted(set(tuple(tuple(sorted(x)) for x in result))))
         cls.permuteCache[valuesTuple] = tupleResult
         return tupleResult

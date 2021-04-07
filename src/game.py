@@ -362,7 +362,7 @@ class Game:
 
     def losers(self):
         """the 3 or 4 losers: All players without the winner"""
-        return list([x for x in self.players if x is not self.__winner])
+        return list(x for x in self.players if x is not self.__winner)
 
     def belongsToRobotPlayer(self):
         """does this game instance belong to a robot player?"""
@@ -654,9 +654,9 @@ class Game:
             (gameid, qLastHandRecord[0])).records
         if not qScoreRecords:
             # this should normally not happen
-            qScoreRecords = list([
+            qScoreRecords = list(
                 tuple([qGameRecord[wind], wind.char, 0, False, East.char])
-                for wind in Wind.all4])
+                for wind in Wind.all4)
         if len(qScoreRecords) != 4:
             logError('game %d inconsistent: There should be exactly '
                      '4 score records for the last hand' % gameid)

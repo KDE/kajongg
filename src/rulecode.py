@@ -635,7 +635,7 @@ class TripleKnitting(MJRule):
         if len(rest) not in (1, 4):
             return set()
         result = list(
-            [Tile(x, y.value).concealed for x in Tile.colors for y in rest])
+            Tile(x, y.value).concealed for x in Tile.colors for y in rest)
         for restTile in rest:
             result.remove(restTile)
         return set(result)

@@ -665,7 +665,7 @@ class PenaltyDialog(QDialog):
         grid = QGridLayout(self)
         lblOffense = QLabel(i18n('Offense:'))
         crimes = list(
-            [x for x in game.ruleset.penaltyRules if not ('absolute' in x.options and game.winner)])
+            x for x in game.ruleset.penaltyRules if not ('absolute' in x.options and game.winner))
         self.cbCrime = ListComboBox(crimes)
         lblOffense.setBuddy(self.cbCrime)
         grid.addWidget(lblOffense, 0, 0)

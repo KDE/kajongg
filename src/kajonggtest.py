@@ -668,7 +668,7 @@ def allJobs():
                     for pyVersion in OPTIONS.pyVersions:
                         OPTIONS.jobCount += 1
                         if OPTIONS.jobCount > OPTIONS.count:
-                            raise StopIteration
+                            return
                         yield Job(pyVersion, ruleset, aiVariant, commitId, game)
 
 def main():
