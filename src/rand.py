@@ -62,7 +62,7 @@ class CountingRandom(Random):
         if Debug.random:
             self.game.debug('Random gets seed %s' % a)
 
-    def randrange(self, start, stop=None, step=1, _int=int):
+    def randrange(self, start, stop=None, step=1):
         with CountRandomCalls(self, 'randrange({},{},step={})'.format(
             start, stop, step)):
             return Random.randrange(self, start, stop, step)
@@ -74,10 +74,10 @@ class CountingRandom(Random):
         with CountRandomCalls(self, 'choice({})'.format(seq)):
             return Random.choice(self, seq)
 
-    def sample(self, population, k):
+    def sample(self, population, k, *, counts=None):
         """add debug output to sample. Chooses k unique random elements"""
         with CountRandomCalls(self, 'sample({}, {})'.format(population, k)):
-            return Random.sample(self, population, k)
+            return Random.sample(self, population, k, counts=counts)
 
     def shuffle(self, x, random=None):
         """add debug output to shuffle. Shuffles list x in place."""
