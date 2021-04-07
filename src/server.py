@@ -301,7 +301,7 @@ class MJServer:
         """table ids with user, except table 'without'"""
         return [x.tableid for x in self.tables.values() if user in x.users]
 
-    def leaveTable(self, user, tableid, message=None, *args):
+    def leaveTable(self, user, tableid, message, *args):
         """user leaves table. If no human user is left on a new table, remove it"""
         if tableid in self.tables:
             table = self.tables[tableid]
@@ -326,7 +326,7 @@ class MJServer:
         """try to start the game"""
         return self._lookupTable(tableid).readyForGameStart(user)
 
-    def removeTable(self, table, reason, message=None, *args):
+    def removeTable(self, table, reason, message, *args):
         """remove a table"""
         assert reason in ('silent', 'tableRemoved', 'gameOver', 'abort')
         # HumanClient implements methods remote_tableRemoved etc.

@@ -113,7 +113,7 @@ class User(pb.Avatar, StrMixin):
 
     def perspective_leaveTable(self, tableid):
         """perspective_* methods are to be called remotely"""
-        return self.server.leaveTable(self, tableid)
+        return self.server.leaveTable(self, tableid, None)
 
     def perspective_newTable(
             self, ruleset, playOpen, autoPlay, wantedGame: str, tableId=None):
