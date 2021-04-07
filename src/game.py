@@ -740,7 +740,7 @@ class Game:
                         self.debug('   %s' % (line))
             for player2 in self.players:
                 if id(player1) != id(player2):
-                    if player1.wind == East or player2.wind == East:
+                    if East in (player1.wind, player2.wind):
                         efactor = 2
                     else:
                         efactor = 1
@@ -891,7 +891,7 @@ class PlayingGame(Game):
         else:
             host = None
 
-        if seed == 'proposed' or seed == host:
+        if seed in ('proposed', host):
             # we reserved the game id by writing a record with seed == host
             Game.saveStartTime(self)
 

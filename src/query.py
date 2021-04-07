@@ -198,7 +198,7 @@ class DBHandle(sqlite3.Connection):
     @staticmethod
     def hasTable(table):
         """does the table contain table?"""
-        return bool(len(Query('SELECT name FROM sqlite_master WHERE type="table" AND name="%s"' % table).records))
+        return len(Query('SELECT name FROM sqlite_master WHERE type="table" AND name="%s"' % table).records) > 0
 
     def tableHasField(self, table, field):
         """does the table contain a column named field?"""
