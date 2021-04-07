@@ -120,7 +120,7 @@ class Tile(str, StrMixin):
                 (result[0], result[1])):
             cls.cache[key] = result
 
-        existing = list([x for x in cls.cache.values() if x.key == result.key])
+        existing = list([x for x in cls.cache.values() if x.key == result.key]) # pylint: disable=consider-using-generator
         existingIds = {id(x) for x in existing}
         assert len(existingIds) == 1, 'new is:{} existing are: {} with ids {}'.format(result, existing, existingIds)
 

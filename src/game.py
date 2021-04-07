@@ -416,7 +416,7 @@ class Game:
 
     def __exchangeSeats(self):
         """execute seat exchanges according to the rules"""
-        winds = [x for x in self.shiftRules.split(',')[(self.roundsFinished - 1) % 4]]
+        winds = list(x for x in self.shiftRules.split(',')[(self.roundsFinished - 1) % 4])
         players = [self.players[Wind(x)] for x in winds]
         pairs = [players[x:x + 2] for x in range(0, len(winds), 2)]
         for playerA, playerB in self._mustExchangeSeats(pairs):

@@ -233,7 +233,7 @@ class Voice(StrMixin):
             group = Internal.kajonggrc.group('Locale')
             prefLanguages = uniqueList(
                 ':'.join(['local', str(group.readEntry('Language')), 'en_US']).split(':'))
-            prefLanguages = {x: y for x, y in enumerate(prefLanguages)}
+            prefLanguages = dict(enumerate(prefLanguages))
             result = sorted(
                 result, key=lambda x: prefLanguages.get(x.language(), 9999))
             if Debug.sound:

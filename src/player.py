@@ -599,7 +599,7 @@ class PlayingPlayer(Player):
                                (self, move.player, move.exposedMeld))
             if Debug.mahJongg:
                 game.debug('%s may say MJ:%s, active=%s' % (
-                    self, [x for x in game.players], game.activePlayer))
+                    self, list(x for x in game.players), game.activePlayer))
                 game.debug('  with hand {}'.format(hand))
             return MeldList(x for x in hand.melds if not x.isDeclared), withDiscard, hand.lastMeld
         return None
