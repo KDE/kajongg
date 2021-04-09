@@ -609,9 +609,9 @@ class MainWindow(KXmlGuiWindow):
             centralWidget.setAutoFillBackground(True)
 
     @afterQueuedAnimations
-    def tilesetNameChanged(  # pylint: disable=unused-argument
+    def tilesetNameChanged(
             self, unusedDeferredResult, unusedOldValue=None,
-            unusedNewValue=None, *unusedArgs):
+            unusedNewValue=None):
         """if the wanted tileset changed, apply the change now"""
         if self.centralView:
             with AnimationSpeed():
