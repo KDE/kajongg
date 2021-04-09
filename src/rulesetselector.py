@@ -282,40 +282,37 @@ class EditableRuleModel(RuleModel):
         # pylint:  disable=too-many-branches
         if not index.isValid():
             return False
-        try:
-            dirty = False
-            column = index.column()
-            item = index.internalPointer()
-            ruleset = item.ruleset()
-            content = item.rawContent
-            if role == Qt.EditRole:
-                if isinstance(content, Ruleset) and column == 0:
-                    oldName = content.name
-                    content.rename(english(value))
-                    dirty = oldName != content.name
-                elif isinstance(content, RuleBase):
-                    dirty, message = self.__setRuleData(column, content, value)
-                    if message:
-                        Sorry(message)
-                        return False
-                else:
+        dirty = False
+        column = index.column()
+        item = index.internalPointer()
+        ruleset = item.ruleset()
+        content = item.rawContent
+        if role == Qt.EditRole:
+            if isinstance(content, Ruleset) and column == 0:
+                oldName = content.name
+                content.rename(english(value))
+                dirty = oldName != content.name
+            elif isinstance(content, RuleBase):
+                dirty, message = self.__setRuleData(column, content, value)
+                if message:
+                    Sorry(message)
                     return False
-            elif role == Qt.CheckStateRole:
-                if isinstance(content, BoolRule) and column == 1:
-                    if not isinstance(ruleset, PredefinedRuleset):
-                        newValue = value == Qt.Checked
-                        if content.parameter != newValue:
-                            dirty = True
-                            content.parameter = newValue
-                else:
-                    return False
-            if dirty:
-                if isinstance(content, RuleBase):
-                    ruleset.updateRule(content)
-                self.dataChanged.emit(index, index)
-            return True
-        except BaseException:
-            return False
+            else:
+                return False
+        elif role == Qt.CheckStateRole:
+            if isinstance(content, BoolRule) and column == 1:
+                if not isinstance(ruleset, PredefinedRuleset):
+                    newValue = value == Qt.Checked
+                    if content.parameter != newValue:
+                        dirty = True
+                        content.parameter = newValue
+            else:
+                return False
+        if dirty:
+            if isinstance(content, RuleBase):
+                ruleset.updateRule(content)
+            self.dataChanged.emit(index, index)
+        return True
 
     def flags(self, index):  # pylint: disable=no-self-use
         """tell the view what it can do with this item"""

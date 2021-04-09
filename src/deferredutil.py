@@ -266,10 +266,7 @@ class DeferredBlock(StrMixin):
             if hasattr(result, 'traceback'):
                 traceBack = result.traceback
             else:
-                try:
-                    traceBack = result.getBriefTraceback()
-                except BaseException as exc:
-                    traceBack = 'twisted cannot give us a traceback:{}'.format(exc)
+                traceBack = result.getBriefTraceback()
             self.table.abort(
                 msg,
                 request.user.name,

@@ -353,7 +353,7 @@ class Voice(StrMixin):
                         (existingMd5sum, md5Name, self.__md5sum))
             try:
                 open(md5Name, 'w').write('%s\n' % self.__md5sum)
-            except BaseException as exception:
+            except OSError as exception:
                 logException(
                     '\n'.join([i18n('cannot write <filename>%1</filename>: %2',
                                     md5Name,
@@ -396,7 +396,7 @@ class Voice(StrMixin):
                 if len(line) == self.md5sumLength:
                     return line
                 logWarning('{} has wrong content: {}'.format(self.md5FileName(), line))
-            except BaseException as exc:
+            except OSError as exc:
                 logWarning('{} has wrong content: {}'.format(self.md5FileName(), exc))
         return None
 
