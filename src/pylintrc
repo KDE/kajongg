@@ -57,7 +57,7 @@ jobs=6
 # W0122 exec statement
 # E0211 method has no argument
 # disable=R0903,R0902,W0122
-disable=R0903,E0211,I0011,I0013,too-many-ancestors,no-member
+disable=R0903,E0211,I0011,I0013,too-many-ancestors,no-member,import-outside-toplevel
 
 
 [REPORTS]
