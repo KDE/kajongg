@@ -10,7 +10,6 @@ SPDX-License-Identifier: GPL-2.0
 # pylint: disable=wrong-import-order, wrong-import-position
 
 import sys
-import os
 import codecs
 from itertools import chain
 
@@ -18,10 +17,9 @@ import cgitb
 import tempfile
 import webbrowser
 import logging
-from signal import signal, SIGABRT, SIGINT, SIGTERM
 
 from log import logError, logDebug
-from common import Options, Internal, isAlive, Debug
+from common import Options, Internal, isAlive, Debug, handleSignals
 
 
 class MyHook(cgitb.Hook):
@@ -111,13 +109,7 @@ def cleanExit(*unusedArgs): # pylint: disable=unused-argument
         # sys.exit(0)
         MainWindow.aboutToQuit()
 
-signal(SIGABRT, cleanExit)
-signal(SIGINT, cleanExit)
-signal(SIGTERM, cleanExit)
-if os.name != 'nt':
-    from signal import SIGHUP, SIGQUIT
-    signal(SIGHUP, cleanExit)
-    signal(SIGQUIT, cleanExit)
+handleSignals(cleanExit)
 
 
 class MainWindow(KXmlGuiWindow):

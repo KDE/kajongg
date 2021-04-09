@@ -17,7 +17,6 @@ import sys
 import os
 import logging
 import datetime
-from signal import signal, SIGABRT, SIGINT, SIGTERM
 
 from zope.interface import implementer
 
@@ -45,14 +44,8 @@ def cleanExit(*unusedArgs): # pylint: disable=unused-argument
     except ReactorNotRunning:
         pass
 
-signal(SIGABRT, cleanExit)
-signal(SIGINT, cleanExit)
-signal(SIGTERM, cleanExit)
-if os.name != 'nt':
-    from signal import SIGHUP, SIGQUIT
-    signal(SIGHUP, cleanExit)
-    signal(SIGQUIT, cleanExit)
-
+from common import handleSignals
+handleSignals(cleanExit)
 
 from common import Options, Internal, Debug
 Internal.isServer = True

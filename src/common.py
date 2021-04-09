@@ -15,6 +15,7 @@ import shutil
 import logging
 import logging.handlers
 import socket
+from signal import signal, SIGABRT, SIGINT, SIGTERM
 
 from qt import QStandardPaths
 try:
@@ -137,6 +138,19 @@ def socketName():
     if Options.socket:
         return Options.socket
     return os.path.normpath('{}/socket{}'.format(serverDir, Internal.defaultPort))
+
+
+def handleSignals(handler):
+
+    """set up signal handling"""
+
+    signal(SIGABRT, handler)
+    signal(SIGINT, handler)
+    signal(SIGTERM, handler)
+    if os.name != 'nt':
+        from signal import SIGHUP, SIGQUIT
+        signal(SIGHUP, handler)
+        signal(SIGQUIT, handler)
 
 
 class Debug:
