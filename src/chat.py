@@ -45,6 +45,7 @@ class ChatModel(QAbstractTableModel):
     def rowCount(self, parent=None):
         """how many lines are in the model?"""
         if parent and parent.isValid():
+            # similar in tables.py
             # we have only top level items
             return 0
         return len(self.chatLines)

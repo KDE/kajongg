@@ -58,6 +58,7 @@ class GamesModel(QAbstractTableModel):
                 or column < 0
                 or row >= self.rowCount(parent)
                 or column >= self.columnCount(parent)):
+	    # similar in tree.py
             return QModelIndex()
         return self.createIndex(row, column, 0)
 

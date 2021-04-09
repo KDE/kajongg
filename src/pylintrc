@@ -265,7 +265,8 @@ defining-attr-methods=__init__,__new__,setUp,setupUi,setupActions,setupUILastTil
 min-similarity-lines=8
 
 # Ignore comments when computing similarities.
-ignore-comments=yes
+# this way I can locally disable this with a comment
+ignore-comments=no
 
 # Ignore docstrings when computing similarities.
 ignore-docstrings=yes
