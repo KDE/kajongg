@@ -583,11 +583,11 @@ class KConfigGroup:
         """calls readEntry and returns it as an int or raises an Exception."""
         try:
             return int(self.readEntry(name, default))
-        except Exception:
+        except Exception as _:
             raise Exception('cannot parse group {} in {}: {}={}'.format(
                 self.groupName, self.config().path, name,
                 self.readEntry(name, default)
-                ))
+                )) from _
 
 
 class KGlobal:
