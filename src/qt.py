@@ -116,5 +116,6 @@ from PyQt5.QtWidgets import QTreeView
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QValidator
+from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtSvg import QGraphicsSvgItem
 from PyQt5.QtSvg import QSvgRenderer
