@@ -155,7 +155,7 @@ class HandBoard(Board):
         without boni"""
         return [x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus]
 
-    def newLowerMelds(self):
+    def newLowerMelds(self):  # pylint: disable=no-self-use
         """a list of melds for the hand as it should look after sync"""
         return []
 

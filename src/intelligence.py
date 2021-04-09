@@ -30,7 +30,7 @@ class AIDefaultAI:
     @property
     def player(self):
         """hide weakref"""
-        return self._player() if self._player else None
+        return self._player() if self._player else None  # pylint: disable=not-callable
 
     def name(self):
         """return our name"""

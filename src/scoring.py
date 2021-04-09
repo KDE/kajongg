@@ -500,7 +500,7 @@ class ScoringGame(Game):
         self.throwDices()
 
     @Game.seed.getter
-    def seed(self):
+    def seed(self): # looks like a pylint bug pylint: disable=invalid-overridden-method
         """a scoring game never has a seed"""
         return None
 
