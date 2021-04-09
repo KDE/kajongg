@@ -643,6 +643,8 @@ def KIcon(name=None):  # pylint: disable=invalid-name
 
 class Action(QAction):
 
+    """helper for creation QAction"""
+
     def __init__(self, parent, name, icon, slot=None, shortcut=None, actionData=None):
         super().__init__(parent)
         if icon:

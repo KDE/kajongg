@@ -298,3 +298,5 @@ max-module-lines=1300
 # String used as indentation unit. This is usually " " (4 spaces) or "\t" (1
 # tab).
 indent-string='    '
+
+extension-pkg-whitelist=sip
