@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from common import Internal, ZValues, StrMixin, Speeds
+from common import Internal, ZValues, StrMixin, Speeds, DrawOnTopMixin
 from wind import Wind, East
 from qt import QPointF, QGraphicsObject, QFontMetrics
 from qt import QPen, QColor, QFont, Qt, QRectF
@@ -22,7 +22,7 @@ from animation import animate, afterQueuedAnimations, AnimationSpeed
 from animation import ParallelAnimationGroup, AnimatedMixin, animateAndDo
 
 
-class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
+class SideText(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
 
     """The text written on the wall"""
 
@@ -143,14 +143,6 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin):
                 txt = txt[:txt.rfind(' - ')] + ' - 55'
             self.__boundingRect = QRectF(QFontMetrics(self.__font).boundingRect(txt))
             self.needsRefresh = True
-
-    def setDrawingOrder(self):
-        """we want the text above all non moving tiles"""
-        if self.activeAnimation.get('pos'):
-            movingZ = ZValues.movingZ
-        else:
-            movingZ = 0
-        self.setZValue(ZValues.markerZ + movingZ)
 
     def paint(self, painter, unusedOption, unusedWidget=None):
         """paint the marker"""

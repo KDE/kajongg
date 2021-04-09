@@ -26,11 +26,11 @@ from util import stack, uniqueList
 from log import logDebug, logException
 from mi18n import i18n, i18nc
 from common import LIGHTSOURCES, Internal, Debug, isAlive, StrMixin
-from common import ZValues
+from common import DrawOnTopMixin
 from wind import Wind, East
 
 
-class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
+class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
 
     """a round wind tile"""
 
@@ -60,14 +60,6 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
             sideCenter.y() - self.boundingRect().height() / 2.0)
         scenePos = self.board.mapToScene(boardPos)
         return {'pos': scenePos, 'rotation': sceneRotation(self.board)}
-
-    def setDrawingOrder(self):
-        """we want the winds above all others"""
-        if self.activeAnimation.get('pos'):
-            movingZ = ZValues.movingZ
-        else:
-            movingZ = 0
-        self.setZValue(ZValues.markerZ + movingZ)
 
     @property
     def wind(self):

@@ -497,3 +497,16 @@ class Speeds:
     """some fixed animation speeds"""
     windMarker = 20
     sideText = 60
+
+
+class DrawOnTopMixin:
+
+    """The inheriting QGraphicsObject will draw itself above all non moving tiles"""
+
+    def setDrawingOrder(self):
+        """we want us above all non moving tiles"""
+        if self.activeAnimation.get('pos'):
+            movingZ = ZValues.movingZ
+        else:
+            movingZ = 0
+        self.setZValue(ZValues.markerZ + movingZ)
