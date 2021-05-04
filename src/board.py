@@ -400,9 +400,11 @@ class Board(QGraphicsRectItem, StrMixin):
         lightSourceIndex = (lightSourceIndex + sceneRotation(self) // 90) % 4
         return LIGHTSOURCES[lightSourceIndex]
 
-    def tileFacePos(self):
+    def tileFacePos(self, showShadows=None):
         """the face pos of a uiTile relative to its origin"""
-        if not Internal.Preferences.showShadows:
+        if showShadows is None:
+            showShadows = Internal.Preferences.showShadows
+        if not showShadows:
             return QPointF()
         lightSource = self.rotatedLightSource()
         xoffset = self.tileset.shadowWidth() - 1 if 'E' in lightSource else 0

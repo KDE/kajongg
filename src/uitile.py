@@ -154,18 +154,22 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
                 else self.tileset.faceSize)
         return self._boundingRect
 
-    def facePos(self):
+    def facePos(self, showShadows=None):
         """return the face position relative to the tile
         depend on tileset, lightSource and shadow"""
-        return self.board.tileFacePos()
+        if showShadows is None:
+            showShadows = Internal.Preferences.showShadows
+        return self.board.tileFacePos(showShadows)
 
     def showFace(self):
         """should we show face for this tile?"""
         return self.tile.isKnown
 
-    def __elementId(self):
+    def __elementId(self, showShadows=None):
         """return the SVG element id of the tile"""
-        if not Internal.Preferences.showShadows:
+        if showShadows is None:
+            showShadows = Internal.Preferences.showShadows
+        if not showShadows:
             return "TILE_2"
         lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
         return "TILE_{}".format(lightSourceIndex % 4 + 1)
@@ -227,11 +231,11 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         except ZeroDivisionError:
             xScale = 1
             yScale = 1
+        # draw the tile too far to the left/upper side such that its shadow is outside of the print region
         if not withBorders:
             painter.scale(*self.tileset.tileFaceRelation())
-            painter.translate(-self.facePos())
         renderer = self.tileset.renderer()
-        renderer.render(painter, self.__elementId())
+        renderer.render(painter, self.__elementId(showShadows=withBorders))
         painter.resetTransform()
         self._drawDarkness(painter)
         if self.showFace():
@@ -239,7 +243,8 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
             faceSize = QSize(
                 int(faceSize.width() * xScale),
                 int(faceSize.height() * yScale))
-            painter.translate(self.facePos())
+            painter.resetTransform()
+            painter.translate(self.facePos(withBorders))
             renderer.render(painter, self.tileset.svgName[self.tile.exposed],
                             QRectF(QPointF(), QSizeF(faceSize)))
         return result
