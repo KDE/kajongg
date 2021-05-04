@@ -131,7 +131,7 @@ class TablesModel(QAbstractTableModel):
                     result = i18n((table.myRuleset if table.myRuleset else table.ruleset).name)
                 elif role == Qt.ForegroundRole:
                     palette = KApplication.palette()
-                    color = palette.windowText() if table.myRuleset else 'red'
+                    color = palette.windowText().color() if table.myRuleset else 'red'
                     result = QColor(color)
         return result
 
