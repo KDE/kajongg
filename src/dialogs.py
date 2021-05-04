@@ -110,7 +110,6 @@ class DeferredDialog(Deferred):
     def __init__(self, dlg, modal=True, always=False):
         Deferred.__init__(self)
         self.dlg = dlg
-        self.defaultResult = dlg.returns()
         self.modal = modal
         self.always = always
         if Options.gui:
