@@ -190,7 +190,9 @@ class MainWindow(KXmlGuiWindow):
         self.centralView.setScene(value)
         self.adjustMainView()
         self.updateGUI()
-        self.actionChat.setEnabled(isinstance(value, PlayingScene))
+        canDemo = not value or isinstance(value, PlayingScene)
+        self.actionChat.setEnabled(canDemo)
+        self.actionAutoPlay.setEnabled(canDemo)
         self.actionExplain.setEnabled(value is not None)
         self.actionScoreTable.setEnabled(value is not None)
 
