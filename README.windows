@@ -20,9 +20,9 @@ in the windows guest:
 - put Python3.5/scripts and Python3.5/DLLs into PATH
 - pip3 install --upgrade pip
 - pip3 install cx_freeze
+- pip3 install pyqt
 - pip3 install twisted
 - pip3 install sip
-- pip3 install PyQt5
 - install pywin32 (right now pip does not offer a 32bit version for Python 3.5, download from sourceforge)
 - install Visual Studio 2015 Community Edition
 - setup a shared directory (visible for host and guest) "kajongg": a working copy of the git repository

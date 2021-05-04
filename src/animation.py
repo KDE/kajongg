@@ -14,7 +14,7 @@ from twisted.internet.defer import Deferred, succeed, fail
 
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve
-from qt import pyqtProperty, QGraphicsObject, QGraphicsItem
+from qt import Property, QGraphicsObject, QGraphicsItem
 
 from common import Internal, Debug, isAlive, StrMixin
 from log import logDebug, logException, id4
@@ -298,7 +298,7 @@ class AnimatedMixin:
         """setter for property pos"""
         QGraphicsObject.setPos(self, pos)
 
-    pos = pyqtProperty('QPointF', fget=_get_pos, fset=_set_pos)
+    pos = Property('QPointF', fget=_get_pos, fset=_set_pos)
 
     def _get_scale(self):
         """getter for property scale"""
@@ -308,7 +308,7 @@ class AnimatedMixin:
         """setter for property scale"""
         QGraphicsObject.setScale(self, scale)
 
-    scale = pyqtProperty(float, fget=_get_scale, fset=_set_scale)
+    scale = Property(float, fget=_get_scale, fset=_set_scale)
 
     def _get_rotation(self):
         """getter for property rotation"""
@@ -318,7 +318,7 @@ class AnimatedMixin:
         """setter for property rotation"""
         QGraphicsObject.setRotation(self, rotation)
 
-    rotation = pyqtProperty(float, fget=_get_rotation, fset=_set_rotation)
+    rotation = Property(float, fget=_get_rotation, fset=_set_rotation)
 
     def queuedAnimation(self, propertyName):
         """return the last queued animation for this graphics object and propertyName"""

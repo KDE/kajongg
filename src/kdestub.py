@@ -745,7 +745,7 @@ class ItemInt(KConfigSkeletonItem):
 class KConfigSkeleton(QObject):
 
     """handles preferences settings"""
-    configChanged = pyqtSignal()
+    configChanged = Signal()
 
     def __init__(self):
         QObject.__init__(self)

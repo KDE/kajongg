@@ -300,4 +300,4 @@ max-module-lines=1300
 # tab).
 indent-string='    '
 
-extension-pkg-whitelist=sip
+extension-pkg-whitelist=sip,PySide2
