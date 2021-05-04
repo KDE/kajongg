@@ -73,7 +73,6 @@ class Prompt(MustChooseKDialog, StrMixin):
     def __init__(self, msg, icon=QMessageBox.Information,
                  buttons=KDialog.Ok, caption=None, default=None):
         """buttons is button codes or-ed like KDialog.Ok | KDialog.Cancel. First one is default."""
-        MustChooseKDialog.__init__(self)
         if r'\n' in msg:
             print(r'*********************** Fix this! Prompt gets \n in', msg)
             msg = msg.replace(r'\n', '\n')
