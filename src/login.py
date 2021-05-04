@@ -498,6 +498,8 @@ class Connection:
 
     def __haveLoginData(self, arguments):
         """user entered login data, now try to login to server"""
+        if not Internal.autoPlay and self.dlg.result() == 0:
+            self._loginReallyFailed(Failure(CancelledError()))
         self.url, self.username, self.password, self.ruleset = arguments
         if self.url.isLocalHost:
             # we have localhost if we play a Local Game: client and server are identical,
