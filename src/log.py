@@ -270,7 +270,10 @@ class EventData(str):
             if hasattr(receiver, 'text'):
                 if receiver.__class__.__name__ != 'QAbstractSpinBox':
                     # accessing QAbstractSpinBox.text() gives a segfault
-                    msg += '(%s)' % receiver.text()
+                    try:
+                        msg += '(%s)' % receiver.text()
+                    except TypeError:
+                        msg += '(%s)' % receiver.text
             elif hasattr(receiver, 'objectName'):
                 msg += '(%s)' % receiver.objectName()
         else:
