@@ -29,7 +29,7 @@ from sound import Voice
 from wall import Wall
 from move import Move
 from player import Players, Player, PlayingPlayer
-from animation import animateAndDo, AnimationSpeed
+from animation import animateAndDo, AnimationSpeed, ParallelAnimationGroup
 
 if os.name != 'nt':
     import resource
@@ -349,6 +349,8 @@ class Game:
         """log off from the server and return a Deferred"""
         self.wall = None
         self.lastDiscard = None
+        if Options.gui:
+            ParallelAnimationGroup.cancelAll()
 
     def playerByName(self, playerName):
         """return None or the matching player"""

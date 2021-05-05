@@ -79,7 +79,7 @@ try:
     from scoringdialog import ScoreTable, ExplainView
     from humanclient import HumanClient
     from rulesetselector import RulesetSelector
-    from animation import afterQueuedAnimations, AnimationSpeed, ParallelAnimationGroup
+    from animation import afterQueuedAnimations, AnimationSpeed
     from chat import ChatWindow
     from scene import PlayingScene, ScoringScene
     from configdialog import ConfigDialog
@@ -344,8 +344,6 @@ class MainWindow(KXmlGuiWindow):
     def close(self, unusedResult=None):
         """wrap close() because we call it with a QTimer"""
         if isAlive(self):
-            if Options.gui:
-                ParallelAnimationGroup.cancelAll()
             return KXmlGuiWindow.close(self)
         return True  # is closed
 
