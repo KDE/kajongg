@@ -42,11 +42,13 @@ class StateSaver(QObject):
     def __restore(widget, name):
         """decode the saved string"""
         # pylint: disable=unsubscriptable-object
+        def canRestore(name,what):
+            return name.endswith(what) and hasattr(widget, 'restore' + what)
         state = QByteArray.fromHex(Internal.Preferences[name].encode())
         if state:
-            if name.endswith('State'):
+            if canRestore(name, 'State'):
                 widget.restoreState(state)
-            elif name.endswith('Geometry'):
+            elif canRestore(name, 'Geometry'):
                 widget.restoreGeometry(state)
             else:
                 # legacy
