@@ -55,15 +55,16 @@ def initRulesets():
 
 class CommandLineOption(QCommandLineOption):
     """add some helping attributes"""
-    def __init__(self, *args, optName=None, argType=None, singleshot=False):
-        QCommandLineOption.__init__(self, *args)
+    def __init__(self, name, description, valueName=None,
+        defaultValue=None, optName=None, argType=None, singleshot=False):
+        QCommandLineOption.__init__(self, [name], description, valueName, defaultValue)
         if argType is None:
-            if len(args) == 2:
+            if valueName is None:
                 argType = bool
             else:
                 argType = str
         self.argType = argType
-        self.optName = optName or args[0]
+        self.optName = optName or name
         self.singleshot = singleshot
 
 def defineOptions():
