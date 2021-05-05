@@ -19,14 +19,14 @@ class StateSaver(QObject):
 
     savers = {}
 
-    def __init__(self, *what):
+    def __init__(self, *widgets):
         QObject.__init__(self)
         pref = Internal.Preferences
-        if what[0] not in StateSaver.savers:
-            StateSaver.savers[what[0]] = self
-            what[0].installEventFilter(self)
+        if widgets[0] not in StateSaver.savers:
+            StateSaver.savers[widgets[0]] = self
+            widgets[0].installEventFilter(self)
         self.widgets = []
-        for widget in what:
+        for widget in widgets:
             name = self.__generateName(widget)
             self.widgets.append((name, widget))
             pref.addString('States', name + 'State')
