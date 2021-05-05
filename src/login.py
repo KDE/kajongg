@@ -276,7 +276,7 @@ class LoginDlg(QDialog):
         # Ubuntu 11.10 unity is a bit strange - without this, it sets focus on
         # the cancel button (which it shows on the left). I found no obvious
         # way to use setDefault and setAutoDefault for fixing this.
-        self.buttonBox.button(QDialogButtonBox.Ok).setFocus(True)
+        self.buttonBox.button(QDialogButtonBox.Ok).setFocus()
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
         vbox = QVBoxLayout(self)
