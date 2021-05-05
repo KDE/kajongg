@@ -153,6 +153,7 @@ if os.name == 'nt':
         # cx_freeze
         os.chdir(os.path.dirname(_))
 
+QGuiApplication.setAttribute(Qt.AA_ShareOpenGLContexts, True)
 Internal.app = KApplication()
 parseOptions()
 
