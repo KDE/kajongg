@@ -515,7 +515,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
 
     @staticmethod
     def selectLanguage():
-        """show an about dialog"""
+        """switch the language"""
         KSwitchLanguageDialog(Internal.mainWindow).exec_()
 
     @staticmethod
