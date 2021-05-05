@@ -470,7 +470,7 @@ class MainWindow(KXmlGuiWindow):
         if mainWindow:
             if Debug.quit:
                 logDebug('aboutToQuit starting')
-            if mainWindow.exitWaitTime > 1000.0 or Debug.quit:
+            if mainWindow.exitWaitTime is not None and mainWindow.exitWaitTime > 1000.0 or Debug.quit:
                 logDebug(
                     'reactor stopped after %d ms' %
                     (mainWindow.exitWaitTime))
