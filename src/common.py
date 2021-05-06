@@ -38,13 +38,19 @@ def isAlive(qobj):
     Up to supporting Pyside2, this function
     was taken from the book
     "Rapid GUI Programming with Python and Qt"
-    by Mark Summerfield but that does not work with Pyside2."""
+    by Mark Summerfield but that does not work with Pyside2.
+    Hopefully in the future isAlive can simply return True
+    unless --debug=isalive."""
     if qobj is None:
         return False
     if isinstance(qobj, QObject):
         try:
             qobj.children()
         except RuntimeError:
+            if Debug.isalive:
+                # hopefully isAlive can be discarded later on
+                print('qobj is NOT alive')
+                raise
             return False
     elif isinstance(qobj, QGraphicsItem):
         try:
@@ -196,6 +202,7 @@ class Debug:
     scoring = False
     wallSize = '0'
     i18n = False
+    isalive = False
 
     def __init__(self):
         raise Exception('Debug is not meant to be instantiated')
