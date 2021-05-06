@@ -1219,13 +1219,13 @@ class KConfigDialog(KDialog):
         self.iconList.addItem(item)
         self.tabSpace.addWidget(configTab)
         self.iconList.setIconSize(QSize(80, 80))
-        icons = [self.iconList.item(x) for x in range(len(self.iconList))]
+        icons = [self.iconList.item(x) for x in range(self.iconList.count())]
         neededIconWidth = max(self.iconList.visualItemRect(x).width()
                               for x in icons)
         margins = self.iconList.contentsMargins()
         neededIconWidth += margins.left() + margins.right()
         self.iconList.setFixedWidth(neededIconWidth)
-        self.iconList.setMinimumHeight(120 * len(self.iconList))
+        self.iconList.setMinimumHeight(120 * self.iconList.count())
         for child in self.allChildren(self):
             self.configWidgets[
                 child.objectName().replace('kcfg_', '')] = child
