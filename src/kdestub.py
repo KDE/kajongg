@@ -1308,13 +1308,12 @@ class ToolBarItem(QListWidgetItem):
     def __init__(self, action, parent):
         self.action = action
         self.parent = parent
-        QListWidgetItem.__init__(self, self.icon, self.text, parent)
+        QListWidgetItem.__init__(self, self.__icon(), self.__text(), parent)
         # drop between items, not onto items
         self.setFlags(
             (self.flags() | Qt.ItemIsDragEnabled) & ~Qt.ItemIsDropEnabled)
 
-    @property
-    def icon(self):
+    def __icon(self):
         """the action icon, default is an empty icon"""
         result = self.action.icon()
         if result.isNull():
@@ -1327,8 +1326,7 @@ class ToolBarItem(QListWidgetItem):
             result = self.emptyIcon
         return result
 
-    @property
-    def text(self):
+    def __text(self):
         """the action text"""
         return self.action.text().replace('&', '')
 
