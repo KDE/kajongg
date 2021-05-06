@@ -251,7 +251,7 @@ class Board(QGraphicsRectItem, StrMixin):
         if self._focusTile and self._focusTile.tile in Debug.focusable:
             logDebug('%s: new focus uiTile %s from %s' % (
                 self.name, self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
-        if self.hasFocus:
+        if self.hasLogicalFocus:
             self.scene().focusBoard = self
 
     def setEnabled(self, enabled):
@@ -268,14 +268,17 @@ class Board(QGraphicsRectItem, StrMixin):
         return sorted((x for x in self.uiTiles if x.focusable), key=lambda x: x.sortKey(sortDir))
 
     @property
-    def hasFocus(self):
+    def hasLogicalFocus(self):
         """defines if this board should show a focusRect
         if another board has focus, setting this to False does
-        not change scene.focusBoard"""
+        not change scene.focusBoard
+
+        Up to May 2021, this was called hasFocus, overriding QGraphicsItem.hasFocus
+        but pylint did not like that."""
         return self.scene() and self.scene().focusBoard == self and self._focusTile
 
-    @hasFocus.setter
-    def hasFocus(self, value):
+    @hasLogicalFocus.setter
+    def hasLogicalFocus(self, value):
         """set focus on this board"""
         if isAlive(self):
             scene = self.scene()
@@ -517,7 +520,7 @@ class Board(QGraphicsRectItem, StrMixin):
                 self.placeTile(uiTile)
                 uiTile.update()
             self.computeRect()
-            if self.hasFocus:
+            if self.hasLogicalFocus:
                 self.scene().focusBoard = self
 
     def focusRectWidth(self):  # pylint: disable=no-self-use
@@ -669,7 +672,7 @@ class SelectorBoard(CourtBoard):
             self.__placeAvailable(myTile)
             myTile.focusable = True
         senderHand.deselect(uiMeld)
-        (senderHand if senderHand.uiTiles else self).hasFocus = True
+        (senderHand if senderHand.uiTiles else self).hasLogicalFocus = True
         self._noPen()
         animate()
 
@@ -823,7 +826,7 @@ class FittingView(QGraphicsView):
             uiTile = board.mapMouseTile(tiles[0])
             if uiTile.focusable:
                 board.focusTile = uiTile
-                board.hasFocus = True
+                board.hasLogicalFocus = True
                 if hasattr(Internal.scene, 'clientDialog'):
                     if Internal.scene.clientDialog:
                         Internal.scene.clientDialog.buttons[0].setFocus()
@@ -941,7 +944,7 @@ class DiscardBoard(CourtBoard):
         uiTile.dark = False
         uiTile.focusable = False
         self.focusTile = uiTile
-        self.hasFocus = True
+        self.hasLogicalFocus = True
         self.lastDiscarded = uiTile
 
     def dropEvent(self, event):

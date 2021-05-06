@@ -342,7 +342,7 @@ class PlayingHandBoard(HandBoard):
         if focusCandidates:
             self.focusTile = focusCandidates[0]
         Internal.scene.handSelectorChanged(self)
-        self.hasFocus = bool(adding)
+        self.hasLogicalFocus = bool(adding)
 
     @Board.focusTile.setter
     def focusTile(self, uiTile):  # pylint: disable=arguments-differ

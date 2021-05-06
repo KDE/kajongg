@@ -244,7 +244,7 @@ class ScoringHandBoard(HandBoard):
         self.uiMelds.append(uiMeld)
         self.player.addMeld(uiMeld.meld)
         self.sync()
-        self.hasFocus = senderBoard == self or not senderBoard.uiTiles
+        self.hasLogicalFocus = senderBoard == self or not senderBoard.uiTiles
         self.checkTiles()
         senderBoard.autoSelectTile()
         senderBoard.checkTiles()
@@ -514,7 +514,7 @@ class ScoringGame(Game):
         if not self.finished():
             selector = Internal.scene.selectorBoard
             selector.refill()
-            selector.hasFocus = True
+            selector.hasLogicalFocus = True
             self.wall.build(shuffleFirst=False)
 
     def nextScoringHand(self):

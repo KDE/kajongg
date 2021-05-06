@@ -84,7 +84,7 @@ class FocusRect(QGraphicsRectItem, StrMixin):
             self.setPos(board.focusTile.pos)
         game = Internal.scene.game
         self.setVisible(board.isVisible() and bool(board.focusTile)
-                        and board.isEnabled() and board.hasFocus and bool(game) and not game.autoPlay)
+                        and board.isEnabled() and board.hasLogicalFocus and bool(game) and not game.autoPlay)
 
 
     def __str__(self):
@@ -455,7 +455,7 @@ class ScoringScene(GameScene):
     def __init__(self, parent=None):
         self.scoringDialog = None
         super().__init__(parent)
-        self.selectorBoard.hasFocus = True
+        self.selectorBoard.hasLogicalFocus = True
 
     @GameScene.game.setter
     def game(self, value):  # pylint: disable=arguments-differ
@@ -539,7 +539,7 @@ class ScoringScene(GameScene):
             currIdx = 0
             while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) - 2:
                 currIdx += 1
-            tabItems[currIdx + 1].hasFocus = True
+            tabItems[currIdx + 1].hasLogicalFocus = True
             return True
         return False
 

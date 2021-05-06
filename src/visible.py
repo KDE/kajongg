@@ -122,7 +122,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
     def getsFocus(self, unusedResults=None):
         """give this player focus on his handBoard"""
         self.handBoard.setEnabled(True)
-        self.handBoard.hasFocus = True
+        self.handBoard.hasLogicalFocus = True
 
     def popupMsg(self, msg):
         """shows a yellow message from player"""
