@@ -10,14 +10,6 @@ SPDX-License-Identifier: GPL-2.0
 # pylint: disable=unused-import, no-name-in-module
 
 from qtpy import uic
-try:
-    from qtpy.QtCore import PYQT_VERSION_STR
-except ImportError:
-    PYQT_VERSION_STR = 'Pyside PYQT_VERSION_STR: TODO'
-try:
-    from qtpy.QtCore import QT_VERSION_STR
-except ImportError:
-    QT_VERSION_STR = 'Pyside QT_VERSION_STR: TODO'
 from qtpy.QtCore import QAbstractAnimation
 from qtpy.QtCore import QAbstractItemModel
 from qtpy.QtCore import QAbstractTableModel

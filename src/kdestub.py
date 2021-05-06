@@ -23,11 +23,6 @@ import codecs
 import weakref
 from collections import defaultdict
 
-try:
-    from PyQt5 import sip
-except ImportError:
-    import sip
-
 # pylint: disable=wrong-import-order
 
 from configparser import ConfigParser, NoSectionError, NoOptionError
@@ -993,6 +988,18 @@ class AboutKajonggDialog(KDialog):
             from appversion import VERSION
         except ImportError:
             VERSION = "Unknown"
+
+        if os.environ['QT_API'].startswith('pyqt'):
+            # pylint: disable=no-name-in-module
+            from PyQt5.sip import SIP_VERSION_STR
+            from PyQt5.QtCore import PYQT_VERSION_STR
+            from PyQt5.QtCore import QT_VERSION_STR
+            qtVersion = 'Qt {} with PyQt5 {} sip {}'.format(QT_VERSION_STR, PYQT_VERSION_STR, SIP_VERSION_STR)
+        else:
+            import PySide2 as PySide
+            qtVersion = 'Qt {} with Pyside2 {} compiled with Qt {}'.format(
+                PySide.QtCore.qVersion(), PySide.__version__, PySide.QtCore.__version__)
+
         h1vLayout.addWidget(QLabel(i18n('Version: %1', VERSION)))
         h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
         authors = ((
@@ -1006,9 +1013,7 @@ class AboutKajonggDialog(KDialog):
             underVersions.append('KDE Frameworks %s' % versionsDict['KDE Frameworks'])
         except OSError:
             underVersions.append(i18n('KDE Frameworks (not installed or not usable)'))
-        underVersions.append('Qt %s' % QT_VERSION_STR)
-        underVersions.append('PyQt %s' % PYQT_VERSION_STR)
-        underVersions.append('sip %s' % sip.SIP_VERSION_STR)
+        underVersions.append(qtVersion)
         underVersions.append('Twisted %s' % __version__)
         underVersions.append(
             'Python {}.{}.{} {}'.format(*sys.version_info[:5]))
