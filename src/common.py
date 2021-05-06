@@ -17,15 +17,7 @@ import logging.handlers
 import socket
 from signal import signal, SIGABRT, SIGINT, SIGTERM
 
-from qt import QStandardPaths
-try:
-    from PyQt5.sip import unwrapinstance
-except ImportError:
-    try:
-        from sip import unwrapinstance
-    except ImportError:
-        def unwrapinstance(unused):
-            """if there is no sip, we have no Qt objects anyway"""
+from qt import QStandardPaths, QObject, QGraphicsItem
 
 # pylint: disable=invalid-name
 
@@ -43,17 +35,25 @@ LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
 def isAlive(qobj):
     """is the underlying C++ object still valid?
-    This function is taken from the book
+    Up to supporting Pyside2, this function
+    was taken from the book
     "Rapid GUI Programming with Python and Qt"
-    by Mark Summerfield."""
+    by Mark Summerfield but that does not work with Pyside2."""
     if qobj is None:
         return False
-    try:
-        unwrapinstance(qobj)
-    except RuntimeError:
-        return False
+    if isinstance(qobj, QObject):
+        try:
+            qobj.children()
+        except RuntimeError:
+            return False
+    elif isinstance(qobj, QGraphicsItem):
+        try:
+            qobj.parentItem
+        except RuntimeError:
+            return False
     else:
-        return True
+        print('isAlive(): qobj type is', type(qobj))
+    return True
 
 
 def serverAppdataDir():
