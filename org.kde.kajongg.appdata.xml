@@ -46,6 +46,7 @@
   <summary xml:lang="es">Juego de fichas Mahjong originario de China</summary>
   <summary xml:lang="et">Mahjongi klotsimäng Hiinast</summary>
   <summary xml:lang="eu">Mahjong Txinako fitxa-jokoa</summary>
+  <summary xml:lang="fi">Mahjongg-laattapeli Kiinasta</summary>
   <summary xml:lang="fr">Jeu de tuiles Mahjong originaire de Chine</summary>
   <summary xml:lang="gl">Xogo de teselas Mahjong da China</summary>
   <summary xml:lang="id">Permainan kartu mahjong dari China</summary>
@@ -114,6 +115,7 @@
       <caption xml:lang="es">Jugando a Kajongg</caption>
       <caption xml:lang="et">Kajonggi mängimine</caption>
       <caption xml:lang="eu">Kajongg jokatzea</caption>
+      <caption xml:lang="fi">Kajonggin pelaaminen</caption>
       <caption xml:lang="fr">En train de jouer à Kajongg</caption>
       <caption xml:lang="gl">Xogando a Kajongg</caption>
       <caption xml:lang="id">Memainkan Kajongg</caption>
