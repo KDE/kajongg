@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
 <!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
-  <!ENTITY kajongg  "<application>Kajongg</application>">
   <!ENTITY % English "INCLUDE" > <!-- change language only here -->
   <!ENTITY % addindex "IGNORE"> <!-- do not change this! -->
   <!ENTITY s1 "s1">
@@ -36,18 +35,14 @@
 <!--INPORTANT! - All other contributors: [to be determined] -->
 <authorgroup>
 <author>
-	<personname>
-		<firstname>Wolfgang</firstname>
-		<surname>Rohdewald</surname>
-	</personname>
-		<email>wolfgang@rohdewald.de</email>
+	&Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail;
 </author>
 <!-- TRANS:ROLES_OF_TRANSLATORS -->
 </authorgroup>
 <legalnotice>&FDLNotice;</legalnotice>
 
-<date>2017-01-20</date><!-- Date of (re)writing, or update.-->
-<releaseinfo>Applications 17.04</releaseinfo>
+<date>2021-05-30</date><!-- Date of (re)writing, or update.-->
+<releaseinfo>KDE Gear 21.04</releaseinfo>
 
 <!--Short description of this document. Do not change unless necessary!-->
 <abstract>
@@ -104,8 +99,7 @@
 			<listitem><para>
 				The Toolbar is located beneath the menubar and contains buttons for the most often used actions. The content of the Toolbar can be edited. You can also make it invisible, giving more room to the Board.
 			      </para><para>
-				Depending on the size of your screen you may want to make the toolbar invisible or to move it to the left side of the window. You can do that by right-clicking with the mouse
-				on the toolbar.
+				Depending on the size of your screen you may want to make the toolbar invisible or to move it to the left side of the window. You can do that by click with the &RMB; on the toolbar.
 			      </para></listitem>
 		</varlistentry>
 		<varlistentry>
@@ -149,13 +143,13 @@
 	</para>
         <itemizedlist>
             <listitem><para>
-                    From the menu, select <guimenu>Game</guimenu> / <guimenuitem>Score Manual Game</guimenuitem> or press <keycombo action="simul">&Ctrl;<keycap>C</keycap></keycombo>.
+                    From the menu, select <menuchoice><guimenu>Game</guimenu> <guimenuitem>Score Manual Game</guimenuitem></menuchoice> or press <keycombo action="simul">&Ctrl;<keycap>C</keycap></keycombo>.
             </para></listitem>
             <listitem><para>
                     Now you can either select an existing unfinished game or start a new game. If you start a new game, you will be asked for the players and the ruleset. &kajongg; will propose the same values used for the previous game. If there was no previous game, it will propose the first four defined players. Please note that you cannot change the ruleset or any of its rules after this selection. You can do that beforehand in <link linkend="ruleset-options">the ruleset editor</link>.
             </para></listitem>
             <listitem><para>
-                Now you get a new window titled "Enter the hand results". Read <link linkend="enterhand-tiles">Have &kajongg; compute the score</link> for a detailed description.
+                Now you get a new window titled <guilabel>Scoring for this Hand</guilabel>. Read <link linkend="enterhand-tiles">Have &kajongg; compute the score</link> for a detailed description.
             </para></listitem>
             <listitem><para>
                 After saving hand results, continue with the next hand.
@@ -185,7 +179,7 @@
 		After having entered all relevant data for a hand, press the button <guibutton>Save Hand</guibutton>. The hand values will be entered in the data base, and they are also shown in the score table. You might be prompted to change the seating positions of the players but you can choose not to change seats. The proposed changes are currently not customizable - if a ruleset needs something different, we will change that.
 	</para>
 	<para>
-		If the player might have won, the check box in the column "Winner" will be enabled - click this for the winner.
+		If the player might have won, the check box in the column <guilabel>Winner</guilabel> will be enabled - click this for the winner.
 	</para>
 	<para>
 		The status bar will now show the updated balances for the players, and you can continue with the next hand.
@@ -196,7 +190,7 @@
 		A good player will probably prefer to compute her score himself. In that case you can directly enter it. This is only possible when no tiles are selected for this player.
 	</para>
 	<para>
-		If you enter a manual score, it must already contain everything except penalties, you will have no optional rules to choose from. There is one exception: "Dangerous Game". This does not influence any scores, it is no offense either. It only means the payment between players is different: The offender pays all for all to the winner. The other two players do not exchange payments. This is currently not customizable.
+		If you enter a manual score, it must already contain everything except penalties, you will have no optional rules to choose from. There is one exception: <quote>Dangerous Game</quote>. This does not influence any scores, it is no offense either. It only means the payment between players is different: The offender pays all for all to the winner. The other two players do not exchange payments. This is currently not customizable.
 	</para>
 	</sect3>
 	<sect3 id="enterhand-tiles">
@@ -212,13 +206,13 @@
 		The keys <keycap>xX</keycap> move it back to the central selector. <keycap>ESWN</keycap> moves to the concealed row, <keycap>eswn</keycap> moves to the exposed row.
 		You can move the cursor between tiles or melds using the arrow keys, the currently selected tile or meld has a blue frame. Since the key arrows are far away from letters on the keyboard,
 		you can also use the letters <keycap>hjkl</keycap> or <keycap>HJKL</keycap> for moving the cursor. <keycap>hH</keycap> move left, <keycap>jJ</keycap> move down, <keycap>kK</keycap> move up,
-		<keycap>lL</keycap> move right. This is how the unix editor "vi" does it. The &kde; browser konqueror and even this help program also support those keys in the same way. Those keys may differ if you use a language other than English but it is currently not possible to configure them.
+		<keycap>lL</keycap> move right. This is how the unix editor <command>vi</command> does it. The &kde; browser &konqueror; and even this help program also support those keys in the same way. Those keys may differ if you use a language other than English but it is currently not possible to configure them.
 	</para>
 	<para>
-		The options "Last Tile" and "Last Meld" are needed by some rules like "last tile completes pair". They can only be used for the winner hand.
+		The options <guilabel>Last Tile:</guilabel> and <guilabel>Last Meld:</guilabel> are needed by some rules like <guilabel>Last tile completes pair</guilabel>. They can only be used for the winner hand.
 	</para>
 	<para>
-		In the right part of the window you can manually apply some rules. What rules appear in this list depends on the current ruleset and on the tiles. In the example of the above screen shot, the losing players might have an option "dangerous game" - again depending on the ruleset and on their tiles. It is the aim of the developers to keep this list of manually selectable rules as short as possible. Optimally &kajongg; should always be able to automatically determine whether a rule applies, but sometimes &kajongg; does not have enough information or knowledge to decide.
+		In the right part of the window you can manually apply some rules. What rules appear in this list depends on the current ruleset and on the tiles. In the example of the above screen shot, the losing players might have an option <quote>dangerous game</quote> - again depending on the ruleset and on their tiles. It is the aim of the developers to keep this list of manually selectable rules as short as possible. Optimally &kajongg; should always be able to automatically determine whether a rule applies, but sometimes &kajongg; does not have enough information or knowledge to decide.
 	</para>
 	</sect3>
 	</sect2>
@@ -235,7 +229,7 @@
 			</screenshot>
 	<para>
 	In the <link linkend="enterhand">window for entering hand results</link>, the <guibutton>Penalties</guibutton> button will bring up this window where you can enter penalties. This can be done at any point in time independent of the normal scoring mechanism.</para>
-	<para>The <guilabel>Offense</guilabel> selection shows all offenses that might be applicable to the hands the players hold. Choose among them.</para>
+	<para>The <guilabel>Offense:</guilabel> selection shows all offenses that might be applicable to the hands the players hold. Choose among them.</para>
 	<para>Now you can adapt the <guilabel>Total Penalty</guilabel>. This is the total sum that is moved from payers to payees. It will be evenly split between them.</para>
 	<para>Depending on the type of offense, the number of payers and payees varies. The right number of players is displayed. If you select a player, &kajongg; ensures that this player only occurs once by adapting the other players.
 	</para>
@@ -250,7 +244,7 @@
         <sect1 id="robotplay">
         <title>Play against the computer</title>
          <para>
-            First you will get a login dialog. Enter the game server you want to connect to and your user name. If you choose the special entry "Local Game",
+            First you will get a login dialog. Enter the game server you want to connect to and your user name. If you choose the special entry <guilabel>Local Game</guilabel>,
             you only need to enter your name (or accept the proposed name) and the wanted ruleset. This will immediately start a local game where you play
             against 3 robot players. However if suspended games exist, they will be displayed in a list. You can then select the game you want to continue with
 	    or start a new game.
@@ -281,10 +275,10 @@
 	   If you do not use <literal>kajongg.org</literal> or any other existing game server, you can start your own &kajongg;  game server in two different ways:
             <itemizedlist><listitem><para>
 	         connect to the server <literal>localhost</literal>. This is your own computer. If you do this and no game server is running, it will be started automatically. And when
-		 you stop playing, the server will be stopped too. This differs from selecting <literal>Local Game</literal>, the latter does not allow connections from other computers.
+		 you stop playing, the server will be stopped too. This differs from selecting <guilabel>Local Game</guilabel>, the latter does not allow connections from other computers.
             </para></listitem><listitem><para>
                 manually start a server on any computer you want. All you need to do is go to a command line and start
-            the program <literal>kajonggserver</literal>. Entering <literal>kajonggserver --help</literal>
+            the program <command>kajonggserver</command>. Entering <command>kajonggserver --help</command>
             will show you all available options like changing the default port. This server will run until you kill it.
             </para></listitem></itemizedlist>
         </para><para>
@@ -292,13 +286,13 @@
             listening on. This might be something like <literal>mypc.dyndns.org:8301</literal> where <literal>8301</literal> is the port. Of course you need to configure your firewall such that the remote
             player can reach that port. The communication will be encrypted.
 	    </para><para>
-	    For the port number, please see <guimenu>Help</guimenu> <guimenuitem>About Kajongg</guimenuitem>. The Protocol version is the port number. For &kajongg; 17.04 this is 8301.
+	    For the port number, please see <menuchoice><guimenu>Help</guimenu> <guimenuitem>About &kajongg;</guimenuitem></menuchoice>. The Protocol version is the port number. For &kajongg; 17.04 this is 8301.
 	    If the player enters no port for the wanted game server, the client computes the port in the same way.
 	    So if a computer runs several game servers with different protocol versions, you should normally reach the correct game server automatically.
 	    Anyway the game server and the client will make sure that their versions are compatible and warn you otherwise.
          </para><para>
-            If you encounter possible bugs, you might want to use the option <literal>kajongg --debug=traffic</literal>. This will show you, on the console where the game server has been started,
-            what messages are flowing between the game server and the clients. For more options, see <literal>kajongg --help</literal>
+            If you encounter possible bugs, you might want to use the option <command>kajongg --debug=traffic</command>. This will show you, on the console where the game server has been started,
+            what messages are flowing between the game server and the clients. For more options, see <command>kajongg --help</command>
         </para>
         <sect2 id="playing-caveats">
         <title>Caveats</title>
@@ -308,14 +302,14 @@
         </sect2>
         </sect1>
 <sect1  id="gamerules"><title>Game rules</title>
-<para>Worldwide, many different game variants exist. Currently, &kajongg; supports two variants of Classical Chinese, one as played in Germany and one as played in Great Britain. </para><para>
+<para>Worldwide, many different game variants exist. Currently, &kajongg; supports two variants of Classical Chinese, one as played in Germany and one as played in Great Britain.</para><para>
   This description does not go into details and as such matches both variants.</para><para>
   However most of the basic rules are the same in most variants.</para>
   <para>Since the program &kajongg; knows how to play, this description only contains things that might not be obvious.</para>
   <para>If you want to learn Mah Jong in more detail, please consult the <link linkend="bibliography">bibliography</link>.</para>
 <sect2 id="gamerules-aim">
   <title>The aim of the game</title>
-  <para>Each player tries to collect tiles such that she has a winning hand. On achieving this, she calls "Mah Jong". In a winning hand, the tiles are normally grouped into five melds: Four
+  <para>Each player tries to collect tiles such that she has a winning hand. On achieving this, she calls <quote>Mah Jong</quote>. In a winning hand, the tiles are normally grouped into five melds: Four
     melds with three or four tiles each and a fifth meld consisting of two equal tiles. A normal meld has three or four identical tiles (called Pung
     and Kong respectively) or three successive tiles like Bamboo 3, Bamboo 4, Bamboo 5 (called Chow).</para>
   </sect2>
@@ -367,7 +361,7 @@
             This timeout is configurable in the Ruleset Editor, under <guilabel>Options</guilabel>, <guilabel>Claim Timeout</guilabel>.
             All players should have the same timeout, that is why this is part of the ruleset.
           </para><para>
-            If you need to select a tile from your hand, you can move between tiles using the right and left arrow keys or the letters h and l on your keyboard. Of course you can use the mouse too.
+            If you need to select a tile from your hand, you can move between tiles using the &Right; and &Left; arrow keys or the letters <keycap>h</keycap> and <keycap>l</keycap> on your keyboard. Of course you can use the mouse too.
           </para><para>
 	    You can discard a tile by using the keyboard the same way as for all actions. Alternatively, you can use the mouse and move the tile from your hand into the
 	    discard area (the interior of the walls). The placement of the tile in the discard area will still be done by the computer - because the placement should be the same for
@@ -394,7 +388,7 @@
 					<guimenu>Game</guimenu>
 					<guimenuitem>Score Manual Game</guimenuitem>
 				</menuchoice></term>
-				<listitem><para><action>Only score a manually played game.</action></para><para>You can load an old game or start a new game. By default only pending (i.e. unfinished) games are shown in the selection list. You can optionally show all games including finished games. Here you can also delete games.</para></listitem>
+				<listitem><para><action>Only score a manually played game.</action></para><para>You can load an old game or start a new game. By default only pending (&ie; unfinished) games are shown in the selection list. You can optionally show all games including finished games. Here you can also delete games.</para></listitem>
 			</varlistentry>
                         <varlistentry  id="game-menu-play">
                                 <term><menuchoice>
@@ -402,7 +396,7 @@
                                         <guimenu>Game</guimenu>
                                         <guimenuitem>Play</guimenuitem>
                                 </menuchoice></term>
-                                <listitem><para><action>Play with others (people and computers)</action></para></listitem>
+                                <listitem><para><action>Play with others (people and computers)</action>.</para></listitem>
                         </varlistentry>
                         <varlistentry  id="game-menu-abort">
                                 <term><menuchoice>
@@ -442,13 +436,13 @@
 				Lets you chat with the other players.
 				</para></listitem>
 			</varlistentry>
-                        <varlistentry id="view-scoretable">
+			<varlistentry id="view-scoretable">
                                 <term><menuchoice>
 					<shortcut><keycombo action="simul">&Ctrl;<keycap>T</keycap></keycombo></shortcut>
                                         <guimenu>View</guimenu>
                                         <guimenuitem>Score Table</guimenuitem>
                                 </menuchoice></term>
-                                <listitem><para><action>Score Table</action>
+                                <listitem><para><action>Score Table</action></para>
                                 <screenshot>
                                         <screeninfo>Score Table</screeninfo>
                                         <mediaobject>
@@ -460,6 +454,7 @@
                                                 </textobject>
                                         </mediaobject>
                                 </screenshot>
+    <para>
 	Show the score table. Round/Hand are the current round (East, South, West, North) followed by a count of the hands played in that round.
 	The winner has a green background for her values.
 	The Payments show how much the player paid to or received from all other players with this hand.
@@ -562,7 +557,7 @@ of the &kde; Fundamentals.
 	</mediaobject>
 </screenshot>
 
-<para>The menu entry <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure &kajongg;...</guimenuitem></menuchoice> opens the <guilabel>Configure - &kajongg;</guilabel> dialog.</para>
+<para>The menu entry <menuchoice><guimenu>Settings</guimenu> <guimenuitem>Configure &kajongg;...</guimenuitem></menuchoice> opens the <guilabel>Configure - &kajongg;</guilabel> dialog.</para>
 <para>If you press the <guibutton>Cancel</guibutton> button  here, all of your configuration changes will be reverted, including everything you did with the ruleset editor.</para>
 <para>
   You can also select the different tabs with the keyboard: <keycombo action="simul">&Ctrl;<keycap>1</keycap></keycombo> selects
@@ -596,7 +591,7 @@ of the &kde; Fundamentals.
 					<guilabel>Show only possible actions</guilabel>
 				</term>
 				<listitem><para>
-				When playing, show only possible actions like "No claim" or "Pung".
+				When playing, show only possible actions like <quote>No claim</quote> or <quote>Pung</quote>.
 </para></listitem>
 			</varlistentry>
 			<varlistentry>
@@ -626,7 +621,7 @@ of the &kde; Fundamentals.
 			</varlistentry>
 			<varlistentry>
 				<term>
-					<guilabel>Animation speed</guilabel>
+					<guilabel>Animation speed:</guilabel>
 				</term>
 				<listitem><para>
 		Define how fast the tiles should move around. If you move the slider to the rightmost position, tile movement is not animated:
@@ -644,19 +639,19 @@ of the &kde; Fundamentals.
 		&kajongg; comes with voices for different players. It automatically assigns voices to players. For every language there should be
 		four voices, preferably two male and two female. &kajongg; tries to use voices in the same language &kajongg; runs in. If it
 		finds no voices in that language, &kajongg; will fallback to other languages, using the same fallback languages you defined for
-		&kajongg; (see <menuchoice><guimenu>Help</guimenu><guimenuitem>Switch Application Language</guimenuitem></menuchoice>). If no
+		&kajongg; (see <menuchoice><guimenu>Help</guimenu> <guimenuitem>Switch Application Language</guimenuitem></menuchoice>). If no
 		voice files exist yet for your language, you are invited to record and contribute them to &kajongg;.
 	</para>
 	<para>
 		</para><itemizedlist><listitem><para>
 		This is how you can generate voices yourself. There is a separate folder for every voice. Please note that those folders may
-		be somewhere else on your system, they depend on how KDE was installed. Only the part starting with <filename class="directory">kajongg</filename>
+		be somewhere else on your system, they depend on how &kde; was installed. Only the part starting with <filename class="directory">kajongg</filename>
 		is always the same. There are two groups of voices
 		with different places in the file system:
 		<itemizedlist><listitem><para>
 			Predefined voices for every language. They live in a folder like <filename class="directory">/usr/share/kajongg/voices/LANG</filename> where
 			LANG is the code for your language. The voice directories directly under <filename class="directory">.../kajongg/voices/</filename> are the US-english
-			versions. Predefined voices are randomly assigned to players. Those voices have names like <literal>"male1 male2 female1 female2"</literal> but those names do not matter, the user will never see them.
+			versions. Predefined voices are randomly assigned to players. Those voices have names like <quote><literal>male1 male2 female1 female2</literal></quote> but those names do not matter, the user will never see them.
 		</para></listitem><listitem><para>
 			User voices can be defined for a specific user.
 			If &kajongg; makes use of such a voice, it can automatically be transferred to other players
@@ -668,7 +663,7 @@ of the &kde; Fundamentals.
 		</para></listitem><listitem><para>
 		Now that you know where to place your new voice, generate a new folder for it.
 		</para></listitem><listitem><para>
-			In that subfolder, you can place the sound files. They have to be encoded with the <ulink url="http://xiph.org/vorbis/">Ogg Vorbis</ulink> audio compressor, the file names need to
+			In that subfolder, you can place the sound files. They have to be encoded with the <ulink url="https://xiph.org/vorbis/">Ogg Vorbis</ulink> audio compressor, the file names need to
 			have the extension <filename class="extension">.ogg</filename>.
 			A single file has a name like <filename>s3.ogg</filename> - this is Stone 3. You should define such files for all tiles and
 			for all claims and announcements. But if a sound file is missing, nothing bad happens - you just will not hear that sound. Fallback
@@ -686,17 +681,17 @@ of the &kde; Fundamentals.
 	<para>
 		This is just one possibility to create the sound files:
 	</para><para><itemizedlist><listitem><para>
-		Record a sound file with the program <command>qarecord</command>, save it in the <literal>WAV</literal> format.
+		Record a sound file with the program <command>qarecord</command>, save it in the <acronym>WAV</acronym> format.
 		In this single sound file, speak all of the sounds.
 	</para></listitem><listitem><para>
 		Edit that file with the sound editor <command>audacity</command>. In that editor, use the mouse to mark a range of the sound waves.
 		The editor will play that part. Repeat until you have the correct part selected.
-		This may be easier if you <menuchoice><guimenu>View</guimenu><guimenuitem>Zoom In</guimenuitem></menuchoice>.
-		Use the menu command <menuchoice><guimenu>File</guimenu><guimenuitem>Export Selection</guimenuitem></menuchoice> and save in the ogg format.
+		This may be easier if you <menuchoice><guimenu>View</guimenu> <guimenuitem>Zoom In</guimenuitem></menuchoice>.
+		Use the menu command <menuchoice><guimenu>File</guimenu> <guimenuitem>Export Selection</guimenuitem></menuchoice> and save in the <filename class="extension">.ogg</filename> format.
 		Under <guilabel>Options</guilabel>, choose low quality - this is sufficient and even
 		wanted because this reduces the time to transfer the sounds to the other players.
 	</para></listitem></itemizedlist></para>
-	<para>The following are the names of the files that you should generate. Always append <filename>.ogg</filename> to them:</para>
+	<para>The following are the names of the files that you should generate. Always append <filename class="extension">.ogg</filename> to them:</para>
 
 <table>
 <title>Sound file names</title>
@@ -819,7 +814,8 @@ of the &kde; Fundamentals.
 <sect1 id="default-keybindings">
 <title>Default Keybindings</title>
 
-<para>The menu entry <menuchoice><guimenu>Settings</guimenu><guimenuitem>Configure ...</guimenuitem></menuchoice> allows you to change the default keyboard bindings.</para>
+<!-- TODO: not yet implemented
+<para>The menu entry <menuchoice><guimenu>Settings</guimenu> <guimenuitem>Configure ...</guimenuitem></menuchoice> allows you to change the default keyboard bindings.</para> -->
 
 <para>
 The default shortcuts are as follows:
@@ -913,7 +909,7 @@ Enables or disables the Demo Mode.
 <term><keycombo action="simul">&Shift;<keycap>F1</keycap></keycombo></term>
 <listitem>
 <para>
-What's this? Help
+What's this? help.
 </para>
 </listitem>
 </varlistentry>
@@ -922,7 +918,7 @@ What's this? Help
 <term><keycombo action="simul">&Ctrl;&Shift;<keycap>F</keycap></keycombo></term>
 <listitem>
 <para>
-Full Screen Mode
+Full Screen Mode.
 </para>
 </listitem>
 </varlistentry>
@@ -956,7 +952,7 @@ Full Screen Mode
         </qandaentry>
         <qandaentry>
                  <question><para>Can I use the keyboard to assign tiles to players?</para></question>
-                 <answer><para>Yes. See  <link linkend="enterhand-tiles">Have &kajongg; compute the score</link></para></answer>
+                 <answer><para>Yes. See  <link linkend="enterhand-tiles">Have &kajongg; compute the score</link>.</para></answer>
         </qandaentry>
 <!--Please add more Q&As if needed-->
 
@@ -970,10 +966,10 @@ Full Screen Mode
 	</para>
 
 	<para>
-		Program Copyright &copy; 2009-2017 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Program Copyright &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail;
 	</para>
 	<para>
-		Documentation Copyright &copy; 2009-2017 <personname><firstname>Wolfgang</firstname><surname>Rohdewald</surname></personname> <email>wolfgang@rohdewald.de</email>
+		Documentation Copyright &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail;
 	</para>
 
 <!-- !!!do not change ANYTHING after this line!!!! -->
@@ -993,7 +989,7 @@ Full Screen Mode
 		<listitem><para>Mah-Jong by Gwyn Headley and Yvonne Seeley, 3rd edition, 2008, A &amp; C Black Publishers Ltd., London. This book is a very easy to use reference, concentrating
 		  on the rules as used in Great Britain, defined by the BMJA (The British Mah Jong Association).</para></listitem>
 		<listitem><para><ulink url="https://en.wikipedia.org/wiki/Mahjong"></ulink></para></listitem>
-		<listitem><para><ulink url="https://de.wikipedia.org/wiki/Mahjongg"></ulink></para></listitem>
+		<listitem><para><ulink url="https://de.wikipedia.org/wiki/Mah-Jongg"></ulink></para></listitem>
         </itemizedlist>
 </appendix>
 
@@ -1008,9 +1004,9 @@ For Windows: Please see <ulink url="https://www.linux-apps.com/p/1109453/"></uli
 <para>
 If you want to download the source and install manually:
 <itemizedlist>
-<listitem><para> <literal>git clone https://anongit.kde.org/kajongg.git</literal> </para></listitem>
+<listitem><para> <literal>git clone https://invent.kde.org/games/kajongg.git</literal> </para></listitem>
 <listitem><para> For Linux: <literal>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal> </para></listitem>
-<listitem><para> For Windows: Please read README.windows </para></listitem>
+<listitem><para> For Windows: Please read <filename>README.windows</filename></para></listitem>
 </itemizedlist>
 </para>
 <para>
@@ -1018,7 +1014,7 @@ Kajongg depends on those packages: (debian package names in parentheses)
 <itemizedlist>
 	<listitem><para>Python 3.5 or higher (python3)</para></listitem>
 	<listitem><para>Qt5.7 or higher (python3-pyqt5 and python3-pyqt5.qtsvg)</para></listitem>
-	<listitem><para>the python bindings for Qt5  (python3-pyqt5)</para></listitem>
+	<listitem><para>the python bindings for Qt5 (python3-pyqt5)</para></listitem>
         <listitem><para>the python twisted library 16.6.0 or higher (python3-twisted)</para></listitem>
         <listitem><para>sqlite3 (libsqlite3-0)</para></listitem>
 </itemizedlist>
