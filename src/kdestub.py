@@ -485,7 +485,7 @@ class KStandardAction:
 
         action = QAction(mainWindow)
         action.triggered.connect(slot)
-        action.setText(i18n('Configure &Kajongg'))
+        action.setText(i18n('Configure &Kajongg...'))
         action.setIcon(KIcon('configure'))
         action.setIconText(i18n('Configure'))
         actionCollection.addAction('options_configure', action)

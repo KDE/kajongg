@@ -493,7 +493,7 @@ class RulesetSelector(QWidget):
 
     def setupUi(self):
         """layout the window"""
-        decorateWindow(self, i18n('Customize rulesets'))
+        decorateWindow(self, i18nc("@title:window", "Customize rulesets"))
         self.setObjectName('Rulesets')
         hlayout = QHBoxLayout(self)
         v1layout = QVBoxLayout()

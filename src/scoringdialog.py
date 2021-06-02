@@ -572,7 +572,7 @@ class ExplainView(QListView):
     def __init__(self, scene):
         QListView.__init__(self)
         self.scene = scene
-        decorateWindow(self, i18n('Explain Scores').replace('&', ''))
+        decorateWindow(self, i18nc("@title:window", "Explain Scores").replace('&', ''))
         self.setGeometry(0, 0, 300, 400)
         self.model = QStringListModel()
         self.setModel(self.model)
@@ -808,7 +808,7 @@ class ScoringDialog(QWidget):
     def __init__(self, scene):
         QWidget.__init__(self)
         self.scene = scene
-        decorateWindow(self, i18n('Scoring for this Hand'))
+        decorateWindow(self, i18nc("@title:window", "Scoring for this Hand"))
         self.nameLabels = [None] * 4
         self.spValues = [None] * 4
         self.windLabels = [None] * 4

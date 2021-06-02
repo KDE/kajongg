@@ -127,7 +127,7 @@ class RulesetDiffer(QDialog):
         layout.addLayout(cmdLayout)
         self.setLayout(layout)
 
-        decorateWindow(self, i18n("Compare"))
+        decorateWindow(self, i18nc("@title:window", "Compare"))
         self.setObjectName('RulesetDiffer')
 
         self.cbRuleset1.currentIndexChanged.connect(self.leftRulesetChanged)

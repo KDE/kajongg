@@ -50,7 +50,7 @@ class SwapDialog(QMessageBox):
 
     def __init__(self, swappers):
         QMessageBox.__init__(self)
-        decorateWindow(self, i18n("Swap Seats"))
+        decorateWindow(self, i18nc("@title:window", "Swap Seats"))
         self.setText(
             i18n("By the rules, %1 and %2 should now exchange their seats. ",
                  swappers[0].name, swappers[1].name))
@@ -67,7 +67,7 @@ class SelectPlayers(SelectRuleset):
     def __init__(self):
         SelectRuleset.__init__(self)
         Players.load()
-        decorateWindow(self, i18n('Select four players'))
+        decorateWindow(self, i18nc("@title:window", "Select four players"))
         self.names = None
         self.nameWidgets = []
         for idx, wind in enumerate(Wind.all4):
