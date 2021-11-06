@@ -5,4 +5,4 @@ Dependencies:
 - 'on': ['@all']
   'require':
     'frameworks/extra-cmake-modules': '@stable'
-    'games/libkmahjongg' : '@latest'
+    'games/libkmahjongg': '@same'
