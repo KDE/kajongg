@@ -250,8 +250,8 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         if self.showFace():
             faceSize = self.tileset.faceSize.toSize()
             faceSize = QSize(
-                faceSize.width() * xScale,
-                faceSize.height() * yScale)
+                int(faceSize.width() * xScale),
+                int(faceSize.height() * yScale))
             painter.translate(self.facePos())
             renderer.render(painter, self.tileset.svgName[self.tile.exposed],
                             QRectF(QPointF(), QSizeF(faceSize)))

@@ -102,7 +102,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
         """paint the marker"""
         with Painter(painter):
             painter.setBrush(self.__brush)
-            size = Internal.scene.windTileset.faceSize.height()
+            size = int(Internal.scene.windTileset.faceSize.height())
             ellRect = QRectF(QPoint(), QPoint(size, size))
             painter.drawEllipse(ellRect)
             renderer = Internal.scene.windTileset.renderer()
@@ -112,7 +112,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin):
 
     def boundingRect(self): # pylint: disable=no-self-use
         """define the part of the tile we want to see"""
-        size = Internal.scene.windTileset.faceSize.height() * 1.1
+        size = int(Internal.scene.windTileset.faceSize.height() * 1.1)
         return QRectF(QPoint(), QPoint(size, size))
 
     def __str__(self):
@@ -878,11 +878,11 @@ class FittingView(QGraphicsView):
         tRect = uiTile.boundingRect()
         tRect = self.viewportTransform().mapRect(tRect)
         pmapSize = QSize(
-            tRect.width() * uiTile.scale,
-            tRect.height() * uiTile.scale)
+            int(tRect.width() * uiTile.scale),
+            int(tRect.height() * uiTile.scale))
         pMap = uiTile.pixmapFromSvg(pmapSize)
         drag.setPixmap(pMap)
-        drag.setHotSpot(QPoint(pMap.width() / 2, pMap.height() / 2))
+        drag.setHotSpot(QPoint(int(pMap.width() / 2), int(pMap.height() / 2)))
         return drag
 
 

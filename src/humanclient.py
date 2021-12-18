@@ -321,8 +321,8 @@ class ClientDialog(QDialog):
             idx if vertical else 0,
             idx if not vertical else 0)
 
-        geometry.setWidth(width)
-        geometry.setHeight(height)
+        geometry.setWidth(int(width))
+        geometry.setHeight(int(height))
         self.setGeometry(geometry)
 
     def showEvent(self, dummyEvent):
