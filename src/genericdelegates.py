@@ -64,7 +64,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
         text = index.model().data(index)
         self.document.setDefaultFont(option.font)
         self.document.setHtml(text)
-        return QSize(self.document.idealWidth() + 5,
+        return QSize(int(self.document.idealWidth()) + 5,
                      option.fontMetrics.height())
 
 

@@ -250,7 +250,7 @@ class QtReactor(posixbase.PosixReactorBase):
             timeout = 0
         else:
             timeout = self.timeout()
-        self._timer.setInterval(timeout * 1000)
+        self._timer.setInterval(int(timeout * 1000))
         self._timer.start()
 
     def runReturn(self, installSignalHandlers=True):
