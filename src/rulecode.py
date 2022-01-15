@@ -1282,7 +1282,8 @@ class BlessingOfHeaven(RuleCode):
             return False
         if hand.ownWind is not East:
             return False
-        assert hand.lastTile.isConcealed, '{}: Blessing of Heaven: last tile must be concealed'.format(hand)
+        assert not any(x.isExposed for x in hand.melds)
+        assert hand.lastTile is None, '{}: Blessing of Heaven: There can be no last tile'.format(hand)
         return True
 
     def selectable(hand):
