@@ -332,6 +332,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         if isAlive(self.handBoard):
             self.handBoard.setEnabled(True)
             self.handBoard.showMoveHelper()
+            self.handBoard.uiMelds = []
         self.manualRuleBoxes = []
 
     def explainHand(self):
