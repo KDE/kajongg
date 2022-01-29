@@ -42,6 +42,7 @@ from visible import VisiblePlayer
 from tables import SelectRuleset
 from uiwall import UIWall, SideText
 from guiutil import decorateWindow, BlockSignals, rotateCenter, sceneRotation
+from mi18n import i18nc
 
 
 class SwapDialog(QMessageBox):
