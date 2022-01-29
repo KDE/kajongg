@@ -867,6 +867,11 @@ class ScoringDialog(QWidget):
         pGrid.addWidget(self.lblLastMeld, 8, 0, 1, 2)
         pGrid.addWidget(self.cbLastMeld, 8, 2, 1, 2)
 
+        self.lblLastTile.setVisible(False)
+        self.cbLastTile.setVisible(False)
+        self.cbLastMeld.setVisible(False)
+        self.lblLastMeld.setVisible(False)
+
     def setupUiForPlayer(self, pGrid, idx):
         """setup UI elements for a player"""
         self.spValues[idx] = QSpinBox()
@@ -972,6 +977,10 @@ class ScoringDialog(QWidget):
                 self.wonBoxes[idx].setChecked(False)
         if newWinner:
             self.draw.setChecked(False)
+            self.lblLastTile.setVisible(True)
+            self.cbLastTile.setVisible(True)
+        self.lblLastMeld.setVisible(False)
+        self.cbLastMeld.setVisible(False)
         self.fillLastTileCombo()
         self.slotInputChanged()
 
@@ -990,10 +999,8 @@ class ScoringDialog(QWidget):
             newState = bool(self.game.winner.handBoard.uiTiles)
         except AttributeError:
             newState = False
-        self.lblLastTile.setEnabled(newState)
-        self.cbLastTile.setEnabled(newState)
-        self.lblLastMeld.setEnabled(newState)
-        self.cbLastMeld.setEnabled(newState)
+        self.lblLastTile.setVisible(newState)
+        self.cbLastTile.setVisible(newState)
         if self.game:
             for player in self.game.players:
                 player.refreshManualRules(self.sender())
@@ -1201,6 +1208,8 @@ class ScoringDialog(QWidget):
             if len(winnerMelds) == 1:
                 self.cbLastMeld.addItem(QIcon(), '', str(winnerMelds[0]))
                 self.cbLastMeld.setCurrentIndex(0)
+                self.lblLastMeld.setVisible(False)
+                self.cbLastMeld.setVisible(False)
                 return
             showCombo = True
             self.__fillLastMeldComboWith(winnerMelds, indexedMeld, lastTile)
