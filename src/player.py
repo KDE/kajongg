@@ -141,7 +141,7 @@ class Player(StrMixin):
         self.handCache = {}
         self.cacheHits = 0
         self.cacheMisses = 0
-        self.__lastSource = TileSource.East14th
+        self.__lastSource = TileSource.Unknown
         self.clearHand()
         self.handBoard = None
 
@@ -195,7 +195,7 @@ class Player(StrMixin):
         self.newHandContent = None
         self.originalCallingHand = None
         self.__lastTile = None
-        self.lastSource = TileSource.East14th
+        self.lastSource = TileSource.Unknown
         self.lastMeld = Meld()
         self.__mayWin = True
         self.__payment = 0

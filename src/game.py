@@ -25,6 +25,7 @@ from wind import Wind, East
 from query import Query
 from rule import Ruleset
 from tile import Tile, elements
+from tilesource import TileSource
 from sound import Voice
 from wall import Wall
 from move import Move
@@ -794,6 +795,7 @@ class PlayingGame(Game):
         self.defaultNameBrush = None
         Game.__init__(self, names, ruleset,
                       gameid, wantedGame=wantedGame, client=client)
+        self.players['E'].lastSource = TileSource.East14th
         self.playOpen = playOpen
         self.autoPlay = autoPlay
         myself = self.myself
