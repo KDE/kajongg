@@ -40,7 +40,6 @@ add_subdirectory( icons )
 
 set(SRCFILES
     src/permutations.py
-    src/about.py
     src/animation.py
     src/mjresource.py
     src/background.py
