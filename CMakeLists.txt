@@ -102,7 +102,8 @@ set(SRCFILES
     src/qt.py
     src/configdialog.py
     src/tilesource.py
-    src/util.py)
+    src/util.py
+    src/kajcsv.py)
 
 set(DATAFILES
     src/tilesetselector.ui
