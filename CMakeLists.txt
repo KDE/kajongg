@@ -21,7 +21,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules ${ECM_MODULE_PAT
 find_package(PythonInterp ${PYTHON_MIN_VERSION} REQUIRED)
 find_package(Twisted ${TWISTED_MIN_VERSION} REQUIRED)
 find_package(Qt5 ${QT_MIN_VERSION} REQUIRED NO_MODULE COMPONENTS Core Gui Svg Widgets)
-find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS Config DocTools)
+find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS Config DocTools I18n)
 
 include(FeatureSummary)
 include(KDEInstallDirs)
