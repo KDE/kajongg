@@ -133,4 +133,7 @@ install(FILES ${DATAFILES} DESTINATION ${KDE_INSTALL_DATADIR}/kajongg)
 install(FILES org.kde.kajongg.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 install(FILES org.kde.kajongg.appdata.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
 
+ki18n_install(po)
+kdoctools_install(po)
+
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
