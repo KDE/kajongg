@@ -173,13 +173,13 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             lastMeld)
         if withDiscard:
             # withDiscard is a Tile, we need the UITile
-            discardTile = Internal.scene.discardBoard.lastDiscarded
-            if discardTile.tile is not withDiscard:
+            discardedTile = Internal.scene.discardBoard.lastDiscarded
+            if discardedTile.tile is not withDiscard:
                 self.game.debug(
                     '%s is not %s' %
-                    (discardTile.tile, withDiscard))
+                    (discardedTile.tile, withDiscard))
                 assert False
-            self.syncHandBoard([discardTile])
+            self.syncHandBoard([discardedTile])
         else:
             # show concealed tiles
             self.syncHandBoard()

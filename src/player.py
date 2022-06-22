@@ -569,10 +569,10 @@ class PlayingPlayer(Player):
                     kongs.append(tileName.kong.exposedClaimed)
         if self.game.lastDiscard:
             # claiming a kong
-            discardTile = self.game.lastDiscard.concealed
-            if self._concealedTiles.count(discardTile) == 3:
+            discardedTile = self.game.lastDiscard.concealed
+            if self._concealedTiles.count(discardedTile) == 3:
                 # discard.kong.concealed is aAAa but we need AAAA
-                kongs.append(Meld(discardTile * 4))
+                kongs.append(Meld(discardedTile * 4))
         return kongs
 
     def __maySayChow(self, unusedMove):
