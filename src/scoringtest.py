@@ -705,11 +705,11 @@ class Blessing(Base):
     """blessing of heaven or earth"""
 
     def testMe(self):
-        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 b5b5 fn yn m1',
+        self.scoreTest('S4S5S6 RS1S2S3B6B6B7B7B8B8B5B5 fn yn m1',
                        [Win(limits=1), NoWin()])
-        self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 b5b5 fn yn m1',
+        self.scoreTest('S4S5S6 RS1S2S3B6B6B7B7B8B8B5B5 fn yn m1',
                        [Win(limits=1), NoWin()])
-        self.scoreTest('s4s5s6 RS1S1S1B6B6B6B8B8B8 b5b5 fn yn m1',
+        self.scoreTest('S4S5S6 RS1S1S1B6B6B6B8B8B8B5B5 fn yn m1',
                        Win(limits=1))
         self.scoreTest('s4s5s6 RS1S2S3B6B6B7B7B8B8 b5b5 fn yn m1 Ls4s4s5s6',
                        [Win(limits=1), NoWin()], myWind=West)
