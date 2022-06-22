@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 import weakref
 from collections import defaultdict
 
-from log import logException, logWarning
+from log import logException, logWarning, logDebug
 from mi18n import i18n, i18nc, i18nE
 from common import IntDict, Debug
 from common import StrMixin, Internal
@@ -713,6 +713,8 @@ class PlayingPlayer(Player):
 
     def robTileFrom(self, tile):
         """used for robbing the kong from this player"""
+        if Debug.robbingKong:
+            logDebug('robbed %s from %s' % (tile, self))
         assert tile.isConcealed
         tile = tile.exposed
         for meld in self._exposedMelds:
@@ -729,6 +731,8 @@ class PlayingPlayer(Player):
 
     def robsTile(self):
         """True if the player is robbing a tile"""
+        if Debug.robbingKong:
+            logDebug('%s robs a tiles' % self)
         self.lastSource = TileSource.RobbedKong
 
     def scoreMatchesServer(self, score):
