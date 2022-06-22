@@ -944,6 +944,12 @@ class DiscardBoard(CourtBoard):
         self.hasLogicalFocus = True
         self.lastDiscarded = uiTile
 
+    def claimDiscard(self):
+        """claim last discarded tile"""
+        result = self.lastDiscarded
+        self.lastDiscarded = None
+        return result
+
     def dropEvent(self, event):
         """drop a uiTile into the discard board
 

@@ -427,8 +427,7 @@ class Client(pb.Referenceable):
     def claimed(self, move):
         """somebody claimed a discarded tile"""
         if Internal.scene:
-            calledTileItem = Internal.scene.discardBoard.lastDiscarded
-            Internal.scene.discardBoard.lastDiscarded = None
+            calledTileItem = Internal.scene.discardBoard.claimDiscard()
             calledTile = calledTileItem.tile
         else:
             calledTileItem = None
