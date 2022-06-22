@@ -358,13 +358,13 @@ class Player(StrMixin):
             self.lastSource = TileSource.LivingWall
         return self.lastTile
 
-    def removeTile(self, tile):
+    def removeConcealedTile(self, tile):
         """remove from my tiles"""
         assert not tile.isBonus, tile
         try:
             self._concealedTiles.remove(tile)
         except ValueError as _:
-            raise ValueError('removeTile(%s): tile not in concealed %s' %
+            raise ValueError('removeConcealedTile(%s): tile not in concealed %s' %
                             (tile, ''.join(self._concealedTiles))) from _
         if tile is self.lastTile:
             self.lastTile = None

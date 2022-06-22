@@ -944,7 +944,7 @@ class PlayingGame(Game):
         if Internal.scene:
             player.handBoard.discard(tileName)
         self.lastDiscard = Tile(tileName)
-        player.removeTile(self.lastDiscard)
+        player.removeConcealedTile(self.lastDiscard)
         if any(tileName.exposed in x[0] for x in self.dangerousTiles):
             self.computeDangerous()
         else:

@@ -181,9 +181,9 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             # show concealed tiles
             self.syncHandBoard()
 
-    def removeTile(self, tile):
+    def removeConcealedTile(self, tile):
         """remove from my melds or tiles"""
-        PlayingPlayer.removeTile(self, tile)
+        PlayingPlayer.removeConcealedTile(self, tile)
         self.syncHandBoard()
 
     def makeTileKnown(self, tile):
