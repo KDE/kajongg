@@ -182,6 +182,11 @@ def __exceptionToString(exception):
         parts.append(exception.filename)
     return ' '.join(parts)
 
+def logSummary(summary, prio):
+    """log traceback summary"""
+    for line in summary.format():
+        if 'logException' not in line:
+            __logUnicodeMessage(prio, '  ' + line.strip())
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
@@ -191,13 +196,9 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     msg = translateServerMessage(msg)
     __logUnicodeMessage(prio, __enrichMessage(msg, withGamePrefix))
     if showStack:
-        if showStack is True:
-            lower = 2
-        else:
-            lower = -showStack - 3
-        for line in traceback.format_stack()[lower:-3]:
-            if 'logException' not in line:
-                __logUnicodeMessage(prio, '  ' + line.strip())
+        _ = traceback.walk_stack(None)
+        summary = traceback.StackSummary.extract(_, limit=3, capture_locals=True)
+        logSummary(summary, prio)
     if int(Debug.callers):
         __logUnicodeMessage(prio, callers(int(Debug.callers)))
     if showDialog and not Internal.isServer:
