@@ -14,14 +14,14 @@ from itertools import chain
 import weakref
 from hashlib import md5
 
-from log import dbgIndent, Fmt, fmt
+from log import dbgIndent
 from tile import Tile, TileList
 from tilesource import TileSource
 from meld import Meld, MeldList
 from rule import Score, UsedRule
 from common import Debug, StrMixin
 from intelligence import AIDefaultAI
-from util import callers
+from util import callers, Fmt, fmt
 from message import Message
 
 

@@ -10,8 +10,8 @@ SPDX-License-Identifier: GPL-2.0
 from qt import Qt, QRectF, QPointF, QSizeF, QSize
 from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor
 
-from util import stack
-from log import logException, logDebug, id4
+from util import stack, id4
+from log import logException, logDebug
 from guiutil import Painter, sceneRotation
 from common import LIGHTSOURCES, ZValues, Internal, Debug
 from common import StrMixin, isAlive

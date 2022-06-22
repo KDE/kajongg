@@ -9,10 +9,8 @@ SPDX-License-Identifier: GPL-2.0
 
 import logging
 import os
-import string
 
 from locale import getpreferredencoding
-from sys import _getframe
 
 # we must not import twisted or we need to change kajongg.py
 
@@ -24,81 +22,6 @@ from dialogs import Sorry, Information, NoPrompt
 
 
 SERVERMARK = '&&SERVER&&'
-
-
-class Fmt(string.Formatter):
-
-    """this formatter can parse {id(x)} and output a short ascii form for id"""
-    alphabet = string.ascii_uppercase + string.ascii_lowercase
-    base = len(alphabet)
-    formatter = None
-
-    @staticmethod
-    def num_encode(number, length=4):
-        """make a short unique ascii string out of number, truncate to length"""
-        result = []
-        while number and len(result) < length:
-            number, remainder = divmod(number, Fmt.base)
-            result.append(Fmt.alphabet[remainder])
-        return ''.join(reversed(result))
-
-    def get_value(self, key, args, kwargs):
-        if key.startswith('id(') and key.endswith(')'):
-            idpar = key[3:-1]
-            if idpar == 'self':
-                idpar = 'SELF'
-            if kwargs[idpar] is None:
-                return 'None'
-            if Debug.neutral:
-                return '....'
-            return Fmt.num_encode(id(kwargs[idpar]))
-        if key == 'self':
-            return kwargs['SELF']
-        return kwargs[key]
-
-Fmt.formatter = Fmt()
-
-def id4(obj):
-    """object id for debug messages"""
-    if obj is None:
-        return 'NONE'
-    try:
-        if hasattr(obj, 'uid'):
-            return obj.uid
-    except Exception:  # pylint: disable=broad-except
-        pass
-    return '.' if Debug.neutral else Fmt.num_encode(id(obj))
-
-def fmt(text, **kwargs):
-    """use the context dict for finding arguments.
-    For something like {self} output 'self:selfValue'"""
-    if '}' in text:
-        parts = []
-        for part in text.split('}'):
-            if '{' not in part:
-                parts.append(part)
-            else:
-                part2 = part.split('{')
-                if part2[1] == 'callers':
-                    if part2[0]:
-                        parts.append('%s:{%s}' % (part2[0], part2[1]))
-                    else:
-                        parts.append('{%s}' % part2[1])
-                else:
-                    showName = part2[1] + ':'
-                    if showName.startswith('_hide'):
-                        showName = ''
-                    if showName.startswith('self.'):
-                        showName = showName[5:]
-                    parts.append('%s%s{%s}' % (part2[0], showName, part2[1]))
-        text = ''.join(parts)
-    argdict = _getframe(1).f_locals
-    argdict.update(kwargs)
-    if 'self' in argdict:
-        # formatter.format will not accept 'self' as keyword
-        argdict['SELF'] = argdict['self']
-        del argdict['self']
-    return Fmt.formatter.format(text, **argdict)
 
 
 def translateServerMessage(msg):

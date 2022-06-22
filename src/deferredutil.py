@@ -14,7 +14,8 @@ import weakref
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
 
-from log import logInfo, logDebug, logException, id4
+from log import logInfo, logDebug, logException
+from util import id4
 from mi18n import i18nE
 from message import Message
 from common import Debug, StrMixin

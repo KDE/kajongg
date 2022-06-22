@@ -17,7 +17,8 @@ from qt import QPropertyAnimation, QParallelAnimationGroup, \
 from qt import Property, QGraphicsObject, QGraphicsItem, QPointF
 
 from common import Internal, Debug, isAlive, StrMixin
-from log import logDebug, logException, id4
+from log import logDebug, logException
+from util import id4
 
 
 class Animation(QPropertyAnimation, StrMixin):
