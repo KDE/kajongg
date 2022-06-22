@@ -273,7 +273,7 @@ class MJServer:
         """user joins table"""
         table = self._lookupTable(tableid)
         table.addUser(user)
-        block = DeferredBlock(table)
+        block = DeferredBlock(table, where='joinTable')
         block.tell(
             None,
             self.srvUsers,
@@ -307,7 +307,7 @@ class MJServer:
                 else:
                     table.delUser(user)
                     if self.srvUsers:
-                        block = DeferredBlock(table)
+                        block = DeferredBlock(table, where='leaveTable')
                         block.tell(
                             None,
                             self.srvUsers,

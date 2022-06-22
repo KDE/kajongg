@@ -120,12 +120,13 @@ class DeferredBlock(StrMixin):
     blocks = []
     blockWarned = False  # did we already warn about too many blocks?
 
-    def __init__(self, table, temp=False):
+    def __init__(self, table, temp=False, where=None):
         dummy, dummy, function, dummy = traceback.extract_stack()[-2]
         self.outstanding = 0
         self.calledBy = function
         if not temp:
             self.garbageCollection()
+        self.where = where
         self.table = table
         self.requests = []
         self.callbackMethod = None
@@ -237,7 +238,7 @@ class DeferredBlock(StrMixin):
             if Debug.deferredBlock:
                 self.debug('ANS', request.pretty())
             if hasattr(request.answer, 'notifyAction'):
-                block = DeferredBlock(self.table, temp=True)
+                block = DeferredBlock(self.table, temp=True, where='__gotAnswer')
                 receivers = request.answer.receivers(request)
                 if receivers:
                     block.tell(

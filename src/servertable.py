@@ -296,7 +296,7 @@ class ServerTable(Table, StrMixin):
             if not query.failure:
                 break
             gameid += random.randrange(1, 100)
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='proposeGameId')
         for player in self.game.players:
             if player.shouldSave and isinstance(self.remotes[player], User):
                 # do not ask robot players, they use the server data base
@@ -322,7 +322,7 @@ class ServerTable(Table, StrMixin):
         """ask clients if they are ready to start"""
         game = self.game
         game.saveStartTime()
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='initGame')
         for player in game.players:
             block.tellPlayer(
                 player, Message.ReadyForGameStart, tableid=self.tableid,
@@ -386,7 +386,7 @@ class ServerTable(Table, StrMixin):
             # no need to pass around voice data
             self.assignVoices()
             return
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='sendVoiceIds')
         for player in humanPlayers:
             remote = self.remotes[player]
             if remote.voiceId:
@@ -406,7 +406,7 @@ class ServerTable(Table, StrMixin):
         """collect voices of other players"""
         if not self.running:
             return
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='collectVoiceData')
         voiceDataRequests = []
         for request in requests:
             if request.answer == Message.ClientWantsVoiceData:
@@ -432,7 +432,7 @@ class ServerTable(Table, StrMixin):
     def sendVoiceData(self, requests, voiceDataRequests):
         """sends voice sounds to other human players"""
         self.processAnswers(requests)
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='sendVoiceData')
         for voiceDataRequester, voiceFor in voiceDataRequests:
             # this player requested sounds for voiceFor
             voice = voiceFor.voice
@@ -457,7 +457,7 @@ class ServerTable(Table, StrMixin):
         """now all human players have all voice data needed"""
         humanPlayers = [
             x for x in self.game.players if isinstance(self.remotes[x], User)]
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='assignVoices')
         block.tell(None, humanPlayers, Message.AssignVoices)
         block.callback(self.startHand)
 
@@ -472,7 +472,7 @@ class ServerTable(Table, StrMixin):
             self.endHand()
         else:
             self.game.lastDiscard = None
-            block = DeferredBlock(self)
+            block = DeferredBlock(self, where='pickTile')
             block.tellPlayer(
                 player,
                 Message.PickedTile,
@@ -511,13 +511,13 @@ class ServerTable(Table, StrMixin):
         mustPlayDangerous = player.mustPlayDangerous()
         violates = player.violatesOriginalCall(tile)
         self.game.hasDiscarded(player, tile)
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='clientDiscarded')
         block.tellAll(player, Message.Discard, tile=tile)
         block.callback(self._clientDiscarded2, msg, dangerousText, mustPlayDangerous, violates)
 
     def _clientDiscarded2(self, unusedResults, msg, dangerousText, mustPlayDangerous, violates):
         """client told us he discarded a tile. Continue, check for violating original call"""
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='_clientDiscarded2')
         player = msg.player
         if violates:
             if Debug.originalCall:
@@ -529,7 +529,7 @@ class ServerTable(Table, StrMixin):
 
     def _clientDiscarded3(self, unusedResults, msg, dangerousText, mustPlayDangerous):
         """client told us he discarded a tile. Continue, check for calling"""
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='_clientDiscarded3')
         player = msg.player
         if self.game.ruleset.mustDeclareCallingHand and not player.isCalling:
             if player.hand.callingHands:
@@ -539,7 +539,7 @@ class ServerTable(Table, StrMixin):
 
     def _clientDiscarded4(self, unusedResults, msg, dangerousText, mustPlayDangerous):
         """client told us he discarded a tile. Continue, check for dangerous game"""
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='_clientDiscarded4')
         player = msg.player
         if dangerousText:
             if mustPlayDangerous and not player.lastSource.isDiscarded:
@@ -574,7 +574,7 @@ class ServerTable(Table, StrMixin):
         msg.player.originalCall = True
         if Debug.originalCall:
             logDebug('server.clientMadeOriginalCall: %s' % msg.player)
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='clientMadeOriginalCall')
         block.tellAll(msg.player, Message.OriginalCall)
         block.callback(self._askForClaims, msg)
 
@@ -591,7 +591,7 @@ class ServerTable(Table, StrMixin):
         """the wall is now divided for all clients"""
         if not self.running:
             return
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='divided')
         for clientPlayer in self.game.players:
             for player in self.game.players:
                 if player == clientPlayer or self.game.playOpen:
@@ -609,7 +609,7 @@ class ServerTable(Table, StrMixin):
         if self.game.playOpen:
             self.saveHand()
         else:
-            block = DeferredBlock(self)
+            block = DeferredBlock(self, where='endHand')
             for player in self.game.players:
                 # there might be no winner, winner.others() would be wrong
                 if player != self.game.winner:
@@ -694,7 +694,7 @@ class ServerTable(Table, StrMixin):
             player.lastSource = TileSource.LivingWallDiscard
         player.exposeMeld(hasTiles, lastDiscard)
         self.game.lastDiscard = None
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='claimTile')
         if (nextMessage != Message.Kong
                 and self.game.dangerousFor(discardingPlayer, lastDiscard)
                 and discardingPlayer.playedDangerous):
@@ -767,7 +767,7 @@ class ServerTable(Table, StrMixin):
             msg = i18nE('%1 claiming MahJongg: This is not a winning hand: %2')
             self.abort(msg, player.name, player.hand.string)
             return
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='claimMahJongg')
         if robbedTheKong:
             block.tellAll(player, Message.RobbedTheKong, tile=withDiscard)
         if (player.lastSource is TileSource.LivingWallDiscard
@@ -871,14 +871,14 @@ class ServerTable(Table, StrMixin):
 
     def tellAll(self, player, command, callback=None, **kwargs):
         """tell something about player to all players"""
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='tellAll: Player {} command {} kwargs {}'.format(player, command, kwargs))
         block.tellAll(player, command, **kwargs)
         block.callback(callback)
         return block
 
     def tellOthers(self, player, command, callback=None, **kwargs):
         """tell something about player to all other players"""
-        block = DeferredBlock(self)
+        block = DeferredBlock(self, where='tellOthers')
         block.tellOthers(player, command, **kwargs)
         block.callback(callback)
         return block
