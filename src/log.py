@@ -62,8 +62,11 @@ def id4(obj):
     """object id for debug messages"""
     if obj is None:
         return 'NONE'
-    if hasattr(obj, 'uid'):
-        return obj.uid
+    try:
+        if hasattr(obj, 'uid'):
+            return obj.uid
+    except Exception:  # pylint: disable=broad-except
+        pass
     return '.' if Debug.neutral else Fmt.num_encode(id(obj))
 
 def fmt(text, **kwargs):
