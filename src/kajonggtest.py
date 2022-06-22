@@ -281,7 +281,13 @@ class Job(StrMixin):
         if result is not None:
             self.process = None
             if not silent:
-                print('       {} done{}'.format(self, 'Return code: {}'.format(result) if result else ''))
+                if result < 0:
+                    result = signal.Signals(-result).name
+                if result:
+                    result = ' with return {}'.format(result)
+                else:
+                    result = ''
+                print('       {} done{}'.format(self, result))
             self.server.jobs.remove(self)
 
     @property
