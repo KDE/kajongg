@@ -143,6 +143,11 @@ class ClassicalChinese(PredefinedRuleset):
             'Discard tiles ordered',
             'booldiscardTilesOrdered', parameter=False,
             description=i18n('Discard tiles ordered from top left'))
+        self.parameterRules.createRule(
+            'Leave holes for claimed discards',
+            'booldiscardTilesOrderedLeaveHole', parameter=True,
+            description=i18n(
+                'Only when discarding tiles ordered: Do not place the next discard where the claimed discard was'))
 
     def loadRules(self):
         """define the rules"""

@@ -917,6 +917,7 @@ class DiscardBoard(CourtBoard):
         CourtBoard.__init__(self, 11, 9)
         self.__places = None
         self.__lastDiscarded = None
+        self.__discardTilesOrderedLeaveHole = True
 
     @property
     def name(self):
@@ -936,6 +937,7 @@ class DiscardBoard(CourtBoard):
             self.__places.sort(key=lambda p: p[0] + p[1] * 1000)
         else:
             game.randomGenerator.shuffle(self.__places)
+        self.__discardTilesOrderedLeaveHole = game.ruleset.discardTilesOrderedLeaveHole
 
     def discardTile(self, uiTile):
         """add uiTile to the discard board"""
@@ -951,6 +953,8 @@ class DiscardBoard(CourtBoard):
         """claim last discarded tile"""
         result = self.__lastDiscarded
         self.__lastDiscarded = None
+        if not self.__discardTilesOrderedLeaveHole:
+            self.__places.insert(0, (result.xoffset, result.yoffset))
         return result
 
     def dropEvent(self, event):
