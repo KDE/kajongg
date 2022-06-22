@@ -115,14 +115,8 @@ class Tile(str, StrMixin):
         except ValueError:
             logException('%s is not a valid tile string' % result)
         result.isKnown = Tile.unknown is not None and result != Tile.unknown
-        for key in (
-                result, (str(result),), (result.group, result.value),
-                (result[0], result[1])):
-            cls.cache[key] = result
 
-        existing = list([x for x in cls.cache.values() if x.key == result.key]) # pylint: disable=consider-using-generator
-        existingIds = {id(x) for x in existing}
-        assert len(existingIds) == 1, 'new is:{} existing are: {} with ids {}'.format(result, existing, existingIds)
+        Tile._storeInCache(result)
 
         result.exposed = result.concealed = result.swapped = None
         result.single = result.pair = result.pung = None
@@ -157,6 +151,18 @@ class Tile(str, StrMixin):
                         1))
 
         return result
+
+    @classmethod
+    def _storeInCache(cls, result):
+        """Put the new tile into the cache"""
+        for key in (
+                result, (str(result),), (result.group, result.value),
+                (result[0], result[1])):
+            cls.cache[key] = result
+
+        existing = list([x for x in cls.cache.values() if x.key == result.key]) # pylint: disable=consider-using-generator
+        existingIds = {id(x) for x in existing}
+        assert len(existingIds) == 1, 'new is:{} existing are: {} with ids {}'.format(result, existing, existingIds)
 
     def __getitem__(self, index):
         if hasattr(self, '_fixed'):
