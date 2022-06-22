@@ -932,7 +932,10 @@ class DiscardBoard(CourtBoard):
         """precompute random positions"""
         self.__places = [(x, y) for x in range(self.width)
                          for y in range(self.height)]
-        game.randomGenerator.shuffle(self.__places)
+        if game.ruleset.discardTilesOrdered:
+            self.__places.sort(key=lambda p: p[0] + p[1] * 1000)
+        else:
+            game.randomGenerator.shuffle(self.__places)
 
     def discardTile(self, uiTile):
         """add uiTile to the discard board"""

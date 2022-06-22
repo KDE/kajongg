@@ -139,6 +139,10 @@ class ClassicalChinese(PredefinedRuleset):
         self.parameterRules.createRule(
             'Standard Rotation',
             'FStandardRotation||Orotate||Ointernal')
+        self.parameterRules.createRule(
+            'Discard tiles ordered',
+            'booldiscardTilesOrdered', parameter=False,
+            description=i18n('Discard tiles ordered from top left'))
 
     def loadRules(self):
         """define the rules"""
