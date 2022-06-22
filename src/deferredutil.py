@@ -394,7 +394,7 @@ class DeferredBlock(StrMixin):
             # messages are either identical for all 4 players
             # or identical for 3 players and different for 1 player. And
             # we want to capture each message exactly once.
-            self.table.game.appendMove(about, command, kwargs)
+            self.table.game.moves.append(Move(about, command, kwargs))
         localDeferreds = []
         for rec in self.__convertReceivers(receivers):
 

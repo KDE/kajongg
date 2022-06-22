@@ -28,7 +28,6 @@ from tile import Tile, elements
 from tilesource import TileSource
 from sound import Voice
 from wall import Wall
-from move import Move
 from player import Players, Player, PlayingPlayer
 from animation import animateAndDo, AnimationSpeed, ParallelAnimationGroup
 
@@ -779,6 +778,8 @@ class Game:
 class PlayingGame(Game):
     """this game is played using the computer"""
 
+    # pylint: disable=too-many-instance-attributes
+
     playerClass = PlayingPlayer
 
     def __init__(self, names, ruleset, gameid=None, wantedGame=None,
@@ -1051,7 +1052,3 @@ class PlayingGame(Game):
             msg = i18n('Short living wall: Tile is invisible, hence dangerous')
             self.dangerousTiles = [x for x in self.dangerousTiles if x[1] != msg]
             self.dangerousTiles.append((invisibleTiles, msg))
-
-    def appendMove(self, player, command, kwargs):
-        """append a Move object to self.moves"""
-        self.moves.append(Move(player, command, kwargs))
