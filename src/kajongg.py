@@ -90,7 +90,6 @@ def defineOptions():
     option('table', i18n('start new TABLE'), 'TABLE', '1', argType=int, singleshot=True)
     option('join', i18n('join TABLE'), 'TABLE', '1', argType=int, singleshot=True)
     option('ruleset', i18n('use RULESET without asking'), 'RULESET', '', optName='rulesetName')
-    option('rounds', i18n('play only ROUNDS rounds per game. Only for debugging!'), 'ROUNDS', '4', argType=int)
     option('player', i18n('prefer PLAYER for next login'), 'PLAYER', '')
     option('ai', i18n('use AI variant for human player in demo mode'), 'AI', '', optName='AI')
     option('csv', i18n('write statistics to CSV'), 'CSV', '')

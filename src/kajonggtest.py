@@ -256,8 +256,6 @@ class Job(StrMixin):
         if self.server.portNumber:
             cmd.append('--port={port}'.format(port=self.server.portNumber))
         cmd.insert(0, 'python{}'.format(self.pythonVersion))
-        if OPTIONS.rounds:
-            cmd.append('--rounds={rounds}'.format(rounds=OPTIONS.rounds))
         if self.aiVariant != 'DefaultAI':
             cmd.append('--ai={ai}'.format(ai=self.aiVariant))
         if OPTIONS.csv:
@@ -533,10 +531,6 @@ def parse_options() ->argparse.Namespace:
         '--ruleset', dest='rulesets', default='ALL',
         help='play like a robot using RULESET: comma separated list. If missing, test all rulesets',
         metavar='RULESET')
-    parser.add_argument(
-        '--rounds', dest='rounds',
-        help='play only # ROUNDS per game',
-        metavar='ROUNDS')
     parser.add_argument(
         '--ai', dest='aiVariants',
         default=None, help='use AI variants: comma separated list',
