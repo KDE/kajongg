@@ -65,8 +65,8 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
     def keyPressEvent(self, event):
         """redirect to the board"""
         if self is not self.board.focusTile:
-            logDebug('id4(self):%s, self:%s, focusTile:%s/%s' % \
-                (id4(self), self, id4(self.board.focusTile), self.board.focusTile))
+            logDebug('keyPressEvent %s on [%s]%s but focus is on [%s]%s' % \
+                (event, id4(self), self, id4(self.board.focusTile), self.board.focusTile))
         return self.board.keyPressEvent(event)
 
     def __lightDistance(self):

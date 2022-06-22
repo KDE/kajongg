@@ -732,7 +732,7 @@ class PlayingPlayer(Player):
     def robsTile(self):
         """True if the player is robbing a tile"""
         if Debug.robbingKong:
-            logDebug('%s robs a tiles' % self)
+            logDebug('%s robs a tile' % self)
         self.lastSource = TileSource.RobbedKong
 
     def scoreMatchesServer(self, score):
