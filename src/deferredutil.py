@@ -10,6 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 import traceback
 import datetime
 import weakref
+import gc
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
@@ -183,6 +184,9 @@ class DeferredBlock(StrMixin):
             logDebug(
                 'We have %d DeferredBlocks, they must be leaking' %
                 len(DeferredBlock.blocks))
+            for _ in (id4(x) for x in gc.get_objects() if x.__class__.__name__ == 'DeferredBlock'):
+                print('DeferredBlock {} left, allocated by {}'.format(_, _.where))
+
 
     def __addRequest(self, deferred, user, about):
         """add deferred for user to this block"""
