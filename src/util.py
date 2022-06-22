@@ -158,17 +158,21 @@ class Duration:
                     raise UserWarning(msg)
                 print(msg)
 
-
-def checkMemory():
-    """as the name says"""
-    if not Debug.gc:
-        return
+def __debugCollect():
+    """collect using DEBUG_LEAK"""
     gc.set_threshold(0)
     gc.set_debug(gc.DEBUG_LEAK)
     gc.enable()
     print('collecting {{{')
     gc.collect()        # we want to eliminate all output
     print('}}} done')
+
+def checkMemory():
+    """as the name says"""
+    if not Debug.gc:
+        return
+
+    __debugCollect()
 
     # code like this may help to find specific things
     if True: # pylint: disable=using-constant-test
