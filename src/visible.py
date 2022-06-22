@@ -149,10 +149,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         hbTiles = self.handBoard.uiTiles
         lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
         lastDiscard.tile = lastDiscard.tile.concealed
-        Internal.scene.discardBoard.lastDiscarded = lastDiscard
-        # remove from board of robbed player, otherwise syncHandBoard would
-        # not fix display for the robbed player
-        lastDiscard.setBoard(None)
+        Internal.scene.discardBoard.discardTile(lastDiscard)
         assert lastDiscard.tile.isConcealed
         self.syncHandBoard()
 
@@ -173,7 +170,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             lastMeld)
         if withDiscard:
             # withDiscard is a Tile, we need the UITile
-            discardedTile = Internal.scene.discardBoard.lastDiscarded
+            discardedTile = Internal.scene.discardBoard.claimDiscard()
             if discardedTile.tile is not withDiscard:
                 self.game.debug(
                     '%s is not %s' %

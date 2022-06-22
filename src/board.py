@@ -916,7 +916,7 @@ class DiscardBoard(CourtBoard):
     def __init__(self):
         CourtBoard.__init__(self, 11, 9)
         self.__places = None
-        self.lastDiscarded = None
+        self.__lastDiscarded = None
 
     @property
     def name(self):
@@ -925,7 +925,7 @@ class DiscardBoard(CourtBoard):
 
     def hide(self):
         """remove all uiTile references so they can be garbage collected"""
-        self.lastDiscarded = None
+        self.__lastDiscarded = None
         CourtBoard.hide(self)
 
     def setRandomPlaces(self, game):
@@ -942,12 +942,12 @@ class DiscardBoard(CourtBoard):
         uiTile.focusable = False
         self.focusTile = uiTile
         self.hasLogicalFocus = True
-        self.lastDiscarded = uiTile
+        self.__lastDiscarded = uiTile
 
     def claimDiscard(self):
         """claim last discarded tile"""
-        result = self.lastDiscarded
-        self.lastDiscarded = None
+        result = self.__lastDiscarded
+        self.__lastDiscarded = None
         return result
 
     def dropEvent(self, event):
