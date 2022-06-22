@@ -428,8 +428,8 @@ class Client(pb.Referenceable):
         """somebody claimed a discarded tile"""
         if Internal.scene:
             calledTileItem = Internal.scene.discardBoard.lastDiscarded
-            calledTile = calledTileItem.tile
             Internal.scene.discardBoard.lastDiscarded = None
+            calledTile = calledTileItem.tile
         else:
             calledTileItem = None
             calledTile = self.game.lastDiscard
