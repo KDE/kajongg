@@ -360,14 +360,12 @@ class Player(StrMixin):
 
     def removeTile(self, tile):
         """remove from my tiles"""
-        if tile.isBonus:
-            self._bonusTiles.remove(tile)
-        else:
-            try:
-                self._concealedTiles.remove(tile)
-            except ValueError as _:
-                raise ValueError('removeTile(%s): tile not in concealed %s' %
-                                (tile, ''.join(self._concealedTiles))) from _
+        assert not tile.isBonus, tile
+        try:
+            self._concealedTiles.remove(tile)
+        except ValueError as _:
+            raise ValueError('removeTile(%s): tile not in concealed %s' %
+                            (tile, ''.join(self._concealedTiles))) from _
         if tile is self.lastTile:
             self.lastTile = None
         self._hand = None
