@@ -928,11 +928,11 @@ class DiscardBoard(CourtBoard):
         self.lastDiscarded = None
         CourtBoard.hide(self)
 
-    def setRandomPlaces(self, randomGenerator):
+    def setRandomPlaces(self, game):
         """precompute random positions"""
         self.__places = [(x, y) for x in range(self.width)
                          for y in range(self.height)]
-        randomGenerator.shuffle(self.__places)
+        game.randomGenerator.shuffle(self.__places)
 
     def discardTile(self, uiTile):
         """add uiTile to the discard board"""

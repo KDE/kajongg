@@ -518,7 +518,7 @@ class MessageInitHand(ServerMessage):
                 i18n(
                     'Kajongg <numid>%1</numid>',
                     client.game.handId.seed))
-            scene.discardBoard.setRandomPlaces(client.game.randomGenerator)
+            scene.discardBoard.setRandomPlaces(client.game)
         client.game.initHand()
 
 
