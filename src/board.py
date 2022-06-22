@@ -935,7 +935,7 @@ class DiscardBoard(CourtBoard):
         randomGenerator.shuffle(self.__places)
 
     def discardTile(self, uiTile):
-        """add uiTile to a random position"""
+        """add uiTile to the discard board"""
         assert isinstance(uiTile, UITile)
         uiTile.setBoard(self, *self.__places.pop(0))
         uiTile.dark = False
@@ -945,7 +945,9 @@ class DiscardBoard(CourtBoard):
         self.lastDiscarded = uiTile
 
     def dropEvent(self, event):
-        """drop a uiTile into the discard board"""
+        """drop a uiTile into the discard board
+
+        The user uses the mouse for discarding a tile"""
         uiTile = event.mimeData().uiTile
         assert isinstance(uiTile, UITile), uiTile
         uiTile.setPos(event.scenePos() - uiTile.boundingRect().center())
