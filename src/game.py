@@ -931,21 +931,21 @@ class PlayingGame(Game):
                              player.name, result, player.concealedTiles))
         return result
 
-    def hasDiscarded(self, player, tileName):
+    def hasDiscarded(self, player, tile):
         """discards a tile from a player board"""
-        assert isinstance(tileName, Tile)
+        assert isinstance(tile, Tile)
         if player != self.activePlayer:
             raise ValueError('Player %s discards but %s is active' % (
                 player, self.activePlayer))
-        self.discardedTiles[tileName.exposed] += 1
-        player.discarded.append(tileName)
-        self._concealedTileName(tileName)
+        self.discardedTiles[tile.exposed] += 1
+        player.discarded.append(tile)
+        self._concealedTileName(tile)
         # the above has side effect, needs to be called
         if Internal.scene:
-            player.handBoard.discard(tileName)
-        self.lastDiscard = Tile(tileName)
+            player.handBoard.discard(tile)
+        self.lastDiscard = tile
         player.removeConcealedTile(self.lastDiscard)
-        if any(tileName.exposed in x[0] for x in self.dangerousTiles):
+        if any(tile.exposed in x[0] for x in self.dangerousTiles):
             self.computeDangerous()
         else:
             self._endWallDangerous()
