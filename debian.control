@@ -8,7 +8,7 @@ Architecture: all
 Depends: python (>= 3.5.0), python-twisted-core (>= 16.6.0), python3-qtpy(>= 1.9.0), libsqlite3-0 (>= 3.5.0), libqt4-sql-sqlite (>= 4.6), python-qt4-sql (>= 4.6), kdegames-mahjongg-data, vorbis-tools
 Recommends: sox
 Replaces: kmj
-Homepage: https://kde.org/applications/games/org.kde.kajongg
+Homepage: https://apps.kde.org/kajongg
 Description: The classical game of Mah Jongg
   This is the classical Mah Jongg for four players.
   .

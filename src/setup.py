@@ -20,7 +20,7 @@ Usage: see ../README.windows
 # ==== adapt this part =====
 FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
 LICENSE = 'GNU General Public License v2'
-URL = "https://kde.org/applications/games/org.kde.kajongg"
+URL = "https://apps.kde.org/kajongg"
 try:
     from appversion import VERSION
 except ImportError:

@@ -1047,7 +1047,7 @@ class AboutKajonggDialog(KDialog):
                      "use the application kmahjongg."),
                 "(C) 2008-2017 Wolfgang Rohdewald",
                 '<a href="{link}">{link}</a>'.format(
-                    link='http://kde.org/applications/games/kajongg/')]))
+                    link='https://apps.kde.org/kajongg')]))
         licenseLabel = QLabel()
         licenseLabel.setText(
             '<a href="file://{link}">GNU General Public License Version 2</a>'.format(

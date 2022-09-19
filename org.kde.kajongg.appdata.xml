@@ -107,6 +107,7 @@
     <p xml:lang="x-test">xxKajongg is the ancient Chinese board game for 4 players. Kajongg can be used in two different ways: Scoring a manual game where you play as always and use Kajongg for the computation of scores and for bookkeeping. Or you can use Kajongg to play against any combination of other human players or computer players.xx</p>
     <p xml:lang="zh-TW">Kajongg 是傳統的四人玩的中國式麻將遊戲。Kajongg 有兩種模式進行遊戲：手動記分或是讓  Kajongg 記分。您也可以用 Kajongg 來對抗其他人類或電腦玩家。</p>
   </description>
+  <url type="homepage">https://apps.kde.org/kajongg</url>
   <url type="bugtracker">https://bugs.kde.org/enter_bug.cgi?format=guided&amp;product=kajongg</url>
   <url type="help">https://docs.kde.org/?application=kajongg</url>
   <url type="donation">https://www.kde.org/community/donations/?app=kajongg&amp;source=appdata</url>
