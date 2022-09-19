@@ -147,6 +147,7 @@
     </screenshot>
   </screenshots>
   <project_group>KDE</project_group>
+  <launchable type="desktop-id">org.kde.kajongg.desktop</launchable>
   <provides>
     <binary>kajongg</binary>
   </provides>
