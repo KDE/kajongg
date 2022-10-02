@@ -1,0 +1,1649 @@
+<?xml version="1.0" ?>
+<!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Catalan  "INCLUDE"
+> <!-- change language only here -->
+  <!ENTITY % addindex "IGNORE"
+> <!-- do not change this! -->
+  <!ENTITY s1 "s1">
+  <!ENTITY s9 "s9">
+  <!ENTITY b1 "b1">
+  <!ENTITY b9 "b9">
+  <!ENTITY c1 "c1">
+  <!ENTITY c9 "c9">
+  <!ENTITY we "we">
+  <!ENTITY ws "ws">
+  <!ENTITY ww "ww">
+  <!ENTITY wn "wn">
+  <!ENTITY db "db">
+  <!ENTITY dr "dr">
+  <!ENTITY dg "dg">
+  <!ENTITY chow "chow">
+  <!ENTITY pung "pung">
+  <!ENTITY kong "kong">
+  <!ENTITY mahjongg "mahjongg">
+  <!ENTITY originalcall "originalcall">
+  <!ENTITY violatesoriginalcall "violatesoriginalcall">
+  <!ENTITY dangerousgame "dangerousgame">
+  <!ENTITY nochoice "nochoice">
+]>
+
+<!-- TODO: describe the window with the list of tables -->
+
+<book id="kajongg" lang="&language;"
+> <!-- do not change this! -->
+<bookinfo>
+	<title
+>El manual del &kajongg;</title
+> <!-- This is the title of this docbook. -->
+<!-- List of immidiate authors begins here. -->
+<!--INPORTANT! - All other contributors: [to be determined] -->
+<authorgroup>
+<author
+>&Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </author>
+&traductor.Antoni.Bella; 
+</authorgroup>
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>3 de maig de 2021</date
+><!-- Date of (re)writing, or update.-->
+<releaseinfo
+>KDE Gear 21.04</releaseinfo>
+
+<!--Short description of this document. Do not change unless necessary!-->
+<abstract>
+	<para
+>Aquesta documentació descriu el joc &kajongg;</para>
+</abstract>
+
+<!--List of relevant keywords-->
+<keywordset>
+	<keyword
+>KDE</keyword
+> <!-- do not change this! -->
+	<keyword
+>kdegames</keyword
+> <!-- do not change this! -->
+	<keyword
+>joc</keyword
+> <!-- do not change this! -->
+	<keyword
+>kajongg</keyword
+><!--Application name goes here-->
+<!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<keyword
+>tauler</keyword>
+	<keyword
+>arcade</keyword>
+	<keyword
+>joc de fitxes</keyword>
+	<keyword
+>fitxes</keyword>
+<!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<keyword
+>quatre jugadors</keyword>
+<!--All other relevant keywords-->
+</keywordset>
+</bookinfo>
+<!--Content begins here: -->
+<chapter id="introduction"
+><title
+>Introducció</title
+> <!-- do not change this! -->
+	<note
+><title
+>Tipus de joc:</title
+><para
+>Tauler, arcade</para
+></note
+><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<note
+><title
+>Nombre de possibles jugadors:</title
+><para
+>Quatre</para
+></note
+><!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<para
+>El &kajongg; és un joc de taula creat després del famós joc oriental de Mah Jong (del xinès <foreignphrase lang="zh"
+>麻將</foreignphrase
+>). El qual és jugat per quatre jugadors. A tot el món s'utilitzen molts jocs de regles diferents. En aquest moment, el &kajongg; admet les regles del xinès clàssic com es juga a Alemanya, finalment seguiran altres jocs de regles principals. És possible personalitzar-los o afegir-ne de nous. Feu-ho i envieu-los a l'autor del programa per a la seva integració! </para>
+	<para
+>El &kajongg; es pot utilitzar de dues maneres diferents: dur la puntuació d'un joc manual en què es juga com sempre sense l'ajuda d'un ordinador i s'utilitza el &kajongg; per al càlcul de les puntuacions i per a la comptabilitat. O podeu utilitzar el &kajongg; per a jugar contra qualsevol combinació d'altres jugadors humans o contra l'ordinador. </para>
+</chapter>
+
+<chapter id="screen_layout"
+><title
+>La disposició de la pantalla</title>
+		<para>
+			<screenshot>
+				<screeninfo
+>Una captura de pantalla del &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="gamescreen.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Captura de pantalla</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+                </para>
+                <para
+>Una explicació ràpida de les parts de la pantalla de joc. </para>
+	<variablelist>
+		<varlistentry>
+			<term
+>Barra d'eines</term>
+			<listitem
+><para
+>La barra d'eines es troba a sota de la barra de menús i conté els botons per a les accions més utilitzades. El contingut de la barra d'eines es pot editar. També podreu fer-la invisible, donant més espai al tauler. </para
+><para
+>Depenent de la mida de la pantalla, possiblement voldreu fer que la barra d'eines sigui invisible o moure-la a la part esquerra de la finestra. Podreu fer-ho fent clic amb el &BDR; a sobre de la barra d'eines. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Tauler</term>
+			<listitem
+><para
+>El tauler és la secció més gran de la finestra. Veureu les quatre parets amb una longitud de 18 fitxes (el nombre exacte dependrà de les regles, com emprar o no fitxes de bonificació). Els noms dels jugadors estan escrits a les parets, juntament amb el valor actual de la mà (que se sàpiga) i les seves fitxes de vent. El vent predominant tindrà un fons amb color, a l'est en la captura de pantalla de dalt és a l'est. </para
+><para
+>Quan es <link linkend="play"
+>juga</link
+>, l'interior de les parets conté les fitxes descartades pels jugadors. Estan col·locades a l'atzar. L'última fitxa descartada tindrà un marc d'enfocament en blau. </para
+><para
+>Quan es <link linkend="scoreGame"
+>puntuen les partides manuals</link
+>, l'interior de les parets tindrà una selecció de totes les fitxes disponibles, el selector central. Podreu assignar-les als jugadors emprant el ratolí o el teclat. </para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Regió del jugador</term>
+			<listitem
+><para
+>Cada jugador té un interval de pantalla per a les seves fitxes. La fila superior contindrà les fitxes exposades, la fila inferior contindrà les fitxes ocultes. En <link linkend="scoreGame"
+>puntuar els jocs manuals</link
+>, les fitxes ocultes es mostraran amb una ombra per sobre de tota la fitxa. Les fitxes de bonificació van a l'extrem dret. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Diàleg</term>
+			<listitem
+><para
+>El diàleg presenta les opcions que té el jugador. La majoria de les vegades té un temps d'espera amb una barra de progrés mostrant el temps restant. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Barra d'estat</term>
+			<listitem
+><para
+>La barra d'estat es troba a la part inferior de la pantalla i conté els totals actuals per als jugadors. </para
+></listitem>
+		</varlistentry>
+	</variablelist>
+</chapter>
+
+<chapter id="scoreGame"
+><title
+>Puntuar un joc manual</title
+> <!-- do not change this! -->
+	<para
+>En aquest mode, el &kajongg; només s'utilitza per a dur la puntuació. Jugueu com de costum amb persones reals en una taula real i al final d'un joc podreu dir-li al &kajongg; les fitxes que un jugador té a la mà i tota la resta que el &kajongg; necessita saber per a calcular les puntuacions -el qual és el que farà el programa-. De manera alternativa, podreu calcular les puntuacions manualment i introduir-les. El &kajongg; després farà els pagaments entre els jugadors i escriurà els resultats en una base de dades. És possible suspendre un joc, iniciar-ne un altre amb altres jugadors i reprendre jocs antics. Totes les regles es desaran juntament amb els jocs, de manera que es poden jugar jocs diferents amb regles diferents. </para>
+        <itemizedlist>
+            <listitem
+><para
+>Des del menú, seleccioneu <menuchoice
+><guimenu
+>Joc</guimenu
+> <guimenuitem
+>Puntuació manual del joc</guimenuitem
+></menuchoice
+> o premeu <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+>. </para
+></listitem>
+            <listitem
+><para
+>Ara podreu escollir un joc sense acabar l'existent o començar-ne un de nou. Si en comenceu un de nou, se us demanarà pels jugadors i el joc de regles. El &kajongg; proposarà els mateixos valors utilitzats per al joc anterior. Si no n'hi havia un, proposarà els quatre primers jugadors definits. Recordeu que no podreu canviar el joc de regles ni cap de les seves regles després d'aquesta selecció. Podeu fer-ho abans a l'<link linkend="ruleset-options"
+>editor dels jocs de regles</link
+>. </para
+></listitem>
+            <listitem
+><para
+>Ara apareixerà una finestra nova titulada <guilabel
+>Puntuació per a aquesta mà</guilabel
+>. Per a una descripció detallada, llegiu <link linkend="enterhand-tiles"
+>Fer que el &kajongg; calculi la puntuació</link
+>. </para
+></listitem>
+            <listitem
+><para
+>Una vegada deseu els resultats de la mà, continueu amb la mà següent. </para
+></listitem>
+        </itemizedlist>
+      <sect1 id="enterhand"
+><title
+>Introduir els resultats de la mà</title>
+        <sect2 id="enterhand-scores">
+	<title
+>Puntuacions</title>
+	<screenshot>
+		<screeninfo
+>Una captura de pantalla del &kajongg;</screeninfo>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="enterhand.png" format="PNG"/>
+			</imageobject
+>				<textobject
+><phrase
+>Captura de pantalla</phrase
+></textobject>
+		</mediaobject>
+	</screenshot>
+	<para
+>Aquesta és la finestra per a introduir els resultats de les mans. Es mostrarà automàticament quan el &kajongg; cregui que podríeu necessitar-ho. Sempre es pot mostrar o ocultar prement <keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+> o seleccionant l'entrada de menú corresponent. </para>
+	<para
+>Com sempre, el vent predominant tindrà el seu fons en color. </para>
+	<para
+>Podeu introduir manualment les puntuacions de tots els jugadors. De manera alternativa, podreu definir exactament quines fitxes tenia un jugador a la mà. Si trieu fer-ho, el camp corresponent per al valor de la puntuació manual apareixerà atenuat. El &kajongg; calcularà automàticament la puntuació. </para>
+	<para
+>Una vegada introduïdes totes les dades rellevants per a una mà, premeu el botó <guibutton
+>Desa la mà</guibutton
+>. Els valors de les mans s'introduiran a la base de dades i també es mostraran a la taula de puntuacions. És possible que se us demani que canvieu les posicions dels seients dels jugadors, però podeu optar per no canviar de seient. Actualment, els canvis proposats no es poden personalitzar -si un joc de regles necessita quelcom diferent, ho canviarem-. </para>
+	<para
+>Si el jugador podria haver guanyat, s'habilitarà la casella de selecció a la columna <guilabel
+>Guanyador</guilabel
+> -feu-hi clic per al guanyador-. </para>
+	<para
+>La barra d'estat ara mostrarà els saldos actualitzats per als jugadors, i es podrà continuar amb la mà següent. </para>
+	<sect3 id="enterhand-manually">
+	<title
+>Introduir manualment la puntuació</title>
+	<para
+>Un bon jugador probablement preferirà calcular la seva puntuació ell mateix. En aquest cas, podeu introduir-la directament. Això només és possible quan no se seleccionen fitxes per a aquest jugador. </para>
+	<para
+>Si introduïu manualment una puntuació, ja haurà de contenir-ho tot excepte les sancions, no tindreu regles opcionals per a triar. Hi ha una excepció: <quote
+>Joc perillós</quote
+>. Això no influirà en cap puntuació, tampoc és una infracció. Només vol dir que el pagament entre jugadors serà diferent: l'infractor ho pagarà tot per tothom al guanyador. Els altres dos jugadors no intercanviaran cap pagament. Actualment, això no es pot personalitzar. </para>
+	</sect3>
+	<sect3 id="enterhand-tiles">
+	<title
+>Fer que el &kajongg; calculi la puntuació</title>
+	<para
+>Si li indiqueu explícitament al &kajongg; quines fitxes té un jugador, s'atenuarà la puntuació que introduïu per a aquest jugador en aquesta finestra. En associar les fitxes amb un jugador, veureu com augmenta la seva puntuació, però tan aviat com afegiu la 14a fitxa, la puntuació passarà a zero. Això pot sorprendre, però a menys que la declareu com la mà guanyadora, es reconeixerà com una mà llarga, la qual sempre tindrà zero punts. Aquest comportament està definit pel joc de regles del xinès clàssic, podria ser diferent si es canvien les regles o es fa servir un joc de regles diferent. </para>
+	<para
+>Podeu associar les fitxes i les combinacions amb un jugador utilitzant el ratolí o el teclat, o ambdós. Amb el ratolí, senzillament moveu les fitxes arrossegant i deixant-les anar a la regió del jugador. En deixar anar la fitxa, se us demanarà què voleu moure: Individual, Parella, Pung, Kong, Kong reclamat o Chow. La fila superior és per a les fitxes exposades, la fila inferior per a les fitxes ocultes. Les fitxes de bonificació apareixeran a l'extrem dret. També podeu moure les fitxes i les combinacions entre files, jugadors i de tornada al selector central. </para>
+	<para
+>Si preferiu utilitzar el teclat, es pot emprar &Tab; per a moure entre el selector central i les regions dels jugadors. Les tecles <keycap
+>eswnESWN</keycap
+> mouen una fitxa als jugadors Est, Sud, Oest i Nord. Les tecles <keycap
+>xX</keycap
+> la tornen al selector central. <keycap
+>ESWN</keycap
+> la mouen a la fila oculta, <keycap
+>eswn</keycap
+> la mouen a la fila exposada. Podreu moure el cursor entre les fitxes o les combinacions amb les tecles de fletxa, la fitxa o la combinació actualment seleccionada tindrà un marc blau. Atès que les fletxes de les tecles estan lluny de les lletres del teclat, també podeu utilitzar les lletres <keycap
+>hjkl</keycap
+> o <keycap
+>HJKL</keycap
+> per a moure el cursor. <keycap
+>hH</keycap
+> la mourà a l'esquerra, <keycap
+>jJ</keycap
+> la mourà cap avall, <keycap
+>kK</keycap
+> la mourà cap amunt, <keycap
+>lL</keycap
+> la mourà cap a la dreta. Així és com ho fa l'editor d'Unix <command
+>vi</command
+>. El navegador &konqueror; del &kde;, així com aquest programa d'ajuda també admeten aquestes tecles de la mateixa forma. Aquestes tecles podrien diferir si utilitzeu un idioma que no sigui l'anglès, però en l'actualitat no és possible configurar-les. </para>
+	<para
+>Les opcions <guilabel
+>Darrera fitxa:</guilabel
+> i <guilabel
+>Darrera combinació:</guilabel
+> són necessàries per a algunes regles com <guilabel
+>L'última fitxa completa el parell</guilabel
+>. Només es poden utilitzar per a la mà guanyadora. </para>
+	<para
+>A la part dreta de la finestra podreu aplicar manualment algunes regles. Les regles que apareixen en aquesta llista dependran del joc de regles actual i de les fitxes. En l'exemple a la captura de pantalla anterior, els jugadors perdedors poden tenir una opció de <quote
+>joc perillós</quote
+> -de nou depenent del joc de regles i de les seves fitxes-. L'objectiu dels desenvolupadors és mantenir aquesta llista de regles seleccionable tan curta com sigui possible. De manera òptima, el &kajongg; sempre hauria de poder determinar automàticament si s'aplica una regla, però de vegades el &kajongg; no té prou informació o coneixement per a decidir. </para>
+	</sect3>
+	</sect2>
+	<sect2 id="enterhand-penalties">
+	<title
+>Penalitzacions</title>
+			<screenshot>
+				<screeninfo
+>Una captura de pantalla del &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="penalty.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Captura de pantalla</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+	<para
+>A la <link linkend="enterhand"
+>finestra per a introduir els resultats de les mans</link
+>, el botó <guibutton
+>Penalitzacions</guibutton
+> obrirà aquesta finestra on podreu introduir les penalitzacions. Això es pot fer en qualsevol moment independentment del mecanisme de puntuació normal.</para>
+	<para
+>La selecció <guilabel
+>Infracció:</guilabel
+> mostrarà totes les infraccions que poden ser aplicables a les mans que sostenen els jugadors. Trieu entre elles.</para>
+	<para
+>Ara podreu adaptar la <guilabel
+>Penalització total</guilabel
+>. Aquesta és la suma total que es transferirà des dels pagadors als beneficiaris. Es dividirà uniformement entre ells.</para>
+	<para
+>Depenent del tipus d'infracció, el nombre de pagadors i beneficiaris variarà. Es mostra el nombre correcte de jugadors. Si seleccioneu un jugador, el &kajongg; s'assegurarà que aquest jugador només esdevingui un cop adaptant els altres jugadors. </para>
+	</sect2>
+	</sect1>
+</chapter>
+
+<chapter  id="play"
+><title
+>Jugar</title>
+	<para
+>En qualsevol moment, podreu activar o desactivar el mode de demostració. En aquest mode, l'ordinador jugarà per vostè. Si actualment no jugueu cap joc, s'iniciarà un de nou amb l'últim joc de regles utilitzat. </para>
+        <sect1 id="robotplay">
+        <title
+>Jugar contra l'ordinador</title>
+         <para
+>Primer obtindreu un diàleg d'inici de sessió. Introduïu el servidor de joc amb el qual voleu connectar i el vostre nom d'usuari. Si escolliu l'entrada especial <guilabel
+>Joc local</guilabel
+>, només necessitareu introduir el vostre nom (o acceptar el nom proposat) i el joc de regles desitjat. Això iniciarà immediatament un joc local on jugareu contra 3 jugadors robot. No obstant això, si hi ha jocs suspesos, es mostraran en una llista. A continuació, podreu seleccionar el joc amb el qual voleu continuar o començar-ne un de nou. </para>
+        </sect1>
+        <sect1 id="humanplay">
+        <title
+>Jugar amb amics</title>
+        <para
+>Si voleu jugar contra altres persones reals, necessitareu un servidor de joc on tots els jugadors, inclòs vós, haureu de connectar-vos. Feu-ho seleccionant qualsevol altre amfitrió o introduint manualment un nom nou d'amfitrió i especificant la contrasenya per a aquest. Es proposarà la darrera contrasenya utilitzada. </para
+><para
+>La manera més senzilla és utilitzar el servidor de joc a <literal
+>kajongg.org</literal
+>&nbsp;. El &kajongg; mostrarà aquest a la llista de possibles servidors de joc. Recordeu que aquest servidor només ofereix un servidor de joc, però no una pàgina web ni cap altre servei. </para
+><para
+>Si no teniu un compte al servidor de joc amb el nom que heu introduït, se us demanarà si voleu obrir un compte. Si dieu que sí, apareixerà un diàleg nou on podreu introduir la contrasenya desitjada dues vegades. El vostre compte es crearà automàticament. </para
+><para
+>Després d'iniciar la sessió correctament amb el servidor de joc, obtindreu una llista de taules amb seients disponibles en aquest servidor de joc. Uniu-vos a una taula o assigneu una taula nova. Si assigneu una taula nova, espereu fins que els altres jugadors ocupin més seients. En qualsevol moment podreu començar el joc en una taula que hàgiu pres, els seients no ocupats seran ocupats per jugadors robot. </para
+><para
+>La llista de la taula també mostra el nom del joc de regles que es juga en aquesta taula. El joc de regles i el seu nom són enviats al servidor de joc pel jugador que inicialitza la taula. Si teniu un joc de regles idèntic, la taula mostrarà el seu nom per al joc de regles -això podria ser útil si l'iniciador de la taula parla un altre idioma i ha anomenat el joc de regles d'una manera diferent-. A més, si es mostra el nom del vostre joc de regles local, es mostrarà en negre. No obstant això, si no teniu un joc de regles idèntic, el nom apareixerà en vermell i podreu utilitzar el botó <guibutton
+>Compara</guibutton
+> per a comparar-lo amb els vostres propis jocs de regles. </para
+><para
+>Si no utilitzeu <literal
+>kajongg.org</literal
+> o qualsevol altre servidor de joc existent, podreu iniciar el vostre propi servidor de joc del &kajongg; de dues formes diferents: <itemizedlist
+><listitem
+><para
+>connecteu-vos amb el servidor <literal
+>localhost</literal
+>. Aquest és el vostre propi ordinador. Si feu això i no s'està executant cap servidor de joc, s'iniciarà automàticament. I quan deixeu de jugar, el servidor també s'aturarà. Això es diferencia de seleccionar <guilabel
+>Joc local</guilabel
+> en que aquest últim no permet connexions des d'altres ordinadors. </para
+></listitem
+><listitem
+><para
+>inicieu manualment un servidor en qualsevol ordinador que vulgueu. Tot el que heu de fer és anar a una línia d'ordres i iniciar el programa <command
+>kajonggserver</command
+>. Introduïu <command
+>kajonggserver --help</command
+> i us mostrarà totes les opcions disponibles, com canviar el port predeterminat. Aquest servidor s'executarà fins que el mateu. </para
+></listitem
+></itemizedlist>
+        </para
+><para
+>En ambdós casos, haureu de dir-li als altres jugadors com poden arribar al vostre servidor de joc. Necessitaran l'&URL; o senzillament una adreça IP i el port on està escoltant el servidor. Això podria ser quelcom com <literal
+>mypc.dyndns.org:8301</literal
+>&nbsp;, on <literal
+>8301</literal
+> és el port. Per descomptat, haureu de configurar el vostre tallafoc de manera que el jugador remot pugui abastar aquest port. La comunicació estarà encriptada. </para
+><para
+>Per a obtenir el número de port, vegeu <menuchoice
+><guimenu
+>Ajuda</guimenu
+> <guimenuitem
+>Quant al &kajongg;</guimenuitem
+></menuchoice
+>. La versió del protocol és el número del port. Per al &kajongg; 21.4.1, és el 8301. Si el jugador no introdueix cap port per al servidor de joc desitjat, el client calcularà el port de la mateixa manera. Per tant, si un ordinador executa diversos servidors de joc amb diferents versions de protocol, normalment hauria d'arribar al servidor de joc correcte de manera automàtica. De totes maneres, el servidor de joc i el client s'hauran d'assegurar que les seves versions siguin compatibles i us advertiran el contrari. </para
+><para
+>Si trobeu possibles errors, possiblement voldreu utilitzar l'opció <command
+>kajongg --debug=traffic</command
+>. Això us mostrarà, a la consola on s'ha iniciat el servidor de joc, quins missatges flueixen entre el servidor de joc i els clients. Per a obtenir més opcions, vegeu &nbsp;<command
+>kajongg --help</command
+> </para>
+        <sect2 id="playing-caveats">
+        <title
+>Advertències</title>
+            <itemizedlist
+><listitem
+><para
+>Si voleu assegurar-vos que ningú pugui enganyar, cap dels jugadors humans haurà de tenir accés a l'ordinador en la qual s'executa el servidor de joc. Per descomptat, mai podreu evitar que dos jugadors s'ajudin entre si perquè no es pot saber el que en realitat estan fent. Dos jugadors poden ser fins i tot la mateixa persona. </para
+></listitem
+></itemizedlist>
+        </sect2>
+        </sect1>
+<sect1  id="gamerules"
+><title
+>Les regles del joc</title>
+<para
+>Arreu del món, hi ha moltes variants de joc diferents. Actualment, el &kajongg; admet dues variants del xinès clàssic, una que es juga a Alemanya i una altra que es juga a la Gran Bretanya.</para
+><para
+>Aquesta descripció no entra en detalls i, com a tal, coincideix amb les dues variants.</para
+><para
+>No obstant això, la majoria de les regles bàsiques són les mateixes en la majoria de les variants.</para>
+  <para
+>Atès que el programa &kajongg; sap com jugar, aquesta descripció només conté coses que podrien no ser òbvies.</para>
+  <para
+>Si voleu aprendre Mah Jong amb més detall, consulteu la <link linkend="bibliography"
+>bibliografia</link
+>.</para>
+<sect2 id="gamerules-aim">
+  <title
+>L'objectiu del joc</title>
+  <para
+>Cada jugador intenta recollir les fitxes de manera que obtingui una mà guanyadora. En aconseguir-ho, ell/a cridarà <quote
+>Mah Jong</quote
+>. En una mà guanyadora, les fitxes normalment s'agruparan en cinc combinacions: quatre combinacions amb tres o quatre fitxes cadascuna i una cinquena combinació que consistirà en dues fitxes iguals. Una combinació normal té tres o quatre fitxes idèntiques (anomenades Pung i Kong respectivament) o tres fitxes successives com Bambú 3, Bambú 4, Bambú 5 (anomenades Chow).</para>
+  </sect2>
+  <sect2>
+    <title
+>El curs del joc</title>
+    <para
+>Inicialment, el jugador amb el vent de l'est (com s'indica a la paret) tindrà una fitxa més que els altres jugadors. Aquest començarà descartant una fitxa no desitjada. </para>
+    <para
+>Sempre que es descarti una fitxa, els altres jugadors podran reclamar-la dient el que poden completar amb aquesta fitxa (Chow, Pung, Kong, Mah Jong). Només el següent jugador podrà reclamar un Chow -la resta de reclams seran possibles per a tots els jugadors-. S'exposarà una combinació completada per a un reclam -visible per a tots els jugadors-. </para
+><para
+>Si ningú reclama la fitxa descartada, el jugador següent, Sud (i després Oest i Nord) obtindran una fitxa de la paret i descartaran una fitxa no desitjada.</para>
+      <para
+>Hi ha diverses regles sobre quan es pot estendre un Pung a un Kong (reclamant la quarta fitxa o traient-la de la paret) -aquestes regles no s'expliquen aquí-. Però el &kajongg;, per descomptat, les coneix i s'assegura que siguin respectades. Si es declara un Kong, el jugador obtindrà automàticament una fitxa de substitució des de la paret -d'altra manera, no seria possible construir les cinc combinacions com s'ha esmentat anteriorment-. </para>
+    </sect2>
+    <sect2>
+      <title
+>Any, tanda i mà</title
+><para
+>Quan un jugador reclama Mah Jong o acabem en taules, es completarà una mà. Ara, excepte per als sortejos, els vents giraran entre els jugadors. Això es repetirà fins que cada jugador obtingui una vegada cada vent. Tota aquesta unitat s'anomena tanda. Un joc complet, també anomenat any, consta de quatre tandes d'aquest tipus: tanda de vent de l'est, tanda de vent del sud, tanda de vent de l'oest, tanda de vent del nord. El vent d'una tanda també s'anomena vent predominant, pot resultar en puntuacions més altes.</para>
+	<para
+>Llavors, un joc complet (un any) consisteix d'almenys 16 mans. Atès que els vents no giren per a les taules o quan el jugador de l'est diu Mah Jong, normalment es necessitarà un major nombre de mans per a un joc complet. </para
+></sect2
+><sect2
+><title
+>Fitxes de bonificació</title>
+    <para
+>Un joc pot contenir 8 fitxes de bonificació (llevat que les regles les excloguin). S'exposen per separat en el costat dret de la regió del jugador, ja que mai s'utilitzen per a construir les combinacions. No obstant això, generen punts de bonificació.</para>
+      <para
+>Si un jugador obté una fitxa de bonificació, automàticament també obtindrà una fitxa de substitució des de la paret. I sonarà una campana.</para
+></sect2>
+      <sect2
+><title
+>Puntuació</title
+><para
+>Al final d'una mà, es calcularà la puntuació de cada jugador. Primer, els punts bàsics es compten com 2 punts per a un pung exposat senzill o 20 punts per guanyar. A continuació, s'aplicarà un altre joc de regles -aquestes regles poden duplicar els punts com un doble per a una combinació de dracs-. Quan es coneix la puntuació de cada mà, es paguen les diferències entre els jugadors -mentre que el guanyador rep la puntuació completa de tots els altres jugadors-. L'est sempre rebrà i pagarà el doble de la seva puntuació.</para>
+	  <para
+>Per descomptat, el &kajongg; coneix totes les regles aplicables, però un bon jugador sabrà quines combinacions obtenen quina puntuació per a poder optimitzar. Mentre s'aprèn, es recomana activar la finestra <guimenuitem
+>Explica les puntuacions</guimenuitem
+>.</para>
+	  <para
+>Les regles de puntuació exactes sovint varien -en el &kajongg; podreu canviar-les amb l'<link linkend="ruleset-options"
+>editor del joc de regles</link
+>&nbsp;-.</para>
+	  <para
+>L'editor del joc de regles també mostra totes les regles disponibles i el seu significat. Situeu el ratolí a sobre seu i per a les regles més exòtiques apareixerà un text d'ajuda.</para>
+	</sect2>
+</sect1>
+<sect1 id="playing-play">
+        <title
+>Com jugar amb el &kajongg;</title>
+        <para
+>Se us demanarà què voleu fer. Aquest és un petit diàleg que apareix a la dreta o a la part inferior depenent de la mida de la finestra. Si el feu més ample que alt, el diàleg apareix a la dreta. De vegades, el diàleg tindrà un temps d'espera -quan acabeu, se seleccionarà automàticament la primera resposta possible-. Aquest temps d'espera es pot configurar a l'Editor del joc de regles, a <guilabel
+>Opcions</guilabel
+>, <guilabel
+>S'esgota el temps de reclamació</guilabel
+> (<guilabel
+>Claim Timeout</guilabel
+>). Tots els jugadors hauran de tenir el mateix temps d'espera, per això forma part del joc de regles. </para
+><para
+>Si heu de seleccionar una fitxa de la vostra mà, podreu moure-us entre les fitxes amb les tecles de &Right; i &Left; o les lletres <keycap
+>h</keycap
+> i <keycap
+>l</keycap
+> en el vostre teclat. Per descomptat, també podreu utilitzar el ratolí. </para
+><para
+>Podreu descartar una fitxa utilitzant el teclat de la mateixa manera que per a totes les accions. De manera alternativa, podreu utilitzar el ratolí i moure la fitxa des de la vostra mà fins a l'àrea de descarts (l'interior de les parets). La ubicació de la fitxa en l'àrea de descarts la realitzarà l'ordinador, perquè la ubicació haurà de ser la mateixa per als jugadors. </para
+><para
+>Sovint, els diàlegs oferiran opcions que no són realment aplicables, com cridar Pung quan no es tenen les fitxes necessàries. Això està previst, com en un joc real. Però podeu configurar opcions impossibles: Inhabiliteu <guilabel
+>Mostra només les accions possibles</guilabel
+> a la pàgina <guilabel
+>Juga</guilabel
+> del diàleg de configuració. </para
+><para
+>Les fitxes rebutjades es col·loquen a l'atzar entre les parets. Algunes variants del joc defineixen a on s'han de col·locar les fitxes, però, això encara no es pot configurar. Quan es torni configurable, formarà part del joc de regles. </para>
+	</sect1>
+</chapter>
+
+<chapter id="interface"
+><title
+>Resum de la interfície</title
+> <!-- do not change this! -->
+<!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist
+> and <varlistentry
+>. Split the chapter into sections using <sect1(2,3)
+> for better viewing.-->
+
+<sect1 id="menu">
+<title
+>Elements de menú</title>
+
+		<variablelist>
+			<varlistentry id="game-menu-scoreGame">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Joc</guimenu
+> <guimenuitem
+>Puntuació d'un joc manual</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Només anotarà un joc jugat manualment.</action
+></para
+><para
+>Podeu carregar un joc antic o iniciar-ne un de nou. De manera predeterminada, només els jocs pendents (&ead;, sense finalitzar) es mostren a la llista de selecció. De manera opcional, podreu mostrar tots els jocs, inclosos els finalitzats. Aquí també podreu suprimir jocs.</para
+></listitem>
+			</varlistentry>
+                        <varlistentry  id="game-menu-play">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Joc</guimenu
+> <guimenuitem
+>Juga</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Juga amb un altre (persones i ordinadors)</action
+>.</para
+></listitem>
+                        </varlistentry>
+                        <varlistentry  id="game-menu-abort">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Joc</guimenu
+> <guimenuitem
+>Interromp la partida</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Interromp el joc actual. Si era un joc manual únicament amb la puntuació, el podreu reprendre més tard. Si heu jugat emprant el &kajongg;, el joc encara no es pot reprendre.</action
+></para
+></listitem>
+                        </varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Joc</guimenu
+> <guimenuitem
+>Surt del &kajongg;</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Surt</action
+> del &kajongg;.</para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-chat">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visualitza</guimenu
+> <guimenuitem
+>Xat</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Xat</action
+></para>
+				<screenshot>
+					<screeninfo
+>Finestra de xat</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Finestra de xat</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Permet que feu un xat amb els altres jugadors. </para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-scoretable">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visualitza</guimenu
+> <guimenuitem
+>Taula de puntuacions</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Taula de puntuacions</action
+></para>
+                                <screenshot>
+                                        <screeninfo
+>Taula de puntuacions</screeninfo>
+                                        <mediaobject>
+                                                <imageobject>
+                                                <imagedata fileref="scoretable.png" format="PNG"/>
+                                                </imageobject>
+                                                <textobject>
+                                                <phrase
+>Captura de pantalla</phrase>
+                                                </textobject>
+                                        </mediaobject>
+                                </screenshot>
+    <para
+>Mostra la taula de puntuació. Tanda/mà són la tanda actual (Est, Sud, Oest, Nord) seguit d'un recompte de les mans jugades en aquesta tanda. La guanyadora té un fons verd per als seus valors. Els pagaments mostren quant ha pagat o rebut el jugador a/de tots els altres jugadors amb aquesta mà. El saldo mostra el saldo actual de tots els jugadors. El gràfic mostra l'evolució dels valors de balanç. Els consells donen més detalls: mostren totes les regles que s'han aplicat a aquesta mà. Senzillament moveu el ratolí a sobre del valor que us interessa.</para
+><para
+>La part inferior mostra el joc de regles utilitzat. Entre la taula de puntuacions i el joc de regles utilitzat, trobareu un divisor que permet canviar les mides relatives d'ambdues parts. </para
+></listitem>
+                        </varlistentry>
+			<varlistentry id="view-explain-scores">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>E</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visualitza</guimenu
+> <guimenuitem
+>Explica les puntuacions</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Explica les puntuacions</action
+></para>
+				<screenshot>
+					<screeninfo
+>Taula de puntuacions</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="explain.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Taula de puntuacions</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Explica com s'ha calculat la puntuació de la mà actual. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;&Maj; <keycap
+>F</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Visualitza</guimenu
+> <guimenuitem
+>Mode de pantalla completa</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Canvia entre els modes de pantalla completa i normal.</action
+></para
+></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Arranjament</guimenu
+> <guimenuitem
+>Jugadors</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Afegeix, modifica i suprimeix els jugadors.</action
+></para>
+				<para
+>Les contrasenyes en aquesta taula són les que s'utilitzen de manera predeterminada en iniciar la sessió en un servidor de joc. Canviar la contrasenya triada inicialment per a un servidor de joc encara no és realment útil perquè encara no hi ha manera que també es canviï la contrasenya en el servidor de joc. Hauríeu de demanar-li a l'administrador del servidor de joc que ho faci per vostè directament a la base de dades.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Arranjament</guimenu
+> <guimenuitem
+>Jocs de regles</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Personalitza els jocs de regles.</action
+></para>
+				<para
+>Utilitzeu l'Editor dels jocs de regles per a personalitzar-los. Per a obtenir més informació, vegeu &nbsp;<link linkend="ruleset-options"
+>aquí</link
+>.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Arranjament</guimenu
+> <guimenuitem
+>Canvia l'angle visual</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Canvia l'angle de visió de les fitxes en sentit antihorari.</action
+></para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Arranjament</guimenu
+> <guimenuitem
+>Mode demostració</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Activa o desactiva el mode de demostració. Per a més detalls, vegeu <link linkend="play"
+>aquí</link
+>.</action
+></para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+<para
+>De manera addicional, el &kajongg; té la configuració comuna al &kde; i els elements dels menús <guimenu
+>Arranjament</guimenu
+> i <guimenu
+>Ajuda</guimenu
+>. Per a obtenir més informació, llegiu les seccions sobre <ulink url="help:/fundamentals/menus.html#menus-settings"
+>El menú Arranjament</ulink
+> i <ulink url="help:/fundamentals/menus.html#menus-help"
+>El menú Ajuda</ulink
+> en els Fonaments del &kde;. </para>
+
+</sect1>
+</chapter>
+
+<chapter id="configuration"
+><title
+>Configuració del joc</title
+> <!-- do not change this! -->
+<!--This section describes configuration &GUI;. If your game is configured using menubar exclusively, please remove this section.-->
+<screenshot>
+<screeninfo
+>El diàleg de configuració</screeninfo>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="config_play.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase
+>El diàleg de configuració</phrase>
+	  </textobject>
+	</mediaobject>
+</screenshot>
+
+<para
+>L'entrada de menú <menuchoice
+><guimenu
+>Arranjament</guimenu
+><guimenuitem
+>Configura el &kajongg;...</guimenuitem
+></menuchoice
+> obre el diàleg <guilabel
+>Configura - &kajongg;</guilabel
+>.</para>
+<para
+>Si premeu aquí el botó <guibutton
+>Cancel·la</guibutton
+>, tots els canvis de configuració es revertiran, inclosos tots els que heu fet amb l'editor del joc de regles.</para>
+<para
+>També podeu seleccionar les diferents pestanyes amb el teclat: <keycombo action="simul"
+>&Ctrl;<keycap
+>1</keycap
+></keycombo
+> selecciona la primera pestanya d'opcions <guilabel
+>Juga</guilabel
+>, <keycombo action="simul"
+>&Ctrl;<keycap
+>2</keycap
+></keycombo
+> selecciona la segona pestanya, i així successivament. </para>
+
+<sect1 id="play-options"
+><title
+>Opcions del joc</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<guilabel
+>Mostra les ombres</guilabel>
+				</term>
+				<listitem
+><para
+>Mostra les fitxes amb vores i ombres. També hi ha una mica d'espai entre les files de fitxes, i les fitxes de la paret es mostren de manera que veureu que la paret té dues o tres fitxes d'alçada. Llavors, si desactiveu aquesta opció, tindreu una pantalla més senzilla amb fitxes una mica més grans. Això podria ser útil per a pantalles petites. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Reorganitza les fitxes ocultes a les combinacions</guilabel>
+				</term>
+				<listitem
+><para
+>Agrupa les combinacions a la mà. De vegades, és possible que l'agrupació no sigui com la que es vol, i per això és possible que preferiu no tenir cap agrupació, com en un joc del món real. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Mostra només les accions possibles</guilabel>
+				</term>
+				<listitem
+><para
+>Quan es juga, només es mostraran les accions possibles com <quote
+>No hi ha reclamacions</quote
+> o <quote
+>Pung</quote
+>. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Proposa què fer</guilabel>
+				</term>
+				<listitem
+><para
+>Sempre que es tingui una opció d'acció com reclamar o no una fitxa, o triar quina fitxa descartar, el &kajongg; podrà ajudar fent-vos una proposta. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Usa els sons si estan disponibles</guilabel>
+				</term>
+				<listitem
+><para
+>Permet escoltar els descarts i les reclamacions. Si els altres jugadors han enregistrat fitxers de so amb la seva pròpia veu, podreu escoltar-los. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Deixa que els altres escoltin la meva veu</guilabel>
+				</term>
+				<listitem
+><para
+>Si heu enregistrat fitxers de so amb la vostra veu, aquesta opció permetrà que els altres jugadors escoltin els vostres descarts i reclamacions amb la vostra veu. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Velocitat de l'animació:</guilabel>
+				</term>
+				<listitem
+><para
+>Defineix com de ràpid s'hauran de moure les fitxes. Si moveu el control lliscant a la posició més a la dreta, el moviment de les fitxes no s'animarà: les fitxes senzillament canviaran de lloc. </para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+	<sect2
+><title
+>So</title>
+	<para
+>Jugar brinda una experiència molt millor si escolteu als jugadors reclamar les fitxes i anunciar els descarts. També facilita el joc perquè podreu concentrar-vos en les vostres pròpies fitxes, no haureu de mirar el que descarten els altres. </para>
+	<para
+>El &kajongg; ve amb veus per a jugadors diferents. Assigna automàticament les veus als jugadors. Per a cada idioma hi haurà d'haver quatre veus, preferiblement dues masculines i dues femenines. El &kajongg; intentarà utilitzar les veus en el mateix idioma en què s'executa. Si no les troba en aquest idioma, el &kajongg; recorrerà a altres idiomes, utilitzant els mateixos idiomes de suport que heu definit per al &kajongg; (vegeu <menuchoice
+><guimenu
+>Ajuda</guimenu
+> <guimenuitem
+>Canvi de l'idioma de l'aplicació</guimenuitem
+></menuchoice
+>). Si encara no existeix cap fitxer de veu per al vostre idioma, se us convida a enregistrar-los i contribuir al &kajongg;. </para>
+	 <itemizedlist
+><listitem
+><para
+>Així és com podreu generar les veus vós mateix. Hi ha una carpeta separada per a cada veu. Recordeu que aquestes carpetes poden estar en un altre lloc al sistema, depenen de com es va instal·lar el &kde;. Només la part que comença amb <filename class="directory"
+>kajongg</filename
+> és sempre la mateixa. Hi ha dos grups de veus amb diferents llocs en el sistema de fitxers: <itemizedlist
+><listitem
+><para
+>Veus predefinides per a cada idioma. Resideixen en una carpeta com <filename class="directory"
+>/usr/share/kajongg/voices/LANG</filename
+>&nbsp; on LANG és el codi per al vostre idioma. Els directoris de veu directament sota <filename class="directory"
+>.../kajongg/voices/</filename
+> són les versions en anglès dels EUA. Les veus predefinides s'assignaran de forma aleatòria als jugadors. Aquestes veus tenen noms com <quote
+><literal
+>male1 male2 female1 female2</literal
+>&nbsp;</quote
+>, però aquests noms no importen, l'usuari mai els veurà. </para
+></listitem
+><listitem
+><para
+>Les veus d'usuari es poden definir per a un usuari específic. Si el &kajongg; fa ús d'aquesta veu, es podrà transferir automàticament a altres jugadors a través d'Internet. Aquestes veus resideixen en una carpeta com <filename class="directory"
+>~/.local/share/apps/kajongg/voices/</filename
+>&nbsp;. De manera que, si el vostre nom d'inici de sessió és jordi, aquest podria ser <filename class="directory"
+>/home/jordi/.local/share/apps/kajongg/voices/jordi/</filename
+>&nbsp;. És possible que la carpeta <filename class="directory"
+>voices/</filename
+> encara no existeixi -de ser així, creeu-la-. </para
+></listitem
+></itemizedlist>
+		</para
+></listitem
+><listitem
+><para
+>Ara que sabeu on col·locar la vostra nova veu, genereu una carpeta nova per a ella. </para
+></listitem
+><listitem
+><para
+>En aquesta subcarpeta, podreu ubicar els fitxers de so. Hauran d'estar codificats amb el compressor d'àudio <ulink url="https://xiph.org/vorbis/"
+>Ogg Vorbis</ulink
+>, els noms dels fitxers hauran de tenir l'extensió <filename class="extension"
+>.ogg</filename
+>. Un sol fitxer té un nom com <filename
+>s3.ogg</filename
+> -aquest és Stone 3 (pedra)-. Haureu de definir aquests fitxers per a totes les fitxes i per a totes les reclamacions i els anuncis. Però si cal un fitxer de so, no passa res, senzillament no el sentireu. El recurs per a altres veus o idiomes només funciona per a les veus completes, no per a fitxers de so individuals. </para
+></listitem
+><listitem
+><para
+>Una vegada s'han definit tots els fitxers de so per a una veu predefinida, assegureu-vos que el procés del &kajongg; tingui permís d'escriptura en la carpeta nova de veus. Inicieu el &kajongg; i proveu la veu. Una vegada tot estigui bé, podreu revocar el permís d'escriptura (i s'ha de fer per a les veus predefinides). El &kajongg; generarà automàticament un fitxer anomenat <filename
+>md5sum</filename
+> que contindrà una suma de verificació sobre tots els fitxers de so. Sempre que es canviï, afegeixi o suprimeixi un fitxer de so per a una veu, el &kajongg; intentarà reescriure aquest fitxer. </para
+></listitem
+></itemizedlist>
+	<para
+>Si us plau, reduïu la durada del so, però parleu amb claredat -aquest joc es pot jugar molt de pressa una vegada hi esteu acostumat-. És més fàcil si primer escriviu una llista amb tot el que s'ha de pronunciar. No ho llegiu com una seqüència d'elements, mireu de pronunciar cada element com si fos únic i com ho faríeu en jugar. Deixeu espai entre els elements. Llegir-ho requereix una mica de pràctica.</para>
+	<para
+>Aquesta és només una possibilitat per a crear els fitxers de so: </para
+><para
+><itemizedlist
+><listitem
+><para
+>Enregistreu un fitxer de so amb el programa <command
+>qarecord</command
+>, deseu-lo en el format <acronym
+>WAV</acronym
+>. En aquest únic fitxer de so, pronuncieu tots els sons. </para
+></listitem
+><listitem
+><para
+>Editeu aquest fitxer amb l'editor de so <command
+>audacity</command
+>. En aquest editor, utilitzeu el ratolí per a marcar un interval d'ones sonores. L'editor reproduirà aquesta part. Repetiu-ho fins que hàgiu seleccionat la part correcta. Això pot ser més fàcil si feu <menuchoice
+><guimenu
+>Visualitza</guimenu
+><guimenuitem
+>Apropa</guimenuitem
+></menuchoice
+>. Utilitzeu l'element de menú <menuchoice
+><guimenu
+>Fitxer</guimenu
+><guimenuitem
+>Exporta la selecció</guimenuitem
+></menuchoice
+> i deseu-la en el format <filename class="extension"
+>.ogg</filename
+>. A <guilabel
+>Opcions</guilabel
+>, escolliu qualitat baixa -això serà suficient i fins i tot desitjable perquè redueix el temps per a transferir els sons als altres jugadors-. </para
+></listitem
+></itemizedlist
+></para>
+	<para
+>Els següents són els noms dels fitxers que heu de generar. Afegiu sempre l'extensió <filename class="extension"
+>.ogg</filename
+>:</para>
+
+<table>
+<title
+>Noms dels fitxers de so</title>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry
+>&s1; .. &s9;</entry
+><entry
+>Pedra 1 a Pedra 9</entry>
+</row>
+<row>
+<entry
+>&b1; .. &b9;</entry>
+<entry
+>Bambú 1 a Bambú 9</entry>
+</row>
+<row>
+<entry
+>&c1; .. &c9;</entry>
+<entry
+>Caràcter 1 a Caràcter 9</entry>
+</row>
+<row>
+<entry
+>&we; &ws; &ww; &wn;</entry>
+<entry
+>Els vents de l'est, sud, oest, nord</entry>
+</row>
+<row>
+<entry
+>&db; &dr; &dg;</entry>
+<entry
+>Els dracs blau/blanc, vermell, verd</entry>
+</row>
+<row>
+<entry
+>&chow; &pung; &kong; &mahjongg;</entry>
+<entry
+>Les reclamacions principals</entry>
+</row>
+<row>
+<entry
+>&originalcall; &violatesoriginalcall;</entry>
+<entry
+>Crida original i la seva violació</entry>
+</row>
+<row>
+<entry
+>&dangerousgame;</entry>
+<entry
+>Un jugador deixa anar un canó (joc perillós)</entry>
+</row>
+<row>
+<entry
+>&nochoice;</entry>
+<entry
+>Un jugador declara que no té més remei que jugar un joc perillós</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+	</sect2>
+</sect1>
+
+<sect1 id="tiles-options"
+><title
+>Opcions de les fitxes</title>
+        <screenshot>
+                <screeninfo
+>Selector de fitxes</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_tiles.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Selector de fitxes</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Utilitzeu el selector de <guilabel
+>Fitxes</guilabel
+> per a seleccionar els gràfics per a les fitxes. </para>
+</sect1>
+
+<sect1 id="background-options"
+><title
+>Opcions del fons</title>
+        <screenshot>
+                <screeninfo
+>Selector del fons</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_background.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Selector del fons</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Utilitzeu el selector de <guilabel
+>Fons</guilabel
+> per a seleccionar un gràfic de fons per al joc. </para
+><para
+>Alguns fons com el paisatge xinès necessiten una mica de temps per a carregar-se. Si creieu que el programa hauria d'iniciar-se més ràpid o canviar la mida de la finestra principal triga massa temps, proveu amb un altre fons. </para>
+</sect1>
+
+<sect1 id="ruleset-options"
+><title
+>Editor del joc de regles</title>
+			<screenshot>
+				<screeninfo
+>Editor del joc de regles</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="ruleseteditor.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Editor del joc de regles</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+			<para
+>Utilitzeu l'editor del joc de regles per a personalitzar-los. Els jocs de regles predefinits es mostren en cursiva, els jocs de regles personalitzats tenen un tipus de lletra normal. L'usuari no podrà canviar de cap manera els jocs de regles predefinits, però, una actualització del &kajongg; podria fer-ho. Els jocs de regles personalitzats mai es veuran afectats per una actualització. </para
+><para
+>Quan s'inicia un joc nou, podreu seleccionar un joc de regles per a aquest joc. Es poden utilitzar tots els jocs de regles definits en l'editor del joc de regles. El joc de regles es desa juntament amb el joc, de manera que sempre el podreu canviar aquí -els vostres canvis només afectaran els jocs futurs-. </para>
+			<sect2
+><title
+>Regla, punts, x2, límits</title
+><para
+>Senzillament, feu doble clic sobre la que voleu canviar. Si es netegen tots els valors, aquesta regla no tindrà cap influència en el joc. Les regles no es poden suprimir.</para>
+			</sect2>
+			<sect2
+><title
+>Copiar i eliminar</title
+><para
+>Podeu copiar i eliminar jocs de regles sencers. </para
+><para
+>De nou, això es pot fer fins i tot si els jocs existents utilitzen aquest joc de regles, ja que cada joc té la seva pròpia còpia del joc de regles. Es poden veure els jocs de regles per als jocs antics: &nbsp;<link linkend="game-menu-scoreGame"
+>carregar</link
+> el joc antic i <link linkend="view-explain-scores"
+>mostrar la seva taula de puntuacions</link
+>. </para>
+			</sect2>
+			<sect2
+><title
+>Comparar</title
+><para>
+			<screenshot>
+				<screeninfo
+>Comparador dels jocs de regles</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="differ.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Comparador dels jocs de regles</phrase
+></textobject>
+				</mediaobject>
+			</screenshot
+>Podeu seleccionar aquesta ordre quan se selecciona un joc de regles sencer. Permet comparar el joc de regles seleccionat amb qualsevol altre joc de regles. </para
+></sect2>
+</sect1>
+
+<sect1 id="default-keybindings">
+<title
+>Dreceres predeterminades</title>
+
+<!-- TODO: not yet implemented
+<para
+>The menu entry <menuchoice
+><guimenu
+>Settings</guimenu
+> <guimenuitem
+>Configure ...</guimenuitem
+></menuchoice
+> allows you to change the default keyboard bindings.</para
+> -->
+
+<para
+>Les dreceres predeterminades són les següents: </para>
+
+<para>
+<variablelist>
+
+<varlistentry>
+<term
+><keycap
+>F1</keycap
+></term>
+<listitem>
+<para
+>Mostra aquest manual. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Permet dur la puntuació d'un joc manual. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Juga un joc amb amics o jugadors d'ordinador. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Interromp la partida actual. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Surt del programa. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Mostra la taula de puntuacions. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Mostra una finestra de xat. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Canvia l'angle de visió. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Activa o desactiva el mode de demostració. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Maj;<keycap
+>F1</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>L'ajuda «Què és això?». </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;&Maj;<keycap
+>F</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Mode de pantalla completa. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</para>
+
+</sect1>
+</chapter>
+
+<appendix id="problems"
+><title
+>Problemes coneguts</title>
+        <itemizedlist>
+                <listitem
+><para
+>En el mode de joc, encara no són possibles les penalitzacions.</para
+></listitem>
+                <listitem
+><para
+>Els jugadors de l'ordinador segueixen sent força estúpids.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="future"
+><title
+>Possibles característiques futures</title>
+        <itemizedlist>
+                <listitem
+><para
+>Afegir més jocs de regles. De manera opcional, això hauria de ser realitzat per persones que utilitzin aquests jocs de regles amb regularitat.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+ <appendix id="faq"
+><title
+>Preguntes més freqüents</title
+> <!-- do not change this! -->
+<!--This chapter is for frequently asked questions. Please use <qandaset
+> <qandaentry
+> only!-->
+<qandaset>
+<!--Following is a standard list of FAQ questions.-->
+        <qandaentry>
+                 <question
+><para
+>Vull canviar l'aparença d'aquest joc. Puc fer-ho? </para
+></question>
+                 <answer
+><para
+>Sí. Per a canviar l'aparença del &kajongg;, empreu la barra de menús per a obrir la <link linkend="configuration"
+>utilitat de configuració</link
+>.</para
+></answer>
+        </qandaentry>
+        <qandaentry>
+                 <question
+><para
+>Puc utilitzar el teclat per a assignar fitxes als jugadors?</para
+></question>
+                 <answer
+><para
+>Sí. Vegeu <link linkend="enterhand-tiles"
+>Fer que el &kajongg; calculi la puntuació</link
+>.</para
+></answer>
+        </qandaentry>
+<!--Please add more Q&As if needed-->
+
+</qandaset>
+</appendix>
+
+<appendix id="credits"
+><title
+>Crèdits i llicència</title
+> <!-- do not change this! -->
+<!--This chapter is for credits and licenses.-->
+	<para
+>&kajongg; per al &kde; </para>
+
+	<para
+>Copyright del programa &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+	<para
+>Copyright de la documentació &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+
+<!-- !!!do not change ANYTHING after this line!!!! -->
+<para
+>Traductor de la documentació: &credits.Antoni.Bella;</para
+> 
+&underFDL;
+&underGPL;
+
+</appendix>
+
+<appendix id="bibliography">
+<title
+>Bibliografia</title>
+        <itemizedlist>
+		<listitem
+><para
+>«Das Chinesische Mah-Jongg-Spiel» per en Uwe Martens el 2005, «Books on Demand» de GmbH, Norderstedt. Aquest llibre és una excel·lent referència en alemany que conté tot el que voldreu saber sobre les regles emprades a Alemanya i molts altres aspectes del joc.</para
+></listitem>
+                <listitem
+><para
+>«The Complete Book of Mah-Jongg» per en A. D. Millington el 1977 (amb diverses edicions de butxaca fins al 2003), «Weidenfeld &amp; Nicolson», Londres. Aquesta és la màxima referència per al Mah Jong de xinès clàssic tal com es juga en el món occidental. Ofereix valuosos consells sobre les estratègies de joc.</para
+></listitem>
+		<listitem
+><para
+>«Mah-Jong» per en Gwyn Headley i na Yvonne Seeley, tercera edició, 2008, «A &amp; C Black Publishers Ltd», Londres. Aquest llibre és una referència molt fàcil d'emprar, es concentra en les regles que s'utilitzen a la Gran Bretanya, definides per la BMJA (l'associació britànica de Mah Jong).</para
+></listitem>
+		<listitem
+><para
+><ulink url="https://en.wikipedia.org/wiki/Mahjong"
+></ulink
+></para
+></listitem>
+		<listitem
+><para
+><ulink url="https://de.wikipedia.org/wiki/Mah-Jongg"
+></ulink
+></para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="installation">
+<title
+>Instal·lació</title>
+<para
+>Per a Linux: La vostra distribució ja l'hauria de tenir empaquetat. </para>
+<para
+>Per a Windows: per a obtenir un instal·lador de Windows, vegeu <ulink url="https://www.linux-apps.com/p/1109453/"
+>https://www.linux-apps.com/p/1109453/</ulink
+>. </para>
+<para
+>Si voleu descarregar el codi font i instal·lar-lo manualment: <itemizedlist>
+<listitem
+><para
+> <literal
+>git clone https://invent.kde.org/games/kajongg.git</literal
+> </para
+></listitem>
+<listitem
+><para
+>Per a Linux: <literal
+>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal
+> </para
+></listitem>
+<listitem
+><para
+>Per a Windows: llegiu el fitxer <filename
+>README.windows</filename
+></para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>El &kajongg; depèn d'aquests paquets: (noms de paquets entre parèntesis de la Debian) <itemizedlist>
+	<listitem
+><para
+>Python 3.5 o superior (python3)</para
+></listitem>
+	<listitem
+><para
+>Qt5.7 o superior (python3-pyqt5 i python3-pyqt5.qtsvg)</para
+></listitem>
+	<listitem
+><para
+>els lligams de Python per a les Qt5 (python3-pyqt5)</para
+></listitem>
+        <listitem
+><para
+>la biblioteca twisted de Python 16.6.0 o superior (python3-twisted)</para
+></listitem>
+        <listitem
+><para
+>sqlite3 (libsqlite3-0)</para
+></listitem>
+</itemizedlist>
+</para>
+
+</appendix>
+
+&documentation.index;
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-always-quote-attributes:t
+sgml-indent-step:0
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

@@ -1,0 +1,1663 @@
+<?xml version="1.0" ?>
+<!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Swedish "INCLUDE"
+> <!-- change language only here -->
+  <!ENTITY % addindex "IGNORE"
+> <!-- do not change this! -->
+  <!ENTITY s1 "s1">
+  <!ENTITY s9 "s9">
+  <!ENTITY b1 "b1">
+  <!ENTITY b9 "b9">
+  <!ENTITY c1 "c1">
+  <!ENTITY c9 "c9">
+  <!ENTITY we "we">
+  <!ENTITY ws "ws">
+  <!ENTITY ww "ww">
+  <!ENTITY wn "wn">
+  <!ENTITY db "db">
+  <!ENTITY dr "dr">
+  <!ENTITY dg "dg">
+  <!ENTITY chow "chow">
+  <!ENTITY pung "pung">
+  <!ENTITY kong "kong">
+  <!ENTITY mahjongg "mahjongg">
+  <!ENTITY originalcall "originalcall">
+  <!ENTITY violatesoriginalcall "violatesoriginalcall">
+  <!ENTITY dangerousgame "dangerousgame">
+  <!ENTITY nochoice "nochoice">
+]>
+
+<!-- TODO: describe the window with the list of tables -->
+
+<book id="kajongg" lang="&language;"
+> <!-- do not change this! -->
+<bookinfo>
+	<title
+>Handbok &kajongg;</title
+> <!-- This is the title of this docbook. -->
+<!-- List of immidiate authors begins here. -->
+<!--INPORTANT! - All other contributors: [to be determined] -->
+<authorgroup>
+<author
+>&Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </author>
+<othercredit role="translator"
+> <firstname
+>Stefan</firstname
+> <surname
+>Asserhäll</surname
+> <affiliation
+><address
+><email
+>stefan.asserhall@bredband.net</email
+></address
+></affiliation
+> <contrib
+>Översättare</contrib
+></othercredit
+> 
+</authorgroup>
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2021-05-30</date
+><!-- Date of (re)writing, or update.-->
+<releaseinfo
+>KDE Gear 21.04</releaseinfo>
+
+<!--Short description of this document. Do not change unless necessary!-->
+<abstract>
+	<para
+>Denna dokumentation beskriver spelet &kajongg;</para>
+</abstract>
+
+<!--List of relevant keywords-->
+<keywordset>
+	<keyword
+>KDE</keyword
+> <!-- do not change this! -->
+	<keyword
+>kdegames</keyword
+> <!-- do not change this! -->
+	<keyword
+>spel</keyword
+> <!-- do not change this! -->
+	<keyword
+>kajongg</keyword
+><!--Application name goes here-->
+<!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<keyword
+>bräde</keyword>
+	<keyword
+>spelhall</keyword>
+	<keyword
+>brickspel</keyword>
+	<keyword
+>brickor</keyword>
+<!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<keyword
+>fyra spelare</keyword>
+<!--All other relevant keywords-->
+</keywordset>
+</bookinfo>
+<!--Content begins here: -->
+<chapter id="introduction"
+><title
+>Inledning</title
+> <!-- do not change this! -->
+	<note
+><title
+>Speltyp:</title
+><para
+>Brädspel, spelhall</para
+></note
+><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<note
+><title
+>Antal möjliga spelare:</title
+><para
+>Fyra</para
+></note
+><!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<para
+>&kajongg; är ett brädspel skapat efter det berömda orientaliska spelet Mah Jong (från kinesiskans <foreignphrase lang="zh"
+>麻將</foreignphrase
+>). Det spelas av fyra spelare. Det finns många olika regeluppsättningar runt om i världen. För närvarande stöder &kajongg; de klassiska kinesiska reglerna, som de tillämpas i Tyskland. I framtiden kommer ytterligare huvudregler att följa. Det är möjligt att anpassa eller lägga till nya regeluppsättningar. Gör gärna det och skicka dem till programmets upphovsman för integrering. </para>
+	<para
+>&kajongg; kan användas på två olika sätt: Poängsätta ett manuellt spel där du spelar som vanligt utan hjälp av en dator och använder &kajongg; för att beräkna poäng och bokföring. Eller kan du använda &kajongg; för att spela mot vilken kombination som helst av mänskliga eller datorspelare. </para>
+</chapter>
+
+<chapter id="screen_layout"
+><title
+>Skärmutläggningen</title>
+		<para>
+			<screenshot>
+				<screeninfo
+>En skärmbild av &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="gamescreen.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Skärmbild</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+                </para>
+                <para
+>En kort förklaring av spelplanens delar. </para>
+	<variablelist>
+		<varlistentry>
+			<term
+>Verktygsrad</term>
+			<listitem
+><para
+>Verktygsraden finns under menyraden och innehåller knappar för de oftast använda åtgärderna. Verktygsradens innehåll kan redigeras. Du kan också göra den osynlig, vilket ger större utrymme på skärmen för brädet. </para
+><para
+>Beroende på din skärmstorlek kanske du vill göra verktygsraden osynlig, eller flytta den till fönstrets vänstra sida. Du åstadkommer det genom att klicka med höger musknapp på verktygsraden. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Bräde</term>
+			<listitem
+><para
+>Brädet är den största delen av fönstret. De fyra mursidorna med längden 18 brickor syns (det exakta antalet beror på reglerna, som om bonusbrickor används eller inte). Spelarnas namn är skrivna på mursidorna, tillsammans med handens aktuella värde (så långt det är känt) och deras vindbrickor. Den rådande vinden har en färgad bakgrund. I skärmbilden ovan är det Östan. </para
+><para
+>Under <link linkend="play"
+>spelet</link
+> samlas brickorna som spelarna kastar innanför murarna. De placeras slumpmässigt. Den senast kastade brickan har en blå fokusram. </para
+><para
+>När <link linkend="scoreGame"
+>manuella spel poängsätts</link
+>, finns ett urval av alla tillgängliga brickor innanför muren, det centrala urvalet. Du kan tilldela dem till spelarna med musen eller tangentbordet. </para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Spelarens område</term>
+			<listitem
+><para
+>Varje spelare har ett område på skärmen för sina brickor. Den övre raden innehåller öppna brickor, den under raden dolda. Vid <link linkend="scoreGame"
+>poängsättning av manuella spel</link
+> visas dolda brickor med en skugga över hela brickan. Bonusbrickor hamnar längst till höger. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Dialogruta</term>
+			<listitem
+><para
+>Dialogrutan visar valen som spelaren har. Oftast har den en tidsgräns, med en förloppsrad som visar återstående tid. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Statusrad</term>
+			<listitem
+><para
+>Statusraden finns längst ner på skärmen, och innehåller spelarnas aktuella behållning. </para
+></listitem>
+		</varlistentry>
+	</variablelist>
+</chapter>
+
+<chapter id="scoreGame"
+><title
+>Poängsätta ett manuellt spel</title
+> <!-- do not change this! -->
+	<para
+>I detta läge används &kajongg; bara för att göra poängberäkningen. Du spelar som vanligt mot verkliga personer på ett verkligt bord, och i slutet av spelet kan du tala om för &kajongg; vilka brickor en spelare har i sin hand och allt annat som &kajongg; behöver veta för att beräkna poängen, vilket är vad programmet gör. Som alternativ kan du beräkna händernas poäng manuellt och skriva in dem. &kajongg; fördelar därefter betalningar mellan spelarna och skriver in resultaten i en databas. Det är möjligt att tillfälligt avbryta ett spel, starta ett annat spel med andra spelare, och återuppta gamla spel. Alla regler sparas tillsammans med spelen, så olika spel kan spelas med olika regler. </para>
+        <itemizedlist>
+            <listitem
+><para
+>Välj <menuchoice
+><guimenu
+>Spel</guimenu
+> <guimenuitem
+>Poängsätt spel manuellt</guimenuitem
+></menuchoice
+> i menyn, eller tryck på <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+>. </para
+></listitem>
+            <listitem
+><para
+>Nu kan du antingen välja ett befintligt inte färdigt spel eller starta ett nytt spel. Om du startar ett nytt spel, blir du tillfrågad om spelarna och regeluppsättningen. &kajongg; föreslår samma värden som användes i det förra spelet. Om det inte finns något föregående spel, föreslås de första fyra definierade spelarna. Observera att du inte kan ändra regeluppsättningen eller någon av dess regler efter detta val. Du kan göra det i förväg i <link linkend="configuration"
+>inställningsverktyget</link
+>. </para
+></listitem>
+            <listitem
+><para
+>Nu får du ett nytt fönster som heter <guilabel
+>Skriv in omgångens resultat</guilabel
+>. Läs <link linkend="enterhand-tiles"
+>Låt &kajongg; beräkna poängen</link
+> för en detaljerad beskrivning. </para
+></listitem>
+            <listitem
+><para
+>Efter att ha sparat handens resultat, fortsätt med nästa hand. </para
+></listitem>
+        </itemizedlist>
+      <sect1 id="enterhand"
+><title
+>Skriva in omgångsresultat</title>
+        <sect2 id="enterhand-scores">
+	<title
+>Poäng</title>
+	<screenshot>
+		<screeninfo
+>En skärmbild av &kajongg;</screeninfo>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="enterhand.png" format="PNG"/>
+			</imageobject
+>				<textobject
+><phrase
+>Skärmbild</phrase
+></textobject>
+		</mediaobject>
+	</screenshot>
+	<para
+>Det här är fönstret där händernas resultat skrivs in. Det visas automatiskt när &kajongg; tror att det behövs. Du kan alltid visa eller dölja det genom att trycka på <keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+> eller genom att använda motsvarande menyalternativ. </para>
+	<para
+>Som alltid har rådande vind sin bakgrund färgad. </para>
+	<para
+>Här kan du manuellt mata in poäng för alla spelare. Som ett alternativ kan du exakt definiera vilka brickor en spelare hade i handen. Om du väljer att göra det, inaktiveras motsvarande fält för det manuella poängvärdet. &kajongg; beräknar automatiskt poängen. </para>
+	<para
+>Efter att ha skrivit in all relevant data för en hand, klicka på knappen <guibutton
+>Spara hand</guibutton
+>. Handens värden skrivs in i databasen, och de visas också i poängtabellen. Du kan bli tillfrågad om att ändra spelarnas platser, men du kan välja att inte göra det. De föreslagna ändringarna går för närvarande inte att anpassa. Om någon regeluppsättning behöver något annorlunda, kommer vi att ändra det. </para>
+	<para
+>Om spelaren kan ha vunnit, är kryssrutan i kolumnen <guilabel
+>Vinnare</guilabel
+> aktiverad. Klicka på den för vinnaren. </para>
+	<para
+>Statusraden visar nu spelarnas uppdaterade behållning, och du kan fortsätta med nästa omgång. </para>
+	<sect3 id="enterhand-manually">
+	<title
+>Skriv in poängen för hand</title>
+	<para
+>En bra spelare föredrar troligen att beräkna sina egna poäng. I detta fall kan du skriva in det direkt. Det är bara möjligt när inga brickor är valda för spelaren. </para>
+	<para
+>Om du skriver in poäng för hand, måste de redan innehålla allt utom straff. Du får inga valfria regler att välja bland. Det finns ett undantag: <quote
+>Farligt spel</quote
+>. Det påverkar inte några poäng, och ger heller inget straff. Det betyder bara att betalning mellan spelare är annorlunda: Den bestraffade betalar allt för allt till vinnaren. De övriga två spelarna gör inga betalningar. Det är för närvarande inte möjligt att anpassa. </para>
+	</sect3>
+	<sect3 id="enterhand-tiles">
+	<title
+>Låt &kajongg; beräkna poängen</title>
+	<para
+>Om du uttryckligen talar om för &kajongg; vilka brickor en spelare har, blir inmatningen av poäng inaktiverad för spelaren i det här fönstret. Medan brickor tilldelas en spelare, ser du hur poängen ökar, men så fort du lägger till den 14:e brickan blir resultatet noll. Det kan förvåna dig, men om du inte deklarerar handen som vinnare, betraktas den som en lång hand som alltid har noll poäng. Beteendet definieras av de klassiska kinesiska reglerna, och kan vara annorlunda om du ändrar reglerna eller använder en annan regeluppsättning. </para>
+	<para
+>Du kan definiera brickor och kombinationer för en spelare med musen, tangentbordet, eller båda. Flytta helt enkelt brickor med musen genom att dra och släppa dem i spelarens område. När brickan släpps, blir du tillfrågad om vad du vill flytta: Ensam, par, pong, kong, kungjord kong eller chi. Den övre raden är till för öppna brickor, och den undre raden för dolda brickor. Bonusbrickorna visas längst till höger. Du kan också flytta brickor och kombinationer mellan rader, mellan spelare och tillbaka till det centrala urvalet. </para>
+	<para
+>Om du föredrar att använda tangentbordet, kan du använda tabulator för att gå mellan det centrala urvalet och spelarnas händer. Tangenterna <keycap
+>ösvnÖSVN</keycap
+> flyttar en bricka till spelarna östan, sunnan, västan och nordan. Tangenterna <keycap
+>xX</keycap
+> flyttar tillbaka den till det centrala urvalet. <keycap
+>ÖSVN</keycap
+> flyttar till den dolda raden, medan <keycap
+>ösvn</keycap
+> flyttar till den öppna raden. Du kan flytta markören mellan brickor eller kombinationer med piltangenterna, och brickan eller kombinationen som för närvarande är markerad har en blå ram. Eftersom piltangenterna är långt bort från bokstäverna på tangentbordet, kan du också använda bokstäverna <keycap
+>hjkl</keycap
+> eller <keycap
+>HJKL</keycap
+> för att flytta markören. <keycap
+>hH</keycap
+> går åt vänster, <keycap
+>jJ</keycap
+> går neråt, <keycap
+>kK</keycap
+> går uppåt och <keycap
+>lL</keycap
+> går åt höger. Det är sättet som Unix-editorn <command
+>vi</command
+> använder. &kde;:s webbläsare &konqueror; och även det här hjälpprogrammet stöder tangenterna på samma sätt. Tangenterna kan vara annorlunda om du använder ett annat språk än engelska, men det är för närvarande inte möjligt att ställa in dem. </para>
+	<para
+>Alternativen <guilabel
+>Sista brickan</guilabel
+> och <guilabel
+>Sista kombinationen</guilabel
+> behövs av vissa regler som <guilabel
+>Sista brickan bildar par</guilabel
+>. De kan bara användas för vinnarens hand. </para>
+	<para
+>På höger sida av fönstret kan du verkställa vissa regler manuellt. Vilka regler som visas i listan beror på aktuell regeluppsättning och på brickorna. I exemplet från skärmbilden ovan, kan spelarna som förlorar ha alternativet <quote
+>Farligt spel</quote
+>, återigen beroende på regeluppsättning och på deras brickor. Det är utvecklarnas mål att hålla den här listan med manuellt valda regler så kort som möjligt. I bästa fall ska &kajongg; alltid automatiskt kunna bestämma om en regel gäller, men ibland har inte &kajongg; tillräckligt med information eller kunskap för att kunna bestämma. </para>
+	</sect3>
+	</sect2>
+	<sect2 id="enterhand-penalties">
+	<title
+>Straff</title>
+			<screenshot>
+				<screeninfo
+>En skärmbild av &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="penalty.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Skärmbild</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+	<para
+>I <link linkend="enterhand"
+>fönstret för att skriva in omgångsresultat</link
+>, visas det här fönstret där du kan skriva in straff av knappen <guibutton
+>Straff</guibutton
+></para>
+	<para
+>Rutan <guilabel
+>Regelbrott:</guilabel
+> visar alla regelbrott som kan gälla för händerna som spelarna har. Välj bland dem.</para>
+	<para
+>Nu kan du anpassa <guilabel
+>Totalt straff</guilabel
+>. Det är den totala summan som flyttas från betalarna till betalningsmottagarna. Den kommer att delas jämnt mellan dem.</para>
+	<para
+>Beroende på typ av regelbrott, varierar antal betalare och betalningsmottagare. Det rätta antalet spelare visas. Om du väljer en spelare, försäkrar sig &kajongg; om att spelaren bara finns en gång, genom att anpassa övriga spelare. </para>
+	</sect2>
+	</sect1>
+</chapter>
+
+<chapter  id="play"
+><title
+>Att spela</title>
+	<para
+>Du kan när som helst aktivera eller inaktivera demonstrationsläget. I demonstrationsläget spelar datorn åt dig. Om inget spel för närvarande pågår, startas ett nytt spel med den senast använda regeluppsättningen. </para>
+        <sect1 id="robotplay">
+        <title
+>Spela mot datorn</title>
+         <para
+>Först visas en dialogruta för inloggning. Skriv in spelservern du vill ansluta till och ditt användarnamn. Om du väljer det särskilda värdet <guilabel
+>Lokalt spel</guilabel
+> behöver du bara skriva in ditt namn (eller acceptera det föreslagna namnet) och önskad regeluppsättning. Det påbörjar omedelbart ett lokalt spel där du spelar mot tre robotspelare. </para>
+        </sect1>
+        <sect1 id="humanplay">
+        <title
+>Spela med vänner</title>
+        <para
+>Om du vill spela mot andra människor, behövs en spelserver som alla spelare, inklusive du själv, måste ansluta till. Gör det genom att välja vilken annan värddator som helst, eller manuellt skriva in ett nytt värddatornamn och ange lösenord för den värddatorn. Det senast använda lösenordet föreslås. </para
+><para
+>Det enklaste sättet är att använda spelservern på <literal
+>kajongg.org</literal
+>. &kajongg; visar den i listan med möjliga spelservrar. Observera att för tillfället erbjuder den bara en spelserver, men ingen webbsida eller några andra tjänster. </para
+><para
+>Om du inte har ett konto på spelservern med namnet du skrev in, blir du tillfrågad om du vill öppna ett konto. Om du svarar ja, visas en ny dialogruta där du kan skriva in önskat lösenord två gånger. Ditt konto skapas automatiskt. </para
+><para
+>Efter att ha lyckats logga in på spelservern, får du en lista över bord med tillgängliga platser på spelservern. Gå med ett bord eller reservera ett nytt bord. Om du reserverar ett nytt bord, vänta till flera platser är tagna av andra spelare. Du kan starta spelet på ett bord du reserverat när som helst, så tilldelas platserna som inte är tagna till robotspelare. </para
+><para
+>Bordlistan visar också namnet på regeluppsättningen som spelas på bordet. Regeluppsättningen och dess namn skickas till spelservern av spelaren som påbörjar bordet. Om du har en identisk regeluppsättning visar bordet ditt namn på regeluppsättningen: det kan vara till hjälp om den som påbörjat bordet talar ett annat språk och har namngett regeluppsättningen på ett annat sätt. Om namnet på din lokala regeluppsättning visas, visas det dessutom i svart. Om du dock inte har någon identisk regeluppsättning visas namnet i rött, och du kan använda knappen <guibutton
+>Jämför</guibutton
+> för att jämföra den med dina egna regeluppsättningar. </para
+><para
+>Om du inte använder <literal
+>kajongg.org</literal
+> eller någon annan befintlig spelserver, kan du starta en egen &kajongg; spelserver på två olika sätt: <itemizedlist
+><listitem
+><para
+>anslut till servern <literal
+>localhost</literal
+>. Det är din egen dator. Om du gör det och ingen spelserver kör, startas den automatiskt. Och när du slutar spela stoppas också servern. Det skiljer sig från <guilabel
+>Lokalt spel</guilabel
+>, det senare tillåter inte anslutning från andra datorer. </para
+></listitem
+><listitem
+><para
+>manuellt starta en server på vilken dator du vill. Allt du behöver göra är att gå till kommandoraden och starta programmet <command
+>kajonggserver</command
+>. Att skriva in <command
+>kajonggserver --help</command
+> visar alla tillgängliga väljare, som att ändra standardporten. Servern kör till du dödar den. </para
+></listitem
+></itemizedlist>
+        </para
+><para
+>I båda fallen måste du tala om för dem hur de kan nå din spelserver. De behöver webbadressen, eller helt enkelt en IP-adress och porten servern lyssnar på. Det kan vara någonting som liknar <literal
+>minpc.dyndns.se:8301</literal
+>, där <literal
+>8301</literal
+> är porten. Du måste förstås ställa in brandväggen så att fjärrspelare kan nå porten. Kommunikationen krypteras. </para
+><para
+>Se <menuchoice
+><guimenu
+>Hjälp</guimenu
+><guimenuitem
+>Om &kajongg;</guimenuitem
+></menuchoice
+> om portnummer. Protokollversionen är portnumret. För &kajongg; 17.04 är det 8301. Om spelaren inte skriver in någon port för önskad spelserver, beräknar klienten porten på samma sätt. Så om en dator kör flera spelservrar med olika protokollversioner, bör du automatiskt nå rätt spelserver. Hur som helst, ser spelservern och klienten till att deras versioner är kompatibla och varnar dig annars. </para
+><para
+>Om du stöder på möjliga fel, bör du kanske använda väljaren <command
+>kajongg --debug=traffic</command
+>. Den visar dig vilka meddelanden som skickas mellan spelservern och klienterna, i terminalen där servern startades. För fler väljare, se <command
+>kajongg --help</command
+>. </para>
+        <sect2 id="playing-caveats">
+        <title
+>Problemområden</title>
+            <itemizedlist
+><listitem
+><para
+>Om du vill försäkra dig om att ingen kan fuska, får ingen av de mänskliga spelarna komma åt datorn som spelservern kör på. Du kan naturligtvis aldrig undvika att två spelare hjälper varandra, eftersom du inte kan veta vad de verkligen gör. Två spelare kan till och med vara en och samma person. </para
+></listitem
+></itemizedlist>
+        </sect2>
+        </sect1>
+<sect1  id="gamerules"
+><title
+>Spelregler</title>
+<para
+>Det finns många olika spelvarianter över hela världen. För närvarande stöder &kajongg; två versioner av de klassiska kinesiska regler som de spelas i Tyskland och i Storbritannien.</para
+><para
+>Den här beskrivningen går inte in på detaljer, och stämmer därigenom för båda varianterna.</para
+><para
+>Dock är de flesta grundreglerna likadana i de flesta varianter.</para>
+  <para
+>Eftersom programmet &kajongg; vet hur man spelar, innehåller den här berskrivningen bara sådant som inte kanske är självklart.</para>
+  <para
+>Om du vill lära dig Mah Jong mer ingående, se <link linkend="bibliography"
+>bibliografin</link
+>.</para>
+<sect2 id="gamerules-aim">
+  <title
+>Spelets mål</title>
+  <para
+>Varje spelare försöker samla brickor för en vinnande hand. När det har uppnåtts, kungör spelaren <quote
+>Mah Jong</quote
+>. Brickorna i en vinnande hand är normalt grupperade i fem kombinationer: Fyra kombinationer med tre eller fyra brickor vardera, och en femte kombination som består av två likadana brickor. En normal kombination har tre eller fyra identiska brickor (som kallas pong eller kong), eller tre brickor i följd som bambu 3, bambu 4, bambu 5 (som kallas chi).</para>
+  </sect2>
+  <sect2>
+    <title
+>Spelets gång</title>
+    <para
+>Från början har spelaren med östanvinden (angivet av muren) en bricka mer än övriga spelare. Östan börjar med att kasta en oönskad bricka. </para>
+    <para
+>Så snart en bricka har kastats, kan övriga spelare begära den genom att kungöra vad de kan komplettera med brickan (chi, pong, kong, Mah Jong). Bara nästa spelare kan kungöra en chi, medan de övriga är möjliga för alla spelare. En kombination som färdigställs av en kungörelse är öppen - synlig för alla spelare. </para
+><para
+>Om ingen begär den kastade brickan, tar sunnan (och därefter västan och nordan) en bricka från muren, och kastar en oönskad bricka. </para>
+      <para
+>Det finns flera regler om när en pong kan utökas till en kong (genom att begära den fjärde brickan eller få den från muren). Reglerna förklaras inte här, men &kajongg; känner förstås till dem och försäkrar sig om att de följs. Om en kong kungörs, får spelaren automatiskt en ersättningsbricka från muren - annars skulle det inte vara möjligt att skapa de fem ovannämnda kombinationerna. </para>
+    </sect2>
+    <sect2>
+      <title
+>År, omgång och hand</title
+><para
+>När en spelare kungör Mah Jong eller det blir oavgjort, är handen fullständig. Förutom vid oavgjort, roteras nu vindarna mellan spelarna. Det upprepas till varje spelare har haft alla vindar. Hela denna följd kallas en omgång. Ett helt spel, som också kallas ett år, består av fyra omgångar: Östan-, sunnan-, västan- och nordan-omgången. En omgångs vind kallas också den rådande vinden, och kan ge högre poäng.</para>
+	<para
+>Ett fullständigt spel (ett år) består av minst 16 händer. Eftersom vindarna inte roteras vid oavgjort eller när östan kungör Mah Jong, behövs normalt fler händer för ett fullständigt spel. </para
+></sect2
+><sect2
+><title
+>Bonusbrickor</title>
+    <para
+>Ett spel kan innehålla åtta bonusbrickor (om inte reglerna utesluter det). De visas separat på höger sida om spelområdet, eftersom de aldrig används för att skapa kombinationer. De ger dock bonuspoäng.</para>
+      <para
+>Om en spelare får en bonusbricka, ges också en ersättningsbricka automatiskt från muren, och en klocka ringer.</para
+></sect2>
+      <sect2
+><title
+>Poängsättning</title
+><para
+>När en hand är färdig beräknas poäng för varje spelare. För det första räknas baspoäng som 2 poäng för en enkel öppen pong, eller 20 poäng vid vinst. Därefter tillämpas en annan uppsättning regler, som kan dubbla antal poäng såsom en dubblering för en kombination med drakar. När poängen för varje hand är känd, betalas skillnader mellan spelarna, medan vinnaren får hela sin poäng betald från alla övriga spelare. Östan får och betalar alltid dubbla poängen.</para>
+	  <para
+>Naturligtvis känner &kajongg; till alla tillämpliga regler, men en god spelare känner till vilka kombinationer som får vilka poäng, och kan optimera. Under inlärning rekommenderas att fönstret <guimenuitem
+>Förklara poäng</guimenuitem
+> aktiveras.</para>
+	  <para
+>De exakta poängreglerna varierar ofta - i &kajongg; har man möjlighet att ändra dem med <link linkend="ruleset-options"
+>regeluppsättningseditorn</link
+>.</para>
+	  <para
+>Regeluppsättningseditorn visar också alla tillgängliga regler och deras betydelse. Håll musen över dem så visas en hjälptext för de mer ovanliga.</para>
+	</sect2>
+</sect1>
+<sect1 id="playing-play">
+        <title
+>Hur man spelar med &kajongg;</title>
+        <para
+>Du blir tillfrågad om vad du vill göra. Det är en liten dialogruta som antingen dyker upp till höger eller längst ner, beroende på fönstrets storlek. Om du gör det bredare än högt, visas dialogrutan till höger. Ibland har dialogrutan en tidsgräns - när den har gått ut väljes automatiskt det första möjliga svaret åt dig. Tidsgränsen går att ställa in i regeluppsättningseditorn, under <guilabel
+>Alternativ</guilabel
+>, <guilabel
+>Tidsgräns för kungörelse</guilabel
+>. Alla spelare ska ha samma tidsgräns, det är därför den är en del av regeluppsättningen. </para
+><para
+>Om du måste välja en bricka från handen, kan du gå mellan brickorna med högerpil och vänsterpil, eller bokstäverna <keycap
+>h</keycap
+> och <keycap
+>l</keycap
+> på tangentbordet. Du kan naturligtvis också använda musen. </para
+><para
+>Du kan slänga en bricka genom att använda tangentbordet på samma sätt som för åtgärder. Som ett alternativ, kan musen användas för att flytta brickan från handen till högern (innanför muren). Placeringen av brickan i högen görs fortfarande av datorn, eftersom placeringen ska vara samma för alla spelare. </para
+><para
+>Ofta erbjuder dialogrutorna val som inte egentligen är möjliga, som att kungöra Pong när du inte har de nödvändiga brickorna. Det är med avsikt, precis som i ett riktigt spel. Men du kan ställa in att omöjliga val tas bort: Inaktivera <guilabel
+>Visa bara möjliga åtgärder</guilabel
+> på sidan <guilabel
+>Spela</guilabel
+> i inställningsdialogrutan. </para
+><para
+>Kastade brickor placeras slumpmässigt mellan murarna. Vissa spelversioner definierar var brickorna ska placeras, men det är dock inte ännu inställningsbart. När det blir inställningsbart, kommer det att ingå i regeluppsättningen. </para>
+	</sect1>
+</chapter>
+
+<chapter id="interface"
+><title
+>Översikt av gränssnittet</title
+> <!-- do not change this! -->
+<!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist
+> and <varlistentry
+>. Split the chapter into sections using <sect1(2,3)
+> for better viewing.-->
+
+<sect1 id="menu">
+<title
+>Menyalternativ</title>
+
+		<variablelist>
+			<varlistentry id="game-menu-scoreGame">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Spel</guimenu
+> <guimenuitem
+>Poängsätt spel manuellt</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Poängsätt bara ett manuellt spelat spel.</action
+></para
+><para
+>Du kan ladda ett gammalt spel eller starta ett nytt. Normalt visas bara väntande (dvs. inte färdiga) spel i urvalslistan. Du kan valfritt visa alla spel, inklusive färdiga. Här kan du också ta bort spel.</para
+></listitem>
+			</varlistentry>
+                        <varlistentry  id="game-menu-play">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Spel</guimenu
+> <guimenuitem
+>Spela</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Spela med andra (personer och datorer)</action
+>.</para
+></listitem>
+                        </varlistentry>
+                        <varlistentry  id="game-menu-abort">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Spel</guimenu
+> <guimenuitem
+>Avbryt spel</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Avbryt pågående spel. Om det var ett manuellt spel, enbart med poängsättning, kan du återuppta det senare. Om du spelar med användning av &kajongg;, kan spel ännu inte återupptas.</action
+></para
+></listitem>
+                        </varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Spel</guimenu
+> <guimenuitem
+>Avsluta &kajongg;</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Avslutar</action
+> &kajongg;.</para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-chat">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visa</guimenu
+> <guimenuitem
+>Chatta</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Chatt</action
+></para>
+				<screenshot>
+					<screeninfo
+>Chattfönster</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Chattfönster</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Låter dig chatta med övriga spelare. </para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-scoretable">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visa</guimenu
+> <guimenuitem
+>Poängtabell</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Poängsättningstabell</action
+></para>
+                                <screenshot>
+                                        <screeninfo
+>Poängsättningstabell</screeninfo>
+                                        <mediaobject>
+                                                <imageobject>
+                                                <imagedata fileref="scoretable.png" format="PNG"/>
+                                                </imageobject>
+                                                <textobject>
+                                                <phrase
+>Skärmbild</phrase>
+                                                </textobject>
+                                        </mediaobject>
+                                </screenshot>
+    <para
+>Visa poängsättningstabellen. Omgång/hand är den pågående ronden (Öst, Syd, Väst, Nord) följd av antal omgångar som har spelats i ronden. Vinnaren har en grön bakgrund för sina värden. Utbetalningar visar hur mycket spelaren betalade ut till eller tog emot från alla andra spelare i omgången. Behållning visar nuvarande behållningen för alla spelare. Diagram visar behållningens utveckling. Tipsen ger mer information: de visar alla regler som har används i omgången. Flytta bara musen över värdet som du är intresserad av.</para
+><para
+>Den nedre delen visar använd regeluppsättning. Mellan poängtabellen och använd regel finns en avdelare, som låter dig ändra den relativa storleken hos båda delarna. </para
+></listitem>
+                        </varlistentry>
+			<varlistentry id="view-explain-scores">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>E</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visa</guimenu
+> <guimenuitem
+>Förklara poängberäkning</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Förklara poäng</action
+></para>
+				<screenshot>
+					<screeninfo
+>Poängsättningstabell</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="explain.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Poängtabell</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Förklarar hur den aktuella omgångens poäng beräknades. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visa</guimenu
+> <guimenuitem
+>Fullskärmsläge</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Byter mellan fullskärmsläge och normalt läge.</action
+></para
+></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Inställningar</guimenu
+> <guimenuitem
+>Spelare</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Lägg till, ändra och ta bort spelare.</action
+></para>
+				<para
+>Lösenorden i tabellen är de som normalt används vid inloggning på en spelserver. Att ändra lösenordet som du från början valde för en spelserver är inte till någon hjälp. eftersom det ännu inte finns något sätt att också ändra lösenordet på spelservern. Du skulle behöva be spelserverns administratör att göra det åt dig direkt i databasen.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Inställningar</guimenu
+> <guimenuitem
+>Regeluppsättningar</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Anpassa regeluppsättningar.</action
+></para>
+				<para
+>Använd regeluppsättningseditorn för att anpassa regeluppsättningar. För detaljerad information se <link linkend="ruleset-options"
+>följande</link
+>.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Inställningar</guimenu
+> <guimenuitem
+>Ändra synvinkel</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Ändrar synvinkeln för brickorna moturs.</action
+></para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Inställningar</guimenu
+> <guimenuitem
+>Demonstrationsläge</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Aktiverar eller inaktiverar demonstrationsläget. Titta <link linkend="play"
+>här</link
+> för detaljinformation.</action
+></para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+<para
+>Dessutom har &kajongg; de vanliga menyalternativen <guimenu
+>Inställningar</guimenu
+> och <guimenu
+>Hjälp</guimenu
+> i &kde;. För mer information, läs avsnitten  <ulink url="help:/fundamentals/menus.html#menus-settings"
+>Menyn Inställningar</ulink
+> och <ulink url="help:/fundamentals/menus.html#menus-help"
+>Menyn Hjälp</ulink
+> i &kde;:s Grunder. </para>
+
+</sect1>
+</chapter>
+
+<chapter id="configuration"
+><title
+>Spelanpassning</title
+> <!-- do not change this! -->
+<!--This section describes configuration &GUI;. If your game is configured using menubar exclusively, please remove this section.-->
+<screenshot>
+<screeninfo
+>Inställningsdialogrutan</screeninfo>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="config_play.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase
+>Inställningsdialogrutan</phrase>
+	  </textobject>
+	</mediaobject>
+</screenshot>
+
+<para
+>Menyalternativet <menuchoice
+><guimenu
+>Inställningar</guimenu
+> <guimenuitem
+>Anpassa &kajongg;...</guimenuitem
+></menuchoice
+> visar dialogrutan <guilabel
+>Anpassa - &kajongg;</guilabel
+>.</para>
+<para
+>Om du klickar på knappen <guibutton
+>Avbryt</guibutton
+> här, ångras alla ändringar av inställningarna, inklusive allt du gjorde i regeluppsättningseditorn.</para>
+<para
+>Du kan också välja olika flikar med tangentbordet: <keycombo action="simul"
+>&Ctrl;<keycap
+>1</keycap
+></keycombo
+> väljer den första fliken, alternativet <guilabel
+>Spela</guilabel
+>, <keycombo action="simul"
+>&Ctrl;<keycap
+>2</keycap
+></keycombo
+> väljer den andra fliken, och så vidare. </para>
+
+<sect1 id="play-options"
+><title
+>Spelalternativ</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<guilabel
+>Visa brickornas skuggor</guilabel>
+				</term>
+				<listitem
+><para
+>Det här visar brickor med kanter och skuggor. Det finns också ett visst mellanrum mellan brickrader, och murens brickor visas så att det går att se om muren är två eller tre brickor hög. Om alternativet inaktiveras, får man alltså en enklare visning med något större brickor. Det kan vara till hjälp för små bildskärmar. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Arrangera om dolda brickor till kombinationer</guilabel>
+				</term>
+				<listitem
+><para
+>Det här grupperar kombinationer på handen. Ibland kan grupperingen kanske inte vara som du vill ha den, så du kanske föredrar att inte ha någon gruppering alls, precis som i ett verkligt spel. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Visa bara möjliga åtgärder</guilabel>
+				</term>
+				<listitem
+><para
+>Visa bara möjliga åtgärder under spelet, som <quote
+>Ingen begäran</quote
+> eller <quote
+>Pong</quote
+>. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Föreslå vad som bör göras</guilabel>
+				</term>
+				<listitem
+><para
+>Så fort du har ett val av åtgärder, som att begära en bricka eller inte, eller välja vilken bricka som ska kastas, kan &kajongg; hjälpa dig genom att ge ett förslag. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Använd ljud om tillgängliga</guilabel>
+				</term>
+				<listitem
+><para
+>Det är låter dig höra kastade och kungjorda brickor. Om andra spelare spelar in ljudfiler med sina egna röster, kan du höra dem. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Låt andra höra min röst</guilabel>
+				</term>
+				<listitem
+><para
+>Om du spelade in ljudfiler med din egen röst, låter det här alternativet andra spelare höra din egen röst för dina kastade och kungjorda brickor. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Animeringshastighet:</guilabel>
+				</term>
+				<listitem
+><para
+>Definiera hur snabbt brickorna ska flyttas omkring. Om du flyttar skjutreglaget längst åt höger, animeras inte förflyttning av brickor: brickorna byter helt enkelt plats. </para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+	<sect2
+><title
+>Ljud</title>
+	<para
+>Du får en mycket bättre spelupplevelse om du hör spelare begära brickor och kungöra kastade brickor. Det gör det också enklare att spela, eftersom du kan koncentrera dig på dina egna brickor, du behöver inte titta på vad andra kastar. </para>
+	<para
+>&kajongg; levereras med röster för olika spelare. Röster tilldelas automatiskt till alla spelare. För varje språk ska det finnas fyra röster, helst två manliga och två kvinnliga. &kajongg; försöker använda röster på samma språk som det kör med. Om inga röster hittas med det språket, använder &kajongg; andra språk som reserv, med samma reservspråk som du har definierat för &kajongg; (se <menuchoice
+><guimenu
+>Hjälp</guimenu
+> <guimenuitem
+>Ändra programmets språk...</guimenuitem
+></menuchoice
+>). Om inga röstfiler finns på ditt modersmål, inbjuds du att spela in och bidra med dem till &kajongg;. </para>
+	 <itemizedlist
+><listitem
+><para
+>Så här kan du skapa röster själv. Det finns en separat katalog för varje röst. Observera att katalogerna kan finnas någon annanstans på ditt system, de beror på hur &kde; installerades. Bara delen som börjar med <filename class="directory"
+>kajongg</filename
+> är alltid likadan. Det finns två röstgrupper med olika platser i filsystemet: <itemizedlist
+><listitem
+><para
+>Fördefinierade röster för varje språk. De finns i en katalog som <filename class="directory"
+>/usr/share/kajongg/voices/SPRÅK</filename
+> där SPRÅK är koden för ditt modersmål. Röstkatalogerna under <filename class="directory"
+>.../kajongg/voices/</filename
+> är på amerikansk engelska. Fördefinierade röster tilldelas slumpmässigt till spelare. Rösterna har namn som <quote
+><literal
+>"male1 male2 female1 female2"</literal
+></quote
+> men namnen spelar ingen roll, eftersom användaren aldrig ser dem. </para
+></listitem
+><listitem
+><para
+>Användarröster kan definieras för en specifik användare. Om &kajongg; använder en sådan röst, kan det automatiskt överföras till andra spelare över Internet. Rösterna kan finnas i en katalog som <filename class="directory"
+>~/.local/share/apps/kajongg/voices/</filename
+>. Så om loginnamnet är anna, kan det vara <filename class="directory"
+>/home/anna/.local/share/apps/kajongg/voices/joe/</filename
+>. Katalogen <filename class="directory"
+>voices/</filename
+> kanske inte existerar ännu. Om så är fallet, skapa den. </para
+></listitem
+></itemizedlist>
+		</para
+></listitem
+><listitem
+><para
+>Nu när du vet var den nya rösten ska placeras, skapa en ny katalog för den. </para
+></listitem
+><listitem
+><para
+>I den underkatalogen kan du placera ljudfilerna. De måste kodas med <ulink url="https://xiph.org/vorbis/"
+>Ogg Vorbis</ulink
+> ljudomkodare, och namnen måste ha filändelsen <filename class="extension"
+>.ogg</filename
+>. En enskild fil har ett namn som <filename
+>s3.ogg</filename
+>, vilket betyder sten 3. Sådana filer ska definieras för varje bricka, varje begäran och kungörelse. Men om ett ljudfil saknas, händer ingenting allvarligt, ljudet hörs helt enkelt bara inte. Återgång till andra röster eller språk fungerar bara för hela röster, inte för enskilda ljudfiler. </para
+></listitem
+><listitem
+><para
+>Efter att ha definierat alla ljudfiler för en fördefinierad röst, försäkra dig om att &kajongg;-processen har skrivrättigheter i den nya röstkatalogen. Starta &kajongg; och prova rösten. När allting är ok, kan du ta bort skrivrättigheterna (och bör göra det för fördefinierade rösterna). &kajongg; kommer automatiskt att skapa en fil som kallas <filename
+>md5sum</filename
+> innehåller en checksumma för alla ljudfiler. När du ändrar, lägger till eller tar bort en ljudfil för en röst, försöker &kajongg; skriva den filen igen. </para
+></listitem
+></itemizedlist>
+	<para
+>Gör ljudets längd kort men tala tydligt. Spelet kan gå mycket snabbt när man är van vid det. Det är enklare om man först skriver ned en lista med allt som ska läsas upp. Läs det inte som en följd av värden, utan försök uttala varje värde som det var det enda, och som man skulle göra det när man spelare. Lämna utrymme mellan värdena. Att läsa upp detta kräver en del övning.</para>
+	<para
+>Det här är bara en möjlighet att skapa ljudfilerna. </para
+><para
+><itemizedlist
+><listitem
+><para
+>Spela in en ljudfil med programmet <command
+>qarecord</command
+>, sparat den med <acronym
+>WAV</acronym
+>-format. Läs upp alla ljud i denna enda ljudfil. </para
+></listitem
+><listitem
+><para
+>Redigera filen med ljudeditorn <command
+>audacity</command
+>. Använd musen i den editorn för att markera ett intervall av ljudvågorna. Editorn spelar upp den delen. Upprepa till du har markerat rätt del. Det kan vara enklare om <menuchoice
+><guimenu
+>Visa</guimenu
+> <guimenuitem
+>Zooma in</guimenuitem
+></menuchoice
+> används. Använd menykommandot <menuchoice
+><guimenu
+>Arkiv</guimenu
+> <guimenuitem
+>Exportera markering</guimenuitem
+></menuchoice
+> och spara med formatet <filename class="extension"
+>.ogg</filename
+>. Välj låg kvalitet under <guilabel
+>Alternativ</guilabel
+>, det är tillräckligt, och till och med önskat, eftersom det reducerar tiden för att överföra ljuden till andra spelare. </para
+></listitem
+></itemizedlist
+></para>
+	<para
+>Följande är namnen på filerna som ska skapas. Lägg alltid till <filename class="extension"
+>.ogg</filename
+> sist i dem:</para>
+
+<table>
+<title
+>Ljudfilernas namn</title>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry
+>&s1; .. &s9;</entry
+><entry
+>Bricka 1 till bricka 9</entry>
+</row>
+<row>
+<entry
+>&b1; .. &b9;</entry>
+<entry
+>Bambu 1 till bambu 9</entry>
+</row>
+<row>
+<entry
+>&c1; .. &c9;</entry>
+<entry
+>Tecken 1 till tecken 9</entry>
+</row>
+<row>
+<entry
+>&we; &ws; &ww; &wn;</entry>
+<entry
+>Vindarna östan, sunnan, västan, nordan</entry>
+</row>
+<row>
+<entry
+>&db; &dr; &dg;</entry>
+<entry
+>Drakarna blå/vit, röd, grön</entry>
+</row>
+<row>
+<entry
+>&chow; &pung; &kong; &mahjongg;</entry>
+<entry
+>De viktigaste kungörelserna: chi, pong, kong, Mah Jong</entry>
+</row>
+<row>
+<entry
+>&originalcall; &violatesoriginalcall;</entry>
+<entry
+>Ursprunglig kungörelse om den är felaktig</entry>
+</row>
+<row>
+<entry
+>&dangerousgame;</entry>
+<entry
+>En spelare fyrar av en kanon (farligt spel)</entry>
+</row>
+<row>
+<entry
+>&nochoice;</entry>
+<entry
+>En spelare deklarerar att han inte har något val annat än att spela ett farligt spel</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+	</sect2>
+</sect1>
+
+<sect1 id="tiles-options"
+><title
+>Brickalternativ</title>
+        <screenshot>
+                <screeninfo
+>Brickuppsättningsväljare</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_tiles.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Brickuppsättningsväljare</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Använd val av <guilabel
+>Brickor</guilabel
+> för att välja brickornas grafik. </para>
+</sect1>
+
+<sect1 id="background-options"
+><title
+>Bakgrundsalternativ</title>
+        <screenshot>
+                <screeninfo
+>Val av bakgrund</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_background.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Val av bakgrund</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Använd val av <guilabel
+>Bakgrund</guilabel
+> för att välja spelets bakgrundsgrafik. </para
+><para
+>Vissa bakgrunder, som det kinesiska landskapet, behöver en viss tid för att läsas in. Om du tycker att programmet ska starta snabbare, eller att det tar för lång tid att ändra storlek på huvudfönstret, kan du prova någon annan bakgrund. </para>
+</sect1>
+
+<sect1 id="ruleset-options"
+><title
+>Regeluppsättningseditor</title>
+			<screenshot>
+				<screeninfo
+>Regeluppsättningseditor</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="ruleseteditor.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Regeluppsättningseditor</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+			<para
+>Använd regeluppsättningseditorn för att anpassa regeluppsättningar. Fördefinierade regeluppsättningar visas med kursivstil, medan anpassade regeluppsättningar använder normal stil. Fördefinierade regeluppsättningar kan inte ändras av användaren på något sätt. Dock kan en uppdatering av &kajongg; det. Anpassade regeluppsättningar påverkas aldrig av en uppdatering. </para
+><para
+>När ett nytt spel startas, kan du välja en regeluppsättning för spelet. Alla regeluppsättningar definierade i regeluppsättningseditorn kan användas. Regeluppsättningen sparas tillsammans med spelet, så du kan alltid ändra regeluppsättning här: ändringarna påverkar bara framtida spel. </para>
+			<sect2
+><title
+>Regel, poäng, x2, gränser</title
+><para
+>Dubbelklicka helt enkelt på vad du än vill ändra. Om alla värden är tomma har regeln ingen påverkan på spelet. Regler kan inte tas bort.</para>
+			</sect2>
+			<sect2
+><title
+>Kopiera och ta bort</title
+><para
+>Du kan kopiera och ta bort hela regeluppsättningar.  </para
+><para
+>Återigen kan det göras även om befintliga spel använder regeluppsättningen, eftersom varje spel har sin egen kopia av regeluppsättningen. Du kan titta på regeluppsättningar för gamla spel: <link linkend="game-menu-scoreGame"
+>Ladda</link
+> det gamla spelet och <link linkend="view-explain-scores"
+>visa dess poängtabell</link
+>. </para>
+			</sect2>
+			<sect2
+><title
+>Jämför</title
+><para>
+			<screenshot>
+				<screeninfo
+>Regeluppsättningsjämförelse</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="differ.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Regeluppsättningsjämförelse</phrase
+></textobject>
+				</mediaobject>
+			</screenshot
+>Du kan välja kommandot när en hel regeluppsättning väljes. Det låter dig jämföra den valda regeluppsättningen med vilken annan regeluppsättning som helst. </para
+></sect2>
+</sect1>
+
+<sect1 id="default-keybindings">
+<title
+>Förvalda tangentbindningar</title>
+
+<!-- TODO: not yet implemented
+<para
+>The menu entry <menuchoice
+><guimenu
+>Settings</guimenu
+> <guimenuitem
+>Configure ...</guimenuitem
+></menuchoice
+> allows you to change the default keyboard bindings.</para
+> -->
+
+<para
+>De förvalda tangentbindningarna är följande: </para>
+
+<para>
+<variablelist>
+
+<varlistentry>
+<term
+><keycap
+>F1</keycap
+></term>
+<listitem>
+<para
+>Visar den här handboken. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Poängsätt ett manuellt spel. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Spela ett spel med vänner eller datorspelare. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Avbryt pågående spel. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Avsluta programmet. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Visa poängtabellen. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Visa ett chattfönster. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Ändra synvinkel. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Aktiverar eller inaktiverar demonstrationsläget. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Shift;<keycap
+>F1</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Vad är det här? hjälp. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Fullskärmsläge. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</para>
+
+</sect1>
+</chapter>
+
+<appendix id="problems"
+><title
+>Kända problem</title>
+        <itemizedlist>
+                <listitem
+><para
+>I spelläget är straff ännu inte möjliga.</para
+></listitem>
+                <listitem
+><para
+>Datorspelarna är fortfarande ganska dumma.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="future"
+><title
+>Möjliga framtida funktioner</title>
+        <itemizedlist>
+                <listitem
+><para
+>Lägg till flera regeluppsättningar. Det är valfritt, och kan göras av personer som ofta använder regeluppsättningarna.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+ <appendix id="faq"
+><title
+>Vanliga frågor</title
+> <!-- do not change this! -->
+<!--This chapter is for frequently asked questions. Please use <qandaset
+> <qandaentry
+> only!-->
+<qandaset>
+<!--Following is a standard list of FAQ questions.-->
+        <qandaentry>
+                 <question
+><para
+>Jag vill ändra hur spelet ser ut. Kan man göra det? </para
+></question>
+                 <answer
+><para
+>Ja. Använd menyraden för att öppna <link linkend="configuration"
+>inställningsverktyget</link
+> för att ändra utseendet på &kajongg;.</para
+></answer>
+        </qandaentry>
+        <qandaentry>
+                 <question
+><para
+>Kan man använda tangentbordet för att tilldela brickor till spelare?</para
+></question>
+                 <answer
+><para
+>Ja. Se <link linkend="enterhand-tiles"
+>Låt &kajongg; beräkna poängen</link
+>.</para
+></answer>
+        </qandaentry>
+<!--Please add more Q&As if needed-->
+
+</qandaset>
+</appendix>
+
+<appendix id="credits"
+><title
+>Tack till och licens</title
+> <!-- do not change this! -->
+<!--This chapter is for credits and licenses.-->
+	<para
+>&kajongg; för &kde; </para>
+
+	<para
+>Program Copyright &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+	<para
+>Dokumentation Copyright &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+
+<!-- !!!do not change ANYTHING after this line!!!! -->
+<para
+>Översättning Stefan Asserhäll <email
+>stefan.asserhall@bredband.net</email
+></para
+> 
+&underFDL;
+&underGPL;
+
+</appendix>
+
+<appendix id="bibliography">
+<title
+>Bibliografi</title>
+        <itemizedlist>
+		<listitem
+><para
+>Das Chinesische Mah-Jongg-Spiel av Uwe Martens 2005, Books on Demand GmbH, Norderstedt. Boken är ett utmärkt tyskt referensverk som innehåller allt man behöver veta om reglerna som används i Tyskland, och många andra spelaspekter.</para
+></listitem>
+                <listitem
+><para
+>The Complete Book of Mah-Jongg av A. D. Millington, 1977 (med flera pocketutgåvor fram till 2003), Weidenfeld &amp; Nicolson, London. Detta är det slutgiltiga referensverket för klassisk kinesisk Mah Jong, som det spelas i västvärlden. Det kan ge värdefulla tips om spelstrategier.</para
+></listitem>
+		<listitem
+><para
+>Mah-Jong av Gwyn Headley och Yvonne Seeley, 3rd edition, 2008, A &amp; C Black Publishers Ltd., London. Denna bok är ett mycket lättanvänt referensverk, som koncentrerar sig på reglerna som används i Storbritannien, definierade av BMJA (Brittiska Mah Jong-föreningen).</para
+></listitem>
+		<listitem
+><para
+><ulink url="https://en.wikipedia.org/wiki/Mahjong"
+></ulink
+></para
+></listitem>
+		<listitem
+><para
+><ulink url="https://de.wikipedia.org/wiki/Mah-Jongg"
+></ulink
+></para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="installation">
+<title
+>Installation</title>
+<para
+>För Linux: Distributionen ska ha det paketerad åt dig. </para>
+<para
+>För Windows: Se <ulink url="https://www.linux-apps.com/p/1109453/"
+></ulink
+> för ett installationsprogram för Windows. </para>
+<para
+>Om du vill ladda ner källkoden och installera för hand: <itemizedlist>
+<listitem
+><para
+> <literal
+>git clone https://invent.kde.org/games/kajongg.git</literal
+> </para
+></listitem>
+<listitem
+><para
+>För Linux: <literal
+>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal
+> </para
+></listitem>
+<listitem
+><para
+>För Windows: Läs <filename
+>README.windows</filename
+></para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>Kajongg beror på följande paket (debian paketnamn inom parentes): <itemizedlist>
+	<listitem
+><para
+>Python 3.5 eller senare (python3)</para
+></listitem>
+	<listitem
+><para
+>Qt 5.7 eller senare (python3-pyqt5 och python3-pyqt5.qtsvg)</para
+></listitem>
+	<listitem
+><para
+>Python-bindningar för Qt5 (python3-pyqt5)</para
+></listitem>
+        <listitem
+><para
+>Python-biblioteket twisted 16.6.0 eller senare (python3-twisted)</para
+></listitem>
+        <listitem
+><para
+>sqlite3 (libsqlite3-0)</para
+></listitem>
+</itemizedlist>
+</para>
+
+</appendix>
+
+&documentation.index;
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-always-quote-attributes:t
+sgml-indent-step:0
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

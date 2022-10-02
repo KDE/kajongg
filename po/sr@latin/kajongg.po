@@ -1,0 +1,2351 @@
+# Translation of kajongg.po into Serbian.
+# Slobodan Simic <slsimic@gmail.com>, 2010.
+# Chusslove Illich <caslav.ilic@gmx.net>, 2014, 2015, 2016, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: kajongg\n"
+"Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
+"POT-Creation-Date: 2020-05-13 03:11+0200\n"
+"PO-Revision-Date: 2017-09-29 16:44+0200\n"
+"Last-Translator: Chusslove Illich <caslav.ilic@gmx.net>\n"
+"Language-Team: Serbian <kde-i18n-sr@kde.org>\n"
+"Language: sr@latin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
+"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Accelerator-Marker: &\n"
+"X-Text-Markup: kde4\n"
+"X-Environment: kde, kajongg\n"
+"X-Generator: Lokalize 1.0\n"
+
+msgid "Preview"
+msgstr "Pregled"
+
+msgid "Properties"
+msgstr "Svojstva"
+
+msgid "Author:"
+msgstr "Autor:"
+
+msgid "Contact:"
+msgstr "Kontakt:"
+
+msgid "Description:"
+msgstr "Opis:"
+
+msgctxt "kajongg"
+msgid "Game"
+msgstr "Igra"
+
+msgid "View"
+msgstr "Prikaz"
+
+msgid "Toolbar"
+msgstr "Traka alatki"
+
+#: src/about.py:36 src/guiutil.py:157 src/guiutil.py:159 src/kdestub.py:228
+#: src/kdestub.py:229 src/kdestub.py:231
+msgid "Kajongg"
+msgstr "Kadžong"
+
+#: src/about.py:38
+msgid "Mah Jongg - the ancient Chinese board game for 4 players"
+msgstr "Madžong — drevna kineska igra na tabli za četiri igrača"
+
+#: src/about.py:41
+msgid ""
+"This is the classical Mah Jongg for four players. If you are looking for Mah "
+"Jongg solitaire please use the application kmahjongg."
+msgstr ""
+"Ovo je klasični madžong za četiri igrača. Ako tražite madžong pasijans, "
+"pogledajte program K‑madžong."
+
+#: src/about.py:50
+msgid "Original author"
+msgstr "prvobitni autor"
+
+# rewrite-msgid: /<.?filename>//
+#: src/background.py:79 src/tileset.py:97
+msgid "file <filename>%1</filename> contains no valid SVG"
+msgstr "Fajl ‘%1’ ne sadrži dobar SVG."
+
+#: src/board.py:317
+msgctxt "kajongg:arrow keys hjkl like in konqueror"
+msgid "hjklHJKL"
+msgstr "hjklHJKL"
+
+# >> @title:menu
+#: src/board.py:366
+msgid "Choose from"
+msgstr "Izbor"
+
+# >> @title:column
+#: src/chat.py:54 src/playerlist.py:94
+msgid "Player"
+msgstr "igrač"
+
+# >> @title:column
+#: src/chat.py:54
+msgid "Time"
+msgstr "vreme"
+
+# >> @title:column
+#: src/chat.py:54
+msgid "Message"
+msgstr "poruka"
+
+# >> %1 table ID, %2 client URL
+#: src/chat.py:134
+msgid "Chat on table %1 at %2"
+msgstr "Ćaskanje na tabli %1 na %2"
+
+#: src/client.py:66
+msgctxt "table status"
+msgid "Suspended"
+msgstr "suspendovana"
+
+#: src/client.py:71
+msgctxt "table status"
+msgid "Running"
+msgstr "u toku"
+
+#: src/client.py:72
+msgctxt "table status"
+msgid "New"
+msgstr "nova"
+
+#: src/configdialog.py:53
+msgid "Show tile shadows"
+msgstr "Senke pločica"
+
+#: src/configdialog.py:56
+msgid "Rearrange undisclosed tiles to melds"
+msgstr "Prerasporedi neotkrivene pločice u slogove"
+
+#: src/configdialog.py:59
+msgid "Show only possible actions"
+msgstr "Prikaži samo moguće radnje"
+
+#: src/configdialog.py:62
+msgid "Propose what to do"
+msgstr "Predlaži šta raditi"
+
+#: src/configdialog.py:68
+msgid "Animation speed:"
+msgstr "Brzina animacije:"
+
+#: src/configdialog.py:72
+msgid "Use sounds if available"
+msgstr "Puštaj zvukove ako ih ima"
+
+#: src/configdialog.py:75
+msgid "Let others hear my voice"
+msgstr "Dozvoli drugima da čuju moj glas"
+
+# >> @title:tab
+#: src/configdialog.py:110
+msgctxt "kajongg"
+msgid "Play"
+msgstr "Puštanje"
+
+# >> @title:tab
+#: src/configdialog.py:113
+msgid "Tiles"
+msgstr "Pločice"
+
+# >> @title:tab
+#: src/configdialog.py:116
+msgid "Backgrounds"
+msgstr "Pozadine"
+
+#: src/deferredutil.py:278 src/deferredutil.py:434
+msgid "The game server lost connection to player %1"
+msgstr "Igrački server je izgubio vezu sa igračem %1"
+
+#: src/deferredutil.py:281
+msgid ""
+"Error for player %1: %2\n"
+"%3"
+msgstr ""
+"Greška za igrača %1: %2\n"
+"%3"
+
+#: src/differ.py:73
+msgctxt "Kajongg"
+msgid "Rule"
+msgstr "Pravilo"
+
+# >> @title:window
+#: src/differ.py:130
+msgid "Compare"
+msgstr "Poređenje"
+
+#: src/differ.py:173 src/differ.py:175
+msgctxt "Kajongg-Rule"
+msgid "not defined"
+msgstr "nije definisano"
+
+#: src/game.py:542
+msgid "Score computed manually"
+msgstr "Rezultat se izračunava ručno"
+
+#: src/game.py:639
+msgid "Player %1 not known"
+msgstr "Igrač %1 nije poznat"
+
+#: src/game.py:1068
+msgid "Short living wall: Tile is invisible, hence dangerous"
+msgstr "Kratkoživeći zid: pločica je nevidljiva, stoga opasna"
+
+# >> @title:window
+# >> @title:column
+# >! Contexts.
+#: src/games.py:101 src/playerlist.py:68 src/tables.py:70
+msgid "Players"
+msgstr "igrači"
+
+# >> @title:column
+#: src/games.py:101
+msgid "Started"
+msgstr "pokrenuto"
+
+# >> @title:window
+#: src/games.py:112
+msgctxt "kajongg"
+msgid "Games"
+msgstr "Partije"
+
+#: src/games.py:129
+msgctxt "start a new game"
+msgid "&New"
+msgstr "&Nova"
+
+#: src/games.py:133
+msgid "&Load"
+msgstr "&Učitaj"
+
+#: src/games.py:137 src/playerlist.py:58
+msgid "&Delete"
+msgstr "&Obriši"
+
+#: src/games.py:141
+msgid "Show only pending games"
+msgstr "Prikaži samo nastupajuće partije"
+
+# >! Plurals.
+# rewrite-msgid: /This will .* button/This cannot be undone/
+#: src/games.py:247
+msgid ""
+"Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
+"you cannot cancel it with the cancel button"
+msgstr ""
+"<html>Želite li zaista da obrišete %1 partija?<br />Ovo se ne može opozvati."
+"</html>|/|<html>Želite li zaista da obrišete %1 $[množ ^1 partiju partije "
+"partija]?<br />Ovo se ne može opozvati.</html>"
+
+#: src/humanclient.py:61
+msgid "Which chow do you want to expose?"
+msgstr "Koji čou želite da otkrijete?"
+
+#: src/humanclient.py:99
+msgid "Which kong do you want to declare?"
+msgstr "Koji kong želite da proglasite?"
+
+# >> @title:window
+#: src/humanclient.py:166
+msgid "Choose"
+msgstr "Izbor"
+
+#: src/humanclient.py:358
+msgid "You cannot say %1"
+msgstr "Ne možete reći %1"
+
+#: src/humanclient.py:582
+msgid "Player %1 has left the table"
+msgstr "Igrač %1 napusti tablu"
+
+# rewrite-msgid: /<.?numid>//
+#: src/humanclient.py:646
+msgid ""
+"The game on table <numid>%1</numid> can begin. Are you ready to play now?"
+msgstr "Partija na tabli %1 može da počne. Jeste li spremni?"
+
+#: src/humanclient.py:665
+msgid "Ready for next hand?"
+msgstr "Spremni za sledeću ruku?"
+
+#: src/humanclient.py:923
+msgid "The connection to the server %1 broke, please try again later."
+msgstr "Veza sa serverom %1 je prekinuta. Pokušajte ponovo kasnije."
+
+#: src/kajongg.py:75
+msgid "all robots play with visible concealed tiles"
+msgstr "Svi roboti igraju sa otkrivenim skrivenim pločicama."
+
+#: src/kajongg.py:76
+msgid "start with demo mode"
+msgstr "Pokreni u demo režimu."
+
+#: src/kajongg.py:77
+msgid "login to HOST"
+msgstr "Prijavi se na ovaj domaćin."
+
+#: src/kajongg.py:78
+msgid "start new TABLE"
+msgstr "Pokreni novu tablu."
+
+#: src/kajongg.py:79
+msgid "join TABLE "
+msgstr "Pridruži se tabli."
+
+#: src/kajongg.py:80
+msgid "use ruleset without asking"
+msgstr "Koristi skup pravila bez pitanja."
+
+#: src/kajongg.py:83
+msgid "play one ROUNDS rounds per game. Only for debugging!"
+msgstr "Ovoliko rundi po partiji. Samo za ispravljanje."
+
+#: src/kajongg.py:84
+msgid "prefer PLAYER for next login"
+msgstr "Željeni igrač za sledeće prijavljivanje."
+
+#: src/kajongg.py:87
+msgid "use AI variant for human player in demo mode"
+msgstr "Varijantna VI za ljudskog igrača u demo režimu."
+
+#: src/kajongg.py:88
+msgid "write statistics to CSV"
+msgstr "Upisuj statistiku u CSV."
+
+#: src/kajongg.py:89
+msgid "show all available rulesets"
+msgstr "Prikaži sve dostupne skupove pravila."
+
+#: src/kajongg.py:91
+msgid "for testing purposes: Initializes the random generator"
+msgstr "Radi probe: priprema generator slučajnih brojeva."
+
+#: src/kajongg.py:94
+msgid "show no graphical user interface. Intended only for testing"
+msgstr "Bez grafičkog korisničkog sučelja. Samo za isprobavanje."
+
+#: src/kajongg.py:97
+msgid "use a dedicated server listening on SOCKET. Intended only for testing"
+msgstr "Namenski server za slušanje na ovom soketu. Samo za isprobavanje."
+
+#: src/kajongg.py:100
+msgid "use a dedicated server listening on PORT. Intended only for testing"
+msgstr "Namenski server za slušanje na ovom portu. Samo za isprobavanje."
+
+#: src/kdestub.py:378
+msgid "&OK"
+msgstr "&U redu"
+
+#: src/kdestub.py:380
+msgid "&Apply"
+msgstr "&Primeni"
+
+#: src/kdestub.py:382
+msgid "&Cancel"
+msgstr "&Odustani"
+
+# >> @title:menu
+#: src/kdestub.py:384 src/kdestub.py:578
+msgid "&Help"
+msgstr "&Pomoć"
+
+#: src/kdestub.py:387
+msgid "&Defaults"
+msgstr "&Podrazumevano"
+
+#: src/kdestub.py:463
+msgctxt "@action:inmenu"
+msgid "Show St&atusbar"
+msgstr "Prikaži traku &stanja"
+
+#: src/kdestub.py:470
+msgctxt "@action:inmenu"
+msgid "Show &Toolbar"
+msgstr "Prikaži &traku alatki"
+
+#: src/kdestub.py:476
+msgid "Configure Tool&bars..."
+msgstr "Po&desi trake alatki"
+
+#: src/kdestub.py:478
+msgid "Configure toolbars"
+msgstr "Podesi trake alatki"
+
+#: src/kdestub.py:485
+msgid "Configure &Kajongg"
+msgstr "Podesi &Kadžong"
+
+# >! Contexts.
+# >> @title:window
+# >> @info:tooltip
+#: src/kdestub.py:487 src/kdestub.py:1253
+msgid "Configure"
+msgstr "Podešavanje"
+
+# >> @title:menu
+#: src/kdestub.py:574
+msgid "&Game"
+msgstr "&Igra"
+
+# >> @title:menu
+#: src/kdestub.py:575
+msgid "&View"
+msgstr "&Prikaz"
+
+# >> @title:menu
+#: src/kdestub.py:576
+msgid "&Settings"
+msgstr "&Podešavanje"
+
+#: src/kdestub.py:584
+msgctxt "@action:inmenu"
+msgid "&Help"
+msgstr "&Pomoć"
+
+# >> @title:window
+#: src/kdestub.py:587 src/kdestub.py:939
+msgid "Switch Application Language"
+msgstr "Promena jezika programa"
+
+#: src/kdestub.py:591
+msgctxt "@action:inmenu"
+msgid "About &Kajongg"
+msgstr "O &Kadžongu"
+
+#: src/kdestub.py:944
+msgid "Please choose the language which should be used for this application:"
+msgstr "Izaberite jezik koji želite da koristite za ovaj program:"
+
+#: src/kdestub.py:963
+msgid "Add Fallback Language"
+msgstr "Dodaj pozadinski jezik"
+
+#: src/kdestub.py:975
+msgid "Primary language:"
+msgstr "Glavni jezik:"
+
+#: src/kdestub.py:975
+msgid "Fallback language:"
+msgstr "Pozadinski jezik:"
+
+#: src/kdestub.py:981
+msgid "Remove"
+msgstr "Ukloni"
+
+#: src/kdestub.py:985
+msgid ""
+"This is the main application language which will be used first, before any "
+"other languages."
+msgstr "Ovo je glavni jezik programa, u kojem će se prvo tražiti svi prevodi."
+
+#: src/kdestub.py:987
+msgid ""
+"This is the language which will be used if any previous languages do not "
+"contain a proper translation."
+msgstr ""
+"Ovaj će jezik biti upotrebljen u slučaju da nijedan prethodni ne sadrži "
+"odgovarajući prevod."
+
+#: src/kdestub.py:1111
+msgid "About Kajongg"
+msgstr "O Kadžongu"
+
+#: src/kdestub.py:1118
+msgid "Protocol version %1"
+msgstr "Verzija protokola %1"
+
+#: src/kdestub.py:1125
+msgid "KDE Frameworks (not installed or not usable)"
+msgstr "Radni okviri KDE‑a (nisu instalirani ili nisu upotrebljivi)"
+
+#: src/kdestub.py:1135
+msgctxt "kajongg"
+msgid "Using versions %1"
+msgstr "Koristi verzije %1"
+
+#: src/kdestub.py:1138
+msgid "Not using Python KDE bindings"
+msgstr "Ne koristi Python KDE sveze"
+
+#: src/kdestub.py:1173
+#, fuzzy
+#| msgid ""
+#| "Please use <a href=\"http://bugs.kde.org\">http://bugs.kde.org</a> to "
+#| "report bugs."
+msgid ""
+"Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
+"report bugs."
+msgstr ""
+"Koristite <a href=\"http://bugs.kde.org\">http://bugs.kde.org</a> za "
+"prijavljivanje grešaka."
+
+#: src/kdestub.py:1178
+msgid "Authors:"
+msgstr "Autori:"
+
+#: src/kdestub.py:1213
+msgid "License Agreement"
+msgstr "Licenca"
+
+#: src/kdestub.py:1454
+msgid "Configure Toolbars"
+msgstr "Podesi trake alatki"
+
+#: src/kdestub.py:1456
+msgid "A&vailable actions:"
+msgstr "&Dostupne radnje:"
+
+#: src/kdestub.py:1467
+msgid "Curr&ent actions:"
+msgstr "&Tekuće radnje:"
+
+#: src/login.py:182
+msgid "trying to start local server %1"
+msgstr "Pokušavam da pokrenem lokalni server %1."
+
+# rewrite-msgid: /<.?filename>//
+#: src/login.py:193 src/login.py:642
+msgid "removed stale socket <filename>%1</filename>"
+msgstr "Uklonjen usporeni soket ‘%1’."
+
+# rewrite-msgid: /<.?numid>//
+#: src/login.py:214
+msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
+msgstr "Pokrenut lokalni server Kadžonga: PID=%1 %2."
+
+# >> @title:window
+#: src/login.py:255
+msgctxt "kajongg"
+msgid "Login"
+msgstr "Prijava"
+
+#: src/login.py:303 src/login.py:412
+msgid "Game server:"
+msgstr "Igrački server:"
+
+#: src/login.py:306 src/login.py:414
+msgid "Username:"
+msgstr "Korisničko ime:"
+
+#: src/login.py:309 src/login.py:417
+msgid "Password:"
+msgstr "Lozinka:"
+
+#: src/login.py:311
+msgctxt "kajongg"
+msgid "Ruleset:"
+msgstr "Skup pravila:"
+
+# >> @title:window
+#: src/login.py:406
+msgid "Create User Account"
+msgstr "Stvaranje korisničkog naloga"
+
+#: src/login.py:420
+msgid "Repeat password:"
+msgstr "Ponovite lozinku:"
+
+#: src/login.py:568
+msgid "You are already connected to server %1"
+msgstr "Već ste povezani na server %1."
+
+#: src/login.py:609
+msgctxt "USER is not known on SERVER"
+msgid "%1 is not known on %2, do you want to open an account?"
+msgstr "Nalog %1 nije poznat na %2, želite li da otvorite nalog?"
+
+#: src/login.py:622
+msgid "Server %1 did not answer"
+msgstr "Server %1 ne odgovara."
+
+#: src/login.py:624
+msgid "Server %1 refused connection"
+msgstr "Server %1 odbija vezu."
+
+#: src/login.py:626
+msgid "Server %1 does not run a kajongg server"
+msgstr "Server %1 ne izvršava server Kadžonga."
+
+#: src/login.py:628
+msgid "Address for server %1 cannot be found"
+msgstr "Adresa servera $1 ne može da se nađe."
+
+#: src/login.py:631
+msgid "Login to server %1 failed: You have no network connection"
+msgstr "Prijava na server %1 propala: nemate vezu sa mrežom."
+
+#: src/login.py:643
+msgid "Please try again"
+msgstr "Pokušajte ponovo."
+
+#: src/mainwindow.py:522
+msgctxt "@action:inmenu"
+msgid "&Score Manual Game"
+msgstr "&Boduj ručnu partiju"
+
+#: src/mainwindow.py:524
+msgctxt "@action:intoolbar"
+msgid "Manual Game"
+msgstr "Ručna partija"
+
+#: src/mainwindow.py:527
+msgctxt "kajongg @info:tooltip"
+msgid "&Score a manual game."
+msgstr "Bodujte ručnu partiju."
+
+#: src/mainwindow.py:529
+msgctxt "@action:intoolbar"
+msgid "&Play"
+msgstr "&Igraj"
+
+#: src/mainwindow.py:532
+msgctxt "kajongg @info:tooltip"
+msgid "Start a new game."
+msgstr "Započinje novu partiju."
+
+#: src/mainwindow.py:534
+msgctxt "@action:inmenu"
+msgid "&Abort Game"
+msgstr "&Obustavi partiju"
+
+#: src/mainwindow.py:538
+msgctxt "kajongg @info:tooltip"
+msgid "Abort the current game."
+msgstr "Obustavlja tekuću partiju."
+
+#: src/mainwindow.py:540
+msgctxt "@action:inmenu"
+msgid "&Quit Kajongg"
+msgstr "&Napusti Kadžong"
+
+#: src/mainwindow.py:543
+msgctxt "@action:intoolbar"
+msgid "&Players"
+msgstr "&Igrači"
+
+#: src/mainwindow.py:546
+msgctxt "kajongg @info:tooltip"
+msgid "define your players."
+msgstr "Definišite igrače."
+
+#: src/mainwindow.py:548
+msgctxt "@action:intoolbar"
+msgid "&Rulesets"
+msgstr "&Skupovi pravila"
+
+#: src/mainwindow.py:551
+msgctxt "kajongg @info:tooltip"
+msgid "customize rulesets."
+msgstr "Prilagodite skupove pravila."
+
+#: src/mainwindow.py:555
+msgctxt "@action:inmenu"
+msgid "&Change Visual Angle"
+msgstr "&Promeni ugao gledanja"
+
+#: src/mainwindow.py:556
+msgctxt "@action:intoolbar"
+msgid "Angle"
+msgstr "Ugao"
+
+#: src/mainwindow.py:559
+msgctxt "kajongg @info:tooltip"
+msgid "Change the visual appearance of the tiles."
+msgstr "Promenite vizuelnu pojavu pločica."
+
+#: src/mainwindow.py:563
+msgctxt "@action:inmenu"
+msgid "F&ull Screen Mode"
+msgstr "Preko &celog ekrana"
+
+#: src/mainwindow.py:566
+msgctxt "kajongg @action:inmenu"
+msgid "&Score Table"
+msgstr "&Tabela rezultata"
+
+#: src/mainwindow.py:568
+msgctxt "kajongg @action:intoolbar"
+msgid "&Scores"
+msgstr "&Rezultati"
+
+#: src/mainwindow.py:570
+msgctxt "kajongg @info:tooltip"
+msgid "Show or hide the score table for the current game."
+msgstr "Prikazuje ili sakriva tabelu rezultata za tekuću partiju."
+
+#: src/mainwindow.py:572
+msgctxt "@action:inmenu"
+msgid "&Explain Scores"
+msgstr "&Objašnjavaj rezultate"
+
+#: src/mainwindow.py:573
+msgctxt "@action:intoolbar"
+msgid "&Explain"
+msgstr "&Objašnjavaj"
+
+#: src/mainwindow.py:575
+msgctxt "kajongg @info:tooltip"
+msgid "Explain the scoring for all players in the current game."
+msgstr "Objašnjava bodovanje za sve igrače u tekućoj partiji."
+
+#: src/mainwindow.py:577
+msgctxt "@action:inmenu"
+msgid "&Demo Mode"
+msgstr "&Demo režim"
+
+#: src/mainwindow.py:580
+msgctxt "kajongg @info:tooltip"
+msgid "Let the computer take over for you. Start a new local game if needed."
+msgstr "Neka računar radi za vas. Pokrenite novu lokalnu partiju ako treba."
+
+#: src/mainwindow.py:582
+msgid "C&hat"
+msgstr "&Ćaskanje"
+
+#: src/mainwindow.py:585
+msgctxt "kajongg @info:tooltip"
+msgid "Chat with the other players."
+msgstr "Ćaskajte sa drugim igračima."
+
+#: src/meld.py:331
+msgctxt "kajongg meld type"
+msgid "Bonus"
+msgstr "bonus"
+
+#: src/meld.py:333
+msgctxt "kajongg meld type"
+msgid "&single"
+msgstr "&jedan"
+
+#: src/meld.py:335
+msgctxt "kajongg meld type"
+msgid "&pair"
+msgstr "&par"
+
+#: src/meld.py:337
+msgctxt "kajongg meld type"
+msgid "&chow"
+msgstr "&čou"
+
+#: src/meld.py:339
+msgctxt "kajongg meld type"
+msgid "p&ung"
+msgstr "pa&ng"
+
+#: src/meld.py:341
+msgctxt "kajongg meld type"
+msgid "c&laimed kong"
+msgstr "&tvrđeni kong"
+
+#: src/meld.py:343
+msgctxt "kajongg meld type"
+msgid "k&ong"
+msgstr "&kong"
+
+#: src/meld.py:345
+msgctxt "kajongg meld type"
+msgid "rest of tiles"
+msgstr "ostatak pločica"
+
+#: src/meld.py:352
+msgctxt "kajongg meld state"
+msgid "Exposed"
+msgstr "otkriven"
+
+#: src/meld.py:354
+msgctxt "kajongg meld state"
+msgid "Concealed"
+msgstr "skriven"
+
+# literal-segment: state|meldType|name
+#: src/meld.py:360
+#, python-brace-format
+msgctxt "kajongg meld name, do not translate parameter names"
+msgid "{state} {meldType} {name}"
+msgstr "{state} {meldType} {name}"
+
+#: src/message.py:215
+msgid "saying %1 violates Original Call"
+msgstr "Izjava %1 narušava izvorni poziv."
+
+#: src/message.py:227
+msgid ""
+"claiming %1 is dangerous because you will have to discard a dangerous tile"
+msgstr "Tvrđenje %1 opasno je zato što ćete morati da odbacite opasnu pločicu."
+
+#: src/message.py:232
+msgid ""
+"claiming %1 for %2 is dangerous because you will have to discard a dangerous "
+"tile"
+msgstr ""
+"Tvrđenje %1 za %2 opasno je zato što ćete morati da odbacite opasnu pločicu."
+
+#: src/message.py:235
+msgid "You may say %1"
+msgstr "Možete reći %1"
+
+#: src/message.py:245
+msgctxt "kajongg"
+msgid "Pung"
+msgstr "Pang"
+
+#: src/message.py:246
+msgctxt "kajongg game dialog:Key for Pung"
+msgid "P"
+msgstr "P"
+
+#: src/message.py:263
+msgctxt "kajongg"
+msgid "Kong"
+msgstr "Kong"
+
+#: src/message.py:264
+msgctxt "kajongg game dialog:Key for Kong"
+msgid "K"
+msgstr "K"
+
+#: src/message.py:284
+msgid "saying Kong for %1 violates Original Call"
+msgstr "Izjava konga za %1 narušava izvorni poziv."
+
+#: src/message.py:287
+msgid "You may say Kong for %1"
+msgstr "Možete reći kong za %1."
+
+#: src/message.py:304
+msgctxt "kajongg"
+msgid "Chow"
+msgstr "Čou"
+
+#: src/message.py:305
+msgctxt "kajongg game dialog:Key for Chow"
+msgid "C"
+msgstr "C"
+
+#: src/message.py:338
+msgctxt "kajongg"
+msgid "Mah Jongg"
+msgstr "Madžong"
+
+#: src/message.py:339
+msgctxt "kajongg game dialog:Key for Mah Jongg"
+msgid "M"
+msgstr "M"
+
+# rewrite-msgid: /Press/Klick/
+#: src/message.py:347
+msgid "Press here and you win"
+msgstr "Kliknite ovde i pobedili ste."
+
+#: src/message.py:361
+msgctxt "kajongg"
+msgid "Original Call"
+msgstr "Izvorni poziv"
+
+#: src/message.py:362
+msgctxt "kajongg game dialog:Key for Original Call"
+msgid "O"
+msgstr "O"
+
+#: src/message.py:375
+msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
+msgstr "Ako se odbaci %1 i proglasi izvorni poziv, ova ruka se ne može dobiti."
+
+#: src/message.py:380
+msgid ""
+"Discard a tile, declaring Original Call meaning you need only one tile to "
+"complete the hand and will not alter the hand in any way (except bonus tiles)"
+msgstr ""
+"Odbaciti pločicu i proglasiti izvorni poziv znači da vam treba samo jedna "
+"pločica da završite ruku, i neće izmeniti ruku ni na koji način (osim bonus "
+"pločica)."
+
+#: src/message.py:405
+msgctxt "kajongg"
+msgid "Discard"
+msgstr "Odbaci"
+
+#: src/message.py:406
+msgctxt "kajongg game dialog:Key for Discard"
+msgid "D"
+msgstr "D"
+
+#: src/message.py:421
+msgid "discarding %1 violates Original Call"
+msgstr "Odbacivanje %1 narušava izvorni poziv."
+
+#: src/message.py:424
+msgid "discarding %1 is Dangerous Game"
+msgstr "Odbacivanje %1 je opasna igra"
+
+#: src/message.py:427
+msgid "discard the least useful tile"
+msgstr "Odbacivanje najmanje korisne pločice."
+
+#: src/message.py:499
+msgid "%1 is not ready to start the game"
+msgstr "%1 još ne može da započne partiju."
+
+# rewrite-msgid: /<.?numid>//
+#: src/message.py:534
+msgid "Kajongg <numid>%1</numid>"
+msgstr "Kadžong %1"
+
+#: src/message.py:612
+msgctxt "kajongg"
+msgid "Violates Original Call"
+msgstr "Narušava izvorni poziv"
+
+#: src/message.py:741
+msgctxt "kajongg"
+msgid "Dangerous Game"
+msgstr "Opasna igra"
+
+#: src/message.py:755
+msgctxt "kajongg"
+msgid "No Choice"
+msgstr "Nema izbora"
+
+#: src/message.py:815
+msgctxt "kajongg"
+msgid "OK"
+msgstr "U redu"
+
+#: src/message.py:816
+msgctxt "kajongg game dialog:Key for OK"
+msgid "O"
+msgstr "O"
+
+#: src/message.py:820
+msgid "Confirm that you saw the message"
+msgstr "Potvrdite da ste videli poruku."
+
+#: src/message.py:829
+msgctxt "kajongg"
+msgid "No Claim"
+msgstr "Bez tvrđenja"
+
+#: src/message.py:830
+msgctxt "kajongg game dialog:Key for No claim"
+msgid "N"
+msgstr "N"
+
+#: src/message.py:834
+msgid "You cannot or do not want to claim this tile"
+msgstr "Ne možete ili ne želite da tvrdite ovu pločicu"
+
+# ! Скриптуј кад добије ознаку kde-format.
+# rewrite-msgid: /find any %1/find any resource of type %1/
+#: src/mjresource.py:90
+msgid ""
+"cannot find any %1 in the following directories, is libkmahjongg installed?"
+msgstr ""
+"Ne mogu da nađem nijedan resurs tipa „%1“ u sledećim fasciklama. Da li je "
+"libkmahjongg instalirana?"
+
+# ! Скриптуј кад добије ознаку kde-format.
+#: src/mjresource.py:114
+msgid "cannot find %1, using default"
+msgstr "Ne mogu da nađem %1. Koristim podrazumevano."
+
+#: src/mjresource.py:124
+msgid "unknown name"
+msgstr "nepoznato ime"
+
+#: src/mjresource.py:125
+msgid "unknown author"
+msgstr "nepoznat autor"
+
+#: src/mjresource.py:128
+msgid "no description available"
+msgstr "opis nije dostupan"
+
+#: src/mjresource.py:131
+msgid "no E-Mail address available"
+msgstr "adresa e‑pošte nije dostupna"
+
+#: src/player.py:687
+msgid "%1 claiming MahJongg: She does not really have tile %2"
+msgstr "%1 tvrdi madžong: ali nema zaista pločicu %2"
+
+#: src/player.py:696
+msgid ""
+"%1 claiming MahJongg: She did not pass all concealed tiles to the server"
+msgstr "%1 tvrdi madžong: ali bez prosleđivanja svih skrivenih pločica serveru"
+
+#: src/player.py:806
+msgid "Player %1 has 3 or 4 exposed melds, all are green"
+msgstr "Igrač %1 ima 3 ili 4 otkrivena sloga, sva zelena"
+
+#: src/player.py:815
+msgid "Player %1 may try a True Color Game"
+msgstr "Igrač %1 može da pokuša partiju pravih boja"
+
+#: src/player.py:818
+msgid "Player %1 may try an All Terminals Game"
+msgstr "Igrač %1 može da pokuša partiju svih terminala"
+
+#: src/player.py:831
+msgid "Player %1 exposed many winds"
+msgstr "Igrač %1 otkriva mnogo vetrova"
+
+#: src/player.py:835
+msgid "Player %1 exposed many dragons"
+msgstr "Igrač %1 otkriva mnogo zmajeva"
+
+#: src/playerlist.py:53
+msgctxt "define a new player"
+msgid "&New"
+msgstr "&Novi"
+
+#: src/playerlist.py:114
+msgid "Player %1 already exists"
+msgstr "Igrač %1 već postoji"
+
+#: src/playerlist.py:123
+msgid "Error while adding player %1: %2"
+msgstr "Greška pri dodavanju igrača %1: %2"
+
+#: src/playerlist.py:149
+msgid "This player cannot be deleted. There are games associated with %1."
+msgstr "Ovaj igrač ne može da se obriše. Neke partije su pridružene igraču %1."
+
+#: src/predefined.py:38
+msgid "Classical Chinese standard"
+msgstr "Klasični kineski standard"
+
+#: src/predefined.py:42
+msgid "Classical Chinese"
+msgstr "Klasični kineski"
+
+#: src/predefined.py:48
+msgid "Last Tile Taken from Dead Wall"
+msgstr "Poslednja pločica uzeta sa mrtvog zida"
+
+#: src/predefined.py:50
+msgid ""
+"The dead wall is also called kong box: The last 16 tiles of the wall used as "
+"source of replacement tiles"
+msgstr ""
+"Mrtvi zid se takođe zove kong kutijom: poslednjih 16 pločica na zidu koriste "
+"se kao izvor zamena."
+
+#: src/predefined.py:53
+msgid "Last Tile is Last Tile of Wall"
+msgstr "Poslednja pločica je poslednja pločica sa zida"
+
+#: src/predefined.py:55
+msgid ""
+"Winner said Mah Jong with the last tile taken from the living end of the wall"
+msgstr ""
+"Pobednik kaže madžong sa poslednjom pločicom uzetom sa živog kraja zida."
+
+#: src/predefined.py:57
+msgid "Last Tile is Last Tile of Wall Discarded"
+msgstr "Poslednja pločica je poslednja pločica sa zida odbačenih"
+
+#: src/predefined.py:59
+msgid ""
+"Winner said Mah Jong by claiming the last tile taken from the living end of "
+"the wall, discarded by another player"
+msgstr ""
+"Pobednik kaže madžong tvrđenjem poslednje pločice uzete sa živog kraja zida, "
+"koju je odbacio neki drugi igrač."
+
+#: src/predefined.py:62
+msgid "Robbing the Kong"
+msgstr "Pljačka konga"
+
+#: src/predefined.py:63
+msgid ""
+"Winner said Mah Jong by claiming the 4th tile of a kong another player just "
+"declared"
+msgstr ""
+"Pobednik kaže madžong tvrđenjem četvrte pločice konga koji je neki drugi "
+"igrač upravo proglasio."
+
+#: src/predefined.py:66
+msgid "Mah Jongg with Original Call"
+msgstr "Madžong sa izvornim pozivom"
+
+#: src/predefined.py:69
+msgid ""
+"Just before the first discard, a player can declare Original Call meaning "
+"she needs only one tile to complete the hand and announces she will not "
+"alter the hand in any way (except bonus tiles)"
+msgstr ""
+"Tik pre prvog odbacivanja, igrač može da proglasi izvorni poziv, što znači "
+"da mu treba samo jedna pločica da završi ruku i objavi da neće izmeniti ruku "
+"ni na koji način (osim bonus pločica)."
+
+#: src/predefined.py:72
+msgid "Dangerous Game"
+msgstr "Opasna igra"
+
+#: src/predefined.py:73
+msgid ""
+"In some situations discarding a tile that has a high chance to help somebody "
+"to win is declared to be dangerous, and if that tile actually makes somebody "
+"win, the discarder pays the winner for all"
+msgstr ""
+"U nekim situacijama, odbacivanje pločice koja ima dobre izglede da pomogne "
+"nekome da pobedi proglašava se opasnim, i ako ta pločica zaista učini da "
+"neko pobedi, odbacivač plaća pobedniku za sve."
+
+#: src/predefined.py:77
+msgid "Twofold Fortune"
+msgstr "Dvostruka sreća"
+
+#: src/predefined.py:78
+msgid ""
+"Kong after Kong: Declare Kong and a second Kong with the replacement tile "
+"and Mah Jong with the second replacement tile"
+msgstr ""
+"Kong za kongom: proglasite kong i drugi kong sa pločicom zamenom i madžong "
+"sa drugom pločicom zamenom."
+
+#: src/predefined.py:82
+msgid "Blessing of Heaven"
+msgstr "Blagoslov neba"
+
+#: src/predefined.py:83
+msgid "East says Mah Jong with the unmodified dealt tiles"
+msgstr "Istok kaže madžong sa neizmenjenim podeljenim pločicama."
+
+#: src/predefined.py:85
+msgid "Blessing of Earth"
+msgstr "Blagoslov zemlje"
+
+#: src/predefined.py:86
+msgid ""
+"South, West or North says Mah Jong with the first tile discarded by East"
+msgstr ""
+"Jug, zapad ili sever kaže madžong sa prvom pločicom koju je odbacio istok."
+
+#: src/predefined.py:88
+msgid "East won nine times in a row"
+msgstr "Istok je pobedio devet puta zaredom"
+
+#: src/predefined.py:89
+msgid "If that happens, East gets a limit score and the winds rotate"
+msgstr "Ako se ovo dogodi, istok dobija granični rezultat i vetrovi se obrću."
+
+#: src/predefined.py:94
+msgid ""
+"False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah "
+"Jongg"
+msgstr ""
+"Netačno imenovanje odbačenih, tvrđenih za madžong i netačan proglas madžonga"
+
+#: src/predefined.py:100
+msgid "Own Flower and Own Season"
+msgstr "Sopstveni cvet i sopstveno doba"
+
+#: src/predefined.py:103
+msgid "All Flowers"
+msgstr "Svo cveće"
+
+#: src/predefined.py:104
+msgid "All Seasons"
+msgstr "Sva doba"
+
+#: src/predefined.py:106
+msgid "Three Concealed Pongs"
+msgstr "Tri skrivena ponga"
+
+#: src/predefined.py:110
+msgid "Long Hand"
+msgstr "Duga ruka"
+
+#: src/predefined.py:111
+msgid "The hand contains too many tiles"
+msgstr "Ruka sadrži previše pločica"
+
+#: src/predefined.py:116
+msgid "Points Needed for Mah Jongg"
+msgstr "Poeni potrebni za madžong"
+
+#: src/predefined.py:120
+msgid "Minimum number of doubles needed for Mah Jongg"
+msgstr "Najmanji broj dupliranja potreban za madžong"
+
+#: src/predefined.py:123
+msgid "Points for a Limit Hand"
+msgstr "Poeni za graničnu ruku"
+
+#: src/predefined.py:127
+msgid "Play with the roof off"
+msgstr "Igra bez krova"
+
+#: src/predefined.py:128
+msgid "Play with no upper scoring limit"
+msgstr "Igra bez gornje granice rezultata."
+
+#: src/predefined.py:130
+msgid "Claim Timeout"
+msgstr "Prekovreme tvrđenja"
+
+#: src/predefined.py:134
+msgid "Size of Kong Box"
+msgstr "Veličina kong polja"
+
+#: src/predefined.py:135
+msgid "The Kong Box is used for replacement tiles when declaring kongs"
+msgstr "Kong kutija daje pločice za zamenu pri proglašavanju kongova."
+
+#: src/predefined.py:137
+msgid "Play with Bonus Tiles"
+msgstr "Igra sa bonus pločicama"
+
+#: src/predefined.py:138
+msgid "Bonus tiles increase the luck factor"
+msgstr "Bonus pločice povećavaju činilac sreće."
+
+#: src/predefined.py:140
+msgid "Minimum number of rounds in game"
+msgstr "Najmanji broj rundi u partiji"
+
+#: src/predefined.py:144
+msgid "number of allowed chows"
+msgstr "Broj dozvoljenih čoua"
+
+#: src/predefined.py:145
+msgid "The number of chows a player may build"
+msgstr "Broj čoua koje igrač može da izgradi."
+
+#: src/predefined.py:147
+msgid "must declare calling hand"
+msgstr "Obavezan proglas pozivne ruke"
+
+#: src/predefined.py:149
+msgid "Mah Jongg is only allowed after having declared to have a calling hand"
+msgstr "Madžong je dozvoljen tek pošto se proglasi posedovanje pozivne ruke."
+
+#: src/predefined.py:151
+msgid "Standard Rotation"
+msgstr "Standardna rotacija"
+
+#: src/predefined.py:161
+msgid "Last Tile Completes Pair of 2..8"
+msgstr "Poslednja pločica dopunjuje par 2 do 8"
+
+#: src/predefined.py:165
+msgid "Last Tile Completes Pair of Terminals or Honors"
+msgstr "Poslednja pločica dopunjuje par terminala ili časti"
+
+#: src/predefined.py:168
+msgid "Last Tile is Only Possible Tile"
+msgstr "Poslednja pločica je jedina moguća"
+
+#: src/predefined.py:172
+msgid "Won with Last Tile Taken from Wall"
+msgstr "Pobeda uzimanjem poslednje pločice sa zida"
+
+#: src/predefined.py:177
+msgid "Zero Point Hand"
+msgstr "Ruka sa nula poena"
+
+#: src/predefined.py:178
+msgid "The hand has 0 basis points excluding bonus tiles"
+msgstr "Ruka ima nula osnovnih poena, isključujući bonus pločice."
+
+#: src/predefined.py:179
+msgid "No Chow"
+msgstr "Nema čoua"
+
+#: src/predefined.py:181
+msgid "Only Concealed Melds"
+msgstr "Samo skriveni slogovi"
+
+#: src/predefined.py:185
+msgid "False Color Game"
+msgstr "Partija pogrešnih boja"
+
+#: src/predefined.py:186
+msgid ""
+"Only same-colored tiles (only bamboo/stone/character) plus any number of "
+"winds and dragons"
+msgstr ""
+"Samo pločice iste boje (samo bambus/kamen/znak) plus koliko god vetrova i "
+"zmajeva."
+
+#: src/predefined.py:189
+msgid "True Color Game"
+msgstr "Partija pravih boja"
+
+#: src/predefined.py:190
+msgid "Only same-colored tiles (only bamboo/stone/character)"
+msgstr "Samo pločice iste boje (samo bambus/kamen/znak)."
+
+#: src/predefined.py:192
+msgid "Concealed True Color Game"
+msgstr "Partija skrivenih pravih boja"
+
+#: src/predefined.py:193
+msgid "All tiles concealed and of the same suit, no honors"
+msgstr "Sve pločice skrivene i iste boje, bez časti."
+
+#: src/predefined.py:195
+msgid "Only Terminals and Honors"
+msgstr "Samo terminali i časti"
+
+#: src/predefined.py:196
+msgid "Only winds, dragons, 1 and 9"
+msgstr "Samo vetrovi, zmajevi, jedan i devet"
+
+#: src/predefined.py:197
+msgid "Only Honors"
+msgstr "Samo časti"
+
+#: src/predefined.py:198
+msgid "Only winds and dragons"
+msgstr "Samo vetrovi i zmajevi"
+
+#: src/predefined.py:200
+msgid "Hidden Treasure"
+msgstr "Skriveno blago"
+
+#: src/predefined.py:201
+msgid "Only hidden Pungs or Kongs, last tile from wall"
+msgstr "Samo skriveni pangovi ili kongovi, poslednja pločica sa zida."
+
+#: src/predefined.py:203
+msgid "Heads and Tails"
+msgstr "Glave i pisma"
+
+#: src/predefined.py:204
+msgid "Only 1 and 9"
+msgstr "Samo jedan i devet."
+
+#: src/predefined.py:206
+msgid "Fourfold Plenty"
+msgstr "Obilje četvorki"
+
+#: src/predefined.py:207
+msgid "4 Kongs"
+msgstr "Četiri konga."
+
+#: src/predefined.py:209 src/predefined.py:427
+msgid "Three Great Scholars"
+msgstr "Tri velika učenjaka"
+
+#: src/predefined.py:210 src/predefined.py:332
+msgid "3 Pungs or Kongs of dragons"
+msgstr "Tri panga ili konga zmajeva."
+
+#: src/predefined.py:211
+msgid "Four Blessings Hovering over the Door"
+msgstr "Četiri blagoslova lebde iznad vrata"
+
+#: src/predefined.py:213 src/predefined.py:337
+msgid "4 Pungs or Kongs of winds"
+msgstr "Četiri panga ili konga vetrova."
+
+#: src/predefined.py:214
+msgid "Imperial Jade"
+msgstr "Carski žad"
+
+#: src/predefined.py:215
+msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
+msgstr "Samo zelene pločice: zeleni zmaj i bambus, 2, 3, 4, 6, 8."
+
+#: src/predefined.py:216
+msgid "Gathering the Plum Blossom from the Roof"
+msgstr "Prikupljanje šljivinog cveta sa krova"
+
+#: src/predefined.py:218
+msgid "Mah Jong with stone 5 from the dead wall"
+msgstr "Madžong sa kamenom 5 sa mrtvog zida."
+
+#: src/predefined.py:220
+msgid "Plucking the Moon from the Bottom of the Sea"
+msgstr "Ubiranje meseca sa dna mora"
+
+#: src/predefined.py:221
+msgid "Mah Jong with the last tile from the wall being a stone 1"
+msgstr "Madžong sa poslednjom pločicom sa zida koja je kamen 1."
+
+#: src/predefined.py:223
+msgid "Scratching a Carrying Pole"
+msgstr "Grebanje noseće šipke"
+
+#: src/predefined.py:224
+msgid "Robbing the Kong of bamboo 2"
+msgstr "Otimanje kongu bambusa 2."
+
+#: src/predefined.py:230
+msgid "Standard Mah Jongg"
+msgstr "Standardni madžong"
+
+#: src/predefined.py:235
+msgid "Nine Gates"
+msgstr "Devet kapija"
+
+#: src/predefined.py:237
+msgid ""
+"A concealed hand in one color 1112345678999 plus last tile of this suit "
+"(from wall or discarded)"
+msgstr ""
+"Skrivena ruka u jednoj boji 1112345678999 plus poslednja pločica ove boje "
+"(sa zida ili odbačena)."
+
+#: src/predefined.py:239
+msgid "Thirteen Orphans"
+msgstr "Trinaest siročadi"
+
+#: src/predefined.py:240
+msgid ""
+"13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
+"with one of them"
+msgstr ""
+"13 jednostrukih pločica: svi zmajevi, vetrovi, 1, 9 i 14. pločica grade par "
+"sa jednom od njih."
+
+#: src/predefined.py:244
+msgid "Pung/Kong of Dragons"
+msgstr "Pang/kong zmajeva"
+
+#: src/predefined.py:246
+msgid "Pung/Kong of Own Wind"
+msgstr "Pang/kong sopstvenog vetra"
+
+#: src/predefined.py:249
+msgid "Pung/Kong of Round Wind"
+msgstr "Pang/kong okruglog vetra"
+
+#: src/predefined.py:253
+msgid "Exposed Kong"
+msgstr "Otkriveni kong"
+
+#: src/predefined.py:256
+msgid "Exposed Kong of Terminals"
+msgstr "Otkriveni kong terminala"
+
+#: src/predefined.py:259
+msgid "Exposed Kong of Honors"
+msgstr "Otkriveni kong časti"
+
+#: src/predefined.py:262
+msgid "Exposed Pung"
+msgstr "Otkriveni pang"
+
+#: src/predefined.py:265
+msgid "Exposed Pung of Terminals"
+msgstr "Otkriveni pang terminala"
+
+#: src/predefined.py:268
+msgid "Exposed Pung of Honors"
+msgstr "Otkriveni pang časti"
+
+#: src/predefined.py:272
+msgid "Concealed Kong"
+msgstr "Skriveni kong"
+
+#: src/predefined.py:275
+msgid "Concealed Kong of Terminals"
+msgstr "Skriveni kong terminala"
+
+#: src/predefined.py:278
+msgid "Concealed Kong of Honors"
+msgstr "Skriveni kong časti"
+
+#: src/predefined.py:281
+msgid "Concealed Pung"
+msgstr "Skriveni pang"
+
+#: src/predefined.py:284
+msgid "Concealed Pung of Terminals"
+msgstr "Skriveni pang terminala"
+
+#: src/predefined.py:287
+msgid "Concealed Pung of Honors"
+msgstr "Skriveni pang časti"
+
+#: src/predefined.py:290
+msgid "Pair of Own Wind"
+msgstr "Par sopstvenog vetra"
+
+#: src/predefined.py:292
+msgid "Pair of Round Wind"
+msgstr "Par okruglog vetra"
+
+#: src/predefined.py:294
+msgid "Pair of Dragons"
+msgstr "Par zmajeva"
+
+#: src/predefined.py:298
+msgid "Flower"
+msgstr "Cvet"
+
+#: src/predefined.py:300
+msgid "Season"
+msgstr "Doba"
+
+#: src/predefined.py:311
+msgid "Classical Chinese DMJL"
+msgstr "Klasični kineski (DMJL)"
+
+#: src/predefined.py:317
+msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
+msgstr "Klasični kineski kako ga definiše Nemačka madžong liga (DMJL)"
+
+#: src/predefined.py:324
+msgid "Squirming Snake"
+msgstr "Vrpoljeća zmija"
+
+#: src/predefined.py:325
+msgid ""
+"All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
+"Chows of the remaining values"
+msgstr ""
+"Sve pločice iste boje. Pang ili kong sa 1 i 9, par sa 2, 5 ili 8, i dva čoua "
+"od preostalih vrednosti."
+
+#: src/predefined.py:328
+msgid "Little Three Dragons"
+msgstr "Mala tri zmaja"
+
+#: src/predefined.py:329
+msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
+msgstr "Dva panga ili konga zmajeva i jedan par zmajeva."
+
+#: src/predefined.py:331
+msgid "Big Three Dragons"
+msgstr "Velika tri zmaja"
+
+#: src/predefined.py:334
+msgid "Little Four Joys"
+msgstr "Male četiri radosti"
+
+#: src/predefined.py:335
+msgid "3 Pungs or Kongs of winds and 1 pair of winds"
+msgstr "Tri panga ili konga vetrova i jedan par vetrova."
+
+#: src/predefined.py:336
+msgid "Big Four Joys"
+msgstr "Velike četiri radosti"
+
+#: src/predefined.py:342
+msgid "False Naming of Discard, Claimed for Chow"
+msgstr "Netačno imenovanje odbačenih, tvrđenih za čou"
+
+#: src/predefined.py:345
+msgid "False Naming of Discard, Claimed for Pung/Kong"
+msgstr "Netačno imenovanje odbačenih, tvrđenih za pang/kong"
+
+#: src/predefined.py:348 src/predefined.py:441
+msgid "False Declaration of Mah Jongg by One Player"
+msgstr "Jedan igrač netačno proglašava madžong"
+
+#: src/predefined.py:351
+msgid "False Declaration of Mah Jongg by Two Players"
+msgstr "Dva igrača netačno proglašavaju madžong"
+
+#: src/predefined.py:354
+msgid "False Declaration of Mah Jongg by Three Players"
+msgstr "Tri igrača netačno proglašavaju madžong"
+
+#: src/predefined.py:357 src/predefined.py:444
+msgid "False Naming of Discard, Claimed for Mah Jongg"
+msgstr "Netačno imenovanje odbačenih, tvrđenih za madžong"
+
+#: src/predefined.py:368
+msgid "Classical Chinese BMJA"
+msgstr "Klasični kineski (BMJA)"
+
+#: src/predefined.py:374
+msgid "Classical Chinese as defined by the British Mah-Jong Association"
+msgstr "Klasični kineski kako ga definiše Britanska madžong asocijacija"
+
+#: src/predefined.py:389
+msgid "Original Call"
+msgstr "Izvorni poziv"
+
+#: src/predefined.py:393
+msgid "Gates of Heaven"
+msgstr "Nebeske kapije"
+
+#: src/predefined.py:394
+msgid ""
+"All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
+"to 8 (last tile from wall or discarded)"
+msgstr ""
+"Sve pločice skrivene iste boje: vrednosti 1112345678999 sa jednim parom od 2 "
+"do 8 (poslednja pločica sa zida ili odbačena)."
+
+#: src/predefined.py:397
+msgid "Wriggling Snake"
+msgstr "Vijugajuća zmija"
+
+#: src/predefined.py:398
+msgid ""
+"Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
+msgstr "Par jedinica i niz od 2 do 9 u istoj boji sa svakim od vetrova."
+
+#: src/predefined.py:400
+msgid "Triple Knitting"
+msgstr "Trostruko pletenje"
+
+#: src/predefined.py:401
+msgid ""
+"Four sets of three tiles in the different suits and a pair: No Winds or "
+"Dragons"
+msgstr ""
+"Četiri skupa od tri pločice u različitim bojama, i par; bez vetrova i "
+"zmajeva."
+
+#: src/predefined.py:402
+msgid "Knitting"
+msgstr "Pletenje"
+
+#: src/predefined.py:403
+msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
+msgstr "7 parova pločica u svake dve od tri boje; bez vetrova i zmajeva."
+
+#: src/predefined.py:405
+msgid "All pair honors"
+msgstr "Svi parovi časti"
+
+#: src/predefined.py:406
+msgid "7 pairs of 1s/9s/Winds/Dragons"
+msgstr "Sedam parova jedinica/devetaka/vetrova/zmajeva"
+
+#: src/predefined.py:409
+msgid "Own Flower"
+msgstr "Sopstveni cvet"
+
+#: src/predefined.py:410
+msgid "Own Season"
+msgstr "Sopstveno doba"
+
+#: src/predefined.py:422
+msgid "Buried Treasure"
+msgstr "Zakopano blago"
+
+#: src/predefined.py:423
+msgid "Concealed pungs of one suit with winds/dragons and a pair"
+msgstr "Skriveni pangovi jedne boje sa vetrovima/zmajevima i parom."
+
+#: src/predefined.py:424
+msgid "Purity"
+msgstr "Čistota"
+
+#: src/predefined.py:425
+msgid "Only same-colored tiles (no chows, dragons or winds)"
+msgstr "Samo pločice iste boje (bez čoua, zmajeva i vetrova)."
+
+#: src/predefined.py:428
+msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
+msgstr "Tri panga ili konga zmajeva plus bilo koji pang/kong i par."
+
+#: src/predefined.py:431
+msgid "The 13 Unique Wonders"
+msgstr "Trinaest jedinstvenih čuda"
+
+#: src/predefined.py:438
+msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
+msgstr "Netačno imenovanje odbačenih, tvrđenih za čou/pang/kong"
+
+#: src/predefined.py:448
+msgid "Calling for Only Honors"
+msgstr "Poziv za samo časti"
+
+#: src/predefined.py:452
+msgid "Calling for Wriggling Snake"
+msgstr "Poziv za vijugajuću zmiju"
+
+#: src/predefined.py:456
+msgid "Calling for Triple Knitting"
+msgstr "Poziv za trostruko pletenje"
+
+#: src/predefined.py:460
+msgid "Calling for Gates of Heaven"
+msgstr "Poziv za nebeske kapije"
+
+#: src/predefined.py:463
+msgid "Calling for Knitting"
+msgstr "Poziv za pletenje"
+
+#: src/predefined.py:467
+msgid "Calling for Imperial Jade"
+msgstr "Poziv za carski žad"
+
+#: src/predefined.py:471
+msgid "Calling for The 13 Unique Wonders"
+msgstr "Poziv za trinaest jedinstvenih čuda"
+
+#: src/predefined.py:474
+msgid "Calling for Three Great Scholars"
+msgstr "Poziv za tri velika učenjaka"
+
+#: src/predefined.py:477
+msgid "Calling for All pair honors"
+msgstr "Poziv za sve parove časti"
+
+#: src/predefined.py:481
+msgid "Calling for Heads and Tails"
+msgstr "Poziv za glave i pisma"
+
+#: src/predefined.py:485
+msgid "Calling for Four Blessings Hovering over the Door"
+msgstr "Poziv za četiri blagoslova što lebde iznad vrata"
+
+#: src/predefined.py:488
+msgid "Calling for Buried Treasure"
+msgstr "Poziv za zakopano blago"
+
+#: src/predefined.py:492
+msgid "Calling for Fourfold Plenty"
+msgstr "Poziv za obilje četvorki"
+
+#: src/predefined.py:496
+msgid "Calling for Purity"
+msgstr "Poziv za čistotu"
+
+#: src/query.py:233
+msgctxt "kajongg name for local game server"
+msgid "Local Game"
+msgstr "Lokalna partija"
+
+#: src/query.py:415
+msgid "Database %1 updated from schema %2 to %3"
+msgstr "Baza podataka %1 ažurirana prema šemi %2 na %3."
+
+#: src/rule.py:54 src/scoringdialog.py:689 src/scoringdialog.py:772
+msgid "points"
+msgstr "poena"
+
+#: src/rule.py:55
+msgctxt "kajongg"
+msgid "doubles"
+msgstr "dublova"
+
+#: src/rule.py:56
+msgctxt "kajongg"
+msgid "limits"
+msgstr "ograničenja"
+
+# >! Plurals.
+#: src/rule.py:93
+msgctxt "Kajongg"
+msgid "%1 points"
+msgstr "%1 poena|/|%1 $[množ ^1 poen poena poena]"
+
+# >! Plurals.
+#: src/rule.py:95
+msgctxt "Kajongg"
+msgid "%1 doubles"
+msgstr "%1 dublova|/|%1 $[množ ^1 dubl dubla dublova]"
+
+# >! Plurals.
+#: src/rule.py:100
+msgctxt "Kajongg"
+msgid "%1 limits"
+msgstr "%1 ograničenja|/|%1 $[množ ^1 ograničenje ograničenja ograničenja]"
+
+#: src/rule.py:344
+msgid "Meld Rules"
+msgstr "Pravila slaganja"
+
+#: src/rule.py:345
+msgid ""
+"Meld rules are applied to single melds independent of the rest of the hand"
+msgstr ""
+"Pravila slaganja se primenjuju na pojedinačne slogove nezavisno od ostatka "
+"ruke."
+
+#: src/rule.py:346
+msgid "Hand Rules"
+msgstr "Pravila ruke"
+
+#: src/rule.py:347
+msgid "Hand rules are applied to the entire hand, for all players"
+msgstr "Pravila ruke se primenjuju na celu ruku i na sve igrače."
+
+#: src/rule.py:348
+msgid "Winner Rules"
+msgstr "Pravila pobednika"
+
+#: src/rule.py:349
+msgid "Winner rules are applied to the entire hand but only for the winner"
+msgstr "Pravila pobednika se primenjuju na celu ruku ali samo na pobednika."
+
+#: src/rule.py:350
+msgid "Loser Rules"
+msgstr "Pravila gubitnika"
+
+#: src/rule.py:351
+msgid "Loser rules are applied to the entire hand but only for non-winners"
+msgstr "Pravila gubitnika se primenjuju na celu ruku ali samo na gubitnike."
+
+#: src/rule.py:352
+msgid "Mah Jongg Rules"
+msgstr "Pravila madžonga"
+
+#: src/rule.py:353
+msgid "Only hands matching a Mah Jongg rule can win"
+msgstr "Samo ruka koja poklapa pravilo madžonga može da pobedi."
+
+#: src/rule.py:354
+msgctxt "kajongg"
+msgid "Options"
+msgstr "Opcije"
+
+#: src/rule.py:355
+msgid "Here we have several special game related options"
+msgstr "Nekoliko posebnih opcija u vezi sa igrom."
+
+#: src/rule.py:356
+msgid "Penalties"
+msgstr "Kazne"
+
+#: src/rule.py:357
+msgid ""
+"Penalties are applied manually by the user. They are only used for scoring "
+"games.\n"
+"When playing against the computer or over the net, Kajongg will never let "
+"you get\n"
+"into a situation where you have to pay a penalty"
+msgstr ""
+"Kazne ručno primenjuje korisnik. Koriste se samo za bodovanje igara.\n"
+"Pri igranju protiv računara ili preko mreže, Kadžong nikad neće\n"
+"dozvoliti da upadnete u situaciju gde morate da platite kaznu."
+
+#: src/rule.py:555
+msgctxt "Ruleset._newKey:%1 is empty or space plus number"
+msgid "Copy%1 of %2"
+msgstr "Kopija %1 od %2"
+
+#: src/rule.py:918
+msgctxt "%1 can be a sentence"
+msgid "%4 have impossible values %2/%3 in rule \"%1\""
+msgstr "%4 ima nemoguće vrednosti %2/%3 u pravilu „%1“."
+
+#: src/rule.py:1014
+msgctxt "wrong value for rule"
+msgid "%1: %2 is too small, minimal value is %3"
+msgstr "%1: %2 je premalo, najmanja vrednost je %3."
+
+# >> @title:window
+#: src/rulesetselector.py:496
+msgid "Customize rulesets"
+msgstr "Prilagođavanje skupova pravila"
+
+#: src/rulesetselector.py:514
+msgctxt "kajongg"
+msgid "Rule"
+msgstr "Pravilo"
+
+#: src/rulesetselector.py:571
+msgid "C&opy"
+msgstr "&Kopiraj"
+
+#: src/rulesetselector.py:572
+msgctxt "Kajongg ruleset comparer"
+msgid "Co&mpare"
+msgstr "U&poredi"
+
+#: src/rulesetselector.py:573
+msgid "&Remove"
+msgstr "&Ukloni"
+
+#: src/rulesetselector.py:574
+msgid "&Close"
+msgstr "&Zatvori"
+
+#: src/scene.py:379 src/scene.py:515
+msgid "Do you really want to abort this game?"
+msgstr "Želite li zaista da prekinete ovu partiju?"
+
+#: src/scoring.py:53
+msgid "Swap Seats"
+msgstr "Zameni mesta"
+
+#: src/scoring.py:55
+msgid "By the rules, %1 and %2 should now exchange their seats. "
+msgstr "Po pravilima, %1 i %2 sada treba da razmene mesta."
+
+#: src/scoring.py:57
+msgid "&Exchange"
+msgstr "&Razmeni"
+
+#: src/scoring.py:59
+msgid "&Keep seat"
+msgstr "&Zadrži mesto"
+
+# >> @title:window
+#: src/scoring.py:70
+msgid "Select four players"
+msgstr "Izbor četiri igrača"
+
+#: src/scoring.py:301
+msgid "Move Exposed Tiles Here"
+msgstr "Premesti ovde otkrivene pločice"
+
+#: src/scoring.py:302
+msgid "Move Concealed Tiles Here"
+msgstr "Premesti ovde skrivene pločice"
+
+# rewrite-msgid: /<.?interface>//
+#: src/scoring.py:613
+msgid "Please define four players in <interface>Settings|Players</interface>"
+msgstr "Definišite četiri igrača preko „Podešavanje→Igrači“."
+
+#: src/scoringdialog.py:252
+msgid "Round/Hand"
+msgstr "Runda/ruka"
+
+#: src/scoringdialog.py:282 src/scoringdialog.py:825
+msgctxt "kajongg"
+msgid "Score"
+msgstr "Rezultat"
+
+#: src/scoringdialog.py:282
+msgctxt "kajongg"
+msgid "Payments"
+msgstr "Plaćanja"
+
+#: src/scoringdialog.py:283
+msgctxt "kajongg"
+msgid "Balance"
+msgstr "Obračun"
+
+#: src/scoringdialog.py:283
+msgctxt "kajongg"
+msgid "Chart"
+msgstr "Grafik"
+
+#: src/scoringdialog.py:429
+msgctxt "kajongg"
+msgid "Scores"
+msgstr "Rezultati"
+
+#: src/scoringdialog.py:471
+msgctxt "kajongg"
+msgid "Used Rules"
+msgstr "Korišćena pravila"
+
+# rewrite-msgid: /<.?numid>//
+#: src/scoringdialog.py:505
+msgid "Final scores for game <numid>%1</numid>"
+msgstr "Krajnji rezultat partije %1"
+
+# rewrite-msgid: /<.?numid>//
+#: src/scoringdialog.py:507
+msgid "Scores for game <numid>%1</numid>"
+msgstr "Rezultat partije %1"
+
+# >> @title:window
+#: src/scoringdialog.py:575
+msgid "Explain Scores"
+msgstr "Objašnjenje rezultata"
+
+#: src/scoringdialog.py:591
+msgid "There is no active game"
+msgstr "Nema aktivnih partija."
+
+#: src/scoringdialog.py:594
+msgid "%1"
+msgstr "%1"
+
+#: src/scoringdialog.py:608
+msgid "Manual score for %1: %2 points"
+msgstr "%1 — ručni rezultat: %2 poena"
+
+#: src/scoringdialog.py:675
+msgid "Penalty"
+msgstr "Kazna"
+
+#: src/scoringdialog.py:678
+msgid "Offense:"
+msgstr "Prekršaj:"
+
+#: src/scoringdialog.py:685
+msgid "Total Penalty"
+msgstr "Ukupna kazna"
+
+#: src/scoringdialog.py:718
+msgid "&Execute"
+msgstr "&Izvrši"
+
+# >! Plurals.
+#: src/scoringdialog.py:795
+msgctxt "penalty dialog, appears behind paying player combobox"
+msgid "pays %1 points"
+msgstr "plaća %1 poena|/|plaća %1 $[množ ^1 poen poena poena]"
+
+# >! Plurals.
+#: src/scoringdialog.py:800
+msgctxt "penalty dialog, appears behind profiting player combobox"
+msgid "gets %1 points"
+msgstr "dobija %1 poena|/|dobija %1 $[množ ^1 poen poena poena]"
+
+#: src/scoringdialog.py:811
+msgid "Scoring for this Hand"
+msgstr "Bodovanje za ovu ruku"
+
+# >> @title:tab
+#: src/scoringdialog.py:823
+msgctxt "kajongg"
+msgid "Player"
+msgstr "Igrač"
+
+# >> @title:tab
+#: src/scoringdialog.py:824
+msgctxt "kajongg"
+msgid "Wind"
+msgstr "Vetar"
+
+# >> @title:tab
+#: src/scoringdialog.py:826
+msgid "Winner"
+msgstr "Pobednik"
+
+#: src/scoringdialog.py:832
+msgctxt "kajongg"
+msgid "Draw"
+msgstr "Nerešeno"
+
+#: src/scoringdialog.py:834
+msgid "&Penalties"
+msgstr "&Kazne"
+
+#: src/scoringdialog.py:836
+msgid "&Save Hand"
+msgstr "&Sačuvaj ruku"
+
+#: src/scoringdialog.py:858
+msgid "&Last Tile:"
+msgstr "&Poslednja pločica:"
+
+#: src/scoringdialog.py:867
+msgid "L&ast Meld:"
+msgstr "P&oslednji slog:"
+
+#: src/server.py:131
+msgid "Wrong password"
+msgstr "Pogrešna lozinka"
+
+# rewrite-msgid: /<.?numid>//
+#: src/server.py:229
+msgid "table with id <numid>%1</numid> not found"
+msgstr "Tabla pod brojem %1 nije nađena."
+
+#: src/server.py:376
+msgid "Player %1 has logged out"
+msgstr "Igrač %1 se odjavio."
+
+#: src/server.py:447
+#, python-format
+msgid "the server will listen on PORT (%d)"
+msgstr "Server će slušati na ovom portu (%d)."
+
+#: src/server.py:451
+msgid "the server will listen on SOCKET"
+msgstr "Server će slušati na ovom soketu."
+
+#: src/server.py:456
+msgid "name of the database"
+msgstr "Ime baze podataka."
+
+#: src/server.py:460
+msgid "do not terminate local game server after last client disconnects"
+msgstr ""
+"Ne obustavljaj lokalni igrački server pošto poslednji klijent prekine vezu."
+
+#: src/server.py:465
+msgid "unrecognized arguments:%1"
+msgstr "Neprepoznati argumenti: %1"
+
+#: src/servertable.py:168
+msgid "You already joined this table"
+msgstr "Već ste se pridružili ovoj tabli"
+
+#: src/servertable.py:170
+msgid "All seats are already taken"
+msgstr "Sva mesta su zauzeta"
+
+#: src/servertable.py:175
+msgid "takes a seat"
+msgstr "seda za tablu"
+
+#: src/servertable.py:183
+msgid "leaves the table"
+msgstr "napušta tablu"
+
+#: src/servertable.py:232
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 1"
+msgstr "robot 1"
+
+#: src/servertable.py:235
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 2"
+msgstr "robot 2"
+
+#: src/servertable.py:236
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 3"
+msgstr "robot 3"
+
+#: src/servertable.py:290
+msgid "Only the initiator %1 can start this game, you are %2"
+msgstr "Samo pokretač %1 može započeti ovu partiju. Vi ste %2."
+
+# rewrite-msgid: /<.?numid>//
+#: src/servertable.py:660
+msgid "Game <numid>%1</numid> is over!"
+msgstr "Partija %1 je gotova!"
+
+#: src/servertable.py:689
+msgid "%1 wrongly said %2 for meld %3"
+msgstr "%1 pogrešno reče %2 za slog %3."
+
+#: src/servertable.py:694
+msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
+msgstr "%1 pogrešno reče %2: tvrdi da ima skrivene pločice %3 ali ima samo %4."
+
+#: src/servertable.py:732
+msgid "declareKong:%1 wrongly said Kong for meld %2"
+msgstr "Proglas konga: %1 pogrešno reče kong za slog %2."
+
+#: src/servertable.py:780
+msgid "%1 claiming MahJongg: This is not a winning hand: %2"
+msgstr "%1 tvrdi madžong: ovo nije dobitna ruka: %2."
+
+#: src/sound.py:68
+msgid "No voices will be heard because the program %1 is missing"
+msgstr "Glasovi se neće čuti jer nedostaje program %1."
+
+# rewrite-msgid: /<.?filename>//
+#: src/sound.py:367
+msgid "cannot write <filename>%1</filename>: %2"
+msgstr "Ne mogu da upišem ‘%1’: %2"
+
+#: src/sound.py:370
+msgid "The voice files have changed, their checksum has changed."
+msgstr "Fajlovi glasova su izmenjeni, promenjena im je kontrolna suma."
+
+#: src/sound.py:371
+msgid "Please reinstall kajongg or do, with sufficient permissions:"
+msgstr "Ponovo instalirajte Kadžong ili izvršite (sa dovoljnim dozvolama):"
+
+# >> @title:column
+#: src/tables.py:68
+msgid "Table"
+msgstr "tabla"
+
+# >> @title:column
+#: src/tables.py:72
+msgctxt "table status"
+msgid "Status"
+msgstr "stanje"
+
+# >> @title:column
+#: src/tables.py:73
+msgid "Ruleset"
+msgstr "skup pravila"
+
+# >> @title:window
+#: src/tables.py:157
+msgid "Select a ruleset"
+msgstr "Izbor skupa pravila"
+
+#: src/tables.py:195
+msgctxt "allocate a new table"
+msgid "&New"
+msgstr "&Nova"
+
+#: src/tables.py:198 src/tables.py:338
+msgid "Allocate a new table"
+msgstr "Rezerviši novu tablu"
+
+#: src/tables.py:201 src/tables.py:339
+msgid "&Join"
+msgstr "&Pridruži se"
+
+#: src/tables.py:205 src/tables.py:340
+msgid "Join a table"
+msgstr "Pridruži se tabli"
+
+#: src/tables.py:207
+msgid "&Leave"
+msgstr "&Napusti"
+
+#: src/tables.py:211
+msgid "Leave a table"
+msgstr "Napusti tablu"
+
+#: src/tables.py:214
+msgctxt "Kajongg-Ruleset"
+msgid "Compare"
+msgstr "Uporedi"
+
+#: src/tables.py:219
+msgid "Compare the rules of this table with my own rulesets"
+msgstr "Uporedi pravila ove table sa mojim skupom pravila"
+
+#: src/tables.py:221
+msgid "&Chat"
+msgstr "&Ćaskanje"
+
+#: src/tables.py:226
+msgid "&Start"
+msgstr "&Pokreni"
+
+#: src/tables.py:231
+msgid "Start playing on a table. Empty seats will be taken by robot players."
+msgstr "Započnite igranje na tabli. Prazna mesta će popuniti robotski igrači."
+
+#: src/tables.py:273
+msgid "opens a chat window"
+msgstr "Otvara prozor za ćaskanje."
+
+#: src/tables.py:292
+msgid "Local Games with Ruleset %1"
+msgstr "Lokalne partije sa skupom pravila %1"
+
+#: src/tables.py:295
+msgid "Tables at %1"
+msgstr "Table na %1"
+
+#: src/tables.py:332
+msgid "Start a new game"
+msgstr "Pokreni novu partiju"
+
+#: src/tables.py:334
+msgctxt "resuming a local suspended game"
+msgid "&Resume"
+msgstr "&Nastavi"
+
+#: src/tables.py:336
+msgid "Resume the selected suspended game"
+msgstr "Nastavi izabranu suspendovanu partiju"
+
+#: src/tables.py:354
+msgid "Chat with others on this table"
+msgstr "Ćaskaj sa drugima za ovom tablom"
+
+#: src/tables.py:357
+msgid "For chatting with others on this table, please first take a seat"
+msgstr "Za ćaskanje sa drugima za ovom tablom, prvo zauzmite mesto."
+
+#: src/tile.py:205
+msgctxt "kajongg"
+msgid "hidden"
+msgstr "skriven"
+
+#: src/tile.py:206
+msgctxt "kajongg"
+msgid "stone"
+msgstr "kamen"
+
+#: src/tile.py:207
+msgctxt "kajongg"
+msgid "bamboo"
+msgstr "bambus"
+
+#: src/tile.py:208
+msgctxt "kajongg"
+msgid "character"
+msgstr "znak"
+
+#: src/tile.py:209
+msgctxt "kajongg"
+msgid "wind"
+msgstr "vetar"
+
+#: src/tile.py:210
+msgctxt "kajongg"
+msgid "dragon"
+msgstr "zmaj"
+
+#: src/tile.py:211
+msgctxt "kajongg"
+msgid "flower"
+msgstr "cvet"
+
+#: src/tile.py:212
+msgctxt "kajongg"
+msgid "season"
+msgstr "doba"
+
+#: src/tile.py:218
+msgctxt "kajongg"
+msgid "tile"
+msgstr "pločica"
+
+#: src/tile.py:219
+msgctxt "kajongg"
+msgid "white"
+msgstr "bela"
+
+#: src/tile.py:220
+msgctxt "kajongg"
+msgid "red"
+msgstr "crvena"
+
+#: src/tile.py:221
+msgctxt "kajongg"
+msgid "green"
+msgstr "zelena"
+
+#: src/tile.py:222
+msgctxt "kajongg"
+msgid "East"
+msgstr "istok"
+
+#: src/tile.py:223
+msgctxt "kajongg"
+msgid "South"
+msgstr "jug"
+
+#: src/tile.py:224
+msgctxt "kajongg"
+msgid "West"
+msgstr "zapad"
+
+#: src/tile.py:225
+msgctxt "kajongg"
+msgid "North"
+msgstr "sever"
+
+#: src/tile.py:234
+msgid "East Wind"
+msgstr "istočni vetar"
+
+#: src/tile.py:235
+msgid "South Wind"
+msgstr "južni vetar"
+
+#: src/tile.py:236
+msgid "West Wind"
+msgstr "zapadni vetar"
+
+#: src/tile.py:237
+msgid "North Wind"
+msgstr "severni vetar"
+
+# literal-segment: group|value
+#: src/tile.py:239
+#, python-brace-format
+msgctxt "kajongg tile name"
+msgid "{group} {value}"
+msgstr "{group} {value}"
+
+#: src/user.py:95
+msgid ""
+"Your client has a version older than 4.9.0 but you need %1 for this server"
+msgstr "Vaš klijent je izdanja starijeg od 4.9.0 a ovaj server traži %1."
+
+#: src/user.py:105
+msgid "Your client has version %1 but you need %2 for this server"
+msgstr "Vaš klijent je izdanja %1 ali vam treba %2 za ovaj server."

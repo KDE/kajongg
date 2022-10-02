@@ -1,0 +1,2644 @@
+# Copyright (C) YEAR This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Sairan Kikkarin <sairan@computer.org>, 2012, 2013.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
+"POT-Creation-Date: 2022-01-31 00:41+0000\n"
+"PO-Revision-Date: 2013-11-20 06:55+0600\n"
+"Last-Translator: Sairan Kikkarin <sairan@computer.org>\n"
+"Language-Team: Kazakh <kde-i18n-doc@kde.org>\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.2\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Preview"
+msgstr "Карап-шығу"
+
+msgid "Properties"
+msgstr "Қасиеттері"
+
+msgid "Author:"
+msgstr "Авторы:"
+
+msgid "Contact:"
+msgstr "Контакт:"
+
+msgid "Description:"
+msgstr "Сипатама:"
+
+msgctxt "kajongg"
+msgid "Game"
+msgstr "Ойын"
+
+msgid "View"
+msgstr "Көрініс"
+
+msgid "Toolbar"
+msgstr "Негізгі құралдар"
+
+#: src/background.py:68 src/tileset.py:81
+msgid "file <filename>%1</filename> contains no valid SVG"
+msgstr "<filename>%1</filename> файлында жарамды SVG жоқ"
+
+#: src/board.py:301
+msgctxt "kajongg:arrow keys hjkl like in konqueror"
+msgid "hjklHJKL"
+msgstr "hjklHJKL"
+
+#: src/board.py:350
+msgid "Choose from"
+msgstr "Қайдан таңдалған:"
+
+#: src/chat.py:42
+msgid "Time"
+msgstr "Уақыт"
+
+#: src/chat.py:42 src/playerlist.py:81
+msgid "Player"
+msgstr "Ойыншы"
+
+#: src/chat.py:42
+msgid "Message"
+msgstr "Хабарлама"
+
+#: src/chat.py:122
+msgid "Chat on table %1 at %2"
+msgstr "%1 үстелдегі әңгіме - %2"
+
+#: src/client.py:55
+msgctxt "table status"
+msgid "Suspended"
+msgstr "Тоқтап тур"
+
+#: src/client.py:60
+msgctxt "table status"
+msgid "Running"
+msgstr "Ойналуда"
+
+#: src/client.py:61
+msgctxt "table status"
+msgid "New"
+msgstr "Жаңа"
+
+#: src/configdialog.py:42
+msgid "Show tile shadows"
+msgstr "Тас көлеңкесі болсын"
+
+#: src/configdialog.py:45
+msgid "Rearrange undisclosed tiles to melds"
+msgstr "Ашылмаған тастар септеп реттелсін"
+
+#: src/configdialog.py:48
+msgid "Show only possible actions"
+msgstr "Мүмкін ғана әрекеттер көрсетілсін"
+
+#: src/configdialog.py:51
+msgid "Propose what to do"
+msgstr "Не істеу керек ұсыну"
+
+#: src/configdialog.py:57
+msgid "Animation speed:"
+msgstr "Анимация жылдамдығы:"
+
+#: src/configdialog.py:61
+msgid "Use sounds if available"
+msgstr "Бар болса дыбысы шықсын"
+
+#: src/configdialog.py:64
+msgid "Let others hear my voice"
+msgstr "Басқалар дауысымды естісін"
+
+#: src/configdialog.py:98
+msgctxt "kajongg"
+msgid "Play"
+msgstr "Ойнау"
+
+#: src/configdialog.py:101
+msgid "Tiles"
+msgstr "Тастар"
+
+#: src/configdialog.py:104
+msgid "Backgrounds"
+msgstr "Аясы"
+
+#: src/deferredutil.py:262 src/deferredutil.py:421
+msgid "The game server lost connection to player %1"
+msgstr "Сервердің %1 ойыншымен байланысы үзіліп кетті"
+
+#: src/deferredutil.py:265
+msgid ""
+"Error for player %1: %2\n"
+"%3"
+msgstr ""
+"%1 ойыншыға қатысты қате: %2\n"
+"%3"
+
+#: src/differ.py:65
+msgctxt "Kajongg"
+msgid "Rule"
+msgstr "Ереже"
+
+#: src/differ.py:123
+#, fuzzy
+#| msgid "Compare"
+msgctxt "@title:window"
+msgid "Compare"
+msgstr "Салыстыру"
+
+#: src/differ.py:166 src/differ.py:168
+msgctxt "Kajongg-Rule"
+msgid "not defined"
+msgstr "анықталмаған"
+
+#: src/game.py:535
+msgid "Score computed manually"
+msgstr "Қолмен есептелген ұпайы"
+
+#: src/game.py:631
+msgid "Player %1 not known"
+msgstr "%1 деген ойыншы беймәлім"
+
+#: src/game.py:1059
+msgid "Short living wall: Tile is invisible, hence dangerous"
+msgstr "Шолақ тірі қорған: Тас көрінбейді, қауіпті"
+
+#: src/games.py:91 src/playerlist.py:58 src/tables.py:58
+msgid "Players"
+msgstr "Ойыншылар"
+
+#: src/games.py:91
+msgid "Started"
+msgstr "Басталған"
+
+#: src/games.py:103
+#, fuzzy
+#| msgctxt "kajongg"
+#| msgid "Games"
+msgctxt "@title:window"
+msgid "Games"
+msgstr "Ойындар"
+
+#: src/games.py:120
+msgctxt "start a new game"
+msgid "&New"
+msgstr "&Жаңа"
+
+#: src/games.py:124
+msgid "&Load"
+msgstr "Жүк&теу"
+
+#: src/games.py:128 src/playerlist.py:48
+msgid "&Delete"
+msgstr "&Кетіру"
+
+#: src/games.py:132
+msgid "Show only pending games"
+msgstr "Тек кезектегі ойындар ғана көрсетілсін"
+
+#: src/games.py:235
+msgid ""
+"Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
+"you cannot cancel it with the cancel button"
+msgstr ""
+"Шынымен <numid>%1</numid> деген ойынды өшірмексіз бе?<br>Осымен өшіріледі, "
+"енді қайту амалы болмайды"
+
+#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:101 src/kdestub.py:102
+#: src/kdestub.py:104
+msgid "Kajongg"
+msgstr "Kajongg"
+
+#: src/humanclient.py:50
+msgid "Which chow do you want to expose?"
+msgstr "Қандай чоу ашпақсыз?"
+
+#: src/humanclient.py:88
+msgid "Which kong do you want to declare?"
+msgstr "Қандай конг жарияламақсыз?"
+
+#: src/humanclient.py:155
+msgid "Choose"
+msgstr "Таңдау"
+
+#: src/humanclient.py:347
+msgid "You cannot say %1"
+msgstr "%1 жария ету алмайсыз"
+
+#: src/humanclient.py:569
+msgid "Player %1 has left the table"
+msgstr "%1 ойыншы шығып кеті"
+
+#: src/humanclient.py:632
+msgid ""
+"The game on table <numid>%1</numid> can begin. Are you ready to play now?"
+msgstr "<numid>%1</numid>-үстелде ойын басталмақ. Сіз дайынзыз ба?"
+
+#: src/humanclient.py:650
+msgid "Ready for next hand?"
+msgstr "Келесі қиыстырмаға дайынсыз ба?"
+
+#: src/humanclient.py:907
+msgid "The connection to the server %1 broke, please try again later."
+msgstr "%1 серверімен байланыс үзілген, кейін қосылып көріңіз."
+
+#: src/kajongg.py:80 src/kdestub.py:1044
+msgid "Mah Jongg - the ancient Chinese board game for 4 players"
+msgstr "Маджонг - 4 жақ ойнайтын көне Қытай тақта ойны"
+
+#: src/kajongg.py:84
+msgid "all robots play with visible concealed tiles"
+msgstr "бүкіл компьютер-ойыншылар көрінетін құпия тастарымен ойнайды"
+
+#: src/kajongg.py:85
+msgid "start with demo mode"
+msgstr "демонстрациядан бастау"
+
+#: src/kajongg.py:86
+msgid "login to HOST"
+msgstr "HOST хостына кіру"
+
+#: src/kajongg.py:87
+msgid "start new TABLE"
+msgstr "жаңа TABLE үстелін құру"
+
+#: src/kajongg.py:88
+#, fuzzy
+#| msgid "join TABLE "
+msgid "join TABLE"
+msgstr "TABLE үстеліне қосылу"
+
+#: src/kajongg.py:89
+#, fuzzy
+#| msgid "use ruleset without asking"
+msgid "use RULESET without asking"
+msgstr "ереже жиыны сұрамай енсін"
+
+#: src/kajongg.py:90
+msgid "play only ROUNDS rounds per game. Only for debugging!"
+msgstr ""
+
+#: src/kajongg.py:91
+msgid "prefer PLAYER for next login"
+msgstr "келесі кіргенде PLAYER деп кіру"
+
+#: src/kajongg.py:92
+msgid "use AI variant for human player in demo mode"
+msgstr "демо режімінде ойыншы-компьютер болсын"
+
+#: src/kajongg.py:93
+msgid "write statistics to CSV"
+msgstr "статистиканы CSV файлға жазу"
+
+#: src/kajongg.py:94
+msgid "show all available rulesets"
+msgstr "бүкіл бар ереже жиындарын көрсету"
+
+#: src/kajongg.py:95
+msgid "for testing purposes: Initializes the random generator"
+msgstr "сынақ үшін: қездейсоқ сан генераторды инициализциялау"
+
+#: src/kajongg.py:97
+msgid "show no graphical user interface. Intended only for testing"
+msgstr "графикалық пайдаланушы интерфейсі көрсетілмейді. Тек сынақ үшін"
+
+#: src/kajongg.py:98
+msgid "use a dedicated server listening on SOCKET. Intended only for testing"
+msgstr "SOCKET портын тыңдайтын арнаулы серверін пайдалану. Тек сыңақ үшін"
+
+#: src/kajongg.py:99
+#, fuzzy
+#| msgid ""
+#| "use a dedicated server listening on SOCKET. Intended only for testing"
+msgid "use a dedicated server listening on PORT. Intended only for testing"
+msgstr "SOCKET портын тыңдайтын арнаулы серверін пайдалану. Тек сыңақ үшін"
+
+#: src/kdestub.py:251
+#, fuzzy
+#| msgctxt "kajongg"
+#| msgid "OK"
+msgid "&OK"
+msgstr "ОК"
+
+#: src/kdestub.py:253
+msgid "&Apply"
+msgstr ""
+
+#: src/kdestub.py:255
+msgid "&Cancel"
+msgstr ""
+
+#: src/kdestub.py:257 src/kdestub.py:447
+msgid "&Help"
+msgstr ""
+
+#: src/kdestub.py:260
+msgid "&Defaults"
+msgstr ""
+
+#: src/kdestub.py:333
+#, fuzzy
+#| msgid "Toolbar"
+msgctxt "@action:inmenu"
+msgid "Show St&atusbar"
+msgstr "Негізгі құралдар"
+
+#: src/kdestub.py:339
+#, fuzzy
+#| msgid "Toolbar"
+msgctxt "@action:inmenu"
+msgid "Show &Toolbar"
+msgstr "Негізгі құралдар"
+
+#: src/kdestub.py:345
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Quit Kajongg"
+msgid "Configure Tool&bars..."
+msgstr "Kajongg-тан &шығу"
+
+#: src/kdestub.py:347
+msgid "Configure toolbars"
+msgstr ""
+
+#: src/kdestub.py:354
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Quit Kajongg"
+msgid "Configure &Kajongg..."
+msgstr "Kajongg-тан &шығу"
+
+#: src/kdestub.py:356 src/kdestub.py:1155
+msgid "Configure"
+msgstr ""
+
+#: src/kdestub.py:443
+#, fuzzy
+#| msgctxt "kajongg"
+#| msgid "Game"
+msgid "&Game"
+msgstr "Ойын"
+
+#: src/kdestub.py:444
+#, fuzzy
+#| msgid "View"
+msgid "&View"
+msgstr "Көрініс"
+
+#: src/kdestub.py:445
+msgid "&Settings"
+msgstr ""
+
+#: src/kdestub.py:453
+msgctxt "@action:inmenu"
+msgid "&Help"
+msgstr ""
+
+#: src/kdestub.py:456 src/kdestub.py:806
+msgid "Switch Application Language"
+msgstr ""
+
+#: src/kdestub.py:460
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Quit Kajongg"
+msgctxt "@action:inmenu"
+msgid "About &Kajongg"
+msgstr "Kajongg-тан &шығу"
+
+#: src/kdestub.py:811
+msgid "Please choose the language which should be used for this application:"
+msgstr ""
+
+#: src/kdestub.py:830
+msgid "Add Fallback Language"
+msgstr ""
+
+#: src/kdestub.py:842
+msgid "Primary language:"
+msgstr ""
+
+#: src/kdestub.py:842
+msgid "Fallback language:"
+msgstr ""
+
+#: src/kdestub.py:848
+#, fuzzy
+#| msgid "Remove"
+msgid "Remove"
+msgstr "Өшіру"
+
+#: src/kdestub.py:852
+msgid ""
+"This is the main application language which will be used first, before any "
+"other languages."
+msgstr ""
+
+#: src/kdestub.py:854
+msgid ""
+"This is the language which will be used if any previous languages do not "
+"contain a proper translation."
+msgstr ""
+
+#: src/kdestub.py:980
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Quit Kajongg"
+msgid "About Kajongg"
+msgstr "Kajongg-тан &шығу"
+
+#: src/kdestub.py:1003
+msgid "Version: %1"
+msgstr ""
+
+#: src/kdestub.py:1004
+msgid "Protocol version %1"
+msgstr ""
+
+#: src/kdestub.py:1007
+msgid "Original author"
+msgstr "Бастапқы авторы"
+
+#: src/kdestub.py:1015
+msgid "KDE Frameworks (not installed or not usable)"
+msgstr ""
+
+#: src/kdestub.py:1023
+msgctxt "kajongg"
+msgid "Using versions %1"
+msgstr ""
+
+#: src/kdestub.py:1026
+msgid "Not using broken Python KDE bindings"
+msgstr ""
+
+#: src/kdestub.py:1045
+msgid ""
+"This is the classical Mah Jongg for four players. If you are looking for Mah "
+"Jongg solitaire please use the application kmahjongg."
+msgstr ""
+"Бұл төртеу ойнайтын дәстүрлі Маджонг. Маджонг деген пасьянсты іздесеңіз - ол "
+"kmahjongg деп аталады."
+
+#: src/kdestub.py:1064
+msgid ""
+"Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
+"report bugs."
+msgstr ""
+
+#: src/kdestub.py:1069
+#, fuzzy
+#| msgid "Author:"
+msgid "Authors:"
+msgstr "Авторы:"
+
+#: src/kdestub.py:1115
+msgid "License Agreement"
+msgstr ""
+
+#: src/kdestub.py:1355
+msgid "Configure Toolbars"
+msgstr ""
+
+#: src/kdestub.py:1357
+msgid "A&vailable actions:"
+msgstr ""
+
+#: src/kdestub.py:1368
+msgid "Curr&ent actions:"
+msgstr ""
+
+#: src/login.py:166
+#, fuzzy
+#| msgid "start a local game server"
+msgid "trying to start local server %1"
+msgstr "жергілікті ойын серверін жегу"
+
+#: src/login.py:177 src/login.py:621
+msgid "removed stale socket <filename>%1</filename>"
+msgstr "ескірген <filename>%1</filename> сокеті өшірілді"
+
+#: src/login.py:198
+msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
+msgstr "жергілікті kajongg сервері жегілді: pid=<numid>%1</numid> %2"
+
+#: src/login.py:238
+#, fuzzy
+#| msgid "Login"
+msgctxt "kajongg"
+msgid "Login"
+msgstr "Кіру"
+
+#: src/login.py:286 src/login.py:394
+msgid "Game server:"
+msgstr "Ойын сервері:"
+
+#: src/login.py:289 src/login.py:396
+msgid "Username:"
+msgstr "Пайдаланушы:"
+
+#: src/login.py:292 src/login.py:399
+msgid "Password:"
+msgstr "Паролі:"
+
+#: src/login.py:294
+msgctxt "kajongg"
+msgid "Ruleset:"
+msgstr "Ереже жиыны:"
+
+#: src/login.py:388
+#, fuzzy
+#| msgid "Create User Account"
+msgctxt "@title:window"
+msgid "Create User Account"
+msgstr "Тіркелгіні құру"
+
+#: src/login.py:402
+msgid "Repeat password:"
+msgstr "Паролінің қайталауы:"
+
+#: src/login.py:552
+msgid "You are already connected to server %1"
+msgstr "Сіз %1 серверге бұрыннан қосылғансыз"
+
+#: src/login.py:589
+msgctxt "USER is not known on SERVER"
+msgid "%1 is not known on %2, do you want to open an account?"
+msgstr "%1 пайдаланушы %2 дегенде жоқ, тіркелгіні құрмақсыз ба?"
+
+#: src/login.py:601
+msgid "Server %1 did not answer"
+msgstr ""
+
+#: src/login.py:603
+msgid "Server %1 refused connection"
+msgstr ""
+
+#: src/login.py:605
+msgid "Server %1 does not run a kajongg server"
+msgstr ""
+
+#: src/login.py:607
+msgid "Address for server %1 cannot be found"
+msgstr ""
+
+#: src/login.py:610
+#, fuzzy
+#| msgid "You have no network connectivity: %1"
+msgid "Login to server %1 failed: You have no network connection"
+msgstr "Желі қосылымыңыз жоқ: %1"
+
+#: src/login.py:622
+msgid "Please try again"
+msgstr "Қайталап көріңіз"
+
+#: src/mainwindow.py:501
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Score Manual Game"
+msgctxt "@action:inmenu"
+msgid "&Score Manual Game"
+msgstr "Қолмен ойнаған &есебі"
+
+#: src/mainwindow.py:503
+msgctxt "@action:intoolbar"
+msgid "Manual Game"
+msgstr "Қолмен ойнаған"
+
+#: src/mainwindow.py:506
+msgctxt "kajongg @info:tooltip"
+msgid "&Score a manual game."
+msgstr "Қолмен ойнаған &есебі."
+
+#: src/mainwindow.py:508
+msgctxt "@action:intoolbar"
+msgid "&Play"
+msgstr "&Ойнау"
+
+#: src/mainwindow.py:511
+msgctxt "kajongg @info:tooltip"
+msgid "Start a new game."
+msgstr "Жаңа ойынды бастау."
+
+#: src/mainwindow.py:513
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Abort Game"
+msgctxt "@action:inmenu"
+msgid "&Abort Game"
+msgstr "Ойынды &доғару"
+
+#: src/mainwindow.py:517
+msgctxt "kajongg @info:tooltip"
+msgid "Abort the current game."
+msgstr "Ойнап жатқанды доғару."
+
+#: src/mainwindow.py:519
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Quit Kajongg"
+msgctxt "@action:inmenu"
+msgid "&Quit Kajongg"
+msgstr "Kajongg-тан &шығу"
+
+#: src/mainwindow.py:522
+msgctxt "@action:intoolbar"
+msgid "&Players"
+msgstr "&Ойыншылар"
+
+#: src/mainwindow.py:525
+msgctxt "kajongg @info:tooltip"
+msgid "define your players."
+msgstr "ойыншыларыңызды анықтау."
+
+#: src/mainwindow.py:527
+msgctxt "@action:intoolbar"
+msgid "&Rulesets"
+msgstr "&Ереже жиындары"
+
+#: src/mainwindow.py:530
+msgctxt "kajongg @info:tooltip"
+msgid "customize rulesets."
+msgstr "ереже жиындарын ыңғайлау."
+
+#: src/mainwindow.py:534
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Change Visual Angle"
+msgctxt "@action:inmenu"
+msgid "&Change Visual Angle"
+msgstr "К&өзқарас бұрышы"
+
+#: src/mainwindow.py:535
+msgctxt "@action:intoolbar"
+msgid "Angle"
+msgstr "Бұрыш"
+
+#: src/mainwindow.py:538
+msgctxt "kajongg @info:tooltip"
+msgid "Change the visual appearance of the tiles."
+msgstr "Тастарының көрінісін өзгерту."
+
+#: src/mainwindow.py:542
+msgctxt "@action:inmenu"
+msgid "F&ull Screen Mode"
+msgstr ""
+
+#: src/mainwindow.py:545
+#, fuzzy
+#| msgctxt "kajongg @action:inmenu"
+#| msgid "&Score Table"
+msgctxt "kajongg @action:inmenu"
+msgid "&Score Table"
+msgstr "&Есеп кестесі"
+
+#: src/mainwindow.py:547
+msgctxt "kajongg @action:intoolbar"
+msgid "&Scores"
+msgstr "Ұ&пайлар"
+
+#: src/mainwindow.py:549
+msgctxt "kajongg @info:tooltip"
+msgid "Show or hide the score table for the current game."
+msgstr "Ойынның ұпай кестесін көрсету/жасыру."
+
+#: src/mainwindow.py:551
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Explain Scores"
+msgctxt "@action:inmenu"
+msgid "&Explain Scores"
+msgstr "Есебін &түсіндіру"
+
+#: src/mainwindow.py:552
+msgctxt "@action:intoolbar"
+msgid "&Explain"
+msgstr "&Түсіндіру"
+
+#: src/mainwindow.py:554
+msgctxt "kajongg @info:tooltip"
+msgid "Explain the scoring for all players in the current game."
+msgstr "Ойнап жатқан бүкіл ойншыларының ұпай есебін түсіндіру."
+
+#: src/mainwindow.py:556
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Demo Mode"
+msgctxt "@action:inmenu"
+msgid "&Demo Mode"
+msgstr "&Демо режімі"
+
+#: src/mainwindow.py:559
+msgctxt "kajongg @info:tooltip"
+msgid "Let the computer take over for you. Start a new local game if needed."
+msgstr ""
+"Керек болса жаңа ойынды бастап, компьютерге өзіне ойынды жалғастыруға "
+"мүмкіндік беру. "
+
+#: src/mainwindow.py:561
+msgid "C&hat"
+msgstr "Ч&ат-әңгіме"
+
+#: src/mainwindow.py:564
+msgctxt "kajongg @info:tooltip"
+msgid "Chat with the other players."
+msgstr "Басқа ойыншылармен әңгімелесу."
+
+#: src/meld.py:318
+msgctxt "kajongg meld type"
+msgid "Bonus"
+msgstr "Сыйлық"
+
+#: src/meld.py:320
+msgctxt "kajongg meld type"
+msgid "&single"
+msgstr "&бірлік"
+
+#: src/meld.py:322
+msgctxt "kajongg meld type"
+msgid "&pair"
+msgstr "&жұп"
+
+#: src/meld.py:324
+msgctxt "kajongg meld type"
+msgid "&chow"
+msgstr "&чоу"
+
+#: src/meld.py:326
+msgctxt "kajongg meld type"
+msgid "p&ung"
+msgstr "п&анг"
+
+#: src/meld.py:328
+msgctxt "kajongg meld type"
+msgid "c&laimed kong"
+msgstr "&жариялаған конг"
+
+#: src/meld.py:330
+msgctxt "kajongg meld type"
+msgid "k&ong"
+msgstr "к&онг"
+
+#: src/meld.py:331
+msgctxt "kajongg meld type"
+msgid "rest of tiles"
+msgstr ""
+
+#: src/meld.py:338
+msgctxt "kajongg meld state"
+msgid "Exposed"
+msgstr "Ашылған"
+
+#: src/meld.py:339
+msgctxt "kajongg meld state"
+msgid "Concealed"
+msgstr "Ашылмаған"
+
+#: src/meld.py:345
+#, python-brace-format
+msgctxt "kajongg meld name, do not translate parameter names"
+msgid "{state} {meldType} {name}"
+msgstr "{state} {meldType} {name}"
+
+#: src/message.py:203
+msgid "saying %1 violates Original Call"
+msgstr "%1 деу Бастапқы шақырылысты бұзады"
+
+#: src/message.py:215
+msgid ""
+"claiming %1 is dangerous because you will have to discard a dangerous tile"
+msgstr "%1 мәлімдеу қауіпті өйткені қауіпті тасты тастайсыз"
+
+#: src/message.py:220
+msgid ""
+"claiming %1 for %2 is dangerous because you will have to discard a dangerous "
+"tile"
+msgstr "%2 үшін %1 мәлімдеу қауіпті өйткені қауіпті тасты тастайсыз"
+
+#: src/message.py:223
+msgid "You may say %1"
+msgstr "%1 деуге болады"
+
+#: src/message.py:233
+msgctxt "kajongg"
+msgid "Pung"
+msgstr "Панг"
+
+#: src/message.py:234
+msgctxt "kajongg game dialog:Key for Pung"
+msgid "P"
+msgstr "P"
+
+#: src/message.py:251
+msgctxt "kajongg"
+msgid "Kong"
+msgstr "Конг"
+
+#: src/message.py:252
+msgctxt "kajongg game dialog:Key for Kong"
+msgid "K"
+msgstr "K"
+
+#: src/message.py:272
+msgid "saying Kong for %1 violates Original Call"
+msgstr "%1 үшін конг деу Бастапқы шақырылысты бұзады"
+
+#: src/message.py:275
+msgid "You may say Kong for %1"
+msgstr "%1 үшін конг дей аласыз"
+
+#: src/message.py:289
+msgctxt "kajongg"
+msgid "Chow"
+msgstr "Чоу"
+
+#: src/message.py:290
+msgctxt "kajongg game dialog:Key for Chow"
+msgid "C"
+msgstr "C"
+
+#: src/message.py:323
+msgctxt "kajongg"
+msgid "Mah Jongg"
+msgstr "Маджонг"
+
+#: src/message.py:324
+msgctxt "kajongg game dialog:Key for Mah Jongg"
+msgid "M"
+msgstr "M"
+
+#: src/message.py:332
+msgid "Press here and you win"
+msgstr "Осында басып ұтыңыз"
+
+#: src/message.py:346
+msgctxt "kajongg"
+msgid "Original Call"
+msgstr "Бастапқы шақырылыс"
+
+#: src/message.py:347
+msgctxt "kajongg game dialog:Key for Original Call"
+msgid "O"
+msgstr "O"
+
+#: src/message.py:360
+msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
+msgstr ""
+"%1 дегенді тастап, Бастапқы шақырылысты жариялау бұл қиыстырманы ұтпайтын "
+"қылады"
+
+#: src/message.py:364
+msgid ""
+"Discard a tile, declaring Original Call meaning you need only one tile to "
+"complete the hand and will not alter the hand in any way (except bonus tiles)"
+msgstr ""
+"Тасты тастап, Бастапқы шақырылысты жарияланыз, ол Сізге қиыстырма жинау үшін "
+"бір тас жетпейді деген сөз, және қиыстырмаңыз енді ауыспайды (сыйлық тастар "
+"болмаса) дегені"
+
+#: src/message.py:389
+msgctxt "kajongg"
+msgid "Discard"
+msgstr "Тастау"
+
+#: src/message.py:390
+msgctxt "kajongg game dialog:Key for Discard"
+msgid "D"
+msgstr "D"
+
+#: src/message.py:405
+msgid "discarding %1 violates Original Call"
+msgstr "%1 дегенді тастау - Бастапқы шақырылысты бұзу"
+
+#: src/message.py:408
+msgid "discarding %1 is Dangerous Game"
+msgstr "%1 дегенді тастау - Қауіпті ойын"
+
+#: src/message.py:411
+msgid "discard the least useful tile"
+msgstr "пайдасы ең аз тасты тастаңыз"
+
+#: src/message.py:483
+msgid "%1 is not ready to start the game"
+msgstr "%1 бұл ойынды бастауға дайын емес"
+
+#: src/message.py:519
+msgid "Kajongg <numid>%1</numid>"
+msgstr "Kajongg <numid>%1</numid>"
+
+#: src/message.py:595
+msgctxt "kajongg"
+msgid "Violates Original Call"
+msgstr "Бастапқы шақырылысты бұзу"
+
+#: src/message.py:723
+msgctxt "kajongg"
+msgid "Dangerous Game"
+msgstr "Қауіпті ойын"
+
+#: src/message.py:737
+msgctxt "kajongg"
+msgid "No Choice"
+msgstr "Таңдаусыз"
+
+#: src/message.py:796
+#, fuzzy
+#| msgctxt "kajongg"
+#| msgid "OK"
+msgctxt "kajongg"
+msgid "OK"
+msgstr "ОК"
+
+#: src/message.py:797
+msgctxt "kajongg game dialog:Key for OK"
+msgid "O"
+msgstr "O"
+
+#: src/message.py:801
+msgid "Confirm that you saw the message"
+msgstr "Хабарламаны көргенін құптаңыз"
+
+#: src/message.py:810
+msgctxt "kajongg"
+msgid "No Claim"
+msgstr "Мәлімдеме жоқ"
+
+#: src/message.py:811
+msgctxt "kajongg game dialog:Key for No claim"
+msgid "N"
+msgstr "N"
+
+#: src/message.py:815
+msgid "You cannot or do not want to claim this tile"
+msgstr "Бұл тасты ала алмайсыз не алуын қаламайсыз"
+
+#: src/mjresource.py:80
+#, fuzzy
+#| msgid ""
+#| "cannot find any tileset in the following directories, is libkmahjongg "
+#| "installed?"
+msgid ""
+"cannot find any %1 in the following directories, is libkmahjongg installed?"
+msgstr ""
+"келесі каталогтарда ешбір тастар жиыны табылған жоқ, libkmahjongg орнатылған "
+"ба өзі?"
+
+#: src/mjresource.py:104
+#, fuzzy
+#| msgid "cannot find tileset %1, using default"
+msgid "cannot find %1, using default"
+msgstr "%1 тастар жиыны табылған жоқ, әдеттегісі қолданылады"
+
+#: src/mjresource.py:114
+#, fuzzy
+#| msgid "Backgrounds"
+msgid "unknown name"
+msgstr "Аясы"
+
+#: src/mjresource.py:115
+msgid "unknown author"
+msgstr ""
+
+#: src/mjresource.py:118
+msgid "no description available"
+msgstr ""
+
+#: src/mjresource.py:121
+msgid "no E-Mail address available"
+msgstr ""
+
+#: src/player.py:687
+msgid "%1 claiming MahJongg: She does not really have tile %2"
+msgstr "%1 маджонг мәлімдеді: бірақ шынында онда %2 тасы жоқ"
+
+#: src/player.py:696
+msgid ""
+"%1 claiming MahJongg: She did not pass all concealed tiles to the server"
+msgstr ""
+"%1 маджонг мәлімдеді: бірақ серверге бүкіл ашылмаған тастарды тапсырған жоқ"
+
+#: src/player.py:807
+msgid "Player %1 has 3 or 4 exposed melds, all are green"
+msgstr "%1 ойыншысыда 3 немесе 4 ашылған септеуі, бүкілі жасыл"
+
+#: src/player.py:816
+msgid "Player %1 may try a True Color Game"
+msgstr "%1 ойыншысы шын түсті ойынды ойна алады"
+
+#: src/player.py:819
+msgid "Player %1 may try an All Terminals Game"
+msgstr "%1 ойыншы Бүкіл терминалды ойының ойнап көре алады"
+
+#: src/player.py:832
+msgid "Player %1 exposed many winds"
+msgstr "%1 ойыншысы көп желдерді ашты"
+
+#: src/player.py:836
+msgid "Player %1 exposed many dragons"
+msgstr "%1 ойыншысы көп айдаһарларды ашты"
+
+#: src/playerlist.py:43
+msgctxt "define a new player"
+msgid "&New"
+msgstr "&Жаңа"
+
+#: src/playerlist.py:101
+#, fuzzy
+#| msgid "User %1 already exists"
+msgid "Player %1 already exists"
+msgstr "%1 деген пайдаланушысы бар екен"
+
+#: src/playerlist.py:110
+#, fuzzy
+#| msgid ""
+#| "Error for player %1: %2\n"
+#| "%3"
+msgid "Error while adding player %1: %2"
+msgstr ""
+"%1 ойыншыға қатысты қате: %2\n"
+"%3"
+
+#: src/playerlist.py:165
+msgid ""
+"There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
+"This will also delete all games played by %3!"
+msgstr ""
+
+#: src/predefined.py:27
+msgid "Classical Chinese standard"
+msgstr "Классикалық қытай стандарты"
+
+#: src/predefined.py:31
+msgid "Classical Chinese"
+msgstr "Классикалық қытайша"
+
+#: src/predefined.py:37
+msgid "Last Tile Taken from Dead Wall"
+msgstr "Соңғы тас өлім қорғаннан алынған"
+
+#: src/predefined.py:39
+msgid ""
+"The dead wall is also called kong box: The last 16 tiles of the wall used as "
+"source of replacement tiles"
+msgstr ""
+"Өлім қорғаны басқаша конг өрісі деп аталады: Қорғанның соңғы 16 тасы "
+"ауыстырушы тастар көзі ретінде пайдаланады"
+
+#: src/predefined.py:42
+msgid "Last Tile is Last Tile of Wall"
+msgstr "Соңғы тас - қорғанның соңғы тасы"
+
+#: src/predefined.py:44
+msgid ""
+"Winner said Mah Jong with the last tile taken from the living end of the wall"
+msgstr "Жеңімпаз қорғанның тірі соңынан алынған соңғы таспен маджонг жариялады"
+
+#: src/predefined.py:46
+msgid "Last Tile is Last Tile of Wall Discarded"
+msgstr "Соңғы тас - қорғанның қойылған соңғы тасы"
+
+#: src/predefined.py:48
+msgid ""
+"Winner said Mah Jong by claiming the last tile taken from the living end of "
+"the wall, discarded by another player"
+msgstr ""
+"Жеңімпаз қорғаның тірі соңынан алынған, басқа ойыншы тастаған, соңғы таспен "
+"маджонг мәлімдеді"
+
+#: src/predefined.py:51
+msgid "Robbing the Kong"
+msgstr "Конгты тонау"
+
+#: src/predefined.py:52
+msgid ""
+"Winner said Mah Jong by claiming the 4th tile of a kong another player just "
+"declared"
+msgstr ""
+"Жеңімпаз баса ойыншымен жаңа жарияланған конгтың 4-тасын алып маджонг "
+"мәлімдеді"
+
+#: src/predefined.py:55
+msgid "Mah Jongg with Original Call"
+msgstr "Бастапқы шақырылыспен маджонг"
+
+#: src/predefined.py:58
+msgid ""
+"Just before the first discard, a player can declare Original Call meaning "
+"she needs only one tile to complete the hand and announces she will not "
+"alter the hand in any way (except bonus tiles)"
+msgstr ""
+"Дәл алғашқы тастар тастау алдында ойыншы Бастапқы шақырылысты жариялай "
+"алады, ол ойыншыға қиыстырма жинау үшін бір тас жетпейді деген сөз, және "
+"қиыстырмасы енді ауыспайды (сыйлық тастар болмаса) дегені"
+
+#: src/predefined.py:61
+msgid "Dangerous Game"
+msgstr "Қауіпті ойын"
+
+#: src/predefined.py:62
+msgid ""
+"In some situations discarding a tile that has a high chance to help somebody "
+"to win is declared to be dangerous, and if that tile actually makes somebody "
+"win, the discarder pays the winner for all"
+msgstr ""
+"Кейбір жағдайларда тасталған тас біреуге ұтуға сеп болатын қауіп болмақ. "
+"Ондай болса, тасты тастаған ұтқанға бүкілі үшін төлейді."
+
+#: src/predefined.py:66
+msgid "Twofold Fortune"
+msgstr "Есі мәрте сәттілік"
+
+#: src/predefined.py:67
+msgid ""
+"Kong after Kong: Declare Kong and a second Kong with the replacement tile "
+"and Mah Jong with the second replacement tile"
+msgstr ""
+"Конгтан кейінгі Конг: Конгтан кейін екінші конгты жариялау. тасты айырбастап "
+"және екінші айырбастаумен Маджонгты жинау"
+
+#: src/predefined.py:71
+msgid "Blessing of Heaven"
+msgstr "Аспан шапағаты"
+
+#: src/predefined.py:72
+msgid "East says Mah Jong with the unmodified dealt tiles"
+msgstr "Шығыс үлестірген тастарымен бірден Маджонг деді"
+
+#: src/predefined.py:74
+msgid "Blessing of Earth"
+msgstr "Жер шапағаты"
+
+#: src/predefined.py:75
+msgid ""
+"South, West or North says Mah Jong with the first tile discarded by East"
+msgstr ""
+"Оңтүстік, Батыс не Солтүсттік бірінші Шығыс тастаған таспен Маджонг деді"
+
+#: src/predefined.py:77
+msgid "East won nine times in a row"
+msgstr "Шығыстың қатарымен тоғыз мәрте жеңісі"
+
+#: src/predefined.py:78
+msgid "If that happens, East gets a limit score and the winds rotate"
+msgstr "Бұндай болса, Шығыс біршама ұпай алып жел айналады"
+
+#: src/predefined.py:83
+msgid ""
+"False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah "
+"Jongg"
+msgstr "Тас тастауды қате атауы, Маджонг мәлімдеуі және қате Маджонг жариялауы"
+
+#: src/predefined.py:89
+msgid "Own Flower and Own Season"
+msgstr "Меншікті гүл және Меншікті маусым"
+
+#: src/predefined.py:92
+msgid "All Flowers"
+msgstr "Бұқіл Гүлдер"
+
+#: src/predefined.py:93
+msgid "All Seasons"
+msgstr "Бүкіл маусымдар"
+
+#: src/predefined.py:95
+msgid "Three Concealed Pongs"
+msgstr "Үш ашылмаған Панг"
+
+#: src/predefined.py:99
+msgid "Long Hand"
+msgstr "Ұзын қиыстырма"
+
+#: src/predefined.py:100
+msgid "The hand contains too many tiles"
+msgstr "Қиыстырмада тым көп тас"
+
+#: src/predefined.py:105
+msgid "Points Needed for Mah Jongg"
+msgstr "Маджонгқа керек ұпайлар"
+
+#: src/predefined.py:109
+msgid "Minimum number of doubles needed for Mah Jongg"
+msgstr "Маджонгқа керек максималды екілік саны"
+
+#: src/predefined.py:112
+msgid "Points for a Limit Hand"
+msgstr "Шектелген қиыстырмаға керек ұпайлар"
+
+#: src/predefined.py:116
+msgid "Play with the roof off"
+msgstr "Шатырсыз ойнау"
+
+#: src/predefined.py:117
+msgid "Play with no upper scoring limit"
+msgstr "Жоғарғы ұпай шексіз ойнау"
+
+#: src/predefined.py:119
+msgid "Claim Timeout"
+msgstr "Мәлімдеме күту уақыты"
+
+#: src/predefined.py:123
+msgid "Size of Kong Box"
+msgstr "Конг өрісінің өшемі"
+
+#: src/predefined.py:124
+msgid "The Kong Box is used for replacement tiles when declaring kongs"
+msgstr "Конгтарды жариялағанда тастарды айырбастау үшін конг өрісі пайдаланды"
+
+#: src/predefined.py:126
+msgid "Play with Bonus Tiles"
+msgstr "Сыйлық тастарымен ойнау"
+
+#: src/predefined.py:127
+msgid "Bonus tiles increase the luck factor"
+msgstr "Сыйлық тастар сәттілікті көбейтеді"
+
+#: src/predefined.py:129
+msgid "Minimum number of rounds in game"
+msgstr "Аз дегендегі ойынның раундтар саны"
+
+#: src/predefined.py:133
+msgid "number of allowed chows"
+msgstr "рұқсатты чоу саны"
+
+#: src/predefined.py:134
+msgid "The number of chows a player may build"
+msgstr "Ойыншы құра алатын чоу саны"
+
+#: src/predefined.py:136
+msgid "must declare calling hand"
+msgstr "шақыру қыстырма жариалау тиіс"
+
+#: src/predefined.py:138
+msgid "Mah Jongg is only allowed after having declared to have a calling hand"
+msgstr "Шақыру қиыстырма туралы жариялаған соң ғана маджонг деуге болады"
+
+#: src/predefined.py:140
+msgid "Standard Rotation"
+msgstr "Стандартты бұралу"
+
+#: src/predefined.py:150
+msgid "Last Tile Completes Pair of 2..8"
+msgstr "Соңғы тас 2...8 жұбын толықтырады"
+
+#: src/predefined.py:154
+msgid "Last Tile Completes Pair of Terminals or Honors"
+msgstr "Соңғы тас Қарапайым не Қадірлі жұбын толықтырады"
+
+#: src/predefined.py:157
+msgid "Last Tile is Only Possible Tile"
+msgstr "Соңғы тас - бір ғана мүмкін тас"
+
+#: src/predefined.py:161
+msgid "Won with Last Tile Taken from Wall"
+msgstr "Қорғаннан алынған соңғы таспен жеңу"
+
+#: src/predefined.py:166
+msgid "Zero Point Hand"
+msgstr "Нөл ұпайлы қиыстырма"
+
+#: src/predefined.py:167
+msgid "The hand has 0 basis points excluding bonus tiles"
+msgstr "Қиыстырмада 0 негізгі ұпай (сыйлық тастарды санамағанда)"
+
+#: src/predefined.py:168
+msgid "No Chow"
+msgstr "Чоусіз"
+
+#: src/predefined.py:170
+msgid "Only Concealed Melds"
+msgstr "Тек ашылмаған Септіктер"
+
+#: src/predefined.py:174
+msgid "False Color Game"
+msgstr "Жалған түсті ойын"
+
+#: src/predefined.py:175
+msgid ""
+"Only same-colored tiles (only bamboo/stone/character) plus any number of "
+"winds and dragons"
+msgstr ""
+"Тек бір түсті тастар (тек бамбук/қойтас/таңба) және желдер мен айдаһарлардың "
+"кез-келген саны"
+
+#: src/predefined.py:178
+msgid "True Color Game"
+msgstr "Шын түсті ойын"
+
+#: src/predefined.py:179
+msgid "Only same-colored tiles (only bamboo/stone/character)"
+msgstr "Тек бір түсті тастар (тек бамбук/қойтас/таңба)"
+
+#: src/predefined.py:181
+msgid "Concealed True Color Game"
+msgstr "Ашылмаған шын түсті ойын"
+
+#: src/predefined.py:182
+msgid "All tiles concealed and of the same suit, no honors"
+msgstr "Бүкіл тастар ашылмаған және бір түрдегі, қадірлілер жоқ"
+
+#: src/predefined.py:184
+msgid "Only Terminals and Honors"
+msgstr "Тек Қарапайым не Қадірлілер"
+
+#: src/predefined.py:185
+msgid "Only winds, dragons, 1 and 9"
+msgstr "Тек желдер, айдаһарлар, 1 және 9"
+
+#: src/predefined.py:186
+msgid "Only Honors"
+msgstr "Тек Қадірлілер"
+
+#: src/predefined.py:187
+msgid "Only winds and dragons"
+msgstr "Тек желдер мен айдаһарлар"
+
+#: src/predefined.py:189
+msgid "Hidden Treasure"
+msgstr "Жасырын қазына"
+
+#: src/predefined.py:190
+msgid "Only hidden Pungs or Kongs, last tile from wall"
+msgstr "Тек жасырын Панг не Конг, соңғы тас қорғаннан"
+
+#: src/predefined.py:192
+msgid "Heads and Tails"
+msgstr "Бас пен құйрықтар"
+
+#: src/predefined.py:193
+msgid "Only 1 and 9"
+msgstr "Тек 1 және 9"
+
+#: src/predefined.py:195
+msgid "Fourfold Plenty"
+msgstr "Мол төрттік"
+
+#: src/predefined.py:196
+msgid "4 Kongs"
+msgstr "4 Конг"
+
+#: src/predefined.py:198 src/predefined.py:416
+msgid "Three Great Scholars"
+msgstr "Үш ұлы ғалым"
+
+#: src/predefined.py:199 src/predefined.py:321
+msgid "3 Pungs or Kongs of dragons"
+msgstr "3 Панг немесе Айдаһар конгы"
+
+#: src/predefined.py:200
+#, fuzzy
+#| msgid "Four Blessings Hovering Over the Door"
+msgid "Four Blessings Hovering over the Door"
+msgstr "Төрт игілік есігінен самғады"
+
+#: src/predefined.py:202 src/predefined.py:326
+msgid "4 Pungs or Kongs of winds"
+msgstr "4 Панг не желдер Конгы"
+
+#: src/predefined.py:203
+msgid "Imperial Jade"
+msgstr "Империал нефрит"
+
+#: src/predefined.py:204
+msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
+msgstr "Тек жасыл тастары: жасыл айдаһар және 2,3,4,6,8-ші бамбук"
+
+#: src/predefined.py:205
+msgid "Gathering the Plum Blossom from the Roof"
+msgstr "Гүлдеген алхорыны шатырдан жинау"
+
+#: src/predefined.py:207
+msgid "Mah Jong with stone 5 from the dead wall"
+msgstr "Өлім қорғаннан алынған 5-тік таспен Маджонг"
+
+#: src/predefined.py:209
+msgid "Plucking the Moon from the Bottom of the Sea"
+msgstr "Терең теңізден Айды ұстау"
+
+#: src/predefined.py:210
+msgid "Mah Jong with the last tile from the wall being a stone 1"
+msgstr "Қорғаннан алынған соңғы таспен маджонг. Ол 1-тас болады"
+
+#: src/predefined.py:212
+msgid "Scratching a Carrying Pole"
+msgstr "Тірек бағанды керту"
+
+#: src/predefined.py:213
+msgid "Robbing the Kong of bamboo 2"
+msgstr "2-бамбуктың Конгын тонау"
+
+#: src/predefined.py:219
+msgid "Standard Mah Jongg"
+msgstr "Стандартты Маджонг"
+
+#: src/predefined.py:224
+msgid "Nine Gates"
+msgstr "Тоғыз қақпа"
+
+#: src/predefined.py:226
+#, fuzzy
+#| msgid ""
+#| "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 "
+#| "completed with another tile of the same color (from wall or discarded)"
+msgid ""
+"A concealed hand in one color 1112345678999 plus last tile of this suit "
+"(from wall or discarded)"
+msgstr ""
+"Бүкіл ашылмаған бір түстегі тастар: Мәндері 1-1-1-2-3-4-5-6-7-8-9-9-9 түсі "
+"бірдей басқа таспен аяқталған (қорғаннан не тасталғаннан алынған)"
+
+#: src/predefined.py:228
+msgid "Thirteen Orphans"
+msgstr "Он үш жетім"
+
+#: src/predefined.py:229
+msgid ""
+"13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
+"with one of them"
+msgstr ""
+"13 жалғыз тас: Бүкіл айдаһар, жел, 1, 9 және 14t-ші оладың біреуімен "
+"сыңарлас тасы"
+
+#: src/predefined.py:233
+msgid "Pung/Kong of Dragons"
+msgstr "Айдаһар панг/конг"
+
+#: src/predefined.py:235
+msgid "Pung/Kong of Own Wind"
+msgstr "Меншікті жел панг/конг"
+
+#: src/predefined.py:238
+msgid "Pung/Kong of Round Wind"
+msgstr "Айнала жел панг/конг"
+
+#: src/predefined.py:242
+msgid "Exposed Kong"
+msgstr "Ашылған конг"
+
+#: src/predefined.py:245
+msgid "Exposed Kong of Terminals"
+msgstr "Ашылған Қарапайым конг"
+
+#: src/predefined.py:248
+msgid "Exposed Kong of Honors"
+msgstr "Ашылған қадірлі конг"
+
+#: src/predefined.py:251
+msgid "Exposed Pung"
+msgstr "Ашылған панг"
+
+#: src/predefined.py:254
+msgid "Exposed Pung of Terminals"
+msgstr "Ашылған Қарапайым панг"
+
+#: src/predefined.py:257
+msgid "Exposed Pung of Honors"
+msgstr "Ашылған қадірлі панг"
+
+#: src/predefined.py:261
+msgid "Concealed Kong"
+msgstr "Ашылмаған конг"
+
+#: src/predefined.py:264
+msgid "Concealed Kong of Terminals"
+msgstr "Ашылмаған Қарапайым конг"
+
+#: src/predefined.py:267
+msgid "Concealed Kong of Honors"
+msgstr "Ашылмаған қадірлі конг"
+
+#: src/predefined.py:270
+msgid "Concealed Pung"
+msgstr "Ашылмаған панг"
+
+#: src/predefined.py:273
+msgid "Concealed Pung of Terminals"
+msgstr "Ашылмаған Қарапайым панг"
+
+#: src/predefined.py:276
+msgid "Concealed Pung of Honors"
+msgstr "Ашылмаған кәдірлі панг"
+
+#: src/predefined.py:279
+msgid "Pair of Own Wind"
+msgstr "Қос меншікті жел"
+
+#: src/predefined.py:281
+msgid "Pair of Round Wind"
+msgstr "Қос айнала жел"
+
+#: src/predefined.py:283
+msgid "Pair of Dragons"
+msgstr "Қос айдаһар"
+
+#: src/predefined.py:287
+msgid "Flower"
+msgstr "Гүл"
+
+#: src/predefined.py:289
+msgid "Season"
+msgstr "Маусым"
+
+#: src/predefined.py:300
+msgid "Classical Chinese DMJL"
+msgstr "Классикалық қытайша DMJL"
+
+#: src/predefined.py:306
+msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
+msgstr "Deutsche Mah Jongg Liga (DMJL) e.V. бойынша классикалық қытайша ойын"
+
+#: src/predefined.py:313
+msgid "Squirming Snake"
+msgstr "Бауырлаған жылан"
+
+#: src/predefined.py:314
+msgid ""
+"All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
+"Chows of the remaining values"
+msgstr ""
+"Бүкіл бір түсті тастары. 1 мен 9-дың, 2, 5 не 8 жубының Пангы не Конгы және "
+"қалған мәндерінің екі Чоуы"
+
+#: src/predefined.py:317
+msgid "Little Three Dragons"
+msgstr "Кіші Үш айдаһар"
+
+#: src/predefined.py:318
+msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
+msgstr "Айдаһардың 2 Пангы не Конгы және 1 қос Айдаһар"
+
+#: src/predefined.py:320
+msgid "Big Three Dragons"
+msgstr "Үлкен Үш айдаһар"
+
+#: src/predefined.py:323
+msgid "Little Four Joys"
+msgstr "Кіші төрт Чоу"
+
+#: src/predefined.py:324
+msgid "3 Pungs or Kongs of winds and 1 pair of winds"
+msgstr "3 Панг не желдер Конгы және 1 қос жел"
+
+#: src/predefined.py:325
+msgid "Big Four Joys"
+msgstr "Үлкен төрт Чоу"
+
+#: src/predefined.py:331
+msgid "False Naming of Discard, Claimed for Chow"
+msgstr "Тас тастауды қате атауы, Чоу мәлімдеуі"
+
+#: src/predefined.py:334
+msgid "False Naming of Discard, Claimed for Pung/Kong"
+msgstr "Тас тастауды қате атауы, Панг/Конг мәлімдеуі"
+
+#: src/predefined.py:337 src/predefined.py:430
+msgid "False Declaration of Mah Jongg by One Player"
+msgstr "Бір ойыншының қате Маджонг жариялауы"
+
+#: src/predefined.py:340
+msgid "False Declaration of Mah Jongg by Two Players"
+msgstr "Екі ойыншының қате Маджонг жариялауы"
+
+#: src/predefined.py:343
+msgid "False Declaration of Mah Jongg by Three Players"
+msgstr "Үш ойыншының қате Маджонг жариялауы"
+
+#: src/predefined.py:346 src/predefined.py:433
+msgid "False Naming of Discard, Claimed for Mah Jongg"
+msgstr "Тас тастауды қате атауы, Маджонг мәлімдеуі"
+
+#: src/predefined.py:357
+msgid "Classical Chinese BMJA"
+msgstr "Классикалық қытайша BMJA"
+
+#: src/predefined.py:363
+msgid "Classical Chinese as defined by the British Mah-Jong Association"
+msgstr "British Mah-Jong Association (BMJA) бойынша классикалық қытайша ойын"
+
+#: src/predefined.py:378
+msgid "Original Call"
+msgstr "Бастапқы шақырылыс"
+
+#: src/predefined.py:382
+msgid "Gates of Heaven"
+msgstr "Аспан қақпалары"
+
+#: src/predefined.py:383
+#, fuzzy
+#| msgid ""
+#| "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 "
+#| "completed with another tile of the same color (from wall or discarded)"
+msgid ""
+"All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
+"to 8 (last tile from wall or discarded)"
+msgstr ""
+"Бүкіл ашылмаған бір түстегі тастар: Мәндері 1-1-1-2-3-4-5-6-7-8-9-9-9 түсі "
+"бірдей басқа таспен аяқталған (қорғаннан не тасталғаннан алынған)"
+
+#: src/predefined.py:386
+msgid "Wriggling Snake"
+msgstr "Ирек жылан"
+
+#: src/predefined.py:387
+msgid ""
+"Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
+msgstr ""
+"Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
+
+#: src/predefined.py:389
+msgid "Triple Knitting"
+msgstr "Үш мәртелік тоқу"
+
+#: src/predefined.py:390
+msgid ""
+"Four sets of three tiles in the different suits and a pair: No Winds or "
+"Dragons"
+msgstr ""
+"Алуан түрлі үш тастан құрылған төрт жиыны мен бір жұп. Жел де Айдаһар да емес"
+
+#: src/predefined.py:391
+msgid "Knitting"
+msgstr "Тоқу"
+
+#: src/predefined.py:392
+msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
+msgstr "3 түрден кез-келген 2 тастан құрылған 7 жұп; Жел де Айдаһар да емес"
+
+#: src/predefined.py:394
+msgid "All pair honors"
+msgstr "Бүкіл жұп қадірлілер"
+
+#: src/predefined.py:395
+msgid "7 pairs of 1s/9s/Winds/Dragons"
+msgstr "7 жұп бірлік/тоғыздық/жел/айдаһар"
+
+#: src/predefined.py:398
+msgid "Own Flower"
+msgstr "Меншікті гүл"
+
+#: src/predefined.py:399
+msgid "Own Season"
+msgstr "Меншікті маусым"
+
+#: src/predefined.py:411
+msgid "Buried Treasure"
+msgstr "Көмілген қазына"
+
+#: src/predefined.py:412
+msgid "Concealed pungs of one suit with winds/dragons and a pair"
+msgstr ""
+"Бір түрдегі тастардан ашылмаған пангтар, желдер/айдаһарлармен бірге және бір "
+"жұп"
+
+#: src/predefined.py:413
+msgid "Purity"
+msgstr "Тазалық"
+
+#: src/predefined.py:414
+msgid "Only same-colored tiles (no chows, dragons or winds)"
+msgstr "Тек бір түсті тастар (чоу, айдаһар, не желдері жоқ)"
+
+#: src/predefined.py:417
+msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
+msgstr "Айдаһардың 3 Пангы не Конгы және кез-келген панг/конг бен жұп"
+
+#: src/predefined.py:420
+msgid "The 13 Unique Wonders"
+msgstr "13 бірегей ғажап"
+
+#: src/predefined.py:427
+msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
+msgstr "Тас тастауды қате атауы, Чоу/Панг/Конг мәлімдеуі"
+
+#: src/predefined.py:437
+msgid "Calling for Only Honors"
+msgstr "Тек Қадірлілер шақыруы"
+
+#: src/predefined.py:441
+msgid "Calling for Wriggling Snake"
+msgstr "Ирек жылан шақыруы"
+
+#: src/predefined.py:445
+msgid "Calling for Triple Knitting"
+msgstr "Үш мәртелік тоқу шақыруы"
+
+#: src/predefined.py:449
+msgid "Calling for Gates of Heaven"
+msgstr "Аспан қақпалары шақыруы"
+
+#: src/predefined.py:452
+msgid "Calling for Knitting"
+msgstr "Тоқу шақыруы"
+
+#: src/predefined.py:456
+msgid "Calling for Imperial Jade"
+msgstr "Империал нефрит шақыруы"
+
+#: src/predefined.py:460
+#, fuzzy
+#| msgid "Calling for 13 Unique Wonders"
+msgid "Calling for The 13 Unique Wonders"
+msgstr "13 бірегей ғажап шақыруы"
+
+#: src/predefined.py:463
+msgid "Calling for Three Great Scholars"
+msgstr "Үш ұлы ғалым шақыруы"
+
+#: src/predefined.py:466
+msgid "Calling for All pair honors"
+msgstr "Бүкіл жұп қадірлілер шақыруы"
+
+#: src/predefined.py:470
+msgid "Calling for Heads and Tails"
+msgstr "Бас пен құйрықтар шақыруы"
+
+#: src/predefined.py:474
+msgid "Calling for Four Blessings Hovering over the Door"
+msgstr "Төрт игілік есігінен самғады шақыруы"
+
+#: src/predefined.py:477
+msgid "Calling for Buried Treasure"
+msgstr "Көмілген қазына шақыруы"
+
+#: src/predefined.py:481
+msgid "Calling for Fourfold Plenty"
+msgstr "Мол төрттік шақыруы"
+
+#: src/predefined.py:485
+msgid "Calling for Purity"
+msgstr "Тазалық шақыруы"
+
+#: src/query.py:219
+msgctxt "kajongg name for local game server"
+msgid "Local Game"
+msgstr "Жергілікті ойын"
+
+#: src/query.py:397
+msgid "Database %1 updated from schema %2 to %3"
+msgstr ""
+
+#: src/rule.py:40 src/scoringdialog.py:677 src/scoringdialog.py:760
+msgid "points"
+msgstr "ұпай"
+
+#: src/rule.py:41
+#, fuzzy
+#| msgid "doubles"
+msgctxt "kajongg"
+msgid "doubles"
+msgstr "екіліктер"
+
+#: src/rule.py:42
+#, fuzzy
+#| msgid "limits"
+msgctxt "kajongg"
+msgid "limits"
+msgstr "шектер"
+
+#: src/rule.py:79
+msgctxt "Kajongg"
+msgid "%1 points"
+msgstr "%1 ұпай"
+
+#: src/rule.py:81
+msgctxt "Kajongg"
+msgid "%1 doubles"
+msgstr "%1 екіліктер"
+
+#: src/rule.py:86
+msgctxt "Kajongg"
+msgid "%1 limits"
+msgstr "%1 шектер"
+
+#: src/rule.py:325
+msgid "Meld Rules"
+msgstr "Септеу ережелері"
+
+#: src/rule.py:326
+msgid ""
+"Meld rules are applied to single melds independent of the rest of the hand"
+msgstr ""
+"Септеу ережелері деген - қолдағы қалғандарына қарамастан үйлесім құру "
+"ережелері"
+
+#: src/rule.py:327
+msgid "Hand Rules"
+msgstr "Қиыстырма ережелері"
+
+#: src/rule.py:328
+msgid "Hand rules are applied to the entire hand, for all players"
+msgstr "Қиыстырма ережелері дегені - бүкіл қолдағылардың үйлесу ережелері"
+
+#: src/rule.py:329
+msgid "Winner Rules"
+msgstr "Жеңіс ережелері"
+
+#: src/rule.py:330
+msgid "Winner rules are applied to the entire hand but only for the winner"
+msgstr "Жеңіс ережелері бүкіл қиыстырмаға қолданады, бірақ тек жеңуші үшін"
+
+#: src/rule.py:331
+msgid "Loser Rules"
+msgstr "Жеңілу ережелері"
+
+#: src/rule.py:332
+msgid "Loser rules are applied to the entire hand but only for non-winners"
+msgstr ""
+"Жеңілу ережелері бүкіл қиыстырмаға қолданады, бірақ тек жеңімпаз еместер үшін"
+
+#: src/rule.py:333
+msgid "Mah Jongg Rules"
+msgstr "Маджонг ережелері"
+
+#: src/rule.py:334
+msgid "Only hands matching a Mah Jongg rule can win"
+msgstr "Тек Маджонгқа сәйкес қиыстырмалар ғана ұтады"
+
+#: src/rule.py:335
+msgctxt "kajongg"
+msgid "Options"
+msgstr "Параметрлері"
+
+#: src/rule.py:336
+msgid "Here we have several special game related options"
+msgstr "Бұнда ойынга қатысты бірнеше арнаулы параметрлері"
+
+#: src/rule.py:337
+msgid "Penalties"
+msgstr "Айыптар"
+
+#: src/rule.py:338
+msgid ""
+"Penalties are applied manually by the user. They are only used for scoring "
+"games.\n"
+"When playing against the computer or over the net, Kajongg will never let "
+"you get\n"
+"into a situation where you have to pay a penalty"
+msgstr ""
+"Пайдаланушы қолмен салған айыптар. Ол есепті ойында ғана қолданады.\n"
+"\n"
+"Компьютермен желі арқылы ойнағанда Kajongg айып төлейтін жағдайға\n"
+"апармайды"
+
+#: src/rule.py:534
+msgctxt "Ruleset._newKey:%1 is empty or space plus number"
+msgid "Copy%1 of %2"
+msgstr "%2 дегеннің %1 көшірмесі "
+
+#: src/rule.py:896
+msgctxt "%1 can be a sentence"
+msgid "%4 have impossible values %2/%3 in rule \"%1\""
+msgstr "\"%1\" ережесіндегі %4 дегеннің %2/%3 мәні жарамсыз"
+
+#: src/rule.py:992
+msgctxt "wrong value for rule"
+msgid "%1: %2 is too small, minimal value is %3"
+msgstr "%1: %2 тым аз, минимумы: %3"
+
+#: src/rulesetselector.py:476
+#, fuzzy
+#| msgid "Customize rulesets"
+msgctxt "@title:window"
+msgid "Customize rulesets"
+msgstr "Ереже жиындарын ыңғайлау"
+
+#: src/rulesetselector.py:494
+msgctxt "kajongg"
+msgid "Rule"
+msgstr "Ереже"
+
+#: src/rulesetselector.py:551
+msgid "C&opy"
+msgstr ""
+
+#: src/rulesetselector.py:552
+#, fuzzy
+#| msgid "Compare"
+msgctxt "Kajongg ruleset comparer"
+msgid "Co&mpare"
+msgstr "Салыстыру"
+
+#: src/rulesetselector.py:553
+#, fuzzy
+#| msgid "Remove"
+msgid "&Remove"
+msgstr "Өшіру"
+
+#: src/rulesetselector.py:554
+#, fuzzy
+#| msgid "Close"
+msgid "&Close"
+msgstr "Жабу"
+
+#: src/scene.py:367 src/scene.py:500
+msgid "Do you really want to abort this game?"
+msgstr "Осы ойынды шын доғармақсыз ба?"
+
+#: src/scoring.py:43
+#, fuzzy
+#| msgid "Swap Seats"
+msgctxt "@title:window"
+msgid "Swap Seats"
+msgstr "Орындарын алмастыру"
+
+#: src/scoring.py:45
+msgid "By the rules, %1 and %2 should now exchange their seats. "
+msgstr "ЕРеже бойынша, %1 және %2 орындарымен айырбасталу керек. "
+
+#: src/scoring.py:47
+msgid "&Exchange"
+msgstr "&Алмасу"
+
+#: src/scoring.py:49
+msgid "&Keep seat"
+msgstr "&Орында қалу"
+
+#: src/scoring.py:60
+#, fuzzy
+#| msgid "Select four players"
+msgctxt "@title:window"
+msgid "Select four players"
+msgstr "Төрт ойыншыны таңдау"
+
+#: src/scoring.py:288
+msgid "Move Exposed Tiles Here"
+msgstr "Ашылған тастарды осында жылжыту"
+
+#: src/scoring.py:289
+msgid "Move Concealed Tiles Here"
+msgstr "Ашылмаған тастарды осында жылжыту"
+
+#: src/scoring.py:599
+msgid "Please define four players in <interface>Settings|Players</interface>"
+msgstr ""
+"Төрт ойыншыны <interface>Баптау|Ойыншылар</interface> мәзірі арқылы таңдаңыз"
+
+#: src/scoringdialog.py:234
+msgid "Round/Hand"
+msgstr "Раунд/Қиыстырма"
+
+#: src/scoringdialog.py:262 src/scoringdialog.py:813
+msgctxt "kajongg"
+msgid "Score"
+msgstr "Есеп"
+
+#: src/scoringdialog.py:262
+msgctxt "kajongg"
+msgid "Payments"
+msgstr "Төлемдер"
+
+#: src/scoringdialog.py:263
+msgctxt "kajongg"
+msgid "Balance"
+msgstr "Баланс"
+
+#: src/scoringdialog.py:263
+msgctxt "kajongg"
+msgid "Chart"
+msgstr "Диаграмма"
+
+#: src/scoringdialog.py:409
+msgctxt "kajongg"
+msgid "Scores"
+msgstr "Ұпайлар"
+
+#: src/scoringdialog.py:451
+msgctxt "kajongg"
+msgid "Used Rules"
+msgstr "Қолданатын ережелері"
+
+#: src/scoringdialog.py:485
+msgid "Final scores for game <numid>%1</numid>"
+msgstr "<numid>%1</numid> ойынның қортынды есебі"
+
+#: src/scoringdialog.py:487
+msgid "Scores for game <numid>%1</numid>"
+msgstr "<numid>%1</numid> ойынның есебі"
+
+#: src/scoringdialog.py:559
+#, fuzzy
+#| msgid "Explain Scores"
+msgctxt "@title:window"
+msgid "Explain Scores"
+msgstr "Есебін түсіндіру"
+
+#: src/scoringdialog.py:575
+msgid "There is no active game"
+msgstr "Белсенді ойын жоқ"
+
+#: src/scoringdialog.py:578
+msgid "%1"
+msgstr "%1"
+
+#: src/scoringdialog.py:592
+msgid "Manual score for %1: %2 points"
+msgstr "%1 дегеннің қолмен есептелгені: %2 ұпай"
+
+#: src/scoringdialog.py:663
+msgid "Penalty"
+msgstr "Айып"
+
+#: src/scoringdialog.py:666
+msgid "Offense:"
+msgstr "Ереже бұзуы:"
+
+#: src/scoringdialog.py:673
+msgid "Total Penalty"
+msgstr "Жалпы айыпы"
+
+#: src/scoringdialog.py:706
+msgid "&Execute"
+msgstr "&Орындау"
+
+#: src/scoringdialog.py:783
+msgctxt "penalty dialog, appears behind paying player combobox"
+msgid "pays %1 points"
+msgstr "%1 ұпай төлеу"
+
+#: src/scoringdialog.py:788
+msgctxt "penalty dialog, appears behind profiting player combobox"
+msgid "gets %1 points"
+msgstr "%1 ұпай алу"
+
+#: src/scoringdialog.py:799
+#, fuzzy
+#| msgid "Scoring for this Hand"
+msgctxt "@title:window"
+msgid "Scoring for this Hand"
+msgstr "Осы қиыстырманың есебі"
+
+#: src/scoringdialog.py:811
+msgctxt "kajongg"
+msgid "Player"
+msgstr "Ойыншы"
+
+#: src/scoringdialog.py:812
+msgctxt "kajongg"
+msgid "Wind"
+msgstr "Жел"
+
+#: src/scoringdialog.py:814
+msgid "Winner"
+msgstr "Жеңімпаз"
+
+#: src/scoringdialog.py:820
+msgctxt "kajongg"
+msgid "Draw"
+msgstr "Тепе-тең"
+
+#: src/scoringdialog.py:822
+msgid "&Penalties"
+msgstr "&Айыптар"
+
+#: src/scoringdialog.py:824
+msgid "&Save Hand"
+msgstr "Қиыстырманы &сақтау"
+
+#: src/scoringdialog.py:846
+msgid "&Last Tile:"
+msgstr "С&оңғы тасы:"
+
+#: src/scoringdialog.py:855
+msgid "L&ast Meld:"
+msgstr "Соңғ&ы септеуі:"
+
+#: src/server.py:113
+msgid "Wrong password"
+msgstr "Жарамсыз паролі"
+
+#: src/server.py:212
+msgid "table with id <numid>%1</numid> not found"
+msgstr "Идентификаторы <numid>%1</numid> деген үстел жоқ"
+
+#: src/server.py:358
+msgid "Player %1 has logged out"
+msgstr "%1 ойыншы шығып кеті"
+
+#: src/server.py:429
+#, python-format
+msgid "the server will listen on PORT (%d)"
+msgstr "сервер PORT (%d) портын тыңдап күтеді"
+
+#: src/server.py:433
+msgid "the server will listen on SOCKET"
+msgstr "сервер SOCKET портын тыңдап күтеді"
+
+#: src/server.py:438
+msgid "name of the database"
+msgstr "деректер қорының атауы"
+
+#: src/server.py:442
+msgid "do not terminate local game server after last client disconnects"
+msgstr "соңғы клиент ажыратылған соң жергілікті ойын сервері тоқтатылмасын"
+
+#: src/server.py:447
+msgid "unrecognized arguments:%1"
+msgstr "беймәлім аргументері:%1"
+
+#: src/servertable.py:157
+msgid "You already joined this table"
+msgstr "Бұл үстелге бұрынан қосылғансыз"
+
+#: src/servertable.py:159
+msgid "All seats are already taken"
+msgstr "Бос орын жоқ"
+
+#: src/servertable.py:164
+msgid "takes a seat"
+msgstr "орналасу"
+
+#: src/servertable.py:172
+msgid "leaves the table"
+msgstr "үстелден кету"
+
+#: src/servertable.py:221
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 1"
+msgstr "1-робот"
+
+#: src/servertable.py:224
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 2"
+msgstr "2-робот"
+
+#: src/servertable.py:225
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 3"
+msgstr "3-робот"
+
+#: src/servertable.py:279
+msgid "Only the initiator %1 can start this game, you are %2"
+msgstr "Бұл ойынның бастайтыны %1 , ал Сіз %2 дегенсіз"
+
+#: src/servertable.py:648
+msgid "Game <numid>%1</numid> is over!"
+msgstr "<numid>%1</numid>-ойын бітті!"
+
+#: src/servertable.py:677
+msgid "%1 wrongly said %2 for meld %3"
+msgstr "%1 қателесіп %3 септігі %2 деді"
+
+#: src/servertable.py:682
+msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
+msgstr ""
+"%1 қателесіп %2 деді: %3 ашылмаған тас мәлімдеген, бірак %4 қана бар екен"
+
+#: src/servertable.py:720
+msgid "declareKong:%1 wrongly said Kong for meld %2"
+msgstr "declareKong:%1 қателесіп %2 септігін конг деді"
+
+#: src/servertable.py:768
+msgid "%1 claiming MahJongg: This is not a winning hand: %2"
+msgstr "%1 маджонг мәлімдемесі: бұл ұтатын қиыстырма емес: %2"
+
+#: src/sound.py:58
+msgid "No voices will be heard because the program %1 is missing"
+msgstr "Дауыстар естілмейді, өйткені %1 бағдарламасы жоқ"
+
+#: src/sound.py:358
+msgid "cannot write <filename>%1</filename>: %2"
+msgstr "<filename>%1</filename> жазылмады: %2"
+
+#: src/sound.py:361
+msgid "The voice files have changed, their checksum has changed."
+msgstr ""
+
+#: src/sound.py:362
+msgid "Please reinstall kajongg or do, with sufficient permissions:"
+msgstr ""
+
+#: src/tables.py:56
+msgid "Table"
+msgstr "Үстел"
+
+#: src/tables.py:60
+msgctxt "table status"
+msgid "Status"
+msgstr "Күй-жайы"
+
+#: src/tables.py:61
+msgid "Ruleset"
+msgstr "Ереже жиыны"
+
+#: src/tables.py:145
+msgid "Select a ruleset"
+msgstr "Ережелерін таңдау"
+
+#: src/tables.py:183
+msgctxt "allocate a new table"
+msgid "&New"
+msgstr "&Жаңа"
+
+#: src/tables.py:186 src/tables.py:326
+msgid "Allocate a new table"
+msgstr "Жаңа үстелді құру"
+
+#: src/tables.py:189 src/tables.py:327
+msgid "&Join"
+msgstr "Қ&осылу"
+
+#: src/tables.py:193 src/tables.py:328
+msgid "Join a table"
+msgstr "Үстелге қосылу"
+
+#: src/tables.py:195
+msgid "&Leave"
+msgstr "&Шығып кету"
+
+#: src/tables.py:199
+msgid "Leave a table"
+msgstr "Үстелден кету"
+
+#: src/tables.py:202
+msgctxt "Kajongg-Ruleset"
+msgid "Compare"
+msgstr "Салыстыру"
+
+#: src/tables.py:207
+msgid "Compare the rules of this table with my own rulesets"
+msgstr "Осы үстелдің ережелерін менікімен салыстыру"
+
+#: src/tables.py:209
+msgid "&Chat"
+msgstr "Ч&ат-әңгіме"
+
+#: src/tables.py:214
+msgid "&Start"
+msgstr "&Бастау"
+
+#: src/tables.py:219
+msgid "Start playing on a table. Empty seats will be taken by robot players."
+msgstr "Үстелдегі ойынды бастау. Бос орындарда ойыншы-компьютерлер ойнайды."
+
+#: src/tables.py:261
+msgid "opens a chat window"
+msgstr "әңгіме-дүкен терезесін ашу"
+
+#: src/tables.py:280
+msgid "Local Games with Ruleset %1"
+msgstr "%1 ережелер жиынымен жергілікті ойын"
+
+#: src/tables.py:283
+msgid "Tables at %1"
+msgstr "Үстелдер %1 дегенде"
+
+#: src/tables.py:320
+msgid "Start a new game"
+msgstr "Жаңа ойынды бастау"
+
+#: src/tables.py:322
+msgctxt "resuming a local suspended game"
+msgid "&Resume"
+msgstr "Жалғастыру"
+
+#: src/tables.py:324
+msgid "Resume the selected suspended game"
+msgstr "Таңдалған тоқтап тұрған ойынды жалғастыру"
+
+#: src/tables.py:342
+msgid "Chat with others on this table"
+msgstr "Үстелдегілермен әңгімелесу"
+
+#: src/tables.py:345
+msgid "For chatting with others on this table, please first take a seat"
+msgstr "Осы үстелдегілермен әңгімелесу алдында орналасыңыз"
+
+#: src/tile.py:192
+msgctxt "kajongg"
+msgid "hidden"
+msgstr "жасырын"
+
+#: src/tile.py:193
+msgctxt "kajongg"
+msgid "stone"
+msgstr "тас"
+
+#: src/tile.py:194
+msgctxt "kajongg"
+msgid "bamboo"
+msgstr "бамбук"
+
+#: src/tile.py:195
+msgctxt "kajongg"
+msgid "character"
+msgstr "таңба"
+
+#: src/tile.py:196
+msgctxt "kajongg"
+msgid "wind"
+msgstr "жел"
+
+#: src/tile.py:197
+msgctxt "kajongg"
+msgid "dragon"
+msgstr "айдаһар"
+
+#: src/tile.py:198
+msgctxt "kajongg"
+msgid "flower"
+msgstr "гүл"
+
+#: src/tile.py:199
+msgctxt "kajongg"
+msgid "season"
+msgstr "маусым"
+
+#: src/tile.py:205
+msgctxt "kajongg"
+msgid "tile"
+msgstr "тас"
+
+#: src/tile.py:206
+msgctxt "kajongg"
+msgid "white"
+msgstr "ақ"
+
+#: src/tile.py:207
+msgctxt "kajongg"
+msgid "red"
+msgstr "қызыл"
+
+#: src/tile.py:208
+msgctxt "kajongg"
+msgid "green"
+msgstr "жасыл"
+
+#: src/tile.py:209
+msgctxt "kajongg"
+msgid "East"
+msgstr "Шығыс"
+
+#: src/tile.py:210
+msgctxt "kajongg"
+msgid "South"
+msgstr "Оңтүстік"
+
+#: src/tile.py:211
+msgctxt "kajongg"
+msgid "West"
+msgstr "Батыс"
+
+#: src/tile.py:212
+msgctxt "kajongg"
+msgid "North"
+msgstr "Солтүстік"
+
+#: src/tile.py:221
+msgid "East Wind"
+msgstr "Шығыс жел"
+
+#: src/tile.py:222
+msgid "South Wind"
+msgstr "Оңтүстік жел"
+
+#: src/tile.py:223
+msgid "West Wind"
+msgstr "Батыс жел"
+
+#: src/tile.py:224
+msgid "North Wind"
+msgstr "Солтүстік жел"
+
+#: src/tile.py:226
+#, python-brace-format
+msgctxt "kajongg tile name"
+msgid "{group} {value}"
+msgstr "{group} {value}"
+
+#: src/user.py:84
+msgid ""
+"Your client has a version older than 4.9.0 but you need %1 for this server"
+msgstr "Клиент бағдарламаңыздың нұсқасы 4.9.0, ал бұл серверге керегі - %1"
+
+#: src/user.py:93
+msgid "Your client has version %1 but you need %2 for this server"
+msgstr "Клиент бағдарламаңыздың нұсқасы %1, ал бұл серверге керегі - %2"
+
+#~ msgid "This player cannot be deleted. There are games associated with %1."
+#~ msgstr "Ойыншы өшірілмеді. %1 дегенмен байланысты ойындар бар."
+
+#, fuzzy
+#~| msgid "(C) 2008,2009,2010,2011,2012 Wolfgang Rohdewald"
+#~ msgid "(C) 2008-2016 Wolfgang Rohdewald"
+#~ msgstr "(C) 2008,2009,2010,2011,2012 Wolfgang Rohdewald"
+
+#~ msgid "Wolfgang Rohdewald"
+#~ msgstr "Wolfgang Rohdewald"
+
+#~ msgid ""
+#~ "cannot find any background in the following directories, is libkmahjongg "
+#~ "installed?"
+#~ msgstr ""
+#~ "келесі каталогтарда ешбір ая файлы табылған жоқ, libkmahjongg орнатылған "
+#~ "ба өзі?"
+
+#~ msgid "cannot find background %1, using default"
+#~ msgstr "%1 аясы табалған жоқ, әдеттегісі болады"
+
+#, fuzzy
+#~| msgid "show no graphical user interface. Intended only for testing"
+#~ msgid "Do not use KDE bindings. Intended only for testing"
+#~ msgstr "графикалық пайдаланушы интерфейсі көрсетілмейді. Тек сынақ үшін"
+
+#~ msgid "Copy"
+#~ msgstr "Көшіріп алу"
+
+#~ msgctxt "Kajongg ruleset comparer"
+#~ msgid "Compare"
+#~ msgstr "Салыстыру"
+
+#, fuzzy
+#~| msgid ""
+#~| "use a dedicated server listening on SOCKET. Intended only for testing"
+#~ msgid "start the server using Python 3. Meant only for testing."
+#~ msgstr "SOCKET портын тыңдайтын арнаулы серверін пайдалану. Тек сыңақ үшін"
+
+#~ msgid ""
+#~ "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and "
+#~ "another tile 2..8 of the same color"
+#~ msgstr ""
+#~ "Бүкіл ашылмаған тастар бір түсті: 1-1-1-2-3-4-5-6-7-8-9-9-9 дегендері "
+#~ "және басқа 2..8 де түсі бірдей тасы"
+
+#~ msgctxt ""
+#~ "kajongg:keyboard commands for moving tiles to the players with wind ESWN "
+#~ "or to the central tile selector (X)"
+#~ msgid "ESWNX"
+#~ msgstr "ESWNX"
+
+#~ msgid "DNS lookup failed, address not found"
+#~ msgstr "DNS қарастыру жаңылысы, сұралған адресі жоқ"
+
+#~ msgctxt "Player"
+#~ msgid "Name"
+#~ msgstr "Аты"
+
+#~ msgid ""
+#~ "Cannot save this. Possibly the name already exists. <br><br>Message from "
+#~ "database:<br><br><message>%1</message>"
+#~ msgstr ""
+#~ "Бұл сақталмады.<br>Бәлкім, қайталанатын атауы себебінен. <br><br "
+#~ ">Деректер қорының хабарламасы:<br><br><message>%1</message>"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "&Show Scoring Editor"
+#~ msgstr "Есеп редакторын &көрсету"
+
+#~ msgctxt "@action:intoolbar"
+#~ msgid "&Scoring"
+#~ msgstr "&Есебі"
+
+#~ msgctxt "kajongg @info:tooltip"
+#~ msgid "Show or hide the scoring editor for a manual game."
+#~ msgstr "Қолмен ойнау үшін есеп редакторын көрсету/жасыру."
+
+#~ msgid "All Greens"
+#~ msgstr "Бүкіл жасылдар"
+
+#~ msgid "{meldName}"
+#~ msgstr "{meldName}"
+
+#~ msgid "{meldType} of Own Wind ({value})"
+#~ msgstr "Меншікті желдің {meldType} дегені ({value})"
+
+#~ msgid "{meldType} of Round Wind ({value})"
+#~ msgstr "Айнала желдің {meldType} дегені ({value})"
+
+#~ msgctxt "kajongg"
+#~ msgid "east"
+#~ msgstr "шығыс"
+
+#~ msgctxt "kajongg"
+#~ msgid "west"
+#~ msgstr "батыс"
+
+#~ msgctxt "kajongg"
+#~ msgid "own wind"
+#~ msgstr "өзінің желі"
+
+#~ msgctxt "kajongg"
+#~ msgid "round wind"
+#~ msgstr "айнала желі"
+
+#~ msgid "Ruleset: %1"
+#~ msgstr "Ереже жиыны: %1"
+
+#~ msgid ""
+#~ "The game can begin. Are you ready to play now?\n"
+#~ "If you answer with NO, you will be removed from table %1."
+#~ msgstr ""
+#~ "Ойын басталмақ. Ойнауға дайынсыз ба? ЖОҚ десеңіз %1 үстелінен шығарыласыз."
+
+#~ msgid "Aborted creating a user account"
+#~ msgstr "Тіркелгіні құру доғарылды"
+
+#~ msgid "Calling"
+#~ msgstr "Шақыру"
+
+#~ msgid "The game is over!"
+#~ msgstr "Ойын бітті!"
+
+#~ msgid ""
+#~ "You cannot specify hand/discard with --game when starting with --nogui"
+#~ msgstr ""
+#~ "Ойынды --nogui деп бастағанда --game параметрімен қиыстырма/тастауды "
+#~ "келтіре алмайсыз"
+
+#~ msgid ""
+#~ "Cannot save your ruleset changes.<br>You probably introduced a duplicate "
+#~ "name. <br><br >Message from database:<br><br><message>%1</message>"
+#~ msgstr ""
+#~ "Ереже жиыныңыз сақталмады.<br>Бәлкім, қайталанатын атауы себебінен. "
+#~ "<br><br >Деректер қорының хабарламасы:<br><br><message>%1</message>"
+
+#~ msgctxt "Kajongg ruleset comparer"
+#~ msgid "C&ompare"
+#~ msgstr "&Салыстыру"
+
+#~ msgid "play like a robot using ruleset"
+#~ msgstr "мынау ережелерімен компьютер-ойыншы болып ойнау"
+
+#~ msgid "ruleset \"%1\" not found"
+#~ msgstr "\"%1\" ереже жиыны табылмады"
+
+#~ msgctxt "kajongg"
+#~ msgid "ROBOT 1"
+#~ msgstr "1-РОБОТ"
+
+#~ msgctxt "kajongg"
+#~ msgid "ROBOT 2"
+#~ msgstr "2-РОБОТ"
+
+#~ msgctxt "kajongg"
+#~ msgid "ROBOT 3"
+#~ msgstr "3-РОБОТ"
+
+#~ msgid "&Quit"
+#~ msgstr "&Шығу"
+
+#~ msgctxt "kajongg"
+#~ msgid "%1 base points"
+#~ msgstr "%1 негізгі ұпай"
+
+#~ msgctxt "kajongg"
+#~ msgid "%1 doubles"
+#~ msgstr "%1 екіліктер"
+
+#~ msgctxt "kajongg"
+#~ msgid "%1 limits"
+#~ msgstr "%1 шектер"
+
+#~ msgid "Computed scoring for %1:"
+#~ msgstr "%1 үшін саналған есеп:"
+
+#~ msgid "Total for %1: %2 base points, %3 doubles, %4 points"
+#~ msgstr "%1 дегеннің қортынды ұпайы: %2 негізгі ұпай, %3 екілік, %4 ұпай"
+
+#~ msgid "Flower 2"
+#~ msgstr "2-Гүл"
+
+#~ msgid "Flower 3"
+#~ msgstr "3-Гүл"
+
+#~ msgid "Flower 4"
+#~ msgstr "4-Гүл"
+
+#~ msgid "Season 2"
+#~ msgstr "2-Маусым"
+
+#~ msgid "Season 3"
+#~ msgstr "3-Маусым"
+
+#~ msgid "Season 4"
+#~ msgstr "4-Маусым"
+
+#~ msgctxt "kajongg"
+#~ msgid "%1 points"
+#~ msgstr "%1 ұпай"
+
+#~ msgid "Penalties are applied manually by the user"
+#~ msgstr "Пайдаланушы қолмен салған айыптары"
+
+#~ msgctxt "penalty dialog, appears behind paying player combobox"
+#~ msgid "pays %1"
+#~ msgstr "%1 төлемі"
+
+#~ msgctxt "penalty dialog, appears behind profiting player combobox"
+#~ msgid "gets %1"
+#~ msgstr "%1 табысы"
+
+#~ msgctxt "Rulesetselector"
+#~ msgid "Score"
+#~ msgstr "Есеп"
+
+#~ msgctxt "Rulesetselector"
+#~ msgid "Unit"
+#~ msgstr "Бірлігі"
+
+#~ msgctxt "Rulesetselector"
+#~ msgid "Definition"
+#~ msgstr "Анықтама"

@@ -1,0 +1,1663 @@
+<?xml version="1.0" ?>
+<!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY kajongg  "<application
+>Kajongg</application
+>">
+  <!ENTITY kappname "&kajongg;">
+  <!ENTITY kappversion "4.13.0"
+><!--Application version. Use this variable everywhere it is needed.-->
+  <!ENTITY package "kdegames"
+>  <!-- do not change this! -->
+  <!ENTITY % Estonian  "INCLUDE"
+> <!-- change language only here -->
+  <!ENTITY % addindex "IGNORE"
+> <!-- do not change this! -->
+  <!ENTITY s1 "s1">
+  <!ENTITY s9 "s9">
+  <!ENTITY b1 "b1">
+  <!ENTITY b9 "b9">
+  <!ENTITY c1 "c1">
+  <!ENTITY c9 "c9">
+  <!ENTITY we "we">
+  <!ENTITY ws "ws">
+  <!ENTITY ww "ww">
+  <!ENTITY wn "wn">
+  <!ENTITY db "db">
+  <!ENTITY dr "dr">
+  <!ENTITY dg "dg">
+  <!ENTITY chow "chow">
+  <!ENTITY pung "pung">
+  <!ENTITY kong "kong">
+  <!ENTITY mahjongg "mahjongg">
+  <!ENTITY originalcall "originalcall">
+  <!ENTITY violatesoriginalcall "violatesoriginalcall">
+  <!ENTITY dangerousgame "dangerousgame">
+  <!ENTITY nochoice "nochoice">
+]>
+
+<!-- TODO: describe the window with the list of tables -->
+
+<book id="kajongg" lang="&language;"
+> <!-- do not change this! -->
+<bookinfo>
+	<title
+>&kajongg;i käsiraamat</title
+> <!-- This is the title of this docbook. -->
+<!-- List of immidiate authors begins here. -->
+<!--INPORTANT! - All other contributors: [to be determined] -->
+<authorgroup>
+<author
+><personname
+> <firstname
+>Wolfgang</firstname
+> <surname
+>Rohdewald</surname
+> </personname
+> <email
+>wolfgang@rohdewald.de</email
+> </author>
+<othercredit role="translator"
+><firstname
+>Marek</firstname
+><surname
+>Laane</surname
+><affiliation
+><address
+><email
+>bald@smail.ee</email
+></address
+></affiliation
+><contrib
+>Tõlge eesti keelde</contrib
+></othercredit
+> 
+</authorgroup>
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2014-02-20</date
+><!-- Date of (re)writing, or update.-->
+<releaseinfo
+>&kappversion; (&kde; 4.13)</releaseinfo
+><!-- Application version number. Use the variable definitions within header to change this value.-->
+
+<!--Short description of this document. Do not change unless necessary!-->
+<abstract>
+	<para
+>See käsiraamat kirjeldab mängu &kajongg;i versiooni &kappversion;.</para>
+</abstract>
+
+<!--List of relevant keywords-->
+<keywordset>
+	<keyword
+>KDE</keyword
+> <!-- do not change this! -->
+	<keyword
+>kdegames</keyword
+> <!-- do not change this! -->
+	<keyword
+>mäng</keyword
+> <!-- do not change this! -->
+	<keyword
+>kajongg</keyword
+><!--Application name goes here-->
+<!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<keyword
+>lauamäng</keyword>
+	<keyword
+>arkaadmäng</keyword>
+	<keyword
+>klotsimäng</keyword>
+	<keyword
+>kivid</keyword>
+<!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<keyword
+>neli mängijat</keyword>
+<!--All other relevant keywords-->
+</keywordset>
+</bookinfo>
+<!--Content begins here: -->
+<chapter id="introduction"
+><title
+>Sissejuhatus</title
+> <!-- do not change this! -->
+	<note
+><title
+>Mängu tüüp:</title
+><para
+>lauamäng, arkaadmäng</para
+></note
+><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<note
+><title
+>Mängijate arv:</title
+><para
+>Neli</para
+></note
+><!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<para
+>&kajongg; on lauamäng, mille aluseks on kuulus idamaine mäng  Mah Jong (hiina keeles <foreignphrase lang="zh"
+>麻將</foreignphrase
+>). See on mäng neljale mängijale. Maailmas kasutatakse väga mitmesuguseid reegleid. Praegu toetab &kajongg; klassikalisi hiina reegleid, nagu neid kasutatakse Saksamaal. Tulevikus on võimalikud ka muud reeglid. Samuti on võimalik reegleid oma äranägemise järgi kohandada või ka luua üldse enda reeglid. Viimasel juhul palub autor need ka endale saata, et need oleks võimalik muuta kättesaadavaks ka teistele! </para>
+	<para
+>&kajongg;i võib kasutada kahel viisil: mängu tulemuste määramine käsitsi, millisel juhul mäng käib nagu ikka, ilma arvuti abita, ning &kajongg;i kasutamine tulemuste arvutamiseks ja arvepidamiseks. Teine võimalus &kajongg;i kasutada on mängida mis tahes inim- ja arvutimängijate kombinatsiooni vastu. </para>
+</chapter>
+
+<chapter id="screen_layout"
+><title
+>Mängu välimus</title>
+		<para>
+			<screenshot>
+				<screeninfo
+>&kajongg;i pilt</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="gamescreen.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Pilt</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+                </para>
+                <para
+>Mänguakna osade lühike selgitus. </para>
+	<variablelist>
+		<varlistentry>
+			<term
+>Tööriistariba</term>
+			<listitem
+><para
+>Tööriistariba asub menüüriba all ja sisaldab kõige sagedamini vaja minevate toimingute nuppe. Tööriistariba sisu saab muuta. Samuti võib selle peita, mis annab mänguväljale veidi rohkem ruumi. </para
+><para
+>Sõltuvalt sinu ekraani suurusest võib olla mõistlik tööriistariba nähtamatuks muuta või viia akna vasakusse serva. Seda saab teha, kui teha tööriistaribal klõps hiire parema nupuga. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Mängulaud</term>
+			<listitem
+><para
+>Mängulaud on akna suurim osa. Seal on näha neli 18 kivi pikkust müüri (pikkus võib ka veidi erineda sõltuvalt reeglitest, näiteks sellest, kas kasutatakse boonuskive või mitte). Müürile on kirjutatud mängijate nimed ning (hetkel teadaolev) jaotuse väärtus, samuti on seal näha mängijate tuulekivi. Valitseval tuulel on värviline taust - ülal toodud pildil on see nii ida (E) puhul. </para
+><para
+><link linkend="play"
+>Mängimise</link
+> ajal paiknevad seespool müüri mängijate ära visatud kivid. Need paiknevad suvaliselt. Viimati ära visatud kivi ümber on näha sinine raam. </para
+><para
+><link linkend="scoreGame"
+>Mängu tulemuste käsitsi määramise</link
+> korral on seespool müüri näha kõik saadaolevad kivid. Need võib määrata mängijatele hiirt või klaviatuuri kasutades. </para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Mängija ala</term>
+			<listitem
+><para
+>Iga mängija ees on ala, kus paiknevad tema kivid. Ülemises reas on näha paljastatud, alumises varjatud kivid. <link linkend="scoreGame"
+>Mängu tulemuste käsitsi määramise</link
+> korral näidatakse varjatud kive kogu kivi katva varjuga. Boonuskivid paiknevad paremas servas. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Dialoog</term>
+			<listitem
+><para
+>Dialoog näitab valikuid, mida mängija saab kasutada. Enamasti lisandub neile edenemisriba, mis näitab, kui palju on mängijal jäänud aega valik langetada. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Olekuriba</term>
+			<listitem
+><para
+>Olekuriba asub mänguakna allservas ja näitab mängijate hetketulemust. </para
+></listitem>
+		</varlistentry>
+	</variablelist>
+</chapter>
+
+<chapter id="scoreGame"
+><title
+>Mängu tulemuste käsitsi määramine</title
+> <!-- do not change this! -->
+	<para
+>Selles režiimis on &kajongg; kasutusel ainult tulemuste määramiseks. Mäng ise käib, nagu ikka, tõeliste inimestega tõelise mängulaua taga ning mängu lõpus tuleb anda &kajongg;ile teada, millised kivid mängijatel olid, ja kõik muu, mida &kajongg; vajab tulemuste arvutamiseks. Teine võimalus on muidugi tulemused käsitsi paberil välja arvutada ning nad siis rakendusse sisestada. Seejärel jagab &kajongg; mängijate vahel punktid ja kirjutab tulemused andmebaasi. Mängu on võimalik peatada, käivitada uue mängu teiste mängijatega või jätkata vana mängu mängimist. Kõik reeglid salvestatakse koos mänguga, mistõttu on võimalik eri mänge mängida eri reeglitega. </para>
+        <itemizedlist>
+            <listitem
+><para
+>Vali menüükäsk <guimenu
+>Mäng</guimenu
+> / <guimenuitem
+>Määra mängu tulemused käsitsi</guimenuitem
+> või vajuta klahve <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+>. </para
+></listitem>
+            <listitem
+><para
+>Nüüd võid valida kas olemasoleva lõpetamata mängu või alustada uut mängu. Viimasel juhul palutakse sul määrata mängijad ja valida reeglid. &kajongg; pakub välja eelmise mängu väärtused. Kui eelmist mängu pole, pakutakse välja esimesed neli defineeritud mängijat. Pane tähele, et reeglistikku ega ühtegi selle reeglit ei saa pärast valikut enam muuta. Küll saab seda teha eelnevalt <link linkend="ruleset-options"
+>reeglite redaktoris</link
+>. </para
+></listitem>
+            <listitem
+><para
+>Siis ilmub uus aken nimega "Selle jaotuse tulemused". Lähemalt kõneleb sellest osa <link linkend="enterhand-tiles"
+>Tulemuse arvutab &kajongg;</link
+>. </para
+></listitem>
+            <listitem
+><para
+>Jaotuse tulemuste salvestamise järel saad edasi minna järgmise jaotuse juurde. </para
+></listitem>
+        </itemizedlist>
+      <sect1 id="enterhand"
+><title
+>Jaotuse tulemuste sisestamine</title>
+        <sect2 id="enterhand-scores">
+	<title
+>Tulemused</title>
+	<screenshot>
+		<screeninfo
+>&kajongg;i pilt</screeninfo>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="enterhand.png" format="PNG"/>
+			</imageobject
+>				<textobject
+><phrase
+>Pilt</phrase
+></textobject>
+		</mediaobject>
+	</screenshot>
+	<para
+>Selles aknas saab sisestada jaotuse tulemused. See ilmub automaatselt nähtavale, kui &kajongg; arvab, et sul läheb seda vaja. Seda saab lasta näidata või peita kiirklahviga <keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+> või vastava menüükäsuga. </para>
+	<para
+>Nagu ikka, on valitseva tuule taust värviline. </para>
+	<para
+>Siin saab käsitsi sisestada kõigi mängijate tulemused. Teine võimalus on täpselt kindlaks määrata, millised kivid olid igal mängijal käes. Sellisel juhul muutub vastav käsitsi määratud tulemuse väärtuse väli halliks: &kajongg; arvutab tulemuse automaatselt välja. </para>
+	<para
+>Pärast jaotuse kõigi asjakohaste andmete sisestamist klõpsa nupule <guibutton
+>Salvesta jaotus</guibutton
+>. Jaotuse väärtused sisestatakse andmebaasi ning need ilmuvad nähtavale ka edetabelis. Võimalik, et sulle tehakse ettepanek vahetada mängijate kohad, kuid sellest võib ka keelduda. Ette pandavad muutused ei ole veel kohandatava, aga kui ilmub reeglistik, mis vajab midagi muud, siis me muudame seda. </para>
+	<para
+>Kui mängijal oli võimalus võita, on võimalik kasutada ka märkekasti veerus "Võitja" - vali see võitja puhul. </para>
+	<para
+>Olekuriba uuendatakse, nii et see näitab mängijate tulemusi, ning sa saad edasi minna järgmise jaotuse juurde. </para>
+	<sect3 id="enterhand-manually">
+	<title
+>Tulemuse käsitsi sisestamine</title>
+	<para
+>Hea mängija võib eelistada tulemuse isiklikku arvutamist. Sel juhul võib selle otse sisestada. See on võimalik ainult siis, kui antud mängija puhul pole valitud ühtegi kivi. </para>
+	<para
+>Tulemuse käsitsi sisestamisel peab see sisaldama kõike peale karistuste, siin ei ole mingeid valitavaid reegleid. On siiski üks erand, nimelt "ohtlik mäng". See ei mõjuta mingeid tulemusi ega ole karikkumine. See tähendab lihtsalt, et punktide jagamine mängijate vahel toimub teistmoodi: rikkuja peab maksma kõik võitjale. Teised kaks mängijat selles ei osale. Praegu ei saa seda kuidagi kohandada. </para>
+	</sect3>
+	<sect3 id="enterhand-tiles">
+	<title
+>Tulemuse arvutab &kajongg;</title>
+	<para
+>Kui annad &kajongg;ile otse teada, millised kivid mängijatel olid, on aknas tulemuste sisestamine võimatu. Lisades mängijale kive, näed, kuidas tema tulemused muutuvad - aga niipea, kui oled lisanud 14. kivi, muutub tulemus nulliks. See võib algul üllatada, aga kui sa ei märgi seda ühtlasi võitvaks jaotuseks, peetakse seda niinimetatud pikaks käeks, mis annab alati null punkti. Nii on see määratletud klassikalise hiina reeglistikuga, teistes reeglistikes võib muidugi teisiti olla. </para>
+	<para
+>Kive ja kombinatsioone saab seostada mängijaga kas hiire või klaviatuuri või mõlema abil. Hiirega lihtsalt lohista kivid mängija alasse. Sel juhul küsitakse, kas soovid liigutada üksikut, paari, pungi, kongi, nõueldud kongi või chow'd. Ülemine rida on paljastatud, alumine varjatud kividele. Boonuskivid on näha paremas servas. Kive ja kombinatsioone võib liigutada ka ridade või mängijate vahel ning tagasi kesksesse valikualasse. </para>
+	<para
+>Kui eelistad kasutada klaviatuuri, saab keskse valikuala ja mängijate alade vahel liikuda klahviga &Tab;. Klahvi <keycap
+>eswnESWN</keycap
+> liigutavad kivi vastavalt ida, lõuna, lääne ja põhja mängijale. Klahvid <keycap
+>xX</keycap
+> liigutavad kivi tagasi kesksesse valikualasse. <keycap
+>ESWN</keycap
+> liigutab kivi varjatud, <keycap
+>eswn</keycap
+> paljastatud kivide ritta. Kursorit kivide või kombinatsioonide vahel saab liigutada nooleklahvidega, sealjuures parajasti valitud kivi ümbritseb sinine raam. Et nooleklahvid asuvad tähtedest kaugel, saab kursori liigutamiseks kasutada ka klaviatuuri tähti <keycap
+>hjkl</keycap
+> ja <keycap
+>HJKL</keycap
+>. <keycap
+>hH</keycap
+> liigutab vasakule, <keycap
+>jJ</keycap
+> liigutab alla, <keycap
+>kK</keycap
+> liigutab üles ja <keycap
+>lL</keycap
+> liigutab paremale. Nii käitub ka näiteks UNIX-i tekstiredaktor "vi". Samu klahve toetavad samamoodi isegi &kde; brauser Konqueror ja käesolev abirakenduski. Klahvid võivad erineda, kui kasutad mõnda muud kui inglise keelt, aga praegu ei ole võimalik neid seadistada. </para>
+	<para
+>Valikuid "Viimane kivi" ja "Viimane kombinatsioon" on vaja mõningate reeglite puhul (nt. "viimane kivi lõpetab paari"). Neid saab kasutada ainult võitva jaotuse korral. </para>
+	<para
+>Akna parempoolses osas saab käsitsi rakendada mõningaid reegleid. Millised reeglid seal näha on, sõltub kehtivast reeglistikust ja kividest. Ülal näidatud pildil võib kaotanud mängijatele rakendada valikut "ohtlik mäng", aga ka see sõltub kehtivast reeglistikust ja mängijate kividest. Arendajate eesmärk on hoida käsitsi valitavate reeglite nimekiri nii lühike kui võimalik. Parimal juhul peaks &kajongg; olema alati võimeline automaatselt tuvastama, milliseid reegleid on vaja rakendada, aga mõnikord pole &kajongg;il selleks piisavalt teavet või teadmisi. </para>
+	</sect3>
+	</sect2>
+	<sect2 id="enterhand-penalties">
+	<title
+>Karistused</title>
+			<screenshot>
+				<screeninfo
+>&kajongg;i pilt</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="penalty.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Pilt</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+	<para
+><link linkend="enterhand"
+>Tulemuste käsitsi sisestamise akna</link
+> nupp <guibutton
+>Karistused</guibutton
+> avab akna, kus saab sisestada karistusi. Seda võib teha igal hetkel, sõltumata tavalisest tulemuste arvestamise mehhanismist.</para>
+	<para
+><guilabel
+>Rikkumise</guilabel
+> valikukast näitab kõiki rikkumisi, mida on võimalik rakendada mängijate jaotustele. Vali nende seast vajalik.</para>
+	<para
+>Seejärel saab täpsustada <guilabel
+>Kogukaristust</guilabel
+>. See on kogusumma, mida rikkuja peab teistele tasuma. See jagatakse saajate vahel võrdselt.</para>
+	<para
+>Sõltuvalt rikkumise tüübist on tasujate ja saajate arv erinev. Igal juhul näidatakse õiget arvu mängijaid. Mängija valimise korral kontrollib &kajongg;, et see mängija esineks ainult ühel korral, kohandades vastavalt teisi mängijaid. </para>
+	</sect2>
+	</sect1>
+</chapter>
+
+<chapter  id="play"
+><title
+>Mängimine</title>
+	<para
+>Igal ajal võib sisse või välja lülitada demorežiimi. Selles režiimis mängib sinu eest arvuti. Kui parajasti ei mängita ühtegi mängu, käivitatakse selle valimisel uus mäng viimati kasutatud reeglistikuga. </para>
+        <sect1 id="robotplay">
+        <title
+>Mängimine arvuti vastu</title>
+         <para
+>Kõigepealt ilmub sisselogimisdialoog. Sisesta mänguserver, millega soovid ühineda, ja oma kasutajanimi. Kui valid erikirje "Kohalik mäng", pead sisestama ainult oma nime (või soostuma pakutud nimega) ja valima reeglistiku. Sel juhul käivitatakse kohe kohalik mäng, milles mängid kolme robotmängija vastu. Kui aga on olemas ka peatatud mänge, näeb neid nimekirjas. Sealt võid valida mängu, mida soovid jätkata, või siis alustada uut mängu. </para>
+        </sect1>
+        <sect1 id="humanplay">
+        <title
+>Mängimine sõpradega</title>
+        <para
+>Kui soovid mängida tõeliste inimestega, siis läheb vaja mänguserverit, millega kõik mängijad, kaasa arvatud sina ise, peavad olema ühendatud. Selleks vali mõni server või sisesta käsitsi uue serveri nimi ning määra oma parool selles serveris. Vaikimisi pakutakse välja viimati kasutatud parool. </para
+><para
+>Lihtsaim viis on kasutada märguserverit <ulink url="http://www.kde.org/applications/games/kajongg/"
+>kajongg.org</ulink
+>. &kajongg; näitab seda ühe võimaliku mänguserverina. Pane tähele, et praegu pakub <ulink url="http://www.kde.org/applications/games/kajongg/"
+>kajongg.org</ulink
+> ainult mänguserverit, mitte aga veebilehte ega muid teenuseid. </para
+><para
+>Kui sul ei ole mänguserveris sisestatud kasutajanimele vastavat kontot, päritakse sinu käest, kas soovid konto luua. Kui vastad jaatavalt, näed järgmist dialoogi, kus tuleb soovitud parool kaks korda sisestada. Konto luuakse nüüd automaatselt. </para
+><para
+>Pärast edukat sisselogimist mänguserverisse, näed serveri laudade nimekirja koos vabade kohtadega. Liitu mõne lauaga või loo endale uus laud. Kui lood uue laua, tasub oodata, kuni teised mängijad võtavad selle taga kohad sisse. Siiski võib uue laua taga ka kohe mängima hakata, sel juhul täidavad tühjad kohad robotmängijad. </para
+><para
+>Laudade nimekirjas on näha iga laua taga kasutatav reeglistik. Reeglistiku ja selle nime saadab mänguserverisse mängija, kes laua lõi. Kui sul juhtub olema samasugune reeglistik, näitab laud reeglistiku juures sinu nime - sellest võib olla abi, kui laua looja peaks kõnelema mõnda muud keelt ja on reeglistiku kuidagi teisiti nimetanud. Kui sinu kohaliku reeglistiku nime näidatakse, on see esitatud mustana. Kui sul aga pole samasugust reeglistikku, näeb nime punasena ning sa võid nupu <guibutton
+>Võrdle</guibutton
+> abil võrrelda seda enda reeglistikuga. </para
+><para
+>Kui sa ei kasuta <ulink url="http://www.kde.org/applications/games/kajongg/"
+>kajongg.org</ulink
+>-i või mõnda muud olemasolevat mänguserverit, võid kahel viisil käivitada omaenda &kajongg;i mänguserveri: <itemizedlist
+><listitem
+><para
+>loo ühendus serveriga "localhost". See on sinu enda arvuti. Kui sa seda teed ja mänguserver ei tööta, käivitatakse see automaatselt. Kui sa aga mängimise lõpetad, peatatakse ka serveri töö. </para
+></listitem
+><listitem
+><para
+>käivita käsitsi server mis tahes arvutis. Selleks tuleb lihtsalt minna käsureale ja käivitada programm <literal
+>kajonggserver</literal
+>. Käsuga <literal
+>kajonggserver --help</literal
+> näeb kõiki võimalikke võtmeid, näiteks vaikimisi porti. Server töötab seni, kuni selle töö lõpetad. </para
+></listitem
+></itemizedlist>
+        </para
+><para
+>Mõlemal juhul tuleb teistele mängijatele öelda, kuidas nad sinu mänguserverisse pääsevad. Selleks vajavad nad &URL;-i või lihtsalt IP-aadressi ja porti, mida sinu server jälgib. See võib olla näiteks <literal
+>mypc.dyndns.org:8409</literal
+>, kus <literal
+>8409</literal
+> on port. Loomulikult tuleb sul ka oma tulemüüri seadistada, et mujal asuvad mängijad ikka saaksid selle pordiga ühenduse luua. Suhtlemine on krüptitud. </para
+><para
+>Server arvutab vaikimisi pordi oma versiooninumbrist. Kui &kajongg;i versioon on 4.9.5, kasutatakse porti 8409: 8000 pluss versiooni esimene arv * 100 pluss versiooni keskmine arv. Kui mängija ei sisesta soovitud mänguserverile porti, arvutab klient samamoodi pordi. Niisiis, kui arvutis töötab mitu mänguserverit programmi eri versioonidega, peaks üldjuhul saama automaatselt ühenduse õige mänguserveriga. Igatahes annavad mänguserver ja klient endast parima kontrollimaks, et nende versioonid ühilduvad, ja hoiatavad, kui see nii pole. </para
+><para
+>Võimalike vigade esinemisel oleks mõttekas kasutada võtit <literal
+>--debug=traffic</literal
+>. See näitab sulle konsoolis, kus mänguserver on käivitatud ning millised sõnumid liiguvad mänguserveri ja klientide vahel. </para>
+        <sect2 id="playing-caveats">
+        <title
+>Hoiatus</title>
+            <itemizedlist
+><listitem
+><para
+>Kui tahad olla kindel, et ükski inimmängija ei peta, peaks sul olema ligipääs arvutile, milles mänguserver töötab. Loomulikult ei ole võimalik takistada näiteks kahel mängijal kokku mängimast ja teineteist abistamast, õieti ei saa isegi seda kontrollida, kas kaks mängijat on ikka kaks või üks ja seesama inimene. </para
+></listitem
+></itemizedlist>
+        </sect2>
+        </sect1>
+<sect1  id="gamerules"
+><title
+>Mängureeglid</title>
+<para
+>Maailmas mängitakse seda mängu väga erineval moel. Praegu toetab &kajongg; kaht klassikalise hiina versiooni: üht kasutatakse Saksamaal ja teist Suurbritannias. </para
+><para
+>Siinne kirjeldus ei süvene üksikasjadesse ja sobib seepärast mõlemale variandile.</para
+><para
+>Enamik põhireegleid on niikunikii mõlemas variandis samad.</para>
+  <para
+>Kuna &kajongg; teab nagunii, kuidas tuleb mängida, siis sisaldab see kirjeldus ainult neid asju, mis ei pruugi olla väga ilmselged.</para>
+  <para
+>Kui soovid Mah Jongiga põhjalikumat tutvust teha, tasuks uurida <link linkend="bibliography"
+>bibliograafiat</link
+>.</para>
+<sect2 id="gamerules-aim">
+  <title
+>Mängu eesmärk</title>
+  <para
+>Iga mängija püüab koguda selliseid kive, mis tagaksid talle võiduka jaotuse. Selle saavutamisel kuulutab ta välja "Mah Jongi". Võidukas jaotuses on kivid tavaliselt rühmitatud viite kombinatsiooni: neli kombinatsiooni, igas kolm või neli kivi, ning viies kombinatsioon, mis koosneb kahest võrdsest kivist. Normaalses kombinatsioonis on kolm või neli ühesugust kivi (vastavalt Pung või Kong) või kolm järjestikust kivi, näiteks Bambus 3, Bambus 4 ja Bambus 5 (see kannab nimetust Chow).</para>
+  </sect2>
+  <sect2>
+    <title
+>Mängu käik</title>
+    <para
+>Algselt on idatuule mängijal (seda näitab müür) üks kivi teistest enam. Ida alustab soovimatu kivi äraviskamisega. </para>
+    <para
+>Kivi äraviskamisel võivad teised mängijad seda endale nõuelda, öeldes välja, mida nad selle abil saavad saavutada (chow, pung, kong või Mah Jong). Ainult järgmine mängija saab kuulutada chow'd, teisi kombinatsioone aga kõik mängijad. Nõudlusega saavutatud kombinatsioon paljastatakse, see tähendab muudetakse kõigile mängijatele nähtavaks. </para
+><para
+>Kui äravisatud kivi keegi endale ei nõudle, võtab järgmine mängija ehk Lõuna (ja tema järel Lääs ja Põhi) müürist kivi ja viskab ära soovimatu kivi.</para>
+      <para
+>Mitu reeglit sätestavad, kuidas pungist saab teha kongi (nõueldes neljandat kivi või saades selle müürist), aga neid reegleid siin lähemalt ei selgitata. &kajongg; mõistagi neid reegleid teab ning tagab nende järgimise. Kongi kuulutamisel saab mängija automaatselt müürist asenduskivi, sest muidu ei oleks võimalik luua viit eespool mainitud kombinatsiooni. </para>
+    </sect2>
+    <sect2>
+      <title
+>Aasta, voor ja jaotus</title
+><para
+>Kui mängija kuulutab välja Mah Jongi või lõpeb asi viigiga, on jaotus läbi mängitud. Kui tulemus ei ole just viik, vahelduvad tuuled mängijate seas. Seda korratakse, kuni iga mängija on korra saanud olla iga tuul. Seda nimetatakse kokku vooruks. Kogu mäng, mida nimetatakse ka aastaks, koosneb neljast sellisest voorust: idatuule voor, lõunatuule viir, läänetuule voor ja põhjatuule voor. Vooru tuult nimetatakse ka valitsevaks tuuleks ning see võib kaasa tuua parema tulemuse.</para>
+	<para
+>Niisiis koosneb kogu mäng ehk aasta vähemalt 16 jaotusest. Et tuuled ei vaheldu viikide korral või siis, kui Ida mängija kuulutab välja Mah Jongi, läheb täismängu jaoks tavaliselt vaja märksa rohkem jaotusi. </para
+></sect2
+><sect2
+><title
+>Boonuskivid</title>
+    <para
+>Mäng võib sisaldada kaheksat boonuskivi (kui reeglid neid just ei keela). Neid näidatakse eraldi paremal pool mängija mänguala, sest neid ei kasutata kunagi kombinatsioonide loomisel. Küll annavad nad boonuspunkte.</para>
+      <para
+>Kui mängija saab boonuskivi, saab ta ka automaatselt müürist asenduskivi.</para
+></sect2>
+      <sect2
+><title
+>Tulemused</title
+><para
+>Pärast jaotuse läbimängimist arvuatatakse kokku iga mängija tulemus. Kõigepealt pannakse kirja baaspunktid, näiteks 2 punkti lihtsa paljastatud pungi või 20 võitva kombinatsiooni eest. Seejärel rakendatakse järgmist reeglivalikut, mis võivad punkte topeldada, näiteks draakonite kombinatsiooni eest. Kui mängulised tulemused on teada, peavad mängijad tasuma nende vahe eest: võitja täisskoori eest tasuvad ülejäänud mängijad. Ida puhul on nii skoori saamine kui ka tasumine alati kahega korrutatud.</para>
+	  <para
+>&kajongg; tunneb mõistagi kõiki rakendatavaid reegleid, kuid ka head mängijad teavad, millised kombinatsioonid annavad millise tulemuse ning saavad sestap, kui neil on ka head õnne, oma tulemust optimeerida. Mängu õppimise ajal on sestap väga tark tegu uurida ka akent <guimenuitem
+>Tulemuste selgitus</guimenuitem
+>.</para>
+	  <para
+>Täpsed hindamisreeglid tihtipeale veidi erinevad: &kajongg;is võib neid vabalt muuta <link linkend="ruleset-options"
+>reeglite redaktoriga</link
+>.</para>
+	  <para
+>Reeglite redaktor näitab ka kõiki saadaolevaid reegleid ning nende tähendust. Hiirekursorit nende kohale viies ilmub nähtavalt eksootilisemate reeglite abitekst.</para>
+	</sect2>
+</sect1>
+<sect1 id="playing-play">
+        <title
+>Kuidas &kajongg;i mängida</title>
+        <para
+>Sinu käest päritakse, mida soovid teha. Sõltuvalt akna suurusest on selleks mõeldud väike dialoog kas akna paremas või allservas. Kui akna laius ületab kõrgust, näeb dialoogi paremal. Mõnikord näeb dialoogis aega: kui see saab täis, valitakse automaatselt esimene võimalik vastus. Aegumist saab seadistada reeglite redaktoris (<guilabel
+>Valikud</guilabel
+>, <guilabel
+>Nõudluse aegumine</guilabel
+>). Aegumine on ühesuguse pikkusega kõigile mängijatele, seepärast ongi see reeglistiku osa. </para
+><para
+>Kui pead valima mõne käes oleva kivi, võid nende vahel liikuda paremale ja vasakule liikuvate nooleklahvidega või tähtedega h ja l. Loomulikult võib seda teha ka hiirega. </para
+><para
+>Kivi võib ära visata klaviatuuri abil, aga võib ka kasutada hiirt ning liigutada kivi oma mängualalt äraviskamisalasse (müüride vahel). Kivide paigutamisega äraviskamisalas tegeleb siiski arvuti, sest see paigutus peab olema ühesugune kõigi mängijate jaoks. </para
+><para
+>Sageli pakub dialoog valikuid, mida sa tegelikult ei saa kasutada, näiteks võimalust kuulutada välja pung, ehkki sul pole selleks vajalikke kive. See on sihilik, et kõik oleks täpselt nagu tõelises mängus. Kuid võimatud valikud on võimalik ka kõrvaldada: Eemalda seadistustedialoogi kaardil <guilabel
+>Mäng</guilabel
+> märge valiku <guilabel
+>Ainult võimalike toimingute näitamine</guilabel
+> eest. </para
+><para
+>Ära visatud kivid asetatakse juhuslikult sissepoole müüri. Mõnes mänguvariandis on ka kindlaks määratud, kuhu kivid asetada, aga see pole veel seadistatav. Kui see muutub seadistatavaks, hakkab see seadistus kuuluma reeglistikku. </para>
+	</sect1>
+</chapter>
+
+<chapter id="interface"
+><title
+>Liidese tutvustus</title
+> <!-- do not change this! -->
+<!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist
+> and <varlistentry
+>. Split the chapter into sections using <sect1(2,3)
+> for better viewing.-->
+
+<sect1 id="menu">
+<title
+>Menüükirjed</title>
+
+		<variablelist>
+			<varlistentry id="game-menu-scoreGame">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Mäng</guimenu
+> <guimenuitem
+>Määra mängu tulemused käsitsi</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>See on mõeldud ainult mängitud mängu tulemuste käsitsi sisestamiseks.</action
+></para
+><para
+>Vastavalt soovile võib laadida vana mängu või alustada uut. Vaikimisi näidatakse valikunimekirjas ainult ootel, s.t lõpetamata mänge. Lisavõimalusena saab lasta näidata kõiki mänge, ka neid, mis on lõpetatud. Siin saab ka mänge kustutada.</para
+></listitem>
+			</varlistentry>
+                        <varlistentry  id="game-menu-play">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Mäng</guimenu
+> <guimenuitem
+>Mängi</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Võimaldab mängida teiste, nii inimeste kui ka arvutitega.</action
+></para
+></listitem>
+                        </varlistentry>
+                        <varlistentry  id="game-menu-abort">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Mäng</guimenu
+> <guimenuitem
+>Katkesta mäng</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Katkestab aktiivse mängu. Kui tegemist oli ainult mängu tulemuste sisestamisega, saab seda hiljem jätkata. Kui aga mängid &kajongg;i abil, siis selliseid mänge veel taastada ei saa.</action
+></para
+></listitem>
+                        </varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Mäng</guimenu
+> <guimenuitem
+>Välju &kajongg;ist</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Lõpetab</action
+> &kajongg;i töö.</para
+></listitem>
+			</varlistentry>
+
+			<varlistentry id="view-scoring">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Vaade</guimenu
+> <guimenuitem
+>Tulemuste redaktori näitamine</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Tulemuste dialoog</action
+>: näitab või peidab tulemuste dialoogi. Seda selgitatakse lähemalt <link linkend="enterhand"
+>siin</link
+>. </para
+></listitem>
+                        </varlistentry>
+                        <varlistentry id="view-scoretable">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Vaade</guimenu
+> <guimenuitem
+>Edetabel</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Edetabel</action
+> <screenshot
+> <screeninfo
+>Edetabel</screeninfo
+> <mediaobject
+> <imageobject
+> <imagedata fileref="scoretable.png" format="PNG"/> </imageobject
+> <textobject
+> <phrase
+>Pilt</phrase
+> </textobject
+> </mediaobject
+> </screenshot
+> Näitab edetabelit. Veerg Voor/jaotus näitab aktiivset vooru (ida, lõuna, lääs, põhi), millele järgneb voorus mängitud jaotuste arv. Võitja taust on tulemuse veerus roheline. Veerg Maksed näitab, kui palju pidi mängija selles jaotuses teistele mängijatele tasuma või kui palju ta ise sai. Veerg Bilanss näitab bilanssi. Diagramm näitab bilansi arengu. Vihjed pakuvad rohkem üksikasju, nii näeb kõiki reegleid, mida antud jaotuse korral rakendati. Liiguta vaid hiir väärtuse kohale, mille vastu huvi tunned.</para
+><para
+>Alumine osa näitab kasutatud reeglistikku. Tulemuste tabeli ja reeglistiku vahel asub eraldaja, mida liigutades on võimalik mõlema osa suurust muuta. </para
+></listitem>
+                        </varlistentry>
+			<varlistentry id="view-explain-scores">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>E</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Vaade</guimenu
+> <guimenuitem
+>Tulemuste selgitus</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Tulemuste selgitus</action
+></para>
+				<screenshot>
+					<screeninfo
+>Edetabel</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="explain.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Edetabel</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Selgitus, kuidas arvutati aktiivse jaotuse tulemused. </para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-chat">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Vaade</guimenu
+> <guimenuitem
+>Vestlus</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Vestlus</action
+></para>
+				<screenshot>
+					<screeninfo
+>Vestlusaken</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Vestlusaken</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Võimaldab vestelda teiste mängijatega. </para
+></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Seadistused</guimenu
+> <guimenuitem
+>Mängijad</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Võimaldab lisada, muuta ja kustutada mängijaid.</action
+></para>
+				<para
+>Paroolid on samad, mida kasutatakse vaikimisi mänguserverisse logimisel. Algselt mänguserveri jaoks valitud parooli muutmine ei ole eriti hea mõte, sest praegu ei ole veel võimalik muuta parooli ka mänguserveris. Seda saab teha ainult mänguserveri administraator otse andmebaasis.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Seadistused</guimenu
+> <guimenuitem
+>Reeglid</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Reeglite kohandamine.</action
+></para>
+				<para
+>Reeglite kohandamiseks kasuta vastavat redaktorit. Sellest kõneldakse lähemalt <link linkend="ruleset-options"
+>siin</link
+>.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Seadistused</guimenu
+> <guimenuitem
+>Vaatenurga muutmine</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Võimaldab muuta kivide vaatamise nurka vastupäeva.</action
+></para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Seadistused</guimenu
+> <guimenuitem
+>Demorežiim</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Demorežiimi sisse- või väljalülitamine. Sellest kõneldakse lähemalt <link linkend="play"
+>siin</link
+>.</action
+></para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>F</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Seadistused</guimenu
+> <guimenuitem
+>Täisekraanirežiim</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Võimaldab lülitada täisekraanirežiimi ja tavalise aknarežiimi vahel.</action
+></para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+<para
+>Lisaks on &kajongg;il tavapärased &kde; <guimenu
+>seadistuste</guimenu
+> ja <guimenu
+>abi</guimenu
+>menüü elemendid, mille kohta leiab rohkem teavet &kde; põhialuste käsiraamatu osadest <ulink url="help:/fundamentals/ui.html#menus-settings"
+>Menüü Seadistused</ulink
+> ja <ulink url="help:/fundamentals/ui.html#menus-help"
+>Menüü Abi</ulink
+>. </para>
+
+</sect1>
+</chapter>
+
+<chapter id="configuration"
+><title
+>Mängu seadistamine</title
+> <!-- do not change this! -->
+<!--This section describes configuration &GUI;. If your game is configured using menubar exclusively, please remove this section.-->
+<screenshot>
+<screeninfo
+>Seadistustedialoog</screeninfo>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="config_play.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase
+>Seadistustedialoog</phrase>
+	  </textobject>
+	</mediaobject>
+</screenshot>
+
+<para
+>Menüükäsk <menuchoice
+><guimenu
+>Seadistused</guimenu
+><guimenuitem
+>&kajongg;i seadistamine...</guimenuitem
+></menuchoice
+> avab dialoogi <guilabel
+>Seadistused - &kajongg;</guilabel
+>.</para>
+<para
+>Kui klõpsata nupule <guibutton
+>Loobu</guibutton
+>, tühistatakse kõik seadistustesse tehtud muudatused, kaasa arvatud need, mida oled teinud reeglite redaktoriga.</para>
+<para
+>Eri kaarte saab valida ka klaviatuuri abil: <keycombo action="simul"
+>&Ctrl;<keycap
+>1</keycap
+></keycombo
+> valib esimese kaardi <guilabel
+>Mäng</guilabel
+>, <keycombo action="simul"
+>&Ctrl;<keycap
+>2</keycap
+></keycombo
+> teise kaardi ja nii edasi.  </para>
+
+<sect1 id="play-options"
+><title
+>Mängu valikud</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<guilabel
+>Kivide varju näitamine</guilabel>
+				</term>
+				<listitem
+><para
+>Sisselülitamise korral näidatakse kivide piirdeid ja varje. Samuti jääb kiviridade vahele veidi ruumi ning müüri kive näidatakse nii, et on selgelt näha, et see on kahe või kolme kivi kõrgune. Väljalülitamise korral on vaade lihtsam ja kivid natuke suuremad. See valik võib olla kasulik väiksema arvutiekraani korral. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Paljastamata kivide korraldamine kombinatsioonidesse</guilabel>
+				</term>
+				<listitem
+><para
+>Sisselülitamise korral rühmitatakse käes olevad kivid kombinatsioonidesse. Mõnikord ei pruugi rühmitamine olla just selline, nagu sulle meeldib, nii et selle võib ka välja lülitada, mis matkib tõelist mängu. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Ainult võimalike toimingute näitamine</guilabel>
+				</term>
+				<listitem
+><para
+>Mängu ajal ainult võimalike toimingute, näiteks "Nõuet ei esitata" või "Pung", näitamine. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Käigu pakkumine</guilabel>
+				</term>
+				<listitem
+><para
+>Kui sinu ees seisab valik, näiteks kivi nõudlemine või nõudlemata jätmine või valimine, milline kivi minema visata, aitab &kajongg; sind oma ettepakenutega. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Võimalusel helide kasutamine</guilabel>
+				</term>
+				<listitem
+><para
+>Sisselülitamisel on võimalik kuulata ära visatud kivide nimesid ja nõudlusi. Kui teised mängijad on salvestanud oma häälega helifailid, on neid võimalik kuulda. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Teised võivad minu häält kuulda</guilabel>
+				</term>
+				<listitem
+><para
+>Kui oled salvestanud oma häälega helifailid, siis selle valiku sisselülitamisel kuulevad teised mängijad sinu ära visatud kive ja nõudlusi sinu häälega. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Animatsiooni kiirus</guilabel>
+				</term>
+				<listitem
+><para
+>Määrab, kui kiiresti kive liigutatakse. Liugurit paremasse serva viies liikumist ei animeerita, vaid kivid vahetavad lihtsalt kohta. </para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+	<sect2
+><title
+>Heli</title>
+	<para
+>Mängukogemus on palju mõnusam, kui kuuled, kuidas mängijad kive nõudlevad ja äravisatud kivisid teatavaks teevad. Samuti muudab see mängimise lihtsamaks, sest saad keskenduda enda kividele ega pea pingsalt jälgima, mida teised ära heidavad. </para>
+	<para
+>&kajongg; pakub eri mängijatele eri helisid. Helid omistatakse mängijatele automaatselt. Iga keele puhul peaks olema neli heli, eelistavalt kaks mees- ja kaks naishäälega. &kajongg; üritab kasutada selle keele helisid, milles &kajongg; töötab. Kui selle keele helisid ei leita, võtab &kajongg; kasutusele teise keele helid, kasutades samasugust tagavaravarianti, mis on &kajongg;is juba määratud (vt. <menuchoice
+><guimenu
+>Abi</guimenu
+><guimenuitem
+>Vaheta rakenduse keelt</guimenuitem
+></menuchoice
+>). Kui sinu keelele pole helifaile, oled oodatud neid ise salvestama ja annetama &kajongg;ile. </para>
+	 <itemizedlist
+><listitem
+><para
+>Selgitame, kuidas helisid ise tekitada. Igale helile on omaette kataloog. Failisüsteemis leidub helisid eri kohtades kahes rühmas: <itemizedlist
+><listitem
+><para
+>Kõigi keelte valmishääled. Need paiknevad kataloogis <filename class="directory"
+>/usr/share/kde4/apps/kajongg/voices/LANG</filename
+>, kus LANG on sinu keele kood. Helikataloogid kataloogis <filename class="directory"
+>.../kajongg/voices/</filename
+> on USA inglise keele versioonid. Valmishelid omistatakse mängijatele juhuslikult. Helidel on oma nimed, näiteks <literal
+>"male1 male2 female1 female2"</literal
+>, kuid see pole oluline, kasutaja ei näe neid kunagi. Samuti pole erilist mõtet luua keele kohta rohkem kui neli valimishäält. </para
+></listitem
+><listitem
+><para
+>Kasutajahääle võib siduda konkreetse kasutajaga. Kui &kajongg; sellist häält kasutab, edastatakse see interneti kaudu automaatselt teistele mängijatele. Need hääled paiknevad kataloogis <filename class="directory"
+>~/.kde/share/apps/kajongg/voices/</filename
+>. Kui näiteks sinu kasutajanimi on juku, võib see olla <filename class="directory"
+>/home/juku/.kde/share/apps/kajongg/voices/juku/</filename
+>. Kataloogi <filename class="directory"
+>voices/</filename
+> ei pruugi olemas olla - sellisel juhul loo see. </para
+></listitem
+></itemizedlist>
+		</para
+></listitem
+><listitem
+><para
+>Nüüd, kus tead, kuhu paigutada oma uus hääl, loo sellele kataloog. </para
+></listitem
+><listitem
+><para
+>Sellesse alamkataloogi saad paigutada oma helifailid. Need peavad olema kodeeritud <ulink url="http://xiph.org/vorbis/"
+>Ogg Vorbise</ulink
+> helikompressoriga ja failinimedel peab olema laiend <filename class="extension"
+>.ogg</filename
+>. Konkreetse faili nimi võib olla näiteks <filename
+>s3.ogg</filename
+> - see käib kivi 3 kohta. Failid tuleks luua kõigi kivide ning kõigi nõudluste ja teadaannete kohta. Kui aga helifail on puudu, ei juhtu ka midagi halba - sa lihtsalt ei kuule seda heli. Tagavaravariant teise hääle või keelega võetakse kasutusele ainult terve hääle, mitte konkreetsete helifailide puhul. </para
+></listitem
+><listitem
+><para
+>Kui kõik valmishääle helifailid on loodud, kontrolli kindlasti, et &kajongg;il oleks õigus kirjutada uude häälekataloogi. Käivita &kajongg; ja testi häält. Kui kõik on korras, võib kirjutamisõiguse tühistada (seda peaks valmishäälte korral nagunii tegema). &kajongg; loob automaatselt faili nimega <filename
+>md5sum</filename
+>, mis sisaldab kõigi helifailide kontrollsummat. Kui muudad, lisad või kustutad mõne hääle helifaili, üritab &kajongg; selle faili üle kirjutada. </para
+></listitem
+></itemizedlist>
+	<para
+>Palun kontrolli, et heli kestus oleks lühike, aga see kõlaks selgelt - mäng võib minna väga kiirelt, kui oled selle käppa saanud. Lihtsam on kõigepealt panna kirja kõik helid, mida sinu arvates vaja läheb. Ära loe neid üksteise järel, vaid püüa iga heli välja öelda, nagu see oleks ainuke, ja nii, nagu see võiks kõlada, kui oled mänguhoos. Jäta pause. Väljaütlemine võib nõuda veidi harjutamist.</para>
+	<para
+>Toome ära ühe võimaluse helifailide loomiseks: </para
+><para
+><itemizedlist
+><listitem
+><para
+>Salvesta helifailid programmiga <command
+>qarecord</command
+> ja kindlasti <literal
+>WAV</literal
+>-vormingusse. Kõnele selles ühes helifailis kõik helid. </para
+></listitem
+><listitem
+><para
+>Redigeeri faili heliredaktoriga <command
+>audacity</command
+>. Kasuta redaktoris hiirt helilainete vahemiku märkimiseks. Redaktor esitab valitud osa. Korda, kuni oled valinud korrektse osa. See võib olla lihtsam menüükäsuga <menuchoice
+><guimenu
+>Vaade</guimenu
+><guimenuitem
+>Suurenda</guimenuitem
+></menuchoice
+>. Kasuta menüükäsku <menuchoice
+><guimenu
+>Fail</guimenu
+><guimenuitem
+>Ekspordi valik</guimenuitem
+></menuchoice
+> ja salvesta ogg-vormingusse. <guilabel
+>Valikute</guilabel
+> all vali madal kvaliteet - see on piisav ja isegi soovitav, sest nii väheneb heli teistele mängijatele edastamise aeg. </para
+></listitem
+></itemizedlist
+></para>
+	<para
+>Allpool on ära toodud failide nimed, mida sul tuleks luua. Alati lisa neile faililaiend <filename
+>.ogg</filename
+>:</para>
+
+<table>
+<title
+>Helifailide nimed</title>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry
+>&s1; .. &s9;</entry
+><entry
+>Kivid 1 kuni 9</entry>
+</row>
+<row>
+<entry
+>&b1; .. &b9;</entry>
+<entry
+>Bambused 1 kuni 9</entry>
+</row>
+<row>
+<entry
+>&c1; .. &c9;</entry>
+<entry
+>Märgid 1 kuni 9</entry>
+</row>
+<row>
+<entry
+>&we; &ws; &ww; &wn;</entry>
+<entry
+>Tuuled - ida, lõuna, lääs, põhi</entry>
+</row>
+<row>
+<entry
+>&db; &dr; &dg;</entry>
+<entry
+>Draakonid - sinine/valge, punane, roheline</entry>
+</row>
+<row>
+<entry
+>&chow; &pung; &kong; &mahjongg;</entry>
+<entry
+>Peamised nõudlused</entry>
+</row>
+<row>
+<entry
+>&originalcall; &violatesoriginalcall;</entry>
+<entry
+>Algkäik ja selle rikkumine</entry>
+</row>
+<row>
+<entry
+>&dangerousgame;</entry>
+<entry
+>Mängija kaotab kontrolli (ohtlik mäng)</entry>
+</row>
+<row>
+<entry
+>&nochoice;</entry>
+<entry
+>Mängija kuulutab, et tema ainuke valik on mängida ohtlikult</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+	</sect2>
+</sect1>
+
+<sect1 id="tiles-options"
+><title
+>Kivide valikud</title>
+        <screenshot>
+                <screeninfo
+>Kivide valija</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_tiles.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Kivide valija</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+><guilabel
+>Kivide</guilabel
+> valija abil saab valida kivide graafilise välimuse. </para>
+</sect1>
+
+<sect1 id="background-options"
+><title
+>Tausta valikud</title>
+        <screenshot>
+                <screeninfo
+>Tausta valija</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_background.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Tausta valija</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+><guilabel
+>Tausta</guilabel
+> valija võimaldab valida mängulaua tausta graafilise välimuse. </para
+><para
+>Mõned taustad, näiteks Hiina maastik, nõuavad laadimiseks veidi aega. Kui arvad, et rakendus peaks käivituma kiiremini või et peaakna suuruse muutmine võtab liiga kaua aega, proovi mõnda muud tausta. </para>
+</sect1>
+
+<sect1 id="ruleset-options"
+><title
+>Reeglite redaktor</title>
+			<screenshot>
+				<screeninfo
+>Reeglite redaktor</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="ruleseteditor.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Reeglite redaktor</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+			<para
+>Reeglite redaktoriga saab kohandada reeglistikke. Valmisreeglistikke näidatakse kaldkirjas, kohandatud reeglistikke tavalises kirjas. Valmisreeglistikke ei saa kasutaja kuidagi muuta, küll võib seda teha &kajongg;i uuendamine. Kohandatud reeglistikke uuendamisel ei muudeta. </para
+><para
+>Uue mängu käivitamisel on võimalik valida selle reeglistik. Kasutada saab kõiki reeglistikke, mis on defineeritud reeglite redaktori abil. Reeglistik salvestatakse koos mänguga, nii et siin võib reeglistikke alati muuta - muudatused mõjutavad ainult edaspidiseid mänge. </para>
+			<sect2
+><title
+>Reegel, punktid, x2, piirangud</title
+><para
+>Tee lihtsalt topeltklõps sellel, mida soovid muuta. Kui kõik väärtused on puhastatud, ei mõjuta reegel mängu. Reegleid ei saa kustutada.</para>
+			</sect2>
+			<sect2
+><title
+>Kopeerimine ja eemaldamine</title
+><para
+>Kopeerida ja eemaldada saab terveid reeglistikke. </para
+><para
+>Ka seda võib teha siis, kui mõni olemasolev mäng kasutab muudetavat reeglistikku, sest nagu öeldud, salvestatakse reeglistik koos mänguga. Soovi korral võib näha vanade mängude reeglistikke: <link linkend="game-menu-scoreGame"
+>laadi</link
+> vana mäng ja <link linkend="view-explain-scores"
+>vaata selle tulemusi</link
+>. </para>
+			</sect2>
+			<sect2
+><title
+>Võrdlemine</title
+><para>
+			<screenshot>
+				<screeninfo
+>Reeglistiku võrdleja</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="differ.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Reeglistiku võrdleja</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+Võrdlemiskäsku saab kasutada, kui valitud on terve reeglistik. See võimaldab võrrelda üht reeglistikku teisega. </para
+></sect2>
+</sect1>
+
+<sect1 id="default-keybindings">
+<title
+>Vaikimisi kiirklahvid</title>
+
+<para
+>Menüükäsu <menuchoice
+><guimenu
+>Seadistused</guimenu
+><guimenuitem
+>Kiirklahvide seadistamine...</guimenuitem
+></menuchoice
+> valimine lubab muuta vaikimisi kiirklahve.</para>
+
+<para
+>Vaikimisi kiirklahvid on järgmised: </para>
+
+<para>
+<variablelist>
+
+<varlistentry>
+<term
+><keycap
+>F1</keycap
+></term>
+<listitem>
+<para
+>Avab käesoleva käsiraamatu. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Mängu tulemuste käsitsi määramine. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Mängimine sõpradega või arvutimängijatega. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Aktiivse mängu katkestamine. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Rakendusest väljumine. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Edetabeli avamine. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Vestlusakna näitamine. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Vaatenurga muutmine. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Demorežiimi sisse- või väljalülitamine. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Shift;<keycap
+>F1</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>"Mis see on?" abi </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Täisekraanirežiim </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</para>
+
+</sect1>
+</chapter>
+
+<appendix id="problems"
+><title
+>Teadaolevad probleemid</title>
+        <itemizedlist>
+                <listitem
+><para
+>Praegu ei ole veel mängijal endal võimalik avada kontot mänguserveris.</para
+></listitem>
+                <listitem
+><para
+>Mängimisrežiimis ei ole veel karistused võimalikud.</para
+></listitem>
+                <listitem
+><para
+>Arvutimängijad on veel üpris rumalad.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="future"
+><title
+>Võimalikud tulevased omadused</title>
+        <itemizedlist>
+                <listitem
+><para
+>Uued reeglistikud. Soovitavalt võiksid neid pakkuda inimesed, kes kasutavad pakutud reeglistikku regulaarselt.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+ <appendix id="faq"
+><title
+>Korduma kippuvad küsimused</title
+> <!-- do not change this! -->
+<!--This chapter is for frequently asked questions. Please use <qandaset
+> <qandaentry
+> only!-->
+<qandaset>
+<!--Following is a standard list of FAQ questions.-->
+        <qandaentry>
+                 <question
+><para
+>Ma soovin muuta mängu välimust. On see võimalik? </para
+></question>
+                 <answer
+><para
+>Jah. &kajongg;i välimuse muutmiseks kasuta menüükäsku, mis avab <link linkend="configuration"
+>seadistustedialoogi</link
+>.</para
+></answer>
+        </qandaentry>
+        <qandaentry>
+                 <question
+><para
+>Kas kive saab mängijatele omistada ka klaviatuuri abil?</para
+></question>
+                 <answer
+><para
+>Jah. Vaata lõiku <link linkend="enterhand-tiles"
+>Tulemuse arvutab &kajongg;</link
+>.</para
+></answer>
+        </qandaentry>
+<!--Please add more Q&As if needed-->
+
+</qandaset>
+</appendix>
+
+<appendix id="credits"
+><title
+>Autorid ja litsents</title
+> <!-- do not change this! -->
+<!--This chapter is for credits and licenses.-->
+	<para
+>&kde; &kajongg; </para>
+
+	<para
+>Rakenduse autoriõigus &copy; 2009, 2010, 2011, 2012: <personname
+><firstname
+>Wolfgang</firstname
+><surname
+>Rohdewald</surname
+></personname
+> <email
+>wolfgang@rohdewald.de</email
+> </para>
+	<para
+>Dokumentatsiooni autoriõigus &copy; 2009, 2010, 2011, 2012: <personname
+><firstname
+>Wolfgang</firstname
+><surname
+>Rohdewald</surname
+></personname
+> <email
+>wolfgang@rohdewald.de</email
+> </para>
+
+<!-- !!!do not change ANYTHING after this line!!!! -->
+<para
+>Tõlge eesti keelde: Marek Laane <email
+>bald@smail.ee</email
+></para
+> 
+&underFDL;
+&underGPL;
+
+</appendix>
+
+<appendix id="bibliography">
+<title
+>Bibliograafia</title>
+        <itemizedlist>
+		<listitem
+><para
+>Uwe Martens. Das Chinesische Mah-Jongg-Spiel. Books on Demand GmbH, Norderstedt, 2005. See on suurepärane saksakeelne käsiraamat, mis sisaldab kõike, mida soovid teada Saksamaal kehtivate reeglite ning veel paljude mängu üksikasjade kohta.</para
+></listitem>
+                <listitem
+><para
+>A. D. Millington. The Complete Book on Mah-Jongg. Weidenfeld &amp; Nicolson, London, 1977 (mitu pehmeköites uustrükki kuni 2003. aastani). See on Läänes mängitava klassikalise hiina Mah Jongi ammendav käsiraamat, kust leiab ka väärtuslikke vihjeid mängustrateegia kohta.</para
+></listitem>
+		<listitem
+><para
+>Gwyn Headley, Yvonne Seeley. Mah-Jong. 3. tr. A &amp; C Black Publishers Ltd., London, 2008. See on väga hõlpsasti käsitsetav käsiraamat, mis peamiselt kõneleb Suurbritannias kasutatavatest reeglitest, mille on kindlaks määranud Briti Mah Jongi ühendus BMJA.</para
+></listitem>
+		<listitem
+><para
+><ulink url="http://en.wikipedia.org/wiki/Mahjong"
+></ulink
+></para
+></listitem>
+		<listitem
+><para
+><ulink url="http://de.wikipedia.org/wiki/Mahjongg"
+></ulink
+></para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="installation">
+<title
+>Paigaldamine</title>
+<para
+>Kasuta .deb-paketti aadressilt <ulink url="http://www.kde-apps.org/content/show.php/kajongg?content=103206"
+></ulink
+>. Kui see ei toimi, võid samalt aadressilt alla laadida kajongg-x-y.tar.gz ja seejärel sooritada järgmised toimingud: <programlisting
+>tar xfz kajongg-x-y.tar.gz
+cd kajongg-x-y
+./setup.py install
+</programlisting>
+</para
+><para
+>Mõlemal juhul tuleb üle kontrollida, et paigaldatud oleks ka mõned muud vajalikud paketid. Debiani pakett ei sisalda veel selliseid nõudmisi. &kajongg; vajab (sulgudes on ära toodud vastavad Debiani paketid): </para>
+<itemizedlist>
+	<listitem
+><para
+>KDE4 mängude teek (libkdegames5)</para
+></listitem>
+	<listitem
+><para
+>Python 2.6 või uuem (python)</para
+></listitem>
+	<listitem
+><para
+>QT4.4 või uuem (libqt4-core, libqt4-gui, libqt4-svg, libqt4-sql, libqt4-sql-sqlite)</para
+></listitem>
+	<listitem
+><para
+>QT4 Pythoni seosed (python-qt4, python-qt4-sql)</para
+></listitem>
+	<listitem
+><para
+>KDE4 Pythoni seosed (python-kde4)</para
+></listitem>
+        <listitem
+><para
+>Pythoni twisted teek (python-twisted-core)</para
+></listitem>
+        <listitem
+><para
+>sqlite3 (libsqlite3-0)</para
+></listitem>
+</itemizedlist>
+
+</appendix>
+
+&documentation.index;
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-always-quote-attributes:t
+sgml-indent-step:0
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

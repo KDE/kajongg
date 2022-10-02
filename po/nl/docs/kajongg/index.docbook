@@ -1,0 +1,1645 @@
+<?xml version="1.0" ?>
+<!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Dutch "INCLUDE"
+> <!-- change language only here -->
+  <!ENTITY % addindex "IGNORE"
+> <!-- do not change this! -->
+  <!ENTITY s1 "s1">
+  <!ENTITY s9 "s9">
+  <!ENTITY b1 "b1">
+  <!ENTITY b9 "b9">
+  <!ENTITY c1 "c1">
+  <!ENTITY c9 "c9">
+  <!ENTITY we "we">
+  <!ENTITY ws "ws">
+  <!ENTITY ww "ww">
+  <!ENTITY wn "wn">
+  <!ENTITY db "db">
+  <!ENTITY dr "dr">
+  <!ENTITY dg "dg">
+  <!ENTITY chow "chow">
+  <!ENTITY pung "pung">
+  <!ENTITY kong "kong">
+  <!ENTITY mahjongg "mahjongg">
+  <!ENTITY originalcall "originalcall">
+  <!ENTITY violatesoriginalcall "violatesoriginalcall">
+  <!ENTITY dangerousgame "dangerousgame">
+  <!ENTITY nochoice "nochoice">
+]>
+
+<!-- TODO: describe the window with the list of tables -->
+
+<book id="kajongg" lang="&language;"
+> <!-- do not change this! -->
+<bookinfo>
+	<title
+>Het handboek van &kajongg;</title
+> <!-- This is the title of this docbook. -->
+<!-- List of immidiate authors begins here. -->
+<!--INPORTANT! - All other contributors: [to be determined] -->
+<authorgroup>
+<author
+>&Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </author>
+&Freek.de.Kruijf;&Ronald.Stroethoff; 
+</authorgroup>
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2021-05-30</date
+><!-- Date of (re)writing, or update.-->
+<releaseinfo
+>KDE Gear 21.04</releaseinfo>
+
+<!--Short description of this document. Do not change unless necessary!-->
+<abstract>
+	<para
+>Deze documentatie beschrijft het spel van &kajongg;</para>
+</abstract>
+
+<!--List of relevant keywords-->
+<keywordset>
+	<keyword
+>KDE</keyword
+> <!-- do not change this! -->
+	<keyword
+>kdegames</keyword
+> <!-- do not change this! -->
+	<keyword
+>spel</keyword
+> <!-- do not change this! -->
+	<keyword
+>kajongg</keyword
+><!--Application name goes here-->
+<!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<keyword
+>bord</keyword>
+	<keyword
+>arcade</keyword>
+	<keyword
+>spel met stenen</keyword>
+	<keyword
+>stenen</keyword>
+<!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<keyword
+>vier spelers</keyword>
+<!--All other relevant keywords-->
+</keywordset>
+</bookinfo>
+<!--Content begins here: -->
+<chapter id="introduction"
+><title
+>Inleiding</title
+> <!-- do not change this! -->
+	<note
+><title
+>Speltype:</title
+><para
+>Bord, Arcade</para
+></note
+><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<note
+><title
+>Aantal mogelijke spelers:</title
+><para
+>Vier</para
+></note
+><!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<para
+>&kajongg; is een bordspel gemaakt volgens het beroemde oosterse spel Mah Jong (in Chinees <foreignphrase lang="zh"
+>麻將</foreignphrase
+>). Het wordt gespeeld door vier spelers. Wereldwijd zijn er verschillende spelregels in gebruik. Op dit moment ondersteunt &kajongg; de klassieke Chinese spelregels zoals deze gespeeld worden in Duitsland, mogelijk kunnen andere spelregels volgen. Het is mogelijk om deze aan te passen of nieuwe spelregels toe te voegen. Doe dat en stuur deze naar de auteur van het programma voor integratie! </para>
+	<para
+>&kajongg; kan op twee verschillende manieren worden gebruikt: de score bijhouden van een handmatig spel waar u speelt zoals u gewend bent zonder de hulp van een computer en gebruikt u &kajongg; voor het berekenen van de scores en voor bijhouden van de boeken. Of u kunt &kajongg; gebruiken om tegen elke combinatie van andere menselijke spelers of computerspelers te spelen. </para>
+</chapter>
+
+<chapter id="screen_layout"
+><title
+>De indeling van het scherm</title>
+		<para>
+			<screenshot>
+				<screeninfo
+>Een schermafdruk van &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="gamescreen.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Schermafdruk</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+                </para>
+                <para
+>Een korte uitleg van de onderdelen van het speelveld. </para>
+	<variablelist>
+		<varlistentry>
+			<term
+>Werkbalk</term>
+			<listitem
+><para
+>De werkbalk bevindt zich onder de menubalk en bevat knoppen voor de meest vaak gebruikte acties. De inhoud van de werkbalk kan worden beweerkt. U kunt deze ook onzichtbaar maken, waardoor er meer ruimte is voor het bord. </para
+><para
+>Afhankelijk van de afmetingen van uw scherm wilt u de werkbalk onzichtbaar maken of het naar de linkerkant van het venster verplaatsen. Dat kan door met een klik met de &RMB; op de werkbalk. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Bord</term>
+			<listitem
+><para
+>Het bord is het grootste gedeelte van het venster. U ziet de vier muren met een lengte van 18 stenen (het exacte aantal hangt af van de regels zoals het gebruik van bonusstenen of niet). De namen van de spelers staan op de muur, samen met de huidige waarde van de hand (voor zover bekend) en hun winden-stenen. De wind van de ronde heeft een gekleurde achtergrond, Oost in de bovenstaande schermafdruk. </para
+><para
+>Tijdens het <link linkend="play"
+>Spelen</link
+>, ziet u in de ruimte tussen de muren de door de spelers teruggelegde stenen. Deze zijn willekeurig geplaatst. De laatst teruggelegde steen is met een blauwe rand gemarkeerd. </para
+><para
+>Bij het <link linkend="scoreGame"
+>bijhouden van de score voor handmatige spellen</link
+> ziet u in de ruimte tussen de muren een selectie van alle beschikbare stenen, de centrale keuzeplaats. U kunt ze aan de spelers toewijzen met behulp van de muis of het toetsenbord. </para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Speelgebied</term>
+			<listitem
+><para
+>Iedere speler heeft een gedeelte van het scherm voor zijn stenen. De bovenste rij is voor de open (zichtbare) stenen, de onderste rij is voor de dichte (verborgen) stenen. Bij <link linkend="scoreGame"
+>bijhouden van de score voor handmatige spellen</link
+>, worden de dichte stenen getoond met een schaduw over de gehele steen. Bonus stenen gaan naar de rechterkant. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Dialoog</term>
+			<listitem
+><para
+>De dialoog presenteert keuzes die de speler heeft. Vaak heeft het een timeout met een voortgangsbalk die de overblijvende tijd aangeeft. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Statusbalk</term>
+			<listitem
+><para
+>De statusbalk bevindt zich onderaan het scherm en bevat de huidige totalen van de spelers. </para
+></listitem>
+		</varlistentry>
+	</variablelist>
+</chapter>
+
+<chapter id="scoreGame"
+><title
+>Scores van een handmatig spel</title
+> <!-- do not change this! -->
+	<para
+>In deze mode, is &kajongg; alleen in gebruik om de score bij te houden. U speelt zoals u normaal met echte mensen aan een echte tafel speelt waarbij u aan het eind van een spel aan &kajongg; doorgeeft welke stenen een speler nog in zijn hand heeft met alle andere gegevens die voor &kajongg; nodig zijn om de scores uit te rekenen - en dat is precies wat het programma zal doen. Als alternatief kan u ook de hand scores handmatig uitrekenen en vervolgens deze invoeren. &kajongg; zal het saldo over de spelers verdelen en de resultaten naar een database wegschrijven. Het is mogelijk het spel te pauzeren, een ander spel met andere spelers te starten en oude spellen te herstarten. De gebruikte spelregels zijn met het spel opgeslagen, verschillende spellen kunt u dus met verschillende regels spelen. </para>
+        <itemizedlist>
+            <listitem
+><para
+>Selecteer uit het menu <menuchoice
+><guimenu
+>Spel</guimenu
+> <guimenuitem
+>Score van een handmatig spel</guimenuitem
+></menuchoice
+> of druk op <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+>. </para
+></listitem>
+            <listitem
+><para
+>Nu kunt u naar keuze een onvoltooid spel openen of een nieuw spel starten. Bij het starten van een nieuw spel wordt u gevraagd voor het aantal spelers en de spelregels. &kajongg; zal dezelfde waarden als van het vorige spel voorstellen. Als er geen vorig spel was, dan zal het eerst vier voorgedefinieerde spelers voorstellen. Merk op nadat u deze selecties heeft gemaakt de spelregelset of de onderdelen daarvan niet meer kan wijzigen. U kunt dat op voorhand doen in de <link linkend="ruleset-options"
+>bewerker voor spelregelsets</link
+>. </para
+></listitem>
+            <listitem
+><para
+>U krijgt nu een nieuw venster met de titel <guilabel
+>Scoren voor deze hand</guilabel
+>. Lees <link linkend="enterhand-tiles"
+>Laat &kajongg; de score berekenen</link
+> voor een gedetailleerde beschrijving. </para
+></listitem>
+            <listitem
+><para
+>Na het opslaan van handmatige resultaten, doorgaan met de volgende hand. </para
+></listitem>
+        </itemizedlist>
+      <sect1 id="enterhand"
+><title
+>Handmatige resultaten invoeren</title>
+        <sect2 id="enterhand-scores">
+	<title
+>Scores</title>
+	<screenshot>
+		<screeninfo
+>Een schermafdruk van &kajongg;</screeninfo>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="enterhand.png" format="PNG"/>
+			</imageobject
+>				<textobject
+><phrase
+>Schermafdruk</phrase
+></textobject>
+		</mediaobject>
+	</screenshot>
+	<para
+>Dit is het venster waar u handmatig resultaten kunt invoeren. Het verschijnt automatisch als &kajongg; denkt dat u het nodig heeft. U kunt het altijd weer zichtbaar maken of verbergen door op <keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+> te drukken of door het corresponderende menu entry te selecteren. </para>
+	<para
+>Zoals altijd heeft de wind van de ronde een gekleurde achtergrond. </para>
+	<para
+>Hier kunt u handmatig voor alle spelers de scores invoeren. Alternatief kunt u exact definiëren welke stenen een speler in zijn handen had. Als u ervoor kiest om dit te doen, dan zal het bijbehorende scorevak voor handmatig invoeren grijs worden. &kajongg; berekent automatisch de score. </para>
+	<para
+>Nadat u alle relevante data voor een hand heeft ingevoerd, drukt u op de knop  <guibutton
+>Hand opslaan</guibutton
+>. De hand-waarden worden in de database geplaatst, en zijn ook in de scoretabel zichtbaar. U kunt worden gevraagd om de zitplaatsen van de spelers te wijzigen maar u kunt ervoor kiezen om dat niet te doen. De voorgestelde wijzigingen zijn momenteel niet aanpasbaar - als een spelregelset iets anders nodig heeft, dan zullen we dat wijzigen. </para>
+	<para
+>Als de speler mogelijk heeft gewonnen, dan komt het keuzevakje in de kolom <guilabel
+>Winnaar</guilabel
+> beschikbaar - klik hier om de winnaar aan te geven. </para>
+	<para
+>De statusbalk zal nu de bijgewerkte stand van de spelers weergeven, en u kunt verdergaan met de volgende hand. </para>
+	<sect3 id="enterhand-manually">
+	<title
+>Score handmatig invoeren</title>
+	<para
+>Een goede speler zal waarschijnlijk er de voorkeur aan geven om de score zelf uit te rekenen. In dat geval kunt u het direct invoeren. Dit is alleen mogelijk als deze speler geen stenen heeft geselecteerd. </para>
+	<para
+>Als u een handmatige score invoert, dan moet het al behalve strafpunten compleet zijn, u heeft optionele regels waaruit u kunt kiezen. Behalve een uitzondering: <quote
+>Gevaarlijk spel</quote
+>. Deze beïnvloedt geen scores, maar het is ook niet tegen de regels. Het betekent alleen dat de betaling tussen spelers anders is: De verliezer betaalt alles aan de winnaar. De andere twee spelers wisselen geen betalingen uit. Dit is momenteel niet aanpasbaar. </para>
+	</sect3>
+	<sect3 id="enterhand-tiles">
+	<title
+>Laat &kajongg; de score bereken</title>
+	<para
+>Als u expliciet aan &kajongg; opgeeft welke stenen een speler heeft, dan is in dit venster voor die speler het invoeren van scores uitgeschakeld. Tijdens het koppelen van stenen aan een speler, ziet u de score groeien -maar op het moment dat u de veertiende steen koppelt, gaat de score weer naar nul. Dit zal u wellicht verrassen maar tenzij u opgeeft dat dit de winnende hand is, dan wordt dit ingedeeld als lange hand die altijd nul punten heeft. dit is ingesteld in de Klassieke Chinese spelregelset, dit kan anders zijn als u een andere spelregelset gebruikt of de regels wijzigt. </para>
+	<para
+>U kunt de stenen en combinaties aan een speler koppelen door middel van de muis, het toetsenbord of beide. Met de muis versleept u eenvoudig de stenen naar het gedeelte van de speler. Tijdens het loslaten, krijgt u de vraag wat u wilt verplaatsen: Single, Pair, Pung, Kong, geclaimde Kong of Chow. De bovenste rij is voor de open (zichtbare) stenen, de onderste rij is voor de dichte (verborgen) stenen. Bonus stenen gaan naar de rechterkant. U kunt ook de stenen en combinaties (melds) verplaatsen tussen de rijen, tussen de spelers en terug naar het centrale gedeelte. </para>
+	<para
+>Als u de voorkeur geeft aan het toetsenbord, dan kunt u &Tab; gebruiken om heen en weer te springen tussen het centrale gedeelte en de gedeeltes van de spelers. De toetsen <keycap
+>eswnESWN</keycap
+> verplaatsen een steen tussen de spelers Oost, Zuid, West en Noord. De toetsen <keycap
+>xX</keycap
+> verplaatsen het terug naar het centrale gedeelte. <keycap
+>ESWN</keycap
+> verplaatst naar de verborgen rij, <keycap
+>eswn</keycap
+> verplaatst naar de open (zichtbare) rij. U kunt de cursor met behulp van de pijltjestoetsen tussen de stenen of de combinaties verplaatsen, de huidige geselecteerde steen of combinatie is met een blauwe rand gemarkeerd. Omdat op het toetsenbord de pijltjestoetsen ver van de toetsen geplaatst zijn, kunt u ook de letters <keycap
+>hjkl</keycap
+> of <keycap
+>HJKL</keycap
+> gebruiken om de cursor te verplaatsen. <keycap
+>hH</keycap
+> verplaatsen naar links, <keycap
+>jJ</keycap
+> verplaatsen omlaag, <keycap
+>kK</keycap
+> verplaatsen omhoog, <keycap
+>lL</keycap
+> verplaatsen naar rechts. Op dezelfde manier doet de unix editor <command
+>vi</command
+> het. De &kde; browser &konqueror; en zelfs dit help programma gebruiken dezelfde toetsen. Deze toetsen kunnen verschillend zijn als u een andere taal dan Engels gebruikt en zijn op dit moment niet instelbaar. </para>
+	<para
+>De opties <guilabel
+>Laatste steen;</guilabel
+> and <guilabel
+>Laatste melding:</guilabel
+> zijn nodig bij sommige regels zoals <guilabel
+>Laatste steen maakt paar</guilabel
+>. Ze zijn alleen geldig voor de winnende hand. </para>
+	<para
+>In het rechter gedeelte kunt u handmatig regels toepassen. Welke regels in deze lijst verschijnen is afhankelijk van de huidige spelregelset en van de stenen. In het voorbeeld van de schermafdruk hierboven, kan de speler die verloren heeft de keuze <quote
+>Gevaarlijk spel</quote
+> maken - opnieuw afhankelijk van de spelregelset en zijn stenen. Het doel van de ontwikkelaars is om de lijst met handmatig selecteerbare regels zo kort mogelijk te houden. &kajongg; zou altijd in staat moeten zijn om automatisch te beslissen welke regel van toepassing is, maar soms heeft &kajongg; niet genoeg informatie of kennis om een beslissing te kunnen nemen. </para>
+	</sect3>
+	</sect2>
+	<sect2 id="enterhand-penalties">
+	<title
+>Strafpunten</title>
+			<screenshot>
+				<screeninfo
+>Een schermafdruk van &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="penalty.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Schermafdruk</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+	<para
+>In het <link linkend="enterhand"
+>venster voor het invoeren van resultaten van scorende handen</link
+>, opent de knop <guibutton
+>Strafpunten</guibutton
+> een venster waar u strafpunten kunt invoeren. Dit kunt op elk moment doen onafhankelijk van het normale scorings-mechanisme.</para>
+	<para
+>De keuzelijst <guilabel
+>Overtreding:</guilabel
+> laat alle overtredingen zien die van toepassing kunnen zijn op de handen. Maak daar een keuze uit.</para>
+	<para
+>Nu kunt u het <guilabel
+>Totaal aantal strafpunten</guilabel
+> aanpassen. Dit is de totale som die van de betalers aan de begunstigden gaat. indien nodig zal het tussen hen verdeeld worden.</para>
+	<para
+>Het aantal betalers en begunstigden is afhankelijk van de soort overtreding. Het juiste aantal betalers wordt getoond. Als u een speler selecteert, dan zal &kajongg; erop letten dat bij het aanpassen van de andere spelers deze speler maar eenmaal voorkomt. </para>
+	</sect2>
+	</sect1>
+</chapter>
+
+<chapter  id="play"
+><title
+>Speelt</title>
+	<para
+>Op elk moment kunt u de demonstratiemodus in en uitschakelen. In de demonstratiemodus zal de computer voor u spelen. Als op dit moment geen spel wordt gespeeld dan zal een nieuw spel met het laatst gebruikte spelregelset worden opgestart. </para>
+        <sect1 id="robotplay">
+        <title
+>Tegen de computer spelen</title>
+         <para
+>Als eerste stap krijgt u een login dialoog. Voer hier de naam van de spelserver waarmee u wilt verbinden en uw gebruikersnaam. Als u het speciale item <guilabel
+>Lokaal spel</guilabel
+> kiest, dan hoeft u alleen nog maar uw naam op te geven (of de voorgestelde naam te accepteren) en de gewenste spelregelset. Dit zal onmiddellijk een lokaal spel starten waar u tegen 3 robotspelers gaat spelen. Maar als er onderbroken spellen zijn, dan krijgt u ze in een lijst te zien. U kunt dan het spel selecteren waarmee u verder wilt gaan of een nieuw spel starten. </para>
+        </sect1>
+        <sect1 id="humanplay">
+        <title
+>Met vrienden spelen</title>
+        <para
+>Als u tegen echte mensen wilt spelen, dan heeft u een spelserver nodig waarmee alle spelers, inclusief uzelf verbonden moet zijn. Doe dat door een host te selecteren of door handmatig een nieuwe host-naam en uw wachtwoord voor deze host in te voeren. Het programma zal het laatst gebruikte wachtwoord voorstellen. </para
+><para
+>De makkelijkste manier is de spelserver op <literal
+>kajongg.org</literal
+> te gebruiken. &kajongg; zal deze in de lijst van mogelijke spelservers tonen. Merk op dat op deze alleen een spelserver aanbied maar geen webpagina of andere services. </para
+><para
+>Als u op de spelserver nog geen account met de door u opgegeven naam heeft, dan u worden gevraagd om een account te openen. Als u ja antwoord, dan krijgt u een nieuw dialoog waarin u twee keer het gewenste wachtwoord kunt invullen. Uw account zal automatisch worden aangemaakt. </para
+><para
+>Nadat u succesvol bent ingelogd op de spelserver, krijgt u van deze spelserver een lijst met tafels die stoelen beschikbaar hebben. schuif bij een tafel aan of reserveer een nieuwe tafel. Als u een nieuwe tafel heeft gereserveerd, wacht dan totdat andere spelers zijn aangeschoven. U kunt op elk moment het spel starten op de tafel die u heeft gereserveerd, de stoelen die niet bezet zijn worden dan opgevuld door robotspelers. </para
+><para
+>In de lijst met tafels is ook de op de tafel gebruikte spelregelset te zien. De spelregelset en zijn naam worden door de speler die de tafel heeft gereserveerd naar de spelserver gestuurd. Als u een identieke spelregelset heeft, dan toont de tafel uw naam voor de spelregelset - dit kan handig zijn als diegene die de tafel heeft gereserveerd een andere taal spreekt en daarom de spelregelset anders heeft genoemd. Als de naam van uw lokale spelregelset wordt getoond dan verschijnt het in zwart. Maar als u geen identieke spelregelset heeft dan verschijnt het in rood, en kunt u de knop <guibutton
+>Vergelijken</guibutton
+> gebruiken om het te vergelijken met uw eigen spelregelsets. </para
+><para
+>Als u niet <literal
+>kajongg.org</literal
+> of enig ander bestaande spelserver wilt gebruiken, dan kunt u uw eigen &kajongg; spelserver op twee verschillende manieren opstarten: <itemizedlist
+><listitem
+><para
+>verbindt met de server <literal
+>localhost</literal
+>. Dit is uw eigen computer. Als u dat doet en er is nog geen spelserver opgestart, dan zal het automatisch worden opgestart. En als u stopt met spelen, dan stopt ook de server. Dit verschilt van het selecteren van <guilabel
+>Lokaal spel</guilabel
+>, deze laatste staat geen verbindingen toe vanaf andere computers. </para
+></listitem
+><listitem
+><para
+>Handmatig een server starten op elke computer die u wilt. Alles wat u hoeft te doen is op de commandoregel het programma <command
+>kajonggserver</command
+> starten. Door het invoeren van <command
+>kajonggserver --help</command
+> krijgt u alle beschikbare opties te zien zoals het wijzigen van de standaard poort. Deze server blijft werken totdat u het stopt (kill). </para
+></listitem
+></itemizedlist>
+        </para
+><para
+>In beide gevallen moet u aan de andere spelers vertellen hoe ze uw spelserver kunnen bereiken. Ze hebben de &URL; of eenvoudig een IP adres en de poort waarop uw server luistert nodig. Dit kan zoiets zijn als <literal
+>mypc.dyndns.org:8301</literal
+> waar <literal
+>8301</literal
+> de poort is. Natuurlijk moet u uw firewall zodanig instellen dat de andere spelers deze poort kunnen bereiken. De communicatie zal versleutelt zijn. </para
+><para
+>Voor het poortnummer kijk in <menuchoice
+><guimenu
+>Help</guimenu
+> <guimenuitem
+>Over &kajongg;</guimenuitem
+></menuchoice
+>. De protocolversie is het poortnummer. Voor &kajongg; 17.04 is dat 8301. Als de speler geen poort voor de gewenste server invult, dan berekent de client de poort op dezelfde manier. Als op een computer meerdere spelservers werken met verschillende protocolversies, dan zou u normaal gesproken automatisch de juiste spelserver moeten bereiken. De spelserver en de client zorgen er op deze manier voor dat hun versies overeenstemmen en compatibel met elkaar zijn en waarschuwen u als dat niet het geval is. </para
+><para
+>Als u denkt dat u een mogelijke bug bent tegengekomen, dan wilt u de optie <command
+>kajongg --debug=traffic</command
+> gebruiken. Dit laat u op de console zien waar de spelserver is gestart, welke berichten tussen de spelserver en de cliënten heen en weer vliegen. Voor meer opties, zie <command
+>kajongg --help</command
+> </para>
+        <sect2 id="playing-caveats">
+        <title
+>Notities</title>
+            <itemizedlist
+><listitem
+><para
+>Als u zeker wilt zijn dat niemand kan vals spelen dan mag niemand toegang tot de computer met de spelserver hebben. Natuurlijk kunt u nooit voorkomen dat twee spelers elkaar helpen omdat u nooit echt kan weten wat ze echt doen. Twee spelers kunnen zelfs dezelfde persoon zijn. </para
+></listitem
+></itemizedlist>
+        </sect2>
+        </sect1>
+<sect1  id="gamerules"
+><title
+>Spelregels</title>
+<para
+>Wereldwijd bestaan er vele varianten van het spel. Op dit moment ondersteunt &kajongg; twee varianten van de klassieke Chinese spelregels zoals deze gespeeld worden in Duitsland en in Engeland.</para
+><para
+>Deze beschrijving gaat niet diep in op de details en is daarom van toepassing op beide varianten.</para
+><para
+>De meeste basisregels zijn in de meeste spelvarianten gelijk.</para>
+  <para
+>Omdat het programma &kajongg; weet hoe het moet spelen, zijn in deze beschrijving alleen die zaken opgenomen die niet van zichzelf spreken.</para>
+  <para
+>Als u meer in detail wilt leren hoe Mah Jong te spelen, dan raden wij u deze <link linkend="bibliography"
+>bibliografie</link
+> aan.</para>
+<sect2 id="gamerules-aim">
+  <title
+>Het doel van het spel</title>
+  <para
+>Elke speler probeert zoveel mogelijk stenen te verzamelen zodat hij de winnende hand heeft. Als hij dat bereikt, dan roept hij <quote
+>Mah Jong</quote
+>. In een winnende hand, zijn de stenen normaal gesproken verdeelt in vijf combinaties: Vier combinaties met drie of vier stenen elk en een vijfde combinatie van twee gelijke stenen. Een normale combinatie heeft drie of vier gelijk stenen (respectievelijk Pung en Kong genaamd) of drie opeenvolgende stenen zoals Bamboo 3, Bamboo 4, Bamboo 5 (Chow genaamd).</para>
+  </sect2>
+  <sect2>
+    <title
+>Het verloop van het spel</title>
+    <para
+>In het begin heeft de speler met de oosten wind (zoals op de muur aangegeven) een steen meer dan de andere spelers. Oosten begint met het terugleggen van een ongewenste steen. </para>
+    <para
+>Als een steen is teruggelegd, dan kunnen andere spelers hem claimen door te roepen wat ze met deze steen compleet mee maken (Chow, Pung, Kong, Mah Jong). Alleen de volgende speler kan een Chow claimen- de andere claims kunnen door alle spelers gemaakt worden. Een combinatie die compleet wordt door een claim komt blootgesteld - wordt zichtbaar voor alle spelers. </para
+><para
+>Als niemand de teruggelegde steen claimt, dan krijgt de volgende speler, Zuid (en vervolgens West en Noord) een steen uit de muur en legt een ongewenste steen terug.</para>
+      <para
+>Er zijn meerdere regels over hoe een Pung vergroot kan worden naar een Kong (door de vierde steen te claimen of door het uit de muur te krijgen) - deze regels worden hier verder niet uitgelegd. Maar &kajongg; kent ze natuurlijk en zorgt ervoor dat ze worden gerespecteerd. Als een Kong is uitgeroepen, dan krijgt de speler automatisch een vervangende steen uit de muur - anders zou het niet mogelijk zijn om de vijf hierboven genoemde combinaties te maken. </para>
+    </sect2>
+    <sect2>
+      <title
+>Jaar, ronde en hand</title
+><para
+>Als een speler Mah Jong roept of als niemand kan winnen, dan is een spel geëindigd. Behalve als niemand heeft gewonnen, draait nu de wind, hij verplaatst zich naar de volgende speler. Dit herhaalt zich totdat elke speler elke wind heeft gehad, waarmee een ronde eindigt. Een compleet spel, ook een jaar genoemd, bestaat uit vier van zulke rondes: Oostenwind-ronde, Zuidenwind-ronde, Westenwind-ronde, Noordenwind-ronde. De wind van een ronde wordt ook wel de heersende wind genoemd, Deze wind kan voor hogere punten zorgen.</para>
+	<para
+>Een compleet spel (een jaar) bestaat uit tenminste 16 handen. Omdat de winden niet draaien als niemand heeft gewonnen of als Oosten Mah Jong roept, is een hoger aantal handen meestal nodig voor een compleet spel. </para
+></sect2
+><sect2
+><title
+>Bonusstenen</title>
+    <para
+>In een spel kunnen acht bonusstenen aanwezig zijn (tenzij een regel dat uitsluit). Ze zijn aan de rechterzijde van het speelgebied zichtbaar omdat ze nooit worden gebruikt om combinaties te maken. Maar ze generen wel bonuspunten.</para>
+      <para
+>Als een speler een bonussteen ontvangt, zal deze automatisch ook een vervangende steen van de muur ontvangen. En er klinkt een bel.</para
+></sect2>
+      <sect2
+><title
+>Scoren</title
+><para
+>Aan het eind van een hand wordt de score voor elke speler berekend. Eerst worden de basispunten geteld zoals 2 punten voor een eenvoudige open pung of 20 punten voor het winnen. Vervolgens wordt een andere set regels toegepast - deze regels kunnen de punten verdubbelen zoals een verdubbeling voor een melding van draken. Wanneer de score voor elke hand bekend is, worden de verschillen tussen de spelers afgerekend - terwijl de winnaar zijn volledige score van alle andere spelers krijgt betaald. Oost krijgt en betaalt altijd twee keer zijn score.</para>
+	  <para
+>Natuurlijk kent &kajongg; alle van toepassing zijnde regels maar een goede speler weet van elke combinatie de score zodat hij weet hoe hij een zo hoog mogelijke score kan krijgen. Een aanbeveling is om terwijl u nog aan het leren bent om het venster <guimenuitem
+>Scores uitleggen</guimenuitem
+> te openen.</para>
+	  <para
+>De exacte score-regels verschillen vaak - in &kajongg; bent u vrij om ze te wijzigen in de <link linkend="ruleset-options"
+>bewerker voor spelregelsets</link
+>.</para>
+	  <para
+>In de bewerker voor spelregelsets kunt u alle regels en hun betekenis zien. Als de muis boven de meer exotische regels zweeft dan verschijnt er een helptekst.</para>
+	</sect2>
+</sect1>
+<sect1 id="playing-play">
+        <title
+>Hoe met &kajongg; te spelen</title>
+        <para
+>U krijgt de vraag wat u wilt doen voorgelegd. Dit is een kleine dialoog die rechts of onderaan verschijnt afhankelijk van het formaat van het venster. Als u het een liggend formaat geeft, dan verschijnt het rechts. Soms heeft het dialoog een maximale tijd - als deze is afgelopen, dan is het eerst mogelijke antwoord automatisch voor u geselecteerd. Deze maximale tijd is instelbaar in de bewerker voor spelregelsets, in <guilabel
+>Instellen</guilabel
+>, <guilabel
+>Maximale tijd voor roepen</guilabel
+>. Alle spelers zouden dezelfde maximale tijd moeten hebben, daarom is dit een onderdeel van de spelregelset. </para
+><para
+>Als u een steen in uw hand wilt selecteren, dan kunt u door de stenen heen gaan met de pijltjestoetsen &Right; en &Left; of met de letters <keycap
+>h</keycap
+> en <keycap
+>l</keycap
+> op uw toetsenbord. Maar u kunt dat natuurlijk ook met de muis doen. </para
+><para
+>U kunt op dezelfde manier als u andere acties uitvoert met het toetsenbord een steen terugleggen. Als alternatief kunt u met de muis een steen uit uw hand verplaatsen naar de teruglegplek (tussen de muren). Het plaatsen van de stenen op de teruglegplek zal nog steeds door de computer gebeuren - omdat de plaatsing voor alle spelers hetzelfde moet zijn. </para
+><para
+>Vaak geven dialoogvensters keuzes die niet echt toepasbaar zijn, zoals het roepen van Pung terwijl u niet de vereiste stenen heeft. Dit is de bedoeling - net zoals in een echt spel. Maar u kunt onmogelijke keuzes weg configureren: Schakel <guilabel
+>Alleen nog mogelijke acties tonen</guilabel
+> in de pagina <guilabel
+>Spelen</guilabel
+> van het instellendialoog uit. </para
+><para
+>Teruggelegde stenen worden willekeurig tussen de muren geplaatst. Sommige spelvarianten definiëren waar de stenen geplaatst moeten worden, dit is echter nog niet instelbaar. Op het moment dat het instelbaar is, dan wordt het onderdeel van de spelregelset. </para>
+	</sect1>
+</chapter>
+
+<chapter id="interface"
+><title
+>Overzicht van het interface</title
+> <!-- do not change this! -->
+<!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist
+> and <varlistentry
+>. Split the chapter into sections using <sect1(2,3)
+> for better viewing.-->
+
+<sect1 id="menu">
+<title
+>Menu-items</title>
+
+		<variablelist>
+			<varlistentry id="game-menu-scoreGame">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Spel</guimenu
+> <guimenuitem
+>Score van handmatig spel</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Hou de score bij van een handmatig gespeeld spel.</action
+></para
+><para
+>U kan een oud spel laden of een nieuw spel starten. Standaard zijn in de keuzelijst alleen lopende (&ie; niet beëindigde) spelen zichtbaar. Optioneel kunt u alle spelen inclusief de nog niet beëindigde spelen bekijken. Hier kunt u ook spelen verwijderen.</para
+></listitem>
+			</varlistentry>
+                        <varlistentry  id="game-menu-play">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Spel</guimenu
+> <guimenuitem
+>Spelen</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Spelen met anderen (mensen en computers)</action
+>.</para
+></listitem>
+                        </varlistentry>
+                        <varlistentry  id="game-menu-abort">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Spel</guimenu
+> <guimenuitem
+>Spel afbreken</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Breekt het huidige spel af. als het een handmatig spel is waarvan het programma alleen de score bijhoudt, dan kunt u daar later mee verder gaan. Als u via &kajongg; het spel speelde dan kunt u niet later met het spel verder gaan.</action
+></para
+></listitem>
+                        </varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Spel</guimenu
+> <guimenuitem
+>&kajongg; verlaten</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Beëindigt</action
+> &kajongg;.</para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-chat">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Beeld</guimenu
+> <guimenuitem
+>Chat</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Chat</action
+></para>
+				<screenshot>
+					<screeninfo
+>Chatsvenster</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Chatvenster</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Laat u chatten met de andere spelers. </para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-scoretable">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Beeld</guimenu
+> <guimenuitem
+>Scoretabel</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Scoretabel</action
+></para>
+                                <screenshot>
+                                        <screeninfo
+>Scoretabel</screeninfo>
+                                        <mediaobject>
+                                                <imageobject>
+                                                <imagedata fileref="scoretable.png" format="PNG"/>
+                                                </imageobject>
+                                                <textobject>
+                                                <phrase
+>Schermafdruk</phrase>
+                                                </textobject>
+                                        </mediaobject>
+                                </screenshot>
+    <para
+>De scoretabel tonen. Ronde/hand zijn de huidige ronde (Oost, Zuid, West, Noord) gevolgd door de uitslag van in de ronde gespeelde hands. De winnaar heeft een groene achtergrond voor zijn getallen. Betalingen toont hoeveel de speler heeft betaalt of ontvangen van de andere spelers met zijn hand. Het saldo toont het huidige saldo van alle spelers. De grafiek toont de ontwikkeling van de balans-waarden. De aanwijzingen geven u meer details: Ze laten de regels zien die zijn toegepast op deze hand. Beweeg gewoon de muis over de waarde waarin u bent geïnteresseerd.</para
+><para
+>Het onderste gedeelte toont het op dit moment gebruikte spelregelset. Tussen de scoretabel en de gebruikte spelregelset vindt u een splitter waarmee u de relatieve afmetingen van beide gedeeltes kunt instellen. </para
+></listitem>
+                        </varlistentry>
+			<varlistentry id="view-explain-scores">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>E</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Beeld</guimenu
+> <guimenuitem
+>Scores verklaren</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Scores uitleggen</action
+></para>
+				<screenshot>
+					<screeninfo
+>Scoretabel</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="explain.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Scoretabel</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Legt uit hoe de score van de huidige hand is berekend. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Beeld</guimenu
+> <guimenuitem
+>Volledig scherm</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Schakelt tussen volledig scherm en normale modus.</action
+></para
+></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Instellingen</guimenu
+> <guimenuitem
+>Spelers</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Spelers toevoegen, wijzigen en verwijderen.</action
+></para>
+				<para
+>Standaard worden de wachtwoorden in deze tabel gebruikt bij het inloggen in een spelserver. Het wachtwoord wijzigen dat u in het begin voor een spelserver heeft gekozen is nog niet zinvol omdat er nog geen methode is waarmee u uw wachtwoord in de spelserver kunt wijzigen. U moet de beheerder van de spelserver vragen om dit rechtstreeks in de database te doen.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Instellingen</guimenu
+> <guimenuitem
+>Spelregelsets</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Spelregelsets aanpassen</action
+></para>
+				<para
+>Gebruik de bewerker voor spelregelsets om spelregelsets aan te passen. Voor details zie <link linkend="ruleset-options"
+>hier</link
+>.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Instellingen</guimenu
+> <guimenuitem
+>Zichthoek wijzigen</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Wijzigt de blikrichting van de stenen tegen de klok in.</action
+></para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Instellingen</guimenu
+><guimenuitem
+>Modus Demo</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Schakelt de Demo Modus IN en UIT. Lees de details <link linkend="play"
+>hier</link
+>.</action
+></para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+<para
+>&kajongg; heeft de standaard &kde;-menuitems <guimenu
+>Instellingen</guimenu
+> en <guimenu
+>Help</guimenu
+>, lees voor meer informatie de secties over het <ulink url="help:/fundamentals/menus.html#menus-settings"
+>Menu-instellingen</ulink
+> en <ulink url="help:/fundamentals/menua.html#menus-help"
+>Help Menu</ulink
+> van de &kde; Fundamentals. </para>
+
+</sect1>
+</chapter>
+
+<chapter id="configuration"
+><title
+>Spelconfiguratie</title
+> <!-- do not change this! -->
+<!--This section describes configuration &GUI;. If your game is configured using menubar exclusively, please remove this section.-->
+<screenshot>
+<screeninfo
+>Dialoog voor instellen</screeninfo>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="config_play.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase
+>Dialoog voor instellen</phrase>
+	  </textobject>
+	</mediaobject>
+</screenshot>
+
+<para
+><menuchoice
+><guimenu
+>Instellen</guimenu
+> <guimenuitem
+>&kajongg; configureren...</guimenuitem
+></menuchoice
+> opent het dialoogvenster <guilabel
+>Configureren - &kajongg;</guilabel
+>.</para>
+<para
+>Als u hier op de knop <guibutton
+>Annuleren</guibutton
+> drukt, dan worden al uw configuratie wijzigingen ongedaan gemaakt, inclusief alles wat u met bewerker voor spelregelsets heeft gewijzigd.</para>
+<para
+>U kunt ook de verschillende tabs met het toetsenbord selecteren: <keycombo action="simul"
+>&Ctrl;<keycap
+>1</keycap
+></keycombo
+> selecteert de eerste tab <guilabel
+>Spelen</guilabel
+>, <keycombo action="simul"
+>&Ctrl;<keycap
+>2</keycap
+></keycombo
+> selecteert de tweede tab, enzovoort. </para>
+
+<sect1 id="play-options"
+><title
+>Opties voor spelen</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<guilabel
+>Schaduw van stenen tonen</guilabel>
+				</term>
+				<listitem
+><para
+>Dit laat de stenen met zijkanten en schaduwen zien. Ook is er een beetje ruimte tussen de rijen stenen, en u ziet dat de muren twee of drie stenen hoog zijn. Als u deze keuze uitschakelt dan heeft u een eenvoudiger scherm waarop de stenen beetje groter zijn. Dit kan handig zijn op kleine schermen. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Blinde stenen naar meldingen herschikken</guilabel>
+				</term>
+				<listitem
+><para
+>Dit groepeert combinaties in de hand. Soms zijn de groepen zoals u ze wilt hebben, en geeft u daarom de voorkeur aan helemaal geen groepen, zoals in een spel in de echte wereld. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Alleen nog mogelijke acties tonen</guilabel>
+				</term>
+				<listitem
+><para
+>Tijdens het spelen, alleen mogelijke acties laten zien zoals <quote
+>Geen roep</quote
+> of <quote
+>Pung</quote
+>. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Een voorstel doen over wat te doen</guilabel>
+				</term>
+				<listitem
+><para
+>In het geval dat u kan kiezen welke actie u uit gaat voeren zoals een steen wel of niet claimen of kiezen welke steen terugleggen, dan kan &kajongg; u helpen door een voorstel te geven. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Geluid gebruiken indien beschikbaar</guilabel>
+				</term>
+				<listitem
+><para
+>Hierdoor kunt u terugleggen en claims horen. Als andere spelers geluidsbestanden met hun eigen stem hebben dan kunt u ze horen. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Laat anderen mijn stem horen</guilabel>
+				</term>
+				<listitem
+><para
+>Als u geluidsbestanden met uw eigen stem heeft dan kunnen andere u stem horen als u teruglegt of claimt. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Animatiesnelheid:</guilabel>
+				</term>
+				<listitem
+><para
+>Stelt in hoe snel de stenen rond schuiven. Als u de schuif helemaal naar rechts verplaatst dan hebben de stenen geen animatie: de stenen veranderen eenvoudig van plaats. </para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+	<sect2
+><title
+>Geluid</title>
+	<para
+>Het spelen is veel leuker als u spelers stenen hoort claimen en het terugleggen hoort aankondigen. Het maakt spelen ook makkelijker om u zich kan concentreren op uw eigen stenen, u hoeft niet te kijken naar wat anderen terugleggen. </para>
+	<para
+>&kajongg; komt met stemmen voor verschillende spelers. Het wijst automatisch stemmen toe aan spelers. Voor elke taal zouden er vier stemmen moeten zijn, bij voorkeur twee mannelijke en twee vrouwelijke. &kajongg; probeert stemmen in dezelfde taal als waarin &kajongg; werkt te gebruiken. Als het geen stemmen in die taal vindt, dan valt &kajongg; terug naar andere talen, de terugval talen gebruikend zoals u die voor &kajongg; heeft ingesteld (zie <menuchoice
+><guimenu
+>Help</guimenu
+><guimenuitem
+>Taal van programma wijzigen</guimenuitem
+></menuchoice
+>). Als er nog geen bestanden met stemmen voor uw taal bestaan, dan bent u uitgenodigd om ze op te nemen en ze bij te dragen aan &kajongg;. </para>
+	 <itemizedlist
+><listitem
+><para
+>Op deze manier kunt u zelf stemmen aanmaken. Er is een aparte map voor elke stem. Merk op dat deze mappen ergens anders op uw systeem kunnen staan, ze hangen af van hoe &kde; is geïnstalleerd. Alleen het gedeelte beginnend met <filename class="directory"
+>kajongg</filename
+> is altijd hetzelfde. Er zijn twee groepen stemmen met verschillende plaatsen in het bestandssysteem: <itemizedlist
+><listitem
+><para
+>Voorgedefinieerde stemmen voor een taal. Deze kunt u in een map vinden zoals <filename class="directory"
+>/usr/share/kajongg/voices/LANG</filename
+> waar LANG de code van uw taal is. De mappen met stemmen direct onder <filename class="directory"
+>.../kajongg/voices/</filename
+> zijn de US-Engelse versies. Voorgedefinieerde stemmen worden willekeurig aan spelers toegewezen. Die stemmen hebben namen zoals <quote
+><literal
+>male1 male2 female1 female2</literal
+></quote
+> maar die namen zijn onbelangrijk, omdat de gebruiker ze toch nooit ziet. </para
+></listitem
+><listitem
+><para
+>Stemmen van gebruikers kunt u voor een specifieke gebruiker instellen. Als &kajongg; gebruik maakt van een dergelijke stem, dan kan het automatisch over het internet naar andere spelers worden verstuurt. Deze stemmen zijn te vinden in een map zoals <filename class="directory"
+>~/.local/share/apps/kajongg/voices/</filename
+>. Als dus uw gebruikersnaam joe is, dan zal dit <filename class="directory"
+>/home/joe/.local/share/apps/kajongg/voices/joe/</filename
+> zijn. Het kan zijn dat de map <filename class="directory"
+>voices/</filename
+> nog niet bestaat - als dat het geval is dan moet u het aanmaken. </para
+></listitem
+></itemizedlist>
+		</para
+></listitem
+><listitem
+><para
+>Nu u weet waar uw nieuwe stem kunt plaatsen, kunt u er een nieuwe map voor aanmaken. </para
+></listitem
+><listitem
+><para
+>In deze submap kunt u uw geluidsbestanden plaatsen. Ze moet gecodeerd zijn met de <ulink url="https://xiph.org/vorbis/"
+>Ogg Vorbis</ulink
+> audio compressor, het bestand moet de extensie <filename class="extension"
+>.ogg</filename
+> hebben. Een enkel bestand heeft een naam zoals <filename
+>s3.ogg</filename
+> - dit is Stone 3. U kunt dergelijke bestanden voor alle stenen, claims en aankondigingen aanmaken. Maar als een geluidsbestand ontbreekt dan gebeurt er niets -u hoort dat geluid niet. terugvallen naar andere stemmen of talen werkt alleen voor gehele stemmen, niet voor een enkel geluidsbestand. </para
+></listitem
+><listitem
+><para
+>Nadat u alle geluidsbestanden voor de voorgedefinieerde stemmen heeft aangemaakt, moet u erop letten dat het &kajongg; programma schrijfrechten heeft voor de nieuwe map met geluiden. Start &kajongg; en test de stemmen. Als alles OK is, kunt u de schrijfrechten weer intrekken (en zou dat zeker moeten doen voor de voorgedefinieerde stemmen). &kajongg; zal automatisch een bestand aanmaken genaamd <filename
+>md5sum</filename
+> met een controlesom voor alle geluidsbestanden. Iedere keer dat u een geluidsbestand voor een stem wijzigt, toevoegt of verwijdert, zal &kajongg; proberen dat bestand te herschrijven. </para
+></listitem
+></itemizedlist>
+	<para
+>Let er op dat de lengte van het geluid kort is en dat u duidelijk spreekt - als u eenmaal gewent bent aan dit spel dan kan het erg snel gespeeld worden. Het is makkelijker als u eerst een lijst maakt met alles wat ingesproken moet worden. Spreekt het niet uit alsof het een lijst van items is, probeer elk item zo uit te spreken alsof het enige item is dat u tijdens het spelen uitspreekt. Laat ook ruimte tussen de items. Dit goed uitspreken heeft een beetje oefening nodig.</para>
+	<para
+>Dit is een mogelijke manier om de geluidsbestanden te creëren:  </para
+><para
+><itemizedlist
+><listitem
+><para
+>Neem een geluidsbestand op met het programma <command
+>qarecord</command
+>, sla het op in het <acronym
+>WAV</acronym
+>-formaat. Spreek alle geluiden in dit enkele geluidsbestand. </para
+></listitem
+><listitem
+><para
+>Bewerk dat geluidsbestand met het programma <command
+>audacity</command
+>. Gebruik in dat programma de muis om een stuk van de geluiden te markeren. Het programma zal dat stuk afspelen. Corrigeer de markering het totdat u het correcte stuk heeft gemarkeerd. Dit gaat misschien makkelijker als u <menuchoice
+><guimenu
+>Weergave</guimenu
+><guimenuitem
+>Inzoomen</guimenuitem
+></menuchoice
+>. Gebruik het commando uit het menu <menuchoice
+><guimenu
+>Bestand</guimenu
+><guimenuitem
+>Selectie Exporteren</guimenuitem
+></menuchoice
+> en sla het op in het <filename class="extension"
+>.ogg</filename
+>-formaat. Kies in <guilabel
+>Opties</guilabel
+>, lage kwaliteit - dat is voldoende en zelfs gewenst omdat dit de transfertijd van de geluiden naar de andere spelers reduceert. </para
+></listitem
+></itemizedlist
+></para>
+	<para
+>De volgende zijn de namen van geluidsbestanden die u zou moeten aanmaken. Zorg dat ze altijd de extensie <filename class="extension"
+>.ogg</filename
+> hebben:</para>
+
+<table>
+<title
+>Namen geluidsbestanden</title>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry
+>&s1; .. &s9;</entry
+><entry
+>Steen 1 tot steen 9</entry>
+</row>
+<row>
+<entry
+>&b1; .. &b9;</entry>
+<entry
+>Bamboe 1 tot Bamboe 9</entry>
+</row>
+<row>
+<entry
+>&c1; .. &c9;</entry>
+<entry
+>Karakter 1 tot karakter 9</entry>
+</row>
+<row>
+<entry
+>&we; &ws; &ww; &wn;</entry>
+<entry
+>De winden Oost, Zuid, West, Noord</entry>
+</row>
+<row>
+<entry
+>&db; &dr; &dg;</entry>
+<entry
+>De draken blauw/wit, rood, groen</entry>
+</row>
+<row>
+<entry
+>&chow; &pung; &kong; &mahjongg;</entry>
+<entry
+>De belangrijkste claims</entry>
+</row>
+<row>
+<entry
+>&originalcall; &violatesoriginalcall;</entry>
+<entry
+>Wachtend in het begin en in strijd daarmee</entry>
+</row>
+<row>
+<entry
+>&dangerousgame;</entry>
+<entry
+>Een speler laat een kanon afgaan (gevaarlijk spel)</entry>
+</row>
+<row>
+<entry
+>&nochoice;</entry>
+<entry
+>Een speler verklaart dat hij geen andere keuze heeft dan gevaarlijk spel te spelen</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+	</sect2>
+</sect1>
+
+<sect1 id="tiles-options"
+><title
+>Opties voor stenen</title>
+        <screenshot>
+                <screeninfo
+>Stenen kiezen</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_tiles.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Stenen kiezen</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Gebruik de <guilabel
+>Stenen</guilabel
+> selectie-dialoog om een uiterlijk voor de stenen te selecteren. </para>
+</sect1>
+
+<sect1 id="background-options"
+><title
+>Opties voor de achtergrond</title>
+        <screenshot>
+                <screeninfo
+>Achtergrond kiezen</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_background.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Achtergrond kiezen</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Gebruik de <guilabel
+>Achtergrond</guilabel
+> selectie-dialoog om een achtergrond voor de spel te selecteren. </para
+><para
+>Sommige achtergronden zoals het Chinese Landschap hebben wat tijd nodig om te laden. Als u vindt dat het programma sneller zou moeten starten of dat het verschalen van het hoofdvenster te langzaam is dan kunt u wellicht een andere achtergrond proberen. </para>
+</sect1>
+
+<sect1 id="ruleset-options"
+><title
+>Spelregelset bewerken</title>
+			<screenshot>
+				<screeninfo
+>Spelregelset bewerken</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="ruleseteditor.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Spelregelset bewerken</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+			<para
+>Gebruik de bewerker voor spelregelsets om spelregelsets aan te passen. Voorgedefinieerde spelregelsets hebben een cursief lettertype, aangepaste spelregelsets hebben een normaal lettertype. Voorgedefinieerde spelregelsets kunnen op geen enkele manier door de gebruiker worden gewijzigd, maar een update van &kajongg; kan dat wel. Aangepaste spelregelsets worden nooit door een update aangetast. </para
+><para
+>Bij het starten van een nieuw spel heeft u de mogelijkheid om een spelregelset voor dat spel te kiezen. Alle spelregelsets die in de bewerker voor spelregelsets zijn aangemaakt kunt u gebruiken. De spelregelset wordt samen met het spel opgeslagen, u kunt dus altijd de spelregelset wijzigen - maar uw wijzigingen zijn alleen van invloed op toekomstige spellen. </para>
+			<sect2
+><title
+>Regels, Punten, x2, Limits</title
+><para
+>Klik gewoon op datgene wat u wilt wijzigen. Als alle waarden leeggemaakt zijn, dan heeft deze regel geen invloed meer op het spel. U kunt regels niet verwijderen.</para>
+			</sect2>
+			<sect2
+><title
+>Kopiëren en verwijderen</title
+><para
+>U kunt gehele spelregelsets kopiëren en verwijderen </para
+><para
+>Opnieuw kunt u dit zelfs doen als bestaande spellen deze spelregelset gebruiken omdat elk spel zijn eigen kopie van het spelregelset heeft. U kunt spelregelsets van oude spellen bekijken: <link linkend="game-menu-scoreGame"
+>Laad</link
+> het oude spel en <link linkend="view-explain-scores"
+>toon zijn score tabel</link
+>. </para>
+			</sect2>
+			<sect2
+><title
+>Vergelijken</title
+><para>
+			<screenshot>
+				<screeninfo
+>Spelregelset vergelijken</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="differ.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Spelregelset vergelijken</phrase
+></textobject>
+				</mediaobject>
+			</screenshot
+>U kunt dit commando selecteren als u een hele spelregelset heeft geselecteerd. U kunt de geselecteerde spelregelset vergelijken met elke andere spelregelset. </para
+></sect2>
+</sect1>
+
+<sect1 id="default-keybindings">
+<title
+>Standaard sneltoetsen</title>
+
+<!-- TODO: not yet implemented
+<para
+>The menu entry <menuchoice
+><guimenu
+>Settings</guimenu
+> <guimenuitem
+>Configure ...</guimenuitem
+></menuchoice
+> allows you to change the default keyboard bindings.</para
+> -->
+
+<para
+>De standaard sneltoetsen zijn als volgt: </para>
+
+<para>
+<variablelist>
+
+<varlistentry>
+<term
+><keycap
+>F1</keycap
+></term>
+<listitem>
+<para
+>Hierdoor wordt dit handboek geopend. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Score van handmatig spel. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Speel een spel tegen vrienden of computerspelers. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Het huidige spel afbreken. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Beëindig het programma </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Toon de scoretabel. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Een chatvenster tonen. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>De zichthoek (kijkhoek) wijzigen. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Schakel demo modus IN of UIT. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Shift;<keycap
+>F1</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Wat is dit? hulp </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Modus Volledig scherm. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</para>
+
+</sect1>
+</chapter>
+
+<appendix id="problems"
+><title
+>Bekende problemen</title>
+        <itemizedlist>
+                <listitem
+><para
+>In de speelmode zijn strafpunten nog niet mogelijk.</para
+></listitem>
+                <listitem
+><para
+>De computerspelers zijn nogal dom.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="future"
+><title
+>Mogelijke toekomstige toevoegingen</title>
+        <itemizedlist>
+                <listitem
+><para
+>Het toevoegen van meer spelregelsets. Dit kan optioneel worden gedaan door mensen die deze spelregelsets regelmatig gebruiken.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+ <appendix id="faq"
+><title
+>Veel voorkomende vragen</title
+> <!-- do not change this! -->
+<!--This chapter is for frequently asked questions. Please use <qandaset
+> <qandaentry
+> only!-->
+<qandaset>
+<!--Following is a standard list of FAQ questions.-->
+        <qandaentry>
+                 <question
+><para
+>Ik wil het uiterlijk van dit spel wijzigen. Kan dat? </para
+></question>
+                 <answer
+><para
+>Ja. Om het uiterlijk van &kajongg; te wijzigen gebruikt u de menubalk om het <link linkend="configuration"
+>configuratieprogramma</link
+> te openen.</para
+></answer>
+        </qandaentry>
+        <qandaentry>
+                 <question
+><para
+>Kan ik het toetsenbord gebruiken om stenen aan spelers toe te wijzen?</para
+></question>
+                 <answer
+><para
+>Ja. Lees <link linkend="enterhand-tiles"
+>&kajongg; de score uit laten rekenen</link
+></para
+></answer>
+        </qandaentry>
+<!--Please add more Q&As if needed-->
+
+</qandaset>
+</appendix>
+
+<appendix id="credits"
+><title
+>Dankbetuigingen en licentie</title
+> <!-- do not change this! -->
+<!--This chapter is for credits and licenses.-->
+	<para
+>&kajongg; voor &kde; </para>
+
+	<para
+>Programma Copyright &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+	<para
+>Documentatie Copyright &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+
+<!-- !!!do not change ANYTHING after this line!!!! -->
+&meld.fouten;&vertaling.freek;&vertaling.ronald; 
+&underFDL;
+&underGPL;
+
+</appendix>
+
+<appendix id="bibliography">
+<title
+>Bibliografie</title>
+        <itemizedlist>
+		<listitem
+><para
+>Das Chinesische Mah-Jongg-Spiel by Uwe Martens 2005, Books on Demand GmbH, Norderstedt. Dit boek is een uitstekende Duitse referentie die alles bevat wat u wilt weten over de spelregels die in Duitsland worden gebruikt en vele andere aspecten van het spel.</para
+></listitem>
+                <listitem
+><para
+>The Complete Book of Mah-Jongg door A. D. Millington, 1977 (met verschillende paperback edities tot 2003), Weidenfeld &amp; Nicolson, London. Dit is de beste referentie voor Klassiek Chinees Mah Jong zoals het gespeeld wordt in de Westerse wereld. Het kan u waardevolle aanwijzingen geven over spelstrategieën.</para
+></listitem>
+		<listitem
+><para
+>Mah-Jong door Gwyn Headley en Yvonne Seeley, 3rd edition, 2008, A &amp; C Black Publishers Ltd., London. Dit boek is makkelijk als referentie te gebruiken, zich concentrerend op de regels in gebruik in Engeland, opgesteld door de BMJA (De British Mah Jong Associatie).</para
+></listitem>
+		<listitem
+><para
+><ulink url="https://en.wikipedia.org/wiki/Mahjong"
+></ulink
+></para
+></listitem>
+		<listitem
+><para
+><ulink url="https://de.wikipedia.org/wiki/Mah-Jongg"
+></ulink
+></para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="installation">
+<title
+>Installatie</title>
+<para
+>Voor Linux: uw distributie zou een pakket voor u moeten hebben. </para>
+<para
+>Voor Windows: kijk op <ulink url="https://www.linux-apps.com/p/1109453/"
+></ulink
+> voor een installatieprogramma voor Windows. </para>
+<para
+>Als u de broncode wilt downloaden en handmatig installeren: <itemizedlist>
+<listitem
+><para
+> <literal
+>git clone https://invent.kde.org/games/kajongg.git</literal
+> </para
+></listitem>
+<listitem
+><para
+>Voor Linux: <literal
+>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal
+> </para
+></listitem>
+<listitem
+><para
+>Voor Windows: Lees <filename
+>README.windows</filename
+></para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>Kajongg is afhankelijk van deze pakketten: (debian pakketnamen in haakjes) <itemizedlist>
+	<listitem
+><para
+>Python 3.5 of hoger (python3)</para
+></listitem>
+	<listitem
+><para
+>Qt5.7 of hoger (python3-pyqt5 en python3-pyqt5.qtsvg)</para
+></listitem>
+	<listitem
+><para
+>de python bindings voor Qt5 (python3-pyqt5)</para
+></listitem>
+        <listitem
+><para
+>de bibliotheek python twisted 16.6.0 of hoger (python3-twisted)</para
+></listitem>
+        <listitem
+><para
+>sqlite3 (libsqlite3-0)</para
+></listitem>
+</itemizedlist>
+</para>
+
+</appendix>
+
+&documentation.index;
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-always-quote-attributes:t
+sgml-indent-step:0
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

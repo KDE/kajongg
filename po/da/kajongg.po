@@ -1,0 +1,2637 @@
+# Copyright (C) 2012 This_file_is_part_of_KDE
+# This file is distributed under the same license as the kajongg package.
+# Uses Danish terminology from the association Mahjong Danmark http://mahjong.dk
+# Martin Schlander <mschlander@opensuse.org>, 2010, 2011, 2012, 2013.
+# Claus Christensen <claus_chr@webspeed.dk>, 2012, 2013.
+# Keld Simonsen <keld@keldix.com>, 2012.
+# scootergrisen, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: kajongg\n"
+"Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
+"POT-Creation-Date: 2022-01-31 00:41+0000\n"
+"PO-Revision-Date: 2017-11-11 16:03+0200\n"
+"Last-Translator: scootergrisen\n"
+"Language-Team: Danish\n"
+"Language: da\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+msgid "Preview"
+msgstr "Forhåndsvisning"
+
+msgid "Properties"
+msgstr "Egenskaber"
+
+msgid "Author:"
+msgstr "Ophavsmand:"
+
+msgid "Contact:"
+msgstr "Kontakt:"
+
+msgid "Description:"
+msgstr "Beskrivelse:"
+
+msgctxt "kajongg"
+msgid "Game"
+msgstr "Spil"
+
+msgid "View"
+msgstr "Vis"
+
+msgid "Toolbar"
+msgstr "Værktøjslinje"
+
+#: src/background.py:68 src/tileset.py:81
+msgid "file <filename>%1</filename> contains no valid SVG"
+msgstr "filen <filename>%1</filename> indeholder ikke en gyldig SVG"
+
+#: src/board.py:301
+msgctxt "kajongg:arrow keys hjkl like in konqueror"
+msgid "hjklHJKL"
+msgstr "hjklHJKL"
+
+#: src/board.py:350
+msgid "Choose from"
+msgstr "Vælg blandt"
+
+#: src/chat.py:42
+msgid "Time"
+msgstr "Tid"
+
+#: src/chat.py:42 src/playerlist.py:81
+msgid "Player"
+msgstr "Spiller"
+
+#: src/chat.py:42
+msgid "Message"
+msgstr "Besked"
+
+#: src/chat.py:122
+msgid "Chat on table %1 at %2"
+msgstr "Chat ved bord %1 til %2"
+
+#: src/client.py:55
+msgctxt "table status"
+msgid "Suspended"
+msgstr "Udsat"
+
+#: src/client.py:60
+msgctxt "table status"
+msgid "Running"
+msgstr "Kører"
+
+#: src/client.py:61
+msgctxt "table status"
+msgid "New"
+msgstr "Nyt"
+
+#: src/configdialog.py:42
+msgid "Show tile shadows"
+msgstr "Vis skygger på brikker"
+
+#: src/configdialog.py:45
+msgid "Rearrange undisclosed tiles to melds"
+msgstr "Arrangér ikke-vendte brikker i sæt"
+
+#: src/configdialog.py:48
+msgid "Show only possible actions"
+msgstr "Vis kun lovlige handlinger"
+
+#: src/configdialog.py:51
+msgid "Propose what to do"
+msgstr "Foreslå, hvad der skal gøres"
+
+#: src/configdialog.py:57
+msgid "Animation speed:"
+msgstr "Animationshastighed:"
+
+#: src/configdialog.py:61
+msgid "Use sounds if available"
+msgstr "Brug lyde hvis de er tilgængelige"
+
+#: src/configdialog.py:64
+msgid "Let others hear my voice"
+msgstr "Lad andre høre min stemme"
+
+#: src/configdialog.py:98
+msgctxt "kajongg"
+msgid "Play"
+msgstr "Spil"
+
+#: src/configdialog.py:101
+msgid "Tiles"
+msgstr "Brikker"
+
+#: src/configdialog.py:104
+msgid "Backgrounds"
+msgstr "Baggrunde"
+
+#: src/deferredutil.py:262 src/deferredutil.py:421
+msgid "The game server lost connection to player %1"
+msgstr "Spilserveren mistede forbindelse til spiller %1"
+
+#: src/deferredutil.py:265
+msgid ""
+"Error for player %1: %2\n"
+"%3"
+msgstr ""
+"Fejl for spiller %1: %2\n"
+"%3"
+
+#: src/differ.py:65
+msgctxt "Kajongg"
+msgid "Rule"
+msgstr "Regel"
+
+#: src/differ.py:123
+#, fuzzy
+#| msgid "Compare"
+msgctxt "@title:window"
+msgid "Compare"
+msgstr "Sammenlign"
+
+#: src/differ.py:166 src/differ.py:168
+msgctxt "Kajongg-Rule"
+msgid "not defined"
+msgstr "ikke defineret"
+
+#: src/game.py:535
+msgid "Score computed manually"
+msgstr "Manuelt beregnet pointstilling"
+
+#: src/game.py:631
+msgid "Player %1 not known"
+msgstr "Spiller %1 er ikke kendt"
+
+#: src/game.py:1059
+msgid "Short living wall: Tile is invisible, hence dangerous"
+msgstr "Kort levende mur: Brik er usynlig og derfor farlig"
+
+#: src/games.py:91 src/playerlist.py:58 src/tables.py:58
+msgid "Players"
+msgstr "Spillere"
+
+#: src/games.py:91
+msgid "Started"
+msgstr "Startet"
+
+#: src/games.py:103
+#, fuzzy
+#| msgctxt "kajongg"
+#| msgid "Games"
+msgctxt "@title:window"
+msgid "Games"
+msgstr "Spil"
+
+#: src/games.py:120
+msgctxt "start a new game"
+msgid "&New"
+msgstr "&Nyt"
+
+#: src/games.py:124
+msgid "&Load"
+msgstr "Ind&læs"
+
+#: src/games.py:128 src/playerlist.py:48
+msgid "&Delete"
+msgstr "&Slet"
+
+#: src/games.py:132
+msgid "Show only pending games"
+msgstr "Vis kun igangværende spil"
+
+#: src/games.py:235
+msgid ""
+"Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
+"you cannot cancel it with the cancel button"
+msgstr ""
+"Vil du virkelig slette <numid>%1</numid> spil?<br>Dette er definitivt, du "
+"kan ikke annullere det med knappen Annullér"
+
+#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:101 src/kdestub.py:102
+#: src/kdestub.py:104
+msgid "Kajongg"
+msgstr "Kajongg"
+
+#: src/humanclient.py:50
+msgid "Which chow do you want to expose?"
+msgstr "Hvilken chow vil du vise?"
+
+#: src/humanclient.py:88
+msgid "Which kong do you want to declare?"
+msgstr "Hvilken kong vil du melde?"
+
+#: src/humanclient.py:155
+msgid "Choose"
+msgstr "Vælg"
+
+#: src/humanclient.py:347
+msgid "You cannot say %1"
+msgstr "Du kan ikke melde %1"
+
+#: src/humanclient.py:569
+msgid "Player %1 has left the table"
+msgstr "Spilleren %1 har forladt bordet"
+
+#: src/humanclient.py:632
+msgid ""
+"The game on table <numid>%1</numid> can begin. Are you ready to play now?"
+msgstr ""
+"Spillet på bord <numid>%1</numid> kan begynde. Er du klar til at spille nu?"
+
+#: src/humanclient.py:650
+msgid "Ready for next hand?"
+msgstr "Klar til næste hånd?"
+
+#: src/humanclient.py:907
+msgid "The connection to the server %1 broke, please try again later."
+msgstr "Forbindelsen til serveren %1 blev afbrudt. Prøv igen senere."
+
+#: src/kajongg.py:80 src/kdestub.py:1044
+msgid "Mah Jongg - the ancient Chinese board game for 4 players"
+msgstr "Mahjong - det ældgamle kinesiske brætspil til fire spillere"
+
+#: src/kajongg.py:84
+msgid "all robots play with visible concealed tiles"
+msgstr "alle robotter spiller med synlige skjulte brikker"
+
+#: src/kajongg.py:85
+msgid "start with demo mode"
+msgstr "start med demotilstand"
+
+#: src/kajongg.py:86
+msgid "login to HOST"
+msgstr "login på VÆRT"
+
+#: src/kajongg.py:87
+msgid "start new TABLE"
+msgstr "start nyt BORD"
+
+#: src/kajongg.py:88
+#, fuzzy
+#| msgid "join TABLE "
+msgid "join TABLE"
+msgstr "deltag ved BORD "
+
+#: src/kajongg.py:89
+#, fuzzy
+#| msgid "use ruleset without asking"
+msgid "use RULESET without asking"
+msgstr "brug regelsæt uden at spørge"
+
+#: src/kajongg.py:90
+msgid "play only ROUNDS rounds per game. Only for debugging!"
+msgstr ""
+
+#: src/kajongg.py:91
+msgid "prefer PLAYER for next login"
+msgstr "foretræk SPILLER til næste login"
+
+#: src/kajongg.py:92
+msgid "use AI variant for human player in demo mode"
+msgstr "brug AI-variant for menneskespiller i demotilstand"
+
+#: src/kajongg.py:93
+msgid "write statistics to CSV"
+msgstr "skriv statistik til CVS-fil"
+
+#: src/kajongg.py:94
+msgid "show all available rulesets"
+msgstr "vis alle tilgængelige regelsæt"
+
+#: src/kajongg.py:95
+msgid "for testing purposes: Initializes the random generator"
+msgstr "til testformål: Initialiserer tilfældighedsgeneratoren"
+
+#: src/kajongg.py:97
+msgid "show no graphical user interface. Intended only for testing"
+msgstr "vis ingen grafisk brugerflade. Kun tiltænkt til testformål"
+
+#: src/kajongg.py:98
+msgid "use a dedicated server listening on SOCKET. Intended only for testing"
+msgstr ""
+"brug en dedikeret server, som lytter på SOCKET. Kun til brug for testning"
+
+#: src/kajongg.py:99
+#, fuzzy
+#| msgid ""
+#| "use a dedicated server listening on SOCKET. Intended only for testing"
+msgid "use a dedicated server listening on PORT. Intended only for testing"
+msgstr ""
+"brug en dedikeret server, som lytter på SOCKET. Kun til brug for testning"
+
+#: src/kdestub.py:251
+msgid "&OK"
+msgstr "&OK"
+
+#: src/kdestub.py:253
+msgid "&Apply"
+msgstr "&Anvend"
+
+#: src/kdestub.py:255
+msgid "&Cancel"
+msgstr "&Annullér"
+
+#: src/kdestub.py:257 src/kdestub.py:447
+msgid "&Help"
+msgstr "&Hjælp"
+
+#: src/kdestub.py:260
+msgid "&Defaults"
+msgstr "&Standarder"
+
+#: src/kdestub.py:333
+msgctxt "@action:inmenu"
+msgid "Show St&atusbar"
+msgstr "Vis &statuslinje"
+
+#: src/kdestub.py:339
+msgctxt "@action:inmenu"
+msgid "Show &Toolbar"
+msgstr "Vis &værktøjslinje"
+
+#: src/kdestub.py:345
+msgid "Configure Tool&bars..."
+msgstr "Indstil &værktøjslinjer..."
+
+#: src/kdestub.py:347
+msgid "Configure toolbars"
+msgstr "Indstil værktøjslinjer"
+
+#: src/kdestub.py:354
+#, fuzzy
+#| msgid "Configure &Kajongg"
+msgid "Configure &Kajongg..."
+msgstr "Indstil &Kajongg"
+
+#: src/kdestub.py:356 src/kdestub.py:1155
+msgid "Configure"
+msgstr "Indstil"
+
+#: src/kdestub.py:443
+msgid "&Game"
+msgstr "&Spil"
+
+#: src/kdestub.py:444
+msgid "&View"
+msgstr "&Vis"
+
+#: src/kdestub.py:445
+msgid "&Settings"
+msgstr "&Indstillinger"
+
+#: src/kdestub.py:453
+msgctxt "@action:inmenu"
+msgid "&Help"
+msgstr "&Hjælp"
+
+#: src/kdestub.py:456 src/kdestub.py:806
+msgid "Switch Application Language"
+msgstr "Skift programsprog"
+
+#: src/kdestub.py:460
+msgctxt "@action:inmenu"
+msgid "About &Kajongg"
+msgstr "&Om Kajongg"
+
+#: src/kdestub.py:811
+msgid "Please choose the language which should be used for this application:"
+msgstr ""
+
+#: src/kdestub.py:830
+msgid "Add Fallback Language"
+msgstr "Tilføj reservesprog"
+
+#: src/kdestub.py:842
+msgid "Primary language:"
+msgstr "Primært sprog:"
+
+#: src/kdestub.py:842
+msgid "Fallback language:"
+msgstr "Reservesprog:"
+
+#: src/kdestub.py:848
+#, fuzzy
+#| msgid "Remove"
+msgid "Remove"
+msgstr "Fjern"
+
+#: src/kdestub.py:852
+msgid ""
+"This is the main application language which will be used first, before any "
+"other languages."
+msgstr ""
+
+#: src/kdestub.py:854
+msgid ""
+"This is the language which will be used if any previous languages do not "
+"contain a proper translation."
+msgstr ""
+
+#: src/kdestub.py:980
+msgid "About Kajongg"
+msgstr "&Om Kajongg"
+
+#: src/kdestub.py:1003
+#, fuzzy
+#| msgctxt "kajongg"
+#| msgid "Using versions %1"
+msgid "Version: %1"
+msgstr "Bruger versioner %1"
+
+#: src/kdestub.py:1004
+msgid "Protocol version %1"
+msgstr "Protokolversion %1"
+
+#: src/kdestub.py:1007
+msgid "Original author"
+msgstr "Oprindelig udvikler"
+
+#: src/kdestub.py:1015
+msgid "KDE Frameworks (not installed or not usable)"
+msgstr ""
+
+#: src/kdestub.py:1023
+msgctxt "kajongg"
+msgid "Using versions %1"
+msgstr "Bruger versioner %1"
+
+#: src/kdestub.py:1026
+#, fuzzy
+#| msgid "Not using Python KDE bindings"
+msgid "Not using broken Python KDE bindings"
+msgstr "Bruger ikke Python KDE-bindinger"
+
+#: src/kdestub.py:1045
+msgid ""
+"This is the classical Mah Jongg for four players. If you are looking for Mah "
+"Jongg solitaire please use the application kmahjongg."
+msgstr ""
+"Dette er det klassiske mahjong til fire spillere. Hvis du leder efter "
+"mahjong for en enkelt spiller, så brug venligst programmet kmahjongg i "
+"stedet."
+
+#: src/kdestub.py:1064
+#, fuzzy
+#| msgid ""
+#| "Please use <a href=\"http://bugs.kde.org\">http://bugs.kde.org</a> to "
+#| "report bugs."
+msgid ""
+"Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
+"report bugs."
+msgstr ""
+"Brug venligst <a href=\"http://bugs.kde.org\">http://bugs.kde.org</a> til at "
+"rapportere fejl."
+
+#: src/kdestub.py:1069
+msgid "Authors:"
+msgstr "Forfattere:"
+
+#: src/kdestub.py:1115
+msgid "License Agreement"
+msgstr "Licensaftale"
+
+#: src/kdestub.py:1355
+msgid "Configure Toolbars"
+msgstr "Indstil værktøjslinjer"
+
+#: src/kdestub.py:1357
+msgid "A&vailable actions:"
+msgstr "&Tilgængelige handlinger:"
+
+#: src/kdestub.py:1368
+msgid "Curr&ent actions:"
+msgstr "&Nuværende handlinger:"
+
+#: src/login.py:166
+#, fuzzy
+#| msgid "start a local game server"
+msgid "trying to start local server %1"
+msgstr "start en lokal spilserver"
+
+#: src/login.py:177 src/login.py:621
+msgid "removed stale socket <filename>%1</filename>"
+msgstr "fjernede død sokkel <filename>%1</filename>"
+
+#: src/login.py:198
+msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
+msgstr "startede den lokale kajongg-server: pid=<numid>%1</numid> %2"
+
+#: src/login.py:238
+msgctxt "kajongg"
+msgid "Login"
+msgstr "Login"
+
+#: src/login.py:286 src/login.py:394
+msgid "Game server:"
+msgstr "Spilserver:"
+
+#: src/login.py:289 src/login.py:396
+msgid "Username:"
+msgstr "Brugernavn:"
+
+#: src/login.py:292 src/login.py:399
+msgid "Password:"
+msgstr "Adgangskode:"
+
+#: src/login.py:294
+msgctxt "kajongg"
+msgid "Ruleset:"
+msgstr "Regelsæt:"
+
+#: src/login.py:388
+#, fuzzy
+#| msgid "Create User Account"
+msgctxt "@title:window"
+msgid "Create User Account"
+msgstr "Opret brugerkonto"
+
+#: src/login.py:402
+msgid "Repeat password:"
+msgstr "Gentag adgangskode:"
+
+#: src/login.py:552
+msgid "You are already connected to server %1"
+msgstr "Du er allerede forbundet til serveren %1"
+
+#: src/login.py:589
+msgctxt "USER is not known on SERVER"
+msgid "%1 is not known on %2, do you want to open an account?"
+msgstr "%1 er ikke kendt på %2, vil du åbne en konto?"
+
+#: src/login.py:601
+msgid "Server %1 did not answer"
+msgstr "Serveren %1 svarede ikke"
+
+#: src/login.py:603
+msgid "Server %1 refused connection"
+msgstr "Serveren %1 nægtede forbindelsen"
+
+#: src/login.py:605
+msgid "Server %1 does not run a kajongg server"
+msgstr "Serveren %1 kører ikke en kajongg-server"
+
+#: src/login.py:607
+msgid "Address for server %1 cannot be found"
+msgstr "Adressen til serveren %1 kan ikke findes"
+
+#: src/login.py:610
+#, fuzzy
+#| msgid "You have no network connectivity: %1"
+msgid "Login to server %1 failed: You have no network connection"
+msgstr "Du har ingen netværksforbindelse: %1"
+
+#: src/login.py:622
+msgid "Please try again"
+msgstr "Prøv igen"
+
+#: src/mainwindow.py:501
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Score Manual Game"
+msgctxt "@action:inmenu"
+msgid "&Score Manual Game"
+msgstr "&Giv point for manuelt spil"
+
+#: src/mainwindow.py:503
+msgctxt "@action:intoolbar"
+msgid "Manual Game"
+msgstr "Manuelt spil"
+
+#: src/mainwindow.py:506
+msgctxt "kajongg @info:tooltip"
+msgid "&Score a manual game."
+msgstr "&Giv point for manuelt spil."
+
+#: src/mainwindow.py:508
+msgctxt "@action:intoolbar"
+msgid "&Play"
+msgstr "S&pil"
+
+#: src/mainwindow.py:511
+msgctxt "kajongg @info:tooltip"
+msgid "Start a new game."
+msgstr "Start et nyt spil."
+
+#: src/mainwindow.py:513
+msgctxt "@action:inmenu"
+msgid "&Abort Game"
+msgstr "&Afbryd spil"
+
+#: src/mainwindow.py:517
+msgctxt "kajongg @info:tooltip"
+msgid "Abort the current game."
+msgstr "Afbryd det aktuelle spil."
+
+#: src/mainwindow.py:519
+msgctxt "@action:inmenu"
+msgid "&Quit Kajongg"
+msgstr "&Afslut Kajongg"
+
+#: src/mainwindow.py:522
+msgctxt "@action:intoolbar"
+msgid "&Players"
+msgstr "&Spillere"
+
+#: src/mainwindow.py:525
+msgctxt "kajongg @info:tooltip"
+msgid "define your players."
+msgstr "definér dine spillere."
+
+#: src/mainwindow.py:527
+msgctxt "@action:intoolbar"
+msgid "&Rulesets"
+msgstr "&Regelsæt"
+
+#: src/mainwindow.py:530
+msgctxt "kajongg @info:tooltip"
+msgid "customize rulesets."
+msgstr "tilpas regelsæt."
+
+#: src/mainwindow.py:534
+msgctxt "@action:inmenu"
+msgid "&Change Visual Angle"
+msgstr "S&kift synsvinkel"
+
+#: src/mainwindow.py:535
+msgctxt "@action:intoolbar"
+msgid "Angle"
+msgstr "Vinkel"
+
+#: src/mainwindow.py:538
+msgctxt "kajongg @info:tooltip"
+msgid "Change the visual appearance of the tiles."
+msgstr "Skift brikkernes visuelle fremtræden."
+
+#: src/mainwindow.py:542
+msgctxt "@action:inmenu"
+msgid "F&ull Screen Mode"
+msgstr "&Fuldskærmstilstand"
+
+#: src/mainwindow.py:545
+msgctxt "kajongg @action:inmenu"
+msgid "&Score Table"
+msgstr "&Pointtabel"
+
+#: src/mainwindow.py:547
+msgctxt "kajongg @action:intoolbar"
+msgid "&Scores"
+msgstr "&Pointstilling"
+
+#: src/mainwindow.py:549
+msgctxt "kajongg @info:tooltip"
+msgid "Show or hide the score table for the current game."
+msgstr "Vis eller gem pointtabellen for det aktuelle spil."
+
+#: src/mainwindow.py:551
+#, fuzzy
+#| msgctxt "@action:inmenu"
+#| msgid "&Explain Scores"
+msgctxt "@action:inmenu"
+msgid "&Explain Scores"
+msgstr "&Forklar pointstilling"
+
+#: src/mainwindow.py:552
+msgctxt "@action:intoolbar"
+msgid "&Explain"
+msgstr "&Forklar"
+
+#: src/mainwindow.py:554
+msgctxt "kajongg @info:tooltip"
+msgid "Explain the scoring for all players in the current game."
+msgstr "Forklar pointstillingen for alle spillere i det aktuelle spil."
+
+#: src/mainwindow.py:556
+msgctxt "@action:inmenu"
+msgid "&Demo Mode"
+msgstr "&Demotilstand"
+
+#: src/mainwindow.py:559
+msgctxt "kajongg @info:tooltip"
+msgid "Let the computer take over for you. Start a new local game if needed."
+msgstr ""
+"Lad computeren overtage dit spil. Start et nyt lokalt spil om nødvendigt."
+
+#: src/mainwindow.py:561
+msgid "C&hat"
+msgstr "C&hat"
+
+#: src/mainwindow.py:564
+msgctxt "kajongg @info:tooltip"
+msgid "Chat with the other players."
+msgstr "Chat med de andre spillere."
+
+#: src/meld.py:318
+msgctxt "kajongg meld type"
+msgid "Bonus"
+msgstr "Bonus"
+
+#: src/meld.py:320
+msgctxt "kajongg meld type"
+msgid "&single"
+msgstr "&enkelt"
+
+#: src/meld.py:322
+msgctxt "kajongg meld type"
+msgid "&pair"
+msgstr "&par"
+
+#: src/meld.py:324
+msgctxt "kajongg meld type"
+msgid "&chow"
+msgstr "&chow"
+
+#: src/meld.py:326
+msgctxt "kajongg meld type"
+msgid "p&ung"
+msgstr "p&ong"
+
+#: src/meld.py:328
+msgctxt "kajongg meld type"
+msgid "c&laimed kong"
+msgstr "me&ldte kong"
+
+#: src/meld.py:330
+msgctxt "kajongg meld type"
+msgid "k&ong"
+msgstr "k&ong"
+
+#: src/meld.py:331
+msgctxt "kajongg meld type"
+msgid "rest of tiles"
+msgstr "resten af fliser"
+
+#: src/meld.py:338
+msgctxt "kajongg meld state"
+msgid "Exposed"
+msgstr "Vist"
+
+#: src/meld.py:339
+msgctxt "kajongg meld state"
+msgid "Concealed"
+msgstr "Skjult"
+
+#: src/meld.py:345
+#, python-brace-format
+msgctxt "kajongg meld name, do not translate parameter names"
+msgid "{state} {meldType} {name}"
+msgstr "{state} {meldType} {name}"
+
+#: src/message.py:203
+msgid "saying %1 violates Original Call"
+msgstr "melding af %1 bryder med oprindelig melding"
+
+#: src/message.py:215
+msgid ""
+"claiming %1 is dangerous because you will have to discard a dangerous tile"
+msgstr "det er farligt at melde %1, for du skal så afsmide en farlig brik"
+
+#: src/message.py:220
+msgid ""
+"claiming %1 for %2 is dangerous because you will have to discard a dangerous "
+"tile"
+msgstr ""
+"melding af %1 for %2 er farligt fordi du så skal afsmide en farlig brik"
+
+#: src/message.py:223
+msgid "You may say %1"
+msgstr "Du kan melde %1"
+
+#: src/message.py:233
+msgctxt "kajongg"
+msgid "Pung"
+msgstr "Pong"
+
+#: src/message.py:234
+msgctxt "kajongg game dialog:Key for Pung"
+msgid "P"
+msgstr "P"
+
+#: src/message.py:251
+msgctxt "kajongg"
+msgid "Kong"
+msgstr "Kong"
+
+#: src/message.py:252
+msgctxt "kajongg game dialog:Key for Kong"
+msgid "K"
+msgstr "K"
+
+#: src/message.py:272
+msgid "saying Kong for %1 violates Original Call"
+msgstr "melding af kong for %1 bryder med oprindelig melding"
+
+#: src/message.py:275
+msgid "You may say Kong for %1"
+msgstr "Du kan melde kong med %1"
+
+#: src/message.py:289
+msgctxt "kajongg"
+msgid "Chow"
+msgstr "Chow"
+
+#: src/message.py:290
+msgctxt "kajongg game dialog:Key for Chow"
+msgid "C"
+msgstr "C"
+
+#: src/message.py:323
+msgctxt "kajongg"
+msgid "Mah Jongg"
+msgstr "Mahjong"
+
+#: src/message.py:324
+msgctxt "kajongg game dialog:Key for Mah Jongg"
+msgid "M"
+msgstr "M"
+
+#: src/message.py:332
+msgid "Press here and you win"
+msgstr "Tryk her og du vinder"
+
+#: src/message.py:346
+msgctxt "kajongg"
+msgid "Original Call"
+msgstr "Oprindelig melding"
+
+#: src/message.py:347
+msgctxt "kajongg game dialog:Key for Original Call"
+msgid "O"
+msgstr "O"
+
+#: src/message.py:360
+msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
+msgstr "afsmid af %1 og melding af oprindelig melding gør denne hånd uvindelig"
+
+#: src/message.py:364
+msgid ""
+"Discard a tile, declaring Original Call meaning you need only one tile to "
+"complete the hand and will not alter the hand in any way (except bonus tiles)"
+msgstr ""
+"Afsmid en brik, erklæring af oprindelig melding betyder at du kun behøver en "
+"brik for at fuldende hånden og vil ikke ændre hånden på nogen måde (udover "
+"bonusbrikker)"
+
+#: src/message.py:389
+msgctxt "kajongg"
+msgid "Discard"
+msgstr "Afsmid"
+
+#: src/message.py:390
+msgctxt "kajongg game dialog:Key for Discard"
+msgid "D"
+msgstr "A"
+
+#: src/message.py:405
+msgid "discarding %1 violates Original Call"
+msgstr "Afsmid af %1 bryder med oprindelig melding"
+
+#: src/message.py:408
+msgid "discarding %1 is Dangerous Game"
+msgstr "det er farligt spil at afsmide %1"
+
+#: src/message.py:411
+msgid "discard the least useful tile"
+msgstr "afsmid den mindst brugbare brik"
+
+#: src/message.py:483
+msgid "%1 is not ready to start the game"
+msgstr "%1 er ikke klar til at begynde spillet"
+
+#: src/message.py:519
+msgid "Kajongg <numid>%1</numid>"
+msgstr "Kajongg <numid>%1</numid>"
+
+#: src/message.py:595
+msgctxt "kajongg"
+msgid "Violates Original Call"
+msgstr "Bryder med oprindelig melding"
+
+#: src/message.py:723
+msgctxt "kajongg"
+msgid "Dangerous Game"
+msgstr "Farligt spil"
+
+#: src/message.py:737
+msgctxt "kajongg"
+msgid "No Choice"
+msgstr "Ingen valgmulighed"
+
+#: src/message.py:796
+#, fuzzy
+#| msgctxt "kajongg"
+#| msgid "OK"
+msgctxt "kajongg"
+msgid "OK"
+msgstr "OK"
+
+#: src/message.py:797
+msgctxt "kajongg game dialog:Key for OK"
+msgid "O"
+msgstr "O"
+
+#: src/message.py:801
+msgid "Confirm that you saw the message"
+msgstr "Bekræft at du så meddelelsen"
+
+#: src/message.py:810
+msgctxt "kajongg"
+msgid "No Claim"
+msgstr "Intet tages"
+
+#: src/message.py:811
+msgctxt "kajongg game dialog:Key for No claim"
+msgid "N"
+msgstr "N"
+
+#: src/message.py:815
+msgid "You cannot or do not want to claim this tile"
+msgstr "Du kan ikke eller ønsker ikke at tage denne brik"
+
+#: src/mjresource.py:80
+#, fuzzy
+#| msgid ""
+#| "cannot find any tileset in the following directories, is libkmahjongg "
+#| "installed?"
+msgid ""
+"cannot find any %1 in the following directories, is libkmahjongg installed?"
+msgstr ""
+"kan ikke finde noget sæt af brikker i følgende mapper, libkmahjongg "
+"installeret?"
+
+#: src/mjresource.py:104
+#, fuzzy
+#| msgid "cannot find tileset %1, using default"
+msgid "cannot find %1, using default"
+msgstr "kan ikke finde briksættet %1, bruger standardsættet"
+
+#: src/mjresource.py:114
+msgid "unknown name"
+msgstr "ukendt navn"
+
+#: src/mjresource.py:115
+msgid "unknown author"
+msgstr "ukendt forfatter"
+
+#: src/mjresource.py:118
+msgid "no description available"
+msgstr "ingen tilgængelig beskrivelse"
+
+#: src/mjresource.py:121
+msgid "no E-Mail address available"
+msgstr "ingen tilgængelig e-mailadresse"
+
+#: src/player.py:687
+msgid "%1 claiming MahJongg: She does not really have tile %2"
+msgstr "%1 melder mahjong: Hun har faktisk ikke brikken %2"
+
+#: src/player.py:696
+msgid ""
+"%1 claiming MahJongg: She did not pass all concealed tiles to the server"
+msgstr "%1 melder mahjong: Hun sendte ikke alle skjulte brikker til serveren"
+
+#: src/player.py:807
+msgid "Player %1 has 3 or 4 exposed melds, all are green"
+msgstr "Spiller %1 har tre eller fire viste sæt, alle er grønne"
+
+#: src/player.py:816
+msgid "Player %1 may try a True Color Game"
+msgstr "Spiller %1 kan forsøge et spil i én kulør"
+
+#: src/player.py:819
+msgid "Player %1 may try an All Terminals Game"
+msgstr "Spiller %1 kan forsøge et spil med kun ettere og niere"
+
+#: src/player.py:832
+msgid "Player %1 exposed many winds"
+msgstr "Spiller %1 viste mange vinde"
+
+#: src/player.py:836
+msgid "Player %1 exposed many dragons"
+msgstr "Spiller %1 viste mange drager"
+
+#: src/playerlist.py:43
+msgctxt "define a new player"
+msgid "&New"
+msgstr "&Nyt"
+
+#: src/playerlist.py:101
+#, fuzzy
+#| msgid "User %1 already exists"
+msgid "Player %1 already exists"
+msgstr "Brugeren %1 findes allerede"
+
+#: src/playerlist.py:110
+#, fuzzy
+#| msgid ""
+#| "Error for player %1: %2\n"
+#| "%3"
+msgid "Error while adding player %1: %2"
+msgstr ""
+"Fejl for spiller %1: %2\n"
+"%3"
+
+#: src/playerlist.py:165
+msgid ""
+"There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
+"This will also delete all games played by %3!"
+msgstr ""
+
+#: src/predefined.py:27
+msgid "Classical Chinese standard"
+msgstr "Klassisk kinesisk standard"
+
+#: src/predefined.py:31
+msgid "Classical Chinese"
+msgstr "Klassisk kinesisk"
+
+#: src/predefined.py:37
+msgid "Last Tile Taken from Dead Wall"
+msgstr "Sidste brik taget fra død mur"
+
+#: src/predefined.py:39
+msgid ""
+"The dead wall is also called kong box: The last 16 tiles of the wall used as "
+"source of replacement tiles"
+msgstr ""
+"Den døde mur kaldes også kong-boks: De sidste 16 brikker i muren bruges som "
+"kilde til erstatningsbrikker"
+
+#: src/predefined.py:42
+msgid "Last Tile is Last Tile of Wall"
+msgstr "Sidste brik er sidste brik i muren"
+
+#: src/predefined.py:44
+msgid ""
+"Winner said Mah Jong with the last tile taken from the living end of the wall"
+msgstr ""
+"Vinderen meldte mahjong med den sidste brik taget fra den levende ende af "
+"muren"
+
+#: src/predefined.py:46
+msgid "Last Tile is Last Tile of Wall Discarded"
+msgstr "Sidste brik er sidste brik i muren af afsmid"
+
+#: src/predefined.py:48
+msgid ""
+"Winner said Mah Jong by claiming the last tile taken from the living end of "
+"the wall, discarded by another player"
+msgstr ""
+"Vinderen meldte mahjong ved at tage den sidste brik fra den levende ende af "
+"muren, afsmidt af en anden spiller"
+
+#: src/predefined.py:51
+msgid "Robbing the Kong"
+msgstr "Stjæle kongen"
+
+#: src/predefined.py:52
+msgid ""
+"Winner said Mah Jong by claiming the 4th tile of a kong another player just "
+"declared"
+msgstr ""
+"Vinderen meldte mahjong ved tage den fjerde brik fra en kong en anden "
+"spiller netop meldte"
+
+#: src/predefined.py:55
+msgid "Mah Jongg with Original Call"
+msgstr "Mahjong med oprindeligt kald"
+
+#: src/predefined.py:58
+msgid ""
+"Just before the first discard, a player can declare Original Call meaning "
+"she needs only one tile to complete the hand and announces she will not "
+"alter the hand in any way (except bonus tiles)"
+msgstr ""
+"Lige før første afsmidning kan en spiller melde oprindeligt kald, som "
+"betyder at hun kun skal bruge en brik for at afslutte hånden og meddeler, at "
+"hun ikke vil ændre hånden på nogen måde (bortset fra bonusbrikker)"
+
+#: src/predefined.py:61
+msgid "Dangerous Game"
+msgstr "Farligt spil"
+
+#: src/predefined.py:62
+msgid ""
+"In some situations discarding a tile that has a high chance to help somebody "
+"to win is declared to be dangerous, and if that tile actually makes somebody "
+"win, the discarder pays the winner for all"
+msgstr ""
+"I visse situationer erklæres det farligt at afsmide en brik, som med stor "
+"sandsynlighed vil hjælpe en anden med at vinde, og hvis den brik faktisk "
+"vinder spillet for nogen, betaler afsmideren for alle til vinderen"
+
+#: src/predefined.py:66
+msgid "Twofold Fortune"
+msgstr "Dobbelt lykke"
+
+#: src/predefined.py:67
+msgid ""
+"Kong after Kong: Declare Kong and a second Kong with the replacement tile "
+"and Mah Jong with the second replacement tile"
+msgstr ""
+"Kong efter kong: Meld kong og endnu en kong med erstatningsbrikken og "
+"mahjong med den anden erstatningsbrik"
+
+#: src/predefined.py:71
+msgid "Blessing of Heaven"
+msgstr "Velsignelse fra himlen"
+
+#: src/predefined.py:72
+msgid "East says Mah Jong with the unmodified dealt tiles"
+msgstr "Øst melder mahjong med de uændrede givne brikker"
+
+#: src/predefined.py:74
+msgid "Blessing of Earth"
+msgstr "Velsignelse fra Jorden"
+
+#: src/predefined.py:75
+msgid ""
+"South, West or North says Mah Jong with the first tile discarded by East"
+msgstr ""
+"Syd, Vest eller Nord siger mahjong med den første brik som Øst har afsmidt"
+
+#: src/predefined.py:77
+msgid "East won nine times in a row"
+msgstr "Øst vandt ni gange i træk"
+
+#: src/predefined.py:78
+msgid "If that happens, East gets a limit score and the winds rotate"
+msgstr "Hvis dette sker får Øst en begrænset pointscore og vindene rokerer"
+
+#: src/predefined.py:83
+msgid ""
+"False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah "
+"Jongg"
+msgstr ""
+"Forkert benævnelse af afsmid, taget til mahjong og forkert melding af mahjong"
+
+#: src/predefined.py:89
+msgid "Own Flower and Own Season"
+msgstr "Egen blomst og egen årstid"
+
+#: src/predefined.py:92
+msgid "All Flowers"
+msgstr "Alle blomster"
+
+#: src/predefined.py:93
+msgid "All Seasons"
+msgstr "Alle årstider"
+
+#: src/predefined.py:95
+msgid "Three Concealed Pongs"
+msgstr "Tre skjulte pong"
+
+#: src/predefined.py:99
+msgid "Long Hand"
+msgstr "Lang hånd"
+
+#: src/predefined.py:100
+msgid "The hand contains too many tiles"
+msgstr "Hånden indeholder for mange brikker"
+
+#: src/predefined.py:105
+msgid "Points Needed for Mah Jongg"
+msgstr "Point der kræves for mahjong"
+
+#: src/predefined.py:109
+msgid "Minimum number of doubles needed for Mah Jongg"
+msgstr "Mindste antal doblinger krævet for mahjong"
+
+#: src/predefined.py:112
+msgid "Points for a Limit Hand"
+msgstr "Point for en skjult hånd"
+
+#: src/predefined.py:116
+msgid "Play with the roof off"
+msgstr "Spil uden loft"
+
+#: src/predefined.py:117
+msgid "Play with no upper scoring limit"
+msgstr "Spil uden en øvre pointgrænse"
+
+#: src/predefined.py:119
+msgid "Claim Timeout"
+msgstr "Bed om timeout"
+
+#: src/predefined.py:123
+msgid "Size of Kong Box"
+msgstr "Størrelse på kong-boks"
+
+#: src/predefined.py:124
+msgid "The Kong Box is used for replacement tiles when declaring kongs"
+msgstr "Kong-boksen bruges til erstatningsbrikker når der meldes kong"
+
+#: src/predefined.py:126
+msgid "Play with Bonus Tiles"
+msgstr "Spil med bonusbrikker"
+
+#: src/predefined.py:127
+msgid "Bonus tiles increase the luck factor"
+msgstr "Bonusbrikker forhøjer heldfaktoren"
+
+#: src/predefined.py:129
+msgid "Minimum number of rounds in game"
+msgstr "Mindste antal runder i spillet"
+
+#: src/predefined.py:133
+msgid "number of allowed chows"
+msgstr "antallet af tilladte chow"
+
+#: src/predefined.py:134
+msgid "The number of chows a player may build"
+msgstr "Antallet af chow, som en spiller kan bygge"
+
+#: src/predefined.py:136
+msgid "must declare calling hand"
+msgstr "skal melde mahjong"
+
+#: src/predefined.py:138
+msgid "Mah Jongg is only allowed after having declared to have a calling hand"
+msgstr "Mahjong er kun tilladt efter at have meldt mahjong"
+
+#: src/predefined.py:140
+msgid "Standard Rotation"
+msgstr "Standardrotation"
+
+#: src/predefined.py:150
+msgid "Last Tile Completes Pair of 2..8"
+msgstr "Sidste brik fuldender par af 2..8"
+
+#: src/predefined.py:154
+msgid "Last Tile Completes Pair of Terminals or Honors"
+msgstr "Sidste brik fuldender par af ettere og niere eller honnører"
+
+#: src/predefined.py:157
+msgid "Last Tile is Only Possible Tile"
+msgstr "Sidste brik er eneste mulige brik"
+
+#: src/predefined.py:161
+msgid "Won with Last Tile Taken from Wall"
+msgstr "Vandt med sidste brik taget fra muren"
+
+#: src/predefined.py:166
+msgid "Zero Point Hand"
+msgstr "Nulpointshånd"
+
+#: src/predefined.py:167
+msgid "The hand has 0 basis points excluding bonus tiles"
+msgstr "Hånden har 0 basispoint eksklusiv bonusbrikker"
+
+#: src/predefined.py:168
+msgid "No Chow"
+msgstr "Ingen chow"
+
+#: src/predefined.py:170
+msgid "Only Concealed Melds"
+msgstr "Kun skjulte sæt"
+
+#: src/predefined.py:174
+msgid "False Color Game"
+msgstr "Spil med forkert farve"
+
+#: src/predefined.py:175
+msgid ""
+"Only same-colored tiles (only bamboo/stone/character) plus any number of "
+"winds and dragons"
+msgstr ""
+"Kun brikker af samme farve (kun bambus/cirkler/skrifttegn) plus et "
+"vilkårligt antal vinde og drager"
+
+#: src/predefined.py:178
+msgid "True Color Game"
+msgstr "Spil med rigtig farve"
+
+#: src/predefined.py:179
+msgid "Only same-colored tiles (only bamboo/stone/character)"
+msgstr "Kun brikker af samme farve (kun bambus/cirkler/skrifttegn)"
+
+#: src/predefined.py:181
+msgid "Concealed True Color Game"
+msgstr "Spil med skjult rigtig farve"
+
+#: src/predefined.py:182
+msgid "All tiles concealed and of the same suit, no honors"
+msgstr "Alle brikker skjult og i samme kulør, ingen honnører"
+
+#: src/predefined.py:184
+msgid "Only Terminals and Honors"
+msgstr "Kun officerer"
+
+#: src/predefined.py:185
+msgid "Only winds, dragons, 1 and 9"
+msgstr "Kun vinde, drager, ettere og niere"
+
+#: src/predefined.py:186
+msgid "Only Honors"
+msgstr "Kun honnører"
+
+#: src/predefined.py:187
+msgid "Only winds and dragons"
+msgstr "Kun vinde og drager"
+
+#: src/predefined.py:189
+msgid "Hidden Treasure"
+msgstr "Begravet skat"
+
+#: src/predefined.py:190
+msgid "Only hidden Pungs or Kongs, last tile from wall"
+msgstr "Kun skjulte pong og kong, sidste brik fra muren"
+
+#: src/predefined.py:192
+msgid "Heads and Tails"
+msgstr "Hoveder og haler"
+
+#: src/predefined.py:193
+msgid "Only 1 and 9"
+msgstr "Kun ettere og niere"
+
+#: src/predefined.py:195
+msgid "Fourfold Plenty"
+msgstr "Firdobbelt overflod"
+
+#: src/predefined.py:196
+msgid "4 Kongs"
+msgstr "Fire kong"
+
+#: src/predefined.py:198 src/predefined.py:416
+msgid "Three Great Scholars"
+msgstr "Tre store lærde mænd"
+
+#: src/predefined.py:199 src/predefined.py:321
+msgid "3 Pungs or Kongs of dragons"
+msgstr "Tre pong eller kong af drager"
+
+#: src/predefined.py:200
+#, fuzzy
+#| msgid "Four Blessings Hovering Over the Door"
+msgid "Four Blessings Hovering over the Door"
+msgstr "Fire velsignelser svæver over døren"
+
+#: src/predefined.py:202 src/predefined.py:326
+msgid "4 Pungs or Kongs of winds"
+msgstr "Fire pong eller kong af vinde"
+
+#: src/predefined.py:203
+msgid "Imperial Jade"
+msgstr "Imperial jade"
+
+#: src/predefined.py:204
+msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
+msgstr "Kun grønne brikker: Grøn drage og bambus 2,3,4,6,8"
+
+#: src/predefined.py:205
+msgid "Gathering the Plum Blossom from the Roof"
+msgstr "Plukker blommeblomsten fra taget"
+
+#: src/predefined.py:207
+msgid "Mah Jong with stone 5 from the dead wall"
+msgstr "Mahjong med 5 cirkler fra den døde mur"
+
+#: src/predefined.py:209
+msgid "Plucking the Moon from the Bottom of the Sea"
+msgstr "Plukker månen fra havets bund"
+
+#: src/predefined.py:210
+msgid "Mah Jong with the last tile from the wall being a stone 1"
+msgstr "Mahjong, hvor den sidste brik fra muren er en cirkel 1"
+
+#: src/predefined.py:212
+msgid "Scratching a Carrying Pole"
+msgstr "Kradser en bærestok"
+
+#: src/predefined.py:213
+msgid "Robbing the Kong of bamboo 2"
+msgstr "Stjæler kong af 2 bambus"
+
+#: src/predefined.py:219
+msgid "Standard Mah Jongg"
+msgstr "Standard mahjong"
+
+#: src/predefined.py:224
+msgid "Nine Gates"
+msgstr "Ni lanterner"
+
+#: src/predefined.py:226
+#, fuzzy
+#| msgid ""
+#| "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 "
+#| "completed with another tile of the same color (from wall or discarded)"
+msgid ""
+"A concealed hand in one color 1112345678999 plus last tile of this suit "
+"(from wall or discarded)"
+msgstr ""
+"Alle skjulte brikker af samme kulør: Værdier 1-1-1-2-3-4-5-6-7-8-9-9-9 "
+"suppleret med endnu en brik af samme farve (fra muren eller afsmidt)"
+
+#: src/predefined.py:228
+msgid "Thirteen Orphans"
+msgstr "13 vidundere"
+
+#: src/predefined.py:229
+msgid ""
+"13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
+"with one of them"
+msgstr ""
+"13 enkeltvise brikker: Kun drager, vinde, ettere, niere og en 14. brik som "
+"danner et par med én af dem"
+
+#: src/predefined.py:233
+msgid "Pung/Kong of Dragons"
+msgstr "Pong/kong af drager"
+
+#: src/predefined.py:235
+msgid "Pung/Kong of Own Wind"
+msgstr "Pong/kong af egen vind"
+
+#: src/predefined.py:238
+msgid "Pung/Kong of Round Wind"
+msgstr "Pong/kong af rundens vind"
+
+#: src/predefined.py:242
+msgid "Exposed Kong"
+msgstr "Vist kong"
+
+#: src/predefined.py:245
+msgid "Exposed Kong of Terminals"
+msgstr "Vist kong af ettere og niere"
+
+#: src/predefined.py:248
+msgid "Exposed Kong of Honors"
+msgstr "Vist kong af honnører"
+
+#: src/predefined.py:251
+msgid "Exposed Pung"
+msgstr "Vist pong"
+
+#: src/predefined.py:254
+msgid "Exposed Pung of Terminals"
+msgstr "Vist pong af ettere og niere"
+
+#: src/predefined.py:257
+msgid "Exposed Pung of Honors"
+msgstr "Vist pong af honnører"
+
+#: src/predefined.py:261
+msgid "Concealed Kong"
+msgstr "Skjult kong"
+
+#: src/predefined.py:264
+msgid "Concealed Kong of Terminals"
+msgstr "Skjult kong af ettere og niere"
+
+#: src/predefined.py:267
+msgid "Concealed Kong of Honors"
+msgstr "Skjult kong af honnører"
+
+#: src/predefined.py:270
+msgid "Concealed Pung"
+msgstr "Skjult pong"
+
+#: src/predefined.py:273
+msgid "Concealed Pung of Terminals"
+msgstr "Skjult pong af ettere og niere"
+
+#: src/predefined.py:276
+msgid "Concealed Pung of Honors"
+msgstr "Skjult pong af honnører"
+
+#: src/predefined.py:279
+msgid "Pair of Own Wind"
+msgstr "Par af egen vind"
+
+#: src/predefined.py:281
+msgid "Pair of Round Wind"
+msgstr "Par af rundens vind"
+
+#: src/predefined.py:283
+msgid "Pair of Dragons"
+msgstr "Par af drager"
+
+#: src/predefined.py:287
+msgid "Flower"
+msgstr "Blomst"
+
+#: src/predefined.py:289
+msgid "Season"
+msgstr "Årstid"
+
+#: src/predefined.py:300
+msgid "Classical Chinese DMJL"
+msgstr "Klassisk kinesisk DMJL"
+
+#: src/predefined.py:306
+msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
+msgstr "Klassisk kinesisk som defineret af Deutsche Mah Jongg Liga (DMJL) e.V."
+
+#: src/predefined.py:313
+msgid "Squirming Snake"
+msgstr "Slange der vrider sig"
+
+#: src/predefined.py:314
+msgid ""
+"All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
+"Chows of the remaining values"
+msgstr ""
+"Alle brikker fra samme farve. Pong eller kong af 1 og 9, par af 2, 5 eller 8 "
+"og to chow af de resterende værdier"
+
+#: src/predefined.py:317
+msgid "Little Three Dragons"
+msgstr "Lille dragehånd"
+
+#: src/predefined.py:318
+msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
+msgstr "To pong eller kong af drager og et par af drager"
+
+#: src/predefined.py:320
+msgid "Big Three Dragons"
+msgstr "Stor dragehånd"
+
+#: src/predefined.py:323
+msgid "Little Four Joys"
+msgstr "Små fire glæder"
+
+#: src/predefined.py:324
+msgid "3 Pungs or Kongs of winds and 1 pair of winds"
+msgstr "Tre pong eller kong af vinde og et par af vinde"
+
+#: src/predefined.py:325
+msgid "Big Four Joys"
+msgstr "Store fire glæder"
+
+#: src/predefined.py:331
+msgid "False Naming of Discard, Claimed for Chow"
+msgstr "Forkert benævnelse af afsmid, taget til chow"
+
+#: src/predefined.py:334
+msgid "False Naming of Discard, Claimed for Pung/Kong"
+msgstr "Forkert benævnelse af afsmid, taget til pong/kong"
+
+#: src/predefined.py:337 src/predefined.py:430
+msgid "False Declaration of Mah Jongg by One Player"
+msgstr "Forkert melding af mahjong af én spiller"
+
+#: src/predefined.py:340
+msgid "False Declaration of Mah Jongg by Two Players"
+msgstr "Forkert melding af mahjong af to spillere"
+
+#: src/predefined.py:343
+msgid "False Declaration of Mah Jongg by Three Players"
+msgstr "Forkert melding af mahjong af tre spillere"
+
+#: src/predefined.py:346 src/predefined.py:433
+msgid "False Naming of Discard, Claimed for Mah Jongg"
+msgstr "Forkert benævnelse af afsmid, taget til mahjong"
+
+#: src/predefined.py:357
+msgid "Classical Chinese BMJA"
+msgstr "Klassisk kinesisk BMJA"
+
+#: src/predefined.py:363
+msgid "Classical Chinese as defined by the British Mah-Jong Association"
+msgstr "Klassisk kinesisk som defineret af the British Mah-Jong Association"
+
+#: src/predefined.py:378
+msgid "Original Call"
+msgstr "Oprindelig melding"
+
+#: src/predefined.py:382
+msgid "Gates of Heaven"
+msgstr "Himmelens port"
+
+#: src/predefined.py:383
+#, fuzzy
+#| msgid ""
+#| "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 "
+#| "completed with another tile of the same color (from wall or discarded)"
+msgid ""
+"All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
+"to 8 (last tile from wall or discarded)"
+msgstr ""
+"Alle skjulte brikker af samme kulør: Værdier 1-1-1-2-3-4-5-6-7-8-9-9-9 "
+"suppleret med endnu en brik af samme farve (fra muren eller afsmidt)"
+
+#: src/predefined.py:386
+msgid "Wriggling Snake"
+msgstr "Slange der snor sig"
+
+#: src/predefined.py:387
+msgid ""
+"Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
+msgstr ""
+"Par af ettere og en serie fra 2 til 9 i samme kulør med hver af vindene"
+
+#: src/predefined.py:389
+msgid "Triple Knitting"
+msgstr "Tredobbelt knytning"
+
+#: src/predefined.py:390
+msgid ""
+"Four sets of three tiles in the different suits and a pair: No Winds or "
+"Dragons"
+msgstr ""
+"Fire sæt af tre brikker i de forskellige kulører og et par: Ingen vinde "
+"eller drager"
+
+#: src/predefined.py:391
+msgid "Knitting"
+msgstr "Knytning"
+
+#: src/predefined.py:392
+msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
+msgstr ""
+"Syv par af brikker i vilkårlige to ud af tre kulører; ingen vinde eller "
+"drager"
+
+#: src/predefined.py:394
+msgid "All pair honors"
+msgstr "Kun par i honnører"
+
+#: src/predefined.py:395
+msgid "7 pairs of 1s/9s/Winds/Dragons"
+msgstr "Syv par af ettere/niere/vinde/drager"
+
+#: src/predefined.py:398
+msgid "Own Flower"
+msgstr "Egen blomst"
+
+#: src/predefined.py:399
+msgid "Own Season"
+msgstr "Egen årstid"
+
+#: src/predefined.py:411
+msgid "Buried Treasure"
+msgstr "Begravet skat"
+
+#: src/predefined.py:412
+msgid "Concealed pungs of one suit with winds/dragons and a pair"
+msgstr "Skjulte pong i én kulør med vinde/drager og et par"
+
+#: src/predefined.py:413
+msgid "Purity"
+msgstr "Renhed"
+
+#: src/predefined.py:414
+msgid "Only same-colored tiles (no chows, dragons or winds)"
+msgstr "Kun brikker af samme farve (ingen chow, drager eller vinde)"
+
+#: src/predefined.py:417
+msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
+msgstr ""
+"Tre pong eller kong af drager plus en hvilken som helst pung/kong og et par"
+
+#: src/predefined.py:420
+msgid "The 13 Unique Wonders"
+msgstr "De 13 unikke vidundere"
+
+#: src/predefined.py:427
+msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
+msgstr "Forkert benævnelse af afsmid, taget til chow/pong/kong"
+
+#: src/predefined.py:437
+msgid "Calling for Only Honors"
+msgstr "Melder kun honnører"
+
+#: src/predefined.py:441
+msgid "Calling for Wriggling Snake"
+msgstr "Melder slange der snor sig"
+
+#: src/predefined.py:445
+msgid "Calling for Triple Knitting"
+msgstr "Melder tredobbelt knytning"
+
+#: src/predefined.py:449
+msgid "Calling for Gates of Heaven"
+msgstr "Melder himmelens port"
+
+#: src/predefined.py:452
+msgid "Calling for Knitting"
+msgstr "Melder knytning"
+
+#: src/predefined.py:456
+msgid "Calling for Imperial Jade"
+msgstr "Melder imperial jade"
+
+#: src/predefined.py:460
+#, fuzzy
+#| msgid "Calling for 13 Unique Wonders"
+msgid "Calling for The 13 Unique Wonders"
+msgstr "Melder 13 unikke vidundere"
+
+#: src/predefined.py:463
+msgid "Calling for Three Great Scholars"
+msgstr "Melder tre store lærde mænd"
+
+#: src/predefined.py:466
+msgid "Calling for All pair honors"
+msgstr "Melder par kun af honnører"
+
+#: src/predefined.py:470
+msgid "Calling for Heads and Tails"
+msgstr "Melder hoveder og haler"
+
+#: src/predefined.py:474
+msgid "Calling for Four Blessings Hovering over the Door"
+msgstr "Melder fire velsignelser svæver over døren"
+
+#: src/predefined.py:477
+msgid "Calling for Buried Treasure"
+msgstr "Melder begravet skat"
+
+#: src/predefined.py:481
+msgid "Calling for Fourfold Plenty"
+msgstr "Melder firdobbelt overflod"
+
+#: src/predefined.py:485
+msgid "Calling for Purity"
+msgstr "Melder renhed"
+
+#: src/query.py:219
+msgctxt "kajongg name for local game server"
+msgid "Local Game"
+msgstr "Lokalt spil"
+
+#: src/query.py:397
+msgid "Database %1 updated from schema %2 to %3"
+msgstr "Databasen %1 blev opdateret fra skema %2 til %3"
+
+#: src/rule.py:40 src/scoringdialog.py:677 src/scoringdialog.py:760
+msgid "points"
+msgstr "point"
+
+#: src/rule.py:41
+#, fuzzy
+#| msgid "doubles"
+msgctxt "kajongg"
+msgid "doubles"
+msgstr "dobler"
+
+#: src/rule.py:42
+#, fuzzy
+#| msgid "limits"
+msgctxt "kajongg"
+msgid "limits"
+msgstr "grænser"
+
+#: src/rule.py:79
+msgctxt "Kajongg"
+msgid "%1 points"
+msgstr "%1 point"
+
+#: src/rule.py:81
+msgctxt "Kajongg"
+msgid "%1 doubles"
+msgstr "%1 dobler"
+
+#: src/rule.py:86
+msgctxt "Kajongg"
+msgid "%1 limits"
+msgstr "%1 grænser"
+
+#: src/rule.py:325
+msgid "Meld Rules"
+msgstr "Sætregler"
+
+#: src/rule.py:326
+msgid ""
+"Meld rules are applied to single melds independent of the rest of the hand"
+msgstr "Sætregler gælder for enkelte sæt uafhængigt af resten af hånden"
+
+#: src/rule.py:327
+msgid "Hand Rules"
+msgstr "Håndregler"
+
+#: src/rule.py:328
+msgid "Hand rules are applied to the entire hand, for all players"
+msgstr "Håndregler gælder for hele hånden for alle spillere"
+
+#: src/rule.py:329
+msgid "Winner Rules"
+msgstr "Vinderregler"
+
+#: src/rule.py:330
+msgid "Winner rules are applied to the entire hand but only for the winner"
+msgstr "Vinderregler gælder for hele hånden, men kun for vinderen"
+
+#: src/rule.py:331
+msgid "Loser Rules"
+msgstr "Taberregler"
+
+#: src/rule.py:332
+msgid "Loser rules are applied to the entire hand but only for non-winners"
+msgstr "Taberregler gælder for hele hånden, men kun for ikke-vindere"
+
+#: src/rule.py:333
+msgid "Mah Jongg Rules"
+msgstr "Mahjong-regler"
+
+#: src/rule.py:334
+msgid "Only hands matching a Mah Jongg rule can win"
+msgstr "Kun hænder som matcher en mahjong-regel kan vinde"
+
+#: src/rule.py:335
+msgctxt "kajongg"
+msgid "Options"
+msgstr "Indstillinger"
+
+#: src/rule.py:336
+msgid "Here we have several special game related options"
+msgstr "Her findes adskillige særlige spilrelaterede indstillinger"
+
+#: src/rule.py:337
+msgid "Penalties"
+msgstr "Straffe"
+
+#: src/rule.py:338
+msgid ""
+"Penalties are applied manually by the user. They are only used for scoring "
+"games.\n"
+"When playing against the computer or over the net, Kajongg will never let "
+"you get\n"
+"into a situation where you have to pay a penalty"
+msgstr ""
+"Straffe påføres manuelt af brugeren. De bruges kun ved pointgivning.\n"
+" Når du spiller imod en computer over nettet vil Kajongg aldrig lade dig "
+"ende i en situation, hvor du skal straffes"
+
+#: src/rule.py:534
+msgctxt "Ruleset._newKey:%1 is empty or space plus number"
+msgid "Copy%1 of %2"
+msgstr "Kopi%1 af %2"
+
+#: src/rule.py:896
+msgctxt "%1 can be a sentence"
+msgid "%4 have impossible values %2/%3 in rule \"%1\""
+msgstr "%4 har umulige værdier %2/%3 i reglen \"%1\""
+
+#: src/rule.py:992
+msgctxt "wrong value for rule"
+msgid "%1: %2 is too small, minimal value is %3"
+msgstr "%1: %2 er for lille, mindsteværdien er %3"
+
+#: src/rulesetselector.py:476
+#, fuzzy
+#| msgid "Customize rulesets"
+msgctxt "@title:window"
+msgid "Customize rulesets"
+msgstr "Tilpas regelsæt"
+
+#: src/rulesetselector.py:494
+msgctxt "kajongg"
+msgid "Rule"
+msgstr "Regel"
+
+#: src/rulesetselector.py:551
+msgid "C&opy"
+msgstr "&Kopiér"
+
+#: src/rulesetselector.py:552
+#, fuzzy
+#| msgid "Compare"
+msgctxt "Kajongg ruleset comparer"
+msgid "Co&mpare"
+msgstr "Sammenlign"
+
+#: src/rulesetselector.py:553
+msgid "&Remove"
+msgstr "&Fjern"
+
+#: src/rulesetselector.py:554
+msgid "&Close"
+msgstr "&Luk"
+
+#: src/scene.py:367 src/scene.py:500
+msgid "Do you really want to abort this game?"
+msgstr "Vil du virkelig afbryde spillet?"
+
+#: src/scoring.py:43
+#, fuzzy
+#| msgid "Swap Seats"
+msgctxt "@title:window"
+msgid "Swap Seats"
+msgstr "Byt pladser"
+
+#: src/scoring.py:45
+msgid "By the rules, %1 and %2 should now exchange their seats. "
+msgstr "Efter reglerne skal %1 og %2 nu bytte plads. "
+
+#: src/scoring.py:47
+msgid "&Exchange"
+msgstr "&Byt"
+
+#: src/scoring.py:49
+msgid "&Keep seat"
+msgstr "&Behold plads"
+
+#: src/scoring.py:60
+#, fuzzy
+#| msgid "Select four players"
+msgctxt "@title:window"
+msgid "Select four players"
+msgstr "Vælg fire spillere"
+
+#: src/scoring.py:288
+msgid "Move Exposed Tiles Here"
+msgstr "Flyt viste brikker hertil"
+
+#: src/scoring.py:289
+msgid "Move Concealed Tiles Here"
+msgstr "Flyt skjulte brikker hertil"
+
+#: src/scoring.py:599
+msgid "Please define four players in <interface>Settings|Players</interface>"
+msgstr ""
+"Angiv fire spillere under <interface>Indstillinger|Spillere</interface>"
+
+#: src/scoringdialog.py:234
+msgid "Round/Hand"
+msgstr "Runde/hånd"
+
+#: src/scoringdialog.py:262 src/scoringdialog.py:813
+msgctxt "kajongg"
+msgid "Score"
+msgstr "Pointstilling"
+
+#: src/scoringdialog.py:262
+msgctxt "kajongg"
+msgid "Payments"
+msgstr "Betalinger"
+
+#: src/scoringdialog.py:263
+msgctxt "kajongg"
+msgid "Balance"
+msgstr "Saldo"
+
+#: src/scoringdialog.py:263
+msgctxt "kajongg"
+msgid "Chart"
+msgstr "Diagram"
+
+#: src/scoringdialog.py:409
+msgctxt "kajongg"
+msgid "Scores"
+msgstr "Pointstilling"
+
+#: src/scoringdialog.py:451
+msgctxt "kajongg"
+msgid "Used Rules"
+msgstr "Brugte regler"
+
+#: src/scoringdialog.py:485
+msgid "Final scores for game <numid>%1</numid>"
+msgstr "Samlet resultat af spil <numid>%1</numid>"
+
+#: src/scoringdialog.py:487
+msgid "Scores for game <numid>%1</numid>"
+msgstr "Resultat af spil <numid>%1</numid>"
+
+#: src/scoringdialog.py:559
+#, fuzzy
+#| msgid "Explain Scores"
+msgctxt "@title:window"
+msgid "Explain Scores"
+msgstr "Forklar pointstilling"
+
+#: src/scoringdialog.py:575
+msgid "There is no active game"
+msgstr "Der er ikke noget aktivt spil"
+
+#: src/scoringdialog.py:578
+msgid "%1"
+msgstr "%1"
+
+#: src/scoringdialog.py:592
+msgid "Manual score for %1: %2 points"
+msgstr "Manuel pointscore for %1: %2 point"
+
+#: src/scoringdialog.py:663
+msgid "Penalty"
+msgstr "Straf"
+
+#: src/scoringdialog.py:666
+msgid "Offense:"
+msgstr "Forseelse:"
+
+#: src/scoringdialog.py:673
+msgid "Total Penalty"
+msgstr "Straf i alt"
+
+#: src/scoringdialog.py:706
+msgid "&Execute"
+msgstr "&Udfør"
+
+#: src/scoringdialog.py:783
+msgctxt "penalty dialog, appears behind paying player combobox"
+msgid "pays %1 points"
+msgstr "betaler %1 point"
+
+#: src/scoringdialog.py:788
+msgctxt "penalty dialog, appears behind profiting player combobox"
+msgid "gets %1 points"
+msgstr "får %1 point"
+
+#: src/scoringdialog.py:799
+#, fuzzy
+#| msgid "Scoring for this Hand"
+msgctxt "@title:window"
+msgid "Scoring for this Hand"
+msgstr "Pointscore for denne hånd"
+
+#: src/scoringdialog.py:811
+msgctxt "kajongg"
+msgid "Player"
+msgstr "Spiller"
+
+#: src/scoringdialog.py:812
+msgctxt "kajongg"
+msgid "Wind"
+msgstr "Vind"
+
+#: src/scoringdialog.py:814
+msgid "Winner"
+msgstr "Vinder"
+
+#: src/scoringdialog.py:820
+msgctxt "kajongg"
+msgid "Draw"
+msgstr "Uafgjort"
+
+#: src/scoringdialog.py:822
+msgid "&Penalties"
+msgstr "&Straffe"
+
+#: src/scoringdialog.py:824
+msgid "&Save Hand"
+msgstr "&Gem hånd"
+
+#: src/scoringdialog.py:846
+msgid "&Last Tile:"
+msgstr "&Sidste felt:"
+
+#: src/scoringdialog.py:855
+msgid "L&ast Meld:"
+msgstr "S&idste sæt:"
+
+#: src/server.py:113
+msgid "Wrong password"
+msgstr "Forkert adgangskode"
+
+#: src/server.py:212
+msgid "table with id <numid>%1</numid> not found"
+msgstr "bordet med id'et <numid>%1</numid> blev ikke fundet"
+
+#: src/server.py:358
+msgid "Player %1 has logged out"
+msgstr "Spilleren %1 har logget ud"
+
+#: src/server.py:429
+#, python-format
+msgid "the server will listen on PORT (%d)"
+msgstr "serveren vil lytte på PORT (%d)"
+
+#: src/server.py:433
+msgid "the server will listen on SOCKET"
+msgstr "serveren vil lytte på SOCKET"
+
+#: src/server.py:438
+msgid "name of the database"
+msgstr "navn på databasen"
+
+#: src/server.py:442
+msgid "do not terminate local game server after last client disconnects"
+msgstr "afslut ikke lokal spilserver når sidste klient kobler fra"
+
+#: src/server.py:447
+msgid "unrecognized arguments:%1"
+msgstr "ukendte argumenter: %1"
+
+#: src/servertable.py:157
+msgid "You already joined this table"
+msgstr "Du deltager allerede ved dette bord"
+
+#: src/servertable.py:159
+msgid "All seats are already taken"
+msgstr "Alle pladserne er allerede optaget"
+
+#: src/servertable.py:164
+msgid "takes a seat"
+msgstr "sætter sig"
+
+#: src/servertable.py:172
+msgid "leaves the table"
+msgstr "forlader bordet"
+
+#: src/servertable.py:221
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 1"
+msgstr "Robot 1"
+
+#: src/servertable.py:224
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 2"
+msgstr "Robot 2"
+
+#: src/servertable.py:225
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 3"
+msgstr "Robot 3"
+
+#: src/servertable.py:279
+msgid "Only the initiator %1 can start this game, you are %2"
+msgstr "Kun initiativtageren %1 kan starte dette spil, du er %2"
+
+#: src/servertable.py:648
+msgid "Game <numid>%1</numid> is over!"
+msgstr "Spillet <numid>%1</numid> er slut!"
+
+#: src/servertable.py:677
+msgid "%1 wrongly said %2 for meld %3"
+msgstr "%1 sagde fejlagtigt %2 for sættet %3"
+
+#: src/servertable.py:682
+msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
+msgstr ""
+"%1 sagde fejlagtigt %2: Påstår at have %3 skjulte brikker, men har kun %4"
+
+#: src/servertable.py:720
+msgid "declareKong:%1 wrongly said Kong for meld %2"
+msgstr "meldKong: %1 sagde fejlagtigt Kong for sættet %2"
+
+#: src/servertable.py:768
+msgid "%1 claiming MahJongg: This is not a winning hand: %2"
+msgstr "%1 melder mahjong: Dette er ikke en vinderhånd: %2"
+
+#: src/sound.py:58
+msgid "No voices will be heard because the program %1 is missing"
+msgstr "Der vil ikke kunne høres stemmer da programmet %1 mangler"
+
+#: src/sound.py:358
+msgid "cannot write <filename>%1</filename>: %2"
+msgstr "kan ikke skrive <filename>%1</filename>: %2"
+
+#: src/sound.py:361
+msgid "The voice files have changed, their checksum has changed."
+msgstr ""
+
+#: src/sound.py:362
+msgid "Please reinstall kajongg or do, with sufficient permissions:"
+msgstr ""
+
+#: src/tables.py:56
+msgid "Table"
+msgstr "Bord"
+
+#: src/tables.py:60
+msgctxt "table status"
+msgid "Status"
+msgstr "Status"
+
+#: src/tables.py:61
+msgid "Ruleset"
+msgstr "Regelsæt"
+
+#: src/tables.py:145
+msgid "Select a ruleset"
+msgstr "Vælg et regelsæt"
+
+#: src/tables.py:183
+msgctxt "allocate a new table"
+msgid "&New"
+msgstr "&Nyt"
+
+#: src/tables.py:186 src/tables.py:326
+msgid "Allocate a new table"
+msgstr "Allokér et nyt bord"
+
+#: src/tables.py:189 src/tables.py:327
+msgid "&Join"
+msgstr "&Deltag"
+
+#: src/tables.py:193 src/tables.py:328
+msgid "Join a table"
+msgstr "Deltag ved et bord"
+
+#: src/tables.py:195
+msgid "&Leave"
+msgstr "&Forlad"
+
+#: src/tables.py:199
+msgid "Leave a table"
+msgstr "Forlad et bord"
+
+#: src/tables.py:202
+msgctxt "Kajongg-Ruleset"
+msgid "Compare"
+msgstr "Sammenlign"
+
+#: src/tables.py:207
+msgid "Compare the rules of this table with my own rulesets"
+msgstr "Sammenlign reglerne for dette bord med mine egne regelsæt"
+
+#: src/tables.py:209
+msgid "&Chat"
+msgstr "&Chat"
+
+#: src/tables.py:214
+msgid "&Start"
+msgstr "&Start"
+
+#: src/tables.py:219
+msgid "Start playing on a table. Empty seats will be taken by robot players."
+msgstr ""
+"Begynd at spille ved et bord. Tomme pladser vil blive optaget af "
+"robotspillere."
+
+#: src/tables.py:261
+msgid "opens a chat window"
+msgstr "åbner et chatvindue"
+
+#: src/tables.py:280
+msgid "Local Games with Ruleset %1"
+msgstr "Lokale spil med regelsættet %1"
+
+#: src/tables.py:283
+msgid "Tables at %1"
+msgstr "Borde ved %1"
+
+#: src/tables.py:320
+msgid "Start a new game"
+msgstr "Start et nyt spil"
+
+#: src/tables.py:322
+msgctxt "resuming a local suspended game"
+msgid "&Resume"
+msgstr "&Genoptag"
+
+#: src/tables.py:324
+msgid "Resume the selected suspended game"
+msgstr "Genoptag det valgte udsatte spil"
+
+#: src/tables.py:342
+msgid "Chat with others on this table"
+msgstr "Chat med andre ved dette bord"
+
+#: src/tables.py:345
+msgid "For chatting with others on this table, please first take a seat"
+msgstr "For at chatte med andre ved dette bord skal du først sætte dig"
+
+#: src/tile.py:192
+msgctxt "kajongg"
+msgid "hidden"
+msgstr "skjult"
+
+#: src/tile.py:193
+msgctxt "kajongg"
+msgid "stone"
+msgstr "cirkler"
+
+#: src/tile.py:194
+msgctxt "kajongg"
+msgid "bamboo"
+msgstr "bambus"
+
+#: src/tile.py:195
+msgctxt "kajongg"
+msgid "character"
+msgstr "skrifttegn"
+
+#: src/tile.py:196
+msgctxt "kajongg"
+msgid "wind"
+msgstr "vind"
+
+#: src/tile.py:197
+msgctxt "kajongg"
+msgid "dragon"
+msgstr "drage"
+
+#: src/tile.py:198
+msgctxt "kajongg"
+msgid "flower"
+msgstr "blomst"
+
+#: src/tile.py:199
+msgctxt "kajongg"
+msgid "season"
+msgstr "årstid"
+
+#: src/tile.py:205
+msgctxt "kajongg"
+msgid "tile"
+msgstr "brik"
+
+#: src/tile.py:206
+msgctxt "kajongg"
+msgid "white"
+msgstr "hvid"
+
+#: src/tile.py:207
+msgctxt "kajongg"
+msgid "red"
+msgstr "rød"
+
+#: src/tile.py:208
+msgctxt "kajongg"
+msgid "green"
+msgstr "grøn"
+
+#: src/tile.py:209
+msgctxt "kajongg"
+msgid "East"
+msgstr "Øst"
+
+#: src/tile.py:210
+msgctxt "kajongg"
+msgid "South"
+msgstr "Syd"
+
+#: src/tile.py:211
+msgctxt "kajongg"
+msgid "West"
+msgstr "Vest"
+
+#: src/tile.py:212
+msgctxt "kajongg"
+msgid "North"
+msgstr "Nord"
+
+#: src/tile.py:221
+msgid "East Wind"
+msgstr "Østens vind"
+
+#: src/tile.py:222
+msgid "South Wind"
+msgstr "Sydens vind"
+
+#: src/tile.py:223
+msgid "West Wind"
+msgstr "Vestens vind"
+
+#: src/tile.py:224
+msgid "North Wind"
+msgstr "Nordens vind"
+
+#: src/tile.py:226
+#, python-brace-format
+msgctxt "kajongg tile name"
+msgid "{group} {value}"
+msgstr "{group} {value}"
+
+#: src/user.py:84
+msgid ""
+"Your client has a version older than 4.9.0 but you need %1 for this server"
+msgstr ""
+"Din klient har en ældre version end 4.9.0, men du skal bruge %1 til denne "
+"server"
+
+#: src/user.py:93
+msgid "Your client has version %1 but you need %2 for this server"
+msgstr "Din klient har version %1 men du skal bruge %2 til denne server"
+
+#~ msgid "This player cannot be deleted. There are games associated with %1."
+#~ msgstr ""
+#~ "Denne spiller kan ikke slettes. Der er spil der er associeret med %1."
+
+#, fuzzy
+#~| msgid "(C) 2008, 2009, 2010,2011,2012 Wolfgang Rohdewald"
+#~ msgid "(C) 2008-2016 Wolfgang Rohdewald"
+#~ msgstr "(C) 2008, 2009, 2010,2011,2012 Wolfgang Rohdewald"
+
+#~ msgid "Wolfgang Rohdewald"
+#~ msgstr "Wolfgang Rohdewald"
+
+#~ msgid ""
+#~ "cannot find any background in the following directories, is libkmahjongg "
+#~ "installed?"
+#~ msgstr ""
+#~ "kan ikke finde nogen baggrund i følgende mapper, er libkmahjongg "
+#~ "installeret?"
+
+#~ msgid "cannot find background %1, using default"
+#~ msgstr "kan ikke finde baggrunden %1, bruger standard"
+
+#, fuzzy
+#~| msgid "show no graphical user interface. Intended only for testing"
+#~ msgid "Do not use KDE bindings. Intended only for testing"
+#~ msgstr "vis ingen grafisk brugerflade. Kun tiltænkt til testformål"
+
+#~ msgid "Copy"
+#~ msgstr "Kopiér"
+
+#~ msgctxt "Kajongg ruleset comparer"
+#~ msgid "Compare"
+#~ msgstr "Sammenlign"
+
+#, fuzzy
+#~| msgid ""
+#~| "use a dedicated server listening on SOCKET. Intended only for testing"
+#~ msgid "start the server using Python 3. Meant only for testing."
+#~ msgstr ""
+#~ "brug en dedikeret server, som lytter på SOCKET. Kun til brug for testning"
+
+#~ msgid ""
+#~ "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and "
+#~ "another tile 2..8 of the same color"
+#~ msgstr ""
+#~ "Alle skjulte brikker af samme farve: Værdier 1-1-1-2-3-4-5-6-7-8-9-9-9 og "
+#~ "endnu en brik 2..8 af samme kulør"
+
+#~ msgctxt ""
+#~ "kajongg:keyboard commands for moving tiles to the players with wind ESWN "
+#~ "or to the central tile selector (X)"
+#~ msgid "ESWNX"
+#~ msgstr "ØSVNX"
+
+#~ msgid "DNS lookup failed, address not found"
+#~ msgstr "DNS-opslag slog fejl, adresse ikke fundet"
+
+#~ msgctxt "Player"
+#~ msgid "Name"
+#~ msgstr "Navn"
+
+#~ msgid ""
+#~ "Cannot save this. Possibly the name already exists. <br><br>Message from "
+#~ "database:<br><br><message>%1</message>"
+#~ msgstr ""
+#~ "Kan ikke gemme dette. Muligvis findes navnet allerede. <br><br>Meddelelse "
+#~ "fra databasen:<br><br><message>%1</message>"
+
+#~ msgctxt "@action:inmenu"
+#~ msgid "&Show Scoring Editor"
+#~ msgstr "Vi&s pointgivningseditoren"
+
+#~ msgctxt "@action:intoolbar"
+#~ msgid "&Scoring"
+#~ msgstr "&Pointgivning"
+
+#~ msgctxt "kajongg @info:tooltip"
+#~ msgid "Show or hide the scoring editor for a manual game."
+#~ msgstr "Vis eller gem pointgivningseditoren for et manuelt spil."
+
+#~ msgid "All Greens"
+#~ msgstr "Kun grønne"
+
+#~ msgid "{meldName}"
+#~ msgstr "{meldName}"
+
+#~ msgid "{meldType} of Own Wind ({value})"
+#~ msgstr "{meldType} af egen vind ({value})"
+
+#~ msgid "{meldType} of Round Wind ({value})"
+#~ msgstr "{meldType} af rundens vind ({value})"
+
+#~ msgctxt "kajongg"
+#~ msgid "east"
+#~ msgstr "øst"
+
+#~ msgctxt "kajongg"
+#~ msgid "west"
+#~ msgstr "vest"
+
+#~ msgctxt "kajongg"
+#~ msgid "own wind"
+#~ msgstr "egen vind"
+
+#~ msgctxt "kajongg"
+#~ msgid "round wind"
+#~ msgstr "rundevind"
+
+#~ msgid "Ruleset: %1"
+#~ msgstr "Regelsæt: %1"
+
+#~ msgid ""
+#~ "The game can begin. Are you ready to play now?\n"
+#~ "If you answer with NO, you will be removed from table %1."
+#~ msgstr ""
+#~ "Spillet kan begynde. Er du parat til at spille nu?\n"
+#~ "Hvis du svarer NEJ, vil du blive fjernet fra bordet %1."
+
+#~ msgid "Aborted creating a user account"
+#~ msgstr "Afbrød oprettelse af brugerkonto"
+
+#~ msgid "Calling"
+#~ msgstr "Melder"
+
+#~ msgid "The game is over!"
+#~ msgstr "Spillet er slut!"
+
+#~ msgid ""
+#~ "You cannot specify hand/discard with --game when starting with --nogui"
+#~ msgstr ""
+#~ "Du kan ikke angive hånd/afsmid med --game, når du starter med --nogui"
+
+#~ msgid ""
+#~ "Cannot save your ruleset changes.<br>You probably introduced a duplicate "
+#~ "name. <br><br >Message from database:<br><br><message>%1</message>"
+#~ msgstr ""
+#~ "Kan ikke gemme dine ændringer af regelsættet.<br>Du har nok brugt et "
+#~ "duplikeret navn. <br><br >Meddelelse fra databasen:<br><br><message>%1</"
+#~ "message>"
+
+#~ msgctxt "Kajongg ruleset comparer"
+#~ msgid "C&ompare"
+#~ msgstr "S&ammenlign"
+
+#~ msgid "play like a robot using ruleset"
+#~ msgstr "spil som en robot med brug af regelsæt"
+
+#~ msgid "ruleset \"%1\" not found"
+#~ msgstr "regelsæt \"%1\" ikke fundet"
+
+#~ msgctxt "kajongg"
+#~ msgid "ROBOT 1"
+#~ msgstr "ROBOT 1"
+
+#~ msgctxt "kajongg"
+#~ msgid "ROBOT 2"
+#~ msgstr "ROBOT 2"
+
+#~ msgctxt "kajongg"
+#~ msgid "ROBOT 3"
+#~ msgstr "ROBOT 3"
+
+#~ msgid "&Quit"
+#~ msgstr "&Afslut"
+
+#~ msgctxt "kajongg"
+#~ msgid "%1 base points"
+#~ msgstr "%1 basispoint"
+
+#~ msgctxt "kajongg"
+#~ msgid "%1 doubles"
+#~ msgstr "%1 dobler"
+
+#~ msgctxt "kajongg"
+#~ msgid "%1 limits"
+#~ msgstr "%1 grænser"
+
+#~ msgid "Computed scoring for %1:"
+#~ msgstr "Beregnede point for %1:"
+
+#~ msgid "Total for %1: %2 base points, %3 doubles, %4 points"
+#~ msgstr "I alt for %1: %2 basispoint, %3 dobler, %4 point"
+
+#~ msgid "Flower 2"
+#~ msgstr "Blomst 2"
+
+#~ msgid "Flower 3"
+#~ msgstr "Blomst 3"
+
+#~ msgid "Flower 4"
+#~ msgstr "Blomst 4"
+
+#~ msgid "Season 2"
+#~ msgstr "Årstid 2"
+
+#~ msgid "Season 3"
+#~ msgstr "Årstid 3"
+
+#~ msgid "Season 4"
+#~ msgstr "Årstid 4"
+
+#~ msgctxt "kajongg"
+#~ msgid "%1 points"
+#~ msgstr "%1 point"
+
+#~ msgid "Penalties are applied manually by the user"
+#~ msgstr "Straffe håndhæves manuelt af brugeren"
+
+#~ msgctxt "Ruleset.copyRule:%1 is empty or space plus number"
+#~ msgid "Copy%1 of %2"
+#~ msgstr "Kopiér%1 af %2"
+
+#~ msgctxt "penalty dialog, appears behind paying player combobox"
+#~ msgid "pays %1"
+#~ msgstr "betaler %1"
+
+#~ msgctxt "penalty dialog, appears behind profiting player combobox"
+#~ msgid "gets %1"
+#~ msgstr "modtager %1"
+
+#~ msgctxt "Rulesetselector"
+#~ msgid "Score"
+#~ msgstr "Pointstilling"
+
+#~ msgctxt "Rulesetselector"
+#~ msgid "Unit"
+#~ msgstr "Enhed"
+
+#~ msgctxt "Rulesetselector"
+#~ msgid "Definition"
+#~ msgstr "Definition"
+
+#~ msgid "Login aborted"
+#~ msgstr "Login afbrudt"
+
+#, fuzzy
+#~| msgctxt "kajongg name for local game server"
+#~| msgid "Local Game"
+#~ msgid "Local Games"
+#~ msgstr "Lokalt spil"
+
+#~ msgctxt "kajongg"
+#~ msgid "Server"
+#~ msgstr "Server"

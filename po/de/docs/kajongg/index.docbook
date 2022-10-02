@@ -1,0 +1,1665 @@
+<?xml version="1.0" ?>
+<!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % German "INCLUDE"
+> <!-- change language only here -->
+  <!ENTITY % addindex "IGNORE"
+> <!-- do not change this! -->
+  <!ENTITY s1 "s1">
+  <!ENTITY s9 "s9">
+  <!ENTITY b1 "b1">
+  <!ENTITY b9 "b9">
+  <!ENTITY c1 "c1">
+  <!ENTITY c9 "c9">
+  <!ENTITY we "we">
+  <!ENTITY ws "ws">
+  <!ENTITY ww "ww">
+  <!ENTITY wn "wn">
+  <!ENTITY db "db">
+  <!ENTITY dr "dr">
+  <!ENTITY dg "dg">
+  <!ENTITY chow "chow">
+  <!ENTITY pung "pung">
+  <!ENTITY kong "kong">
+  <!ENTITY mahjongg "mahjongg">
+  <!ENTITY originalcall "originalcall">
+  <!ENTITY violatesoriginalcall "violatesoriginalcall">
+  <!ENTITY dangerousgame "dangerousgame">
+  <!ENTITY nochoice "nochoice">
+]>
+
+<!-- TODO: describe the window with the list of tables -->
+
+<book id="kajongg" lang="&language;"
+> <!-- do not change this! -->
+<bookinfo>
+	<title
+>Das Handbuch zu &kajongg;</title
+> <!-- This is the title of this docbook. -->
+<!-- List of immidiate authors begins here. -->
+<!--INPORTANT! - All other contributors: [to be determined] -->
+<authorgroup>
+<author
+>&Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </author>
+<othercredit role="translator"
+><firstname
+>Wolfgang</firstname
+><surname
+>Rohdewald</surname
+><affiliation
+><address
+><email
+>wolfgang@rohdewald.de</email
+></address
+></affiliation
+><contrib
+>Übersetzung</contrib
+></othercredit
+> 
+</authorgroup>
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2021-05-30</date
+><!-- Date of (re)writing, or update.-->
+<releaseinfo
+>KDE Gear 21.04</releaseinfo>
+
+<!--Short description of this document. Do not change unless necessary!-->
+<abstract>
+	<para
+>Dieses Handbuch beschreibt das Spiel &kajongg;</para>
+</abstract>
+
+<!--List of relevant keywords-->
+<keywordset>
+	<keyword
+>KDE</keyword
+> <!-- do not change this! -->
+	<keyword
+>kdegames</keyword
+> <!-- do not change this! -->
+	<keyword
+>Spiel</keyword
+> <!-- do not change this! -->
+	<keyword
+>kajongg</keyword
+><!--Application name goes here-->
+<!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<keyword
+>Brettspiel</keyword>
+	<keyword
+>Arkade</keyword>
+	<keyword
+>Spiel mit Steinen</keyword>
+	<keyword
+>Steine</keyword>
+<!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<keyword
+>vier Spieler</keyword>
+<!--All other relevant keywords-->
+</keywordset>
+</bookinfo>
+<!--Content begins here: -->
+<chapter id="introduction"
+><title
+>Einführung</title
+> <!-- do not change this! -->
+	<note
+><title
+>Spieltyp:</title
+><para
+>Brettspiel, Arkade</para
+></note
+><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<note
+><title
+>Anzahl der Spieler:</title
+><para
+>vier</para
+></note
+><!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<para
+>&kajongg; ist ein Brettspiel: Das berühmte fernöstliche Spiel Mahjongg (chinesisch<foreignphrase lang="zh"
+>麻將</foreignphrase
+>). Es wird zu viert gespielt. Weltweit gibt es viele verschiedene Spielvarianten. Zurzeit unterstützt &kajongg; die klassischen Chinesischen Regeln, wie sie in Deutschland gespielt werden; weitere werden folgen. Man kann die Regeln beliebig ändern und auch neue Regelsätze definieren. Bitte tun Sie das und senden Sie sie dem Programm-Autor zur Integration! </para>
+	<para
+>&kajongg; kann auf zwei Arten verwendet werden: Erstens ein manuelles Spiel bewerten, wo Sie wie immer spielen und &kajongg; für die Berechnung der Punkte und für die Abrechnung verwenden. Zweitens mit &kajongg; spielen: gegen eine beliebige Kombination von anderen Personen und Rechnerspielern. </para>
+</chapter>
+
+<chapter id="screen_layout"
+><title
+>Der Bildschirmaufbau</title>
+		<para>
+			<screenshot>
+				<screeninfo
+>Bildschirmphoto von &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="gamescreen.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Bildschirmfoto</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+                </para>
+                <para
+>Eine kurze Beschreibung aller Teile des Spielfeldes: </para>
+	<variablelist>
+		<varlistentry>
+			<term
+>Werkzeugleiste</term>
+			<listitem
+><para
+>Die Werkzeugleiste ist unterhalb der Menüleiste und enthält Knöpfe für die wichtigsten Befehle. Den Inhalt der Werkzeugleiste können Sie ändern. Sie können sie auch ausblenden, um mehr Platz für das Spielfeld zu haben. </para
+><para
+>Je nach Bildschirmgröße kann es sinnvoll sein, die Werkzeugleiste auszublenden oder sie an den linken Rand des Fensters zu verschieben. Das können Sie tun, indem Sie mit der &RMBn; auf die Werkzeugleiste klicken. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Spielfeld</term>
+			<listitem
+><para
+>Das Spielbrett ist der größte Bereich des Fensters. Sie sehen 4 Mauern mit einer Länge von 18 Ziegeln (wird später konfigurierbar). Die Namen der Spieler stehen auf den Mauern, zusammen mit ihren Winden. Der vorherrschende Wind hat einen gefärbten Hintergrund, im obigen Beispiel Osten. </para
+><para
+>Beim <link linkend="play"
+>Spielen</link
+> sehen Sie im Hof (zwischen den Mauern) die von den Spielern abgelegten Ziegel. Sie werden dort zufällig platziert. Der zuletzt abgelegte Ziegel hat einen blauen Rahmen. </para
+><para
+>Wenn Sie ein Spiel <link linkend="scoreGame"
+>bewerten</link
+>, sehen Sie innerhalb der Wände eine Auswahl aller Ziegel: Den zentralen Auswahlbereich. Sie können Ziegel den Spieler mit der Maus oder der Tastatur zuordnen. </para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Spielerbereich</term>
+			<listitem
+><para
+>Jeder Spieler hat einen Bereich für seine Ziegel. Die obere Reihe enthält aufgedeckte Ziegel, die untere verdeckte. Beim <link linkend="scoreGame"
+>manuellen Bewerten einer Partie</link
+> werden verdeckte Ziegel mit einem Schatten über dem ganzen Ziegel gezeigt. Im Beispiel hat Klaus einen verdeckten Pong Kreis 9. Bonusziegel stehen ganz rechts. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Dialog</term>
+			<listitem
+><para
+>Der Dialog zeigt die Möglichkeiten, die der Spieler hat. Meistens hat er einen Time-Out mit einem Fortschrittsbalken, der die noch verbleibende Zeit anzeigt. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Statusleiste</term>
+			<listitem
+><para
+>Die Statusleiste ist ganz unten im Fenster und zeigt die aktuellen Punktestände aller Spieler. </para
+></listitem>
+		</varlistentry>
+	</variablelist>
+</chapter>
+
+<chapter id="scoreGame"
+><title
+>Manuelle Partie bewerten</title
+> <!-- do not change this! -->
+	<para
+>In diesem Modus übernimmt &kajongg; nur das Bewerten einer Partie. Sie spielen wie immer, und am Ende jedes Spiels sagen Sie &kajongg;, welcher Spieler was hat, und alles andere, was &kajongg; braucht, um seine Hand zu bewerten. Alternativ können Sie die Werte auch selber berechnen und eingeben - meistens ist das am bequemsten. &kajongg; rechnet dann zwischen den Spielern ab und schreibt alles in eine Datenbank. Man kann eine Partie unterbrechen, eine andere mit anderen Spielern und anderen Regeln starten und alte Partien wiederaufnehmen. Alle Regeln werden zusammen mit den Partien gespeichert, dadurch kann man jede Partie mit anderen Regeln spielen. </para>
+        <itemizedlist>
+            <listitem
+><para
+>Wählen Sie im Menü <menuchoice
+><guimenu
+>Partie</guimenu
+><guimenuitem
+>Manuelle Partie bewerten</guimenuitem
+></menuchoice
+> oder drücken Sie <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+>. </para
+></listitem>
+            <listitem
+><para
+>Nun können Sie entweder eine existierende, unbeendete Partie wählen oder eine neue starten. Wenn Sie eine neue Partie starten, werden Sie nach den Spielern und dem Regelsatz gefragt. &kajongg; wird dieselben Werte wie die des zuletzt gespielten Partie. Wenn es keine vorherige gibt, werden die ersten vier definierten Spieler vorgeschlagen. Beachten Sie bitte, dass Sie die Regeln für diese Partie nach Auswahl des Regelsatzes nicht mehr ändern können. Sie können das vorher tun, mit dem <link linkend="ruleset-options"
+>Regel - Editor</link
+>. </para
+></listitem>
+            <listitem
+><para
+>Nun bekommen Sie ein neues Fenster <guilabel
+>Bewertung für dieses Spiel</guilabel
+>. Lesen Sie <link linkend="enterhand-tiles"
+>&kajongg; den Wert berechnen lassen</link
+> für eine genaue Beschreibung. </para
+></listitem>
+            <listitem
+><para
+>Nachdem Sie die Spielresultate gespeichert haben, geht es weiter mit dem nächsten Spiel. </para
+></listitem>
+        </itemizedlist>
+      <sect1 id="enterhand"
+><title
+>Spiel bewerten</title>
+        <sect2 id="enterhand-scores">
+	<title
+>Punkte</title>
+	<screenshot>
+		<screeninfo
+>Bildschirmphoto von &kajongg;</screeninfo>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="enterhand.png" format="PNG"/>
+			</imageobject
+>				<textobject
+><phrase
+>Bildschirmfoto</phrase
+></textobject>
+		</mediaobject>
+	</screenshot>
+	<para
+>In diesem Fenster können Sie Spielresultate erfassen. Es zeigt sich von selber, wenn &kajongg; denkt, dass Sie es benötigen. Sie können es jederzeit zeigen oder ausblenden, indem Sie  <keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+> eingeben oder den entsprechenden Menü-Befehl auswählen. </para>
+	<para
+>Wie immer hat der vorherrschende Wind einen farbigen Hintergrund. </para>
+	<para
+>Hier können Sie manuell Punkte für alle Spieler erfassen. Stattdessen können Sie aber auch eingeben, welche Ziegel ein Spieler hat. Wenn Sie das tun, wird das Feld für die Punktezahl deaktiviert - es enthält aber nach wie vor die von &kajongg; automatisch berechneten Punkte. </para>
+	<para
+>Nachdem Sie alle relevanten Daten zu einem Spiel erfasst haben, drücken Sie den Knopf <guibutton
+>Spiel speichern</guibutton
+>. Die Spielwerte werden dann in der Datenbank eingetragen, und auch in der Punkte-Tabelle angezeigt. Eventuell werden Sie aufgefordert, Plätze zu tauschen, das können Sie aber ablehnen. Die vorgeschlagenen Wechsel sind derzeit nicht konfigurierbar - wenn ein Regelsatz etwas anderes benötigt, werden wir das ändern. </para>
+	<para
+>Wenn der Spieler gewonnen haben könnte, wird die Box in der Kolonne <guilabel
+>Gewinner</guilabel
+> aktiv sein - setzen Sie dort einen Haken für den Gewinner. </para>
+	<para
+>Die Statusleiste zeigt dann die aktualisierten Totale der Spieler, und Sie können mit dem nächsten Spiel fortfahren. </para>
+	<sect3 id="enterhand-manually">
+	<title
+>Die Punktzahl manuell eingeben</title>
+	<para
+>Ein guter Spieler wird es wahrscheinlich vorziehen, seine Punkte selber zu berechnen. In diesem Fall können Sie sie direkt eingeben. Das ist nur dann möglich, wenn diesem Spieler keine Ziegel zugeordnet sind. </para>
+	<para
+>Wenn Sie manuell eine Punktzahl eingeben, muss sie schon alles enthalten, Sie können keine Regeln manuell wählen. Nur die Strafen erfassen Sie bitte getrennt. Es gibt eine Ausnahme: <quote
+>Gefährliches Spiel</quote
+>. Das beeinflusst die Punktezahl nicht, und es ist auch keine Strafe, da es nur die Zahlungen zwischen den Spielern beeinflusst: Der Verursacher zahlt alles für alle an den Gewinner. Die anderen beiden Spieler rechnen nicht miteinander ab. Das ist derzeit nicht über den Regeleditor änderbar. </para>
+	</sect3>
+	<sect3 id="enterhand-tiles">
+	<title
+>&kajongg; den Wert berechnen lassen</title>
+	<para
+>Wenn Sie &kajongg; explizit sagen, was für Ziegel ein Spieler hat, wird das Feld zur Punkteeingabe für diesen Spieler grau sein (keine Eingabe möglich). Während Sie einem Spieler Ziegel zuordnen, können Sie sehen, wie seine Punktezahl steigt - aber beim 14ten Ziegel auf 0 fällt. Das mag Sie überraschen, aber wenn das nicht der Gewinner ist, sind 14 Ziegel eine lange Hand und ergeben immer 0 Punkte. Das ist durch den Regelsatz Klassisch Chinesisch definiert, andere Regelsätze könnten sich auch anders verhalten. </para>
+	<para
+>Sie können Ziegel und Figuren den Spielern wahlweise mit der Maus oder mit der Tastatur zuordnen. Mit der Maus ziehen Sie die Ziegel einfach an den gewünschten Ort - je nach dem, was Sie von wo nach wo verschieben, werden Sie dann gefragt, was Sie verschieben wollen, z.B. Einzelziegel oder Pong. Zur Erinnerung - im Spielerbereich ist die obere Zeile für offene Figuren, die untere für verdeckte. Sie können auch von Spieler zu Spieler und zurück ins Zentrum verschieben. </para>
+	<para
+>Wenn Sie die Tastatur bevorzugen, benutzen Sie &Tab;, um Ihre Position zwischen dem zentralen Auswahlbereich und den Spielerbereichen zu ändern. Die Tasten<keycap
+>eswnESWN</keycap
+> verschieben einen Ziegel zu den Spielern Ost, Süd, West, Nord. Die Tasten <keycap
+>xX</keycap
+> verschieben ihn zurück zum zentralen Auswahlbereich. <keycap
+>ESWN</keycap
+> verschiebt in die untere Reihe für verdeckte Ziegel, <keycap
+>eswn</keycap
+> verschiebt in die obere Reihe für aufgedeckte Ziegel. Sie können Ihre Position von Ziegel zu Ziegel verschieben, indem Sie die Pfeiltasten verwenden. Der aktuelle Ziegel hat einen blauen Rahmen. Da die Pfeiltasten weit weg von den Buchstabentasten sind, können Sie auch die Tasten <keycap
+>hjkl</keycap
+> or <keycap
+>HJKL</keycap
+> benutzen, um Ihre Position zu ändern: <keycap
+>hH</keycap
+> nach links, <keycap
+>jJ</keycap
+> nach unten, <keycap
+>kK</keycap
+> nach oben, <keycap
+>lL</keycap
+> nach rechts. So ist es auch im Unix-Editor <command
+>vi</command
+>, im &kde;-Browser &konqueror; und sogar in diesem Hilfeprogramm. Diese Tasten sind in anderen Sprachen als Englisch anders, aber es ist derzeit nicht möglich, sie einzurichten. </para>
+	<para
+>Die Optionen <guilabel
+>Letzter Ziegel</guilabel
+> und <guilabel
+>Letzte Figur</guilabel
+> werden von manchen Regeln gebraucht, z.B. <guilabel
+>Letzter Ziegel komplettiert Paar</guilabel
+>. Sie können nur für die Gewinner-Hand verwendet werden. </para>
+	<para
+>Im rechten Teil des Fensters können Sie manuell Regeln anwenden. Welche Regeln dort zur Auswahl stehen, hängt vom aktuellen Regelsatz und den vorhandenen Ziegeln ab. Im Beispiel oben im Bild könnten die Verlierer eine Option <quote
+>Gefährliches Spiel</quote
+> haben - auch das abhängig vom Regelsatz und den Ziegeln. Das Ziel der Entwickler ist, diese Liste so kurz wie möglich zu halten. &kajongg; soll möglichst alles automatisch bestimmen. Aber manchmal hat es nicht genug Information oder Wissen, um das selbst entscheiden zu können. </para>
+	</sect3>
+	</sect2>
+	<sect2 id="enterhand-penalties">
+	<title
+>Strafen</title>
+			<screenshot>
+				<screeninfo
+>Bildschirmphoto von &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="penalty.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Bildschirmfoto</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+	<para
+>Im Fenster <link linkend="enterhand"
+>Bewertung für diese Hand</link
+> zeigt Ihnen der Knopf  <guibutton
+>Strafen</guibutton
+> dieses Fenster, in dem Sie Strafen erfassen können. Das können Sie jederzeit tun, unabhängig vom normalen Bewertungssystem.</para>
+	<para
+>Die Auswahl <guilabel
+>Vergehen</guilabel
+> zeigt alle Vergehen, die für die aktuelle Hand möglich sind. Wählen Sie.</para>
+	<para
+>Nun können Sie die  <guilabel
+>Totalstrafe</guilabel
+> anpassen. Dies ist das Total, das von Schuldnern zu Empfängern verschoben wird. Es wird gleichmäßig zwischen den betroffenen Spielern aufgeteilt.</para>
+	<para
+>Je  nach Art des Vergehens variiert die Anzahl Schuldner und Empfänger. Die korrekte Anzahl von Spielern wird angezeigt. Wenn Sie einen Spieler auswählen, sorgt &kajongg; dafür, dass dieser Spieler nur einmal vorkommt, indem es die anderen Spieler anpasst. </para>
+	</sect2>
+	</sect1>
+</chapter>
+
+<chapter  id="play"
+><title
+>Spielen</title>
+	<para
+>Sie können den Demomodus jederzeit ein- und ausschalten. Im Demomodus wird der Rechner für Sie spielen. Wenn gerade keine Partie läuft, wird automatisch eine gestartet, und zwar mit dem zuletzt verwendeten Regelsatz. </para>
+        <sect1 id="robotplay">
+        <title
+>Spiele gegen den Rechner</title>
+         <para
+>Zuerst bekommen Sie einen Anmeldungs-Dialog. Wählen Sie den Spielserver, mit dem Sie sich verbinden möchten, und Ihren Benutzernamen. Wenn Sie den speziellen Eintrag <guilabel
+>Lokale Partie</guilabel
+> wählen, müssen Sie nur Ihren Benutzernamen eingeben (oder den vorgeschlagenen akzeptieren), und den gewünschten Regelsatz. Dann wird sofort eine lokale Partie gestartet, in der Sie gegen drei Rechnerspieler spielen. Wenn allerdings unterbrochene Partien existieren, werden diese in einer Liste angezeigt. Sie können dann eine davon wählen, um sie weiterzuspielen, oder eine neue Partie beginnen. </para>
+        </sect1>
+        <sect1 id="humanplay">
+        <title
+>Mit Freunden spielen</title>
+        <para
+>Wenn Sie mit Freunden spielen möchten, benötigen Sie einen Spielserver, mit dem sich alle Spieler, auch Sie, verbinden müssen. Tun Sie das, indem Sie den richtigen Spielserver auswählen oder einen neuen manuell eingeben, und indem Sie dann Ihr Passwort für diesen Spielserver eingeben. Das zuletzt verwendete Passwort wird vorgeschlagen. </para
+><para
+>Am einfachsten ist es, den Spielserver auf <literal
+>kajongg.org</literal
+> zu benutzen. &kajongg; zeigt diesen Server in der Liste der vorhandenen Spielserver. Beachten Sie bitte, dass dort zurzeit nur ein Spielserver läuft, keine Webseite oder andere Dienste. </para
+><para
+>Wenn Sie auf dem Spielserver kein Benutzerkonto mit dem eingegeben Namen haben, werden Sie gefragt, ob Sie eines anlegen wollen. Wenn Sie Ja sagen, wird ein neuer Dialog erscheinen, in dem Sie das gewünschte Passwort zweimal eingeben können. Ihr Benutzerkonto wird dann automatisch angelegt. </para
+><para
+>Nachdem Sie sich erfolgreich am Spielserver angemeldet haben, bekommen Sie eine Liste von Tischen mit freien Plätzen. Setzen Sie sich an einen Tisch oder legen Sie einen neuen an. Wenn Sie einen neuen Tisch anlegen, warten Sie, bis genug weitere Spieler sich drangesetzt haben. Sie können das Spiel jederzeit starten, die nicht besetzten Plätze werden automatisch von Rechnerspielern eingenommen. </para
+><para
+>Die Tischliste zeigt auch den Namen des Regelsatzes, der für den Tisch gilt. Dieser wird von dem Spieler, der den Tisch anlegt, an den Spielserver geschickt. Wenn Sie einen identischen Regelsatz haben, wird Ihr Name für diesen Regelsatz angezeigt - das kann nützlich sein, wenn der Spieler, der den Tisch anlegte, eine andere Sprache spricht und den Regelsatz anders nennt. Wenn Ihr lokaler Name angezeigt wird, erscheint er schwarz. Wenn Sie aber keinen identischen Regelsatz haben, erscheint der Name rot, und Sie können ihn mit dem Knopf <guibutton
+>Vergleichen</guibutton
+>  mit Ihren eigenen Regelsätzen vergleichen. </para
+><para
+>Wenn Sie <literal
+>kajongg.org</literal
+> oder einen anderen vorhandenen Spielserver nicht verwenden, können Sie Ihren eigenen &kajongg;-Spielserver auf zwei Arten starten: <itemizedlist
+><listitem
+><para
+>Mit dem Server <literal
+>localhost</literal
+> verbinden. Dies ist Ihr eigener Rechner. Wenn Sie das tun und noch kein Spielserver läuft, wird er automatisch gestartet. Und wenn Sie zu spielen aufhören, wird er auch beendet. Dies ist anders als bei der Auswahl von <guilabel
+>Lokales Spiel</guilabel
+>, damit ist keine Verbindungen von anderen Rechnern erlaubt. </para
+></listitem
+><listitem
+><para
+>Starten Sie manuell einen Spielserver auf irgendeinem Rechner. Alles, was Sie tun müssen, ist auf der Befehlszeile das Programm <command
+>kajonggserver</command
+> zu starten. <command
+>kajonggserver --help</command
+> wird Ihnen alle Optionen zeigen, zum Beispiel wie man den Port auf einen anderen Wert als 8149 setzt. Dieser Server wird laufen, bis Sie ihn mit "kill" beenden. </para
+></listitem
+></itemizedlist>
+        </para
+><para
+>In beiden Fällen müssen Sie den anderen Spielern mitteilen, wie sie Ihren Spielserver erreichen können. Sie benötigen die &URL; oder einfach eine IP-Adresse und den Port, auf dem Ihr Spielserver lauscht. Das könnte z.B. etwas wie <literal
+>mypc.dyndns.org:8301</literal
+> sein, wobei <literal
+>8301</literal
+> der Port ist. Natürlich müssen Sie Ihre Firewall so konfigurieren, dass der Port vom Spielserver für die anderen Spieler erreichbar ist. Die Kommunikation läuft verschlüsselt.  </para
+><para
+>Informationen über die Pornummer finden Sie in <menuchoice
+><guimenu
+>Hilfe</guimenu
+> <guimenuitem
+>Über &kajongg;</guimenuitem
+></menuchoice
+>. Die Version des Protokolls entspricht der Portnummer. Bei &kajongg; 17.04 lautet die Portnummer 8301. Wenn der Spieler keinen Port für den gewünschten Server angibt, berechnet sein Rechner den Portnummer auf die gleiche Art. Wenn also auf einem Rechner mehrere Spielserver mit verschiedenen Protokollversionen laufen, sollte normalerweise die Verbindung zum richtigen Spielserver automatisch hergestellt werden. Auf jeden Fall ist dadurch sichergestellt, das die Versionen auf dem Spielserver und dem Rechner übereinstimmen, falls nicht, erhalten Sie einen Warnhinweis. </para
+><para
+>Wenn Sie eventuelle Fehler finden, wollen Sie vielleicht die Option <command
+>kajongg ---debug=traffic</command
+> verwenden. Damit sehen Sie auf der Konsole, auf der Sie den Server gestartet haben, was für Meldungen zwischen dem Server und den Spieler-Rechnern ausgetauscht werden. Weiter Informationen finden Sie mit <command
+>kajongg --help</command
+> </para>
+        <sect2 id="playing-caveats">
+        <title
+>Vorsicht!</title>
+            <itemizedlist
+><listitem
+><para
+>Wenn Sie sicherstellen wollen, dass niemand betrügen kann, sollte kein Mitspieler Zugriff auf den Spielserver haben. Natürlich kann man nie vermeiden, dass zwei Spieler einander helfen, weil man ja nicht wissen kann, was sie wirklich tun. Zwei Spieler könnten sogar ein und dieselbe Person sein. </para
+></listitem
+></itemizedlist>
+        </sect2>
+        </sect1>
+<sect1  id="gamerules"
+><title
+>Spielregeln</title>
+<para
+>Weltweit gibt es viele verschiedene Varianten. Zurzeit unterstützt &kajongg; zwei Varianten des klassischen Chinesische Mah Jongg, eine Variante der Spielweise in Deutschland und eine andere Variante, die in Großbritannien gespielt wird.</para
+><para
+>Diese Beschreibung ist nicht sehr ausführlich und trifft daher auf beide Varianten zu.</para
+><para
+>Aber die meisten der grundlegenden Regeln sind in den meisten Varianten dieselben.</para>
+  <para
+>Da das Programm &kajongg; die Spielregeln beherrscht, beschreiben wir hier nur, was nicht offensichtlich ist.</para>
+  <para
+>Wenn Sie Mah Jongg genauer kennen lernen möchten, finden Sie in der <link linkend="bibliography"
+>Bibliographie</link
+> geeignete Lektüre.</para>
+<sect2 id="gamerules-aim">
+  <title
+>Das Ziel des Spiels</title>
+  <para
+>Jeder Spieler versucht, Ziegel so zu sammeln, dass er eine Gewinnerhand bekommt. Wenn das erreicht ist, ruft er <quote
+>Mah Jongg</quote
+> In einer Gewinnerhand sind die Ziegel normalerweise in fünf Figuren angeordnet: Vier Figuren mit je drei oder vier Ziegeln und eine fünfte Figur, die aus zwei identischen Ziegeln besteht. Eine normale Figur hat drei oder vier identische Ziegel (Pong oder Kan) oder drei aufeinanderfolgende Ziegel wie Bambus 3, Bambus 4, Bambus 5 (Chi).</para>
+  </sect2>
+  <sect2>
+    <title
+>Der Spielverlauf</title>
+    <para
+>Am Anfang  hat der Spieler mit dem Ostwind (sichtbar auf der Mauer) einen Ziegel mehr als die anderen. Osten beginnt, indem er einen ungewünschten Ziegel ablegt. </para>
+    <para
+>Wenn ein Ziegel abgelegt wurde, können andere Spieler ihn rufen, indem sie sagen, was sie damit komplettieren können (Chi, Pong, Kan, Mah  Jongg). Nur der nächste Spieler darf Chi rufen - die anderen Rufe sind für alle Spieler erlaubt. Eine Figur, die durch einen gerufenen Ziegel komplettiert wird, wird aufgedeckt - sie wird für alle Spieler sichtbar. </para
+><para
+>Wenn niemand den abgelegten Ziegel ruft, bekommt der nächste Spieler, Süden (und dann Westen und Norden) einen Ziegel von der Mauer und legt einen unpassenden Ziegel ab.</para>
+      <para
+>Es gibt verschiedene Regeln, wann man einen Pong zu einem Kan erweitern kann (indem man ruft oder den vierten Stein von der Mauer bekommt) - diese Regeln erklären wir hier nicht. Aber &kajongg; kennt sie natürlich und stellt sicher, dass sie eingehalten werden. Wenn ein Kan deklariert wird, bekommt der Spieler automatisch einen Ersatzziegel von der Mauer - sonst wäre es ihm nicht möglich, die 5 Figuren für eine Gewinnerhand zu erzeugen. </para>
+    </sect2>
+    <sect2>
+      <title
+>Jahr, Runde und Spiel</title
+><para
+>Wenn ein Spieler Mah Jongg sagt oder niemand gewinnen kann, ist ein Spiel zu Ende. Nun drehen die Winde, sie wandern zum nächsten Spieler, es sei denn Osten oder niemand gewinnt. Das wiederholt sich, bis jeder Spieler einmal jeden Wind hatte. Damit ist eine Runde beendet. Eine ganze Partie (ein Jahr) besteht aus vier solchen Runden: Ostwindrunde, Südwindrunde usw. Der Wind der Runde, der Rundenwind, wird auch der vorherrschende Wind genannt. Ziegel dieses Windes können höhere Punktzahlen erzeugen.</para>
+	<para
+>Eine volle Partie (ein Jahr) besteht aus mindestens 16 Händen. Da die Winde sich nicht drehen, wenn unentschieden gespielt wird oder Osten gewinnt, sind es meistens deutlich mehr Hände. </para
+></sect2
+><sect2
+><title
+>Bonusziegel</title>
+    <para
+>Das Spiel kann acht Bonusziegel enthalten (wenn der Regelsatz sie nicht ausschließt). Sie werden sofort rechts aufgedeckt, da sie nie für Figuren(Chi, Pong, Kan) verwendet werden können. Sie generieren aber Bonuspunkte.</para>
+      <para
+>Wenn ein Spieler einen Bonusziegel bekommt, wird ihm automatisch ein Ersatzziegel von der Mauer zugeteilt und ein Signal ertönt.</para
+></sect2>
+      <sect2
+><title
+>Bewertung</title
+><para
+>Am Ende jedes Spiels werden die Punkte für jeden Spieler berechnet. Zuerst werden die Basispunkte gezählt wie z.B. zwei Punkte für einen einfachen offenen Pong oder 20 Punkte für den Gewinner. Danach wird eine weitere Gruppe von Regeln angewandt - diese können die Punktzahl verdoppeln. Zum Beispiel für einen Pong von Drachen. Nachdem die Punktzahl für jeden Spieler berechnet ist, zahlen diese die Differenzen untereinander aus. Nur der Gewinner bekommt seine volle Punktzahl von allen Verlierern. Osten bekommt und bezahlt immer alles doppelt.</para>
+	  <para
+>Natürlich kennt &kajongg; alle Bewertungsregeln, aber ein guter Spieler weiß, welche Kombinationen wieviel wert sind, um den Wert optimieren zu können. Während der Lernphase wird empfohlen, das Fenster  <guimenuitem
+>Wertung erklären</guimenuitem
+> zu aktivieren.</para>
+	  <para
+>Die exakten Bewertungsregeln variieren oft - in &kajongg; können Sie sie beliebig ändern, mit dem <link linkend="ruleset-options"
+>Regel-Editor</link
+>.</para>
+	  <para
+>Der Regel-Editor zeigt auch alle verfügbaren Regeln und ihre Bedeutung. Platzieren Sie die Maus über einer Regel. Bei den komplizierteren wird ein Hilfetext erscheinen.</para>
+	</sect2>
+</sect1>
+<sect1 id="playing-play">
+        <title
+>Wie man mit &kajongg; spielt</title>
+        <para
+>Sie werden einen Dialog sehen, in denen Sie angeben können, was Sie tun wollen. Dieser Dialog erscheint entweder rechts oder unten, abhängig von der Größe des Fensters. Wenn Sie es breiter als hoch machen, erscheint er rechts. Manchmal wird der Dialog eine Bedenkzeit anbieten - wenn sie vorbei ist, wird automatisch die erste mögliche Antwort für Sie ausgewählt. Diese Bedenkzeit ist im Regel-Editor definierbar, unter <guilabel
+>Optionen</guilabel
+>, <guilabel
+>Bedenkzeit</guilabel
+>. Alle Spieler sollten dieselbe Bedenkzeit haben, darum ist sie Teil des Regelsatzes. </para
+><para
+>Wenn Sie einen Ziegel aus Ihrer Hand auswählen wollen, können Sie sich mit den &Right; und &Left; respektive den Tasten <keycap
+>H</keycap
+> und <keycap
+>L</keycap
+> bewegen. Natürlich können Sie auch die Maus benutzen. </para
+><para
+>Man kann einen Ziegel ablegen, indem man wie üblich mit den Pfeiltasten draufgeht und ihn auswählt. Alternativ geht das aber auch mit der Maus: Einfach den Ziegel ins Spielfeld ziehen. Die Platzierung im Spielfeld ist aber trotzdem zufällig und nicht dort, wo man ihn hinzieht. Weil die Platzierung für alle Spieler dieselbe sein soll, wird sie immer vom Rechner vorgenommen. </para
+><para
+>Oft wird der Dialog Auswahlmöglichkeiten anbieten, die gar nicht anwendbar sind, z.B. Pong, wenn Sie die nötigen Ziegel gar nicht haben. Das ist Absicht - wie in einem echten Spiel. Sie können dies Verhalten ändern, indem Sie im Einrichtungsdialog auf der Seite <guilabel
+>Spielen</guilabel
+> <guilabel
+>Nur mögliche Aktionen anzeigen</guilabel
+> deaktivieren. </para
+><para
+>Abgelegte Ziegel werden zufällig zwischen den Mauern platziert. Manche Spielvarianten definieren, wo die Ziegel abgelegt werden sollen, das ist aber noch nicht definierbar. Wenn man das dann definieren kann, wird es Teil des Regelsatzes. </para>
+	</sect1>
+</chapter>
+
+<chapter id="interface"
+><title
+>Die Benutzeroberfläche</title
+> <!-- do not change this! -->
+<!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist
+> and <varlistentry
+>. Split the chapter into sections using <sect1(2,3)
+> for better viewing.-->
+
+<sect1 id="menu">
+<title
+>Menüeinträge</title>
+
+		<variablelist>
+			<varlistentry id="game-menu-scoreGame">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Partie</guimenu
+> <guimenuitem
+>Manuelle Partie bewerten</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Bewertet eine manuell gespielte Partie.</action
+></para
+><para
+>Sie können eine alte Partie laden oder eine neue starten. Normalerweise werden nur unbeendete Partien angezeigt, optional können Sie alle sehen. Hier können Sie auch Partien löschen.</para
+></listitem>
+			</varlistentry>
+                        <varlistentry  id="game-menu-play">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Partie</guimenu
+> <guimenuitem
+>Spielen</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Spiele mit anderen (Personen oder Rechner)</action
+></para
+></listitem>
+                        </varlistentry>
+                        <varlistentry  id="game-menu-abort">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Partie</guimenu
+> <guimenuitem
+>Partie abbrechen</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Aktuelle Partie abbrechen. Wenn das eine Bewertung einer manuellen Partie ist, können Sie sie später fortsetzen. Wenn Sie mit Freunden oder gegen den Rechner spielen, ist eine spätere Wiederaufnahme noch nicht möglich.</action
+></para
+></listitem>
+                        </varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Partie</guimenu
+> <guimenuitem
+>&kajongg; beenden</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Beendet</action
+> &kajongg;.</para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-chat">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Ansicht</guimenu
+> <guimenuitem
+>Chatten</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Chat</action
+></para>
+				<screenshot>
+					<screeninfo
+>Chatfenster</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Chatfenster</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Ermöglicht den Chat mit anderen Spielern. </para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-scoretable">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Ansicht</guimenu
+> <guimenuitem
+>Punktetabelle</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Punktetabelle</action
+></para>
+                                <screenshot>
+                                        <screeninfo
+>Punktetabelle</screeninfo>
+                                        <mediaobject>
+                                                <imageobject>
+                                                <imagedata fileref="scoretable.png" format="PNG"/>
+                                                </imageobject>
+                                                <textobject>
+                                                <phrase
+>Bildschirmfoto</phrase>
+                                                </textobject>
+                                        </mediaobject>
+                                </screenshot>
+    <para
+>Zeigt die Punktetabelle. Runde/Hand sind die aktuelle Runde (Osten, Süden, Westen, Norden) gefolgt von einem Zähler für die Hände, die in dieser Runde gespielt wurden. Der Gewinner hat einen grünen Hintergrund für seine Werte. Die Zahlungen zeigen, wieviel der Spieler insgesamt in dieser Hand von anderen Spielern erhielt oder an sie zahlte. Das Total zeigt das aktuelle Total für alle Spieler. Das Diagramm zeigt, wie sich die Totale entwickeln. Die Tipps zeigen mehr Details: Alle Regeln, die für die Berechnung einer Hand verwendet wurden. Bewegen Sie einfach die Maus über den Wert, der Sie interessiert.</para
+><para
+>Der untere Teil zeigt die verwendeten Regeln. Zwischen der Punktetabelle und den Regeln finden Sie eine "Verschiebeleiste", mit der Sie die beiden Teile größer oder kleiner machen können. </para
+></listitem>
+                        </varlistentry>
+			<varlistentry id="view-explain-scores">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>E</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Ansicht</guimenu
+> <guimenuitem
+>Wertung erklären</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Wertung erklären</action
+></para>
+				<screenshot>
+					<screeninfo
+>Punktetabelle</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="explain.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Punktetabelle</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Erklärt, wie die Punktezahlen für das aktuelle Spiel berechnet wurden. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+> <keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+> </shortcut
+> <guimenu
+>Ansicht</guimenu
+> <guimenuitem
+>Vollbildmodus</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Wechselt zwischen Vollbildmodus und normalem Fenstermodus</action
+></para
+></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Einstellungen</guimenu
+> <guimenuitem
+>Spieler</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Spieler hinzufügen, löschen und deren Namen ändern.</action
+></para>
+				<para
+>Die Passwörter in dieser Tabelle werden beim Anmelden auf einem Spielserver standardmäßig verwendet. Es ist nicht sinnvoll, das ursprünglich gewählte Passwort für einen Server zu verändern, weil es noch keine Möglichkeit gibt, das auch auf dem Server zu ändern. Sie müssten dazu den Administrator des Spielservers bitten, das neue Passwort direkt in der Datenbank zu ändern.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Einstellungen</guimenu
+> <guimenuitem
+>Regelsätze</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Anpassen der Regelsätze.</action
+></para>
+				<para
+><action
+>Öffnet den Dialog zum Bearbeiten von Regelsätzen</action
+>. Erläuterungen dazu finden Sie <link linkend="ruleset-options"
+>hier</link
+>.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Einstellungen</guimenu
+> <guimenuitem
+>Blickrichtung ändern</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Ändert die Blickrichtung auf die Ziegel gegen den Uhrzeigersinn.</action
+></para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Einstellungen</guimenu
+> <guimenuitem
+>Demomodus</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Schaltet den Demomodus ein und aus. Siehe <link linkend="play"
+>hier</link
+> für Einzelheiten.</action
+></para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+<para
+>Zusätzlich hat &kajongg; die bekannten &kde;-Einträge im Menü <guimenu
+>Einstellungen</guimenu
+> und <guimenu
+>Hilfe</guimenu
+>, weitere Informationen dazu finden Sie in den Abschnitten über die Menüs <ulink url="help:/fundamentals/menus.html#menus-settings"
+>Einstellungen</ulink
+> und <ulink url="help:/fundamentals/menus.html#menus-help"
+>Hilfe</ulink
+> der &kde;-Grundlagen. </para>
+
+</sect1>
+</chapter>
+
+<chapter id="configuration"
+><title
+>Spieleinstellungen</title
+> <!-- do not change this! -->
+<!--This section describes configuration &GUI;. If your game is configured using menubar exclusively, please remove this section.-->
+<screenshot>
+<screeninfo
+>Einrichtungsdialog</screeninfo>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="config_play.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase
+>Einrichtungsdialog</phrase>
+	  </textobject>
+	</mediaobject>
+</screenshot>
+
+<para
+><menuchoice
+><guimenu
+>Einstellungen</guimenu
+><guimenuitem
+>&kajongg; einrichten ...</guimenuitem
+></menuchoice
+> öffnet den Einrichtungsdialog für &kajongg;.</para>
+<para
+>Wenn Sie hier den Knopf <guibutton
+>Abbrechen</guibutton
+> drücken, werden alle Ihre Änderungen verworfen, auch alle, die Sie mit dem Regel - Editor gemacht haben.</para>
+<para
+>Sie können die verschiedenen Seiten auch mit der Tastatur auswählen: <keycombo action="simul"
+>&Ctrl;<keycap
+>1</keycap
+></keycombo
+> wählt die erste Seite <guilabel
+>Spielen</guilabel
+>, <keycombo action="simul"
+>&Ctrl;<keycap
+>2</keycap
+></keycombo
+> wählt die zweite Seite, und so weiter. </para>
+
+<sect1 id="play-options"
+><title
+>Spielen</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<guilabel
+>Ziegel-Schatten anzeigen</guilabel>
+				</term>
+				<listitem
+><para
+>Zeigt Ziegel mit Rändern und Schatten. Es wird auch zwischen den Ziegelreihen ein Abstand eingehalten, und die Mauerziegel werden so gezeigt, dass man sehen kann, wie viele übereinander liegen. Wenn Sie diese Option ausschalten, bekommen Sie einen einfacheren Bildaufbau mit leicht größeren Ziegeln. Das kann für kleine Bildschirme hilfreich sein. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Verdeckte Ziegel zu Figuren anordnen</guilabel>
+				</term>
+				<listitem
+><para
+>Dies gruppiert die verdeckten Ziegel automatisch zu Figuren. Manchmal wird die Gruppierung nicht Ihren Vorstellungen entsprechen, darum ziehen Sie es vielleicht vor, keine Gruppierung zu haben, wie in einem wirklichen Spiel ohne Rechner. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Nur mögliche Aktionen anzeigen</guilabel>
+				</term>
+				<listitem
+><para
+>Beim Spielen nur mögliche Aktionen wie <quote
+>Kein Ruf</quote
+> oder <quote
+>Pung</quote
+> anzeigen </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Vorschläge machen</guilabel>
+				</term>
+				<listitem
+><para
+>Immer, wenn Sie die Wahl zwischen verschiedenen Aktion haben wie zum Beispiel einen Ziegel zu rufen oder das zu unterlassen oder bei mehreren Ziegeln einen zum Ablegen auszuwählen,, kann &kajongg; Sie mit Vorschlägen unterstützten. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Klänge verwenden (falls verfügbar)</guilabel>
+				</term>
+				<listitem
+><para
+>Dann hören Sie, was die Spieler ablegen und rufen. Dazu müssen die anderen Spieler auch ihre eigene Stimme aufgezeichnet haben. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Mitspieler meine Stimme hören lassen</guilabel>
+				</term>
+				<listitem
+><para
+>Wenn Sie Tondateien mit Ihrer Stimme aufgezeichnet haben, können Sie sie hiermit den anderen Spielern schicken. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Animationsgeschwindigkeit:</guilabel>
+				</term>
+				<listitem
+><para
+>Definiert, wie schnell sich die Ziegel bewegen sollen. Wenn Sie den Regler bis zum rechten Anschlag bewegen, ist die Bewegung der Ziegel gar nicht animiert: Sie ändern einfach ihre Position. </para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+	<sect2
+><title
+>Stimmen</title>
+	<para
+>Spielen macht viel mehr Spaß, wenn Sie die Ansage oder das Ablegen von Ziegeln andere Spieler hören können. Es erleichtert außerdem auch das Spiel, da Sie sich auf Ihre eigenen Ziegel konzentrieren können und nicht beobachten müssen, was andere Spieler ablegen. </para>
+	<para
+>&kajongg; enthält Stimmen für verschiedene Spieler. Stimmen werden den Spielern automatisch zugewiesen. Für jede Sprache sollte es vier Stimmen geben, vorzugsweise zwei weibliche und zwei männliche Stimmen. &kajongg; sucht zuerst nach Stimmen in der Sprache, in der das Programm ausgeführt wird. Sind für diese Sprache keine Stimmen vorhanden, wird auf andere Sprachen ausgewichen. Dabei werden die für &kajongg; mit <menuchoice
+><guimenu
+>Hilfe</guimenu
+><guimenuitem
+>Sprache der Anwendung umschalten</guimenuitem
+></menuchoice
+> festgelegten Ausweichsprachen verwendet. Gibt es für Ihre Sprache noch keine Stimmdateien, sollten Sie sie aufnehmen und zu &kajongg; beisteuern. </para>
+	 <itemizedlist
+><listitem
+><para
+>Nun folgt eine Anleitung zur Aufnahme eigener Stimmen. Jede Stimme wird in einem eigenen Ordner gespeichert. Bitte beachten Sie, dass sich diese Ordner auf Ihrem System an einem anderen Ort befinden können, abhängig von der Installation. Nur der Teil, der mit <filename class="directory"
+>kajongg</filename
+> beginnt, ist immer gleich. Es gibt zwei Gruppen von Stimmen mit unterschiedlichen Speicherorten: <itemizedlist
+><listitem
+><para
+>Vorgegebene Stimmen für jede Sprache werden in einem Ordner wie <filename class="directory"
+>/usr/share/kajongg/voices/LANG</filename
+> gespeichert, dabei ist LANG der Code für Ihre Sprache, In den Ordner direkt unter <filename class="directory"
+>.../kajongg/voices/</filename
+> befinden sich die Stimmen in amerikanischem Englisch. Vorgegebene Stimmen werden den Spielern zufällig zugewiesen. Diese Stimmen haben Namen wie <quote
+><literal
+>male1 male2 female1 female2</literal
+></quote
+>, aber diese Namen sind unwichtig und Benutzer werden sie nie sehen. </para
+></listitem
+><listitem
+><para
+>Für jeden Benutzer können eigene Stimmen definiert werden. Werden diese Stimmen von &kajongg; benutzt, können Sie automatisch zu anderen Spielern im Internet übertragen werden. Diese Stimmen werden in einem Ordner wie <filename class="directory"
+>~/.local/share/apps/kajongg/voices/</filename
+>. Ist Ihr Anmeldungsname zum Beispiel hans, dann ist dieser Ordner <filename class="directory"
+>/home/hans/.local/share/apps/kajongg/voices/hans/</filename
+>. Falls der Ordner <filename class="directory"
+>voices/</filename
+> noch nicht existiert, erstellen Sie ihn. </para
+></listitem
+></itemizedlist>
+		</para
+></listitem
+><listitem
+><para
+>Nun wissen Sie, wo Ihre neuen Stimmen gespeichert werden, erstellen Sie also einen neuen Ordner dafür. </para
+></listitem
+><listitem
+><para
+>In diesem Unterordner speichern Sie die Stimmendateien, Diese Dateien müssen in der Audio-Komprimierung <ulink url="https://xiph.org/vorbis/"
+>Ogg Vorbis</ulink
+> mit der Dateierweiterung <filename class="extension"
+>.ogg</filename
+> kodiert sein. Jede Datei hat einen Namen wie zum Beispiel <filename
+>s3.ogg</filename
+> für Kreis 3. Für alle Ziegel, Rufe oder Ansagen sollte eine Datei erstellt werden. Wenn eine Datei fehlt, werden Sie für eine Aktion keine Stimme hören. Ausweichen auf andere Stimmen oder Sprachen funktioniert nur für eine gesamte Stimme, nicht für einzelne fehlende Stimmdateien. </para
+></listitem
+><listitem
+><para
+>Nachdem alle Dateien für eine vorgegebene Stimme erstellt sind, überprüfen Sie, ob &kajongg; Schreibrechte für den neuen Stimmenordner hat. Starten Sie &kajongg; und testen Sie die Stimmen. Ist alles in Ordnung, können Sie &kajongg; die Schreibberechtigung für den Stimmenordner wieder entziehen, das wird für vorgegebene Stimmen empfohlen. &kajongg; erstellt automatisch eine Datei mit dem Namen <filename
+>md5sum</filename
+> mit einer Prüfsumme über alle Stimmdateien, dafür ist eine Schreibberechtigung erforderlich. Immer, wenn eine Stimmdatei geändert, hinzugefügt oder gelöscht wird, versucht &kajongg; eine neue Prüfsummendatei zu erstellen. </para
+></listitem
+></itemizedlist>
+	<para
+>Halten Sie bitte die Länge kurz, sprechen Sie aber deutlich - dieses Spiel kann mit ein bisschen Übung sehr schnell gespielt werden. Am einfachsten ist es, wenn Sie zuerst eine Liste mit allem aufschreiben, das gesprochen werden soll. Lesen Sie das nicht wie eine Liste, sondern sprechen Sie jeden Begriff so aus, wie wenn er für sich stände, und wie Sie das während des Spiels tun würden. Lassen Sie Platz zwischen den einzelnen Einträgen. Das gut zu lesen erfordert ein bisschen Übung.</para>
+	<para
+>Dies ist eine von vielen Möglichkeiten, die Audiodateien zu erzeugen: </para
+><para
+><itemizedlist
+><listitem
+><para
+>Nehmen Sie mit dem Programm <command
+>qarecord</command
+> eine Stimmdatei auf, speichern Sie sie im Format <acronym
+>WAV</acronym
+>. Sprechen Sie alles in diese eine Datei. </para
+></listitem
+><listitem
+><para
+>Editieren Sie diese Datei mit dem Toneditor <command
+>audacity</command
+>. In diesem Editor benutzen Sie die Maus, um eine Bereich der Tonwellen zu markieren. Der Editor wird diesen Teil abspielen. Wiederholen Sie das, bis Sie einen korrekten Teil markiert haben. Das geht einfacher, wenn Sie die Tonwellen vergrößern mit <menuchoice
+><guimenu
+>Ansicht</guimenu
+><guimenuitem
+>Einzoomen - Vergrößern</guimenuitem
+></menuchoice
+>. Wählen Sie den Menü-Befehl <menuchoice
+><guimenu
+>Datei</guimenu
+><guimenuitem
+>Auswahl exportieren</guimenuitem
+></menuchoice
+> und speichern Sie diesen Teil im <filename class="extension"
+>ogg</filename
+>-Format. Unter <guilabel
+>Optionen</guilabel
+> wählen Sie eine niedrige Qualität, die ist ausreichend und auch besser, weil das die Übertragungszeit zu den anderen Spielern reduziert. </para
+></listitem
+></itemizedlist
+></para>
+	<para
+>Dies sind die Namen der Dateien, die Sie anlegen sollten. Verwenden Sie immer die Erweiterung <filename class="extension"
+>.ogg</filename
+>:</para>
+
+<table>
+<title
+>Tondateinamen</title>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry
+>&s1; .. &s9;</entry
+><entry
+>Kreis 1 bis Kreis 9</entry>
+</row>
+<row>
+<entry
+>&b1; .. &b9;</entry>
+<entry
+>Bambus 1 bis Bambus 9</entry>
+</row>
+<row>
+<entry
+>&c1; .. &c9;</entry>
+<entry
+>Zahl 1 bis Zahl 9</entry>
+</row>
+<row>
+<entry
+>&we; &ws; &ww; &wn;</entry>
+<entry
+>Die Winde Ost, Süd, West, Nord</entry>
+</row>
+<row>
+<entry
+>&db; &dr; &dg;</entry>
+<entry
+>Die Drachen blau/weiß, rot, grün</entry>
+</row>
+<row>
+<entry
+>&chow; &pung; &kong; &mahjongg;</entry>
+<entry
+>Die wichtigsten Rufe</entry>
+</row>
+<row>
+<entry
+>&originalcall; &violatesoriginalcall;</entry>
+<entry
+>Ruf zu Beginn und seine Verletzung</entry>
+</row>
+<row>
+<entry
+>&dangerousgame;</entry>
+<entry
+>Ein Spieler spielt gefährliches Spiel</entry>
+</row>
+<row>
+<entry
+>&nochoice;</entry>
+<entry
+>Ein Spieler sagt, dass er keine andere Wahl hat, als gefährliches Spiel zu spielen.</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+	</sect2>
+</sect1>
+
+<sect1 id="tiles-options"
+><title
+>Ziegel</title>
+        <screenshot>
+                <screeninfo
+>Ziegelsatz wählen</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_tiles.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Ziegelsatz wählen</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Aus der <guilabel
+>Ziegel</guilabel
+>-Liste können Sie verschiedene Sätze von Spielsteinen wählen. </para>
+</sect1>
+
+<sect1 id="background-options"
+><title
+>Hintergründe</title>
+        <screenshot>
+                <screeninfo
+>Auswahl des Hintergrundes</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_background.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Auswahl des Hintergrundes</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Aus der <guilabel
+>Hintergrund</guilabel
+>-Liste können Sie verschiedene Hintergrundbilder wählen. </para
+><para
+>Einige Hintergründe, zum Beispiel die Chinesische Landschaft, benötigen mehr Zeit für die Anzeige. Wenn Sie möchten, dass das Programm schneller startet, oder wenn das Ändern der Größe des Programmfensters zu langsam ist, wählen Sie bitte einen einfacheren Hintergrund. </para>
+</sect1>
+
+<sect1 id="ruleset-options"
+><title
+>Regel-Editor</title>
+			<screenshot>
+				<screeninfo
+>Regel-Editor</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="ruleseteditor.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Regel-Editor</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+			<para
+>Mit dem Regel-Editor können Sie die Regeln beliebig verändern. Vordefinierte Regelsätze werden kursiv angezeigt, angepasste Regelsätze erscheinen in normaler Schrift. Vordefinierte Regelsätze können Sie nicht ändern, aber eine Aktualisierung von &kajongg; könnte das tun. Angepasste Regelsätze werden durch eine Aktualisierung niemals verändert. </para
+><para
+>Wenn Sie eine neue Partie beginnen, können Sie den gewünschten Regelsatz für diese Partie auswählen. Alle Regelsätze, die im Regel-Editor erscheinen, können dort ausgewählt werden. Der Regelsatz wird zusammen mit der Partie gespeichert. Darum können Sie hier immer alle Regelsätze beliebig verändern - Ihre Änderungen können nur zukünftige Partien beeinflussen. </para>
+			<sect2
+><title
+>Regeln, Punkte, x2, Limits</title
+><para
+>Machen Sie einen Doppelklick auf den Wert, den Sie ändern möchten. Sind alle Werte gelöscht, hat diese Regel keinen Einfluss mehr auf das Spiel. Regeln können nicht gelöscht werden.</para>
+			</sect2>
+			<sect2
+><title
+>Kopieren und Löschen</title
+><para
+>Sie können ganze Regelsätze kopieren und auch löschen.  </para
+><para
+>Das geht sogar dann, wenn existierende Partien diese Regelsätze verwenden, da jede Partie ihre eigene Kopie vom verwendeten Regelsatz hat. Sie können sich die verwendeten Regeln für alte Partien ansehen: <link linkend="game-menu-scoreGame"
+>Laden</link
+> der alten Partie und <link linkend="view-explain-scores"
+>Anzeigen ihrer Punktetabelle</link
+>. </para>
+			</sect2>
+			<sect2
+><title
+>Vergleichen</title
+><para>
+			<screenshot>
+				<screeninfo
+>Regel-Vergleich</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="differ.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Regel-Vergleich</phrase
+></textobject>
+				</mediaobject>
+			</screenshot
+>Sie können diesen Befehl verwenden, wenn ein ganzer Regelsatz markiert ist. Damit können Sie den markierten Regelsatz mit anderen vergleichen. </para
+></sect2>
+</sect1>
+
+<sect1 id="default-keybindings">
+<title
+>Standard-Tastenkürzel</title>
+
+<!-- TODO: not yet implemented
+<para
+>The menu entry <menuchoice
+><guimenu
+>Settings</guimenu
+> <guimenuitem
+>Configure ...</guimenuitem
+></menuchoice
+> allows you to change the default keyboard bindings.</para
+> -->
+
+<para
+>Die folgenden Tastenkürzel sind voreingestellt: </para>
+
+<para>
+<variablelist>
+
+<varlistentry>
+<term
+><keycap
+>F1</keycap
+></term>
+<listitem>
+<para
+>Zeigt dieses Handbuch. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Eine manuelle Partie bewerten </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Spiele mit Freunden oder Rechnerspielern. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Aktuelle Partie abbrechen. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Das Programm verlassen </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Zeigt die Punkte-Tabelle an. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Im Chatfenster anzeigen. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Änderung der Blickrichtung </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Schaltet den Demomodus ein und aus. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Shift;<keycap
+>F1</keycap
+></keycombo
+></term>
+<listitem>
+<para
+><quote
+>Was ist das?</quote
+>-Hilfe </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Vollbildmodus. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</para>
+
+</sect1>
+</chapter>
+
+<appendix id="problems"
+><title
+>Bekannte Probleme</title>
+        <itemizedlist>
+                <listitem
+><para
+>Im Spielmodus sind noch keine Strafen möglich.</para
+></listitem>
+                <listitem
+><para
+>Die Rechnerspieler sind noch ziemlich dumm.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="future"
+><title
+>Mögliche Erweiterungen</title>
+        <itemizedlist>
+                <listitem
+><para
+>Mehr Regelsätze definieren. Am besten wäre es, wenn das Leute tun würden, die diese Regelsätze regelmäßig verwenden.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+ <appendix id="faq"
+><title
+>Häufig gestellte Fragen</title
+> <!-- do not change this! -->
+<!--This chapter is for frequently asked questions. Please use <qandaset
+> <qandaentry
+> only!-->
+<qandaset>
+<!--Following is a standard list of FAQ questions.-->
+        <qandaentry>
+                 <question
+><para
+>Kann ich das Erscheinungsbild des Spiels ändern? </para
+></question>
+                 <answer
+><para
+>Ja. Um das Design für &kappname; zu ändern, verwenden Sie die Menüleiste, um den <link linkend="configuration"
+>Einrichtungsdialog</link
+> zu öffnen.</para
+></answer>
+        </qandaentry>
+        <qandaentry>
+                 <question
+><para
+>Kann ich mit der Tastatur Ziegel den Spielern zuordnen?</para
+></question>
+                 <answer
+><para
+>Ja. Siehe <link linkend="enterhand-tiles"
+>Manuelle Bewertung</link
+>.</para
+></answer>
+        </qandaentry>
+<!--Please add more Q&As if needed-->
+
+</qandaset>
+</appendix>
+
+<appendix id="credits"
+><title
+>Mitwirkende und Lizenz</title
+> <!-- do not change this! -->
+<!--This chapter is for credits and licenses.-->
+	<para
+>&kajongg; für &kde; </para>
+
+	<para
+>Programm Copyright &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+	<para
+>Dokumentation Copyright &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+
+<!-- !!!do not change ANYTHING after this line!!!! -->
+<para
+>Übersetzung Wolfgang Rohdewald <email
+>wolfgang@rohdewald.de</email
+></para
+>  
+&underFDL;
+&underGPL;
+
+</appendix>
+
+<appendix id="bibliography">
+<title
+>Literaturverzeichnis</title>
+        <itemizedlist>
+		<listitem
+><para
+>Das Chinesische Mah-Jongg-Spiel by Uwe Martens 2005, Books on Demand GmbH, Norderstedt. Dieses Buch ist eine sehr gute deutsche Referenz. Sie erfahren alles über die in Deutschland benutzten Regeln und über viele andere Aspekte des Spiels.</para
+></listitem>
+                <listitem
+><para
+>The Complete Book of Mah-Jongg by A. D. Millington, 1977 (mit verschiedenen Taschenbuchausgaben bis 2003), Weidenfeld &amp; Nicolson, London. Dies ist die maßgebliche Referenz zum Klassischen Chinesischen Mah Jongg, wie es in der westlichen Welt gespielt wird. Es enthält viele wertvolle Tipps über Spielstrategien.</para
+></listitem>
+		<listitem
+><para
+>Mah-Jong von Gwyn Headley and Yvonne Seeley, 3. Ausgabe, 2008, A &amp; C Black Publishers Ltd., London. Dies ist eine einfach zu benutzende Referenz, die sich auf die in England üblichen Regeln konzentriert, wie sie vom BMJA (The British Mah Jong Association) definiert wurden.</para
+></listitem>
+		<listitem
+><para
+><ulink url="https://en.wikipedia.org/wiki/Mahjong"
+></ulink
+></para
+></listitem>
+		<listitem
+><para
+><ulink url="https://de.wikipedia.org/wiki/Mah-Jongg"
+></ulink
+></para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="installation">
+<title
+>Installation</title>
+<para
+>Für Linux: Suchen Sie das Paket in Ihrer Distribution. </para>
+<para
+>Für Windows: Auf <ulink url="https://www.linux-apps.com/p/1109453/"
+></ulink
+> finden Sie ein Installationsprogramm für Windows. </para>
+<para
+>Wenn Sie den Quelltext herunterladen und manuell installieren möchten: <itemizedlist>
+<listitem
+><para
+> <literal
+>git clone https://invent.kde.org/games/kajongg.git</literal
+> </para
+></listitem>
+<listitem
+><para
+>Für Linux: <literal
+>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal
+> </para
+></listitem>
+<listitem
+><para
+>Für Windows: Bitte lesen Sie die Datei <filename
+>README.windows</filename
+></para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>Kajongg benötigt folgende Pakete: (Name des Debian-Pakts in Klammern) <itemizedlist>
+	<listitem
+><para
+>Python 3.5 oder höher (python3)</para
+></listitem>
+	<listitem
+><para
+>Qt5.7 oder höher (python3-pyqt5 und python3-pyqt5.qtsvg)</para
+></listitem>
+	<listitem
+><para
+>die Python-Anbindung für Qt5 (python3-pyqt5)</para
+></listitem>
+        <listitem
+><para
+>Die Python-Bibliothek twisted 16.6.0 oder neuer (python3-twisted)</para
+></listitem>
+        <listitem
+><para
+>sqlite3 (libsqlite3-0)</para
+></listitem>
+</itemizedlist>
+</para>
+
+</appendix>
+
+&documentation.index;
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-always-quote-attributes:t
+sgml-indent-step:0
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

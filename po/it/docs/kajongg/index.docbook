@@ -1,0 +1,1663 @@
+<?xml version="1.0" ?>
+<!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Italian "INCLUDE"
+> <!-- change language only here -->
+  <!ENTITY % addindex "IGNORE"
+> <!-- do not change this! -->
+  <!ENTITY s1 "s1">
+  <!ENTITY s9 "s9">
+  <!ENTITY b1 "b1">
+  <!ENTITY b9 "b9">
+  <!ENTITY c1 "c1">
+  <!ENTITY c9 "c9">
+  <!ENTITY we "we">
+  <!ENTITY ws "ws">
+  <!ENTITY ww "ww">
+  <!ENTITY wn "wn">
+  <!ENTITY db "db">
+  <!ENTITY dr "dr">
+  <!ENTITY dg "dg">
+  <!ENTITY chow "chow">
+  <!ENTITY pung "pung">
+  <!ENTITY kong "kong">
+  <!ENTITY mahjongg "mahjongg">
+  <!ENTITY originalcall "originalcall">
+  <!ENTITY violatesoriginalcall "violatesoriginalcall">
+  <!ENTITY dangerousgame "dangerousgame">
+  <!ENTITY nochoice "nochoice">
+]>
+
+<!-- TODO: describe the window with the list of tables -->
+
+<book id="kajongg" lang="&language;"
+> <!-- do not change this! -->
+<bookinfo>
+	<title
+>Manuale di &kajongg;</title
+> <!-- This is the title of this docbook. -->
+<!-- List of immidiate authors begins here. -->
+<!--INPORTANT! - All other contributors: [to be determined] -->
+<authorgroup>
+<author
+>&Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </author>
+<othercredit role="translator"
+><firstname
+>Valter</firstname
+><surname
+>Mura</surname
+><affiliation
+><address
+><email
+>valtermura@gmail.com</email
+></address
+></affiliation
+><contrib
+>Traduzione della documentazione</contrib
+></othercredit
+> 
+</authorgroup>
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2021-05-30</date
+><!-- Date of (re)writing, or update.-->
+<releaseinfo
+>KDE Gear 21.04</releaseinfo>
+
+<!--Short description of this document. Do not change unless necessary!-->
+<abstract>
+	<para
+>Questa documentazione descrive il gioco di &kajongg;</para>
+</abstract>
+
+<!--List of relevant keywords-->
+<keywordset>
+	<keyword
+>KDE</keyword
+> <!-- do not change this! -->
+	<keyword
+>kdegames</keyword
+> <!-- do not change this! -->
+	<keyword
+>gioco</keyword
+> <!-- do not change this! -->
+	<keyword
+>kajongg</keyword
+><!--Application name goes here-->
+<!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<keyword
+>da tavolo</keyword>
+	<keyword
+>arcade</keyword>
+	<keyword
+>gioco di tessere</keyword>
+	<keyword
+>tessere</keyword>
+<!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<keyword
+>quattro giocatori</keyword>
+<!--All other relevant keywords-->
+</keywordset>
+</bookinfo>
+<!--Content begins here: -->
+<chapter id="introduction"
+><title
+>Introduzione</title
+> <!-- do not change this! -->
+	<note
+><title
+>Tipo di gioco:</title
+><para
+>Da tavolo, arcade</para
+></note
+><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<note
+><title
+>Numero di possibili giocatori:</title
+><para
+>Quattro</para
+></note
+><!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<para
+>&kajongg; è un gioco da tavolo creato basandosi sul famoso gioco orientale del Mah Jong (dal Cinese <foreignphrase lang="zh"
+>麻將</foreignphrase
+>). Viene giocato da quattro giocatori. Al mondo esistono molte e diverse regole in uso. Al momento &kajongg; supporta le regole classiche cinesi, come giocate in Germania; e seguiranno, eventualmente, altri importanti regole. È possibile personalizzare o aggiungere nuovi schemi di regole. Se lo fate, inviatele cortesemente all'autore del programma per l'integrazione! </para>
+	<para
+>&kajongg; può essere usato in due modi differenti: conteggio dei punti di una partita manuale, in cui giochi come tuo solito senza l'aiuto del computer e utilizzi &kajongg; per il conteggio e il mantenimento dei punti; oppure puoi usarlo per giocare contro qualsiasi combinazione di utenti umani e digitali. </para>
+</chapter>
+
+<chapter id="screen_layout"
+><title
+>Aspetto della schermata</title>
+		<para>
+			<screenshot>
+				<screeninfo
+>Schermata di &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="gamescreen.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Schermata</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+                </para>
+                <para
+>Una rapida spiegazione delle parti della schermata di gioco. </para>
+	<variablelist>
+		<varlistentry>
+			<term
+>Barra degli strumenti</term>
+			<listitem
+><para
+>La barra degli strumenti è posizionata sotto la barra dei menu e contiene i pulsanti per le azioni più utilizzate. Il contenuto della barra degli strumenti può essere modificata. Puoi anche renderla invisibile, dando più spazio al tavoliere. </para
+><para
+>A seconda della dimensione del tuo schermo, potresti decidere di far scomparire la barra degli strumenti o di spostarla nel lato sinistro della finestra. Puoi eseguire il comando facendo clic col &RMB; sulla barra degli strumenti. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Tavoliere</term>
+			<listitem
+><para
+>Il tavoliere è la sezione più ampia della finestra. Puoi vedere i quattro muri della lunghezza di 18 tessere (l'esatto numero dipende dalle regole come usare le tessere bonus o no). I nomi dei giocatori sono scritti sul muro, insieme con il valore corrente della mano (per quanto conosciuta) e le loro tessere di vento. Il vento prevalente ha uno sfondo colorato, Est nella schermata qui sopra. </para
+><para
+>Quando <link linkend="play"
+>si gioca</link
+>, l'interno dei muri conserva le tessere scartate dai giocatori. Essi sono posizionate a caso. L'ultima tessera scartata è evidenziata con una cornice azzurra. </para
+><para
+>Quando si <link linkend="scoreGame"
+>conteggiano partite manuali</link
+>, l'interno dei muri ha una selezione di tutte le tessere disponibili, il selettore centrale. Puoi assegnarle ai giocatori utilizzando il mouse o la tastiera. </para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Area del giocatore</term>
+			<listitem
+><para
+>Ciascun giocatore ha un'area di schermata per le proprie tessere. La fila superiore contiene le tessere dichiarate, quella inferiore quelle coperte. Quando <link linkend="scoreGame"
+>si conteggia manualmente una partita</link
+>, le tessere coperte sono mostrate con un'ombra sopra l'intera tessera. Le tessere bonus vanno all'estrema destra. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Finestra di dialogo</term>
+			<listitem
+><para
+>La finestra di dialogo mostra le scelte che ha il giocatore. Il più delle volte presenta un timer che indica una barra di avanzamento indicante il tempo rimanente. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Barra di stato</term>
+			<listitem
+><para
+>La barra di stato è posizionata in basso nella schermata e contiene i totali correnti per i giocatori. </para
+></listitem>
+		</varlistentry>
+	</variablelist>
+</chapter>
+
+<chapter id="scoreGame"
+><title
+>Conteggio dei punti di una partita manuale</title
+> <!-- do not change this! -->
+	<para
+>In questa modalità, &kajongg; viene utilizzato solo per eseguire il conteggio. giochi come al solito con persone vere in un tabellone vero, e alla fine della partita puoi inserire in &kajongg; le tessere che un giocatore ha in mano e qualsiasi altra informazione che &kajongg; necessita per calcolare i punteggi (che è quello che farà il programma). In alternativa, puoi calcolare manualmente i punteggi di mano e inserirli. &kajongg; eseguirà poi i pagamenti tra i giocatori e scriverà i risultati in una banca dati. È possibile interrompere una partita, avviarne una con altri giocatori e riprendere vecchie partite. Tutte le regole saranno salvate con le partite, perciò partite diverse possono essere giocate con regole diverse. </para>
+        <itemizedlist>
+            <listitem
+><para
+>Dal menu, seleziona <menuchoice
+><guimenu
+>Partita</guimenu
+> <guimenuitem
+>Conteggia partita manuale</guimenuitem
+></menuchoice
+> o premi <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+>. </para
+></listitem>
+            <listitem
+><para
+>Ora puoi sia selezionare una partita esistente non terminata, sia iniziare una nuova partita. Se inizi una nuova partita, ti verranno chieste informazioni sui giocatori e sullo schema di gioco. &kajongg; proporrà gli stessi valori usati per la partita precedente. Se non esistono partite precedenti, proporrà i primi quattro giocatori definiti. Nota che non puoi modificare lo schema di gioco e qualsiasi altra sua regola dopo questa selezione. Puoi farlo anticipatamente nell'<link linkend="ruleset-options"
+>editor degli schemi</link
+>. </para
+></listitem>
+            <listitem
+><para
+>Ora otterrai una nuova finestra intitolata <guilabel
+>Punteggio per questa mano</guilabel
+>. Leggi <link linkend="enterhand-tiles"
+>Fare in modo che &kajongg; calcoli il punteggio</link
+> per una descrizione dettagliata. </para
+></listitem>
+            <listitem
+><para
+>Dopo aver salvato i risultati di mano, continua con la mano successiva. </para
+></listitem>
+        </itemizedlist>
+      <sect1 id="enterhand"
+><title
+>Inserire i risultati di mano</title>
+        <sect2 id="enterhand-scores">
+	<title
+>Punteggi</title>
+	<screenshot>
+		<screeninfo
+>Schermata di &kajongg;</screeninfo>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="enterhand.png" format="PNG"/>
+			</imageobject
+>				<textobject
+><phrase
+>Schermata</phrase
+></textobject>
+		</mediaobject>
+	</screenshot>
+	<para
+>Questa è la finestra per l'inserimento dei risultato di mano. Viene mostrata automaticamente quando &kajongg; pensa che tu ne abbia bisogno. Puoi sempre visualizzarla o nasconderla premendo <keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+> o selezionando la voce di menu corrispondente. </para>
+	<para
+>Come sempre, il vento prevalente ha lo sfondo colorato. </para>
+	<para
+>Qui puoi inserire manualmente i punteggi per tutti i giocatori. In alternativa puoi definire esattamente quali tessere aveva in mano un giocatore. Se scegli questa azione, il campo corrispondente per il punteggio manuale diverrà grigio. &kajongg; calcolerà automaticamente il punteggio. </para>
+	<para
+>Dopo aver inserito tutti i dati rilevanti per una mano, premi il pulsante <guibutton
+>Salva mano</guibutton
+>. I valori della mano saranno inseriti nella banca dati e anche mostrati nel tabellone del punteggio. Ti potrebbe essere chiesto di cambiare le posizioni dei giocatori, ma puoi scegliere anche di non cambiarle. I posti proposti sono al momento non personalizzabili: se uno schema di gioco necessita qualcosa di diverso, lo cambieremo. </para>
+	<para
+>Se il giocatore può aver vinto, sarà attivata la casella nella colonna <guilabel
+>Vincitore</guilabel
+>: facci clic sopra per il vincitore. </para>
+	<para
+>La barra di stato ora mostrerà il bilancio aggiornato per i giocatori, ed è possibile continuare con la mano successiva. </para>
+	<sect3 id="enterhand-manually">
+	<title
+>Inserire manualmente il punteggio</title>
+	<para
+>Un buon giocatore preferirà probabilmente calcolare il proprio punteggio da sé. In questo caso puoi inserire direttamente il punteggio. Questo non è possibile se non vi è alcuna tessera selezionata per il giocatore. </para>
+	<para
+>Se inserisci manualmente un punteggio, esso deve contenere tutto eccetto le penalità, e non vi saranno regole facoltative da cui scegliere. Esiste un'eccezione: <quote
+>Gioco pericoloso</quote
+>. Questo non influenza alcun punteggio, e non è neppure un'irregolarità. Significa solo che il pagamento tra i giocatori è diverso: il giocatore irregolare paga tutto per tutti al vincitore. Gli altri due giocatori non si scambiano pagamenti. Questa opzione al momento non è personalizzabile. </para>
+	</sect3>
+	<sect3 id="enterhand-tiles">
+	<title
+>Far calcolare il punteggio a &kajongg;</title>
+	<para
+>Se indichi esplicitamente a &kajongg; quali tessere possiede un giocatore, l'inserimento dei punteggi in questa finestra saranno disattivati per quel giocatore. Durante l'associazione delle tessere a un giocatore noterai che il punteggio aumenta, ma non appena aggiungi la quattordicesima tessera il punteggio è riportato a zero. Questo può sorprendere ma, a meno di non dichiararla vincitrice, questa mano è riconosciuta come mano morta, che ha sempre zero punti. Questo comportamento è definito dallo schema di regole cinesi classiche, e può differire se cambi le regole o utilizzi uno schema di gioco diverso. </para>
+	<para
+>Puoi associare tessere e combinazioni a un giocatore utilizzando il mouse, la tastiera o entrambi. Col mouse basta trascinare e rilasciare le tessere nell'area del giocatore. Quando rilasci la tessera ti verrà chiesto cosa vuoi rilasciare: singolo, coppia, tris, poker, poker dichiarato o scala. La fila superiore è riservata alle tessere scoperte, mentre quella inferiore a quelle coperte. Le tessere bonus appariranno all'estrema destra. Puoi anche muovere le tessere e le combinazioni tra le righe, tra i giocatori o indietro al selettore centrale. </para>
+	<para
+>Se preferisci utilizzare la tastiera, puoi usare il tasto &Tab; per spostarti tra il selettore centrale e le aree dei giocatori. I tasti <keycap
+>eswnESWN</keycap
+> spostano una tessera ai giocatori Est, Sud, Ovest e Nord. I tasti <keycap
+>xX</keycap
+> la riportano indietro al selettore centrale. <keycap
+>ESWN</keycap
+> sposta alla fila delle tessere coperte, <keycap
+>eswn</keycap
+> sposta a quella delle scoperte. Puoi muovere il cursore tra le tessere o le combinazioni tramite i tasti freccia, e la tessera o la combinazione correntemente selezionata viene evidenziata con un riquadro azzurro. Dato che i tasti freccia stanno abbastanza lontano dalle lettere nella tastiera, puoi usare anche le lettere <keycap
+>hjkl</keycap
+> o <keycap
+>HJKL</keycap
+> per lo spostamento del cursore. <keycap
+>hH</keycap
+> sposta a sinistra, <keycap
+>jJ</keycap
+> sposta giù, <keycap
+>kK</keycap
+> sposta su, <keycap
+>lL</keycap
+> sposta a destra. Questo è il metodo utilizzato dall'editor unix <command
+>vi</command
+>. Anche il browser &kde; &konqueror; e questo programma di aiuto supportano quei tasti allo stesso modo. Essi possono variare se utilizzi una lingua diversa dall'inglese, ma al momento non è possibile configurarli. </para>
+	<para
+>Le opzioni <guilabel
+>Ultima tessera</guilabel
+> e <guilabel
+>Ultima combinazione</guilabel
+> sono necessarie ad alcune regole come <guilabel
+>L'ultima tessera completa la coppia</guilabel
+>. Esse possono essere utilizzate solo per la mano vincente. </para>
+	<para
+>Nella parte destra della finestra puoi applicare manualmente alcune regole. Le regole che appaiono in quest'elenco dipendono dallo schema di gioco attivo e dalle tessere. Nell'esempio della schermata in alto, i giocatori perdenti potrebbero avere l'opzione <quote
+>gioco pericoloso</quote
+>: anche in questo caso, essa dipende dallo schema di gioco e dalle sue tessere. Lo scopo degli sviluppatori è mantenere più corto possibile quest'elenco di regole selezionabili manualmente. In una condizione ottimale &kajongg; dovrebbe essere sempre in grado di determinare se una regola è applicabile, ma talvolta non ha abbastanza informazioni o conoscenze per decidere. </para>
+	</sect3>
+	</sect2>
+	<sect2 id="enterhand-penalties">
+	<title
+>Penalità</title>
+			<screenshot>
+				<screeninfo
+>Schermata di &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="penalty.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Schermata</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+	<para
+>Nella <link linkend="enterhand"
+>finestra di inserimento dei risultati della mano</link
+>, il pulsante <guibutton
+>Penalità</guibutton
+> conduce alla finestra in cui inserire le penalità. Questo può essere eseguito in qualsiasi momento indipendentemente dal normale meccanismo di attribuzione del punteggio.</para>
+	<para
+>La selezione <guilabel
+>Irregolarità:</guilabel
+> mostra tutte le irregolarità che possono essere alle mani che il giocatore possiede. Scegli tra esse.</para>
+	<para
+>Ora puoi adattare la <guilabel
+>Penalità totale</guilabel
+>. Questa è la somma totale che viene spostata dai paganti ai pagati. Verrà divisa equamente tra di loro.</para>
+	<para
+>A seconda del tipo di penalità, il numero di paganti e pagati varia. viene visualizzato l'esatto numero di giocatori. Se selezioni un giocatore, &kajongg; assicura che questi esista solo una volta, adattando gli altri giocatori. </para>
+	</sect2>
+	</sect1>
+</chapter>
+
+<chapter  id="play"
+><title
+>Giocare</title>
+	<para
+>Puoi attivare la modalità Dimostrazione in qualsiasi momento. In questa modalità, il computer giocherà per te. Se non stai giocando alcuna partita, ne verrà iniziata una nuova con l'ultimo schema di gioco usato. </para>
+        <sect1 id="robotplay">
+        <title
+>Gioca contro il computer</title>
+         <para
+>In primo luogo ti appare una finestra di accesso. Digita il server di gioco cui vuoi collegarti e il tuo nome utente. Se scegli la voce speciale <guilabel
+>Partita locale</guilabel
+>, devi solo digitare il tuo nome (o accettare quello proposto) e lo schema di gioco desiderato. Ciò avvierà immediatamente una partita locale in cui giochi contro tre giocatori robot. Tuttavia, se esistono partite in sospeso, esse saranno visualizzate in un elenco. Puoi dunque selezionare la partita che desideri continuare o iniziarne una nuova. </para>
+        </sect1>
+        <sect1 id="humanplay">
+        <title
+>Gioca con amici</title>
+        <para
+>Se desideri giocare contro persone reali, hai bisogno di un server di gioco a cui tutti i giocatori, incluso tu, devono collegarsi. Esegui questa azione selezionando qualsiasi altro host o digitando manualmente il nome di un nuovo host e specificando la password appropriata. Verrà proposta l'ultima password usata. </para
+><para
+>Il modo più facile è utilizzare il server di gioco <literal
+>kajongg.org</literal
+>. &kajongg; te lo mostrerà nell'elenco dei server di gioco a disposizione. Nota che al momento questo server offre solo un server di gioco e nessuna pagina web o servizi. </para
+><para
+>Se non hai un account sul server di gioco corrispondente al nome che hai digitato, ti verrà chiesto a aprirne uno. Se rispondi sì, otterrai una nuova finestra di dialogo in cui digitare due volte la password scelta. L'account sarà creato automaticamente. </para
+><para
+>Dopo aver avuto correttamente accesso al server di gioco cui vuoi collegarti, otterrai un elenco di tavoli con i posti disponibili su quel server. Unisciti a un tavolo o creane uno nuovo. Se ne crei uno nuovo, aspetta fino a quando i posti vengono occupati da altri giocatori. Puoi iniziare la partita in qualsiasi momento nel tavolo da te creato, i posti vuoti verranno occupati da giocatori robot. </para
+><para
+>L'elenco della tavoliere mostra anche il nome dello schema giocato in quel tavoliere. Lo schema e il suo nome vengono inviati al server di gioco dal giocatore che inizia il tavolo. Se hai uno schema identico, il tavoliere mostra il tuo nome per lo schema: questo può essere utile se chi ha aperto il tavolo parla un'altra lingua e chiama lo schema in modo diverso. Inoltre, il nome del tuo schema locale sarà visualizzato in nero. Tuttavia, se non possiedi lo stesso il nome appare in rosso e puoi premere il pulsante <guibutton
+>Confronta</guibutton
+> per confrontarlo con quelli in tuo possesso. </para
+><para
+>Se non usi <literal
+>kajongg.org</literal
+> e nessun altro dei server di gioco esistenti, puoi avviare il tuo server di gioco &kajongg; in due modi differenti: <itemizedlist
+><listitem
+><para
+>collegarti al server <literal
+>localhost</literal
+>. questo è il tuo computer. Se fai questa scelta e non è avviato alcun server di gioco, esso sarà avviato automaticamente. Quando finisci di giocare, anche il server viene fermato. Questo è diverso dal selezionare <guilabel
+>Partita locale</guilabel
+>, quest'ultimo non permette connessioni con altri computer. </para
+></listitem
+><listitem
+><para
+>avviare manualmente un server su un computer di tua scelta. Tutto quello che serve è avviare da riga di comando il programma <command
+>kajonggserver</command
+>. Se scrivi <command
+>kajonggserver --help</command
+> ti verranno mostrate le opzioni disponibili, come la modifica della porta predefinita. Questo server rimarrà avviato fino a che non lo termini. </para
+></listitem
+></itemizedlist>
+        </para
+><para
+>In entrambi i casi devi dire agli altri giocatori come possono raggiungere il tuo server di gioco. Essi hanno bisogno dell'&URL;, o semplicemente di un indirizzo IP e la porta in cui il tuo server è in ascolto. Può essere qualcosa tipo <literal
+>miopc.dyndns.org:8301</literal
+>, dove <literal
+>8301</literal
+> è la porta. Naturalmente devi configurare il tuo firewall affinché il giocatore remoto possa raggiungere quella porta. La comunicazione sarà cifrata. </para
+><para
+>Per il numero di porta, vedi <menuchoice
+><guimenu
+>Aiuto</guimenu
+> <guimenuitem
+>Informazioni su &kajongg;</guimenuitem
+></menuchoice
+>. La versione del protocollo è il numero di porta. Per &kajongg; 17.04 questo è 8301. Se il giocatore non inserisce alcuna porta per il server di gioco desiderato, il client calcola la porta nello stesso modo. Se, dunque, un computer esegue diversi server di gioco con versioni diverse del protocollo, in genere ti dovresti collegare automaticamente al server corretto. Ad ogni modo, il server e il client di gioco verificheranno mutuamente di possedere versioni compatibili e, in caso contrario, ti avviseranno. </para
+><para
+>Se ti imbatti in possibili errori, potresti voler utilizzare l'opzione <command
+>kajongg --debug=traffic</command
+>. Questa ti mostrerà, nella console in cui è stato avviato il server di gioco, quali messaggi vengono scambiati tra il server di gioco e i client. Per altre opzioni, vedi <command
+>kajongg --help</command
+> </para>
+        <sect2 id="playing-caveats">
+        <title
+>Limitazioni</title>
+            <itemizedlist
+><listitem
+><para
+>Se vuoi essere sicuro che nessuno possa imbrogliare, nessuno dei giocatori umani devono avere accesso al computer in cui è avviato il server di gioco. Non puoi, naturalmente, evitare che due giocatori si aiutino a vicenda, perché non puoi sapere cosa realmente stanno facendo. Due giocatori possono essere anche la stessa persona. </para
+></listitem
+></itemizedlist>
+        </sect2>
+        </sect1>
+<sect1  id="gamerules"
+><title
+>Regole del gioco</title>
+<para
+>Esistono, a livello internazionale, molte varianti del gioco. Attualmente &kajongg; supporta due varianti del Cinese classico, quella giocata in Germania e quella giocata in Gran Bretagna.</para
+><para
+>Questa descrizione non entra nei dettagli e corrisponde a entrambe le varianti.</para
+><para
+>La maggior parte delle regole, tuttavia, è comune alla maggioranza delle varianti.</para>
+  <para
+>Poiché il programma &kajongg; sa come giocare, questa descrizione contiene solo le cose che potrebbero non essere ovvie.</para>
+  <para
+>Se vuoi apprendere il Mah Jong in modo più approfondito, consulta la <link linkend="bibliography"
+>bibliografia</link
+>.</para>
+<sect2 id="gamerules-aim">
+  <title
+>Scopo del gioco</title>
+  <para
+>Ciascun giocatore tenta di raccogliere le tessere in modo da ottenere una mano vincente. Nel riuscirvi, egli chiama il <quote
+>Mah Jong</quote
+>. In una mano vincente le tessere sono normalmente raggruppate in cinque combinazioni: quattro combinazioni con tre o quattro tessere ciascuna e una quinta composta da due tessere uguali. Una combinazione normale contiene tre o quattro tessere identiche (chiamate rispettivamente Tris o Poker) oppure tessere in sequenza come Bambù 3, Bambù 4, Bambù 5 (chiamata Scala).</para>
+  </sect2>
+  <sect2>
+    <title
+>Svolgimento della partita</title>
+    <para
+>Inizialmente, il giocatore col vento Est (come indicato sul muro) possiede una tessera in più rispetto agli altri giocatori. Est inizia a scartare una tessera indesiderata. </para>
+    <para
+>Ogni volta che viene scartata una tessera, gli altri giocatori possono dichiararla annunciando ciò che con essa possono completare (Scala, Tris, Poker, Mah Jong). Solo il giocatore successivo può dichiarare una scala, mentre le altre dichiarazioni possono essere eseguite da tutti. Una combinazione completata da una dichiarazione verrà esposta, ossia resa visibile a tutti i giocatori. </para
+><para
+>Se nessuno dichiara la tessera scartata, il giocatore successivo, Sud (e di seguito Ovest e Nord), prende una tessera dal muro e scarta una tessera indesiderata.</para>
+      <para
+>Esistono varie regole sul modo in cui un tris può diventare un poker (dichiarando la quarta tessera od ottenendola dal muro): essere non vengono trattate qui. Ma &kajongg; conosce, naturalmente, tali regole e fa in modo che esse siano rispettate. Se viene dichiarato un poker, il giocatore ottiene automaticamente un rimpiazzo di tessera dal muro - diversamente non sarebbe possibile costruire le cinque combinazioni, come affermato sopra. </para>
+    </sect2>
+    <sect2>
+      <title
+>Anno, Giro e Mano</title
+><para
+>Quando un giocatore dichiara Mah Jong o si termina in parità, viene completata una mano. Ora, ad eccezione delle mani pari, i venti ruotano tra i giocatori. Questo sistema è ripetuto fino a che ciascun giocatore ha ottenuto tutti i venti. Questa unità intera viene chiamata giro. Una partita intera, chiamata anche anno, consiste di quattro giri: vento di giro Est, vento di giro Sud, vento di giro Ovest, vento di giro Nord. Il vento di un giro è anche chiamato vento prevalente, che può determinare anche punteggi superiori.</para>
+	<para
+>Dunque una partita completa (un anno) consiste almeno di sedici mani. Dato che i venti non ruotano per le mani pari o quando il giocatore Est dichiara Mah Jong, per portare a termine un'intera partita è necessario normalmente un numero superiore di mani. </para
+></sect2
+><sect2
+><title
+>Tessere bonus</title>
+    <para
+>Una partita può contenere otto tessere bonus (a meno che le regole non le escludano). Esse sono esposte separatamente sul lato destro dell'area del giocatore, poiché essere non vengono mai utilizzate per costruire combinazioni. Esse, comunque, generano punti bonus.</para>
+      <para
+>Se un giocatore ottiene una tessera bonus, ottiene automaticamente anche una tessera di rimpiazzo dal muro. E suona una campana.</para
+></sect2>
+      <sect2
+><title
+>Punteggio</title
+><para
+>Alla fine di una mano, viene calcolato il punteggio per ciascun giocatore. Per primo, i punti base sono conteggiati come due punti per un tris scoperto semplice o 20 punti per una vittoria. Poi, viene applicato un altro gruppo di regole - quelle regole possono raddoppiare i punti, come un punteggio doppio per una combinazione di draghi. Quando il punteggio per ciascuna mano è noto, le differenze sono pagate tra giocatori - mentre il vincitore ottiene il punteggio pieno pagato da tutti gli altri giocatori. Est ottiene e paga sempre due volte il proprio punteggio.</para>
+	  <para
+>Ovviamente &kajongg; conosce tutte le regole applicabili, ma un buon giocatore sa il punteggio delle varie combinazioni, e ottimizza le proprie giocate. Durante l'apprendimento, è bene attivare la finestra <guimenuitem
+>Spiega punteggi</guimenuitem
+>.</para>
+	  <para
+>Le esatte regole di calcolo del punteggio spesso variano - in &kajongg; si è liberi di modificarle con l'<link linkend="ruleset-options"
+>editor degli schemi</link
+>.</para>
+	  <para
+>L'editor degli schemi mostra anche tutti gli schemi disponibili e il loro significato. Posiziona il mouse sopra di essi: per le regole più particolari apparirà un testo esplicativo.</para>
+	</sect2>
+</sect1>
+<sect1 id="playing-play">
+        <title
+>Come si gioca a &kajongg;</title>
+        <para
+>Ti verrà domandato cosa desideri fare. Questa è una finestrella sulla destra o sulla parte inferiore, a seconda della dimensione della finestra. Puoi renderla più larga che alta, in tal caso essa apparirà a destra. A volte la finestrella è a tempo: una volta scaduto, la prima risposta possibile viene selezionata automaticamente per te. Il tempo è configurabile nell'editor degli schemi, sotto <guilabel
+>Opzioni</guilabel
+>, <guilabel
+>Dichiara il tempo</guilabel
+>. Tutti i giocatori devono avere lo stesso tempo a disposizione, ecco perché esso fa parte dello schema di gioco. </para
+><para
+>Se devi selezionare una tessera dalla tua mano, puoi spostarti tra le tessere utilizzando i tasti freccia &Right; e &Left; o le lettere <keycap
+>h</keycap
+> e <keycap
+>l</keycap
+> sulla tastiera. Ovviamente puoi usare anche il mouse. </para
+><para
+>Puoi scaricare una tessera usando sempre la tastiera, per qualsiasi azione. In alternativa, puoi usare il mouse e spostare la tessera dalla tua mano all'interno dell'area di scarto (all'interno delle mura). Il posizionamento della tessera nell'area di scarto verrà ancora eseguito dal computer - poiché il posizionamento deve essere uguale per tutti i giocatori. </para
+><para
+>Spesso, le finestre di dialogo offrono scelte che non sono veramente applicabili, tipo la chiamata di Tris quando non possiedi le tessere necessarie. Ciò è voluto: proprio come in una partita vera. Ma puoi configurare il programma in modo che non vengano mostrate le scelte non possibili: disabilita <guilabel
+>Mostra solo le azioni possibili</guilabel
+> nella pagina <guilabel
+>Gioca</guilabel
+> della finestra di dialogo delle impostazioni. </para
+><para
+>Le tessere scartate sono distribuite casualmente tra i muri. Alcune varianti di gioco definiscono il punto in  cui le tessere devono essere posizionate, ma ciò non è ancora configurabile. Quando lo sarà, diventerà parte dello schema di gioco. </para>
+	</sect1>
+</chapter>
+
+<chapter id="interface"
+><title
+>Panoramica dell'interfaccia</title
+> <!-- do not change this! -->
+<!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist
+> and <varlistentry
+>. Split the chapter into sections using <sect1(2,3)
+> for better viewing.-->
+
+<sect1 id="menu">
+<title
+>Elementi del menu</title>
+
+		<variablelist>
+			<varlistentry id="game-menu-scoreGame">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Partita</guimenu
+> <guimenuitem
+>Conteggia una partita manuale</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Conteggia solo i punti di una partita giocata manualmente.</action
+></para
+><para
+>Puoi caricare una vecchia partita o iniziarne una nuova. Per impostazione predefinita, solo le partite in corso (ossia quelle non terminate) vengono mostrate nell'elenco di selezione. Facoltativamente, puoi visualizzare tutte le partite, incluse quelle terminate. Qui puoi anche eliminare partite.</para
+></listitem>
+			</varlistentry>
+                        <varlistentry  id="game-menu-play">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Partita</guimenu
+> <guimenuitem
+>Gioca</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Gioca con altri (persone e computer)</action
+>.</para
+></listitem>
+                        </varlistentry>
+                        <varlistentry  id="game-menu-abort">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Partita</guimenu
+> <guimenuitem
+>Interrompi partita</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Termina la partita corrente. Se è una partita manuale col solo conteggio dei punti, puoi riprenderla in seguito. Se giochi con &kajongg;, non puoi riprendere la partita.</action
+></para
+></listitem>
+                        </varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Partita</guimenu
+> <guimenuitem
+>Esci da &kajongg;</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Esce</action
+> da &kajongg;.</para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-chat">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visualizza</guimenu
+> <guimenuitem
+>Chat</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Chat</action
+></para>
+				<screenshot>
+					<screeninfo
+>Finestra della chat</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Finestra della chat</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Ti permette di conversare con gli altri giocatori. </para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-scoretable">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visualizza</guimenu
+> <guimenuitem
+>Bacheca punteggio</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Bacheca punteggio</action
+></para>
+                                <screenshot>
+                                        <screeninfo
+>Bacheca punteggio</screeninfo>
+                                        <mediaobject>
+                                                <imageobject>
+                                                <imagedata fileref="scoretable.png" format="PNG"/>
+                                                </imageobject>
+                                                <textobject>
+                                                <phrase
+>Schermata</phrase>
+                                                </textobject>
+                                        </mediaobject>
+                                </screenshot>
+    <para
+>Mostra la bacheca del punteggio. La colonna Giro/Mano indica gli attuali giri (Est, Sud, Ovest, Nord) seguiti dal conteggio delle mani giocate in quel giro. I valori del vincitore hanno uno sfondo verde. La colonna Pagamenti mostra quanto il giocatore ha pagato o ricevuto da tutti gli altri giocatori in questa mano. La colonna Bilancio mostra il bilancio attuale di tutti i giocatori. La colona Grafico mostra l'andamento dei valori del bilancio. I suggerimenti offrono maggiori dettagli: mostrano tutte le regole applicate a questa mano. Basta muovere il mouse sul valore cui sei interessato.</para
+><para
+>La parte inferiore mostra lo schema di gioco usato. Tra la bacheca del punteggio e lo schema di gioco usato è presente un divisore che ti permette di modificare le relative dimensioni di entrambe le aree. </para
+></listitem>
+                        </varlistentry>
+			<varlistentry id="view-explain-scores">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>E</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visualizza</guimenu
+> <guimenuitem
+>Spiega punteggi</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Spiega punteggi</action
+></para>
+				<screenshot>
+					<screeninfo
+>Bacheca punteggio</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="explain.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Bacheca punteggio</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Spiega come è stato calcolato il punteggio per la mano corrente. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Visualizza</guimenu
+> <guimenuitem
+>Modalità schermo intero</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Alterna le modalità a schermo intero e normale.</action
+></para
+></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Impostazioni</guimenu
+> <guimenuitem
+>Giocatori</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Aggiunge, modifica ed elimina i giocatori.</action
+></para>
+				<para
+>Le password in questa tabella sono quelle utilizzate per impostazione predefinita quando si accede a un server di gioco. La modifica della password scelta al principio per il server non è in realtà per niente utile, perché non esiste ancora il modo di cambiare la tua password sul server di gioco. Dovresti chiedere all'amministratore del server di farlo al tuo posto, direttamente nella banca dati.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Impostazioni</guimenu
+> <guimenuitem
+>Schemi di gioco</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Personalizza gli schemi di gioco.</action
+></para>
+				<para
+>Usa l'editor degli schemi di gioco per personalizzare gli schemi. Per dettagli, leggi <link linkend="ruleset-options"
+>qui</link
+>.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Impostazioni</guimenu
+> <guimenuitem
+>Cambia angolo di visuale</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Cambia in senso antiorario l'angolo di visuale delle tessere.</action
+></para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Impostazioni</guimenu
+> <guimenuitem
+>Modalità dimostrazione</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Abilita o disabilita la modalità Dimostrazione. Per dettagli, leggi <link linkend="play"
+>qui</link
+>.</action
+></para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+<para
+>In aggiunta, &kajongg; contiene gli elementi di menu <guimenu
+>Impostazioni</guimenu
+> e <guimenu
+>Aiuto</guimenu
+>, comuni di &kde;, per ulteriori informazioni leggi le sezioni relative al <ulink url="help:/fundamentals/menus.html#menus-settings"
+>menu Impostazioni</ulink
+> e <ulink url="help:/fundamentals/menus.html#menus-help"
+>menu Aiuto</ulink
+> dei Fondamentali di &kde;. </para>
+
+</sect1>
+</chapter>
+
+<chapter id="configuration"
+><title
+>Configurazione del gioco</title
+> <!-- do not change this! -->
+<!--This section describes configuration &GUI;. If your game is configured using menubar exclusively, please remove this section.-->
+<screenshot>
+<screeninfo
+>Finestra di configurazione</screeninfo>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="config_play.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase
+>Finestra di configurazione</phrase>
+	  </textobject>
+	</mediaobject>
+</screenshot>
+
+<para
+>La voce di menu <menuchoice
+><guimenu
+>Impostazioni</guimenu
+> <guimenuitem
+>Configura &kajongg;...</guimenuitem
+></menuchoice
+> apre la finestra di dialogo <guilabel
+>Configura - &kajongg;</guilabel
+>.</para>
+<para
+>Se premi qui il pulsante <guibutton
+>Annulla</guibutton
+>, tutte le tue modifiche alla configurazione saranno annullate, incluse tutte le modifiche eseguite con l'editor degli schemi di gioco.</para>
+<para
+>Puoi anche selezionare le varie schede con la tastiera: <keycombo action="simul"
+>&Ctrl;<keycap
+>1</keycap
+></keycombo
+> seleziona la prima scheda delle opzioni <guilabel
+>Gioca</guilabel
+>, <keycombo action="simul"
+>&Ctrl;<keycap
+>2</keycap
+></keycombo
+> seleziona la seconda, e così via. </para>
+
+<sect1 id="play-options"
+><title
+>Opzioni di gioco</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<guilabel
+>Mostra ombre delle tessere</guilabel>
+				</term>
+				<listitem
+><para
+>Mostra le tessere con bordi e ombre. C'è anche un po' di spazio tra le file delle tessere e vengono mostrate le tessere del muro, in modo che possa vedere quanto esso è alto (due o tre file di tessere). Se l'opzione è disabilitata, si ottiene una vista più semplice con tessere leggermente più grandi, utile per schermi piccoli. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Ridisponi le tessere coperte in combinazioni</guilabel>
+				</term>
+				<listitem
+><para
+>Raggruppa le combinazioni nella mano. Talvolta il raggruppamento non è come vorresti, e dunque potresti desiderare di non averne alcuno, proprio come nelle partite reali. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Mostra solo le azioni possibili</guilabel>
+				</term>
+				<listitem
+><para
+>Durante la partita, mostra solo le azioni possibili come <quote
+>Nessuna dichiarazione</quote
+> o <quote
+>Tris</quote
+>. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Proponi cosa fare</guilabel>
+				</term>
+				<listitem
+><para
+>Ogni qualvolta sei di fronte ad azioni come dichiarare o no una tessera oppure scegliere quale tessera scartare, &kajongg; ti può aiutare con un suggerimento. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Usa suoni, se disponibili</guilabel>
+				</term>
+				<listitem
+><para
+>Permette di ascoltare gli scarti e le dichiarazioni. Se gli altri giocatori hanno registrato file sonori della propria voce, puoi sentirli. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Permetti agli altri di sentire la mia voce</guilabel>
+				</term>
+				<listitem
+><para
+>Se registri file sonori con la tua voce, questa opzione permette agli altri giocatori di sentire la tua voce quando scarti o dichiari. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Velocità animazione:</guilabel>
+				</term>
+				<listitem
+><para
+>Definisce quanto rapidamente si spostano le tessere. Se sposti l'indicatore completamente verso destra, il movimento delle tessere non viene animato: le tessere cambieranno semplicemente di posto. </para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+	<sect2
+><title
+>Suoni</title>
+	<para
+>Il gioco fornisce un'esperienza più coinvolgente se ascolti gli altri giocatori mentre dichiarano le tessere e annunciano gli scarti. Rende inoltre il gioco più semplice perché ti permette di concentrarti sulle tue tessere, senza dover osservare gli scarti degli altri. </para>
+	<para
+>&kajongg; è fornito con voci per diversi giocatori, e assegna automaticamente le voci. Per ciascuna lingua dovrebbero esserci quattro voci, meglio se due maschili e due femminili. &kajongg; tenta di usare le voci nella stessa lingua in cui è avviato. Se non trova le voci in quella lingua, &kajongg; usa le lingue di ripiego che hai definito per il programma (vedi <menuchoice
+><guimenu
+>Aiuto</guimenu
+> <guimenuitem
+>Cambia lingua dell'applicazione</guimenuitem
+></menuchoice
+>). Se non sono presenti file sonori per la tua lingua, sei invitato a registrarli e contribuire al miglioramento di &kajongg;. </para>
+	 <itemizedlist
+><listitem
+><para
+>Ecco come generare le voci per tuo conto. Per ogni voce è presente una cartella. Nota che queste cartelle si possono trovare in un'altra posizione all'interno del tuo sistema, esse dipendono da come è stato installato &kde;. Solo la parte che inizia per <filename class="directory"
+>kajongg</filename
+> è sempre uguale. Esistono due gruppi di voci in posti diversi, nel file system: <itemizedlist
+><listitem
+><para
+>Voci predefinite per ciascuna lingua. Risiedono in una cartella tipo <filename class="directory"
+>/usr/share/kajongg/voices/LANG</filename
+>, dove LANG è il codice della tua lingua. Le cartelle voce sotto <filename class="directory"
+>.../kajongg/voices/</filename
+> sono le versioni inglesi US. Le voci predefinite vengono assegnate ai giocatori casualmente. Esse hanno nomi del tipo <quote
+><literal
+>"male1 male2 female1 female2"</literal
+></quote
+>, ma è poco importante dato che l'utente non li vedrà mai. </para
+></listitem
+><listitem
+><para
+>Le voci utente sono definibili per un utente specifico. Se &kajongg; usa una di queste voci, la stessa viene trasferita automaticamente agli altri giocatori in Internet. Queste voci risiedono in una cartella tipo <filename class="directory"
+>~/.local/share/apps/kajongg/voices/</filename
+>. Se il tuo nome di accesso è pippo, essa sarà <filename class="directory"
+>/home/joe/.local/share/apps/kajongg/voices/pippo/</filename
+>. La cartella <filename class="directory"
+>voices/</filename
+> potrebbe non esistere; in tal caso va creata. </para
+></listitem
+></itemizedlist>
+		</para
+></listitem
+><listitem
+><para
+>Ora che sai dove memorizzare la tua nuova voce, genera per essa una nuova cartella. </para
+></listitem
+><listitem
+><para
+>In quella sottocartella puoi memorizzare i file sonori. Essi devono essere codificati col compressore audio <ulink url="https://xiph.org/vorbis/"
+>Ogg Vorbis</ulink
+> e i nomi dei file devono avere l'estensione <filename class="extension"
+>.ogg</filename
+>. Un singolo file ha un nome tipo <filename
+>s3.ogg</filename
+> - questo è Pietra («Stone») 3. Devi definire questi file per tutte le pedine, tutte le dichiarazioni e gli annunci. Se un file sonoro non è presente non succede nulla, semplicemente non sentirai il suono. Il ripiego ad altre voci o lingue funziona solo per le voci complete e non per i singoli file sonori. </para
+></listitem
+><listitem
+><para
+>Dopo aver definito tutti i file sonori per una voce predefinita, assicurati che il processo di &kajongg; abbia i permessi di scrittura nella nuova cartella voce. Avvia &kajongg; e prova la voce. Dopo aver verificato che tutto sia a posto, puoi revocare il permesso di scrittura (è necessario farlo per le voci predefinite). &kajongg; genererà automaticamente un file di nome <filename
+>md5sum</filename
+> che contiene la somma di controllo di tutti i file sonori. Se cambi, aggiungi o elimini un file sonoro per una voce, &kajongg; tenterà di riscrivere il file. </para
+></listitem
+></itemizedlist>
+	<para
+>Rendi il suono breve ma parla chiaramente: il gioco può svolgersi molto rapidamente, una volta preso confidenza con esso. Se scrivi un elenco di tutti gli elementi da pronunciare ti renderà più facile il lavoro. Non leggere gli elementi in sequenza ma sforzati di pronunciare ciascuna voce come un elemento isolato e come se stessi giocando. Lascia spazio tra gli elementi. Questo tipo di lettura necessita di un po' di pratica.</para>
+	<para
+>Di seguito, un metodo per creare i file sonori: </para
+><para
+><itemizedlist
+><listitem
+><para
+>Registra un file sonoro col programma <command
+>qarecord</command
+>, salvalo nel formato <acronym
+>WAV</acronym
+>. In quest'unico file registra tutti i suoni. </para
+></listitem
+><listitem
+><para
+>Modifica il file con l'editor di suoni <command
+>audacity</command
+>. Nell'editor, usa il mouse per evidenziare un intervallo di suono. L'editor riprodurrà quella porzione. Ripeti fino a quando non selezioni la porzione corretta. Quest'operazione può risultare più semplice con <menuchoice
+><guimenu
+>Visualizza</guimenu
+><guimenuitem
+>Zoom avanti</guimenuitem
+></menuchoice
+>. Usa il comando <menuchoice
+><guimenu
+>File</guimenu
+><guimenuitem
+>Esporta selezione</guimenuitem
+></menuchoice
+> e salvala in formato <filename class="extension"
+>.ogg</filename
+>. Nelle <guilabel
+>Opzioni</guilabel
+>, scegli una bassa qualità: questa è sufficiente e anche necessaria, poiché riduce il tempo del trasferimento dei suoni agli altri giocatori. </para
+></listitem
+></itemizedlist
+></para>
+	<para
+>I seguenti nomi sono i nomi dei file da generare. Associa loro sempre l'estensione <filename class="extension"
+>.ogg</filename
+>:</para>
+
+<table>
+<title
+>Nomi dei file sonori</title>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry
+>&s1; .. &s9;</entry
+><entry
+>Da pietra 1 a pietra 9</entry>
+</row>
+<row>
+<entry
+>&b1; .. &b9;</entry>
+<entry
+>Da bambù 1 a bambù 9</entry>
+</row>
+<row>
+<entry
+>&c1; .. &c9;</entry>
+<entry
+>Da carattere 1 a carattere 9</entry>
+</row>
+<row>
+<entry
+>&we; &ws; &ww; &wn;</entry>
+<entry
+>I venti Est, Sud, Ovest, Nord</entry>
+</row>
+<row>
+<entry
+>&db; &dr; &dg;</entry>
+<entry
+>I dragoni blu/bianchi, rossi, verdi</entry>
+</row>
+<row>
+<entry
+>&chow; &pung; &kong; &mahjongg;</entry>
+<entry
+>Le dichiarazioni principali</entry>
+</row>
+<row>
+<entry
+>&originalcall; &violatesoriginalcall;</entry>
+<entry
+>Chiamata originale e sua violazione</entry>
+</row>
+<row>
+<entry
+>&dangerousgame;</entry>
+<entry
+>Un giocatore rilascia un cannone (gioco pericoloso)</entry>
+</row>
+<row>
+<entry
+>&nochoice;</entry>
+<entry
+>Un giocatore dichiara di non avere alcuna possibilità se non eseguire un gioco pericoloso</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+	</sect2>
+</sect1>
+
+<sect1 id="tiles-options"
+><title
+>Opzioni delle tessere</title>
+        <screenshot>
+                <screeninfo
+>Selettore del set di tessere</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_tiles.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Selettore del set di tessere</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Usa il selettore delle <guilabel
+>tessere</guilabel
+> per selezionare le immagini per le tessere. </para>
+</sect1>
+
+<sect1 id="background-options"
+><title
+>Opzioni dello sfondo</title>
+        <screenshot>
+                <screeninfo
+>Selettore sfondo</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_background.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Selettore sfondo</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>Usa il selettore dello <guilabel
+>sfondo</guilabel
+> per selezionare un'immagine di sfondo per il gioco. </para
+><para
+>Alcuni sfondi, come il panorama cinese, impiegano del tempo a caricare. Se ritieni che il programma debba avviarsi più rapidamente o che il ridimensionamento della finestra principale impieghi sia troppo lento, puoi provare altri sfondi. </para>
+</sect1>
+
+<sect1 id="ruleset-options"
+><title
+>Editor degli schemi di gioco</title>
+			<screenshot>
+				<screeninfo
+>Editor schemi di gioco</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="ruleseteditor.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Editor schemi di gioco</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+			<para
+>Usa l'editor degli schemi per personalizzare gli schemi di gioco. Gli schemi di gioco predefiniti sono mostrati in corsivo, mentre quelli personalizzati in carattere normale. Gli schemi di gioco predefiniti non possono essere modificati in alcun modo dall'utente, ma potrebbe farlo un aggiornamento di &kajongg;. Gli schemi personalizzati non saranno mai modificati da un aggiornamento. </para
+><para
+>Quando avvi una nuova partita, potrai selezionare per essa uno schema di gioco. Possono essere utilizzati tutti gli schemi di gioco definiti nell'editor degli schemi. Lo schema di gioco è salvato assieme alla partita, così che puoi sempre cambiare le regole al suo interno: le tue modifiche avranno effetto solo sulle partite future. </para>
+			<sect2
+><title
+>Regola, punti, x2, limiti</title
+><para
+>Fai doppio clic su ciò che vuoi modificare. Se vengono azzerati tutti i valori, questa regola non avrà influenza sulla partita. Le regole non possono essere eliminate.</para>
+			</sect2>
+			<sect2
+><title
+>Copia e rimuovi</title
+><para
+>Puoi copiare e rimuovere interi schemi di gioco. </para
+><para
+>Questo può essere eseguito se le partite esistenti usano questo schema di gioco, dato che ogni partita possiede la sua propria copia dello schema. Puoi visualizzare gli schemi di gioco delle vecchie partite: <link linkend="game-menu-scoreGame"
+>Carica</link
+> la vecchia partita e <link linkend="view-explain-scores"
+>mostra la sua bacheca punteggio</link
+>. </para>
+			</sect2>
+			<sect2
+><title
+>Confronta</title
+><para>
+			<screenshot>
+				<screeninfo
+>Comparatore di schemi di gioco</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="differ.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Comparatore di schemi di gioco</phrase
+></textobject>
+				</mediaobject>
+			</screenshot
+>Puoi selezionare questo comando quando è selezionato un intero schema di gioco. Ti consente di confrontare lo schema selezionato con gli altri schemi. </para
+></sect2>
+</sect1>
+
+<sect1 id="default-keybindings">
+<title
+>Combinazioni predefinite della tastiera</title>
+
+<!-- TODO: not yet implemented
+<para
+>The menu entry <menuchoice
+><guimenu
+>Settings</guimenu
+> <guimenuitem
+>Configure ...</guimenuitem
+></menuchoice
+> allows you to change the default keyboard bindings.</para
+> -->
+
+<para
+>Le scorciatoie predefinite della tastiera sono le seguenti: </para>
+
+<para>
+<variablelist>
+
+<varlistentry>
+<term
+><keycap
+>F1</keycap
+></term>
+<listitem>
+<para
+>Mostra questo manuale. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Conteggia una partita manuale. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Gioca una partita con amici o computer. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Interrompi la partita corrente. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Esci dal programma. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Mostra la bacheca punteggio. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Mostra una finestra per la chat. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Cambia l'angolo di visuale. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Abilita o disabilita la modalità Dimostrazione. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Shift;<keycap
+>F1</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Che cos'è? Aiuto. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Modalità schermo intero. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</para>
+
+</sect1>
+</chapter>
+
+<appendix id="problems"
+><title
+>Problemi conosciuti</title>
+        <itemizedlist>
+                <listitem
+><para
+>In modalità gioco, le penalità non sono ancora possibili.</para
+></listitem>
+                <listitem
+><para
+>I giocatori computer sono ancora piuttosto stupidi.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="future"
+><title
+>Caratteristiche future possibili</title>
+        <itemizedlist>
+                <listitem
+><para
+>Aggiungere altri schemi di gioco. Questo dovrebbe essere fatto da persone che usano regolarmente quegli schemi di gioco.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+ <appendix id="faq"
+><title
+>Domande ricorrenti</title
+> <!-- do not change this! -->
+<!--This chapter is for frequently asked questions. Please use <qandaset
+> <qandaentry
+> only!-->
+<qandaset>
+<!--Following is a standard list of FAQ questions.-->
+        <qandaentry>
+                 <question
+><para
+>Posso cambiare l'aspetto del gioco? </para
+></question>
+                 <answer
+><para
+>Sì. Per cambiare l'aspetto di &kajongg;, usa la barra dei menu per aprire l'<link linkend="configuration"
+>utilità di configurazione</link
+>.</para
+></answer>
+        </qandaentry>
+        <qandaentry>
+                 <question
+><para
+>Posso usare la tastiera per assegnare tessere ai giocatori?</para
+></question>
+                 <answer
+><para
+>Sì. Consulta <link linkend="enterhand-tiles"
+>Far calcolare il punteggio a &kajongg;</link
+>.</para
+></answer>
+        </qandaentry>
+<!--Please add more Q&As if needed-->
+
+</qandaset>
+</appendix>
+
+<appendix id="credits"
+><title
+>Riconoscimenti e licenza</title
+> <!-- do not change this! -->
+<!--This chapter is for credits and licenses.-->
+	<para
+>&kajongg; per &kde; </para>
+
+	<para
+>Copyright del programma &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+	<para
+>Copyright della documentazione &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+
+<!-- !!!do not change ANYTHING after this line!!!! -->
+<para
+>Valter Mura <email
+>valtermura@gmail.com</email
+></para
+> 
+&underFDL;
+&underGPL;
+
+</appendix>
+
+<appendix id="bibliography">
+<title
+>Bibliografia</title>
+        <itemizedlist>
+		<listitem
+><para
+>Das Chinesische Mah-Jongg-Spiel, di Uwe Martens, 2005, Books on Demand GmbH, Norderstedt. Questo libro è un eccellente testo tedesco che contiene tutto ciò che desideri sapere sulle regole utilizzate in Germania e su molti altri aspetti del gioco.</para
+></listitem>
+                <listitem
+><para
+>The Complete Book of Mah-Jongg, di A. D. Millington, 1977 (con varie edizioni paperback fino al 2003), Weidenfeld &amp; Nicolson, London. Questo è l'ultimissimo testo di consultazione per il Mah Jong cinese classico, così come giocato nel mondo occidentale. Può darti importanti suggerimenti sulle strategie di gioco.</para
+></listitem>
+		<listitem
+><para
+>Mah-Jong, di Gwyn Headley e Yvonne Seeley, 3rd edition, 2008, A &amp; C Black Publishers Ltd., London. Questo libro è un testo di consultazione molto facile da usare, che si concentra sulle regole usate in Gran Bretagna, definite dalla BMJA (The British Mah Jong Association).</para
+></listitem>
+		<listitem
+><para
+><ulink url="https://en.wikipedia.org/wiki/Mahjong"
+></ulink
+></para
+></listitem>
+		<listitem
+><para
+><ulink url="https://de.wikipedia.org/wiki/Mah-Jongg"
+></ulink
+></para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="installation">
+<title
+>Installazione</title>
+<para
+>Per Linux: la tua distribuzione dovrebbe aver creato il pacchetto per te. </para>
+<para
+>Per Windows: vedi <ulink url="https://www.linux-apps.com/p/1109453/"
+></ulink
+> relativamente a un installatore Windows. </para>
+<para
+>Se vuoi scaricare il sorgente e installarlo manualmente: <itemizedlist>
+<listitem
+><para
+> <literal
+>git clone https://invent.kde.org/games/kajongg.git</literal
+> </para
+></listitem>
+<listitem
+><para
+>Per Linux: <literal
+>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal
+> </para
+></listitem>
+<listitem
+><para
+>Per Windows: leggi <filename
+>README.windows</filename
+></para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>Kajongg dipende da questi pacchetti: (i nomi dei pacchetti debian sono tra parentesi) <itemizedlist>
+	<listitem
+><para
+>Python 3.5 o superiore (python3)</para
+></listitem>
+	<listitem
+><para
+>Qt5.7 o superiore (python3-pyqt5 e python3-pyqt5.qtsvg)</para
+></listitem>
+	<listitem
+><para
+>l'interfacciamento python per Qt5 (python3-pyqt5)</para
+></listitem>
+        <listitem
+><para
+>la libreria particolare di python 16.6.0 o superiore (python3-twisted)</para
+></listitem>
+        <listitem
+><para
+>sqlite3 (libsqlite3-0)</para
+></listitem>
+</itemizedlist>
+</para>
+
+</appendix>
+
+&documentation.index;
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-always-quote-attributes:t
+sgml-indent-step:0
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
