@@ -88,7 +88,7 @@ endmacro(PYTHON_INSTALL)
 
 MACRO(KDE_INSTALL_PYTHON_FILES)
     FOREACH (_current_file ${ARGN})
-        python_install(${_current_file} ${DATA_INSTALL_DIR}/${PROJECT_NAME})
+        python_install(${_current_file} ${KDE_INSTALL_DATADIR}/${PROJECT_NAME})
     ENDFOREACH (_current_file)
 ENDMACRO(KDE_INSTALL_PYTHON_FILES)
 
@@ -105,8 +105,8 @@ MACRO(KDE_ADD_PYTHON_EXECUTABLE _pyname _exename)
          MESSAGE(STATUS "Project name is necessary to create symlink against python program!!! It will fail.")
     endif(NOT PROJECT_NAME)
 
-    set(TARGET ${CMAKE_INSTALL_PREFIX}/${DATA_INSTALL_DIR}/${PROJECT_NAME}/${_pyname})
-    set(LINK_NAME ${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL_DIR}/${_exename})
+    set(TARGET ${CMAKE_INSTALL_PREFIX}/${KDE_INSTALL_DATADIR}/${PROJECT_NAME}/${_pyname})
+    set(LINK_NAME ${CMAKE_INSTALL_PREFIX}/${KDE_INSTALL_BINDIR}/${_exename})
 
     GET_FILENAME_COMPONENT(abs_link_name ${LINK_NAME} ABSOLUTE)
     GET_FILENAME_COMPONENT(link_path ${LINK_NAME} PATH)
