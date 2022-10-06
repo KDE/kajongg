@@ -328,7 +328,7 @@ msgstr "&Aplica"
 
 #: src/kdestub.py:255
 msgid "&Cancel"
-msgstr "&Cancel·la"
+msgstr "C&ancel·la"
 
 #: src/kdestub.py:257 src/kdestub.py:447
 msgid "&Help"
@@ -374,7 +374,7 @@ msgstr "&Vista"
 
 #: src/kdestub.py:445
 msgid "&Settings"
-msgstr "&Configuració"
+msgstr "Con&figuració"
 
 #: src/kdestub.py:453
 msgctxt "@action:inmenu"
