@@ -2352,7 +2352,3 @@ msgstr ""
 #: src/user.py:93
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
-
-#~ msgid "This player cannot be deleted. There are games associated with %1."
-#~ msgstr ""
-#~ "このプレイヤーは削除できません。%1 に関連付けられたゲームがあります。"
