@@ -1694,7 +1694,7 @@ msgstr "Crida per a tresor amagat"
 
 #: src/predefined.py:481
 msgid "Calling for Fourfold Plenty"
-msgstr "Crida per abundància a quadro"
+msgstr "Crida per a abundància a quadro"
 
 #: src/predefined.py:485
 msgid "Calling for Purity"
