@@ -357,9 +357,8 @@ class ServerTable(Table, StrMixin):
         if Debug.table:
             logDebug('Game starts on table %s' % self)
         elementIter = iter(elements.all(self.game.ruleset))
-        wallSize = len(self.game.wall.tiles)
         self.game.wall.tiles = []
-        for _ in range(wallSize):
+        for _ in range(self.game.fullWallSize):
             self.game.wall.tiles.append(next(elementIter).concealed)
         assert isinstance(self.game, ServerGame), self.game
         self.running = True

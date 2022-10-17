@@ -266,6 +266,12 @@ class Game:
         return result
 
     @property
+    def fullWallSize(self):
+        """How many tiles we want to play with"""
+        # the assertion for wallSize should not be done more often than needed: leave it in Wall()
+        return int(Debug.wallSize) or elements.count(self.ruleset)
+
+    @property
     def client(self):
         """hide weakref"""
         return self._client() if self._client else None

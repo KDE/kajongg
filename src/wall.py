@@ -9,8 +9,8 @@ SPDX-License-Identifier: GPL-2.0
 
 import weakref
 
-from common import StrMixin, Debug
-from tile import Tile, elements
+from common import StrMixin
+from tile import Tile
 
 
 class WallEmpty(Exception):
@@ -57,11 +57,8 @@ class Wall(StrMixin):
     def __init__(self, game):
         """init and position the wall"""
         self._game = weakref.ref(game)  # avoid cycles for garbage collection
-        wallSize = int(Debug.wallSize)
-        if not wallSize:
-            wallSize = elements.count(game.ruleset)
         self.tiles = [self.tileClass(Tile.unknown)
-                      for _ in range(wallSize)]
+                      for _ in range(game.fullWallSize)]
         self.living = None
         self.kongBox = self.kongBoxClass()
         assert len(self.tiles) % 8 == 0
