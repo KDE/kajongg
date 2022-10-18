@@ -718,9 +718,8 @@ class ServerTable(Table, StrMixin):
         else:
             block.callback(self.moved)
 
-    def declareKong(self, player, meldTiles):
-        """player declares a Kong, meldTiles is a list"""
-        kongMeld = Meld(meldTiles)
+    def declareKong(self, player, kongMeld):
+        """player declares a Kong"""
         if not player.hasConcealedTiles(kongMeld) and kongMeld[0].exposed.pung not in player.exposedMelds:
             msg = i18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, str(kongMeld))
