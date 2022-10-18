@@ -304,7 +304,7 @@ class Hand(ReprMixin):
 
         self.ruleCache.clear()
         # do the rest only if we know all tiles of the hand
-        if Tile.unknown in self.string:
+        if Tile.unknownStr in self.string:
             return
         if self.__won:
             matchingMJRules = self.__maybeMahjongg()

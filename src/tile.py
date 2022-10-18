@@ -337,7 +337,10 @@ class Elements:
         """a list of all elements, each of them occurrence times"""
         return self.occurrence.all(self.__filter(ruleset))
 
-Tile.unknown = Tile('Xy')  # must come first
+
+Tile.unknownStr = 'Xy'
+Tile.unknown = Tile(Tile.unknownStr)  # must come first
+
 elements = Elements()
 assert not Tile.unknown.isKnown
 for wind in Wind.all4:
