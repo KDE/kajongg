@@ -951,6 +951,7 @@ class TstProgram(unittest.TestProgram):
     def __init__(self, *args, **kwargs):
         global PROGRAM  # pylint: disable=global-statement
         PROGRAM = self
+        Debug.callers = 8
 #        unittest.TestProgram.__init__(self, exit=False, *args, **kwargs)
         unittest.TestProgram.__init__(self, *args, **kwargs)
 
