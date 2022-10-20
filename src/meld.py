@@ -238,7 +238,7 @@ class Meld(TileList, ReprMixin):
         if length == 0:
             return
         if length > 4:
-            raise UserWarning('Meld %s is too long' % self)
+            raise UserWarning('Meld %s is too long' % str(self))
         if any(not x.isKnown for x in self):
             if len(set(self)) != 1:
                 raise UserWarning(
@@ -255,7 +255,7 @@ class Meld(TileList, ReprMixin):
                     and all(x.lowerGroup in Tile.colors for x in self):
                 self.isKnitted = True
             else:
-                raise UserWarning('Meld %s is malformed' % self)
+                raise UserWarning('Meld %s is malformed' % str(self))
             return
         # now length is 3 or 4
         tiles = set(self)
@@ -274,17 +274,17 @@ class Meld(TileList, ReprMixin):
                             return
         groups = {x.group for x in self}
         if len(groups) > 2 or len({x.lower() for x in groups}) > 1:
-            raise UserWarning('Meld %s is malformed' % self)
+            raise UserWarning('Meld %s is malformed' % str(self))
         values = {x.value for x in self}
         if length == 4:
             if len(values) > 1:
-                raise UserWarning('Meld %s is malformed' % self)
+                raise UserWarning('Meld %s is malformed' % str(self))
             if self.case == 'aaaA':
                 self.isKong = self.isClaimedKong = True
             elif self.case == 'aAAa':
                 self.isKong = True
             else:
-                raise UserWarning('Meld %s is malformed' % self)
+                raise UserWarning('Meld %s is malformed' % str(self))
             return
         # only possibilities left are CHOW and REST
         # length is 3
@@ -293,7 +293,7 @@ class Meld(TileList, ReprMixin):
                 if self[0].nextForChow is self[1] and self[1].nextForChow is self[2]:
                     self.isChow = True
                     return
-        raise UserWarning('Meld %s is malformed' % self)
+        raise UserWarning('Meld %s is malformed' % str(self))
 
     def __lt__(self, other):
         """used for sorting. Smaller value is shown first."""
