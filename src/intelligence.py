@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import weakref
+from itertools import chain
 
 from message import Message
 from common import IntDict, Debug, StrMixin
@@ -377,7 +378,7 @@ class DiscardCandidates(list):
         for tile in self.hiddenTiles:
             self.groupCounts[tile.group] += 1
         self.declaredGroupCounts = IntDict()
-        for tile in sum((x for x in hand.declaredMelds), []):
+        for tile in chain(*hand.declaredMelds):
             self.groupCounts[tile.lowerGroup] += 1
             self.declaredGroupCounts[tile.lowerGroup] += 1
         self.extend(TileAI(self, x) for x in sorted(set(self.hiddenTiles)))

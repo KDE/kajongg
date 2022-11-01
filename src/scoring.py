@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import datetime
+from itertools import chain
 
 from qt import QPointF, QRectF, QDialogButtonBox
 from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
@@ -184,7 +185,7 @@ class ScoringHandBoard(HandBoard):
 
     def sync(self, adding=None):
         """place all tiles in ScoringHandBoard"""
-        self.placeTiles(sum(self.uiMelds, []))
+        self.placeTiles(chain(*self.uiMelds))
 
     def deselect(self, meld):
         """remove meld from old board"""
