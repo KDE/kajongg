@@ -100,7 +100,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
             position -= textCenter
         return {'pos': self.board.mapToScene(position), 'rotation': rotation, 'scale': self.board.scale()}
 
-    def name(self):
+    def debug_name(self):
         """for identification in animations"""
         return self.__name
 
@@ -159,7 +159,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
     def __str__(self):
         """for debugging"""
         return 'SideText(%s %s x/y= %.1f/%1f)' % (
-            self.name(), self.text, self.x(), self.y())
+            self.debug_name(), self.text, self.x(), self.y())
 
 
 class UIWallSide(Board, ReprMixin):
@@ -171,8 +171,7 @@ class UIWallSide(Board, ReprMixin):
         Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
         self.length = length
 
-    @property
-    def name(self):
+    def debug_name(self):
         """name for debug messages"""
         return 'UIWallSide {}'.format(UIWall.sideNames[self.rotation()])
 
@@ -192,7 +191,7 @@ class UIWallSide(Board, ReprMixin):
 
     def __str__(self):
         """for debugging"""
-        return self.name
+        return self.debug_name()
 
 
 class UIKongBox(KongBox):
@@ -271,7 +270,7 @@ class UIWall(Wall):
                 Internal.scene.addItem(wind.disc)
 
     @staticmethod
-    def name():
+    def debug_name():
         """name for debug messages"""
         return 'wall'
 

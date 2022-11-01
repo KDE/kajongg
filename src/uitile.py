@@ -50,7 +50,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         self.__dark = False
         self.level = level
 
-    def name(self):
+    def debug_name(self):
         """identification for animations"""
         return self._tile
 
@@ -389,7 +389,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             size = ''
         return '%s(%s) %s: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
             (self.tile,
-             self.board.name if self.board else 'None', id4(self),
+             self.board.debug_name() if self.board else 'None', id4(self),
              self.xoffset, self.x(), self.yoffset,
              self.y(), self.zValue(), size, rotation, scale, level)
 

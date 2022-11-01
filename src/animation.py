@@ -38,7 +38,7 @@ class Animation(QPropertyAnimation, ReprMixin):
         self.setEasingCurve(QEasingCurve.InOutQuad)
         graphicsObject.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
-        self.debug = graphicsObject.name() in Debug.animation or Debug.animation == 'all'
+        self.debug = graphicsObject.debug_name() in Debug.animation or Debug.animation == 'all'
         self.debug |= 'T{}t'.format(id4(graphicsObject)) in Debug.animation
         if self.debug:
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
@@ -56,7 +56,7 @@ class Animation(QPropertyAnimation, ReprMixin):
             # may happen when aborting a game because animations are cancelled first,
             # before the last move from server is executed
             return
-        if graphicsObject.name() in Debug.animation or Debug.animation == 'all':
+        if graphicsObject.debug_name() in Debug.animation or Debug.animation == 'all':
             pName = self.pName().decode()
             logDebug(
                 '%s: change endValue for %s: %s->%s  %s' % (
@@ -70,7 +70,7 @@ class Animation(QPropertyAnimation, ReprMixin):
         pGroup = self.group() if isAlive(self) else 'notAlive'
         if pGroup or not isAlive(self):
             return '%s/A%s' % (pGroup, id4(self))
-        return 'A%s-%s' % (id4(self), self.targetObject().name())
+        return 'A%s-%s' % (id4(self), self.targetObject().debug_name())
 
     def pName(self):
         """
@@ -330,7 +330,7 @@ class AnimatedMixin:
     def shortcutAnimation(self, animation):
         """directly set the end value of the animation"""
         if animation.debug:
-            logDebug('shortcut {}: UTile {}: clear queuedAnimations'.format(animation, self.name()))
+            logDebug('shortcut {}: UTile {}: clear queuedAnimations'.format(animation, self.debug_name()))
         setattr(self, animation.pName(), animation.endValue())
         self.queuedAnimations = []
         self.setDrawingOrder()
@@ -344,15 +344,15 @@ class AnimatedMixin:
         """the graphics object knows which of its properties are currently animated"""
         self.queuedAnimations = []
         propName = animation.pName()
-        if self.name() in Debug.animation:
+        if self.debug_name() in Debug.animation:
             oldAnimation = self.activeAnimation.get(propName, None)
             if not isAlive(oldAnimation):
                 oldAnimation = None
             if oldAnimation:
                 logDebug('**** setActiveAnimation {} {}: {} OVERRIDES {}'.format(
-                    self.name(), propName, animation, oldAnimation))
+                    self.debug_name(), propName, animation, oldAnimation))
             else:
-                logDebug('setActiveAnimation {} {}: set {}'.format(self.name(), propName, animation))
+                logDebug('setActiveAnimation {} {}: set {}'.format(self.debug_name(), propName, animation))
         self.activeAnimation[propName] = animation
         self.setCacheMode(QGraphicsItem.ItemCoordinateCache)
 
@@ -360,8 +360,8 @@ class AnimatedMixin:
         """an animation for this graphics object has ended.
         Finalize graphics object in its new position"""
         del self.activeAnimation[animation.pName()]
-        if self.name() in Debug.animation:
-            logDebug('UITile {}: clear activeAnimation_{}'.format(self.name(), animation.pName()))
+        if self.debug_name() in Debug.animation:
+            logDebug('UITile {}: clear activeAnimation_{}'.format(self.debug_name(), animation.pName()))
         self.setDrawingOrder()
         if not self.activeAnimation:
             self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
@@ -380,7 +380,7 @@ class AnimatedMixin:
                 curValue = animation.endValue()
                 if curValue != newValue:
                     # change a queued animation
-                    if self.name() in Debug.animation:
+                    if self.debug_name() in Debug.animation:
                         logDebug('setEndValue for {}: {}: {}->{}'.format(
                             animation, pName, animation.formatValue(curValue), animation.formatValue(newValue)))
                     animation.setEndValue(newValue)

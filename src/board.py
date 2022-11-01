@@ -47,7 +47,7 @@ class WindDisc(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
         self.__brush = self.whiteColor
         self.board = None
 
-    def name(self):
+    def debug_name(self):
         """for identification in animations"""
         return self.__wind.tile
 
@@ -99,7 +99,7 @@ class WindDisc(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
     def __str__(self):
         """for debugging"""
         return 'WindDisc(%s x/y= %.1f/%1f)' % (
-            self.name(), self.x(), self.y())
+            self.debug_name(), self.x(), self.y())
 
 
 class WindLabel(QLabel):
@@ -190,14 +190,13 @@ class Board(QGraphicsRectItem, ReprMixin):
         self.level = 0
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
-    @property
-    def name(self):
+    def debug_name(self):
         """default board name, used for debugging messages"""
         return 'board'
 
     def __str__(self):
         """for debugging"""
-        return self.name
+        return self.debug_name()
 
     def setVisible(self, value):
         """also update focusRect if it belongs to this board"""
@@ -250,7 +249,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         self._focusTile = uiTile
         if self._focusTile and self._focusTile.tile in Debug.focusable:
             logDebug('%s: new focus uiTile %s from %s' % (
-                self.name, self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
+                self.debug_name(), self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
         if self.hasLogicalFocus:
             self.scene().focusBoard = self
 
@@ -641,8 +640,7 @@ class SelectorBoard(CourtBoard):
                 uiTile.focusable = True
             self.focusTile = self.tilesByElement(Tile('c1'))[0]
 
-    @property
-    def name(self):
+    def debug_name(self):
         """for debugging messages"""
         return 'selector'
 
@@ -919,8 +917,7 @@ class DiscardBoard(CourtBoard):
         self.__lastDiscarded = None
         self.__discardTilesOrderedLeaveHole = True
 
-    @property
-    def name(self):
+    def debug_name(self):
         """to be used in debug output"""
         return "discardBoard"
 

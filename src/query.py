@@ -146,7 +146,7 @@ class DBHandle(sqlite3.Connection):
         return Options.dbPath if Options.dbPath else os.path.join(appdataDir(), name)
 
     @property
-    def name(self):
+    def debug_name(self):
         """get name for log messages. Readonly."""
         stack = [x[2] for x in traceback.extract_stack()]
         name = stack[-3]

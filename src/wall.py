@@ -129,10 +129,10 @@ class Wall(ReprMixin):
         self.kongBox.fill(boxTiles)
 
     @staticmethod
-    def name():
+    def debug_name():
         """name for debug messages"""
         return '4sided wall'
 
     def __str__(self):
         """for debugging"""
-        return self.name()
+        return self.debug_name()

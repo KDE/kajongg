@@ -110,8 +110,7 @@ class HandBoard(Board):
     # this is ordered such that pylint does not complain about
     # identical code in board.py
 
-    @property
-    def name(self):
+    def debug_name(self):
         """for debugging messages"""
         return self.player.name
 
