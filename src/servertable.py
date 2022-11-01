@@ -668,17 +668,17 @@ class ServerTable(Table, StrMixin):
         """abort the table. Reason: message/args"""
         self.server.removeTable(self, 'abort', message, *args)
 
-    def claimTile(self, player, claim, meldTiles, nextMessage):
+    def claimTile(self, player, claim, meld, nextMessage):
         """a player claims a tile for pung, kong or chow.
-        meldTiles contains the claimed tile, concealed"""
+        meld contains the claimed tile, concealed"""
         if not self.running:
             return
+        assert meld.isConcealed
         lastDiscard = self.game.lastDiscard
         # if we rob a tile, self.game.lastDiscard has already been set to the
         # robbed tile
         discardingPlayer = self.game.activePlayer
-        hasTiles = Meld(meldTiles[:]).without(lastDiscard)
-        meld = Meld(meldTiles)
+        hasTiles = meld.without(lastDiscard)
         if len(meld) != 4 and not (meld.isPair or meld.isPungKong or meld.isChow):
             msg = i18nE('%1 wrongly said %2 for meld %3')
             self.abort(msg, player.name, claim.name, str(meld))

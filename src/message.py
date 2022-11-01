@@ -235,7 +235,7 @@ class MessagePung(PungChowMessage, ServerMessage):
 
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
-        table.claimTile(msg.player, self, msg.args[0], Message.Pung)
+        table.claimTile(msg.player, self, Meld(msg.args[0]), Message.Pung)
 
     def clientAction(self, client, move):
         """mirror pung call"""
@@ -254,7 +254,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
         if table.game.lastDiscard:
-            table.claimTile(msg.player, self, msg.args[0], Message.Kong)
+            table.claimTile(msg.player, self, Meld(msg.args[0]), Message.Kong)
         else:
             table.declareKong(msg.player, Meld(msg.args[0]))
 
@@ -296,7 +296,7 @@ class MessageChow(PungChowMessage, ServerMessage):
                 'player %s illegally said Chow, only %s may' %
                 (msg.player, table.game.nextPlayer()))
         else:
-            table.claimTile(msg.player, self, msg.args[0], Message.Chow)
+            table.claimTile(msg.player, self, Meld(msg.args[0]), Message.Chow)
 
     def clientAction(self, client, move):
         """mirror chow call"""
