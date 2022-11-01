@@ -12,7 +12,7 @@ import datetime
 from log import logWarning, logException, logDebug
 from mi18n import i18n, i18nc, i18ncE
 from sound import Voice
-from tile import Tile, TileList
+from tile import Tile, TileList, TileTuple
 from meld import Meld, MeldList
 from common import Internal, Debug, Options, ReprMixin
 from wind import Wind
@@ -64,7 +64,7 @@ class Message:
         pb.Copyable is too much overhead"""
         # pylint: disable=too-many-return-statements
         cls = value.__class__
-        if cls in (Tile, TileList, Meld, MeldList):
+        if cls in (Tile, TileList, Meld, MeldList, TileTuple):
             return str(value)
         if isinstance(value, Wind):
             return str(value)

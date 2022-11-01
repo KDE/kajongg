@@ -344,6 +344,94 @@ class TileList(list):
         return str(''.join(str(x) for x in self))
 
 
+class TileTuple(tuple):
+
+    """a list that can only hold tiles"""
+
+    tileClass = Tile
+
+    def __new__(cls, iterable=None):
+        if isinstance(iterable, str):
+            memberList = [cls.tileClass(iterable[x:x + 2])
+                       for x in range(0, len(iterable), 2)]
+        elif isinstance(iterable, Tile):
+            memberList = [iterable]
+        elif iterable is None:
+            memberList = []
+        else:
+            memberList = []
+            for member in iterable:
+                if isinstance(member, cls.tileClass):
+                    memberList.append(member)
+                elif isinstance(member, str):
+                    memberList = [cls.tileClass(member[x:x + 2])
+                               for x in range(0, len(member), 2)]
+                elif hasattr(member, '__iter__'):
+                    memberList.extend(member)
+                else:
+                    raise ValueError(
+                        'TileTuple() accepts only {} and str but got {}'.format(cls.tileClass.__name__, repr(member)))
+        result = tuple.__new__(cls, memberList)
+        result.isRest = True
+        result._hash = result._compute_hash()
+        return result
+
+    def __init__(self, iterable=None):  # pylint: disable=unused-argument
+        tuple.__init__(self)
+
+    def _compute_hash(self):
+        """usable for sorting"""
+        result = 0
+        factor = len(Tile.hashTable) // 2
+        for tile in self:
+            assert isinstance(tile, Tile), 'tile is:{}'.format(repr(tile))
+            result = result * factor + tile.key
+        return result
+
+    def __hash__(self):
+        return self._hash
+
+    def __add__(self, other):
+        result = list(self)
+        if isinstance(other, str):
+            result.extend(
+                [self.tileClass(other[x:x + 2])
+                       for x in range(0, len(other), 2)])
+        elif hasattr(other, '__iter__'):
+            result.extend(other)
+        else:
+            result.append(other)
+        return TileTuple(result)
+
+    def sorted(self):
+        """sort(TileList) would not keep TileList type"""
+        return TileList(sorted(self))
+
+    def hasChows(self, tile):
+        """return my chows with tileName"""
+        if tile not in self:
+            return []
+        if tile.lowerGroup not in Tile.colors:
+            return []
+        group = tile.group
+        values = {x.value for x in self if x.group == group}
+        chows = []
+        for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
+            subset = {tile.value + x for x in offsets}
+            if subset <= values:
+                chow = self.__class__(self.tileClass(group, x) for x in sorted(subset))
+                if chow not in chows:
+                    chows.append(chow)
+        return chows
+
+    def __str__(self):
+        """the content"""
+        return str(''.join(str(x) for x in self))
+
+    def __repr__(self):
+        """for debugging"""
+        return '{}_{}({})'.format(self.__class__.__name__, id4(self), ','.join(repr(x) for x in self))
+
 class Elements:
 
     """represents all elements"""
