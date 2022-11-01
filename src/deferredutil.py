@@ -408,9 +408,9 @@ class DeferredBlock(StrMixin):
                 localDeferreds.append(defer)
             else:
                 if Debug.traffic:
-                    message = '-> {receiver:<15} about {about} {command}{kwargs}'.format(
+                    message = '-> {receiver:<15} about {about} {command}{kwargs!r}'.format(
                         receiver=rec.name[:15], about=about, command=command,
-                        kwargs=Move.prettyKwargs(kwargs))
+                        kwargs=kwargs)
                     logDebug(message)
                 defer = self.table.server.callRemote(
                     rec,

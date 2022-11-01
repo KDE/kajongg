@@ -227,7 +227,7 @@ class HandBoard(Board):
         oldTiles = {}
         oldBonusTiles = {}
         for uiTile in tiles:
-            assert isinstance(uiTile, UITile)
+            assert isinstance(uiTile, UITile), 'uiTile is {}'.format(type(uiTile))
             if uiTile.isBonus:
                 targetDict = oldBonusTiles
             else:

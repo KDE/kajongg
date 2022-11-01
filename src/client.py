@@ -359,16 +359,16 @@ class Client(pb.Referenceable):
         if Debug.traffic:
             if self.isHumanClient():
                 if self.game:
-                    self.game.debug('got Move: %s' % move)
+                    self.game.debug('got Move: {!r}'.format(move))
                 else:
-                    logDebug('got Move: %s' % move)
+                    logDebug('got Move: {!r}'.format(move))
         if self.game:
             if move.token:
                 if move.token != self.game.handId.token():
                     logException(
                         'wrong token: %s, we have %s' %
                         (move.token, self.game.handId.token()))
-        with Duration('Move %s:' % move):
+        with Duration('Move {!r}:'.format(move)):
             return self.exec_move(move).addCallback(self.__jellyMessage)
 
     def exec_move(self, move):

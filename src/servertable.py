@@ -511,8 +511,8 @@ class ServerTable(Table, StrMixin):
         tile = Tile(msg.args[0])
         if tile not in player.concealedTiles:
             self.abort(
-                'player %s discarded %s but does not have it' %
-                (player, tile))
+                'player %s discarded %s but does not have it. He has %s' %
+                (player, tile, player.concealedTiles))
             return
         dangerousText = self.game.dangerousFor(player, tile)
         mustPlayDangerous = player.mustPlayDangerous()

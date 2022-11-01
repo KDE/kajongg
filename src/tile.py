@@ -7,6 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from util import id4
 from log import logException
 from mi18n import i18n, i18nc
 from common import IntDict, StrMixin
@@ -163,6 +164,9 @@ class Tile(str, StrMixin):
         existing = list([x for x in cls.cache.values() if x.key == result.key]) # pylint: disable=consider-using-generator
         existingIds = {id(x) for x in existing}
         assert len(existingIds) == 1, 'new is:{} existing are: {} with ids {}'.format(result, existing, existingIds)
+
+    def __repr__(self):
+        return '{}_{}({}{})'.format(self.__class__.__name__, id4(self), self.group, self.char)
 
     def __getitem__(self, index):
         if hasattr(self, '_fixed'):

@@ -362,7 +362,7 @@ class AnimatedMixin:
         Finalize graphics object in its new position"""
         del self.activeAnimation[animation.pName()]
         if self.name() in Debug.animation:
-            logDebug('UITile {}: clear activeAnimation[{}]'.format(self.name(), animation.pName()))
+            logDebug('UITile {}: clear activeAnimation_{}'.format(self.name(), animation.pName()))
         self.setDrawingOrder()
         if not self.activeAnimation:
             self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
