@@ -404,8 +404,8 @@ class TileTuple(tuple):
         return TileTuple(result)
 
     def sorted(self):
-        """sort(TileList) would not keep TileList type"""
-        return TileList(sorted(self))
+        """sort(TileTuple) would not keep TileTuple type"""
+        return TileTuple(sorted(self))
 
     def hasChows(self, tile):
         """return my chows with tileName"""

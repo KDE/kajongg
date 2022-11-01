@@ -15,7 +15,7 @@ import weakref
 from hashlib import md5
 
 from log import dbgIndent
-from tile import Tile, TileList
+from tile import Tile, TileList, TileTuple
 from tilesource import TileSource
 from meld import Meld, MeldList
 from rule import Score, UsedRule
@@ -166,7 +166,7 @@ class Hand(ReprMixin):
         self.values = tuple(x.value for x in self.tiles)
         self.suits = {x.lowerGroup for x in self.tiles}
         self.declaredMelds = MeldList(x for x in self.melds if x.isDeclared)
-        declaredTiles = list(sum((x for x in self.declaredMelds), []))
+        declaredTiles = TileTuple(self.declaredMelds)
         self.tilesInHand = TileList(x for x in self.tiles
                                     if x not in declaredTiles)
         self.lenOffset = (len(self.tiles) - 13

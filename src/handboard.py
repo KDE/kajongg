@@ -414,7 +414,7 @@ class PlayingHandBoard(HandBoard):
         if self.player.concealedMelds:
             result = MeldList(self.player.concealedMelds)
         elif self.player.concealedTiles:
-            tileStr = 'R' + ''.join(str(x) for x in self.player.concealedTiles)
+            tileStr = 'R' + str(self.player.concealedTiles)
             content = Hand(self.player, tileStr)
             result = MeldList(content.melds + content.bonusMelds)
         else:

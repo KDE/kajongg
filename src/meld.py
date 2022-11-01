@@ -12,7 +12,7 @@ from itertools import chain
 
 from mi18n import i18nc
 from common import ReprMixin
-from tile import Tile, TileList, elements
+from tile import Tile, TileList, TileTuple, elements
 
 
 class Meld(TileList, ReprMixin):
@@ -206,14 +206,14 @@ class Meld(TileList, ReprMixin):
     def without(self, remove):
         """self without tile. The rest will be uppercased."""
         assert remove is not None, 'without(None) is illegal'
-        tiles = TileList()
+        tiles = []
         for tile in self:
             if tile is remove:
                 remove = None
             else:
                 tiles.append(tile.concealed)
         assert remove is None, 'trying to remove {} from {}'.format(remove, self)
-        return tiles
+        return TileTuple(tiles)
 
     def __setitem__(self, index, value):
         """set a tile in the meld"""
@@ -409,7 +409,7 @@ class MeldList(list):
 
     def tiles(self):
         """flat view of all tiles in all melds"""
-        return TileList(sum(self, []))
+        return TileTuple(self)
 
     def __str__(self):
         if self:

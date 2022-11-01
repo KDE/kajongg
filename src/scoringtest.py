@@ -15,7 +15,7 @@ from wind import Wind, East, South, West, North
 from player import Players
 from game import PlayingGame
 from hand import Hand, Score
-from tile import TileList
+from tile import TileTuple
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
 
 RULESETS = []
@@ -118,8 +118,7 @@ class Helpers:
             game = GAMES[idx]
             game.players[0].clearCache()
             hand = Hand(game.players[0], string)
-            testSays = TileList(
-                {x.lastTile.exposed for x in hand.callingHands}).sorted()
+            testSays = TileTuple({x.lastTile.exposed for x in hand.callingHands}).sorted()
             if isinstance(expected, list):
                 if idx >= len(expected):
                     idx %= len(RULESETS) // 2
@@ -129,7 +128,7 @@ class Helpers:
                 exp = expected[expIdx]
             else:
                 exp = expected
-            completingTiles = TileList(exp)
+            completingTiles = TileTuple(exp)
             self.assertTrue(testSays == completingTiles,
                             '%s: %s may be completed by %s but testresult is %s' % (
                                 ruleset.name, string, completingTiles or 'None', testSays or 'None'))

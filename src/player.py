@@ -16,7 +16,7 @@ from common import IntDict, Debug
 from common import ReprMixin, Internal
 from wind import East, Wind
 from query import Query
-from tile import Tile, TileList, elements
+from tile import Tile, TileTuple, elements
 from tilesource import TileSource
 from meld import Meld, MeldList
 from permutations import Permutations
@@ -257,7 +257,7 @@ class Player(ReprMixin):
     @property
     def concealedTiles(self):
         """a readonly tuple"""
-        return tuple(self._concealedTiles)
+        return TileTuple(self._concealedTiles)
 
     @property
     def exposedMelds(self):
@@ -438,14 +438,14 @@ class Player(ReprMixin):
         finally:
             self.lastTile, self.lastSource = save
             if discard:
-                self._concealedTiles = self._concealedTiles[:-1]
+                self._concealedTiles.pop(-1)
 
     def scoringString(self):
         """helper for HandBoard.__str__"""
         if self._concealedMelds:
             parts = [str(x) for x in self._concealedMelds + self._exposedMelds]
         else:
-            parts = [''.join(self._concealedTiles)]
+            parts = [str(self._concealedTiles)]
             parts.extend([str(x) for x in self._exposedMelds])
         parts.extend(str(x) for x in self._bonusTiles)
         return ' '.join(parts)
@@ -547,10 +547,8 @@ class PlayingPlayer(Player):
         exposedChows = [x for x in self._exposedMelds if x.isChow]
         if len(exposedChows) >= self.game.ruleset.maxChows:
             return []
-        tile = self.game.lastDiscard
-        within = TileList(self.concealedTiles[:])
-        within.append(tile)
-        return within.hasChows(tile)
+        _ = self.game.lastDiscard
+        return (TileTuple(self.concealedTiles) + _).hasChows(_)
 
     def __possibleKongs(self):
         """return a unique list of lists with possible kong combinations"""
@@ -761,7 +759,7 @@ class PlayingPlayer(Player):
             return False
         afterExposed = [x.exposed for x in self._concealedTiles]
         if exposing:
-            exposing = exposing[:]
+            exposing = list(exposing)
             if self.game.lastDiscard:
                 # if this is about claiming a discarded tile, ignore it
                 # the player who discarded it is responsible
@@ -779,7 +777,7 @@ class PlayingPlayer(Player):
         from the wall"""
         game = self.game
         game.activePlayer = self
-        allMeldTiles = meldTiles[:]
+        allMeldTiles = list(meldTiles)
         if calledTile:
             assert isinstance(calledTile, Tile), calledTile
             allMeldTiles.append(calledTile)

@@ -25,7 +25,7 @@ from message import Message, ChatMessage
 from log import logDebug, logError
 from mi18n import i18nE, i18n, i18ncE
 from deferredutil import DeferredBlock
-from tile import Tile, TileList, elements
+from tile import Tile, TileTuple, elements
 from meld import Meld, MeldList
 from query import Query
 from client import Client, Table
@@ -558,7 +558,7 @@ class ServerTable(Table, ReprMixin):
                 block.tellAll(
                     player,
                     Message.NoChoice,
-                    tiles=TileList(player.concealedTiles))
+                    tiles=TileTuple(player.concealedTiles))
             else:
                 player.playedDangerous = True
                 if Debug.dangerousGame:
@@ -568,7 +568,7 @@ class ServerTable(Table, ReprMixin):
                 block.tellAll(
                     player,
                     Message.DangerousGame,
-                    tiles=TileList(player.concealedTiles))
+                    tiles=TileTuple(player.concealedTiles))
         if msg.answer == Message.OriginalCall:
             player.isCalling = True
             block.callback(self.clientMadeOriginalCall, msg)
@@ -604,9 +604,9 @@ class ServerTable(Table, ReprMixin):
                 if player == clientPlayer or self.game.playOpen:
                     tiles = player.concealedTiles
                 else:
-                    tiles = TileList(Tile.unknown * 13)
+                    tiles = TileTuple(Tile.unknown * 13)
                 block.tell(player, clientPlayer, Message.SetConcealedTiles,
-                           tiles=TileList(chain(tiles, player.bonusTiles)))
+                           tiles=TileTuple(chain(tiles, player.bonusTiles)))
         block.callback(self.dealt)
 
     def endHand(self, unusedResults=None):
@@ -623,7 +623,7 @@ class ServerTable(Table, ReprMixin):
                     # the winner tiles are already shown in claimMahJongg
                     block.tellOthers(
                         player, Message.ShowConcealedTiles, show=True,
-                        tiles=TileList(player.concealedTiles))
+                        tiles=TileTuple(player.concealedTiles))
             block.callback(self.saveHand)
 
     def saveHand(self, unusedResults=None):

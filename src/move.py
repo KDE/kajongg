@@ -12,7 +12,7 @@ import weakref
 from common import ReprMixin, Internal
 from message import Message
 from wind import Wind
-from tile import Tile, TileList
+from tile import Tile, TileTuple
 from meld import Meld, MeldList
 
 class Move(ReprMixin):
@@ -40,7 +40,7 @@ class Move(ReprMixin):
                 if key.lower().endswith('tile'):
                     self.__setattr__(key, Tile(value))
                 elif key.lower().endswith('tiles'):
-                    self.__setattr__(key, TileList(value))
+                    self.__setattr__(key, TileTuple(value))
                 elif key.lower().endswith('meld'):
                     self.__setattr__(key, Meld(value))
                 elif key.lower().endswith('melds'):
