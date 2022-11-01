@@ -676,9 +676,8 @@ class ServerTable(Table, StrMixin):
         lastDiscard = self.game.lastDiscard
         # if we rob a tile, self.game.lastDiscard has already been set to the
         # robbed tile
-        hasTiles = Meld(meldTiles[:])
         discardingPlayer = self.game.activePlayer
-        hasTiles = hasTiles.without(lastDiscard)
+        hasTiles = Meld(meldTiles[:]).without(lastDiscard)
         meld = Meld(meldTiles)
         if len(meld) != 4 and not (meld.isPair or meld.isPungKong or meld.isChow):
             msg = i18nE('%1 wrongly said %2 for meld %3')
