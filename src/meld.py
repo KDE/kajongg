@@ -205,12 +205,14 @@ class Meld(TileList, ReprMixin):
 
     def without(self, remove):
         """self without tile. The rest will be uppercased."""
+        assert remove is not None, 'without(None) is illegal'
         tiles = TileList()
         for tile in self:
             if tile is remove:
                 remove = None
             else:
                 tiles.append(tile.concealed)
+        assert remove is None, 'trying to remove {} from {}'.format(remove, self)
         return tiles
 
     def __setitem__(self, index, value):
