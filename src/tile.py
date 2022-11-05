@@ -84,86 +84,94 @@ class Tile(ReprMixin):
     def __build(cls, *args):
         """build a new Tile object out of args"""
 
-        # set raw data attributes (group, char)
-        result = object.__new__(cls)
-        if len(args) == 1:
+        result = super().__new__(cls)
+        result.setUp(args)
+        return result
+
+    def setUp(self, args):  # pylint:disable=too-many-statements
+        """Initialize"""
+
+        # parse args
+        if isinstance(args, Tile):
+            group, arg1 = args.group, args.char
+        elif len(args) == 1:
             if isinstance(args[0], Tile):
-                result.group = args[0].group
+                group = args[0].group
                 arg1 = args[0].value
             else:
                 assert isinstance(args[0], str)
-                result.group, arg1 = args[0]
+                group, arg1 = args[0]
         else:
-            result.group, arg1 = args
+            group, arg1 = args
+        self.group = group
 
         # set attributes depending only on group
-        result.isKnown = result.group != 'X'
-        result.lowerGroup = result.group.lower()
-        result.isExposed = result.group == result.lowerGroup
-        result.isConcealed = not result.isExposed
-        result.isBonus = result.group in Tile.boni
-        result.isDragon = result.lowerGroup == Tile.dragon
-        result.isWind = result.lowerGroup == Tile.wind
-        result.isHonor = result.isDragon or result.isWind
+        self.isKnown = self.group != 'X'
+        self.lowerGroup = self.group.lower()
+        self.isExposed = self.group == self.lowerGroup
+        self.isConcealed = not self.isExposed
+        self.isBonus = self.group in Tile.boni
+        self.isDragon = self.lowerGroup == Tile.dragon
+        self.isWind = self.lowerGroup == Tile.wind
+        self.isHonor = self.isDragon or self.isWind
 
-        result.char, result.value = result.set_value(arg1)
+        self.char, self.value = self.parse_arg1(arg1)
 
         try:
-            result.key = 1 + result.hashTable.index(str(result)) // 2
+            self.key = 1 + self.hashTable.index(Tile.__str__(self)) // 2
         except ValueError:
-            logException('%s is not a valid tile string' % result)
+            logException('%s is not a valid tile string' % self)
 
-        result.isTerminal = False
-        result.isNumber = False
-        result.isReal = False
+        self.isNumber = False
+        self.isTerminal = False
+        self.isReal = False
 
-        if result.isBonus or result.isDragon or result.isWind:
-            result.isReal = True
-        elif result.isKnown:
-            result.isNumber = True
-            result.isTerminal = result.value in Tile.terminals
-            result.isReal = result.value in Tile.numbers
+        if self.isBonus or self.isDragon or self.isWind:
+            self.isReal = True
+        elif self.isKnown:
+            self.isNumber = True
+            self.isTerminal = self.value in Tile.terminals
+            self.isReal = self.value in Tile.numbers
+        self.isMajor = self.isHonor or self.isTerminal
+        self.isMinor = self.isKnown and not self.isMajor
 
-        result.isMajor = result.isHonor or result.isTerminal
-        result.isMinor = result.isKnown and not result.isMajor
+        Tile._storeInCache(self)
 
-        Tile._storeInCache(result)
-
-        result.exposed = result.concealed = result.swapped = None
-        result.single = result.pair = result.pung = None
-        result.chow = result.kong = None
-        result._fixed = True
+        self.exposed = self.concealed = self.swapped = None
+        self.single = self.pair = self.pung = None
+        self.chow = self.kong = None
+        if self.__class__ is Tile:
+            # a Piece may change
+            self._fixed = True
 
         object.__setattr__(
-            result,
+            self,
             'exposed',
-            result if not result.isKnown else Tile(result.group.lower(), result.char))
-        object.__setattr__(result, 'concealed',
-                        result if not result.isKnown or result.isBonus
-                        else Tile(result.group.upper(), result.char))
+            Tile(self.name2()) if not self.isKnown else Tile(self.group.lower(), self.char))
+        object.__setattr__(self, 'concealed',
+                        Tile(self.name2()) if not self.isKnown or self.isBonus
+                        else Tile(self.group.upper(), self.char))
         object.__setattr__(
-            result,
+            self,
             'swapped',
-            result.exposed if result.isConcealed else result.concealed)
-        if isinstance(result.value, int):
-            if 0 <= result.value <= 11:
+            self.exposed if self.isConcealed else self.concealed)
+        if isinstance(self.value, int):
+            if 0 <= self.value <= 11:
                 object.__setattr__(
-                    result,
+                    self,
                     'prevForChow',
-                    Tile(result.group,
-                         result.value - 1))
-            if -1 <= result.value <= 10:
+                    Tile(self.group,
+                         self.value - 1))
+            if -1 <= self.value <= 10:
                 object.__setattr__(
-                    result,
+                    self,
                     'nextForChow',
                     Tile(
-                        result.group,
-                        result.value +
+                        self.group,
+                        self.value +
                         1))
 
-        return result
-
-    def set_value(self, arg1):
+    def parse_arg1(self, arg1):
         """set the interpreted Tile.value (str, Wind, int)"""
         if isinstance(arg1, Wind):
             char = arg1.char.lower()
