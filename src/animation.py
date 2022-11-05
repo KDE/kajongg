@@ -28,6 +28,8 @@ class Animation(QPropertyAnimation, ReprMixin):
     clsUid = 0
 
     def __init__(self, graphicsObject, propName, endValue, parent=None):
+        self.debug = graphicsObject.debug_name() in Debug.animation or Debug.animation == 'all'
+        self.debug |= 'T{}t'.format(id4(graphicsObject)) in Debug.animation
         Animation.clsUid += 1
         self.uid = Animation.clsUid
         pName = propName
@@ -38,8 +40,6 @@ class Animation(QPropertyAnimation, ReprMixin):
         self.setEasingCurve(QEasingCurve.InOutQuad)
         graphicsObject.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
-        self.debug = graphicsObject.debug_name() in Debug.animation or Debug.animation == 'all'
-        self.debug |= 'T{}t'.format(id4(graphicsObject)) in Debug.animation
         if self.debug:
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
