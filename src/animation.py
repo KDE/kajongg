@@ -32,8 +32,7 @@ class Animation(QPropertyAnimation, ReprMixin):
         self.debug |= 'T{}t'.format(id4(graphicsObject)) in Debug.animation
         Animation.clsUid += 1
         self.uid = Animation.clsUid
-        pName = propName
-        QPropertyAnimation.__init__(self, graphicsObject, pName.encode(), parent)
+        QPropertyAnimation.__init__(self, graphicsObject, propName.encode(), parent)
         QPropertyAnimation.setEndValue(self, endValue)
         duration = Internal.Preferences.animationDuration()
         self.setDuration(duration)
