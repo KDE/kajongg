@@ -784,7 +784,8 @@ class Game:
 class PlayingGame(Game):
     """this game is played using the computer"""
 
-    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-many-instance-attributes,useless-suppression
+    # pylint 2.16.2 is erratic here, sometimes it warns, sometimes not
 
     playerClass = PlayingPlayer
 

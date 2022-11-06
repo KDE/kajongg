@@ -294,7 +294,7 @@ class ReprMixin:
         content = str(self)
         if content.startswith(clsName):
             return content
-        return '{cls}({content})'.format(cls=clsName, content=content)
+        return '{cls}_{id4}({content})'.format(cls=clsName, id4=id4(self), content=content)
 
 
 class Options(metaclass=FixedClass):
