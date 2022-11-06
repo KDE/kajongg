@@ -139,7 +139,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                 movingZ += ZValues.movingZ
         self.setZValue(movingZ +
                        boardLevel +
-                       (self.level + (2 if self.tile.isKnown else 1))
+                       (self.level + (2 if self.isKnown else 1))
                        * ZValues.itemZFactor +
                        self.__lightDistance())
 
@@ -162,7 +162,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
 
     def showFace(self):
         """should we show face for this tile?"""
-        return self.tile.isKnown
+        return self.isKnown
 
     def __elementId(self, showShadows=None):
         """return the SVG element id of the tile"""
@@ -189,11 +189,11 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                 if withBorders:
                     faceSize = self.tileset.faceSize.toSize()
                     renderer.render(
-                        painter, self.tileset.svgName[str(self.tile.exposed)],
+                        painter, self.tileset.svgName[str(self.exposed)],
                         QRectF(self.facePos(), QSizeF(faceSize)))
                 else:
                     renderer.render(
-                        painter, self.tileset.svgName[str(self.tile.exposed)],
+                        painter, self.tileset.svgName[str(self.exposed)],
                         self.boundingRect())
         if self.cross:
             self.__paintCross(painter)
@@ -244,7 +244,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                 int(faceSize.height() * yScale))
             painter.resetTransform()
             painter.translate(self.facePos(withBorders))
-            renderer.render(painter, self.tileset.svgName[self.tile.exposed],
+            renderer.render(painter, self.tileset.svgName[self.exposed],
                             QRectF(QPointF(), QSizeF(faceSize)))
         return result
 
@@ -397,6 +397,40 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
     def isBonus(self):
         """proxy for tile"""
         return self.tile.isBonus
+
+    @property
+    def isKnown(self):
+        """proxy for tile"""
+        return self.tile.isKnown
+
+    @property
+    def exposed(self):
+        """proxy for tile"""
+        return self.tile.exposed
+
+    @property
+    def concealed(self):
+        """proxy for tile"""
+        return self.tile.concealed
+
+    @property
+    def isConcealed(self):
+        """proxy for tile"""
+        return self.tile.isConcealed
+
+    @property
+    def lowerGroup(self):
+        """proxy for tile"""
+        return self.tile.lowerGroup
+
+    @property
+    def char(self):
+        """proxy for tile"""
+        return self.tile.char
+
+    def name2(self):
+        """proxy for tile"""
+        return self.tile.name2()
 
 
 class UIMeld(list):

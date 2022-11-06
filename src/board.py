@@ -242,7 +242,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         if uiTile is self._focusTile:
             return
         if uiTile:
-            assert uiTile.tile.isKnown, uiTile
+            assert uiTile.isKnown, uiTile
             if not isinstance(uiTile.board, DiscardBoard):
                 assert uiTile.focusable, uiTile
             self.__prevPos = uiTile.sortKey()
@@ -634,7 +634,7 @@ class SelectorBoard(CourtBoard):
         """move all tiles back into the selector"""
         with AnimationSpeed():
             for uiTile in self.allSelectorTiles:
-                uiTile.tile = uiTile.tile.exposed
+                uiTile.tile = uiTile.exposed
                 self.__placeAvailable(uiTile)
                 uiTile.dark = False
                 uiTile.focusable = True
@@ -698,8 +698,8 @@ class SelectorBoard(CourtBoard):
             Tile.bamboo: (1, 0, Tile.numbers),
             Tile.stone: (2, 0, Tile.numbers),
             Tile.character: (0, 0, Tile.numbers)}
-        row, baseColumn, order = offsets[uiTile.tile.lowerGroup]
-        column = baseColumn + order.index(uiTile.tile.char)
+        row, baseColumn, order = offsets[uiTile.lowerGroup]
+        column = baseColumn + order.index(uiTile.char)
         uiTile.dark = False
         uiTile.setBoard(self, column, row)
 
@@ -708,7 +708,7 @@ class SelectorBoard(CourtBoard):
         assert isinstance(tile, UITile)
         wantedTile = tile.tile
         for selectorTile in self.uiTiles:
-            selectorTile.tile = selectorTile.tile.exposed
+            selectorTile.tile = selectorTile.exposed
         lowerName = wantedTile.exposed
         upperName = wantedTile.concealed
         if lowerHalf:

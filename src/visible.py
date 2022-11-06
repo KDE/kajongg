@@ -148,9 +148,9 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         tile = tile.exposed
         hbTiles = self.handBoard.uiTiles
         lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
-        lastDiscard.tile = lastDiscard.tile.concealed
+        lastDiscard.tile = lastDiscard.concealed
         Internal.scene.discardBoard.discardTile(lastDiscard)
-        assert lastDiscard.tile.isConcealed
+        assert lastDiscard.isConcealed
         self.syncHandBoard()
 
     def addConcealedTiles(self, tiles, animated=True):
