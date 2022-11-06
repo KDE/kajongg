@@ -7,10 +7,9 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from util import id4
 from log import logException
 from mi18n import i18n, i18nc
-from common import IntDict, StrMixin
+from common import IntDict, StrMixin, id4
 from wind import Wind, East, South, West, North
 
 class Tile(str, StrMixin):

@@ -10,10 +10,9 @@ SPDX-License-Identifier: GPL-2.0
 from twisted.internet.defer import succeed, Deferred
 
 from log import logDebug
-from util import id4
 from mi18n import i18n, i18nc
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
-from common import StrMixin, Speeds
+from common import StrMixin, Speeds, id4
 from wind import Wind
 
 from qt import Qt, QMetaObject

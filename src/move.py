@@ -9,12 +9,11 @@ SPDX-License-Identifier: GPL-2.0
 
 import weakref
 
-from common import StrMixin, Internal
+from common import StrMixin, Internal, id4
 from message import Message
 from wind import Wind
 from tile import Tile, TileList
 from meld import Meld, MeldList
-from util import id4
 
 class Move(StrMixin):
 

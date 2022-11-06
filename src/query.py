@@ -19,9 +19,9 @@ from collections import defaultdict
 import sqlite3
 
 from mi18n import i18n, i18ncE
-from util import Duration, id4
+from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug
-from common import IntDict, Options, Internal, Debug, appdataDir
+from common import IntDict, Options, Internal, Debug, appdataDir, id4
 
 class QueryException(Exception):
 

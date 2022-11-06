@@ -19,9 +19,9 @@ from tile import Tile, TileList
 from tilesource import TileSource
 from meld import Meld, MeldList
 from rule import Score, UsedRule
-from common import Debug, StrMixin
+from common import Debug, StrMixin, Fmt, fmt
 from intelligence import AIDefaultAI
-from util import callers, Fmt, fmt
+from util import callers
 from message import Message
 
 

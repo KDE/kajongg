@@ -16,9 +16,8 @@ from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve
 from qt import Property, QGraphicsObject, QGraphicsItem, QPointF
 
-from common import Internal, Debug, isAlive, StrMixin
+from common import Internal, Debug, isAlive, StrMixin, id4
 from log import logDebug, logException
-from util import id4
 
 
 class Animation(QPropertyAnimation, StrMixin):
