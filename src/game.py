@@ -772,13 +772,13 @@ class Game:
         """set random living and kongBox
         sets divideAt: an index for the wall break"""
         breakWall = self.randomGenerator.randrange(4)
-        sideLength = len(self.wall.tiles) // 4
+        sideLength = len(self.wall) // 4
         # use the sum of four dices to find the divide
         self.divideAt = breakWall * sideLength + \
             sum(self.randomGenerator.randrange(1, 7) for idx in range(4))
         if self.divideAt % 2 == 1:
             self.divideAt -= 1
-        self.divideAt %= len(self.wall.tiles)
+        self.divideAt %= len(self.wall)
 
 
 class PlayingGame(Game):

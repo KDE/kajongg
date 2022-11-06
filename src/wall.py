@@ -128,6 +128,10 @@ class Wall(ReprMixin):
                 boxTiles[pair * 2 + 2:]
         self.kongBox.fill(boxTiles)
 
+    def __len__(self):
+        """Proxy for len(tiles)"""
+        return len(self.tiles)
+
     @staticmethod
     def debug_name():
         """name for debug messages"""
