@@ -49,7 +49,7 @@ class WindDisc(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
 
     def debug_name(self):
         """for identification in animations"""
-        return self.__wind.tile
+        return self.__wind.tile.name2()
 
     def moveDict(self):
         """a dict with attributes for the new position,
@@ -247,7 +247,7 @@ class Board(QGraphicsRectItem, ReprMixin):
                 assert uiTile.focusable, uiTile
             self.__prevPos = uiTile.sortKey()
         self._focusTile = uiTile
-        if self._focusTile and self._focusTile.tile in Debug.focusable:
+        if self._focusTile and self._focusTile.tile.name2() in Debug.focusable:
             logDebug('%s: new focus uiTile %s from %s' % (
                 self.debug_name(), self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
         if self.hasLogicalFocus:

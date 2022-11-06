@@ -164,6 +164,10 @@ class Tile(str, ReprMixin):
         existingIds = {id(x) for x in existing}
         assert len(existingIds) == 1, 'new is:{} existing are: {} with ids {}'.format(result, existing, existingIds)
 
+    def name2(self):
+        """__str__ might be changed by a subclass"""
+        return self.group + str(self.char)
+
     def __repr__(self):
         """ReprMixin does not seem to work on str subclass"""
         return ReprMixin.__repr__(self)

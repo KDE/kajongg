@@ -52,7 +52,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
 
     def debug_name(self):
         """identification for animations"""
-        return self._tile
+        return self._tile.name2()
 
     def setClippingFlags(self):
         """if we do not show shadows, we need to clip"""
@@ -341,9 +341,9 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
     @focusable.setter
     def focusable(self, value):
         """redirect and generate Debug output"""
-        if self.tile in Debug.focusable:
+        if self.tile.name2() in Debug.focusable:
             newStr = 'focusable' if value else 'unfocusable'
-            logDebug('%s: %s from %s' % (newStr, self.tile, stack('')[-2]))
+            logDebug('%s: %s from %s' % (newStr, self.tile.name2(), stack('')[-2]))
         self.setFlag(QGraphicsItem.ItemIsFocusable, value)
 
     @property
@@ -388,7 +388,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         else:
             size = ''
         return '%s(%s) %s: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
-            (self.tile,
+            (self.tile.name2(),
              self.board.debug_name() if self.board else 'None', id4(self),
              self.xoffset, self.x(), self.yoffset,
              self.y(), self.zValue(), size, rotation, scale, level)

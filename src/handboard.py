@@ -43,7 +43,7 @@ class TileAttr(ReprMixin):
             self.dark = self.setDark()
             # dark and focusable are different in a ScoringHandBoard
             self.focusable = self.setFocusable(hand, meld, idx)
-            if self.tile in Debug.focusable:
+            if self.tile.name2() in Debug.focusable:
                 logDebug('TileAttr %s:%s' % (self.tile, self.focusable))
 
     def setDark(self):
