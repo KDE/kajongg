@@ -75,7 +75,7 @@ class Meld(TileList, ReprMixin):
         - a list of Tile objects"""
         if not hasattr(self, '_fixed'):  # already defined if I am from cache
             TileList.__init__(self, newContent)
-            self.case = ''.join('a' if x.islower() else 'A' for x in self)
+            self.case = ''.join('a' if x.isExposed else 'A' for x in self)
             self.key = TileList.key(self)
             if self.key not in self.cache:
                 self.cache[self.key] = self

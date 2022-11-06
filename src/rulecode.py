@@ -731,7 +731,7 @@ class Knitting(MJRule):
     def rearrange(cls, hand, rest):
         melds = []
         for couple in cls.findCouples(hand, rest)[0]:
-            if couple[0].islower():
+            if couple[0].isExposed:
                 # this is the mj pair, lower after claiming
                 continue
             melds.append(Meld(couple))
