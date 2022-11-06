@@ -188,12 +188,18 @@ class Tile(str, ReprMixin):
 
     def istitle(self):
         raise TypeError
+    def __mul__(self, other):
+        return [self] * other
+
 
     def upper(self):
         raise TypeError
 
     def capitalize(self):
         raise TypeError
+    def __imul__(self, other):
+        return [self] * other
+
 
     def meld(self, size):
         """return a meld of size. Those attributes are set
