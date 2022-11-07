@@ -343,6 +343,9 @@ class TileList(list):
         """the content"""
         return str(''.join(str(x) for x in self))
 
+    def __repr__(self):
+        """for debugging"""
+        return '{}_{}({})'.format(self.__class__.__name__, id4(self), ','.join(repr(x) for x in self))
 
 class TileTuple(tuple):
 
