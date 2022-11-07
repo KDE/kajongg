@@ -78,17 +78,17 @@ class Tile(ReprMixin):
         try:
             return cls.cache[args]
         except KeyError:
-            return cls.__build(*args)
+            return cls._build(*args)
 
     @classmethod
-    def __build(cls, *args):
+    def _build(cls, *args):
         """build a new Tile object out of args"""
 
         result = super().__new__(cls)
         result.setUp(args)
         return result
 
-    def setUp(self, args):  # pylint:disable=too-many-statements
+    def setUp(self, args):  # pylint:disable=too-many-statements, too-many-branches
         """Initialize"""
 
         # parse args
@@ -135,7 +135,8 @@ class Tile(ReprMixin):
         self.isMajor = self.isHonor or self.isTerminal
         self.isMinor = self.isKnown and not self.isMajor
 
-        Tile._storeInCache(self)
+        if self.__class__ is Tile:
+            Tile._storeInCache(self)
 
         self.exposed = self.concealed = self.swapped = None
         self.single = self.pair = self.pung = None
@@ -288,20 +289,27 @@ class Tile(ReprMixin):
         assert element.__class__ is Tile, repr(element)
         return element
 
+    def __eq__(self, other):
+        if isinstance(other, Tile):
+            return self.name2() == other.name2()
+        return object.__eq__(self, other)
+
 
 class TileList(list):
 
     """a list that can only hold tiles"""
 
+    tileClass = Tile
+
     def __init__(self, newContent=None):
         list.__init__(self)
         if newContent is None:
             return
-        if isinstance(newContent, Tile):
+        if isinstance(newContent, self.tileClass):
             list.append(self, newContent)
         elif isinstance(newContent, str):
             list.extend(
-                self, [Tile(newContent[x:x + 2])
+                self, [self.tileClass(newContent[x:x + 2])
                        for x in range(0, len(newContent), 2)])
         else:
             list.extend(self, newContent)
@@ -334,7 +342,7 @@ class TileList(list):
         for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
             subset = {tile.value + x for x in offsets}
             if subset <= values:
-                chow = TileList(Tile(group, x) for x in sorted(subset))
+                chow = self.__class__(self.tileClass(group, x) for x in sorted(subset))
                 if chow not in chows:
                     chows.append(chow)
         return chows
