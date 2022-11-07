@@ -8,14 +8,15 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 
+from types import GeneratorType
 from itertools import chain
 
 from mi18n import i18nc
 from common import ReprMixin
-from tile import Tile, TileList, TileTuple, elements
+from tile import Tile, TileTuple, elements
 
 
-class Meld(TileList, ReprMixin):
+class Meld(TileTuple, ReprMixin):
 
     """represents a meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
@@ -41,20 +42,19 @@ class Meld(TileList, ReprMixin):
     """
     # pylint: disable=too-many-instance-attributes
 
-    __hash__ = None
     cache = {}
 
-    def __new__(cls, newContent=None):
+    def __new__(cls, iterable=None):
         """try to use cache"""
-        if isinstance(newContent, str) and newContent in cls.cache:
-            return cls.cache[newContent]
-        if isinstance(newContent, Meld):
-            return newContent
-        tiles = TileList(newContent)
-        cacheKey = tiles.key()
-        if cacheKey in cls.cache:
-            return cls.cache[cacheKey]
-        return TileList.__new__(cls, tiles)
+        if isinstance(iterable, str) and iterable in cls.cache:
+            return cls.cache[iterable]
+        if isinstance(iterable, Meld):
+            # brauchen wir das?
+            return iterable
+        tiles = super(Meld, cls).__new__(cls, TileTuple(iterable))
+        if tiles in cls.cache:
+            return cls.cache[tiles]
+        return tiles
 
     @classmethod
     def check(cls):
@@ -63,22 +63,21 @@ class Meld(TileList, ReprMixin):
             assert key == value.key or key == str(value), 'cache wrong: cachekey=%s realkey=%s value=%s' % (
                 key, value.key, value)
             assert value.key == 1 + value.hashTable.index(value) / 2
-            assert value.key == TileList.key(value), \
+            assert value.key == TileTuple.key(value), \
                 'static key:%s current key:%s, static value:%s, current value:%s ' % (
-                    value.key, TileList.key(value), value.original, value)
+                    value.key, TileTuple.key(value), value.original, value)
 
-    def __init__(self, newContent=None):
+    def __init__(self, iterable=None):
         """init the meld: content can be either
         - a single string with 2 chars for every tile
         - a list containing such strings
         - another meld. Its tiles are not passed.
         - a list of Tile objects"""
         if not hasattr(self, '_fixed'):  # already defined if I am from cache
-            TileList.__init__(self, newContent)
+            TileTuple.__init__(self, iterable)
             self.case = ''.join('a' if x.isExposed else 'A' for x in self)
-            self.key = TileList.key(self)
-            if self.key not in self.cache:
-                self.cache[self.key] = self
+            if self not in self.cache:
+                self.cache[self] = self
                 self.cache[str(self)] = self
             self.isExposed = self.__isExposed()
             self.isConcealed = not self.isExposed
@@ -109,37 +108,37 @@ class Meld(TileList, ReprMixin):
             self._fixed = True
 
             if len(self) < 4:
-                TileList.__setattr__(
+                TileTuple.__setattr__(
                     self,
                     'concealed',
-                    Meld(TileList(x.concealed for x in self)))
-                TileList.__setattr__(self, 'declared', self.concealed)
-                TileList.__setattr__(
+                    Meld(x.concealed for x in self))
+                TileTuple.__setattr__(self, 'declared', self.concealed)
+                TileTuple.__setattr__(
                     self,
                     'exposed',
-                    Meld(TileList(x.exposed for x in self)))
-                TileList.__setattr__(self, 'exposedClaimed', self.exposed)
+                    Meld(x.exposed for x in self))
+                TileTuple.__setattr__(self, 'exposedClaimed', self.exposed)
             else:
-                TileList.__setattr__(
+                TileTuple.__setattr__(
                     self,
                     'concealed',
-                    Meld(TileList(x.concealed for x in self)))
-                TileList.__setattr__(
+                    Meld(x.concealed for x in self))
+                TileTuple.__setattr__(
                     self, 'declared',
-                    Meld(TileList([self[0].exposed, self[1].concealed, self[2].concealed, self[3].exposed])))
-                TileList.__setattr__(
+                    Meld([self[0].exposed, self[1].concealed, self[2].concealed, self[3].exposed]))
+                TileTuple.__setattr__(
                     self,
                     'exposed',
-                    Meld(TileList(x.exposed for x in self)))
-                TileList.__setattr__(
+                    Meld(x.exposed for x in self))
+                TileTuple.__setattr__(
                     self, 'exposedClaimed',
-                    Meld(TileList([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed])))
+                    Meld([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed]))
 
     def __setattr__(self, name, value):
         if (hasattr(self, '_fixed')
                 and not name.endswith('__hasRules')):
             raise TypeError
-        TileList.__setattr__(self, name, value)
+        TileTuple.__setattr__(self, name, value)
 
     def __prepareRules(self, ruleset):
         """prepare rules from ruleset"""
@@ -182,26 +181,6 @@ class Meld(TileList, ReprMixin):
         result.extend(x for x in self.__dynamicDoublingRules[
             rulesetId] if x.appliesToMeld(hand, self))
         return result
-
-    def append(self, unused):
-        """we want to be immutable"""
-        raise TypeError
-
-    def extend(self, unused):
-        """we want to be immutable"""
-        raise TypeError
-
-    def insert(self, unused):
-        """we want to be immutable"""
-        raise TypeError
-
-    def pop(self, unused):
-        """we want to be immutable"""
-        raise TypeError
-
-    def remove(self, unused):
-        """we want to be immutable"""
-        raise TypeError
 
     def without(self, remove):
         """self without tile. The rest will be uppercased."""
@@ -380,7 +359,7 @@ class Meld(TileList, ReprMixin):
                         tile.concealed.kong = Meld(tile.concealed * 4)
 
     def __repr__(self):
-        return 'Meld({}'.format(TileList.__repr__(self))
+        return 'Meld({}'.format(TileTuple.__repr__(self))
 
 class MeldList(list):
 
@@ -392,6 +371,9 @@ class MeldList(list):
             return
         if isinstance(newContent, Meld):
             list.append(self, newContent)
+        elif isinstance(newContent, (list, GeneratorType)):
+            # I tried hasattr('__iter__') but that does not work
+            list.extend(self, newContent)
         elif isinstance(newContent, str):
             list.extend(self, [Meld(x)
                                for x in newContent.split()])
