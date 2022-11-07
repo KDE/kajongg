@@ -518,8 +518,12 @@ class PieceList(TileList):
     tileClass = Piece
 
     def __contains__(self, value):
-        """Also accept Tile."""
-        return any(Tile(x) is value for x in self)
+        """If value is Piece: must be the same object
+        If value is Tile: any element having the same name"""
+        if value.__class__ is Tile:
+            _ =  value.name2()
+            return any(x.name2() == _ for x in self)
+        return any(x is value for x in self)
 
     def index(self, value):
         """Also accept Tile."""

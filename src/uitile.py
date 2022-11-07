@@ -301,11 +301,11 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
 
     def change_name(self, value):
         """set tile name and update display"""
-        if value is not self._tile:
-            assert not self._tile.isKnown or not value.isKnown or (self._tile.exposed == value.exposed)
-            self._tile = value
-            self.setDrawingOrder() # because known tiles are above unknown tiles
-            self.update()
+        if value is not None:
+            if self.name2() != value.name2():
+                self._tile = value
+                self.setDrawingOrder() # because known tiles are above unknown tiles
+                self.update()
 
     @property
     def cross(self):

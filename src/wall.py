@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 import weakref
 
 from common import ReprMixin
-from tile import Tile
+from tile import Piece
 
 
 class WallEmpty(Exception):
@@ -51,13 +51,13 @@ class Wall(ReprMixin):
     counter clockwise, 0..3. 0 is bottom.
     Wall.tiles always holds references to all tiles in the game even
     when they are used"""
-    tileClass = Tile
+    tileClass = Piece
     kongBoxClass = KongBox
 
     def __init__(self, game):
         """init and position the wall"""
         self._game = weakref.ref(game)  # avoid cycles for garbage collection
-        self.tiles = [self.tileClass(Tile.unknown)
+        self.tiles = [self.tileClass(Piece.unknownStr)
                       for _ in range(game.fullWallSize)]
         self.living = None
         self.kongBox = self.kongBoxClass()

@@ -16,7 +16,7 @@ from common import IntDict, Debug
 from common import ReprMixin, Internal
 from wind import East, Wind
 from query import Query
-from tile import Tile, TileTuple, elements
+from tile import Tile, TileTuple, PieceList, elements
 from tilesource import TileSource
 from meld import Meld, MeldList
 from permutations import Permutations
@@ -188,7 +188,7 @@ class Player(ReprMixin):
 
     def clearHand(self):
         """clear player attributes concerning the current hand"""
-        self._concealedTiles = []
+        self._concealedTiles = PieceList()
         self._exposedMelds = []
         self._concealedMelds = []
         self._bonusTiles = []
@@ -361,11 +361,11 @@ class Player(ReprMixin):
     def removeConcealedTile(self, tile):
         """remove from my tiles"""
         assert not tile.isBonus, tile
-        try:
-            self._concealedTiles.remove(tile)
-        except ValueError as _:
-            raise ValueError('removeConcealedTile(%s): tile not in concealed %s' %
-                            (tile, ''.join(self._concealedTiles))) from _
+        assert tile.__class__ == Tile
+        if tile not in self._concealedTiles:
+            raise ValueError('removeConcealedTile({!r}): tile not in concealed {!r}'.format(
+                            tile, self._concealedTiles))
+        self._concealedTiles.remove(tile)
         if tile is self.lastTile:
             self.lastTile = None
         self._hand = None
@@ -534,7 +534,7 @@ class PlayingPlayer(Player):
         self.lastTile = lastTile or Tile.unknown
         self.lastMeld = lastMeld
         self._concealedMelds = melds
-        self._concealedTiles = []
+        self._concealedTiles = PieceList()
         self._hand = None
         if Debug.mahJongg:
             self.game.debug('  hand becomes {}'.format(self.hand))
@@ -653,7 +653,7 @@ class PlayingPlayer(Player):
         """do I have those concealed tiles?"""
         if within is None:
             within = self._concealedTiles
-        within = within[:]
+        within = PieceList(within[:])
         for tile in tiles:
             if tile not in within:
                 return False

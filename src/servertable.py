@@ -25,7 +25,7 @@ from message import Message, ChatMessage
 from log import logDebug, logError
 from mi18n import i18nE, i18n, i18ncE
 from deferredutil import DeferredBlock
-from tile import Tile, TileTuple, elements
+from tile import Tile, Piece, TileTuple, elements
 from meld import Meld, MeldList
 from query import Query
 from client import Client, Table
@@ -359,7 +359,7 @@ class ServerTable(Table, ReprMixin):
         elementIter = iter(elements.all(self.game.ruleset))
         self.game.wall.tiles = []
         for _ in range(self.game.fullWallSize):
-            self.game.wall.tiles.append(next(elementIter).concealed)
+            self.game.wall.tiles.append(Piece(next(elementIter).concealed))
         assert isinstance(self.game, ServerGame), self.game
         self.running = True
         self.__adaptOtherTables()
@@ -732,9 +732,7 @@ class ServerTable(Table, ReprMixin):
             msg = i18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, str(kongMeld))
             logDebug(i18n(msg, *args))
-            logDebug(
-                'declareKong:concealedTiles:%s' %
-                ''.join(player.concealedTiles))
+            logDebug('declareKong:concealedTiles:%s' % player.concealedTiles)
             logDebug('declareKong:concealedMelds:%s' %
                      ' '.join(str(x) for x in player.concealedMelds))
             logDebug('declareKong:exposedMelds:%s' %
