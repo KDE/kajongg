@@ -557,7 +557,7 @@ class ServerTable(Table, ReprMixin):
                 if Debug.dangerousGame:
                     tile = Tile(msg.args[0])
                     logDebug('%s claims no choice. Discarded %s, keeping %s. %s' %
-                             (player, tile, ''.join(player.concealedTiles), ' / '.join(dangerousText)))
+                             (player, tile, player.concealedTiles, ' / '.join(dangerousText)))
                 player.claimedNoChoice = True
                 block.tellAll(
                     player,
@@ -568,7 +568,7 @@ class ServerTable(Table, ReprMixin):
                 if Debug.dangerousGame:
                     tile = Tile(msg.args[0])
                     logDebug('%s played dangerous. Discarded %s, keeping %s. %s' %
-                             (player, tile, ''.join(player.concealedTiles), ' / '.join(dangerousText)))
+                             (player, tile, player.concealedTiles, ' / '.join(dangerousText)))
                 block.tellAll(
                     player,
                     Message.DangerousGame,

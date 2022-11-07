@@ -73,6 +73,8 @@ class Tile(ReprMixin):
         if len(args) == 1:
             if  type(args[0]) is Tile:  # pylint: disable=unidiomatic-typecheck
                 return args[0]
+            if  type(args[0]) is Piece:  # pylint: disable=unidiomatic-typecheck
+                args = tuple([args[0].name2()])
 # FIXME: wirklich list als key?
 # lieber arg1, arg2 und fuer dict und _build daraus eines machen
         try:
@@ -236,7 +238,10 @@ class Tile(ReprMixin):
     def meld(self, size):
         """return a meld of size. Those attributes are set
         in Meld.cacheMeldsInTiles"""
-        return getattr(self, ('single', 'pair', 'pung', 'kong')[size - 1])
+        _ = self
+        if isinstance(_, Piece):
+            _ = Tile(_)
+        return getattr(_, ('single', 'pair', 'pung', 'kong')[size - 1])
 
     def groupName(self):
         """the name of the group this tile is of"""
@@ -486,6 +491,55 @@ class Elements:
     def all(self, ruleset):
         """a list of all elements, each of them occurrence times"""
         return self.occurrence.all(self.__filter(ruleset))
+
+
+class Piece(Tile):
+
+    """
+    This tile is part of the game. The wall is built from this.
+    """
+
+    def __new__(cls, *args):
+        result = cls._build(*args)
+        return result
+
+    def __init__(self, *args):  # pylint: disable=unused-argument
+        self.uiTile = None  # might be a UITile
+
+    def __hash__(self):
+        """this is not inherited from Tile. I am sure there is a good reason."""
+        return self.key
+
+
+class PieceList(TileList):
+
+    """a list that can only hold tiles"""
+
+    tileClass = Piece
+
+    def __contains__(self, value):
+        """Also accept Tile."""
+        return any(Tile(x) is value for x in self)
+
+    def index(self, value):
+        """Also accept Tile."""
+        if value.__class__ is Tile:
+            for result, _ in enumerate(self):
+                if _ == value:
+                    return result
+            raise ValueError('{!r} is not in list {!r}'.format(value, self))
+        return TileList.index(self, value)
+
+    def remove(self, value):
+        """Can also remove Tile."""
+# FIXME: should we do tile == piece? would remove then work?
+        if value.__class__ is Tile:
+            value = value.name2()
+            for _ in self:
+                if _.name2() == value:
+                    value = _
+                    break
+        return TileList.remove(self, value)
 
 
 Tile.unknownStr = 'Xy'
