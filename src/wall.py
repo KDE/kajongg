@@ -71,13 +71,10 @@ class Wall(ReprMixin):
     @staticmethod
     def __nameTile(tile, element):
         """define what tile this is"""
-        if element is None:
-            return tile
-        assert isinstance(element, Tile), element
-        if isinstance(tile, Tile):
-            return element
-        # tile is UITile
-        tile.tile = element
+        if tile.__class__.__name__ == 'UITile':
+            tile.change_name(element)
+        else:
+            tile = tile.change_name(element)
         return tile
 
     def deal(self, tiles=None, deadEnd=False):

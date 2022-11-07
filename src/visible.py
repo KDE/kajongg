@@ -148,7 +148,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         tile = tile.exposed
         hbTiles = self.handBoard.uiTiles
         lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
-        lastDiscard.tile = lastDiscard.concealed
+        lastDiscard.change_name(lastDiscard.concealed)
         Internal.scene.discardBoard.discardTile(lastDiscard)
         assert lastDiscard.isConcealed
         self.syncHandBoard()
@@ -193,7 +193,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         matchingTiles = sorted(
             self.handBoard.tilesByElement(Tile.unknown),
             key=lambda x: x.xoffset)
-        matchingTiles[-1].tile = tile
+        matchingTiles[-1].change_name(tile)
 
     def exposeMeld(self, meldTiles, calledTile=None):
         result = PlayingPlayer.exposeMeld(

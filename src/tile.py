@@ -244,6 +244,13 @@ class Tile(str, ReprMixin):
         """needed for sort"""
         return self.key < other.key
 
+    def change_name(self, element):
+        """FIXME: should go away when Tile/Piece is done"""
+        if element is None:
+            return self
+        assert element.__class__ is Tile, repr(element)
+        return element
+
 
 class TileList(list):
 

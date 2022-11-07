@@ -634,7 +634,7 @@ class SelectorBoard(CourtBoard):
         """move all tiles back into the selector"""
         with AnimationSpeed():
             for uiTile in self.allSelectorTiles:
-                uiTile.tile = uiTile.exposed
+                uiTile.change_name(uiTile.exposed)
                 self.__placeAvailable(uiTile)
                 uiTile.dark = False
                 uiTile.focusable = True
@@ -708,7 +708,7 @@ class SelectorBoard(CourtBoard):
         assert isinstance(tile, UITile)
         wantedTile = tile.tile
         for selectorTile in self.uiTiles:
-            selectorTile.tile = selectorTile.exposed
+            selectorTile.change_name(selectorTile.exposed)
         lowerName = wantedTile.exposed
         upperName = wantedTile.concealed
         if lowerHalf:

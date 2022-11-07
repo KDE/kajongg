@@ -299,8 +299,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         """tile"""
         return self._tile
 
-    @tile.setter
-    def tile(self, value):
+    def change_name(self, value):
         """set tile name and update display"""
         if value is not self._tile:
             assert not self._tile.isKnown or not value.isKnown or (self._tile.exposed == value.exposed)

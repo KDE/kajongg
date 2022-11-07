@@ -264,7 +264,7 @@ class HandBoard(Board):
         self._avoidCrossingMovements(result)
         for uiTile, newPos in result.items():
             uiTile.level = 0  # for tiles coming from the wall
-            uiTile.tile = newPos.tile
+            uiTile.change_name(newPos.tile)
             uiTile.setBoard(self, newPos.xoffset, newPos.yoffset)
             uiTile.dark = newPos.dark
             uiTile.focusable = newPos.focusable

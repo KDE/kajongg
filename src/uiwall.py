@@ -315,7 +315,7 @@ class UIWall(Wall):
         """builds the wall without dividing"""
         # recycle used tiles
         for uiTile in self.tiles:
-            uiTile.tile = Tile.unknown
+            uiTile.change_name(Tile.unknown)
             uiTile.dark = True
 #        scene = Internal.scene
 # if not scene.game.isScoringGame() and not self.game.isFirstHand():
