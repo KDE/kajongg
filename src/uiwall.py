@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from common import Internal, ZValues, StrMixin, Speeds, DrawOnTopMixin
+from common import Internal, ZValues, ReprMixin, Speeds, DrawOnTopMixin
 from wind import Wind, East
 from qt import QPointF, QGraphicsObject, QFontMetrics
 from qt import QPen, QColor, QFont, Qt, QRectF
@@ -22,7 +22,7 @@ from animation import animate, afterQueuedAnimations, AnimationSpeed
 from animation import ParallelAnimationGroup, AnimatedMixin, animateAndDo
 
 
-class SideText(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
+class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
 
     """The text written on the wall"""
 
@@ -162,7 +162,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
             self.name(), self.text, self.x(), self.y())
 
 
-class UIWallSide(Board, StrMixin):
+class UIWallSide(Board, ReprMixin):
 
     """a Board representing a wall of tiles"""
     penColor = 'red'

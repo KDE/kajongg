@@ -17,7 +17,7 @@ from util import Duration
 from log import logDebug, logException, logWarning
 from mi18n import i18nc
 from message import Message
-from common import Internal, Debug, Options, StrMixin
+from common import Internal, Debug, Options, ReprMixin
 from common import isAlive
 from tilesource import TileSource
 from rule import Ruleset
@@ -31,7 +31,7 @@ import intelligence
 import altint
 
 
-class Table(StrMixin):
+class Table(ReprMixin):
 
     """defines things common to both ClientTable and ServerTable"""
 

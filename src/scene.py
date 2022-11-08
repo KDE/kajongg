@@ -12,7 +12,7 @@ from twisted.internet.defer import succeed, Deferred
 from log import logDebug
 from mi18n import i18n, i18nc
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
-from common import StrMixin, Speeds, id4
+from common import ReprMixin, Speeds, id4
 from wind import Wind
 
 from qt import Qt, QMetaObject
@@ -30,7 +30,7 @@ from animation import AnimationSpeed, afterQueuedAnimations
 from scoringdialog import ScoringDialog
 
 
-class FocusRect(QGraphicsRectItem, StrMixin):
+class FocusRect(QGraphicsRectItem, ReprMixin):
 
     """show a focusRect with blue border around focused tile or meld.
     We can NOT do this as a child of the item or the focus rect would

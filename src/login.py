@@ -33,7 +33,7 @@ from log import logWarning, logException, logInfo, logDebug, SERVERMARK
 from util import removeIfExists, which
 from common import Internal, Options, SingleshotOptions, Debug, isAlive
 from common import interpreterName
-from common import StrMixin
+from common import ReprMixin
 from common import appdataDir, socketName
 from game import Players
 from query import Query
@@ -48,7 +48,7 @@ class LoginAborted(Exception):
     """the user aborted the login"""
 
 
-class Url(str, StrMixin):
+class Url(str, ReprMixin):
 
     """holds connection related attributes: host, port, socketname"""
     def __new__(cls, url):

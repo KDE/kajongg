@@ -280,7 +280,7 @@ class FixedClass(type):
         type.__setattr__(cls, key, value)
 
 
-class StrMixin:
+class ReprMixin:
 
     """
     A mixin defining a default for __repr__,
@@ -403,7 +403,7 @@ class __Internal:
 __Internal()
 
 
-class IntDict(defaultdict, StrMixin):
+class IntDict(defaultdict, ReprMixin):
 
     """a dict where the values are expected to be numeric, so
     we can add dicts.If parent is given, parent is expected to

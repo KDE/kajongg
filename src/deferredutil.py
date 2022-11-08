@@ -18,11 +18,11 @@ from twisted.internet.defer import Deferred
 from log import logInfo, logDebug, logException
 from mi18n import i18nE
 from message import Message
-from common import Debug, StrMixin, id4
+from common import Debug, ReprMixin, id4
 from move import Move
 
 
-class Request(StrMixin):
+class Request(ReprMixin):
 
     """holds a Deferred and related attributes, used as part of a DeferredBlock"""
 
@@ -111,7 +111,7 @@ class Request(StrMixin):
         return result
 
 
-class DeferredBlock(StrMixin):
+class DeferredBlock(ReprMixin):
 
     """holds a list of deferreds and waits for each of them individually,
     with each deferred having its own independent callbacks. Fires a

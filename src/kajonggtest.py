@@ -20,7 +20,7 @@ import gc
 import argparse
 from locale import getpreferredencoding
 
-from common import Debug, StrMixin, cacheDir
+from common import Debug, ReprMixin, cacheDir
 from util import removeIfExists, gitHead, checkMemory, popenReadlines
 from kajcsv import Csv, CsvRow, CsvWriter
 
@@ -86,7 +86,7 @@ class TooManyServers(UserWarning):
     """we would surpass options.servers"""
 
 
-class Server(StrMixin):
+class Server(ReprMixin):
 
     """represents a kajongg server instance. Called when we want to start a job."""
     servers = []
@@ -207,7 +207,7 @@ class Server(StrMixin):
             'port={}'.format(self.portNumber) if self.portNumber else 'socket={}'.format(self.socketName))
 
 
-class Job(StrMixin):
+class Job(ReprMixin):
 
     """a simple container"""
 
@@ -346,7 +346,7 @@ def pairs(data):
         prev = _
 
 
-class CSV(StrMixin):
+class CSV(ReprMixin):
     """represent kajongg.csv"""
 
     knownCommits = []

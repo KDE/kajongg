@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import weakref
 
-from common import StrMixin
+from common import ReprMixin
 from tile import Tile
 
 
@@ -45,7 +45,7 @@ class KongBox:
         return len(self._tiles)
 
 
-class Wall(StrMixin):
+class Wall(ReprMixin):
 
     """represents the wall with four sides. self.wall[] indexes them
     counter clockwise, 0..3. 0 is bottom.

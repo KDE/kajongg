@@ -17,7 +17,7 @@ import traceback
 from itertools import chain
 from twisted.spread import pb
 
-from common import Debug, Internal, StrMixin
+from common import Debug, Internal, ReprMixin
 from wind import Wind
 from tilesource import TileSource
 from util import Duration
@@ -84,7 +84,7 @@ class ServerGame(PlayingGame):
                             (player.name, tileName, player.concealedTiles))
         return tileName
 
-class ServerTable(Table, StrMixin):
+class ServerTable(Table, ReprMixin):
 
     """a table on the game server"""
     # pylint: disable=too-many-arguments

@@ -20,7 +20,7 @@ from kajcsv import CsvRow
 from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, i18n
 from common import Internal, IntDict, Debug, Options
-from common import StrMixin, Speeds
+from common import ReprMixin, Speeds
 from wind import Wind, East
 from query import Query
 from rule import Ruleset
@@ -36,7 +36,7 @@ if os.name != 'nt':
 
 
 @total_ordering
-class HandId(StrMixin):
+class HandId(ReprMixin):
 
     """handle a string representing a hand Id"""
 

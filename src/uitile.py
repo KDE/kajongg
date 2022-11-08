@@ -14,13 +14,13 @@ from util import stack
 from log import logException, logDebug
 from guiutil import Painter, sceneRotation
 from common import LIGHTSOURCES, ZValues, Internal, Debug
-from common import StrMixin, isAlive, id4
+from common import ReprMixin, isAlive, id4
 from tile import Tile
 from meld import Meld
 from animation import AnimatedMixin
 
 
-class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
+class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
 
     """A tile visible on the screen. Every tile is only allocated once
     and then reshuffled and reused for every game.

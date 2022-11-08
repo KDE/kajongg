@@ -11,7 +11,7 @@ import weakref
 from itertools import chain
 
 from message import Message
-from common import IntDict, Debug, StrMixin
+from common import IntDict, Debug, ReprMixin
 from tile import Tile
 
 
@@ -320,7 +320,7 @@ class AIDefaultAI:
 #        return result
 
 
-class TileAI(StrMixin):
+class TileAI(ReprMixin):
 
     """holds a few AI related tile properties"""
     # pylint: disable=too-many-instance-attributes

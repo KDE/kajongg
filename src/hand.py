@@ -19,13 +19,13 @@ from tile import Tile, TileList
 from tilesource import TileSource
 from meld import Meld, MeldList
 from rule import Score, UsedRule
-from common import Debug, StrMixin, Fmt, fmt
+from common import Debug, ReprMixin, Fmt, fmt
 from intelligence import AIDefaultAI
 from util import callers
 from message import Message
 
 
-class Hand(StrMixin):
+class Hand(ReprMixin):
 
     """represent the hand to be evaluated.
 

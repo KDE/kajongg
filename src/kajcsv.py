@@ -14,7 +14,7 @@ import datetime
 from enum import IntEnum
 from functools import total_ordering
 
-from common import Options, StrMixin
+from common import Options, ReprMixin
 from player import Player, Players
 
 class CsvWriter:
@@ -43,7 +43,7 @@ class Csv:
         return csv.reader(open(filename, 'r', encoding='utf-8'), delimiter=Csv.delimiter)
 
 @total_ordering
-class CsvRow(StrMixin):
+class CsvRow(ReprMixin):
     """represent a row in kajongg.csv"""
 
     fields = IntEnum('Field', 'RULESET AI COMMIT PY_VERSION GAME TAGS PLAYERS', start=0)

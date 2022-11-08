@@ -25,12 +25,12 @@ from message import Message
 from util import stack, uniqueList
 from log import logDebug, logException
 from mi18n import i18n, i18nc
-from common import LIGHTSOURCES, Internal, Debug, isAlive, StrMixin
+from common import LIGHTSOURCES, Internal, Debug, isAlive, ReprMixin
 from common import DrawOnTopMixin
 from wind import Wind, East
 
 
-class WindDisc(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
+class WindDisc(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
 
     """a round wind tile"""
 
@@ -160,7 +160,7 @@ class WindLabel(QLabel):
         return pMap
 
 
-class Board(QGraphicsRectItem, StrMixin):
+class Board(QGraphicsRectItem, ReprMixin):
 
     """ a board with any number of positioned tiles"""
     # pylint: disable=too-many-instance-attributes

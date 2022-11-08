@@ -17,7 +17,7 @@ from kde import KMessageBox, KDialog
 
 from qt import Qt, QDialog, QMessageBox, QWidget
 
-from common import Options, Internal, isAlive, StrMixin
+from common import Options, Internal, isAlive, ReprMixin
 
 
 class IgnoreEscape:
@@ -67,7 +67,7 @@ class MustChooseKDialog(KDialogIgnoringEscape):
         event.ignore()
 
 
-class Prompt(MustChooseKDialog, StrMixin):
+class Prompt(MustChooseKDialog, ReprMixin):
 
     """common code for things like QuestionYesNo, Information"""
 

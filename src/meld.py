@@ -11,11 +11,11 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 
 from mi18n import i18nc
-from common import StrMixin
+from common import ReprMixin
 from tile import Tile, TileList, elements
 
 
-class Meld(TileList, StrMixin):
+class Meld(TileList, ReprMixin):
 
     """represents a meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,

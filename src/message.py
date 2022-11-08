@@ -14,7 +14,7 @@ from mi18n import i18n, i18nc, i18ncE
 from sound import Voice
 from tile import Tile, TileList
 from meld import Meld, MeldList
-from common import Internal, Debug, Options, StrMixin
+from common import Internal, Debug, Options, ReprMixin
 from wind import Wind
 from dialogs import Sorry
 
@@ -841,7 +841,7 @@ def __scanSelf():
                     Message.defined[msg.name] = msg
 
 
-class ChatMessage(StrMixin):
+class ChatMessage(ReprMixin):
 
     """holds relevant info about a chat message"""
 

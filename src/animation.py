@@ -16,11 +16,11 @@ from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve
 from qt import Property, QGraphicsObject, QGraphicsItem, QPointF
 
-from common import Internal, Debug, isAlive, StrMixin, id4
+from common import Internal, Debug, isAlive, ReprMixin, id4
 from log import logDebug, logException
 
 
-class Animation(QPropertyAnimation, StrMixin):
+class Animation(QPropertyAnimation, ReprMixin):
 
     """a Qt animation with helper methods"""
 
@@ -136,7 +136,7 @@ class Animation(QPropertyAnimation, StrMixin):
                 Internal.scene.focusRect.refresh()
 
 
-class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
+class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
 
     """
     current is the currently executed group

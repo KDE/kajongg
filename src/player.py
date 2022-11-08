@@ -13,7 +13,7 @@ from collections import defaultdict
 from log import logException, logWarning, logDebug
 from mi18n import i18n, i18nc, i18nE
 from common import IntDict, Debug
-from common import StrMixin, Internal
+from common import ReprMixin, Internal
 from wind import East, Wind
 from query import Query
 from tile import Tile, TileList, elements
@@ -25,7 +25,7 @@ from hand import Hand
 from intelligence import AIDefaultAI
 
 
-class Players(list, StrMixin):
+class Players(list, ReprMixin):
 
     """a list of players where the player can also be indexed by wind.
     The position in the list defines the place on screen. First is on the
@@ -107,7 +107,7 @@ class Players(list, StrMixin):
         return [self.byName(x).localName if x in known else x for x in names]
 
 
-class Player(StrMixin):
+class Player(ReprMixin):
 
     """
     all player related attributes without GUI stuff.

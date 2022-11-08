@@ -19,10 +19,10 @@ from board import Board
 from sound import Sound
 
 from log import logDebug
-from common import Internal, Debug, isAlive, StrMixin
+from common import Internal, Debug, isAlive, ReprMixin
 
 
-class TileAttr(StrMixin):
+class TileAttr(ReprMixin):
 
     """a helper class for syncing the hand board, holding relevant
     tile attributes.

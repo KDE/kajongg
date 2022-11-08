@@ -14,7 +14,7 @@ import datetime
 from io import BytesIO
 from hashlib import md5
 
-from common import Debug, Internal, StrMixin, cacheDir
+from common import Debug, Internal, ReprMixin, cacheDir
 from util import which, removeIfExists, uniqueList, elapsedSince
 from log import logWarning, i18n, logDebug, logException
 
@@ -177,7 +177,7 @@ class Sound:
         if Sound.__bonusOgg:
             Sound.speak(Sound.__bonusOgg)
 
-class Voice(StrMixin):
+class Voice(ReprMixin):
 
     """this administers voice sounds.
 

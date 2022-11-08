@@ -11,13 +11,13 @@ import types
 from hashlib import md5
 
 from common import Internal, Debug
-from common import StrMixin
+from common import ReprMixin
 from log import logException, logDebug
 from mi18n import i18n, i18nc, i18nE, i18ncE, english
 from query import Query
 
 
-class Score(StrMixin):
+class Score(ReprMixin):
 
     """holds all parts contributing to a score. It has two use cases:
     1. for defining what a rules does: either points or doubles or limits, holding never more than one unit
@@ -237,7 +237,7 @@ class RuleList(list):
         self.add(rule)
 
 
-class UsedRule(StrMixin):
+class UsedRule(ReprMixin):
 
     """use this in scoring, never change class Rule.
     If the rule has been used for a meld, pass it"""
@@ -708,7 +708,7 @@ into a situation where you have to pay a penalty"""))
         return result
 
 
-class RuleBase(StrMixin):
+class RuleBase(ReprMixin):
 
     """a base for standard Rule and parameter rules IntRule, StrRule, BoolRule"""
 

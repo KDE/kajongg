@@ -9,10 +9,10 @@ SPDX-License-Identifier: GPL-2.0
 
 from log import logException
 from mi18n import i18n, i18nc
-from common import IntDict, StrMixin, id4
+from common import IntDict, ReprMixin, id4
 from wind import Wind, East, South, West, North
 
-class Tile(str, StrMixin):
+class Tile(str, ReprMixin):
 
     """
     A single tile, represented as a string of length 2.
