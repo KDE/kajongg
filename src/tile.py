@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 from log import logException
 from mi18n import i18n, i18nc
-from common import IntDict, ReprMixin, id4
+from common import IntDict, ReprMixin
 from wind import Wind, East, South, West, North
 
 class Tile(str, ReprMixin):
@@ -165,7 +165,8 @@ class Tile(str, ReprMixin):
         assert len(existingIds) == 1, 'new is:{} existing are: {} with ids {}'.format(result, existing, existingIds)
 
     def __repr__(self):
-        return '{}_{}({}{})'.format(self.__class__.__name__, id4(self), self.group, self.char)
+        """ReprMixin does not seem to work on str subclass"""
+        return ReprMixin.__repr__(self)
 
     def __getitem__(self, index):
         if hasattr(self, '_fixed'):

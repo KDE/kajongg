@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import weakref
 
-from common import ReprMixin, Internal, id4
+from common import ReprMixin, Internal
 from message import Message
 from wind import Wind
 from tile import Tile, TileList
@@ -66,5 +66,5 @@ class Move(ReprMixin):
         """hide weakref"""
         return self._player() if self._player else None
 
-    def __repr__(self):
-        return 'Move_{}({!r} {!r} {!r}'.format(id4(self), self.player, self.message, self.kwargs)
+    def __str__(self):
+        return '{!r} {!r} {!r}'.format(self.player, self.message, self.kwargs)

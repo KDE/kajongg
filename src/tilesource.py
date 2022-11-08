@@ -7,6 +7,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from common import ReprMixin
+
 class TileSource:
     """
     some constants
@@ -14,15 +16,15 @@ class TileSource:
 
     byChar = {}
 
-    def __str__(self):
-        return self.char
-
-    def __repr__(self):
-        return 'TileSource.{}'.format(self.__class__.__name__)
-
-    class SourceClass:
+    class SourceClass(ReprMixin):
         """Defines defaults"""
         isDiscarded = False
+
+        def __str__(self):
+            return self.__repr__()
+
+        def __repr__(self):
+            return 'TileSource.' + self.__class__.__name__.rsplit('.', maxsplit=1)[-1]
 
     class LivingWallDiscard(SourceClass):
         """Last Tile was discarded"""
