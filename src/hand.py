@@ -485,6 +485,7 @@ class Hand(ReprMixin):
             parts.append(f"m{self.lastSource.char}{''.join(self.announcements)}")
         if lastTile:
             parts.append(f"L{lastTile}{lastMeld if lastMeld else ''}")
+            self.player.assertLastTile()
         return ' '.join(parts).strip()
 
     def __add__(self, addTile:Tile) ->'Hand':

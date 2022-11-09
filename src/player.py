@@ -236,6 +236,9 @@ class Player(ReprMixin):
         self.__lastTile = value
         if value is Tile.none:
             self.lastMeld = Meld()
+        # FIXME self.assertLastTile()
+# this would probably work if we compute new tiles first and lastTile/lastMeld last, but
+# when changing that order, kajongg returns different results.
 
     @property
     def originalCall(self) ->bool:
@@ -417,6 +420,19 @@ class Player(ReprMixin):
         assert not self._concealedTiles[0].isKnown
         self._concealedTiles[0] = tile
         self._hand = None
+
+    def assertLastTile(self) ->None:
+        """TODO: Remove again"""
+        return
+        # pylint: disable=unreachable
+        if self.lastTile and self.lastTile.isKnown:
+            if not self.lastTile.isBonus: # TODO: wirklich ausklammern?
+                # pylint:disable=consider-using-f-string
+                assert (self.lastTile in self._concealedTiles
+                    or any(self.lastTile in x for x in self._exposedMelds)
+                    or any(self.lastTile in x for x in self._concealedMelds)), \
+                    'lastTile:{!r} conc:{!r} exp:{!r} concmelds:{!r}'.format(
+                        self.lastTile, self._concealedTiles, self._exposedMelds, self._concealedMelds)
 
     def __computeHand(self) -> Hand:
         """return Hand for this player"""
@@ -794,6 +810,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         adds the meld to exposedMelds and returns it
         calledTile: we got the last tile for the meld from discarded, otherwise
         from the wall"""
+        self.assertLastTile()
         game = self.game
         assert game
         game.activePlayer = self
