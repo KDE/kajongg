@@ -946,6 +946,7 @@ class PlayingGame(Game):
                 player, self.activePlayer))
         self.discardedTiles[tile.exposed] += 1
         player.discarded.append(tile)
+        player.lastTile = Tile.unknown
         self._concealedTileName(tile)
         # the above has side effect, needs to be called
         if Internal.scene:

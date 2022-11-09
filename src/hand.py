@@ -94,7 +94,7 @@ class Hand(ReprMixin):
         self.__callingHands = None
         self.__mjRule = None
         self.ruleCache = {}
-        self.__lastTile = None
+        self.__lastTile = Tile.unknown
         self.__lastSource = TileSource.Unknown
         self.__announcements = set()
         self.__lastMeld = 0
@@ -178,7 +178,7 @@ class Hand(ReprMixin):
             self.__rest.extend(TileList(tileStrings[0][1:]))
 
         last = self.__lastTile
-        if last and not last.isBonus:
+        if last.isKnown and not last.isBonus:
             assert last in self.tiles, \
                 'lastTile %s is not in hand %s' % (last, str(self))
             if self.__lastSource is TileSource.RobbedKong:

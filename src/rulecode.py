@@ -1285,7 +1285,7 @@ class BlessingOfHeaven(RuleCode):
             return False
         if any(x.isExposed for x in hand.melds):
             return False
-        assert hand.lastTile is None, '{}: Blessing of Heaven: There can be no last tile'.format(hand)
+        assert hand.lastTile is Tile.unknown, '{}: Blessing of Heaven: There can be no last tile'.format(hand)
         return True
 
     def selectable(hand):

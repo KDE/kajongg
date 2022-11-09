@@ -196,7 +196,7 @@ class Player(ReprMixin):
         self.visibleTiles.clear()
         self.newHandContent = None
         self.originalCallingHand = None
-        self.__lastTile = None
+        self.__lastTile = Tile.unknown
         self.lastSource = TileSource.Unknown
         self.lastMeld = Meld()
         self.__mayWin = True
@@ -218,7 +218,7 @@ class Player(ReprMixin):
     @lastTile.setter
     def lastTile(self, value):
         """temp for debugging"""
-        assert isinstance(value, (Tile, type(None))), value
+        assert isinstance(value, Tile), value
         self.__lastTile = value
         if value is None:
             self.lastMeld = Meld()
@@ -531,7 +531,7 @@ class PlayingPlayer(Player):
             self._exposedMelds.append(lastMeld)
             for tileName in lastMeld:
                 self.visibleTiles[tileName] += 1
-        self.lastTile = lastTile
+        self.lastTile = lastTile or Tile.unknown
         self.lastMeld = lastMeld
         self._concealedMelds = melds
         self._concealedTiles = []
@@ -680,8 +680,6 @@ class PlayingPlayer(Player):
                                  (self, tiles, src, self._concealedTiles))
                 idx = self._concealedTiles.index(src)
                 self._concealedTiles[idx] = dst
-            if self.lastTile and not self.lastTile.isKnown:
-                self.lastTile = None
             self._hand = None
             self.syncHandBoard()
 
@@ -724,7 +722,7 @@ class PlayingPlayer(Player):
             # TODO: should we somehow show an error and continue?
             raise ValueError('robTileFrom: no meld found with %s' % tile)
         self.game.lastDiscard = tile.concealed
-        self.lastTile = None  # our lastTile has just been robbed
+        self.lastTile = Tile.unknown  # our lastTile has just been robbed
         self._hand = None
 
     def robsTile(self):
