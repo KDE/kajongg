@@ -69,7 +69,10 @@ class Tile(str, ReprMixin):
     majors = list(dragons) + list(winds) + terminals
 
     def __new__(cls, *args):
-        return cls.cache.get(args) or cls.__build(*args)
+        try:
+            return cls.cache[args]
+        except KeyError:
+            return cls.__build(*args)
 
     @classmethod
     def __build(cls, *args):
@@ -84,6 +87,8 @@ class Tile(str, ReprMixin):
         what = arg0 + arg1
         result = str.__new__(cls, what)
         result.group = result[0]
+
+        result.isKnown = result.group != 'X'
         result.lowerGroup = result.group.lower()
         result.isExposed = result.group == result.lowerGroup
         result.isConcealed = not result.isExposed
@@ -92,11 +97,7 @@ class Tile(str, ReprMixin):
         result.isWind = result.lowerGroup == Tile.wind
         result.isHonor = result.isDragon or result.isWind
 
-        result.isTerminal = False
-        result.isNumber = False
-        result.isReal = True
-
-        if result.isWind or result.isBonus:
+        if result.isBonus or result.isWind:
             result.value = Wind(result[1])
             result.char = result[1]
         elif result.isDragon:
@@ -105,16 +106,24 @@ class Tile(str, ReprMixin):
         else:
             result.value = ord(result[1]) - 48
             result.char = result.value
-            result.isTerminal = result.value in Tile.terminals
+
+        result.isTerminal = False
+        result.isNumber = False
+        result.isReal = False
+
+        if result.isBonus or result.isDragon or result.isWind:
+            result.isReal = True
+        elif result.isKnown:
             result.isNumber = True
+            result.isTerminal = result.value in Tile.terminals
             result.isReal = result.value in Tile.numbers
+
         result.isMajor = result.isHonor or result.isTerminal
-        result.isMinor = not result.isMajor
+        result.isMinor = result.isKnown and not result.isMajor
         try:
             result.key = 1 + result.hashTable.index(result) // 2
         except ValueError:
             logException('%s is not a valid tile string' % result)
-        result.isKnown = Tile.unknown is not None and result != Tile.unknown
 
         Tile._storeInCache(result)
 
