@@ -209,6 +209,8 @@ class Tile(str, ReprMixin):
     def __imul__(self, other):
         return [self] * other
 
+    def __bool__(self):
+        return self.isKnown
 
     def meld(self, size):
         """return a meld of size. Those attributes are set
