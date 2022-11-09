@@ -135,11 +135,11 @@ class Tile(str, ReprMixin):
         str.__setattr__(
             result,
             'exposed',
-            result if not result.isKnown else Tile(str.lower(result)))
-        str.__setattr__(result, 'concealed',
+            result if not result.isKnown else Tile(result.group.lower(), result.char))
+        object.__setattr__(result, 'concealed',
                         result if not result.isKnown or result.isBonus
-                        else Tile(str.capitalize(result)))
-        str.__setattr__(
+                        else Tile(result.group.upper(), result.char))
+        object.__setattr__(
             result,
             'swapped',
             result.exposed if result.isConcealed else result.concealed)
