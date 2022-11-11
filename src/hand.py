@@ -499,8 +499,7 @@ class Hand(ReprMixin):
     def __findAllCallingHands(self):
         """always try to find all of them"""
         result = []
-        string = self.string
-        if ' x' in string or self.lenOffset:
+        if self.lenOffset:
             return result
         candidates = []
         for rule in self.ruleset.mjRules:
