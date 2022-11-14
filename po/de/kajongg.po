@@ -5,20 +5,21 @@
 # Panagiotis Papadopoulos <pano_90@gmx.net>, 2010.
 # Frederik Schwarzer <schwarzer@kde.org>, 2010, 2011, 2012, 2015, 2016, 2022.
 # Jonas Schürmann <jonasschuermann@aol.de>, 2012.
+# Frank Steinmetzger <dev-kde@felsenfleischer.de>, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2022-01-31 00:41+0000\n"
-"PO-Revision-Date: 2022-03-06 16:51+0100\n"
-"Last-Translator: Frederik Schwarzer <schwarzer@kde.org>\n"
-"Language-Team: German <kde-i18n-doc@kde.org>\n"
+"PO-Revision-Date: 2022-11-10 20:26+0100\n"
+"Last-Translator: Frank Steinmetzger <dev-kde@felsenfleischer.de>\n"
+"Language-Team: German <kde-i18n-de@kde.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 21.12.2\n"
+"X-Generator: Lokalize 22.08.3\n"
 
 msgid "Preview"
 msgstr "Vorschau"
@@ -1004,6 +1005,8 @@ msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
 msgstr ""
+"%3 hat %1 beendete und %2 unbeendete Spiele, %3 trotzdem löschen? Dies wird "
+"auch alle Spiele löschen, die %3 gespielt hat!"
 
 #: src/predefined.py:27
 msgid "Classical Chinese standard"
