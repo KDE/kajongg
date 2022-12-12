@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2022-01-31 00:41+0000\n"
-"PO-Revision-Date: 2022-11-24 16:55+0300\n"
+"PO-Revision-Date: 2022-12-11 19:58+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 22.08.3\n"
+"X-Generator: Lokalize 22.12.0\n"
 
 msgid "Preview"
 msgstr "Önizleme"
@@ -2182,11 +2182,11 @@ msgstr "Yeni bir oyun başlat"
 #: src/tables.py:322
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
-msgstr "&Devam et"
+msgstr "&Sürdür"
 
 #: src/tables.py:324
 msgid "Resume the selected suspended game"
-msgstr "Seçili bekletilen oyunu devam ettir"
+msgstr "Seçili bekletilen oyunu sürdür"
 
 #: src/tables.py:342
 msgid "Chat with others on this table"
