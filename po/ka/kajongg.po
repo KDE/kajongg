@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2022-01-31 00:41+0000\n"
-"PO-Revision-Date: 2022-10-10 09:29+0200\n"
+"PO-Revision-Date: 2023-01-06 07:44+0100\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.2.2\n"
 
 msgid "Preview"
 msgstr "მინიატურა"
@@ -50,11 +50,11 @@ msgstr ""
 #: src/board.py:301
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
 msgid "hjklHJKL"
-msgstr ""
+msgstr "hjklHJKL"
 
 #: src/board.py:350
 msgid "Choose from"
-msgstr ""
+msgstr "აირჩიეთ"
 
 #: src/chat.py:42
 msgid "Time"
@@ -326,7 +326,7 @@ msgstr "&ნაგულისხმები პარამეტრები"
 #: src/kdestub.py:333
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
-msgstr ""
+msgstr "სტატუსის &ზოლის ჩვენება"
 
 #: src/kdestub.py:339
 msgctxt "@action:inmenu"
@@ -335,7 +335,7 @@ msgstr "&პანელის ჩვენება"
 
 #: src/kdestub.py:345
 msgid "Configure Tool&bars..."
-msgstr ""
+msgstr "ხელსაწყოების &პანელების მორგება...."
 
 #: src/kdestub.py:347
 msgid "Configure toolbars"
@@ -624,7 +624,7 @@ msgstr ""
 #: src/mainwindow.py:542
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
-msgstr ""
+msgstr "&მთელ-ეკრანზე"
 
 #: src/mainwindow.py:545
 msgctxt "kajongg @action:inmenu"
@@ -758,7 +758,7 @@ msgstr ""
 #: src/message.py:234
 msgctxt "kajongg game dialog:Key for Pung"
 msgid "P"
-msgstr ""
+msgstr "პ"
 
 #: src/message.py:251
 msgctxt "kajongg"
@@ -889,7 +889,7 @@ msgstr ""
 #: src/message.py:811
 msgctxt "kajongg game dialog:Key for No claim"
 msgid "N"
-msgstr ""
+msgstr "N"
 
 #: src/message.py:815
 msgid "You cannot or do not want to claim this tile"
@@ -906,7 +906,7 @@ msgstr ""
 
 #: src/mjresource.py:114
 msgid "unknown name"
-msgstr ""
+msgstr "უცნობი სახელი"
 
 #: src/mjresource.py:115
 msgid "unknown author"
@@ -1282,7 +1282,7 @@ msgstr ""
 
 #: src/predefined.py:203
 msgid "Imperial Jade"
-msgstr ""
+msgstr "სამეფო ნეფრიტი"
 
 #: src/predefined.py:204
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
@@ -1657,7 +1657,7 @@ msgstr ""
 #: src/rule.py:79
 msgctxt "Kajongg"
 msgid "%1 points"
-msgstr ""
+msgstr "%1 ქულა"
 
 #: src/rule.py:81
 msgctxt "Kajongg"
@@ -1939,7 +1939,7 @@ msgstr ""
 
 #: src/server.py:113
 msgid "Wrong password"
-msgstr ""
+msgstr "არასწორი პაროლი"
 
 #: src/server.py:212
 msgid "table with id <numid>%1</numid> not found"
