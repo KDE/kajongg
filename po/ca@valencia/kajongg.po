@@ -528,7 +528,7 @@ msgstr "Joc de regles:"
 #: src/login.py:388
 msgctxt "@title:window"
 msgid "Create User Account"
-msgstr "Creació d'un compte d'usuari"
+msgstr "Creeu un compte d'usuari"
 
 #: src/login.py:402
 msgid "Repeat password:"
@@ -1877,7 +1877,7 @@ msgstr "&Conserva el seient"
 #: src/scoring.py:60
 msgctxt "@title:window"
 msgid "Select four players"
-msgstr "Selecció dels quatre jugadors"
+msgstr "Seleccioneu els quatre jugadors"
 
 #: src/scoring.py:288
 msgid "Move Exposed Tiles Here"
