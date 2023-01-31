@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2022-01-31 00:41+0000\n"
-"PO-Revision-Date: 2023-01-30 00:41+0300\n"
+"PO-Revision-Date: 2023-01-31 01:00+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -2059,7 +2059,7 @@ msgstr "Robot 3"
 
 #: src/servertable.py:279
 msgid "Only the initiator %1 can start this game, you are %2"
-msgstr "Bu oyunu yalnızca %1 başlatabilir, siz %2'siniz"
+msgstr "Bu oyunu yalnızca %1 başlatabilir, siz %2 olarak varsınız"
 
 #: src/servertable.py:648
 msgid "Game <numid>%1</numid> is over!"
@@ -2093,11 +2093,11 @@ msgstr "<filename>%1</filename> yazılamıyor: %2"
 
 #: src/sound.py:361
 msgid "The voice files have changed, their checksum has changed."
-msgstr "Ses dosyaları değişti, özetleri değişmiş."
+msgstr "Ses dosyaları değişti, sağlama toplamları değişmiş."
 
 #: src/sound.py:362
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
-msgstr "Lütfen kajongg'u yeniden yükleyin, ya da yeterli yetkiyle:"
+msgstr "Lütfen kajongg'u yeniden kurun veya yeterli izinlerle şunu yapın:"
 
 #: src/tables.py:56
 msgid "Table"
@@ -2110,7 +2110,7 @@ msgstr "Durum"
 
 #: src/tables.py:61
 msgid "Ruleset"
-msgstr "Kuralkümesi"
+msgstr "Kural Kümesi"
 
 #: src/tables.py:145
 msgid "Select a ruleset"
