@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2022-01-31 00:41+0000\n"
-"PO-Revision-Date: 2023-01-31 01:00+0300\n"
+"PO-Revision-Date: 2023-02-08 14:24+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 22.12.1\n"
+"X-Generator: Lokalize 22.12.2\n"
 
 msgid "Preview"
 msgstr "Önizleme"
@@ -262,7 +262,7 @@ msgstr "tanıtım kipinde başlat"
 
 #: src/kajongg.py:86
 msgid "login to HOST"
-msgstr "İSTEMCİye giriş yap"
+msgstr "İSTEMCİ'ye oturum aç"
 
 #: src/kajongg.py:87
 msgid "start new TABLE"
@@ -282,7 +282,7 @@ msgstr "oyun başına yalnızca EL el oyna. Yalnızca hata ayıklama için!"
 
 #: src/kajongg.py:91
 msgid "prefer PLAYER for next login"
-msgstr "sonraki giriş içi PLAYER tercih et"
+msgstr "sonraki oturum açma için OYUNCU'yu tercih et"
 
 #: src/kajongg.py:92
 msgid "use AI variant for human player in demo mode"
@@ -497,7 +497,7 @@ msgstr "yerel kajongg sunucu başlatıldı: pid=<numid>%1</numid> %2"
 #: src/login.py:238
 msgctxt "kajongg"
 msgid "Login"
-msgstr "Giriş"
+msgstr "Oturum Aç"
 
 #: src/login.py:286 src/login.py:394
 msgid "Game server:"
@@ -552,7 +552,7 @@ msgstr "Sunucu %1 için adres bulunamadı"
 
 #: src/login.py:610
 msgid "Login to server %1 failed: You have no network connection"
-msgstr "%1 sunucusuna giriş başarısız. Ağ bağlantınız yok"
+msgstr "%1 sunucusuna oturum açma başarısız. Ağ bağlantınız yok"
 
 #: src/login.py:622
 msgid "Please try again"
