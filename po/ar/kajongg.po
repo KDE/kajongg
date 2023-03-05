@@ -428,7 +428,7 @@ msgstr "المؤلف الأصلي"
 
 #: src/kdestub.py:1015
 msgid "KDE Frameworks (not installed or not usable)"
-msgstr "إطار عمل كدي (لم يثبت أو لم يستعمل)"
+msgstr "إطار عمل كِيدِي (لم يثبت أو لم يستعمل)"
 
 #: src/kdestub.py:1023
 msgctxt "kajongg"
@@ -439,7 +439,7 @@ msgstr "يستخدم الإصدارات %1"
 #, fuzzy
 #| msgid "Not using Python KDE bindings"
 msgid "Not using broken Python KDE bindings"
-msgstr "لا يستعمل ربط بايثون لكدي"
+msgstr "لا يستعمل ربط بايثون لكِيدِي"
 
 #: src/kdestub.py:1045
 msgid ""
@@ -775,7 +775,7 @@ msgstr ""
 #: src/message.py:252
 msgctxt "kajongg game dialog:Key for Kong"
 msgid "K"
-msgstr "كلڤن"
+msgstr "كلفن"
 
 #: src/message.py:272
 msgid "saying Kong for %1 violates Original Call"
