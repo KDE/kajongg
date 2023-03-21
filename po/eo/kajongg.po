@@ -6,8 +6,8 @@ msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2022-01-31 00:41+0000\n"
-"PO-Revision-Date: 2009-11-15 12:06+0100\n"
-"Last-Translator: Axel Rousseau <axel@esperanto-jeunes.org>\n"
+"PO-Revision-Date: 2023-03-20 22:31+0100\n"
+"Last-Translator: Oliver Kellogg <okellogg@users.sourceforge.net>\n"
 "Language-Team: esperanto <kde-i18n-eo@kde.org>\n"
 "Language: eo\n"
 "MIME-Version: 1.0\n"
@@ -46,12 +46,9 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr ""
 
 #: src/board.py:301
-#, fuzzy
-#| msgctxt "kmj:arrow keys hjkl like in the vi editor"
-#| msgid "HJKL"
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
 msgid "hjklHJKL"
-msgstr "HJKL"
+msgstr ""
 
 #: src/board.py:350
 msgid "Choose from"
@@ -175,9 +172,6 @@ msgid "Started"
 msgstr ""
 
 #: src/games.py:103
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Games"
 msgctxt "@title:window"
 msgid "Games"
 msgstr "Ludoj"
@@ -207,10 +201,8 @@ msgstr ""
 
 #: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:101 src/kdestub.py:102
 #: src/kdestub.py:104
-#, fuzzy
-#| msgid "&Join"
 msgid "Kajongg"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/humanclient.py:50
 msgid "Which chow do you want to expose?"
@@ -310,11 +302,8 @@ msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgstr ""
 
 #: src/kdestub.py:251
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "OK"
 msgid "&OK"
-msgstr "Bone"
+msgstr "B&one"
 
 #: src/kdestub.py:253
 msgid "&Apply"
@@ -333,52 +322,38 @@ msgid "&Defaults"
 msgstr "&Defaŭltoj"
 
 #: src/kdestub.py:333
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "Show &Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
-msgstr "Montri illis&telon"
+msgstr ""
 
 #: src/kdestub.py:339
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "Show &Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Montri illis&telon"
 
 #: src/kdestub.py:345
-#, fuzzy
-#| msgid "&Join"
 msgid "Configure Tool&bars..."
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/kdestub.py:347
 msgid "Configure toolbars"
 msgstr ""
 
 #: src/kdestub.py:354
-#, fuzzy
-#| msgid "&Join"
 msgid "Configure &Kajongg..."
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/kdestub.py:356 src/kdestub.py:1155
 msgid "Configure"
 msgstr ""
 
 #: src/kdestub.py:443
-#, fuzzy
-#| msgid "&Abort"
 msgid "&Game"
-msgstr "&Haltigu"
+msgstr ""
 
 #: src/kdestub.py:444
-#, fuzzy
-#| msgid "View"
 msgid "&View"
-msgstr "Vido"
+msgstr "&Vido"
 
 #: src/kdestub.py:445
 msgid "&Settings"
@@ -394,11 +369,9 @@ msgid "Switch Application Language"
 msgstr ""
 
 #: src/kdestub.py:460
-#, fuzzy
-#| msgid "&Join"
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/kdestub.py:811
 msgid "Please choose the language which should be used for this application:"
@@ -417,8 +390,6 @@ msgid "Fallback language:"
 msgstr ""
 
 #: src/kdestub.py:848
-#, fuzzy
-#| msgid "Remove"
 msgid "Remove"
 msgstr "Forpreni"
 
@@ -435,10 +406,8 @@ msgid ""
 msgstr ""
 
 #: src/kdestub.py:980
-#, fuzzy
-#| msgid "&Join"
 msgid "About Kajongg"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/kdestub.py:1003
 msgid "Version: %1"
@@ -478,10 +447,8 @@ msgid ""
 msgstr ""
 
 #: src/kdestub.py:1069
-#, fuzzy
-#| msgid "Author:"
 msgid "Authors:"
-msgstr "Aŭtoro:"
+msgstr ""
 
 #: src/kdestub.py:1115
 msgid "License Agreement"
@@ -512,8 +479,6 @@ msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
 msgstr ""
 
 #: src/login.py:238
-#, fuzzy
-#| msgid "Login"
 msgctxt "kajongg"
 msgid "Login"
 msgstr "Ensaluti"
@@ -578,46 +543,34 @@ msgid "Please try again"
 msgstr ""
 
 #: src/mainwindow.py:501
-#, fuzzy
-#| msgid "Tiles"
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
-msgstr "Tegoloj"
+msgstr ""
 
 #: src/mainwindow.py:503
-#, fuzzy
-#| msgid "Tiles"
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
-msgstr "Tegoloj"
+msgstr ""
 
 #: src/mainwindow.py:506
-#, fuzzy
-#| msgid "Tiles"
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
-msgstr "Tegoloj"
+msgstr ""
 
 #: src/mainwindow.py:508
-#, fuzzy
-#| msgid "&Players"
 msgctxt "@action:intoolbar"
 msgid "&Play"
-msgstr "Lu&dantoj"
+msgstr ""
 
 #: src/mainwindow.py:511
-#, fuzzy
-#| msgid "Tiles"
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
-msgstr "Tegoloj"
+msgstr ""
 
 #: src/mainwindow.py:513
-#, fuzzy
-#| msgid "&Abort"
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
-msgstr "&Haltigu"
+msgstr ""
 
 #: src/mainwindow.py:517
 msgctxt "kajongg @info:tooltip"
@@ -625,11 +578,9 @@ msgid "Abort the current game."
 msgstr ""
 
 #: src/mainwindow.py:519
-#, fuzzy
-#| msgid "&Join"
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/mainwindow.py:522
 msgctxt "@action:intoolbar"
@@ -672,18 +623,14 @@ msgid "F&ull Screen Mode"
 msgstr ""
 
 #: src/mainwindow.py:545
-#, fuzzy
-#| msgid "Tiles"
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
-msgstr "Tegoloj"
+msgstr ""
 
 #: src/mainwindow.py:547
-#, fuzzy
-#| msgid "&Join"
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/mainwindow.py:549
 msgctxt "kajongg @info:tooltip"
@@ -691,11 +638,9 @@ msgid "Show or hide the score table for the current game."
 msgstr ""
 
 #: src/mainwindow.py:551
-#, fuzzy
-#| msgid "&Join"
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/mainwindow.py:552
 msgctxt "@action:intoolbar"
@@ -742,11 +687,9 @@ msgid "&pair"
 msgstr ""
 
 #: src/meld.py:324
-#, fuzzy
-#| msgid "&Copy"
 msgctxt "kajongg meld type"
 msgid "&chow"
-msgstr "&Kopii"
+msgstr ""
 
 #: src/meld.py:326
 msgctxt "kajongg meld type"
@@ -759,11 +702,9 @@ msgid "c&laimed kong"
 msgstr ""
 
 #: src/meld.py:330
-#, fuzzy
-#| msgid "&Join"
 msgctxt "kajongg meld type"
 msgid "k&ong"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/meld.py:331
 msgctxt "kajongg meld type"
@@ -816,11 +757,9 @@ msgid "P"
 msgstr ""
 
 #: src/message.py:251
-#, fuzzy
-#| msgid "&Join"
 msgctxt "kajongg"
 msgid "Kong"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/message.py:252
 msgctxt "kajongg game dialog:Key for Kong"
@@ -836,11 +775,9 @@ msgid "You may say Kong for %1"
 msgstr ""
 
 #: src/message.py:289
-#, fuzzy
-#| msgid "&Copy"
 msgctxt "kajongg"
 msgid "Chow"
-msgstr "&Kopii"
+msgstr ""
 
 #: src/message.py:290
 msgctxt "kajongg game dialog:Key for Chow"
@@ -848,11 +785,9 @@ msgid "C"
 msgstr ""
 
 #: src/message.py:323
-#, fuzzy
-#| msgid "&Join"
 msgctxt "kajongg"
 msgid "Mah Jongg"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/message.py:324
 msgctxt "kajongg game dialog:Key for Mah Jongg"
@@ -864,11 +799,9 @@ msgid "Press here and you win"
 msgstr ""
 
 #: src/message.py:346
-#, fuzzy
-#| msgid "Original author"
 msgctxt "kajongg"
 msgid "Original Call"
-msgstr "Origina aŭtoro"
+msgstr ""
 
 #: src/message.py:347
 msgctxt "kajongg game dialog:Key for Original Call"
@@ -916,18 +849,14 @@ msgid "Kajongg <numid>%1</numid>"
 msgstr ""
 
 #: src/message.py:595
-#, fuzzy
-#| msgid "Original author"
 msgctxt "kajongg"
 msgid "Violates Original Call"
-msgstr "Origina aŭtoro"
+msgstr ""
 
 #: src/message.py:723
-#, fuzzy
-#| msgid "Tiles"
 msgctxt "kajongg"
 msgid "Dangerous Game"
-msgstr "Tegoloj"
+msgstr ""
 
 #: src/message.py:737
 msgctxt "kajongg"
@@ -935,9 +864,6 @@ msgid "No Choice"
 msgstr ""
 
 #: src/message.py:796
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "OK"
 msgctxt "kajongg"
 msgid "OK"
 msgstr "Bone"
@@ -1331,10 +1257,8 @@ msgid "Fourfold Plenty"
 msgstr ""
 
 #: src/predefined.py:196
-#, fuzzy
-#| msgid "&Join"
 msgid "4 Kongs"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/predefined.py:198 src/predefined.py:416
 msgid "Three Great Scholars"
@@ -1563,10 +1487,8 @@ msgid "Classical Chinese as defined by the British Mah-Jong Association"
 msgstr ""
 
 #: src/predefined.py:378
-#, fuzzy
-#| msgid "Original author"
 msgid "Original Call"
-msgstr "Origina aŭtoro"
+msgstr ""
 
 #: src/predefined.py:382
 msgid "Gates of Heaven"
@@ -1706,11 +1628,9 @@ msgid "Calling for Purity"
 msgstr ""
 
 #: src/query.py:219
-#, fuzzy
-#| msgid "Tiles"
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
-msgstr "Tegoloj"
+msgstr ""
 
 #: src/query.py:397
 msgid "Database %1 updated from schema %2 to %3"
@@ -1843,16 +1763,12 @@ msgid "Co&mpare"
 msgstr ""
 
 #: src/rulesetselector.py:553
-#, fuzzy
-#| msgid "Remove"
 msgid "&Remove"
-msgstr "Forpreni"
+msgstr "Fo&rpreni"
 
 #: src/rulesetselector.py:554
-#, fuzzy
-#| msgid "Close"
 msgid "&Close"
-msgstr "Fermi"
+msgstr "&Fermi"
 
 #: src/scene.py:367 src/scene.py:500
 msgid "Do you really want to abort this game?"
@@ -1902,11 +1818,9 @@ msgid "Score"
 msgstr ""
 
 #: src/scoringdialog.py:262
-#, fuzzy
-#| msgid "Players"
 msgctxt "kajongg"
 msgid "Payments"
-msgstr "Ludantoj"
+msgstr ""
 
 #: src/scoringdialog.py:263
 msgctxt "kajongg"
@@ -1937,11 +1851,9 @@ msgid "Scores for game <numid>%1</numid>"
 msgstr ""
 
 #: src/scoringdialog.py:559
-#, fuzzy
-#| msgid "&Join"
 msgctxt "@title:window"
 msgid "Explain Scores"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/scoringdialog.py:575
 msgid "There is no active game"
@@ -1992,11 +1904,9 @@ msgid "Player"
 msgstr "Ludanto"
 
 #: src/scoringdialog.py:812
-#, fuzzy
-#| msgid "Winner"
 msgctxt "kajongg"
 msgid "Wind"
-msgstr "Gajninto"
+msgstr ""
 
 #: src/scoringdialog.py:814
 msgid "Winner"
@@ -2008,10 +1918,8 @@ msgid "Draw"
 msgstr "Egaliĝo"
 
 #: src/scoringdialog.py:822
-#, fuzzy
-#| msgid "Properties"
 msgid "&Penalties"
-msgstr "Ecoj"
+msgstr ""
 
 #: src/scoringdialog.py:824
 msgid "&Save Hand"
@@ -2026,10 +1934,8 @@ msgid "L&ast Meld:"
 msgstr ""
 
 #: src/server.py:113
-#, fuzzy
-#| msgid "Password:"
 msgid "Wrong password"
-msgstr "Pasvorto:"
+msgstr ""
 
 #: src/server.py:212
 msgid "table with id <numid>%1</numid> not found"
@@ -2166,10 +2072,8 @@ msgid "Join a table"
 msgstr ""
 
 #: src/tables.py:195
-#, fuzzy
-#| msgid "R&emove"
 msgid "&Leave"
-msgstr "&Forigi"
+msgstr ""
 
 #: src/tables.py:199
 msgid "Leave a table"
@@ -2250,11 +2154,9 @@ msgid "character"
 msgstr ""
 
 #: src/tile.py:196
-#, fuzzy
-#| msgid "Winner"
 msgctxt "kajongg"
 msgid "wind"
-msgstr "Gajninto"
+msgstr ""
 
 #: src/tile.py:197
 msgctxt "kajongg"
@@ -2272,11 +2174,9 @@ msgid "season"
 msgstr ""
 
 #: src/tile.py:205
-#, fuzzy
-#| msgid "Tiles"
 msgctxt "kajongg"
 msgid "tile"
-msgstr "Tegoloj"
+msgstr ""
 
 #: src/tile.py:206
 msgctxt "kajongg"
@@ -2314,20 +2214,16 @@ msgid "North"
 msgstr ""
 
 #: src/tile.py:221
-#, fuzzy
-#| msgid "Winner"
 msgid "East Wind"
-msgstr "Gajninto"
+msgstr ""
 
 #: src/tile.py:222
 msgid "South Wind"
 msgstr ""
 
 #: src/tile.py:223
-#, fuzzy
-#| msgid "Winner"
 msgid "West Wind"
-msgstr "Gajninto"
+msgstr ""
 
 #: src/tile.py:224
 msgid "North Wind"
@@ -2347,47 +2243,3 @@ msgstr ""
 #: src/user.py:93
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
-
-#~ msgid "Copy"
-#~ msgstr "Kopii"
-
-#, fuzzy
-#~| msgid "&Join"
-#~ msgctxt "@action:intoolbar"
-#~ msgid "&Scoring"
-#~ msgstr "&Aliĝu"
-
-#, fuzzy
-#~| msgid "&Quit"
-#~ msgid "&Quit"
-#~ msgstr "&Ĉesi"
-
-#, fuzzy
-#~| msgid "Players"
-#~ msgid "Payer pays"
-#~ msgid_plural "Payers pay"
-#~ msgstr[0] "Ludantoj"
-#~ msgstr[1] "Ludantoj"
-
-#, fuzzy
-#~| msgid "Players"
-#~ msgid "Payee gets"
-#~ msgid_plural "Payees get"
-#~ msgstr[0] "Ludantoj"
-#~ msgstr[1] "Ludantoj"
-
-#, fuzzy
-#~| msgid "Password:"
-#~ msgid "Password"
-#~ msgstr "Pasvorto:"
-
-#, fuzzy
-#~| msgid "Username:"
-#~ msgid "Wrong username"
-#~ msgstr "Uzantnomo:"
-
-#~ msgid "kmj"
-#~ msgstr "kmj"
-
-#~ msgid "Numbers"
-#~ msgstr "Numeroj"
