@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2022-01-31 00:41+0000\n"
-"PO-Revision-Date: 2023-03-11 04:52\n"
+"PO-Revision-Date: 2023-03-26 02:18\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -69,7 +69,7 @@ msgstr "消息"
 
 #: src/chat.py:122
 msgid "Chat on table %1 at %2"
-msgstr ""
+msgstr "在 %2 的表 %1 上聊天"
 
 #: src/client.py:55
 msgctxt "table status"
@@ -92,7 +92,7 @@ msgstr "显示麻将牌阴影"
 
 #: src/configdialog.py:45
 msgid "Rearrange undisclosed tiles to melds"
-msgstr ""
+msgstr "重新排列未公开的图块以融合"
 
 #: src/configdialog.py:48
 msgid "Show only possible actions"
@@ -164,7 +164,7 @@ msgstr "未知玩家 %1"
 
 #: src/game.py:1059
 msgid "Short living wall: Tile is invisible, hence dangerous"
-msgstr ""
+msgstr "短暂生活墙: 平铺不可见, 因此很危险"
 
 #: src/games.py:91 src/playerlist.py:58 src/tables.py:58
 msgid "Players"
@@ -177,7 +177,7 @@ msgstr "已开始"
 #: src/games.py:103
 msgctxt "@title:window"
 msgid "Games"
-msgstr ""
+msgstr "游戏"
 
 #: src/games.py:120
 msgctxt "start a new game"
@@ -211,7 +211,7 @@ msgstr "Kajongg"
 
 #: src/humanclient.py:50
 msgid "Which chow do you want to expose?"
-msgstr ""
+msgstr "你想曝光哪周?"
 
 #: src/humanclient.py:88
 msgid "Which kong do you want to declare?"
@@ -223,7 +223,7 @@ msgstr "选择"
 
 #: src/humanclient.py:347
 msgid "You cannot say %1"
-msgstr ""
+msgstr "您不能说 %1"
 
 #: src/humanclient.py:569
 msgid "Player %1 has left the table"
@@ -232,7 +232,7 @@ msgstr "玩家 %1 已离开此牌桌"
 #: src/humanclient.py:632
 msgid ""
 "The game on table <numid>%1</numid> can begin. Are you ready to play now?"
-msgstr ""
+msgstr "桌上的游戏 <numid>%1</numid> 可以开始。您现在准备好玩吗？"
 
 #: src/humanclient.py:650
 msgid "Ready for next hand?"
@@ -248,7 +248,7 @@ msgstr "Mah Jongg - 4 位玩家玩的中国古老棋牌类游戏"
 
 #: src/kajongg.py:84
 msgid "all robots play with visible concealed tiles"
-msgstr ""
+msgstr "所有机器人都玩可见的隐藏瓷砖"
 
 #: src/kajongg.py:85
 msgid "start with demo mode"
@@ -260,7 +260,7 @@ msgstr "登录到 HOST"
 
 #: src/kajongg.py:87
 msgid "start new TABLE"
-msgstr ""
+msgstr "开始新表"
 
 #: src/kajongg.py:88
 msgid "join TABLE"
@@ -276,11 +276,11 @@ msgstr ""
 
 #: src/kajongg.py:91
 msgid "prefer PLAYER for next login"
-msgstr ""
+msgstr "在下次登录时选择玩家登录"
 
 #: src/kajongg.py:92
 msgid "use AI variant for human player in demo mode"
-msgstr ""
+msgstr "在演示模式下为人类玩家使用 AI 变体"
 
 #: src/kajongg.py:93
 msgid "write statistics to CSV"
@@ -296,15 +296,15 @@ msgstr "测试用：初始化随机数生成器"
 
 #: src/kajongg.py:97
 msgid "show no graphical user interface. Intended only for testing"
-msgstr ""
+msgstr "不显示图形用户界面。仅用于测试"
 
 #: src/kajongg.py:98
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
-msgstr ""
+msgstr "使用侦听 SOCKET 的专用服务器。仅用于测试"
 
 #: src/kajongg.py:99
 msgid "use a dedicated server listening on PORT. Intended only for testing"
-msgstr ""
+msgstr "使用侦听端口的专用服务器。仅用于测试"
 
 #: src/kdestub.py:251
 msgid "&OK"
@@ -376,7 +376,7 @@ msgstr "切换应用程序语言"
 #: src/kdestub.py:460
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
-msgstr ""
+msgstr "关于 &Kajongg"
 
 #: src/kdestub.py:811
 msgid "Please choose the language which should be used for this application:"
@@ -420,7 +420,7 @@ msgstr "版本：%1"
 
 #: src/kdestub.py:1004
 msgid "Protocol version %1"
-msgstr ""
+msgstr "协议版本 %1"
 
 #: src/kdestub.py:1007
 msgid "Original author"
@@ -433,7 +433,7 @@ msgstr "KDE 框架 (未安装或无法使用)"
 #: src/kdestub.py:1023
 msgctxt "kajongg"
 msgid "Using versions %1"
-msgstr ""
+msgstr "使用版本 %1"
 
 #: src/kdestub.py:1026
 msgid "Not using broken Python KDE bindings"
@@ -523,7 +523,7 @@ msgstr "您已连接到服务器 %1"
 #: src/login.py:589
 msgctxt "USER is not known on SERVER"
 msgid "%1 is not known on %2, do you want to open an account?"
-msgstr ""
+msgstr "%1 在 %2上不知道, 你想要打开一个帐户吗？"
 
 #: src/login.py:601
 msgid "Server %1 did not answer"
@@ -552,17 +552,17 @@ msgstr "请重试"
 #: src/mainwindow.py:501
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
-msgstr ""
+msgstr "计分板游戏"
 
 #: src/mainwindow.py:503
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
-msgstr ""
+msgstr "手动游戏"
 
 #: src/mainwindow.py:506
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
-msgstr ""
+msgstr "计分板游戏"
 
 #: src/mainwindow.py:508
 msgctxt "@action:intoolbar"
@@ -577,7 +577,7 @@ msgstr "开始一局新的游戏。"
 #: src/mainwindow.py:513
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
-msgstr ""
+msgstr "中止游戏"
 
 #: src/mainwindow.py:517
 msgctxt "kajongg @info:tooltip"
@@ -587,7 +587,7 @@ msgstr "终止当前游戏."
 #: src/mainwindow.py:519
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
-msgstr ""
+msgstr "&退出Kajongg"
 
 #: src/mainwindow.py:522
 msgctxt "@action:intoolbar"
@@ -597,22 +597,22 @@ msgstr "&玩家"
 #: src/mainwindow.py:525
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
-msgstr ""
+msgstr "定义您的玩家。"
 
 #: src/mainwindow.py:527
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
-msgstr ""
+msgstr "&规则集"
 
 #: src/mainwindow.py:530
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
-msgstr ""
+msgstr "自定义规则。"
 
 #: src/mainwindow.py:534
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
-msgstr ""
+msgstr "&更改视角"
 
 #: src/mainwindow.py:535
 msgctxt "@action:intoolbar"
@@ -622,7 +622,7 @@ msgstr "角"
 #: src/mainwindow.py:538
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
-msgstr ""
+msgstr "更改麻将的视觉外观。"
 
 #: src/mainwindow.py:542
 msgctxt "@action:inmenu"
@@ -632,7 +632,7 @@ msgstr "全屏模式(&U)"
 #: src/mainwindow.py:545
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
-msgstr ""
+msgstr "得分表"
 
 #: src/mainwindow.py:547
 msgctxt "kajongg @action:intoolbar"
@@ -642,32 +642,32 @@ msgstr "&分数"
 #: src/mainwindow.py:549
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
-msgstr ""
+msgstr "显示或隐藏当前游戏的比分表。"
 
 #: src/mainwindow.py:551
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
-msgstr ""
+msgstr "&得分详解"
 
 #: src/mainwindow.py:552
 msgctxt "@action:intoolbar"
 msgid "&Explain"
-msgstr ""
+msgstr "注释"
 
 #: src/mainwindow.py:554
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
-msgstr ""
+msgstr "当前游戏中所有玩家的得分详情。"
 
 #: src/mainwindow.py:556
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
-msgstr ""
+msgstr "&演示模式"
 
 #: src/mainwindow.py:559
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
-msgstr ""
+msgstr "让计算机接替您。如果有需要，开始一个新的本地游戏。"
 
 #: src/mainwindow.py:561
 msgid "C&hat"
@@ -676,12 +676,12 @@ msgstr "聊天(&h)"
 #: src/mainwindow.py:564
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
-msgstr ""
+msgstr "与其他玩家聊天。"
 
 #: src/meld.py:318
 msgctxt "kajongg meld type"
 msgid "Bonus"
-msgstr ""
+msgstr "奖金"
 
 #: src/meld.py:320
 msgctxt "kajongg meld type"
@@ -716,7 +716,7 @@ msgstr "杠(&O)"
 #: src/meld.py:331
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
-msgstr ""
+msgstr "剩余麻将"
 
 #: src/meld.py:338
 msgctxt "kajongg meld state"
@@ -732,11 +732,11 @@ msgstr ""
 #, python-brace-format
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
-msgstr ""
+msgstr "{state} {meldType} {name}"
 
 #: src/message.py:203
 msgid "saying %1 violates Original Call"
-msgstr ""
+msgstr "说 %1 违反原始调用"
 
 #: src/message.py:215
 msgid ""
@@ -751,7 +751,7 @@ msgstr ""
 
 #: src/message.py:223
 msgid "You may say %1"
-msgstr ""
+msgstr "您可以说 %1"
 
 #: src/message.py:233
 msgctxt "kajongg"
@@ -794,7 +794,7 @@ msgstr "C"
 #: src/message.py:323
 msgctxt "kajongg"
 msgid "Mah Jongg"
-msgstr "胡"
+msgstr "麻将"
 
 #: src/message.py:324
 msgctxt "kajongg game dialog:Key for Mah Jongg"
@@ -803,12 +803,12 @@ msgstr "M"
 
 #: src/message.py:332
 msgid "Press here and you win"
-msgstr ""
+msgstr "点击这里并获胜。"
 
 #: src/message.py:346
 msgctxt "kajongg"
 msgid "Original Call"
-msgstr ""
+msgstr "原始调用"
 
 #: src/message.py:347
 msgctxt "kajongg game dialog:Key for Original Call"
@@ -853,7 +853,7 @@ msgstr ""
 
 #: src/message.py:519
 msgid "Kajongg <numid>%1</numid>"
-msgstr ""
+msgstr "Kajongg <numid>%1</numid>"
 
 #: src/message.py:595
 msgctxt "kajongg"
@@ -905,15 +905,15 @@ msgstr "在以下目录找不到 %1，libkmahjongg 正确安装了吗？"
 
 #: src/mjresource.py:104
 msgid "cannot find %1, using default"
-msgstr ""
+msgstr "找不到 %1，使用默认值"
 
 #: src/mjresource.py:114
 msgid "unknown name"
-msgstr ""
+msgstr "未知名称"
 
 #: src/mjresource.py:115
 msgid "unknown author"
-msgstr ""
+msgstr "未知作者"
 
 #: src/mjresource.py:118
 msgid "no description available"
@@ -921,7 +921,7 @@ msgstr "没有可用的描述"
 
 #: src/mjresource.py:121
 msgid "no E-Mail address available"
-msgstr ""
+msgstr "没有可用的电子邮件地址"
 
 #: src/player.py:687
 msgid "%1 claiming MahJongg: She does not really have tile %2"
@@ -938,11 +938,11 @@ msgstr ""
 
 #: src/player.py:816
 msgid "Player %1 may try a True Color Game"
-msgstr ""
+msgstr "玩家 %1 可以尝试真彩色游戏"
 
 #: src/player.py:819
 msgid "Player %1 may try an All Terminals Game"
-msgstr ""
+msgstr "玩家 %1 可以尝试全终端游戏"
 
 #: src/player.py:832
 msgid "Player %1 exposed many winds"
@@ -959,7 +959,7 @@ msgstr "新游戏(&N)"
 
 #: src/playerlist.py:101
 msgid "Player %1 already exists"
-msgstr ""
+msgstr "玩家 %1 已存在"
 
 #: src/playerlist.py:110
 msgid "Error while adding player %1: %2"
@@ -973,11 +973,11 @@ msgstr ""
 
 #: src/predefined.py:27
 msgid "Classical Chinese standard"
-msgstr ""
+msgstr "中国古典标准"
 
 #: src/predefined.py:31
 msgid "Classical Chinese"
-msgstr ""
+msgstr "文言文"
 
 #: src/predefined.py:37
 msgid "Last Tile Taken from Dead Wall"
@@ -1031,7 +1031,7 @@ msgstr ""
 
 #: src/predefined.py:61
 msgid "Dangerous Game"
-msgstr ""
+msgstr "危险游戏"
 
 #: src/predefined.py:62
 msgid ""
