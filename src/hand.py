@@ -209,7 +209,7 @@ class Hand(ReprMixin):
     def __calculate(self):
         """apply rules, calculate score"""
         assert not self.unusedTiles, (
-            'Hand.__calculate expects there to be no rest tiles: %s' % self)
+            'Hand.__calculate expects there to be no unused tiles: %s' % self)
         oldWon = self.__won
         self.__applyRules()
         if len(self.lastMelds) > 1:
@@ -393,13 +393,13 @@ class Hand(ReprMixin):
                 (self.player.tileAvailable(completedHand.lastTile, self)))
         return result
 
-    def newString(self, melds=1, rest=1, lastSource=1, announcements=1, lastTile=1, lastMeld=1):
+    def newString(self, melds=1, unusedTiles=1, lastSource=1, announcements=1, lastTile=1, lastMeld=1):
         """create string representing a hand. Default is current Hand, but every part
         can be overridden or excluded by passing None"""
         if melds == 1:
             melds = chain(self.melds, self.bonusMelds)
-        if rest == 1:
-            rest = self.unusedTiles
+        if unusedTiles== 1:
+            unusedTiles = self.unusedTiles
         if lastSource == 1:
             lastSource = self.lastSource
         if announcements == 1:
@@ -409,8 +409,8 @@ class Hand(ReprMixin):
         if lastMeld == 1:
             lastMeld = self.__lastMeld
         parts = [str(x) for x in sorted(melds)]
-        if rest:
-            parts.append('R' + ''.join(str(x) for x in sorted(rest)))
+        if unusedTiles:
+            parts.append('R' + ''.join(str(x) for x in sorted(unusedTiles)))
         if lastSource or announcements:
             parts.append('m{}{}'.format(
                 self.lastSource.char,
@@ -427,7 +427,7 @@ class Hand(ReprMixin):
         # anyway
         newString = self.newString(
             melds=chain(self.declaredMelds, self.bonusMelds),
-            rest=self.tilesInHand + [addTile],
+            unusedTiles=self.tilesInHand + [addTile],
             lastSource=None,
             lastTile=addTile,
             lastMeld=None
@@ -595,7 +595,7 @@ class Hand(ReprMixin):
             if self.won:
                 if not mjRules:
                     # how could this ever happen?
-                    raise Hand.__NotWon('Long Hand with no rest')
+                    raise Hand.__NotWon('Long Hand with no unused tiles')
                 self.mjRule = mjRules[0]
             return
         wonHands = []
@@ -613,7 +613,7 @@ class Hand(ReprMixin):
                     allMelds.append(lastMelds[0].exposed)
             _ = self.newString(
                 chain(allMelds, self.bonusMelds),
-                rest=None, lastTile=lastTile, lastMeld=None)
+                unusedTiles=None, lastTile=lastTile, lastMeld=None)
             tryHand = Hand(self.player, _, prevHand=self)
             if tryHand.won:
                 tryHand.mjRule = mjRule
