@@ -101,7 +101,7 @@ class Hand(ReprMixin):
         self.melds = MeldList()
         self.bonusMelds = MeldList()
         self.usedRules = []
-        self.__rest = TileList()
+        self.unusedTiles = TileList()
         self.__arranged = None
 
         self.__parseString(string)
@@ -171,9 +171,9 @@ class Hand(ReprMixin):
                           - sum(x.isKong for x in self.melds))
 
         assert len(tileStrings) < 2, tileStrings
-        self.__rest = TileList()
+        self.unusedTiles = TileList()
         if tileStrings:
-            self.__rest.extend(TileList(tileStrings[0][1:]))
+            self.unusedTiles.extend(TileList(tileStrings[0][1:]))
 
         last = self.__lastTile
         if last.isKnown and not last.isBonus:
@@ -208,7 +208,7 @@ class Hand(ReprMixin):
 
     def __calculate(self):
         """apply rules, calculate score"""
-        assert not self.__rest, (
+        assert not self.unusedTiles, (
             'Hand.__calculate expects there to be no rest tiles: %s' % self)
         oldWon = self.__won
         self.__applyRules()
@@ -399,7 +399,7 @@ class Hand(ReprMixin):
         if melds == 1:
             melds = chain(self.melds, self.bonusMelds)
         if rest == 1:
-            rest = self.__rest
+            rest = self.unusedTiles
         if lastSource == 1:
             lastSource = self.lastSource
         if announcements == 1:
@@ -557,7 +557,7 @@ class Hand(ReprMixin):
     def __arrangements(self):
         """find all legal arrangements.
         Returns a list of tuples with the mjRule and a list of concealed melds"""
-        self.__rest.sort()
+        self.unusedTiles.sort()
         result = []
         stdMJ = self.ruleset.standardMJRule
         if self.mjRule:
@@ -567,8 +567,8 @@ class Hand(ReprMixin):
         for mjRule in rules:
             if ((self.lenOffset == 1 and mjRule.appliesToHand(self))
                     or (self.lenOffset < 1 and mjRule.shouldTry(self))):
-                if self.__rest:
-                    for melds, rest2 in mjRule.rearrange(self, self.__rest[:]):
+                if self.unusedTiles:
+                    for melds, rest2 in mjRule.rearrange(self, self.unusedTiles[:]):
                         if rest2:
                             melds = list(melds)
                             restMelds, _ = next(
@@ -578,18 +578,18 @@ class Hand(ReprMixin):
         if not result:
             result.extend(
                 (stdMJ, x[0])
-                for x in stdMJ.rearrange(self, self.__rest[:]))
+                for x in stdMJ.rearrange(self, self.unusedTiles[:]))
         return result
 
     def __arrange(self):
         """work hard to always return the variant with the highest Mah Jongg value."""
-        if any(not x.isKnown for x in self.__rest):
-            melds, rest = divmod(len(self.__rest), 3)
+        if any(not x.isKnown for x in self.unusedTiles):
+            melds, rest = divmod(len(self.unusedTiles), 3)
             self.melds.extend([Tile.unknown.pung] * melds)
             if rest:
                 self.melds.append(Meld(Tile.unknown * rest))
-            self.__rest = []
-        if not self.__rest:
+            self.unusedTiles = []
+        if not self.unusedTiles:
             self.melds.sort()
             mjRules = self.__maybeMahjongg()
             if self.won:
@@ -627,7 +627,7 @@ class Hand(ReprMixin):
             self.mjRule = bestRule
         self.melds.extend(bestVariant)
         self.melds.sort()
-        self.__rest = []
+        self.unusedTiles = []
         self.ruleCache.clear()
         assert sum(len(x) for x in self.melds) == len(self.tiles), (
             '%s != %s' % (self.melds, self.tiles))
