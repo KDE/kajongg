@@ -594,7 +594,7 @@ class Game:
                 with AnimationSpeed(Speeds.windDisc):
                     self.wall.showWindDiscs()
 
-    def debug(self, msg, btIndent=None, prevHandId=False):
+    def debug(self, msg, btIndent=None, prevHandId=False, showStack=False):
         """
         Log a debug message.
 
@@ -620,7 +620,8 @@ class Game:
         logDebug(
             '%s%s: %s' % (prefix, handId, msg),
             withGamePrefix=False,
-            btIndent=btIndent)
+            btIndent=btIndent,
+            showStack=showStack)
 
     @staticmethod
     def __getName(playerid):
