@@ -178,7 +178,7 @@ class Hand(ReprMixin):
         last = self.__lastTile
         if last.isKnown and not last.isBonus:
             assert last in self.tiles, \
-                'lastTile %s is not in hand %s' % (last, str(self))
+                'lastTile %s is not in hand.tiles %s, hand %s' % (last, self.tiles, str(self))
             if self.__lastSource is TileSource.RobbedKong:
                 assert self.tiles.count(last.exposed) + \
                     self.tiles.count(last.concealed) == 1, (
@@ -457,7 +457,12 @@ class Hand(ReprMixin):
         else:
             if lastMeld and lastMeld.isDeclared and (
                     subtractTile.exposed in lastMeld.exposed):
-                declaredMelds.remove(lastMeld)
+                try:
+                    declaredMelds.remove(lastMeld)
+                except ValueError as _:
+                    raise ValueError(
+                        'lastMeld {} is not in declaredMelds {}, hand is: {}'.format(
+                            lastMeld, declaredMelds, self)) from _
                 tilesInHand.extend(lastMeld.concealed)
             tilesInHand.remove(subtractTile.concealed)
         for meld in declaredMelds[:]:
