@@ -300,7 +300,55 @@ class Tile(ReprMixin):
         return object.__eq__(self, other)
 
 
-class TileList(list):
+class Tiles:
+
+    """a Mixin for TileList and TileTuple"""
+
+    # pylint: disable=not-an-iterable
+
+    def exposed(self):
+        """lower case all tiles"""
+        return self.__class__(x.exposed for x in self)
+
+    def sorted(self):
+        """sort(TileList) would not keep TileList type"""
+        return self.__class__(sorted(self))
+
+    def hasChows(self, tile):
+        """return my chows with tileName"""
+        if tile not in self:  # pylint: disable=unsupported-membership-test
+            return []
+        if tile.lowerGroup not in Tile.colors:
+            return []
+        group = tile.group
+        values = {x.value for x in self if x.group == group}
+        chows = []
+        for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
+            subset = {tile.value + x for x in offsets}
+            if subset <= values:
+                chow = self.__class__(self.tileClass(group, x) for x in sorted(subset))
+                if chow not in chows:
+                    chows.append(chow)
+        return chows
+
+    def _compute_hash(self):
+        """usable for sorting"""
+        result = 0
+        factor = len(Tile.hashTable) // 2
+        for tile in self:
+            result = result * factor + tile.key
+        return result
+
+    def __str__(self):
+        """the content"""
+        return str(''.join(str(x) for x in self))
+
+    def __repr__(self):
+        """for debugging"""
+        return '{}_{}({})'.format(self.__class__.__name__, id4(self), ','.join(repr(x) for x in self))
+
+
+class TileList(list, Tiles):
 
     """a list that can only hold tiles"""
 
@@ -320,49 +368,13 @@ class TileList(list):
             list.extend(self, newContent)
         self.isRest = True
 
-    def key(self):
-        """usable for sorting"""
-        result = 0
-        factor = len(Tile.hashTable) // 2
-        for tile in self:
-            result = result * factor + tile.key
-        return result
-
     def __hash__(self):
-        return self.key()
+        return self._compute_hash()
 
-    def sorted(self):
-        """sort(TileList) would not keep TileList type"""
-        return TileList(sorted(self))
 
-    def hasChows(self, tile):
-        """return my chows with tileName"""
-        if tile not in self:
-            return []
-        if tile.lowerGroup not in Tile.colors:
-            return []
-        group = tile.group
-        values = {x.value for x in self if x.group == group}
-        chows = []
-        for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
-            subset = {tile.value + x for x in offsets}
-            if subset <= values:
-                chow = self.__class__(self.tileClass(group, x) for x in sorted(subset))
-                if chow not in chows:
-                    chows.append(chow)
-        return chows
+class TileTuple(tuple, Tiles):
 
-    def __str__(self):
-        """the content"""
-        return str(''.join(str(x) for x in self))
-
-    def __repr__(self):
-        """for debugging"""
-        return '{}_{}({})'.format(self.__class__.__name__, id4(self), ','.join(repr(x) for x in self))
-
-class TileTuple(tuple):
-
-    """a list that can only hold tiles"""
+    """a tuple that can only hold tiles"""
 
     tileClass = Tile
 
@@ -395,15 +407,6 @@ class TileTuple(tuple):
     def __init__(self, iterable=None):  # pylint: disable=unused-argument
         tuple.__init__(self)
 
-    def _compute_hash(self):
-        """usable for sorting"""
-        result = 0
-        factor = len(Tile.hashTable) // 2
-        for tile in self:
-            assert isinstance(tile, Tile), 'tile is:{}'.format(repr(tile))
-            result = result * factor + tile.key
-        return result
-
     def __hash__(self):
         return self._hash
 
@@ -419,34 +422,6 @@ class TileTuple(tuple):
             result.append(other)
         return TileTuple(result)
 
-    def sorted(self):
-        """sort(TileTuple) would not keep TileTuple type"""
-        return TileTuple(sorted(self))
-
-    def hasChows(self, tile):
-        """return my chows with tileName"""
-        if tile not in self:
-            return []
-        if tile.lowerGroup not in Tile.colors:
-            return []
-        group = tile.group
-        values = {x.value for x in self if x.group == group}
-        chows = []
-        for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
-            subset = {tile.value + x for x in offsets}
-            if subset <= values:
-                chow = self.__class__(self.tileClass(group, x) for x in sorted(subset))
-                if chow not in chows:
-                    chows.append(chow)
-        return chows
-
-    def __str__(self):
-        """the content"""
-        return str(''.join(str(x) for x in self))
-
-    def __repr__(self):
-        """for debugging"""
-        return '{}_{}({})'.format(self.__class__.__name__, id4(self), ','.join(repr(x) for x in self))
 
 class Elements:
 
