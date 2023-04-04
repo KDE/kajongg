@@ -737,6 +737,7 @@ class HumanClient(Client):
             logWarning(i18n(message, *args))
             if self.game:
                 self.game.close()
+                self.game = None
 
     def remote_gameOver(self, tableid, message, *args):
         """the game is over"""
