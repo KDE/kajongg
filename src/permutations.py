@@ -38,11 +38,12 @@ class Permutations:
         honors = []
         for tile in sorted(set(self.tiles)):
             if tile.isHonor:
-                count = self.tiles.count(tile)
+                those = list(x for x in self.tiles if x == tile)
+                count = len(those)
                 if count == 4:
-                    honors.append(tile.single)
+                    honors.append(Meld([those.pop()]))
                     count -= 1
-                honors.append(tile.meld(count))
+                honors.append(Meld(those))
         boni = [x.single for x in self.tiles if x.isBonus]
         variants = []
         for group in Tile.colors.upper():

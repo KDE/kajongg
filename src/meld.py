@@ -13,7 +13,7 @@ from itertools import chain
 
 from mi18n import i18nc
 from common import ReprMixin
-from tile import Tile, TileTuple, elements
+from tile import Tile, TileList, TileTuple, elements, Piece
 
 
 class Meld(TileTuple, ReprMixin):
@@ -51,7 +51,15 @@ class Meld(TileTuple, ReprMixin):
         if isinstance(iterable, Meld):
             # brauchen wir das?
             return iterable
-        tiles = super(Meld, cls).__new__(cls, TileTuple(iterable))
+        superclass = TileTuple
+        if hasattr(iterable, '__iter__') and not isinstance(iterable, str):
+            iterable = list(iterable)
+            if iterable:
+                class1 = iterable[0].__class__
+                assert all(x.__class__ is class1 for x in iterable)
+                if class1 is Piece:
+                    superclass = TileList
+        tiles = super(Meld, cls).__new__(cls, superclass(iterable))
         if tiles in cls.cache:
             return cls.cache[tiles]
         return tiles

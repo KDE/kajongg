@@ -390,10 +390,13 @@ class Player(ReprMixin):
     def getsFocus(self, unusedResults=None):
         """virtual: player gets focus on his hand"""
 
+    def __announcements(self):
+        """used to build the Hand"""
+        return set('a') if self.originalCall else set()
+
     def mjString(self):
         """compile hand info into a string as needed by the scoring engine"""
-        announcements = 'a' if self.originalCall else ''
-        return ''.join(['m', self.lastSource.char, ''.join(announcements)])
+        return ''.join(['m', self.lastSource.char, ''.join(self.__announcements())])
 
     def makeTileKnown(self, tile):
         """used when somebody else discards a tile"""
@@ -401,29 +404,13 @@ class Player(ReprMixin):
         self._concealedTiles[0] = tile
         self._hand = None
 
-    def __computeLastInfo(self):
-        """compile info about last tile and last meld into a list of strings"""
-        result = []
-        if self.lastTile:
-# TODO assert, dass lastTile in _concealedTiles oder in _exposedMelds ist
-# and (self.lastTile in self._concealedTiles or self.lastTile in :
-            result.append(
-                'L%s%s' %
-                (self.lastTile, self.lastMeld if self.lastMeld else ''))
-        return result
-
     def __computeHand(self):
         """return Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
-        melds = []
-        melds.extend(str(x) for x in self._exposedMelds)
-        melds.extend(str(x) for x in self._concealedMelds)
-        if self._concealedTiles:
-            melds.append('R' + ''.join(str(x) for x in sorted(self._concealedTiles)))
-        melds.extend(str(x) for x in self._bonusTiles)
-        melds.append(self.mjString())
-        melds.extend(self.__computeLastInfo())
-        return Hand(self, ' '.join(melds))
+        return Hand(
+            self, melds=self._exposedMelds + self._concealedMelds, unusedTiles=self._concealedTiles,
+            bonusTiles=self._bonusTiles, lastTile=self.lastTile, lastMeld=self.lastMeld,
+            lastSource=self.lastSource, announcements=self.__announcements())
 
     def _computeHandWithDiscard(self, discard):
         """what if"""

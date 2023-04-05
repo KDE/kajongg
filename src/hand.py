@@ -61,22 +61,29 @@ class Hand(ReprMixin):
 
         """should be won but is not a winning hand"""
 
-    def __new__(cls, player, string, prevHand=None):
+    def __new__(cls, player, string=None, melds=None, unusedTiles=None, bonusTiles=None,  # pylint: disable=too-many-arguments
+            lastSource=None, lastTile=None, lastMeld=None, announcements=None, prevHand=None):
         # pylint: disable=unused-argument
         """since a Hand instance is never changed, we can use a cache"""
-        cache = player.handCache
-        cacheKey = string
-        if cacheKey in cache:
-            result = cache[cacheKey]
-            player.cacheHits += 1
-            return result
-        player.cacheMisses += 1
-        result = object.__new__(cls)
-        cache[cacheKey] = result
+        if string:
+            cache = player.handCache
+            cacheKey = string
+            if cacheKey in cache:
+                result = cache[cacheKey]
+                player.cacheHits += 1
+                return result
+            player.cacheMisses += 1
+            result = object.__new__(cls)
+            cache[cacheKey] = result
+        else:
+            result = object.__new__(cls)
         return result
 
-    def __init__(self, player, string, prevHand=None):
+    def __init__(self, player, string=None, melds=None, unusedTiles=None, bonusTiles=None,  # pylint: disable=too-many-arguments
+            lastSource=None, lastTile=None, lastMeld=None, announcements=None, prevHand=None):
         """evaluate string for player. rules are to be applied in any case"""
+
+        # pylint: disable=too-many-branches, too-many-statements
         if hasattr(self, 'string'):
             # I am from cache
             return
@@ -104,7 +111,24 @@ class Hand(ReprMixin):
         self.unusedTiles = TileList()
         self.__arranged = None
 
-        self.__parseString(string)
+        if string:
+            self.__parseString(string)
+        else:
+            self.melds = melds or MeldList()
+            if unusedTiles is not None:
+                self.unusedTiles.extend(unusedTiles)  # FIXME: assign
+            if bonusTiles:
+                self.bonusMelds = MeldList(Meld(x) for x in bonusTiles)
+            self.__lastSource = lastSource or TileSource.Unknown
+            if lastTile:
+                self.__lastTile= lastTile
+            if lastMeld:
+                self.__lastMeld= lastMeld
+            self.__announcements = announcements or set()
+            self.tiles = TileTuple(chain(self.melds, self.unusedTiles))
+
+        self.__precompute()
+
         self.__won = self.lenOffset == 1 and player.mayWin
 
         if Debug.hand or (Debug.mahJongg and self.lenOffset == 1):
@@ -130,7 +154,6 @@ class Hand(ReprMixin):
 
     def __parseString(self, inString):
         """parse the string passed to Hand()"""
-        # pylint: disable=too-many-branches
         tileStrings = []
         for part in inString.split():
             partId = part[0]
@@ -155,11 +178,17 @@ class Hand(ReprMixin):
         self.bonusMelds, tileStrings = self.__separateBonusMelds(tileStrings)
         tileString = ' '.join(tileStrings)
         self.tiles = TileList(tileString.replace(' ', '').replace('R', ''))
-        self.tiles.sort()
         for part in tileStrings[:]:
             if part[:1] != 'R':
                 self.melds.append(Meld(part))
                 tileStrings.remove(part)
+        assert len(tileStrings) < 2, tileStrings
+        if tileStrings:
+            self.unusedTiles.extend(TileList(tileStrings[0][1:]))
+
+    def __precompute(self):
+        """precompute commonly used things"""
+        self.tiles = self.tiles.sorted()
 
         self.values = tuple(x.value for x in self.tiles)
         self.suits = {x.lowerGroup for x in self.tiles}
@@ -170,13 +199,9 @@ class Hand(ReprMixin):
         self.lenOffset = (len(self.tiles) - 13
                           - sum(x.isKong for x in self.melds))
 
-        assert len(tileStrings) < 2, tileStrings
-        self.unusedTiles = TileList()
-        if tileStrings:
-            self.unusedTiles.extend(TileList(tileStrings[0][1:]))
-
         last = self.__lastTile
         if last.isKnown and not last.isBonus:
+#            print('lastTile %s hand.tiles %s, string=%s hand %s' % (last, self.tiles, self.string, str(self)))
             assert last in self.tiles, \
                 'lastTile %s is not in hand.tiles %s, hand %s' % (last, self.tiles, str(self))
             if self.__lastSource is TileSource.RobbedKong:
@@ -185,6 +210,7 @@ class Hand(ReprMixin):
                         'Robbing kong: I cannot have '
                         'lastTile %s more than once in %s' % (
                             last, ' '.join(self.tiles)))
+        self.newStr = self.newString()
 
     @property
     def arranged(self):
@@ -302,8 +328,13 @@ class Hand(ReprMixin):
 
         self.ruleCache.clear()
         # do the rest only if we know all tiles of the hand
-        if Tile.unknownStr in self.string:
-            return
+        if self.string:
+            if Tile.unknownStr in self.string:
+                return
+        else:
+# FIXME: try to do this also for string
+            if Tile.unknown in self.tiles:
+                return
         if self.__won:
             matchingMJRules = self.__maybeMahjongg()
             if not matchingMJRules:
@@ -392,6 +423,19 @@ class Hand(ReprMixin):
                 [completedHand.lastTile] *
                 (self.player.tileAvailable(completedHand.lastTile, self)))
         return result
+
+    def assertEqual(self, other):
+        """raise assertion if not equal with detailled info"""
+        assert self.melds == other.melds, \
+            'Melds in hands differ:{!r} != {!r}'.format(self.melds, other.melds)
+        assert self.lastTile == other.lastTile, \
+            'lastTile in hands differs:{} != {}'.format(self.lastTile, other.lastTile)
+        assert self.lastMeld == other.lastMeld, \
+            'lastMeld in hands differs:{} != {}'.format(self.lastMeld, other.lastMeld)
+        assert self.newString() == other.newString(), \
+            'newString() in hands differs:{} != {}'.format(self.newString(), other.newString())
+        assert self.newStr == other.newStr, \
+            'newStr in hands differs:{} != {}'.format(self.newStr, other.newStr)
 
     def newString(self, melds=1, unusedTiles=1, lastSource=1, announcements=1, lastTile=1, lastMeld=1):
         """create string representing a hand. Default is current Hand, but every part
@@ -573,7 +617,8 @@ class Hand(ReprMixin):
             if ((self.lenOffset == 1 and mjRule.appliesToHand(self))
                     or (self.lenOffset < 1 and mjRule.shouldTry(self))):
                 if self.unusedTiles:
-                    for melds, rest2 in mjRule.rearrange(self, self.unusedTiles[:]):
+                    unused = TileList(Tile(x) for x in self.unusedTiles)
+                    for melds, rest2 in mjRule.rearrange(self, unused):
                         if rest2:
                             melds = list(melds)
                             restMelds, _ = next(
@@ -634,8 +679,6 @@ class Hand(ReprMixin):
         self.melds.sort()
         self.unusedTiles = []
         self.ruleCache.clear()
-        assert sum(len(x) for x in self.melds) == len(self.tiles), (
-            '%s != %s' % (self.melds, self.tiles))
 
     def __gt__(self, other):
         """compares hand values"""
@@ -655,13 +698,16 @@ class Hand(ReprMixin):
 
     def __eq__(self, other):
         """compares hand values"""
+        assert self.__class__ is other.__class__, \
+            'Hands have different classes:{} and {}'.format(self.__class__, other.__class__)
         assert self.player == other.player
-        return self.string == other.string
+        return self.newStr == other.newStr
 
     def __ne__(self, other):
         """compares hand values"""
+        assert self.__class__ is other.__class__
         assert self.player == other.player
-        return self.string != other.string
+        return self.newStr != other.newStr
 
     def __matchingRules(self, rules):
         """return all matching rules for this hand"""
@@ -750,7 +796,8 @@ class Hand(ReprMixin):
             return 0
         md5sum = md5()
         md5sum.update(self.player.name.encode('utf-8'))
-        md5sum.update(self.string.encode())
+        _ = self.string if self.string else str(self)
+        md5sum.update(_.encode())
         digest = md5sum.digest()
         assert len(digest) == 16
         result = 0
