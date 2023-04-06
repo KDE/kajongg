@@ -304,8 +304,6 @@ class Tiles:
 
     """a Mixin for TileList and TileTuple"""
 
-    # pylint: disable=not-an-iterable
-
     def exposed(self):
         """lower case all tiles"""
         return self.__class__(x.exposed for x in self)
@@ -316,7 +314,7 @@ class Tiles:
 
     def hasChows(self, tile):
         """return my chows with tileName"""
-        if tile not in self:  # pylint: disable=unsupported-membership-test
+        if tile not in self:
             return []
         if tile.lowerGroup not in Tile.colors:
             return []
@@ -346,6 +344,10 @@ class Tiles:
     def __repr__(self):
         """for debugging"""
         return '{}_{}({})'.format(self.__class__.__name__, id4(self), ','.join(repr(x) for x in self))
+
+    def __iter__(self):
+        """just to make this clear to mypy"""
+        return iter(self)
 
 
 class TileList(list, Tiles):
