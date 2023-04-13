@@ -594,6 +594,11 @@ class KConfigGroup:
                 self.readEntry(name, default)
                 )) from _
 
+    def __str__(self) ->str:
+        config = self.config()
+        path = config.path if config else 'NO_PATH'
+        return '{}:[{}]'.format(path, self.groupName)
+
 
 class KGlobal:
 
