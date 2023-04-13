@@ -626,7 +626,7 @@ class KConfig(ConfigParser):
 
     def setValue(self, section, option, value):
         """like set but add missing section"""
-        if section not in self._sections:
+        if section not in self.sections():
             self.add_section(section)
         self.set(section, option, str(value))
 
