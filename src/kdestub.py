@@ -555,22 +555,20 @@ class KConfigGroup:
         self.config = weakref.ref(config)
         self.groupName = groupName
 
-    def __default(self, name, default):
+    def __default(self, name):
         """defer computation of Languages until really needed"""
-        if default is not None:
-            return default
         if self.groupName == 'Locale' and name == 'Language':
             return QLocale().name()
         return None
 
-    def readEntry(self, name, default=None):
+    def readEntry(self, name):
         """get an entry from this group."""
         try:
             _ = self.config()
             assert _
             items = _.items(self.groupName)
         except NoSectionError:
-            return self.__default(name, default)
+            return self.__default(name)
         items = {x: y for x, y in items if x.startswith(name)}
         i18nItems = {x: y for x, y in items.items() if x.startswith(name + '[')}
         if i18nItems:
@@ -587,17 +585,17 @@ class KConfigGroup:
                     return ':'.join(languages)
                 return QLocale().name()
             return items[name]
-        return self.__default(name, default)
+        return self.__default(name)
 
-    def readInteger(self, name, default=None):
+    def readInteger(self, name):
         """calls readEntry and returns it as an int or raises an Exception."""
+        result = self.readEntry(name)
+        if result is None:
+            raise ValueError('{}: cannot find {}'.format(self, name))
         try:
-            return int(self.readEntry(name, default))
-        except Exception as _:
-            raise ValueError('cannot parse group {} in {}: {}={}'.format(
-                self.groupName, self.config().path, name,
-                self.readEntry(name, default)
-                )) from _
+            return int(result)
+        except ValueError as _:
+            raise ValueError('{}: cannot parse {}'.format(self, name)) from _
 
     def __str__(self) ->str:
         config = self.config()
