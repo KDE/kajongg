@@ -120,7 +120,7 @@ class Resource:
                 "no E-Mail address available")
 
         # Version control
-        resourceVersion = self.group.readInteger("VersionFormat", default=0)
+        resourceVersion = self.group.readInteger("VersionFormat")
         # Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if resourceVersion > RESOURCEFORMAT:
