@@ -377,10 +377,14 @@ class DeferredBlock(ReprMixin):
         def encodeKwargs():
             """those values are classes like Meld, Tile etc.
                Convert to bytes"""
-            for keyword, value in kwargs.items():
+            _ = tuple(kwargs.keys())
+            for keyword in _:
                 if any(keyword.lower().endswith(x) for x in ('tile', 'tiles', 'meld', 'melds')):
-                    if value is not None:
-                        kwargs[keyword] = str(value)
+                    if kwargs[keyword] is not None:
+                        kwargs[keyword] = str(kwargs[keyword])
+                if keyword == 'players':
+                    kwargs['playerNames'] = [(x.wind, x.name) for x in kwargs[keyword]]
+                    del kwargs['players']
         encodeKwargs()
         if about.__class__.__name__ == 'User':
             about = self.playerForUser(about)

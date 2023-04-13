@@ -333,7 +333,7 @@ class ServerTable(Table, ReprMixin):
             block.tellPlayer(
                 player, Message.ReadyForGameStart, tableid=self.tableid,
                 gameid=game.gameid, shouldSave=player.shouldSave,
-                wantedGame=game.wantedGame, playerNames=[(x.wind, x.name) for x in game.players])
+                wantedGame=game.wantedGame, players=game.players)
         block.callback(self.startGame)
 
     def startGame(self, requests):
@@ -665,9 +665,8 @@ class ServerTable(Table, ReprMixin):
                     resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
             return
         self.game.sortPlayers()
-        playerNames = [(x.wind, x.name) for x in self.game.players]
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,
-                     playerNames=playerNames, rotateWinds=rotateWinds, token=token)
+                     players=self.game.players, rotateWinds=rotateWinds, token=token)
 
     def abort(self, message, *args):
         """abort the table. Reason: message/args"""
