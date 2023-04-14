@@ -758,7 +758,7 @@ class HumanClient(Client):
         if Debug.connections and result:
             logDebug(
                 'server %s disconnects: %s' %
-                (self.connection.url, result))
+                (self.connection, result))
         self.connection = None
         game = self.game
         self.game = None  # avoid races: messages might still arrive

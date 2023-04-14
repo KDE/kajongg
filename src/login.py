@@ -635,3 +635,6 @@ class Connection:
                 'ping').addCallback(
                     self.pingLater).addErrback(
                         self.client.remote_serverDisconnects)
+
+    def __str__(self) ->str:
+        return '{}@{}'.format(self.username, self.url)
