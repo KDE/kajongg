@@ -270,11 +270,7 @@ class EditableRuleModel(RuleModel):
     def __setRuleData(self, column, content, value):
         """change rule data in the model"""
         dirty, message = False, None
-        if column == 0:
-            if content.name != english(value):
-                dirty = True
-                content.name = english(value)
-        elif column == 1 and isinstance(content, ParameterRule):
+        if column == 1 and isinstance(content, ParameterRule):
             oldParameter = content.parameter
             if isinstance(content, BoolRule):
                 return False, ''
