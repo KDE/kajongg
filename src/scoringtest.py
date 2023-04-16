@@ -411,8 +411,8 @@ class ThirteenOrphans(Base):
 
     def testMe(self):
         self.scoreTest('RC1C9B9B1S1S9WeDgWsWnWwDbDrS1 LDgDg', Win(limits=1))
-        self.scoreTest('ww RC1C9B9B1S1S9WeDgWsWnDbDrS8 Lww', NoWin())
-        self.scoreTest('ww RC1C9B9B1S1S9WeDgWsWnDbDrS9 Lww', Win(limits=1))
+        self.scoreTest('ww RC1C9B9B1S1S9WeDgWsWnDbDrS8 Lwwww', NoWin())
+        self.scoreTest('ww RC1C9B9B1S1S9WeDgWsWnDbDrS9 Lwwww', Win(limits=1))
         self.scoreTest('RC1C9B9B1S1S9S9WeDgWsWnWwDbDr LDrDr', Win(limits=1))
         self.scoreTest('dr RC1C9B9B1S1S9S9WeDgWsWnWwDb Ldrdr', Win(limits=1))
         self.scoreTest(
@@ -676,7 +676,7 @@ class OriginalCall(Base):
 
     def testMe(self):
         # in DMJL, b4 would also win:
-        self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5B5 fn yn m.a LB5',
+        self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5B5 fn yn m.a LB5B5B5',
                        [Win(44, 2), Win(42, 3)], myWind=North)
         self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5 fn yn m.a LB5',
                        [NoWin(20, 1), NoWin(20, 2)], myWind=North)
@@ -907,11 +907,11 @@ class LastTile(Base):
 
     def testMe(self):
         self.scoreTest(
-            'wewewe s1s1s1 b9b9b9 RC1C1C1C2C3 LC1', [Win(38, 2), Win(34, 2)])
+            'wewewe s1s1s1 b9b9b9 RC1C1C1C2C3 LC1C1C1', [Win(38, 2), Win(34, 2)])
         self.scoreTest(
-            'wewewe s1s1s1 b9b9b9 RC1C2C3C3C3 LC3', [Win(38, 2), Win(34, 2)])
+            'wewewe s1s1s1 b9b9b9 RC1C2C3C3C3 LC3C3C3', [Win(38, 2), Win(34, 2)])
         self.scoreTest(
-            'b5b6b7 s1s1s1 RB8C6C7C5B8B8C7C7 mw LC7', [Win(32, 0), NoWin()])
+            'b5b6b7 s1s1s1 RB8C6C7C5B8B8C7C7 mw LC7C7C7', [Win(32, 0), NoWin()])
 
 
 class CallingHands(Base):
