@@ -135,7 +135,7 @@ class Score(ReprMixin):
         """the total score"""
         return self.total()
 
-    def __nonzero__(self):
+    def __bool__(self):
         """for bool() conversion"""
         return self.points != 0 or self.doubles != 0 or self.limits != 0
 
