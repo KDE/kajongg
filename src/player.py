@@ -548,7 +548,7 @@ class PlayingPlayer(Player):
         if len(exposedChows) >= self.game.ruleset.maxChows:
             return []
         _ = self.game.lastDiscard
-        return (TileTuple(self.concealedTiles) + _).hasChows(_)
+        return (TileTuple(self.concealedTiles) + _).possibleChows(_)
 
     def __possibleKongs(self):
         """return a unique list of lists with possible kong combinations"""

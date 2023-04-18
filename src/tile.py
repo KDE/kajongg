@@ -312,7 +312,7 @@ class Tiles:
         """sort(TileList) would not keep TileList type"""
         return self.__class__(sorted(self))
 
-    def hasChows(self, tile):
+    def possibleChows(self, tile):
         """return my chows with tileName"""
         if tile not in self:
             return []
