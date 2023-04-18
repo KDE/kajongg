@@ -373,6 +373,18 @@ class TileList(list, Tiles):
     def __hash__(self):
         return self._compute_hash()
 
+    def __add__(self, other):
+        result = TileList(self)
+        if isinstance(other, str):
+            result.extend(
+                [self.tileClass(other[x:x + 2])
+                       for x in range(0, len(other), 2)])
+        elif hasattr(other, '__iter__'):
+            result.extend(other)
+        else:
+            result.append(other)
+        return result
+
 
 class TileTuple(tuple, Tiles):
 
