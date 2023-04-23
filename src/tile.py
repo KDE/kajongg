@@ -335,10 +335,6 @@ class Tiles:
                             cls.__name__, cls.tileClass.__name__, repr(member)))
         return memberList
 
-    def exposed(self):
-        """lower case all tiles"""
-        return self.__class__(x.exposed for x in self)
-
     def sorted(self):
         """sort(TileList) would not keep TileList type"""
         return self.__class__(sorted(self))
