@@ -32,8 +32,7 @@ from query import Query
 from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
 from tree import TreeItem, RootItem, TreeModel
 from wind import Wind
-from tile import Tile
-from meld import MeldList
+from tile import Tile, MeldList
 
 
 class ScoreTreeItem(TreeItem):

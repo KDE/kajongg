@@ -65,7 +65,6 @@ set(SRCFILES
     src/kdestub.py
     src/deferredutil.py
     src/differ.py
-    src/meld.py
     src/player.py
     src/game.py
     src/games.py

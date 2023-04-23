@@ -15,9 +15,8 @@ import weakref
 from hashlib import md5
 
 from log import dbgIndent
-from tile import Tile, TileList, TileTuple
+from tile import Tile, TileList, TileTuple, Meld, MeldList
 from tilesource import TileSource
-from meld import Meld, MeldList
 from rule import Score, UsedRule
 from common import Debug, ReprMixin, Fmt, fmt
 from util import callers

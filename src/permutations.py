@@ -9,8 +9,7 @@ Read the user manual for a description of the interface to this scoring engine
 
 import itertools
 
-from tile import Tile
-from meld import Meld, MeldList
+from tile import Tile, Meld, MeldList
 
 
 class Permutations:

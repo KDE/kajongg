@@ -12,8 +12,7 @@ import datetime
 from log import logWarning, logException, logDebug
 from mi18n import i18n, i18nc, i18ncE
 from sound import Voice
-from tile import Tile, TileTuple
-from meld import Meld, MeldList
+from tile import Tile, TileTuple, Meld, MeldList
 from common import Internal, Debug, Options, ReprMixin
 from wind import Wind
 from dialogs import Sorry

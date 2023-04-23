@@ -15,8 +15,7 @@ from log import logException, logDebug
 from guiutil import Painter, sceneRotation
 from common import LIGHTSOURCES, ZValues, Internal, Debug
 from common import ReprMixin, isAlive, id4
-from tile import Tile
-from meld import Meld
+from tile import Tile, Meld
 from animation import AnimatedMixin
 
 

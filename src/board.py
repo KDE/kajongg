@@ -15,10 +15,9 @@ from qt import QFontMetrics, QGraphicsObject
 from qt import QMenu, QCursor
 from qt import QGraphicsSvgItem
 from tileset import Tileset
-from tile import Tile, elements
+from tile import Tile, elements, Meld, MeldList
 from uitile import UITile, UIMeld
 from guiutil import Painter, rotateCenter, sceneRotation
-from meld import Meld, MeldList
 from animation import AnimationSpeed, animate, AnimatedMixin
 from message import Message
 

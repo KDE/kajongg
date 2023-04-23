@@ -22,8 +22,7 @@ from dialogs import QuestionYesNo
 from guiutil import decorateWindow, sceneRotation
 from board import SelectorBoard, DiscardBoard
 from tileset import Tileset
-from tile import Tile
-from meld import Meld
+from tile import Tile, Meld
 from humanclient import HumanClient
 from uitile import UITile
 from uiwall import UIWall

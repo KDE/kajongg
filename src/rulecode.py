@@ -7,9 +7,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from tile import Tile, TileList, elements
+from tile import Tile, TileList, elements, Meld, MeldList
 from tilesource import TileSource
-from meld import Meld, MeldList
 from common import IntDict
 from wind import East
 from message import Message

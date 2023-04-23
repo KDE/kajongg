@@ -10,10 +10,9 @@ SPDX-License-Identifier: GPL-2.0
 import weakref
 
 from qt import QGraphicsRectItem, QColor
-from tile import Tile
+from tile import Tile, Meld, MeldList
 from tileset import Tileset
 from uitile import UITile
-from meld import Meld, MeldList
 from hand import Hand
 from board import Board
 from sound import Sound

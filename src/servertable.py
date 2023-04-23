@@ -25,8 +25,7 @@ from message import Message, ChatMessage
 from log import logDebug, logError
 from mi18n import i18nE, i18n, i18ncE
 from deferredutil import DeferredBlock
-from tile import Tile, Piece, TileTuple, elements
-from meld import Meld, MeldList
+from tile import Tile, Piece, TileTuple, elements, Meld, MeldList
 from query import Query
 from client import Client, Table
 from wall import WallEmpty

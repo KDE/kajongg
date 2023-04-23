@@ -15,9 +15,8 @@ from common import IntDict, Debug
 from common import ReprMixin, Internal
 from wind import East, Wind
 from query import Query
-from tile import Tile, TileList, TileTuple, PieceList, elements
+from tile import Tile, TileList, TileTuple, PieceList, elements, Meld, MeldList
 from tilesource import TileSource
-from meld import Meld, MeldList
 from permutations import Permutations
 from message import Message
 from hand import Hand

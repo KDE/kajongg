@@ -12,8 +12,7 @@ import weakref
 from common import ReprMixin, Internal
 from message import Message
 from wind import Wind
-from tile import Tile, TileTuple
-from meld import Meld, MeldList
+from tile import Tile, TileTuple, Meld, MeldList
 
 class Move(ReprMixin):
 

@@ -16,7 +16,7 @@ from qt import QPushButton, QMessageBox, QComboBox
 
 
 from common import Internal, isAlive, Debug
-from meld import MeldList
+from tile import MeldList
 from wind import Wind
 from tilesource import TileSource
 from animation import animate
