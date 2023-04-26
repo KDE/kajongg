@@ -65,14 +65,6 @@ class Clone:
                 removeDir = os.path.join(cacheDir(), commitDir)
                 shutil.rmtree(removeDir)
 
-class Client:
-
-    """a simple container, assigning process to job"""
-
-    def __init__(self, process=None, job=None):
-        self.process = process
-        self.job = job
-
 
 class TooManyClients(UserWarning):
 
