@@ -17,7 +17,7 @@ class TreeItem:
     """generic class for items in a tree"""
 
     def __init__(self, content):
-        self.rawContent = content
+        self.__rawContent = content
         self.parent = None
         self.children = []
 
@@ -52,6 +52,15 @@ class TreeItem:
             return self.parent.children.index(self)
         return 0
 
+    def columnCount(self):
+        """Always return 1. Is 1 always correct? No, inherit from RootItem FIXME"""
+        return 1
+
+    @property
+    def raw(self):
+        """make it read only"""
+        return self.__rawContent
+
 
 class RootItem(TreeItem):
 
@@ -62,7 +71,7 @@ class RootItem(TreeItem):
 
     def content(self, column):
         """content held by this item"""
-        return self.rawContent[column]
+        return self.raw[column]
 
     def columnCount(self):
         """Always return 1. is 1 always correct? No, inherit from RootItem"""

@@ -46,7 +46,7 @@ class ScoreTreeItem(TreeItem):
         while not isinstance(child1, ScorePlayerItem) and child1.children:
             child1 = child1.children[0]
         if isinstance(child1, ScorePlayerItem):
-            return len(child1.rawContent[1]) + 1
+            return len(child1.raw[1]) + 1
         return 1
 
 
@@ -59,7 +59,7 @@ class ScoreRootItem(RootItem):
         while not isinstance(child1, ScorePlayerItem) and child1.children:
             child1 = child1.children[0]
         if isinstance(child1, ScorePlayerItem):
-            return len(child1.rawContent[1]) + 1
+            return len(child1.raw[1]) + 1
         return 1
 
 
@@ -72,7 +72,7 @@ class ScoreGroupItem(ScoreTreeItem):
 
     def content(self, column):
         """return content stored in this item"""
-        return i18n(self.rawContent)
+        return i18n(self.raw)
 
 
 class ScorePlayerItem(ScoreTreeItem):
@@ -85,7 +85,7 @@ class ScorePlayerItem(ScoreTreeItem):
     def content(self, column):
         """return the content stored in this node"""
         if column == 0:
-            return i18n(self.rawContent[0])
+            return i18n(self.raw[0])
         try:
             return self.hands()[column - 1]
         except IndexError:
@@ -95,7 +95,7 @@ class ScorePlayerItem(ScoreTreeItem):
 
     def hands(self):
         """a small helper"""
-        return self.rawContent[1]
+        return self.raw[1]
 
     def chartPoints(self, column, steps):
         """the returned points spread over a height of four rows"""

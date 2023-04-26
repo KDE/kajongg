@@ -33,7 +33,7 @@ class RuleRootItem(RootItem):
     """the root item for the ruleset tree"""
 
     def columnCount(self):
-        return len(self.rawContent)
+        return len(self.raw)
 
 
 class RuleTreeItem(TreeItem):
@@ -46,14 +46,14 @@ class RuleTreeItem(TreeItem):
         """can be different for every rule"""
         if hasattr(self, 'colCount'):
             return self.colCount
-        return len(self.rawContent)
+        return len(self.raw)
 
     def ruleset(self):
         """return the ruleset containing this item"""
         item = self
-        while not isinstance(item.rawContent, Ruleset):
+        while not isinstance(item.raw, Ruleset):
             item = item.parent
-        return item.rawContent
+        return item.raw
 
 
 class RulesetItem(RuleTreeItem):
@@ -63,10 +63,14 @@ class RulesetItem(RuleTreeItem):
     def __init__(self, content):
         RuleTreeItem.__init__(self, content)
 
+    @property
+    def raw(self) ->Ruleset:
+        return super().raw
+
     def content(self, column):
         """return content stored in this item"""
         if column == 0:
-            return self.rawContent.name
+            return self.raw.name
         return ''
 
     def columnCount(self):
@@ -74,11 +78,11 @@ class RulesetItem(RuleTreeItem):
 
     def remove(self):
         """remove this ruleset from the model and the database"""
-        self.rawContent.remove()
+        self.raw.remove()
 
     def tooltip(self):
         """the tooltip for a ruleset"""
-        return self.rawContent.description
+        return self.raw.description
 
 
 class RuleListItem(RuleTreeItem):
@@ -88,17 +92,21 @@ class RuleListItem(RuleTreeItem):
     def __init__(self, content):
         RuleTreeItem.__init__(self, content)
 
+    @property
+    def raw(self) ->'RuleList':
+        return super().raw
+
     def content(self, column):
         """return content stored in this item"""
         if column == 0:
-            return self.rawContent.name
+            return self.raw.name
         return ''
 
     def tooltip(self):
         """tooltip for a list item explaining the usage of this list"""
         ruleset = self.ruleset()
         return '<b>' + i18n(ruleset.name) + '</b><br><br>' + \
-            i18n(self.rawContent.description)
+            i18n(self.raw.description)
 
 
 class RuleItem(RuleTreeItem):
@@ -108,27 +116,31 @@ class RuleItem(RuleTreeItem):
     def __init__(self, content):
         RuleTreeItem.__init__(self, content)
 
+    @property
+    def raw(self):
+        return super().raw
+
     def content(self, column):
         """return the content stored in this node"""
-        colNames = self.parent.parent.parent.rawContent
-        content = self.rawContent
+        colNames = self.parent.parent.parent.raw  # type:ignore
         if column == 0:
-            return content.name
-        if isinstance(content, ParameterRule):
+            return self.raw.name
+        if isinstance(self.raw, ParameterRule):
             if column == 1:
-                return content.parameter
+                return self.raw.parameter
         else:
-            if not hasattr(content.score, str(column)):
-                column = colNames[column]
-            return getattr(content.score, column)
+            _ = str(column)
+            if not hasattr(self.raw.score, _):
+                _ = colNames[column]
+            return getattr(self.raw.score, _)
         return ''
 
     def tooltip(self):
         """tooltip for rule: just the name of the ruleset"""
         ruleset = self.ruleset()
-        if self.rawContent.description:
+        if self.raw.description:
             return '<b>' + i18n(ruleset.name) + '</b><br><br>' + \
-                i18n(self.rawContent.description)
+                i18n(self.raw.description)
         return i18n(ruleset.name)
 
 
@@ -171,7 +183,7 @@ class RuleModel(TreeModel):
             item = index.internalPointer()
             if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
                 if index.column() == 1:
-                    if isinstance(item, RuleItem) and isinstance(item.rawContent, BoolRule):
+                    if isinstance(item, RuleItem) and isinstance(item.raw, BoolRule):
                         return ''
                 showValue = item.content(index.column())
                 if isinstance(showValue, str) and showValue.endswith('.0'):
@@ -208,7 +220,7 @@ class RuleModel(TreeModel):
         if index.column() != 1:
             return False
         item = index.internalPointer()
-        return isinstance(item, RuleItem) and isinstance(item.rawContent, BoolRule)
+        return isinstance(item, RuleItem) and isinstance(item.raw, BoolRule)
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
@@ -287,7 +299,7 @@ class EditableRuleModel(RuleModel):
         column = index.column()
         item = index.internalPointer()
         ruleset = item.ruleset()
-        content = item.rawContent
+        content = item.raw
         if role == Qt.ItemDataRole.EditRole:
             if isinstance(content, Ruleset) and column == 0:
                 oldName = content.name
@@ -321,7 +333,7 @@ class EditableRuleModel(RuleModel):
             return Qt.ItemFlag.ItemIsEnabled
         column = index.column()
         item = index.internalPointer()
-        content = item.rawContent
+        content = item.raw
         checkable = False
         if isinstance(content, Ruleset) and column == 0:
             mayEdit = True
@@ -436,7 +448,7 @@ class RuleTreeView(QTreeView):
         if row:
             item = row.internalPointer()
             assert isinstance(item, RulesetItem)
-            ruleset = item.rawContent.copyTemplate()
+            ruleset = item.raw.copyTemplate()
             self.model().appendRuleset(ruleset)
             self.rulesets.append(ruleset)
             self.selectionChanged(self.selectionModel().selection())
@@ -456,7 +468,7 @@ class RuleTreeView(QTreeView):
     def compareRow(self):
         """shows the difference between two rulesets"""
         rows = self.selectionModel().selectedRows()
-        ruleset = rows[0].internalPointer().rawContent
+        ruleset = rows[0].internalPointer().raw
         assert isinstance(ruleset, Ruleset)
         differ = RulesetDiffer([ruleset], self.rulesets)
         differ.show()
