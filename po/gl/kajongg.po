@@ -1,19 +1,19 @@
 # translation of kmj.po to galician
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
-#
 # mvillarino <mvillarino@users.sourceforge.net>, 2008, 2009.
 # Marce Villarino <mvillarino@users.sourceforge.net>, 2008, 2009, 2013, 2014.
 # marce villarino <mvillarino@users.sourceforge.net>, 2009.
 # Xosé <xosecalvo@gmail.com>, 2010, 2012.
 # Adrián Chaves Fernández <adriyetichaves@gmail.com>, 2012, 2015, 2017.
-# Adrián Chaves (Gallaecio) <adrian@chaves.io>, 2017, 2018, 2019.
+# Adrián Chaves (Gallaecio) <adrian@chaves.io>, 2017, 2018, 2019, 2023.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2022-01-31 00:41+0000\n"
-"PO-Revision-Date: 2019-11-26 22:49+0100\n"
+"PO-Revision-Date: 2023-04-30 16:11+0200\n"
 "Last-Translator: Adrián Chaves (Gallaecio) <adrian@chaves.io>\n"
 "Language-Team: Galician <proxecto@trasno.gal>\n"
 "Language: gl\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 19.08.3\n"
+"X-Generator: Lokalize 23.04.0\n"
 
 msgid "Preview"
 msgstr "Vista previa"
@@ -115,7 +115,7 @@ msgstr "Velocidade das animacións:"
 
 #: src/configdialog.py:61
 msgid "Use sounds if available"
-msgstr "Empregar sons, de estaren dispoñibeis."
+msgstr "Empregar sons, de estaren dispoñíbeis."
 
 #: src/configdialog.py:64
 msgid "Let others hear my voice"
@@ -152,8 +152,6 @@ msgid "Rule"
 msgstr "Regra"
 
 #: src/differ.py:123
-#, fuzzy
-#| msgid "Compare"
 msgctxt "@title:window"
 msgid "Compare"
 msgstr "Comparar"
@@ -184,9 +182,6 @@ msgid "Started"
 msgstr "Data de inicio"
 
 #: src/games.py:103
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Games"
 msgctxt "@title:window"
 msgid "Games"
 msgstr "Partidas"
@@ -270,53 +265,47 @@ msgstr "comezar co modo de demostración"
 
 #: src/kajongg.py:86
 msgid "login to HOST"
-msgstr "acceso a SERVIDOR"
+msgstr "acceso a HOST"
 
 #: src/kajongg.py:87
 msgid "start new TABLE"
-msgstr "comezar unha novo TABOLEIRO"
+msgstr "comezar unha novo TABLE"
 
 #: src/kajongg.py:88
-#, fuzzy
-#| msgid "join TABLE "
 msgid "join TABLE"
-msgstr "unirse ao TABOLEIRO "
+msgstr "unirse a TABLE"
 
 #: src/kajongg.py:89
-#, fuzzy
-#| msgid "use ruleset without asking"
 msgid "use RULESET without asking"
-msgstr "empregar o conxunto de regras sen preguntar"
+msgstr "usar RULESET sen preguntar"
 
 #: src/kajongg.py:90
-#, fuzzy
-#| msgid "play one ROUNDS rounds per game. Only for debugging!"
 msgid "play only ROUNDS rounds per game. Only for debugging!"
-msgstr "xogar ROUNDS roldas por partida. Só para depurar!"
+msgstr "xogar só ROUNDS roldas por partida. Só para depurar!"
 
 #: src/kajongg.py:91
 msgid "prefer PLAYER for next login"
-msgstr "preferir XOGADOR no seguinte acceso"
+msgstr "preferir PLAYER no seguinte acceso"
 
 #: src/kajongg.py:92
 msgid "use AI variant for human player in demo mode"
-msgstr "Empregar a variante AI para o xogador humano no modo de demostración."
+msgstr "usar a variante AI para o xogador humano no modo de demostración"
 
 #: src/kajongg.py:93
 msgid "write statistics to CSV"
-msgstr "Escribir as estatísticas en CSV."
+msgstr "escribir as estatísticas en CSV"
 
 #: src/kajongg.py:94
 msgid "show all available rulesets"
-msgstr "mostrar todas as regras dispoñíbeis."
+msgstr "mostrar todas as regras dispoñíbeis"
 
 #: src/kajongg.py:95
 msgid "for testing purposes: Initializes the random generator"
-msgstr "Para probas: inicializa o xerador aleatorio."
+msgstr "para probas: prepara o xerador aleatorio"
 
 #: src/kajongg.py:97
 msgid "show no graphical user interface. Intended only for testing"
-msgstr "mostrar a interface gráfica de usuario. Só para probas."
+msgstr "mostrar a interface gráfica de usuario. Só para probas"
 
 #: src/kajongg.py:98
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
@@ -365,10 +354,8 @@ msgid "Configure toolbars"
 msgstr "Configurar as barras de ferramentas"
 
 #: src/kdestub.py:354
-#, fuzzy
-#| msgid "Configure &Kajongg"
 msgid "Configure &Kajongg..."
-msgstr "Configurar &Kajongg"
+msgstr "Configurar &Kajongg…"
 
 #: src/kdestub.py:356 src/kdestub.py:1155
 msgid "Configure"
@@ -440,11 +427,8 @@ msgid "About Kajongg"
 msgstr "Sobre Kajongg"
 
 #: src/kdestub.py:1003
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Using versions %1"
 msgid "Version: %1"
-msgstr "Usando as versións %1"
+msgstr "Versión: %1"
 
 #: src/kdestub.py:1004
 msgid "Protocol version %1"
@@ -464,10 +448,8 @@ msgid "Using versions %1"
 msgstr "Usando as versións %1"
 
 #: src/kdestub.py:1026
-#, fuzzy
-#| msgid "Not using Python KDE bindings"
 msgid "Not using broken Python KDE bindings"
-msgstr "Non usar a adaptación para Python de KDE."
+msgstr "Non usar a adaptación rota para Python de KDE."
 
 #: src/kdestub.py:1045
 msgid ""
@@ -540,8 +522,6 @@ msgid "Ruleset:"
 msgstr "Regras:"
 
 #: src/login.py:388
-#, fuzzy
-#| msgid "Create User Account"
 msgctxt "@title:window"
 msgid "Create User Account"
 msgstr "Crear unha conta de usuario"
@@ -966,7 +946,7 @@ msgstr "non hai ningún enderezo de correo dispoñíbel"
 
 #: src/player.py:687
 msgid "%1 claiming MahJongg: She does not really have tile %2"
-msgstr "%1 cantou Mah Jongg: en realidade non ten a ficha %2"
+msgstr "%1 cantou MahJongg: en realidade non ten a ficha %2"
 
 #: src/player.py:696
 msgid ""
@@ -1013,6 +993,8 @@ msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
 msgstr ""
+"Hai %1 partidas rematadas e %2 sen rematar de %3, quere eliminar %3 aínda "
+"así? Tamén se eliminarán todas as partidas nas que xogase %3!"
 
 #: src/predefined.py:27
 msgid "Classical Chinese standard"
@@ -1111,7 +1093,7 @@ msgstr ""
 
 #: src/predefined.py:71
 msgid "Blessing of Heaven"
-msgstr "Benzón do Ceo"
+msgstr "Bendición do ceo"
 
 #: src/predefined.py:72
 msgid "East says Mah Jong with the unmodified dealt tiles"
@@ -1119,7 +1101,7 @@ msgstr "Leste canta Mah Jong coas fichas repartidas sen modificar"
 
 #: src/predefined.py:74
 msgid "Blessing of Earth"
-msgstr "Benzón da Terra"
+msgstr "Bendición da Terra"
 
 #: src/predefined.py:75
 msgid ""
@@ -1507,7 +1489,7 @@ msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
 msgstr ""
-"Todas as fichas da mesma cor. Pung ou Kond de 1 e 9, parella de 2, 5 ou 8 e "
+"Todas as fichas da mesma cor. Pung ou Kong de 1 e 9, parella de 2, 5 ou 8 e "
 "dous Chows dos valores restantes"
 
 #: src/predefined.py:317
@@ -1835,8 +1817,6 @@ msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 é demasiado pequeno, o valor mínimo é %3."
 
 #: src/rulesetselector.py:476
-#, fuzzy
-#| msgid "Customize rulesets"
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "Personalizar os conxuntos de regras"
@@ -1868,8 +1848,6 @@ msgid "Do you really want to abort this game?"
 msgstr "Seguro que queres interromper esta partida?"
 
 #: src/scoring.py:43
-#, fuzzy
-#| msgid "Swap Seats"
 msgctxt "@title:window"
 msgid "Swap Seats"
 msgstr "Intercambiar os asentos"
@@ -1887,8 +1865,6 @@ msgid "&Keep seat"
 msgstr "&Manter os sitios"
 
 #: src/scoring.py:60
-#, fuzzy
-#| msgid "Select four players"
 msgctxt "@title:window"
 msgid "Select four players"
 msgstr "Escoller catro xogadores"
@@ -1948,8 +1924,6 @@ msgid "Scores for game <numid>%1</numid>"
 msgstr "Puntuacións da partida <numid>%1</numid>"
 
 #: src/scoringdialog.py:559
-#, fuzzy
-#| msgid "Explain Scores"
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "Explicación das puntuacións"
@@ -1993,8 +1967,6 @@ msgid "gets %1 points"
 msgstr "obtén %1 puntos"
 
 #: src/scoringdialog.py:799
-#, fuzzy
-#| msgid "Scoring for this Hand"
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
 msgstr "Puntuación desta man"
@@ -2110,7 +2082,7 @@ msgstr "Rematou a partida <numid>%1</numid>!"
 
 #: src/servertable.py:677
 msgid "%1 wrongly said %2 for meld %3"
-msgstr "%1 cantou %2 equivocadamente para a combinación %3."
+msgstr "%1 cantou %2 mal para a combinación %3."
 
 #: src/servertable.py:682
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
@@ -2118,11 +2090,11 @@ msgstr "%1 dixo incorrectamente %2: di ter %3 fichas escondidas pero só ten %4"
 
 #: src/servertable.py:720
 msgid "declareKong:%1 wrongly said Kong for meld %2"
-msgstr "declareKong: %1 cantou kong equivocadamente para a combinación %2."
+msgstr "declareKong: %1 cantou Kong mal para a combinación %2."
 
 #: src/servertable.py:768
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
-msgstr "%1 cantou Mah Jongg: non é unha man gañadora: %2"
+msgstr "%1 cantou MahJongg: non é unha man gañadora: %2"
 
 #: src/sound.py:58
 msgid "No voices will be heard because the program %1 is missing"
