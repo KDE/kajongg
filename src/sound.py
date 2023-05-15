@@ -238,9 +238,9 @@ class Voice(StrMixin):
                     if os.path.exists(os.path.join(dirpath, 's1.ogg')):
                         result.append(Voice(dirpath))
             group = Internal.kajonggrc.group('Locale')
-            prefLanguages = uniqueList(
+            _ = uniqueList(
                 ':'.join(['local', str(group.readEntry('Language')), 'en_US']).split(':'))
-            prefLanguages = dict(enumerate(prefLanguages))
+            prefLanguages = dict((x[1], x[0]) for x in enumerate(_))
             result = sorted(
                 result, key=lambda x: prefLanguages.get(x.language(), 9999))
             if Debug.sound:
