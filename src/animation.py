@@ -58,10 +58,9 @@ class Animation(QPropertyAnimation, ReprMixin):
             # before the last move from server is executed
             return
         if graphicsObject.debug_name() in Debug.animation or Debug.animation == 'all':
-            pName = self.pName().decode()
             logDebug(
                 '%s: change endValue for %s: %s->%s  %s' % (
-                    self.ident(), pName,
+                    self.ident(), self.pName(),
                     self.formatValue(self.endValue()),
                     self.formatValue(endValue), graphicsObject))
         QPropertyAnimation.setEndValue(self, endValue)
