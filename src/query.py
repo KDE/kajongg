@@ -396,16 +396,6 @@ class PrepareDB:
         finally:
             Internal.db.close(silent=True)
 
-    def updateToVersion4_13_0(self):
-        """as the name says"""
-        self.__upgradeFromLegacy()
-        # add general.schemaversion
-        Query('ALTER TABLE general add schemaversion text')
-        Query('UPDATE general set schemaversion="001.001.001"')
-        # this makes finding suspended games much faster in the presence
-        # of many test games (with autoplay=1)
-        self.createIndex('idxautoplay', 'game(autoplay)')
-
     @classmethod
     def sqlForCreateTable(cls, table):
         """the SQL command for creating 'table'"""
@@ -531,30 +521,6 @@ class PrepareDB:
                     'insert into rule select * from temp',
                     'drop table temp']):
                 Query(statement)
-
-    def __upgradeFromLegacy(self):
-        """upgrade versions prior to 4.13.0"""
-        self.createIndex('idxgame', 'score(game)')
-        if not Internal.db.tableHasField('game', 'autoplay'):
-            Query('ALTER TABLE game add autoplay integer default 0')
-        if not Internal.db.tableHasField('score', 'penalty'):
-            Query('ALTER TABLE score add penalty integer default 0')
-            Query("UPDATE score SET penalty=1 WHERE manualrules LIKE "
-                  "'False Naming%' OR manualrules LIKE 'False Decl%'")
-        if Internal.db.tableHasField('player', 'host'):
-            self.cleanPlayerTable()
-        if Internal.isServer:
-            if not Internal.db.tableHasField('player', 'password'):
-                Query('ALTER TABLE player add password text')
-        else:
-            self.createTable('passwords')
-            if not Internal.db.tableHasField('server', 'lastruleset'):
-                Query('alter table server add lastruleset integer')
-        if Internal.db.tableHasField('game', 'server'):
-            self.removeGameServer()
-        if not Internal.db.tableHasField('score', 'notrotated'):
-            Query('ALTER TABLE score add notrotated integer default 0')
-        self.removeUsedRuleset()
 
     @staticmethod
     def __generateDbIdent():
