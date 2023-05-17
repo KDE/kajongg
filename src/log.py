@@ -217,7 +217,7 @@ def logDebug(msg, showStack=False, withGamePrefix=True, btIndent=None):
     if btIndent is set, message is indented by depth(backtrace)-btIndent"""
     if btIndent:
         depth = traceback.extract_stack()
-        msg = ' ' * (len(depth) - btIndent) + msg
+        msg = ' ' * (len(depth) - btIndent) + str(msg)
     return logMessage(msg, logging.DEBUG, False, showStack=showStack, withGamePrefix=withGamePrefix)
 
 
