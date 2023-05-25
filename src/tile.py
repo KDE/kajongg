@@ -124,6 +124,7 @@ class Tile(ReprMixin):
 
         self.char, self.value = self.parse_arg1(arg1)
 
+        self.key:int
         try:
             self.key = 1 + self.hashTable.index(Tile.__str__(self)) // 2
         except ValueError:
@@ -390,14 +391,6 @@ class Tiles:
                     chows.append(chow)
         return chows
 
-    def _compute_hash(self):
-        """usable for sorting"""
-        result = 0
-        factor = len(Tile.hashTable) // 2
-        for tile in self:
-            result = result * factor + tile.key
-        return result
-
     def __str__(self):
         """the content"""
         return str(''.join(str(x) for x in self))
@@ -424,9 +417,6 @@ class TileList(list, Tiles):
         if self:
             self.isRest = True
 
-    def __hash__(self):
-        return self._compute_hash()
-
     def __add__(self, other):
         result = TileList(self)
         result.extend(self._parseArgs(other))
@@ -448,6 +438,14 @@ class TileTuple(tuple, Tiles):
     def __init__(self, iterable=None):  # pylint: disable=unused-argument
         tuple.__init__(self)
         Tiles.__init__(self)
+
+    def _compute_hash(self):
+        """usable for sorting"""
+        result = 0
+        factor = len(Tile.hashTable) // 2
+        for tile in self:
+            result = result * factor + tile.key
+        return result
 
     def __hash__(self):
         return self._hash
