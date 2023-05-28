@@ -1,6 +1,6 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
-# Tommi Nieminen <translator@legisign.org>, 2011, 2014, 2015, 2016, 2018, 2021.
+# Tommi Nieminen <translator@legisign.org>, 2011, 2014, 2015, 2016, 2018, 2021, 2023.
 # Lasse Liehu <lasse.liehu@gmail.com>, 2012, 2013, 2014.
 #
 # KDE Finnish translation sprint participants:
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2022-01-31 00:41+0000\n"
-"PO-Revision-Date: 2021-07-06 15:49+0300\n"
+"PO-Revision-Date: 2023-05-15 18:57+0300\n"
 "Last-Translator: Tommi Nieminen <translator@legisign.org>\n"
 "Language-Team: Finnish <kde-i18n-doc@kde.org>\n"
 "Language: fi\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-POT-Import-Date: 2012-12-01 22:23:59+0000\n"
-"X-Generator: Lokalize 20.04.2\n"
+"X-Generator: Lokalize 23.04.1\n"
 
 msgid "Preview"
 msgstr "Esikatselu"
@@ -181,9 +181,6 @@ msgid "Started"
 msgstr "Käynnistynyt"
 
 #: src/games.py:103
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Games"
 msgctxt "@title:window"
 msgid "Games"
 msgstr "Pelit"
@@ -275,22 +272,16 @@ msgid "start new TABLE"
 msgstr "aloita uusi PÖYTÄ"
 
 #: src/kajongg.py:88
-#, fuzzy
-#| msgid "join TABLE "
 msgid "join TABLE"
 msgstr "liity PÖYTÄän "
 
 #: src/kajongg.py:89
-#, fuzzy
-#| msgid "use ruleset without asking"
 msgid "use RULESET without asking"
-msgstr "käytä säännöstöä kysymättä"
+msgstr "käytä kysymättä SÄÄNNÖSTÖä"
 
 #: src/kajongg.py:90
-#, fuzzy
-#| msgid "play one ROUNDS rounds per game. Only for debugging!"
 msgid "play only ROUNDS rounds per game. Only for debugging!"
-msgstr "pelaa KIERROS kierrosta per peli. Vain virheenpaikannusta varten!"
+msgstr "pelaa KIERROS kierrosta per peli. Vain virheenpaikannukseen!"
 
 #: src/kajongg.py:91
 msgid "prefer PLAYER for next login"
@@ -458,10 +449,8 @@ msgid "Using versions %1"
 msgstr "Käytetään versiota %1"
 
 #: src/kdestub.py:1026
-#, fuzzy
-#| msgid "Not using Python KDE bindings"
 msgid "Not using broken Python KDE bindings"
-msgstr "Ei käytetä Pythonin KDE-sidoksia"
+msgstr "Ei käytetä Pythonin rikkonaisia KDE-sidoksia"
 
 #: src/kdestub.py:1045
 msgid ""
@@ -1013,6 +1002,8 @@ msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
 msgstr ""
+"Pelaajalla %3 on %1 valmista ja %2 kesken olevaa peliä: poistetaanko %3 "
+"silti? Tämä poistaa myös kaikki pelaajan %3 pelaamat pelit!"
 
 #: src/predefined.py:27
 msgid "Classical Chinese standard"
@@ -1957,7 +1948,7 @@ msgstr "%1"
 
 #: src/scoringdialog.py:592
 msgid "Manual score for %1: %2 points"
-msgstr ""
+msgstr "Käsinlaskenta – %1: %2 pistettä"
 
 #: src/scoringdialog.py:663
 msgid "Penalty"
