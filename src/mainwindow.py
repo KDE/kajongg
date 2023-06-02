@@ -55,12 +55,6 @@ except ImportError as importError:
     NOTFOUND.append('Please install PyQt5: %s' % importError)
 
 try:
-    from zope.interface import implements  # pylint: disable=unused-import
-except ImportError as importError:
-    NOTFOUND.append('Package python-zope-interface missing: %s' % importError)
-
-
-try:
     from twisted.spread import pb # pylint: disable=unused-import
     from twisted.internet.error import ReactorNotRunning
 except ImportError as importError:

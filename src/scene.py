@@ -7,8 +7,6 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from zope.interface import implements  # pylint: disable=unused-import
-
 from twisted.internet.defer import succeed
 
 from log import logDebug, id4
