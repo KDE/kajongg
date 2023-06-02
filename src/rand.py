@@ -79,7 +79,7 @@ class CountingRandom(Random):
         with CountRandomCalls(self, 'sample({}, {})'.format(population, k)):
             return Random.sample(self, population, k, counts=counts)
 
-    def shuffle(self, x, random=None):
+    def shuffle(self, x):
         """add debug output to shuffle. Shuffles list x in place."""
         with CountRandomCalls(self, 'shuffle({})'.format(x)):
-            Random.shuffle(self, x, random)
+            Random.shuffle(self, x)
