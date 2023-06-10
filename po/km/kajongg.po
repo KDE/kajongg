@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2022-01-31 00:41+0000\n"
+"POT-Creation-Date: 2023-06-10 00:45+0000\n"
 "PO-Revision-Date: 2013-01-02 09:50+0700\n"
 "Last-Translator: sutha <sutha@khmeros.info>\n"
 "Language-Team: Khmer <support@khmeros>\n"
@@ -599,7 +599,7 @@ msgstr "អ្នក​មិន​បាន​តភ្ជាប់​បណ្
 msgid "Please try again"
 msgstr "សូម​ព្យាយាម​ម្ដងទៀត"
 
-#: src/mainwindow.py:501
+#: src/mainwindow.py:495
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Score Manual Game"
@@ -607,12 +607,12 @@ msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "ល្បែង​ដាក់​ពិន្ទុ​ដោយដៃ"
 
-#: src/mainwindow.py:503
+#: src/mainwindow.py:497
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "ល្បែង​លេង​ដោយដៃ"
 
-#: src/mainwindow.py:506
+#: src/mainwindow.py:500
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "&Score a manual game."
@@ -620,12 +620,12 @@ msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "ល្បែង​ដាក់​ពិន្ទុ​ដោយ​ដៃ ។"
 
-#: src/mainwindow.py:508
+#: src/mainwindow.py:502
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "លេង"
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:505
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Start a new game."
@@ -633,7 +633,7 @@ msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "ចាប់ផ្ដើម​ល្បែង​ថ្មី ។"
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:507
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Abort Game"
@@ -641,7 +641,7 @@ msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "បោះបង់​ល្បែង"
 
-#: src/mainwindow.py:517
+#: src/mainwindow.py:511
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Abort the current game."
@@ -649,7 +649,7 @@ msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "បោះបង់​ល្បែង​បច្ចុប្បន្ន ។"
 
-#: src/mainwindow.py:519
+#: src/mainwindow.py:513
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
@@ -657,12 +657,12 @@ msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/mainwindow.py:522
+#: src/mainwindow.py:516
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "អ្នកលេង"
 
-#: src/mainwindow.py:525
+#: src/mainwindow.py:519
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "define your players."
@@ -670,19 +670,19 @@ msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "កំណត់​អ្នកលេង​របស់អ្នក ។"
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:521
 #, fuzzy
 #| msgid "Rulesets"
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "សំណុំ​​ក្បួន​"
 
-#: src/mainwindow.py:530
+#: src/mainwindow.py:524
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr ""
 
-#: src/mainwindow.py:534
+#: src/mainwindow.py:528
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Change Visual Angle"
@@ -690,12 +690,12 @@ msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "ផ្លាស់​ប្ដូរ​មុំ​ចក្ខុ"
 
-#: src/mainwindow.py:535
+#: src/mainwindow.py:529
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "មុំ"
 
-#: src/mainwindow.py:538
+#: src/mainwindow.py:532
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Change the visual appearance of the tiles."
@@ -703,12 +703,12 @@ msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "ផ្លាស់ប្ដូរ​រូបរាង​ក្រឡាក្បឿង ។"
 
-#: src/mainwindow.py:542
+#: src/mainwindow.py:536
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr ""
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:539
 #, fuzzy
 #| msgctxt "kajongg @action:inmenu"
 #| msgid "&Score Table"
@@ -716,17 +716,17 @@ msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "តារាង​ពិន្ទុ"
 
-#: src/mainwindow.py:547
+#: src/mainwindow.py:541
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "ពិន្ទុ"
 
-#: src/mainwindow.py:549
+#: src/mainwindow.py:543
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "បង្ហាញ ឬ​លាក់​តារាង​ពិន្ទុ​សម្រាប់​ល្បែង​បច្ចុប្បន្ន ។"
 
-#: src/mainwindow.py:551
+#: src/mainwindow.py:545
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Explain Scores"
@@ -734,12 +734,12 @@ msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "ពន្យល់​អំពី​ពិន្ទុ"
 
-#: src/mainwindow.py:552
+#: src/mainwindow.py:546
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "ពន្យល់"
 
-#: src/mainwindow.py:554
+#: src/mainwindow.py:548
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Explain the scoring for all players in the current game."
@@ -747,7 +747,7 @@ msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "ពន្យល់​អំពី​ការ​ដាក់​ពិន្ទុ​សម្រាប់​អ្នកលេង​ទាំងអស់​នៅ​ក្នុង​ល្បែង​បច្ចុប្បន្ន ។"
 
-#: src/mainwindow.py:556
+#: src/mainwindow.py:550
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Demo Mode"
@@ -755,7 +755,7 @@ msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "របៀប​បង្ហាញ​សាក​ល្បង"
 
-#: src/mainwindow.py:559
+#: src/mainwindow.py:553
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid ""
@@ -764,11 +764,11 @@ msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr "អនុញ្ញាត​ឲ្យ​កុំព្យូទ័រ​គ្រប់គ្រង​អ្នក ។ ចាប់ផ្ដើម​ល្បែង​មូលដ្ឋាន​ថ្មី ប្រសិនបើ​ចាំបាច់ ។"
 
-#: src/mainwindow.py:561
+#: src/mainwindow.py:555
 msgid "C&hat"
 msgstr "ជជែក"
 
-#: src/mainwindow.py:564
+#: src/mainwindow.py:558
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Chat with the other players."
@@ -1963,7 +1963,7 @@ msgstr "យកចេញ"
 msgid "&Close"
 msgstr ""
 
-#: src/scene.py:367 src/scene.py:500
+#: src/scene.py:365 src/scene.py:498
 msgid "Do you really want to abort this game?"
 msgstr "តើ​អ្នក​ពិត​ជា​ចង់​បោះ​បង់​ល្បែង​នេះ​​ឬ​ ?"
 
