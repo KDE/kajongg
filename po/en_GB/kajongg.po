@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2022-01-31 00:41+0000\n"
+"POT-Creation-Date: 2023-06-11 02:40+0000\n"
 "PO-Revision-Date: 2022-02-19 12:08+0000\n"
 "Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
 "Language-Team: British English <kde-l10n-en_gb@kde.org>\n"
@@ -557,131 +557,131 @@ msgstr "Login to server %1 failed: You have no network connection"
 msgid "Please try again"
 msgstr "Please try again"
 
-#: src/mainwindow.py:501
+#: src/mainwindow.py:495
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "&Score Manual Game"
 
-#: src/mainwindow.py:503
+#: src/mainwindow.py:497
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Manual Game"
 
-#: src/mainwindow.py:506
+#: src/mainwindow.py:500
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "&Score a manual game."
 
-#: src/mainwindow.py:508
+#: src/mainwindow.py:502
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Play"
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:505
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Start a new game."
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:507
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "&Abort Game"
 
-#: src/mainwindow.py:517
+#: src/mainwindow.py:511
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Abort the current game."
 
-#: src/mainwindow.py:519
+#: src/mainwindow.py:513
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "&Quit Kajongg"
 
-#: src/mainwindow.py:522
+#: src/mainwindow.py:516
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Players"
 
-#: src/mainwindow.py:525
+#: src/mainwindow.py:519
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "define your players."
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:521
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "&Rulesets"
 
-#: src/mainwindow.py:530
+#: src/mainwindow.py:524
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "customise rulesets."
 
-#: src/mainwindow.py:534
+#: src/mainwindow.py:528
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "&Change Visual Angle"
 
-#: src/mainwindow.py:535
+#: src/mainwindow.py:529
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Angle"
 
-#: src/mainwindow.py:538
+#: src/mainwindow.py:532
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Change the visual appearance of the tiles."
 
-#: src/mainwindow.py:542
+#: src/mainwindow.py:536
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "F&ull Screen Mode"
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:539
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&Score Table"
 
-#: src/mainwindow.py:547
+#: src/mainwindow.py:541
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "&Scores"
 
-#: src/mainwindow.py:549
+#: src/mainwindow.py:543
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Show or hide the score table for the current game."
 
-#: src/mainwindow.py:551
+#: src/mainwindow.py:545
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "&Explain Scores"
 
-#: src/mainwindow.py:552
+#: src/mainwindow.py:546
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "&Explain"
 
-#: src/mainwindow.py:554
+#: src/mainwindow.py:548
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Explain the scoring for all players in the current game."
 
-#: src/mainwindow.py:556
+#: src/mainwindow.py:550
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "&Demo Mode"
 
-#: src/mainwindow.py:559
+#: src/mainwindow.py:553
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr "Let the computer take over for you. Start a new local game if needed."
 
-#: src/mainwindow.py:561
+#: src/mainwindow.py:555
 msgid "C&hat"
 msgstr "C&hat"
 
-#: src/mainwindow.py:564
+#: src/mainwindow.py:558
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Chat with the other players."
@@ -1832,7 +1832,7 @@ msgstr "&Remove"
 msgid "&Close"
 msgstr "&Close"
 
-#: src/scene.py:367 src/scene.py:500
+#: src/scene.py:365 src/scene.py:498
 msgid "Do you really want to abort this game?"
 msgstr "Do you really want to abort this game?"
 
