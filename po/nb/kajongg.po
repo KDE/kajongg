@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2022-01-31 00:41+0000\n"
+"POT-Creation-Date: 2023-06-10 00:45+0000\n"
 "PO-Revision-Date: 2014-01-07 17:53+0100\n"
 "Last-Translator: Bjørn Steensrud <bjornst@skogkatt.homelinux.org>\n"
 "Language-Team: Norwegian Bokmål <l10n-no@lister.huftis.org>\n"
@@ -552,132 +552,132 @@ msgstr ""
 msgid "Please try again"
 msgstr "Forsøk igjen"
 
-#: src/mainwindow.py:501
+#: src/mainwindow.py:495
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "Poengberegning for manuelt &spill"
 
-#: src/mainwindow.py:503
+#: src/mainwindow.py:497
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Manuelt spill"
 
-#: src/mainwindow.py:506
+#: src/mainwindow.py:500
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "Beregn poeng for et manuelt &spill."
 
-#: src/mainwindow.py:508
+#: src/mainwindow.py:502
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Spill"
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:505
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Start et nytt spill."
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:507
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "&Avbryt spillet"
 
-#: src/mainwindow.py:517
+#: src/mainwindow.py:511
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Avbryt dette spillet."
 
-#: src/mainwindow.py:519
+#: src/mainwindow.py:513
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "&Avslutt Kajongg"
 
-#: src/mainwindow.py:522
+#: src/mainwindow.py:516
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Spillere"
 
-#: src/mainwindow.py:525
+#: src/mainwindow.py:519
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "definer dine spillere."
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:521
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "&Regelsett"
 
-#: src/mainwindow.py:530
+#: src/mainwindow.py:524
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "tilpass regelsett."
 
-#: src/mainwindow.py:534
+#: src/mainwindow.py:528
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "&Endre synsvinkel"
 
-#: src/mainwindow.py:535
+#: src/mainwindow.py:529
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Vinkel"
 
-#: src/mainwindow.py:538
+#: src/mainwindow.py:532
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Endre visuelt utseende på brikkene."
 
-#: src/mainwindow.py:542
+#: src/mainwindow.py:536
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "F&ullskjermmodus"
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:539
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&Poengtabell"
 
-#: src/mainwindow.py:547
+#: src/mainwindow.py:541
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "Poengsummer"
 
-#: src/mainwindow.py:549
+#: src/mainwindow.py:543
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Vis eller skjul poengtavla for dette spillet."
 
-#: src/mainwindow.py:551
+#: src/mainwindow.py:545
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "&Forklar poengsetting"
 
-#: src/mainwindow.py:552
+#: src/mainwindow.py:546
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "&Forklar"
 
-#: src/mainwindow.py:554
+#: src/mainwindow.py:548
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Forklar poengsettingen for alle deltakere i dette spillet."
 
-#: src/mainwindow.py:556
+#: src/mainwindow.py:550
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "&Demomodus"
 
-#: src/mainwindow.py:559
+#: src/mainwindow.py:553
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr ""
 "La datamaskinen overta for deg. Start et nytt lokalt spill hvis det trengs."
 
-#: src/mainwindow.py:561
+#: src/mainwindow.py:555
 msgid "C&hat"
 msgstr "&Prat"
 
-#: src/mainwindow.py:564
+#: src/mainwindow.py:558
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Prat med de andre spillerne."
@@ -1815,7 +1815,7 @@ msgstr ""
 msgid "&Close"
 msgstr ""
 
-#: src/scene.py:367 src/scene.py:500
+#: src/scene.py:365 src/scene.py:498
 msgid "Do you really want to abort this game?"
 msgstr "Er du sikker på at du vil avbryte dette splllet?"
 
