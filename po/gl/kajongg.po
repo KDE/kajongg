@@ -95,7 +95,7 @@ msgstr "Nova"
 
 #: src/configdialog.py:42
 msgid "Show tile shadows"
-msgstr "Mostrar as sombras das fichas."
+msgstr "Amosar as sombras das fichas."
 
 #: src/configdialog.py:45
 msgid "Rearrange undisclosed tiles to melds"
@@ -103,7 +103,7 @@ msgstr "Redistribuír as fichas sen descubrir aos grupos"
 
 #: src/configdialog.py:48
 msgid "Show only possible actions"
-msgstr "Mostrar só as accións posíbeis."
+msgstr "Amosar só as accións posíbeis."
 
 #: src/configdialog.py:51
 msgid "Propose what to do"
@@ -115,7 +115,7 @@ msgstr "Velocidade das animacións:"
 
 #: src/configdialog.py:61
 msgid "Use sounds if available"
-msgstr "Empregar sons, de estaren dispoñíbeis."
+msgstr "Usar sons, de estaren dispoñíbeis."
 
 #: src/configdialog.py:64
 msgid "Let others hear my voice"
@@ -201,7 +201,7 @@ msgstr "&Eliminar"
 
 #: src/games.py:132
 msgid "Show only pending games"
-msgstr "Mostrar só as partidas pendentes."
+msgstr "Amosar só as partidas pendentes."
 
 #: src/games.py:235
 msgid ""
@@ -297,7 +297,7 @@ msgstr "escribir as estatísticas en CSV"
 
 #: src/kajongg.py:94
 msgid "show all available rulesets"
-msgstr "mostrar todas as regras dispoñíbeis"
+msgstr "amosar todas as regras dispoñíbeis"
 
 #: src/kajongg.py:95
 msgid "for testing purposes: Initializes the random generator"
@@ -305,15 +305,15 @@ msgstr "para probas: prepara o xerador aleatorio"
 
 #: src/kajongg.py:97
 msgid "show no graphical user interface. Intended only for testing"
-msgstr "mostrar a interface gráfica de usuario. Só para probas"
+msgstr "amosar a interface gráfica de usuario. Só para probas"
 
 #: src/kajongg.py:98
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
-msgstr "Empregar un servidor dedicado que escoite polo SOCKET. Só para probas."
+msgstr "Usar un servidor dedicado que escoite polo SOCKET. Só para probas."
 
 #: src/kajongg.py:99
 msgid "use a dedicated server listening on PORT. Intended only for testing"
-msgstr "Empregar un servidor dedicado que escoite polo PORTO. Só para probas."
+msgstr "Usar un servidor dedicado que escoite polo PORTO. Só para probas."
 
 #: src/kdestub.py:251
 msgid "&OK"
@@ -338,12 +338,12 @@ msgstr "Valores &predeterminados"
 #: src/kdestub.py:333
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
-msgstr "Mostrar a barra de &estado"
+msgstr "Amosar a barra de &estado"
 
 #: src/kdestub.py:339
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
-msgstr "Mostrar a barra de &ferramentas"
+msgstr "Amosar a barra de &ferramentas"
 
 #: src/kdestub.py:345
 msgid "Configure Tool&bars..."
@@ -457,7 +457,7 @@ msgid ""
 "Jongg solitaire please use the application kmahjongg."
 msgstr ""
 "Este é o Mah Jongg clásico para catro xogadores. Se está á busca do "
-"solitario Mah Jongg empregue a aplicación kmahjongg."
+"solitario Mah Jongg use a aplicación kmahjongg."
 
 #: src/kdestub.py:1064
 msgid ""
@@ -656,7 +656,7 @@ msgstr "&Puntuacións"
 #: src/mainwindow.py:543
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
-msgstr "Mostrar ou agochar a táboa de puntuacións desta partida."
+msgstr "Amosar ou agochar a táboa de puntuacións desta partida."
 
 #: src/mainwindow.py:545
 msgctxt "@action:inmenu"
@@ -926,7 +926,7 @@ msgstr ""
 
 #: src/mjresource.py:104
 msgid "cannot find %1, using default"
-msgstr "non se pode atopar %1; emprégase o predeterminado"
+msgstr "non se pode atopar %1; úsase o predeterminado"
 
 #: src/mjresource.py:114
 msgid "unknown name"
@@ -1178,8 +1178,7 @@ msgstr "Tamaño da caixa de Kong"
 
 #: src/predefined.py:124
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
-msgstr ""
-"A Caixa Kong emprégase para as fichas de substitución ao declarar kongs"
+msgstr "A Caixa Kong úsase para as fichas de substitución ao declarar kongs"
 
 #: src/predefined.py:126
 msgid "Play with Bonus Tiles"
@@ -1796,8 +1795,8 @@ msgid ""
 "you get\n"
 "into a situation where you have to pay a penalty"
 msgstr ""
-"As penalizacións aplícaas manualmente o usuario. Só se empregan para os "
-"xogos con puntuación.\n"
+"As penalizacións aplícaas manualmente o usuario. Só se usan para os xogos "
+"con puntuación.\n"
 "Cando se xoga contra o computador ou por Internet, Kajongg non permite que\n"
 "quedes nunha situación na que teñas que pagar unha penalización"
 
