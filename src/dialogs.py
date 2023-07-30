@@ -31,7 +31,9 @@ class IgnoreEscape:
         else:
             # pass on to the first declared ancestor class which
             # currently is either KDialog or QDialog
-            self.__class__.__mro__[1].keyPressEvent(self, event)
+            _ = self.__class__.__mro__[1]
+            assert isinstance(_, QDialog), 'dialog is:{} {}'.format(type(_), repr(_))
+            _.keyPressEvent(self, event)
 
 
 class KDialogIgnoringEscape(KDialog, IgnoreEscape):
