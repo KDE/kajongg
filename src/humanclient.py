@@ -178,7 +178,7 @@ class ClientDialog(QDialog):
         else:
             for btn in self.buttons:
                 if str(event.text()).upper() == btn.message.shortcut:
-                    self.selectButton(btn)
+                    self.selectButton(btn.message)
                     event.accept()
                     return
             QDialog.keyPressEvent(self, event)
@@ -252,7 +252,7 @@ class ClientDialog(QDialog):
         myTurn = game.activePlayer == game.myself
         prefButton = self.proposeAction()
         if game.autoPlay:
-            self.selectButton(prefButton)
+            self.selectButton(prefButton.message)
             return
         prefButton.setFocus()
 
@@ -330,21 +330,18 @@ class ClientDialog(QDialog):
                 self.selectButton()
                 pBar.setVisible(False)
 
-    def selectButton(self, button=None):
+    def selectButton(self, message=None):
         """select default answer. button may also be of type Message."""
         if self.answered:
             # sometimes we get this event twice
             return
-        if button is None:
-            button = self.focusWidget()
-        if isinstance(button, Message):
-            assert any(x.message == button for x in self.buttons)
-            answer = button
-        else:
-            answer = button.message
-        if not self.client.game.myself.sayable[answer]:
+        if message is None:
+            message = self.focusWidget().message
+        assert any(x.message == message for x in self.buttons)
+        assert self.client.game
+        if not self.client.game.myself.sayable[message]:
             self.proposeAction().setFocus() # go back to default action
-            self.sorry = Sorry(i18n('You cannot say %1', answer.i18nName))
+            self.sorry = Sorry(i18n('You cannot say %1', message.i18nName))
             return
         self.timer.stop()
         self.answered = True
@@ -352,13 +349,13 @@ class ClientDialog(QDialog):
             self.sorry.cancel()
         self.sorry = None
         Internal.scene.clientDialog = None
-        self.deferred.callback(answer)
+        self.deferred.callback(message)
 
     def selectedAnswer(self, unusedChecked):
         """the user clicked one of the buttons"""
         game = self.client.game
         if game and not game.autoPlay:
-            self.selectButton(self.sender())
+            self.selectButton(self.sender().message)
 
 
 class HumanClient(Client):
