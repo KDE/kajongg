@@ -71,12 +71,14 @@ class Hand(ReprMixin):
             if cacheKey in cache:
                 result = cache[cacheKey]
                 player.cacheHits += 1
+                result.is_from_cache = True
                 return result
             player.cacheMisses += 1
             result = object.__new__(cls)
             cache[cacheKey] = result
         else:
             result = object.__new__(cls)
+        result.is_from_cache = False
         return result
 
     def __init__(self, player, string=None, melds=None, unusedTiles=None, bonusTiles=None,  # pylint: disable=too-many-arguments
@@ -84,14 +86,13 @@ class Hand(ReprMixin):
         """evaluate string for player. rules are to be applied in any case"""
 
         # pylint: disable=too-many-branches, too-many-statements
-        if hasattr(self, 'string'):
-            # I am from cache
+        self.is_from_cache:bool
+        if self.is_from_cache:
             return
 
         # shortcuts for speed:
         self._player = weakref.ref(player)
         self.ruleset = player.game.ruleset
-        self.string = string
         self.__robbedTile = Tile.none
         self.prevHand = prevHand
         self.__won = None
@@ -126,6 +127,8 @@ class Hand(ReprMixin):
                 self.__lastMeld= lastMeld
             self.__announcements = announcements or set()
             self.tiles = TileTuple(chain(self.melds, self.unusedTiles))
+            string = self.newString()
+        self.string = string
 
         self.__precompute()
 
