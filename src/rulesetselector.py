@@ -458,7 +458,7 @@ class RuleTreeView(QTreeView):
         rows = self.selectionModel().selectedRows()
         ruleset = rows[0].internalPointer().rawContent
         assert isinstance(ruleset, Ruleset)
-        differ = RulesetDiffer(ruleset, self.rulesets)
+        differ = RulesetDiffer([ruleset], self.rulesets)
         differ.show()
         self.differs.append(differ)
 

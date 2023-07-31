@@ -361,7 +361,7 @@ class TableList(QWidget):
     def compareRuleset(self):
         """compare the ruleset of this table against ours"""
         table = self.selectedTable()
-        self.differ = RulesetDiffer(table.ruleset, Ruleset.availableRulesets())
+        self.differ = RulesetDiffer([table.ruleset], Ruleset.availableRulesets())
         self.differ.show()
 
     def startGame(self):
