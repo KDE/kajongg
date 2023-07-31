@@ -117,19 +117,20 @@ class Score(ReprMixin):
 
     def total(self):
         """the total score"""
-        score = int(self.points * (2 ** self.doubles))
+        result = int(self.points * (2 ** self.doubles))
         if self.limits:
             if self.limits >= 1:
                 self.points = self.doubles = 0
-            elif self.limits * self.ruleset.limit >= score:
+            elif self.limits * self.ruleset.limit >= result:
                 self.points = self.doubles = 0
             else:
                 self.limits = 0
         if self.limits:
             return int(round(self.limits * self.ruleset.limit))
-        if score and not self.ruleset.roofOff:
-            score = min(score, self.ruleset.limit)
-        return score
+        if result and self.ruleset:
+            if not self.ruleset.roofOff:
+                result = int(min(result, self.ruleset.limit))
+        return result
 
     def __int__(self):
         """the total score"""
