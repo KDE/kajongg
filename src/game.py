@@ -207,7 +207,7 @@ class Game:
         self.client = client
         self.rotated = 0
         self.notRotated = 0  # counts hands since last rotation
-        self.ruleset = None
+        self.ruleset = ruleset
         self.roundsFinished = 0
         self._currentHandId = None
         self._prevHandId = None
@@ -231,7 +231,7 @@ class Game:
         self.activePlayer = None
         self.__winner = None
         self._setGameId()
-        self.__useRuleset(ruleset)
+        self.__loadRuleset()
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
@@ -461,9 +461,8 @@ class Game:
         Query("update game set starttime=?,seed=?,autoplay=?,"
               "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", tuple(args))
 
-    def __useRuleset(self, ruleset):
+    def __loadRuleset(self):
         """use a copy of ruleset for this game, reusing an existing copy"""
-        self.ruleset = ruleset
         self.ruleset.load()
         if Internal.db:
             # only if we have a DB open. False in scoringtest.py
