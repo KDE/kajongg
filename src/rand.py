@@ -79,7 +79,13 @@ class CountingRandom(Random):
         with CountRandomCalls(self, 'sample({}, {})'.format(population, k)):
             return Random.sample(self, population, k, counts=counts)
 
-    def shuffle(self, x):
+    def shuffle(self, x, random=None):
         """add debug output to shuffle. Shuffles list x in place."""
         with CountRandomCalls(self, 'shuffle({})'.format(x)):
-            Random.shuffle(self, x)  # pylint:disable=deprecated-argument
+            try:
+                # Python 3.10 or earlier
+                # pylint:disable=deprecated-argument,too-many-function-args
+                Random.shuffle(self, x, random)
+            except TypeError:
+                # Python 3.11 or later
+                Random.shuffle(self, x)  # pylint:disable=deprecated-argument
