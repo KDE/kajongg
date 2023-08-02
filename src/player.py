@@ -627,7 +627,7 @@ class PlayingPlayer(Player):
                 return True
         return False
 
-    sayables = {
+    __sayables = {
         Message.Pung: __maySayPung,
         Message.Kong: __maySayKong,
         Message.Chow: __maySayChow,
@@ -638,8 +638,8 @@ class PlayingPlayer(Player):
         """find out what the player can legally say with this hand"""
         self.sayable = {}
         for message in Message.defined.values():
-            if message in answers and message in self.sayables:
-                self.sayable[message] = self.sayables[message](self, move)
+            if message in answers and message in self.__sayables:
+                self.sayable[message] = self.__sayables[message](self, move)
             else:
                 self.sayable[message] = True
 
