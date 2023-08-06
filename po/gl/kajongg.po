@@ -76,7 +76,7 @@ msgstr "Mensaxe"
 
 #: src/chat.py:122
 msgid "Chat on table %1 at %2"
-msgstr "Conversa na mesa %1 en %2"
+msgstr "Charla na mesa %1 en %2"
 
 #: src/client.py:55
 msgctxt "table status"
