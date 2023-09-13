@@ -182,6 +182,7 @@ if Options.csv:
             'You cannot write to %s with changes uncommitted to git',
             Options.csv)
         sys.exit(2)
+
 from mainwindow import MainWindow
 if QT5:
     QGuiApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
