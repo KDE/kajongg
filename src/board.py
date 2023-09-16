@@ -84,7 +84,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
         with Painter(painter):
             painter.setBrush(self.__brush)
             size = int(Internal.scene.windTileset.faceSize.height())
-            ellRect = QRectF(QPoint(), QPoint(size, size))
+            ellRect = QRectF(QPointF(), QPointF(size, size))
             painter.drawEllipse(ellRect)
             renderer = Internal.scene.windTileset.renderer()
             painter.translate(12, 12)
@@ -94,7 +94,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
     def boundingRect(self):  # pylint: disable=no-self-use
         """define the part of the tile we want to see"""
         size = int(Internal.scene.windTileset.faceSize.height() * 1.1)
-        return QRectF(QPoint(), QPoint(size, size))
+        return QRectF(QPointF(), QPointF(size, size))
 
     def __str__(self):
         """for debugging"""
