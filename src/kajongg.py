@@ -18,6 +18,7 @@ import os
 import logging
 
 from qt import QObject, QCommandLineParser, QCommandLineOption, Qt, QGuiApplication
+from qtpy import QT5
 from kde import KApplication
 from mi18n import i18n, MLocale
 
@@ -182,6 +183,7 @@ if Options.csv:
             Options.csv)
         sys.exit(2)
 from mainwindow import MainWindow
-QGuiApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+if QT5:
+    QGuiApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 MainWindow()
 Internal.app.exec_()
