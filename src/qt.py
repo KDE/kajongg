@@ -116,5 +116,10 @@ from qtpy.QtWidgets import QVBoxLayout
 from qtpy.QtWidgets import QWidget
 from qtpy.QtGui import QValidator
 from qtpy.QtGui import QGuiApplication
-from qtpy.QtSvg import QGraphicsSvgItem
+try:
+    # it seems this moved in Qt6
+    from qtpy.QtSvgWidgets import QGraphicsSvgItem
+except ImportError:
+    # as it was in Qt5:
+    from qtpy.QtSvg import QGraphicsSvgItem
 from qtpy.QtSvg import QSvgRenderer
