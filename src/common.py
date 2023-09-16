@@ -18,6 +18,8 @@ import socket
 from signal import signal, SIGABRT, SIGINT, SIGTERM
 
 from qt import QStandardPaths, QObject, QGraphicsItem, QSize
+from qtpy import PYSIDE_VERSION, QT5, QT6, compat
+from qtpy.compat import isalive as qtpy_isalive
 
 # pylint: disable=invalid-name
 
@@ -33,34 +35,14 @@ else:
 
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
-def isAlive(qobj):
-    """is the underlying C++ object still valid?
-    Up to supporting Pyside2, this function
-    was taken from the book
-    "Rapid GUI Programming with Python and Qt"
-    by Mark Summerfield but that does not work with Pyside2.
-    Hopefully in the future isAlive can simply return True
-    unless --debug=isalive."""
+def isAlive(qobj: QObject) ->bool:
+    """check if the underlying C++ object still exists"""
     if qobj is None:
         return False
-    if isinstance(qobj, QObject):
-        try:
-            qobj.children()
-        except RuntimeError:
-            if Debug.isalive:
-                # hopefully isAlive can be discarded later on
-                print('qobj is NOT alive')
-                raise
-            return False
-    elif isinstance(qobj, QGraphicsItem):
-        try:
-            qobj.parentItem
-        except RuntimeError:
-            return False
-    else:
-        print('isAlive(): qobj type is', type(qobj))
-    return True
-
+    result = qtpy_isalive(qobj)
+    if not result and Debug.isalive:
+        print('NOT alive:', repr(qobj))
+    return result
 
 def serverAppdataDir():
     """
