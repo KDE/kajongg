@@ -32,6 +32,8 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
 from qtpy import QT5, QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
+if QT6:
+    from qtpy.QtCore import QKeyCombination
 
 from mi18n import MLocale, KDETranslator, i18n, i18nc
 
@@ -657,7 +659,10 @@ class Action(QAction):
         if parent:
             parent.actionCollection().addAction(name, self)
         if shortcut:
-            self.setShortcut(Qt.CTRL + shortcut)
+            if QT6:
+                if isinstance(shortcut, QKeyCombination):
+                    shortcut = shortcut.key()
+            self.setShortcut(QKeySequence(shortcut | Qt.CTRL))
             self.setShortcutContext(Qt.ApplicationShortcut)
         if actionData is not None:
             self.setData(actionData)

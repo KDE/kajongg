@@ -49,7 +49,7 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from qt import Qt, QEvent, QMetaObject, QTimer
+    from qt import Qt, QEvent, QMetaObject, QTimer, QKeySequence
     from qt import QWidget, QGridLayout, QAction
 except ImportError as importError:
     NOTFOUND.append('Please install PyQt5: %s' % importError)
@@ -293,7 +293,7 @@ class MainWindow(KXmlGuiWindow):
             Qt.Key_E, actionData=ExplainView)
         self.actionExplain.setEnabled(False)
         self.actionFullscreen = self._kajonggToggleAction(
-            "fullscreen", "view-fullscreen", shortcut=Qt.Key_F + Qt.ShiftModifier)
+            "fullscreen", "view-fullscreen", shortcut=Qt.Key_F | Qt.ShiftModifier)
         self.actionFullscreen.toggled.connect(self.fullScreen)
         self.actionAutoPlay = Action(
             self,

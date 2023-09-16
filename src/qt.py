@@ -55,6 +55,7 @@ from qtpy.QtWidgets import QDialogButtonBox
 from qtpy.QtGui import QDrag
 from qtpy.QtGui import QFont
 from qtpy.QtGui import QFontMetrics
+from qtpy.QtGui import QKeySequence
 from qtpy.QtWidgets import QFormLayout
 from qtpy.QtWidgets import QFrame
 from qtpy.QtWidgets import QGraphicsItem
