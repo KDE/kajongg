@@ -31,6 +31,7 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
+from qtpy import QT5, QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
 
 from mi18n import MLocale, KDETranslator, i18n, i18nc
 
@@ -996,16 +997,17 @@ class AboutKajonggDialog(KDialog):
         except ImportError:
             VERSION = "Unknown"
 
-        if os.environ['QT_API'].startswith('pyqt'):
-            # pylint: disable=no-name-in-module
-            from PyQt5.sip import SIP_VERSION_STR
-            from PyQt5.QtCore import PYQT_VERSION_STR
-            from PyQt5.QtCore import QT_VERSION_STR
-            qtVersion = 'Qt {} with PyQt5 {} sip {}'.format(QT_VERSION_STR, PYQT_VERSION_STR, SIP_VERSION_STR)
-        else:
-            import PySide2 as PySide
-            qtVersion = 'Qt {} with Pyside2 {} compiled with Qt {}'.format(
-                PySide.QtCore.qVersion(), PySide.__version__, PySide.QtCore.__version__)
+        underVersions = ['Qt' + QT_VERSION +' API=' + API_NAME]
+        if PYQT_VERSION:
+            from sip import SIP_VERSION_STR
+            underVersions.append('sip ' + SIP_VERSION_STR)
+        if PYSIDE2:
+            import PySide2  # pylint: disable=import-error
+            underVersions.append('PySide2 ' + PySide2.__version__)
+        if PYSIDE6:
+            import PySide6  # pylint: disable=import-error
+            underVersions.append('PySide6 ' + PySide6.__version__)
+
 
         h1vLayout.addWidget(QLabel(i18n('Version: %1', VERSION)))
         h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
@@ -1013,14 +1015,12 @@ class AboutKajonggDialog(KDialog):
             "Wolfgang Rohdewald",
             i18n("Original author"),
             "wolfgang@rohdewald.de"), )
-        underVersions = []
         try:
             versions = popenReadlines('kf5-config -v')
             versionsDict = dict(x.split(': ') for x in versions if ':' in x)
             underVersions.append('KDE Frameworks %s' % versionsDict['KDE Frameworks'])
         except OSError:
             underVersions.append(i18n('KDE Frameworks (not installed or not usable)'))
-        underVersions.append(qtVersion)
         underVersions.append('Twisted %s' % __version__)
         underVersions.append(
             'Python {}.{}.{} {}'.format(*sys.version_info[:5]))
@@ -1030,7 +1030,6 @@ class AboutKajonggDialog(KDialog):
                       'Using versions %1',
                       ', '.join(
                           underVersions))))
-        h1vLayout.addWidget(QLabel(i18n('Not using broken Python KDE bindings')))
         hLayout1.addLayout(h1vLayout)
         spacerItem = QSpacerItem(
             20,
