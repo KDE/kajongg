@@ -90,6 +90,15 @@ class KApplication(QApplication):
                 QLibraryInfo.location(QLibraryInfo.TranslationsPath), 'qtbase_{}.qm'.format(language)))
             self.installTranslatorFile('/usr/share/locale/{}/LC_MESSAGES/kwidgetsaddons5_qt.qm'.format(language))
 
+    @classmethod
+    def desktopSize(cls) -> QSize:
+        """The size of the current screen"""
+        try:
+            result = Internal.app.desktop().availableGeometry()
+        except AttributeError:
+            result = Internal.mainWindow.screen().availableGeometry()
+        return result
+
 
 class CaptionMixin:
 
@@ -193,7 +202,7 @@ class KMessageBox:
             messageLabel.setOpenExternalLinks(True)
         messageLabel.setTextInteractionFlags(flags)
 
-        desktop = Internal.app.desktop().availableGeometry()
+        desktop = KApplication.desktopSize()
         if messageLabel.sizeHint().width() > desktop.width() * 0.5:
             messageLabel.setWordWrap(True)
 

@@ -79,7 +79,7 @@ try:
     from configdialog import ConfigDialog
     from statesaver import StateSaver
     from util import checkMemory
-    from kdestub import Action
+    from kdestub import Action, KApplication
 
 except ImportError as importError:
     NOTFOUND.append('Kajongg is not correctly installed: modules: %s' %
@@ -197,7 +197,7 @@ class MainWindow(KXmlGuiWindow):
                         # we want space to the right for the buttons
         # the default is too small. Use at least 2/3 of screen height and 1/2
         # of screen width:
-        available = Internal.app.desktop().availableGeometry()
+        available = KApplication.desktopSize()
         height = max(result.height(), available.height() * 2 // 3)
         width = max(result.width(), available.width() // 2)
         result.setHeight(height)

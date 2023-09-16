@@ -14,6 +14,7 @@ from qt import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
 from qt import QModelIndex
+from kdestub import KApplication
 from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, BoolRule
 from util import uniqueList
 from mi18n import i18n, i18nc, i18ncE, english
@@ -520,7 +521,7 @@ class RulesetSelector(QWidget):
         """we never want a horizontal scrollbar for player names,
         we always want to see them in full"""
         result = QWidget.sizeHint(self)
-        available = Internal.app.desktop().availableGeometry()
+        available = KApplication.desktopSize()
         height = max(result.height(), available.height() * 2 // 3)
         width = max(result.width(), available.width() // 2)
         return QSize(width, height)
