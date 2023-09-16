@@ -469,6 +469,9 @@ class MainWindow(KXmlGuiWindow):
         else:
             if Debug.quit:
                 logDebug('aboutToQuit: mainWindow is already None')
+            # this does not happen with PyQt5/6 or PySide2, only with PySide6
+            # return here to avoid recursion in StateSaver
+            return
         StateSaver.saveAll()
         Internal.app.quit()
         try:
