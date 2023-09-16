@@ -241,10 +241,8 @@ class KDialog(CaptionMixin, QDialog):
     Default = QDialogButtonBox.RestoreDefaults
     Close = QDialogButtonBox.Close
 
-    def __init__(self, parent=None, flags=None):
-        if flags is None:
-            flags = Qt.WindowFlags(0)
-        QDialog.__init__(self, parent, flags)
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
