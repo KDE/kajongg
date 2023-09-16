@@ -457,12 +457,12 @@ class ScoreTable(QWidget):
     def sizeHint(self):
         """give the scoring table window a sensible default size"""
         result = QWidget.sizeHint(self)
-        result.setWidth(result.height() * 3 / 2)
+        result.setWidth(result.height() * 3 // 2)
         # the default is too small. Use at least 2/5 of screen height and 1/4
         # of screen width:
         available = KApplication.desktopSize()
-        height = max(result.height(), available.height() * 2 / 5)
-        width = max(result.width(), available.width() / 4)
+        height = max(result.height(), available.height() * 2 // 5)
+        width = max(result.width(), available.width() // 4)
         result.setHeight(height)
         result.setWidth(width)
         return result

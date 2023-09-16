@@ -867,7 +867,7 @@ class FittingView(QGraphicsView):
             int(tRect.height() * uiTile.scale))
         pMap = uiTile.pixmapFromSvg(pmapSize)
         drag.setPixmap(pMap)
-        drag.setHotSpot(QPoint(int(pMap.width() / 2), int(pMap.height() / 2)))
+        drag.setHotSpot(QPoint(pMap.width() // 2, pMap.height() // 2))
         return drag
 
 
