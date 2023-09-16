@@ -477,7 +477,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.toolBar().setVisible(Internal.Preferences.toolBarVisible)
         self.actionStatusBar.setChecked(self.statusBar().isVisible())
         self.actionToolBar.setChecked(self.toolBar().isVisible())
-        self.actionFullscreen.setChecked(self.windowState() & Qt.WindowFullScreen)
+        self.actionFullscreen.setChecked(self.windowState() & Qt.WindowFullScreen == Qt.WindowFullScreen)
         QMainWindow.showEvent(self, event)
 
     def hideEvent(self, event):
