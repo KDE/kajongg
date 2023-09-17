@@ -32,8 +32,6 @@ include(FindPythonInterp)
 
 include(KDEPython)
 
-set(PROJECT_NAME kajongg)
-
 add_subdirectory( voices )
 add_subdirectory( doc )
 add_subdirectory( icons )
