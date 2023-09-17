@@ -1,5 +1,5 @@
 # vim: set expandtab shiftwidth=4 softtabstop=4:
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.16)
 
 # Release Service version, managed by release script
 set(RELEASE_SERVICE_VERSION_MAJOR "23")
