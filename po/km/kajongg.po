@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2023-06-10 00:45+0000\n"
+"POT-Creation-Date: 2023-09-17 00:42+0000\n"
 "PO-Revision-Date: 2013-01-02 09:50+0700\n"
 "Last-Translator: sutha <sutha@khmeros.info>\n"
 "Language-Team: Khmer <support@khmeros>\n"
@@ -215,8 +215,8 @@ msgstr ""
 "តើ​​អ្នក​ពិត​ជា​ចង់​លុប​ល្បែ​ង​​ <numid>%1</numid> ឬ ​?<br>វា​នឹង​ត្រូវ​បាន​បញ្ចប់​​​ ​អ្នក​មិន​អាច​បោះបង់​វា​ដោយ​"
 "ចុច​​ប៊ូតុង​បោះបង់​ឡើយ​​"
 
-#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:101 src/kdestub.py:102
-#: src/kdestub.py:104
+#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:113 src/kdestub.py:114
+#: src/kdestub.py:116
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -253,159 +253,159 @@ msgstr "សម្រាប់​ដៃ​បន្ទាប់​រួចហើ
 msgid "The connection to the server %1 broke, please try again later."
 msgstr "ការ​តភ្ជាប់​ទៅកាន់​ម៉ាស៊ីន​បម្រើ​​ %1 បាន​ខូច​​ សូម​ព្យាយាម​ម្ដង​ទៀត​​ពេលក្រោយ​ ។​"
 
-#: src/kajongg.py:80 src/kdestub.py:1044
+#: src/kajongg.py:81 src/kdestub.py:1055
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Mah Jongg - ល្បែង​ក្ដារ​ចិន​បុរាណ​សម្រាប់​អ្នក​លេង​ ៤​ នាក់​"
 
-#: src/kajongg.py:84
+#: src/kajongg.py:85
 msgid "all robots play with visible concealed tiles"
 msgstr "គ្រប់​មនុស្ស​យន្ត​លេង​ជា​មួយ​ក្រឡា​ក្បឿង​លាក់​ដែល​អាច​មើល​ឃើញ"
 
-#: src/kajongg.py:85
+#: src/kajongg.py:86
 msgid "start with demo mode"
 msgstr ""
 
-#: src/kajongg.py:86
+#: src/kajongg.py:87
 msgid "login to HOST"
 msgstr ""
 
-#: src/kajongg.py:87
+#: src/kajongg.py:88
 msgid "start new TABLE"
 msgstr ""
 
-#: src/kajongg.py:88
+#: src/kajongg.py:89
 msgid "join TABLE"
 msgstr ""
 
-#: src/kajongg.py:89
+#: src/kajongg.py:90
 msgid "use RULESET without asking"
 msgstr ""
 
-#: src/kajongg.py:90
+#: src/kajongg.py:91
 msgid "play only ROUNDS rounds per game. Only for debugging!"
 msgstr ""
 
-#: src/kajongg.py:91
+#: src/kajongg.py:92
 msgid "prefer PLAYER for next login"
 msgstr ""
 
-#: src/kajongg.py:92
+#: src/kajongg.py:93
 msgid "use AI variant for human player in demo mode"
 msgstr "ប្រើ​ AI ផ្សេង​គ្នា​សម្រាប់​អ្នក​លេង​ជា​របៀប​ដេមិន"
 
-#: src/kajongg.py:93
+#: src/kajongg.py:94
 msgid "write statistics to CSV"
 msgstr "សរសេរ​ស្ថិតិ​ទៅកាន់ CSV"
 
-#: src/kajongg.py:94
+#: src/kajongg.py:95
 msgid "show all available rulesets"
 msgstr "បង្ហាញ​សំណុំ​ក្បួន​​ដែល​មាន​ទាំង​អស់"
 
-#: src/kajongg.py:95
+#: src/kajongg.py:96
 msgid "for testing purposes: Initializes the random generator"
 msgstr "សម្រាប់​គោល​បំណង​សាក​ល្បង​ ៖ ចាប់​​​ផ្ដើម​កម្មវិធី​បង្កើត​ចៃដន្យ"
 
-#: src/kajongg.py:97
+#: src/kajongg.py:98
 msgid "show no graphical user interface. Intended only for testing"
 msgstr "មិន​បង្ហាញ​ចំណុច​​ប្រទាក់​អ្នក​ប្រើ​ក្រាហ្វិក ។ សម្រាប់​តែ​ការ​សាក​ល្បង​ប៉ុណ្ណោះ"
 
-#: src/kajongg.py:98
+#: src/kajongg.py:99
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
 msgstr "ប្រើ​ម៉ាស៊ីន​បម្រើ​ដែល​ទទួល​បញ្ជា​នៅ​លើរន្ធ ។ ប្រើ​សម្រាប់​តែ​ការ​សាកល្បង​ប៉ុណ្ណោះ"
 
-#: src/kajongg.py:99
+#: src/kajongg.py:100
 #, fuzzy
 #| msgid ""
 #| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgstr "ប្រើ​ម៉ាស៊ីន​បម្រើ​ដែល​ទទួល​បញ្ជា​នៅ​លើរន្ធ ។ ប្រើ​សម្រាប់​តែ​ការ​សាកល្បង​ប៉ុណ្ណោះ"
 
-#: src/kdestub.py:251
+#: src/kdestub.py:261
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "OK"
 msgid "&OK"
 msgstr "យល់ព្រម​"
 
-#: src/kdestub.py:253
+#: src/kdestub.py:263
 msgid "&Apply"
 msgstr ""
 
-#: src/kdestub.py:255
+#: src/kdestub.py:265
 msgid "&Cancel"
 msgstr ""
 
-#: src/kdestub.py:257 src/kdestub.py:447
+#: src/kdestub.py:267 src/kdestub.py:457
 msgid "&Help"
 msgstr ""
 
-#: src/kdestub.py:260
+#: src/kdestub.py:270
 msgid "&Defaults"
 msgstr ""
 
-#: src/kdestub.py:333
+#: src/kdestub.py:343
 #, fuzzy
 #| msgid "Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "របារ​ឧបករណ៍"
 
-#: src/kdestub.py:339
+#: src/kdestub.py:349
 #, fuzzy
 #| msgid "Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "របារ​ឧបករណ៍"
 
-#: src/kdestub.py:345
+#: src/kdestub.py:355
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
 msgid "Configure Tool&bars..."
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/kdestub.py:347
+#: src/kdestub.py:357
 msgid "Configure toolbars"
 msgstr ""
 
-#: src/kdestub.py:354
+#: src/kdestub.py:364
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
 msgid "Configure &Kajongg..."
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/kdestub.py:356 src/kdestub.py:1155
+#: src/kdestub.py:366 src/kdestub.py:1166
 msgid "Configure"
 msgstr ""
 
-#: src/kdestub.py:443
+#: src/kdestub.py:453
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "Game"
 msgid "&Game"
 msgstr "ល្បែង "
 
-#: src/kdestub.py:444
+#: src/kdestub.py:454
 #, fuzzy
 #| msgid "View"
 msgid "&View"
 msgstr "ទិដ្ឋភាព​"
 
-#: src/kdestub.py:445
+#: src/kdestub.py:455
 msgid "&Settings"
 msgstr ""
 
-#: src/kdestub.py:453
+#: src/kdestub.py:463
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr ""
 
-#: src/kdestub.py:456 src/kdestub.py:806
+#: src/kdestub.py:466 src/kdestub.py:819
 msgid "Switch Application Language"
 msgstr ""
 
-#: src/kdestub.py:460
+#: src/kdestub.py:470
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
@@ -413,73 +413,69 @@ msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/kdestub.py:811
+#: src/kdestub.py:824
 msgid "Please choose the language which should be used for this application:"
 msgstr ""
 
-#: src/kdestub.py:830
+#: src/kdestub.py:843
 msgid "Add Fallback Language"
 msgstr ""
 
-#: src/kdestub.py:842
+#: src/kdestub.py:855
 msgid "Primary language:"
 msgstr ""
 
-#: src/kdestub.py:842
+#: src/kdestub.py:855
 msgid "Fallback language:"
 msgstr ""
 
-#: src/kdestub.py:848
+#: src/kdestub.py:861
 #, fuzzy
 #| msgid "R&emove"
 msgid "Remove"
 msgstr "យកចេញ"
 
-#: src/kdestub.py:852
+#: src/kdestub.py:865
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr ""
 
-#: src/kdestub.py:854
+#: src/kdestub.py:867
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
 msgstr ""
 
-#: src/kdestub.py:980
+#: src/kdestub.py:993
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
 msgid "About Kajongg"
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/kdestub.py:1003
+#: src/kdestub.py:1017
 msgid "Version: %1"
 msgstr ""
 
-#: src/kdestub.py:1004
+#: src/kdestub.py:1018
 msgid "Protocol version %1"
 msgstr ""
 
-#: src/kdestub.py:1007
+#: src/kdestub.py:1021
 msgid "Original author"
 msgstr "អ្នក​និពន្ធ​ដើម"
 
-#: src/kdestub.py:1015
+#: src/kdestub.py:1028
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr ""
 
-#: src/kdestub.py:1023
+#: src/kdestub.py:1035
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr ""
 
-#: src/kdestub.py:1026
-msgid "Not using broken Python KDE bindings"
-msgstr ""
-
-#: src/kdestub.py:1045
+#: src/kdestub.py:1056
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -487,31 +483,31 @@ msgstr ""
 "នេះ​ជា​ Mah Jongg បុរាណ​សម្រាប់​អ្នក​លេង ៤ នាក់ ។ ប្រសិនបើ​អ្នក​កំពុង​រកមើល​ Mah Jongg "
 "solitaire សូម​ប្រើ​កម្មវិធី kmahjongg ។​"
 
-#: src/kdestub.py:1064
+#: src/kdestub.py:1075
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
 msgstr ""
 
-#: src/kdestub.py:1069
+#: src/kdestub.py:1080
 #, fuzzy
 #| msgid "Author:"
 msgid "Authors:"
 msgstr "អ្នកនិពន្ធ ៖"
 
-#: src/kdestub.py:1115
+#: src/kdestub.py:1126
 msgid "License Agreement"
 msgstr ""
 
-#: src/kdestub.py:1355
+#: src/kdestub.py:1366
 msgid "Configure Toolbars"
 msgstr ""
 
-#: src/kdestub.py:1357
+#: src/kdestub.py:1368
 msgid "A&vailable actions:"
 msgstr ""
 
-#: src/kdestub.py:1368
+#: src/kdestub.py:1379
 msgid "Curr&ent actions:"
 msgstr ""
 
@@ -599,7 +595,7 @@ msgstr "អ្នក​មិន​បាន​តភ្ជាប់​បណ្
 msgid "Please try again"
 msgstr "សូម​ព្យាយាម​ម្ដងទៀត"
 
-#: src/mainwindow.py:495
+#: src/mainwindow.py:498
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Score Manual Game"
@@ -607,12 +603,12 @@ msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "ល្បែង​ដាក់​ពិន្ទុ​ដោយដៃ"
 
-#: src/mainwindow.py:497
+#: src/mainwindow.py:500
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "ល្បែង​លេង​ដោយដៃ"
 
-#: src/mainwindow.py:500
+#: src/mainwindow.py:503
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "&Score a manual game."
@@ -620,12 +616,12 @@ msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "ល្បែង​ដាក់​ពិន្ទុ​ដោយ​ដៃ ។"
 
-#: src/mainwindow.py:502
+#: src/mainwindow.py:505
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "លេង"
 
-#: src/mainwindow.py:505
+#: src/mainwindow.py:508
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Start a new game."
@@ -633,7 +629,7 @@ msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "ចាប់ផ្ដើម​ល្បែង​ថ្មី ។"
 
-#: src/mainwindow.py:507
+#: src/mainwindow.py:510
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Abort Game"
@@ -641,7 +637,7 @@ msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "បោះបង់​ល្បែង"
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:514
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Abort the current game."
@@ -649,7 +645,7 @@ msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "បោះបង់​ល្បែង​បច្ចុប្បន្ន ។"
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:516
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
@@ -657,12 +653,12 @@ msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:519
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "អ្នកលេង"
 
-#: src/mainwindow.py:519
+#: src/mainwindow.py:522
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "define your players."
@@ -670,19 +666,19 @@ msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "កំណត់​អ្នកលេង​របស់អ្នក ។"
 
-#: src/mainwindow.py:521
+#: src/mainwindow.py:524
 #, fuzzy
 #| msgid "Rulesets"
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "សំណុំ​​ក្បួន​"
 
-#: src/mainwindow.py:524
+#: src/mainwindow.py:527
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr ""
 
-#: src/mainwindow.py:528
+#: src/mainwindow.py:531
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Change Visual Angle"
@@ -690,12 +686,12 @@ msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "ផ្លាស់​ប្ដូរ​មុំ​ចក្ខុ"
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:532
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "មុំ"
 
-#: src/mainwindow.py:532
+#: src/mainwindow.py:535
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Change the visual appearance of the tiles."
@@ -703,12 +699,12 @@ msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "ផ្លាស់ប្ដូរ​រូបរាង​ក្រឡាក្បឿង ។"
 
-#: src/mainwindow.py:536
+#: src/mainwindow.py:539
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr ""
 
-#: src/mainwindow.py:539
+#: src/mainwindow.py:542
 #, fuzzy
 #| msgctxt "kajongg @action:inmenu"
 #| msgid "&Score Table"
@@ -716,17 +712,17 @@ msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "តារាង​ពិន្ទុ"
 
-#: src/mainwindow.py:541
+#: src/mainwindow.py:544
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "ពិន្ទុ"
 
-#: src/mainwindow.py:543
+#: src/mainwindow.py:546
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "បង្ហាញ ឬ​លាក់​តារាង​ពិន្ទុ​សម្រាប់​ល្បែង​បច្ចុប្បន្ន ។"
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:548
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Explain Scores"
@@ -734,12 +730,12 @@ msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "ពន្យល់​អំពី​ពិន្ទុ"
 
-#: src/mainwindow.py:546
+#: src/mainwindow.py:549
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "ពន្យល់"
 
-#: src/mainwindow.py:548
+#: src/mainwindow.py:551
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Explain the scoring for all players in the current game."
@@ -747,7 +743,7 @@ msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "ពន្យល់​អំពី​ការ​ដាក់​ពិន្ទុ​សម្រាប់​អ្នកលេង​ទាំងអស់​នៅ​ក្នុង​ល្បែង​បច្ចុប្បន្ន ។"
 
-#: src/mainwindow.py:550
+#: src/mainwindow.py:553
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Demo Mode"
@@ -755,7 +751,7 @@ msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "របៀប​បង្ហាញ​សាក​ល្បង"
 
-#: src/mainwindow.py:553
+#: src/mainwindow.py:556
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid ""
@@ -764,11 +760,11 @@ msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr "អនុញ្ញាត​ឲ្យ​កុំព្យូទ័រ​គ្រប់គ្រង​អ្នក ។ ចាប់ផ្ដើម​ល្បែង​មូលដ្ឋាន​ថ្មី ប្រសិនបើ​ចាំបាច់ ។"
 
-#: src/mainwindow.py:555
+#: src/mainwindow.py:558
 msgid "C&hat"
 msgstr "ជជែក"
 
-#: src/mainwindow.py:558
+#: src/mainwindow.py:561
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Chat with the other players."
@@ -1932,34 +1928,34 @@ msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 តូច​ពេក តម្លៃ​អប្បបរមា​គឺ %3"
 
-#: src/rulesetselector.py:476
+#: src/rulesetselector.py:477
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr ""
 
-#: src/rulesetselector.py:494
+#: src/rulesetselector.py:495
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "ក្បួន​"
 
-#: src/rulesetselector.py:551
+#: src/rulesetselector.py:552
 msgid "C&opy"
 msgstr ""
 
-#: src/rulesetselector.py:552
+#: src/rulesetselector.py:553
 #, fuzzy
 #| msgid "Compare"
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "ប្រៀបធៀប​​"
 
-#: src/rulesetselector.py:553
+#: src/rulesetselector.py:554
 #, fuzzy
 #| msgid "R&emove"
 msgid "&Remove"
 msgstr "យកចេញ"
 
-#: src/rulesetselector.py:554
+#: src/rulesetselector.py:555
 msgid "&Close"
 msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2023-06-10 00:45+0000\n"
+"POT-Creation-Date: 2023-09-17 00:42+0000\n"
 "PO-Revision-Date: 2022-01-31 09:58+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
@@ -207,8 +207,8 @@ msgstr ""
 "Ви справді бажаєте вилучити <numid>%1</numid> ігор?<br>Вилучення буде "
 "остаточним, ви не зможете скасувати його за допомогою кнопки «Скасувати»"
 
-#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:101 src/kdestub.py:102
-#: src/kdestub.py:104
+#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:113 src/kdestub.py:114
+#: src/kdestub.py:116
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -247,176 +247,176 @@ msgstr ""
 "Не вдається встановити з’єднання з сервером %1, будь ласка, повторіть спробу "
 "пізніше."
 
-#: src/kajongg.py:80 src/kdestub.py:1044
+#: src/kajongg.py:81 src/kdestub.py:1055
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Маджонґ — старовинна китайська гра на дошці для 4 гравців"
 
-#: src/kajongg.py:84
+#: src/kajongg.py:85
 msgid "all robots play with visible concealed tiles"
 msgstr "всі комп’ютерні гравці грають з видимими прихованими плитками"
 
-#: src/kajongg.py:85
+#: src/kajongg.py:86
 msgid "start with demo mode"
 msgstr "запустити у режимі демонстрації"
 
-#: src/kajongg.py:86
+#: src/kajongg.py:87
 msgid "login to HOST"
 msgstr "увійти на вузол HOST"
 
-#: src/kajongg.py:87
+#: src/kajongg.py:88
 msgid "start new TABLE"
 msgstr "створити новий стіл TABLE"
 
-#: src/kajongg.py:88
+#: src/kajongg.py:89
 msgid "join TABLE"
 msgstr "приєднатися до гри на столі TABLE"
 
-#: src/kajongg.py:89
+#: src/kajongg.py:90
 msgid "use RULESET without asking"
 msgstr "використовувати набір правил RULESET без додаткових запитів"
 
-#: src/kajongg.py:90
+#: src/kajongg.py:91
 msgid "play only ROUNDS rounds per game. Only for debugging!"
 msgstr "грати лише ROUNDS раундів у грі. Лише для діагностики!"
 
-#: src/kajongg.py:91
+#: src/kajongg.py:92
 msgid "prefer PLAYER for next login"
 msgstr ""
 "намагатися використатися запис PLAYER під час наступної спроби увійти на "
 "сервер"
 
-#: src/kajongg.py:92
+#: src/kajongg.py:93
 msgid "use AI variant for human player in demo mode"
 msgstr "скористатися комп’ютерним гравцем у демонстраційному режимі"
 
-#: src/kajongg.py:93
+#: src/kajongg.py:94
 msgid "write statistics to CSV"
 msgstr "записати статистичні дані у форматі CSV"
 
-#: src/kajongg.py:94
+#: src/kajongg.py:95
 msgid "show all available rulesets"
 msgstr "показати всі можливі набори правил"
 
-#: src/kajongg.py:95
+#: src/kajongg.py:96
 msgid "for testing purposes: Initializes the random generator"
 msgstr ""
 "для тестування: задає початкове значення генератора псевдовипадкових чисел"
 
-#: src/kajongg.py:97
+#: src/kajongg.py:98
 msgid "show no graphical user interface. Intended only for testing"
 msgstr "не показувати графічний інтерфейс. Призначено для тестування"
 
-#: src/kajongg.py:98
+#: src/kajongg.py:99
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
 msgstr ""
 "використати спеціальний сервер, що очікуватиме на дані на сокеті SOCKET. "
 "Призначено лише для тестування."
 
-#: src/kajongg.py:99
+#: src/kajongg.py:100
 msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgstr ""
 "використати спеціальний сервер, що очікуватиме на дані на порту PORT. "
 "Призначено лише для тестування."
 
-#: src/kdestub.py:251
+#: src/kdestub.py:261
 msgid "&OK"
 msgstr "&Гаразд"
 
-#: src/kdestub.py:253
+#: src/kdestub.py:263
 msgid "&Apply"
 msgstr "&Застосувати"
 
-#: src/kdestub.py:255
+#: src/kdestub.py:265
 msgid "&Cancel"
 msgstr "&Скасувати"
 
-#: src/kdestub.py:257 src/kdestub.py:447
+#: src/kdestub.py:267 src/kdestub.py:457
 msgid "&Help"
 msgstr "&Довідка"
 
-#: src/kdestub.py:260
+#: src/kdestub.py:270
 msgid "&Defaults"
 msgstr "&Типові значення"
 
-#: src/kdestub.py:333
+#: src/kdestub.py:343
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Пок&азувати смужку стану"
 
-#: src/kdestub.py:339
+#: src/kdestub.py:349
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Показати панель &інструментів"
 
-#: src/kdestub.py:345
+#: src/kdestub.py:355
 msgid "Configure Tool&bars..."
 msgstr "Налаштувати пенал&и..."
 
-#: src/kdestub.py:347
+#: src/kdestub.py:357
 msgid "Configure toolbars"
 msgstr "Налаштувати панелі інструментів"
 
-#: src/kdestub.py:354
+#: src/kdestub.py:364
 msgid "Configure &Kajongg..."
 msgstr "&Налаштувати Kajongg…"
 
-#: src/kdestub.py:356 src/kdestub.py:1155
+#: src/kdestub.py:366 src/kdestub.py:1166
 msgid "Configure"
 msgstr "Налаштувати"
 
-#: src/kdestub.py:443
+#: src/kdestub.py:453
 msgid "&Game"
 msgstr "&Гра"
 
-#: src/kdestub.py:444
+#: src/kdestub.py:454
 msgid "&View"
 msgstr "П&ерегляд"
 
-#: src/kdestub.py:445
+#: src/kdestub.py:455
 msgid "&Settings"
 msgstr "П&араметри"
 
-#: src/kdestub.py:453
+#: src/kdestub.py:463
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Довідка"
 
-#: src/kdestub.py:456 src/kdestub.py:806
+#: src/kdestub.py:466 src/kdestub.py:819
 msgid "Switch Application Language"
 msgstr "Перемкнути мову програми"
 
-#: src/kdestub.py:460
+#: src/kdestub.py:470
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "П&ро Kajongg"
 
-#: src/kdestub.py:811
+#: src/kdestub.py:824
 msgid "Please choose the language which should be used for this application:"
 msgstr "Будь ласка, виберіть мову, яку слід використовувати в цій програмі:"
 
-#: src/kdestub.py:830
+#: src/kdestub.py:843
 msgid "Add Fallback Language"
 msgstr "Додати запасну мову"
 
-#: src/kdestub.py:842
+#: src/kdestub.py:855
 msgid "Primary language:"
 msgstr "Головна мова:"
 
-#: src/kdestub.py:842
+#: src/kdestub.py:855
 msgid "Fallback language:"
 msgstr "Запасна мова:"
 
-#: src/kdestub.py:848
+#: src/kdestub.py:861
 msgid "Remove"
 msgstr "Вилучити"
 
-#: src/kdestub.py:852
+#: src/kdestub.py:865
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr "Це головна мова програми, і вона буде використовуватися першою."
 
-#: src/kdestub.py:854
+#: src/kdestub.py:867
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
@@ -424,36 +424,32 @@ msgstr ""
 "Ця мова буде використовуватися, якщо попередня мова не має належного "
 "перекладу."
 
-#: src/kdestub.py:980
+#: src/kdestub.py:993
 msgid "About Kajongg"
 msgstr "Про Kajongg"
 
-#: src/kdestub.py:1003
+#: src/kdestub.py:1017
 msgid "Version: %1"
 msgstr "Версія: %1"
 
-#: src/kdestub.py:1004
+#: src/kdestub.py:1018
 msgid "Protocol version %1"
 msgstr "Версія протоколу %1"
 
-#: src/kdestub.py:1007
+#: src/kdestub.py:1021
 msgid "Original author"
 msgstr "Перший автор"
 
-#: src/kdestub.py:1015
+#: src/kdestub.py:1028
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "KDE Frameworks (не встановлено або не можна скористатися)"
 
-#: src/kdestub.py:1023
+#: src/kdestub.py:1035
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "Використовуємо версії %1"
 
-#: src/kdestub.py:1026
-msgid "Not using broken Python KDE bindings"
-msgstr "Не використовуємо непрацездатні прив'язки KDE до Python"
-
-#: src/kdestub.py:1045
+#: src/kdestub.py:1056
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -461,7 +457,7 @@ msgstr ""
 "Це класичний маджонґ для чотирьох гравців. Якщо вам потрібен пасьянс "
 "«маджонґ», будь ласка, скористайтеся програмою kmahjongg."
 
-#: src/kdestub.py:1064
+#: src/kdestub.py:1075
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -469,23 +465,23 @@ msgstr ""
 "Будь ласка, користуйтесь <a href=\"https://bugs.kde.org\">https://bugs.kde."
 "org</a> для повідомлень про помилки."
 
-#: src/kdestub.py:1069
+#: src/kdestub.py:1080
 msgid "Authors:"
 msgstr "Автори:"
 
-#: src/kdestub.py:1115
+#: src/kdestub.py:1126
 msgid "License Agreement"
 msgstr "Ліцензійна угода"
 
-#: src/kdestub.py:1355
+#: src/kdestub.py:1366
 msgid "Configure Toolbars"
 msgstr "Налаштувати панелі"
 
-#: src/kdestub.py:1357
+#: src/kdestub.py:1368
 msgid "A&vailable actions:"
 msgstr "&Наявні дії:"
 
-#: src/kdestub.py:1368
+#: src/kdestub.py:1379
 msgid "Curr&ent actions:"
 msgstr "Пот&очні дії:"
 
@@ -567,133 +563,133 @@ msgstr ""
 msgid "Please try again"
 msgstr "Будь ласка, спробуйте ще раз"
 
-#: src/mainwindow.py:495
+#: src/mainwindow.py:498
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "&Рахунок гри вручну"
 
-#: src/mainwindow.py:497
+#: src/mainwindow.py:500
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Гра справжніми плитками"
 
-#: src/mainwindow.py:500
+#: src/mainwindow.py:503
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "О&бчислення рахунку гри справжніми плитками."
 
-#: src/mainwindow.py:502
+#: src/mainwindow.py:505
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Грати"
 
-#: src/mainwindow.py:505
+#: src/mainwindow.py:508
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Почати нову гру."
 
-#: src/mainwindow.py:507
+#: src/mainwindow.py:510
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "П&ерервати гру"
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:514
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Перервати поточну гру."
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:516
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "Ви&йти з Kajongg"
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:519
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Гравці"
 
-#: src/mainwindow.py:519
+#: src/mainwindow.py:522
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "Визначити ваших гравців."
 
-#: src/mainwindow.py:521
+#: src/mainwindow.py:524
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "&Набори правил"
 
-#: src/mainwindow.py:524
+#: src/mainwindow.py:527
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "Налаштувати набори правил."
 
-#: src/mainwindow.py:528
+#: src/mainwindow.py:531
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "З&мінити кут огляду"
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:532
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Кут"
 
-#: src/mainwindow.py:532
+#: src/mainwindow.py:535
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Змінити вигляд плиток."
 
-#: src/mainwindow.py:536
+#: src/mainwindow.py:539
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "Повноекранний &режим"
 
-#: src/mainwindow.py:539
+#: src/mainwindow.py:542
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "П&ідсумкова таблиця"
 
-#: src/mainwindow.py:541
+#: src/mainwindow.py:544
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "&Рахунки"
 
-#: src/mainwindow.py:543
+#: src/mainwindow.py:546
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Показати або приховати підсумкову таблицю поточної гри."
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:548
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "По&яснення рахунку"
 
-#: src/mainwindow.py:546
+#: src/mainwindow.py:549
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "По&яснити"
 
-#: src/mainwindow.py:548
+#: src/mainwindow.py:551
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Надати пояснення щодо обчислення результатів гравців у поточній грі."
 
-#: src/mainwindow.py:550
+#: src/mainwindow.py:553
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "Режим &демонстрації"
 
-#: src/mainwindow.py:553
+#: src/mainwindow.py:556
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr ""
 "Дозволити комп’ютеру замінити вас. Якщо потрібно, буде запущено нову "
 "локальну гру."
 
-#: src/mainwindow.py:555
+#: src/mainwindow.py:558
 msgid "C&hat"
 msgstr "С&пілкування"
 
-#: src/mainwindow.py:558
+#: src/mainwindow.py:561
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Спілкування з іншими гравцями."
@@ -1827,30 +1823,30 @@ msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 є надто малим, мінімальним є значення %3"
 
-#: src/rulesetselector.py:476
+#: src/rulesetselector.py:477
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "Налаштування наборів правил"
 
-#: src/rulesetselector.py:494
+#: src/rulesetselector.py:495
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "Правило"
 
-#: src/rulesetselector.py:551
+#: src/rulesetselector.py:552
 msgid "C&opy"
 msgstr "&Копіювати"
 
-#: src/rulesetselector.py:552
+#: src/rulesetselector.py:553
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "По&рівняти"
 
-#: src/rulesetselector.py:553
+#: src/rulesetselector.py:554
 msgid "&Remove"
 msgstr "Ви&лучити"
 
-#: src/rulesetselector.py:554
+#: src/rulesetselector.py:555
 msgid "&Close"
 msgstr "За&крити"
 
@@ -2344,6 +2340,9 @@ msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "Ви користуєтеся клієнтською програмою версії %1. Для роботи з цим сервером "
 "потрібна версія програми %2."
+
+#~ msgid "Not using broken Python KDE bindings"
+#~ msgstr "Не використовуємо непрацездатні прив'язки KDE до Python"
 
 #~ msgid "This player cannot be deleted. There are games associated with %1."
 #~ msgstr "Цього гравця не можна вилучати. Існують ігри, пов’язані з %1."

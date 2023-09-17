@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2023-06-10 00:45+0000\n"
+"POT-Creation-Date: 2023-09-17 00:42+0000\n"
 "PO-Revision-Date: 2022-02-19 12:08+0000\n"
 "Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
 "Language-Team: British English <kde-l10n-en_gb@kde.org>\n"
@@ -205,8 +205,8 @@ msgstr ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
 
-#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:101 src/kdestub.py:102
-#: src/kdestub.py:104
+#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:113 src/kdestub.py:114
+#: src/kdestub.py:116
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -244,163 +244,163 @@ msgstr "Ready for next hand?"
 msgid "The connection to the server %1 broke, please try again later."
 msgstr "The connection to the server %1 broke, please try again later."
 
-#: src/kajongg.py:80 src/kdestub.py:1044
+#: src/kajongg.py:81 src/kdestub.py:1055
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Mah Jongg - the ancient Chinese board game for 4 players"
 
-#: src/kajongg.py:84
+#: src/kajongg.py:85
 msgid "all robots play with visible concealed tiles"
 msgstr "all robots play with visible concealed tiles"
 
-#: src/kajongg.py:85
+#: src/kajongg.py:86
 msgid "start with demo mode"
 msgstr "start with demo mode"
 
-#: src/kajongg.py:86
+#: src/kajongg.py:87
 msgid "login to HOST"
 msgstr "login to HOST"
 
-#: src/kajongg.py:87
+#: src/kajongg.py:88
 msgid "start new TABLE"
 msgstr "start new TABLE"
 
-#: src/kajongg.py:88
+#: src/kajongg.py:89
 msgid "join TABLE"
 msgstr "join TABLE"
 
-#: src/kajongg.py:89
+#: src/kajongg.py:90
 msgid "use RULESET without asking"
 msgstr "use RULESET without asking"
 
-#: src/kajongg.py:90
+#: src/kajongg.py:91
 msgid "play only ROUNDS rounds per game. Only for debugging!"
 msgstr "play only ROUNDS rounds per game. Only for debugging!"
 
-#: src/kajongg.py:91
+#: src/kajongg.py:92
 msgid "prefer PLAYER for next login"
 msgstr "prefer PLAYER for next login"
 
-#: src/kajongg.py:92
+#: src/kajongg.py:93
 msgid "use AI variant for human player in demo mode"
 msgstr "use AI variant for human player in demo mode"
 
-#: src/kajongg.py:93
+#: src/kajongg.py:94
 msgid "write statistics to CSV"
 msgstr "write statistics to CSV"
 
-#: src/kajongg.py:94
+#: src/kajongg.py:95
 msgid "show all available rulesets"
 msgstr "show all available rulesets"
 
-#: src/kajongg.py:95
+#: src/kajongg.py:96
 msgid "for testing purposes: Initializes the random generator"
 msgstr "for testing purposes: Initialises the random generator"
 
-#: src/kajongg.py:97
+#: src/kajongg.py:98
 msgid "show no graphical user interface. Intended only for testing"
 msgstr "show no graphical user interface. Intended only for testing"
 
-#: src/kajongg.py:98
+#: src/kajongg.py:99
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
 msgstr "use a dedicated server listening on SOCKET. Intended only for testing"
 
-#: src/kajongg.py:99
+#: src/kajongg.py:100
 msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgstr "use a dedicated server listening on PORT. Intended only for testing"
 
-#: src/kdestub.py:251
+#: src/kdestub.py:261
 msgid "&OK"
 msgstr "&OK"
 
-#: src/kdestub.py:253
+#: src/kdestub.py:263
 msgid "&Apply"
 msgstr "&Apply"
 
-#: src/kdestub.py:255
+#: src/kdestub.py:265
 msgid "&Cancel"
 msgstr "&Cancel"
 
-#: src/kdestub.py:257 src/kdestub.py:447
+#: src/kdestub.py:267 src/kdestub.py:457
 msgid "&Help"
 msgstr "&Help"
 
-#: src/kdestub.py:260
+#: src/kdestub.py:270
 msgid "&Defaults"
 msgstr "&Defaults"
 
-#: src/kdestub.py:333
+#: src/kdestub.py:343
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Show St&atusbar"
 
-#: src/kdestub.py:339
+#: src/kdestub.py:349
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Show &Toolbar"
 
-#: src/kdestub.py:345
+#: src/kdestub.py:355
 msgid "Configure Tool&bars..."
 msgstr "Configure Tool&bars..."
 
-#: src/kdestub.py:347
+#: src/kdestub.py:357
 msgid "Configure toolbars"
 msgstr "Configure toolbars"
 
-#: src/kdestub.py:354
+#: src/kdestub.py:364
 msgid "Configure &Kajongg..."
 msgstr "Configure &Kajongg..."
 
-#: src/kdestub.py:356 src/kdestub.py:1155
+#: src/kdestub.py:366 src/kdestub.py:1166
 msgid "Configure"
 msgstr "Configure"
 
-#: src/kdestub.py:443
+#: src/kdestub.py:453
 msgid "&Game"
 msgstr "&Game"
 
-#: src/kdestub.py:444
+#: src/kdestub.py:454
 msgid "&View"
 msgstr "&View"
 
-#: src/kdestub.py:445
+#: src/kdestub.py:455
 msgid "&Settings"
 msgstr "&Settings"
 
-#: src/kdestub.py:453
+#: src/kdestub.py:463
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Help"
 
-#: src/kdestub.py:456 src/kdestub.py:806
+#: src/kdestub.py:466 src/kdestub.py:819
 msgid "Switch Application Language"
 msgstr "Switch Application &Language"
 
-#: src/kdestub.py:460
+#: src/kdestub.py:470
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "About &Kajongg"
 
-#: src/kdestub.py:811
+#: src/kdestub.py:824
 msgid "Please choose the language which should be used for this application:"
 msgstr "Please choose the language which should be used for this application:"
 
-#: src/kdestub.py:830
+#: src/kdestub.py:843
 msgid "Add Fallback Language"
 msgstr "Add Fallback Language"
 
-#: src/kdestub.py:842
+#: src/kdestub.py:855
 msgid "Primary language:"
 msgstr "Primary language:"
 
-#: src/kdestub.py:842
+#: src/kdestub.py:855
 msgid "Fallback language:"
 msgstr "Fallback language:"
 
-#: src/kdestub.py:848
+#: src/kdestub.py:861
 msgid "Remove"
 msgstr "Remove"
 
-#: src/kdestub.py:852
+#: src/kdestub.py:865
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
@@ -408,7 +408,7 @@ msgstr ""
 "This is the main application language which will be used first, before any "
 "other languages."
 
-#: src/kdestub.py:854
+#: src/kdestub.py:867
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
@@ -416,36 +416,32 @@ msgstr ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
 
-#: src/kdestub.py:980
+#: src/kdestub.py:993
 msgid "About Kajongg"
 msgstr "About Kajongg"
 
-#: src/kdestub.py:1003
+#: src/kdestub.py:1017
 msgid "Version: %1"
 msgstr "Version: %1"
 
-#: src/kdestub.py:1004
+#: src/kdestub.py:1018
 msgid "Protocol version %1"
 msgstr "Protocol version %1"
 
-#: src/kdestub.py:1007
+#: src/kdestub.py:1021
 msgid "Original author"
 msgstr "Original author"
 
-#: src/kdestub.py:1015
+#: src/kdestub.py:1028
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "KDE Frameworks (not installed or not usable)"
 
-#: src/kdestub.py:1023
+#: src/kdestub.py:1035
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "Using versions %1"
 
-#: src/kdestub.py:1026
-msgid "Not using broken Python KDE bindings"
-msgstr "Not using broken Python KDE bindings"
-
-#: src/kdestub.py:1045
+#: src/kdestub.py:1056
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -453,7 +449,7 @@ msgstr ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
 
-#: src/kdestub.py:1064
+#: src/kdestub.py:1075
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -461,23 +457,23 @@ msgstr ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
 
-#: src/kdestub.py:1069
+#: src/kdestub.py:1080
 msgid "Authors:"
 msgstr "Authors:"
 
-#: src/kdestub.py:1115
+#: src/kdestub.py:1126
 msgid "License Agreement"
 msgstr "Licence Agreement"
 
-#: src/kdestub.py:1355
+#: src/kdestub.py:1366
 msgid "Configure Toolbars"
 msgstr "Configure Toolbars"
 
-#: src/kdestub.py:1357
+#: src/kdestub.py:1368
 msgid "A&vailable actions:"
 msgstr "A&vailable actions:"
 
-#: src/kdestub.py:1368
+#: src/kdestub.py:1379
 msgid "Curr&ent actions:"
 msgstr "Curr&ent actions:"
 
@@ -557,131 +553,131 @@ msgstr "Login to server %1 failed: You have no network connection"
 msgid "Please try again"
 msgstr "Please try again"
 
-#: src/mainwindow.py:495
+#: src/mainwindow.py:498
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "&Score Manual Game"
 
-#: src/mainwindow.py:497
+#: src/mainwindow.py:500
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Manual Game"
 
-#: src/mainwindow.py:500
+#: src/mainwindow.py:503
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "&Score a manual game."
 
-#: src/mainwindow.py:502
+#: src/mainwindow.py:505
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Play"
 
-#: src/mainwindow.py:505
+#: src/mainwindow.py:508
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Start a new game."
 
-#: src/mainwindow.py:507
+#: src/mainwindow.py:510
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "&Abort Game"
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:514
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Abort the current game."
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:516
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "&Quit Kajongg"
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:519
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Players"
 
-#: src/mainwindow.py:519
+#: src/mainwindow.py:522
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "define your players."
 
-#: src/mainwindow.py:521
+#: src/mainwindow.py:524
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "&Rulesets"
 
-#: src/mainwindow.py:524
+#: src/mainwindow.py:527
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "customise rulesets."
 
-#: src/mainwindow.py:528
+#: src/mainwindow.py:531
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "&Change Visual Angle"
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:532
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Angle"
 
-#: src/mainwindow.py:532
+#: src/mainwindow.py:535
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Change the visual appearance of the tiles."
 
-#: src/mainwindow.py:536
+#: src/mainwindow.py:539
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "F&ull Screen Mode"
 
-#: src/mainwindow.py:539
+#: src/mainwindow.py:542
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&Score Table"
 
-#: src/mainwindow.py:541
+#: src/mainwindow.py:544
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "&Scores"
 
-#: src/mainwindow.py:543
+#: src/mainwindow.py:546
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Show or hide the score table for the current game."
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:548
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "&Explain Scores"
 
-#: src/mainwindow.py:546
+#: src/mainwindow.py:549
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "&Explain"
 
-#: src/mainwindow.py:548
+#: src/mainwindow.py:551
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Explain the scoring for all players in the current game."
 
-#: src/mainwindow.py:550
+#: src/mainwindow.py:553
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "&Demo Mode"
 
-#: src/mainwindow.py:553
+#: src/mainwindow.py:556
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr "Let the computer take over for you. Start a new local game if needed."
 
-#: src/mainwindow.py:555
+#: src/mainwindow.py:558
 msgid "C&hat"
 msgstr "C&hat"
 
-#: src/mainwindow.py:558
+#: src/mainwindow.py:561
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Chat with the other players."
@@ -1805,30 +1801,30 @@ msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 is too small, minimum value is %3"
 
-#: src/rulesetselector.py:476
+#: src/rulesetselector.py:477
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "Customize rulesets"
 
-#: src/rulesetselector.py:494
+#: src/rulesetselector.py:495
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "Rule"
 
-#: src/rulesetselector.py:551
+#: src/rulesetselector.py:552
 msgid "C&opy"
 msgstr "C&opy"
 
-#: src/rulesetselector.py:552
+#: src/rulesetselector.py:553
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "Co&mpare"
 
-#: src/rulesetselector.py:553
+#: src/rulesetselector.py:554
 msgid "&Remove"
 msgstr "&Remove"
 
-#: src/rulesetselector.py:554
+#: src/rulesetselector.py:555
 msgid "&Close"
 msgstr "&Close"
 
@@ -2306,6 +2302,9 @@ msgstr ""
 #: src/user.py:93
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Your client has version %1 but you need %2 for this server"
+
+#~ msgid "Not using broken Python KDE bindings"
+#~ msgstr "Not using broken Python KDE bindings"
 
 #~ msgid "This player cannot be deleted. There are games associated with %1."
 #~ msgstr "This player cannot be deleted. There are games associated with %1."

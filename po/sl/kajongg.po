@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2023-06-10 00:45+0000\n"
+"POT-Creation-Date: 2023-09-17 00:42+0000\n"
 "PO-Revision-Date: 2022-01-31 10:09+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
@@ -206,8 +206,8 @@ msgstr ""
 "Ali želite izbrisati <numid>%1</numid> iger?<br>To bo dokončno in ne boste "
 "mogli prekiniti z uporabo gumba prekliči"
 
-#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:101 src/kdestub.py:102
-#: src/kdestub.py:104
+#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:113 src/kdestub.py:114
+#: src/kdestub.py:116
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -245,175 +245,175 @@ msgstr "Pripravljeni na naslednjo zbirko ploščic?"
 msgid "The connection to the server %1 broke, please try again later."
 msgstr "Povezava s strežnikom %1 se je prekinila. Poskusite znova kasneje."
 
-#: src/kajongg.py:80 src/kdestub.py:1044
+#: src/kajongg.py:81 src/kdestub.py:1055
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Mah Jongg - prastara kitajska igra na plošči za štiri igralce"
 
-#: src/kajongg.py:84
+#: src/kajongg.py:85
 msgid "all robots play with visible concealed tiles"
 msgstr "vsi računalniški igralci igrajo z vidnimi zakritimi ploščicami"
 
-#: src/kajongg.py:85
+#: src/kajongg.py:86
 msgid "start with demo mode"
 msgstr "zaženi s predstavitvenim načinom"
 
-#: src/kajongg.py:86
+#: src/kajongg.py:87
 msgid "login to HOST"
 msgstr "prijavi se na GOSTITELJA"
 
-#: src/kajongg.py:87
+#: src/kajongg.py:88
 msgid "start new TABLE"
 msgstr "začni novo MIZO"
 
-#: src/kajongg.py:88
+#: src/kajongg.py:89
 msgid "join TABLE"
 msgstr "pridruži se MIZI"
 
-#: src/kajongg.py:89
+#: src/kajongg.py:90
 msgid "use RULESET without asking"
 msgstr "uporabi SEZNAMPRAVIL brez vprašanj"
 
-#: src/kajongg.py:90
+#: src/kajongg.py:91
 msgid "play only ROUNDS rounds per game. Only for debugging!"
 msgstr "igraj le KROGI krogov na igro. Samo za razhroščevanje!"
 
-#: src/kajongg.py:91
+#: src/kajongg.py:92
 msgid "prefer PLAYER for next login"
 msgstr "ob naslednji prijavi naj ima prednost IGRALEC"
 
-#: src/kajongg.py:92
+#: src/kajongg.py:93
 msgid "use AI variant for human player in demo mode"
 msgstr ""
 "uporabi različico umetne inteligence za človeškega igralca v predstavitvenem "
 "načinu"
 
-#: src/kajongg.py:93
+#: src/kajongg.py:94
 msgid "write statistics to CSV"
 msgstr "zapiši statistiko v CSV"
 
-#: src/kajongg.py:94
+#: src/kajongg.py:95
 msgid "show all available rulesets"
 msgstr "pokaži vse razpoložljive sezname pravil"
 
-#: src/kajongg.py:95
+#: src/kajongg.py:96
 msgid "for testing purposes: Initializes the random generator"
 msgstr "za namene preizkušanja: začne ustvarjalnik naključnih števil"
 
-#: src/kajongg.py:97
+#: src/kajongg.py:98
 msgid "show no graphical user interface. Intended only for testing"
 msgstr "ne kaži grafičnega vmesnika. Namenjeno samo za preizkušanje"
 
-#: src/kajongg.py:98
+#: src/kajongg.py:99
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
 msgstr ""
 "uporabi namenski strežnik, ki posluša na VTIČ-u. Namenjeno samo za "
 "preizkušanje"
 
-#: src/kajongg.py:99
+#: src/kajongg.py:100
 msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgstr ""
 "uporabi namenski strežnik, ki posluša na VRAT-ih. Namenjeno samo za "
 "preizkušanje"
 
-#: src/kdestub.py:251
+#: src/kdestub.py:261
 msgid "&OK"
 msgstr "&V redu"
 
-#: src/kdestub.py:253
+#: src/kdestub.py:263
 msgid "&Apply"
 msgstr "Uvelj&avi"
 
-#: src/kdestub.py:255
+#: src/kdestub.py:265
 msgid "&Cancel"
 msgstr "Prekli&či"
 
-#: src/kdestub.py:257 src/kdestub.py:447
+#: src/kdestub.py:267 src/kdestub.py:457
 msgid "&Help"
 msgstr "&Pomoč"
 
-#: src/kdestub.py:260
+#: src/kdestub.py:270
 msgid "&Defaults"
 msgstr "Privzete vre&dnosti"
 
-#: src/kdestub.py:333
+#: src/kdestub.py:343
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Pokaži vrstico st&anja"
 
-#: src/kdestub.py:339
+#: src/kdestub.py:349
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Pokaži orodno vrs&tico"
 
-#: src/kdestub.py:345
+#: src/kdestub.py:355
 msgid "Configure Tool&bars..."
 msgstr "Nastavi orodne &vrstice ..."
 
-#: src/kdestub.py:347
+#: src/kdestub.py:357
 msgid "Configure toolbars"
 msgstr "Nastavi orodne vrstice"
 
-#: src/kdestub.py:354
+#: src/kdestub.py:364
 msgid "Configure &Kajongg..."
 msgstr "Nastavi &Kajongg..."
 
-#: src/kdestub.py:356 src/kdestub.py:1155
+#: src/kdestub.py:366 src/kdestub.py:1166
 msgid "Configure"
 msgstr "Nastavi"
 
-#: src/kdestub.py:443
+#: src/kdestub.py:453
 msgid "&Game"
 msgstr "I&gra"
 
-#: src/kdestub.py:444
+#: src/kdestub.py:454
 msgid "&View"
 msgstr "Po&gled"
 
-#: src/kdestub.py:445
+#: src/kdestub.py:455
 msgid "&Settings"
 msgstr "Na&stavitve"
 
-#: src/kdestub.py:453
+#: src/kdestub.py:463
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Pomoč"
 
-#: src/kdestub.py:456 src/kdestub.py:806
+#: src/kdestub.py:466 src/kdestub.py:819
 msgid "Switch Application Language"
 msgstr "Preklopi jezik programa"
 
-#: src/kdestub.py:460
+#: src/kdestub.py:470
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "O programu &Kajongg"
 
-#: src/kdestub.py:811
+#: src/kdestub.py:824
 msgid "Please choose the language which should be used for this application:"
 msgstr "Izberite jezik, ki naj bo uporabljen za ta program:"
 
-#: src/kdestub.py:830
+#: src/kdestub.py:843
 msgid "Add Fallback Language"
 msgstr "Dodaj zasilni jezik"
 
-#: src/kdestub.py:842
+#: src/kdestub.py:855
 msgid "Primary language:"
 msgstr "Glavni jezik:"
 
-#: src/kdestub.py:842
+#: src/kdestub.py:855
 msgid "Fallback language:"
 msgstr "Zasilni jezik:"
 
-#: src/kdestub.py:848
+#: src/kdestub.py:861
 msgid "Remove"
 msgstr "Odstrani"
 
-#: src/kdestub.py:852
+#: src/kdestub.py:865
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr "To je glavni jezik programa, ki bo uporabljen pred drugimi jeziki."
 
-#: src/kdestub.py:854
+#: src/kdestub.py:867
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
@@ -421,36 +421,32 @@ msgstr ""
 "To je jezik, ki bo uporabljen, če predhodni jeziki ne vsebujejo primernega "
 "prevoda."
 
-#: src/kdestub.py:980
+#: src/kdestub.py:993
 msgid "About Kajongg"
 msgstr "O programu Kajongg"
 
-#: src/kdestub.py:1003
+#: src/kdestub.py:1017
 msgid "Version: %1"
 msgstr "Verzija: %1"
 
-#: src/kdestub.py:1004
+#: src/kdestub.py:1018
 msgid "Protocol version %1"
 msgstr "Različica protokola %1"
 
-#: src/kdestub.py:1007
+#: src/kdestub.py:1021
 msgid "Original author"
 msgstr "Prvotni avtor"
 
-#: src/kdestub.py:1015
+#: src/kdestub.py:1028
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "Ogrodja KDE (ni nameščeno ali uporabno)"
 
-#: src/kdestub.py:1023
+#: src/kdestub.py:1035
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "Uporablja različice %1"
 
-#: src/kdestub.py:1026
-msgid "Not using broken Python KDE bindings"
-msgstr "Okvarjene vezave za Python KDE niso uporabljene"
-
-#: src/kdestub.py:1045
+#: src/kdestub.py:1056
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -458,7 +454,7 @@ msgstr ""
 "To je klasični Mah Jongg za štiri igralce. Če iščete pasjanso Mah Jongg "
 "uporabite program kmahjongg."
 
-#: src/kdestub.py:1064
+#: src/kdestub.py:1075
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -466,23 +462,23 @@ msgstr ""
 "Za poročanje o hroščih uporabite <a href=\"https://bugs.kde.org/\">https://"
 "bugs.kde.org</a>."
 
-#: src/kdestub.py:1069
+#: src/kdestub.py:1080
 msgid "Authors:"
 msgstr "Avtorji:"
 
-#: src/kdestub.py:1115
+#: src/kdestub.py:1126
 msgid "License Agreement"
 msgstr "Licenčni sporazum"
 
-#: src/kdestub.py:1355
+#: src/kdestub.py:1366
 msgid "Configure Toolbars"
 msgstr "Nastavi orodne vrstice"
 
-#: src/kdestub.py:1357
+#: src/kdestub.py:1368
 msgid "A&vailable actions:"
 msgstr "Razpoložlji&va dejanja:"
 
-#: src/kdestub.py:1368
+#: src/kdestub.py:1379
 msgid "Curr&ent actions:"
 msgstr "Tr&enutna dejanja:"
 
@@ -562,133 +558,133 @@ msgstr "Prijava na strežnik %1 je spodletela. Nimate omrežne povezave"
 msgid "Please try again"
 msgstr "Poskusite znova"
 
-#: src/mainwindow.py:495
+#: src/mainwindow.py:498
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "Oceni &ročno igro"
 
-#: src/mainwindow.py:497
+#: src/mainwindow.py:500
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Ročna igra"
 
-#: src/mainwindow.py:500
+#: src/mainwindow.py:503
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "Oceni &ročno igro."
 
-#: src/mainwindow.py:502
+#: src/mainwindow.py:505
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Igraj"
 
-#: src/mainwindow.py:505
+#: src/mainwindow.py:508
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Začne novo igro."
 
-#: src/mainwindow.py:507
+#: src/mainwindow.py:510
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "&Prekini igro"
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:514
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Prekine trenutno igro."
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:516
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "&Končaj Kajongg"
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:519
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Igralci"
 
-#: src/mainwindow.py:519
+#: src/mainwindow.py:522
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "določite vaše igralce."
 
-#: src/mainwindow.py:521
+#: src/mainwindow.py:524
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "Seznami p&ravil"
 
-#: src/mainwindow.py:524
+#: src/mainwindow.py:527
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "prilagodi sezname pravil."
 
-#: src/mainwindow.py:528
+#: src/mainwindow.py:531
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "Spremeni &vidni kot"
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:532
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Kot"
 
-#: src/mainwindow.py:532
+#: src/mainwindow.py:535
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Spremeni videz ploščic."
 
-#: src/mainwindow.py:536
+#: src/mainwindow.py:539
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "Ce&lozaslonski način"
 
-#: src/mainwindow.py:539
+#: src/mainwindow.py:542
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&Razpredelnica točk"
 
-#: src/mainwindow.py:541
+#: src/mainwindow.py:544
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "&Točke"
 
-#: src/mainwindow.py:543
+#: src/mainwindow.py:546
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Prikaže ali skrije razpredelnico točk za trenutno igro."
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:548
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "Pojasni točk&e"
 
-#: src/mainwindow.py:546
+#: src/mainwindow.py:549
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "&Pojasni"
 
-#: src/mainwindow.py:548
+#: src/mainwindow.py:551
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Pojasni točkovanje za vse igralce trenutne igre."
 
-#: src/mainwindow.py:550
+#: src/mainwindow.py:553
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "Pre&dstavitveni način"
 
-#: src/mainwindow.py:553
+#: src/mainwindow.py:556
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr ""
 "Pusti računalniku, da prevzame nadzor. Če je potrebno, naj začne novo "
 "krajevno igro."
 
-#: src/mainwindow.py:555
+#: src/mainwindow.py:558
 msgid "C&hat"
 msgstr "&Klepet"
 
-#: src/mainwindow.py:558
+#: src/mainwindow.py:561
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Klepetajte z drugimi igralci."
@@ -1813,30 +1809,30 @@ msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 je premajhno, najmanjša vrednost je %3"
 
-#: src/rulesetselector.py:476
+#: src/rulesetselector.py:477
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "Prilagodi sezname pravil"
 
-#: src/rulesetselector.py:494
+#: src/rulesetselector.py:495
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "Pravilo"
 
-#: src/rulesetselector.py:551
+#: src/rulesetselector.py:552
 msgid "C&opy"
 msgstr "K&opiraj"
 
-#: src/rulesetselector.py:552
+#: src/rulesetselector.py:553
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "Pri&merjaj"
 
-#: src/rulesetselector.py:553
+#: src/rulesetselector.py:554
 msgid "&Remove"
 msgstr "Odst&rani"
 
-#: src/rulesetselector.py:554
+#: src/rulesetselector.py:555
 msgid "&Close"
 msgstr "&Zapri"
 
@@ -2319,3 +2315,6 @@ msgstr ""
 #: src/user.py:93
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Vaš odjemalec ima različico %1, za ta strežnik pa potrebujete %2"
+
+#~ msgid "Not using broken Python KDE bindings"
+#~ msgstr "Okvarjene vezave za Python KDE niso uporabljene"
