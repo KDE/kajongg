@@ -72,9 +72,11 @@ def defineOptions():
     """define command line options"""
     parser = QCommandLineParser()
     options = []
-    def option(*args, optName=None, argType=None, singleshot=False):
+    def option(name, description, valueName=None, defaultValue=None,
+        optName=None, argType=None, singleshot=False):
         """helper"""
-        opt = CommandLineOption(*args, optName=optName, argType=argType, singleshot=singleshot)
+        opt = CommandLineOption(name, description, valueName, defaultValue,
+            optName=optName, argType=argType, singleshot=singleshot)
         options.append(opt)
         parser.addOption(opt)
 

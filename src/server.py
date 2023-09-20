@@ -17,6 +17,7 @@ import sys
 import os
 import logging
 import datetime
+import argparse
 
 from zope.interface import implementer
 
@@ -418,43 +419,37 @@ class MJRealm:
             logDebug('Connection from %s ' % avatar.source())
         return pb.IPerspective, avatar, lambda a=avatar: a.detached(mind)
 
-
 def parseArgs():
     """as the name says"""
-    from optparse import OptionParser
-    parser = OptionParser()
+    parser = argparse.ArgumentParser()
     defaultPort = Internal.defaultPort
-    parser.add_option('', '--port', dest='port',
+    parser.add_argument('--port', dest='port',
                       help=i18n(
                           'the server will listen on PORT (%d)' %
                           defaultPort),
                       type=int, default=defaultPort)
-    parser.add_option('', '--socket', dest='socket',
+    parser.add_argument('--socket', dest='socket',
                       help=i18n('the server will listen on SOCKET'), default=None)
-    parser.add_option(
-        '',
+    parser.add_argument(
         '--db',
         dest='dbpath',
         help=i18n('name of the database'),
         default=None)
-    parser.add_option(
-        '', '--continue', dest='continueServer', action='store_true',
+    parser.add_argument(
+        '--continue', dest='continueServer', action='store_true',
         help=i18n('do not terminate local game server after last client disconnects'), default=False)
-    parser.add_option('', '--debug', dest='debug',
+    parser.add_argument('--debug', dest='debug',
                       help=Debug.help())
-    (options, args) = parser.parse_args()
-    if args and ''.join(args):
-        logWarning(i18n('unrecognized arguments:%1', ' '.join(args)))
-        sys.exit(2)
-    Options.continueServer |= options.continueServer
-    if options.dbpath:
-        Options.dbPath = os.path.expanduser(options.dbpath)
-    if options.socket:
-        Options.socket = options.socket
-    Debug.setOptions(options.debug)
+    args = parser.parse_args(sys.argv[1:])
+    Options.continueServer |= args.continueServer
+    if args.dbpath:
+        Options.dbPath = os.path.expanduser(args.dbpath)
+    if args.socket:
+        Options.socket = args.socket
+    Debug.setOptions(args.debug)
     Options.fixed = True  # may not be changed anymore
     del parser           # makes Debug.gc quieter
-    return options
+    return args
 
 
 def kajonggServer():

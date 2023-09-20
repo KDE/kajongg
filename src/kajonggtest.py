@@ -17,7 +17,7 @@ import shutil
 import time
 import gc
 
-from optparse import OptionParser
+import argparse
 from locale import getpreferredencoding
 
 from common import Debug, StrMixin, cacheDir
@@ -514,59 +514,58 @@ def doJobs():
             time.sleep(1)
 
 
-def parse_options():
+def parse_options() ->argparse.Namespace:
     """parse options"""
-    parser = OptionParser()
-    parser.add_option(
-        '', '--gui', dest='gui', action='store_true',
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--gui', dest='gui', action='store_true',
         default=False, help='show graphical user interface')
-    parser.add_option(
-        '', '--ruleset', dest='rulesets', default='ALL',
+    parser.add_argument(
+        '--ruleset', dest='rulesets', default='ALL',
         help='play like a robot using RULESET: comma separated list. If missing, test all rulesets',
         metavar='RULESET')
-    parser.add_option(
-        '', '--rounds', dest='rounds',
+    parser.add_argument(
+        '--rounds', dest='rounds',
         help='play only # ROUNDS per game',
         metavar='ROUNDS')
-    parser.add_option(
-        '', '--ai', dest='aiVariants',
+    parser.add_argument(
+        '--ai', dest='aiVariants',
         default=None, help='use AI variants: comma separated list',
         metavar='AI')
-    parser.add_option(
-        '', '--python', dest='pyVersions',
+    parser.add_argument(
+        '--python', dest='pyVersions',
         default=None, help='use python versions: comma separated list',
         metavar='PY_VERSION')
-    parser.add_option(
-        '', '--log', dest='log', action='store_true',
+    parser.add_argument(
+        '--log', dest='log', action='store_true',
         default=False, help='write detailled debug info to ~/.kajongg/log/game/ruleset/commit.'
                             ' This starts a separate server process per job, it sets --servers to --clients.')
-    parser.add_option(
-        '', '--game', dest='game',
+    parser.add_argument(
+        '--game', dest='game',
         help='start first game with GAMEID, increment for following games.' +
         ' Without this, random values are used.',
         metavar='GAMEID', type=int, default=0)
-    parser.add_option(
-        '', '--count', dest='count',
+    parser.add_argument(
+        '--count', dest='count',
         help='play COUNT games. Default is unlimited',
         metavar='COUNT', type=int, default=999999999)
-    parser.add_option(
-        '', '--playopen', dest='playopen', action='store_true',
+    parser.add_argument(
+        '--playopen', dest='playopen', action='store_true',
         help='all robots play with visible concealed tiles', default=False)
-    parser.add_option(
-        '', '--clients', dest='clients',
+    parser.add_argument(
+        '--clients', dest='clients',
         help='start a maximum of CLIENTS kajongg instances. Default is 2',
         metavar='CLIENTS', type=int, default=1)
-    parser.add_option(
-        '', '--servers', dest='servers',
+    parser.add_argument(
+        '--servers', dest='servers',
         help='start a maximum of SERVERS kajonggserver instances. Default is 1',
         metavar='SERVERS', type=int, default=1)
-    parser.add_option(
-        '', '--git', dest='git',
+    parser.add_argument(
+        '--git', dest='git',
         help='check all commits: either a comma separated list or a range from..until')
-    parser.add_option(
-        '', '--debug', dest='debug',
+    parser.add_argument(
+        '--debug', dest='debug',
         help=Debug.help())
-
     return parser.parse_args()
 
 
@@ -683,7 +682,7 @@ def main():
     # we want only english in the logs because i18n and friends
     # behave differently in kde and kde
     os.environ['LANG'] = 'en_US.UTF-8'
-    (OPTIONS, args) = parse_options()
+    OPTIONS = parse_options()
     OPTIONS.csv = os.path.expanduser(
         os.path.join('~', '.kajongg', 'kajongg.csv'))
     if not os.path.exists(os.path.dirname(OPTIONS.csv)):
@@ -699,10 +698,6 @@ def main():
     errorMessage = Debug.setOptions(','.join(OPTIONS.debug))
     if errorMessage:
         print(errorMessage)
-        sys.exit(2)
-
-    if args and ''.join(args):
-        print('unrecognized arguments:', ' '.join(args))
         sys.exit(2)
 
     print()
