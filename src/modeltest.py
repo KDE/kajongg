@@ -88,16 +88,16 @@ class ModelTest(QObject):
         assert(self.model.buddy(QModelIndex()) == QModelIndex())
         self.model.canFetchMore(QModelIndex())
         assert(self.model.columnCount(QModelIndex()) >= 0)
-        assert(self.model.data(QModelIndex(), Qt.DisplayRole) is None)
+        assert(self.model.data(QModelIndex(), Qt.ItemDataRole.DisplayRole) is None)
         self.fetchingMore = True
         self.model.fetchMore(QModelIndex())
         self.fetchingMore = False
         flags = self.model.flags(QModelIndex())
-        assert(int(flags & Qt.ItemIsEnabled) == Qt.ItemIsEnabled or
-               int(flags & Qt.ItemIsEnabled) == 0)
+        assert(int(flags & Qt.ItemFlag.ItemIsEnabled) == Qt.ItemFlag.ItemIsEnabled or
+               int(flags & Qt.ItemFlag.ItemIsEnabled) == 0)
         self.model.hasChildren(QModelIndex())
         self.model.hasIndex(0, 0)
-        self.model.headerData(0, Qt.Horizontal, Qt.DisplayRole)
+        self.model.headerData(0, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
         self.model.index(0, 0, QModelIndex())
         self.model.itemData(QModelIndex())
         cache = None
@@ -107,9 +107,9 @@ class ModelTest(QObject):
         assert(self.model.rowCount(QModelIndex()) >= 0)
         variant = None
         self.model.setData(QModelIndex(), variant, -1)
-        self.model.setHeaderData(-1, Qt.Horizontal, None)
-        self.model.setHeaderData(0, Qt.Horizontal, None)
-        self.model.setHeaderData(999999, Qt.Horizontal, None)
+        self.model.setHeaderData(-1, Qt.Orientation.Horizontal, None)
+        self.model.setHeaderData(0, Qt.Orientation.Horizontal, None)
+        self.model.setHeaderData(999999, Qt.Orientation.Horizontal, None)
         self.model.sibling(0, 0, QModelIndex())
         self.model.span(QModelIndex())
         self.model.supportedDropActions()
@@ -264,7 +264,7 @@ class ModelTest(QObject):
         Tests self.model's implementation of QAbstractItemModel::data()
         """
         # Invalid index should return an invalid qvariant
-        assert not isValid(self.model.data(QModelIndex(), Qt.DisplayRole))
+        assert not isValid(self.model.data(QModelIndex(), Qt.ItemDataRole.DisplayRole))
 
         if self.model.rowCount(QModelIndex()) == 0:
             return
@@ -276,28 +276,28 @@ class ModelTest(QObject):
         assert(
             self.model.setData(QModelIndex(),
                                "foo",
-                               Qt.DisplayRole) == False)
+                               Qt.ItemDataRole.DisplayRole) == False)
 
         # General Purpose roles that should return a QString
-        self.testRoleDataType(Qt.ToolTipRole, str)
-        self.testRoleDataType(Qt.StatusTipRole, str)
-        self.testRoleDataType(Qt.WhatsThisRole, str)
-        self.testRoleDataType(Qt.SizeHintRole, QSize)
-        self.testRoleDataType(Qt.FontRole, QFont)
-        self.testRoleDataType(Qt.ForegroundRole, QColor)
-        self.testRoleDataType(Qt.BackgroundColorRole, QColor)
-        self.testRoleDataType(Qt.TextColorRole, QColor)
+        self.testRoleDataType(Qt.ItemDataRole.ToolTipRole, str)
+        self.testRoleDataType(Qt.ItemDataRole.StatusTipRole, str)
+        self.testRoleDataType(Qt.ItemDataRole.WhatsThisRole, str)
+        self.testRoleDataType(Qt.ItemDataRole.SizeHintRole, QSize)
+        self.testRoleDataType(Qt.ItemDataRole.FontRole, QFont)
+        self.testRoleDataType(Qt.ItemDataRole.ForegroundRole, QColor)
+        self.testRoleDataType(Qt.ItemDataRole.BackgroundColorRole, QColor)
+        self.testRoleDataType(Qt.ItemDataRole.TextColorRole, QColor)
 
         # Check that the alignment is one we know about
         self.testRoleDataValues(
-            Qt.TextAlignmentRole,
-            lambda x: x == (x & int(Qt.AlignHorizontal_Mask | Qt.AlignVertical_Mask)))
+            Qt.ItemDataRole.TextAlignmentRole,
+            lambda x: x == (x & int(Qt.AlignmentFlag.AlignHorizontal_Mask | Qt.AlignmentFlag.AlignVertical_Mask)))
 
         # General Purpose roles that should return a QColor
         # Check that the "check state" is one we know about.
         self.testRoleDataValues(
-            Qt.CheckStateRole,
-            lambda x: x in (Qt.Unchecked, Qt.PartiallyChecked, Qt.Checked))
+            Qt.ItemDataRole.CheckStateRole,
+            lambda x: x in (Qt.CheckState.Unchecked, Qt.CheckState.PartiallyChecked, Qt.CheckState.Checked))
 
     def runAllTests(self):
         """run all tests after the model changed"""
@@ -464,7 +464,7 @@ class ModelTest(QObject):
                 # While you can technically return a QVariant usually this is a sign
                 # if an bug in data() Disable if this really is ok in your
                 # self.model
-                assert isValid(self.model.data(index, Qt.DisplayRole))
+                assert isValid(self.model.data(index, Qt.ItemDataRole.DisplayRole))
 
                 # if the next test fails here is some somewhat useful debug you play with
                 # if self.model.parent(index) != parent:

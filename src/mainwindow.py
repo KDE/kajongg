@@ -141,7 +141,7 @@ class MainWindow(KXmlGuiWindow):
             self.retranslateUi()
             for action in self.toolBar().actions():
                 if 'onfigure' in action.text():
-                    action.setPriority(QAction.LowPriority)
+                    action.setPriority(QAction.Priority.LowPriority)
             if Options.host and not Options.demo:
                 self.scene = PlayingScene(self)
                 HumanClient()
@@ -231,7 +231,7 @@ class MainWindow(KXmlGuiWindow):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.centralView)
         self.setCentralWidget(centralWidget)
-        self.centralView.setFocusPolicy(Qt.StrongFocus)
+        self.centralView.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.background = None  # just for pylint
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
         self.adjustMainView()
@@ -240,26 +240,26 @@ class MainWindow(KXmlGuiWindow):
             "scoreGame",
             "draw-freehand",
             self.scoringScene,
-            Qt.Key_C)
+            Qt.Key.Key_C)
         self.actionPlayGame = Action(
             self,
             "play",
             "arrow-right",
             self.playGame,
-            Qt.Key_N)
+            Qt.Key.Key_N)
         self.actionAbortGame = Action(
             self,
             "abort",
             "dialog-close",
             self.abortAction,
-            Qt.Key_W)
+            Qt.Key.Key_W)
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = Action(
             self,
             "quit",
             "application-exit",
             self.close,
-            Qt.Key_Q)
+            Qt.Key.Key_Q)
         self.actionPlayers = Action(
             self,
             "players", "im-user", self.slotPlayers)
@@ -269,32 +269,32 @@ class MainWindow(KXmlGuiWindow):
             "games-kajongg-law",
             self.slotRulesets)
         self.actionChat = self._kajonggToggleAction("chat", "call-start",
-                                                    shortcut=Qt.Key_H, actionData=ChatWindow)
+                                                    shortcut=Qt.Key.Key_H, actionData=ChatWindow)
         self.actionChat.setEnabled(False)
         self.actionAngle = Action(
             self,
             "angle",
             "object-rotate-left",
             self.changeAngle,
-            Qt.Key_G)
+            Qt.Key.Key_G)
         self.actionAngle.setEnabled(False)
         self.actionScoreTable = self._kajonggToggleAction(
             "scoreTable", "format-list-ordered",
-            Qt.Key_T, actionData=ScoreTable)
+            Qt.Key.Key_T, actionData=ScoreTable)
         self.actionScoreTable.setEnabled(False)
         self.actionExplain = self._kajonggToggleAction(
             "explain", "applications-education",
-            Qt.Key_E, actionData=ExplainView)
+            Qt.Key.Key_E, actionData=ExplainView)
         self.actionExplain.setEnabled(False)
         self.actionFullscreen = self._kajonggToggleAction(
-            "fullscreen", "view-fullscreen", shortcut=Qt.Key_F | Qt.ShiftModifier)
+            "fullscreen", "view-fullscreen", shortcut=Qt.Key.Key_F | Qt.KeyboardModifier.ShiftModifier)
         self.actionFullscreen.toggled.connect(self.fullScreen)
         self.actionAutoPlay = Action(
             self,
             "demoMode",
             "arrow-right-double",
             None,
-            Qt.Key_D)
+            Qt.Key.Key_D)
         self.actionAutoPlay.setCheckable(True)
         self.actionAutoPlay.setEnabled(True)
         self.actionAutoPlay.toggled.connect(self._toggleDemoMode)
@@ -325,9 +325,9 @@ class MainWindow(KXmlGuiWindow):
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""
         if toggle:
-            self.setWindowState(self.windowState() | Qt.WindowFullScreen)
+            self.setWindowState(self.windowState() | Qt.WindowState.WindowFullScreen)
         else:
-            self.setWindowState(self.windowState() & ~Qt.WindowFullScreen)
+            self.setWindowState(self.windowState() & ~Qt.WindowState.WindowFullScreen)
 
     def close(self, unusedResult=None):
         """wrap close() because we call it with a QTimer"""
@@ -496,18 +496,18 @@ class MainWindow(KXmlGuiWindow):
                   '&Score a manual game.'))
 
         self.actionPlayGame.setText(i18nc('@action:intoolbar', "&Play"))
-        self.actionPlayGame.setPriority(QAction.LowPriority)
+        self.actionPlayGame.setPriority(QAction.Priority.LowPriority)
         self.actionPlayGame.setWhatsThis(
             i18nc('kajongg @info:tooltip', 'Start a new game.'))
 
         self.actionAbortGame.setText(i18nc('@action:inmenu', "&Abort Game"))
-        self.actionAbortGame.setPriority(QAction.LowPriority)
+        self.actionAbortGame.setPriority(QAction.Priority.LowPriority)
         self.actionAbortGame.setWhatsThis(
             i18nc('kajongg @info:tooltip',
                   'Abort the current game.'))
 
         self.actionQuit.setText(i18nc('@action:inmenu', "&Quit Kajongg"))
-        self.actionQuit.setPriority(QAction.LowPriority)
+        self.actionQuit.setPriority(QAction.Priority.LowPriority)
 
         self.actionPlayers.setText(i18nc('@action:intoolbar', "&Players"))
         self.actionPlayers.setWhatsThis(
@@ -544,7 +544,7 @@ class MainWindow(KXmlGuiWindow):
                                               'Explain the scoring for all players in the current game.'))
 
         self.actionAutoPlay.setText(i18nc('@action:inmenu', "&Demo Mode"))
-        self.actionAutoPlay.setPriority(QAction.LowPriority)
+        self.actionAutoPlay.setPriority(QAction.Priority.LowPriority)
         self.actionAutoPlay.setWhatsThis(i18nc('kajongg @info:tooltip',
                                                'Let the computer take over for you. Start a new local game if needed.'))
 
@@ -555,7 +555,7 @@ class MainWindow(KXmlGuiWindow):
 
     def changeEvent(self, event):
         """when the applicationwide language changes, recreate GUI"""
-        if event.type() == QEvent.LanguageChange:
+        if event.type() == QEvent.Type.LanguageChange:
             self.setupGUI()
             self.retranslateUi()
 
@@ -579,7 +579,7 @@ class MainWindow(KXmlGuiWindow):
         view, scene = self.centralView, self.scene
         if scene:
             scene.adjustSceneView()
-            view.fitInView(scene.itemsBoundingRect(), Qt.KeepAspectRatio)
+            view.fitInView(scene.itemsBoundingRect(), Qt.AspectRatioMode.KeepAspectRatio)
 
     @afterQueuedAnimations
     def backgroundChanged(self, unusedDeferredResult, unusedOldName, newName):

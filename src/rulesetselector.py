@@ -169,7 +169,7 @@ class RuleModel(TreeModel):
         result = None
         if index.isValid():
             item = index.internalPointer()
-            if role in (Qt.DisplayRole, Qt.EditRole):
+            if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and isinstance(item.rawContent, BoolRule):
                         return ''
@@ -182,21 +182,21 @@ class RuleModel(TreeModel):
                 if showValue == '0':
                     showValue = ''
                 result = showValue
-            elif role == Qt.CheckStateRole:
+            elif role == Qt.ItemDataRole.CheckStateRole:
                 if self.isCheckboxCell(index):
                     bData = item.content(index.column())
-                    result = Qt.Checked if bData else Qt.Unchecked
-            elif role == Qt.TextAlignmentRole:
-                result = int(Qt.AlignLeft | Qt.AlignVCenter)
+                    result = Qt.CheckState.Checked if bData else Qt.CheckState.Unchecked
+            elif role == Qt.ItemDataRole.TextAlignmentRole:
+                result = int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
                 if index.column() > 0:
-                    result = int(Qt.AlignRight | Qt.AlignVCenter)
-            elif role == Qt.FontRole and index.column() == 0:
+                    result = int(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            elif role == Qt.ItemDataRole.FontRole and index.column() == 0:
                 ruleset = item.ruleset()
                 if isinstance(ruleset, PredefinedRuleset):
                     font = QFont()
                     font.setItalic(True)
                     result = font
-            elif role == Qt.ToolTipRole:
+            elif role == Qt.ItemDataRole.ToolTipRole:
                 tip = '<b></b>%s<b></b>' % i18n(
                     item.tooltip()) if item else ''
                 result = tip
@@ -215,16 +215,16 @@ class RuleModel(TreeModel):
         if Qt is None:
             # happens when kajongg exits unexpectedly
             return None
-        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
             if section >= self.rootItem.columnCount():
                 return None
             result = self.rootItem.content(section)
             if result == 'doubles':
                 return 'x2'
             return i18nc('kajongg', result)
-        if role == Qt.TextAlignmentRole:
-            leftRight = Qt.AlignLeft if section == 0 else Qt.AlignRight
-            return int(leftRight | Qt.AlignVCenter)
+        if role == Qt.ItemDataRole.TextAlignmentRole:
+            leftRight = Qt.AlignmentFlag.AlignLeft if section == 0 else Qt.AlignmentFlag.AlignRight
+            return int(leftRight | Qt.AlignmentFlag.AlignVCenter)
         return None
 
     def appendRuleset(self, ruleset):
@@ -278,7 +278,7 @@ class EditableRuleModel(RuleModel):
             dirty, message = content.score.change(unitName, value)
         return dirty, message
 
-    def setData(self, index, value, role=Qt.EditRole):
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
         """change data in the model"""
         # pylint:  disable=too-many-branches
         if not index.isValid():
@@ -288,7 +288,7 @@ class EditableRuleModel(RuleModel):
         item = index.internalPointer()
         ruleset = item.ruleset()
         content = item.rawContent
-        if role == Qt.EditRole:
+        if role == Qt.ItemDataRole.EditRole:
             if isinstance(content, Ruleset) and column == 0:
                 oldName = content.name
                 content.rename(english(value))
@@ -300,10 +300,10 @@ class EditableRuleModel(RuleModel):
                     return False
             else:
                 return False
-        elif role == Qt.CheckStateRole:
+        elif role == Qt.ItemDataRole.CheckStateRole:
             if isinstance(content, BoolRule) and column == 1:
                 if not isinstance(ruleset, PredefinedRuleset):
-                    newValue = value == Qt.Checked
+                    newValue = value == Qt.CheckState.Checked
                     if content.parameter != newValue:
                         dirty = True
                         content.parameter = newValue
@@ -318,7 +318,7 @@ class EditableRuleModel(RuleModel):
     def flags(self, index):
         """tell the view what it can do with this item"""
         if not index.isValid():
-            return Qt.ItemIsEnabled
+            return Qt.ItemFlag.ItemIsEnabled
         column = index.column()
         item = index.internalPointer()
         content = item.rawContent
@@ -331,11 +331,11 @@ class EditableRuleModel(RuleModel):
         else:
             mayEdit = False
         mayEdit = mayEdit and not isinstance(item.ruleset(), PredefinedRuleset)
-        result = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        result = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
         if mayEdit:
-            result |= Qt.ItemIsEditable
+            result |= Qt.ItemFlag.ItemIsEditable
         if checkable:
-            result |= Qt.ItemIsUserCheckable
+            result |= Qt.ItemFlag.ItemIsUserCheckable
         return result
 
 

@@ -40,7 +40,7 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
 
     def __init__(self):
         QGraphicsRectItem.__init__(self)
-        pen = QPen(QColor(Qt.blue))
+        pen = QPen(QColor(Qt.GlobalColor.blue))
         pen.setWidth(6)
         self.setPen(pen)
         self.setZValue(ZValues.markerZ)
@@ -117,7 +117,7 @@ class SceneWithFocusRect(QGraphicsScene):
         """
         prev = self.focusItem()
         QGraphicsScene.focusInEvent(self, event)
-        if prev and bool(prev.flags() & QGraphicsItem.ItemIsFocusable) and prev != self.focusItem():
+        if prev and bool(prev.flags() & QGraphicsItem.GraphicsItemFlag.ItemIsFocusable) and prev != self.focusItem():
             self.setFocusItem(prev)
 
     @property
@@ -278,7 +278,7 @@ class GameScene(SceneWithFocusRect):
                     sBar.changeItem(sbMessage, idx)
                 else:
                     sBar.insertItem(sbMessage, idx, 1)
-                    sBar.setItemAlignment(idx, Qt.AlignLeft)
+                    sBar.setItemAlignment(idx, Qt.AlignmentFlag.AlignLeft)
         else:
             for idx in range(5):
                 if sBar.hasItem(idx):
@@ -388,7 +388,7 @@ class PlayingScene(GameScene):
     def keyPressEvent(self, event):
         """if we have a clientDialog, pass event to it"""
         mod = event.modifiers()
-        if mod in (Qt.NoModifier, Qt.ShiftModifier):
+        if mod in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier):
             if self.clientDialog:
                 self.clientDialog.keyPressEvent(event)
         GameScene.keyPressEvent(self, event)
@@ -547,9 +547,9 @@ class ScoringScene(GameScene):
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
             wind_chr = windsX[moveCommands.index(wind)]
-            self.__moveTile(uiTile, wind_chr, bool(mod & Qt.ShiftModifier))
+            self.__moveTile(uiTile, wind_chr, bool(mod & Qt.KeyboardModifier.ShiftModifier))
             return True
-        if key == Qt.Key_Tab and self.game:
+        if key == Qt.Key.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
             tabItems.extend(p.handBoard for p in self.game.players if p.handBoard.uiTiles)
             tabItems.append(tabItems[0])
@@ -564,7 +564,7 @@ class ScoringScene(GameScene):
     def keyPressEvent(self, event):
         """navigate in the selectorboard"""
         mod = event.modifiers()
-        if mod in (Qt.NoModifier, Qt.ShiftModifier):
+        if mod in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier):
             if self.game:
                 if self.__navigateScoringGame(event):
                     return

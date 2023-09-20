@@ -52,7 +52,7 @@ class PlayConfigTab(QWidget):
         self.kcfg_propose.setObjectName('kcfg_propose')
         self.kcfg_animationSpeed = QSlider(self)
         self.kcfg_animationSpeed.setObjectName('kcfg_animationSpeed')
-        self.kcfg_animationSpeed.setOrientation(Qt.Horizontal)
+        self.kcfg_animationSpeed.setOrientation(Qt.Orientation.Horizontal)
         self.kcfg_animationSpeed.setSingleStep(1)
         lblSpeed = QLabel(i18n('Animation speed:'))
         lblSpeed.setBuddy(self.kcfg_animationSpeed)
@@ -106,7 +106,7 @@ class ConfigDialog(KConfigDialog):
         """The four tabs can be selected with CTRL-1 .. CTRL-4"""
         mod = event.modifiers()
         key = chr(event.key() % 128)
-        if Qt.ControlModifier | mod and key in '123456789'[:len(self.pages)]:
+        if Qt.KeyboardModifier.ControlModifier | mod and key in '123456789'[:len(self.pages)]:
             self.setCurrentPage(self.pages[int(key) - 1])
             return
         KConfigDialog.keyPressEvent(self, event)

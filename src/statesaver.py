@@ -82,9 +82,9 @@ class StateSaver(QObject):
         if QEvent is not None:
             # while appquit, QEvent may be None. Maybe not anymore
             # with later versions?
-            if event.type() == QEvent.Hide:
+            if event.type() in(QEvent.Type.Hide, QEvent.Type.Move, QEvent.Type.Resize):
                 self.save()
-            elif event.type() == QEvent.Close:
+            elif event.type() == QEvent.Type.Close:
                 self.save()
                 widget = self.widgets[0][1]
                 if widget in StateSaver.savers:

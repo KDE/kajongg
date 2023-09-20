@@ -72,7 +72,7 @@ class TwistedSocketNotifier(QObject):
         self.fn:Optional[Callable[[int], None]]
         self.notifier = QSocketNotifier(fd, socketType, parent)
         self.notifier.setEnabled(True)
-        if socketType == QSocketNotifier.Read:
+        if socketType == QSocketNotifier.Type.Read:
             self.fn = self.read
         else:
             self.fn = self.write
@@ -169,13 +169,13 @@ class QtReactor(posixbase.PosixReactorBase):
         """
         Add a FileDescriptor for notification of data available to read.
         """
-        self._add(reader, self._reads, QSocketNotifier.Read)
+        self._add(reader, self._reads, QSocketNotifier.Type.Read)
 
     def addWriter(self, writer:unix.Client) ->None:
         """
         Add a FileDescriptor for notification of data available to write.
         """
-        self._add(writer, self._writes, QSocketNotifier.Write)
+        self._add(writer, self._writes, QSocketNotifier.Type.Write)
 
     def _remove(self, xer:unix.Client, primary:Dict[unix.Client, TwistedSocketNotifier]) ->None:
         """
@@ -241,7 +241,7 @@ class QtReactor(posixbase.PosixReactorBase):
         self._timer.stop()
         delay = max(delay or 0, 1)
         if not fromqt:
-            self.qApp.processEvents(QEventLoop.AllEvents, delay * 1000)
+            self.qApp.processEvents(QEventLoop.ProcessEventsFlag.AllEvents, delay * 1000)
         if self.timeout() is None:
             timeout = 0.1
         elif self.timeout() == 0:

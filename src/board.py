@@ -147,7 +147,7 @@ class WindLabel(QLabel):
         pwind = WindDisc(self.__wind)
         pwind.prevailing = self.__wind == Wind.all4[min(self.__roundsFinished, 3)]
         pMap = QPixmap(40, 40)
-        pMap.fill(Qt.transparent)
+        pMap.fill(Qt.GlobalColor.transparent)
         painter = QPainter(pMap)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.scale(0.40, 0.40)
@@ -167,7 +167,7 @@ class Board(QGraphicsRectItem, ReprMixin):
 
     penColor = 'black'
 
-    arrows = [Qt.Key_Left, Qt.Key_Down, Qt.Key_Up, Qt.Key_Right]
+    arrows = [Qt.Key.Key_Left, Qt.Key.Key_Down, Qt.Key.Key_Up, Qt.Key.Key_Right]
 
     def __init__(self, width, height, tileset, boardRotation=0):
         QGraphicsRectItem.__init__(self)
@@ -258,7 +258,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         self.tileDragEnabled = enabled
         QGraphicsRectItem.setEnabled(self, enabled)
 
-    def _focusableTiles(self, sortDir=Qt.Key_Right):
+    def _focusableTiles(self, sortDir=Qt.Key.Key_Right):
         """return a list of all tiles in this board sorted such that
         moving in the sortDir direction corresponds to going to
         the next list element.
@@ -376,7 +376,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         if Debug.graphics:
             self.setPen(QPen(QColor(self.penColor)))
         else:
-            self.setPen(QPen(Qt.NoPen))
+            self.setPen(QPen(Qt.PenStyle.NoPen))
 
     def tileAt(self, xoffset, yoffset, level=0):
         """if there is a uiTile at this place, return it"""
@@ -756,8 +756,8 @@ class FittingView(QGraphicsView):
     def __init__(self, parent=None):
         """generate a fitting view with our favourite properties"""
         QGraphicsView.__init__(self, parent)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         vpol = QSizePolicy()
         vpol.setHorizontalPolicy(QSizePolicy.Expanding)
         vpol.setVerticalPolicy(QSizePolicy.Expanding)
@@ -787,7 +787,7 @@ class FittingView(QGraphicsView):
         if self.scene():
             self.fitInView(
                 self.scene().itemsBoundingRect(),
-                Qt.KeepAspectRatio)
+                Qt.AspectRatioMode.KeepAspectRatio)
         self.setFocus()
 
     def __matchingTile(self, position, uiTile):
@@ -816,7 +816,7 @@ class FittingView(QGraphicsView):
         """set blue focus frame"""
         tiles = self.tileAt(event.pos())
         if tiles:
-            if event.modifiers() & Qt.ShiftModifier:
+            if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
                 for uiTile in tiles:
                     print(
                         '%s: board.level:%s' %
@@ -849,7 +849,7 @@ class FittingView(QGraphicsView):
             board = tilePressed.board
             if board and board.tileDragEnabled:
                 self.dragObject = self.drag(tilePressed)
-                self.dragObject.exec_(Qt.MoveAction)
+                self.dragObject.exec_(Qt.DropAction.MoveAction)
                 self.dragObject = None
                 return None
         return QGraphicsView.mouseMoveEvent(self, event)

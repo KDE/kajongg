@@ -26,7 +26,7 @@ class KDialogIgnoringEscape(KDialog):
 
     def keyPressEvent(self, event):
         """catch and ignore the Escape key"""
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             event.ignore()
         else:
             KDialog.keyPressEvent(self, event)
@@ -72,7 +72,7 @@ class Prompt(MustChooseKDialog, ReprMixin):
         self.default = default
         if Options.gui:
             MustChooseKDialog.__init__(self)
-            self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+            self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
             self.setCaption(caption or '')
             KMessageBox.createKMessageBox(
                 self, icon, msg,

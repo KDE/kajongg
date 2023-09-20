@@ -40,16 +40,16 @@ class TablesModel(QAbstractTableModel):
 
     def headerData(
             self, section,
-            orientation, role=Qt.DisplayRole):
+            orientation, role=Qt.ItemDataRole.DisplayRole):
         """show header"""
-        if role == Qt.TextAlignmentRole:
-            if orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.TextAlignmentRole:
+            if orientation == Qt.Orientation.Horizontal:
                 if section in [3, 4]:
-                    return int(Qt.AlignLeft)
-                return int(Qt.AlignHCenter | Qt.AlignVCenter)
-        if role != Qt.DisplayRole:
+                    return int(Qt.AlignmentFlag.AlignLeft)
+                return int(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        if role != Qt.ItemDataRole.DisplayRole:
             return None
-        if orientation != Qt.Horizontal:
+        if orientation != Qt.Orientation.Horizontal:
             return int(section + 1)
         result = ''
         if section < 5:
@@ -75,20 +75,20 @@ class TablesModel(QAbstractTableModel):
         id(visible) is what should be displayed."""
         return 5
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         """score table"""
         # pylint: disable=too-many-branches,too-many-locals
         result = None
-        if role == Qt.TextAlignmentRole:
+        if role == Qt.ItemDataRole.TextAlignmentRole:
             if index.column() == 0:
-                result = int(Qt.AlignHCenter | Qt.AlignVCenter)
+                result = int(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
             else:
-                result = int(Qt.AlignLeft | Qt.AlignVCenter)
+                result = int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         if index.isValid() and (0 <= index.row() < len(self.tables)):
             table = self.tables[index.row()]
-            if role == Qt.DisplayRole and index.column() in (0, 1):
+            if role == Qt.ItemDataRole.DisplayRole and index.column() in (0, 1):
                 result = table.tableid
-            elif role == Qt.DisplayRole and index.column() == 2:
+            elif role == Qt.ItemDataRole.DisplayRole and index.column() == 2:
                 players = []
                 zipped = list(zip(table.playerNames, table.playersOnline))
                 for idx, pair in enumerate(zipped):
@@ -116,7 +116,7 @@ class TablesModel(QAbstractTableModel):
                         '</nobr>')
                 names = ''.join(players)
                 result = names
-            elif role == Qt.DisplayRole and index.column() == 3:
+            elif role == Qt.ItemDataRole.DisplayRole and index.column() == 3:
                 status = table.status()
                 if table.suspendedAt:
                     dateVal = ' ' + datetime.datetime.strptime(
@@ -127,9 +127,9 @@ class TablesModel(QAbstractTableModel):
                     dateVal = ''
                 result = i18nc('table status', status) + dateVal
             elif index.column() == 4:
-                if role == Qt.DisplayRole:
+                if role == Qt.ItemDataRole.DisplayRole:
                     result = i18n((table.myRuleset if table.myRuleset else table.ruleset).name)
-                elif role == Qt.ForegroundRole:
+                elif role == Qt.ItemDataRole.ForegroundRole:
                     palette = KApplication.palette()
                     color = palette.windowText().color() if table.myRuleset else 'red'
                     result = QColor(color)

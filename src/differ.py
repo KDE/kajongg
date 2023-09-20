@@ -38,7 +38,7 @@ class DifferModel(QAbstractTableModel):
             return 0
         return len(self.diffs)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         """get from model"""
         if not index.isValid():
             return None
@@ -46,20 +46,20 @@ class DifferModel(QAbstractTableModel):
             return None
         diff = self.diffs[index.row()]
         column = index.column()
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             return diff[column]
-        if role == Qt.TextAlignmentRole:
-            return int(Qt.AlignLeft | Qt.AlignVCenter)
+        if role == Qt.ItemDataRole.TextAlignmentRole:
+            return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         return None
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
-        if role == Qt.TextAlignmentRole:
-            if orientation == Qt.Horizontal:
-                return int(Qt.AlignLeft | Qt.AlignVCenter)
-        if role != Qt.DisplayRole:
+        if role == Qt.ItemDataRole.TextAlignmentRole:
+            if orientation == Qt.Orientation.Horizontal:
+                return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        if role != Qt.ItemDataRole.DisplayRole:
             return None
-        if orientation == Qt.Horizontal:
+        if orientation == Qt.Orientation.Horizontal:
             if section == 0:
                 return i18nc('Kajongg', 'Rule')
             if section == 1:

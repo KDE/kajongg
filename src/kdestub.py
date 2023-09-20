@@ -167,7 +167,7 @@ class IconLabel(QLabel):
         option = QStyleOption()
         option.initFrom(dialog)
         self.setPixmap(icon.pixmap(dialog.style().pixelMetric(
-            QStyle.PM_MessageBoxIconSize, option, dialog)))
+            QStyle.PixelMetric.PM_MessageBoxIconSize, option, dialog)))
 
 
 class KMessageBox:
@@ -200,9 +200,9 @@ class KMessageBox:
         hLayout.addLayout(iconLayout, 0)
 
         messageLabel = QLabel(text)
-        flags = Qt.TextSelectableByMouse
+        flags = Qt.TextInteractionFlag.TextSelectableByMouse
         if options & KMessageBox.AllowLink:
-            flags |= Qt.LinksAccessibleByMouse
+            flags |= Qt.TextInteractionFlag.LinksAccessibleByMouse
             messageLabel.setOpenExternalLinks(True)
         messageLabel.setTextInteractionFlags(flags)
 
@@ -218,7 +218,7 @@ class KMessageBox:
             scrollArea = QScrollArea(dialog)
             scrollArea.setWidget(messageLabel)
             scrollArea.setWidgetResizable(True)
-            scrollArea.setFocusPolicy(Qt.NoFocus)
+            scrollArea.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             scrollPal = QPalette(scrollArea.palette())
             scrollArea.viewport().setPalette(scrollPal)
             hLayout.addWidget(scrollArea, 5)
@@ -234,7 +234,7 @@ KDialogButtonBox = QDialogButtonBox
 class KDialog(CaptionMixin, QDialog):
 
     """QDialog should be enough for kajongg"""
-    NoButton = 0
+    NoButton = QDialogButtonBox.NoButton
     Ok = QDialogButtonBox.Ok
     Cancel = QDialogButtonBox.Cancel
     Yes = QDialogButtonBox.Yes
@@ -300,12 +300,12 @@ class KDialog(CaptionMixin, QDialog):
     @staticmethod
     def spacingHint():
         """stub"""
-        return QApplication.style().pixelMetric(QStyle.PM_DefaultLayoutSpacing)
+        return QApplication.style().pixelMetric(QStyle.PixelMetric.PM_DefaultLayoutSpacing)
 
     @staticmethod
     def marginHint():
         """stub"""
-        return QApplication.style().pixelMetric(QStyle.PM_DefaultChildMargin)
+        return QApplication.style().pixelMetric(QStyle.PixelMetric.PM_DefaultChildMargin)
 
 
 class KUser:
@@ -398,7 +398,7 @@ class MyStatusBarItem:
         self.stretch = stretch
         self.label = QLabel()
         self.label.setText(text)
-        self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
 
 
 class KStatusBar(QStatusBar):
@@ -471,7 +471,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
             i18nc('@action:inmenu', 'About &Kajongg'))
         self.toolBar().setMovable(False)
         self.toolBar().setFloatable(False)
-        self.toolBar().setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.toolBar().setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
 
     def showEvent(self, event):
         """now that the MainWindow code has run, we know all actions"""
@@ -479,7 +479,8 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.toolBar().setVisible(Internal.Preferences.toolBarVisible)
         self.actionStatusBar.setChecked(self.statusBar().isVisible())
         self.actionToolBar.setChecked(self.toolBar().isVisible())
-        self.actionFullscreen.setChecked(self.windowState() & Qt.WindowFullScreen == Qt.WindowFullScreen)
+        self.actionFullscreen.setChecked(
+            self.windowState() & Qt.WindowState.WindowFullScreen == Qt.WindowState.WindowFullScreen)
         QMainWindow.showEvent(self, event)
 
     def hideEvent(self, event):
@@ -667,8 +668,8 @@ class Action(QAction):
             if QT6:
                 if isinstance(shortcut, QKeyCombination):
                     shortcut = shortcut.key()
-            self.setShortcut(QKeySequence(shortcut | Qt.CTRL))
-            self.setShortcutContext(Qt.ApplicationShortcut)
+            self.setShortcut(QKeySequence(shortcut | Qt.Modifier.CTRL))
+            self.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
         if actionData is not None:
             self.setData(actionData)
 
@@ -875,11 +876,11 @@ class KSwitchLanguageDialog(KDialog):
         numRows = self.languagesLayout.rowCount()
 
         languageLabel = QLabel(labelText)
-        self.languagesLayout.addWidget(languageLabel, numRows + 1, 1, Qt.AlignLeft)
-        self.languagesLayout.addWidget(languageButton.button, numRows + 1, 2, Qt.AlignLeft)
+        self.languagesLayout.addWidget(languageLabel, numRows + 1, 1, Qt.AlignmentFlag.AlignLeft)
+        self.languagesLayout.addWidget(languageButton.button, numRows + 1, 2, Qt.AlignmentFlag.AlignLeft)
 
         if not isPrimaryLanguage:
-            self.languagesLayout.addWidget(removeButton, numRows + 1, 3, Qt.AlignLeft)
+            self.languagesLayout.addWidget(removeButton, numRows + 1, 3, Qt.AlignmentFlag.AlignLeft)
             removeButton.show()
             self.languageRows[removeButton] = tuple([languageLabel, languageButton])
 
@@ -1126,7 +1127,7 @@ class LicenseDialog(KDialog):
 
     def __init__(self, parent, licenseFile):
         KDialog.__init__(self, parent)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setCaption(i18n("License Agreement"))
         self.setButtons(KDialog.Close)
         self.buttonBox.setFocus()
@@ -1232,11 +1233,11 @@ class KConfigDialog(KDialog):
     def addPage(self, configTab, name, iconName):
         """add a page to the config dialog"""
         item = QListWidgetItem(KIcon(iconName), name)
-        item.setTextAlignment(Qt.AlignHCenter)
+        item.setTextAlignment(Qt.AlignmentFlag.AlignHCenter)
         font = item.font()
         font.setBold(True)
         item.setFont(font)
-        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
         self.iconList.addItem(item)
         self.tabSpace.addWidget(configTab)
         self.iconList.setIconSize(QSize(80, 80))
@@ -1332,7 +1333,7 @@ class ToolBarItem(QListWidgetItem):
         QListWidgetItem.__init__(self, self.__icon(), self.__text(), parent)
         # drop between items, not onto items
         self.setFlags(
-            (self.flags() | Qt.ItemIsDragEnabled) & ~Qt.ItemIsDropEnabled)
+            (self.flags() | Qt.ItemFlag.ItemIsDragEnabled) & ~Qt.ItemFlag.ItemIsDropEnabled)
 
     def __icon(self):
         """the action icon, default is an empty icon"""
@@ -1340,9 +1341,9 @@ class ToolBarItem(QListWidgetItem):
         if result.isNull():
             if not self.emptyIcon:
                 iconSize = self.parent.style().pixelMetric(
-                    QStyle.PM_SmallIconSize)
+                    QStyle.PixelMetric.PM_SmallIconSize)
                 self.emptyIcon = QPixmap(iconSize, iconSize)
-                self.emptyIcon.fill(Qt.transparent)
+                self.emptyIcon.fill(Qt.GlobalColor.transparent)
                 self.emptyIcon = QIcon(self.emptyIcon)
             result = self.emptyIcon
         return result

@@ -168,9 +168,9 @@ class PlayerList(QDialog):
     def keyPressEvent(self, event):
         """use insert/delete keys for insert/delete"""
         key = event.key()
-        if key == Qt.Key_Insert:
+        if key == Qt.Key.Key_Insert:
             self.slotInsert()
-        elif key == Qt.Key_Delete:
+        elif key == Qt.Key.Key_Delete:
             self.delete()
         else:
             QDialog.keyPressEvent(self, event)

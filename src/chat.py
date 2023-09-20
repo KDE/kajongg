@@ -26,16 +26,16 @@ class ChatModel(QAbstractTableModel):
         super().__init__(parent)
         self.chatLines = []
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole):
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         """show header"""
-        if role == Qt.TextAlignmentRole:
-            if orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.TextAlignmentRole:
+            if orientation == Qt.Orientation.Horizontal:
                 if section == 1:
-                    return int(Qt.AlignRight)
-                return int(Qt.AlignLeft)
-        if orientation != Qt.Horizontal:
+                    return int(Qt.AlignmentFlag.AlignRight)
+                return int(Qt.AlignmentFlag.AlignLeft)
+        if orientation != Qt.Orientation.Horizontal:
             return int(section + 1)
-        if role != Qt.DisplayRole:
+        if role != Qt.ItemDataRole.DisplayRole:
             return None
         result = ''
         if section < self.columnCount():
@@ -54,26 +54,26 @@ class ChatModel(QAbstractTableModel):
         """for now we only have time, who, message"""
         return 3
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         """score table"""
         result = None
-        if role == Qt.TextAlignmentRole:
+        if role == Qt.ItemDataRole.TextAlignmentRole:
             if index.column() == 1:
-                return int(Qt.AlignRight)
-            return int(Qt.AlignLeft)
+                return int(Qt.AlignmentFlag.AlignRight)
+            return int(Qt.AlignmentFlag.AlignLeft)
         if index.isValid() and (0 <= index.row() < len(self.chatLines)):
             chatLine = self.chatLines[index.row()]
-            if role == Qt.DisplayRole and index.column() == 0:
+            if role == Qt.ItemDataRole.DisplayRole and index.column() == 0:
                 local = chatLine.localtimestamp()
                 result = '%02d:%02d:%02d' % (
                     local.hour,
                     local.minute,
                     local.second)
-            elif role == Qt.DisplayRole and index.column() == 1:
+            elif role == Qt.ItemDataRole.DisplayRole and index.column() == 1:
                 result = chatLine.fromUser
-            elif role == Qt.DisplayRole and index.column() == 2:
+            elif role == Qt.ItemDataRole.DisplayRole and index.column() == 2:
                 result = i18n(chatLine.message)
-            elif role == Qt.ForegroundRole and index.column() == 2:
+            elif role == Qt.ItemDataRole.ForegroundRole and index.column() == 2:
                 palette = Internal.app.palette()
                 color = 'blue' if chatLine.isStatusMessage else palette.windowText(
                 )
@@ -124,7 +124,7 @@ class ChatWindow(QWidget):
         decorateWindow(self, title)
         self.messageView = ChatView()
         self.messageView.setModel(ChatModel())
-        self.messageView.setFocusPolicy(Qt.NoFocus)
+        self.messageView.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.messageView.setShowGrid(False)
         self.messageView.setWordWrap(False)
         self.messageView.setSelectionMode(QAbstractItemView.NoSelection)
@@ -145,13 +145,13 @@ class ChatWindow(QWidget):
     def show(self):
         """not only show but also restore and raise"""
         self.activateWindow()
-        self.setWindowState(self.windowState() & ~Qt.WindowMinimized)
+        self.setWindowState(self.windowState() & ~Qt.WindowState.WindowMinimized)
         self.raise_()
         QWidget.show(self)
 
     def isVisible(self):
         """not only visible but also not minimized"""
-        return QWidget.isVisible(self) and not self.windowState() & Qt.WindowMinimized
+        return QWidget.isVisible(self) and not self.windowState() & Qt.WindowState.WindowMinimized
 
     def kill(self):
         """hide and null on table"""

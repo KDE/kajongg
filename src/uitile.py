@@ -40,7 +40,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         self._tile = tile
         self._boundingRect = None
         self._cross = False
-        self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
+        self.setCacheMode(QGraphicsItem.CacheMode.DeviceCoordinateCache)
         # while moving the tile we use ItemCoordinateCache, see
         # Tile.setActiveAnimation
         self.__board = None
@@ -58,9 +58,9 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         """if we do not show shadows, we need to clip"""
         showShadows = Internal.Preferences.showShadows
         self.setFlag(
-            QGraphicsItem.ItemClipsChildrenToShape,
+            QGraphicsItem.GraphicsItemFlag.ItemClipsChildrenToShape,
             enabled=not showShadows)
-        self.setFlag(QGraphicsItem.ItemClipsToShape, enabled=not showShadows)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemClipsToShape, enabled=not showShadows)
 
     def keyPressEvent(self, event):
         """redirect to the board"""
@@ -218,7 +218,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         else:
             originalSize = self.tileset.faceSize.toSize()
         result = QPixmap(pmapSize)
-        result.fill(Qt.transparent)
+        result.fill(Qt.GlobalColor.transparent)
         painter = QPainter(result)
         if not painter.isActive():
             logException(
@@ -257,15 +257,15 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             color.setAlpha(self.tileset.darkenerAlpha)
             painter.fillRect(rect, color)
 
-    def sortKey(self, sortDir=Qt.Key_Right):
+    def sortKey(self, sortDir=Qt.Key.Key_Right):
         """moving order for cursor"""
-        dirs = [Qt.Key_Right, Qt.Key_Up, Qt.Key_Left, Qt.Key_Down] * 2
+        dirs = [Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Left, Qt.Key.Key_Down] * 2
         sorter = dirs[dirs.index(sortDir) + sceneRotation(self.__board) // 90]
-        if sorter == Qt.Key_Down:
+        if sorter == Qt.Key.Key_Down:
             return self.xoffset * 100 + self.yoffset
-        if sorter == Qt.Key_Up:
+        if sorter == Qt.Key.Key_Up:
             return -(self.xoffset * 100 + self.yoffset)
-        if sorter == Qt.Key_Left:
+        if sorter == Qt.Key.Key_Left:
             return -(self.yoffset * 100 + self.xoffset)
         return self.yoffset * 100 + self.xoffset
 
@@ -335,7 +335,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
     @property
     def focusable(self):
         """as the name says"""
-        return bool(self.flags() & QGraphicsItem.ItemIsFocusable)
+        return bool(self.flags() & QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
 
     @focusable.setter
     def focusable(self, value):
@@ -343,7 +343,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         if self.tile.name2() in Debug.focusable:
             newStr = 'focusable' if value else 'unfocusable'
             logDebug('%s: %s from %s' % (newStr, self.tile.name2(), stack('')[-2]))
-        self.setFlag(QGraphicsItem.ItemIsFocusable, value)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, value)
 
     @property
     def board(self):

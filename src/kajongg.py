@@ -156,7 +156,8 @@ if sys.platform == 'win32':
         # cx_freeze
         os.chdir(os.path.dirname(_))
 
-QGuiApplication.setAttribute(Qt.AA_ShareOpenGLContexts, True)
+QGuiApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts, True)
+
 Internal.app = KApplication()
 parseOptions()
 
@@ -186,6 +187,6 @@ if Options.csv:
 
 from mainwindow import MainWindow
 if QT5:
-    QGuiApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+    QGuiApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)
 MainWindow()
 Internal.app.exec_()

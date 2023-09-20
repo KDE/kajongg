@@ -65,10 +65,10 @@ class GamesModel(QAbstractTableModel):
     def data(self, index, role=None):
         """get score table from view"""
         if role is None:
-            role = Qt.DisplayRole
-        if not (index.isValid() and role == Qt.DisplayRole):
+            role = Qt.ItemDataRole.DisplayRole
+        if not (index.isValid() and role == Qt.ItemDataRole.DisplayRole):
             return None
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             unformatted = str(
                 self._resultRows[index.row()][index.column()]) # TODO: brauche ich str?
             if index.column() == 2:
@@ -86,7 +86,7 @@ class GamesModel(QAbstractTableModel):
 
     def headerData(self, section, orientation, role):
         """for the two visible columns"""
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+        if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
             return i18n('Players') if section == 2 else i18n('Started')
         return None
 
@@ -156,10 +156,10 @@ class Games(QDialog):
     def keyPressEvent(self, event):
         """use insert/delete keys for insert/delete"""
         key = event.key()
-        if key == Qt.Key_Insert:
+        if key == Qt.Key.Key_Insert:
             self.newEntry()
             return
-        if key == Qt.Key_Delete:
+        if key == Qt.Key.Key_Delete:
             self.delete()
             event.ignore()
             return

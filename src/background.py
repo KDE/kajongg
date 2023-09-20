@@ -66,7 +66,7 @@ class Background(Resource):
                     logException(
                         i18n('file <filename>%1</filename> contains no valid SVG', self.graphicsPath))
                 self.__pmap = QPixmap(width, height)
-                self.__pmap.fill(Qt.transparent)
+                self.__pmap.fill(Qt.GlobalColor.transparent)
                 painter = QPainter(self.__pmap)
                 renderer.render(painter)
                 QPixmapCache.insert(cachekey, self.__pmap)

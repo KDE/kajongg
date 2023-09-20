@@ -203,7 +203,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         """start the animation, returning its deferred"""
         if not isAlive(self):
             return fail()
-        assert self.state() != QAbstractAnimation.Running
+        assert self.state() != QAbstractAnimation.State.Running
         for animation in self.animations:
             graphicsObject = animation.targetObject()
             if not isAlive(animation) or not isAlive(graphicsObject):
@@ -227,7 +227,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         scene.focusRect.hide()
         QParallelAnimationGroup.start(
             self,
-            QAbstractAnimation.DeleteWhenStopped)
+            QAbstractAnimation.DeletionPolicy.DeleteWhenStopped)
         if self.debug:
             logDebug('%s started with speed %d (%s)' % (
                 self, Internal.Preferences.animationSpeed,
@@ -269,9 +269,9 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             return 'not alive'
         if state is None:
             state = self.state()
-        if state == QAbstractAnimation.Stopped:
+        if state == QAbstractAnimation.State.Stopped:
             return 'stopped'
-        if state == QAbstractAnimation.Running:
+        if state == QAbstractAnimation.State.Running:
             return 'running'
         assert False
         return None
@@ -353,7 +353,7 @@ class AnimatedMixin:
             else:
                 logDebug('setActiveAnimation {} {}: set {}'.format(self.debug_name(), propName, animation))
         self.activeAnimation[propName] = animation
-        self.setCacheMode(QGraphicsItem.ItemCoordinateCache)
+        self.setCacheMode(QGraphicsItem.CacheMode.ItemCoordinateCache)
 
     def clearActiveAnimation(self, animation):
         """an animation for this graphics object has ended.

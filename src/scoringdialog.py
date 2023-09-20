@@ -188,8 +188,8 @@ class ScoreModel(TreeModel):
         column = index.column()
         item = index.internalPointer()
         if role is None:
-            role = Qt.DisplayRole
-        if role == Qt.DisplayRole:
+            role = Qt.ItemDataRole.DisplayRole
+        if role == Qt.ItemDataRole.DisplayRole:
             if isinstance(item, ScorePlayerItem):
                 content = item.content(column)
                 if isinstance(content, HandResult):
@@ -203,21 +203,22 @@ class ScoreModel(TreeModel):
                         content = str(content.balance)
                 return content
             return '' if column > 0 else item.content(0)
-        if role == Qt.TextAlignmentRole:
-            return int(Qt.AlignLeft | Qt.AlignVCenter) if index.column() == 0 else int(Qt.AlignRight | Qt.AlignVCenter)
-        if role == Qt.FontRole:
+        if role == Qt.ItemDataRole.TextAlignmentRole:
+            return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter) \
+                if index.column() == 0 else int(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        if role == Qt.ItemDataRole.FontRole:
             return QFont('Monospaced')
-        if role == Qt.ForegroundRole:
+        if role == Qt.ItemDataRole.ForegroundRole:
             if isinstance(item, ScorePlayerItem) and item.parent.row() == 3:
                 content = item.content(column)
                 if not isinstance(content, HandResult):
                     return QBrush(ScoreItemDelegate.colors[index.row()])
         if column > 0 and isinstance(item, ScorePlayerItem):
             content = item.content(column)
-            if role == Qt.BackgroundRole:
+            if role == Qt.ItemDataRole.BackgroundRole:
                 if content and content.won:
                     return QColor(165, 255, 165)
-            if role == Qt.ToolTipRole:
+            if role == Qt.ItemDataRole.ToolTipRole:
                 englishHints = content.manualrules.split('||')
                 tooltip = '<br />'.join(i18n(x) for x in englishHints)
                 return tooltip
@@ -225,7 +226,7 @@ class ScoreModel(TreeModel):
 
     def headerData(self, section, orientation, role):
         """tell the view about the wanted headers"""
-        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
             if section == 0:
                 return i18n('Round/Hand')
             child1 = self.rootItem.children[0]
@@ -235,8 +236,9 @@ class ScoreModel(TreeModel):
                 handResult = hands[section - 1]
                 if not handResult.penalty:
                     return handResult.handId()
-        elif role == Qt.TextAlignmentRole:
-            return int(Qt.AlignLeft | Qt.AlignVCenter) if section == 0 else int(Qt.AlignRight | Qt.AlignVCenter)
+        elif role == Qt.ItemDataRole.TextAlignmentRole:
+            return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter) \
+                if section == 0 else int(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         return None
 
     def loadData(self):
@@ -403,7 +405,7 @@ class ScoreTable(QWidget):
         self.scoreModel = None
         self.scoreModelTest = None
         decorateWindow(self, i18nc('kajongg', 'Scores'))
-        self.setAttribute(Qt.WA_AlwaysShowToolTips)
+        self.setAttribute(Qt.WidgetAttribute.WA_AlwaysShowToolTips)
         self.setMouseTracking(True)
         self.setupUi()
         self.refresh()
@@ -426,12 +428,12 @@ class ScoreTable(QWidget):
         self.viewRight = ScoreViewRight(self)
         self.viewRight.setHorizontalScrollBar(HorizontalScrollBar(self))
         self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
-        self.viewRight.setFocusPolicy(Qt.NoFocus)
+        self.viewRight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.viewRight.header().setSectionsClickable(False)
         self.viewRight.header().setSectionsMovable(False)
         self.viewRight.setSelectionMode(QAbstractItemView.NoSelection)
         windowLayout = QVBoxLayout(self)
-        self.splitter = QSplitter(Qt.Vertical)
+        self.splitter = QSplitter(Qt.Orientation.Vertical)
         self.splitter.setObjectName('ScoreTableSplitter')
         windowLayout.addWidget(self.splitter)
         scoreWidget = QWidget()
@@ -497,7 +499,7 @@ class ScoreTable(QWidget):
         self.scoreLayout.setSpacing(0)
         self.viewLeft.setFrameStyle(QFrame.NoFrame)
         self.viewRight.setFrameStyle(QFrame.NoFrame)
-        self.viewLeft.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.viewLeft.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         for master, slave in ((self.viewRight, self.viewLeft), (self.viewLeft, self.viewRight)):
             master.expanded.connect(slave.expand)
             master.collapsed.connect(slave.collapse)
@@ -610,14 +612,14 @@ class PenaltyBox(QSpinBox):
     def validate(self, inputData, pos):
         """check if value is a multiple of parties"""
         result, inputData, newPos = QSpinBox.validate(self, inputData, pos)
-        if result == QValidator.Acceptable:
+        if result == QValidator.State.Acceptable:
             try:
                 int_data = int(inputData)
             except ValueError:
-                return (QValidator.Invalid, inputData, pos)
+                return (QValidator.State.Invalid, inputData, pos)
             if int_data % self.parties != 0:
-                result = QValidator.Intermediate
-        if result == QValidator.Acceptable:
+                result = QValidator.State.Intermediate
+        if result == QValidator.State.Acceptable:
             self.prevValue = str(inputData)
         return (result, inputData, newPos)
 
@@ -1145,7 +1147,7 @@ class ScoringDialog(QWidget):
         restoredIdx = None
         for meld in winnerMelds:
             pixMap = QPixmap(faceWidth * len(meld), faceHeight)
-            pixMap.fill(Qt.transparent)
+            pixMap.fill(Qt.GlobalColor.transparent)
             self.__meldPixMaps.append(pixMap)
             painter = QPainter(pixMap)
             for element in meld:

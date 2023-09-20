@@ -48,13 +48,13 @@ class SelectChow(KDialogIgnoringEscape):
         layout = QVBoxLayout()
         label = QLabel(i18n('Which chow do you want to expose?'))
         layout.addWidget(label)
-        layout.setAlignment(label, Qt.AlignHCenter)
+        layout.setAlignment(label, Qt.AlignmentFlag.AlignHCenter)
         self.buttons = []
         for chow in chows:
             button = QRadioButton('{}-{}-{}'.format(*(x.value for x in chow)))
             self.buttons.append(button)
             layout.addWidget(button)
-            layout.setAlignment(button, Qt.AlignHCenter)
+            layout.setAlignment(button, Qt.AlignmentFlag.AlignHCenter)
             button.toggled.connect(self.toggled)
         widget = QWidget(self)
         widget.setLayout(layout)
@@ -86,7 +86,7 @@ class SelectKong(KDialogIgnoringEscape):
         layout = QVBoxLayout()
         label = QLabel(i18n('Which kong do you want to declare?'))
         layout.addWidget(label)
-        layout.setAlignment(label, Qt.AlignHCenter)
+        layout.setAlignment(label, Qt.AlignmentFlag.AlignHCenter)
         self.buttons = []
         for kong in kongs:
             button = QRadioButton((kong[0].name()), self)
@@ -129,7 +129,7 @@ class DlgButton(QPushButton):
     def keyPressEvent(self, event):
         """forward horizintal arrows to the hand board"""
         key = Board.mapChar2Arrow(event)
-        if key in [Qt.Key_Left, Qt.Key_Right]:
+        if key in [Qt.Key.Key_Left, Qt.Key.Key_Right]:
             game = self.client.game
             if game and game.activePlayer == game.myself:
                 game.myself.handBoard.keyPressEvent(event)
@@ -162,7 +162,7 @@ class ClientDialog(QDialog):
             self.timer.timeout.connect(self.timeout)
         self.deferred = None
         self.buttons = []
-        self.setWindowFlags(Qt.SubWindow | Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(Qt.WindowType.SubWindow | Qt.WindowType.WindowStaysOnTopHint)
         self.setModal(False)
         self.btnHeight = 0
         self.answered = False
@@ -173,7 +173,7 @@ class ClientDialog(QDialog):
         """ESC selects default answer"""
         if not self.client.game or self.client.game.autoPlay:
             return
-        if event.key() in [Qt.Key_Escape, Qt.Key_Space]:
+        if event.key() in [Qt.Key.Key_Escape, Qt.Key.Key_Space]:
             self.selectButton()
             event.accept()
         else:

@@ -36,17 +36,17 @@ class RichTextColumnDelegate(QStyledItemDelegate):
         if self.label is None:
             self.label = QLabel()
             self.label.setIndent(5)
-            self.label.setTextFormat(Qt.RichText)
+            self.label.setTextFormat(Qt.TextFormat.RichText)
             self.document = QTextDocument()
 
     def paint(self, painter, option, index):
         """paint richtext"""
-        if option.state & QStyle.State_Selected:
+        if option.state & QStyle.StateFlag.State_Selected:
             role = QPalette.Highlight
         else:
             role = QPalette.AlternateBase if index.row() % 2 else QPalette.Base
         self.label.setBackgroundRole(role)
-        text = index.model().data(index, Qt.DisplayRole)
+        text = index.model().data(index, Qt.ItemDataRole.DisplayRole)
         self.label.setText(text)
         self.label.setFixedSize(option.rect.size())
         with Painter(painter):
@@ -75,7 +75,7 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
     def __textMargin():
         """text margin"""
         return QApplication.style().pixelMetric(
-            QStyle.PM_FocusFrameHMargin) + 1
+            QStyle.PixelMetric.PM_FocusFrameHMargin) + 1
 
     def paint(self, painter, option, index):
         """paint right aligned checkbox"""
@@ -83,7 +83,7 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
         if self.cellFilter(index):
             textMargin = self.__textMargin()
             newRect = QStyle.alignedRect(
-                option.direction, Qt.AlignRight,
+                option.direction, Qt.AlignmentFlag.AlignRight,
                 QSize(
                     option.decorationSize.width() + 5,
                     option.decorationSize.height()),
@@ -98,17 +98,17 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
         """edit right aligned checkbox"""
         flags = model.flags(index)
         # make sure that the item is checkable
-        if not flags & Qt.ItemIsUserCheckable or not flags & Qt.ItemIsEnabled:
+        if not flags & Qt.ItemFlag.ItemIsUserCheckable or not flags & Qt.ItemFlag.ItemIsEnabled:
             return False
         # make sure that we have a check state
-        value = index.data(Qt.CheckStateRole)
+        value = index.data(Qt.ItemDataRole.CheckStateRole)
         if not isinstance(value, int):
             return False
         # make sure that we have the right event type
-        if event.type() == QEvent.MouseButtonRelease:
+        if event.type() == QEvent.Type.MouseButtonRelease:
             textMargin = self.__textMargin()
             checkRect = QStyle.alignedRect(
-                option.direction, Qt.AlignRight,
+                option.direction, Qt.AlignmentFlag.AlignRight,
                 option.decorationSize,
                 QRect(
                     option.rect.x() + (2 * textMargin), option.rect.y(),
@@ -116,13 +116,13 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
                     option.rect.height()))
             if not checkRect.contains(event.pos()):
                 return False
-        elif event.type() == QEvent.KeyPress:
-            if event.key() not in (Qt.Key_Space, Qt.Key_Select):
+        elif event.type() == QEvent.Type.KeyPress:
+            if event.key() not in (Qt.Key.Key_Space, Qt.Key.Key_Select):
                 return False
         else:
             return False
-        if value == Qt.Checked:
-            state = Qt.Unchecked
+        if value == Qt.CheckState.Checked:
+            state = Qt.CheckState.Unchecked
         else:
-            state = Qt.Checked
-        return model.setData(index, state, Qt.CheckStateRole)
+            state = Qt.CheckState.Checked
+        return model.setData(index, state, Qt.ItemDataRole.CheckStateRole)
