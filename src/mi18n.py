@@ -16,8 +16,7 @@ python interface to KDE.
 
 import os
 import sys
-from locale import _parse_localename, getdefaultlocale, setlocale, LC_ALL
-
+from locale import _parse_localename, setlocale, LC_ALL
 
 # pylint: disable=wrong-import-order
 
@@ -241,9 +240,6 @@ class MLocale:
     def get_localenames():
         """parse environment variables"""
         result = []
-        defaultlocale = getdefaultlocale()[0]
-        if defaultlocale:
-            result.append(defaultlocale)
         for variable in ('LANGUAGE', 'LC_ALL', 'LC_MESSAGES', 'LANG'):
             try:
                 localename = os.environ[variable]

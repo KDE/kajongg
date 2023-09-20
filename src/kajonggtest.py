@@ -18,7 +18,7 @@ import time
 import gc
 
 from optparse import OptionParser
-from locale import getdefaultlocale
+from locale import getpreferredencoding
 
 from common import Debug, StrMixin, cacheDir
 from util import removeIfExists, gitHead, checkMemory, popenReadlines
@@ -675,9 +675,9 @@ def main():
     """parse options, play, evaluate results"""
     global OPTIONS  # pylint: disable=global-statement
 
-    locale_encoding = getdefaultlocale()[1]
-    if locale_encoding != 'UTF-8':
-        print('we need default encoding UTF-8 but have {}'.format(locale_encoding))
+    locale_encoding = getpreferredencoding()
+    if locale_encoding.lower() != 'utf-8':
+        print('we need default encoding utf-8 but have {}'.format(locale_encoding))
         sys.exit(2)
 
     # we want only english in the logs because i18n and friends
