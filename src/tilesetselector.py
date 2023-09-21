@@ -40,7 +40,6 @@ class TilesetSelector(QWidget):
         self.tileset = Tileset(_)
         self.uiTiles = [UITile(Tile('w' + s.char.lower())) for s in Wind.all4]
         self.board = Board(2, 2, self.tileset)
-        self.board.showShadows = True
         self.tileScene.addItem(self.board)
         self.tileView.setParent(self.tilesetPreview)
         layout = QHBoxLayout(self.tilesetPreview)
