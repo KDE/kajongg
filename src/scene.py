@@ -374,6 +374,7 @@ class PlayingScene(GameScene):
                 self.game = None
             else:
                 self.mainWindow.actionAutoPlay.setChecked(autoPlaying)
+                result = False  # this implicitly handles the Cancelled Error
             return result
         if not self.game:
             return succeed(True)
@@ -382,7 +383,7 @@ class PlayingScene(GameScene):
             self.game = None
             return succeed(True)
         autoPlaying = self.mainWindow.actionAutoPlay.isChecked()
-        return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(
+        return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addBoth(
             gotAnswer, autoPlaying)
 
     def keyPressEvent(self, event):
