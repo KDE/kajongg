@@ -41,7 +41,7 @@ find_package(Qt${QT_MAJOR_VERSION} ${QT_MIN_VERSION} REQUIRED NO_MODULE COMPONEN
 if (QT_MAJOR_VERSION STREQUAL "6")
     find_package(Qt6SvgWidgets ${QT_MIN_VERSION} REQUIRED)
 endif()
-find_package(KF${KF_MAJOR_VERSION} ${KF_MIN_VERSION} REQUIRED COMPONENTS Config DocTools I18n)
+find_package(KF${KF_MAJOR_VERSION} ${KF_MIN_VERSION} REQUIRED COMPONENTS DocTools I18n)
 
 add_subdirectory( voices )
 add_subdirectory( doc )
