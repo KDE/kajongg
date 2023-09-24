@@ -1012,9 +1012,9 @@ If you want to download the source and install manually:
 <para>
 Kajongg depends on those packages: (debian package names in parentheses)
 <itemizedlist>
-	<listitem><para>Python 3.5 or higher (python3)</para></listitem>
-	<listitem><para>Qt5.7 or higher (python3-pyqt5 and python3-pyqt5.qtsvg)</para></listitem>
-	<listitem><para>the python bindings for Qt5 (python3-pyqt5)</para></listitem>
+	<listitem><para>Python 3.8 or higher (python3)</para></listitem>
+	<listitem><para>Qt6.5 or higher (python3-pyqt6 and python3-pyqt6.qtsvg)</para></listitem>
+	<listitem><para>the python bindings for Qt6 (python3-pyqt6)</para></listitem>
         <listitem><para>the python twisted library 16.6.0 or higher (python3-twisted)</para></listitem>
         <listitem><para>sqlite3 (libsqlite3-0)</para></listitem>
 </itemizedlist>

@@ -8,10 +8,3 @@ Dependencies:
     'frameworks/kdoctools': '@latest-kf6'
     'frameworks/ki18n': '@latest-kf6'
     'games/libkmahjongg': '@latest-kf6'
-
-- 'on': ['Linux/Qt5', 'FreeBSD/Qt5']
-  'require':
-    'frameworks/extra-cmake-modules': '@stable'
-    'frameworks/kdoctools': '@stable'
-    'frameworks/ki18n': '@stable'
-    'games/libkmahjongg': '@same'

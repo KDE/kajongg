@@ -10,8 +10,8 @@ set(RELEASE_SERVICE_VERSION "${RELEASE_SERVICE_VERSION_MAJOR}.${RELEASE_SERVICE_
 project(kajongg VERSION ${RELEASE_SERVICE_VERSION})
 
 set(PYTHON_MIN_VERSION "3.8.0")
-set(QT_MIN_VERSION "5.2")
-set(KF_MIN_VERSION "5.15.0")
+set(QT_MIN_VERSION "6.5.0")
+set(KF_MIN_VERSION "5.240.0")
 set(TWISTED_MIN_VERSION "16.6.0")
 
 find_package(ECM ${KF_MIN_VERSION} REQUIRED NO_MODULE)
@@ -27,21 +27,20 @@ include(FindPythonInterp)
 
 include(KDEPython)
 
-if (QT_MAJOR_VERSION STREQUAL "6")
-    set(QT_REQUIRED_VERSION "6.5.0")
-    set(KF_MIN_VERSION "5.240.0")
-    set(KF_MAJOR_VERSION "6")
-else()
-    set(KF_MAJOR_VERSION "5")
-endif()
-
 find_package(PythonInterp ${PYTHON_MIN_VERSION} REQUIRED)
 find_package(Twisted ${TWISTED_MIN_VERSION} REQUIRED)
-find_package(Qt${QT_MAJOR_VERSION} ${QT_MIN_VERSION} REQUIRED NO_MODULE COMPONENTS Core Gui Svg Widgets)
-if (QT_MAJOR_VERSION STREQUAL "6")
-    find_package(Qt6SvgWidgets ${QT_MIN_VERSION} REQUIRED)
-endif()
-find_package(KF${KF_MAJOR_VERSION} ${KF_MIN_VERSION} REQUIRED COMPONENTS DocTools I18n)
+find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS
+    Core
+    Gui
+    Svg
+    SvgWidgets
+    Widgets
+)
+
+find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS
+    DocTools
+    I18n
+)
 
 add_subdirectory( voices )
 add_subdirectory( doc )
@@ -119,11 +118,8 @@ set(DATAFILES
     src/backgroundselector.ui
     src/kajonggui.rc)
 
-if (QT_MAJOR_VERSION STREQUAL "6")
-    find_package(KMahjongglib6 5.1.0 REQUIRED)
-else()
-    find_package(KF5KMahjongglib REQUIRED)
-endif()
+
+find_package(KMahjongglib6 5.1.0 REQUIRED)
 
 # In KDE4, this was done with PYKDE4_INSTALL_PYTHON_FILES and PYKDE4_ADD_EXECUTABLE
 # because including PYKDE4 does not seem appropriate when not using PYKDE4 bindings,
