@@ -549,7 +549,7 @@ msgstr "O servidor %1 non está a executar un servidor de Kajongg."
 
 #: src/login.py:607
 msgid "Address for server %1 cannot be found"
-msgstr "Non se pode atopar o enderezo do servidor %1."
+msgstr "Non é posíbel atopar o enderezo do servidor %1."
 
 #: src/login.py:610
 msgid "Login to server %1 failed: You have no network connection"
@@ -917,12 +917,12 @@ msgstr "Non podes ou non che cómpre cantar esta ficha."
 msgid ""
 "cannot find any %1 in the following directories, is libkmahjongg installed?"
 msgstr ""
-"non se pode atopar ningún %1 nos directorios seguintes; está instalada "
+"non é posíbel atopar ningún %1 nos directorios seguintes; está instalada "
 "libkmahjongg?"
 
 #: src/mjresource.py:104
 msgid "cannot find %1, using default"
-msgstr "non se pode atopar %1; úsase o predeterminado"
+msgstr "non é posíbel atopar %1; úsase o predeterminado"
 
 #: src/mjresource.py:114
 msgid "unknown name"
@@ -2097,7 +2097,7 @@ msgstr "Non se escoitarán as voces porque falta o programa %1."
 
 #: src/sound.py:358
 msgid "cannot write <filename>%1</filename>: %2"
-msgstr "non se pode escribir <filename>%1</filename>: %2"
+msgstr "non é posíbel escribir <filename>%1</filename>: %2"
 
 #: src/sound.py:361
 msgid "The voice files have changed, their checksum has changed."
