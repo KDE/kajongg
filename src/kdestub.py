@@ -1396,12 +1396,12 @@ class KEditToolBar(KDialog):
         self.upAction.clicked.connect(self.upButton)
         self.insertAction = QToolButton(self)
         self.insertAction.setIcon(
-            KIcon('go-next' if QApplication.isRightToLeft else 'go-previous'))
+            KIcon('go-next' if QApplication.isRightToLeft() else 'go-previous'))
         self.insertAction.setEnabled(False)
         self.insertAction.clicked.connect(self.insertButton)
         self.removeAction = QToolButton(self)
         self.removeAction.setIcon(
-            KIcon('go-previous' if QApplication.isRightToLeft else 'go-next'))
+            KIcon('go-previous' if QApplication.isRightToLeft() else 'go-next'))
         self.removeAction.setEnabled(False)
         self.removeAction.clicked.connect(self.removeButton)
         self.downAction = QToolButton(self)
