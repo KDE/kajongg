@@ -1609,15 +1609,15 @@
 >Kajongg залежить від таких пакунків: (назви пакунків у debian наведено у дужках) <itemizedlist>
 	<listitem
 ><para
->Python 3.5 або новіша версія (python3)</para
+>Python 3.8 або новіша версія (python3)</para
 ></listitem>
 	<listitem
 ><para
->Qt 5.7 або новіша версія (python3-pyqt5 і python3-pyqt5.qtsvg)</para
+>Qt 6.5 або новіша версія (python3-pyqt6 і python3-pyqt6.qtsvg)</para
 ></listitem>
 	<listitem
 ><para
->Прив’язки Python до Qt 5 (python3-pyqt5)</para
+>Прив’язки Python до Qt 6 (python3-pyqt6)</para
 ></listitem>
         <listitem
 ><para

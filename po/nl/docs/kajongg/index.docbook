@@ -1601,15 +1601,15 @@
 >Kajongg is afhankelijk van deze pakketten: (debian pakketnamen in haakjes) <itemizedlist>
 	<listitem
 ><para
->Python 3.5 of hoger (python3)</para
+>Python 3.8 of hoger (python3)</para
 ></listitem>
 	<listitem
 ><para
->Qt5.7 of hoger (python3-pyqt5 en python3-pyqt5.qtsvg)</para
+>Qt6.5 of hoger (python3-pyqt6 en python3-pyqt6.qtsvg)</para
 ></listitem>
 	<listitem
 ><para
->de python bindings voor Qt5 (python3-pyqt5)</para
+>de python bindings voor Qt6 (python3-pyqt6)</para
 ></listitem>
         <listitem
 ><para

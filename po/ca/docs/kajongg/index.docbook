@@ -264,7 +264,7 @@
 >Desa la mà</guibutton
 >. Els valors de les mans s'introduiran a la base de dades i també es mostraran a la taula de puntuacions. És possible que se us demani que canvieu les posicions dels seients dels jugadors, però podeu optar per no canviar de seient. Actualment, els canvis proposats no es poden personalitzar -si un joc de regles necessita quelcom diferent, ho canviarem-. </para>
 	<para
->Si el jugador podria haver guanyat, s'habilitarà la casella de selecció a la columna <guilabel
+>Si el jugador podia haver guanyat, s'habilitarà la casella de selecció a la columna <guilabel
 >Guanyador</guilabel
 > -feu-hi clic per al guanyador-. </para>
 	<para
@@ -413,7 +413,7 @@
 ></itemizedlist>
         </para
 ><para
->En ambdós casos, haureu de dir-li als altres jugadors com poden arribar al vostre servidor de joc. Necessitaran l'&URL; o senzillament una adreça IP i el port on està escoltant el servidor. Això podria ser quelcom com <literal
+>En ambdós casos, haureu de dir als altres jugadors com poden arribar al vostre servidor de joc. Necessitaran l'&URL; o senzillament una adreça IP i el port on està escoltant el servidor. Això podria ser quelcom com <literal
 >mypc.dyndns.org:8301</literal
 >&nbsp;, on <literal
 >8301</literal
@@ -498,7 +498,7 @@
 ><title
 >Puntuació</title
 ><para
->Al final d'una mà, es calcularà la puntuació de cada jugador. Primer, els punts bàsics es compten com 2 punts per a un pung exposat senzill o 20 punts per guanyar. A continuació, s'aplicarà un altre joc de regles -aquestes regles poden duplicar els punts com un doble per a una combinació de dracs-. Quan es coneix la puntuació de cada mà, es paguen les diferències entre els jugadors -mentre que el guanyador rep la puntuació completa de tots els altres jugadors-. L'est sempre rebrà i pagarà el doble de la seva puntuació.</para>
+>Al final d'una mà, es calcularà la puntuació de cada jugador. Primer, els punts bàsics es compten com 2 punts per un pung exposat senzill o 20 punts per guanyar. A continuació, s'aplicarà un altre joc de regles -aquestes regles poden duplicar els punts com un doble per a una combinació de dracs-. Quan es coneix la puntuació de cada mà, es paguen les diferències entre els jugadors -mentre que el guanyador rep la puntuació completa de tots els altres jugadors-. L'est sempre rebrà i pagarà el doble de la seva puntuació.</para>
 	  <para
 >Per descomptat, el &kajongg; coneix totes les regles aplicables, però un bon jugador sabrà quines combinacions obtenen quina puntuació per a poder optimitzar. Mentre s'aprèn, es recomana activar la finestra <guimenuitem
 >Explica les puntuacions</guimenuitem
@@ -1046,14 +1046,14 @@
 >/home/jordi/.local/share/apps/kajongg/voices/jordi/</filename
 >&nbsp;. És possible que la carpeta <filename class="directory"
 >voices/</filename
-> encara no existeixi -de ser així, creeu-la-. </para
+> encara no existeixi, si és així, creeu-la. </para
 ></listitem
 ></itemizedlist>
 		</para
 ></listitem
 ><listitem
 ><para
->Ara que sabeu on col·locar la vostra nova veu, genereu una carpeta nova per a ella. </para
+>Ara que sabeu on col·locar la vostra veu nova, genereu una carpeta nova per a ella. </para
 ></listitem
 ><listitem
 ><para
@@ -1243,7 +1243,7 @@
 				</mediaobject>
 			</screenshot>
 			<para
->Utilitzeu l'editor del joc de regles per a personalitzar-los. Els jocs de regles predefinits es mostren en cursiva, els jocs de regles personalitzats tenen un tipus de lletra normal. L'usuari no podrà canviar de cap manera els jocs de regles predefinits, però, una actualització del &kajongg; podria fer-ho. Els jocs de regles personalitzats mai es veuran afectats per una actualització. </para
+>Utilitzeu l'editor del joc de regles per a personalitzar-los. Els jocs de regles predefinits es mostren en cursiva, els jocs de regles personalitzats tenen una lletra normal. L'usuari no podrà canviar de cap manera els jocs de regles predefinits, però, una actualització del &kajongg; podria fer-ho. Els jocs de regles personalitzats mai es veuran afectats per una actualització. </para
 ><para
 >Quan s'inicia un joc nou, podreu seleccionar un joc de regles per a aquest joc. Es poden utilitzar tots els jocs de regles definits en l'editor del joc de regles. El joc de regles es desa juntament amb el joc, de manera que sempre el podreu canviar aquí -els vostres canvis només afectaran els jocs futurs-. </para>
 			<sect2
@@ -1605,15 +1605,15 @@
 >El &kajongg; depèn d'aquests paquets: (noms de paquets entre parèntesis de la Debian) <itemizedlist>
 	<listitem
 ><para
->Python 3.5 o superior (python3)</para
+>Python 3.8 o superior (python3)</para
 ></listitem>
 	<listitem
 ><para
->Qt5.7 o superior (python3-pyqt5 i python3-pyqt5.qtsvg)</para
+>Qt6.5 o superior (python3-pyqt6 i python3-pyqt6.qtsvg)</para
 ></listitem>
 	<listitem
 ><para
->els lligams de Python per a les Qt5 (python3-pyqt5)</para
+>els lligams de Python per a les Qt6 (python3-pyqt6)</para
 ></listitem>
         <listitem
 ><para

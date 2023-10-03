@@ -4,7 +4,7 @@
 # Kira J. Fernandez <kirajfdez@gmail.com>, 2010, 2011.
 # Huever, 2010.
 # Kira J. Fernandez <kirajfdez@gmail.es>, 2011, 2012.
-# Eloy Cuadra <ecuadra@eloihr.net>, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022.
+# SPDX-FileCopyrightText: 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023 Eloy Cuadra <ecuadra@eloihr.net>
 # Rocio Gallego <traducciones@rociogallego.com>, 2012.
 # Javier Viñal <fjvinal@gmail.com>, 2013.
 # David Paul <eodos0@gmail.com>, 2014.
@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2022-02-02 00:27+0100\n"
+"PO-Revision-Date: 2023-10-02 21:40+0100\n"
 "Last-Translator: Sofía Priego <spriego@darksylvania.net>\n"
 "Language-Team: Spanish <kde-l10n-es@kde.org>\n"
 "Language: es\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-KDE-DocBook-SVN-URL: trunk/kdereview/doc/kajongg/index.docbook\n"
 "X-KDE-DocBook-SVN-Changed-Revision: 1101477\n"
-"X-Generator: Lokalize 21.12.1\n"
+"X-Generator: Lokalize 23.08.1\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 msgid "Preview"
@@ -250,8 +250,8 @@ msgstr "¿Preparado para la próxima mano?"
 #: src/humanclient.py:907
 msgid "The connection to the server %1 broke, please try again later."
 msgstr ""
-"La conexión con el servidor %1 se ha interrumpido; por favor, inténtelo de "
-"nuevo más tarde."
+"La conexión con el servidor %1 se ha interrumpido. Inténtelo de nuevo más "
+"tarde."
 
 #: src/kajongg.py:81 src/kdestub.py:1055
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
@@ -391,7 +391,7 @@ msgstr "Acerca de &Kajongg"
 
 #: src/kdestub.py:824
 msgid "Please choose the language which should be used for this application:"
-msgstr "Por favor, elija el idioma que se debe usar en esta aplicación:"
+msgstr "Elija el idioma que se debe usar en esta aplicación:"
 
 #: src/kdestub.py:843
 msgid "Add Fallback Language"
@@ -456,15 +456,15 @@ msgid ""
 "Jongg solitaire please use the application kmahjongg."
 msgstr ""
 "Este es el Mahjong clásico para cuatro jugadores. Si está buscando el "
-"solitario del Mahjong, por favor use la aplicación kmahjongg."
+"solitario del Mahjong, use la aplicación kmahjongg."
 
 #: src/kdestub.py:1075
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
 msgstr ""
-"Por favor, use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> "
-"para informar de errores."
+"Use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> para informar "
+"de errores."
 
 #: src/kdestub.py:1080
 msgid "Authors:"
@@ -2124,8 +2124,7 @@ msgstr "Los archivos de voz han cambiado: su suma de verificación ha cambiado."
 
 #: src/sound.py:362
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
-msgstr ""
-"Por favor, vuelva a instalar kajongg o ejecute (con los permisos necesarios):"
+msgstr "Vuelva a instalar kajongg o ejecute (con los permisos necesarios):"
 
 #: src/tables.py:56
 msgid "Table"
