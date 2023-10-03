@@ -833,7 +833,7 @@ class KSwitchLanguageDialog(KDialog):
         defined = Internal.kajonggrc.group(
             'Locale').readEntry('Language').split(':')
         if not defined:
-            defined = [QLocale.name()]
+            defined = [QLocale().name()]
         for idx, _ in enumerate(defined):
             self.addLanguageButton(_, isPrimaryLanguage=idx == 0)
 
