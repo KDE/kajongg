@@ -257,6 +257,7 @@ class ScoreModel(TreeModel):
                                           if x[0] == player.nameid]]) for player in humans + robots]
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
+        assert self.rootItem
         groupIndex = self.index(self.rootItem.childCount(), 0, parent)
         groupNames = [i18nc('kajongg', 'Score'), i18nc('kajongg', 'Payments'),
                       i18nc('kajongg', 'Balance'), i18nc('kajongg', 'Chart')]
@@ -1070,6 +1071,7 @@ class ScoringDialog(QWidget):
                         wonBox.setChecked(False)
                 if not wonBox.isVisibleTo(self) and player is self.game.winner:
                     self.game.winner = None
+        assert Internal.scene
         if Internal.scene.explainView:
             Internal.scene.explainView.refresh()
 
