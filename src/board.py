@@ -783,7 +783,7 @@ class FittingView(QGraphicsView):
         Internal.Preferences.callTrigger(
             'tilesetName')  # this redraws and resizes
         Internal.Preferences.callTrigger('backgroundName')  # redraw background
-        if Internal.scaleScene and self.scene():
+        if self.scene():
             self.fitInView(
                 self.scene().itemsBoundingRect(),
                 Qt.KeepAspectRatio)

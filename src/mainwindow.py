@@ -579,7 +579,7 @@ class MainWindow(KXmlGuiWindow):
     def adjustMainView(self):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
-        if not Internal.scaleScene or not isAlive(self):
+        if not isAlive(self):
             return
         view, scene = self.centralView, self.scene
         if scene:

@@ -87,9 +87,6 @@ class Tileset(Resource):
             'BAMBOO_1').size() + distanceSize
         self.tileSize = self.__renderer.boundsOnElement(
             'TILE_2').size() + distanceSize
-        if not Internal.scaleScene:
-            self.faceSize /= 2
-            self.tileSize /= 2
         shW = self.shadowWidth()
         shH = self.shadowHeight()
         self.__shadowOffsets = [

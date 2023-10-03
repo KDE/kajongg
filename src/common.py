@@ -352,9 +352,6 @@ class __Internal:
     @type logPrefix: C{str}
     @cvar isServer: True if this is the server process.
     @type isServer: C{bool}
-    @cvar scaleScene: Defines if the scene is scaled.
-        Disable for debugging only.
-    @type scaleScene: C{bool}
     @cvar reactor: The twisted reactor instance.
     @type reactor: L{twisted.internet.reactor}
     @cvar app: The Qt or KDE app instance
@@ -368,7 +365,6 @@ class __Internal:
     defaultPort = 8301
     logPrefix = 'C'
     isServer = False
-    scaleScene = True
     reactor = None
     app = None
     db = None
