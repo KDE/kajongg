@@ -170,7 +170,7 @@ class TableList(QWidget):
         self.setObjectName('TableList')
         self.resize(700, 400)
         self.view = MJTableView(self)
-        self.differ = None
+        self.__differ = None
         self.debugModelTest = None
         self.requestedNewTable = False
         self.view.setItemDelegateForColumn(
@@ -361,8 +361,8 @@ class TableList(QWidget):
     def compareRuleset(self):
         """compare the ruleset of this table against ours"""
         table = self.selectedTable()
-        self.differ = RulesetDiffer([table.ruleset], Ruleset.availableRulesets())
-        self.differ.show()
+        self.__differ = RulesetDiffer([table.ruleset], Ruleset.availableRulesets())
+        self.__differ.show()
 
     def startGame(self):
         """start playing at the selected table"""
