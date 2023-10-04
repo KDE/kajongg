@@ -170,7 +170,11 @@ class DeferredBlock(StrMixin):
         never overlaps."""
         for block in DeferredBlock.blocks[:]:
             if block.callbackMethod is None:
-                block.logBug('DBlock %s has no callback' % str(block))
+                try:
+                    block.logBug('DBlock %s has no callback' % str(block))
+                finally:
+                    # we do not want DoS for future games
+                    DeferredBlock.blocks.remove(block)
             if block.completed:
                 DeferredBlock.blocks.remove(block)
         if len(DeferredBlock.blocks) > 100:
