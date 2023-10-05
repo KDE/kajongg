@@ -379,7 +379,7 @@ class Client(pb.Referenceable):
                         'wrong token: %s, we have %s' %
                         (move.token, self.game.handId.token()))
         with Duration('Move {!r}:'.format(move)):
-            return self.exec_move(move).addCallback(self.__jellyMessage)
+            return self.exec_move(move).addCallback(self.__jellyMessage).addErrback(logException)
 
     def exec_move(self, move):
         """mirror the move of a player as told by the game server"""
@@ -432,7 +432,7 @@ class Client(pb.Referenceable):
             return answer
         # return answer only after animation ends. Put answer into
         # the Deferred returned by animate().
-        return animate().addCallback(lambda x: answer)
+        return animate().addCallback(lambda x: answer).addErrback(logException)
 
     def claimed(self, move):
         """somebody claimed a discarded tile"""

@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 from twisted.internet.defer import succeed, Deferred
 
-from log import logDebug
+from log import logDebug, logException
 from mi18n import i18n, i18nc
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import ReprMixin, Speeds, id4
@@ -515,7 +515,8 @@ class ScoringScene(GameScene):
         if self.game.finished():
             self.game = None
             return succeed(True)
-        return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(answered)
+        return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(
+            answered).addErrback(logException)
 
     def __moveTile(self, uiTile, wind, toConcealed):
         """the user pressed a wind letter or X for center, wanting to move a uiTile there"""

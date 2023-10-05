@@ -404,7 +404,7 @@ class DeferredBlock(ReprMixin):
             isClient = rec.__class__.__name__.endswith('Client')
             if isClient:
                 defer = Deferred()
-                defer.addCallback(rec.remote_move, command, **kwargs)
+                defer.addCallback(rec.remote_move, command, **kwargs).addErrback(logException)
                 defer.command = command.name
                 defer.notifying = 'notifying' in kwargs
                 self.__addRequest(defer, rec, about)

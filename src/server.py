@@ -63,7 +63,7 @@ Internal.reactor = reactor
 
 from player import Players
 from query import Query, initDb
-from log import logDebug, logWarning, logError, logInfo, SERVERMARK
+from log import logDebug, logWarning, logError, logInfo, logException, SERVERMARK
 from mi18n import i18n, i18nE
 from util import elapsedSince
 from message import Message, ChatMessage
@@ -104,7 +104,7 @@ class DBPasswordChecker:
             return fail(credError.UnauthorizedLogin(srvMessage(template, cred.username)))
         userid, password = query.records[0]
         defer1 = maybeDeferred(cred.checkPassword, password.encode('utf-8'))
-        defer1.addCallback(DBPasswordChecker._checkedPassword, userid)
+        defer1.addCallback(DBPasswordChecker._checkedPassword, userid).addErrback(logException)
         return defer1
 
     @staticmethod
@@ -234,8 +234,8 @@ class MJServer:
         if Ruleset.hashIsKnown(ruleset):
             return self.__newTable(None, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
         return self.callRemote(user, 'needRuleset', ruleset).addCallback(
-            gotRuleset).addCallback(
-                self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
+            gotRuleset).addErrback(logException).addCallback(
+                self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId).addErrback(logException)
 
     def __newTable(self, unused, user, ruleset,
                    playOpen, autoPlay, wantedGame, tableId=None):
@@ -257,7 +257,7 @@ class MJServer:
             deferred = self.sendTables(srvUser, [table])
             if user == srvUser:
                 result = deferred
-                deferred.addCallback(sent)
+                deferred.addCallback(sent).addErrback(logException)
         assert result
         return result
 

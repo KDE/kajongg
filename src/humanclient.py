@@ -419,7 +419,7 @@ class HumanClient(Client):
                     client.logout(
                     ).addCallback(
                         disconnectedClient,
-                        client))
+                        client).addErrback(logException))
         return DeferredList(deferreds)
 
     def __loggedIn(self, connection):
@@ -548,8 +548,8 @@ class HumanClient(Client):
             self.callServer(
                 'needRulesets',
                 needRulesets).addCallback(
-                    gotRulesets).addCallback(
-                        self.__receiveTables)
+                    gotRulesets).addErrback(logException).addCallback(
+                        self.__receiveTables).addErrback(logException)
         else:
             self.__receiveTables(tables)
 
@@ -583,7 +583,7 @@ class HumanClient(Client):
                         if self.beginQuestion:
                             self.beginQuestion.cancel()
                         Sorry(i18n('Player %1 has left the table', name)).addCallback(
-                            sorried).addCallback(self.showTableList)
+                            sorried).addErrback(logException).addCallback(self.showTableList).addErrback(logException)
                         break
         self.__updateTableList()
         return oldTable, newTable
@@ -655,7 +655,7 @@ class HumanClient(Client):
                 Internal.mainWindow.updateGUI()
         assert self.game
         assert not self.game.isFirstHand()
-        return Information(i18n("Ready for next hand?"), modal=False).addCallback(answered)
+        return Information(i18n("Ready for next hand?"), modal=False).addCallback(answered).addErrback(logException)
 
     def ask(self, move, answers):
         """server sends move. We ask the user. answers is a list with possible answers,
@@ -780,7 +780,7 @@ class HumanClient(Client):
         if Internal.scene:
             # update the balances in the status bar:
             Internal.scene.mainWindow.updateGUI()
-        Information(i18n(message, *args)).addCallback(yes)
+        Information(i18n(message, *args)).addCallback(yes).addErrback(logException)
 
     def remote_serverDisconnects(self, result=None):
         """we logged out or lost connection to the server.
@@ -894,7 +894,7 @@ class HumanClient(Client):
             self.connection = None
             if Debug.connections:
                 logDebug('sending logout to server for {}'.format(self))
-            return self.callServer('logout').addCallback(loggedout, conn)
+            return self.callServer('logout').addCallback(loggedout, conn).addErrback(logException)
         return succeed(None)
 
     def __logCallServer(self, *args):

@@ -234,4 +234,4 @@ class Games(QDialog):
                 "Do you really want to delete <numid>%1</numid> games?<br>"
                 "This will be final, you cannot cancel it with "
                 "the cancel button",
-                len(deleteGames))).addCallback(answered, deleteGames)
+                len(deleteGames))).addCallback(answered, deleteGames).addErrback(logException)

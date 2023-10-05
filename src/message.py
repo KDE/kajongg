@@ -492,7 +492,8 @@ class MessageReadyForGameStart(ServerMessage):
         assert move.gameid
         return client.readyForGameStart(  # type:ignore[attr-defined]
             move.tableid, move.gameid,
-            move.wantedGame, move.playerNames, shouldSave=move.shouldSave).addCallback(hideTableList)
+            move.wantedGame, move.playerNames, shouldSave=move.shouldSave).addCallback(
+                hideTableList).addErrback(logException)
 
 
 class MessageNoGameStart(NotifyAtOnceMessage):
@@ -801,7 +802,7 @@ class MessageNoChoice(ServerMessage):
         # otherwise we have a visible artifact of the discarded tile.
         # Only when animations are disabled. Why?
 #        Internal.mainWindow.centralView.resizeEvent(None)
-        return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain)
+        return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain).addErrback(logException)
 
     def hideConcealedAgain(self, result):
         """only show them for explaining the 'no choice'"""
