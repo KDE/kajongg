@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2023-10-03 14:21+0200\n"
+"PO-Revision-Date: 2023-10-04 11:38+0200\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -856,7 +856,7 @@ msgstr "%1-ის მოცილება საშიშია"
 
 #: src/message.py:411
 msgid "discard the least useful tile"
-msgstr ""
+msgstr "ყველაზე ნაკლებად საჭირო კამათლის მოცილება"
 
 #: src/message.py:483
 msgid "%1 is not ready to start the game"
@@ -947,7 +947,7 @@ msgstr ""
 
 #: src/player.py:807
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
-msgstr ""
+msgstr "%1-ს 3 ან 4 ღია კომბინაცია გააჩნია და ყველა მწვანეა"
 
 #: src/player.py:816
 msgid "Player %1 may try a True Color Game"
@@ -1136,7 +1136,7 @@ msgstr ""
 
 #: src/predefined.py:117
 msgid "Play with no upper scoring limit"
-msgstr ""
+msgstr "თამაში ქულების ზედა ზღვრის გარეშე"
 
 #: src/predefined.py:119
 msgid "Claim Timeout"
@@ -1160,7 +1160,7 @@ msgstr ""
 
 #: src/predefined.py:129
 msgid "Minimum number of rounds in game"
-msgstr ""
+msgstr "თამაშის ხელების მინიმალური რაოდენობა"
 
 #: src/predefined.py:133
 msgid "number of allowed chows"
