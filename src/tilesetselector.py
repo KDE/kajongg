@@ -8,6 +8,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import cast
+
 from qt import QWidget, QHBoxLayout, QLineEdit
 from tile import Tile
 from tileset import Tileset
@@ -68,7 +70,7 @@ class TilesetSelector(QWidget):
         self.tilesetList = Tileset.available()
         for aset in self.tilesetList:
             self.tilesetNameList.addItem(aset.name)
-        self.kcfg_tilesetName.setText(Internal.Preferences.tilesetName)
+        self.kcfg_tilesetName.setText(cast(str, Internal.Preferences.tilesetName))
 
     def tilesetNameChanged(self, name:str) ->None:
         """the name changed: update the current row"""
