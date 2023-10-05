@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-06-10 00:45+0000\n"
-"PO-Revision-Date: 2023-02-15 07:56+0100\n"
+"PO-Revision-Date: 2023-10-04 18:42+0200\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.4\n"
 
 msgid "Preview"
 msgstr "მინიატურა"
@@ -45,7 +45,7 @@ msgstr "ხელსაწყოთა ზოლი"
 
 #: src/background.py:68 src/tileset.py:81
 msgid "file <filename>%1</filename> contains no valid SVG"
-msgstr ""
+msgstr "ფაილი <filename>%1</filename> სწორ SVG-ს არ შეიცავს"
 
 #: src/board.py:301
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
@@ -70,7 +70,7 @@ msgstr "შეტყობინება"
 
 #: src/chat.py:122
 msgid "Chat on table %1 at %2"
-msgstr ""
+msgstr "ჩატი მაგიდაზე %1 მისამართზე %2"
 
 #: src/client.py:55
 msgctxt "table status"
@@ -89,11 +89,11 @@ msgstr "ახალი"
 
 #: src/configdialog.py:42
 msgid "Show tile shadows"
-msgstr ""
+msgstr "ფილის ჩრდილების ჩვენება"
 
 #: src/configdialog.py:45
 msgid "Rearrange undisclosed tiles to melds"
-msgstr ""
+msgstr "გაუხსნელი კამათლების დაჯგუფება კომბინაციებში"
 
 #: src/configdialog.py:48
 msgid "Show only possible actions"
@@ -130,7 +130,7 @@ msgstr "ფონები"
 
 #: src/deferredutil.py:262 src/deferredutil.py:421
 msgid "The game server lost connection to player %1"
-msgstr ""
+msgstr "თამაშის სერვერმა დაკარგა მიერთება მოთამაშესთან %1"
 
 #: src/deferredutil.py:265
 msgid ""
@@ -157,7 +157,7 @@ msgstr "აღუწერელია"
 
 #: src/game.py:535
 msgid "Score computed manually"
-msgstr ""
+msgstr "ქულები ხელით ითვლბა"
 
 #: src/game.py:631
 msgid "Player %1 not known"
@@ -165,7 +165,7 @@ msgstr "მოთამაშე %1 უცნობია"
 
 #: src/game.py:1059
 msgid "Short living wall: Tile is invisible, hence dangerous"
-msgstr ""
+msgstr "მოკლე სიცოცხლიანი კედელი: ფილა უჩინარია, ამიტომ საშიშიცაა"
 
 #: src/games.py:91 src/playerlist.py:58 src/tables.py:58
 msgid "Players"
@@ -202,6 +202,8 @@ msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
 msgstr ""
+"მართლა გნებავთ, წაშალოთ<numid>%1</numid> თამაში?<br>ეს ბოლო კითხვაა, ამის "
+"შემდეგ ქმედებას გაუქმების ღილაკით ვეღარ გააუქმებთ"
 
 #: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:101 src/kdestub.py:102
 #: src/kdestub.py:104
@@ -210,11 +212,11 @@ msgstr "Kajongg"
 
 #: src/humanclient.py:50
 msgid "Which chow do you want to expose?"
-msgstr ""
+msgstr "რომელი ჩოუ გნებავთ, გამოაჩინოთ?"
 
 #: src/humanclient.py:88
 msgid "Which kong do you want to declare?"
-msgstr ""
+msgstr "რომელი კონგი გნებავთ, აღწეროთ?"
 
 #: src/humanclient.py:155
 msgid "Choose"
@@ -232,6 +234,7 @@ msgstr "მოთამაშე %1 გავიდა"
 msgid ""
 "The game on table <numid>%1</numid> can begin. Are you ready to play now?"
 msgstr ""
+"თამაში მაგიდაზე <numid>%1</numid> შეიძლება, დაიწყოს. მზად ხართ სათამაშოდ?"
 
 #: src/humanclient.py:650
 msgid "Ready for next hand?"
@@ -239,15 +242,15 @@ msgstr "მზად ხარ შემდეგი ხელისთვის
 
 #: src/humanclient.py:907
 msgid "The connection to the server %1 broke, please try again later."
-msgstr ""
+msgstr "სერვერამდე %1 კავშირი ჩავარდა. მოგვიანებით სცადეთ."
 
 #: src/kajongg.py:80 src/kdestub.py:1044
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
-msgstr ""
+msgstr "მაჰ ჯონგი ძველი ჩინური სამაგიდო თამაში 4 კაცისთვის"
 
 #: src/kajongg.py:84
 msgid "all robots play with visible concealed tiles"
-msgstr ""
+msgstr "ყველა რბოტი ხილული დამალული კამათლებით თამაშობს"
 
 #: src/kajongg.py:85
 msgid "start with demo mode"
@@ -267,19 +270,20 @@ msgstr "მაგიდაზე შესვლა"
 
 #: src/kajongg.py:89
 msgid "use RULESET without asking"
-msgstr ""
+msgstr "მითითებული წესების სეტის კითხვის გამოყენება კითხვის გარეშე"
 
 #: src/kajongg.py:90
 msgid "play only ROUNDS rounds per game. Only for debugging!"
 msgstr ""
+"ერთ თამაშში მხოლოდ მითითებული რაოდენობის ხელის თამაში. მხოლოდ გამართვისთვის!"
 
 #: src/kajongg.py:91
 msgid "prefer PLAYER for next login"
-msgstr ""
+msgstr "შემდეგი შესვლისთვის მითითებული მოთამაშე მირჩევნია"
 
 #: src/kajongg.py:92
 msgid "use AI variant for human player in demo mode"
-msgstr ""
+msgstr "დემო რეჟიმში ადამიანი მოთამაშის AI ვარიანტის გამოყენება"
 
 #: src/kajongg.py:93
 msgid "write statistics to CSV"
@@ -287,23 +291,27 @@ msgstr "სტატისტიკის CSV ფაილში ჩაწერ
 
 #: src/kajongg.py:94
 msgid "show all available rulesets"
-msgstr ""
+msgstr "ყველა ხელმისაწვდომი წესის ნაკრებების ჩვენება"
 
 #: src/kajongg.py:95
 msgid "for testing purposes: Initializes the random generator"
-msgstr ""
+msgstr "ტესტისვის: შემთხვევითი რიცხვების გენერატორის ინიცილიზება"
 
 #: src/kajongg.py:97
 msgid "show no graphical user interface. Intended only for testing"
-msgstr ""
+msgstr "გრაფიკული ინტერფეისის ჩვენების გარეშე. განკუთვნილია მხოლოდ ტესტისთვს"
 
 #: src/kajongg.py:98
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
 msgstr ""
+"მითითებულ სოკეტზე გაშვებული გამოყოფილი სერვერის გამოყენება. განკუთვნილია "
+"მხოლოდ დასატესტად"
 
 #: src/kajongg.py:99
 msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgstr ""
+"მითითებულ პორტზე გაშვებული გამოყოფილი სერვერის გამოყენება. განკუთვნილია "
+"მხოლოდ დასატესტად"
 
 #: src/kdestub.py:251
 msgid "&OK"
@@ -345,7 +353,7 @@ msgstr "ხელსაწყოთა ზოლების გამართ�
 
 #: src/kdestub.py:354
 msgid "Configure &Kajongg..."
-msgstr ""
+msgstr "&Kajongg-ის მორგება..."
 
 #: src/kdestub.py:356 src/kdestub.py:1155
 msgid "Configure"
@@ -429,7 +437,7 @@ msgstr "საწყისი ავტორი"
 
 #: src/kdestub.py:1015
 msgid "KDE Frameworks (not installed or not usable)"
-msgstr ""
+msgstr "KDE Frameworks (დაყენებული არაა ან არ მუშაობს)"
 
 #: src/kdestub.py:1023
 msgctxt "kajongg"
@@ -445,12 +453,16 @@ msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
 msgstr ""
+"ეს კლასიკური მაჰ ჯონგია ოთხი მოთამაშისთვის. თუ ეძებთ მაჰ ჯონგის პასეანსს, "
+"გაუშვით აპლიკაცია kmahjongg."
 
 #: src/kdestub.py:1064
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
 msgstr ""
+"შეცდომების შესახებ მოსაწერად გამოიყენეთ ბმული <a href=\"https://bugs.kde.org"
+"\">https://bugs.kde.org</a>."
 
 #: src/kdestub.py:1069
 msgid "Authors:"
@@ -474,15 +486,15 @@ msgstr "&მიმდინარე ქმედებები:"
 
 #: src/login.py:166
 msgid "trying to start local server %1"
-msgstr ""
+msgstr "მცდელობა, გაეშვას ლოკალური სერვერი %1"
 
 #: src/login.py:177 src/login.py:621
 msgid "removed stale socket <filename>%1</filename>"
-msgstr ""
+msgstr "წაიშალა გაჭედილი სოკეტი <filename>%1</filename>"
 
 #: src/login.py:198
 msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
-msgstr ""
+msgstr "გაეშვა ლოკალური kajongg სერვერი: pid=<numid>%1</numid> %2"
 
 #: src/login.py:238
 msgctxt "kajongg"
@@ -517,12 +529,12 @@ msgstr "გაიმეორეთ პაროლი:"
 
 #: src/login.py:552
 msgid "You are already connected to server %1"
-msgstr ""
+msgstr "სერვერთან %1 უკვე მიერთებული ბრძანდებით"
 
 #: src/login.py:589
 msgctxt "USER is not known on SERVER"
 msgid "%1 is not known on %2, do you want to open an account?"
-msgstr ""
+msgstr "%1 %2-ზე ცნობილი არაა. გნებავთ ანგარიშის გახსნა?"
 
 #: src/login.py:601
 msgid "Server %1 did not answer"
@@ -538,11 +550,11 @@ msgstr "სერვერზე %1 kajongg-ის სერვერი გა�
 
 #: src/login.py:607
 msgid "Address for server %1 cannot be found"
-msgstr ""
+msgstr "მისამართი სერვერისთვის %1 აღმოჩენილი არაა"
 
 #: src/login.py:610
 msgid "Login to server %1 failed: You have no network connection"
-msgstr ""
+msgstr "შესვლა სერვერზე %1 ჩავარდა: ქსელთან მიერთებული არ ბრძანდებით"
 
 #: src/login.py:622
 msgid "Please try again"
@@ -551,17 +563,17 @@ msgstr "გთხოვთ კიდევ მოგვიანებით"
 #: src/mainwindow.py:495
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
-msgstr ""
+msgstr "&ქულების ხელით დათვლა"
 
 #: src/mainwindow.py:497
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
-msgstr ""
+msgstr "მომხმარებლის თამაში"
 
 #: src/mainwindow.py:500
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
-msgstr ""
+msgstr "&ქულების ხელით დათვლა."
 
 #: src/mainwindow.py:502
 msgctxt "@action:intoolbar"
@@ -581,7 +593,7 @@ msgstr "&თამაშის გაუქმება"
 #: src/mainwindow.py:511
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
-msgstr ""
+msgstr "მიმდინარე თამაშის გაუქმება."
 
 #: src/mainwindow.py:513
 msgctxt "@action:inmenu"
@@ -596,7 +608,7 @@ msgstr "&მოთამაშეები"
 #: src/mainwindow.py:519
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
-msgstr ""
+msgstr "აღწერეთ თქვენი მოთამაშეები."
 
 #: src/mainwindow.py:521
 msgctxt "@action:intoolbar"
@@ -606,12 +618,12 @@ msgstr "&წესები"
 #: src/mainwindow.py:524
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
-msgstr ""
+msgstr "მოირგეთ წესის ნაკრებები."
 
 #: src/mainwindow.py:528
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
-msgstr ""
+msgstr "&ვიზუალური კუთხის შეცვლა"
 
 #: src/mainwindow.py:529
 msgctxt "@action:intoolbar"
@@ -621,7 +633,7 @@ msgstr "კუთხე"
 #: src/mainwindow.py:532
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
-msgstr ""
+msgstr "კამათლების გარეგნობის შეცვლა."
 
 #: src/mainwindow.py:536
 msgctxt "@action:inmenu"
@@ -631,22 +643,22 @@ msgstr "&მთელ-ეკრანზე"
 #: src/mainwindow.py:539
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
-msgstr ""
+msgstr "&ქულების ცხრილი"
 
 #: src/mainwindow.py:541
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
-msgstr ""
+msgstr "&ქულებ"
 
 #: src/mainwindow.py:543
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
-msgstr ""
+msgstr "მიმდინარე თამაშის ქულების ცხრილის ჩვენება ან დამალვა."
 
 #: src/mainwindow.py:545
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
-msgstr ""
+msgstr "&ქულების ახსნა"
 
 #: src/mainwindow.py:546
 msgctxt "@action:intoolbar"
@@ -656,17 +668,19 @@ msgstr "&ახსნა"
 #: src/mainwindow.py:548
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
-msgstr ""
+msgstr "მიმდინარე თამაშში ქულების ახსნა ყველა მოთამაშისთვის."
 
 #: src/mainwindow.py:550
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
-msgstr ""
+msgstr "&დემო რეჟიმი"
 
 #: src/mainwindow.py:553
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr ""
+"სადავეების კომპიუტერისთვის გადაცემა. თუ საჭიროა, ახალი ლოკალური თამაშის "
+"დაწყება."
 
 #: src/mainwindow.py:555
 msgid "C&hat"
@@ -675,7 +689,7 @@ msgstr "&ჩატი"
 #: src/mainwindow.py:558
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
-msgstr ""
+msgstr "დაელაპარაკეთ სხვა მოთამაშეებს."
 
 #: src/meld.py:318
 msgctxt "kajongg meld type"
@@ -700,12 +714,12 @@ msgstr "&ჩოუ"
 #: src/meld.py:326
 msgctxt "kajongg meld type"
 msgid "p&ung"
-msgstr ""
+msgstr "&პანგი"
 
 #: src/meld.py:328
 msgctxt "kajongg meld type"
 msgid "c&laimed kong"
-msgstr ""
+msgstr "&გამოცხადებული კონგი"
 
 #: src/meld.py:330
 msgctxt "kajongg meld type"
@@ -715,17 +729,17 @@ msgstr "&კონგი"
 #: src/meld.py:331
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
-msgstr ""
+msgstr "დარჩენილი კამათლები"
 
 #: src/meld.py:338
 msgctxt "kajongg meld state"
 msgid "Exposed"
-msgstr ""
+msgstr "გამოჩენილია"
 
 #: src/meld.py:339
 msgctxt "kajongg meld state"
 msgid "Concealed"
-msgstr ""
+msgstr "დამალულია"
 
 #: src/meld.py:345
 #, python-brace-format
@@ -740,17 +754,19 @@ msgstr ""
 #: src/message.py:215
 msgid ""
 "claiming %1 is dangerous because you will have to discard a dangerous tile"
-msgstr ""
+msgstr "კამათლის, %1, აღება საშიშია, რადგან საშიში კამათლის მოცილება მოგიწევთ"
 
 #: src/message.py:220
 msgid ""
 "claiming %1 for %2 is dangerous because you will have to discard a dangerous "
 "tile"
 msgstr ""
+"კამათლის, %1, %2-სთვის აღება საშიშია, რადგან საშიში კამათლის მოცილება "
+"მოგიწევთ"
 
 #: src/message.py:223
 msgid "You may say %1"
-msgstr ""
+msgstr "შეგიძლიათ იძახოთ %1"
 
 #: src/message.py:233
 msgctxt "kajongg"
@@ -778,7 +794,7 @@ msgstr ""
 
 #: src/message.py:275
 msgid "You may say Kong for %1"
-msgstr ""
+msgstr "შეგიძლიათ იძახოთ კონგი %1-სთვის"
 
 #: src/message.py:289
 msgctxt "kajongg"
@@ -802,7 +818,7 @@ msgstr "ო"
 
 #: src/message.py:332
 msgid "Press here and you win"
-msgstr ""
+msgstr "დააწექით აქ და მოიგეთ"
 
 #: src/message.py:346
 msgctxt "kajongg"
@@ -840,15 +856,15 @@ msgstr ""
 
 #: src/message.py:408
 msgid "discarding %1 is Dangerous Game"
-msgstr ""
+msgstr "%1-ის მოცილება საშიშია"
 
 #: src/message.py:411
 msgid "discard the least useful tile"
-msgstr ""
+msgstr "ყველაზე ნაკლებად საჭირო კამათლის მოცილება"
 
 #: src/message.py:483
 msgid "%1 is not ready to start the game"
-msgstr ""
+msgstr "%1 თამაშის დასაწყებად მზად არაა"
 
 #: src/message.py:519
 msgid "Kajongg <numid>%1</numid>"
@@ -867,7 +883,7 @@ msgstr "საშიში თამაში"
 #: src/message.py:737
 msgctxt "kajongg"
 msgid "No Choice"
-msgstr ""
+msgstr "არჩევნის გარეშე"
 
 #: src/message.py:796
 msgctxt "kajongg"
@@ -881,12 +897,12 @@ msgstr "O"
 
 #: src/message.py:801
 msgid "Confirm that you saw the message"
-msgstr ""
+msgstr "დაადასტურეთ, რომ ნახეთ შეტყობინება"
 
 #: src/message.py:810
 msgctxt "kajongg"
 msgid "No Claim"
-msgstr ""
+msgstr "გამოცხადების გარეშე"
 
 #: src/message.py:811
 msgctxt "kajongg game dialog:Key for No claim"
@@ -895,16 +911,17 @@ msgstr "N"
 
 #: src/message.py:815
 msgid "You cannot or do not want to claim this tile"
-msgstr ""
+msgstr "თქვენ არ შეგიძლიათ ან არ გნებავთ, გამოაცხადოთ ეს კამათელი"
 
 #: src/mjresource.py:80
 msgid ""
 "cannot find any %1 in the following directories, is libkmahjongg installed?"
 msgstr ""
+"შემდეგ საქაღალდეებში ვერც ერთი %1 ვერ ვიპოვე. libkmahjongg დაყენებული გაქვთ?"
 
 #: src/mjresource.py:104
 msgid "cannot find %1, using default"
-msgstr ""
+msgstr "%1 ვერ ვიპოვე. ვიყენებ ნაგულისხმევს"
 
 #: src/mjresource.py:114
 msgid "unknown name"
@@ -912,28 +929,29 @@ msgstr "უცნობი სახელი"
 
 #: src/mjresource.py:115
 msgid "unknown author"
-msgstr ""
+msgstr "უცნობი ავტორი"
 
 #: src/mjresource.py:118
 msgid "no description available"
-msgstr ""
+msgstr "აღწერის გარეშე"
 
 #: src/mjresource.py:121
 msgid "no E-Mail address available"
-msgstr ""
+msgstr "ელფოსტის მისამართი ხელმისაწვდომი არაა"
 
 #: src/player.py:687
 msgid "%1 claiming MahJongg: She does not really have tile %2"
-msgstr ""
+msgstr "%1 აცხადებს მაჰჯონგს, მაგრამ მას კამათელი % არ აქვს"
 
 #: src/player.py:696
 msgid ""
 "%1 claiming MahJongg: She did not pass all concealed tiles to the server"
 msgstr ""
+"%1 აცხადებს მაჰჯონგს: მას ყველა დამალული კამათელი სერვერისთვის არ გადაუცია"
 
 #: src/player.py:807
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
-msgstr ""
+msgstr "%1-ს 3 ან 4 ღია კომბინაცია გააჩნია და ყველა მწვანეა"
 
 #: src/player.py:816
 msgid "Player %1 may try a True Color Game"
@@ -958,11 +976,11 @@ msgstr "&ახალი"
 
 #: src/playerlist.py:101
 msgid "Player %1 already exists"
-msgstr ""
+msgstr "მოთამაშე %1 უკვე არსებობს"
 
 #: src/playerlist.py:110
 msgid "Error while adding player %1: %2"
-msgstr ""
+msgstr "შეცდომა მოთამაშის (%1) დამატებისას: %2"
 
 #: src/playerlist.py:165
 msgid ""
@@ -972,11 +990,11 @@ msgstr ""
 
 #: src/predefined.py:27
 msgid "Classical Chinese standard"
-msgstr ""
+msgstr "კლასიკური ჩინური სტანდარტი"
 
 #: src/predefined.py:31
 msgid "Classical Chinese"
-msgstr ""
+msgstr "კლასიკური ჩინური"
 
 #: src/predefined.py:37
 msgid "Last Tile Taken from Dead Wall"
@@ -1009,7 +1027,7 @@ msgstr ""
 
 #: src/predefined.py:51
 msgid "Robbing the Kong"
-msgstr ""
+msgstr "კონგის გაძარცვა"
 
 #: src/predefined.py:52
 msgid ""
@@ -1041,7 +1059,7 @@ msgstr ""
 
 #: src/predefined.py:66
 msgid "Twofold Fortune"
-msgstr ""
+msgstr "ორმაგ იღბალი"
 
 #: src/predefined.py:67
 msgid ""
@@ -1068,7 +1086,7 @@ msgstr ""
 
 #: src/predefined.py:77
 msgid "East won nine times in a row"
-msgstr ""
+msgstr "აღმოსავლეთმა ცხრაჯერ ზედიზედ მოიგო"
 
 #: src/predefined.py:78
 msgid "If that happens, East gets a limit score and the winds rotate"
@@ -1082,7 +1100,7 @@ msgstr ""
 
 #: src/predefined.py:89
 msgid "Own Flower and Own Season"
-msgstr ""
+msgstr "საკუთარი ყვავილი და საკუთარი სეზონი"
 
 #: src/predefined.py:92
 msgid "All Flowers"
@@ -1094,7 +1112,7 @@ msgstr "ყველა სეზონი"
 
 #: src/predefined.py:95
 msgid "Three Concealed Pongs"
-msgstr ""
+msgstr "სამი დამალული პონგი"
 
 #: src/predefined.py:99
 msgid "Long Hand"
@@ -1102,7 +1120,7 @@ msgstr "გრძელი ხელი"
 
 #: src/predefined.py:100
 msgid "The hand contains too many tiles"
-msgstr ""
+msgstr "ხელში მეტისმეტად ბევრი კამათელია"
 
 #: src/predefined.py:105
 msgid "Points Needed for Mah Jongg"
@@ -1122,15 +1140,15 @@ msgstr ""
 
 #: src/predefined.py:117
 msgid "Play with no upper scoring limit"
-msgstr ""
+msgstr "თამაში ქულების ზედა ზღვრის გარეშე"
 
 #: src/predefined.py:119
 msgid "Claim Timeout"
-msgstr ""
+msgstr "გამოცხადების ვადა"
 
 #: src/predefined.py:123
 msgid "Size of Kong Box"
-msgstr ""
+msgstr "კონგის ყუთის ზომა"
 
 #: src/predefined.py:124
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
@@ -1138,7 +1156,7 @@ msgstr ""
 
 #: src/predefined.py:126
 msgid "Play with Bonus Tiles"
-msgstr ""
+msgstr "თამაში პრემიის კამათლებით"
 
 #: src/predefined.py:127
 msgid "Bonus tiles increase the luck factor"
@@ -1146,11 +1164,11 @@ msgstr ""
 
 #: src/predefined.py:129
 msgid "Minimum number of rounds in game"
-msgstr ""
+msgstr "თამაშის ხელების მინიმალური რაოდენობა"
 
 #: src/predefined.py:133
 msgid "number of allowed chows"
-msgstr ""
+msgstr "დაშვებულ ჩოუების რაოდენობა"
 
 #: src/predefined.py:134
 msgid "The number of chows a player may build"
@@ -1166,7 +1184,7 @@ msgstr ""
 
 #: src/predefined.py:140
 msgid "Standard Rotation"
-msgstr ""
+msgstr "სტანდარტული ბრუნვა"
 
 #: src/predefined.py:150
 msgid "Last Tile Completes Pair of 2..8"
@@ -1186,7 +1204,7 @@ msgstr ""
 
 #: src/predefined.py:166
 msgid "Zero Point Hand"
-msgstr ""
+msgstr "ნული ქულა"
 
 #: src/predefined.py:167
 msgid "The hand has 0 basis points excluding bonus tiles"
@@ -1194,7 +1212,7 @@ msgstr ""
 
 #: src/predefined.py:168
 msgid "No Chow"
-msgstr ""
+msgstr "ჩოუს გარეშე"
 
 #: src/predefined.py:170
 msgid "Only Concealed Melds"
@@ -1202,7 +1220,7 @@ msgstr ""
 
 #: src/predefined.py:174
 msgid "False Color Game"
-msgstr ""
+msgstr "ცრუ ფერის თამაში"
 
 #: src/predefined.py:175
 msgid ""
@@ -1212,7 +1230,7 @@ msgstr ""
 
 #: src/predefined.py:178
 msgid "True Color Game"
-msgstr ""
+msgstr "ნამდვილი ფერის თამაში"
 
 #: src/predefined.py:179
 msgid "Only same-colored tiles (only bamboo/stone/character)"
@@ -1228,7 +1246,7 @@ msgstr ""
 
 #: src/predefined.py:184
 msgid "Only Terminals and Honors"
-msgstr ""
+msgstr "მხოლოდ ტერმინალები და ჯილდოები"
 
 #: src/predefined.py:185
 msgid "Only winds, dragons, 1 and 9"
@@ -1236,15 +1254,15 @@ msgstr ""
 
 #: src/predefined.py:186
 msgid "Only Honors"
-msgstr ""
+msgstr "მხოლოდ ჯილდოები"
 
 #: src/predefined.py:187
 msgid "Only winds and dragons"
-msgstr ""
+msgstr "მხოლოდ ქარები და დრაკონები"
 
 #: src/predefined.py:189
 msgid "Hidden Treasure"
-msgstr ""
+msgstr "დამალული განძი"
 
 #: src/predefined.py:190
 msgid "Only hidden Pungs or Kongs, last tile from wall"
@@ -1252,11 +1270,11 @@ msgstr ""
 
 #: src/predefined.py:192
 msgid "Heads and Tails"
-msgstr ""
+msgstr "თავები და კუდები"
 
 #: src/predefined.py:193
 msgid "Only 1 and 9"
-msgstr ""
+msgstr "მხოლოდ 1 და 9"
 
 #: src/predefined.py:195
 msgid "Fourfold Plenty"
@@ -1264,11 +1282,11 @@ msgstr ""
 
 #: src/predefined.py:196
 msgid "4 Kongs"
-msgstr ""
+msgstr "4 კონგი"
 
 #: src/predefined.py:198 src/predefined.py:416
 msgid "Three Great Scholars"
-msgstr ""
+msgstr "სამი დიდი მეცნიერი"
 
 #: src/predefined.py:199 src/predefined.py:321
 msgid "3 Pungs or Kongs of dragons"
@@ -1316,11 +1334,11 @@ msgstr ""
 
 #: src/predefined.py:219
 msgid "Standard Mah Jongg"
-msgstr ""
+msgstr "სტანდარტული Mah Jongg"
 
 #: src/predefined.py:224
 msgid "Nine Gates"
-msgstr ""
+msgstr "ცხრა კარიბჭე"
 
 #: src/predefined.py:226
 msgid ""
@@ -1330,7 +1348,7 @@ msgstr ""
 
 #: src/predefined.py:228
 msgid "Thirteen Orphans"
-msgstr ""
+msgstr "ცამეტი ობოლი"
 
 #: src/predefined.py:229
 msgid ""
@@ -1352,11 +1370,11 @@ msgstr ""
 
 #: src/predefined.py:242
 msgid "Exposed Kong"
-msgstr ""
+msgstr "გამოჩენილი კონგი"
 
 #: src/predefined.py:245
 msgid "Exposed Kong of Terminals"
-msgstr ""
+msgstr "გამოჩენილი ტერმინალების კონგი"
 
 #: src/predefined.py:248
 msgid "Exposed Kong of Honors"
@@ -1364,11 +1382,11 @@ msgstr ""
 
 #: src/predefined.py:251
 msgid "Exposed Pung"
-msgstr ""
+msgstr "გამოჩენილი პანგი"
 
 #: src/predefined.py:254
 msgid "Exposed Pung of Terminals"
-msgstr ""
+msgstr "გამოჩენილი ტერმინალების პანგი"
 
 #: src/predefined.py:257
 msgid "Exposed Pung of Honors"
@@ -1376,11 +1394,11 @@ msgstr ""
 
 #: src/predefined.py:261
 msgid "Concealed Kong"
-msgstr ""
+msgstr "დამალული კონგი"
 
 #: src/predefined.py:264
 msgid "Concealed Kong of Terminals"
-msgstr ""
+msgstr "დამალული ტერმინალების კონგი"
 
 #: src/predefined.py:267
 msgid "Concealed Kong of Honors"
@@ -1388,11 +1406,11 @@ msgstr ""
 
 #: src/predefined.py:270
 msgid "Concealed Pung"
-msgstr ""
+msgstr "დამალული პანგი"
 
 #: src/predefined.py:273
 msgid "Concealed Pung of Terminals"
-msgstr ""
+msgstr "დამალული ტერმინალების პანგი"
 
 #: src/predefined.py:276
 msgid "Concealed Pung of Honors"
@@ -1400,15 +1418,15 @@ msgstr ""
 
 #: src/predefined.py:279
 msgid "Pair of Own Wind"
-msgstr ""
+msgstr "საკუთარი ქარის წყვილი"
 
 #: src/predefined.py:281
 msgid "Pair of Round Wind"
-msgstr ""
+msgstr "მრგვალი ქარის წყვილი"
 
 #: src/predefined.py:283
 msgid "Pair of Dragons"
-msgstr ""
+msgstr "დრაკონების წყვილი"
 
 #: src/predefined.py:287
 msgid "Flower"
@@ -1420,7 +1438,7 @@ msgstr "სეზონი"
 
 #: src/predefined.py:300
 msgid "Classical Chinese DMJL"
-msgstr ""
+msgstr "კლასიკური ჩინური DMJL"
 
 #: src/predefined.py:306
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
@@ -1428,7 +1446,7 @@ msgstr ""
 
 #: src/predefined.py:313
 msgid "Squirming Snake"
-msgstr ""
+msgstr "გველი, რომელიც იმალება"
 
 #: src/predefined.py:314
 msgid ""
@@ -1438,7 +1456,7 @@ msgstr ""
 
 #: src/predefined.py:317
 msgid "Little Three Dragons"
-msgstr ""
+msgstr "პატარა სამი დრაკონი"
 
 #: src/predefined.py:318
 msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
@@ -1446,7 +1464,7 @@ msgstr ""
 
 #: src/predefined.py:320
 msgid "Big Three Dragons"
-msgstr ""
+msgstr "დიდი სამი დრაკონი"
 
 #: src/predefined.py:323
 msgid "Little Four Joys"
@@ -1486,7 +1504,7 @@ msgstr ""
 
 #: src/predefined.py:357
 msgid "Classical Chinese BMJA"
-msgstr ""
+msgstr "კლასიკური ჩინური BMJA"
 
 #: src/predefined.py:363
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
@@ -1498,7 +1516,7 @@ msgstr ""
 
 #: src/predefined.py:382
 msgid "Gates of Heaven"
-msgstr ""
+msgstr "სამოთხის კარიბჭე"
 
 #: src/predefined.py:383
 msgid ""
@@ -1517,7 +1535,7 @@ msgstr ""
 
 #: src/predefined.py:389
 msgid "Triple Knitting"
-msgstr ""
+msgstr "სამმაგი ქსოვა"
 
 #: src/predefined.py:390
 msgid ""
@@ -1527,7 +1545,7 @@ msgstr ""
 
 #: src/predefined.py:391
 msgid "Knitting"
-msgstr ""
+msgstr "ქსოვა"
 
 #: src/predefined.py:392
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
@@ -1543,15 +1561,15 @@ msgstr ""
 
 #: src/predefined.py:398
 msgid "Own Flower"
-msgstr ""
+msgstr "საკუთარი ყვავილი"
 
 #: src/predefined.py:399
 msgid "Own Season"
-msgstr ""
+msgstr "საკუთარი სეზონი"
 
 #: src/predefined.py:411
 msgid "Buried Treasure"
-msgstr ""
+msgstr "დამარხული განძი"
 
 #: src/predefined.py:412
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
@@ -1559,7 +1577,7 @@ msgstr ""
 
 #: src/predefined.py:413
 msgid "Purity"
-msgstr ""
+msgstr "სისუფთავე"
 
 #: src/predefined.py:414
 msgid "Only same-colored tiles (no chows, dragons or winds)"
@@ -1571,7 +1589,7 @@ msgstr ""
 
 #: src/predefined.py:420
 msgid "The 13 Unique Wonders"
-msgstr ""
+msgstr "მსოფლიოს 13 საოცრება"
 
 #: src/predefined.py:427
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
@@ -1636,7 +1654,7 @@ msgstr ""
 #: src/query.py:219
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
-msgstr ""
+msgstr "ლოკალური თამაში"
 
 #: src/query.py:397
 msgid "Database %1 updated from schema %2 to %3"
@@ -1690,7 +1708,7 @@ msgstr ""
 
 #: src/rule.py:329
 msgid "Winner Rules"
-msgstr ""
+msgstr "გამარჯვებულის წესები"
 
 #: src/rule.py:330
 msgid "Winner rules are applied to the entire hand but only for the winner"
@@ -1698,7 +1716,7 @@ msgstr ""
 
 #: src/rule.py:331
 msgid "Loser Rules"
-msgstr ""
+msgstr "დამარცხებულის წესები"
 
 #: src/rule.py:332
 msgid "Loser rules are applied to the entire hand but only for non-winners"
@@ -1706,7 +1724,7 @@ msgstr ""
 
 #: src/rule.py:333
 msgid "Mah Jongg Rules"
-msgstr ""
+msgstr "Mah Jongg-ის წესები"
 
 #: src/rule.py:334
 msgid "Only hands matching a Mah Jongg rule can win"
@@ -1737,7 +1755,7 @@ msgstr ""
 #: src/rule.py:534
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
-msgstr ""
+msgstr "ასლი%1 %2-დან"
 
 #: src/rule.py:896
 msgctxt "%1 can be a sentence"
@@ -1752,7 +1770,7 @@ msgstr ""
 #: src/rulesetselector.py:476
 msgctxt "@title:window"
 msgid "Customize rulesets"
-msgstr ""
+msgstr "წესის ნაკრებების მორგება"
 
 #: src/rulesetselector.py:494
 msgctxt "kajongg"
@@ -1766,7 +1784,7 @@ msgstr "&კოპირება"
 #: src/rulesetselector.py:552
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
-msgstr ""
+msgstr "&შედარება"
 
 #: src/rulesetselector.py:553
 msgid "&Remove"
@@ -1778,12 +1796,12 @@ msgstr "დაკე&ტვა"
 
 #: src/scene.py:365 src/scene.py:498
 msgid "Do you really want to abort this game?"
-msgstr ""
+msgstr "მართლა გნებავთ ამ თამაშის გაუქმება?"
 
 #: src/scoring.py:43
 msgctxt "@title:window"
 msgid "Swap Seats"
-msgstr ""
+msgstr "ადგილების მიმოცვლა"
 
 #: src/scoring.py:45
 msgid "By the rules, %1 and %2 should now exchange their seats. "
@@ -1795,7 +1813,7 @@ msgstr "&გადაცვლა"
 
 #: src/scoring.py:49
 msgid "&Keep seat"
-msgstr ""
+msgstr "&ადგილის დატოვება"
 
 #: src/scoring.py:60
 msgctxt "@title:window"
@@ -1863,7 +1881,7 @@ msgstr ""
 
 #: src/scoringdialog.py:575
 msgid "There is no active game"
-msgstr ""
+msgstr "აქტიური თამაში არ არსებობს"
 
 #: src/scoringdialog.py:578
 msgid "%1"
@@ -1892,12 +1910,12 @@ msgstr "&შესრულება"
 #: src/scoringdialog.py:783
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
-msgstr ""
+msgstr "იხდის %1 ქულას"
 
 #: src/scoringdialog.py:788
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
-msgstr ""
+msgstr "იღებს %1 ქულას"
 
 #: src/scoringdialog.py:799
 msgctxt "@title:window"
@@ -1945,7 +1963,7 @@ msgstr "არასწორი პაროლი"
 
 #: src/server.py:212
 msgid "table with id <numid>%1</numid> not found"
-msgstr ""
+msgstr "ცხრილი ID-ით <numid>%1</numid> აღმოჩენილი არაა"
 
 #: src/server.py:358
 msgid "Player %1 has logged out"
@@ -1954,11 +1972,11 @@ msgstr ""
 #: src/server.py:429
 #, python-format
 msgid "the server will listen on PORT (%d)"
-msgstr ""
+msgstr "სერვერი მითითებულ პორტზე (%d) მოუსმენს"
 
 #: src/server.py:433
 msgid "the server will listen on SOCKET"
-msgstr ""
+msgstr "სერვერი მითითებულ სოკეტზე მოუსმენს"
 
 #: src/server.py:438
 msgid "name of the database"
@@ -1970,23 +1988,23 @@ msgstr ""
 
 #: src/server.py:447
 msgid "unrecognized arguments:%1"
-msgstr ""
+msgstr "უცნობი არგუმენტები:%1"
 
 #: src/servertable.py:157
 msgid "You already joined this table"
-msgstr ""
+msgstr "მაგიდას უკვე მიუერთდით"
 
 #: src/servertable.py:159
 msgid "All seats are already taken"
-msgstr ""
+msgstr "ყველა სავარძელი უკვე დაკავებულია"
 
 #: src/servertable.py:164
 msgid "takes a seat"
-msgstr ""
+msgstr "დაჯდა"
 
 #: src/servertable.py:172
 msgid "leaves the table"
-msgstr ""
+msgstr "გავიდა მაგდიდან"
 
 #: src/servertable.py:221
 msgctxt "kajongg, name of robot player, to be translated"
@@ -2006,6 +2024,7 @@ msgstr "რობოტი 3"
 #: src/servertable.py:279
 msgid "Only the initiator %1 can start this game, you are %2"
 msgstr ""
+"ამ თამაშის დაწყება, მხოლოდ, ინიციატორს, %1, შეუძლია, თქვენ კი %2 ბრძანდებით"
 
 #: src/servertable.py:648
 msgid "Game <numid>%1</numid> is over!"
@@ -2033,11 +2052,11 @@ msgstr ""
 
 #: src/sound.py:358
 msgid "cannot write <filename>%1</filename>: %2"
-msgstr ""
+msgstr "ჩაწერის შეცდომა ფაილისთვის <filename>%1</filename>: %2"
 
 #: src/sound.py:361
 msgid "The voice files have changed, their checksum has changed."
-msgstr ""
+msgstr "ხმის ფაილები შეიცვალა, რადგან შეიცვალა მათი საკონტროლო ჯამი."
 
 #: src/sound.py:362
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
@@ -2054,11 +2073,11 @@ msgstr "მდგომარეობა"
 
 #: src/tables.py:61
 msgid "Ruleset"
-msgstr ""
+msgstr "წესების ნაკრები"
 
 #: src/tables.py:145
 msgid "Select a ruleset"
-msgstr ""
+msgstr "აირჩიეთ წესების ნაკრები"
 
 #: src/tables.py:183
 msgctxt "allocate a new table"
@@ -2092,7 +2111,7 @@ msgstr "შედარება"
 
 #: src/tables.py:207
 msgid "Compare the rules of this table with my own rulesets"
-msgstr ""
+msgstr "ამ მაგიდის წესების ჩემს წესებთან შედარება"
 
 #: src/tables.py:209
 msgid "&Chat"
@@ -2104,19 +2123,19 @@ msgstr "&დაწყება"
 
 #: src/tables.py:219
 msgid "Start playing on a table. Empty seats will be taken by robot players."
-msgstr ""
+msgstr "მაგიდაზე თამაშის დაწყება. ცარიელ სავარძლებს ბოტები დაიკავებენ."
 
 #: src/tables.py:261
 msgid "opens a chat window"
-msgstr ""
+msgstr "გახსნის ჩატის ფანჯარას"
 
 #: src/tables.py:280
 msgid "Local Games with Ruleset %1"
-msgstr ""
+msgstr "ლოკალური თამაშები წესების ნაკრებით %1"
 
 #: src/tables.py:283
 msgid "Tables at %1"
-msgstr ""
+msgstr "მაგიდები სერვერზე %1"
 
 #: src/tables.py:320
 msgid "Start a new game"
@@ -2129,15 +2148,15 @@ msgstr "გაგრძელება"
 
 #: src/tables.py:324
 msgid "Resume the selected suspended game"
-msgstr ""
+msgstr "არჩეული შეჩერებული თამაშის გაგრძელება"
 
 #: src/tables.py:342
 msgid "Chat with others on this table"
-msgstr ""
+msgstr "დაელაპარაკეთ სხვებს ამ მაგიდაზე"
 
 #: src/tables.py:345
 msgid "For chatting with others on this table, please first take a seat"
-msgstr ""
+msgstr "ამ მაგიდაზე სხვებთან დასალაპარაკებლად, ჯერ დაბრძანდით"
 
 #: src/tile.py:192
 msgctxt "kajongg"
@@ -2177,12 +2196,12 @@ msgstr "ყვავილი"
 #: src/tile.py:199
 msgctxt "kajongg"
 msgid "season"
-msgstr ""
+msgstr "სეზონი"
 
 #: src/tile.py:205
 msgctxt "kajongg"
 msgid "tile"
-msgstr ""
+msgstr "ძვალი"
 
 #: src/tile.py:206
 msgctxt "kajongg"
@@ -2221,19 +2240,19 @@ msgstr "ჩრდილოეთი"
 
 #: src/tile.py:221
 msgid "East Wind"
-msgstr ""
+msgstr "აღმოსავლეთის ქარი"
 
 #: src/tile.py:222
 msgid "South Wind"
-msgstr ""
+msgstr "სამხრეთის ქარი"
 
 #: src/tile.py:223
 msgid "West Wind"
-msgstr ""
+msgstr "დასავლეთის ქარი"
 
 #: src/tile.py:224
 msgid "North Wind"
-msgstr ""
+msgstr "ჩრდილოეთის ქარი"
 
 #: src/tile.py:226
 #, python-brace-format
@@ -2245,7 +2264,8 @@ msgstr ""
 msgid ""
 "Your client has a version older than 4.9.0 but you need %1 for this server"
 msgstr ""
+"თქვენი კლიენტის ვერსია 4.9-ზე ძველია, მაგრამ ამ სერვერისთვის %1 გჭირდებათ"
 
 #: src/user.py:93
 msgid "Your client has version %1 but you need %2 for this server"
-msgstr ""
+msgstr "თქვენი კლიენტის ვერსიაა %1, მაგრამ ამ სერვერისთვის %2 გჭირდებათ"
