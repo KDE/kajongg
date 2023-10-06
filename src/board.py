@@ -410,7 +410,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         """the face rect of a uiTile relative its origin"""
         return QRectF(self.tileFacePos(), self.tileset.faceSize)
 
-    def setPos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
+    def setTilePos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
         """set the position in the parent item expressing the position in tile face units.
         The X position is xWidth*facewidth + xHeight*faceheight, analog for Y"""
         self.__xWidth = xWidth
@@ -465,7 +465,7 @@ class Board(QGraphicsRectItem, ReprMixin):
                 sceneRotation(self))
         newX = self.__xWidth * width + self.__xHeight * height + offsets[0]
         newY = self.__yWidth * width + self.__yHeight * height + offsets[1]
-        QGraphicsRectItem.setPos(self, newX, newY)
+        self.setPos(newX, newY)
 
     def showShadowsChanged(self, unusedOldValue, newValue):
         """set active lightSource"""
@@ -605,7 +605,7 @@ class CourtBoard(Board):
         yNeeded = self.height * tileset.faceSize.height()
         xScaleFactor = xAvail / xNeeded
         yScaleFactor = yAvail / yNeeded
-        QGraphicsRectItem.setPos(self, newSceneX, newSceneY)
+        self.setPos(newSceneX, newSceneY)
         self.setScale(min(xScaleFactor, yScaleFactor))
         for uiTile in self.uiTiles:
             uiTile.board.placeTile(uiTile)

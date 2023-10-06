@@ -122,9 +122,9 @@ class HandBoard(Board):
         """Position myself"""
         show = Internal.Preferences.showShadows
         if show:
-            self.setPos(yHeight=1.5)
+            self.setTilePos(yHeight=1.5)
         else:
-            self.setPos(yHeight=1.0)
+            self.setTilePos(yHeight=1.0)
         if show:
             self.lowerY = 1.2
         else:
