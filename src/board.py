@@ -419,7 +419,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         self.__yHeight = yHeight
         self.setGeometry()
 
-    def setRect(self, width, height):
+    def setBoardRect(self, width, height):
         """gives the board a fixed size in uiTile coordinates"""
         self.__fixedWidth = width
         self.__fixedHeight = height

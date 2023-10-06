@@ -129,7 +129,7 @@ class HandBoard(Board):
             self.lowerY = 1.2
         else:
             self.lowerY = 1.0
-        self.setRect(15.6, 1.0 + self.lowerY)
+        self.setBoardRect(15.6, 1.0 + self.lowerY)
         self._reload(self.tileset, showShadows=show)
         self.sync()
 
