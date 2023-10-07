@@ -682,8 +682,7 @@ msgstr "Mode &demostració"
 #: src/mainwindow.py:556
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
-msgstr ""
-"Deixeu que l'ordinador jugue per a vós. Inicia una partida nova si cal."
+msgstr "Deixeu que l'ordinador jugue per a tu. Inicia una partida nova si cal."
 
 #: src/mainwindow.py:558
 msgid "C&hat"
@@ -2331,6 +2330,3 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "El vostre client té la versió %1 però necessiteu %2 per a este servidor"
-
-#~ msgid "Not using broken Python KDE bindings"
-#~ msgstr "No utilitza les vinculacions trencades de KDE de Python"
