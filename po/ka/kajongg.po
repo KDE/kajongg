@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2023-10-04 11:38+0200\n"
+"PO-Revision-Date: 2023-10-07 22:49+0200\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -745,7 +745,7 @@ msgstr "{state} {meldType} {name}"
 
 #: src/message.py:203
 msgid "saying %1 violates Original Call"
-msgstr ""
+msgstr "%1-ის თქმა არღვევს დარიგების მთხოვნელ ხელს"
 
 #: src/message.py:215
 msgid ""
@@ -786,7 +786,7 @@ msgstr "K"
 
 #: src/message.py:272
 msgid "saying Kong for %1 violates Original Call"
-msgstr ""
+msgstr "%1-სთვის კონგის თქმა არღვევს დარიგების მთხოვნელ ხელს"
 
 #: src/message.py:275
 msgid "You may say Kong for %1"
@@ -819,7 +819,7 @@ msgstr "დააწექით აქ და მოიგეთ"
 #: src/message.py:346
 msgctxt "kajongg"
 msgid "Original Call"
-msgstr ""
+msgstr "დარიგების მთხოვნელი ხელი"
 
 #: src/message.py:347
 msgctxt "kajongg game dialog:Key for Original Call"
@@ -829,12 +829,17 @@ msgstr "O"
 #: src/message.py:360
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
 msgstr ""
+"%1-ის მოცილება და დარიგების მთხოვნელი ხელის გამოცხადება ამ ხელს მოუგებელს "
+"გახდის"
 
 #: src/message.py:364
 msgid ""
 "Discard a tile, declaring Original Call meaning you need only one tile to "
 "complete the hand and will not alter the hand in any way (except bonus tiles)"
 msgstr ""
+"კამათლის დაგდება და დარიგების მთხოვნელი ხელის გამოცხადება, რაც ნიშნავს, რომ "
+"ხელის დასრულებისთვის ერთი კამათელი გჭირდებათ და ხელს ვერ შეცვლით (დამატებითი "
+"კამათლების გარდა)"
 
 #: src/message.py:389
 msgctxt "kajongg"
@@ -848,7 +853,7 @@ msgstr "მ"
 
 #: src/message.py:405
 msgid "discarding %1 violates Original Call"
-msgstr ""
+msgstr "%1-ის მოცილება არღვევს დარიგების მთხოვნელ ხელს"
 
 #: src/message.py:408
 msgid "discarding %1 is Dangerous Game"
@@ -869,7 +874,7 @@ msgstr "Kajongg <numid>%1</numid>"
 #: src/message.py:595
 msgctxt "kajongg"
 msgid "Violates Original Call"
-msgstr ""
+msgstr "არღვევს დარიგების მთხოვნელ ხელს"
 
 #: src/message.py:723
 msgctxt "kajongg"
@@ -951,19 +956,19 @@ msgstr "%1-ს 3 ან 4 ღია კომბინაცია გააჩ�
 
 #: src/player.py:816
 msgid "Player %1 may try a True Color Game"
-msgstr ""
+msgstr "მოთამაშეს %1 შეუძლია ნამდვილი ფერის თამაში ითამაშოს"
 
 #: src/player.py:819
 msgid "Player %1 may try an All Terminals Game"
-msgstr ""
+msgstr "მოთამაშეს %1 შეუძლია ყველა ტერმინალის თამაში ითამაშოს"
 
 #: src/player.py:832
 msgid "Player %1 exposed many winds"
-msgstr ""
+msgstr "მოთამაშემ %1 ბევრი ქარი გამოაჩინა"
 
 #: src/player.py:836
 msgid "Player %1 exposed many dragons"
-msgstr ""
+msgstr "მოთამაშემ %1 ბევრი დრაკონი გამოაჩინა"
 
 #: src/playerlist.py:43
 msgctxt "define a new player"
@@ -983,6 +988,8 @@ msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
 msgstr ""
+"არსებობს %1 დასრულებული და %2 დაუსრულებელი თამაში %3-სთვის. მაინც წავშალო "
+"%3?  ეს ასევე წაშლის %3-ის მიერ ნათამაშებ ყველა ხელს!"
 
 #: src/predefined.py:27
 msgid "Classical Chinese standard"
@@ -994,32 +1001,36 @@ msgstr "კლასიკური ჩინური"
 
 #: src/predefined.py:37
 msgid "Last Tile Taken from Dead Wall"
-msgstr ""
+msgstr "მკვდარი კედლიდან აღებული ბოლო კამათელი"
 
 #: src/predefined.py:39
 msgid ""
 "The dead wall is also called kong box: The last 16 tiles of the wall used as "
 "source of replacement tiles"
 msgstr ""
+"მკვდარ კედელს კონგის ყუთიც ჰქვია: კედლის ბოლო 16 კამათელი შესაცვლელი "
+"კამათლის წყაროდ გამოიყენება"
 
 #: src/predefined.py:42
 msgid "Last Tile is Last Tile of Wall"
-msgstr ""
+msgstr "ბოლო კამათელი კედლის ბოლო კამათელია"
 
 #: src/predefined.py:44
 msgid ""
 "Winner said Mah Jong with the last tile taken from the living end of the wall"
-msgstr ""
+msgstr "მოგებულმა მაჯონგი კედლის ცოცხალი ბოლოდან აღებული ბოლო კამათლით თქვა"
 
 #: src/predefined.py:46
 msgid "Last Tile is Last Tile of Wall Discarded"
-msgstr ""
+msgstr "ბოლო კამათელი კედლიდან მოცილებული ბოლო კამათელია"
 
 #: src/predefined.py:48
 msgid ""
 "Winner said Mah Jong by claiming the last tile taken from the living end of "
 "the wall, discarded by another player"
 msgstr ""
+"მოგებულმა მაჯონგი კედლის ცოცხალი ბოლოდან აღებული ბოლო კამათლით თქვა, "
+"რომელიც, მანამდე სხვა მოთამაშემ გადააგდო"
 
 #: src/predefined.py:51
 msgid "Robbing the Kong"
@@ -1030,10 +1041,12 @@ msgid ""
 "Winner said Mah Jong by claiming the 4th tile of a kong another player just "
 "declared"
 msgstr ""
+"მოგებულმა მაჯონგი სხვა მოთამაშის მიერ გამოცხადებული კონგის მეოთხე კამათლით "
+"თქვა"
 
 #: src/predefined.py:55
 msgid "Mah Jongg with Original Call"
-msgstr ""
+msgstr "მაჯონგი დარიგების მთხოვნელი ხელით"
 
 #: src/predefined.py:58
 msgid ""
@@ -1041,6 +1054,9 @@ msgid ""
 "she needs only one tile to complete the hand and announces she will not "
 "alter the hand in any way (except bonus tiles)"
 msgstr ""
+"პირველ გადაგდებამდე მოთამაშეს შეუძლია გამოაცხადოს დარიგების დამხმარე ხელი, "
+"რაც ნიშნავს, რომ ხელის დასასრულებლად მას სულ ერთი კამათელი დასჭირდება და "
+"გამოაცხადებს, რომ ამ ხელს არ შეცვლის (დამატებითი კამათლების გარდა)"
 
 #: src/predefined.py:61
 msgid "Dangerous Game"
@@ -1052,6 +1068,9 @@ msgid ""
 "to win is declared to be dangerous, and if that tile actually makes somebody "
 "win, the discarder pays the winner for all"
 msgstr ""
+"ზოგიერთ სიტუაციაში კამათლის გადაგდება, რომელსაც დიდი შანსი აქვს, ვინმეს "
+"მოგებაში დაეხმაროს, გამოცხადებულია, როგორც საშიში და თუ ეს კამათელი ვინმეს "
+"მართლა მოაგებინებს, გადამგდები მომგებს ყველაფრისთვის უხდის"
 
 #: src/predefined.py:66
 msgid "Twofold Fortune"
@@ -1062,6 +1081,8 @@ msgid ""
 "Kong after Kong: Declare Kong and a second Kong with the replacement tile "
 "and Mah Jong with the second replacement tile"
 msgstr ""
+"კონგი კონგის შემდეგ: გამოაცხადეთ კონგი და მეორე კონგი ჩანაცვლებული კამათლით "
+"და მაჯონგი მეორე ჩანაცვლებული კამათლით"
 
 #: src/predefined.py:71
 msgid "Blessing of Heaven"
@@ -1069,7 +1090,7 @@ msgstr "ღმერთის დალოცვა"
 
 #: src/predefined.py:72
 msgid "East says Mah Jong with the unmodified dealt tiles"
-msgstr ""
+msgstr "აღმოსავლეთი მაჯონგს აცხადებს დარიგებიდან"
 
 #: src/predefined.py:74
 msgid "Blessing of Earth"
@@ -1079,6 +1100,8 @@ msgstr "მიწის დალოცვა"
 msgid ""
 "South, West or North says Mah Jong with the first tile discarded by East"
 msgstr ""
+"სამხრეთი, დასავლეთ ან ჩრდილოეთი იძახის მაჯონგს პირველი კამათლით, რომელიც "
+"აღმოსავლეთმა გააგორა"
 
 #: src/predefined.py:77
 msgid "East won nine times in a row"
@@ -1087,12 +1110,13 @@ msgstr "აღმოსავლეთმა ცხრაჯერ ზედი�
 #: src/predefined.py:78
 msgid "If that happens, East gets a limit score and the winds rotate"
 msgstr ""
+"თუ ეს ხდება, აღმოსავლეთი მაქსიმალურ ქულებს მიიღებს და ქარი შემობრუნდება"
 
 #: src/predefined.py:83
 msgid ""
 "False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah "
 "Jongg"
-msgstr ""
+msgstr "მაჯონგის არასწორად დარქმეული კგაგორება და მაჯონგის ცრუ გამოცხადება"
 
 #: src/predefined.py:89
 msgid "Own Flower and Own Season"
@@ -1120,19 +1144,19 @@ msgstr "ხელში მეტისმეტად ბევრი კამ
 
 #: src/predefined.py:105
 msgid "Points Needed for Mah Jongg"
-msgstr ""
+msgstr "მაჯონგისთვის საჭირო ქულები"
 
 #: src/predefined.py:109
 msgid "Minimum number of doubles needed for Mah Jongg"
-msgstr ""
+msgstr "მაჯონგისთვის საჭირო დაბლების მინიმალური რაოდენობა"
 
 #: src/predefined.py:112
 msgid "Points for a Limit Hand"
-msgstr ""
+msgstr "ქულები შეზღუდული ხელისთვის"
 
 #: src/predefined.py:116
 msgid "Play with the roof off"
-msgstr ""
+msgstr "თამაში სახურავის გარეშე"
 
 #: src/predefined.py:117
 msgid "Play with no upper scoring limit"
@@ -1149,6 +1173,7 @@ msgstr "კონგის ყუთის ზომა"
 #: src/predefined.py:124
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
 msgstr ""
+"კონგების გამოცხადებისას ჩასანაცვლებელი კამათლებისთვის კონგის ყუთი გამოიყენება"
 
 #: src/predefined.py:126
 msgid "Play with Bonus Tiles"
@@ -1156,7 +1181,7 @@ msgstr "თამაში პრემიის კამათლებით"
 
 #: src/predefined.py:127
 msgid "Bonus tiles increase the luck factor"
-msgstr ""
+msgstr "დამატებითი კამათლები იღბლის ფაქტორს ზრდის"
 
 #: src/predefined.py:129
 msgid "Minimum number of rounds in game"
@@ -1168,15 +1193,16 @@ msgstr "დაშვებულ ჩოუების რაოდენობ�
 
 #: src/predefined.py:134
 msgid "The number of chows a player may build"
-msgstr ""
+msgstr "ჩოუების რაოდენობა, რომელიც, მოთამაშეს, შეუძლია, ააწყოს"
 
 #: src/predefined.py:136
 msgid "must declare calling hand"
-msgstr ""
+msgstr "საჭიროა მთხოვნელი ხელის არწერა"
 
 #: src/predefined.py:138
 msgid "Mah Jongg is only allowed after having declared to have a calling hand"
 msgstr ""
+"მაჯონგის გამოცხადება მხოლოდ მთხოვნელი ხელის გამოცხადების შემდეგაა შესაძლებელი"
 
 #: src/predefined.py:140
 msgid "Standard Rotation"
@@ -1184,19 +1210,19 @@ msgstr "სტანდარტული ბრუნვა"
 
 #: src/predefined.py:150
 msgid "Last Tile Completes Pair of 2..8"
-msgstr ""
+msgstr "ბოლო კამათელი ასრულებს წყვილებს 2..8"
 
 #: src/predefined.py:154
 msgid "Last Tile Completes Pair of Terminals or Honors"
-msgstr ""
+msgstr "ბოლო კამათელი ტერმინალების ან ჯილდოების წყვილს ასრულებს"
 
 #: src/predefined.py:157
 msgid "Last Tile is Only Possible Tile"
-msgstr ""
+msgstr "ბოლო კამათელი ერთად-ერთი შესაძლო კამათელია"
 
 #: src/predefined.py:161
 msgid "Won with Last Tile Taken from Wall"
-msgstr ""
+msgstr "მიგო კედლიდან აღებული ბოლო კამათლით"
 
 #: src/predefined.py:166
 msgid "Zero Point Hand"
@@ -1204,7 +1230,7 @@ msgstr "ნული ქულა"
 
 #: src/predefined.py:167
 msgid "The hand has 0 basis points excluding bonus tiles"
-msgstr ""
+msgstr "ხელს 0 ძირითადი ქულა აქვს, დამატებითი კამათლების არჩათვლით"
 
 #: src/predefined.py:168
 msgid "No Chow"
@@ -1212,7 +1238,7 @@ msgstr "ჩოუს გარეშე"
 
 #: src/predefined.py:170
 msgid "Only Concealed Melds"
-msgstr ""
+msgstr "მხოლოდ დამალული კომბინაციები"
 
 #: src/predefined.py:174
 msgid "False Color Game"
@@ -1223,6 +1249,8 @@ msgid ""
 "Only same-colored tiles (only bamboo/stone/character) plus any number of "
 "winds and dragons"
 msgstr ""
+"მხოლოდ იგივე ფერის მქონე კამათლები (მხოლოდ, ბამბუკი/ქვა/სიმბოლო) და "
+"ნებისმიერი რაოდენობის ქარი და დრაკონი"
 
 #: src/predefined.py:178
 msgid "True Color Game"
@@ -1230,15 +1258,15 @@ msgstr "ნამდვილი ფერის თამაში"
 
 #: src/predefined.py:179
 msgid "Only same-colored tiles (only bamboo/stone/character)"
-msgstr ""
+msgstr "მხოლოდ იგივე ფერის მქონე კამათლები (მხოლოდ, ბამბუკი/ქვა/სიმბოლო)"
 
 #: src/predefined.py:181
 msgid "Concealed True Color Game"
-msgstr ""
+msgstr "დამალული ნამდვილი ფერის თამაში"
 
 #: src/predefined.py:182
 msgid "All tiles concealed and of the same suit, no honors"
-msgstr ""
+msgstr "ყველა კამათელი დამალულია და ერთი ფერის. ჯილდოების გარეშე"
 
 #: src/predefined.py:184
 msgid "Only Terminals and Honors"
@@ -1246,7 +1274,7 @@ msgstr "მხოლოდ ტერმინალები და ჯილდ
 
 #: src/predefined.py:185
 msgid "Only winds, dragons, 1 and 9"
-msgstr ""
+msgstr "მხოლოდ ქარები, დრაკონები, 1 და 9"
 
 #: src/predefined.py:186
 msgid "Only Honors"
@@ -1262,7 +1290,7 @@ msgstr "დამალული განძი"
 
 #: src/predefined.py:190
 msgid "Only hidden Pungs or Kongs, last tile from wall"
-msgstr ""
+msgstr "მხოლოდ დამალული პანგები ან კონგები. ბოლო კამათელი კედლიდან"
 
 #: src/predefined.py:192
 msgid "Heads and Tails"
@@ -1274,7 +1302,7 @@ msgstr "მხოლოდ 1 და 9"
 
 #: src/predefined.py:195
 msgid "Fourfold Plenty"
-msgstr ""
+msgstr "ოთხი კონგი"
 
 #: src/predefined.py:196
 msgid "4 Kongs"
@@ -1286,15 +1314,15 @@ msgstr "სამი დიდი მეცნიერი"
 
 #: src/predefined.py:199 src/predefined.py:321
 msgid "3 Pungs or Kongs of dragons"
-msgstr ""
+msgstr "პანგები ან დრაკონის კონგები"
 
 #: src/predefined.py:200
 msgid "Four Blessings Hovering over the Door"
-msgstr ""
+msgstr "ოთხი სიამოვნება ლივლივებს კარზე"
 
 #: src/predefined.py:202 src/predefined.py:326
 msgid "4 Pungs or Kongs of winds"
-msgstr ""
+msgstr "პანგები ან ქარის კონგები"
 
 #: src/predefined.py:203
 msgid "Imperial Jade"
@@ -1302,31 +1330,31 @@ msgstr "სამეფო ნეფრიტი"
 
 #: src/predefined.py:204
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
-msgstr ""
+msgstr "მხოლოდ მწვანე კამათლები: მწვანე დრაკონი და ბამბუკი 2,3,4,6,8"
 
 #: src/predefined.py:205
 msgid "Gathering the Plum Blossom from the Roof"
-msgstr ""
+msgstr "ბრტყელ სახურავზე ვაზის გაზრდა"
 
 #: src/predefined.py:207
 msgid "Mah Jong with stone 5 from the dead wall"
-msgstr ""
+msgstr "მაჯონგი 5 ქვით მკვდარი კედლიდან"
 
 #: src/predefined.py:209
 msgid "Plucking the Moon from the Bottom of the Sea"
-msgstr ""
+msgstr "მთვარის ამოღება ზღვის ფსკერიდან"
 
 #: src/predefined.py:210
 msgid "Mah Jong with the last tile from the wall being a stone 1"
-msgstr ""
+msgstr "მაჯონგი ბოლო კამათლით კედლიდან, რომელიც 1 ქვაა"
 
 #: src/predefined.py:212
 msgid "Scratching a Carrying Pole"
-msgstr ""
+msgstr "მზიდი ჭოკის შემოჭრა"
 
 #: src/predefined.py:213
 msgid "Robbing the Kong of bamboo 2"
-msgstr ""
+msgstr "ბამბუკი -ის კონგის გაძარცვა"
 
 #: src/predefined.py:219
 msgid "Standard Mah Jongg"
@@ -1341,6 +1369,8 @@ msgid ""
 "A concealed hand in one color 1112345678999 plus last tile of this suit "
 "(from wall or discarded)"
 msgstr ""
+"დამალულ ხელი ერთ ფერში 1112345678999 პლუს ფერის ბოლო კამათელი (კედლიდან ან "
+"მოცილებული)"
 
 #: src/predefined.py:228
 msgid "Thirteen Orphans"
@@ -1354,15 +1384,15 @@ msgstr ""
 
 #: src/predefined.py:233
 msgid "Pung/Kong of Dragons"
-msgstr ""
+msgstr "დრაკონის პანგი/კონგი"
 
 #: src/predefined.py:235
 msgid "Pung/Kong of Own Wind"
-msgstr ""
+msgstr "საკუთარი ქარის პანგი/კონგი"
 
 #: src/predefined.py:238
 msgid "Pung/Kong of Round Wind"
-msgstr ""
+msgstr "მრგვალი ქარის პანგი/კონგი"
 
 #: src/predefined.py:242
 msgid "Exposed Kong"
@@ -1374,7 +1404,7 @@ msgstr "გამოჩენილი ტერმინალების კ�
 
 #: src/predefined.py:248
 msgid "Exposed Kong of Honors"
-msgstr ""
+msgstr "ღია გამოჩენილი კონგები"
 
 #: src/predefined.py:251
 msgid "Exposed Pung"
@@ -1386,7 +1416,7 @@ msgstr "გამოჩენილი ტერმინალების პ�
 
 #: src/predefined.py:257
 msgid "Exposed Pung of Honors"
-msgstr ""
+msgstr "ღია გამოჩენილი პანგები"
 
 #: src/predefined.py:261
 msgid "Concealed Kong"
@@ -1398,7 +1428,7 @@ msgstr "დამალული ტერმინალების კონ�
 
 #: src/predefined.py:267
 msgid "Concealed Kong of Honors"
-msgstr ""
+msgstr "დახურული გამოჩენილი კონგები"
 
 #: src/predefined.py:270
 msgid "Concealed Pung"
@@ -1410,7 +1440,7 @@ msgstr "დამალული ტერმინალების პან�
 
 #: src/predefined.py:276
 msgid "Concealed Pung of Honors"
-msgstr ""
+msgstr "დახურული გამოჩენილი პანგები"
 
 #: src/predefined.py:279
 msgid "Pair of Own Wind"
@@ -1439,6 +1469,8 @@ msgstr "კლასიკური ჩინური DMJL"
 #: src/predefined.py:306
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgstr ""
+"კლასიკური ჩინური, როგორც ის აღწერილია Deutsche Mah Jongg Liga-ის (DMJL) e.V. "
+"მიერ."
 
 #: src/predefined.py:313
 msgid "Squirming Snake"
@@ -1456,7 +1488,7 @@ msgstr "პატარა სამი დრაკონი"
 
 #: src/predefined.py:318
 msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
-msgstr ""
+msgstr "2 პანგი ან დრაკონის კონგი და 1 წყვილი დრაკონი"
 
 #: src/predefined.py:320
 msgid "Big Three Dragons"
@@ -1464,39 +1496,39 @@ msgstr "დიდი სამი დრაკონი"
 
 #: src/predefined.py:323
 msgid "Little Four Joys"
-msgstr ""
+msgstr "მცირე ოთხი ქარი"
 
 #: src/predefined.py:324
 msgid "3 Pungs or Kongs of winds and 1 pair of winds"
-msgstr ""
+msgstr "3 პანგი ან ქარის კონგები და ქარის 1 წყვილი"
 
 #: src/predefined.py:325
 msgid "Big Four Joys"
-msgstr ""
+msgstr "დიდი ოთხი ქარი"
 
 #: src/predefined.py:331
 msgid "False Naming of Discard, Claimed for Chow"
-msgstr ""
+msgstr "ჩოუსთვის კამათლის სახელი არასწორია"
 
 #: src/predefined.py:334
 msgid "False Naming of Discard, Claimed for Pung/Kong"
-msgstr ""
+msgstr "პანგის/კონგისთვის კამათლის სახელი არასწორია"
 
 #: src/predefined.py:337 src/predefined.py:430
 msgid "False Declaration of Mah Jongg by One Player"
-msgstr ""
+msgstr "ერთი მოთამაშის მიერ შეცდომით გამოცხადებული მაჯონგი"
 
 #: src/predefined.py:340
 msgid "False Declaration of Mah Jongg by Two Players"
-msgstr ""
+msgstr "ორი მოთამაშის მიერ შეცდომით გამოცხადებული მაჯონგი"
 
 #: src/predefined.py:343
 msgid "False Declaration of Mah Jongg by Three Players"
-msgstr ""
+msgstr "სამი მოთამაშის მიერ შეცდომით გამოცხადებული მაჯონგი"
 
 #: src/predefined.py:346 src/predefined.py:433
 msgid "False Naming of Discard, Claimed for Mah Jongg"
-msgstr ""
+msgstr "კამათლის არასწორი დასახელება მაჯონგისთვის"
 
 #: src/predefined.py:357
 msgid "Classical Chinese BMJA"
@@ -1504,11 +1536,11 @@ msgstr "კლასიკური ჩინური BMJA"
 
 #: src/predefined.py:363
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
-msgstr ""
+msgstr "კლასიკური ჩინური, როგორც აღწერილია ბრიტანული მაჯონგის ასოციაციის მიერ"
 
 #: src/predefined.py:378
 msgid "Original Call"
-msgstr ""
+msgstr "დარიგების მთხოვნელი ხელი"
 
 #: src/predefined.py:382
 msgid "Gates of Heaven"
@@ -1522,7 +1554,7 @@ msgstr ""
 
 #: src/predefined.py:386
 msgid "Wriggling Snake"
-msgstr ""
+msgstr "გველი, რომელიც იკლაკნება"
 
 #: src/predefined.py:387
 msgid ""
@@ -1549,11 +1581,11 @@ msgstr ""
 
 #: src/predefined.py:394
 msgid "All pair honors"
-msgstr ""
+msgstr "ყველა წყვილი გამოჩენილი"
 
 #: src/predefined.py:395
 msgid "7 pairs of 1s/9s/Winds/Dragons"
-msgstr ""
+msgstr "7 წყვილი ერთიანები/ცხრიანები/ქარები/დრაკონები"
 
 #: src/predefined.py:398
 msgid "Own Flower"
@@ -1593,59 +1625,59 @@ msgstr ""
 
 #: src/predefined.py:437
 msgid "Calling for Only Honors"
-msgstr ""
+msgstr "მხოლოდ ღირსეულების მოლოდინი"
 
 #: src/predefined.py:441
 msgid "Calling for Wriggling Snake"
-msgstr ""
+msgstr "გველის მოლოდინი, რომელიც იკლაკნება"
 
 #: src/predefined.py:445
 msgid "Calling for Triple Knitting"
-msgstr ""
+msgstr "სამმაგი ქსოვის მოლოდინი"
 
 #: src/predefined.py:449
 msgid "Calling for Gates of Heaven"
-msgstr ""
+msgstr "სამოთხის კარიბჭის მოლდინი"
 
 #: src/predefined.py:452
 msgid "Calling for Knitting"
-msgstr ""
+msgstr "ქსოვის მოლოდინი"
 
 #: src/predefined.py:456
 msgid "Calling for Imperial Jade"
-msgstr ""
+msgstr "სამეფო ნეფრიტის მოლოდინი"
 
 #: src/predefined.py:460
 msgid "Calling for The 13 Unique Wonders"
-msgstr ""
+msgstr "მსოფლიოს 13 საოცრების მოლოდინი"
 
 #: src/predefined.py:463
 msgid "Calling for Three Great Scholars"
-msgstr ""
+msgstr "სამი დიდი მეცნიერის მოლოდინი"
 
 #: src/predefined.py:466
 msgid "Calling for All pair honors"
-msgstr ""
+msgstr "ყველა წყვილი გამოჩენილის მოლოდინი"
 
 #: src/predefined.py:470
 msgid "Calling for Heads and Tails"
-msgstr ""
+msgstr "თავების და კუდების მოლოდინი"
 
 #: src/predefined.py:474
 msgid "Calling for Four Blessings Hovering over the Door"
-msgstr ""
+msgstr "ოთხი სიამოვნება ლივლივებს კარზეს მოლოდნი"
 
 #: src/predefined.py:477
 msgid "Calling for Buried Treasure"
-msgstr ""
+msgstr "დამარხული განძის მოლოდინი"
 
 #: src/predefined.py:481
 msgid "Calling for Fourfold Plenty"
-msgstr ""
+msgstr "ოთხი კონგის მოლოდინი"
 
 #: src/predefined.py:485
 msgid "Calling for Purity"
-msgstr ""
+msgstr "სისუფთავის მოლოდოდინი"
 
 #: src/query.py:219
 msgctxt "kajongg name for local game server"
@@ -1654,7 +1686,7 @@ msgstr "ლოკალური თამაში"
 
 #: src/query.py:397
 msgid "Database %1 updated from schema %2 to %3"
-msgstr ""
+msgstr "ბაზის %1 სქემა %2 ვერსიიდან %3-მდე განახლდა"
 
 #: src/rule.py:40 src/scoringdialog.py:677 src/scoringdialog.py:760
 msgid "points"
@@ -1687,7 +1719,7 @@ msgstr "%1 ლიმიტი"
 
 #: src/rule.py:325
 msgid "Meld Rules"
-msgstr ""
+msgstr "კომბინაციის წესები"
 
 #: src/rule.py:326
 msgid ""
@@ -1696,7 +1728,7 @@ msgstr ""
 
 #: src/rule.py:327
 msgid "Hand Rules"
-msgstr ""
+msgstr "ხელის წესები"
 
 #: src/rule.py:328
 msgid "Hand rules are applied to the entire hand, for all players"
@@ -1733,7 +1765,7 @@ msgstr "გამართვა"
 
 #: src/rule.py:336
 msgid "Here we have several special game related options"
-msgstr ""
+msgstr "აქ თამაშის რამდენიმე სპეციალური პარამეტრი შეგიძლიათ, იპოვოთ"
 
 #: src/rule.py:337
 msgid "Penalties"
@@ -1756,12 +1788,12 @@ msgstr "ასლი%1 %2-დან"
 #: src/rule.py:896
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
-msgstr ""
+msgstr "%4-ს აქვს შეუძლებელი მნიშვნელობა %2/%3 წესში \"%1\""
 
 #: src/rule.py:992
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
-msgstr ""
+msgstr "%1: %2 is მეტისმეტად პატარაა. მინიმალური მნიშვნელობაა %3"
 
 #: src/rulesetselector.py:477
 msgctxt "@title:window"
@@ -1801,7 +1833,7 @@ msgstr "ადგილების მიმოცვლა"
 
 #: src/scoring.py:45
 msgid "By the rules, %1 and %2 should now exchange their seats. "
-msgstr ""
+msgstr "წესით, %1-მა და %2-მა ახლა სავარძელი უნდა გაცვალონ. "
 
 #: src/scoring.py:47
 msgid "&Exchange"
@@ -1818,11 +1850,11 @@ msgstr "აირჩიეთ ოთხი მოთამაშე"
 
 #: src/scoring.py:288
 msgid "Move Exposed Tiles Here"
-msgstr ""
+msgstr "ღია კამათლების აქ გადმოტანა"
 
 #: src/scoring.py:289
 msgid "Move Concealed Tiles Here"
-msgstr ""
+msgstr "დაფარული კამათლების აქ გადმოტანა"
 
 #: src/scoring.py:599
 msgid "Please define four players in <interface>Settings|Players</interface>"
@@ -1830,7 +1862,7 @@ msgstr ""
 
 #: src/scoringdialog.py:234
 msgid "Round/Hand"
-msgstr ""
+msgstr "რაუნდი/ხელი"
 
 #: src/scoringdialog.py:262 src/scoringdialog.py:813
 msgctxt "kajongg"
@@ -1864,16 +1896,16 @@ msgstr "გამოყენებული წესებ"
 
 #: src/scoringdialog.py:485
 msgid "Final scores for game <numid>%1</numid>"
-msgstr ""
+msgstr "საბოლოო ქულები თამაშისთვის <numid>%1</numid>"
 
 #: src/scoringdialog.py:487
 msgid "Scores for game <numid>%1</numid>"
-msgstr ""
+msgstr "ქულები თამაშისტვის <numid>%1</numid>"
 
 #: src/scoringdialog.py:559
 msgctxt "@title:window"
 msgid "Explain Scores"
-msgstr ""
+msgstr "ქულების ახსნა"
 
 #: src/scoringdialog.py:575
 msgid "There is no active game"
@@ -1885,7 +1917,7 @@ msgstr "%1"
 
 #: src/scoringdialog.py:592
 msgid "Manual score for %1: %2 points"
-msgstr ""
+msgstr "ხელით დათვლილი ქულები მოთამაშისთვის %1: %2 ქულა"
 
 #: src/scoringdialog.py:663
 msgid "Penalty"
@@ -1916,7 +1948,7 @@ msgstr "იღებს %1 ქულას"
 #: src/scoringdialog.py:799
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
-msgstr ""
+msgstr "ქულები ამ ხელისთვის"
 
 #: src/scoringdialog.py:811
 msgctxt "kajongg"
@@ -1947,11 +1979,11 @@ msgstr "ხელის &შენახვა"
 
 #: src/scoringdialog.py:846
 msgid "&Last Tile:"
-msgstr ""
+msgstr "&ბოლო კამათელი:"
 
 #: src/scoringdialog.py:855
 msgid "L&ast Meld:"
-msgstr ""
+msgstr "&ბოლო კომბინაცია:"
 
 #: src/server.py:113
 msgid "Wrong password"
@@ -1980,7 +2012,7 @@ msgstr "მონაცემთა ბაზის სახელი"
 
 #: src/server.py:442
 msgid "do not terminate local game server after last client disconnects"
-msgstr ""
+msgstr "ლოკალური თამაშის სერვერი არ გამოირთვება ბოლო კლიენტის გასვლის შემდეგ"
 
 #: src/server.py:447
 msgid "unrecognized arguments:%1"
@@ -2024,11 +2056,11 @@ msgstr ""
 
 #: src/servertable.py:648
 msgid "Game <numid>%1</numid> is over!"
-msgstr ""
+msgstr "თამაშ <numid>%1</numid> დასრულდა!"
 
 #: src/servertable.py:677
 msgid "%1 wrongly said %2 for meld %3"
-msgstr ""
+msgstr "%1-მა არასწორად თქვა %2 კომბინაციისთვის %3"
 
 #: src/servertable.py:682
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
@@ -2036,15 +2068,15 @@ msgstr ""
 
 #: src/servertable.py:720
 msgid "declareKong:%1 wrongly said Kong for meld %2"
-msgstr ""
+msgstr "კონგისგამოცხადება: %1-მა კონგი არასწორად თქვა კომბინაციისთვის %2"
 
 #: src/servertable.py:768
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
-msgstr ""
+msgstr "%1 აცხადებს მაჯონგს: ეს მოგებული ხელი არაა: %2"
 
 #: src/sound.py:58
 msgid "No voices will be heard because the program %1 is missing"
-msgstr ""
+msgstr "ხმას ვერ გაიგებთ, რადგან პროგრამა %1 აღმოჩენილი არაა"
 
 #: src/sound.py:358
 msgid "cannot write <filename>%1</filename>: %2"
@@ -2056,7 +2088,7 @@ msgstr "ხმის ფაილები შეიცვალა, რად�
 
 #: src/sound.py:362
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
-msgstr ""
+msgstr "თავიდან დააყენეთ kajongg ან, გაუშვით, საკმარისი პრივილეგიებით:"
 
 #: src/tables.py:56
 msgid "Table"
