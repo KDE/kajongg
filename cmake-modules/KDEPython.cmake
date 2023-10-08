@@ -40,7 +40,7 @@ macro(PYTHON_INSTALL SOURCE_FILE DESTINATION_DIR)
 
     set(_bin_py ${CMAKE_CURRENT_BINARY_DIR}/${_basepath}/${_filename})
 
-    set(_bin_pyc "${CMAKE_CURRENT_BINARY_DIR}/${_basepath}/__pycache__/${_filenamebase}.cpython-${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.pyc")
+    set(_bin_pyc "${CMAKE_CURRENT_BINARY_DIR}/${_basepath}/__pycache__/${_filenamebase}.cpython-${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}.pyc")
     set(_py_install_dir "${DESTINATION_DIR}/__pycache__/")
 
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_basepath})
@@ -57,7 +57,7 @@ macro(PYTHON_INSTALL SOURCE_FILE DESTINATION_DIR)
       add_custom_command(
         TARGET "${_rule_name}"
         COMMAND "${CMAKE_COMMAND}" -E echo "${_message}"
-        COMMAND "${PYTHON_EXECUTABLE}" "${_python_compile_py}" "--destination-dir" "${DESTINATION_DIR}" "${_bin_py}"
+        COMMAND "${Python3_EXECUTABLE}" "${_python_compile_py}" "--destination-dir" "${DESTINATION_DIR}" "${_bin_py}"
         DEPENDS "${_absfilename}"
       )
     else()
@@ -65,7 +65,7 @@ macro(PYTHON_INSTALL SOURCE_FILE DESTINATION_DIR)
         TARGET "${_rule_name}"
         COMMAND "${CMAKE_COMMAND}" -E echo "${_message}"
         COMMAND "${CMAKE_COMMAND}" -E copy "${_absfilename}" "${_bin_py}"
-        COMMAND "${PYTHON_EXECUTABLE}" "${_python_compile_py}" "--destination-dir" "${DESTINATION_DIR}" "${_bin_py}"
+        COMMAND "${Python3_EXECUTABLE}" "${_python_compile_py}" "--destination-dir" "${DESTINATION_DIR}" "${_bin_py}"
         DEPENDS "${_absfilename}"
       )
     endif()

@@ -23,11 +23,10 @@ include(KDEInstallDirs)
 include(ECMInstallIcons)
 include(KDECMakeSettings)
 
-include(FindPythonInterp)
+find_package(Python3 ${PYTHON_MIN_VERSION} COMPONENTS REQUIRED)
 
 include(KDEPython)
 
-find_package(PythonInterp ${PYTHON_MIN_VERSION} REQUIRED)
 find_package(Twisted ${TWISTED_MIN_VERSION} REQUIRED)
 find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS
     Core
