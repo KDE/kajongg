@@ -56,6 +56,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
 
     def setClippingFlags(self):
         """if we do not show shadows, we need to clip"""
+        assert Internal.Preferences
         showShadows = Internal.Preferences.showShadows
         self.setFlag(
             QGraphicsItem.GraphicsItemFlag.ItemClipsChildrenToShape,
@@ -64,19 +65,21 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
 
     def keyPressEvent(self, event):
         """redirect to the board"""
-        if self is not self.board.focusTile:
+        _ = self.board
+        assert _
+        if self is not _.focusTile:
             logDebug('keyPressEvent %s on [%s]%s but focus is on [%s]%s' % \
-                (event, id4(self), self, id4(self.board.focusTile), self.board.focusTile))
-        return self.board.keyPressEvent(event)
+                (event, id4(self), self, id4(_.focusTile), _.focusTile))
+        _.keyPressEvent(event)
 
     def __lightDistance(self):
         """the distance of item from the light source"""
         board = self.board
         if not board:
-            return 0
+            return 0.0
         rect = self.sceneBoundingRect()
         lightSource = board.lightSource
-        result = 0
+        result = 0.0
         if 'E' in lightSource:
             result -= rect.right()
         if 'W' in lightSource:
@@ -96,6 +99,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         """a dict with attributes for the new position,
         normally pos, rotation and scale"""
         assert self.board
+        assert self.tileset
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
         shiftZ = self.board.shiftZ(self.level)
@@ -146,19 +150,25 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
     def boundingRect(self):
         """define the part of the tile we want to see. Do not return QRect()
         if tileset is not known because that makes QGraphicsscene crash"""
+        assert Internal.Preferences
         if self.tileset:
             self._boundingRect = QRectF(
                 QPointF(),
                 self.tileset.tileSize if Internal.Preferences.showShadows
                 else self.tileset.faceSize)
+        else:
+            # just something. QRectF() gives segfault. FIXME: Still true?
+            self._boundingRect = QRectF(0.0, 0.0, 10.0, 10.0)
         return self._boundingRect
 
     def facePos(self, showShadows=None):
         """return the face position relative to the tile
         depend on tileset, lightSource and shadow"""
+        assert Internal.Preferences
         if showShadows is None:
-            showShadows = Internal.Preferences.showShadows
-        return self.board.tileFacePos(showShadows)
+            showShadows = bool(Internal.Preferences.showShadows)
+        _ = self.board
+        return _.tileFacePos(showShadows)
 
     def showFace(self):
         """should we show face for this tile?"""
@@ -166,17 +176,22 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
 
     def __elementId(self, showShadows=None):
         """return the SVG element id of the tile"""
+        assert Internal.Preferences
         if showShadows is None:
-            showShadows = Internal.Preferences.showShadows
+            showShadows = bool(Internal.Preferences.showShadows)
         if not showShadows:
             return "TILE_2"
-        lightSourceIndex = LIGHTSOURCES.index(self.board.rotatedLightSource())
+        _ = self.board
+        assert _
+        lightSourceIndex = LIGHTSOURCES.index(_.rotatedLightSource())
         return "TILE_{}".format(lightSourceIndex % 4 + 1)
 
     def paint(self, painter, unusedOption, unusedWidget=None):
         """paint the entire tile.
         I tried to cache a pixmap for the tile and darkener but without face,
         but that actually made it slower."""
+        assert Internal.Preferences
+        assert self.tileset
         with Painter(painter):
             renderer = self.tileset.renderer()
             withBorders = Internal.Preferences.showShadows
@@ -201,6 +216,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
     def __paintCross(self, painter):
         """paint a cross on the tile"""
         with Painter(painter):
+            assert self.tileset
             faceSize = self.tileset.faceSize
             width = faceSize.width()
             height = faceSize.height()
@@ -211,8 +227,10 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
     def pixmapFromSvg(self, pmapSize, withBorders=None):
         """return a pixmap with default size as given in SVG
         and optional borders/shadows"""
+        assert Internal.Preferences
+        assert self.tileset
         if withBorders is None:
-            withBorders = Internal.Preferences.showShadows
+            withBorders = bool(Internal.Preferences.showShadows)
         if withBorders:
             originalSize = self.tileset.tileSize.toSize()
         else:
@@ -251,7 +269,9 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
     def _drawDarkness(self, painter):
         """if appropriate, make tiles darker. Mainly used for hidden tiles"""
         if self.dark:
+            assert self.tileset
             board = self.board
+            assert board
             rect = board.tileFaceRect().adjusted(-1, -1, -1, -1)
             color = QColor('black')
             color.setAlpha(self.tileset.darkenerAlpha)
@@ -260,6 +280,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
     def sortKey(self, sortDir=Qt.Key.Key_Right):
         """moving order for cursor"""
         dirs = [Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Left, Qt.Key.Key_Down] * 2
+        assert self.__board
         sorter = dirs[dirs.index(sortDir) + sceneRotation(self.__board) // 90]
         if sorter == Qt.Key.Key_Down:
             return self.xoffset * 100 + self.yoffset
@@ -381,11 +402,8 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         rotation = ' rot%d' % self.rotation if self.rotation else ''
         scale = ' scale=%.2f' % self.scale if self.scale != 1 else ''
         level = ' level=%d' % self.level if self.level else ''
-        if self.boundingRect():
-            size = self.boundingRect()
-            size = ' %.2dx%.2d' % (size.width(), size.height())
-        else:
-            size = ''
+        _ = self.boundingRect()
+        size = ' %.2dx%.2d' % (_.width(), _.height())
         return '%s(%s) %s: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
             (self.tile.name2(),
              self.board.debug_name() if self.board else 'None', id4(self),
