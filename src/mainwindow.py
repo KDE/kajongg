@@ -121,7 +121,7 @@ class MainWindow(KXmlGuiWindow):
         Internal.mainWindow = self
         self._scene = None
         self.centralView = None
-        self.background = None
+        self.background = Background()
         self.playerWindow = None
         self.rulesetWindow = None
         self.confDialog = None

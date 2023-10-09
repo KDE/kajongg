@@ -185,7 +185,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         self.__yHeight = 0
         self.__fixedWidth = width
         self.__fixedHeight = height
-        self._tileset = None
+        self._tileset = Tileset()
         self.tileset = tileset
         self.level = 0
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
@@ -505,6 +505,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         if showShadows is None:
             showShadows = Internal.Preferences.showShadows
         if (self._tileset != tileset
+                or self.__yHeight == 0
                 or self._lightSource != lightSource
                 or Internal.Preferences.showShadows != showShadows):
             self.prepareGeometryChange()

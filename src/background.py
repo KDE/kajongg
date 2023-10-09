@@ -25,7 +25,7 @@ class Background(Resource):
     configGroupName = 'KMahjonggBackground'
     cache = {}
 
-    def __init__(self, name):
+    def __init__(self, name=None):
         """continue __build"""
         super().__init__(name)
         self.__pmap = None

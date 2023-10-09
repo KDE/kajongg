@@ -28,7 +28,7 @@ class Tileset(Resource):
     configGroupName = 'KMahjonggTileset'
     cache = {}
 
-    def __init__(self, name):
+    def __init__(self, name=None):
         """continue __build"""
         super().__init__(name)
         self.tileSize = None

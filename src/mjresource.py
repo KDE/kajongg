@@ -30,9 +30,14 @@ class Resource:
 
     """represents a complete tileset"""
 
-    cache = {}
+    cache = None  # common cache: tiles and background must not share identical names!
 
-    def __new__(cls, name):
+    def __new__(cls, name=None):
+        if cls.cache is None:
+            cls.cache = {}
+            cls.loadAll()
+        if name is None:
+            return cls.available()[0]
         return cls.cache.get(name) or cls.cache.get(cls.__name(name)) or cls.__build(name)
 
     @classmethod
@@ -68,6 +73,7 @@ class Resource:
     def available(cls):
         """ready for the selector dialog, default first"""
         cls.loadAll()
+        assert cls.cache is not None
         return sorted(set(cls.cache.values()), key=lambda x: x.desktopFileName != 'default')
 
     @classmethod
@@ -102,11 +108,12 @@ class Resource:
                 else:
                     logWarning(i18n('cannot find %1, using default', name))
 
-        cls.cache[result.desktopFileName] = result
-        cls.cache[result.path] = result
+        assert cls.cache is not None
+        cls.cache[result.desktopFileName] = result  # pylint:disable=unsupported-assignment-operation
+        cls.cache[result.path] = result  # pylint:disable=unsupported-assignment-operation
         return result
 
-    def __init__(self, unusedName):
+    def __init__(self, unusedName=None):
         """continue __build"""
         self.group = KConfig(self.path).group(self.configGroupName)
 
