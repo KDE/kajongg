@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2023-10-07 22:49+0200\n"
+"PO-Revision-Date: 2023-10-08 09:34+0200\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -1381,6 +1381,8 @@ msgid ""
 "13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
 "with one of them"
 msgstr ""
+"13 ერთეული კამათელი: ყველა დრაკონი, ქარები, 1, 9 და 14-ე კამათელი, რომელიც "
+"მათთან წყვილს ქმნის"
 
 #: src/predefined.py:233
 msgid "Pung/Kong of Dragons"
@@ -1481,6 +1483,8 @@ msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
 msgstr ""
+"ყველა კამათელი ერთი ფერისაა. პანგ ან კონგი 1 და 9; 2,5 ან 8-ის წყვილი და ორი "
+"ჩოუ დარჩენილი მნიშვნელობებისთვის"
 
 #: src/predefined.py:317
 msgid "Little Three Dragons"
@@ -1551,6 +1555,8 @@ msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
 msgstr ""
+"ყველა კამათელი ერთი ფერითაა დაფარული: 1112345678999 ერთი წყვილით 2-დან 8-მდე "
+"(ბოლო კამათელი კედლიდან ან მოცილებული)"
 
 #: src/predefined.py:386
 msgid "Wriggling Snake"
@@ -1559,7 +1565,7 @@ msgstr "გველი, რომელიც იკლაკნება"
 #: src/predefined.py:387
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
-msgstr ""
+msgstr "1-ების წყვილი და რიგი 2-დან 9-მდე იგივე ფერში თითოეული ქარისთვის"
 
 #: src/predefined.py:389
 msgid "Triple Knitting"
@@ -1570,6 +1576,8 @@ msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
 msgstr ""
+"ოთხი ნაკრები სამი კამათლისთვის სხვადასხვა ფერებში და წყვილი: ქარების და "
+"დრაკონების გარეშე"
 
 #: src/predefined.py:391
 msgid "Knitting"
@@ -1578,6 +1586,7 @@ msgstr "ქსოვა"
 #: src/predefined.py:392
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr ""
+"9 კამათლის წყვილი ნებისმიერ 2 ფერში სამიდან. ქარების ან დრაკონების გარეშე"
 
 #: src/predefined.py:394
 msgid "All pair honors"
@@ -1601,7 +1610,7 @@ msgstr "დამარხული განძი"
 
 #: src/predefined.py:412
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
-msgstr ""
+msgstr "დაფარული პანგები ერთი ფერით ქარებით/დრაკონებით და წყვილი"
 
 #: src/predefined.py:413
 msgid "Purity"
@@ -1609,11 +1618,11 @@ msgstr "სისუფთავე"
 
 #: src/predefined.py:414
 msgid "Only same-colored tiles (no chows, dragons or winds)"
-msgstr ""
+msgstr "მხოლოდ იგივე ფერის კამათლები (ჩოუების, დრაკონების ან ქარების გარეშე)"
 
 #: src/predefined.py:417
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
-msgstr ""
+msgstr "3 პანგი ან კონგი ან დრაკონი, პლუს ნებისმიერი პანგი/დრაკონი და წყვილი"
 
 #: src/predefined.py:420
 msgid "The 13 Unique Wonders"
@@ -1621,7 +1630,7 @@ msgstr "მსოფლიოს 13 საოცრება"
 
 #: src/predefined.py:427
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
-msgstr ""
+msgstr "არასწორსახელიანი კამათელი ჩოუსთვის/პანგისთვის/კონგისთვის"
 
 #: src/predefined.py:437
 msgid "Calling for Only Honors"
@@ -1725,6 +1734,8 @@ msgstr "კომბინაციის წესები"
 msgid ""
 "Meld rules are applied to single melds independent of the rest of the hand"
 msgstr ""
+"კომბინაციის წესები ერთ კომბინაციაზე გადატარდება, დანარჩენი ხელისგან "
+"დამოუკიდებლად"
 
 #: src/rule.py:327
 msgid "Hand Rules"
@@ -1732,7 +1743,7 @@ msgstr "ხელის წესები"
 
 #: src/rule.py:328
 msgid "Hand rules are applied to the entire hand, for all players"
-msgstr ""
+msgstr "ხელის წესები გადატარდება მთელ ხელზე, ყველა მოთამაშისთვის"
 
 #: src/rule.py:329
 msgid "Winner Rules"
@@ -1741,6 +1752,7 @@ msgstr "გამარჯვებულის წესები"
 #: src/rule.py:330
 msgid "Winner rules are applied to the entire hand but only for the winner"
 msgstr ""
+"გამარჯვებულის წესები გადატარდება მთელ ხელზე, მაგრამ მხოლოდ გამარჯვებულისთვის"
 
 #: src/rule.py:331
 msgid "Loser Rules"
@@ -1748,7 +1760,7 @@ msgstr "დამარცხებულის წესები"
 
 #: src/rule.py:332
 msgid "Loser rules are applied to the entire hand but only for non-winners"
-msgstr ""
+msgstr "წაგებულის წესები გადატარდება მთელ ხელზე, მხოლოდ, წაგებულებისთვის"
 
 #: src/rule.py:333
 msgid "Mah Jongg Rules"
@@ -1756,7 +1768,7 @@ msgstr "Mah Jongg-ის წესები"
 
 #: src/rule.py:334
 msgid "Only hands matching a Mah Jongg rule can win"
-msgstr ""
+msgstr "მხოლოდ ხელები, რომლებიც მაჯონგის წესს ემთხვევა, შეგიძლიათ, მოიგოთ"
 
 #: src/rule.py:335
 msgctxt "kajongg"
@@ -1779,6 +1791,11 @@ msgid ""
 "you get\n"
 "into a situation where you have to pay a penalty"
 msgstr ""
+"ჯარიმები გამოიყენება ხელით მომხმარებლის მიერ. ისინი მხოლოდ ქულების "
+"მოსაპოვებლად გამოიყენება.\n"
+"როდესაც თამაშობენ წინააღმდეგ კომპიუტერი ან მეტი წმინდა, Kajongg არასოდეს "
+"მოგცემთ მიიღოთ\n"
+"შევიდა სიტუაცია, სადაც თქვენ უნდა გადაიხადოს ჯარიმა"
 
 #: src/rule.py:534
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
@@ -1859,6 +1876,7 @@ msgstr "დაფარული კამათლების აქ გად
 #: src/scoring.py:599
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
+"აღწერეთ ოთხი მოთამაშე მენიუში <interface>მორგება|მოთამაშეები</interface>"
 
 #: src/scoringdialog.py:234
 msgid "Round/Hand"
@@ -2065,6 +2083,8 @@ msgstr "%1-მა არასწორად თქვა %2 კომბინ
 #: src/servertable.py:682
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
 msgstr ""
+"%1-მა არასწორად თქვა %2: ამტკიცებს, რომა აქვს დაფარული კამათლები %3 მაგრამ, "
+"მხოლოდ, აქვს %4"
 
 #: src/servertable.py:720
 msgid "declareKong:%1 wrongly said Kong for meld %2"
