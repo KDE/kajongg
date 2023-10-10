@@ -68,6 +68,9 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
     def refresh(self, unusedDeferredResult=None):
         """show/hide on correct position after queued animations end"""
         board = self.board
+        if not board:
+            # for mypy
+            return
         if not isAlive(board) or not isAlive(self):
             if isAlive(self):
                 self.setVisible(False)
@@ -80,10 +83,13 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
         if board.focusTile:
             board.focusTile.setFocus()
             self.setPos(board.focusTile.pos)
+        assert Internal.scene
         game = Internal.scene.game
-        self.setVisible(board.isVisible() and bool(board.focusTile)
-                        and board.isEnabled() and board.hasLogicalFocus and bool(game) and not game.autoPlay)
-
+        if game is None:
+            self.setVisible(False)
+        else:
+            self.setVisible(board.isVisible() and bool(board.focusTile)
+                        and board.isEnabled() and board.hasLogicalFocus and not game.autoPlay)
 
     def __str__(self):
         """for debugging"""
@@ -131,6 +137,7 @@ class GameScene(SceneWithFocusRect):
 
     def __init__(self, parent=None):
         Internal.scene = self
+        assert parent
         self.mainWindow = parent
         self._game = None
         super().__init__()
@@ -138,6 +145,7 @@ class GameScene(SceneWithFocusRect):
         self.scoreTable = None
         self.explainView = None
         self.setupUi()
+        assert Internal.Preferences
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @property
@@ -150,11 +158,13 @@ class GameScene(SceneWithFocusRect):
         """if it changes, update GUI"""
         changing = self._game != value
         game = self._game
+        assert self.mainWindow
         self._game = value
         if changing:
             if value:
                 self.mainWindow.updateGUI()
             else:
+                assert game
                 game.close()
                 if self.scoreTable:
                     self.scoreTable.hide()
@@ -174,6 +184,7 @@ class GameScene(SceneWithFocusRect):
     def handSelectorChanged(self, handBoard):
         """update all relevant dialogs"""
         if self.game and not self.game.finished():
+            assert handBoard.player
             handBoard.player.showInfo()
         # first decorate walls - that will compute player.handBoard for
         # explainView
@@ -182,11 +193,14 @@ class GameScene(SceneWithFocusRect):
 
     def setupUi(self):
         """prepare scene"""
+        assert Internal.Preferences
+        assert isinstance(Internal.Preferences.windTilesetName, str)
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
 
     def showWall(self):
         """shows the wall according to the game rules (length may vary)"""
-        UIWall(self.game)   # sets self.game.wall
+        if self.game:
+            UIWall(self.game)   # sets self.game.wall
 
     def abort(self):
         """abort current game"""
@@ -197,16 +211,20 @@ class GameScene(SceneWithFocusRect):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
+            assert self.game.wall
             with AnimationSpeed():
                 self.game.wall.decorate4()
                 for uiTile in self.game.wall.tiles:
-                    if uiTile.board:
-                        uiTile.board.placeTile(uiTile)
+                    _ = uiTile
+                    if _.board:
+                        _.board.placeTile(_)
 
     def applySettings(self):
         """apply preferences"""
+        assert self.mainWindow
+        assert Internal.Preferences
         self.mainWindow.actionAngle.setEnabled(
-            bool(self.game) and Internal.Preferences.showShadows)
+            bool(self.game) and bool(Internal.Preferences.showShadows))
         with AnimationSpeed():
             for item in self.nonTiles():
                 if hasattr(item, 'tileset'):
@@ -216,18 +234,20 @@ class GameScene(SceneWithFocusRect):
         """redecorate wall"""
         self.mainWindow.updateGUI()
         if self.game:
+            assert self.game.wall
             with AnimationSpeed(Speeds.windDisc):
                 self.game.wall.decorate4()
 
     def updateSceneGUI(self):
         """update some actions, all auxiliary windows and the statusbar"""
         game = self.game
+        assert Internal.Preferences
         mainWindow = self.mainWindow
         for action in [mainWindow.actionScoreGame, mainWindow.actionPlayGame]:
             action.setEnabled(not bool(game))
         mainWindow.actionAbortGame.setEnabled(bool(game))
         mainWindow.actionAngle.setEnabled(
-            bool(game) and Internal.Preferences.showShadows)
+            bool(game) and bool(Internal.Preferences.showShadows))
         for view in [self.explainView, self.scoreTable]:
             if view:
                 view.refresh()
@@ -235,11 +255,15 @@ class GameScene(SceneWithFocusRect):
 
     def newLightSource(self):
         """next value"""
+        assert self.game
+        assert self.game.wall
         oldIdx = LIGHTSOURCES.index(self.game.wall.lightSource)
         return LIGHTSOURCES[(oldIdx + 1) % 4]
 
     def changeAngle(self):
         """change the lightSource"""
+        assert self.game
+        assert self.game.wall
         self.game.wall.lightSource = self.newLightSource()
         self.focusRect.refresh()
         self.mainWindow.adjustMainView()
@@ -315,7 +339,7 @@ class PlayingScene(GameScene):
     @clientDialog.setter
     def clientDialog(self, value):
         """wrapper: hide dialog when it is set to None"""
-        if isAlive(self._clientDialog) and not value:
+        if self._clientDialog and isAlive(self._clientDialog) and not value:
             self._clientDialog.timer.stop()
             self._clientDialog.hide()
         self._clientDialog = value
@@ -348,9 +372,10 @@ class PlayingScene(GameScene):
 
     def abort(self):
         """abort current game"""
-        def gotAnswer(result, autoPlaying):
+        def gotAnswer(gotResult, autoPlaying):
             """user answered"""
-            if result:
+            result = gotResult
+            if result is True:
                 self.game = None
             else:
                 self.mainWindow.actionAutoPlay.setChecked(autoPlaying)
@@ -396,7 +421,6 @@ class PlayingScene(GameScene):
     def applySettings(self):
         """apply preferences"""
         GameScene.applySettings(self)
-        self.discardBoard.showShadows = Internal.Preferences.showShadows
 
     def toggleDemoMode(self, checked):
         """switch on / off for autoPlay"""
@@ -509,6 +533,7 @@ class ScoringScene(GameScene):
         movingMeld = currentBoard.uiMeldWithTile(uiTile)
         if receiver != currentBoard or toConcealed != movingMeld.meld.isConcealed:
             movingLastMeld = movingMeld.meld == self.computeLastMeld()
+            assert self.scoringDialog
             if movingLastMeld:
                 self.scoringDialog.clearLastTileCombo()
             receiver.dropTile(uiTile, toConcealed)
