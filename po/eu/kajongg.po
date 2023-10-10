@@ -1,17 +1,17 @@
 # Translation for kajongg.po to Euskara/Basque (eu).
-# Copyright (C) 2020, This file is copyright:
+# Copyright (C) 2020-2023 This file is copyright:
 # This file is distributed under the same license as the kajongg package.
-# KDE euskaratzeko proiektuko arduraduna <xalba@euskalnet.net>.
+# KDE euskaratzeko proiektuko arduraduna <xalba@ni.eus>.
 #
 # Translators:
-# Iñigo Salvador Azurmendi <xalba@ni.eus>, 2010, 2020.
+# SPDX-FileCopyrightText: 2010, 2020, 2023 Iñigo Salvador Azurmendi <xalba@ni.eus>
 # marcos <marcos@euskalgnu.org>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2020-08-05 11:54+0200\n"
+"PO-Revision-Date: 2023-10-09 23:26+0200\n"
 "Last-Translator: Iñigo Salvador Azurmendi <xalba@ni.eus>\n"
 "Language-Team: Basque <kde-i18n-eu@kde.org>\n"
 "Language: eu\n"
@@ -19,10 +19,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 20.04.3\n"
+"X-Generator: Lokalize 23.08.1\n"
 
 msgid "Preview"
-msgstr "Aurreikusi"
+msgstr "Aurreikuspegia"
 
 msgid "Properties"
 msgstr "Propietateak"
@@ -149,11 +149,9 @@ msgid "Rule"
 msgstr "Araua"
 
 #: src/differ.py:123
-#, fuzzy
-#| msgid "Compare"
 msgctxt "@title:window"
 msgid "Compare"
-msgstr "Alderatu"
+msgstr "Alderatzea"
 
 #: src/differ.py:166 src/differ.py:168
 msgctxt "Kajongg-Rule"
@@ -181,9 +179,6 @@ msgid "Started"
 msgstr "Hasita"
 
 #: src/games.py:103
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Games"
 msgctxt "@title:window"
 msgid "Games"
 msgstr "Jokoak"
@@ -236,13 +231,13 @@ msgstr "Ezin duzu esan %1"
 
 #: src/humanclient.py:569
 msgid "Player %1 has left the table"
-msgstr "%1 jokalariak mahaia utzi du"
+msgstr "%1 jokalariak taula utzi du"
 
 #: src/humanclient.py:632
 msgid ""
 "The game on table <numid>%1</numid> can begin. Are you ready to play now?"
 msgstr ""
-"<numid>%1</numid> mahaiko jokoa has daiteke. Jokatzeko prest zaude orain?"
+"<numid>%1</numid> taulako jokoa has daiteke. Jokatzeko prest zaude orain?"
 
 #: src/humanclient.py:650
 msgid "Ready for next hand?"
@@ -255,7 +250,7 @@ msgstr ""
 
 #: src/kajongg.py:81 src/kdestub.py:1055
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
-msgstr "Mah Jongg - 4 jokalarirentzako Txinako antzinako mahai-jokoa da"
+msgstr "Mah Jongg - 4 jokalarirentzako Txinako antzinako mahai-jokoa"
 
 #: src/kajongg.py:85
 msgid "all robots play with visible concealed tiles"
@@ -269,27 +264,23 @@ msgstr "hasi erakustaldi moduarekin"
 
 #: src/kajongg.py:87
 msgid "login to HOST"
-msgstr "saio-hasi OSTALARIan"
+msgstr "saio-hasi hemen, HOST"
 
 #: src/kajongg.py:88
 msgid "start new TABLE"
-msgstr "hasi MAHAI berria"
+msgstr "hasi TABLE berria"
 
 #: src/kajongg.py:89
-#, fuzzy
-#| msgid "join TABLE "
 msgid "join TABLE"
-msgstr "batu MAHAIra"
+msgstr "batu honetara, TABLE"
 
 #: src/kajongg.py:90
-#, fuzzy
-#| msgid "use ruleset without asking"
 msgid "use RULESET without asking"
-msgstr "erabili arau multzo bat galdetu gabe"
+msgstr "erabili RULESET galdetu gabe"
 
 #: src/kajongg.py:91
 msgid "play only ROUNDS rounds per game. Only for debugging!"
-msgstr ""
+msgstr "jokatu bakarrik ROUNDS erronda jokoko. Arazteko bakarrik!"
 
 #: src/kajongg.py:92
 msgid "prefer PLAYER for next login"
@@ -2093,7 +2084,7 @@ msgstr "Pasahitz okerra"
 
 #: src/server.py:212
 msgid "table with id <numid>%1</numid> not found"
-msgstr "id <numid>%1</numid> duen mahaia ez da aurkitu"
+msgstr "id <numid>%1</numid> duen taula ez da aurkitu"
 
 #: src/server.py:358
 msgid "Player %1 has logged out"
@@ -2183,49 +2174,40 @@ msgid "%1 claiming MahJongg: This is not a winning hand: %2"
 msgstr ""
 
 #: src/sound.py:58
-#, fuzzy
-#| msgid "No voices will be heard because the program ogg123 is missing"
 msgid "No voices will be heard because the program %1 is missing"
-msgstr "Ez da ahotsik adituko ogg123 programa falta delako"
+msgstr "Ez da ahotsik entzungo, %1 programa falta delako"
 
 #: src/sound.py:358
-#, fuzzy
-#| msgid "file <filename>%1</filename> contains no valid SVG"
 msgid "cannot write <filename>%1</filename>: %2"
-msgstr "<filename>%1</filename> fitxategiak ez dauka baliodun SVG"
+msgstr "ezin da <filename>%1</filename>(e)an idatzi: %2"
 
 #: src/sound.py:361
 msgid "The voice files have changed, their checksum has changed."
 msgstr ""
+"Ahots-fitxategiak aldatu egin dira, haien egiaztapen-batura aldatu egin da."
 
 #: src/sound.py:362
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
-msgstr ""
+msgstr "Mesedez, berrinstalatu kajongg edo egin, behar adina baimenekin:"
 
 #: src/tables.py:56
 msgid "Table"
 msgstr "Taula"
 
 #: src/tables.py:60
-#, fuzzy
-#| msgid "&Start"
 msgctxt "table status"
 msgid "Status"
-msgstr "&Hasi"
+msgstr "Egoera"
 
 #: src/tables.py:61
-#, fuzzy
-#| msgid "Rulesets"
 msgid "Ruleset"
-msgstr "Arau multzoak"
+msgstr "Arau multzoa"
 
 #: src/tables.py:145
 msgid "Select a ruleset"
 msgstr "Hautatu arau multzo bat"
 
 #: src/tables.py:183
-#, fuzzy
-#| msgid "&New"
 msgctxt "allocate a new table"
 msgid "&New"
 msgstr "&Berria"
@@ -2236,11 +2218,11 @@ msgstr ""
 
 #: src/tables.py:189 src/tables.py:327
 msgid "&Join"
-msgstr "&Bat egin"
+msgstr "&Batu"
 
 #: src/tables.py:193 src/tables.py:328
 msgid "Join a table"
-msgstr ""
+msgstr "Batu taula batera"
 
 #: src/tables.py:195
 msgid "&Leave"
@@ -2248,7 +2230,7 @@ msgstr "&Utzi"
 
 #: src/tables.py:199
 msgid "Leave a table"
-msgstr ""
+msgstr "Utzi taula bat"
 
 #: src/tables.py:202
 msgctxt "Kajongg-Ruleset"
@@ -2257,11 +2239,11 @@ msgstr "Konparatu"
 
 #: src/tables.py:207
 msgid "Compare the rules of this table with my own rulesets"
-msgstr "Konparatu mahai honetako arauak nere arau propioekin"
+msgstr "Alderatu taula horretako arauak nire arau propioekin"
 
 #: src/tables.py:209
 msgid "&Chat"
-msgstr ""
+msgstr "&Berriketa"
 
 #: src/tables.py:214
 msgid "&Start"
@@ -2270,39 +2252,42 @@ msgstr "&Hasi"
 #: src/tables.py:219
 msgid "Start playing on a table. Empty seats will be taken by robot players."
 msgstr ""
+"Hasi taula batean jokatzen. Aulki hutsak robot jokalariek beteko dituzte."
 
 #: src/tables.py:261
 msgid "opens a chat window"
-msgstr ""
+msgstr "berriketa leiho bat irekitzen du"
 
 #: src/tables.py:280
 msgid "Local Games with Ruleset %1"
-msgstr ""
+msgstr "%1 arau-multzoak dituzten joko lokalak"
 
 #: src/tables.py:283
 msgid "Tables at %1"
-msgstr ""
+msgstr "%1(e)ko taulak"
 
 #: src/tables.py:320
 msgid "Start a new game"
-msgstr ""
+msgstr "Hasi joko berri bat"
 
 #: src/tables.py:322
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
-msgstr ""
+msgstr "Be&rrekin"
 
 #: src/tables.py:324
 msgid "Resume the selected suspended game"
-msgstr ""
+msgstr "Hautatutako joko esekiari berriro ekitea"
 
 #: src/tables.py:342
 msgid "Chat with others on this table"
-msgstr ""
+msgstr "Taula horretako beste batzuekin berriketa egin"
 
 #: src/tables.py:345
 msgid "For chatting with others on this table, please first take a seat"
 msgstr ""
+"Taula horretako beste batzuekin berriketan aritzeko, mesedez, aurrena eseri "
+"zaitez"
 
 #: src/tile.py:192
 msgctxt "kajongg"
@@ -2367,59 +2352,56 @@ msgstr "berde"
 #: src/tile.py:209
 msgctxt "kajongg"
 msgid "East"
-msgstr ""
+msgstr "Ekialdea"
 
 #: src/tile.py:210
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "south"
 msgctxt "kajongg"
 msgid "South"
-msgstr "hegoa"
+msgstr "Iparra"
 
 #: src/tile.py:211
 msgctxt "kajongg"
 msgid "West"
-msgstr ""
+msgstr "Mendebaldea"
 
 #: src/tile.py:212
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "north"
 msgctxt "kajongg"
 msgid "North"
-msgstr "iparra"
+msgstr "iparraldea"
 
 #: src/tile.py:221
 msgid "East Wind"
-msgstr ""
+msgstr "Ekialdeko haizea"
 
 #: src/tile.py:222
 msgid "South Wind"
-msgstr ""
+msgstr "Hegoaldeko haizea"
 
 #: src/tile.py:223
 msgid "West Wind"
-msgstr ""
+msgstr "Mendebaldeko haizea"
 
 #: src/tile.py:224
 msgid "North Wind"
-msgstr ""
+msgstr "Iparreko haizea"
 
 #: src/tile.py:226
 #, python-brace-format
 msgctxt "kajongg tile name"
 msgid "{group} {value}"
-msgstr ""
+msgstr "{group} {value}"
 
 #: src/user.py:84
 msgid ""
 "Your client has a version older than 4.9.0 but you need %1 for this server"
 msgstr ""
+"Zure bezeroak 4.9.0 baino bertsio zaharragoa du, baina zerbitzari "
+"horretarako %1 behar duzu"
 
 #: src/user.py:93
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
+"Zure bezeroaren bertsioa %1 da, baina zerbitzari horretarako %2 behar duzu"
 
 #, fuzzy
 #~| msgid "Not using Python KDE bindings"
