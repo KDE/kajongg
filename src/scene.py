@@ -344,11 +344,6 @@ class PlayingScene(GameScene):
             self._clientDialog.hide()
         self._clientDialog = value
 
-    def resizeEvent(self, unusedEvent):
-        """main window changed size"""
-        if self.clientDialog:
-            self.clientDialog.placeInField()
-
     def setupUi(self):
         """create all other widgets
         we could make the scene view the central widget but I did
