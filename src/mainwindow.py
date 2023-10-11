@@ -184,7 +184,8 @@ class MainWindow(KXmlGuiWindow):
             self.actionExplain.setData(ExplainView)
             self.actionScoreTable.setData(ScoreTable)
         self._scene = value
-        self.centralView.setScene(value)
+        # contrary to what the Qt doc says, scene can be set to None
+        self.centralView.setScene(value)  # type:ignore[arg-type]
         self.adjustMainView()
         self.updateGUI()
         canDemo = not value or isinstance(value, PlayingScene)
