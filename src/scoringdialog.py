@@ -1101,8 +1101,7 @@ class ScoringDialog(QWidget):
         self.cbLastTile.clear()
         if not winnerTiles:
             return
-        pmSize = winnerTiles[0].board.tileset.faceSize
-        pmSize = QSize(pmSize.width() * 0.5, pmSize.height() * 0.5)
+        pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()
         self.cbLastTile.setIconSize(pmSize)
         QPixmapCache.clear()
         self.__tilePixMaps = []
