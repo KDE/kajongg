@@ -204,11 +204,6 @@ class MainWindow(KXmlGuiWindow):
         result.setWidth(width)
         return result
 
-    def showEvent(self, event):
-        """force a resize which calculates the correct background image size"""
-        self.centralView.resizeEvent(True)
-        KXmlGuiWindow.showEvent(self, event)
-
     def _kajonggToggleAction(self, name, icon, shortcut=None, actionData=None):
         """a checkable action"""
         res = Action(self,
