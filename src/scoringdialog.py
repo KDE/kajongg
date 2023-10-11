@@ -611,7 +611,11 @@ class PenaltyBox(QSpinBox):
         """check if value is a multiple of parties"""
         result, inputData, newPos = QSpinBox.validate(self, inputData, pos)
         if result == QValidator.Acceptable:
-            if int(inputData) % self.parties != 0:
+            try:
+                int_data = int(inputData)
+            except ValueError:
+                return (QValidator.Invalid, inputData, pos)
+            if int_data % self.parties != 0:
                 result = QValidator.Intermediate
         if result == QValidator.Acceptable:
             self.prevValue = str(inputData)
@@ -628,8 +632,7 @@ class PenaltyBox(QSpinBox):
             newV = str(int((small + 1) * common))
         else:
             newV = str(int(small * common))
-        data.clear()
-        data.append(newV)
+        return newV
 
 
 class RuleBox(QCheckBox):
