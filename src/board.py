@@ -18,7 +18,7 @@ from tileset import Tileset
 from tile import Tile, elements
 from uitile import UITile, UIMeld
 from guiutil import Painter, rotateCenter, sceneRotation
-from meld import Meld
+from meld import Meld, MeldList
 from animation import AnimationSpeed, animate, AnimatedMixin
 from message import Message
 
@@ -28,7 +28,6 @@ from mi18n import i18n, i18nc
 from common import LIGHTSOURCES, Internal, Debug, isAlive, ReprMixin
 from common import DrawOnTopMixin
 from wind import Wind, East
-
 
 class WindDisc(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
 
@@ -343,7 +342,7 @@ class Board(QGraphicsRectItem, ReprMixin):
 
     def meldVariants(self, tile, lowerHalf):  # pylint: disable=unused-argument
         """all possible melds that could be meant by dragging/dropping uiTile"""
-        return [Meld(tile)]
+        return MeldList(Meld(tile))
 
     def chooseVariant(self, uiTile, lowerHalf=False):
         """make the user choose from a list of possible melds for the target.
@@ -730,7 +729,7 @@ class SelectorBoard(CourtBoard):
             scName = upperName
         else:
             scName = lowerName
-        result = [scName.single]
+        result = MeldList(scName.single)
         baseTiles = len(self.tilesByElement(lowerName))
         if baseTiles >= 2:
             result.append(scName.pair)

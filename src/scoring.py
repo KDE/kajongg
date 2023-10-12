@@ -164,7 +164,7 @@ class ScoringHandBoard(HandBoard):
         result.append(meld.concealed if lowerHalf else meld.exposed)
         if len(meld) == 4:
             if lowerHalf:
-                result = [meld.declared]
+                result.append(meld.declared)
             else:
                 result.append(meld.exposedClaimed)
         return result
