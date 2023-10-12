@@ -21,7 +21,7 @@ from tilesource import TileSource
 from animation import animate
 from log import logError, logDebug, logWarning, i18n
 from query import Query
-from uitile import UITile
+from uitile import UITile, UIMeld
 from board import WindLabel, Board
 from game import Game
 from games import Games
@@ -169,14 +169,18 @@ class ScoringHandBoard(HandBoard):
         for myMeld in self.uiMelds:
             if uiTile in myMeld:
                 return myMeld
-        return None
+        logWarning('ScoringBoard: found no meld with %s' % uiTile)
+        return UIMeld(uiTile)
 
     def findUIMeld(self, meld):
         """find the first UIMeld matching the logical meld"""
         for result in self.uiMelds:
             if result.meld == meld:
                 return result
-        return None
+        logWarning('Scoring game: cannot find UIMeld for {}'.format(meld))
+        if self.uiMelds:
+            return self.uiMelds[1]
+        raise ValueError('Scoring Game: findUIMeld() in absence of any uiMelds')
 
     def assignUITiles(self, uiTile, meld):  # pylint: disable=unused-argument
         """generate a UIMeld. First uiTile is given, the rest should be as defined by meld"""
