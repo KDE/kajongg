@@ -577,7 +577,7 @@ class ExplainView(QListView):
                 if explainHand.hasTiles():
                     total = explainHand.total()
                     if total:
-                        pLines = ['%s - %s' % (player.localName, total)]
+                        pLines = ['%s: %s' % (player.localName, total)]
                         for line in explainHand.explain():
                             pLines.append('- ' + line)
                 elif player.handTotal:
