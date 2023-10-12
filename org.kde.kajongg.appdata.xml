@@ -19,6 +19,7 @@
   <name xml:lang="fi">Kajongg</name>
   <name xml:lang="fr">Kajongg</name>
   <name xml:lang="gl">Kajongg</name>
+  <name xml:lang="ia">Re Kajongg</name>
   <name xml:lang="id">Kajongg</name>
   <name xml:lang="it">Kajongg</name>
   <name xml:lang="ka">Kajongg</name>
@@ -54,6 +55,7 @@
   <summary xml:lang="fi">Mahjongg-laattapeli Kiinasta</summary>
   <summary xml:lang="fr">Jeu de tuiles Mahjong originaire de Chine</summary>
   <summary xml:lang="gl">Xogo de teselas Mahjong da China</summary>
+  <summary xml:lang="ia">Joco de tegula Mahjong ex China</summary>
   <summary xml:lang="id">Permainan kartu mahjong dari China</summary>
   <summary xml:lang="it">Gioco delle tessere Mahjong dalla Cina</summary>
   <summary xml:lang="ka">Mahjong ფილების თამაში ჩინეთიდან</summary>
@@ -133,6 +135,7 @@
       <caption xml:lang="fi">Kajonggin pelaaminen</caption>
       <caption xml:lang="fr">En train de jouer à Kajongg</caption>
       <caption xml:lang="gl">Xogando a Kajongg</caption>
+      <caption xml:lang="ia">Jocar Kajongg</caption>
       <caption xml:lang="id">Memainkan Kajongg</caption>
       <caption xml:lang="it">Giocare con Kajongg</caption>
       <caption xml:lang="ka">Kajongg-ის თამაში</caption>
