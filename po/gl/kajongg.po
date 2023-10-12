@@ -510,7 +510,7 @@ msgstr "Servidor de partidas:"
 
 #: src/login.py:289 src/login.py:396
 msgid "Username:"
-msgstr "Nome de usuario:"
+msgstr "Nome de usuaria:"
 
 #: src/login.py:292 src/login.py:399
 msgid "Password:"
