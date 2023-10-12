@@ -465,8 +465,8 @@ class Player(ReprMixin):
         """called if discarding discard violates the Original Call"""
         if not self.originalCall or not self.mayWin:
             return False
-        if self.lastTile.exposed != discard.exposed:
-            if Debug.originalCall:
+        if self.lastTile and self.lastTile.exposed != discard.exposed:
+            if Debug.originalCall and self.game:
                 self.game.debug(
                     '%s would violate OC with %s, lastTile=%s' %
                     (self, discard, self.lastTile))
