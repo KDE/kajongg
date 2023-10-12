@@ -179,11 +179,13 @@ class AIDefaultAI:
         myself = aiInstance.player
         game = myself.game
         if myself.originalCall and myself.mayWin:
+            last = myself.lastTile
             if Debug.originalCall:
                 game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
-                           (myself.lastTile, [str(x) for x in candidates]))
+                           (last, [str(x) for x in candidates]))
             for candidate in candidates:
-                if candidate.tile is myself.lastTile.exposed:
+                if last and last.exposed and candidate.tile:
+                    assert myself.originalCallingHand
                     winningTiles = myself.originalCallingHand.chancesToWin()
                     if Debug.originalCall:
                         game.debug('weighOriginalCall: winningTiles=%s for %s' %
@@ -223,7 +225,8 @@ class AIDefaultAI:
         """this is where the robot AI should go.
         Returns answer and one parameter"""
         # disable warning about too many branches
-        answer = parameter = None
+        answer = answers[0]
+        parameter = None
         tryAnswers = (
             x for x in [Message.MahJongg, Message.OriginalCall, Message.Kong,
                         Message.Pung, Message.Chow, Message.Discard] if x in answers)
@@ -254,8 +257,6 @@ class AIDefaultAI:
             if parameter:
                 answer = tryAnswer
                 break
-        if not answer:
-            answer = answers[0]  # for now always return default answer
         return answer, parameter
 
     def selectChow(self, chows):
