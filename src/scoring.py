@@ -463,7 +463,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             if not popped:
                 logDebug(
                     '%s: %s.removeMeld did not find %s' %
-                    (self.name, self.__class__.__name__, meld), showStack=3)
+                    (self.name, self.__class__.__name__, meld), showStack=True)
                 logDebug('    concealed: %s' % self._concealedMelds)
                 logDebug('      exposed: %s' % self._exposedMelds)
             else:
