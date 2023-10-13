@@ -684,7 +684,7 @@ class MessageDeclaredKong(ServerMessage):
                 # do not do this when adding a 4th tile to an exposed pung
                 move.player.showConcealedTiles(move.meld)
             else:
-                move.player.showConcealedTiles(move.meld[3])
+                move.player.showConcealedTiles(TileTuple(move.meld[3]))
             prompts = [Message.NoClaim, Message.MahJongg]
         move.exposedMeld = move.player.exposeMeld(move.meld)
         return client.ask(move, prompts) if prompts else None
