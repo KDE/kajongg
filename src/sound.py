@@ -35,6 +35,15 @@ from tile import Tile
 if os.name == 'nt':
     import winsound  # pylint: disable=import-error
 
+class SoundPopen(subprocess.Popen):
+
+    """with additional attributes"""
+
+    def __init__(self, what, args):
+        super().__init__(args)
+        self.name = what
+        self.startTime = datetime.datetime.now()
+
 
 class Sound:
 
@@ -145,9 +154,7 @@ class Sound:
                     args = [oggBinary, '-q', what]
                     if Debug.sound:
                         game.debug(' '.join(args))
-                    process = subprocess.Popen(args)  # pylint: disable=consider-using-with
-                    process.startTime = datetime.datetime.now()
-                    process.name = what
+                    process = SoundPopen(what, args)
                     Sound.playProcesses.append(process)
                     reactor.callLater(3, Sound.cleanProcesses)
                     reactor.callLater(6, Sound.cleanProcesses)
