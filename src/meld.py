@@ -56,7 +56,7 @@ class Meld(TileTuple, ReprMixin):
             iterable = list(iterable)
             if iterable:
                 class1 = iterable[0].__class__
-                assert all(x.__class__ is class1 for x in iterable)
+                assert all(x.__class__ is class1 for x in iterable), repr(list(iterable))
                 if class1 is Piece:
                     superclass = TileList
         tiles = super(Meld, cls).__new__(cls, superclass(iterable))
