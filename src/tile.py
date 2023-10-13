@@ -360,7 +360,7 @@ class TileList(list, Tiles):
         list.__init__(self)
         if newContent is None:
             return
-        if isinstance(newContent, self.tileClass):
+        if isinstance(newContent, Tile) or newContent.__class__.__name__ == 'UITile':
             list.append(self, newContent)
         elif isinstance(newContent, str):
             list.extend(
