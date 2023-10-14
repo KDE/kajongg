@@ -212,6 +212,7 @@ class RuleList(list):
         rule = None
         description = kwargs.get('description', '')
         for cls in [IntRule, BoolRule, StrRule]:
+            assert isinstance(cls.prefix, str)
             if defParts[0].startswith(cls.prefix):
                 rule = cls(
                     name,
@@ -224,6 +225,7 @@ class RuleList(list):
                 del kwargs['parameter']
             ruleType = type(ruleKey(name) + 'Rule', (Rule, ), {})
             rule = ruleType(name, definition, **kwargs)
+            assert isinstance(rule, Rule)  # hint for mypy
             if defParts[0] == 'FCallingHand':
                 parts1 = defParts[1].split('=')
                 assert parts1[0] == 'Ohand', definition
