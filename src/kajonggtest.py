@@ -29,8 +29,6 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 OPTIONS = None
 
-KNOWNCOMMITS = set()
-
 class Clone:
 
     """make a temp directory for commitId"""
@@ -60,10 +58,10 @@ class Clone:
         return result
 
     @classmethod
-    def removeObsolete(cls):
+    def removeObsolete(cls, knownCommits):
         """remove all clones for obsolete commits"""
         for commitDir in os.listdir(cacheDir()):
-            if not any(x.startswith(commitDir) for x in KNOWNCOMMITS):
+            if not any(x.startswith(commitDir) for x in knownCommits):
                 removeDir = os.path.join(cacheDir(), commitDir)
                 shutil.rmtree(removeDir)
 
@@ -335,7 +333,7 @@ def cleanup_data(csv):
             os.removedirs(dirName)
         except OSError:
             pass  # not yet empty
-    Clone.removeObsolete()
+    Clone.removeObsolete(knownCommits)
 
 def pairs(data):
     """return all consecutive pairs"""
@@ -349,7 +347,7 @@ def pairs(data):
 class CSV(ReprMixin):
     """represent kajongg.csv"""
 
-    knownCommits = []
+    knownCommits = set()
 
     def __init__(self):
         self.findKnownCommits()
