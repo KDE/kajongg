@@ -11,7 +11,7 @@ Twisted Network Programming Essentials by Abe Fettig, 2006
 O'Reilly Media, Inc., ISBN 0-596-10032-9
 """
 
-import os
+import sys
 import random
 import traceback
 from itertools import chain
@@ -35,7 +35,7 @@ from servercommon import srvError
 from user import User
 from game import PlayingGame
 
-if os.name != 'nt':
+if sys.platform != 'win32':
     import resource
 
 
@@ -661,7 +661,7 @@ class ServerTable(Table, ReprMixin):
                 'gameOver',
                 i18nE('Game <numid>%1</numid> is over!'),
                 self.game.seed)
-            if Debug.process and os.name != 'nt':
+            if Debug.process and sys.platform != 'win32':
                 logDebug(
                     'MEM:%s' %
                     resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)

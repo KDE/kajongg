@@ -325,7 +325,7 @@ def win32install() ->None:
     installReactor(p)
 
 
-if runtime.platform.getType() == 'win32':
+if sys.platform == 'win32':
     install = win32install
 else:
     install = posixinstall

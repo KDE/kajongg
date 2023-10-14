@@ -150,7 +150,7 @@ class EvHandler(QObject):
 
 from util import gitHead
 
-if os.name == 'nt':
+if sys.platform == 'win32':
     _ = os.path.dirname(os.path.realpath(__file__))
     if _.endswith('.zip'):
         # cx_freeze

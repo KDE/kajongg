@@ -25,7 +25,7 @@ from qt import QStandardPaths, QObject, QSize
 
 Internal = None
 
-if os.name == 'nt':
+if sys.platform == 'win32':
     # This is only needed for manual execution, and
     # we expect python to be the python3 interpreter.
     # The windows installer will use kajongg.exe and kajonggserver.exe
@@ -135,7 +135,7 @@ def handleSignals(handler):
     signal(SIGABRT, handler)
     signal(SIGINT, handler)
     signal(SIGTERM, handler)
-    if os.name != 'nt':
+    if sys.platform != 'win32':
         from signal import SIGHUP, SIGQUIT
         signal(SIGHUP, handler)
         signal(SIGQUIT, handler)
@@ -382,7 +382,7 @@ class __Internal:
         Internal = self
         logName = os.path.basename(sys.argv[0]).replace('.py', '').replace('.exe', '')  + '.log'
         self.logger = logging.getLogger(logName)
-        if os.name == 'nt':
+        if sys.platform == 'win32':
             haveDevLog = False
         else:
             try:

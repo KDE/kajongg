@@ -643,7 +643,7 @@ def improve_options():
     OPTIONS.jobs = allJobs()
     OPTIONS.games = allGames()
     OPTIONS.jobCount = 0
-    OPTIONS.usePort = os.name == 'nt'
+    OPTIONS.usePort = sys.platform == 'win32'
 
 
 def allGames():
@@ -717,7 +717,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGABRT, cleanup)
     signal.signal(signal.SIGTERM, cleanup)
     signal.signal(signal.SIGINT, cleanup)
-    if os.name != 'nt':
+    if sys.platform != 'win32':
         signal.signal(signal.SIGHUP, cleanup)
         signal.signal(signal.SIGQUIT, cleanup)
 

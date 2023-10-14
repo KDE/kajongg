@@ -26,7 +26,7 @@ def cleanExit(*unusedArgs):
     """we want to cleanly close sqlite3 files"""
     if Debug.quit:
         logDebug('cleanExit')
-    if Options.socket and os.name != 'nt':
+    if Options.socket and sys.platform != 'win32':
         if os.path.exists(Options.socket):
             os.remove(Options.socket)
     try:
@@ -467,7 +467,7 @@ def kajonggServer():
             # we do not want tracebacks to go from server to client,
             # please check on the server side instead
             factory = pb.PBServerFactory(kajonggPortal, unsafeTracebacks=False)
-            if os.name == 'nt':
+            if sys.platform == 'win32':
                 if Debug.connections:
                     logDebug(
                         'local server listening on 127.0.0.1 port %d' %

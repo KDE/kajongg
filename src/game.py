@@ -9,7 +9,6 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 import weakref
-import os
 import sys
 from collections import defaultdict
 from functools import total_ordering
@@ -31,7 +30,7 @@ from wall import Wall
 from player import Players, Player, PlayingPlayer
 from animation import animateAndDo, AnimationSpeed, ParallelAnimationGroup
 
-if os.name != 'nt':
+if sys.platform != 'win32':
     import resource
 
 
@@ -815,7 +814,7 @@ class PlayingGame(Game):
         """write game summary to Options.csv"""
         if self.finished() and Options.csv:
             gameWinner = max(self.players, key=lambda x: x.balance)
-            if Debug.process and os.name != 'nt':
+            if Debug.process and sys.platform != 'win32':
                 self.csvTags.append('MEM:%s' % resource.getrusage(
                     resource.RUSAGE_SELF).ru_maxrss)
             if Options.rounds:

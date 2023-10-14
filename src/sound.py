@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import os
+import sys
 import tarfile
 import subprocess
 import datetime
@@ -32,7 +33,7 @@ from tile import Tile
         # self.audio.enqueue(Phonon.MediaSource(wavName))
         # self.audio.play()
 
-if os.name == 'nt':
+if sys.platform == 'win32':
     import winsound  # pylint: disable=import-error
 
 class SoundPopen(subprocess.Popen):
@@ -58,7 +59,7 @@ class Sound:
     def findOggBinary():
         """set __oggBinary to exe name or an empty string"""
         if Sound.__oggBinary is None:
-            if os.name == 'nt':
+            if sys.platform == 'win32':
                 Sound.__oggBinary = os.path.join('share', 'kajongg', 'voices', 'oggdec.exe')
                 msg = ''  # we bundle oggdec.exe with the kajongg installer, it must be there
             else:
@@ -125,7 +126,7 @@ class Sound:
         if os.path.exists(what):
             oggBinary = Sound.findOggBinary()
             if oggBinary:
-                if os.name == 'nt':
+                if sys.platform == 'win32':
                     # convert to .wav, store .wav in cacheDir
                     name, ext = os.path.splitext(what)
                     assert ext == '.ogg', 'what: {} name: {} ext: {}'.format(what, name, ext)

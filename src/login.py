@@ -84,7 +84,7 @@ class Url(str, ReprMixin):
         """do we use socket for current host?"""
         return (
             self.host == '127.0.0.1'
-            and os.name != 'nt'
+            and sys.platform != 'win32'
             and not Options.port)
 
     @property
@@ -169,7 +169,7 @@ class Url(str, ReprMixin):
         """start a local server"""
         try:
             args = self.__findServerProgram()
-            if self.useSocket or os.name == 'nt':  # for nt --socket tells the server to bind to 127.0.0.1
+            if self.useSocket or sys.platform == 'win32':  # for win32 --socket tells the server to bind to 127.0.0.1
                 args.append('--socket=%s' % socketName())
                 if removeIfExists(socketName()):
                     logInfo(
@@ -183,14 +183,14 @@ class Url(str, ReprMixin):
                             os.path.join(appdataDir(), 'local3.db'))))
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
-            if os.name == 'nt':
+            if sys.platform == 'win32':
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             else:
                 startupinfo = None
             process = subprocess.Popen(  # pylint:disable=consider-using-with
                 args,
-                startupinfo=startupinfo)  # , shell=os.name == 'nt')
+                startupinfo=startupinfo)  # , shell=sys.platform == 'win32')
             if Debug.connections:
                 logDebug(
                     i18n(
@@ -310,7 +310,7 @@ class LoginDlg(QDialog):
         self.cbUser.clear()
         self.cbUser.addItems(players)
         if not self.cbUser.count():
-            user = KUser() if os.name == 'nt' else KUser(os.geteuid())
+            user = KUser() if sys.platform == 'win32' else KUser(os.geteuid())
             self.cbUser.addItem(user.fullName() or user.loginName())
         if not preferPlayer:
             userNames = [x[1] for x in self.servers if x[0] == self.url]

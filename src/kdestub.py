@@ -43,7 +43,7 @@ from common import Internal, isAlive, Debug
 from util import popenReadlines
 from statesaver import StateSaver
 
-if os.name != 'nt':
+if sys.platform != 'win32':
     import pwd
 
 __all__ = ['KApplication', 'KConfig',
@@ -317,7 +317,7 @@ class KUser:
 
     def fullName(self):
         """stub"""
-        if os.name == 'nt':
+        if sys.platform == 'win32':
             return self.loginName()
         return pwd.getpwnam(self.loginName()).pw_gecos.replace(',', '')
 
@@ -641,7 +641,7 @@ class KConfig(ConfigParser):
 
 def KIcon(name=None):  # pylint: disable=invalid-name
     """simple wrapper"""
-    if os.name == 'nt':
+    if sys.platform == 'win32':
         return QIcon(os.path.join('share', 'icons', name) if name else None)
     return QIcon.fromTheme(name)
 

@@ -177,7 +177,7 @@ class MLocale:
     @classmethod
     def installTranslations(cls):
         """install translations"""
-        if os.name == 'nt':
+        if sys.platform == 'win32':
             # on Linux, QCoreApplication initializes locale but not on Windows.
             # This is actually documented for QCoreApplication
             setlocale(LC_ALL, '')
