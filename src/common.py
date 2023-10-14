@@ -23,8 +23,6 @@ from qt import QStandardPaths, QObject, QSize
 
 # pylint: disable=invalid-name
 
-Internal = None
-
 if sys.platform == 'win32':
     # This is only needed for manual execution, and
     # we expect python to be the python3 interpreter.
@@ -378,8 +376,6 @@ class __Internal:
 
     def __init__(self):
         """init the loggers"""
-        global Internal # pylint: disable=global-statement
-        Internal = self
         logName = os.path.basename(sys.argv[0]).replace('.py', '').replace('.exe', '')  + '.log'
         self.logger = logging.getLogger(logName)
         if sys.platform == 'win32':
@@ -400,7 +396,7 @@ class __Internal:
         formatter = logging.Formatter("%(name)s: %(levelname)s %(message)s")
         handler.setFormatter(formatter)
 
-__Internal()
+Internal = __Internal()
 
 
 class IntDict(defaultdict, ReprMixin):
