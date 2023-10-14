@@ -319,11 +319,6 @@ class Game:
         """the name of the game server this game is attached to"""
         return self.__winner
 
-    @property
-    def roundWind(self):
-        """the round wind for Hand"""
-        return Wind.all[self.roundsFinished % 4]
-
     @winner.setter
     def winner(self, value):
         """the name of the game server this game is attached to"""
@@ -333,6 +328,11 @@ class Game:
             self.__winner = value
             if value:
                 value.invalidateHand()
+
+    @property
+    def roundWind(self):
+        """the round wind for Hand"""
+        return Wind.all[self.roundsFinished % 4]
 
     def addCsvTag(self, tag, forAllPlayers=False):
         """tag will be written to tag field in csv row"""
