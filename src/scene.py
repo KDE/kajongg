@@ -40,7 +40,7 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
 
     def __init__(self):
         QGraphicsRectItem.__init__(self)
-        pen = QPen(QColor(Qt.GlobalColor.blue))
+        pen = QPen(QColor('blue'))
         pen.setWidth(6)
         self.setPen(pen)
         self.setZValue(ZValues.markerZ)

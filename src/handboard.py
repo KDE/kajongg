@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import weakref
 
-from qt import QGraphicsRectItem
+from qt import QGraphicsRectItem, QColor
 from tile import Tile
 from tileset import Tileset
 from uitile import UITile
@@ -73,7 +73,7 @@ class HandBoard(Board):
     """a board showing the tiles a player holds"""
 
     tileAttrClass = TileAttr
-    penColor = 'blue'
+    penColor = QColor('blue')
 
     def __init__(self, player):
         assert player

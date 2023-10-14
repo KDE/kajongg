@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 from common import Internal, ZValues, ReprMixin, Speeds, DrawOnTopMixin
 from wind import Wind, East
 from qt import QPointF, QGraphicsObject, QFontMetrics
-from qt import QPen, QColor, QFont, Qt, QRectF
+from qt import QPen, QColor, QFont, QRectF
 
 from guiutil import Painter, sceneRotation
 from board import WindDisc, YellowText, Board
@@ -39,7 +39,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
         self.__text = ''
         self.__board = None
         self.needsRefresh = False
-        self.__color = Qt.black
+        self.__color = QColor('black')
         self.__boundingRect = None
         self.__font = None
 
@@ -147,7 +147,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
     def paint(self, painter, unusedOption, unusedWidget=None):
         """paint the disc"""
         with Painter(painter):
-            pen = QPen(QColor(self.color))
+            pen = QPen(self.color)
             painter.setPen(pen)
             painter.setFont(self.__font)
             painter.drawText(0, 0, self.__text)
@@ -165,7 +165,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
 class UIWallSide(Board, ReprMixin):
 
     """a Board representing a wall of tiles"""
-    penColor = 'red'
+    penColor = QColor('red')
 
     def __init__(self, tileset, boardRotation, length):
         Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)

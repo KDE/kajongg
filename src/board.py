@@ -165,7 +165,7 @@ class Board(QGraphicsRectItem, ReprMixin):
     """ a board with any number of positioned tiles"""
     # pylint: disable=too-many-instance-attributes
 
-    penColor = 'black'
+    penColor = QColor('black')
 
     arrows = [Qt.Key.Key_Left, Qt.Key.Key_Down, Qt.Key.Key_Up, Qt.Key.Key_Right]
 
@@ -365,7 +365,7 @@ class Board(QGraphicsRectItem, ReprMixin):
 
     def dragEnterEvent(self, unusedEvent):
         """drag enters the HandBoard: highlight it"""
-        self.setPen(QPen(QColor(self.penColor)))
+        self.setPen(QPen(self.penColor))
 
     def dragLeaveEvent(self, unusedEvent):
         """drag leaves the HandBoard"""
@@ -374,7 +374,7 @@ class Board(QGraphicsRectItem, ReprMixin):
     def _noPen(self):
         """remove pen for this board. The pen defines the border"""
         if Debug.graphics:
-            self.setPen(QPen(QColor(self.penColor)))
+            self.setPen(QPen(self.penColor))
         else:
             self.setPen(QPen(Qt.PenStyle.NoPen))
 
@@ -577,7 +577,7 @@ class Board(QGraphicsRectItem, ReprMixin):
 class CourtBoard(Board):
 
     """A Board that is displayed within the wall"""
-    penColor = 'green'
+    penColor = QColor('green')
 
     def __init__(self, width, height):
         Board.__init__(self, width, height, Tileset.current())
@@ -912,7 +912,7 @@ class YellowText(QGraphicsRectItem):
 class DiscardBoard(CourtBoard):
 
     """A special board for discarded tiles"""
-    penColor = 'orange'
+    penColor = QColor('orange')
 
     def __init__(self):
         CourtBoard.__init__(self, 11, 9)

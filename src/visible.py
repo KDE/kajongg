@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from qt import Qt
+from qt import QColor
 
 from mi18n import i18nc
 from message import Message
@@ -123,12 +123,12 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         assert self.game
         assert Internal.Preferences
         if self == self.game.activePlayer and self.game.client:
-            color = Qt.blue
+            color = 'blue'
         elif Internal.Preferences.tilesetName == 'jade':
-            color = Qt.white
+            color = 'white'
         else:
-            color = Qt.black
-        self.sideText.color = color
+            color = 'black'
+        self.sideText.color = QColor(color)
 
     def getsFocus(self, unusedResults=None):
         """give this player focus on his handBoard"""
