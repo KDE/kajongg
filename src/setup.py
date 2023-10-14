@@ -18,7 +18,8 @@ Usage: see ../README.windows
 # pylint: disable=wrong-import-order, wrong-import-position, import-error
 
 # ==== adapt this part =====
-FULLAUTHOR = "Wolfgang Rohdewald <wolfgang@rohdewald.de>"
+AUTHOR = "Wolfgang Rohdewald"
+EMAIL = "wolfgang@rohdewald.de"
 LICENSE = 'GNU General Public License v2'
 URL = "https://apps.kde.org/kajongg"
 try:
@@ -29,13 +30,10 @@ except ImportError:
 
 import os
 import sys
-import re
 import msilib  # pylint:disable=deprecated-module
 from shutil import rmtree
 
 from cx_Freeze import setup, Executable
-
-(AUTHOR, EMAIL) = re.match(r'^(.*?)\s*<(.*)>$', FULLAUTHOR).groups()
 
 # pylint: disable=invalid-name
 
