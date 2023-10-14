@@ -51,9 +51,8 @@ def makeIcon(svgName, icoName):
                 os.remove(pngName(resolution2))
         os.rmdir(tmpDir)
 
-iconDir = check_output(
-    "kf5-config --expandvars --install icon".split()).strip()
-iconDir = iconDir.decode()
+_ = "kf5-config --expandvars --install icon".split()
+iconDir = check_output(_).decode().strip()
 
 oxy48 = iconDir + '/oxygen/base/48x48'
 oxy48Cat = oxy48 + '/categories/'
