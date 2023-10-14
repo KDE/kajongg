@@ -71,6 +71,7 @@ class Sound:
                     Sound.__oggBinary = oggBinary
                 else:
                     Sound.__oggBinary = ''
+                    assert Internal.Preferences
                     Internal.Preferences.useSounds = False
                     # checks again at next reenable
                     if msg:
@@ -102,7 +103,9 @@ class Sound:
                 except OSError:
                     pass
                 if Debug.sound:
+                    assert Internal.scene
                     game = Internal.scene.game
+                    assert game
                     game.debug('10 seconds passed. Killing %s' % process.name)
             else:
                 remaining.append(process)
@@ -112,15 +115,22 @@ class Sound:
     def speak(what):
         """this is what the user of this module will call."""
         # pylint: disable=too-many-branches
+        if not Internal.scene:
+            return
+        assert Internal.Preferences
         if not Internal.Preferences.useSounds:
             return
         game = Internal.scene.game
+        if not game:
+            return
         reactor = Internal.reactor
-        if game and not game.autoPlay and Sound.playProcesses:
+        assert reactor
+        if game and not game.autoPlay and len(Sound.playProcesses) > 0:
             # in normal play, wait a moment between two speaks. Otherwise
             # sometimes too many simultaneous speaks make them ununderstandable
             lastSpeakStart = max(x.startTime for x in Sound.playProcesses)
             if elapsedSince(lastSpeakStart) < 0.3:
+                assert reactor
                 reactor.callLater(1, Sound.speak, what)
                 return
         if os.path.exists(what):
@@ -413,6 +423,7 @@ class Voice(ReprMixin):
     def md5sum(self):
         """the current checksum over all ogg files"""
         self.__computeMd5sum()
+        assert self.__md5sum
         return self.__md5sum
 
     def __setArchiveContent(self, content):
