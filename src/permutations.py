@@ -8,7 +8,7 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 import itertools
-from typing import List, Tuple, TYPE_CHECKING, Iterable
+from typing import List, Tuple, TYPE_CHECKING, Iterable, Dict, Any
 
 from tile import Tile, Meld, MeldList
 
@@ -19,8 +19,8 @@ class Permutations:
 
     """creates permutations for building melds out of single tiles.
     NEVER returns Kongs!"""
-    cache = {}
-    permuteCache = {}
+    cache : Dict[tuple, 'Permutations'] = {}
+    permuteCache : Dict[tuple, Tuple[Tuple[Tuple, ...], ...]] = {}
 
     def __new__(cls, tiles:'Tiles') ->'Permutations':
         cacheKey = tuple(x.key for x in tiles)
@@ -47,13 +47,14 @@ class Permutations:
                     count -= 1
                 honors.append(Meld(those))
         boni = [x.single for x in self.tiles if x.isBonus]
-        variants = []
+        variants:List[List[MeldList]] = []
         for group in Tile.colors.upper():
             gTiles = [x for x in self.tiles if x.group == group]
-            groupVariants = self.__colorVariants(group, [x.value for x in gTiles])
+            groupVariants = self.__colorVariants(group, [x.value for x in gTiles])  # type:ignore[misc]
             if groupVariants:
                 variants.append(groupVariants)
-        result = []
+        result:List[MeldList] = []
+        variant:Any
         for variant in (sum(x, []) for x in itertools.product(*variants)):
             if variant not in result:
                 result.append(MeldList(variant))
@@ -68,7 +69,7 @@ class Permutations:
         if valuesTuple in cls.permuteCache:
             return cls.permuteCache[valuesTuple]
         values = list(valuesTuple)
-        result = []
+        result:List[Tuple[Tuple, ...]] = []
         possibleMelds = []
         valueSet = set(values)
         for value in sorted(valueSet):
@@ -97,7 +98,7 @@ class Permutations:
         cls.permuteCache[valuesTuple] = tupleResult
         return tupleResult
 
-    colorPermCache = {}
+    colorPermCache : Dict[tuple, tuple] = {}
 
     @classmethod
     def usefulPermutations(cls, values:Iterable) ->Tuple:
@@ -148,7 +149,7 @@ class Permutations:
                 groups.append(content)
                 allValues = [x for x in allValues if x > border]
         combinations = [cls.usefulPermutations(x) for x in groups]
-        result = []
+        result:List[MeldList] = []
         for variant in itertools.product(*combinations):
             melds = MeldList()
             for block in variant:
