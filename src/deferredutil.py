@@ -11,7 +11,7 @@ import traceback
 import datetime
 import weakref
 import gc
-from typing import Dict, Any, TYPE_CHECKING, Optional, Union, Sequence, Generator, Type
+from typing import List, Dict, Any, TYPE_CHECKING, Optional, Tuple, Union, Sequence, Generator, cast
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
@@ -38,9 +38,9 @@ class Request(ReprMixin):
     def __init__(self, block:'DeferredBlock', deferred:Deferred, user:'User') ->None:
         self._block = weakref.ref(block)
         self.deferred = deferred
-        self._user = weakref.ref(user)
-        self.answer = None
-        self.args = None
+        self._user:weakref.ReferenceType['User'] = weakref.ref(user)
+        self.answer:Optional[Message] = None
+        self.args:Optional[Union[Tuple[Any, ...], List[Any]]] = None  # FIXME: unify or explain
         self.startTime = datetime.datetime.now()
         player = self.block.playerForUser(user)
         self._player = weakref.ref(player) if player else None
@@ -86,7 +86,7 @@ class Request(ReprMixin):
         return int((datetime.datetime.now() - self.startTime).total_seconds())
 
     def __str__(self) ->str:
-        cmd = self.deferred.command
+        cmd = self.deferred.command  # type:ignore[attr-defined]
         if self.answer:
             answer = str(self.answer) # TODO: needed?
         else:
@@ -118,7 +118,7 @@ class Request(ReprMixin):
             result += '[{id4:>4}] '.format(id4=id4(self))
         result += '{cmd:<12}<-{cls:>6}({receiver:<10}): ANS={answer}'.format(
             cls=self.user.__class__.__name__,
-            answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.user.name)
+            answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.user.name)  # type:ignore[attr-defined]
         if self.age() > 0:
             result += ' after {} sec'.format(self.age())
         return result
@@ -131,7 +131,7 @@ class DeferredBlock(ReprMixin):
     'general' callback after all deferreds have returned.
     Usage: 1. define, 2. add requests, 3. set callback"""
 
-    blocks = []
+    blocks : List['DeferredBlock'] = []
     blockWarned = False  # did we already warn about too many blocks?
 
     def __init__(self, table:'ServerTable', temp:bool=False, where:Optional[str]=None) ->None:
@@ -142,9 +142,9 @@ class DeferredBlock(ReprMixin):
             self.garbageCollection()
         self.where = where
         self.table = table
-        self.requests = []
+        self.requests:List[Request] = []
         self.callbackMethod = None
-        self.__callbackArgs = None
+        self.__callbackArgs:Optional[Tuple[Any,...]] = None
         self.completed = False
         if not temp:
             DeferredBlock.blocks.append(self)
@@ -213,10 +213,10 @@ class DeferredBlock(ReprMixin):
                 self.__failed,
                 request)
         if Debug.deferredBlock:
-            notifying = ' notifying' if deferred.notifying else ''
+            notifying = ' notifying' if deferred.notifying else ''  # type:ignore[attr-defined]
             rqString = '[{id4:>4}] {cmd}{notifying} {about}->{cls:>6}({receiver:<10})'.format(
                 cls=user.__class__.__name__,
-                id4=id4(request), cmd=deferred.command, receiver=user.name,
+                id4=id4(request), cmd=deferred.command, receiver=user.name,  # type:ignore[attr-defined]
                 about=about.name if about else '', notifying=notifying)
             self.debug('+:%d' % len(self.requests), rqString)
 
@@ -359,7 +359,7 @@ class DeferredBlock(ReprMixin):
     def playerForUser(self, user:'User') ->Optional['PlayingPlayer']:
         """return the game player matching user"""
         if user.__class__.__name__.endswith('Player'):
-            return user
+            assert False, 'playerForUser must get User, not {}'.format(user)
         if self.table.game:
             for player in self.table.game.players:
                 if user.name == player.name:
@@ -368,7 +368,7 @@ class DeferredBlock(ReprMixin):
 
     @staticmethod
     def __enrichMessage(game:Optional['ServerGame'], about:Optional['PlayingPlayer'],
-        command:Type[Message], kwargs:Dict[Any,Any]) ->None:
+        command:Message, kwargs:Dict[Any,Any]) ->None:
         """add supplemental data for debugging"""
         if command.sendScore and about:
             # the clients will compare our status with theirs. This helps
@@ -386,12 +386,12 @@ class DeferredBlock(ReprMixin):
         """try to convert Player to User or Client where possible"""
         for rec in receivers:
             if rec.__class__.__name__ == 'User':
-                yield rec
+                yield rec  # type:ignore[misc]
             else:
-                yield self.table.remotes[rec]
+                yield self.table.remotes[rec]  # type:ignore[misc,index]
 
     def tell(self, about:Optional[Union['User', 'PlayingPlayer']],
-        receivers:Sequence[Union['User', 'PlayingPlayer']], command:Type[Message], **kwargs:Any) ->None:
+        receivers:Sequence[Union['User', 'PlayingPlayer']], command:Message, **kwargs:Any) ->None:
         """send info about player 'about' to users 'receivers'"""
         def encodeKwargs() ->None:
             """those values are classes like Meld, Tile etc.
@@ -406,9 +406,9 @@ class DeferredBlock(ReprMixin):
                     del kwargs['players']
         encodeKwargs()
         if about.__class__.__name__ == 'User':
-            aboutPlayer = self.playerForUser(about)
+            aboutPlayer = self.playerForUser(about)  # type:ignore[arg-type]
         else:
-            aboutPlayer = about
+            aboutPlayer = about  # type:ignore[assignment]
         assert isinstance(receivers, list), 'receivers should be list: {}/{}'.format(type(receivers), repr(receivers))
         assert receivers, 'DeferredBlock.tell(%s) has no receiver' % command
         self.__enrichMessage(self.table.game, aboutPlayer, command, kwargs)
@@ -421,31 +421,31 @@ class DeferredBlock(ReprMixin):
             self.table.game.moves.append(Move(aboutPlayer, command, kwargs))
         localDeferreds = []
         for rec in self.__convertReceivers(receivers):
-
+            defer:Deferred
             isClient = rec.__class__.__name__.endswith('Client')
             if isClient:
                 defer = Deferred()
-                defer.addCallback(rec.remote_move, command, **kwargs).addErrback(logException)
-                defer.command = command.name
-                defer.notifying = 'notifying' in kwargs
-                self.__addRequest(defer, rec, aboutPlayer)
+                defer.addCallback(cast('Client', rec).remote_move, command, **kwargs).addErrback(logException)
+                defer.command = command.name  # type:ignore[attr-defined]
+                defer.notifying = 'notifying' in kwargs  # type:ignore[attr-defined]
+                self.__addRequest(defer, rec, aboutPlayer)  # type:ignore[arg-type]
                 localDeferreds.append(defer)
             else:
                 if Debug.traffic:
                     message = '-> {receiver:<15} about {aboutPlayer} {command}{kwargs!r}'.format(
-                        receiver=rec.name[:15], aboutPlayer=aboutPlayer, command=command,
+                        receiver=rec.name[:15], aboutPlayer=aboutPlayer, command=command,  # type:ignore[index]
                         kwargs=kwargs)
                     logDebug(message)
                 defer = self.table.server.callRemote(
-                    rec,
+                    rec,  # type:ignore[arg-type]
                     'move',
                     aboutName,
                     command.name,
                     **kwargs)
                 if defer:
-                    defer.command = command.name
-                    defer.notifying = 'notifying' in kwargs
-                    self.__addRequest(defer, rec, aboutPlayer)
+                    defer.command = command.name  # type:ignore[attr-defined]
+                    defer.notifying = 'notifying' in kwargs  # type:ignore[attr-defined]
+                    self.__addRequest(defer, rec, aboutPlayer)  # type:ignore[arg-type]
                 else:
                     msg = i18nE('The game server lost connection to player %1')
                     self.table.abort(msg, rec.name)
