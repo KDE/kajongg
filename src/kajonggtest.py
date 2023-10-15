@@ -20,7 +20,7 @@ import gc
 import argparse
 from locale import getpreferredencoding
 
-from typing import List, Set, Optional, Any, Generator, Iterable, TYPE_CHECKING, Tuple
+from typing import List, Set, Optional, Any, Generator, Iterable, Union, TYPE_CHECKING, Tuple, cast
 
 from common import Debug, ReprMixin, cacheDir
 from util import removeIfExists, gitHead, checkMemory, popenReadlines
@@ -33,6 +33,7 @@ if TYPE_CHECKING:
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 
+OPTIONS: Any
 
 class Clone:
 
@@ -84,7 +85,7 @@ class TooManyServers(UserWarning):
 class Server(ReprMixin):
 
     """represents a kajongg server instance. Called when we want to start a job."""
-    servers = []
+    servers:List['Server'] = []
     count = 0
 
     def __new__(cls, job:'Job') ->'Server':
@@ -117,11 +118,11 @@ class Server(ReprMixin):
     def __init__(self, job:'Job') ->None:
         if not hasattr(self, 'jobs'):
             self.jobs = []
-            self.process = None
-            self.socketName = None
-            self.portNumber = None
-            self.commitId = job.commitId
-            self.pythonVersion = job.pythonVersion
+            self.process:Optional[subprocess.Popen] = None
+            self.socketName:Optional[str] = None
+            self.portNumber:Optional[int] = None
+            self.commitId:str = job.commitId
+            self.pythonVersion:str = job.pythonVersion
             self.clone = Clone(job.commitId)
             self.start(job)
         else:
@@ -212,7 +213,10 @@ class Job(ReprMixin):
         self.aiVariant = aiVariant
         self.commitId = commitId
         self.game = game
-        self.process = None
+        self.__logFile:'FileIO'
+        self.logFileName:str
+        self.process:Optional[subprocess.Popen] = None
+        self.server:Server
         self.started = False
 
     def srcDir(self) ->str:
@@ -233,7 +237,7 @@ class Job(ReprMixin):
 
     def start(self) ->None:
         """start this job"""
-        self.server = Server(self)  # pylint:disable=attribute-defined-outside-init
+        self.server = Server(self)
         # never login to the same server twice at the
         # same time with the same player name
         player = self.server.jobs.index(self) + 1
@@ -267,7 +271,7 @@ class Job(ReprMixin):
         """if done, cleanup"""
         if not self.started or not self.process:
             return
-        result = self.process.poll()
+        result:Union[int, str, None] = self.process.poll()
         if result is not None:
             assert isinstance(result, int)
             self.process = None
@@ -291,8 +295,8 @@ class Job(ReprMixin):
             if not os.path.exists(logDir):
                 os.makedirs(logDir)
             logFileName = self.commitId
-            self.logFileName = os.path.join(logDir, logFileName)  # pylint:disable=attribute-defined-outside-init
-            self.__logFile = open(self.logFileName, 'ab', buffering=0)  # pylint:disable=consider-using-with,attribute-defined-outside-init
+            self.logFileName = os.path.join(logDir, logFileName)
+            self.__logFile = open(self.logFileName, 'ab', buffering=0)  # pylint:disable=consider-using-with
         return self.__logFile
 
     def shortRulesetName(self) ->str:
@@ -342,11 +346,11 @@ def pairs(data:List[CsvRow]) ->Generator[Tuple[CsvRow, CsvRow], None, None]:
 class CSV(ReprMixin):
     """represent kajongg.csv"""
 
-    knownCommits = set()
+    knownCommits : Set[str] = set()
 
     def __init__(self) ->None:
         self.findKnownCommits()
-        self.rows = []
+        self.rows:List[CsvRow] = []
         if os.path.exists(OPTIONS.csv):
             self.rows = list(sorted({CsvRow(x) for x in Csv.reader(OPTIONS.csv)}))
         self.removeInvalidCommits()
@@ -433,15 +437,16 @@ class CSV(ReprMixin):
         if not rows:
             return []
         msgHeader = None
-        result = []
+        result:List[CsvRow] = []
         ruleset = rows[0].ruleset
         aiVariant = rows[0].aiVariant
         game = rows[0].game
-        differences = []
+        differences:List[Tuple[CsvRow, CsvRow, Tuple[str, str]]] = []
         for pair in pairs(rows):
             causes = pair[1].differs_for(pair[0])
             if causes:
-                differences.append(tuple([pair[0], pair[1], causes]))
+                triple = cast(Tuple[CsvRow, CsvRow, Tuple[str, str]], tuple([pair[0], pair[1], causes]))
+                differences.append(triple)
         for difference in sorted(differences, key=lambda x: len(x[2])):
             if not set(difference[:2]) & set(result):
                 if msgHeader is None:
@@ -481,7 +486,7 @@ def doJobs() ->None:
             OPTIONS.csv = None
 
     try:
-        jobs = []
+        jobs:List[Job] = []
         while getJobs(jobs):
             for checkJob in Server.allRunningJobs()[:]:
                 checkJob.check()
@@ -667,7 +672,7 @@ def allJobs() ->Generator[Job, None, None]:
 
 def main() ->None:
     """parse options, play, evaluate results"""
-    global OPTIONS  # pylint: disable=global-variable-undefined
+    global OPTIONS  # pylint: disable=global-statement
 
     locale_encoding = getpreferredencoding()
     if locale_encoding.lower() != 'utf-8':
