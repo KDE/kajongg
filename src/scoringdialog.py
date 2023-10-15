@@ -183,15 +183,13 @@ class ScoreModel(TreeModel):
         xValues = [x * stepX for x in range(self.steps + 1)]
         return [QPointF(x, y) for x, y in zip(xValues, yValues)]
 
-    def data(self, index, role=None):  # pylint: disable=too-many-branches
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):  # pylint: disable=too-many-branches
         """score table"""
         # pylint: disable=too-many-return-statements
         if not index.isValid():
             return None
         column = index.column()
         item = index.internalPointer()
-        if role is None:
-            role = Qt.ItemDataRole.DisplayRole
         assert item.parent
         if role == Qt.ItemDataRole.DisplayRole:
             if isinstance(item, ScorePlayerItem):
@@ -228,7 +226,7 @@ class ScoreModel(TreeModel):
                 return tooltip
         return None
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         """tell the view about the wanted headers"""
         if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
             if section == 0:
@@ -666,9 +664,9 @@ class PenaltyDialog(QDialog):
 
     """enter penalties"""
 
-    def __init__(self, game):
+    def __init__(self, game, parent=None):
         """selection for this player, tiles are the still available tiles"""
-        QDialog.__init__(self, None)
+        QDialog.__init__(self, parent)
         decorateWindow(self, i18n("Penalty"))
         self.game = game
         grid = QGridLayout(self)
@@ -802,8 +800,8 @@ class ScoringDialog(QWidget):
     """a dialog for entering the scores"""
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, scene):
-        QWidget.__init__(self)
+    def __init__(self, scene, parent=None):
+        QWidget.__init__(self, parent)
         self.scene = scene
         decorateWindow(self, i18nc("@title:window", "Scoring for this Hand"))
         self.nameLabels = list(QLabel() for x in range(4))
