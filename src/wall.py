@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import weakref
-from typing import TYPE_CHECKING, Optional, List, Union
+from typing import TYPE_CHECKING, Optional, List, Union, Type
 from itertools import zip_longest
 from twisted.internet.defer import Deferred
 
@@ -30,7 +30,7 @@ class KongBox:
     """a non-ui kong box"""
 
     def __init__(self) ->None:
-        self._tiles = []
+        self._tiles:List[Union[Piece, 'UITile']] = []
 
     def fill(self, tiles:List[Union[Piece, 'UITile']]) ->None:
         """fill the box"""
@@ -58,15 +58,15 @@ class Wall(ReprMixin):
     counter clockwise, 0..3. 0 is bottom.
     Wall.tiles always holds references to all tiles in the game even
     when they are used"""
-    tileClass = Piece
+    tileClass : Type = Piece
     kongBoxClass = KongBox
 
     def __init__(self, game:'Game') ->None:
         """init and position the wall"""
         self._game = weakref.ref(game)  # avoid cycles for garbage collection
-        self.tiles = [self.tileClass(Piece.unknownStr)
+        self.tiles:List[Union[Piece, 'UITile']] = [self.tileClass(Piece.unknownStr)
                       for _ in range(game.fullWallSize)]
-        self.living = []
+        self.living:List[Union[Piece, 'UITile']] = []
         self.kongBox = self.kongBoxClass()
         assert len(self.tiles) % 8 == 0
 
@@ -81,7 +81,7 @@ class Wall(ReprMixin):
         if tile.__class__.__name__ == 'UITile':
             tile.change_name(element)
         else:
-            tile = tile.change_name(element)
+            tile = tile.change_name(element)  # type:ignore[assignment]
         return tile
 
     def deal(self, tiles:Union[TileList, Tile, None]=None, deadEnd:bool=False) ->List[Union['UITile', Piece]]:
@@ -128,7 +128,7 @@ class Wall(ReprMixin):
         self.tiles[:] = self.tiles[
             self.game.divideAt:] + \
             self.tiles[0:self.game.divideAt]
-        kongBoxSize = self.game.ruleset.kongBoxSize
+        kongBoxSize = self.game.ruleset.kongBoxSize  # type:ignore[attr-defined]
         self.living = self.tiles[:-kongBoxSize]
         boxTiles = self.tiles[-kongBoxSize:]
         for pair in range(kongBoxSize // 2):
