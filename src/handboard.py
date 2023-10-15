@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import weakref
-from typing import Optional, TYPE_CHECKING, List, Dict, Union
+from typing import Optional, TYPE_CHECKING, List, Dict, Union, Any, cast
 
 from qt import QGraphicsRectItem, QColor
 from tile import Tile, TileList, Meld, MeldList
@@ -50,8 +50,8 @@ class TileAttr(ReprMixin):
             self.tile = Tile(meld[idx])
             assert xoffset is not None # FIXME: overload __init__
             assert yoffset is not None
-            self.xoffset = xoffset
-            self.yoffset = yoffset
+            self.xoffset = xoffset  # type:ignore[assignment]
+            self.yoffset = yoffset  # type:ignore[assignment]
             self.dark = self.setDark()
             # dark and focusable are different in a ScoringHandBoard
             self.focusable = self.setFocusable(hand, meld, idx)
@@ -93,9 +93,9 @@ class HandBoard(Board):
     def __init__(self, player:'VisiblePlayer') ->None:
         assert player
         self._player = weakref.ref(player)
-        self.exposedMeldDistance = 0.15
-        self.concealedMeldDistance = 0.0
-        self.lowerY = 1.0
+        self.exposedMeldDistance:float = 0.15
+        self.concealedMeldDistance:float = 0.0
+        self.lowerY:float = 1.0
         Board.__init__(self, 15.6, 2.0, Tileset.current())
         self.isHandBoard = True
         self.tileDragEnabled = False
@@ -182,18 +182,17 @@ class HandBoard(Board):
     def newTilePositions(self) ->List[TileAttr]:
         """return list(TileAttr) for all tiles except bonus tiles.
         The tiles are not associated to any board."""
-        result = []
+        result:List[TileAttr] = []
         assert self.player
         newUpperMelds = list(self.player.exposedMelds)
         newLowerMelds = self.newLowerMelds()
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
             meldDistance = (self.concealedMeldDistance if yPos
                             else self.exposedMeldDistance)
-            meldX = 0.0
+            meldX:float = 0.0
             for meld in melds:
                 for idx in range(len(meld)):
-                    result.append(
-                        self.tileAttrClass(self, meld, idx, meldX, yPos))
+                    result.append(self.tileAttrClass(self, meld, idx, meldX, yPos))
                     meldX += 1
                 meldX += meldDistance
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
@@ -246,8 +245,8 @@ class HandBoard(Board):
     def placeTiles(self, tiles:List[UITile]) ->List[UITile]:
         """tiles are all tiles for this board.
         returns a list of those uiTiles which are placed on the board"""
-        oldTiles = {}
-        oldBonusTiles = {}
+        oldTiles:Dict[Tile, List[UITile]] = {}
+        oldBonusTiles:Dict[Tile, List[UITile]] = {}
         for uiTile in tiles:
             assert isinstance(uiTile, UITile), 'uiTile is {}'.format(type(uiTile))
             if uiTile.isBonus:
@@ -257,7 +256,7 @@ class HandBoard(Board):
             if uiTile.tile not in targetDict:
                 targetDict[uiTile.tile] = []
             targetDict[uiTile.tile].append(uiTile)
-        result = {}
+        result:Dict[UITile, TileAttr] = {}
         newPositions = self.newTilePositions()
         for newPosition in newPositions:
             assert isinstance(newPosition.tile, Tile)
@@ -368,7 +367,7 @@ class PlayingHandBoard(HandBoard):
         Internal.scene.handSelectorChanged(self)
         self.hasLogicalFocus = bool(adding)
 
-    @Board.focusTile.setter
+    @Board.focusTile.setter  # type: ignore
     def focusTile(self, uiTile):
         Board.focusTile.fset(self, uiTile)
         assert self.player
@@ -420,7 +419,7 @@ class PlayingHandBoard(HandBoard):
     def __movingPlaces(self, places:Dict[UITile, TileAttr]) ->Dict[UITile, TileAttr]:
         """filter out the left parts of the rows which do not change
         at all"""
-        rows = [[], []]
+        rows:List[List[Any]] = [[], []]
         for idx, yOld in enumerate([0, self.lowerY]):
             rowPlaces = [x for x in places.items() if x[0].yoffset == yOld]
             rowPlaces = sorted(rowPlaces, key=lambda x: x[0].xoffset)
@@ -469,7 +468,7 @@ class PlayingHandBoard(HandBoard):
             # within the hand
             lastDiscard = matchingTiles[-1]
         assert Internal.scene
-        Internal.scene.discardBoard.discardTile(lastDiscard)
+        cast('PlayingScene', Internal.scene).discardBoard.discardTile(lastDiscard)
         for uiTile in self.uiTiles:
             uiTile.focusable = False
 
