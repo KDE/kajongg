@@ -247,7 +247,6 @@ class ScoreModel(TreeModel):
     def loadData(self):
         """loads all data from the data base into a 2D matrix formatted like the wanted tree"""
         game = self.scoreTable.game
-        data = []
         assert game
         assert game.gameid
         records = Query(
