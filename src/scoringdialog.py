@@ -163,9 +163,9 @@ class ScoreModel(TreeModel):
     """a model for our score table"""
     steps = 30  # how fine do we want the stepping in the chart spline
 
-    def __init__(self, parent=None):
+    def __init__(self, scoreTable, parent=None):
         super().__init__(parent)
-        self.scoreTable = parent
+        self.scoreTable = scoreTable
         self.rootItem = ScoreRootItem(None)
         self.minY = 9999999.9
         self.maxY = -9999999.9
