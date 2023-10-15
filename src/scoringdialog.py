@@ -295,7 +295,7 @@ class HandResult:
                  prevailing, wind, points, payments, balance, manualrules):
         self.rotated = rotated
         self.notRotated = notRotated
-        self.penalty = bool(penalty)
+        self.penalty = penalty
         self.won = won
         self.prevailing = Wind(prevailing)
         self.wind = Wind(wind)
@@ -614,7 +614,7 @@ class PenaltyBox(QSpinBox):
     def __init__(self, parties, parent=None):
         QSpinBox.__init__(self, parent)
         self.parties = parties
-        self.prevValue = None
+        self.prevValue = 0
 
     def validate(self, inputData, pos):
         """check if value is a multiple of parties"""
@@ -633,7 +633,7 @@ class PenaltyBox(QSpinBox):
     def fixup(self, data):
         """change input to a legal value"""
         value = int(str(data))
-        prevValue = int(str(self.prevValue))
+        prevValue = self.prevValue
         assert value != prevValue
         common = int(self.parties * 10)
         small = value // common
@@ -759,7 +759,7 @@ class PenaltyDialog(QDialog):
         offense = self.cbCrime.current
         payers = int(offense.options.get('payers', 1))
         payees = int(offense.options.get('payees', 1))
-        self.spPenalty.prevValue = str(-offense.score.points)
+        self.spPenalty.prevValue = -offense.score.points
         self.spPenalty.setValue(-offense.score.points)
         self.spPenalty.parties = max(payers, payees)
         self.spPenalty.setSingleStep(10)
@@ -910,7 +910,7 @@ class ScoringDialog(QWidget):
                         self.detailsLayout[idx].removeWidget(child)
                         del child
                 if game:
-                    self.spValues[idx].setRange(0, game.ruleset.limit or 99999)
+                    self.spValues[idx].setRange(0, int(game.ruleset.limit) or 99999)
                     self.nameLabels[idx].setText(player.localName)
                     self.refreshWindLabels()
                     self.detailTabs.setTabText(idx, player.localName)
@@ -964,7 +964,7 @@ class ScoringDialog(QWidget):
             if checkbox == self.wonBoxes[idx]:
                 return idx
         assert False
-        return None
+        return 0
 
     def wonChanged(self):
         """if a new winner has been defined, uncheck any previous winner"""
@@ -1152,8 +1152,8 @@ class ScoringDialog(QWidget):
         winner = self.game.winner
         assert winner
         assert winner.handBoard
-        faceWidth = winner.handBoard.tileset.faceSize.width() * 0.5
-        faceHeight = winner.handBoard.tileset.faceSize.height() * 0.5
+        faceWidth = int(winner.handBoard.tileset.faceSize.width() * 0.5)
+        faceHeight = int(winner.handBoard.tileset.faceSize.height() * 0.5)
         restoredIdx = None
         for meld in winnerMelds:
             pixMap = QPixmap(faceWidth * len(meld), faceHeight)
