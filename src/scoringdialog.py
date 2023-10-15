@@ -167,7 +167,8 @@ class ScoreModel(TreeModel):
         super().__init__(parent)
         self.scoreTable = parent
         self.rootItem = ScoreRootItem(None)
-        self.minY = self.maxY = None
+        self.minY = 9999999.9
+        self.maxY = -9999999.9
         self.loadData()
 
     def chart(self, rect, index, playerItem):
@@ -274,8 +275,8 @@ class ScoreModel(TreeModel):
     def __findMinMaxChartPoints(self, data):
         """find and save the extremes of the spline. They can be higher than
         the pure balance values"""
-        self.minY = 9999999
-        self.maxY = -9999999
+        self.minY = 9999999.9
+        self.maxY = -9999999.9
         for item in data:
             playerItem = ScorePlayerItem(item)
             for col in range(len(playerItem.hands())):
