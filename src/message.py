@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import datetime
-from typing import Optional, TYPE_CHECKING, List, Any, Tuple, Union
+from typing import Dict, Tuple, Optional, TYPE_CHECKING, List, Any, Union, cast
 
 from log import logWarning, logException, logDebug
 from mi18n import i18n, i18nc, i18ncE
@@ -42,12 +42,55 @@ class Message:
     """those are the message types between client and server. They have no state
     i.e. they never hold real attributes. They only describe the message and actions upon it"""
 
-    defined = {}
+    defined : Dict[str, 'Message'] = {}
+    sendScore = False
+
+# only for mypy:
+    Abort:'Message'
+    Pung:'ServerMessage'
+    Kong:'ServerMessage'
+    Chow:'ServerMessage'
+    Bonus:'Message'
+    MahJongg:'ServerMessage'
+    OriginalCall:'ServerMessage'
+    Discard:Union['ServerMessage', 'ClientMessage']
+    ProposeGameId:'Message'
+    TableChanged:'Message'
+    ReadyForGameStart:'ServerMessage'
+    NoGameStart:'ServerMessage'
+    ReadyForHandStart:'ServerMessage'
+    InitHand:'ServerMessage'
+    SetConcealedTiles:'Message'
+    ShowConcealedTiles:'ServerMessage'
+    SaveHand:'ServerMessage'
+    AskForClaims:'ServerMessage'
+    PickedTile:'ServerMessage'
+    ActivePlayer:'ServerMessage'
+    ViolatesOriginalCall:'Message'
+    VoiceId:'Message'
+    VoiceData:'Message'
+    AssignVoices:'Message'
+    ClientWantsVoiceData:'Message'
+    ServerWantsVoiceData:'Message'
+    ServerGetsVoiceData:'ServerMessage'
+    DeclaredKong:'ServerMessage'
+    RobbedTheKong:'Message'
+    Calling:'Message'
+    DangerousGame:'Message'
+    NoChoice:'Message'
+    UsedDangerousFrom:'Message'
+    Draw:'Message'
+    Error:'Message'
+    NO:'Message'
+    OK:'ClientMessage'
+    NoClaim:'Message'
+
+
 
     def __init__(self, name:Optional[str]=None, shortcut:Optional[str]=None) ->None:
         """those are the english values"""
-        self.name = name or self.__class__.__name__.replace('Message', '')
-        self.__i18nName = None
+        self.name:str = name or self.__class__.__name__.replace('Message', '')
+        self.__i18nName:Optional[str] = None
         self.shortcut = shortcut
         # do not use a numerical value because that could easier
         # change with software updates
@@ -516,6 +559,7 @@ class MessageNoGameStart(NotifyAtOnceMessage):
 
     def notifyAction(self, client:'Client', move:'Move') ->Any:
         assert move.player
+        client = cast('HumanClient', client)
         if client.beginQuestion or client.game:
             Sorry(i18n('%1 is not ready to start the game', move.player.name))
         if client.beginQuestion:
@@ -528,7 +572,7 @@ class MessageNoGameStart(NotifyAtOnceMessage):
     def receivers(cls, request:'Request') ->List['PlayingPlayer']:
         """notification is not needed for those who already said no game"""
         result = [x.player for x in request.block.requests if x.answer != Message.NoGameStart]
-        return result
+        return cast(List['PlayingPlayer'], result)
 
 
 class MessageReadyForHandStart(ServerMessage):
@@ -552,7 +596,7 @@ class MessageInitHand(ServerMessage):
         client.game.wall.divide()
         if hasattr(client, 'shutdownHumanClients'):
             client.shutdownHumanClients(exception=client)
-        scene = Internal.scene
+        scene = cast('PlayingScene', Internal.scene)
         if scene:
             scene.mainWindow.setWindowTitle(
                 i18n(
@@ -605,7 +649,9 @@ class MessageAskForClaims(ServerMessage):
             raise ValueError(
                 'Server asked me(%s) for claims but I just discarded that tile!' %
                 move.player)
-        return client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
+        _ = (Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg)
+        choice = list(cast(ClientMessage, x) for x in _)
+        return client.ask(move, choice)
 
 
 class MessagePickedTile(ServerMessage):
@@ -663,7 +709,7 @@ class MessageVoiceId(ServerMessage):
         assert Internal.Preferences
         if Internal.Preferences.useSounds and Options.gui:
             assert move.player
-            move.player.voice = Voice.locate(move.source)
+            move.player.voice = Voice.locate(cast(str, move.source))
             if not move.player.voice:
                 return Message.ClientWantsVoiceData, move.source
         return None
@@ -677,7 +723,7 @@ class MessageVoiceData(ServerMessage):
         """server sent us voice sounds about somebody else"""
         assert move.md5sum
         assert move.player
-        move.player.voice = Voice(move.md5sum, move.source)
+        move.player.voice = Voice(move.md5sum, cast(bytes, move.source))
         if Debug.sound:
             logDebug('%s gets voice data %s from server, language=%s' % (
                 move.player, move.player.voice, move.player.voice.language()))
@@ -748,7 +794,7 @@ class MessageDeclaredKong(ServerMessage):
                 move.player.showConcealedTiles(move.meld)
             else:
                 move.player.showConcealedTiles(TileTuple(move.meld[3]))
-            prompts = [Message.NoClaim, Message.MahJongg]
+            prompts = [cast(ClientMessage, Message.NoClaim), cast(ClientMessage, Message.MahJongg)]
         move.exposedMeld = move.player.exposeMeld(move.meld)
         return client.ask(move, prompts) if prompts else None
 
@@ -803,7 +849,7 @@ class MessageNoChoice(ServerMessage):
 
     def __init__(self) ->None:
         ServerMessage.__init__(self, name=i18ncE('kajongg', 'No Choice'))
-        self.move = None
+        self.move:Optional['Move'] = None
 
     def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror the no choice action locally"""
@@ -831,7 +877,7 @@ class MessageUsedDangerousFrom(ServerMessage):
 
     def clientAction(self, client:'Client', move:'Move') ->Any:
         assert client.game
-        fromPlayer = client.game.playerByName(str(move.source))
+        fromPlayer = cast('PlayingPlayer', client.game.playerByName(str(move.source)))
         assert move.player
         move.player.usedDangerousFrom = fromPlayer
         if Debug.dangerousGame:
@@ -891,7 +937,7 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
     def receivers(cls, request:'Request') ->List['PlayingPlayer']:
         """no Claim notifications are not needed for those who already answered"""
         result = [x.player for x in request.block.requests if x.answer is None]
-        return result
+        return cast(List['PlayingPlayer'], result)
 
 
 def __scanSelf() ->None:
