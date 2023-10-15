@@ -33,6 +33,7 @@ from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
 from tree import TreeItem, RootItem, TreeModel
 from wind import Wind
 from tile import Tile
+from meld import MeldList
 
 
 class ScoreTreeItem(TreeItem):
@@ -1168,13 +1169,13 @@ class ScoringDialog(QWidget):
                                    [0].pixmapFromSvg(QSize(faceWidth, faceHeight), withBorders=False))
                 painter.translate(QPointF(faceWidth, 0.0))
             self.cbLastMeld.addItem(QIcon(pixMap), '', str(meld))
-            if indexedMeld == str(meld):
+            if indexedMeld == meld:
                 restoredIdx = self.cbLastMeld.count() - 1
         if not restoredIdx and indexedMeld:
             # try again, maybe the meld changed between concealed and exposed
-            indexedMeld = indexedMeld.lower()
+            indexedMeld = indexedMeld.exposed
             for idx in range(self.cbLastMeld.count()):
-                meldContent = str(self.cbLastMeld.itemData(idx))
+                meldContent = self.cbLastMeld.itemData(idx)
                 if indexedMeld == meldContent.lower():
                     restoredIdx = idx
                     if lastTile is not None and lastTile not in meldContent:
@@ -1196,7 +1197,7 @@ class ScoringDialog(QWidget):
         with BlockSignals([self.cbLastMeld]):  # we only want to emit the changed signal once
             showCombo = False
             idx = max(self.cbLastMeld.currentIndex(), 0)
-            indexedMeld = str(self.cbLastMeld.itemData(idx))
+            indexedMeld = self.cbLastMeld.itemData(idx)
             self.cbLastMeld.clear()
             self.__meldPixMaps = []
             if not self.game.winner:
@@ -1205,8 +1206,8 @@ class ScoringDialog(QWidget):
                 return
             assert Internal.scene
             lastTile = Internal.scene.computeLastTile()
-            winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4
-                           and lastTile in m]
+            winnerMelds = MeldList(m for m in self.game.winner.hand.melds if len(m) < 4
+                           and lastTile in m)
             assert winnerMelds, 'lastTile %s missing in %s' % (
                 lastTile, self.game.winner.hand.melds)
             if len(winnerMelds) == 1:
