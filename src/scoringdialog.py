@@ -562,8 +562,8 @@ class ExplainView(QListView):
         self.scene = scene
         decorateWindow(self, i18nc("@title:window", "Explain Scores").replace('&', ''))
         self.setGeometry(0, 0, 300, 400)
-        self.model = QStringListModel()
-        self.setModel(self.model)
+        self._model = QStringListModel()
+        self.setModel(self._model)
         StateSaver(self)
         self.refresh()
 
@@ -599,9 +599,9 @@ class ExplainView(QListView):
                 if pLines:
                     pLines.append('')
                 lines.extend(pLines)
-        if 'xxx'.join(lines) != 'xxx'.join(str(x) for x in self.model.stringList()): # TODO: ohne?
+        if 'xxx'.join(lines) != 'xxx'.join(str(x) for x in self._model.stringList()): # TODO: ohne?
             # QStringListModel does not optimize identical lists away, so we do
-            self.model.setStringList(lines)
+            self._model.setStringList(lines)
 
     def closeEvent(self, unusedEvent):
         """update action button state"""
