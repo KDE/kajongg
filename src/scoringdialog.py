@@ -100,13 +100,13 @@ class ScorePlayerItem(ScoreTreeItem):
 
     def chartPoints(self, column, steps):
         """the returned points spread over a height of four rows"""
-        points = [x.balance for x in self.hands()]
-        points.insert(0, 0)
-        points.insert(0, 0)
-        points.append(points[-1])
+        int_points = [x.balance for x in self.hands()]
+        int_points.insert(0, 0)
+        int_points.insert(0, 0)
+        int_points.append(int_points[-1])
         column -= 1
-        points = points[column:column + 4]
-        points = [float(x) for x in points]
+        int_points = int_points[column:column + 4]
+        points = [float(x) for x in int_points]
         for idx in range(1, len(points) - 2):  # skip the ends
             for step in range(steps):
                 point_1, point0, point1, point2 = points[idx - 1:idx + 3]
