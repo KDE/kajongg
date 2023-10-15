@@ -141,7 +141,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
     def paint(self, painter, option, index):
         """where the real work is done..."""
         item = index.internalPointer()
-        if isinstance(item, ScorePlayerItem) and item.parent.row() == 3 and index.column() != 0:
+        if isinstance(item, ScorePlayerItem) and item.parent and item.parent.row() == 3 and index.column() != 0:
             for idx, playerItem in enumerate(index.parent().internalPointer().children):
                 chart = index.model().chart(option.rect, index, playerItem)
                 if chart:
@@ -190,6 +190,7 @@ class ScoreModel(TreeModel):
         item = index.internalPointer()
         if role is None:
             role = Qt.ItemDataRole.DisplayRole
+        assert item.parent
         if role == Qt.ItemDataRole.DisplayRole:
             if isinstance(item, ScorePlayerItem):
                 content = item.content(column)
@@ -230,6 +231,7 @@ class ScoreModel(TreeModel):
         if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
             if section == 0:
                 return i18n('Round/Hand')
+            assert self.rootItem
             child1 = self.rootItem.children[0]
             if child1 and child1.children:
                 child1 = child1.children[0]
@@ -246,6 +248,8 @@ class ScoreModel(TreeModel):
         """loads all data from the data base into a 2D matrix formatted like the wanted tree"""
         game = self.scoreTable.game
         data = []
+        assert game
+        assert game.gameid
         records = Query(
             'select player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
             ' from score where game=? order by player,hand', (game.gameid,)).records
@@ -544,6 +548,7 @@ class ScoreTable(QWidget):
 
     def closeEvent(self, unusedEvent):
         """update action button state"""
+        assert Internal.mainWindow
         Internal.mainWindow.actionScoreTable.setChecked(False)
 
 
@@ -599,6 +604,7 @@ class ExplainView(QListView):
 
     def closeEvent(self, unusedEvent):
         """update action button state"""
+        assert Internal.mainWindow
         Internal.mainWindow.actionExplain.setChecked(False)
 
 
@@ -1099,6 +1105,7 @@ class ScoringDialog(QWidget):
         self.cbLastTile.clear()
         if not winnerTiles:
             return
+        assert winnerTiles[0].board
         pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()
         self.cbLastTile.setIconSize(pmSize)
         QPixmapCache.clear()
@@ -1145,6 +1152,8 @@ class ScoringDialog(QWidget):
     def __fillLastMeldComboWith(self, winnerMelds, indexedMeld, lastTile):
         """fill last meld combo with prepared content"""
         winner = self.game.winner
+        assert winner
+        assert winner.handBoard
         faceWidth = winner.handBoard.tileset.faceSize.width() * 0.5
         faceHeight = winner.handBoard.tileset.faceSize.height() * 0.5
         restoredIdx = None
@@ -1168,7 +1177,7 @@ class ScoringDialog(QWidget):
                 meldContent = str(self.cbLastMeld.itemData(idx))
                 if indexedMeld == meldContent.lower():
                     restoredIdx = idx
-                    if lastTile not in meldContent:
+                    if lastTile is not None and lastTile not in meldContent:
                         lastTile = lastTile.swapped
                         assert lastTile in meldContent
                         with BlockSignals([self.cbLastTile]):  # we want to continue right here
@@ -1194,6 +1203,7 @@ class ScoringDialog(QWidget):
                 return
             if self.cbLastTile.count() == 0:
                 return
+            assert Internal.scene
             lastTile = Internal.scene.computeLastTile()
             winnerMelds = [m for m in self.game.winner.hand.melds if len(m) < 4
                            and lastTile in m]
@@ -1220,6 +1230,7 @@ class ScoringDialog(QWidget):
         self.validate()
         for player in self.game.players:
             player.showInfo()
+        assert Internal.mainWindow
         Internal.mainWindow.updateGUI()
 
     def validate(self):
