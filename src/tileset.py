@@ -12,7 +12,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import Optional, Tuple, TYPE_CHECKING
+from typing import Optional, List, Tuple
 
 from qt import QSizeF, QSvgRenderer
 from log import logException, i18n
@@ -21,21 +21,21 @@ from mjresource import Resource
 from common import LIGHTSOURCES, Internal
 from wind import East, South, West, North
 
-if TYPE_CHECKING:
-    from wind import Wind
 
 class Tileset(Resource):
 
     """represents a complete tileset"""
 
-    resourceName = 'tileset'
-    configGroupName = 'KMahjonggTileset'
+    resourceName : Optional[str] = 'tileset'
+    configGroupName : str = 'KMahjonggTileset'
     cache = {}
 
     def __init__(self, name:Optional[str]=None) ->None:
         """continue __build"""
         super().__init__(name)
-        self.__shadowOffsets = None
+        self.tileSize:QSizeF
+        self.faceSize:QSizeF
+        self.__shadowOffsets:List[List[Tuple[int,int]]]
         self.darkenerAlpha = 120 if self.desktopFileName == 'jade' else 50
 
         graphName = str(self.group.readEntry("FileName"))
