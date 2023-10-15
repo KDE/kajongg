@@ -1131,7 +1131,7 @@ class ScoringDialog(QWidget):
 
     def clearLastTileCombo(self):
         """as the name says"""
-        self.comboTilePairs = None
+        self.comboTilePairs = set()
         self.cbLastTile.clear()
 
     def fillLastTileCombo(self):
