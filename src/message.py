@@ -108,6 +108,10 @@ class ServerMessage(Message):
             'clientAction is not defined for %s. msg:%s' %
             (self, move))
 
+    def serverAction(self, table, msg):  # pylint: disable=unused-argument
+        """the server mirrors that and tells all others"""
+        logException('serverAction is not defined for msg:%s' % msg)
+
 
 class ClientMessage(Message):
 
