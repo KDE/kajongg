@@ -23,6 +23,7 @@ class Move(ReprMixin):
         if isinstance(command, Message):
             self.message = command
         else:
+            assert isinstance(command, str) # for mypy
             self.message = Message.defined[command]
         self.table = None
         self.notifying = False
