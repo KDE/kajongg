@@ -78,7 +78,7 @@ class User(pb.Avatar, ReprMixin):
         if clientVersion != serverVersion:
             if clientVersion is None:
                 # client passed no version info
-                return fail(srvError(pb.Error,
+                return fail(srvError(
                                      i18nE(
                                          'Your client has a version older than 4.9.0 but you need %1 for this server'),
                                      serverVersion))

@@ -208,7 +208,7 @@ class MJServer:
     def _lookupTable(self, tableid):
         """return table by id or raise exception"""
         if tableid not in self.tables:
-            raise srvError(
+            srvError(
                 pb.Error,
                 i18nE('table with id <numid>%1</numid> not found'),
                 tableid)

@@ -7,27 +7,26 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from twisted.spread.pb import Error
+
 from log import SERVERMARK
 
 def srvMessage(*args):
     """
     concatenate all args needed for i18n encoded in one string.
-    For an explanation see util.translateServerMessage.
+    For an explanation see log.translateServerMessage.
 
     @returns: The string to be wired.
     @rtype: C{str}, utf-8 encoded
     """
     strArgs = []
     for arg in args:
-        if isinstance(arg, str):
-            arg = arg.encode('utf-8')
-        else:
-            arg = str(arg).encode('utf-8')
+        if not isinstance(arg, str):
+            arg = str(arg)
         strArgs.append(arg)
-    mark = SERVERMARK.encode()
-    return mark + mark.join(strArgs) + mark
+    return SERVERMARK + SERVERMARK.join(strArgs) + SERVERMARK
 
 
-def srvError(cls, *args):
+def srvError(cls, *args):  # pylint:disable=unused-argument
     """raise an exception, passing args as a single string"""
-    raise cls(srvMessage(*args))
+    return Error(srvMessage(*args))

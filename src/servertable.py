@@ -15,7 +15,7 @@ import sys
 import random
 import traceback
 from itertools import chain
-from twisted.spread import pb
+
 
 from common import Debug, Internal, ReprMixin
 from wind import Wind
@@ -161,9 +161,9 @@ class ServerTable(Table, ReprMixin):
     def addUser(self, user):
         """add user to this table"""
         if user.name in (x.name for x in self.users):
-            raise srvError(pb.Error, i18nE('You already joined this table'))
+            raise srvError(i18nE('You already joined this table'))
         if len(self.users) == self.maxSeats():
-            raise srvError(pb.Error, i18nE('All seats are already taken'))
+            raise srvError(i18nE('All seats are already taken'))
         self.users.append(user)
         if Debug.table:
             logDebug('%s seated on table %s' % (user.name, self))
@@ -281,8 +281,7 @@ class ServerTable(Table, ReprMixin):
     def readyForGameStart(self, user):
         """the table initiator told us he wants to start the game"""
         if len(self.users) < self.maxSeats() and self.owner != user:
-            raise srvError(pb.Error,
-                           i18nE(
+            raise srvError(i18nE(
                                'Only the initiator %1 can start this game, you are %2'),
                            self.owner.name, user.name)
         if self.suspendedAt:
@@ -321,7 +320,6 @@ class ServerTable(Table, ReprMixin):
                     return
                 if msg.answer != Message.OK:
                     raise srvError(
-                        pb.Error,
                         'collectGameIdAnswers got neither NO nor OK')
             self.game.gameid = gameid
             self.initGame()
