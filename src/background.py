@@ -28,7 +28,6 @@ class Background(Resource):
     def __init__(self, name=None):
         """continue __build"""
         super().__init__(name)
-        self.__pmap = None
         self.graphicsPath = None
         QPixmapCache.setCacheLimit(20480)  # the chinese landscape needs much
 
@@ -43,6 +42,7 @@ class Background(Resource):
         self.isPlain = bool(self.group.readEntry('Plain'))
         if not self.isPlain:
             graphName = self.group.readEntry("FileName")
+            assert isinstance(graphName, str)
             self.graphicsPath = self.locate(graphName)
             if not self.graphicsPath:
                 logException(
@@ -51,7 +51,7 @@ class Background(Resource):
 
     def pixmap(self, size):
         """return a background pixmap or None for isPlain"""
-        self.__pmap = QBrush()
+        self.__pmap = QBrush()  # pylint:disable=attribute-defined-outside-init
         if not self.isPlain:
             width = size.width()
             height = size.height()
@@ -59,13 +59,13 @@ class Background(Resource):
                 width = self.imageWidth
                 height = self.imageHeight
             cachekey = '{name}W{width}H{height}'.format(name=self.name, width=width, height=height)
-            self.__pmap = QPixmapCache.find(cachekey)
+            self.__pmap = QPixmapCache.find(cachekey)  # pylint:disable=attribute-defined-outside-init
             if not self.__pmap:
                 renderer = QSvgRenderer(self.graphicsPath)
                 if not renderer.isValid():
                     logException(
                         i18n('file <filename>%1</filename> contains no valid SVG', self.graphicsPath))
-                self.__pmap = QPixmap(width, height)
+                self.__pmap = QPixmap(width, height)  # pylint:disable=attribute-defined-outside-init
                 self.__pmap.fill(Qt.GlobalColor.transparent)
                 painter = QPainter(self.__pmap)
                 renderer.render(painter)
