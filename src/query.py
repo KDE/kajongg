@@ -17,7 +17,7 @@ import datetime
 import random
 from collections import defaultdict
 import sqlite3
-from typing import List, Tuple, Union, Any, Optional
+from typing import List, Tuple, Union, Any, Optional, cast, Literal
 
 from mi18n import i18n, i18ncE
 from util import Duration
@@ -38,14 +38,15 @@ class DBCursor(sqlite3.Cursor):
 
     def __init__(self, dbHandle:'DBHandle') ->None:
         sqlite3.Cursor.__init__(self, dbHandle)
-        self.parameters = None
-        self.failure = None
+        self.statement:str
+        self.parameters:Optional[Tuple[Union[str, int], ...]] = None
+        self.failure:Optional[Exception] = None
 
     def execute(self, statement:str, parameters:Optional[Tuple[Union[str, int], ...]]=None, # type:ignore[override]
                 silent:bool=False, failSilent:bool=False, mayFail:bool=False) ->None:
         """logging wrapper, returning all selected data"""
         # pylint: disable=too-many-branches
-        self.statement = statement  # pylint:disable=attribute-defined-outside-init
+        self.statement = statement
         self.parameters = parameters
         if not silent:
             logDebug(str(self))
@@ -100,7 +101,7 @@ class DBHandle(sqlite3.Connection):
     def __init__(self, path: str) ->None:
         assert Internal.db is None, id(self)
         Internal.db = self
-        self.inTransaction = None
+        self.inTransaction:Optional[datetime.datetime] = None
         self.path = path
         self.identifier = None
         try:
@@ -127,11 +128,11 @@ class DBHandle(sqlite3.Connection):
             logDebug('starting transaction')
         return sqlite3.Connection.__enter__(self)
 
-    def __exit__(self, *args:Any) ->None:  # type:ignore[override]
-        self.inTransaction = None
+    def __exit__(self, *args:Any) ->Literal[False]:
         sqlite3.Connection.__exit__(self, *args)
         if Debug.sql:
             logDebug('finished transaction')
+        return False
 
     @staticmethod
     def dbPath() ->str:
@@ -224,7 +225,7 @@ class Query:
         Else if the default dbHandle (Internal.db) is defined, use it."""
         silent |= not Debug.sql
         self.msg = None
-        self.records = []
+        self.records:List[List[Any]] = []
         self.statement = statement
         self.args = args
         if Internal.db:
@@ -446,7 +447,7 @@ class PrepareDB:
             nameIds = [x[0] for x in names.items() if x[1] == name]
             keepId = nameIds[0]
             keep[keepId] = name
-            if counter > 1:
+            if cast(int, counter) > 1:
                 for nameId in nameIds[1:]:
                     Query(
                         'update score set player=%d where player=%d' %
