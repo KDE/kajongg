@@ -328,7 +328,7 @@ class MJServer:
         if Debug.connections or reason == 'abort':
             logDebug(
                 '%s%s ' % (('%d:' % table.game.seed) if table.game else '',
-                           i18n(message, *args)), withGamePrefix=None)
+                           i18n(message, *args)), withGamePrefix=False)
         if table.tableid in self.tables:
             del self.tables[table.tableid]
             if reason == 'silent':
