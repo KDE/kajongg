@@ -20,8 +20,7 @@ from permutations import Permutations
 # pylint:disable=missing-function-docstring,missing-class-docstring
 # the class and method names are mostly self explaining, we do not
 # need docstringss
-
-# pylint: disable=no-self-argument, no-member
+# pylint: disable=no-self-argument,no-member
 # pylint: disable=too-many-function-args, unused-argument, arguments-differ
 
 

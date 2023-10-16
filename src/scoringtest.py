@@ -44,9 +44,18 @@ class Expected:
     def __init__(self, won, points, doubles, limits):
         self.won = won
         self.score = Score(points, doubles, limits)
+        self.ruleset = None
 
     def __str__(self):
         return 'Won with %s' % self.score if self.won else 'Lost with %s' % self.score
+
+
+class Nothing(Expected):
+
+    """we do not expect anything"""
+
+    def __init__(self, points=0, doubles=0, limits=0.0) ->None:
+        Expected.__init__(self, True, points, doubles, limits)
 
 
 class Win(Expected):
@@ -65,10 +74,12 @@ class NoWin(Expected):
         Expected.__init__(self, False, points, doubles, limits)
 
 
-class Helpers:
+class Base(unittest.TestCase):
 
-    """for my test classes"""
-    # pylint: disable=no-member, too-many-locals
+
+    """tests lots of hand examples. We might want to add comments which test should test which rule"""
+
+    # pylint: disable=too-many-locals
 
     def scoreTest(self, string, expected, myWind=None, roundWind=None, totals=None):
         """execute one scoreTest test"""
@@ -84,8 +95,6 @@ class Helpers:
                 exp = expected[expIdx]
             else:
                 exp = expected
-            if exp is None:
-                continue
             exp.ruleset = ruleset
             variants = []
             game = GAMES[idx]
@@ -100,6 +109,7 @@ class Helpers:
                 print('starting test for %s' % ruleset.name)
             variant = Hand(game.winner, string)
             score = variant.score
+            assert score is not None
             variants.append(variant)
             self.assertTrue(
                 variant.won == isinstance(exp, Win) and score == exp.score,
@@ -148,6 +158,8 @@ class Helpers:
             result.append(hand.string)
             roofOff = ' roofOff' if hand.player.game.ruleset.roofOff else ''
             score = hand.score
+            assert score is not None
+            assert hand.player.game
             if score != expected.score:
                 result.append('%s%s: %s with %s should be %s' % (
                     hand.player.game.ruleset.name, roofOff, 'Won' if hand.won else 'Lost', score, expected))
@@ -168,10 +180,6 @@ class Helpers:
 
 # pylint: disable=useless-suppression,missing-docstring
 
-
-class Base(unittest.TestCase, Helpers):
-
-    """tests lots of hand examples. We might want to add comments which test should test which rule"""
 
 
 class Partials(Base):
@@ -800,7 +808,7 @@ class TripleKnitting(Base):
     def testMe(self):
         self.scoreTest(
             'RS2B2C2S4B4C4S6B6C6S7B7C7 s8b8 Ls8s8b8',
-            [None,
+            [Nothing(),
              Win(limits=0.5)])
         self.scoreTest(
             'RB2C2S4B4C4S6B6C6S7B7C7S8B8 LS8',
@@ -947,12 +955,12 @@ class TstProgram(unittest.TestProgram):
 
     """we want global access to this program so we can check for verbosity in our tests"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         global PROGRAM  # pylint: disable=global-statement
         PROGRAM = self
-        Debug.callers = 8
+        Debug.callers = '8'
 #        unittest.TestProgram.__init__(self, exit=False, *args, **kwargs)
-        unittest.TestProgram.__init__(self, *args, **kwargs)
+        unittest.TestProgram.__init__(self)
 
 if __name__ == '__main__':
     # Debug.hand = True
