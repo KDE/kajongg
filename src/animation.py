@@ -420,7 +420,7 @@ class AnimationSpeed:
                 animate()
             if Internal.Preferences.animationSpeed != self.prevAnimationSpeed:
                 if Debug.animationSpeed:
-                    logDebug('AnimationSpeed restores speed %d to %d' % (
+                    logDebug('AnimationSpeed restores speed {} to {}'.format(
                         Internal.Preferences.animationSpeed, self.prevAnimationSpeed))
                 Internal.Preferences.animationSpeed = self.prevAnimationSpeed
 
