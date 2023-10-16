@@ -149,7 +149,8 @@ def logError(msg:Union[Exception, str], showStack:bool=True, withGamePrefix:bool
     return logMessage(msg, logging.ERROR, True, showStack=showStack, withGamePrefix=withGamePrefix)
 
 
-def logDebug(msg:str, showStack:bool=False, withGamePrefix:bool=True, btIndent:Optional[int]=None) ->'Deferred':
+def logDebug(msg:Union[Exception, str], showStack:bool=False,
+    withGamePrefix:bool=True, btIndent:Optional[int]=None) ->'Deferred':
     """log this message and show it on stdout
     if btIndent is set, message is indented by depth(backtrace)-btIndent"""
     if btIndent:
