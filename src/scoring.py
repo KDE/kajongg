@@ -376,7 +376,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         ignore the rule. If however the action does other things like penalties leave it applicable"""
         if box.rule.hasNonValueAction():
             return True
-        with BlockSignals(box):
+        with BlockSignals([box]):
             try:
                 checked = box.isChecked()
                 box.setChecked(not checked)

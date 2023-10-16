@@ -143,7 +143,7 @@ class RulesetDiffer(QDialog):
         diffPairs = sorted((len(x.diff(leftRuleset)), x)
                            for x in self.rightRulesets)
         combo = self.cbRuleset2
-        with BlockSignals(combo):
+        with BlockSignals([combo]):
             combo.items = [x[1] for x in diffPairs]
         combo.setCurrentIndex(0)
 

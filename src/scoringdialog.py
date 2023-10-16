@@ -1132,7 +1132,7 @@ class ScoringDialog(QWidget):
         lastTiles, winnerTiles = self.__lastMeldContent()
         if self.comboTilePairs == lastTiles:
             return
-        with BlockSignals(self.cbLastTile):
+        with BlockSignals([self.cbLastTile]):
             # we only want to emit the changed signal once
             self.__fillLastTileComboWith(lastTiles, winnerTiles)
         self.cbLastTile.currentIndexChanged.emit(0)
@@ -1166,7 +1166,7 @@ class ScoringDialog(QWidget):
                     if lastTile not in meldContent:
                         lastTile = lastTile.swapped
                         assert lastTile in meldContent
-                        with BlockSignals(self.cbLastTile):  # we want to continue right here
+                        with BlockSignals([self.cbLastTile]):  # we want to continue right here
                             idx = self.cbLastTile.findData(lastTile)
                             self.cbLastTile.setCurrentIndex(idx)
                     break
@@ -1179,7 +1179,7 @@ class ScoringDialog(QWidget):
         """fill the drop down list with all possible melds.
         If the drop down had content before try to preserve the
         current index. Even if the meld changed state meanwhile."""
-        with BlockSignals(self.cbLastMeld):  # we only want to emit the changed signal once
+        with BlockSignals([self.cbLastMeld]):  # we only want to emit the changed signal once
             showCombo = False
             idx = max(self.cbLastMeld.currentIndex(), 0)
             indexedMeld = str(self.cbLastMeld.itemData(idx))

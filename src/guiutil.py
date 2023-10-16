@@ -122,22 +122,16 @@ class BlockSignals:
 
     """a helper class for temporary blocking of Qt signals"""
 
-    def __init__(self, qobject):
-        self.qobject = qobject
+    def __init__(self, qobjects):
+        self.qobjects = qobjects
 
-    def __enter__(self):
-        if isinstance(self.qobject, list):
-            for obj in self.qobject:
-                obj.blockSignals(True)
-        else:
-            self.qobject.blockSignals(True)
+    def __enter__(self) ->None:
+        for obj in self.qobjects:
+            obj.blockSignals(True)
 
     def __exit__(self, exc_type, exc_value, trback):
-        if isinstance(self.qobject, list):
-            for obj in self.qobject:
-                obj.blockSignals(False)
-        else:
-            self.qobject.blockSignals(False)
+        for obj in self.qobjects:
+            obj.blockSignals(False)
 
 
 def decorateWindow(window, name=None):
