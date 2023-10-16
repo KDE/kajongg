@@ -18,7 +18,7 @@ import os
 import logging
 import datetime
 import argparse
-from typing import TYPE_CHECKING, Tuple, Any, Optional, Sequence, List, Mapping, Union
+from typing import TYPE_CHECKING, Tuple, Any, Optional, Sequence, List, Mapping, Dict, Union, cast, Type
 
 from zope.interface import implementer
 
@@ -40,7 +40,7 @@ def cleanExit(*unusedArgs: Any) ->None:
     except NameError:
         logging.shutdown()
     try:
-        reactor.stop()
+        reactor.stop()  # type:ignore[misc]
     except NameError:
         sys.exit(0)
     except ReactorNotRunning:
@@ -54,17 +54,18 @@ Internal.isServer = True
 Internal.logPrefix = 'S'
 
 from twisted.spread import pb
+from twisted.internet.interfaces import IReactorCore
 from twisted.internet import error
 from twisted.internet.defer import maybeDeferred, fail, succeed, Deferred
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor as reactor_module
 from twisted.internet.error import ReactorNotRunning
-reactor = reactor_module
 if TYPE_CHECKING:
     from twisted.python.failure import Failure
 
-reactor.addSystemEventTrigger('before', 'shutdown', cleanExit)
-Internal.reactor = reactor
+reactor = cast(IReactorCore, reactor_module)
+reactor.addSystemEventTrigger('before', 'shutdown', cleanExit)  # type:ignore[arg-type]
+Internal.reactor = reactor  # type:ignore[assignment]
 
 from player import Players
 from query import Query, initDb
@@ -125,17 +126,18 @@ class MJServer:
     """the real mah jongg server"""
 
     def __init__(self) ->None:
-        self.tables = {}
-        self.srvUsers = []
+        self.tables:Dict[int, ServerTable] = {}
+        self.srvUsers:List[User] = []
         Players.load()
         self.lastPing = datetime.datetime.now()
         self.checkPings()
 
     def chat(self, chatString:str) ->None:
         """a client sent us a chat message"""
-        chatLine = ChatMessage(chatString)
-        if Debug.chat:
-            logDebug('server got chat message %s' % chatLine)
+        # FIXME: why does this work?
+        chatLine = ChatMessage(chatString)  # type:ignore[arg-type]
+
+
         self.tables[chatLine.tableid].sendChatMessage(chatLine)
 
     def login(self, user: User) ->None:
@@ -160,7 +162,7 @@ class MJServer:
         """as the name says"""
         if Options.socket and not Options.continueServer:
             try:
-                reactor.stop()
+                reactor.stop()  # type:ignore[misc]
                 if Debug.connections:
                     logDebug('local server terminates from %s. Reason: last client disconnected' % (
                         Options.socket))
@@ -286,7 +288,7 @@ class MJServer:
         block.tell(
             None,
             self.srvUsers,
-            Message.TableChanged,  # type: ignore
+            Message.TableChanged,
             source=table.asSimpleList())
         if len(table.users) == table.maxSeats():
             if Debug.table:
@@ -321,7 +323,7 @@ class MJServer:
                         block.tell(
                             None,
                             self.srvUsers,
-                            Message.TableChanged,  # type: ignore
+                            Message.TableChanged,
                             source=table.asSimpleList())
                         block.callback(False)
         return True
@@ -378,7 +380,7 @@ class MJServer:
         for block in DeferredBlock.blocks:
             for request in block.requests:
                 if request.user == user:
-                    request.answer = Message.Abort  # type: ignore
+                    request.answer = Message.Abort
 
     def loadSuspendedTables(self, user: User) ->None:
         """loads all yet unloaded suspended tables where this
@@ -406,7 +408,7 @@ class MJServer:
                 table = ServerTable(
                     self, None, ruleset, suspendTime, playOpen=False,
                     autoPlay=False, wantedGame=str(seed))
-                table.game = ServerGame.loadFromDB(gameid)
+                table.game = cast(ServerGame, ServerGame.loadFromDB(gameid))
 
 
 @implementer(portal.IRealm)
@@ -415,10 +417,10 @@ class MJRealm:
     """connects mind and server"""
 
     def __init__(self) ->None:
-        self.server = None
+        self.server : Optional[MJServer] = None
 
     def requestAvatar(self, avatarId: str, mind: pb.RemoteReference,
-        *interfaces: Sequence[pb.IPerspective]) -> Tuple[pb.IPerspective, User, Any]:
+        *interfaces: Sequence[pb.IPerspective]) -> Tuple[Type[pb.IPerspective], User, Any]:
         """as the tutorials do..."""
         if pb.IPerspective not in interfaces:
             raise NotImplementedError("No supported avatar interface")
@@ -497,7 +499,7 @@ def kajonggServer() ->None:
         logWarning(errObj)
         sys.exit(1)
     else:
-        reactor.run()
+        reactor.run()  # type:ignore[misc]
 
 
 def profileMe() ->None:
