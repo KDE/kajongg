@@ -200,16 +200,9 @@ class Url(str, ReprMixin):
             exc.filename = ' '.join(args)
             logException(exc)
 
-    def __serverListening(self):
-        """is the expected server listening?"""
-        if self.useSocket:
-            proto = socket.AF_UNIX
-            param = socketName()
-            if not os.path.exists(param):
-                return False
-        else:
-            proto = socket.AF_INET
-            param = (self.host, self.port)
+    @staticmethod
+    def __check_socket(proto, param):
+        """check connection on socket"""
         sock = socket.socket(proto, socket.SOCK_STREAM)
         sock.settimeout(1)
         try:
@@ -219,8 +212,18 @@ class Url(str, ReprMixin):
         except socket.error:
             return False
 
+    def __serverListening(self):
+        """is the expected server listening?"""
+        if self.useSocket:
+            socket_path = socketName()
+            if not os.path.exists(socket_path):
+                return False
+            return self.__check_socket(socket.AF_UNIX, socket_path)
+        return self.__check_socket(socket.AF_INET, (self.host, self.port))
+
     def connect(self, factory):
         """return a twisted connector"""
+        assert Internal.reactor
         if self.useSocket:
             return Internal.reactor.connectUNIX(socketName(), factory, timeout=5)
         host = self.host
