@@ -219,7 +219,7 @@ Options {stropt} take a string argument like {example}.
         """args comes from the command line. Put this in the Debug class.
         If something goes wrong, return an error message."""
         if not args:
-            return None
+            return ''
         Debug.argString = args
         for arg in args.split(','):
             parts = arg.split(':')
@@ -242,7 +242,7 @@ Options {stropt} take a string argument like {example}.
         if Debug.modelTest and not Debug.modeltest_is_supported():
             print('--debug=modelTest is not yet supported for pyside, use pyqt')
             sys.exit(2)
-        return None
+        return ''
 
     @staticmethod
     def modeltest_is_supported():
@@ -421,6 +421,7 @@ class IntDict(defaultdict, ReprMixin):
 
     def __add__(self, other):
         """add two IntDicts"""
+        assert isinstance(other, IntDict), other
         result = self.copy()
         for key, value in other.items():
             result[key] += value
@@ -433,6 +434,7 @@ class IntDict(defaultdict, ReprMixin):
 
     def __sub__(self, other):
         """self - other"""
+        assert isinstance(other, IntDict), other
         result = self.copy()
         for key, value in other.items():
             result[key] -= value
@@ -442,9 +444,11 @@ class IntDict(defaultdict, ReprMixin):
         return result
 
     def __eq__(self, other):
+        assert isinstance(other, IntDict), other
         return self.all() == other.all()
 
     def __ne__(self, other):
+        assert isinstance(other, IntDict), other
         return self.all() != other.all()
 
     def count(self, countFilter=None):
@@ -552,6 +556,7 @@ class Fmt(string.Formatter):
         return ''.join(reversed(result))
 
     def get_value(self, key, args, kwargs):
+        assert isinstance(key, str), key
         if key.startswith('id(') and key.endswith(')'):
             idpar = key[3:-1]
             if idpar == 'self':
@@ -597,4 +602,5 @@ def fmt(text, **kwargs):
         # formatter.format will not accept 'self' as keyword
         argdict['SELF'] = argdict['self']
         del argdict['self']
+    assert Fmt.formatter is not None
     return Fmt.formatter.format(text, **argdict)
