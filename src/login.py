@@ -386,7 +386,7 @@ class AddUserDialog(KDialog):
     def __init__(self, url, username, password):
         KDialog.__init__(self)
         decorateWindow(self, i18nc("@title:window", "Create User Account"))
-        self.setButtons(KDialog.ButtonCode(KDialog.Ok | KDialog.Cancel))
+        self.setButtons(KDialog.Ok | KDialog.Cancel)
         vbox = QVBoxLayout()
         grid = QFormLayout()
         self.lbServer = QLabel()

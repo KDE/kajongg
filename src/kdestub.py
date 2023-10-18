@@ -293,11 +293,6 @@ class KDialog(CaptionMixin, QDialog):
         return self.buttonBox.button(buttonCode)
 
     @staticmethod
-    def ButtonCode(value):  # pylint: disable=invalid-name
-        """not needed in Python"""
-        return value
-
-    @staticmethod
     def spacingHint():
         """stub"""
         return QApplication.style().pixelMetric(QStyle.PixelMetric.PM_DefaultLayoutSpacing)

@@ -78,7 +78,7 @@ class Prompt(MustChooseKDialog, ReprMixin):
                 self, icon, msg,
                 [], "", False,
                 KMessageBox.Options(KMessageBox.NoExec | KMessageBox.AllowLink))
-            self.setButtons(KDialog.ButtonCode(buttons))
+            self.setButtons(buttons)
             # buttons is either Yes/No or Ok
             defaultButton = KDialog.Yes if KDialog.Yes & buttons else KDialog.Ok
             assert defaultButton & buttons, buttons
