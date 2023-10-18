@@ -22,11 +22,12 @@ class StateSaver(QObject):
     def __init__(self, *widgets):
         QObject.__init__(self)
         pref = Internal.Preferences
-        if widgets[0] not in StateSaver.savers:
-            StateSaver.savers[widgets[0]] = self
-            widgets[0].installEventFilter(self)
+        assert pref
         self.widgets = []
         for widget in widgets:
+            if widget not in StateSaver.savers:
+                StateSaver.savers[widget] = self
+                widget.installEventFilter(self)
             name = self.__generateName(widget)
             self.widgets.append((name, widget))
             pref.addString('States', name + 'State')
@@ -94,6 +95,7 @@ class StateSaver(QObject):
     @staticmethod
     def saveAll():
         """execute all registered savers and write states to config file"""
+        assert Internal.Preferences
         for saver in StateSaver.savers.values():
             saver.save()
         Internal.Preferences.writeConfig()
@@ -105,6 +107,7 @@ class StateSaver(QObject):
 
     def save(self):
         """writes the state into Preferences, but does not save"""
+        assert Internal.Preferences
         for name, widget in self.widgets:
             if isAlive(widget):
                 # pylint: disable=unsupported-assignment-operation
@@ -112,3 +115,4 @@ class StateSaver(QObject):
                     Internal.Preferences[name + 'State'] = self.stateStr(widget.saveState())
                 if hasattr(widget, 'saveGeometry'):
                     Internal.Preferences[name + 'Geometry'] = self.stateStr(widget.saveGeometry())
+        Internal.Preferences.writeConfig()
