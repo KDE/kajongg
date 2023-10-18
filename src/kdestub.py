@@ -101,6 +101,7 @@ class KApplication(QApplication):
         try:
             result = Internal.app.desktop().availableGeometry()
         except AttributeError:
+            assert Internal.mainWindow
             result = Internal.mainWindow.screen().availableGeometry()
         return result
 
@@ -202,7 +203,7 @@ class KMessageBox:
         messageLabel = QLabel(text)
         flags = Qt.TextInteractionFlag.TextSelectableByMouse
         if options & KMessageBox.AllowLink:
-            flags |= Qt.TextInteractionFlag.LinksAccessibleByMouse
+            flags = flags | Qt.TextInteractionFlag.LinksAccessibleByMouse
             messageLabel.setOpenExternalLinks(True)
         messageLabel.setTextInteractionFlags(flags)
 
@@ -329,6 +330,7 @@ class KStandardAction:
     def preferences(cls, slot, actionCollection):
         """should add config dialog menu entry"""
         mainWindow = Internal.mainWindow
+        assert mainWindow
         separator = Action(mainWindow)
         separator.setSeparator(True)
         mainWindow.actionStatusBar = Action(mainWindow, 'options_show_statusbar', None)
@@ -471,7 +473,8 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
     def showEvent(self, event):
         """now that the MainWindow code has run, we know all actions"""
         self.refreshToolBar()
-        self.toolBar().setVisible(Internal.Preferences.toolBarVisible)
+        assert Internal.Preferences
+        self.toolBar().setVisible(bool(Internal.Preferences.toolBarVisible))
         self.actionStatusBar.setChecked(self.statusBar().isVisible())
         self.actionToolBar.setChecked(self.toolBar().isVisible())
         self.actionFullscreen.setChecked(
@@ -480,6 +483,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
 
     def hideEvent(self, event):
         """save status"""
+        assert Internal.Preferences
         Internal.Preferences.toolBarVisible = self.toolBar(
         ).isVisible()
         QMainWindow.hideEvent(self, event)
@@ -500,6 +504,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
     def refreshToolBar(self):
         """reload settings for toolbar actions"""
         self.toolBar().clear()
+        assert Internal.Preferences
         for name in Internal.Preferences.toolBarActions.split(','):
             self.toolBar().addAction(self.actionCollection().actions()[name])
 
@@ -517,11 +522,13 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
     @staticmethod
     def selectLanguage():
         """switch the language"""
+        assert Internal.mainWindow
         KSwitchLanguageDialog(Internal.mainWindow).exec_()
 
     @staticmethod
     def aboutKajongg():
         """show an about dialog"""
+        assert Internal.mainWindow
         AboutKajonggDialog(Internal.mainWindow).exec_()
 
     def queryClose(self):
@@ -559,7 +566,9 @@ class KConfigGroup:
     def readEntry(self, name, default=None):
         """get an entry from this group."""
         try:
-            items = self.config().items(self.groupName)
+            _ = self.config()
+            assert _
+            items = _.items(self.groupName)
         except NoSectionError:
             return self.__default(name, default)
         items = {x: y for x, y in items if x.startswith(name)}
@@ -665,6 +674,7 @@ class Action(QAction):
             if QT6:
                 if isinstance(shortcut, QKeyCombination):
                     shortcut = shortcut.key()
+                    assert shortcut
             self.setShortcut(QKeySequence(shortcut | Qt.Modifier.CTRL))
             self.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
         if actionData is not None:
@@ -760,7 +770,6 @@ class KConfigSkeleton(QObject):
 
     def __init__(self):
         QObject.__init__(self)
-        self.currentGroup = None
         self.items = []
         self.addBool('MainWindow', 'toolBarVisible', True)
         self.addString(
@@ -794,7 +803,7 @@ class KConfigSkeleton(QObject):
 
     def setCurrentGroup(self, group):
         """to be used by following add* calls"""
-        self.currentGroup = group
+        self.currentGroup = group  # pylint:disable=attribute-defined-outside-init
 
     def addItem(self, key, value, default=None):
         """add a string preference"""
@@ -877,6 +886,7 @@ class KSwitchLanguageDialog(KDialog):
         self.languagesLayout.addWidget(languageButton.button, numRows + 1, 2, Qt.AlignmentFlag.AlignLeft)
 
         if not isPrimaryLanguage:
+            assert removeButton
             self.languagesLayout.addWidget(removeButton, numRows + 1, 3, Qt.AlignmentFlag.AlignLeft)
             removeButton.show()
             self.languageRows[removeButton] = tuple([languageLabel, languageButton])
@@ -907,7 +917,9 @@ class KSwitchLanguageDialog(KDialog):
 
     def removeButtonClicked(self):
         """remove this language"""
-        self.removeLanguage(self.sender())
+        _ = self.sender()
+        assert isinstance(_, KLanguageButton)
+        self.removeLanguage(_)
 
     def removeLanguage(self, button):
         """remove this language"""
@@ -981,6 +993,7 @@ class KLanguageButton(QWidget):
         """find action by name"""
         for action in self.popup.actions():
             if action.data() == data:
+                assert isinstance(action, QAction)
                 return action
         return None
 
@@ -1005,6 +1018,7 @@ class AboutKajonggDialog(KDialog):
         except ImportError:
             VERSION = "Unknown"
 
+        assert isinstance(QT_VERSION, str)
         underVersions = ['Qt' + QT_VERSION +' API=' + API_NAME]
         if PYQT_VERSION:
             from sip import SIP_VERSION_STR
@@ -1115,6 +1129,7 @@ class AboutKajonggDialog(KDialog):
     @classmethod
     def showLicense(cls):
         """as the name says"""
+        assert Internal.mainWindow
         LicenseDialog(Internal.mainWindow, cls.licenseFile()).exec_()
 
 
@@ -1128,8 +1143,11 @@ class LicenseDialog(KDialog):
         self.setCaption(i18n("License Agreement"))
         self.setButtons(KDialog.Close)
         self.buttonBox.setFocus()
-        with open('x' + licenseFile, 'r', encoding='utf-8') as _:
-            licenseText = _.read()
+        if licenseFile is None:
+            licenseText = 'no license file found'
+        else:
+            with open('x' + licenseFile, 'r', encoding='utf-8') as _:
+                licenseText = _.read()
         self.licenseBrowser = QTextBrowser()
         self.licenseBrowser.setLineWrapMode(QTextEdit.NoWrap)
         self.licenseBrowser.setText(licenseText)
@@ -1148,7 +1166,7 @@ class LicenseDialog(KDialog):
         # shown
         metrics = QFontMetrics(self.licenseBrowser.font())
         idealHeight = metrics.height() * 30
-        return KDialog.sizeHint(self).expandedTo(QSize(idealWidth, idealHeight))
+        return KDialog.sizeHint(self).expandedTo(QSize(int(idealWidth), idealHeight))
 
 
 class KConfigDialog(KDialog):
@@ -1207,7 +1225,7 @@ class KConfigDialog(KDialog):
     def showEvent(self, unusedEvent):
         """if the settings dialog shows, remember current values
         and show them in the widgets"""
-        self.orgPref = self.preferences.as_dict()
+        self.orgPref = self.preferences.as_dict() # FIXME: unused
         self.updateWidgets()
 
     def iconClicked(self, item):
@@ -1221,6 +1239,7 @@ class KConfigDialog(KDialog):
         starts with kcfg_"""
         result = []
         for child in widget.children():
+            assert isinstance(child, QObject), 'child is:{}'.format(type(child))
             if child.objectName().startswith('kcfg_'):
                 result.append(child)
             else:
@@ -1246,6 +1265,7 @@ class KConfigDialog(KDialog):
         self.iconList.setFixedWidth(neededIconWidth)
         self.iconList.setMinimumHeight(120 * self.iconList.count())
         for child in self.allChildren(self):
+            assert isinstance(child, QWidget)
             self.configWidgets[
                 child.objectName().replace('kcfg_', '')] = child
             if isinstance(child, QCheckBox):
@@ -1322,7 +1342,6 @@ class KSeparator(QFrame):
 class ToolBarItem(QListWidgetItem):
 
     """a toolbar item"""
-    emptyIcon = None
 
     def __init__(self, action, parent):
         self.action = action
@@ -1336,12 +1355,12 @@ class ToolBarItem(QListWidgetItem):
         """the action icon, default is an empty icon"""
         result = self.action.icon()
         if result.isNull():
-            if not self.emptyIcon:
+            if not self.emptyIcon:  # pylint:disable=access-member-before-definition
                 iconSize = self.parent.style().pixelMetric(
                     QStyle.PixelMetric.PM_SmallIconSize)
-                self.emptyIcon = QPixmap(iconSize, iconSize)
-                self.emptyIcon.fill(Qt.GlobalColor.transparent)
-                self.emptyIcon = QIcon(self.emptyIcon)
+                _ = QPixmap(iconSize, iconSize)
+                _.fill(Qt.GlobalColor.transparent)
+                self.emptyIcon = QIcon(_)
             result = self.emptyIcon
         return result
 
@@ -1513,6 +1532,8 @@ class KEditToolBar(KDialog):
 
     def loadActions(self):
         """load active actions from Preferences"""
+        assert Internal.mainWindow
+        assert Internal.Preferences
         for name, action in Internal.mainWindow.actionCollection().actions().items():
             if action.text():
                 if name in Internal.Preferences.toolBarActions:
@@ -1522,6 +1543,8 @@ class KEditToolBar(KDialog):
 
     def saveActions(self):
         """write active actions into Preferences"""
+        if Internal.mainWindow is None:
+            return
         activeActions = (self.activeList.item(
             x).action for x in range(len(self.activeList)))
         names = {
@@ -1530,6 +1553,7 @@ class KEditToolBar(KDialog):
             ).actions(
             ).items(
             )}
+        assert Internal.Preferences
         Internal.Preferences.toolBarActions = ','.join(
             names[x] for x in activeActions)
         Internal.mainWindow.refreshToolBar()
