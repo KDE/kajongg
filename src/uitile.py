@@ -44,12 +44,12 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         UITile.clsUid += 1
         self.uid = UITile.clsUid
         self._tile = tile
-        self._boundingRect = None
-        self._cross = False
+        self._boundingRect:Optional[QRectF] = None
+        self._cross:bool = False
         self.setCacheMode(QGraphicsItem.CacheMode.DeviceCoordinateCache)
         # while moving the tile we use ItemCoordinateCache, see
         # Tile.setActiveAnimation
-        self.__board = None
+        self.__board:Optional['Board'] = None
         self.setClippingFlags()
         self.__xoffset = xoffset
         self.__yoffset = yoffset
@@ -113,6 +113,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             self.xoffset * width,
             self.yoffset * height) + shiftZ
         scenePos = self.board.mapToScene(boardPos)
+# TODO: rename to 'def get_moveDict, return class MoveDict(TypedDict)
         return {'pos': scenePos, 'rotation': sceneRotation(self.board), 'scale': self.board.scale()}
 
     def setDrawingOrder(self) ->None:
@@ -465,7 +466,7 @@ class UIMeld(list):
     those methods are not supposed to be called on empty melds.
     UIMeld is a list of UITile"""
 
-    __hash__ = None
+    __hash__ = None  # type:ignore
 
     def __init__(self, newContent:Any) ->None:
         list.__init__(self)
