@@ -7,19 +7,23 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import Dict, TYPE_CHECKING, Any
 from qt import QObject, QByteArray, QEvent, QSplitter, QHeaderView
 
 from common import Internal, isAlive
 from mi18n import english
+
+if TYPE_CHECKING:
+    from qt import QWidget
 
 
 class StateSaver(QObject):
 
     """saves and restores the state for widgets"""
 
-    savers = {}
+    savers : Dict['QWidget', 'StateSaver'] = {}
 
-    def __init__(self, *widgets):
+    def __init__(self, *widgets:'QWidget') ->None:
         QObject.__init__(self)
         pref = Internal.Preferences
         assert pref
@@ -40,11 +44,12 @@ class StateSaver(QObject):
                 self.__restore(widget, name)
 
     @staticmethod
-    def __restore(widget, name):
+    def __restore(widget:'QWidget', name:str) ->bool:
         """decode the saved string"""
         # pylint: disable=unsubscriptable-object
-        def canRestore(name,what):
+        def canRestore(name:str,what:str) ->bool:
             return name.endswith(what) and hasattr(widget, 'restore' + what)
+        assert Internal.Preferences
         state = QByteArray.fromHex(Internal.Preferences[name].encode())
         if state:
             if canRestore(name, 'State'):
@@ -60,7 +65,7 @@ class StateSaver(QObject):
         return bool(state)
 
     @staticmethod
-    def __generateName(widget):
+    def __generateName(widget:'QWidget') ->str:
         """generate a name for this widget to be used in the config file"""
         orgWidget = widget
         name = english(widget.objectName())
@@ -77,7 +82,7 @@ class StateSaver(QObject):
             name = orgWidget.__class__.__name__
         return str(name)
 
-    def eventFilter(self, unusedWatched, event):
+    def eventFilter(self, unusedWatched:QObject, event:QEvent) ->bool:
         """if the watched widget hides, save its state.
         Return False if the event should be handled further"""
         if QEvent is not None:
@@ -93,7 +98,7 @@ class StateSaver(QObject):
         return False
 
     @staticmethod
-    def saveAll():
+    def saveAll() ->None:
         """execute all registered savers and write states to config file"""
         assert Internal.Preferences
         for saver in StateSaver.savers.values():
@@ -101,11 +106,11 @@ class StateSaver(QObject):
         Internal.Preferences.writeConfig()
 
     @staticmethod
-    def stateStr(state):
+    def stateStr(state:Any) ->str:
         """convert hex string to str"""
         return str(bytes(state.toHex()).decode())
 
-    def save(self):
+    def save(self) ->None:
         """writes the state into Preferences, but does not save"""
         assert Internal.Preferences
         for name, widget in self.widgets:
