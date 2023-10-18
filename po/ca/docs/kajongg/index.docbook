@@ -400,7 +400,7 @@
 >localhost</literal
 >. Aquest és el vostre propi ordinador. Si feu això i no s'està executant cap servidor de joc, s'iniciarà automàticament. I quan deixeu de jugar, el servidor també s'aturarà. Això es diferencia de seleccionar <guilabel
 >Joc local</guilabel
-> en que aquest últim no permet connexions des d'altres ordinadors. </para
+> en el fet que aquest últim no permet connexions des d'altres ordinadors. </para
 ></listitem
 ><listitem
 ><para
