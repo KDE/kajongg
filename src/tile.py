@@ -303,6 +303,36 @@ class Tile(ReprMixin):
             return self.name2() == other.name2()
         return object.__eq__(self, other)
 
+    def cacheMelds(self):
+        """fill meld cache"""
+        occ = elements.occurrence[self]
+        self.single = Meld(self)
+        self.concealed.single = Meld(self.concealed)
+        if occ > 1:
+            self.pair = Meld(self * 2)
+            self.concealed.pair = Meld(self.concealed * 2)
+            if occ > 2:
+                self.pung = Meld(self * 3)
+                self.concealed.pung = Meld(self.concealed * 3)
+                if self.value in range(1, 8):
+                    self.chow = Meld(
+                        [self,
+                         self.nextForChow,
+                         self.nextForChow.nextForChow])
+                    self.concealed.chow = Meld(
+                        [self.concealed,
+                         self.concealed.nextForChow,
+                         self.concealed.nextForChow.nextForChow])
+                if self.value in range(1, 10):
+                    self.knitted3 = Meld(  # pylint:disable=attribute-defined-outside-init
+                        [Tile(x, self.value) for x in Tile.colors])
+                    self.concealed.knitted3 = Meld(
+                        [Tile(x, self.value).concealed for x in Tile.colors])
+                if occ > 3:
+                    self.kong = Meld(self * 4)
+                    self.claimedKong = Meld(  # pylint:disable=attribute-defined-outside-init
+                        [self, self, self, self.concealed])
+                    self.concealed.kong = Meld(self.concealed * 4)
 
 class Tiles:
 
@@ -851,33 +881,9 @@ class Meld(TileTuple, ReprMixin):
         """define all usual melds as Tile attributes"""
         Tile.unknown.single = Meld(Tile.unknown)
         Tile.unknown.pung = Meld(Tile.unknown * 3)
-        for tile, occ in elements.occurrence.items():
-            tile.single = Meld(tile)
-            tile.concealed.single = Meld(tile.concealed)
-            if occ > 1:
-                tile.pair = Meld(tile * 2)
-                tile.concealed.pair = Meld(tile.concealed * 2)
-                if occ > 2:
-                    tile.pung = Meld(tile * 3)
-                    tile.concealed.pung = Meld(tile.concealed * 3)
-                    if tile.value in range(1, 8):
-                        tile.chow = Meld(
-                            [tile,
-                             tile.nextForChow,
-                             tile.nextForChow.nextForChow])
-                        tile.concealed.chow = Meld(
-                            [tile.concealed, tile.nextForChow.concealed,
-                             tile.nextForChow.nextForChow.concealed])
-                    if tile.value in range(1, 10):
-                        tile.knitted3 = Meld(
-                            [Tile(x, tile.value) for x in Tile.colors])
-                        tile.concealed.knitted3 = Meld(
-                            [Tile(x, tile.value).concealed for x in Tile.colors])
-                    if occ > 3:
-                        tile.kong = Meld(tile * 4)
-                        tile.claimedKong = Meld(
-                            [tile, tile, tile, tile.concealed])
-                        tile.concealed.kong = Meld(tile.concealed * 4)
+        do_those = list(elements.occurrence.keys())
+        for tile in do_those:
+            tile.cacheMelds()
 
     def __repr__(self):
         """because TileTuple.__repr__ does not indicate class Meld"""

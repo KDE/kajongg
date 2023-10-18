@@ -410,7 +410,6 @@ class StandardMahJongg(MJRule):
                     # logDebug('removing first 3 from %s' % values)
                     meld = Tile(group, values[0]).chow
                     assert meld
-                    # pylint: disable=not-an-iterable
                     # must be a pylint bug. meld is TileList is list
                     for pair in meld:
                         result.remove(pair)
@@ -430,7 +429,6 @@ class StandardMahJongg(MJRule):
                 if values[-1] - 2 == values[-3] and (len(values) == 3 or values[-4] < values[-1] - 3):
                     meld = Tile(group, values[-3]).chow
                     assert meld
-                    # pylint: disable=not-an-iterable
                     # must be a pylint bug. meld is TileList is list
                     for pair in meld:
                         result.remove(pair)
