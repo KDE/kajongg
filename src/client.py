@@ -218,6 +218,7 @@ class Client(pb.Referenceable):
         """the game server proposes a new game id. We check if it is available
         in our local data base - we want to use the same gameid everywhere"""
         with Internal.db:
+            assert self.connection
             query = Query('insert into game(id,seed) values(?,?)',
                           (gameid, self.connection.url), mayFail=True, failSilent=True)
             if query.rowcount() != 1:
@@ -236,6 +237,7 @@ class Client(pb.Referenceable):
     def __assignIntelligence(self):
         """assign intelligence to myself. All players already have default intelligence."""
         if self.isHumanClient():
+            assert self.game
             aiClass = self.__findAI([intelligence, altint], Options.AI)
             if not aiClass:
                 raise ValueError('intelligence %s is undefined' % Options.AI)
@@ -246,6 +248,7 @@ class Client(pb.Referenceable):
         """the game server asks us if we are ready. A robot is always ready."""
         def disagree(about):
             """do not bother to translate this, it should normally not happen"""
+            assert self.game  # mypy should be able to infer this
             self.game.close()
             msg = 'The data bases for game %s have different %s' % (
                 self.game.seed, about)
@@ -276,6 +279,7 @@ class Client(pb.Referenceable):
             self.game = gameClass(playerNames, self.table.ruleset,
                                   gameid=gameid, wantedGame=wantedGame, client=self,
                                   playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
+            assert self.game, 'cannot initialize game {}'.format(gameid)
         self.game.shouldSave = shouldSave
         self.__assignIntelligence()
                                   # intelligence variant is not saved for
@@ -285,10 +289,11 @@ class Client(pb.Referenceable):
 
     def readyForHandStart(self, playerNames, rotateWinds):
         """the game server asks us if we are ready. A robot is always ready..."""
-        self.game.assignPlayers(playerNames)
-        if rotateWinds:
-            self.game.rotateWinds()
-        self.game.prepareHand()
+        if self.game:
+            self.game.assignPlayers(playerNames)
+            if rotateWinds:
+                self.game.rotateWinds()
+            self.game.prepareHand()
 
     def __delayAnswer(self, result, delay, delayStep):
         """try again, may we chow now?"""
@@ -330,8 +335,9 @@ class Client(pb.Referenceable):
         myself = self.game.myself
         myself.computeSayable(move, answers)
         result = myself.intelligence.selectAnswer(answers)
+        assert result
         if result[0] == Message.Chow:
-            if Debug.delayChow:
+            if Debug.delayChow and self.game.lastDiscard:
                 self.game.debug('{} waits to see if somebody says Pung or Kong before saying chow for {}'.format(
                     self.game.myself.name, self.game.lastDiscard.name()))
             return deferLater(Internal.reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
@@ -429,17 +435,21 @@ class Client(pb.Referenceable):
 
     def claimed(self, move):
         """somebody claimed a discarded tile"""
+        assert self.game
         if Internal.scene:
             calledTileItem = Internal.scene.discardBoard.claimDiscard()
             calledTile = calledTileItem.tile
         else:
             calledTileItem = None
+            assert self.game.lastDiscard
             calledTile = self.game.lastDiscard
         self.game.lastDiscard = None
+        assert calledTile
         self.game.discardedTiles[calledTile.exposed] -= 1
         assert move.meld, 'move has no meld: {!r}'.format(move)
         assert calledTile in move.meld, '%s %s' % (calledTile, move.meld)
         hadTiles = move.meld.without(calledTile)
+        assert move.player
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
         move.player.lastTile = calledTile.exposed
@@ -463,6 +473,7 @@ class Client(pb.Referenceable):
         # only when all animations ended, our handboard gets focus. Otherwise
         # we would see a blue focusRect in the handboard even when a tile
         # ist still moving from the discardboard to the handboard.
+        assert move.player
         animateAndDo(move.player.getsFocus)
         possibleAnswers = [Message.Discard, Message.Kong, Message.MahJongg]
         if not move.player.discarded:
@@ -474,7 +485,10 @@ class Client(pb.Referenceable):
         By declaring we mean exposing a meld, using only tiles from the hand.
         For now we only support Kong: in Classical Chinese it makes no sense
         to declare a Pung."""
+        # FIXME: need a test case
         assert move.message == Message.Kong
+        assert self.game
+        assert move.player
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(move.source)
         move.exposedMeld = move.player.exposeMeld(move.source)
@@ -482,4 +496,5 @@ class Client(pb.Referenceable):
             self.ask(move, [Message.OK])
 
     def __str__(self):
+        assert self.name
         return self.name
