@@ -129,8 +129,8 @@ from qtpy.QtGui import QValidator
 from qtpy.QtGui import QGuiApplication
 try:
     # it seems this moved in Qt6
-    from qtpy.QtSvgWidgets import QGraphicsSvgItem
+    from qtpy.QtSvgWidgets import QGraphicsSvgItem  # type: ignore
 except ImportError:
     # as it was in Qt5:
-    from qtpy.QtSvg import QGraphicsSvgItem
+    from qtpy.QtSvg import QGraphicsSvgItem  # type:ignore[assignment]
 from qtpy.QtSvg import QSvgRenderer
