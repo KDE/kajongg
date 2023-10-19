@@ -490,8 +490,8 @@ class Client(pb.Referenceable):
         assert self.game
         assert move.player
         if not self.thatWasMe(move.player) and not self.game.playOpen:
-            move.player.showConcealedTiles(move.source)
-        move.exposedMeld = move.player.exposeMeld(move.source)
+            move.player.showConcealedTiles(move.meld)
+        move.exposedMeld = move.player.exposeMeld(move.meld)
         if not self.thatWasMe(move.player):
             self.ask(move, [Message.OK])
 
