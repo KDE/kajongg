@@ -21,6 +21,7 @@ import getpass
 import webbrowser
 import codecs
 import weakref
+import urllib
 from collections import defaultdict
 
 # pylint: disable=wrong-import-order
@@ -121,28 +122,26 @@ class CaptionMixin:
         self.setWindowIcon(KIcon('kajongg'))
 
 
-
-
 class Help:
     """Interface to the KDE help system"""
 
     @staticmethod
-    def __getDocUrl(languages):
-        """return the best match for the online user manual"""
-        from twisted.web import client
+    def url_for_language(lang):
+        """The url for a given language"""
+        return 'https://docs.kde.org/stable/{}/kajongg/kajongg/index.html'.format(lang)
 
-        def processResult(unusedResult, fallbacks):
-            """if status 404, try the next fallback language"""
-            return Help.__getDocUrl(fallbacks) if factory.status == '404' else url
-        host = 'docs.kde.org'
-        path = '?application=kajongg&language={}'.format(languages[0])
-        url = 'https://' + host + path
-        factory = client.HTTPClientFactory(url.encode('ascii'))
-        factory.protocol = client.HTTPPageGetter
-        factory.protocol.handleEndHeaders = lambda x: x
-        Internal.reactor.connectTCP(host, 80, factory)
-        factory.deferred.addCallback(processResult, languages[1:])
-        return factory.deferred
+    @staticmethod
+    def find_help_url():
+        """find an existing help url for preferred language"""
+        for language in Internal.kajonggrc.group('Locale').readEntry('Language').split(':'):
+            try:
+                url = Help.url_for_language(language)
+                with urllib.request.urlopen(url) as _:
+                    if _.status == 200:
+                        return url
+            except urllib.error.HTTPError:
+                pass
+        return Help.url_for_language('en')
 
     @staticmethod
     def start():
@@ -150,12 +149,7 @@ class Help:
         try:
             subprocess.Popen(['khelpcenter', 'help:/kajongg/index.html'])  # pylint:disable=consider-using-with
         except OSError:
-            def gotUrl(url):
-                """now we know where the manual is"""
-                webbrowser.open(url)
-            languages = Internal.kajonggrc.group(
-                'Locale').readEntry('Language').split(':')
-            Help.__getDocUrl(languages).addCallback(gotUrl)
+            webbrowser.open(Help.find_help_url())
 
 
 class IconLabel(QLabel):
