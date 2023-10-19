@@ -872,9 +872,9 @@ class YellowText(QGraphicsRectItem):
 
     """a yellow rect with a message, used for claims"""
 
-    def __init__(self, side):
-        QGraphicsRectItem.__init__(self, side)
-        self.side = side
+    def __init__(self, parent):
+        QGraphicsRectItem.__init__(self, parent)
+        self.parent = parent
         self.font = QFont()
         self.font.setPointSize(48)
         self.height = 62
@@ -890,8 +890,8 @@ class YellowText(QGraphicsRectItem):
         self.height = metrics.lineSpacing() * 1.1
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()
-        self.setPos(self.side.center())
-        rotation = self.side.rotation()
+        self.setPos(self.parent.rect().center())
+        rotation = self.parent.rotation()
         rotateCenter(self, -rotation)
         xOffset = -self.rect().width() / 2
         yOffset = -self.rect().height() / 2
