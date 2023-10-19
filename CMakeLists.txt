@@ -119,7 +119,7 @@ set(DATAFILES
     src/kajonggui.rc)
 
 
-find_package(KMahjongglib6 5.1.0 REQUIRED)
+find_package(KMahjongglib6 6.0.0 REQUIRED)
 
 # In KDE4, this was done with PYKDE4_INSTALL_PYTHON_FILES and PYKDE4_ADD_EXECUTABLE
 # because including PYKDE4 does not seem appropriate when not using PYKDE4 bindings,
