@@ -329,7 +329,7 @@ class KStandardAction:
     def preferences(cls, slot, actionCollection):
         """should add config dialog menu entry"""
         mainWindow = Internal.mainWindow
-        separator = QAction(Internal.mainWindow)
+        separator = Action(mainWindow)
         separator.setSeparator(True)
         mainWindow.actionStatusBar = Action(mainWindow, 'options_show_statusbar', None)
         mainWindow.actionStatusBar.setCheckable(True)
@@ -346,16 +346,16 @@ class KStandardAction:
 
         actionCollection.addAction('', separator)
 
-        action = QAction(mainWindow)
+        action = Action(mainWindow)
         action.triggered.connect(mainWindow.configureToolBar)
         action.setText(i18n('Configure Tool&bars...'))
         action.setIcon(KIcon('configure-toolbars'))  # TODO: winprep
         action.setIconText(i18n('Configure toolbars'))
-        separator = QAction(Internal.mainWindow)
+        separator = Action(mainWindow)
         separator.setSeparator(True)
         actionCollection.addAction('options_configure_toolbars', action)
 
-        action = QAction(mainWindow)
+        action = Action(mainWindow)
         action.triggered.connect(slot)
         action.setText(i18n('Configure &Kajongg...'))
         action.setIcon(KIcon('configure'))
@@ -651,13 +651,15 @@ class Action(QAction):
 
     """helper for creation QAction"""
 
-    def __init__(self, parent, name, icon, slot=None, shortcut=None, actionData=None):
+    def __init__(self, parent, name=None, icon=None, slot=None, shortcut=None, actionData=None):
         super().__init__(parent)
         if icon:
             self.setIcon(KIcon(icon))
         if slot:
             self.triggered.connect(slot)
         if parent:
+            if name is None:
+                name = ''
             parent.actionCollection().addAction(name, self)
         if shortcut:
             if QT6:
