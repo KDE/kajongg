@@ -77,8 +77,8 @@ class Tileset(Resource):
         if not self.__renderer.isValid():
             logException(
                 i18n(
-                    'file <filename>%1</filename> contains no valid SVG'),
-                self.graphicsPath)
+                    'file <filename>%1</filename> contains no valid SVG',
+                self.graphicsPath))
         distance = 0
         if self.desktopFileName == 'classic':
             distance = 2
