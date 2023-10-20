@@ -292,8 +292,8 @@ class ClientDialog(QDialog):
         if vertical:
             height = (len(self.buttons) + 1) * self.btnHeight * 1.2
             width = (cwi.width() - cwi.height()) // 2
-            geometry.setX(cwi.width() - width)
-            geometry.setY(min(cwi.height() // 3, cwi.height() - height))
+            geometry.setX(int(cwi.width() - width))
+            geometry.setY(int(min(cwi.height() // 3, cwi.height() - height)))
         else:
             assert self.client.game
             handBoard = self.client.game.myself.handBoard
