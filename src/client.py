@@ -267,14 +267,15 @@ class Client(pb.Referenceable):
             self.game = gameClass.loadFromDB(gameid, self)
             assert self.game, 'cannot load game {}'.format(gameid)
             self.game.assignPlayers(playerNames)
+            table = self.table
             if self.isHumanClient():
-                if self.game.handctr != self.table.endValues[0]:
+                if self.game.handctr != table.endValues[0]:
                     disagree('numbers for played hands: Server:%s, Client:%s' % (
-                        self.table.endValues[0], self.game.handctr))
+                        table.endValues[0], self.game.handctr))
                 for player in self.game.players:
-                    if player.balance != self.table.endValues[1][player.wind.char]:
+                    if player.balance != table.endValues[1][player.wind.char]:
                         disagree('balances for wind %s: Server:%s, Client:%s' % (
-                            player.wind, self.table.endValues[1][player.wind], player.balance))
+                            player.wind, table.endValues[1][player.wind], player.balance))
         else:
             self.game = gameClass(playerNames, self.table.ruleset,
                                   gameid=gameid, wantedGame=wantedGame, client=self,
