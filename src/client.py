@@ -205,7 +205,7 @@ class Client(pb.Referenceable):
         oldTable = self._tableById(newTable.tableid)
         if oldTable:
             self.tables.remove(oldTable)
-            self.tables.append(newTable)
+            self.tables.append(newTable)  # FIXME: I think indent is wrong
         return oldTable, newTable
 
     def remote_tableRemoved(self, tableid, message, *args):  # pylint: disable=unused-argument
