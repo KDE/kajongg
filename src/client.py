@@ -304,19 +304,19 @@ class Client(pb.Referenceable):
             if move.message == Message.NoClaim and move.notifying:
                 noClaimCount += 1
                 if noClaimCount == 2:
-                    if Debug.delayChow:
+                    if Debug.delayChow and self.game.lastDiscard:
                         self.game.debug('everybody said "I am not interested", so {} claims chow now for {}'.format(
                             self.game.myself.name, self.game.lastDiscard.name()))
                     return result
             elif move.message in (Message.Pung, Message.Kong, Message.MahJongg) and move.notifying:
-                if Debug.delayChow:
+                if Debug.delayChow and self.game.lastDiscard:
                     self.game.debug('{} said {} so {} suppresses Chow for {}'.format(
                         move.player, move.message, self.game.myself, self.game.lastDiscard.name()).replace('  ', ' '))
                 return Message.NoClaim
         if delay < self.game.ruleset.claimTimeout * 0.95:
             # one of those slow humans is still thinking
             return deferLater(Internal.reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
-        if Debug.delayChow:
+        if Debug.delayChow and self.game.lastDiscard:
             self.game.debug('{} must chow now for {} because timeout is over'.format(
                 self.game.myself.name, self.game.lastDiscard.name()))
         return result
