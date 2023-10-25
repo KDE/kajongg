@@ -31,7 +31,6 @@ class Move(ReprMixin):
         self.kwargs = kwargs.copy()
         del self.kwargs['token']
         self.score = None
-        self.lastMeld = None
         for key, value in kwargs.items():
             assert not isinstance(value, bytes), 'value is bytes:{}'.format(repr(value))
             if value is None:
