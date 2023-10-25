@@ -96,22 +96,28 @@ class Score(ReprMixin):
 
     def __ne__(self, other):
         """ != comparison """
+        assert isinstance(other, Score)
         return self.points != other.points or self.doubles != other.doubles or self.limits != other.limits
 
     def __lt__(self, other):
+        assert isinstance(other, Score)
         return self.total() < other.total()
 
     def __le__(self, other):
+        assert isinstance(other, Score)
         return self.total() <= other.total()
 
     def __gt__(self, other):
+        assert isinstance(other, Score)
         return self.total() > other.total()
 
     def __ge__(self, other):
+        assert isinstance(other, Score)
         return self.total() >= other.total()
 
     def __add__(self, other):
         """implement adding Score"""
+        assert isinstance(other, Score)
         return Score(self.points + other.points, self.doubles + other.doubles,
                      max(self.limits, other.limits), self.ruleset or other.ruleset)
 
@@ -119,13 +125,15 @@ class Score(ReprMixin):
         """the total score"""
         result = int(self.points * (2 ** self.doubles))
         if self.limits:
+            assert self.ruleset is not None
             if self.limits >= 1:
                 self.points = self.doubles = 0
             elif self.limits * self.ruleset.limit >= result:
                 self.points = self.doubles = 0
             else:
-                self.limits = 0
+                self.limits = 0.0
         if self.limits:
+            assert self.ruleset is not None
             return int(round(self.limits * self.ruleset.limit))
         if result and self.ruleset:
             if not self.ruleset.roofOff:
@@ -213,7 +221,6 @@ class RuleList(list):
         rule = None
         description = kwargs.get('description', '')
         for cls in [IntRule, BoolRule, StrRule]:
-            assert isinstance(cls.prefix, str)
             if defParts[0].startswith(cls.prefix):
                 rule = cls(
                     name,
@@ -318,12 +325,12 @@ class Ruleset:
         Rule.importRulecode()
         self.name = name
         self.rulesetId = 0
-        self.__hash = None
+        self.__hash = ''
         self.allRules = []
         self.__dirty = False  # only the ruleset editor is supposed to make us dirty
         self.__loaded = False
         self.__filteredLists = {}
-        self.description = None
+        self.description = ''
         self.rawRules = None  # used when we get the rules over the network
         self.doublingMeldRules = []
         self.doublingHandRules = []
@@ -374,12 +381,12 @@ into a situation where you have to pay a penalty"""))
     def __eq__(self, other):
         """two rulesets are equal if everything except name or description is identical.
         The name might be localized."""
-        return other and self.hash == other.hash
+        return other and isinstance(other, Ruleset) and self.hash == other.hash
 
     def __ne__(self, other):
         """two rulesets are equal if everything except name or description is identical.
         The name might be localized."""
-        return not other or self.hash != other.hash
+        return not other or not isinstance(other, Ruleset) or self.hash != other.hash
 
     def minMJTotal(self):
         """the minimum score for Mah Jongg including all winner points. This is not accurate,
@@ -471,18 +478,22 @@ into a situation where you have to pay a penalty"""))
 
     def loadRules(self):
         """load rules from database or from self.rawRules (got over the net)"""
-        for record in self.rawRules or self.__loadQuery().records:
-            self.__loadRule(record)
+        if self.rawRules:
+            for record in self.rawRules:
+                self.__loadRule(record)
+        else:
+            for record in self.__loadQuery().records:
+                self.__loadRule(record)
 
     def __loadRule(self, record):
         """loads a rule into the correct ruleList"""
-        _, listNr, _, name, definition, points, doubles, limits, parameter = record
+        _, listNr, _, name, definition, points_str, doubles, limits, parameter = record
         try:
-            points = int(points)
+            points = int(points_str)
         except ValueError:
             # this happens if the unit changed from limits to points but the value
             # is not converted at the same time
-            points = int(float(points))
+            points = int(float(points_str))
         for ruleList in self.ruleLists:
             if ruleList.listId == listNr:
                 ruleList.createRule(
@@ -530,14 +541,14 @@ into a situation where you have to pay a penalty"""))
     def _newKey(self, minus=False):
         """generate a new id and a new name if the name already exists"""
         newId = self.newId(minus=minus)
-        newName = self.name
+        newName = str(self.name)
         if minus:
             copyNr = 1
             while self.nameExists(newName):
                 copyStr = ' ' + str(copyNr) if copyNr > 1 else ''
                 newName = i18nc(
                     'Ruleset._newKey:%1 is empty or space plus number',
-                    'Copy%1 of %2', copyStr, i18n(self.name))
+                    'Copy%1 of %2', copyStr, i18n(str(self.name)))
                 copyNr += 1
         return newId, newName
 
@@ -595,12 +606,12 @@ into a situation where you have to pay a penalty"""))
                 break
         assert rule in ruleList, '%s: %s not in list %s' % (
             type(rule), rule, ruleList.name)
-        return (self.rulesetId, ruleList.listId, ruleIdx, rule.name,
-                rule.definition, score.points, score.doubles, score.limits, rule.parameter)
+        return [self.rulesetId, ruleList.listId, ruleIdx, rule.name,
+                rule.definition, score.points, score.doubles, score.limits, rule.parameter]
 
     def updateRule(self, rule):
         """update rule in database"""
-        self.__hash = None  # invalidate, will be recomputed when needed
+        self.__hash = ''  # invalidate, will be recomputed when needed
         with Internal.db:
             record = self.ruleRecord(rule)
             Query("UPDATE rule SET name=?, definition=?, points=?, doubles=?, limits=?, parameter=? "
@@ -631,7 +642,7 @@ into a situation where you have to pay a penalty"""))
                     "select id from ruleset where hash=?", (self.hash,)).records
             if qData:
                 # is already in database
-                self.rulesetId = qData[0][0]
+                self.rulesetId = int(qData[0][0])
                 return
         with Internal.db:
             self.rulesetId, self.name = self._newKey(minus)
@@ -729,6 +740,22 @@ class RuleBase(ReprMixin):
     def name(self):
         """name is readonly"""
         return self.__name
+
+    def selectable(self, hand):  # pylint:disable=unused-argument
+        """default, for mypy"""
+        return False
+
+    def appliesToHand(self, hand):  # pylint:disable=unused-argument
+        """returns true if this applies to hand"""
+        return False
+
+    def appliesToMeld(self, hand, meld):  # pylint:disable=unused-argument
+        """for mypy"""
+        return False
+
+    def key(self):
+        """for mypy"""
+        return ''
 
     def validate(self):
         """is the rule valid?"""
@@ -828,10 +855,9 @@ class Rule(RuleBase):
                     method = destClass.memoize(method, srcClass)
                 else:
                     if method.__code__.co_varnames[0] == 'cls':
-                        methodType = classmethod
+                        method = classmethod(method)
                     else:
-                        methodType = staticmethod
-                    method = methodType(method)
+                        method = staticmethod(method)
                 setattr(destClass, funcName, method)
 
     @classmethod
@@ -928,7 +954,7 @@ class Rule(RuleBase):
 class ParameterRule(RuleBase):
 
     """for parameters"""
-    prefix = 0
+    prefix = ''
 
     def __init__(self, name, definition, description, parameter):
         RuleBase.__init__(self, name, definition, description)
@@ -971,6 +997,7 @@ class IntRule(ParameterRule):
 
     def validate(self):
         """is the rule valid?"""
+        assert isinstance(self.parameter, int)
         if self.parameter < self.minimum:
             return i18nc(
                 'wrong value for rule', '%1: %2 is too small, minimal value is %3',
