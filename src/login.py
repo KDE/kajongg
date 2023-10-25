@@ -292,7 +292,7 @@ class LoginDlg(QDialog):
         self.edPassword = QLineEdit()
         self.edPassword.setEchoMode(QLineEdit.PasswordEchoOnEdit)
         self.grid.addRow(i18n('Password:'), self.edPassword)
-        self.cbRuleset = ListComboBox()
+        self.cbRuleset = ListComboBox([])
         self.grid.addRow(i18nc('kajongg', 'Ruleset:'), self.cbRuleset)
         vbox.addLayout(self.grid)
         vbox.addWidget(self.buttonBox)

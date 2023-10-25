@@ -59,7 +59,7 @@ class ListComboBox(QComboBox):
     """easy to use with a python list. The elements must have an
     attribute 'name'."""
 
-    def __init__(self, items=None, parent=None):
+    def __init__(self, items, parent=None):
         QComboBox.__init__(self, parent)
         self.items = items
 
