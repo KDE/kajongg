@@ -201,7 +201,6 @@ class Game:
             assert isinstance(name, str), 'Game.__init__: name must be string and not {}'.format(type(name))
         self.players = Players()
         # if we fail later on in init, at least we can still close the program
-        self.myself = None
         # the player using this client instance for talking to the server
         self.__shouldSave = False
         self._client = None
@@ -237,7 +236,8 @@ class Game:
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
         self.wall = self.wallClass(self)
-        self.assignPlayers(names)
+        # FIXME:  wall nach PlayingGame verschieben?
+        self.assignPlayers(names)  # also defines self.myself
         if self.belongsToGameServer():
             self.__shufflePlayers()
         self._scanGameOption()
@@ -793,8 +793,8 @@ class PlayingGame(Game):
         self.players[East].lastSource = TileSource.East14th
         self.playOpen = playOpen
         self.autoPlay = autoPlay
-        myself = self.myself
-        if self.belongsToHumanPlayer() and myself:
+        if self.belongsToHumanPlayer():
+            myself = self.myself
             myself.voice = Voice.locate(myself.name)
             if myself.voice:
                 if Debug.sound:
@@ -916,7 +916,7 @@ class PlayingGame(Game):
     def _concealedTileName(self, tileName):
         """tileName has been discarded, by which name did we know it?"""
         player = self.activePlayer
-        if self.myself and player != self.myself and not self.playOpen:
+        if player != self.myself and not self.playOpen:
             # we are human and server tells us another player discarded
             # a tile. In our game instance, tiles in handBoards of other
             # players are unknown

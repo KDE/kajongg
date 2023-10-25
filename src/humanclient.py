@@ -198,6 +198,8 @@ class ClientDialog(QDialog):
         """update icon and tooltip for the discard button"""
         if not self.client.game:
             return
+        assert self.client.game.myself  # FIXME: needed?
+        assert self.client.game.myself.handBoard
         for button in self.buttons:
             button.setMeaning(self.client.game.myself.handBoard.focusTile)
         for uiTile in self.client.game.myself.handBoard.lowerHalfTiles():
@@ -707,7 +709,7 @@ class HumanClient(Client):
             # it.
             myself.handBoard.setEnabled(False)
             return answer, myself.handBoard.focusTile.tile
-        args = self.game.myself.sayable[answer]
+        args = myself.sayable[answer]
         assert args
         if answer == Message.Chow:
             return self.__selectChow(args)
