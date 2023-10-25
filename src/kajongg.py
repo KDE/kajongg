@@ -58,7 +58,7 @@ class CommandLineOption(QCommandLineOption):
     """add some helping attributes"""
     def __init__(self, name, description, valueName=None,
         defaultValue=None, optName=None, argType=None, singleshot=False):
-        QCommandLineOption.__init__(self, [name], description, valueName, defaultValue)
+        QCommandLineOption.__init__(self, [name], description, valueName or '', defaultValue or '')
         if argType is None:
             if valueName is None:
                 argType = bool
