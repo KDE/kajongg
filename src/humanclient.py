@@ -119,8 +119,8 @@ class DlgButton(QPushButton):
 
     def setMeaning(self, uiTile):
         """give me caption, shortcut, tooltip, icon"""
-        txt, warn, _ = self.message.toolTip(
-            self, uiTile.tile if uiTile else None)
+        tile = uiTile.tile if uiTile else None
+        txt, warn, _ = self.message.toolTip(button=self, tile=tile)
         if not txt:
             txt = self.message.i18nName  # .replace(i18nShortcut, '&'+i18nShortcut, 1)
         self.setToolTip(txt)
