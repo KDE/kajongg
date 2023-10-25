@@ -166,7 +166,6 @@ class ClientDialog(QDialog):
         self.setModal(False)
         self.btnHeight = 0
         self.answered = False
-        self.move = None
         self.sorry = None
 
     def keyPressEvent(self, event):
