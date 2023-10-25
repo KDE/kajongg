@@ -569,6 +569,7 @@ class HumanClient(Client):
                             sorried).addCallback(self.showTableList)
                         break
         self.__updateTableList()
+        return oldTable, newTable
 
     def readyForGameStart(
             self, tableid, gameid, wantedGame, playerNames, shouldSave=True,
