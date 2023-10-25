@@ -1062,9 +1062,9 @@ msgid ""
 "she needs only one tile to complete the hand and announces she will not "
 "alter the hand in any way (except bonus tiles)"
 msgstr ""
-"Al primer descart, un jugador pot declarar Crida Original, que vol dir que "
-"necessita només una fitxa per a completar la mà i anuncia que no alterarà la "
-"mà de cap forma (excepte les fitxes de bonificació)"
+"En el primer descart, un jugador pot declarar Crida Original, que vol dir "
+"que necessita només una fitxa per a completar la mà i anuncia que no "
+"alterarà la mà de cap forma (excepte les fitxes de bonificació)"
 
 #: src/predefined.py:61
 msgid "Dangerous Game"
