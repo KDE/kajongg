@@ -154,7 +154,7 @@ class ClientDialog(QDialog):
         decorateWindow(self, i18n('Choose'))
         self.setObjectName('ClientDialog')
         self.client = client
-        self.layout = QGridLayout(self)
+        self.gridLayout = QGridLayout(self)
         self.progressBar = QProgressBar()
         self.progressBar.setMinimumHeight(25)
         self.timer = QTimer()
@@ -293,7 +293,7 @@ class ClientDialog(QDialog):
             geometry.setY(cwi.height() - height)
             geometry.setX(hbLeftTop.x())
         for idx, btn in enumerate(self.buttons + [self.progressBar]):
-            self.layout.addWidget(
+            self.gridLayout.addWidget(
                 btn,
                 idx +
                 1 if vertical else 0,
@@ -305,7 +305,7 @@ class ClientDialog(QDialog):
             20,
             QSizePolicy.Expanding,
             QSizePolicy.Expanding)
-        self.layout.addItem(
+        self.gridLayout.addItem(
             spacer,
             idx if vertical else 0,
             idx if not vertical else 0)
