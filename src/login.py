@@ -296,7 +296,6 @@ class LoginDlg(QDialog):
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         self.cbUser.setSizePolicy(pol)
-        self.__port = None
 
     def serverChanged(self, unusedText=None):
         """the user selected a different server"""

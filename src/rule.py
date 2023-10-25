@@ -555,16 +555,6 @@ into a situation where you have to pay a penalty"""))
             newRuleset = Ruleset(newRuleset.rulesetId)
         return newRuleset
 
-    def __ruleList(self, rule):
-        """return the list containing rule. We could make the list
-        an attribute of the rule but then we rarely
-        need this, and it is not time critical"""
-        for ruleList in self.ruleLists:
-            if rule in ruleList:
-                return ruleList
-        assert False
-        return None
-
     def rename(self, newName):
         """renames the ruleset. returns True if done, False if not"""
         with Internal.db:

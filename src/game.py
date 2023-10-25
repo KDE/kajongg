@@ -287,7 +287,6 @@ class Game:
         for player in self.players:
             player.clearHand()
         self.__winner = None
-        self.__activePlayer = None
         self.prevActivePlayer = None
         self.dangerousTiles = []
         self.discardedTiles.clear()

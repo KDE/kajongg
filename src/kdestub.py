@@ -313,7 +313,7 @@ class KUser:
     """only the things kajongg needs"""
 
     def __init__(self, uid=None):
-        self.__uid = uid
+        pass
 
     def fullName(self):
         """stub"""

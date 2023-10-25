@@ -405,8 +405,6 @@ class ScoreTable(QWidget):
         decorateWindow(self, i18nc('kajongg', 'Scores'))
         self.setAttribute(Qt.WA_AlwaysShowToolTips)
         self.setMouseTracking(True)
-        self.__tableFields = ['prevailing', 'won', 'wind',
-                              'points', 'payments', 'balance', 'hand', 'manualrules']
         self.setupUi()
         self.refresh()
         StateSaver(self, self.splitter)
@@ -799,7 +797,6 @@ class ScoringDialog(QWidget):
         self.wonBoxes = [None] * 4
         self.detailsLayout = [None] * 4
         self.details = [None] * 4
-        self.__tilePixMaps = []
         self.__meldPixMaps = []
         grid = QGridLayout(self)
         pGrid = QGridLayout()
@@ -1097,7 +1094,6 @@ class ScoringDialog(QWidget):
         pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()
         self.cbLastTile.setIconSize(pmSize)
         QPixmapCache.clear()
-        self.__tilePixMaps = []
         shownTiles = set()
         for tile in winnerTiles:
             if tile.tile in lastTiles and tile.tile not in shownTiles:

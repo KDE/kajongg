@@ -105,7 +105,6 @@ class Meld(TileList, StrMixin):
             self.__staticDoublingRules = {}  # ruleset is key
             self.__dynamicDoublingRules = {}  # ruleset is key
             self.__hasRules = None  # unknown yet
-            self.__hasDoublingRules = None  # unknown yet
             self.concealed = self.exposed = self.declared = self.exposedClaimed = None  # to satisfy pylint
             self._fixed = True
 
@@ -138,8 +137,7 @@ class Meld(TileList, StrMixin):
 
     def __setattr__(self, name, value):
         if (hasattr(self, '_fixed')
-                and not name.endswith('__hasRules')
-                and not name.endswith('__hasDoublingRules')):
+                and not name.endswith('__hasRules')):
             raise TypeError
         TileList.__setattr__(self, name, value)
 
@@ -160,8 +158,6 @@ class Meld(TileList, StrMixin):
             if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self)]
         self.__dynamicDoublingRules[rulesetId] = [x for x in ruleset.doublingMeldRules
                                                   if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self)]
-        self.__hasDoublingRules = any(len(x) for x in chain(
-            self.__staticDoublingRules.values(), self.__dynamicDoublingRules.values()))
 
     def rules(self, hand):
         """all applicable rules for this meld being part of hand"""
