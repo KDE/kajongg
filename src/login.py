@@ -51,6 +51,11 @@ class LoginAborted(Exception):
 class Url(str, ReprMixin):
 
     """holds connection related attributes: host, port, socketname"""
+
+    def __init__(self, url):
+        assert url
+        super().__init__()
+
     def __new__(cls, url):
         assert url
         host = None
@@ -175,6 +180,7 @@ class Url(str, ReprMixin):
                     logInfo(
                         i18n('removed stale socket <filename>%1</filename>', socketName()))
             if not self.useSocket:
+                assert self.port
                 args.append('--port=%d' % self.port)
             if self.isLocalGame:
                 args.append(
@@ -455,12 +461,6 @@ class Connection:
 
     def __init__(self, client):
         self.client = client
-        self.perspective = None
-        self.connector = None
-        self.url = None
-        self.username = None
-        self.password = None
-        self.__ruleset = None
         self.dlg = LoginDlg()
 
     @property
@@ -471,7 +471,7 @@ class Connection:
     @ruleset.setter
     def ruleset(self, value):
         """save changed ruleset as last used ruleset for this server"""
-        if self.__ruleset != value:
+        if not hasattr(self, '__ruleset'):
             self.__ruleset = value
             if value:
                 def write():
@@ -486,7 +486,8 @@ class Connection:
 
     def login(self):
         """to be called from HumanClient"""
-        result = DeferredDialog(self.dlg).addCallback(self.__haveLoginData)
+        result = DeferredDialog(self.dlg)
+        result.addCallback(self.__haveLoginData)
         result.addCallback(self.__checkExistingConnections)
         result.addCallback(self.__startServer)
         result.addCallback(self.__loginToServer)
@@ -500,7 +501,7 @@ class Connection:
         """user entered login data, now try to login to server"""
         if not Internal.autoPlay and self.dlg.result() == 0:
             self._loginReallyFailed(Failure(CancelledError()))
-        self.url, self.username, self.password, self.ruleset = arguments
+        self.url, self.username, self.password, self.ruleset = arguments  # pylint:disable=attribute-defined-outside-init
         if self.url.isLocalHost:
             # we have localhost if we play a Local Game: client and server are identical,
             # we have no security concerns about creating a new account
@@ -510,14 +511,14 @@ class Connection:
         """if needed"""
         return self.url.startServer(result)
 
-    def __loginToServer(self, unused=None):
+    def __loginToServer(self, unused):
         """login to server"""
         return self.loginCommand(self.username).addErrback(self._loginFailed)
 
     def loggedIn(self, perspective):
         """successful login on server"""
-        assert perspective
-        self.perspective = perspective
+        assert perspective, type(perspective)
+        self.perspective = perspective  # pylint:disable=attribute-defined-outside-init
         self.perspective.notifyOnDisconnect(self.client.serverDisconnected)
         self.__updateServerInfoInDatabase()
         self.dlg = None
@@ -550,14 +551,16 @@ class Connection:
             if client.connection and client.connection.url == self.url:
                 logWarning(
                     i18n('You are already connected to server %1', self.url))
-                client.tableList.activateWindow()
+                if client.tableList:
+                    client.tableList.activateWindow()
                 raise CancelledError
 
     def loginCommand(self, username):
         """send a login command to server. That might be a normal login
         or adduser/deluser/change passwd encoded in the username"""
         factory = pb.PBClientFactory(unsafeTracebacks=True)
-        self.connector = self.url.connect(factory)
+        self.connector = self.url.connect(factory)  # pylint:disable=attribute-defined-outside-init
+        assert self.dlg
         utf8Password = self.dlg.password.encode('utf-8')
         utf8Username = username.encode('utf-8')
         cred = credentials.UsernamePassword(utf8Username, utf8Password)
@@ -565,7 +568,7 @@ class Connection:
 
     def __adduser(self):
         """create a user account"""
-        assert self.url is not None
+        assert self.dlg
         if not self.url.isLocalHost:
             if not AddUserDialog(self.url,
                                  self.dlg.username,
@@ -585,10 +588,12 @@ class Connection:
         if 'Wrong username' in message:
             if self.url.isLocalHost:
                 return answered(True)
+            assert self.dlg
             msg = i18nc('USER is not known on SERVER',
                         '%1 is not known on %2, do you want to open an account?', self.dlg.username, self.url.host)
             return QuestionYesNo(msg).addCallback(answered)
-        return self._loginReallyFailed(failure)
+        self._loginReallyFailed(failure)
+        return Failure() # only for mypy
 
     def _loginReallyFailed(self, failure):
         """login failed, not fixable by adding missing user"""
@@ -614,6 +619,7 @@ class Connection:
                 self.url, failure.value.__class__.__name__, failure.getErrorMessage(
                 ),
                 failure.getTraceback())
+        assert msg
         # Maybe the server is running but something is wrong with it
         if self.url and self.url.useSocket:
             if removeIfExists(socketName()):
