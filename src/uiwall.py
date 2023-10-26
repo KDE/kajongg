@@ -145,7 +145,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
             self.needsRefresh = True
 
     def paint(self, painter, unusedOption, unusedWidget=None):
-        """paint the marker"""
+        """paint the disc"""
         with Painter(painter):
             pen = QPen(QColor(self.color))
             painter.setPen(pen)
@@ -249,7 +249,7 @@ class UIWall(Wall):
         for idx, side in enumerate(self.__sides):
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
-            side.windTile = Wind.all4[idx].marker
+            side.windTile = Wind.all4[idx].disc
             side.windTile.hide()
             side.message = YellowText(side)
             side.message.setZValue(ZValues.popupZ)
@@ -264,11 +264,11 @@ class UIWall(Wall):
 
     @staticmethod
     def initWindMarkers():
-        """the 4 round wind markers on the player walls"""
-        if East.marker is None:
+        """the 4 round wind discs on the player walls"""
+        if East.disc is None:
             for wind in Wind.all4:
-                wind.marker = PlayerWind(wind)
-                Internal.scene.addItem(wind.marker)
+                wind.disc = PlayerWind(wind)
+                Internal.scene.addItem(wind.disc)
 
     @staticmethod
     def name():

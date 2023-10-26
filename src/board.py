@@ -38,7 +38,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
     whiteColor = QColor('white')
 
     def __init__(self, wind, parent=None):
-        """generate new wind marker"""
+        """generate new wind disc"""
         super().__init__()
         assert not parent
         assert isinstance(wind, Wind), 'wind {}  must be a real Wind but is {}'.format(
@@ -80,7 +80,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
         self.__brush = self.roundWindColor if newPrevailing else self.whiteColor
 
     def paint(self, painter, unusedOption, unusedWidget=None):
-        """paint the marker"""
+        """paint the disc"""
         with Painter(painter):
             painter.setBrush(self.__brush)
             size = int(Internal.scene.windTileset.faceSize.height())
@@ -89,7 +89,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
             renderer = Internal.scene.windTileset.renderer()
             painter.translate(12, 12)
             painter.scale(0.60, 0.60)
-            renderer.render(painter, self.wind.markerSvgName, self.boundingRect())
+            renderer.render(painter, self.wind.discSvgName, self.boundingRect())
 
     def boundingRect(self):
         """define the part of the tile we want to see"""

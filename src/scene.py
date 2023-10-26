@@ -273,7 +273,7 @@ class GameScene(SceneWithFocusRect):
         for item in self.graphicsTileItems():
             self.removeItem(item)
         for wind in Wind.all:
-            wind.marker = None
+            wind.disc = None
         self.focusRect.hide()
 
 

@@ -20,7 +20,7 @@ class Wind:
     all4 = []
 
     tile = None
-    marker = None
+    disc = None
 
     def __new__(cls, *args):
         if not Wind.all:
@@ -81,7 +81,7 @@ class _East(Wind):
     """East"""
     char = 'E'
     svgName = 'WIND_3'
-    markerSvgName = 'g4657'  # WIND_2 etc have a border
+    discSvgName = 'g4657'  # WIND_2 etc have a border
 
     def __index__(self):
         return 0
@@ -91,7 +91,7 @@ class _South(Wind):
     """South"""
     char = 'S'
     svgName = 'WIND_2'
-    markerSvgName = 'g3980'
+    discSvgName = 'g3980'
 
     def __index__(self):
         return 1
@@ -101,7 +101,7 @@ class _West(Wind):
     """West"""
     char = 'W'
     svgName = 'WIND_4'
-    markerSvgName = 'g3192'
+    discSvgName = 'g3192'
 
     def __index__(self):
         return 2
@@ -111,7 +111,7 @@ class _North(Wind):
     """North"""
     char = 'N'
     svgName = 'WIND_1'
-    markerSvgName = 'g4290'
+    discSvgName = 'g4290'
 
     def __index__(self):
         return 3
