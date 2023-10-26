@@ -216,7 +216,7 @@ class GameScene(SceneWithFocusRect):
         """redecorate wall"""
         self.mainWindow.updateGUI()
         if self.game:
-            with AnimationSpeed(Speeds.windMarker):
+            with AnimationSpeed(Speeds.windDisc):
                 self.game.wall.decorate4()
 
     def updateSceneGUI(self):

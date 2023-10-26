@@ -283,7 +283,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
 
 
 class AnimatedMixin:
-    """for UITile and PlayerWind"""
+    """for UITile and WindDisc"""
 
     def __init__(self):
         super().__init__()

@@ -13,7 +13,7 @@ from qt import QPointF, QGraphicsObject, QFontMetrics
 from qt import QPen, QColor, QFont, Qt, QRectF
 
 from guiutil import Painter, sceneRotation
-from board import PlayerWind, YellowText, Board
+from board import WindDisc, YellowText, Board
 from wall import Wall, KongBox
 from tile import Tile
 from tileset import Tileset
@@ -71,7 +71,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
             rotating |= sceneRotation(side) != sceneRotation(side.board)
 
         alreadyMoved = any(x.x() for x in sides)
-        with AnimationSpeed(speed=Speeds.windMarker if rotating and alreadyMoved else 99):
+        with AnimationSpeed(speed=Speeds.windDisc if rotating and alreadyMoved else 99):
             # first round: just place the winds. Only animate moving them
             # for later rounds.
             for side in sides:
@@ -237,7 +237,7 @@ class UIWall(Wall):
         """init and position the wall"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
-        self.initWindMarkers()
+        self.initWindDiscs()
         game.wall = self
         Wall.__init__(self, game)
         self.__square = Board(1, 1, Tileset.current())
@@ -263,11 +263,11 @@ class UIWall(Wall):
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @staticmethod
-    def initWindMarkers():
+    def initWindDiscs():
         """the 4 round wind discs on the player walls"""
         if East.disc is None:
             for wind in Wind.all4:
-                wind.disc = PlayerWind(wind)
+                wind.disc = WindDisc(wind)
                 Internal.scene.addItem(wind.disc)
 
     @staticmethod
@@ -435,17 +435,17 @@ class UIWall(Wall):
         """show player info on the wall. The caller must ensure
         all are moved simultaneously and at which speed by using
         AnimationSpeed.
-        already queued animations keep their speed, only the windMarkeres
+        already queued animations keep their speed, only the windDiscs
         are moved without animation.
         """
         with AnimationSpeed():
             for player in self.game.players:
                 player.showInfo()
             SideText.refreshAll()
-        animateAndDo(self.showWindMarkers)
+        animateAndDo(self.showWindDiscs)
 
-    def showWindMarkers(self, unusedDeferred=None):
-        """animate all windMarkers. The caller must ensure
+    def showWindDiscs(self, unusedDeferred=None):
+        """animate all windDiscs. The caller must ensure
         all are moved simultaneously and at which speed
         by using AnimationSpeed."""
         for player in self.game.players:

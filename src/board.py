@@ -30,7 +30,7 @@ from common import DrawOnTopMixin
 from wind import Wind, East
 
 
-class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
+class WindDisc(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
 
     """a round wind tile"""
 
@@ -98,7 +98,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
 
     def __str__(self):
         """for debugging"""
-        return 'WindMarker(%s x/y= %.1f/%1f)' % (
+        return 'WindDisc(%s x/y= %.1f/%1f)' % (
             self.name(), self.x(), self.y())
 
 
@@ -144,7 +144,7 @@ class WindLabel(QLabel):
 
     def genWindPixmap(self):
         """prepare wind tiles"""
-        pwind = PlayerWind(self.__wind)
+        pwind = WindDisc(self.__wind)
         pwind.prevailing = self.__wind == Wind.all4[min(self.__roundsFinished, 3)]
         pMap = QPixmap(40, 40)
         pMap.fill(Qt.transparent)

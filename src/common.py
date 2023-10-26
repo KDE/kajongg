@@ -513,7 +513,7 @@ class ZValues:
 
 class Speeds:
     """some fixed animation speeds"""
-    windMarker = 20
+    windDisc = 20
     sideText = 60
 
 

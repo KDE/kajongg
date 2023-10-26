@@ -586,8 +586,8 @@ class Game:
                 # exchange seats between rounds
                 self.__exchangeSeats()
             if Internal.scene:
-                with AnimationSpeed(Speeds.windMarker):
-                    self.wall.showWindMarkers()
+                with AnimationSpeed(Speeds.windDisc):
+                    self.wall.showWindDiscs()
 
     def debug(self, msg, btIndent=None, prevHandId=False):
         """
@@ -692,7 +692,7 @@ class Game:
         game.notRotated += 1
         game.maybeRotateWinds()
         game.sortPlayers()
-        with AnimationSpeed(Speeds.windMarker):
+        with AnimationSpeed(Speeds.windDisc):
             animateAndDo(game.wall.decorate4)
         return game
 
