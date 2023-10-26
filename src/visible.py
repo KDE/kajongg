@@ -65,9 +65,9 @@ class VisiblePlayer(Player):
         side = self.front
         self.sideText.text = '{} - {}'.format(self.localName, self.explainHand().total())
         self.colorizeName()
-        side.windTile = Wind.all4[self.wind].disc
-        side.windTile.prevailing = self.game.roundsFinished
-        side.windTile.board = self.front
+        side.disc = Wind.all4[self.wind].disc
+        side.disc.prevailing = self.game.roundsFinished
+        side.disc.board = self.front
 
 
 class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):

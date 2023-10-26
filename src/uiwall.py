@@ -187,7 +187,7 @@ class UIWallSide(Board, StrMixin):
 
     def hide(self):
         """hide all my parts"""
-        self.windTile.hide()
+        self.disc.hide()
         Board.hide(self)
 
     def __str__(self):
@@ -249,8 +249,8 @@ class UIWall(Wall):
         for idx, side in enumerate(self.__sides):
             side.setParentItem(self.__square)
             side.lightSource = self.lightSource
-            side.windTile = Wind.all4[idx].disc
-            side.windTile.hide()
+            side.disc = Wind.all4[idx].disc
+            side.disc.hide()
             side.message = YellowText(side)
             side.message.setZValue(ZValues.popupZ)
             side.message.setVisible(False)
@@ -450,5 +450,5 @@ class UIWall(Wall):
         by using AnimationSpeed."""
         for player in self.game.players:
             side = player.front
-            side.windTile.setupAnimations()
-            side.windTile.show()
+            side.disc.setupAnimations()
+            side.disc.show()
