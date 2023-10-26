@@ -20,7 +20,6 @@ class Wind:
     all4 = []
 
     tile = None
-    disc = None
 
     def __new__(cls, *args):
         if not Wind.all:

@@ -265,7 +265,7 @@ class UIWall(Wall):
     @staticmethod
     def initWindDiscs():
         """the 4 round wind discs on the player walls"""
-        if East.disc is None:
+        if not hasattr(East, 'disc'):
             for wind in Wind.all4:
                 wind.disc = WindDisc(wind)
                 Internal.scene.addItem(wind.disc)
