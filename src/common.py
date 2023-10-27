@@ -148,6 +148,7 @@ class Debug:
     traffic = False
     process = False
     time = False
+    timestamp = None
     sql = False
     animation = ''  # 'yeysywynG87gfefsfwfn' for tiles and G#g for groups where # is the uid
     animationSpeed = False
@@ -238,7 +239,7 @@ Options {stropt} take a string argument like {example}.
             if option != 'scores' or not Internal.isServer:
                 type.__setattr__(Debug, option, value)
         if Debug.time:
-            Debug.time = datetime.datetime.now()
+            Debug.timestamp = datetime.datetime.now()
         if Debug.modelTest and not Debug.modeltest_is_supported():
             print('--debug=modelTest is not yet supported for pyside, use pyqt')
             sys.exit(2)

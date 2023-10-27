@@ -69,8 +69,8 @@ def __enrichMessage(msg, withGamePrefix=True):
             prefix=Internal.logPrefix,
             process=os.getpid() if Debug.process else '',
             msg=msg)
-    if Debug.time:
-        result = '{:08.4f} {}'.format(elapsedSince(Debug.time), result)
+    if Debug.timestamp:
+        result = '{:08.4f} {}'.format(elapsedSince(Debug.timestamp), result)
     if Debug.git:
         head = gitHead()
         if head not in ('current', None):
