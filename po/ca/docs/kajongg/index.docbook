@@ -275,9 +275,7 @@
 	<para
 >Un bon jugador probablement preferirà calcular la seva puntuació ell mateix. En aquest cas, podeu introduir-la directament. Això només és possible quan no se seleccionen fitxes per a aquest jugador. </para>
 	<para
->Si introduïu manualment una puntuació, ja haurà de contenir-ho tot excepte les sancions, no tindreu regles opcionals per a triar. Hi ha una excepció: <quote
->Joc perillós</quote
->. Això no influirà en cap puntuació, tampoc és una infracció. Només vol dir que el pagament entre jugadors serà diferent: l'infractor ho pagarà tot per tothom al guanyador. Els altres dos jugadors no intercanviaran cap pagament. Actualment, això no es pot personalitzar. </para>
+>Si introduïu manualment una puntuació, ja haurà de contenir-ho tot excepte les sancions, no tindreu regles opcionals per a triar. Hi ha una excepció: «Joc perillós». Això no influirà en cap puntuació, tampoc és una infracció. Només vol dir que el pagament entre jugadors serà diferent: l'infractor ho pagarà tot per tothom al guanyador. Els altres dos jugadors no intercanviaran cap pagament. Actualment, això no es pot personalitzar. </para>
 	</sect3>
 	<sect3 id="enterhand-tiles">
 	<title
@@ -319,9 +317,7 @@
 >L'última fitxa completa el parell</guilabel
 >. Només es poden utilitzar per a la mà guanyadora. </para>
 	<para
->A la part dreta de la finestra podreu aplicar manualment algunes regles. Les regles que apareixen en aquesta llista dependran del joc de regles actual i de les fitxes. En l'exemple a la captura de pantalla anterior, els jugadors perdedors poden tenir una opció de <quote
->joc perillós</quote
-> -de nou depenent del joc de regles i de les seves fitxes-. L'objectiu dels desenvolupadors és mantenir aquesta llista de regles seleccionable tan curta com sigui possible. De manera òptima, el &kajongg; sempre hauria de poder determinar automàticament si s'aplica una regla, però de vegades el &kajongg; no té prou informació o coneixement per a decidir. </para>
+>A la part dreta de la finestra podreu aplicar manualment algunes regles. Les regles que apareixen en aquesta llista dependran del joc de regles actual i de les fitxes. En l'exemple a la captura de pantalla anterior, els jugadors perdedors poden tenir una opció de «joc perillós» -de nou depenent del joc de regles i de les seves fitxes-. L'objectiu dels desenvolupadors és mantenir aquesta llista de regles seleccionable tan curta com sigui possible. De manera òptima, el &kajongg; sempre hauria de poder determinar automàticament si s'aplica una regla, però de vegades el &kajongg; no té prou informació o coneixement per a decidir. </para>
 	</sect3>
 	</sect2>
 	<sect2 id="enterhand-penalties">
@@ -462,9 +458,7 @@
   <title
 >L'objectiu del joc</title>
   <para
->Cada jugador intenta recollir les fitxes de manera que obtingui una mà guanyadora. En aconseguir-ho, ell/a cridarà <quote
->Mah Jong</quote
->. En una mà guanyadora, les fitxes normalment s'agruparan en cinc combinacions: quatre combinacions amb tres o quatre fitxes cadascuna i una cinquena combinació que consistirà en dues fitxes iguals. Una combinació normal té tres o quatre fitxes idèntiques (anomenades Pung i Kong respectivament) o tres fitxes successives com Bambú 3, Bambú 4, Bambú 5 (anomenades Chow).</para>
+>Cada jugador intenta recollir les fitxes de manera que obtingui una mà guanyadora. En aconseguir-ho, ell/a cridarà «Mah Jong». En una mà guanyadora, les fitxes normalment s'agruparan en cinc combinacions: quatre combinacions amb tres o quatre fitxes cadascuna i una cinquena combinació que consistirà en dues fitxes iguals. Una combinació normal té tres o quatre fitxes idèntiques (anomenades Pung i Kong respectivament) o tres fitxes successives com Bambú 3, Bambú 4, Bambú 5 (anomenades Chow).</para>
   </sect2>
   <sect2>
     <title
@@ -958,11 +952,7 @@
 				</term>
 				<listitem
 ><para
->Quan es juga, només es mostraran les accions possibles com <quote
->No hi ha reclamacions</quote
-> o <quote
->Pung</quote
->. </para
+>Quan es juga, només es mostraran les accions possibles com «No hi ha reclamacions» o «Pung». </para
 ></listitem>
 			</varlistentry>
 			<varlistentry>
@@ -1032,11 +1022,9 @@
 >/usr/share/kajongg/voices/LANG</filename
 >&nbsp; on LANG és el codi per al vostre idioma. Els directoris de veu directament sota <filename class="directory"
 >.../kajongg/voices/</filename
-> són les versions en anglès dels EUA. Les veus predefinides s'assignaran de forma aleatòria als jugadors. Aquestes veus tenen noms com <quote
-><literal
+> són les versions en anglès dels EUA. Les veus predefinides s'assignaran de forma aleatòria als jugadors. Aquestes veus tenen noms com «<literal
 >male1 male2 female1 female2</literal
->&nbsp;</quote
->, però aquests noms no importen, l'usuari mai els veurà. </para
+>&nbsp;», però aquests noms no importen, l'usuari mai els veurà. </para
 ></listitem
 ><listitem
 ><para
