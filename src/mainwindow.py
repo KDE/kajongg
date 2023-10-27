@@ -153,7 +153,7 @@ class MainWindow(KXmlGuiWindow):
     @staticmethod
     def __installReactor():
         """install the twisted reactor"""
-        if Internal.reactor is None:
+        if not hasattr(Internal, 'reactor'):
             import qtreactor
             qtreactor.install()
             from twisted.internet import reactor
@@ -427,7 +427,7 @@ class MainWindow(KXmlGuiWindow):
                     widget.hide()
             if self.exitWaitTime is None:
                 self.exitWaitTime = 0
-            if Internal.reactor and Internal.reactor.running:
+            if hasattr(Internal, 'reactor') and Internal.reactor.running:
                 self.exitWaitTime += 10
                 if self.exitWaitTime % 1000 == 0:
                     logDebug(

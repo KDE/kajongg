@@ -109,7 +109,7 @@ class DeferredDialog(Deferred):
             else:
                 self.dlg.accepted.connect(self.clicked)
                 self.dlg.rejected.connect(self.cancel)
-        if Internal.reactor:
+        if hasattr(Internal, 'reactor'):
             # sometimes pylint 2.7.2 warns, sometimes not
             Internal.reactor.callLater(0, self.__execute)
         else:
@@ -130,6 +130,7 @@ class DeferredDialog(Deferred):
         else:
             self.dlg.show()
         if autoAnswerDelayed:
+            assert Internal.Preferences
             Internal.reactor.callLater(
                 Internal.Preferences.animationDuration() / 500.0,
                 self.clicked)

@@ -365,7 +365,6 @@ class __Internal:
     defaultPort = 8301
     logPrefix = 'C'
     isServer = False
-    reactor = None
     app = None
     db = None
     scene = None
