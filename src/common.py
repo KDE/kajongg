@@ -267,6 +267,7 @@ Options {stropt} take a string argument like {example}.
                 result.append('{}={}'.format(option, getattr(Debug, option)))
         return ' '.join(result)
 
+
 class FixedClass(type):
 
     """Metaclass: after the class variable fixed is set to True,

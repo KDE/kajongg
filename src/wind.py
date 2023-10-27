@@ -9,6 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 # pylint: disable=invalid-name
 
+
 class Wind:
     """we want to use an wind for indices.
 
@@ -75,6 +76,7 @@ class Wind:
     def __repr__(self):
         return 'Wind.{}'.format(self.char)
 
+
 class _East(Wind):
     """East"""
     char = 'E'
@@ -83,6 +85,7 @@ class _East(Wind):
 
     def __index__(self):
         return 0
+
 
 class _South(Wind):
     """South"""
@@ -93,6 +96,7 @@ class _South(Wind):
     def __index__(self):
         return 1
 
+
 class _West(Wind):
     """West"""
     char = 'W'
@@ -101,6 +105,7 @@ class _West(Wind):
 
     def __index__(self):
         return 2
+
 
 class _North(Wind):
     """North"""
@@ -111,6 +116,7 @@ class _North(Wind):
     def __index__(self):
         return 3
 
+
 class _NoWind(Wind):
     """no wind"""
     char = 'X'
@@ -118,6 +124,7 @@ class _NoWind(Wind):
 
     def __index__(self):
         return 4
+
 
 East = _East()
 South = _South()
