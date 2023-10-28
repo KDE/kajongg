@@ -31,13 +31,13 @@ for testRuleset in [ClassicalChineseDMJL, ClassicalChineseBMJA] * 2:
     RULESETS.append(_)
 
 for _ in RULESETS[2:]:
-    _.roofOff = True
+    _.roofOff = True  # type: ignore
 
 # Do not create our test players in the data base:
-Players.createIfUnknown = str
+Players.createIfUnknown = str  # type: ignore
 
 # RULESETS=RULESETS[:1]
-GAMES = [PlayingGame([tuple([wind, str(wind.char)]) for wind in Wind.all4], x) for x in RULESETS]
+GAMES = [PlayingGame([tuple([wind, str(wind.char)]) for wind in Wind.all4], x) for x in RULESETS]  # type:ignore[misc]
 PROGRAM = None
 
 
@@ -48,7 +48,7 @@ class Expected:
     def __init__(self, won:bool, points:int, doubles:int, limits:float) ->None:
         self.won = won
         self.score = Score(points, doubles, limits)
-        self.ruleset = None
+        self.ruleset:Optional['Ruleset'] = None
 
     def __str__(self) ->str:
         return 'Won with %s' % self.score if self.won else 'Lost with %s' % self.score
@@ -161,7 +161,7 @@ class Base(unittest.TestCase):
                     'hand.won is %s, expected %s' %
                     (hand.won, isinstance(expected, Win)))
             result.append(hand.string)
-            roofOff = ' roofOff' if hand.player.game.ruleset.roofOff else ''
+            roofOff = ' roofOff' if hand.player.game.ruleset.roofOff else ''  #  type: ignore
             score = hand.score
             assert score is not None
             assert hand.player.game
@@ -960,12 +960,13 @@ class TstProgram(unittest.TestProgram):
 
     """we want global access to this program so we can check for verbosity in our tests"""
 
+#    def __init__(self, *args: Any, **kwargs:Mapping[Any, Any]) ->None:
     def __init__(self) ->None:
         global PROGRAM  # pylint: disable=global-statement
         PROGRAM = self
         Debug.callers = '8'
 #        unittest.TestProgram.__init__(self, exit=False, *args, **kwargs)
-        unittest.TestProgram.__init__(self)
+        unittest.TestProgram.__init__(self) #, *args, **kwargs)
 
 if __name__ == '__main__':
     # Debug.hand = True
