@@ -926,7 +926,7 @@ class KSwitchLanguageDialog(KDialog):
 class KLanguageButton(QWidget):
     """A language button for KSwitchLanguageDialog"""
 
-    def __init__(self, txt, parent=None):
+    def __init__(self, txt:str, parent) ->None:
         super().__init__(parent)
         self.button = QPushButton(txt)
         self.popup = QMenu()
@@ -1322,7 +1322,7 @@ class KSeparator(QFrame):
 
     """used for toolbar editor"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent) ->None:
         QFrame.__init__(self, parent)
         self.setLineWidth(1)
         self.setMidLineWidth(0)
