@@ -119,6 +119,7 @@ def parseOptions() ->None:
                     logging.shutdown()
                     sys.exit(2)
                 continue
+            target: Type
             if option.optName in SingleshotOptions.__dict__:
                 target = SingleshotOptions
             else:
