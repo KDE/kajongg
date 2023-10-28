@@ -1619,15 +1619,15 @@
 >Kajongg dipende da questi pacchetti: (i nomi dei pacchetti debian sono tra parentesi) <itemizedlist>
 	<listitem
 ><para
->Python 3.5 o superiore (python3)</para
+>Python 3.8 o superiore (python3)</para
 ></listitem>
 	<listitem
 ><para
->Qt5.7 o superiore (python3-pyqt5 e python3-pyqt5.qtsvg)</para
+>Qt6.5 o superiore (python3-pyqt6 e python3-pyqt6.qtsvg)</para
 ></listitem>
 	<listitem
 ><para
->l'interfacciamento python per Qt5 (python3-pyqt5)</para
+>l'interfacciamento python per Qt6 (python3-pyqt6)</para
 ></listitem>
         <listitem
 ><para
