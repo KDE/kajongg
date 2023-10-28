@@ -25,11 +25,10 @@ class Request(StrMixin):
 
     """holds a Deferred and related attributes, used as part of a DeferredBlock"""
 
-    def __init__(self, block, deferred, user, about):
+    def __init__(self, block, deferred, user):
         self._block = weakref.ref(block)
         self.deferred = deferred
         self._user = weakref.ref(user)
-        self._about = weakref.ref(about) if about else None
         self.answer = None
         self.args = None
         self.startTime = datetime.datetime.now()
@@ -45,11 +44,6 @@ class Request(StrMixin):
     def user(self):
         """hide weakref"""
         return self._user() if self._user else None
-
-    @property
-    def about(self):
-        """hide weakref"""
-        return self._about() if self._about else None
 
     @property
     def player(self):
@@ -188,7 +182,7 @@ class DeferredBlock(StrMixin):
         """add deferred for user to this block"""
         assert self.callbackMethod is None, 'AddRequest: already have callback defined'
         assert not self.completed, 'AddRequest: already completed'
-        request = Request(self, deferred, user, about)
+        request = Request(self, deferred, user)
         self.requests.append(request)
         self.outstanding += 1
         deferred.addCallback(
