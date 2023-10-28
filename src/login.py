@@ -51,7 +51,6 @@ class LoginAborted(Exception):
 class Url(str, StrMixin):
 
     """holds connection related attributes: host, port, socketname"""
-    # pylint: disable=too-many-public-methods
     def __new__(cls, url):
         assert url
         host = None
@@ -128,7 +127,7 @@ class Url(str, StrMixin):
             return deferLater(Internal.reactor, 1, self.startServer, result, waiting + 1)
         if which('qdbus'):
             try:
-                stdoutdata, stderrdata = subprocess.Popen(
+                stdoutdata, stderrdata = subprocess.Popen(  # pylint:disable=consider-using-with
                     ['qdbus',
                      'org.kde.kded',
                      '/modules/networkstatus',
@@ -189,7 +188,7 @@ class Url(str, StrMixin):
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             else:
                 startupinfo = None
-            process = subprocess.Popen(
+            process = subprocess.Popen(  # pylint:disable=consider-using-with
                 args,
                 startupinfo=startupinfo)  # , shell=os.name == 'nt')
             if Debug.connections:
@@ -381,7 +380,6 @@ class LoginDlg(QDialog):
 class AddUserDialog(KDialog):
 
     """add a user account on a server: This dialog asks for the needed attributes"""
-    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, url, username, password):
         KDialog.__init__(self)

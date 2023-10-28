@@ -139,7 +139,6 @@ class ScoringTileAttr(TileAttr):
 class ScoringHandBoard(HandBoard):
 
     """a board showing the tiles a player holds"""
-    # pylint: disable=too-many-public-methods,too-many-instance-attributes
     tileAttrClass = ScoringTileAttr
 
     def __init__(self, player):
@@ -150,7 +149,7 @@ class ScoringHandBoard(HandBoard):
     def meldVariants(self, tile, lowerHalf):
         """Kong might have variants"""
         result = []
-        meld = self.uiMeldWithTile(tile).meld  # pylint: disable=no-member
+        meld = self.uiMeldWithTile(tile).meld
         result.append(meld.concealed if lowerHalf else meld.exposed)
         if len(meld) == 4:
             if lowerHalf:
@@ -183,7 +182,7 @@ class ScoringHandBoard(HandBoard):
         assert isinstance(uiTile, UITile), uiTile
         return self.uiMeldWithTile(uiTile)
 
-    def sync(self, adding=None):  # pylint: disable=unused-argument
+    def sync(self, adding=None):
         """place all tiles in ScoringHandBoard"""
         self.placeTiles(sum(self.uiMelds, []))
 
@@ -312,7 +311,6 @@ class ScoringHandBoard(HandBoard):
 class ScoringPlayer(VisiblePlayer, Player):
 
     """Player in a scoring game"""
-    # pylint: disable=too-many-public-methods
 
     def __init__(self, game, name):
         self.handBoard = None  # because Player.init calls clearHand()
@@ -571,7 +569,6 @@ class ScoringGame(Game):
 
     def _mustExchangeSeats(self, pairs):
         """filter: which player pairs should really swap places?"""
-        # pylint: disable=no-self-use
         # I do not understand the logic of the exec return value. The yes button returns 0
         # and the no button returns 1. According to the C++ doc, the return value is an
         # opaque value that should not be used."""

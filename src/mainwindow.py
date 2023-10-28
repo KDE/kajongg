@@ -7,13 +7,13 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-# pylint: disable=wrong-import-order, wrong-import-position
+# pylint: disable=wrong-import-order
 
 import sys
 import codecs
 from itertools import chain
 
-import cgitb
+import cgitb  # pylint:disable=deprecated-module
 import tempfile
 import webbrowser
 import logging
@@ -33,7 +33,7 @@ class MyHook(cgitb.Hook):
             text=True)[1]
         # cgitb can only handle ascii, work around that.
         # See https://bugs.python.org/issue22746
-        cgitb.Hook.__init__(self, file=codecs.open(self.tmpFileName, 'w',
+        cgitb.Hook.__init__(self, file=codecs.open(self.tmpFileName, 'w',  # pylint:disable=consider-using-with
                                                    encoding='latin-1', errors='xmlcharrefreplace'))
 
     def handle(self, info=None):
@@ -49,7 +49,7 @@ class MyHook(cgitb.Hook):
 NOTFOUND = []
 
 try:
-    from qt import Qt, QEvent, QMetaObject, QTimer, QKeySequence
+    from qt import Qt, QEvent, QMetaObject, QTimer
     from qt import QWidget, QGridLayout, QAction
 except ImportError as importError:
     NOTFOUND.append('Please install PyQt5: %s' % importError)
@@ -90,7 +90,7 @@ if NOTFOUND:
     sys.exit(3)
 
 
-def cleanExit(*unusedArgs): # pylint: disable=unused-argument
+def cleanExit(*unusedArgs):
     """close sqlite3 files before quitting"""
     if isAlive(Internal.mainWindow):
         if Debug.quit:
@@ -229,7 +229,6 @@ class MainWindow(KXmlGuiWindow):
         QGraphicsView.drawBackground always wants a pixmap
         for a huge rect like 4000x3000 where my screen only has
         1920x1200"""
-        # pylint: disable=too-many-statements
         self.setObjectName("MainWindow")
         centralWidget = QWidget()
         self.centralView = FittingView()
@@ -377,7 +376,6 @@ class MainWindow(KXmlGuiWindow):
         and we really end the program.
         """
 
-        # pylint: disable=too-many-branches
         def confirmed(result):
             """quit if the active game has been aborted"""
             self.exitConfirmed = bool(result)

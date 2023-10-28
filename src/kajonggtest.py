@@ -40,10 +40,14 @@ class Clone:
         if commitId != 'current':
             tmpdir = os.path.expanduser(os.path.join(cacheDir(), commitId))
             if not os.path.exists(tmpdir):
-                subprocess.Popen('git clone --shared --no-checkout -q .. {temp}'.format(
-                    temp=tmpdir).split()).wait()
-                subprocess.Popen('git checkout -q {commitId}'.format(
-                    commitId=commitId).split(), cwd=tmpdir).wait()
+                with subprocess.Popen(
+                    'git clone --shared --no-checkout -q .. {temp}'.format(
+                        temp=tmpdir).split()) as _:
+                    _.wait()
+                with subprocess.Popen(
+                    'git checkout -q {commitId}'.format(
+                        commitId=commitId).split(), cwd=tmpdir) as _:
+                    _.wait()
 
     def sourceDirectory(self):
         """the source directory for this git commit"""
@@ -163,7 +167,7 @@ class Server(StrMixin):
         else:
             # reuse this server (otherwise it stops by itself)
             cmd.append('--continue')
-            self.process = subprocess.Popen(cmd, cwd=job.srcDir())
+            self.process = subprocess.Popen(cmd, cwd=job.srcDir())  # pylint:disable=consider-using-with
         print('{} started'.format(self))
 
     def stop(self, job=None):
@@ -232,12 +236,11 @@ class Job(StrMixin):
                 cmd, cwd=self.srcDir(),
                 stdout=self.logFile, stderr=self.logFile)
         else:
-            self.process = subprocess.Popen(cmd, cwd=self.srcDir())
+            self.process = subprocess.Popen(cmd, cwd=self.srcDir())  # pylint:disable=consider-using-with
         print('       %s started' % (self))
 
     def start(self):
         """start this job"""
-        # pylint: disable=too-many-branches
         self.server = Server(self)
         # never login to the same server twice at the
         # same time with the same player name
@@ -292,7 +295,7 @@ class Job(StrMixin):
                 os.makedirs(logDir)
             logFileName = self.commitId
             self.logFileName = os.path.join(logDir, logFileName)
-            self.__logFile = open(self.logFileName, 'wb', buffering=0)
+            self.__logFile = open(self.logFileName, 'wb', buffering=0)  # pylint:disable=consider-using-with
         return self.__logFile
 
     def shortRulesetName(self):
@@ -470,7 +473,7 @@ def getJobs(jobs):
 
 def doJobs():
     """now execute all jobs"""
-    # pylint: disable=too-many-branches, too-many-locals, too-many-statements
+    # pylint: disable=too-many-branches
 
     if not OPTIONS.git and OPTIONS.csv:
         if gitHead() in ('current', None):
@@ -572,8 +575,7 @@ def parse_options() ->argparse.Namespace:
 def improve_options():
     """add sensible defaults"""
     # pylint: disable=too-many-branches,too-many-statements
-    if OPTIONS.servers < 1:
-        OPTIONS.servers = 1
+    OPTIONS.servers = max(OPTIONS.servers, 1)
 
     cmdPath = os.path.join(startingDir(), 'kajongg.py')
     cmd = ['python3', cmdPath, '--rulesets']

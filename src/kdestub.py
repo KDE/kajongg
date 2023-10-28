@@ -31,9 +31,11 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
-from qtpy import QT5, QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
+from qtpy import QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
 if QT6:
-    from qtpy.QtCore import QKeyCombination
+    from qtpy.QtCore import QKeyCombination  # pylint:disable=no-name-in-module
+
+# pylint: disable=wrong-import-position
 
 from mi18n import MLocale, KDETranslator, i18n, i18nc
 
@@ -145,7 +147,7 @@ class Help:
     def start():
         """start the KDE help center for kajongg or go to docs.kde.org"""
         try:
-            subprocess.Popen(['khelpcenter', 'help:/kajongg/index.html'])
+            subprocess.Popen(['khelpcenter', 'help:/kajongg/index.html'])  # pylint:disable=consider-using-with
         except OSError:
             def gotUrl(url):
                 """now we know where the manual is"""
@@ -179,7 +181,6 @@ class KMessageBox:
     def createKMessageBox(
             dialog, icon, text, unusedStrlist, unusedAsk, unusedCheckboxReturn, options):
         """translated as far as needed from kmessagegox.cpp"""
-        # pylint: disable=too-many-locals
         mainLayout = QVBoxLayout()
 
         hLayout = QHBoxLayout()
@@ -227,17 +228,17 @@ class KMessageBox:
         mainLayout.addWidget(dialog.buttonBox)
         dialog.setLayout(mainLayout)
 
-KDialogButtonBox = QDialogButtonBox  # pylint: disable=invalid-name
+KDialogButtonBox = QDialogButtonBox
 
 
 class KDialog(CaptionMixin, QDialog):
 
     """QDialog should be enough for kajongg"""
     NoButton = 0
-    Ok = QDialogButtonBox.Ok  # pylint: disable=invalid-name
+    Ok = QDialogButtonBox.Ok
     Cancel = QDialogButtonBox.Cancel
     Yes = QDialogButtonBox.Yes
-    No = QDialogButtonBox.No  # pylint: disable=invalid-name
+    No = QDialogButtonBox.No
     Help = QDialogButtonBox.Help
     Apply = QDialogButtonBox.Apply
     RestoreDefaults = QDialogButtonBox.RestoreDefaults
@@ -484,8 +485,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
     def hideEvent(self, event):
         """save status"""
         Internal.Preferences.toolBarVisible = self.toolBar(
-        ).isVisible(
-        )  # pylint: disable=attribute-defined-outside-init
+        ).isVisible()
         QMainWindow.hideEvent(self, event)
 
     def toggleStatusBar(self, checked):
@@ -528,11 +528,11 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         """show an about dialog"""
         AboutKajonggDialog(Internal.mainWindow).exec_()
 
-    def queryClose(self):  # pylint: disable=no-self-use
+    def queryClose(self):
         """default"""
         return True
 
-    def queryExit(self):  # pylint: disable=no-self-use
+    def queryExit(self):
         """default"""
         return True
 
@@ -589,7 +589,7 @@ class KConfigGroup:
         try:
             return int(self.readEntry(name, default))
         except Exception as _:
-            raise Exception('cannot parse group {} in {}: {}={}'.format(
+            raise ValueError('cannot parse group {} in {}: {}={}'.format(
                 self.groupName, self.config().path, name,
                 self.readEntry(name, default)
                 )) from _
@@ -632,7 +632,7 @@ class KConfig(ConfigParser):
 
     def writeToFile(self):
         """Write an .ini-format representation of the configuration state."""
-        with open(self.path, 'w') as filePointer:
+        with open(self.path, 'w', encoding='utf-8') as filePointer:
             self.write(filePointer, space_around_delimiters=False)
 
     def group(self, groupName):
@@ -802,7 +802,7 @@ class KConfigSkeleton(QObject):
         elif isinstance(value, str):
             cls = ItemString
         else:
-            raise Exception('addiItem accepts only bool, int, str but not {}/{}'.format(type(value), value))
+            raise TypeError('addiItem accepts only bool, int, str but not {}/{}'.format(type(value), value))
         result = cls(self, key, value, default)
         result.getFromConfig()
         self.items.append(result)
@@ -814,8 +814,8 @@ class KSwitchLanguageDialog(KDialog):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.languageRows = dict()
-        self.languageButtons = list()
+        self.languageRows = {}
+        self.languageButtons = []
         self.setCaption(i18n('Switch Application Language'))
         self.widget = QWidget()
         topLayout = QVBoxLayout()
@@ -899,7 +899,7 @@ class KSwitchLanguageDialog(KDialog):
         for removeButton in self.languageRows:
             if isAlive(removeButton):
                 removeButton.deleteLater()
-        self.languageRows = dict()
+        self.languageRows = {}
         self.addLanguageButton(QLocale().name(), True)
 
     def removeButtonClicked(self):
@@ -1007,12 +1007,11 @@ class AboutKajonggDialog(KDialog):
             from sip import SIP_VERSION_STR
             underVersions.append('sip ' + SIP_VERSION_STR)
         if PYSIDE2:
-            import PySide2  # pylint: disable=import-error
+            import PySide2
             underVersions.append('PySide2 ' + PySide2.__version__)
         if PYSIDE6:
-            import PySide6  # pylint: disable=import-error
+            import PySide6
             underVersions.append('PySide6 ' + PySide6.__version__)
-
 
         h1vLayout.addWidget(QLabel(i18n('Version: %1', VERSION)))
         h1vLayout.addWidget(QLabel(i18n('Protocol version %1', Internal.defaultPort)))
@@ -1126,7 +1125,8 @@ class LicenseDialog(KDialog):
         self.setCaption(i18n("License Agreement"))
         self.setButtons(KDialog.Close)
         self.buttonBox.setFocus()
-        licenseText = open(licenseFile, 'r').read()
+        with open('x' + licenseFile, 'r', encoding='utf-8') as _:
+            licenseText = _.read()
         self.licenseBrowser = QTextBrowser()
         self.licenseBrowser.setLineWrapMode(QTextEdit.NoWrap)
         self.licenseBrowser.setText(licenseText)
@@ -1528,7 +1528,7 @@ class KEditToolBar(KDialog):
             ).items(
             )}
         Internal.Preferences.toolBarActions = ','.join(
-            names[x] for x in activeActions)  # pylint: disable=attribute-defined-outside-init
+            names[x] for x in activeActions)
         Internal.mainWindow.refreshToolBar()
 
 KGlobal.initStatic()

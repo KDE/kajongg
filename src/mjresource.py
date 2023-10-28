@@ -29,7 +29,6 @@ class Resource:
     configGroupName = None
 
     """represents a complete tileset"""
-    # pylint: disable=too-many-instance-attributes
 
     cache = {}
 

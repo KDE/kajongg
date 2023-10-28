@@ -106,7 +106,7 @@ class Wall(StrMixin):
     def _placeLooseTiles(self, deferredResult=None):
         """to be done only for UIWall"""
 
-    def decorate4(self, deferredResult=None): # pylint: disable=unused-argument
+    def decorate4(self, deferredResult=None):
         """virtual: show player info on the wall"""
 
     def hide(self):

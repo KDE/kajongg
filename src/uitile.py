@@ -28,7 +28,6 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
     the unit of yoffset is the height of the tile.
     This is a QObject because we want to animate it."""
 
-    # pylint: disable=too-many-instance-attributes
 
     clsUid = 0
 
@@ -301,7 +300,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
         return self._tile
 
     @tile.setter
-    def tile(self, value):  # pylint: disable=arguments-differ
+    def tile(self, value):
         """set tile name and update display"""
         if value is not self._tile:
             assert not self._tile.isKnown or not value.isKnown or (self._tile.exposed == value.exposed)

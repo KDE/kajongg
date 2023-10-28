@@ -35,8 +35,6 @@ class DBCursor(sqlite3.Cursor):
 
     """logging wrapper"""
 
-    # pylint: disable=no-member
-
     def __init__(self, dbHandle):
         sqlite3.Cursor.__init__(self, dbHandle)
         self.statement = None
@@ -98,8 +96,6 @@ class DBCursor(sqlite3.Cursor):
 class DBHandle(sqlite3.Connection):
 
     """a handle with our preferred configuration"""
-
-    # pylint: disable=no-member
 
     def __init__(self, path: str):
         assert Internal.db is None, id(self)
@@ -225,7 +221,6 @@ class Query:
         If args is a list of lists, execute the prepared query for every sublist.
         Use Internal.db for db access.
         Else if the default dbHandle (Internal.db) is defined, use it."""
-        # pylint: disable=too-many-branches
         silent |= not Debug.sql
         self.msg = None
         self.records = []
@@ -233,7 +228,7 @@ class Query:
         self.args = args
         if Internal.db:
             self.cursor = Internal.db.cursor(
-                DBCursor)  # pylint: disable=no-member
+                DBCursor)
             self.cursor.execute(
                 statement,
                 args,
@@ -248,7 +243,7 @@ class Query:
             # may happen at shutdown
             self.cursor = None
             self.failure = None
-            self.records = list()
+            self.records = []
         if self.records and Debug.sql:
             logDebug('result set:{}'.format(self.records))
 

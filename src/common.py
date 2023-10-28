@@ -17,9 +17,8 @@ import logging.handlers
 import socket
 from signal import signal, SIGABRT, SIGINT, SIGTERM
 
-from qt import QStandardPaths, QObject, QGraphicsItem, QSize
-from qtpy import PYSIDE_VERSION, QT5, QT6, compat
 from qtpy.compat import isalive as qtpy_isalive
+from qt import QStandardPaths, QObject, QSize
 
 # pylint: disable=invalid-name
 
@@ -187,7 +186,7 @@ class Debug:
     isalive = False
 
     def __init__(self):
-        raise Exception('Debug is not meant to be instantiated')
+        raise TypeError('Debug is not meant to be instantiated')
 
     @staticmethod
     def help():
@@ -318,7 +317,7 @@ class Options(metaclass=FixedClass):
     fixed = False
 
     def __init__(self):
-        raise Exception('Options is not meant to be instantiated')
+        raise TypeError('Options is not meant to be instantiated')
 
     @staticmethod
     def str():
@@ -364,7 +363,6 @@ class __Internal:
     @cvar scene: The QGraphicsScene.
     @type scene: L{PlayingScene} or L{ScoringScene}
     """
-    # pylint: disable=too-many-instance-attributes
     Preferences = None
     defaultPort = 8301
     logPrefix = 'C'

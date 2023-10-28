@@ -1,4 +1,3 @@
-# pylint: disable=too-many-lines
 # -*- coding: utf-8 -*-
 
 """
@@ -221,7 +220,7 @@ class MLocale:
         """the currently used languages, primary first"""
         languages = Internal.kajonggrc.group('Locale').readEntry('Language')
         if not languages:
-            return list()
+            return []
         languages = languages.split(':')
         if 'en_US' in languages:
             languages.remove('en_US')
@@ -244,7 +243,7 @@ class MLocale:
             try:
                 localename = os.environ[variable]
                 if localename is None:
-                    raise Exception('{} is None'.format(variable))
+                    raise ValueError('{} is None'.format(variable))
             except KeyError:
                 continue
             else:
@@ -262,7 +261,7 @@ class MLocale:
         if cls.__cached_availableLanguages:
             return cls.__cached_availableLanguages
         localenames = cls.get_localenames()
-        languages = list()
+        languages = []
         for _ in localenames:
             if _ is None:
                 continue

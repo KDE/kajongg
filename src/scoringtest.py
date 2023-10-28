@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import unittest
 
-from common import Debug  # pylint: disable=unused-import
+from common import Debug
 from wind import Wind, East, South, West, North
 from player import Players
 from game import PlayingGame
@@ -158,7 +158,7 @@ class Helpers:
                     result.append('%s %s%s: total %s for %s should be %s' % (
                         id(
                             hand.player.game.ruleset), hand.player.game.ruleset.name, roofOff,
-                        score.total(), score.__str__(), total))
+                        score.total(), str(score), total))
                 result.append('hand:%s' % hand)
             result.extend(hand.explain())
             result.append(
@@ -167,7 +167,7 @@ class Helpers:
             result.append('')
         return '\n'.join(result)
 
-# pylint: disable=missing-docstring, too-many-public-methods
+# pylint: disable=useless-suppression,missing-docstring
 
 
 class Base(unittest.TestCase, Helpers):

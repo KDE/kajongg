@@ -73,7 +73,6 @@ class VisiblePlayer(Player):
 class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
     """this player instance has a visual representation"""
-    # pylint: disable=too-many-public-methods
 
     def __init__(self, game, name):
         assert game
@@ -212,7 +211,6 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 class VisiblePlayingGame(PlayingGame):
 
     """for the client"""
-    # pylint: disable=too-many-arguments, too-many-public-methods
     playerClass = VisiblePlayingPlayer
     wallClass = UIWall
 

@@ -28,7 +28,6 @@ class Background(Resource):
     def __init__(self, name):
         """continue __build"""
         super().__init__(name)
-        self.__svg = None
         self.__pmap = None
         self.graphicsPath = None
         QPixmapCache.setCacheLimit(20480)  # the chinese landscape needs much

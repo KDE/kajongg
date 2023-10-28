@@ -38,7 +38,7 @@ class TablesModel(QAbstractTableModel):
         self.tables = tables
         assert isinstance(tables, list)
 
-    def headerData(  # pylint: disable=no-self-use
+    def headerData(
             self, section,
             orientation, role=Qt.DisplayRole):
         """show header"""
@@ -68,7 +68,7 @@ class TablesModel(QAbstractTableModel):
             return 0
         return len(self.tables)
 
-    def columnCount(self, unusedParent=None):  # pylint: disable=no-self-use
+    def columnCount(self, unusedParent=None):
         """for now we only have id (invisible), id (visible), players,
         status, ruleset.name.
         id(invisible) always holds the real id, also 1000 for suspended tables.
@@ -231,7 +231,7 @@ class TableList(QWidget):
         StateSaver(self, self.view.horizontalHeader())
         self.updateButtonsForTable(None)
 
-    def hideEvent(self, unusedEvent):  # pylint: disable=no-self-use
+    def hideEvent(self, unusedEvent):
         """table window hides"""
         scene = Internal.scene
         if scene:

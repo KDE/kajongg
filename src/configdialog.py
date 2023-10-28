@@ -83,12 +83,11 @@ class PlayConfigTab(QWidget):
         """translate to current language"""
 
 
-class ConfigDialog(KConfigDialog):  # pylint: disable=too-many-public-methods
+class ConfigDialog(KConfigDialog):
 
     """configuration dialog with several pages"""
 
     def __init__(self, parent, name):
-        # pylint: disable=super-init-not-called
         KConfigDialog.__init__(
             self, parent, name, Internal.Preferences)
         StateSaver(self)

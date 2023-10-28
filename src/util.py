@@ -160,7 +160,6 @@ class Duration:
 
 def checkMemory():
     """as the name says"""
-    # pylint: disable=too-many-branches
     if not Debug.gc:
         return
     gc.set_threshold(0)
@@ -199,7 +198,7 @@ def gitHead():
     and None if no .git found"""
     if not os.path.exists(os.path.join('..', '.git')):
         return None
-    subprocess.Popen(['git', 'update-index', '-q', '--refresh'])
+    subprocess.Popen(['git', 'update-index', '-q', '--refresh'])  # pylint:disable=consider-using-with
     uncommitted = list(popenReadlines('git diff-index --name-only HEAD --'))
     return 'current' if uncommitted else next(popenReadlines('git log -1 --format=%h'))
 
@@ -210,5 +209,5 @@ def popenReadlines(args):
         args = args.split()
     my_env = os.environ.copy()
     my_env["LANG"] = "C"
-    result = subprocess.Popen(args, universal_newlines=True, stdout=subprocess.PIPE, env=my_env).communicate()[0]
+    result = subprocess.Popen(args, universal_newlines=True, stdout=subprocess.PIPE, env=my_env).communicate()[0]  # pylint:disable=consider-using-with
     return (x.strip() for x in result.split('\n') if x.strip())

@@ -67,7 +67,6 @@ class Table(StrMixin):
 class ClientTable(Table):
 
     """the table as seen by the client"""
-    # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
 
     def __init__(self, client, tableid, ruleset, gameid, suspendedAt, running,
@@ -165,7 +164,7 @@ class Client(pb.Referenceable):
                 return table
         return None
 
-    def logout(self, unusedResult=None):  # pylint: disable=no-self-use
+    def logout(self, unusedResult=None):
         """virtual"""
         return succeed(None)
 
@@ -239,7 +238,7 @@ class Client(pb.Referenceable):
         if self.isHumanClient():
             aiClass = self.__findAI([intelligence, altint], Options.AI)
             if not aiClass:
-                raise Exception('intelligence %s is undefined' % Options.AI)
+                raise ValueError('intelligence %s is undefined' % Options.AI)
             self.game.myself.intelligence = aiClass(self.game.myself)
 
     def readyForGameStart(
@@ -346,7 +345,7 @@ class Client(pb.Referenceable):
         """the Message classes are not pb.copyable, convert them into their names"""
         return Message.OK.name if value is None else Message.jelly(value, value)
 
-    def remote_move(self, playerName, command, *unusedArgs, **kwargs): # pylint: disable=unused-argument
+    def remote_move(self, playerName, command, *unusedArgs, **kwargs):
         """the server sends us info or a question and always wants us to answer"""
         if Internal.scene and not isAlive(Internal.scene):
             return fail()

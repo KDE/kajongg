@@ -7,6 +7,6 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-# pylint: disable=unused-import, wrong-import-order, wrong-import-position
+# pylint: disable=wrong-import-order
 
-from kdestub import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from kdestub import *  # pylint: disable=wildcard-import,unused-wildcard-import

@@ -97,7 +97,7 @@ class ListComboBox(QComboBox):
         """current item"""
         newIdx = self.findItem(item)
         if newIdx < 0:
-            raise Exception('%s not found in ListComboBox' % item.name)
+            raise IndexError('%s not found in ListComboBox' % item.name)
         self.setCurrentIndex(newIdx)
 
 
@@ -171,5 +171,5 @@ def sceneRotation(item):
     rotations = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
         0, 1, -1, 0): 90, (-1, 0, 0, -1): 180, (0, -1, 1, 0): 270}
     if matrix not in rotations:
-        raise Exception('matrix unknown:%s' % str(matrix))
+        raise ValueError('matrix unknown:%s' % str(matrix))
     return rotations[matrix]

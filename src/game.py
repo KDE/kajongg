@@ -173,7 +173,7 @@ class HandId(StrMixin):
                 (other.roundsFinished, other.rotated, other.notRotated))
 
     def __ne__(self, other):
-        return not self == other # pylint: disable=unneeded-not
+        return not self == other
 
     def __lt__(self, other):
         return (self.roundsFinished, self.rotated, self.notRotated) < (
@@ -196,7 +196,6 @@ class Game:
         reset to None when a player gets a tile from the living end of the
         wall or after he claimed a discard.
         """
-        # pylint: disable=too-many-statements
         assert self.__class__ != Game, 'Do not directly instantiate Game'
         for wind, name in names:
             assert isinstance(wind, Wind), 'Game.__init__ expects Wind objects'
@@ -227,7 +226,7 @@ class Game:
         self.visibleTiles = IntDict()
         self.discardedTiles = IntDict(self.visibleTiles)
         # tile names are always lowercase
-        self.dangerousTiles = list()
+        self.dangerousTiles = []
         self.csvTags = []
         self.randomGenerator = CountingRandom(self)
         self._setHandSeed()
@@ -282,16 +281,15 @@ class Game:
 
     def clearHand(self):
         """empty all data"""
-        if self.moves:
-            for move in self.moves:
-                del move
-        self.moves = []
+        while self.moves:
+            _ = self.moves.pop()
+            del _
         for player in self.players:
             player.clearHand()
         self.__winner = None
         self.__activePlayer = None
         self.prevActivePlayer = None
-        self.dangerousTiles = list()
+        self.dangerousTiles = []
         self.discardedTiles.clear()
         assert self.visibleTiles.count() == 0
 
@@ -310,7 +308,7 @@ class Game:
         if value is not None:
             assert isinstance(value, Tile), value
             if value.isExposed:
-                raise Exception('lastDiscard is exposed:%s' % value)
+                raise ValueError('lastDiscard is exposed:%s' % value)
 
     @property
     def winner(self):
@@ -427,7 +425,6 @@ class Game:
 
     def _mustExchangeSeats(self, pairs):
         """filter: which player pairs should really swap places?"""
-        # pylint: disable=no-self-use
         return pairs
 
     def sortPlayers(self):
@@ -504,7 +501,7 @@ class Game:
 
     def initHand(self):
         """directly before starting"""
-        self.dangerousTiles = list()
+        self.dangerousTiles = []
         self.discardedTiles.clear()
         assert self.visibleTiles.count() == 0
         if Internal.scene:
@@ -781,10 +778,8 @@ class Game:
 
 
 class PlayingGame(Game):
-
     """this game is played using the computer"""
-    # pylint: disable=too-many-arguments,too-many-public-methods
-    # pylint: disable=too-many-instance-attributes
+
     playerClass = PlayingPlayer
 
     def __init__(self, names, ruleset, gameid=None, wantedGame=None,
@@ -930,7 +925,7 @@ class PlayingGame(Game):
         else:
             result = tileName
         if tileName not in player.concealedTiles:
-            raise Exception('I am %s. Player %s is told to show discard '
+            raise ValueError('I am %s. Player %s is told to show discard '
                             'of tile %s but does not have it, he has %s' %
                             (self.myself.name if self.myself else 'None',
                              player.name, result, player.concealedTiles))
@@ -938,11 +933,9 @@ class PlayingGame(Game):
 
     def hasDiscarded(self, player, tileName):
         """discards a tile from a player board"""
-        # pylint: disable=too-many-branches
-        # too many branches
         assert isinstance(tileName, Tile)
         if player != self.activePlayer:
-            raise Exception('Player %s discards but %s is active' % (
+            raise ValueError('Player %s discards but %s is active' % (
                 player, self.activePlayer))
         self.discardedTiles[tileName.exposed] += 1
         player.discarded.append(tileName)
@@ -1038,7 +1031,7 @@ class PlayingGame(Game):
     def computeDangerous(self, playerChanged=None):
         """recompute gamewide dangerous tiles. Either for playerChanged or
         for all players"""
-        self.dangerousTiles = list()
+        self.dangerousTiles = []
         if playerChanged:
             playerChanged.findDangerousTiles()
         else:

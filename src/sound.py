@@ -145,7 +145,7 @@ class Sound:
                     args = [oggBinary, '-q', what]
                     if Debug.sound:
                         game.debug(' '.join(args))
-                    process = subprocess.Popen(args)
+                    process = subprocess.Popen(args)  # pylint: disable=consider-using-with
                     process.startTime = datetime.datetime.now()
                     process.name = what
                     Sound.playProcesses.append(process)
@@ -337,8 +337,8 @@ class Voice(StrMixin):
             return
         md5sum = md5()
         for oggFile in ogg:
-            md5sum.update(
-                open(os.path.join(self.directory, oggFile), 'rb').read())
+            with open(os.path.join(self.directory, oggFile), 'rb') as _:
+                md5sum.update(_.read())
         # the md5 stamp goes into the old archive directory 'username'
         self.__md5sum = md5sum.hexdigest()
         existingMd5sum = self.savedmd5Sum()
@@ -352,7 +352,8 @@ class Voice(StrMixin):
                         'md5sum %s changed, rewriting %s with %s' %
                         (existingMd5sum, md5Name, self.__md5sum))
             try:
-                open(md5Name, 'w').write('%s\n' % self.__md5sum)
+                with open(md5Name, 'w', encoding='ascii') as _:
+                    _.write('%s\n' % self.__md5sum)
             except OSError as exception:
                 logException(
                     '\n'.join([i18n('cannot write <filename>%1</filename>: %2',
@@ -371,14 +372,13 @@ class Voice(StrMixin):
         """write the archive file and set self.__md5sum"""
         self.__computeMd5sum()
         if not os.path.exists(self.archiveName()):
-            tarFile = tarfile.open(self.archiveName(), mode='w:bz2')
-            for oggFile in self.oggFiles():
-                tarFile.add(
-                    os.path.join(
-                        self.directory,
-                        oggFile),
-                    arcname=oggFile)
-            tarFile.close()
+            with tarfile.open(self.archiveName(), mode='w:bz2') as tarFile:
+                for oggFile in self.oggFiles():
+                    tarFile.add(
+                        os.path.join(
+                            self.directory,
+                            oggFile),
+                        arcname=oggFile)
 
     def archiveName(self):
         """ the full path of the archive file"""
@@ -392,7 +392,8 @@ class Voice(StrMixin):
         """return the current value of the md5sum file"""
         if os.path.exists(self.md5FileName()):
             try:
-                line = open(self.md5FileName(), 'r').readlines()[0].replace(' -', '').strip()
+                with open(self.md5FileName(), 'r', encoding='ascii') as _:
+                    line = _.readlines()[0].replace(' -', '').strip()
                 if len(line) == self.md5sumLength:
                     return line
                 logWarning('{} has wrong content: {}'.format(self.md5FileName(), line))
@@ -413,11 +414,10 @@ class Voice(StrMixin):
         if not os.path.exists(self.directory):
             os.makedirs(self.directory)
         filelike = BytesIO(content)
-        tarFile = tarfile.open(mode='r|bz2', fileobj=filelike)
-        tarFile.extractall(path=self.directory)
-        if Debug.sound:
-            logDebug('extracted archive into %s' % self.directory)
-        tarFile.close()
+        with tarfile.open(mode='r|bz2', fileobj=filelike) as tarFile:
+            tarFile.extractall(path=self.directory)
+            if Debug.sound:
+                logDebug('extracted archive into %s' % self.directory)
         filelike.close()
 
     @property

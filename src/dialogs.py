@@ -7,8 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-# pylint: disable=invalid-name,W0611
-# invalid names, unused imports
+# pylint: disable=invalid-name
 
 import inspect
 
@@ -61,7 +60,7 @@ class MustChooseKDialog(KDialogIgnoringEscape):
             parent = None
         KDialogIgnoringEscape.__init__(self, parent)
 
-    def closeEvent(self, event): # pylint: disable=no-self-use
+    def closeEvent(self, event):
         """self.chosen is currently not used, never allow this"""
         event.ignore()
 
@@ -118,6 +117,7 @@ class DeferredDialog(Deferred):
                 self.dlg.accepted.connect(self.clicked)
                 self.dlg.rejected.connect(self.cancel)
         if Internal.reactor:
+            # sometimes pylint 2.7.2 warns, sometimes not
             Internal.reactor.callLater(0, self.__execute)
         else:
             # we do not yet have a reactor in initDb()

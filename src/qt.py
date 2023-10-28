@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-# pylint: disable=unused-import, no-name-in-module
+# pylint: disable=unused-import
 
 from qtpy import uic
 from qtpy.QtCore import QAbstractAnimation

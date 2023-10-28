@@ -364,7 +364,6 @@ class ClientDialog(QDialog):
 class HumanClient(Client):
 
     """a human client"""
-    # pylint: disable=too-many-public-methods
     humanClients = []
 
     def __init__(self):
@@ -662,11 +661,11 @@ class HumanClient(Client):
         self.game.myself.handBoard.setEnabled(iAmActive)
         scene = Internal.scene
         oldDialog = scene.clientDialog
-        if oldDialog and not oldDialog.answered:
-            raise Exception('old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
+        assert oldDialog is None or oldDialog.answered, \
+            'old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
                 str(oldDialog.move),
                 str([x.message.name for x in oldDialog.buttons]),
-                str(move), str(answers)))
+                str(move), str(answers))
         if not oldDialog or not oldDialog.isVisible():
             # always build a new dialog because if we change its layout before
             # reshowing it, sometimes the old buttons are still visible in which

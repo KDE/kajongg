@@ -22,9 +22,6 @@ ignore=CVS
 # Pickle collected data for later comparisons.
 persistent=yes
 
-# Set the cache size for astng objects.
-cache-size=500
-
 # List of plugins (as comma separated values of python modules names) to load,
 # usually to register additional checkers.
 load-plugins=
@@ -32,6 +29,8 @@ load-plugins=
 jobs=6
 
 [MESSAGES CONTROL]
+
+enable=useless-suppression
 
 # Enable only checker(s) with the given id(s). This option conflicts with the
 # disable-checker option
@@ -57,7 +56,7 @@ jobs=6
 # W0122 exec statement
 # E0211 method has no argument
 # disable=R0903,R0902,W0122
-disable=R0903,E0211,I0011,I0013,too-many-ancestors,no-member,import-outside-toplevel
+disable=R0903,E0211,I0011,I0013,too-many-ancestors,no-member,import-outside-toplevel,fixme,consider-using-f-string
 
 
 [REPORTS]
@@ -68,11 +67,6 @@ output-format=text
 
 # Include message's id in output
 # include-ids=yes deprecated
-
-# Put messages in a separate file for each module / package specified on the
-# command line instead of printing them on stdout. Reports (if any) will be
-# written in a file name "pylint_global.[txt|html]".
-files-output=no
 
 # Tells wether to display a full report or only the messages
 reports=no
@@ -102,11 +96,6 @@ ignore-mixin-members=yes
 # List of classes names for which member attributes should not be checked
 # (useful for classes with attributes dynamicaly set).
 ignored-classes=SQLObject,Message,Ruleset,Move,twisted.internet.reactor
-
-# List of members which are usually get through zope's acquisition mecanism and
-# so shouldn't trigger E0201 when accessed (need zope=yes to be considered).
-acquired-members=REQUEST,acl_users,aq_parent
-
 
 # checks for :
 # * doc strings
@@ -157,10 +146,6 @@ good-names=i,j,k,ex,Run,_
 
 # Bad variable names which should always be refused, separated by a comma
 bad-names=foo,bar,baz,toto,tutu,tata
-
-# List of builtins function names that should not be used, separated by a comma
-bad-functions=map,filter,apply,input
-
 
 # checks for
 # * unused variables / imports
@@ -223,7 +208,7 @@ max-locals=15
 max-returns=6
 
 # Maximum number of branch for function / method body
-max-branchs=12
+max-branches=12
 
 # Maximum number of statements in function / method body
 max-statements=50

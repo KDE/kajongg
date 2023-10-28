@@ -158,13 +158,13 @@ class ParallelAnimationGroup(QParallelAnimationGroup, StrMixin):
         self.steps = 0
         self.debug = any(x.debug for x in self.animations)
         self.debug |= 'G{}g'.format(id4(self)) in Debug.animation
-        self.doAfter = list()
+        self.doAfter = []
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
                 logDebug('Chaining Animation group G%s to G%s' %
                          (id4(self), ParallelAnimationGroup.current))
             self.doAfter = ParallelAnimationGroup.current.doAfter
-            ParallelAnimationGroup.current.doAfter = list()
+            ParallelAnimationGroup.current.doAfter = []
             ParallelAnimationGroup.current.deferred.addCallback(self.start).addErrback(logException)
         else:
             self.start()
@@ -287,7 +287,7 @@ class AnimatedMixin:
 
     def __init__(self):
         super().__init__()
-        self.activeAnimation = dict()  # key is the property name
+        self.activeAnimation = {}  # key is the property name
         self.queuedAnimations = []
 
     def _get_pos(self):

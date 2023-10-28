@@ -82,4 +82,4 @@ class CountingRandom(Random):
     def shuffle(self, x):
         """add debug output to shuffle. Shuffles list x in place."""
         with CountRandomCalls(self, 'shuffle({})'.format(x)):
-            Random.shuffle(self, x)
+            Random.shuffle(self, x)  # pylint:disable=deprecated-argument

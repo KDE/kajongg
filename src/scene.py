@@ -128,7 +128,6 @@ class SceneWithFocusRect(QGraphicsScene):
 class GameScene(SceneWithFocusRect):
 
     """the game field"""
-    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, parent=None):
         Internal.scene = self
@@ -183,7 +182,6 @@ class GameScene(SceneWithFocusRect):
 
     def setupUi(self):
         """prepare scene"""
-        # pylint: disable=too-many-statements
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
 
     def showWall(self):
@@ -290,7 +288,7 @@ class PlayingScene(GameScene):
         super().__init__(parent)
 
     @GameScene.game.setter
-    def game(self, value):  # pylint: disable=arguments-differ
+    def game(self, value):
         game = self._game
         changing = value != game
         GameScene.game.fset(self, value)
@@ -332,7 +330,6 @@ class PlayingScene(GameScene):
         QGraphicsView.drawBackground always wants a pixmap
         for a huge rect like 4000x3000 where my screen only has
         1920x1200"""
-        # pylint: disable=too-many-statements
         GameScene.setupUi(self)
         self.setObjectName("PlayingField")
 
@@ -448,7 +445,6 @@ class PlayingScene(GameScene):
 class ScoringScene(GameScene):
 
     """a scoring game"""
-    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, parent=None):
         self.scoringDialog = None
@@ -456,7 +452,7 @@ class ScoringScene(GameScene):
         self.selectorBoard.hasLogicalFocus = True
 
     @GameScene.game.setter
-    def game(self, value):  # pylint: disable=arguments-differ
+    def game(self, value):
         game = self._game
         changing = value != game
         GameScene.game.fset(self, value)

@@ -30,7 +30,7 @@ except ImportError:
 import os
 import sys
 import re
-import msilib
+import msilib  # pylint:disable=deprecated-module
 from shutil import rmtree
 
 from cx_Freeze import setup, Executable

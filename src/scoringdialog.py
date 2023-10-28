@@ -7,8 +7,6 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-# pylint: disable=ungrouped-imports
-
 from qt import Qt, QPointF, QSize, QModelIndex, QEvent, QTimer
 
 from qt import QColor, QPushButton, QPixmapCache
@@ -182,7 +180,7 @@ class ScoreModel(TreeModel):
         xValues = [x * stepX for x in range(self.steps + 1)]
         return [QPointF(x, y) for x, y in zip(xValues, yValues)]
 
-    def data(self, index, role=None):  # pylint: disable=no-self-use,too-many-branches
+    def data(self, index, role=None):  # pylint: disable=too-many-branches
         """score table"""
         # pylint: disable=too-many-return-statements
         if not index.isValid():
@@ -216,8 +214,6 @@ class ScoreModel(TreeModel):
                     return QBrush(ScoreItemDelegate.colors[index.row()])
         if column > 0 and isinstance(item, ScorePlayerItem):
             content = item.content(column)
-            # pylint: disable=maybe-no-member
-            # pylint thinks content is a str
             if role == Qt.BackgroundRole:
                 if content and content.won:
                     return QColor(165, 255, 165)
@@ -276,8 +272,8 @@ class ScoreModel(TreeModel):
             playerItem = ScorePlayerItem(item)
             for col in range(len(playerItem.hands())):
                 points = list(playerItem.chartPoints(col + 1, self.steps))
-                self.minY = min(self.minY, min(points))
-                self.maxY = max(self.maxY, max(points))
+                self.minY = min(self.minY, min(points))  # pylint:disable=nested-min-max
+                self.maxY = max(self.maxY, max(points))  # pylint:disable=nested-min-max
         self.minY -= 2  # antialiasing might cross the cell border
         self.maxY += 2
 
@@ -544,7 +540,7 @@ class ScoreTable(QWidget):
         if height:
             self.leftLayout.addSpacing(height)
 
-    def closeEvent(self, unusedEvent):  # pylint: disable=no-self-use
+    def closeEvent(self, unusedEvent):
         """update action button state"""
         Internal.mainWindow.actionScoreTable.setChecked(False)
 
@@ -599,7 +595,7 @@ class ExplainView(QListView):
             # QStringListModel does not optimize identical lists away, so we do
             self.model.setStringList(lines)
 
-    def closeEvent(self, unusedEvent):  # pylint: disable=no-self-use
+    def closeEvent(self, unusedEvent):
         """update action button state"""
         Internal.mainWindow.actionExplain.setChecked(False)
 
@@ -1035,7 +1031,6 @@ class ScoringDialog(QWidget):
 
     def computeScores(self):
         """if tiles have been selected, compute their value"""
-        # pylint: disable=too-many-branches
         # too many branches
         if not self.game:
             return
@@ -1093,9 +1088,7 @@ class ScoringDialog(QWidget):
     def __fillLastTileComboWith(self, lastTiles, winnerTiles):
         """fill last meld combo with prepared content"""
         self.comboTilePairs = lastTiles
-        idx = self.cbLastTile.currentIndex()
-        if idx < 0:
-            idx = 0
+        idx = max(self.cbLastTile.currentIndex(), 0)
         indexedTile = self.cbLastTile.itemData(idx)
         restoredIdx = None
         self.cbLastTile.clear()
@@ -1189,9 +1182,7 @@ class ScoringDialog(QWidget):
         current index. Even if the meld changed state meanwhile."""
         with BlockSignals(self.cbLastMeld):  # we only want to emit the changed signal once
             showCombo = False
-            idx = self.cbLastMeld.currentIndex()
-            if idx < 0:
-                idx = 0
+            idx = max(self.cbLastMeld.currentIndex(), 0)
             indexedMeld = str(self.cbLastMeld.itemData(idx))
             self.cbLastMeld.clear()
             self.__meldPixMaps = []

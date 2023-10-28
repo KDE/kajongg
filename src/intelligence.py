@@ -20,7 +20,6 @@ class AIDefaultAI:
 
     groupPrefs = dict(zip(Tile.colors + Tile.honors, (0, 0, 0, 4, 7)))
 
-    # pylint: disable=no-self-use
     # we could solve this by moving those filters into DiscardCandidates
     # but that would make it more complicated to define alternative AIs
 
@@ -56,7 +55,6 @@ class AIDefaultAI:
         return candidates
 
     def selectDiscard(self, hand):
-        # pylint: disable=too-many-branches, R0915
         # disable warning about too many branches
         """return exactly one tile for discard.
         Much of this is just trial and success - trying to get as much AI
@@ -223,7 +221,6 @@ class AIDefaultAI:
     def selectAnswer(self, answers):
         """this is where the robot AI should go.
         Returns answer and one parameter"""
-        # pylint: disable=too-many-branches
         # disable warning about too many branches
         answer = parameter = None
         tryAnswers = (

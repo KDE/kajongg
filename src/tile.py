@@ -34,7 +34,7 @@ class Tile(str, StrMixin):
         Wind for winds and boni
         bgr for dragons
     """
-    # pylint: disable=too-many-public-methods,too-many-instance-attributes
+    # pylint: disable=too-many-instance-attributes
     cache = {}
     hashTable = 'XyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
                 'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \
@@ -78,7 +78,7 @@ class Tile(str, StrMixin):
         if len(args) == 1:
             arg0, arg1 = args[0]
         else:
-            arg0, arg1 = args  # pylint: disable=unbalanced-tuple-unpacking
+            arg0, arg1 = args
         if isinstance(arg1, int):
             arg1 = chr(arg1 + 48)
         what = arg0 + arg1
@@ -127,7 +127,7 @@ class Tile(str, StrMixin):
         result.exposed = result.concealed = result.swapped = None
         result.single = result.pair = result.pung = None
         result.chow = result.kong = None
-        result._fixed = True  # pylint: disable=protected-access
+        result._fixed = True
 
         str.__setattr__(
             result,
@@ -328,7 +328,7 @@ class Elements:
         return self.occurrence.all(self.__filter(ruleset))
 
 Tile.unknown = Tile('Xy')  # must come first
-elements = Elements()  # pylint: disable=invalid-name
+elements = Elements()
 assert not Tile.unknown.isKnown
 for wind in Wind.all4:
     wind.tile = Tile('w', wind.char.lower())

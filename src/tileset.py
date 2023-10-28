@@ -23,7 +23,6 @@ from wind import East, South, West, North
 class Tileset(Resource):
 
     """represents a complete tileset"""
-    # pylint: disable=too-many-instance-attributes
 
     resourceName = 'tileset'
     configGroupName = 'KMahjonggTileset'

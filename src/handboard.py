@@ -71,7 +71,7 @@ class TileAttr(StrMixin):
 class HandBoard(Board):
 
     """a board showing the tiles a player holds"""
-    # pylint: disable=too-many-public-methods,too-many-instance-attributes
+
     tileAttrClass = TileAttr
     penColor = 'blue'
 
@@ -155,14 +155,14 @@ class HandBoard(Board):
         without boni"""
         return [x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus]
 
-    def newLowerMelds(self):  # pylint: disable=no-self-use
+    def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
         return []
 
     def newTilePositions(self):
         """return list(TileAttr) for all tiles except bonus tiles.
         The tiles are not associated to any board."""
-        result = list()
+        result = []
         newUpperMelds = list(self.player.exposedMelds)
         newLowerMelds = self.newLowerMelds()
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
@@ -188,9 +188,9 @@ class HandBoard(Board):
         placeBoni = bonusTiles[:]
         while 13 - len(placeBoni) < rightmostTileX + 1 + self.exposedMeldDistance:
             if keepTogether:
-                return list()
+                return []
             placeBoni = placeBoni[:-1]
-        result = list()
+        result = []
         xPos = 13 - len(placeBoni)
         newBonusTiles = [self.tileAttrClass(x) for x in placeBoni]
         for bonus in sorted(newBonusTiles, key=lambda x: x.tile.key):
@@ -206,7 +206,7 @@ class HandBoard(Board):
         right adjusted. If necessary, extend to the right even
         outside of our board"""
         if not bonusTiles:
-            return list()
+            return []
         bonusTiles = sorted(bonusTiles, key=lambda x: hash(x.tile))
         result = (
             self.placeBoniInRow(bonusTiles, newTilePositions, 0.0)
@@ -224,18 +224,18 @@ class HandBoard(Board):
     def placeTiles(self, tiles):
         """tiles are all tiles for this board.
         returns a list of those uiTiles which are placed on the board"""
-        oldTiles = dict()
-        oldBonusTiles = dict()
+        oldTiles = {}
+        oldBonusTiles = {}
         for uiTile in tiles:
             assert isinstance(uiTile, UITile)
             if uiTile.isBonus:
                 targetDict = oldBonusTiles
             else:
                 targetDict = oldTiles
-            if uiTile.tile not in targetDict.keys():
-                targetDict[uiTile.tile] = list()
+            if uiTile.tile not in targetDict:
+                targetDict[uiTile.tile] = []
             targetDict[uiTile.tile].append(uiTile)
-        result = dict()
+        result = {}
         newPositions = self.newTilePositions()
         for newPosition in newPositions:
             assert isinstance(newPosition.tile, Tile)
@@ -288,10 +288,10 @@ class HandBoard(Board):
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
-        logExposed = list()
-        physExposed = list()
-        logConcealed = list()
-        physConcealed = list()
+        logExposed = []
+        physExposed = []
+        logConcealed = []
+        physConcealed = []
         for tile in self.player.bonusTiles:
             logExposed.append(tile)
         for uiTile in self.uiTiles:
@@ -322,7 +322,6 @@ class HandBoard(Board):
 class PlayingHandBoard(HandBoard):
 
     """a board showing the tiles a player holds"""
-    # pylint: disable=too-many-public-methods,too-many-instance-attributes
 
     def __init__(self, player):
         HandBoard.__init__(self, player)
@@ -345,7 +344,7 @@ class PlayingHandBoard(HandBoard):
         self.hasLogicalFocus = bool(adding)
 
     @Board.focusTile.setter
-    def focusTile(self, uiTile):  # pylint: disable=arguments-differ
+    def focusTile(self, uiTile):
         Board.focusTile.fset(self, uiTile)
         if self.player and Internal.scene.clientDialog:
             Internal.scene.clientDialog.focusTileChanged()
@@ -360,7 +359,7 @@ class PlayingHandBoard(HandBoard):
                 and self.player == self.player.game.myself)
             QGraphicsRectItem.setEnabled(self, enabled)
 
-    def dragMoveEvent(self, event):  # pylint: disable=no-self-use
+    def dragMoveEvent(self, event):
         """only dragging to discard board should be possible"""
         event.setAccepted(False)
 

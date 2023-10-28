@@ -22,7 +22,7 @@ import argparse
 from zope.interface import implementer
 
 
-def cleanExit(*unusedArgs): # pylint: disable=unused-argument
+def cleanExit(*unusedArgs):
     """we want to cleanly close sqlite3 files"""
     if Debug.quit:
         logDebug('cleanExit')
@@ -81,7 +81,7 @@ class DBPasswordChecker:
     credentialInterfaces = (credentials.IUsernamePassword,
                             credentials.IUsernameHashedPassword)
 
-    def requestAvatarId(self, cred):  # pylint: disable=no-self-use
+    def requestAvatarId(self, cred):
         """get user id from database"""
         cred.username = cred.username.decode('utf-8')
         args = cred.username.split(SERVERMARK)
@@ -121,7 +121,7 @@ class MJServer:
 
     def __init__(self):
         self.tables = {}
-        self.srvUsers = list()
+        self.srvUsers = []
         Players.load()
         self.lastPing = datetime.datetime.now()
         self.checkPings()
@@ -454,7 +454,6 @@ def parseArgs():
 
 def kajonggServer():
     """start the server"""
-    # pylint: disable=too-many-branches
     options = parseArgs()
     if not initDb():
         sys.exit(1)

@@ -78,7 +78,7 @@ class Message:
         if isinstance(value, dict):
             return {Message.jelly('key', x): Message.jelly('value', y) for x, y in value.items()}
         if not isinstance(value, (int, bytes, str, float, type(None))):
-            raise Exception(
+            raise TypeError(
                 'callRemote got illegal arg: %s %s(%s)' %
                 (key, type(value), str(value)))
         return value
@@ -190,7 +190,7 @@ class PungChowMessage(NotifyAtOnceMessage):
     def __init__(self, name=None, shortcut=None):
         NotifyAtOnceMessage.__init__(self, name=name, shortcut=shortcut)
 
-    def toolTip(self, button, tile): # pylint: disable=unused-argument
+    def toolTip(self, button, tile):
         """for the action button which will send this message"""
         myself = button.client.game.myself
         maySay = myself.sayable[self]
@@ -327,7 +327,7 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
         """the server mirrors that and tells all others"""
         table.claimMahJongg(msg)
 
-    def toolTip(self, button, tile): # pylint: disable=unused-argument
+    def toolTip(self, button, tile):
         """return text and warning flag for button and text for tile"""
         return i18n('Press here and you win'), False, ''
 
@@ -556,7 +556,7 @@ class MessageAskForClaims(ServerMessage):
     def clientAction(self, client, move):
         """ask the player"""
         if client.thatWasMe(move.player):
-            raise Exception(
+            raise ValueError(
                 'Server asked me(%s) for claims but I just discarded that tile!' %
                 move.player)
         return client.ask(move, [Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg])
@@ -659,7 +659,7 @@ class MessageServerGetsVoiceData(ClientMessage):
 
     """The server gets voice sounds from a client"""
 
-    def serverAction(self, table, msg): # pylint: disable=unused-argument
+    def serverAction(self, table, msg):
         """save voice sounds on the server"""
         voice = msg.player.voice
         voice.archiveContent = msg.args[0]
@@ -796,7 +796,7 @@ class MessageOK(ClientMessage):
                                name=i18ncE('kajongg', 'OK'),
                                shortcut=i18ncE('kajongg game dialog:Key for OK', 'O'))
 
-    def toolTip(self, button, tile): # pylint: disable=unused-argument
+    def toolTip(self, button, tile):
         """return text and warning flag for button and text for tile for button and text for tile"""
         return i18n('Confirm that you saw the message'), False, ''
 
@@ -810,7 +810,7 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
                                      name=i18ncE('kajongg', 'No Claim'),
                                      shortcut=i18ncE('kajongg game dialog:Key for No claim', 'N'))
 
-    def toolTip(self, button, tile): # pylint: disable=unused-argument
+    def toolTip(self, button, tile):
         """return text and warning flag for button and text for tile for button and text for tile"""
         return i18n('You cannot or do not want to claim this tile'), False, ''
 
@@ -871,7 +871,6 @@ class ChatMessage(StrMixin):
 
     def __str__(self):
         local = self.localtimestamp()
-        # pylint: disable=no-member
         # pylint says something about NotImplemented, check with later versions
         _ = i18n(self.message)
         if self.isStatusMessage:

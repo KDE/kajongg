@@ -134,24 +134,24 @@ languages = (
 for lang in languages:
     print('getting language', lang)
     os.makedirs(DEST + '/locale/{}/LC_MESSAGES'.format(lang))
-    DEVNULL = open(os.devnull, 'wb')
-    for filename in (
-            'kdegames/kajongg',
-            'kdegames/libkmahjongg5',
-            'kdegames/desktop_kdegames_libkmahjongg'):
-        try:
-            mo_data = check_output(
-                'svn cat svn://anonsvn.kde.org/home/kde/'
-                'trunk/l10n-kf5/{}/messages/{}.po'.format(
-                    lang, filename).split(), stderr=DEVNULL)
-            print('found:', lang, filename)
-            with open('x.po', 'wb') as outfile:
-                outfile.write(mo_data)
-            call(
-                'msgfmt x.po -o {}/locale/{}/LC_MESSAGES/{}.mo'.format(
-                    DEST,
-                    lang,
-                    filename.split('/')[1]).split())
-            os.remove('x.po')
-        except CalledProcessError:
-            print('not found:', lang, filename)
+    with open(os.devnull, 'wb') as DEVNULL:
+        for filename in (
+                'kdegames/kajongg',
+                'kdegames/libkmahjongg5',
+                'kdegames/desktop_kdegames_libkmahjongg'):
+            try:
+                mo_data = check_output(
+                    'svn cat svn://anonsvn.kde.org/home/kde/'
+                    'trunk/l10n-kf5/{}/messages/{}.po'.format(
+                        lang, filename).split(), stderr=DEVNULL)
+                print('found:', lang, filename)
+                with open('x.po', 'wb') as outfile:
+                    outfile.write(mo_data)
+                call(
+                    'msgfmt x.po -o {}/locale/{}/LC_MESSAGES/{}.mo'.format(
+                        DEST,
+                        lang,
+                        filename.split('/')[1]).split())
+                os.remove('x.po')
+            except CalledProcessError:
+                print('not found:', lang, filename)

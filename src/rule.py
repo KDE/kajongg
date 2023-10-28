@@ -47,8 +47,11 @@ class Score(StrMixin):
 
     def change(self, unitName, value):
         """set value for unitName. If changed, return True"""
-        oldValue = self.__getattribute__(unitName)
-        newValue = type(oldValue)(value)
+        oldValue = getattr(self, unitName)
+        try:
+            newValue = type(oldValue)(value)
+        except ValueError:
+            return False, '{} is not of type {}'.format(value, type(oldValue))
         if newValue == oldValue:
             return False, None
         if newValue:
@@ -58,7 +61,7 @@ class Score(StrMixin):
             if unitName == 'doubles':
                 if self.points:
                     return False, 'Cannot have points and doubles'
-        self.__setattr__(unitName, newValue)
+        setattr(self, unitName, newValue)
         return True, None
 
     def __str__(self):
@@ -151,8 +154,8 @@ class RuleList(list):
 
     def pop(self, key):
         """find rule, return it, delete it from this list"""
-        result = self.__getitem__(key)
-        self.__delitem__(key)
+        result = self[key]
+        del self[key]
         return result
 
     def __contains__(self, key):
@@ -194,7 +197,7 @@ class RuleList(list):
 
     def append(self, rule):
         """do not append"""
-        raise Exception('do not append %s' % rule)
+        raise TypeError('do not append %s' % rule)
 
     def add(self, rule):
         """use add instead of append"""
@@ -281,7 +284,7 @@ class Ruleset:
 
     __hash__ = None
 
-    cache = dict()
+    cache = {}
     hits = 0
     misses = 0
 
@@ -410,7 +413,7 @@ into a situation where you have to pay a penalty"""))
             (self.rulesetId, self.__hash, self.name,
              self.description) = query.records[0]
         else:
-            raise Exception('ruleset %s not found' % self.name)
+            raise ValueError('ruleset %s not found' % self.name)
 
     def __setParametersFrom(self, fromRuleset):
         """set attributes for parameters defined in fromRuleset.
@@ -734,11 +737,11 @@ class RuleBase(StrMixin):
         """name is readonly"""
         return self.__name
 
-    def validate(self):  # pylint: disable=no-self-use
+    def validate(self):
         """is the rule valid?"""
         return True
 
-    def hashStr(self):  # pylint: disable=no-self-use
+    def hashStr(self):
         """
         all that is needed to hash this rule
 
@@ -762,7 +765,7 @@ class Rule(RuleBase):
     The rule applies if at least one of the variants matches the hand.
     For parameter rules, only use name, definition,parameter. definition must start with int or str
     which is there for loading&saving, but internally is stripped off."""
-    # pylint: disable=too-many-arguments,too-many-instance-attributes
+    # pylint: disable=too-many-arguments
 
     ruleCode = {}
     limitHand = None
@@ -859,7 +862,6 @@ class Rule(RuleBase):
 
     def __parseDefinition(self):
         """private setter for definition"""
-        # pylint: disable=too-many-branches
         if not self.definition:
             return  # may happen with special programmed rules
         variants = self.definition.split('||')
@@ -872,7 +874,6 @@ class Rule(RuleBase):
                 code = self.ruleCode[variant[1:]]
                 # when executing code for this rule, we do not want
                 # to call those things indirectly
-                # pylint: disable=attribute-defined-outside-init
                 self.redirectTo(code, self.__class__, memoize=True)
                 if hasattr(code, 'selectable'):
                     self.hasSelectable = True

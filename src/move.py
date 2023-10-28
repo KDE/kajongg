@@ -57,7 +57,7 @@ class Move(StrMixin):
     @staticmethod
     def __convertWinds(tuples):
         """convert wind strings to Wind objects"""
-        result = list()
+        result = []
         for wind, name in tuples:
             result.append(tuple([Wind(wind), name]))
         return result

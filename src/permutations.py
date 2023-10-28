@@ -65,7 +65,7 @@ class Permutations:
         if valuesTuple in cls.permuteCache:
             return cls.permuteCache[valuesTuple]
         values = list(valuesTuple)
-        result = list()
+        result = []
         possibleMelds = []
         valueSet = set(values)
         for value in sorted(valueSet):

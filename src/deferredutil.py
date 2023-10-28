@@ -373,10 +373,10 @@ class DeferredBlock(StrMixin):
         def encodeKwargs():
             """those values are classes like Meld, Tile etc.
                Convert to bytes"""
-            for keyword in kwargs:
+            for keyword, value in kwargs.items():
                 if any(keyword.lower().endswith(x) for x in ('tile', 'tiles', 'meld', 'melds')):
-                    if kwargs[keyword] is not None:
-                        kwargs[keyword] = str(kwargs[keyword])
+                    if value is not None:
+                        kwargs[keyword] = str(value)
         encodeKwargs()
         if about.__class__.__name__ == 'User':
             about = self.playerForUser(about)

@@ -116,7 +116,7 @@ class Player(StrMixin):
     @todo: Now that Player() always calls createIfUnknown, test defining new
     players and adding new players to server
     """
-    # pylint: disable=too-many-instance-attributes,too-many-public-methods
+    # pylint: disable=too-many-instance-attributes
 
     def __init__(self, game, name):
         """
@@ -200,7 +200,7 @@ class Player(StrMixin):
         self.__mayWin = True
         self.__payment = 0
         self.__originalCall = False
-        self.dangerousTiles = list()
+        self.dangerousTiles = []
         self.claimedNoChoice = False
         self.playedDangerous = False
         self.usedDangerousFrom = None
@@ -364,7 +364,7 @@ class Player(StrMixin):
             try:
                 self._concealedTiles.remove(tile)
             except ValueError as _:
-                raise Exception('removeTile(%s): tile not in concealed %s' %
+                raise ValueError('removeTile(%s): tile not in concealed %s' %
                                 (tile, ''.join(self._concealedTiles))) from _
         if tile is self.lastTile:
             self.lastTile = None
@@ -415,7 +415,7 @@ class Player(StrMixin):
     def __computeHand(self):
         """return Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
-        melds = list()
+        melds = []
         melds.extend(str(x) for x in self._exposedMelds)
         melds.extend(str(x) for x in self._concealedMelds)
         if self._concealedTiles:
@@ -450,7 +450,7 @@ class Player(StrMixin):
         parts.extend(str(x) for x in self._bonusTiles)
         return ' '.join(parts)
 
-    def sortRulesByX(self, rules):  # pylint: disable=no-self-use
+    def sortRulesByX(self, rules):
         """if this game has a GUI, sort rules by GUI order"""
         return rules
 
@@ -490,7 +490,6 @@ class Player(StrMixin):
 class PlayingPlayer(Player):
 
     """a player in a computer game as opposed to a ScoringPlayer"""
-    # pylint: disable=too-many-public-methods
     # too many public methods
 
     def __init__(self, game, name):
@@ -720,7 +719,8 @@ class PlayingPlayer(Player):
                 self.visibleTiles[tile] -= 1
                 break
         else:
-            raise Exception('robTileFrom: no meld found with %s' % tile)
+            # TODO: should we somehow show an error and continue?
+            raise ValueError('robTileFrom: no meld found with %s' % tile)
         self.game.lastDiscard = tile.concealed
         self.lastTile = None  # our lastTile has just been robbed
         self._hand = None
@@ -811,7 +811,7 @@ class PlayingPlayer(Player):
     def findDangerousTiles(self):
         """update the list of dangerous tile"""
         pName = self.localName
-        dangerous = list()
+        dangerous = []
         expMeldCount = len(self._exposedMelds)
         if expMeldCount >= 3:
             if all(x in elements.greenHandTiles for x in self.visibleTiles):

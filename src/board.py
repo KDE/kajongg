@@ -91,7 +91,7 @@ class PlayerWind(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
             painter.scale(0.60, 0.60)
             renderer.render(painter, self.wind.markerSvgName, self.boundingRect())
 
-    def boundingRect(self):  # pylint: disable=no-self-use
+    def boundingRect(self):
         """define the part of the tile we want to see"""
         size = int(Internal.scene.windTileset.faceSize.height() * 1.1)
         return QRectF(QPointF(), QPointF(size, size))
@@ -191,7 +191,7 @@ class Board(QGraphicsRectItem, StrMixin):
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @property
-    def name(self):  # pylint: disable=no-self-use
+    def name(self):
         """default board name, used for debugging messages"""
         return 'board'
 
@@ -327,17 +327,17 @@ class Board(QGraphicsRectItem, StrMixin):
             tiles.append(tiles[0])
             self.focusTile = tiles[tiles.index(self.focusTile) + 1]
 
-    def mapMouseTile(self, uiTile):  # pylint: disable=no-self-use
+    def mapMouseTile(self, uiTile):
         """map the pressed tile to the wanted tile. For melds, this would
         be the first tile no matter which one is pressed"""
         return uiTile
 
-    def uiMeldWithTile(self, uiTile):  # pylint: disable=no-self-use
+    def uiMeldWithTile(self, uiTile):
         """return the UI Meld with uiTile. A Board does not know about melds,
         so default is to return a Meld with only uiTile"""
         return UIMeld(uiTile)
 
-    def meldVariants(self, tile, lowerHalf):  # pylint: disable=no-self-use,unused-argument
+    def meldVariants(self, tile, lowerHalf):  # pylint: disable=unused-argument
         """all possible melds that could be meant by dragging/dropping uiTile"""
         return [Meld(tile)]
 
@@ -523,7 +523,7 @@ class Board(QGraphicsRectItem, StrMixin):
             if self.hasLogicalFocus:
                 self.scene().focusBoard = self
 
-    def focusRectWidth(self):  # pylint: disable=no-self-use
+    def focusRectWidth(self):
         """how many tiles are in focus rect?"""
         return 1
 
@@ -615,7 +615,6 @@ class CourtBoard(Board):
 class SelectorBoard(CourtBoard):
 
     """a board containing all possible tiles for selection"""
-    # pylint: disable=too-many-public-methods
 
     def __init__(self):
         CourtBoard.__init__(self, 9, 5)
@@ -643,7 +642,7 @@ class SelectorBoard(CourtBoard):
             self.focusTile = self.tilesByElement(Tile('c1'))[0]
 
     @property
-    def name(self):  # pylint: disable=no-self-use
+    def name(self):
         """for debugging messages"""
         return 'selector'
 
@@ -708,7 +707,6 @@ class SelectorBoard(CourtBoard):
 
     def meldVariants(self, tile, lowerHalf):
         """return a list of possible variants based on meld. Those are logical melds."""
-        # pylint: disable=too-many-locals
         assert isinstance(tile, UITile)
         wantedTile = tile.tile
         for selectorTile in self.uiTiles:
@@ -771,7 +769,7 @@ class FittingView(QGraphicsView):
         self.dragObject = None
         self.setFocus()
 
-    def wheelEvent(self, event):  # pylint: disable=no-self-use
+    def wheelEvent(self, event):
         """we do not want scrolling for the scene view.
         Instead scrolling down changes perspective like in kmahjongg"""
         angleX = event.angleDelta().x()
@@ -913,7 +911,6 @@ class YellowText(QGraphicsRectItem):
 class DiscardBoard(CourtBoard):
 
     """A special board for discarded tiles"""
-    # pylint: disable=too-many-public-methods
     penColor = 'orange'
 
     def __init__(self):
@@ -922,7 +919,7 @@ class DiscardBoard(CourtBoard):
         self.lastDiscarded = None
 
     @property
-    def name(self):  # pylint: disable=no-self-use
+    def name(self):
         """to be used in debug output"""
         return "discardBoard"
 

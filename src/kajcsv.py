@@ -20,7 +20,7 @@ from player import Player, Players
 class CsvWriter:
     """how we want it"""
     def __init__(self, filename, mode='w'):
-        self.outfile = open(filename, mode)
+        self.outfile = open(filename, mode, encoding='utf-8')  # pylint: disable=consider-using-with
         self.__writer = csv.writer(self.outfile, delimiter=Csv.delimiter)
 
     def writerow(self, row):
@@ -48,7 +48,7 @@ class CsvRow(StrMixin):
 
     fields = IntEnum('Field', 'RULESET AI COMMIT PY_VERSION GAME TAGS PLAYERS', start=0)
 
-    commitDates = dict()
+    commitDates = {}
 
     def __init__(self, row):
         self.row = row

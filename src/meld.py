@@ -394,7 +394,7 @@ class MeldList(list):
             list.append(self, newContent)
         elif isinstance(newContent, str):
             list.extend(self, [Meld(x)
-                               for x in newContent.split()])  # pylint: disable=maybe-no-member
+                               for x in newContent.split()])
         else:
             list.extend(self, [Meld(x) for x in newContent])
         self.sort()

@@ -26,7 +26,7 @@ class ChatModel(QAbstractTableModel):
         super().__init__(parent)
         self.chatLines = []
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole):  # pylint: disable=no-self-use
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
         """show header"""
         if role == Qt.TextAlignmentRole:
             if orientation == Qt.Horizontal:
@@ -50,7 +50,7 @@ class ChatModel(QAbstractTableModel):
             return 0
         return len(self.chatLines)
 
-    def columnCount(self, unusedParent=None):  # pylint: disable=no-self-use
+    def columnCount(self, unusedParent=None):
         """for now we only have time, who, message"""
         return 3
 
@@ -74,7 +74,7 @@ class ChatModel(QAbstractTableModel):
             elif role == Qt.DisplayRole and index.column() == 2:
                 result = i18n(chatLine.message)
             elif role == Qt.ForegroundRole and index.column() == 2:
-                palette = Internal.app.palette()  # pylint: disable=no-member
+                palette = Internal.app.palette()
                 color = 'blue' if chatLine.isStatusMessage else palette.windowText(
                 )
                 result = QColor(color)
@@ -99,7 +99,7 @@ class ChatView(MJTableView):
     def __init__(self):
         MJTableView.__init__(self)
 
-    def sizeHint(self):  # pylint: disable=no-self-use
+    def sizeHint(self):
         """sizeHint"""
         return QSize(400, 100)
 

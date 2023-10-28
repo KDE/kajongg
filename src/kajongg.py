@@ -17,8 +17,8 @@ import sys
 import os
 import logging
 
-from qt import QObject, QCommandLineParser, QCommandLineOption, Qt, QGuiApplication
 from qtpy import QT5
+from qt import QObject, QCommandLineParser, QCommandLineOption, Qt, QGuiApplication
 from kde import KApplication
 from mi18n import i18n, MLocale
 

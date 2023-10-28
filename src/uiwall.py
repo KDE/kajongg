@@ -26,7 +26,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
 
     """The text written on the wall"""
 
-    sideTexts = list()
+    sideTexts = []
 
     def __init__(self, parent=None):
         assert parent is None
@@ -83,7 +83,7 @@ class SideText(AnimatedMixin, QGraphicsObject, StrMixin, DrawOnTopMixin):
         """from the scene"""
         for side in SideText.sideTexts:
             Internal.scene.removeItem(side)
-        SideText.sideTexts = list()
+        SideText.sideTexts = []
 
     def moveDict(self):
         """return a dict with new property values for our sidetext
@@ -431,7 +431,7 @@ class UIWall(Wall):
             # move last two tiles onto the dead end:
             return self._placeLooseTiles()
 
-    def decorate4(self, deferredResult=None): # pylint: disable=unused-argument
+    def decorate4(self, deferredResult=None):
         """show player info on the wall. The caller must ensure
         all are moved simultaneously and at which speed by using
         AnimationSpeed.

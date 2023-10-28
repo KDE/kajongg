@@ -28,10 +28,10 @@ class TreeItem:
         self.children.insert(row, child)
         return child
 
-    def remove(self):  # pylint: disable=no-self-use
+    def remove(self):
         """remove this item from the model and the database.
         This is an abstract method."""
-        raise Exception(
+        raise TypeError(
             'cannot remove this TreeItem. We should never get here.')
 
     def child(self, row):
@@ -64,7 +64,7 @@ class RootItem(TreeItem):
         """content held by this item"""
         return self.rawContent[column]
 
-    def columnCount(self):  # pylint: disable=no-self-use
+    def columnCount(self):
         """Always return 1. is 1 always correct? No, inherit from RootItem"""
         return 1
 

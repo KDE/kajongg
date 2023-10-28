@@ -141,12 +141,12 @@ class Hand(StrMixin):
                     try:
                         self.__lastSource = TileSource.byChar[part[1]]
                     except KeyError as _:
-                        raise Exception('{} has unknown lastTile {}'.format(inString, part[1])) from _
+                        raise KeyError('{} has unknown lastTile {}'.format(inString, part[1])) from _
                     if len(part) > 2:
                         self.__announcements = set(part[2])
             elif partId == 'L':
                 if len(part[1:]) > 8:
-                    raise Exception(
+                    raise ValueError(
                         'last tile cannot complete a kang:' + inString)
                 if len(part) > 3:
                     self.__lastMeld = Meld(part[3:])
@@ -441,7 +441,6 @@ class Hand(StrMixin):
         Case of subtractTile (hidden or exposed) is ignored.
         subtractTile must either be undeclared or part of
         lastMeld. Exposed melds of length<3 will be hidden."""
-        # pylint: disable=too-many-branches
         # If lastMeld is given, it must be first in the list.
         # Next try undeclared melds, then declared melds
         assert self.lenOffset == 1
@@ -508,7 +507,7 @@ class Hand(StrMixin):
             cand = rule.winningTileCandidates(self)
             if Debug.hand and cand:
                 # Py2 and Py3 show sets differently
-                candis = ''.join(str(x) for x in sorted(cand)) # pylint: disable=unused-variable
+                candis = ''.join(str(x) for x in sorted(cand))
                 self.debug('callingHands found {} for {}'.format(candis, rule))
             candidates.extend(x.concealed for x in cand)
         for tile in sorted(set(candidates)):

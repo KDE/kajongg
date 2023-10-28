@@ -33,7 +33,7 @@ class GamesModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self)
         self._resultRows = []
 
-    def columnCount(self, unusedParent=None):   # pylint: disable=no-self-use
+    def columnCount(self, unusedParent=None):
         """including the hidden col 0"""
         return 3
 
@@ -86,7 +86,6 @@ class GamesModel(QAbstractTableModel):
 
     def headerData(self, section, orientation, role):
         """for the two visible columns"""
-        # pylint: disable=no-self-use
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return i18n('Players') if section == 2 else i18n('Started')
         return None

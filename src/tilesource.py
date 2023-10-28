@@ -12,7 +12,7 @@ class TileSource:
     some constants
     """
 
-    byChar = dict()
+    byChar = {}
 
     def __str__(self):
         return self.char

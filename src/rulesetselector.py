@@ -19,7 +19,7 @@ from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, BoolRule
 from util import uniqueList
 from mi18n import i18n, i18nc, i18ncE, english
 from differ import RulesetDiffer
-from common import Debug, Internal
+from common import Debug
 from tree import TreeItem, RootItem, TreeModel
 from dialogs import Sorry
 from modeltest import ModelTest
@@ -45,7 +45,7 @@ class RuleTreeItem(TreeItem):
     def columnCount(self):
         """can be different for every rule"""
         if hasattr(self, 'colCount'):
-            return self.colCount  # pylint: disable=no-member
+            return self.colCount
         return len(self.rawContent)
 
     def ruleset(self):
@@ -140,7 +140,7 @@ class RuleModel(TreeModel):
         super().__init__(parent)
         self.rulesets = rulesets
         self.loaded = False
-        unitNames = list()
+        unitNames = []
         for ruleset in rulesets:
             ruleset.load()
             for rule in ruleset.allRules:
@@ -162,7 +162,7 @@ class RuleModel(TreeModel):
             self.appendRuleset(ruleset)
         self.loaded = True
 
-    def data(self, index, role):  # pylint: disable=no-self-use
+    def data(self, index, role):
         """get data fom model"""
         # pylint: disable=too-many-branches
         # too many branches
@@ -315,7 +315,7 @@ class EditableRuleModel(RuleModel):
             self.dataChanged.emit(index, index)
         return True
 
-    def flags(self, index):  # pylint: disable=no-self-use
+    def flags(self, index):
         """tell the view what it can do with this item"""
         if not index.isValid():
             return Qt.ItemIsEnabled
@@ -542,10 +542,13 @@ class RulesetSelector(QWidget):
 
     def hideEvent(self, event):
         """close all differ dialogs"""
+        marked = []
         for differ in self.rulesetView.differs:
             differ.hide()
-            del differ
+            marked += differ
         QWidget.hideEvent(self, event)
+        for _ in marked:
+            del _
 
     def retranslateUi(self):
         """translate to current language"""

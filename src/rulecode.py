@@ -17,6 +17,14 @@ from query import Query
 from permutations import Permutations
 
 
+# pylint:disable=missing-function-docstring,missing-class-docstring
+# the class and method names are mostly self explaining, we do not
+# need docstringss
+
+# pylint: disable=no-self-argument, no-member
+# pylint: disable=too-many-function-args, unused-argument, arguments-differ
+
+
 class RuleCode:
 
     """Parent for all RuleCode classes. A RuleCode class can be used to
@@ -41,13 +49,6 @@ class RuleCode:
 
     cache = ()
 
-
-# pylint: disable=missing-docstring
-# the class and method names are mostly self explaining, we do not
-# need docstringss
-
-# pylint: disable=no-self-argument, no-self-use, no-value-for-parameter, no-member
-# pylint: disable=too-many-function-args, unused-argument, arguments-differ
 
 class MJRule(RuleCode):
 

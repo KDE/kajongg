@@ -16,7 +16,7 @@ from sys import _getframe
 
 # util must not import twisted or we need to change kajongg.py
 
-from common import Internal, Debug # pylint: disable=redefined-builtin
+from common import Internal, Debug
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead, callers
 from mi18n import i18n
@@ -182,7 +182,6 @@ def __exceptionToString(exception):
 
 def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     """writes info message to log and to stdout"""
-    # pylint: disable=R0912
     if isinstance(msg, Exception):
         msg = __exceptionToString(msg)
     msg = str(msg)
@@ -230,7 +229,7 @@ def logWarning(msg, withGamePrefix=True):
 def logException(exception: str, withGamePrefix=True):
     """logs error message and re-raises exception"""
     logError(exception, withGamePrefix=withGamePrefix)
-    raise Exception(exception)
+    raise Exception(exception)  # pylint:disable=broad-exception-raised
 
 
 class EventData(str):

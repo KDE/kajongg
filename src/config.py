@@ -95,7 +95,7 @@ class SetupPreferences(KConfigSkeleton):
     """Holds all Kajongg options. Only instantiate this once"""
     _Parameters = {}
 
-    def __init__(self):  # pylint: disable=super-init-not-called
+    def __init__(self):
         if Internal.Preferences:
             logException('Preferences is not None')
         self.__watching = defaultdict(list)

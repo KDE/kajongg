@@ -42,7 +42,6 @@ if os.name != 'nt':
 class ServerGame(PlayingGame):
 
     """the central game instance on the server"""
-    # pylint: disable=too-many-arguments, too-many-public-methods
 
     def __init__(self, names, ruleset, gameid=None, wantedGame=None,
                  client=None, playOpen=False, autoPlay=False):

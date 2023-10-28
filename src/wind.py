@@ -15,8 +15,8 @@ class Wind:
     char is the wind as a char (native string)
     svgName is the name of the wind in the SVG files.
     """
-    all = list()
-    all4 = list()
+    all = []
+    all4 = []
 
     tile = None
     marker = None
@@ -34,8 +34,9 @@ class Wind:
 
         for result in Wind.all:
             if isinstance(result, cls):
+                # return the correct Wind subclass like _East
                 return result
-        raise Exception('Wind.__new__ failed badly')
+        assert False
 
     def __eq__(self, other):
         if not other:
