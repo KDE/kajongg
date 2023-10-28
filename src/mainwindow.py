@@ -95,6 +95,7 @@ def cleanExit(*unusedArgs):
     if isAlive(Internal.mainWindow):
         if Debug.quit:
             logDebug('cleanExit calling mainWindow.close')
+        assert Internal.mainWindow  # for mypy
         Internal.mainWindow.close()
     else:
         # this must be very early or very late
@@ -132,6 +133,7 @@ class MainWindow(KXmlGuiWindow):
                 self.actionCollection())
             self.setupUi()
             self.setupGUI()
+            assert Internal.Preferences
             Internal.Preferences.addWatch(
                 'tilesetName',
                 self.tilesetNameChanged)
@@ -232,7 +234,7 @@ class MainWindow(KXmlGuiWindow):
         layout.addWidget(self.centralView)
         self.setCentralWidget(centralWidget)
         self.centralView.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.background = None  # just for pylint
+        assert Internal.Preferences
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
         self.adjustMainView()
         self.actionScoreGame = Action(
@@ -324,10 +326,16 @@ class MainWindow(KXmlGuiWindow):
 
     def fullScreen(self, toggle):
         """toggle between full screen and normal view"""
+        _ = self.windowState()
         if toggle:
-            self.setWindowState(self.windowState() | Qt.WindowState.WindowFullScreen)
+            new_state = _ | Qt.WindowState.WindowFullScreen
         else:
-            self.setWindowState(self.windowState() & ~Qt.WindowState.WindowFullScreen)
+            new_state = _ & ~Qt.WindowState.WindowFullScreen
+        self.setWindowState(new_state)
+
+    def closeMe(self) ->None:
+        """for QTimer"""
+        self.close()
 
     def close(self, unusedResult=None):
         """wrap close() because we call it with a QTimer"""
@@ -424,6 +432,7 @@ class MainWindow(KXmlGuiWindow):
                         self.confDialog,
                         self.rulesetWindow, self.playerWindow]):
                 if isAlive(widget):
+                    assert widget
                     widget.hide()
             if self.exitWaitTime is None:
                 self.exitWaitTime = 0
@@ -437,7 +446,7 @@ class MainWindow(KXmlGuiWindow):
                     quitDebug('now stopping reactor')
                     Internal.reactor.stop()
                     assert isAlive(self)
-                    QTimer.singleShot(10, self.close)
+                    QTimer.singleShot(10, self.closeMe)
                 except ReactorNotRunning:
                     self.exitReady = True
                     quitDebug(
@@ -455,10 +464,11 @@ class MainWindow(KXmlGuiWindow):
         if mainWindow:
             if Debug.quit:
                 logDebug('aboutToQuit starting')
-            if mainWindow.exitWaitTime is not None and mainWindow.exitWaitTime > 1000.0 or Debug.quit:
-                logDebug(
-                    'reactor stopped after %d ms' %
-                    (mainWindow.exitWaitTime))
+            if mainWindow.exitWaitTime is not None:
+                if mainWindow.exitWaitTime > 1000.0 or Debug.quit:
+                    logDebug(
+                        'reactor stopped after %d ms' %
+                        (mainWindow.exitWaitTime))
         else:
             if Debug.quit:
                 logDebug('aboutToQuit: mainWindow is already None')
@@ -483,6 +493,7 @@ class MainWindow(KXmlGuiWindow):
         """abort current game"""
         if Debug.quit:
             logDebug('mainWindow.abortAction invoked')
+        assert self.scene
         return self.scene.abort()
 
     def retranslateUi(self):
@@ -618,6 +629,7 @@ class MainWindow(KXmlGuiWindow):
         """user has toggled widget visibility with an action"""
         assert self.scene
         action = self.sender()
+        assert isinstance(action, Action), action
         actionData = action.data()
         if checked:
             if isinstance(actionData, type):
@@ -637,6 +649,7 @@ class MainWindow(KXmlGuiWindow):
     def _toggleDemoMode(self, checked):
         """switch on / off for autoPlay"""
         if self.scene:
+            assert isinstance(self.scene, PlayingScene)
             self.scene.toggleDemoMode(checked)
         else:
             Internal.autoPlay = checked
@@ -653,6 +666,7 @@ class MainWindow(KXmlGuiWindow):
         self.actionAbortGame.setEnabled(bool(self.scene))
         scene = self.scene
         if isAlive(scene):
+            assert scene
             scene.updateSceneGUI()
 
     @afterQueuedAnimations
