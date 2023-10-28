@@ -59,7 +59,7 @@ class Wall(ReprMixin):
         self._game = weakref.ref(game)  # avoid cycles for garbage collection
         self.tiles = [self.tileClass(Piece.unknownStr)
                       for _ in range(game.fullWallSize)]
-        self.living = None
+        self.living = []
         self.kongBox = self.kongBoxClass()
         assert len(self.tiles) % 8 == 0
 
