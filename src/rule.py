@@ -934,16 +934,11 @@ class ParameterRule(RuleBase):
         defParts = definition.split('||')
         self.parName = defParts[0][len(self.prefix):]
         self.score = Score()
-        self.parameter = self.convertParameter(parameter)
+        self.parameter = parameter
 
     def key(self):
         """the key is used for finding a rule in a RuleList"""
         return self.parName
-
-    @staticmethod
-    def convertParameter(parameter):
-        """convert string to wanted type"""
-        return parameter
 
     def hashStr(self):
         """
@@ -967,16 +962,11 @@ class IntRule(ParameterRule):
     prefix = 'int'
 
     def __init__(self, name, definition, description, parameter):
-        ParameterRule.__init__(self, name, definition, description, parameter)
+        ParameterRule.__init__(self, name, definition, description, int(parameter))
         self.minimum = 0
         for defPart in definition.split('||'):
             if defPart.startswith('Omin='):
                 self.minimum = int(defPart[5:])
-
-    @staticmethod
-    def convertParameter(parameter):
-        """convert string to wanted type"""
-        return int(parameter)
 
     def validate(self):
         """is the rule valid?"""
@@ -993,12 +983,8 @@ class BoolRule(ParameterRule):
     prefix = 'bool'
 
     def __init__(self, name, definition, description, parameter):
-        ParameterRule.__init__(self, name, definition, description, parameter)
-
-    @staticmethod
-    def convertParameter(parameter):
-        """convert string to wanted type"""
-        return parameter not in ('false', 'False', False, 0, '0', None, '')
+        _ = parameter not in ('false', 'False', False, 0, '0', None, '')
+        ParameterRule.__init__(self, name, definition, description, _)
 
 
 class StrRule(ParameterRule):
