@@ -317,13 +317,13 @@ class Ruleset:
         cache[result.hash] = result
         return result
 
-    def __init__(self, name):
-        """name may be:
+    def __init__(self, raw_data):
+        """raw_data may be:
             - an integer: ruleset.id from the sql table
             - a list: the full ruleset specification (probably sent from the server)
             - a string: The hash value of a ruleset"""
         Rule.importRulecode()
-        self.name = name
+        self.raw_data = raw_data
         self.rulesetId = 0
         self.__hash = ''
         self.allRules = []
@@ -406,24 +406,24 @@ into a situation where you have to pay a penalty"""))
 
     def _initRuleset(self):
         """load ruleset headers but not the rules"""
-        if isinstance(self.name, int):
+        if isinstance(self.raw_data, int):
             query = Query(
-                "select id,hash,name,description from ruleset where id=?", (self.name,))
-        elif isinstance(self.name, list):
+                "select id,hash,name,description from ruleset where id=?", (self.raw_data,))
+        elif isinstance(self.raw_data, list):
             # we got the rules over the wire
-            self.rawRules = self.name[1:]
-            (self.rulesetId, self.__hash, self.name,
-             self.description) = self.name[0]
+            self.rawRules = self.raw_data[1:]
+            (self.rulesetId, self.__hash, self.raw_data,
+             self.description) = self.raw_data[0]
             self.load()
                       # load raw rules at once, rules from db only when needed
             return
         else:
-            query = Query("select id,hash,name,description from ruleset where hash=?", (self.name,))
+            query = Query("select id,hash,name,description from ruleset where hash=?", (self.raw_data,))
         if query.records:
             (self.rulesetId, self.__hash, self.name,
              self.description) = query.records[0]
         else:
-            raise ValueError('ruleset %s not found' % self.name)
+            raise ValueError('ruleset %s not found' % self.raw_data)
 
     def __setParametersFrom(self, fromRuleset):
         """set attributes for parameters defined in fromRuleset.
@@ -577,7 +577,7 @@ into a situation where you have to pay a penalty"""))
             query = Query(
                 "update ruleset set name=? where id<0 and name=?", (newName, self.name))
             if not query.failure:
-                self.name = newName
+                self.name = newName  # pylint:disable=attribute-defined-outside-init
             return not query.failure
 
     def remove(self):
@@ -645,7 +645,7 @@ into a situation where you have to pay a penalty"""))
                 self.rulesetId = int(qData[0][0])
                 return
         with Internal.db:
-            self.rulesetId, self.name = self._newKey(minus)
+            self.rulesetId, self.name = self._newKey(minus)  # pylint:disable=attribute-defined-outside-init
             Query(
                 'INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
                 (self.rulesetId, english(self.name),

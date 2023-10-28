@@ -28,6 +28,8 @@ class ClassicalChinese(PredefinedRuleset):
 
     def _initRuleset(self):
         """set the description"""
+        assert isinstance(self.raw_data, str)
+        self.name = self.raw_data
         self.description = i18n('Classical Chinese')
 
     def addManualRules(self):
