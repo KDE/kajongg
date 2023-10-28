@@ -847,9 +847,7 @@ class Rule(RuleBase):
             combinedDict.update(ancestor.__dict__)
         for funcName, method in combinedDict.items():
             if isinstance(method, (types.FunctionType, classmethod, staticmethod)):
-                if hasattr(method, 'im_func'):
-                    method = method.__func__
-                elif hasattr(method, '__func__'):
+                if hasattr(method, '__func__'):
                     method = method.__func__
                 if memoize and method.__name__ in srcClass.cache:
                     method = destClass.memoize(method, srcClass)
