@@ -18,7 +18,7 @@ import socket
 import string
 from signal import signal, SIGABRT, SIGINT, SIGTERM
 from typing import Optional, Any, Union, List, Sequence, Mapping
-from typing import TYPE_CHECKING, Iterable, Generator
+from typing import TYPE_CHECKING, Iterable, Generator, Literal, cast
 
 from qtpy.compat import isalive as qtpy_isalive
 from qt import QStandardPaths, QObject, QSize
@@ -41,7 +41,9 @@ if sys.platform == 'win32':
 else:
     interpreterName = 'python3'
 
-LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
+# TODO: enumeration
+LIGHTSOURCES = cast(Union[Literal['NE'], Literal['NW'], Literal['SW'], Literal['SE']], ['NE', 'NW', 'SW', 'SE'])
+
 
 def isAlive(qobj: Union[QObject, 'QGraphicsItem', None]) ->bool:
     """check if the underlying C++ object still exists"""
@@ -158,7 +160,7 @@ class Debug:
     traffic = False
     process = False
     time = False
-    timestamp = None
+    timestamp:Optional[datetime.datetime] = None
     sql = False
     animation = ''  # 'yeysywynG87gfefsfwfn' for tiles and G#g for groups where # is the uid
     animationSpeed = False
@@ -235,6 +237,7 @@ Options {stropt} take a string argument like {example}.
         for arg in args.split(','):
             parts = arg.split(':')
             option = parts[0]
+            value: Union[bool, str]
             if len(parts) == 1:
                 value = True
             else:
@@ -259,7 +262,7 @@ Options {stropt} take a string argument like {example}.
     def modeltest_is_supported() ->bool:
         """Is the QT binding supported."""
         try:
-            import sip
+            import sip  # type:ignore[import]
         except ImportError:
             return False
         try:
@@ -283,7 +286,7 @@ class FixedClass(type):
     """Metaclass: after the class variable fixed is set to True,
     all class variables become immutable"""
     def __setattr__(cls, key: str, value: object) ->None:
-        if cls.fixed:
+        if cls.fixed:  # type: ignore
             raise SystemExit('{cls}.{key} may not be changed'.format(
                 cls=cls.__name__, key=key))
         type.__setattr__(cls, key, value)
@@ -318,7 +321,7 @@ class Options(metaclass=FixedClass):
     host = None
     player = None
     dbPath = None
-    socket = None
+    socket : Optional[str] = None
     port = None
     playOpen = False
     gui = False
@@ -368,24 +371,26 @@ class __Internal:
     @type app: L{KApplication}
     @cvar db: The sqlite3 data base
     @type db: L{DBHandle}
-    @cvar scene: The QGraphicsScene.
-    @type scene: L{PlayingScene} or L{ScoringScene}
+    @cvar scene: The game scene.
+    @type scene: L{GameScene}: L{PlayingScene} or L{ScoringScene}
     """
-    Preferences = None
+    Preferences:Optional['SetupPreferences'] = None
     defaultPort = 8301
     logPrefix = 'C'
     isServer = False
-    app = None
-    db = None
-    scene = None
-    mainWindow = None
+    reactor:'IReactorCore'
+    app : Any = None
+    db : Any = None
+    scene:Optional['GameScene'] = None
+    mainWindow : Optional['MainWindow'] = None
     game = None
     autoPlay = False
-    logger = None
-    kajonggrc = None
+    logger : Any = None
+    kajonggrc : Any = None
 
     def __init__(self) ->None:
         """init the loggers"""
+        handler: Any
         logName = os.path.basename(sys.argv[0]).replace('.py', '').replace('.exe', '')  + '.log'
         self.logger = logging.getLogger(logName)
         if sys.platform == 'win32':
@@ -465,7 +470,7 @@ class IntDict(defaultdict, ReprMixin):
         """how many tiles defined by countFilter do we hold?
         countFilter is an iterator of element names. No countFilter: Take all
         So count(['we', 'ws']) should return 8"""
-        return sum((defaultdict.get(self, x) or 0)
+        return sum((defaultdict.get(self, x) or 0)  # type: ignore
                    for x in countFilter or self)
 
     def all(self, countFilter: Optional[Iterable]=None) ->List['Tile']:
@@ -473,7 +478,7 @@ class IntDict(defaultdict, ReprMixin):
         each tile multiplied by its occurrence.
         countFilter is an iterator of element names. No countFilter: take all
         So all(['we', 'fs']) should return ['we', 'we', 'we', 'we', 'fs']"""
-        result = []
+        result : List['Tile'] = []
         for element in countFilter or self:
             result.extend([element] * self[element])
         return sorted(result)
@@ -485,13 +490,13 @@ class IntDict(defaultdict, ReprMixin):
     def __setitem__(self, key: Any, value: Any) ->None:
         """also update parent if given"""
         if self.parent is not None:
-            self.parent[key] += value - defaultdict.get(self, key, 0)
+            self.parent[key] += value - defaultdict.get(self, key, cast(Any, 0))
         defaultdict.__setitem__(self, key, value)
 
     def __delitem__(self, key: Any) ->None:
         """also update parent if given"""
         if self.parent is not None:
-            self.parent[key] -= defaultdict.get(self, key, 0)
+            self.parent[key] -= defaultdict.get(self, key, cast(Any, 0))
         defaultdict.__delitem__(self, key)
 
     def clear(self) ->None:
@@ -530,11 +535,11 @@ class DrawOnTopMixin:
 
     def setDrawingOrder(self) ->None:
         """we want us above all non moving tiles"""
-        if self.activeAnimation.get('pos'):
+        if self.activeAnimation.get('pos'):  # type: ignore
             movingZ = ZValues.movingZ
         else:
             movingZ = 0
-        self.setZValue(ZValues.markerZ + movingZ)
+        self.setZValue(ZValues.markerZ + movingZ)  # type: ignore
 
 
 def id4(obj: object) ->str:
@@ -554,12 +559,12 @@ class Fmt(string.Formatter):
     """this formatter can parse {id(x)} and output a short ascii form for id"""
     alphabet = string.ascii_uppercase + string.ascii_lowercase
     base = len(alphabet)
-    formatter = None
+    formatter : Optional['Fmt'] = None
 
     @staticmethod
     def num_encode(number: int, length: int=4) ->str:
         """make a short unique ascii string out of number, truncate to length"""
-        result = []
+        result : List[str] = []
         while number and len(result) < length:
             number, remainder = divmod(number, Fmt.base)
             result.append(Fmt.alphabet[remainder])
