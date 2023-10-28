@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 import functools
 import types
 
-from typing import List, Callable, Any, Optional, Union, Type, TYPE_CHECKING
+from typing import List, Any, Optional, Dict, Union, TYPE_CHECKING, Callable, Type, cast
 
 from twisted.internet.defer import Deferred, succeed, fail
 
@@ -30,7 +30,7 @@ class Animation(QPropertyAnimation, ReprMixin):
 
     """a Qt animation with helper methods"""
 
-    nextAnimations = []
+    nextAnimations : List['Animation'] = []
     clsUid = 0
 
     def __init__(self, graphicsObject:'AnimatedMixin', propName:str,
@@ -65,7 +65,7 @@ class Animation(QPropertyAnimation, ReprMixin):
             # may happen when aborting a game because animations are cancelled first,
             # before the last move from server is executed
             return
-        if graphicsObject.debug_name() in Debug.animation or Debug.animation == 'all':
+        if cast('AnimatedMixin', graphicsObject).debug_name() in Debug.animation or Debug.animation == 'all':
             logDebug(
                 '%s: change endValue for %s: %s->%s  %s' % (
                     self.ident(), self.pName(),
@@ -78,7 +78,7 @@ class Animation(QPropertyAnimation, ReprMixin):
         pGroup = self.group() if isAlive(self) else 'notAlive'
         if pGroup or not isAlive(self):
             return '%s/A%s' % (pGroup, id4(self))
-        return 'A%s-%s' % (id4(self), self.targetObject().debug_name())
+        return 'A%s-%s' % (id4(self), cast('AnimatedMixin', self.targetObject()).debug_name())
 
     def pName(self) ->str:
         """
@@ -107,7 +107,7 @@ class Animation(QPropertyAnimation, ReprMixin):
         if isAlive(self) and isAlive(self.targetObject()):
             currentValue = getattr(self.targetObject(), self.pName())
             endValue = self.endValue()
-            targetObject = self.targetObject()
+            targetObject:Union[QObject, str] = self.targetObject()
         else:
             currentValue = 'notAlive'
             endValue = 'notAlive'
@@ -140,7 +140,7 @@ class Animation(QPropertyAnimation, ReprMixin):
                     # initial deal
             for animation in Animation.nextAnimations[:]:
                 if shortcutAll or animation.duration() == 0:
-                    animation.targetObject().shortcutAnimation(animation)
+                    cast(AnimatedMixin, animation.targetObject()).shortcutAnimation(animation)
                     Animation.nextAnimations.remove(animation)
                     needRefresh = True
             if needRefresh and Internal.scene:
@@ -156,7 +156,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
     doAfter to that other group.
     """
 
-    running = []  # we need a reference to active animation groups
+    running : List['ParallelAnimationGroup'] = []  # we need a reference to active animation groups
     current = None
     clsUid = 0
     def __init__(self, animations:List[Animation], parent:Optional['QObject']=None) ->None:
@@ -164,12 +164,12 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         self.animations = animations
         self.uid = ParallelAnimationGroup.clsUid
         ParallelAnimationGroup.clsUid += 1
-        self.deferred = Deferred()
+        self.deferred:Deferred = Deferred()
         self.deferred.addErrback(logException)
         self.steps = 0
         self.debug = any(x.debug for x in self.animations)
         self.debug |= 'G{}g'.format(id4(self)) in Debug.animation
-        self.doAfter = []
+        self.doAfter:List[Deferred] = []
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
                 logDebug('Chaining Animation group G%s to G%s' %
@@ -205,7 +205,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             # periodically check if the board still exists.
             # if not (game end), we do not want to go on
             for animation in self.animations:
-                graphicsObject = animation.targetObject()
+                graphicsObject = cast(AnimatedMixin, animation.targetObject())
                 if hasattr(graphicsObject, 'board') and not isAlive(graphicsObject.board):
                     graphicsObject.clearActiveAnimation(animation)
                     self.removeAnimation(animation)
@@ -218,9 +218,10 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         assert self.state() != QAbstractAnimation.State.Running
         for animation in self.animations:
             graphicsObject = animation.targetObject()
+ #            graphicsObject = cast(AnimatedMixin, animation.targetObject())
             if not isAlive(animation) or not isAlive(graphicsObject):
                 return fail()
-            animatedObject = graphicsObject
+            animatedObject = cast(AnimatedMixin, graphicsObject)
             animatedObject.setActiveAnimation(animation)
             self.addAnimation(animation)
             propName = animation.pName()
@@ -234,7 +235,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
                 if currValue - endValue > 180:
                     animation.setStartValue(currValue - 360)
         for animation in self.animations:
-            animation.targetObject().setDrawingOrder()
+            animation.targetObject().setDrawingOrder()  # type:ignore[attr-defined]
         self.finished.connect(self.allFinished)
         scene = Internal.scene
         assert scene
@@ -272,7 +273,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
     def fixAllBoards(self) ->None:
         """set correct drawing order for all moved graphics objects"""
         for animation in self.children():
-            graphicsObject = animation.targetObject()
+            graphicsObject = animation.targetObject()  # type:ignore[attr-defined]
             if graphicsObject:
                 graphicsObject.clearActiveAnimation(animation)
         if Internal.scene:
@@ -300,36 +301,36 @@ class AnimatedMixin:
 
     def __init__(self) ->None:
         super().__init__()
-        self.activeAnimation = {}  # key is the property name
-        self.queuedAnimations = []
+        self.activeAnimation:Dict[str, Animation]  = {}  # key is the property name
+        self.queuedAnimations:List[Animation] = []
 
     def _get_pos(self) ->QPointF:
         """getter for property pos"""
-        return QGraphicsObject.pos(self)
+        return QGraphicsObject.pos(cast(QGraphicsItem, self))
 
     def _set_pos(self, pos:QPointF) ->None:
         """setter for property pos"""
-        QGraphicsObject.setPos(self, pos)
+        QGraphicsObject.setPos(cast(QGraphicsItem, self), pos)
 
     pos = Property(QPointF, fget=_get_pos, fset=_set_pos)
 
     def _get_scale(self) ->float:
         """getter for property scale"""
-        return QGraphicsObject.scale(self)
+        return QGraphicsObject.scale(cast(QGraphicsItem, self))
 
     def _set_scale(self, scale:float) ->None:
         """setter for property scale"""
-        QGraphicsObject.setScale(self, scale)
+        QGraphicsObject.setScale(cast(QGraphicsItem, self), scale)
 
     scale = Property(float, fget=_get_scale, fset=_set_scale)
 
     def _get_rotation(self) ->float:
         """getter for property rotation"""
-        return QGraphicsObject.rotation(self)
+        return QGraphicsObject.rotation(cast(QGraphicsItem, self))
 
     def _set_rotation(self, rotation:float) ->None:
         """setter for property rotation"""
-        QGraphicsObject.setRotation(self, rotation)
+        QGraphicsObject.setRotation(cast(QGraphicsItem, self), rotation)
 
     rotation = Property(float, fget=_get_rotation, fset=_set_rotation)
 
@@ -355,7 +356,7 @@ class AnimatedMixin:
             logDebug('shortcut {}: UTile {}: clear queuedAnimations'.format(animation, self.debug_name()))
         setattr(self, animation.pName(), animation.endValue())
         self.queuedAnimations = []
-        self.setDrawingOrder()
+        self.setDrawingOrder()  # type:ignore[attr-defined] # TODO: mypy protocol?
 
     def getValue(self, pName:str) ->PropertyType:
         """get a current property value"""
@@ -376,7 +377,7 @@ class AnimatedMixin:
             else:
                 logDebug('setActiveAnimation {} {}: set {}'.format(self.debug_name(), propName, animation))
         self.activeAnimation[propName] = animation
-        self.setCacheMode(QGraphicsItem.CacheMode.ItemCoordinateCache)
+        self.setCacheMode(QGraphicsItem.CacheMode.ItemCoordinateCache)  # type: ignore[attr-defined]
 
     def clearActiveAnimation(self, animation:'Animation') ->None:
         """an animation for this graphics object has ended.
@@ -384,16 +385,16 @@ class AnimatedMixin:
         del self.activeAnimation[animation.pName()]
         if self.debug_name() in Debug.animation:
             logDebug('UITile {}: clear activeAnimation_{}'.format(self.debug_name(), animation.pName()))
-        self.setDrawingOrder()
+        self.setDrawingOrder()  # type:ignore[attr-defined] # TODO: mypy protocol?
         if not self.activeAnimation:
-            self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
-            self.update()
+            self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)  # type: ignore[attr-defined]
+            self.update()  # type: ignore[attr-defined]
 
     def setupAnimations(self) ->None:
         """move the item to its new place. This puts new Animation
         objects into the queue to be animated by calling animate()"""
-        for pName, newValue in self.moveDict().items():
-            if self.scene() != Internal.scene:
+        for pName, newValue in self.moveDict().items():  # type: ignore[attr-defined]
+            if self.scene() != Internal.scene:  # type: ignore[attr-defined]
                 # not part of the playing scene, like tiles in tilesetselector
                 setattr(self, pName, newValue)
                 continue
@@ -455,12 +456,12 @@ def afterQueuedAnimations(doAfter:Deferred) ->Callable:
     @functools.wraps(doAfter)  # type:ignore[arg-type]
     def doAfterQueuedAnimations(*args:Any, **kwargs:Any) ->None:
         """do this after all queued animations have finished"""
-        method = types.MethodType(doAfter, args[0])
+        method = types.MethodType(doAfter, args[0])  # type:ignore[arg-type]
         args = args[1:]
-        varnames = doAfter.__code__.co_varnames
+        varnames = doAfter.__code__.co_varnames  # type:ignore[attr-defined]
         assert varnames[1] in ('deferredResult', 'unusedDeferredResult'), \
             '{} passed {} instead of deferredResult'.format(
-                doAfter.__qualname__, varnames[1])
+                doAfter.__qualname__, varnames[1])  # type:ignore[attr-defined]
         animateAndDo(method, *args, **kwargs)
 
     return doAfterQueuedAnimations
