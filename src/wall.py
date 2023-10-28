@@ -8,6 +8,8 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import weakref
+from itertools import zip_longest
+from twisted.internet.defer import Deferred
 
 from common import ReprMixin
 from tile import Piece, Tile, TileList
@@ -96,10 +98,11 @@ class Wall(ReprMixin):
                 raise WallEmpty
             dealTiles = self.living[:count]
             self.living = self.living[count:]
-        return [self.__nameTile(*x) for x in zip(dealTiles, tiles)]
+        return [self.__nameTile(x[0], x[1]) for x in zip_longest(dealTiles, tiles)]
 
-    def build(self, shuffleFirst=False):
+    def build(self, shuffleFirst=False):  # pylint:disable=unused-argument
         """virtual: build visible wall"""
+        return Deferred()
 
     def _placeLooseTiles(self, deferredResult=None):
         """to be done only for UIWall"""
@@ -114,6 +117,7 @@ class Wall(ReprMixin):
         """divides a wall, building a living end and a dead end"""
         # neutralise the different directions of winds and removal of wall
         # tiles
+        assert self.game
         assert self.game.divideAt is not None
         # shift tiles: tile[0] becomes living end
         self.tiles[:] = self.tiles[
