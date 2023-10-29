@@ -66,6 +66,8 @@ def callers(count=5, exclude=None):
 
 def elapsedSince(since):
     """return seconds since since"""
+    if not since:
+        return 0.0
     delta = datetime.datetime.now() - since
     return float(
         delta.microseconds
