@@ -715,7 +715,7 @@ class PlayingPlayer(Player):
         tile = tile.exposed
         for meld in self._exposedMelds:
             if tile in meld:
-                meld = meld.without(tile)
+                # FIXME: document if and where Player is updated meld = meld.without(tile)
                 self.visibleTiles[tile] -= 1
                 break
         else:
