@@ -6,7 +6,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import TYPE_CHECKING, Optional, Callable, Any
+from typing import TYPE_CHECKING, Optional, Callable, Any, cast
 
 from qt import Qt, QSize, QRect, QEvent
 from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
@@ -33,7 +33,8 @@ class ZeroEmptyColumnDelegate(QStyledItemDelegate):
 class RichTextColumnDelegate(QStyledItemDelegate):
 
     """enables rich text in a view"""
-    label = None
+    label:Optional[QLabel] = None
+    document:QTextDocument
 
     def __init__(self, parent:Optional['QObject']=None) ->None:
         super().__init__(parent)
@@ -123,7 +124,7 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
             if not checkRect.contains(event.pos()):  # type: ignore[attr-defined]
                 return False
         elif event.type() == QEvent.Type.KeyPress:
-            if event.key() not in (Qt.Key.Key_Space, Qt.Key.Key_Select):
+            if cast('QKeyEvent', event).key() not in (Qt.Key.Key_Space, Qt.Key.Key_Select):
                 return False
         else:
             return False
