@@ -534,7 +534,7 @@ class WrigglingSnake(MJRule):
         # pair of 1 is not complete
         return {Tile(group, '1')}
 
-    def rearrange(hand, rest):
+    def rearrange(cls, hand, rest):
         melds = MeldList()
         for tileName in rest[:]:
             if rest.count(tileName) >= 2:
@@ -651,7 +651,7 @@ class TripleKnitting(MJRule):
         tripleCount = len(cls.findTriples(hand)[0])
         return tripleCount >= tripleWanted
 
-    def findTriples(cls, hand):
+    def findTriples(hand):
         """return a list of triple knitted melds, including the mj triple.
         Also returns the remaining untripled tiles"""
         if hand.declaredMelds:
@@ -783,7 +783,7 @@ class AllPairHonors(MJRule):
     def computeLastMelds(hand):
         return MeldList(Tile(hand.lastTile).pair)
 
-    def claimness(hand, discard):
+    def claimness(cls, hand, discard):
         result = IntDict()
         if AllPairHonors.shouldTry(hand):
             result[Message.Pung] = -999
@@ -827,7 +827,7 @@ class AllPairHonors(MJRule):
             pairCount + kongCount * 2) > pairWanted
         return result
 
-    def rearrange(hand, rest):
+    def rearrange(cls, hand, rest):
         melds = MeldList()
         for pair in sorted(set(rest) & elements.mAJORS):
             while rest.count(pair) >= 2:
@@ -980,7 +980,7 @@ class EastWonNineTimesInARow(RuleCode):
     def appliesToHand(cls, hand):
         return cls.appliesToGame(hand.player.game)
 
-    def appliesToGame(cls, game, needWins=None):
+    def appliesToGame(game, needWins=None):
         if needWins is None:
             needWins = EastWonNineTimesInARow.nineTimes
             if game.isScoringGame():
@@ -995,7 +995,7 @@ class EastWonNineTimesInARow(RuleCode):
         return False
 
     def rotate(cls, game):
-        return cls.appliesToGame(game, needWins=EastWonNineTimesInARow.nineTimes)
+        return cls.appliesToGame(game, EastWonNineTimesInARow.nineTimes)
 
 
 class GatesOfHeaven(StandardMahJongg):
@@ -1021,7 +1021,7 @@ class GatesOfHeaven(StandardMahJongg):
                 return True
         return False
 
-    def appliesToHand(cls, hand):
+    def appliesToHand(hand):
         if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
             return False
         if any(len(x) > 2 for x in hand.declaredMelds):
@@ -1038,7 +1038,7 @@ class GatesOfHeaven(StandardMahJongg):
         surplus = values[0]
         return 1 < surplus < 9
 
-    def winningTileCandidates(cls, hand):
+    def winningTileCandidates(hand):
         if hand.declaredMelds:
             return set()
         if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
@@ -1053,7 +1053,7 @@ class GatesOfHeaven(StandardMahJongg):
         for suit in hand.suits:
             return {Tile(suit, x) for x in Tile.minors}
 
-    def rearrange(hand, rest):
+    def rearrange(cls, hand, rest):
         melds = MeldList()
         for suit in hand.suits & set(Tile.colors):
             for value in Tile.numbers:
@@ -1077,7 +1077,7 @@ class GatesOfHeaven(StandardMahJongg):
 class NineGates(GatesOfHeaven):
     """as used for Classical Chinese DMJL"""
 
-    def appliesToHand(cls, hand):
+    def appliesToHand(hand):
         """last tile may also be 1 or 9"""
         if hand.declaredMelds:
             return False
@@ -1097,7 +1097,7 @@ class NineGates(GatesOfHeaven):
         surplus = values[0]
         return hand.lastTile and surplus == hand.lastTile.value
 
-    def winningTileCandidates(cls, hand):
+    def winningTileCandidates(hand):
         if hand.declaredMelds:
             return set()
         if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
@@ -1121,7 +1121,7 @@ class ThirteenOrphans(MJRule):
             return MeldList()
         return MeldList(Tile(hand.lastTile).meld(meldSize))
 
-    def rearrange(hand, rest):
+    def rearrange(cls, hand, rest):
         melds = MeldList()
         for tileName in rest:
             if rest.count(tileName) >= 2:
@@ -1343,7 +1343,7 @@ class DangerousGame(RuleCode):
 class LastOnlyPossible(RuleCode):
 
     """check if the last tile was the only one possible for winning"""
-    def appliesToHand(cls, hand):
+    def appliesToHand(hand):
         if not hand.lastTile:
             return False
         if any(hand.lastTile in x for x in hand.melds if len(x) == 4):
