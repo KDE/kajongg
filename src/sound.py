@@ -37,11 +37,12 @@ from tile import Tile
 if sys.platform == 'win32':
     import winsound  # pylint: disable=import-error
 
+
 class SoundPopen(subprocess.Popen):
 
     """with additional attributes"""
 
-    def __init__(self, what:str, args:Any) ->str:
+    def __init__(self, what:str, args:Any) ->None:
         super().__init__(args)
         self.name = what
         self.startTime = datetime.datetime.now()
@@ -53,7 +54,7 @@ class Sound:
     thusly ensuring no two instances try to speak"""
     __oggBinary = None
     __bonusOgg = None
-    playProcesses = []
+    playProcesses : List[SoundPopen] = []
     lastCleaned = None
 
     @staticmethod
@@ -198,12 +199,12 @@ class Voice(ReprMixin):
     destination, no tarfile is written, only the content. It makes
     only sense to cache the voice in a tarfile at source."""
 
-    __availableVoices = []
+    __availableVoices : List['Voice'] = []
     md5sumLength = 32 # magical constant
 
     def __init__(self, directory:str, content:Optional[bytes]=None) ->None:
         """give this name a voice"""
-        self.__md5sum = None
+        self.__md5sum:Optional[str] = None
         if not os.path.split(directory)[0]:
             if Debug.sound:
                 logDebug('place voice %s in %s' % (directory, cacheDir()))
@@ -241,7 +242,7 @@ class Voice(ReprMixin):
     def availableVoices() ->List['Voice']:
         """a list of all voice directories"""
         if not Voice.__availableVoices:
-            result = []
+            result:List['Voice'] = []
             directories = QStandardPaths.locateAll(
                 QStandardPaths.AppDataLocation, 'voices', QStandardPaths.LocateDirectory)
             directories.insert(0, os.path.join('share', 'kajongg', 'voices'))
