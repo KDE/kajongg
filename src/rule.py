@@ -10,7 +10,7 @@ Read the user manual for a description of the interface to this scoring engine
 import types
 from hashlib import md5
 from typing import Any, List, Tuple, Dict, Type, Union, Optional, TYPE_CHECKING
-from typing import Sequence
+from typing import Sequence, Set
 
 from common import Internal, Debug
 from common import ReprMixin
@@ -21,7 +21,6 @@ from query import Query
 if TYPE_CHECKING:
     from tile import Meld
     from rulecode import MJRule
-    from login import Url
     from hand import Hand
     from login import Url
 
@@ -34,13 +33,13 @@ class Score(ReprMixin):
     should want to set more than one unit, split it into two rules.
     For the first use case only we have the attributes value and unit"""
 
-    __hash__ = None
+    __hash__ = None  # type: ignore
 
     def __init__(self, points:int=0, doubles:int=0, limits:float=0, ruleset:Optional['Ruleset']=None):
-        self.points = 0  # define the types for those values
-        self.doubles = 0
-        self.limits = 0.0
-        self.ruleset = ruleset
+        self.points:int = 0  # define the types for those values
+        self.doubles:int = 0
+        self.limits:float = 0.0
+        self.ruleset:Optional['Ruleset'] = ruleset
         self.points = type(self.points)(points)
         self.doubles = type(self.doubles)(doubles)
         self.limits = type(self.limits)(limits)
@@ -167,7 +166,7 @@ class RuleList(list):
     def __init__(self, listId:int, name:str, description:str) ->None:
         list.__init__(self)
         self.listId = listId
-        self.name = name
+        self.name:str = name
         self.description = description
 
     def pop(self, key:str) ->'RuleBase':  # type:ignore
@@ -227,7 +226,7 @@ class RuleList(list):
         """use add instead of append"""
         if rule.key() in self:
             logException('%s is already defined as %s, not accepting new rule %s/%s' % (
-                rule.key(), self[rule.key()].definition, rule.name, rule.definition))
+                rule.key(), self[rule.key()].definition, rule.name, rule.definition))  # type:ignore
         self[rule.key()] = rule
 
     def createRule(self, name:str, definition:str='', **kwargs:Any) ->None:
@@ -235,6 +234,7 @@ class RuleList(list):
         defParts = definition.split('||')
         rule = None
         description = kwargs.get('description', '')
+        cls:Type[ParameterRule]
         for cls in [IntRule, BoolRule, StrRule]:
             if defParts[0].startswith(cls.prefix):
                 rule = cls(
@@ -307,9 +307,9 @@ class Ruleset:
     """
     # pylint: disable=too-many-instance-attributes
 
-    __hash__ = None
+    __hash__ = None  # type: ignore
 
-    cache = {}
+    cache : Dict[Union[int, str], 'Ruleset'] = {}
     hits = 0
     misses = 0
 
@@ -339,17 +339,29 @@ class Ruleset:
             - a string: The hash value of a ruleset"""
         Rule.importRulecode()
         self.raw_data = raw_data
-        self.rulesetId = 0
-        self.__hash = ''
-        self.allRules = []
+        self.name:str
+        self.rulesetId:int = 0
+        self.__hash:str = ''
+        self.allRules:List[Rule] = []
         self.__dirty = False  # only the ruleset editor is supposed to make us dirty
         self.__loaded = False
-        self.__filteredLists = {}
+        self.__filteredLists:Dict[str, List[RuleBase]] = {}
         self.description = ''
-        self.rawRules = None  # used when we get the rules over the network
-        self.doublingMeldRules = []
-        self.doublingHandRules = []
-        self.standardMJRule = None
+        self.rawRules:Optional[List[List[str]]] = None  # used when we get the rules over the network
+        self.doublingMeldRules:List[Rule] = []
+        self.doublingHandRules:List[Rule] = []
+        self.standardMJRule:Optional['Rule'] = None
+        self.limit:int
+        self.roofOff:bool
+        self.mustDeclareCallingHand:bool
+        self.minMJPoints:int
+        self.minRounds:int
+        self.withBonusTiles:bool
+        self.claimTimeout:int
+        self.maxChows:int
+        self.minMJDoubles:int
+        self.discardTilesOrdered:bool
+        self.discardTilesOrderedLeaveHole:bool
         self.meldRules = RuleList(1, i18n('Meld Rules'),
                                   i18n('Meld rules are applied to single melds independent of the rest of the hand'))
         self.handRules = RuleList(2, i18n('Hand Rules'),
@@ -373,6 +385,7 @@ into a situation where you have to pay a penalty"""))
         # if you ever want to remove an entry from ruleLists: make sure its listId is not reused or you get
         # in trouble when updating
         self._initRuleset()
+        assert self.name
 
     @property
     def dirty(self) ->bool:
@@ -426,9 +439,9 @@ into a situation where you have to pay a penalty"""))
                 "select id,hash,name,description from ruleset where id=?", (self.raw_data,))
         elif isinstance(self.raw_data, list):
             # we got the rules over the wire
-            self.rawRules = self.raw_data[1:]
-            (self.rulesetId, self.__hash, self.raw_data,
-             self.description) = self.raw_data[0]
+            self.rawRules = self.raw_data[1:]  # type:ignore
+            (self.rulesetId, self.__hash, self.name,
+             self.description) = self.raw_data[0]  # type:ignore
             self.load()
                       # load raw rules at once, rules from db only when needed
             return
@@ -485,9 +498,9 @@ into a situation where you have to pay a penalty"""))
             "where ruleset=? order by list,position", (self.rulesetId,))
 
     def toList(self) -> List[List[Union[str, int, float]]]:
-        """return entire ruleset encoded in a string"""
+        """return entire ruleset in a list"""
         self.load()
-        result = [[self.rulesetId, self.hash, self.name, self.description]]
+        result:List[List[Union[str, int, float]]] = [[self.rulesetId, self.hash, self.name, self.description]]
         result.extend(self.ruleRecord(x) for x in self.allRules)
         return result
 
@@ -592,7 +605,7 @@ into a situation where you have to pay a penalty"""))
             query = Query(
                 "update ruleset set name=? where id<0 and name=?", (newName, self.name))
             if not query.failure:
-                self.name = newName  # pylint:disable=attribute-defined-outside-init
+                self.name = newName
             return not query.failure
 
     def remove(self) ->None:
@@ -622,7 +635,7 @@ into a situation where you have to pay a penalty"""))
         assert rule in ruleList, '%s: %s not in list %s' % (
             type(rule), rule, ruleList.name)
         return [self.rulesetId, ruleList.listId, ruleIdx, rule.name,
-                rule.definition, score.points, score.doubles, score.limits, rule.parameter]
+                rule.definition, score.points, score.doubles, score.limits, rule.parameter] # type:ignore
 
     def updateRule(self, rule:'Rule') ->None:
         """update rule in database"""
@@ -660,7 +673,7 @@ into a situation where you have to pay a penalty"""))
                 self.rulesetId = int(qData[0][0])
                 return
         with Internal.db:
-            self.rulesetId, self.name = self._newKey(minus)  # pylint:disable=attribute-defined-outside-init
+            self.rulesetId, self.name = self._newKey(minus)
             Query(
                 'INSERT INTO ruleset(id,name,hash,description) VALUES(?,?,?,?)',
                 (self.rulesetId, english(self.name),
@@ -721,7 +734,7 @@ into a situation where you have to pay a penalty"""))
 
     def diff(self, other:Any) ->List[Tuple[Optional['RuleBase'], Optional['RuleBase']]]:
         """return a list of tuples. Every tuple holds one or two rules: tuple[0] is from self, tuple[1] is from other"""
-        result = []
+        result:List[Tuple[Optional[RuleBase], Optional[RuleBase]]] = []
         leftDict = {x.name: x for x in self.allRules}
         rightDict = {x.name: x for x in other.allRules}
         left = set(leftDict.keys())
@@ -741,8 +754,8 @@ class RuleBase(ReprMixin):
 
     """a base for standard Rule and parameter rules IntRule, StrRule, BoolRule"""
 
-    options = {}
-    ruleClasses = {}
+    options : Dict[str, str] = {}
+    ruleClasses : Dict[str, Type] = {}
 
     def __init__(self, name: str, definition: str, description: str):
         self.hasSelectable = False
@@ -750,6 +763,7 @@ class RuleBase(ReprMixin):
         self.__name = name
         self.definition = definition
         self.description = description
+        self.score:Score
 
     @property
     def name(self) ->str:
@@ -801,7 +815,7 @@ class Rule(RuleBase):
     which is there for loading&saving, but internally is stripped off."""
     # pylint: disable=too-many-arguments
 
-    ruleCode = {}
+    ruleCode : Dict[str, 'Rule'] = {}
     limitHand = None
 
     @classmethod
@@ -966,7 +980,7 @@ class Rule(RuleBase):
 class ParameterRule(RuleBase):
 
     """for parameters"""
-    prefix = ''
+    prefix: str = ''
 
     def __init__(self, name:str, definition:str, description:str, parameter:Union[str, int, bool]):
         RuleBase.__init__(self, name, definition, description)
@@ -1040,8 +1054,8 @@ class PredefinedRuleset(Ruleset):
 
     """special code for loading rules from program code instead of from the database"""
 
-    classes = set()  # only those will be playable
-    preRulesets = []
+    classes : Set[Type] = set()  # only those will be playable
+    preRulesets : List['PredefinedRuleset'] = []
 
     def __init__(self, name:str='') ->None:
         Ruleset.__init__(self, name or 'general predefined ruleset')
