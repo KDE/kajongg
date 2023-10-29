@@ -132,12 +132,12 @@ class Duration:
 
     """a helper class for checking code execution duration"""
 
-    def __init__(self, name, threshold=None, bug=False):
+    def __init__(self, name, threshold=1.0, bug=False):
         """name describes where in the source we are checking
         threshold in seconds: do not warn below
         if bug is True, throw an exception if threshold is exceeded"""
         self.name = name
-        self.threshold = threshold or 1.0
+        self.threshold = threshold
         self.bug = bug
         self.__start = datetime.datetime.now()
 
