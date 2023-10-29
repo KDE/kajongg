@@ -17,7 +17,7 @@ import cgitb  # pylint:disable=deprecated-module
 import tempfile
 import webbrowser
 import logging
-from typing import Any, TYPE_CHECKING, Optional, Union, Tuple, Type
+from typing import Any, TYPE_CHECKING, Optional, Union, Tuple, Type, cast
 
 from log import logError, logDebug
 from common import Options, Internal, isAlive, Debug, handleSignals
@@ -121,16 +121,16 @@ class MainWindow(KXmlGuiWindow):
         # see https://marc.info/?l=kde-games-devel&m=120071267328984&w=2
         super().__init__()
         Internal.app.aboutToQuit.connect(self.aboutToQuit)
-        self.exitConfirmed = None
-        self.exitReady = None
-        self.exitWaitTime = None
+        self.exitConfirmed:Optional[bool] = None
+        self.exitReady:Optional[bool] = None
+        self.exitWaitTime:Optional[int] = None
         Internal.mainWindow = self
-        self._scene = None
-        self.centralView = None
-        self.background = Background()
-        self.playerWindow = None
-        self.rulesetWindow = None
-        self.confDialog = None
+        self._scene:Optional['GameScene'] = None
+        self.centralView: FittingView
+        self.background:Background = Background()
+        self.playerWindow:Optional[PlayerList] = None
+        self.rulesetWindow:Optional[RulesetSelector] = None
+        self.confDialog:Optional[ConfigDialog] = None
         self.__installReactor()
         if Options.gui:
             KStandardAction.preferences(
@@ -163,8 +163,9 @@ class MainWindow(KXmlGuiWindow):
         if not hasattr(Internal, 'reactor'):
             import qtreactor
             qtreactor.install()
+            from twisted.internet.interfaces import IReactorCore
             from twisted.internet import reactor as reactor_module
-            reactor = reactor_module
+            reactor = cast(IReactorCore, reactor_module)
             reactor.runReturn(installSignalHandlers=False)
             Internal.reactor = reactor
             if Debug.quit:
@@ -243,7 +244,9 @@ class MainWindow(KXmlGuiWindow):
         self.setCentralWidget(centralWidget)
         self.centralView.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         assert Internal.Preferences
-        self.windTileset = Tileset(Internal.Preferences.windTilesetName)
+        _ = Internal.Preferences.windTilesetName
+        assert isinstance(_, str)
+        self.windTileset = Tileset(_)
         self.adjustMainView()
         self.actionScoreGame = Action(
             self,
@@ -297,7 +300,7 @@ class MainWindow(KXmlGuiWindow):
             Qt.Key.Key_E, actionData=ExplainView)
         self.actionExplain.setEnabled(False)
         self.actionFullscreen = self._kajonggToggleAction(
-            "fullscreen", "view-fullscreen", shortcut=Qt.Key.Key_F | Qt.KeyboardModifier.ShiftModifier)
+            "fullscreen", "view-fullscreen", shortcut=cast(Qt.Key, Qt.Key.Key_F | Qt.KeyboardModifier.ShiftModifier))
         self.actionFullscreen.toggled.connect(self.fullScreen)
         self.actionAutoPlay = Action(
             self,
@@ -339,7 +342,7 @@ class MainWindow(KXmlGuiWindow):
             new_state = _ | Qt.WindowState.WindowFullScreen
         else:
             new_state = _ & ~Qt.WindowState.WindowFullScreen
-        self.setWindowState(new_state)
+        self.setWindowState(cast(Qt.WindowState, new_state))
 
     def closeMe(self) ->None:
         """for QTimer"""
@@ -452,7 +455,7 @@ class MainWindow(KXmlGuiWindow):
                         (self.exitWaitTime // 1000))
                 try:
                     quitDebug('now stopping reactor')
-                    Internal.reactor.stop()
+                    Internal.reactor.stop()  # type:ignore[misc]
                     assert isAlive(self)
                     QTimer.singleShot(10, self.closeMe)
                 except ReactorNotRunning:
