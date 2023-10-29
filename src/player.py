@@ -66,7 +66,7 @@ class Players(list, ReprMixin):
             if player.name == playerName:
                 return player
         logException(
-            "no player has name %s - we have %s" %
+            "no player has name '%s' - we have %s" %
             (playerName, [x.name for x in self]))
         return None
 
