@@ -56,8 +56,9 @@ from twisted.spread import pb
 from twisted.internet import error
 from twisted.internet.defer import maybeDeferred, fail, succeed
 from twisted.cred import checkers, portal, credentials, error as credError
-from twisted.internet import reactor
+from twisted.internet import reactor as reactor_module
 from twisted.internet.error import ReactorNotRunning
+reactor = reactor_module
 reactor.addSystemEventTrigger('before', 'shutdown', cleanExit)
 Internal.reactor = reactor
 

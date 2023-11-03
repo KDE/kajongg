@@ -158,7 +158,8 @@ class MainWindow(KXmlGuiWindow):
         if not hasattr(Internal, 'reactor'):
             import qtreactor
             qtreactor.install()
-            from twisted.internet import reactor
+            from twisted.internet import reactor as reactor_module
+            reactor = reactor_module
             reactor.runReturn(installSignalHandlers=False)
             Internal.reactor = reactor
             if Debug.quit:
