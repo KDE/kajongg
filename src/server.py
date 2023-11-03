@@ -229,14 +229,18 @@ class MJServer:
             Ruleset.cached(
                 ruleset).save()  # make it known to the cache and save in db
         if tableId in self.tables:
+            assert tableId is not None  # for mypy
             return fail(srvError(pb.Error,
                                  'You want a new table with id=%d but that id is already used for table %s' % (
                                      tableId, self.tables[tableId])))
         if Ruleset.hashIsKnown(ruleset):
             return self.__newTable(None, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
-        return self.callRemote(user, 'needRuleset', ruleset).addCallback(
-            gotRuleset).addErrback(logException).addCallback(
-                self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId).addErrback(logException)
+        _ = self.callRemote(user, 'needRuleset', ruleset)
+        if _:
+            return _.addCallback(
+                gotRuleset).addErrback(logException).addCallback(
+                    self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId).addErrback(logException)
+        return None
 
     def __newTable(self, unused, user, ruleset,
                    playOpen, autoPlay, wantedGame, tableId=None):
@@ -246,13 +250,13 @@ class MJServer:
             return table.tableid
         table = ServerTable(
             self,
-            user,
-            ruleset,
-            None,
-            playOpen,
-            autoPlay,
-            wantedGame,
-            tableId)
+            owner=user,
+            ruleset=ruleset,
+            suspendedAt=None,
+            playOpen=playOpen,
+            autoPlay=autoPlay,
+            wantedGame=wantedGame,
+            tableId=tableId)
         result = None
         for srvUser in self.srvUsers:
             deferred = self.sendTables(srvUser, [table])
@@ -278,7 +282,7 @@ class MJServer:
         block.tell(
             None,
             self.srvUsers,
-            Message.TableChanged,
+            Message.TableChanged,  # type: ignore
             source=table.asSimpleList())
         if len(table.users) == table.maxSeats():
             if Debug.table:
@@ -286,6 +290,7 @@ class MJServer:
 
             def startTable(unused):
                 """now all players know about our join"""
+                assert table.owner
                 table.readyForGameStart(table.owner)
             block.callback(startTable)
         else:
@@ -312,20 +317,19 @@ class MJServer:
                         block.tell(
                             None,
                             self.srvUsers,
-                            Message.TableChanged,
+                            Message.TableChanged,  # type: ignore
                             source=table.asSimpleList())
                         block.callback(False)
         return True
 
     def startGame(self, user, tableid):
         """try to start the game"""
-        return self._lookupTable(tableid).readyForGameStart(user)
+        self._lookupTable(tableid).readyForGameStart(user)
 
     def removeTable(self, table, reason, message, *args):
         """remove a table"""
         assert reason in ('silent', 'tableRemoved', 'gameOver', 'abort')
         # HumanClient implements methods remote_tableRemoved etc.
-        message = message or ''
         if Debug.connections or reason == 'abort':
             logDebug(
                 '%s%s ' % (('%d:' % table.game.seed) if table.game else '',
@@ -370,7 +374,7 @@ class MJServer:
         for block in DeferredBlock.blocks:
             for request in block.requests:
                 if request.user == user:
-                    request.answer = Message.Abort
+                    request.answer = Message.Abort  # type: ignore
 
     def loadSuspendedTables(self, user):
         """loads all yet unloaded suspended tables where this
