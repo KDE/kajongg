@@ -577,7 +577,7 @@ class HumanClient(Client):
             logDebug('got chatLine: %s' % chatLine)
         table = self._tableById(chatLine.tableid)
         if not chatLine.isStatusMessage and not table.chatWindow:
-            ChatWindow(table)
+            ChatWindow(table=table)
         if table.chatWindow:
             table.chatWindow.receiveLine(chatLine)
 

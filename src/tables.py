@@ -254,7 +254,7 @@ class TableList(QWidget):
         def initChat(_):
             """now that we were able to send the message to the server
             instantiate the chat window"""
-            table.chatWindow = ChatWindow(table=table)
+            table.chatWindow = ChatWindow(table)
             table.chatWindow.receiveLine(msg)
         table = self.selectedTable()
         if not table.chatWindow:

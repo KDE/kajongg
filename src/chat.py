@@ -112,10 +112,9 @@ class ChatWindow(QWidget):
 
     """a widget for showing chat messages"""
 
-    def __init__(self, scene=None, table=None):
+    def __init__(self, table):
         super().__init__(None)
-        self.scene = scene
-        self.table = table or scene.game.client.table
+        self.table = table
         self.table.chatWindow = self
         self.setObjectName('chatWindow')
         title = i18n(
