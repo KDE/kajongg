@@ -387,7 +387,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
             size = ' %.2dx%.2d' % (size.width(), size.height())
         else:
             size = ''
-        return '%s(%s) %d: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
+        return '%s(%s) %s: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
             (self.tile,
              self.board.name if self.board else 'None', id4(self),
              self.xoffset, self.x(), self.yoffset,
