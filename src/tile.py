@@ -304,6 +304,37 @@ class Tiles:
 
     """a Mixin for TileList and TileTuple"""
 
+    def __init__(self, newContent=None):  # pylint:disable=unused-argument
+        ...
+
+    @classmethod
+    def _parseArgs(cls, iterable):
+        """flatten any args into a nice sequence"""
+        if isinstance(iterable, str):
+            memberList = [cls.tileClass(iterable[x:x + 2])
+                       for x in range(0, len(iterable), 2)]
+        elif isinstance(iterable, Tile) or iterable.__class__.__name__ == 'UITile':
+            memberList = [iterable]
+        elif iterable is None:
+            memberList = []
+        else:
+            memberList = []
+            for member in iterable:
+                if isinstance(member, cls.tileClass):
+                    memberList.append(member)
+                elif isinstance(member, str):
+                    memberList.extend(cls.tileClass(member[x:x + 2])
+                               for x in range(0, len(member), 2))
+                elif hasattr(member, '__iter__'):
+                    memberList.extend(member)
+                elif isinstance(member, Tile): # FIXME: remove again
+                    memberList.append(member)
+                else:
+                    raise ValueError(
+                        '{}() accepts only {} and str but got {}'.format(
+                            cls.__name__, cls.tileClass.__name__, repr(member)))
+        return memberList
+
     def exposed(self):
         """lower case all tiles"""
         return self.__class__(x.exposed for x in self)
@@ -358,31 +389,17 @@ class TileList(list, Tiles):
 
     def __init__(self, newContent=None):
         list.__init__(self)
-        if newContent is None:
-            return
-        if isinstance(newContent, Tile) or newContent.__class__.__name__ == 'UITile':
-            list.append(self, newContent)
-        elif isinstance(newContent, str):
-            list.extend(
-                self, [self.tileClass(newContent[x:x + 2])
-                       for x in range(0, len(newContent), 2)])
-        else:
-            list.extend(self, newContent)
-        self.isRest = True
+        Tiles.__init__(self, newContent)
+        self.extend(self._parseArgs(newContent))
+        if self:
+            self.isRest = True
 
     def __hash__(self):
         return self._compute_hash()
 
     def __add__(self, other):
         result = TileList(self)
-        if isinstance(other, str):
-            result.extend(
-                [self.tileClass(other[x:x + 2])
-                       for x in range(0, len(other), 2)])
-        elif hasattr(other, '__iter__'):
-            result.extend(other)
-        else:
-            result.append(other)
+        result.extend(self._parseArgs(other))
         return result
 
 
@@ -393,48 +410,20 @@ class TileTuple(tuple, Tiles):
     tileClass = Tile
 
     def __new__(cls, iterable=None):
-        if isinstance(iterable, str):
-            memberList = [cls.tileClass(iterable[x:x + 2])
-                       for x in range(0, len(iterable), 2)]
-        elif isinstance(iterable, Tile):
-            memberList = [iterable]
-        elif iterable is None:
-            memberList = []
-        else:
-            memberList = []
-            for member in iterable:
-                if isinstance(member, cls.tileClass):
-                    memberList.append(member)
-                elif isinstance(member, str):
-                    memberList = [cls.tileClass(member[x:x + 2])
-                               for x in range(0, len(member), 2)]
-                elif hasattr(member, '__iter__'):
-                    memberList.extend(member)
-                else:
-                    raise ValueError(
-                        'TileTuple() accepts only {} and str but got {}'.format(cls.tileClass.__name__, repr(member)))
-        result = tuple.__new__(cls, memberList)
+        result = tuple.__new__(cls, cls._parseArgs(iterable))
         result.isRest = True
         result._hash = result._compute_hash()
         return result
 
     def __init__(self, iterable=None):  # pylint: disable=unused-argument
         tuple.__init__(self)
+        Tiles.__init__(self)
 
     def __hash__(self):
         return self._hash
 
     def __add__(self, other):
-        result = list(self)
-        if isinstance(other, str):
-            result.extend(
-                [self.tileClass(other[x:x + 2])
-                       for x in range(0, len(other), 2)])
-        elif hasattr(other, '__iter__'):
-            result.extend(other)
-        else:
-            result.append(other)
-        return TileTuple(result)
+        return TileTuple(TileList(self) + self._parseArgs(other))
 
 
 class Elements:

@@ -19,8 +19,6 @@ class Wind:
     all = []
     all4 = []
 
-    tile = None
-
     def __new__(cls, *args):
         if not Wind.all:
             Wind.all = [object.__new__(cls) for cls in (_East, _South, _West, _North, _NoWind)]
