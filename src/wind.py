@@ -9,10 +9,11 @@ SPDX-License-Identifier: GPL-2.0
 
 # pylint: disable=invalid-name
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from tile import Tile
+    from board import WindDisc
 
 
 class Wind:
@@ -21,8 +22,14 @@ class Wind:
     char is the wind as a char (native string)
     svgName is the name of the wind in the SVG files.
     """
-    all = []
-    all4 = []
+
+    char: str
+    discSvgName: str
+    all : List['Wind'] = []
+    all4 : List['Wind'] = []
+
+    tile : 'Tile'
+    disc:'WindDisc'
 
     def __new__(cls, *args:Any) ->'Wind':
         if not Wind.all:
