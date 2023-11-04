@@ -80,15 +80,11 @@ class ChatModel(QAbstractTableModel):
                 result = QColor(color)
         return result
 
-    def appendLines(self, lines):
+    def appendLine(self, line):
         """insert a chatline"""
-        if not isinstance(lines, list):
-            lines = [lines]
-        self.beginInsertRows(
-            QModelIndex(),
-            self.rowCount(),
-            self.rowCount() + len(lines) - 1)
-        self.chatLines.extend(lines)
+        old_rowCount = self.rowCount()
+        self.beginInsertRows(QModelIndex(), old_rowCount, old_rowCount)
+        self.chatLines.append(line)
         self.endInsertRows()
 
 
@@ -187,7 +183,7 @@ class ChatWindow(QWidget):
     def receiveLine(self, chatLine):
         """show a new line in protocol"""
         self.show()
-        self.messageView.model().appendLines(chatLine)
+        self.messageView.model().appendLine(chatLine)
         for row in range(self.messageView.model().rowCount()):
             self.messageView.setRowHeight(
                 row,
