@@ -154,6 +154,7 @@ class ChatWindow(QWidget):
         if Debug.chat:
             logDebug('chat.kill for %s on table %s' % (self, self.table))
         self.hide()
+        assert self.table
         self.table.chatWindow = None
 
     def sendLine(self, line=None, isStatusMessage=False):
@@ -162,6 +163,8 @@ class ChatWindow(QWidget):
             line = self.edit.text()
             self.edit.clear()
         if line:
+            assert self.table
+            assert self.table.client
             if Debug.chat:
                 logDebug('sending line %s to others' % line)
             msg = ChatMessage(
@@ -173,6 +176,8 @@ class ChatWindow(QWidget):
 
     def chatError(self, result):
         """tableList may already have gone away"""
+        assert self.table
+        assert self.table.client
         if self.table.client.tableList:
             self.table.client.tableList.tableError(result)
 
