@@ -31,7 +31,7 @@ class DifferModel(QAbstractTableModel):
         """how many columns does this node have?"""
         return 3  # rule name, left values, right values
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         """how many items?"""
         if parent.isValid():
             # we have only top level items

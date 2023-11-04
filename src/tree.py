@@ -73,18 +73,18 @@ class TreeModel(QAbstractItemModel):
 
     """a basic class for Kajongg tree views"""
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         """how many columns does this node have?"""
         return self.itemForIndex(parent).columnCount()
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         """how many items?"""
         if parent.isValid() and parent.column():
             # all children have col=0 for parent
             return 0
         return self.itemForIndex(parent).childCount()
 
-    def index(self, row, column, parent):
+    def index(self, row, column, parent=QModelIndex()):
         """generate an index for this item"""
         if self.rootItem is None:
             return QModelIndex()

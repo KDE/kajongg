@@ -33,13 +33,13 @@ class GamesModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self)
         self._resultRows = []
 
-    def columnCount(self, unusedParent=None):
+    def columnCount(self, unusedParent=QModelIndex()):
         """including the hidden col 0"""
         return 3
 
-    def rowCount(self, parent=None):
+    def rowCount(self, parent=QModelIndex()):
         """how many games"""
-        if parent and parent.isValid():
+        if parent.isValid():
             # we have only top level items
             return 0
         return len(self._resultRows)
@@ -52,7 +52,7 @@ class GamesModel(QAbstractTableModel):
         finally:
             self.endResetModel()
 
-    def index(self, row, column, parent=None):
+    def index(self, row, column, parent=QModelIndex()):
         """helper"""
         if (row < 0
                 or column < 0

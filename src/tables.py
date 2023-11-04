@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 
-from qt import Qt, QAbstractTableModel
+from qt import Qt, QAbstractTableModel, QModelIndex
 from qt import QDialog, QDialogButtonBox, QWidget
 from qt import QHBoxLayout, QVBoxLayout, QAbstractItemView
 from qt import QItemSelectionModel, QGridLayout, QColor, QPalette
@@ -61,14 +61,14 @@ class TablesModel(QAbstractTableModel):
                       i18n('Ruleset')][section]
         return result
 
-    def rowCount(self, parent=None):
+    def rowCount(self, parent=QModelIndex()):
         """how many tables are in the model?"""
-        if parent and parent.isValid():
+        if parent.isValid():
             # we have only top level items
             return 0
         return len(self.tables)
 
-    def columnCount(self, unusedParent=None):
+    def columnCount(self, unusedParent=QModelIndex()):
         """for now we only have id (invisible), id (visible), players,
         status, ruleset.name.
         id(invisible) always holds the real id, also 1000 for suspended tables.
@@ -283,8 +283,7 @@ class TableList(QWidget):
             title = i18n('Tables at %1', self.client.connection.url)
         decorateWindow(self, ' - '.join([self.client.name, title]))
         self.view.hideColumn(1)
-        tableCount = self.view.model().rowCount(
-            None) if self.view.model() else 0
+        tableCount = self.view.model().rowCount() if self.view.model() else 0
         self.view.showColumn(0)
         self.view.showColumn(2)
         self.view.showColumn(4)

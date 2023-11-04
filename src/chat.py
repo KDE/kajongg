@@ -42,15 +42,15 @@ class ChatModel(QAbstractTableModel):
             result = [i18n('Time'), i18n('Player'), i18n('Message')][section]
         return result
 
-    def rowCount(self, parent=None):
+    def rowCount(self, parent=QModelIndex()):
         """how many lines are in the model?"""
-        if parent and parent.isValid():
+        if parent.isValid():
             # similar in tables.py
             # we have only top level items
             return 0
         return len(self.chatLines)
 
-    def columnCount(self, unusedParent=None):
+    def columnCount(self, unusedParent=QModelIndex()):
         """for now we only have time, who, message"""
         return 3
 
