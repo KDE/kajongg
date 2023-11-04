@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import Optional, Union, TYPE_CHECKING
+from typing import List, Optional, Union, TYPE_CHECKING, cast
 
 from qt import Qt, QAbstractTableModel, QModelIndex, QSize
 from qt import QWidget, QLineEdit, QVBoxLayout, QColor, QAbstractItemView
@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from qt import QObject
     from client import ClientTable
     from scene import GameScene
+    from humanclient import HumanClient
 
 class ChatModel(QAbstractTableModel):
 
@@ -30,7 +31,7 @@ class ChatModel(QAbstractTableModel):
 
     def __init__(self, parent:Optional['QObject']=None) ->None:
         super().__init__(parent)
-        self.chatLines = []
+        self.chatLines:List[ChatMessage] = []
 
     def headerData(self, section:int, orientation:int, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, None]:
         """show header"""
@@ -116,13 +117,14 @@ class ChatWindow(QWidget):
 
     def __init__(self, table:'ClientTable') ->None:
         super().__init__(None)
+        assert table.client.connection
         self.table = table
-        self.table.chatWindow = self
+        table.chatWindow = self
         self.setObjectName('chatWindow')
         title = i18n(
             'Chat on table %1 at %2',
-            self.table.tableid,
-            self.table.client.connection.url)
+            table.tableid,
+            table.client.connection.url)
         decorateWindow(self, title)
         self.messageView = ChatView()
         self.messageView.setModel(ChatModel())
@@ -147,7 +149,7 @@ class ChatWindow(QWidget):
     def show(self) ->None:
         """not only show but also restore and raise"""
         self.activateWindow()
-        self.setWindowState(self.windowState() & ~Qt.WindowState.WindowMinimized)
+        self.setWindowState(cast(Qt.WindowState, self.windowState() & ~Qt.WindowState.WindowMinimized))
         self.raise_()
         QWidget.show(self)
 
@@ -178,7 +180,7 @@ class ChatWindow(QWidget):
                 self.table.client.name,
                 line,
                 isStatusMessage)
-            self.table.client.sendChat(msg).addErrback(self.chatError)
+            cast('HumanClient', self.table.client).sendChat(msg).addErrback(self.chatError)
 
     def chatError(self, result:str) ->None:
         """tableList may already have gone away"""
@@ -194,7 +196,7 @@ class ChatWindow(QWidget):
     def receiveLine(self, chatLine:ChatMessage) ->None:
         """show a new line in protocol"""
         self.show()
-        self.messageView.model().appendLine(chatLine)
+        cast(ChatModel, self.messageView.model()).appendLine(chatLine)
         for row in range(self.messageView.model().rowCount()):
             self.messageView.setRowHeight(
                 row,
