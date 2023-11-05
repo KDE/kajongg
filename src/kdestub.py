@@ -23,7 +23,7 @@ import codecs
 import weakref
 import urllib
 from collections import defaultdict
-from typing import List, Dict, TYPE_CHECKING, Optional, Union, Callable, Any, Type
+from typing import List, Dict, TYPE_CHECKING, Optional, Union, Callable, Any, Type, cast
 
 # pylint: disable=wrong-import-order
 
@@ -44,7 +44,8 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 from qt import *
 from qtpy import QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
 if QT6:
-    from qtpy.QtCore import QKeyCombination  # pylint:disable=no-name-in-module
+    # pylint:disable=no-name-in-module
+    from qtpy.QtCore import QKeyCombination  # type: ignore
 
 # pylint: disable=wrong-import-position
 
@@ -76,7 +77,7 @@ class KApplication(QApplication):
         # which is used by QStandardPaths - if we start kajongg.py directly,
         # the search path would look like /usr/share/kajongg.py/
 
-        self.translators = []
+        self.translators:List[KDETranslator] = []
         self.setApplicationName('kajongg')
         self.setApplicationVersion(str(Internal.defaultPort))
 
@@ -128,8 +129,8 @@ class CaptionMixin:
                 caption += ' – {}'.format(i18n('Kajongg'))
         else:
             caption = i18n('Kajongg')
-        self.setWindowTitle(caption)
-        self.setWindowIcon(KIcon('kajongg'))
+        self.setWindowTitle(caption)  # type:ignore
+        self.setWindowIcon(KIcon('kajongg'))  # type:ignore
 
 
 class Help:
@@ -208,7 +209,7 @@ class KMessageBox:
         messageLabel = QLabel(text)
         flags = Qt.TextInteractionFlag.TextSelectableByMouse
         if options & KMessageBox.AllowLink:
-            flags = flags | Qt.TextInteractionFlag.LinksAccessibleByMouse
+            flags = cast(Qt.TextInteractionFlag, flags | Qt.TextInteractionFlag.LinksAccessibleByMouse)
             messageLabel.setOpenExternalLinks(True)
         messageLabel.setTextInteractionFlags(flags)
 
@@ -256,7 +257,7 @@ class KDialog(CaptionMixin, QDialog):
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
-        self.__mainWidget = None
+        self.__mainWidget:Optional[QWidget] = None
 
     def setButtons(self, buttonMask:QDialogButtonBox.StandardButtons) ->None:
         """(re)create the buttonbox and put all wanted buttons into it"""
@@ -400,7 +401,7 @@ class MyStatusBarItem:
         self.stretch = stretch
         self.label = QLabel()
         self.label.setText(text)
-        self.label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        self.label.setAlignment(cast(Qt.AlignmentFlag, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter))
 
 
 class KStatusBar(QStatusBar):
@@ -409,7 +410,7 @@ class KStatusBar(QStatusBar):
 
     def __init__(self, *args:Any, **kwargs:Any) ->None:
         QStatusBar.__init__(self, *args, **kwargs)
-        self.__items = []
+        self.__items:List[MyStatusBarItem] = []
 
     def hasItem(self, idx:int) ->bool:
         """stub"""
@@ -778,7 +779,9 @@ class KConfigSkeleton(QObject):
 
     def __init__(self) ->None:
         QObject.__init__(self)
-        self.items = []
+        self.currentGroup:str
+        self.items:List[KConfigSkeletonItem] = []
+        self.toolBarActions:str
         self.addBool('MainWindow', 'toolBarVisible', True)
         self.addString(
             'MainWindow',
@@ -811,11 +814,12 @@ class KConfigSkeleton(QObject):
 
     def setCurrentGroup(self, group:str) ->None:
         """to be used by following add* calls"""
-        self.currentGroup = group  # pylint:disable=attribute-defined-outside-init
+        self.currentGroup = group
 
     def addItem(self, key:str, value:ParamValue,
         default:ParamValue) ->KConfigSkeletonItem:
         """add a string preference"""
+        cls: Type[KConfigSkeletonItem]
         if isinstance(value, bool):
             cls = ItemBool
         elif isinstance(value, int):
@@ -835,8 +839,8 @@ class KSwitchLanguageDialog(KDialog):
 
     def __init__(self, parent:QWidget) ->None:
         super().__init__(parent)
-        self.languageRows = {}
-        self.languageButtons = []
+        self.languageRows:Dict[QPushButton, Any] = {}
+        self.languageButtons:List[KLanguageButton] = []
         self.setCaption(i18n('Switch Application Language'))
         self.widget = QWidget()
         topLayout = QVBoxLayout()
@@ -949,7 +953,7 @@ class KLanguageButton(QWidget):
         self.popup = QMenu()
         self.button.setMenu(self.popup)
         self.setText(txt)
-        self.__currentItem = None
+        self.__currentItem:str
         for _ in MLocale.availableLanguages_().split(':'):
             self.addLanguage(_)
         self.popup.triggered.connect(self.slotTriggered)
@@ -1023,14 +1027,14 @@ class AboutKajonggDialog(KDialog):
         h1vLayout = QVBoxLayout()
         h1vLayout.addWidget(QLabel('Kajongg'))
         try:
-            from appversion import VERSION
+            from appversion import VERSION  # type:ignore[import]
         except ImportError:
             VERSION = "Unknown"
 
         assert isinstance(QT_VERSION, str)
         underVersions = ['Qt' + QT_VERSION +' API=' + API_NAME]
         if PYQT_VERSION:
-            from sip import SIP_VERSION_STR
+            from sip import SIP_VERSION_STR  # type:ignore[import]
             underVersions.append('sip ' + SIP_VERSION_STR)
         if PYSIDE2:
             import PySide2
@@ -1196,8 +1200,8 @@ class KConfigDialog(KDialog):
         self.setCaption(i18n('Configure'))
         self.name = name
         self.preferences = preferences
-        self.orgPref = None
-        self.configWidgets = {}
+        self.orgPref:defaultdict[Any, Any]
+        self.configWidgets:Dict[str, QWidget] = {}
         self.iconList = QListWidget()
         self.iconList.setViewMode(QListWidget.IconMode)
         self.iconList.setFlow(QListWidget.TopToBottom)
@@ -1246,7 +1250,7 @@ class KConfigDialog(KDialog):
     def allChildren(cls, widget:QObject) ->List[QObject]:
         """recursively find all widgets holding settings: Their object name
         starts with kcfg_"""
-        result = []
+        result:List[QObject] = []
         for child in widget.children():
             assert isinstance(child, QObject), 'child is:{}'.format(type(child))
             if child.objectName().startswith('kcfg_'):
@@ -1262,7 +1266,7 @@ class KConfigDialog(KDialog):
         font = item.font()
         font.setBold(True)
         item.setFont(font)
-        item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
+        item.setFlags(cast(Qt.ItemFlag, Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled))
         self.iconList.addItem(item)
         self.tabSpace.addWidget(configTab)
         self.iconList.setIconSize(QSize(80, 80))
@@ -1278,11 +1282,11 @@ class KConfigDialog(KDialog):
             self.configWidgets[
                 child.objectName().replace('kcfg_', '')] = child
             if isinstance(child, QCheckBox):
-                child.stateChanged.connect(self.updateButtons)
+                child.stateChanged.connect(self.updateButtons)  # type:ignore[arg-type]
             elif isinstance(child, QSlider):
-                child.valueChanged.connect(self.updateButtons)
+                child.valueChanged.connect(self.updateButtons)  # type:ignore[arg-type]
             elif isinstance(child, QLineEdit):
-                child.textChanged.connect(self.updateButtons)
+                child.textChanged.connect(self.updateButtons)  # type:ignore[arg-type]
         self.updateButtons()
         return configTab
 
@@ -1351,6 +1355,7 @@ class KSeparator(QFrame):
 class ToolBarItem(QListWidgetItem):
 
     """a toolbar item"""
+    emptyIcon:QIcon
 
     def __init__(self, action:Action, parent:QWidget) ->None:
         self.action = action
@@ -1358,13 +1363,13 @@ class ToolBarItem(QListWidgetItem):
         QListWidgetItem.__init__(self, self.__icon(), self.__text(), parent)
         # drop between items, not onto items
         self.setFlags(
-            (self.flags() | Qt.ItemFlag.ItemIsDragEnabled) & ~Qt.ItemFlag.ItemIsDropEnabled)
+            cast(Qt.ItemFlag, (self.flags() | Qt.ItemFlag.ItemIsDragEnabled) & ~Qt.ItemFlag.ItemIsDropEnabled))
 
     def __icon(self) ->QIcon:
         """the action icon, default is an empty icon"""
         result = self.action.icon()
         if result.isNull():
-            if not self.emptyIcon:  # pylint:disable=access-member-before-definition
+            if not self.emptyIcon:
                 iconSize = self.parent.style().pixelMetric(
                     QStyle.PixelMetric.PM_SmallIconSize)
                 _ = QPixmap(iconSize, iconSize)
@@ -1420,12 +1425,12 @@ class KEditToolBar(KDialog):
         self.upAction.setEnabled(False)
         self.upAction.setAutoRepeat(True)
         self.upAction.clicked.connect(self.upButton)
-        self.insertAction = QToolButton(self)
+        self.insertAction:QToolButton = QToolButton(self)
         self.insertAction.setIcon(
             KIcon('go-next' if QApplication.isRightToLeft() else 'go-previous'))
         self.insertAction.setEnabled(False)
         self.insertAction.clicked.connect(self.insertButton)
-        self.removeAction = QToolButton(self)
+        self.removeAction:QToolButton = QToolButton(self)
         self.removeAction.setIcon(
             KIcon('go-previous' if QApplication.isRightToLeft() else 'go-next'))
         self.removeAction.setEnabled(False)
@@ -1518,7 +1523,7 @@ class KEditToolBar(KDialog):
         else:
             fromList = self.activeList
             toList = self.inactiveList
-        item = fromList.takeItem(fromList.currentRow())
+        item = cast(ToolBarItem, fromList.takeItem(fromList.currentRow()))
         ToolBarItem(item.action, toList)
 
     def upButton(self) ->None:
@@ -1545,7 +1550,7 @@ class KEditToolBar(KDialog):
         assert Internal.Preferences
         for name, action in Internal.mainWindow.actionCollection().actions().items():
             if action.text():
-                if name in Internal.Preferences.toolBarActions:
+                if name in Internal.Preferences.toolBarActions:  # type:ignore
                     ToolBarItem(action, self.activeList)
                 else:
                     ToolBarItem(action, self.inactiveList)
@@ -1554,8 +1559,8 @@ class KEditToolBar(KDialog):
         """write active actions into Preferences"""
         if Internal.mainWindow is None:
             return
-        activeActions = (self.activeList.item(
-            x).action for x in range(len(self.activeList)))
+        activeActions = (cast(ToolBarItem, self.activeList.item(
+            x)).action for x in range(len(self.activeList)))
         names = {
             v: k for k,
             v in Internal.mainWindow.actionCollection(
