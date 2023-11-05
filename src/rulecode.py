@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import Tuple, List, Set, Generator, Optional, TYPE_CHECKING, Union
+from typing import Tuple, Dict, Any, List, Set, Generator, Optional, TYPE_CHECKING, Union
 
 # we disable those because of our automatic conversion to classmethod/staticmethod
 # mypy: disable-error-code="misc, override, call-arg, arg-type"
@@ -56,7 +56,9 @@ class RuleCode:
 
     """
 
-    cache = ()
+    cache : Tuple[str, ...] = ()
+
+    options:Dict[str, Any] = {}
 
     def appliesToHand(self, hand:'Hand') ->bool:
         """returns true if this applies to hand"""
@@ -327,7 +329,7 @@ class AllTerminals(RuleCode):
 
 class StandardMahJongg(MJRule):
 
-    cache = ('appliesToHand',)
+    cache : Tuple[str, ...] = ('appliesToHand',)
 
     def computeLastMelds(hand:'Hand') ->MeldList:
         """return all possible last melds"""
@@ -499,7 +501,7 @@ class StandardMahJongg(MJRule):
 
 
 class SquirmingSnake(StandardMahJongg):
-    cache = ()
+    cache : Tuple[str, ...] = ()
 
     def appliesToHand(hand:'Hand') ->bool:
         cacheKey = (hand.ruleset.standardMJRule.__class__, 'appliesToHand')
