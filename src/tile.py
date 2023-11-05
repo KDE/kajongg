@@ -543,6 +543,8 @@ class PieceList(TileList):
                 if _.name2() == value:
                     value = _
                     break
+            else:
+                raise ValueError('{} does not contain {!r}'.format(self, value))
         return TileList.remove(self, value)
 
 
