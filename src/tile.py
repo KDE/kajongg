@@ -538,9 +538,9 @@ class PieceList(TileList):
         """Can also remove Tile."""
 # FIXME: should we do tile == piece? would remove then work?
         if value.__class__ is Tile:
-            value = value.name2()
+            name2 = value.name2()
             for _ in self:
-                if _.name2() == value:
+                if _.name2() == name2:
                     value = _
                     break
             else:
