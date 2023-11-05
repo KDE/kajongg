@@ -7,6 +7,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import Dict, Type
+
 from common import ReprMixin
 
 class TileSource:
@@ -14,11 +16,12 @@ class TileSource:
     some constants
     """
 
-    byChar = {}
+    byChar : Dict[str, Type] = {}
 
     class SourceClass(ReprMixin):
         """Defines defaults"""
         isDiscarded = False
+        char: str
 
         def __str__(self) ->str:
             return self.__repr__()
