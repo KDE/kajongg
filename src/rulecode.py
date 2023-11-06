@@ -48,6 +48,9 @@ class RuleCode:
 
     cache = ()
 
+    def appliesToHand(self, hand):
+        """returns true if this applies to hand"""
+        return False
 
 class MJRule(RuleCode):
 
@@ -149,6 +152,7 @@ class ConcealedHonorsKong(RuleCode):
 class OwnWindPungKong(RuleCode):
 
     def appliesToMeld(hand, meld):
+        assert hand
         return meld[0].value is hand.ownWind
 
     def mayApplyToMeld(meld):
@@ -163,6 +167,7 @@ class OwnWindPungKong(RuleCode):
 class OwnWindPair(RuleCode):
 
     def appliesToMeld(hand, meld):
+        assert hand
         return meld[0].value is hand.ownWind
 
     def mayApplyToMeld(meld):
@@ -172,6 +177,7 @@ class OwnWindPair(RuleCode):
 class RoundWindPungKong(RuleCode):
 
     def appliesToMeld(hand, meld):
+        assert hand
         return meld[0].value is hand.roundWind
 
     def mayApplyToMeld(meld):
@@ -181,6 +187,7 @@ class RoundWindPungKong(RuleCode):
 class RoundWindPair(RuleCode):
 
     def appliesToMeld(hand, meld):
+        assert hand
         return meld[0].value is hand.roundWind
 
     def mayApplyToMeld(meld):
@@ -196,7 +203,9 @@ class DragonPair(RuleCode):
 class LastTileCompletesPairMinor(RuleCode):
 
     def appliesToHand(hand):
-        return hand.lastMeld and hand.lastMeld.isPair and hand.lastTile.isMinor
+        if hand.lastMeld is None:
+            return False
+        return hand.lastMeld.isPair and hand.lastTile.isMinor
 
 
 class Flower(RuleCode):
@@ -214,13 +223,15 @@ class Season(RuleCode):
 class LastTileCompletesPairMajor(RuleCode):
 
     def appliesToHand(hand):
-        return hand.lastMeld and hand.lastMeld.isPair and hand.lastTile.isMajor
+        if hand.lastMeld is None:
+            return False
+        return bool(hand.lastMeld) and hand.lastMeld.isPair and hand.lastTile.isMajor
 
 
 class LastFromWall(RuleCode):
 
     def appliesToHand(hand):
-        return hand.lastTile and hand.lastTile.isConcealed
+        return bool(hand.lastTile) and hand.lastTile.isConcealed
 
 
 class ZeroPointHand(RuleCode):
@@ -245,7 +256,7 @@ class FalseColorGame(RuleCode):
 
     def appliesToHand(hand):
         dwSet = set(Tile.honors)
-        return dwSet & hand.suits and len(hand.suits - dwSet) == 1
+        return bool(dwSet & hand.suits) and len(hand.suits - dwSet) == 1
 
 
 class TrueColorGame(RuleCode):
@@ -285,7 +296,7 @@ class HiddenTreasure(RuleCode):
 
     def appliesToHand(hand):
         return (not any(((x.isExposed and not x.isClaimedKong) or x.isChow) for x in hand.melds)
-                and hand.lastTile and hand.lastTile.isConcealed
+                and bool(hand.lastTile) and hand.lastTile.isConcealed
                 and len(hand.melds) == 5)
 
 
@@ -326,6 +337,7 @@ class StandardMahJongg(MJRule):
         if hand.arranged is None:
             # this is only Hand.__arrange
             return True
+        assert hand.score
         if hand.score.total() < hand.ruleset.minMJPoints:
             return False
         if hand.score.doubles >= hand.ruleset.minMJDoubles:
@@ -398,6 +410,7 @@ class StandardMahJongg(MJRule):
                 if values[0] + 2 == values[2] and (len(values) == 3 or values[3] > values[0] + 3):
                     # logDebug('removing first 3 from %s' % values)
                     meld = Tile(group, values[0]).chow
+                    assert meld
                     # pylint: disable=not-an-iterable
                     # must be a pylint bug. meld is TileList is list
                     for pair in meld:
@@ -417,6 +430,7 @@ class StandardMahJongg(MJRule):
                 changed = False
                 if values[-1] - 2 == values[-3] and (len(values) == 3 or values[-4] < values[-1] - 3):
                     meld = Tile(group, values[-3]).chow
+                    assert meld
                     # pylint: disable=not-an-iterable
                     # must be a pylint bug. meld is TileList is list
                     for pair in meld:
@@ -561,9 +575,10 @@ class WrigglingSnake(MJRule):
 
 class CallingHand(RuleCode):
 
-    def appliesToHand(cls, hand):
+    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
         for callHand in hand.callingHands:
             used = (x.rule.__class__ for x in callHand.usedRules)
+            assert hasattr(cls, 'limitHand')
             if cls.limitHand in used:
                 return True
         return False
@@ -618,7 +633,7 @@ class TripleKnitting(MJRule):
                 rest.remove(pair[1])
         yield melds, rest
 
-    def appliesToHand(cls, hand):
+    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
         if any(x.isHonor for x in hand.tiles):
             return False
         if len(hand.declaredMelds) > 1:
@@ -704,7 +719,7 @@ class Knitting(MJRule):
         pairCount = len(cls.findCouples(hand)[0])
         return pairCount >= pairWanted
 
-    def appliesToHand(cls, hand):
+    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
         if any(x.isHonor for x in hand.tiles):
             return False
         if len(hand.declaredMelds) > 1:
@@ -768,13 +783,13 @@ class Knitting(MJRule):
         return result, tiles0 + tiles1
 
     def pairSuits(hand):
-        """return a lowercase string with two suit characters. If no prevalence, returns None"""
+        """return a lowercase string with two suit characters. If no prevalence, returns ''"""
         suitCounts = [len([x for x in hand.tiles if x.lowerGroup == y]) for y in Tile.colors]
         minSuit = min(suitCounts)
         result = ''.join(x for idx, x in enumerate(Tile.colors) if suitCounts[idx] > minSuit)
         if len(result) == 2:
             return result
-        return None
+        return ''
 
 
 class AllPairHonors(MJRule):
@@ -784,7 +799,7 @@ class AllPairHonors(MJRule):
 
     def claimness(cls, hand, discard):
         result = IntDict()
-        if AllPairHonors.shouldTry(hand):
+        if cls.shouldTry(hand):
             result[Message.Pung] = -999
             result[Message.Kong] = -999
             result[Message.Chow] = -999
@@ -795,7 +810,7 @@ class AllPairHonors(MJRule):
             return False
         return len(hand.declaredMelds) < 2
 
-    def appliesToHand(cls, hand):
+    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
         if not cls.maybeCallingOrWon(hand):
             return False
         if len(set(hand.tiles)) != 7:
@@ -859,7 +874,7 @@ class FourfoldPlenty(RuleCode):
 
 class ThreeGreatScholars(RuleCode):
 
-    def appliesToHand(cls, hand):
+    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
         return (BigThreeDragons.appliesToHand(hand)
                 and ('nochow' not in cls.options or not any(x.isChow for x in hand.melds)))
 
@@ -945,7 +960,7 @@ class RobbingKong(RuleCode):
     def selectable(hand):
         """for scoring game"""
         return (hand.lastSource in (TileSource.RobbedKong, TileSource.LivingWall, TileSource.LivingWallDiscard)
-                and hand.lastTile and hand.lastTile.group.islower()
+                and bool(hand.lastTile )and hand.lastTile.group.islower()
                 and [x.exposed for x in hand.tiles].count(hand.lastTile.exposed) < 2)
 
 
@@ -970,13 +985,17 @@ class ScratchingPole(RuleCode):
 class StandardRotation(RuleCode):
 
     def rotate(game):
-        return game.winner and game.winner.wind is not East
+        if game is None:
+            return False
+        if game.winner is None:
+            return False
+        return game.winner.wind is not East
 
 
 class EastWonNineTimesInARow(RuleCode):
     nineTimes = 9
 
-    def appliesToHand(cls, hand):
+    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
         return cls.appliesToGame(hand.player.game)
 
     def appliesToGame(game, needWins=None):
@@ -987,7 +1006,7 @@ class EastWonNineTimesInARow(RuleCode):
                 needWins -= 1
         if game.winner and game.winner.wind is East and game.notRotated >= needWins:
             eastMJCount = int(Query("select count(1) from score "
-                                    "where game=%d and won=1 and wind='E' and player=%d "
+                                    "where game=%s and won=1 and wind='E' and player=%d "
                                     "and prevailing='%s'" %
                                     (game.gameid, game.players[East].nameid, game.roundWind.char)).records[0][0])
             return eastMJCount == needWins
@@ -1051,6 +1070,7 @@ class GatesOfHeaven(StandardMahJongg):
             return set()
         for suit in hand.suits:
             return {Tile(suit, x) for x in Tile.minors}
+        return set()
 
     def rearrange(cls, hand, rest):
         melds = MeldList()
@@ -1094,7 +1114,7 @@ class NineGates(GatesOfHeaven):
         if len(values_list) != 1:
             return False
         surplus = values_list[0]
-        return hand.lastTile and surplus == hand.lastTile.value
+        return bool(hand.lastTile) and surplus == hand.lastTile.value
 
     def winningTileCandidates(hand):
         if hand.declaredMelds:
@@ -1109,6 +1129,7 @@ class NineGates(GatesOfHeaven):
             return set()
         for suit in hand.suits:
             return {Tile(suit, x) for x in Tile.numbers}
+        return set()
 
 
 class ThirteenOrphans(MJRule):
@@ -1176,6 +1197,7 @@ class ThirteenOrphans(MJRule):
 
     def weigh(cls, aiInstance, candidates):
         hand = candidates.hand
+        assert hand
         if not cls.shouldTry(hand):
             return candidates
         handTiles = {x.exposed for x in hand.tiles}
@@ -1197,6 +1219,7 @@ class ThirteenOrphans(MJRule):
 class OwnFlower(RuleCode):
 
     def appliesToMeld(hand, meld):
+        assert hand
         return meld[0].value is hand.ownWind
 
     def mayApplyToMeld(meld):
@@ -1208,6 +1231,7 @@ class OwnFlower(RuleCode):
 class OwnSeason(RuleCode):
 
     def appliesToMeld(hand, meld):
+        assert hand
         return meld[0].value is hand.ownWind
 
     def mayApplyToMeld(meld):
@@ -1257,7 +1281,7 @@ class MahJonggWithOriginalCall(RuleCode):
         result = IntDict()
         player = hand.player
         if player.originalCall and player.mayWin:
-            if player.originalCallingHand.chancesToWin():
+            if player.originalCallingHand and player.originalCallingHand.chancesToWin():
                 # winning with OriginalCall is still possible
                 result[Message.Pung] = -999
                 result[Message.Kong] = -999
