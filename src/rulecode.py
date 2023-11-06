@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from tile import Tile, elements
+from tile import Tile, TileList, elements
 from tilesource import TileSource
 from meld import Meld, MeldList
 from common import IntDict
@@ -54,6 +54,7 @@ class MJRule(RuleCode):
 
     def computeLastMelds(hand):
         """return all possible last melds"""
+        return MeldList()
 
 
 class DragonPungKong(RuleCode):
@@ -534,7 +535,7 @@ class WrigglingSnake(MJRule):
         return {Tile(group, '1')}
 
     def rearrange(hand, rest):
-        melds = []
+        melds = MeldList()
         for tileName in rest[:]:
             if rest.count(tileName) >= 2:
                 melds.append(tileName.pair)
@@ -543,7 +544,7 @@ class WrigglingSnake(MJRule):
             elif rest.count(tileName) == 1:
                 melds.append(tileName.single)
                 rest.remove(tileName)
-        yield tuple(melds), tuple(rest)
+        yield melds, rest
 
     def appliesToHand(hand):
         if hand.declaredMelds:
@@ -574,12 +575,11 @@ class TripleKnitting(MJRule):
     def computeLastMelds(cls, hand):
         """return all possible last melds"""
         if not hand.lastTile:
-            return None
+            return MeldList()
         triples, rest = cls.findTriples(hand)
         assert len(rest) == 2
-        triples = [triples]
-        triples.append(rest)
-        return [Meld(x) for x in triples if hand.lastTile in x]
+        triples.append(Meld(rest))
+        return MeldList(Meld(x) for x in triples if hand.lastTile in x)
 
     def claimness(cls, hand, discard):
         result = IntDict()
@@ -600,7 +600,7 @@ class TripleKnitting(MJRule):
         return candidates
 
     def rearrange(cls, hand, rest):
-        melds = []
+        melds = MeldList()
         for triple in cls.findTriples(hand)[0]:
             melds.append(triple)
             rest.remove(triple[0])
@@ -611,13 +611,13 @@ class TripleKnitting(MJRule):
                 value = tile.value
                 suits = {x.group for x in rest if x.value == value}
                 if len(suits) < 2:
-                    yield tuple(melds), tuple(rest)
+                    yield melds, rest
                     return
                 pair = (Tile(suits.pop(), value), Tile(suits.pop(), value))
                 melds.append(Meld(sorted(pair)))
                 rest.remove(pair[0])
                 rest.remove(pair[1])
-        yield tuple(melds), tuple(rest)
+        yield melds, rest
 
     def appliesToHand(cls, hand):
         if any(x.isHonor for x in hand.tiles):
@@ -656,8 +656,8 @@ class TripleKnitting(MJRule):
         Also returns the remaining untripled tiles"""
         if hand.declaredMelds:
             if len(hand.declaredMelds) > 1:
-                return (Meld(), None)
-        result = []
+                return MeldList(), TileList()
+        result = MeldList()
         tilesS = [x.concealed for x in hand.tiles if x.lowerGroup == Tile.stone]
         tilesB = [x.concealed for x in hand.tiles if x.lowerGroup == Tile.bamboo]
         tilesC = [x.concealed for x in hand.tiles if x.lowerGroup == Tile.character]
@@ -669,7 +669,7 @@ class TripleKnitting(MJRule):
                 tilesB.remove(tileB)
                 tilesC.remove(tileC)
                 result.append(tileS.knitted3)
-        return tuple(result), tuple(tilesS + tilesB + tilesC)
+        return result, TileList(tilesS + tilesB + tilesC)
 
 
 class Knitting(MJRule):
@@ -677,11 +677,11 @@ class Knitting(MJRule):
     def computeLastMelds(cls, hand):
         """return all possible last melds"""
         if not hand.lastTile:
-            return []
+            return MeldList()
         couples, rest = cls.findCouples(hand)
         assert not rest, '%s: couples=%s rest=%s' % (
             hand.string, couples, rest)
-        return [Meld(x) for x in couples if hand.lastTile in x]
+        return MeldList(Meld(x) for x in couples if hand.lastTile in x)
 
     def claimness(cls, hand, discard):
         result = IntDict()
@@ -732,7 +732,7 @@ class Knitting(MJRule):
         return {otherTile}
 
     def rearrange(cls, hand, rest):
-        melds = []
+        melds = MeldList()
         for couple in cls.findCouples(hand, rest)[0]:
             if couple[0].isExposed:
                 # this is the mj pair, lower after claiming
@@ -740,7 +740,7 @@ class Knitting(MJRule):
             melds.append(Meld(couple))
             rest.remove(couple[0])
             rest.remove(couple[1])
-        yield tuple(melds), tuple(rest)
+        yield melds, rest
 
     def findCouples(cls, hand, pairs=None):
         """return a list of tuples, including the mj couple.
@@ -748,15 +748,15 @@ class Knitting(MJRule):
         are of the wanted suits"""
         if hand.declaredMelds:
             if len(hand.declaredMelds) > 1 or len(hand.declaredMelds[0]) > 2:
-                return [], []
-        result = []
-        if pairs is None:
+                return MeldList(), TileList()
+        result = MeldList()
+        if not pairs:
             pairs = hand.tiles
         suits = cls.pairSuits(hand)
         if not suits:
-            return [], []
-        tiles0 = [x for x in pairs if x.lowerGroup == suits[0]]
-        tiles1 = [x for x in pairs if x.lowerGroup == suits[1]]
+            return MeldList(), TileList()
+        tiles0 = TileList(x for x in pairs if x.lowerGroup == suits[0])
+        tiles1 = TileList(x for x in pairs if x.lowerGroup == suits[1])
         for tile0 in tiles0[:]:
             if tile0.isExposed:
                 tile1 = Tile(suits[1], tile0.value)
@@ -828,7 +828,7 @@ class AllPairHonors(MJRule):
         return result
 
     def rearrange(hand, rest):
-        melds = []
+        melds = MeldList()
         for pair in sorted(set(rest) & elements.mAJORS):
             while rest.count(pair) >= 2:
                 melds.append(pair.pair)
@@ -1009,7 +1009,7 @@ class GatesOfHeaven(StandardMahJongg):
 
 # TODO: in BMJA, 111 and 999 must be concealed, we do not check this
     def computeLastMelds(hand):
-        return [x for x in hand.melds if hand.lastTile in x]
+        return MeldList(x for x in hand.melds if hand.lastTile in x)
 
     def shouldTry(hand, maxMissing=None):
         if hand.declaredMelds:
@@ -1054,7 +1054,7 @@ class GatesOfHeaven(StandardMahJongg):
             return {Tile(suit, x) for x in Tile.minors}
 
     def rearrange(hand, rest):
-        melds = []
+        melds = MeldList()
         for suit in hand.suits & set(Tile.colors):
             for value in Tile.numbers:
                 tile = Tile(suit, value).concealed
@@ -1071,7 +1071,7 @@ class GatesOfHeaven(StandardMahJongg):
                     melds.append(tile.single)
                     rest.remove(tile)
             break
-        yield tuple(melds), tuple(rest)
+        yield melds, rest
 
 
 class NineGates(GatesOfHeaven):
@@ -1122,7 +1122,7 @@ class ThirteenOrphans(MJRule):
         return MeldList(Tile(hand.lastTile).meld(meldSize))
 
     def rearrange(hand, rest):
-        melds = []
+        melds = MeldList()
         for tileName in rest:
             if rest.count(tileName) >= 2:
                 melds.append(tileName.pair)
@@ -1131,7 +1131,7 @@ class ThirteenOrphans(MJRule):
             elif rest.count(tileName) == 1:
                 melds.append(tileName.single)
                 rest.remove(tileName)
-        yield tuple(melds), tuple(rest)
+        yield melds, rest
 
     def claimness(cls, hand, discard):
         result = IntDict()
