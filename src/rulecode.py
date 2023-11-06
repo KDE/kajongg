@@ -55,6 +55,18 @@ class MJRule(RuleCode):
         """return all possible last melds"""
         return MeldList()
 
+    def shouldTry(hand, maxMissing=10):
+        return True
+
+    def rearrange(cls, hand, rest):
+        """rest is a list of those tiles that can still
+        be rearranged: No declared melds and no bonus tiles.
+        done is already arranged, do not change this.
+        TODO: also return how many tiles are missing for winning"""
+        permutations = Permutations(rest)
+        for variantMelds in permutations.variants:
+            yield variantMelds, TileList()
+
 
 class DragonPungKong(RuleCode):
 
@@ -462,18 +474,6 @@ class StandardMahJongg(MJRule):
                         result.append(Tile(group, value + 1))
         return set(result)
 
-    def shouldTry(hand, maxMissing=10):
-        return True
-
-    def rearrange(hand, rest):
-        """rest is a list of those tiles that can still
-        be rearranged: No declared melds and no bonus tiles.
-        done is already arranged, do not change this.
-        TODO: also return how many tiles are missing for winning"""
-        permutations = Permutations(rest)
-        for variantMelds in permutations.variants:
-            yield tuple(variantMelds), tuple()
-
 
 class SquirmingSnake(StandardMahJongg):
     cache = ()
@@ -643,7 +643,7 @@ class TripleKnitting(MJRule):
             result.remove(restTile)
         return set(result)
 
-    def shouldTry(cls, hand, maxMissing=3):
+    def shouldTry(cls, hand, maxMissing=3):  # pylint:disable=arguments-renamed
         if hand.declaredMelds:
             return False
         tripleWanted = 4 - maxMissing // 3  # count triples
@@ -697,7 +697,7 @@ class Knitting(MJRule):
                     candidate.keep -= 50
         return candidates
 
-    def shouldTry(cls, hand, maxMissing=4):
+    def shouldTry(cls, hand, maxMissing=4):  # pylint:disable=arguments-renamed
         if hand.declaredMelds:
             return False
         pairWanted = 7 - maxMissing // 2  # count pairs
