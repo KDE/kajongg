@@ -725,9 +725,9 @@ class Knitting(MJRule):
             # single tile has wrong suit
             return set()
         assert len(singleTile) == 1
-        singleTile = singleTile[0]
-        otherSuit = (hand.suits - {singleTile.lowerGroup}).pop()
-        otherTile = Tile(otherSuit, singleTile.value).concealed
+        tile = singleTile[0]
+        otherSuit = (hand.suits - {tile.lowerGroup}).pop()
+        otherTile = Tile(otherSuit, tile.value).concealed
         return {otherTile}
 
     def rearrange(cls, hand, rest):
@@ -1028,13 +1028,13 @@ class GatesOfHeaven(StandardMahJongg):
         values = hand.values
         if len(set(values)) < 9 or values.count(1) != 3 or values.count(9) != 3:
             return False
-        values = list(values[3:-3])
+        values_list = list(values[3:-3])
         for value in Tile.minors:
-            if value in values:
-                values.remove(value)
-        if len(values) != 1:
+            if value in values_list:
+                values_list.remove(value)
+        if len(values_list) != 1:
             return False
-        surplus = values[0]
+        surplus = values_list[0]
         return 1 < surplus < 9
 
     def winningTileCandidates(hand):
@@ -1087,13 +1087,13 @@ class NineGates(GatesOfHeaven):
             return False
         if values.count(1) != 3 or values.count(9) != 3:
             return False
-        values = list(values[3:-3])
+        values_list = list(values[3:-3])
         for value in Tile.minors:
-            if value in values:
-                values.remove(value)
-        if len(values) != 1:
+            if value in values_list:
+                values_list.remove(value)
+        if len(values_list) != 1:
             return False
-        surplus = values[0]
+        surplus = values_list[0]
         return hand.lastTile and surplus == hand.lastTile.value
 
     def winningTileCandidates(hand):
