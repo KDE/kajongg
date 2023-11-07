@@ -37,7 +37,6 @@ class DBCursor(sqlite3.Cursor):
 
     def __init__(self, dbHandle):
         sqlite3.Cursor.__init__(self, dbHandle)
-        self.statement = None
         self.parameters = None
         self.failure = None
 
@@ -45,7 +44,7 @@ class DBCursor(sqlite3.Cursor):
                 silent=False, failSilent=False, mayFail=False):
         """logging wrapper, returning all selected data"""
         # pylint: disable=too-many-branches
-        self.statement = statement
+        self.statement = statement  # pylint:disable=attribute-defined-outside-init
         self.parameters = parameters
         if not silent:
             logDebug(str(self))
@@ -74,7 +73,7 @@ class DBCursor(sqlite3.Cursor):
         except sqlite3.Error as exc:
             self.failure = exc
             msg = 'ERROR in %s: %s for %s' % (
-                self.connection.path,
+                DBHandle.dbPath(),
                 exc.message if hasattr(exc, 'message') else '',
                 self)
             if mayFail:
@@ -152,7 +151,7 @@ class DBHandle(sqlite3.Connection):
         name = stack[-3]
         if name in ('__exit__', '__init__'):
             name = stack[-4]
-        return '%s on %s (%x)' % (name, self.path, id4(self))
+        return '%s on %s (%s)' % (name, self.path, id4(self))
 
     def commit(self, silent=None):
         """commit and log it"""
@@ -162,7 +161,7 @@ class DBHandle(sqlite3.Connection):
             if not silent:
                 logWarning(
                     '%s cannot commit: %s :' %
-                    (self.name, exc.message))
+                    (DBHandle.dbPath(), exc))
 
     def rollback(self, silent=None):
         """rollback and log it"""
@@ -171,7 +170,7 @@ class DBHandle(sqlite3.Connection):
             if not silent and Debug.sql:
                 logDebug('%x rollbacked transaction' % id(self))
         except sqlite3.Error as exc:
-            logWarning('%s cannot rollback: %s' % (self.name, exc.message))
+            logWarning('%s cannot rollback: %s' % (DBHandle.dbPath(), exc))
 
     def close(self, silent=False):
         """just for logging"""
@@ -392,7 +391,7 @@ class PrepareDB:
                 logInfo(i18n('Database %1 updated from schema %2 to %3',
                              Internal.db.path, currentVersion, version), showDialog=True)
         except sqlite3.Error as exc:
-            logException('opening %s: %s' % (self.path, exc.message))
+            logException('opening %s: %s' % (self.path, exc))
         finally:
             Internal.db.close(silent=True)
 
