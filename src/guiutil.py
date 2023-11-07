@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import os
-from typing import TYPE_CHECKING, Optional, List, Any, Type, Union
+from typing import TYPE_CHECKING, Optional, List, Any, Type, Union, Tuple, Dict
 
 from qt import uic, QStandardPaths
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
@@ -160,13 +160,13 @@ def rotateCenter(item:'QGraphicsItem', angle:float) ->None:
 def sceneRotation(item:'QGraphicsItem') ->int:
     """the combined rotation of item and all parents in degrees: 0,90,180 or 270"""
     transform = item.sceneTransform()
-    matrix = (
+    matrix:Tuple[int, ...] = (
         round(transform.m11()),
         round(transform.m12()),
         round(transform.m21()),
         round(transform.m22()))
     matrix = tuple(1 if x > 0 else -1 if x < 0 else 0 for x in matrix)
-    rotations = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
+    rotations:Dict[Tuple[int, ...], int] = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
         0, 1, -1, 0): 90, (-1, 0, 0, -1): 180, (0, -1, 1, 0): 270}
     if matrix not in rotations:
         raise ValueError('matrix unknown:%s' % str(matrix))
