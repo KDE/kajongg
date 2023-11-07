@@ -169,8 +169,6 @@ class TableList(QWidget):
         self.setObjectName('TableList')
         self.resize(700, 400)
         self.view = MJTableView(self)
-        self.__differ = None
-        self.debugModelTest = None
         self.requestedNewTable = False
         self.view.setItemDelegateForColumn(
             2,
@@ -253,9 +251,11 @@ class TableList(QWidget):
         def initChat(_):
             """now that we were able to send the message to the server
             instantiate the chat window"""
+            assert table
             table.chatWindow = ChatWindow(table)
             table.chatWindow.receiveLine(msg)
         table = self.selectedTable()
+        assert table
         if not table.chatWindow:
             line = i18nE('opens a chat window')
             msg = ChatMessage(
@@ -279,6 +279,7 @@ class TableList(QWidget):
                 'Local Games with Ruleset %1',
                 self.client.ruleset.name)
         else:
+            assert self.client.connection
             title = i18n('Tables at %1', self.client.connection.url)
         assert self.client.name
         decorateWindow(self, ' - '.join([self.client.name, title]))
@@ -376,32 +377,36 @@ class TableList(QWidget):
     def compareRuleset(self):
         """compare the ruleset of this table against ours"""
         table = self.selectedTable()
-        self.__differ = RulesetDiffer([table.ruleset], Ruleset.availableRulesets())
-        self.__differ.show()
+        if table:
+            self.__differ = RulesetDiffer([table.ruleset], Ruleset.availableRulesets())  # pylint:disable=attribute-defined-outside-init
+            self.__differ.show()
 
     def startGame(self):
         """start playing at the selected table"""
         table = self.selectedTable()
-        self.startButton.setEnabled(False)
-        self.client.callServer(
-            'startGame',
-            table.tableid).addErrback(
-                self.client.tableError)
+        if table:
+            self.startButton.setEnabled(False)
+            self.client.callServer(
+                'startGame',
+                table.tableid).addErrback(
+                    self.client.tableError)
 
     def leaveTable(self):
         """leave a table"""
         table = self.selectedTable()
-        self.client.callServer(
-            'leaveTable',
-            table.tableid).addErrback(
-                self.client.tableError)
+        if table:
+            self.client.callServer(
+                'leaveTable',
+                table.tableid).addErrback(
+                    self.client.tableError)
 
     def __keepChatWindows(self, tables):
         """copy chatWindows from the old table list which will be
         thrown away"""
-        if self.view.model():
-            chatWindows = {x.tableid: x.chatWindow for x in self.view.model().tables}
-            unusedWindows = {x.chatWindow for x in self.view.model().tables}
+        model = self.view.model()
+        if model:
+            chatWindows = {x.tableid: x.chatWindow for x in model.tables}
+            unusedWindows = {x.chatWindow for x in model.tables}
             for table in tables:
                 table.chatWindow = chatWindows.get(table.tableid, None)
                 unusedWindows -= {table.chatWindow}
@@ -428,8 +433,9 @@ class TableList(QWidget):
                 newIds = sorted({x.tableid for x in tables} - oldIds)
                 if newIds:
                     return newIds[0]
-        if self.selectedTable():
-            return self.selectedTable().tableid
+        _ = self.selectedTable()
+        if _:
+            return _.tableid
         return 0
 
     def loadTables(self, tables):
@@ -451,7 +457,7 @@ class TableList(QWidget):
         model = TablesModel(tables)
         self.view.setModel(model)
         if Debug.modelTest:
-            self.debugModelTest = ModelTest(model, self.view)
+            self.debugModelTest = ModelTest(model, self.view)  # pylint:disable=attribute-defined-outside-init
         selection = QItemSelectionModel(model, self.view)
         self.view.initView()
         self.view.setSelectionModel(selection)
