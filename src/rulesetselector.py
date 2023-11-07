@@ -15,7 +15,7 @@ from qt import QWidget, QHBoxLayout, QVBoxLayout, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
 from qt import QModelIndex
 from kdestub import KApplication
-from rule import Ruleset, PredefinedRuleset, RuleBase, ParameterRule, BoolRule
+from rule import Rule, Ruleset, PredefinedRuleset, ParameterRule, BoolRule
 from util import uniqueList
 from mi18n import i18n, i18nc, i18ncE, english
 from differ import RulesetDiffer
@@ -301,7 +301,7 @@ class EditableRuleModel(RuleModel):
                 oldName = content.name
                 content.rename(english(value))
                 dirty = oldName != content.name
-            elif isinstance(content, RuleBase):
+            elif isinstance(content, (Rule, ParameterRule)):
                 dirty, message = self.__setRuleData(column, content, value)
                 if message:
                     Sorry(message)
@@ -318,7 +318,7 @@ class EditableRuleModel(RuleModel):
             else:
                 return False
         if dirty:
-            if isinstance(content, RuleBase):
+            if isinstance(content, (Rule, ParameterRule)):
                 ruleset.updateRule(content)
             self.dataChanged.emit(index, index)
         return True
@@ -333,7 +333,7 @@ class EditableRuleModel(RuleModel):
         checkable = False
         if isinstance(content, Ruleset) and column == 0:
             mayEdit = True
-        elif isinstance(content, RuleBase):
+        elif isinstance(content, (Rule, ParameterRule)):
             checkable = column == 1 and isinstance(content, BoolRule)
             mayEdit = bool(column)
         else:
