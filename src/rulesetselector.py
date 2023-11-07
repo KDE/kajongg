@@ -52,6 +52,7 @@ class RuleTreeItem(TreeItem):
         """return the ruleset containing this item"""
         item = self
         while not isinstance(item.raw, Ruleset):
+            assert item.parent
             item = item.parent
         return item.raw
 
@@ -152,13 +153,14 @@ class RuleModel(TreeModel):
         super().__init__(parent)
         self.rulesets = rulesets
         self.loaded = False
-        unitNames = []
+        unitPairs = []
+        # unitPairs: int is the priority:show 0 leftmost, 9999 rightmost
         for ruleset in rulesets:
             ruleset.load()
             for rule in ruleset.allRules:
-                unitNames.extend(rule.score.unitNames.items())
-        unitNames = sorted(unitNames, key=lambda x: x[1])
-        unitNames = uniqueList(x[0] for x in unitNames)
+                unitPairs.extend(rule.score.unitNames.items())
+        unitPairs = sorted(unitPairs, key=lambda x: x[1])
+        unitNames = uniqueList(x[0] for x in unitPairs)
         rootData = [title]
         rootData.extend(unitNames)
         self.rootItem = RuleRootItem(rootData)
@@ -228,6 +230,7 @@ class RuleModel(TreeModel):
             # happens when kajongg exits unexpectedly
             return None
         if role == Qt.ItemDataRole.DisplayRole and orientation == Qt.Orientation.Horizontal:
+            assert self.rootItem
             if section >= self.rootItem.columnCount():
                 return None
             result = self.rootItem.content(section)
@@ -245,6 +248,7 @@ class RuleModel(TreeModel):
             return
         ruleset.load()
         parent = QModelIndex()
+        assert self.rootItem
         row = self.rootItem.childCount()
         rulesetItems = list([RulesetItem(ruleset)])
         self.insertRows(row, rulesetItems, parent)
@@ -282,7 +286,9 @@ class EditableRuleModel(RuleModel):
                 content.parameter = oldParameter
                 dirty = False
         else:
+            assert self.rootItem
             unitName = self.rootItem.content(column)
+            assert isinstance(value, (int, float))
             dirty, message = content.score.change(unitName, value)
         return dirty, message
 
@@ -377,6 +383,7 @@ class RuleTreeView(QTreeView):
     @property
     def rulesets(self):
         """a list of rulesets made available by this model"""
+        assert self.ruleModel
         return self.ruleModel.rulesets
 
     @rulesets.setter
@@ -387,11 +394,8 @@ class RuleTreeView(QTreeView):
                 self.ruleModel = EditableRuleModel(rulesets, self.name)
             else:
                 self.ruleModel = RuleModel(rulesets, self.name)
-            self.setItemDelegateForColumn(
-                1,
-                RightAlignedCheckboxDelegate(
-                    self,
-                    self.ruleModel.isCheckboxCell))
+            delegate = RightAlignedCheckboxDelegate(self, self.ruleModel.isCheckboxCell)
+            self.setItemDelegateForColumn(1, delegate)
             for  col in (2, 3):
                 self.setItemDelegateForColumn(col, ZeroEmptyColumnDelegate(self))
             self.setModel(self.ruleModel)
@@ -401,6 +405,7 @@ class RuleTreeView(QTreeView):
 
     def selectionChanged(self, selected, unusedDeselected=None):
         """update editing buttons"""
+        assert self.ruleModel
         enableCopy = enableRemove = enableCompare = False
         if selected.indexes():
             item = selected.indexes()[0].internalPointer()
@@ -421,6 +426,7 @@ class RuleTreeView(QTreeView):
     def showEvent(self, unusedEvent):
         """reload the models when the view comes into sight"""
         # default: make sure the name column is wide enough
+        assert self.ruleModel
         if self.ruleModel.canFetchMore():
             # we want to load all before adjusting column width
             self.ruleModel.fetchMore()
