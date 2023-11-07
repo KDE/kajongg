@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 
-from typing import TYPE_CHECKING, Optional, List, Any
+from typing import TYPE_CHECKING, Optional, List, Any, cast
 
 from qt import Qt, QAbstractTableModel, QModelIndex
 from qt import QDialog, QDialogButtonBox, QWidget
@@ -86,7 +86,7 @@ class TablesModel(QAbstractTableModel):
     def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Any:
         """score table"""
         # pylint: disable=too-many-branches,too-many-locals
-        result = None
+        result:Any = None
         if role == Qt.ItemDataRole.TextAlignmentRole:
             if index.column() == 0:
                 result = int(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
@@ -177,6 +177,8 @@ class TableList(QWidget):
         self.setObjectName('TableList')
         self.resize(700, 400)
         self.view = MJTableView(self)
+        self.__differ:RulesetDiffer
+        self.debugModelTest:ModelTest
         self.requestedNewTable = False
         self.view.setItemDelegateForColumn(
             2,
@@ -240,8 +242,8 @@ class TableList(QWidget):
         """table window hides"""
         scene = Internal.scene
         if scene:
-            scene.startingGame = False
-        model = self.view.model()
+            cast('PlayingScene', scene).startingGame = False
+        model = cast(TablesModel, self.view.model())
         if model:
             for table in model.tables:
                 if table.chatWindow:
@@ -256,6 +258,7 @@ class TableList(QWidget):
         """chat. Only generate ChatWindow after the
         message has successfully been sent to the server.
         Because the server might have gone away."""
+        msg:ChatMessage
         def initChat(_:Any) ->None:
             """now that we were able to send the message to the server
             instantiate the chat window"""
@@ -271,7 +274,7 @@ class TableList(QWidget):
                 table.client.name,
                 line,
                 isStatusMessage=True)
-            table.client.sendChat(
+            cast('HumanClient', table.client).sendChat(
                 msg).addCallback(
                     initChat).addErrback(
                         self.client.tableError)
@@ -377,7 +380,7 @@ class TableList(QWidget):
         """return the selected table"""
         if self.view.selectionModel():
             index = self.view.selectionModel().currentIndex()
-            model = self.view.model()
+            model = cast(TablesModel, self.view.model())
             if index.isValid() and model:
                 return model.tables[index.row()]
         return None
@@ -386,7 +389,7 @@ class TableList(QWidget):
         """compare the ruleset of this table against ours"""
         table = self.selectedTable()
         if table:
-            self.__differ = RulesetDiffer([table.ruleset], Ruleset.availableRulesets())  # pylint:disable=attribute-defined-outside-init
+            self.__differ = RulesetDiffer([table.ruleset], Ruleset.availableRulesets())
             self.__differ.show()
 
     def startGame(self) ->None:
@@ -411,7 +414,7 @@ class TableList(QWidget):
     def __keepChatWindows(self, tables:List['ClientTable']) ->None:
         """copy chatWindows from the old table list which will be
         thrown away"""
-        model = self.view.model()
+        model = cast(TablesModel, self.view.model())
         if model:
             chatWindows = {x.tableid: x.chatWindow for x in model.tables}
             unusedWindows = {x.chatWindow for x in model.tables}
@@ -435,7 +438,7 @@ class TableList(QWidget):
           select first table"""
         if self.requestedNewTable:
             self.requestedNewTable = False
-            model = self.view.model()
+            model = cast(TablesModel, self.view.model())
             if model:
                 oldIds = {x.tableid for x in model.tables}
                 newIds = sorted({x.tableid for x in tables} - oldIds)
@@ -465,7 +468,7 @@ class TableList(QWidget):
         model = TablesModel(tables)
         self.view.setModel(model)
         if Debug.modelTest:
-            self.debugModelTest = ModelTest(model, self.view)  # pylint:disable=attribute-defined-outside-init
+            self.debugModelTest = ModelTest(model, self.view)
         selection = QItemSelectionModel(model, self.view)
         self.view.initView()
         self.view.setSelectionModel(selection)
