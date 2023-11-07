@@ -14,6 +14,7 @@ from locale import getpreferredencoding
 
 # we must not import twisted or we need to change kajongg.py
 
+from qtpy import PYQT_VERSION
 from common import Internal, Debug
 from qt import Qt, QEvent
 from util import elapsedSince, traceback, gitHead, callers
@@ -165,7 +166,6 @@ def logException(exception: str, withGamePrefix=True) ->None:
             raise exception
         raise Exception(exception)  # pylint:disable=broad-exception-raised
 
-
 class EventData(str):
 
     """used for generating a nice string"""
@@ -183,36 +183,58 @@ class EventData(str):
 
     def __new__(cls, receiver, event, prefix=None):
         """create the wanted string"""
-        # pylint: disable=too-many-branches
-        if event.type() in cls.events:
-            # ignore unknown event types
-            name = cls.events[event.type()]
-            value = ''
-            if hasattr(event, 'key'):
-                if event.key() in cls.keys:
-                    value = cls.keys[event.key()]
-                else:
-                    value = 'unknown key:%s' % event.key()
-            if hasattr(event, 'text'):
-                eventText = str(event.text())
-                if eventText and eventText != '\r':
-                    value += ':%s' % eventText
-            if value:
-                value = '(%s)' % value
-            msg = '%s%s->%s' % (name, value, receiver)
-            if hasattr(receiver, 'text'):
-                if receiver.__class__.__name__ != 'QAbstractSpinBox':
-                    # accessing QAbstractSpinBox.text() gives a segfault
-                    try:
-                        msg += '(%s)' % receiver.text()
-                    except TypeError:
-                        msg += '(%s)' % receiver.text
-            elif hasattr(receiver, 'objectName'):
-                msg += '(%s)' % receiver.objectName()
-        else:
-            msg = 'unknown event:%s' % event.type()
+        name = cls.eventName(event)
+        msg = '%s%sreceiver:%s' % (name, cls.eventValue(event), cls.eventReceiver(receiver))
         if prefix:
             msg = ': '.join([prefix, msg])
         if 'all' in Debug.events or any(x in msg for x in Debug.events.split(':')):
             logDebug(msg)
-        return msg
+        return super().__new__(cls, msg)
+
+    @classmethod
+    def eventReceiver(cls, receiver):
+        """Format data about event receiver"""
+        text = ''
+        if hasattr(receiver, 'text'):
+            try:
+                text = receiver.text()
+            except TypeError:
+                text = receiver.text
+        name = ''
+        if hasattr(receiver, 'objectName') and receiver.objectName():
+            name = receiver.objectName()
+        debug_name = ''
+        if hasattr(receiver, 'debug_name'):
+            debug_name = receiver.debug_name()
+
+        return ''.join([text, name, debug_name, repr(receiver)])
+
+    @classmethod
+    def eventValue(cls, event):
+        """Format data about event value"""
+        value = ''
+        if hasattr(event, 'key'):
+            if event.key() in cls.keys:
+                value = cls.keys[event.key()]
+            else:
+                value = 'unknown key:%s' % event.key()
+        if hasattr(event, 'text'):
+            eventText = str(event.text())
+            if eventText and eventText != '\r':
+                value += ':%s' % eventText
+        return value
+
+    @classmethod
+    def eventName(cls, event):
+        """Format data about event name"""
+        if not PYQT_VERSION:
+            # Pyside
+            evtype = event.type()
+            repr_last = repr(evtype).split('.')[-1]
+            result = repr_last.split(':')[0]
+        elif event.type() in cls.events:
+            # ignore unknown event types
+            result = cls.events[event.type()]
+        else:
+            result = 'unknown :%s' % event.type()
+        return 'Event:{}'.format(result)
