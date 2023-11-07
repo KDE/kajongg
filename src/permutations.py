@@ -54,7 +54,7 @@ class Permutations:
         result = []
         for variant in (sum(x, []) for x in itertools.product(*variants)):
             if variant not in result:
-                result.append(variant)
+                result.append(MeldList(variant))
         result = sorted(MeldList(honors + x + boni) for x in result)
         return result
 
@@ -87,9 +87,9 @@ class Permutations:
                     for combi in permuteRest:
                         result.append(tuple(list(appendValue) + list(combi)))
                 else:
-                    result.append(appendValue)
+                    result.append(tuple(appendValue))
         else:
-            result = list([list([tuple([x]) for x in values])])  # pylint: disable=consider-using-generator
+            result = list([tuple([tuple([x]) for x in values])])  # pylint: disable=consider-using-generator
             # the solution proposed by pylint creates something unusable
         tupleResult = tuple(sorted(set(tuple(tuple(sorted(x)) for x in result))))
         cls.permuteCache[valuesTuple] = tupleResult
@@ -122,7 +122,9 @@ class Permutations:
                     maxPungs = pungCount
                     maxPungVariant = variant
             if maxPungs > 0 and maxPungVariant not in result:
+                assert maxPungVariant
                 result.append(maxPungVariant)
+            assert minMeldVariant
             result.append(minMeldVariant)
             if not result:
                 # if nothing seems useful, return all possible permutations
@@ -146,7 +148,7 @@ class Permutations:
         combinations = [cls.usefulPermutations(x) for x in groups]
         result = []
         for variant in itertools.product(*combinations):
-            melds = []
+            melds = MeldList()
             for block in variant:
                 for meld in block:
                     melds.append(Meld(Tile(color, x) for x in meld))
