@@ -49,8 +49,8 @@ def __logUnicodeMessage(prio, msg):
     str object.
     The logger module would log the str object with the
     marker feff at the beginning of every message, we do not want that."""
-    msg = msg.encode(getpreferredencoding(), 'ignore')[:4000]
-    msg = msg.decode(getpreferredencoding())
+    byte_msg = msg.encode(getpreferredencoding(), 'ignore')[:4000]
+    msg = byte_msg.decode(getpreferredencoding())
     Internal.logger.log(prio, msg)
 
 
