@@ -384,7 +384,7 @@ class RuleTreeView(QTreeView):
                 RightAlignedCheckboxDelegate(
                     self,
                     self.ruleModel.isCheckboxCell))
-            for  col in (1, 2, 3):
+            for  col in (2, 3):
                 self.setItemDelegateForColumn(col, ZeroEmptyColumnDelegate(self))
             self.setModel(self.ruleModel)
             if Debug.modelTest:
