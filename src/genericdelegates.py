@@ -29,7 +29,6 @@ class RichTextColumnDelegate(QStyledItemDelegate):
 
     """enables rich text in a view"""
     label = None
-    document = None
 
     def __init__(self, parent=None):
         super().__init__(parent)
