@@ -27,7 +27,6 @@ from kajcsv import Csv, CsvRow, CsvWriter
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 
-OPTIONS = None
 
 class Clone:
 
@@ -193,8 +192,8 @@ class Server(ReprMixin):
         return 'Server {} Python{}{} {}'.format(
             self.commitId,
             self.pythonVersion,
-            ' pid={}'.format(self.process.pid) if Debug.process else '',
-            'port={}'.format(self.portNumber) if self.portNumber else 'socket={}'.format(self.socketName))
+            ' pid={}'.format(self.process.pid) if Debug.process and self.process else '',
+            ' port={}'.format(self.portNumber) if self.portNumber else ' socket={}'.format(self.socketName))
 
 
 class Job(ReprMixin):
@@ -207,10 +206,7 @@ class Job(ReprMixin):
         self.aiVariant = aiVariant
         self.commitId = commitId
         self.game = game
-        self.__logFile = None
-        self.logFileName = None
         self.process = None
-        self.server = None
         self.started = False
 
     def srcDir(self):
@@ -231,7 +227,7 @@ class Job(ReprMixin):
 
     def start(self):
         """start this job"""
-        self.server = Server(self)
+        self.server = Server(self)  # pylint:disable=attribute-defined-outside-init
         # never login to the same server twice at the
         # same time with the same player name
         player = self.server.jobs.index(self) + 1
@@ -267,6 +263,7 @@ class Job(ReprMixin):
             return
         result = self.process.poll()
         if result is not None:
+            assert isinstance(result, int)
             self.process = None
             if not silent:
                 if result < 0:
@@ -281,15 +278,15 @@ class Job(ReprMixin):
     @property
     def logFile(self):
         """open if needed"""
-        if self.__logFile is None:
+        if not hasattr(self, '__logFile'):
             logDir = os.path.expanduser(
                 os.path.join('~', '.kajongg', 'log', str(self.game),
                              self.ruleset, self.aiVariant, str(self.pythonVersion)))
             if not os.path.exists(logDir):
                 os.makedirs(logDir)
             logFileName = self.commitId
-            self.logFileName = os.path.join(logDir, logFileName)
-            self.__logFile = open(self.logFileName, 'wb', buffering=0)  # pylint:disable=consider-using-with
+            self.logFileName = os.path.join(logDir, logFileName)  # pylint:disable=attribute-defined-outside-init
+            self.__logFile = open(self.logFileName, 'wb', buffering=0)  # pylint:disable=consider-using-with,attribute-defined-outside-init
         return self.__logFile
 
     def shortRulesetName(self):
@@ -298,7 +295,7 @@ class Job(ReprMixin):
         for prefix in range(100):
             if sum(x.startswith(self.ruleset[:prefix]) for x in names) == 1:
                 return self.ruleset[prefix - 1:]
-        return None
+        return self.ruleset
 
     def __str__(self):
         pid = 'pid={}'.format(
@@ -664,7 +661,7 @@ def allJobs():
 
 def main():
     """parse options, play, evaluate results"""
-    global OPTIONS  # pylint: disable=global-statement
+    global OPTIONS  # pylint: disable=global-variable-undefined
 
     locale_encoding = getpreferredencoding()
     if locale_encoding.lower() != 'utf-8':
