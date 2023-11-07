@@ -45,6 +45,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
             role = QPalette.Highlight
         else:
             role = QPalette.AlternateBase if index.row() % 2 else QPalette.Base
+        assert self.label
         self.label.setBackgroundRole(role)
         text = index.model().data(index, Qt.ItemDataRole.DisplayRole)
         self.label.setText(text)
