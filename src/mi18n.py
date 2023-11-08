@@ -16,7 +16,7 @@ python interface to KDE.
 import os
 import sys
 from locale import setlocale, LC_ALL
-from locale import _parse_localename
+from locale import _parse_localename  # type: ignore
 from typing import Any, List, Generator, Optional
 
 # pylint: disable=wrong-import-order
@@ -167,7 +167,7 @@ class MLocale:
 
     __cached_availableLanguages = None
 
-    translation = None
+    translation:Optional[gettext.NullTranslations]  = None
 
     @classmethod
     def gettext(cls, txt:str) ->str:
