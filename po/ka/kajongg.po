@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-06-10 00:45+0000\n"
-"PO-Revision-Date: 2023-10-16 06:30+0200\n"
+"PO-Revision-Date: 2023-11-08 06:07+0100\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.3.2\n"
 
 msgid "Preview"
 msgstr "მინიატურა"
@@ -446,7 +446,7 @@ msgstr "ვიყენებ ვერსიას %1"
 
 #: src/kdestub.py:1026
 msgid "Not using broken Python KDE bindings"
-msgstr ""
+msgstr "არ ვიყენებ გაფუჭებულ Python-ის KDE-ზე მიბმებს"
 
 #: src/kdestub.py:1045
 msgid ""
@@ -2218,7 +2218,7 @@ msgstr "ქვა"
 #: src/tile.py:194
 msgctxt "kajongg"
 msgid "bamboo"
-msgstr ""
+msgstr "ბამბუკი"
 
 #: src/tile.py:195
 msgctxt "kajongg"
