@@ -449,7 +449,7 @@ class RuleTreeView(QTreeView):
             assert not isinstance(item.ruleset(), PredefinedRuleset)
             assert isinstance(item, RulesetItem)
             ruleset = item.ruleset()
-            self.model().removeRows(row.row(), parent=row.parent())
+            self.model().removeRow(row.row(), parent=row.parent())
             self.rulesets.remove(ruleset)
             self.selectionChanged(self.selectionModel().selection())
 
