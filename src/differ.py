@@ -97,6 +97,8 @@ class RulesetDiffer(QDialog):
                         x for x in rightRulesets if id(x) != id(right)]
         self.leftRulesets = leftRulesets
         self.rightRulesets = rightRulesets
+        self.model:DifferModel
+        self.modelTest:ModelTest
         self.view = MJTableView(self)
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
@@ -136,9 +138,9 @@ class RulesetDiffer(QDialog):
 
     def rulesetChanged(self) ->None:
         """slot to be called if the right ruleset changes"""
-        self.model = DifferModel(self.formattedDiffs(), self)  # pylint:disable=attribute-defined-outside-init
+        self.model = DifferModel(self.formattedDiffs(), self)
         if Debug.modelTest:
-            self.modelTest = ModelTest(self.model, self)  # pylint:disable=attribute-defined-outside-init
+            self.modelTest = ModelTest(self.model, self)
         self.view.setModel(self.model)
 
     def orderRight(self) ->None:
