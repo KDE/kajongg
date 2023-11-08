@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import TYPE_CHECKING, Sequence, Tuple, Union, Optional
+from typing import TYPE_CHECKING, Sequence, Tuple, Union, Optional, Any, Dict, List, cast
 
 import weakref
 from itertools import chain
@@ -239,8 +239,8 @@ class AIDefaultAI:
         Returns answer and one parameter"""
         # disable warning about too many branches
         assert self.player.game
-        answer = answers[0]
-        parameter = None
+        answer:Message = answers[0]
+        parameter:Any = None
         tryAnswers = (
             x for x in [Message.MahJongg, Message.OriginalCall, Message.Kong,
                         Message.Pung, Message.Chow, Message.Discard] if x in answers)
@@ -249,7 +249,7 @@ class AIDefaultAI:
         discard = self.player.game.lastDiscard
         if discard:
             for rule in self.player.game.ruleset.filterRules('claimness'):
-                claimness += rule.claimness(hand, discard)
+                claimness += rule.claimness(hand, discard)  # type:ignore[attr-defined]
                 if Debug.robotAI:
                     hand.debug(
                         '%s: claimness in selectAnswer:%s' %
@@ -265,9 +265,9 @@ class AIDefaultAI:
             elif tryAnswer == Message.Pung and self.player.maybeDangerous(tryAnswer):
                 continue
             elif tryAnswer == Message.Chow:
-                parameter = self.selectChow(parameter)
+                parameter = self.selectChow(cast('MeldList', parameter))
             elif tryAnswer == Message.Kong:
-                parameter = self.selectKong(parameter)
+                parameter = self.selectKong(cast('MeldList', parameter))
             if parameter:
                 answer = tryAnswer
                 break
@@ -369,7 +369,7 @@ class TileAI(ReprMixin):
 
     def __lt__(self, other:object) ->bool:
         """for sorting"""
-        return self.tile < other.tile
+        return self.tile < cast('TileAI', other).tile
 
     def __str__(self) ->str:
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
@@ -389,13 +389,13 @@ class DiscardCandidates(list):
             assert player.game
             player.game.debug('DiscardCandidates for hand %s are %s' % (
                 hand, hand.tilesInHand))
-        self.hiddenTiles = [x.exposed for x in hand.tilesInHand]
-        self.groupCounts = IntDict()
+        self.hiddenTiles:List[Tile] = [x.exposed for x in hand.tilesInHand]
+        self.groupCounts:Dict[str, int] = IntDict()
                                    # counts for tile groups (sbcdw), exposed
                                    # and concealed
         for tile in self.hiddenTiles:
             self.groupCounts[tile.group] += 1
-        self.declaredGroupCounts = IntDict()
+        self.declaredGroupCounts:Dict[str, int] = IntDict()
         for tile in chain(*hand.declaredMelds):
             self.groupCounts[tile.lowerGroup] += 1
             self.declaredGroupCounts[tile.lowerGroup] += 1
