@@ -228,7 +228,7 @@ class TableList(QWidget):
 
         self.view.doubleClicked.connect(client.joinTable)
         StateSaver(self, self.view.horizontalHeader())
-        self.updateButtonsForTable(None)
+        self.__updateButtonsForNoTable()
 
     def hideEvent(self, unusedEvent):
         """table window hides"""
@@ -280,6 +280,7 @@ class TableList(QWidget):
                 self.client.ruleset.name)
         else:
             title = i18n('Tables at %1', self.client.connection.url)
+        assert self.client.name
         decorateWindow(self, ' - '.join([self.client.name, title]))
         self.view.hideColumn(1)
         tableCount = self.view.model().rowCount() if self.view.model() else 0
@@ -298,16 +299,31 @@ class TableList(QWidget):
         self.view.selectRow(idx)
         self.updateButtonsForTable(self.selectedTable())
 
-    def updateButtonsForTable(self, table):
+    def __updateButtonsForNoTable(self):
+        """update button status when no table is selected"""
+        self.joinButton.setEnabled(False)
+        self.leaveButton.setVisible(False)
+        self.compareButton.setVisible(False)
+        self.startButton.setVisible(False)
+        self.newButton.setToolTip(i18n("Allocate a new table"))
+        self.joinButton.setText(i18n('&Join'))
+        self.joinButton.setToolTip(i18n("Join a table"))
+        self.startButton.setEnabled(False)
+        self.compareButton.setEnabled(False)
+        self.chatButton.setVisible(False)
+
+    def updateButtonsForTable(self, table=None):
         """update button status for the currently selected table"""
-        hasTable = bool(table)
-        suspended = hasTable and bool(table.suspendedAt)
-        running = hasTable and table.running
+        if table is None:
+            self.__updateButtonsForNoTable()
+            return
+        assert table
+        suspended = bool(table.suspendedAt)
+        running = table.running
         suspendedLocalGame = (
             suspended and table.gameid
             and self.client.hasLocalServer())
         self.joinButton.setEnabled(
-            hasTable and
             not running and
             not table.isOnline(self.client.name) and
             (self.client.name in table.playerNames) == suspended)
@@ -325,14 +341,14 @@ class TableList(QWidget):
             self.joinButton.setText(i18n('&Join'))
             self.joinButton.setToolTip(i18n("Join a table"))
         self.leaveButton.setEnabled(
-            hasTable and not running and not self.joinButton.isEnabled())
+            not running and not self.joinButton.isEnabled())
         self.startButton.setEnabled(
-            not running and not suspendedLocalGame and hasTable
+            not running and not suspendedLocalGame
             and self.client.name == table.playerNames[0])
-        self.compareButton.setEnabled(hasTable and table.myRuleset is None)
+        self.compareButton.setEnabled(table.myRuleset is None)
         self.chatButton.setVisible(not self.client.hasLocalServer())
         self.chatButton.setEnabled(
-            not running and hasTable
+            not running
             and self.client.name in table.playerNames
             and sum(x.startswith('Robot ') for x in table.playerNames) < 3)
         if self.chatButton.isEnabled():
@@ -352,8 +368,9 @@ class TableList(QWidget):
         """return the selected table"""
         if self.view.selectionModel():
             index = self.view.selectionModel().currentIndex()
-            if index.isValid() and self.view.model():
-                return self.view.model().tables[index.row()]
+            model = self.view.model()
+            if index.isValid() and model:
+                return model.tables[index.row()]
         return None
 
     def compareRuleset(self):
