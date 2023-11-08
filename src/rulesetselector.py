@@ -174,7 +174,7 @@ class RuleModel(TreeModel):
             self.appendRuleset(ruleset)
         self.loaded = True
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         """get data fom model"""
         # pylint: disable=too-many-branches
         # too many branches
@@ -222,7 +222,7 @@ class RuleModel(TreeModel):
         item = index.internalPointer()
         return isinstance(item, RuleItem) and isinstance(item.raw, BoolRule)
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         """tell the view about the wanted headers"""
         if Qt is None:
             # happens when kajongg exits unexpectedly

@@ -62,7 +62,7 @@ class GamesModel(QAbstractTableModel):
             return QModelIndex()
         return self.createIndex(row, column, 0)
 
-    def data(self, index, role=None):
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         """get score table from view"""
         if role is None:
             role = Qt.ItemDataRole.DisplayRole
@@ -84,7 +84,7 @@ class GamesModel(QAbstractTableModel):
                 return int(unformatted)
         return QAbstractTableModel.data(self, index, role)
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         """for the two visible columns"""
         if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
             return i18n('Players') if section == 2 else i18n('Started')

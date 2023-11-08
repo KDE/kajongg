@@ -52,7 +52,7 @@ class DifferModel(QAbstractTableModel):
             return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         return None
 
-    def headerData(self, section, orientation, role):
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         """tell the view about the wanted headers"""
         if role == Qt.ItemDataRole.TextAlignmentRole:
             if orientation == Qt.Orientation.Horizontal:
