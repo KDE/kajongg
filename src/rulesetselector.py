@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import TYPE_CHECKING, Tuple, List, Optional, Any, Union, Iterable
+from typing import TYPE_CHECKING, Tuple, List, Optional, Any, Union, Iterable, cast
 
 from qt import Qt, QSize
 from qt import QWidget, QHBoxLayout, QVBoxLayout, \
@@ -30,7 +30,7 @@ from statesaver import StateSaver
 from guiutil import decorateWindow
 
 if TYPE_CHECKING:
-    from qt import QShowEvent, QHideEvent, QItemSelection, QObject
+    from qt import QShowEvent, QHideEvent, QItemSelection, QObject, QLayout
     from rule import RuleList
 
 
@@ -56,7 +56,7 @@ class RuleTreeItem(TreeItem):
 
     def ruleset(self) ->Ruleset:
         """return the ruleset containing this item"""
-        item = self
+        item:TreeItem = self
         while not isinstance(item.raw, Ruleset):
             assert item.parent
             item = item.parent
@@ -72,7 +72,7 @@ class RulesetItem(RuleTreeItem):
 
     @property
     def raw(self) ->Ruleset:
-        return super().raw
+        return cast(Ruleset, super().raw)
 
     def content(self, column:int) ->str:
         """return content stored in this item"""
@@ -101,7 +101,7 @@ class RuleListItem(RuleTreeItem):
 
     @property
     def raw(self) ->'RuleList':
-        return super().raw
+        return cast('RuleList', super().raw)
 
     def content(self, column:int) ->str:
         """return content stored in this item"""
@@ -125,7 +125,7 @@ class RuleItem(RuleTreeItem):
 
     @property
     def raw(self) ->Rule:
-        return super().raw
+        return cast(Rule, super().raw)
 
     def content(self, column:int) ->str:
         """return the content stored in this node"""
@@ -159,7 +159,7 @@ class RuleModel(TreeModel):
         super().__init__(parent)
         self.rulesets = rulesets
         self.loaded = False
-        unitPairs = []
+        unitPairs:List[Tuple[str, int]] = []
         # unitPairs: int is the priority:show 0 leftmost, 9999 rightmost
         for ruleset in rulesets:
             ruleset.load()
@@ -259,10 +259,10 @@ class RuleModel(TreeModel):
         rulesetItems = list([RulesetItem(ruleset)])
         self.insertRows(row, rulesetItems, parent)
         rulesetIndex = self.index(row, 0, parent)
-        ruleLists = [x for x in ruleset.ruleLists if len(x)]
-        ruleListItems = [RuleListItem(x) for x in ruleLists]
+        ruleLists:List[List[ParameterRule]] = [x for x in ruleset.ruleLists if len(x)]
+        ruleListItems:List[RuleListItem] = [RuleListItem(x) for x in ruleLists]
         for item in ruleListItems:
-            item.colCount = self.rootItem.columnCount()
+            item.colCount = self.rootItem.columnCount()  # type:ignore
         self.insertRows(0, ruleListItems, rulesetIndex)
         for ridx, ruleList in enumerate(ruleLists):
             listIndex = self.index(ridx, 0, rulesetIndex)
@@ -339,7 +339,7 @@ class EditableRuleModel(RuleModel):
     def flags(self, index:QModelIndex) ->Qt.ItemFlags:
         """tell the view what it can do with this item"""
         if not index.isValid():
-            return Qt.ItemFlag.ItemIsEnabled
+            return cast(Qt.ItemFlags, Qt.ItemFlag.ItemIsEnabled)
         column = index.column()
         item = index.internalPointer()
         content = item.raw
@@ -357,7 +357,7 @@ class EditableRuleModel(RuleModel):
             result |= Qt.ItemFlag.ItemIsEditable
         if checkable:
             result |= Qt.ItemFlag.ItemIsUserCheckable
-        return result
+        return cast(Qt.ItemFlags, result)
 
 
 class RuleTreeView(QTreeView):
@@ -379,10 +379,10 @@ class RuleTreeView(QTreeView):
                 button.setEnabled(False)
         self.header().setObjectName('RuleTreeViewHeader')
         self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.ruleModel = None
+        self.ruleModel:Optional[RuleModel] = None
         self.ruleModelTest = None
-        self.rulesets = []  # nasty: this generates self.ruleModel
-        self.differs = []
+        self.rulesets:List[Ruleset] = []  # nasty: this generates self.ruleModel
+        self.differs:List[RulesetDiffer] = []
 
     def dataChanged(self, unusedIndex1:int, unusedIndex2:int, unusedRoles:Optional[Iterable[int]]=None) ->None:
         """get called if the model has changed: Update all differs"""
@@ -460,7 +460,7 @@ class RuleTreeView(QTreeView):
             item = row.internalPointer()
             assert isinstance(item, RulesetItem)
             ruleset = item.raw.copyTemplate()
-            self.model().appendRuleset(ruleset)
+            cast(RuleModel, self.model()).appendRuleset(ruleset)
             self.rulesets.append(ruleset)
             self.selectionChanged(self.selectionModel().selection())
 
@@ -506,7 +506,8 @@ class RulesetSelector(QWidget):
         v2layout = QVBoxLayout()
         hlayout.addWidget(self.v1widget)
         hlayout.addLayout(v2layout)
-        for widget in [self.v1widget, hlayout, v1layout, v2layout]:
+        widgets:List[Union[QWidget, 'QLayout']] = [self.v1widget, hlayout, v1layout, v2layout]
+        for widget in widgets:
             widget.setContentsMargins(0, 0, 0, 0)
         hlayout.setStretchFactor(self.v1widget, 10)
         self.btnCopy = QPushButton()
@@ -565,7 +566,7 @@ class RulesetSelector(QWidget):
 
     def hideEvent(self, event:'QHideEvent') ->None:
         """close all differ dialogs"""
-        marked = []
+        marked:List[RulesetDiffer] = []
         for differ in self.rulesetView.differs:
             differ.hide()
             marked += differ
