@@ -15,7 +15,8 @@ python interface to KDE.
 
 import os
 import sys
-from locale import _parse_localename, setlocale, LC_ALL
+from locale import setlocale, LC_ALL
+from locale import _parse_localename
 
 # pylint: disable=wrong-import-order
 
@@ -172,6 +173,7 @@ class MLocale:
         """with lazy installation of languages"""
         if cls.translation is None:
             cls.installTranslations()
+        assert cls.translation is not None
         return cls.translation.gettext(txt)
 
     @classmethod
