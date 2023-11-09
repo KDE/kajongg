@@ -52,7 +52,7 @@ class TreeItem:
             return self.parent.children.index(self)
         return 0
 
-    def columnCount(self):
+    def columnCount(self) ->int:
         """Always return 1. Is 1 always correct? No, inherit from RootItem FIXME"""
         return 1
 
@@ -73,14 +73,13 @@ class RootItem(TreeItem):
         """content held by this item"""
         return self.raw[column]
 
-    def columnCount(self):
-        """Always return 1. is 1 always correct? No, inherit from RootItem"""
-        return 1
-
 
 class TreeModel(QAbstractItemModel):
 
     """a basic class for Kajongg tree views"""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
     def columnCount(self, parent=QModelIndex()):
         """how many columns does this node have?"""
@@ -111,6 +110,7 @@ class TreeModel(QAbstractItemModel):
 
     def parent(self, index):
         """find the parent for index"""
+        assert isinstance(index, QModelIndex)  # we never use parent() for getting QObject
         if not index.isValid():
             return QModelIndex()
         childItem = self.itemForIndex(index)
@@ -130,6 +130,7 @@ class TreeModel(QAbstractItemModel):
             item = index.internalPointer()
             if item:
                 return item
+        assert self.rootItem
         return self.rootItem
 
     def insertRows(self, position, items, parent=QModelIndex()):
