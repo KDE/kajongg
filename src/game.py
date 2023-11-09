@@ -533,7 +533,7 @@ class Game:
                 "INSERT INTO SCORE "
                 "(game,hand,data,manualrules,player,scoretime,won,prevailing,"
                 "wind,points,payments, balance,rotated,notrotated) "
-                "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" %
+                "VALUES(%s,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" %
                 (self.gameid, self.handctr, player.nameid,
                  scoretime, int(player == self.__winner),
                  self.roundWind.char, player.wind,
@@ -574,7 +574,7 @@ class Game:
                 microsecond=0).isoformat()
             with Internal.db as transaction:
                 transaction.execute(
-                    'UPDATE game set endtime = "%s" where id = %d' %
+                    'UPDATE game set endtime = "%s" where id = %s' %
                     (endtime, self.gameid))
         elif not self.belongsToPlayer():
             # the game server already told us the new placement and winds
