@@ -14,7 +14,7 @@ from message import Message
 from common import Internal, isAlive
 from player import Player, PlayingPlayer
 from game import PlayingGame
-from tile import Tile
+from tile import Tile, TileList
 from handboard import PlayingHandBoard
 from animation import AnimationSpeed
 from uiwall import UIWall, SideText
@@ -27,6 +27,8 @@ class VisiblePlayer(Player):
 
     def __init__(self):
         # pylint: disable=super-init-not-called
+        assert self.game
+        assert self.game.wall
         self.__front = self.game.wall[self.idx]
         self.sideText = SideText()
         self.sideText.board = self.__front
@@ -34,11 +36,14 @@ class VisiblePlayer(Player):
     def hide(self):
         """clear visible data and hide"""
         self.clearHand()
-        self.handBoard.hide()
+        if isAlive(self.handBoard):
+            assert self.handBoard
+            self.handBoard.hide()
 
     @property
     def idx(self):
         """our index in the player list"""
+        assert self.game
         if self not in self.game.players:
             # we will be added next
             return len(self.game.players)
@@ -58,6 +63,7 @@ class VisiblePlayer(Player):
 
     def syncHandBoard(self, adding=None):
         """update display of handBoard. Set Focus to tileName."""
+        assert self.handBoard
         self.handBoard.sync(adding)
 
     def showInfo(self):
@@ -65,8 +71,11 @@ class VisiblePlayer(Player):
         side = self.front
         self.sideText.text = '{} - {}'.format(self.localName, self.explainHand().total())
         self.colorizeName()
-        side.disc = Wind.all4[self.wind].disc
-        side.disc.prevailing = self.game.roundsFinished
+        _ = Wind.all4[self.wind].disc
+        assert _
+        side.disc = _
+        assert self.game
+        side.disc.prevailing = self.game.roundsFinished > 0
         side.disc.board = self.front
 
 
@@ -90,7 +99,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             self.front = self.game.wall[self.idx]
         if self.handBoard:
             self.handBoard.setEnabled(
-                self.game and self.game.belongsToHumanPlayer(
+                self.game is not None and self.game.belongsToHumanPlayer(
                 ) and self == self.game.myself)
 
     def explainHand(self):
@@ -98,6 +107,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         In that case, make an educated guess about the discard.
         For player==game.myself, use the focused tile."""
         hand = self.hand
+        assert self.handBoard
         if hand and hand.tiles and self._concealedTiles:
             if hand.lenOffset == 1 and not hand.won:
                 if any(not x.isKnown for x in self._concealedTiles):
@@ -110,6 +120,8 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         """set the color to be used for showing the player name on the wall"""
         if not isAlive(self.sideText):
             return
+        assert self.game
+        assert Internal.Preferences
         if self == self.game.activePlayer and self.game.client:
             color = Qt.blue
         elif Internal.Preferences.tilesetName == 'jade':
@@ -120,6 +132,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
     def getsFocus(self, unusedResults=None):
         """give this player focus on his handBoard"""
+        assert self.handBoard
         self.handBoard.setEnabled(True)
         self.handBoard.hasLogicalFocus = True
 
@@ -146,6 +159,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         """used for robbing the kong from this player"""
         PlayingPlayer.robTileFrom(self, tile)
         tile = tile.exposed
+        assert self.handBoard
         hbTiles = self.handBoard.uiTiles
         lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
         lastDiscard.change_name(lastDiscard.concealed)
@@ -155,9 +169,11 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
     def addConcealedTiles(self, tiles, animated=True):
         """add to my tiles and sync the hand board"""
-        with AnimationSpeed(speed=Internal.Preferences.animationSpeed if animated else 99):
-            PlayingPlayer.addConcealedTiles(self, [x.tile for x in tiles])
-            self.syncHandBoard(tiles)
+        assert Internal.Preferences
+        _ = tiles
+        with AnimationSpeed(speed=int(Internal.Preferences.animationSpeed) if animated else 99):
+            PlayingPlayer.addConcealedTiles(self, TileList(x.tile for x in _))
+            self.syncHandBoard(_)
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show
@@ -172,6 +188,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             # withDiscard is a Tile, we need the UITile
             discardedTile = Internal.scene.discardBoard.claimDiscard()
             if discardedTile.tile is not withDiscard:
+                assert self.game
                 self.game.debug(
                     '%s is not %s' %
                     (discardedTile.tile, withDiscard))
@@ -190,6 +207,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         """give an unknown tileItem a name"""
         PlayingPlayer.makeTileKnown(self, tile)
         assert tile.isKnown
+        assert self.handBoard
         matchingTiles = sorted(
             self.handBoard.tilesByElement(Tile.unknown),
             key=lambda x: x.xoffset)
@@ -218,11 +236,13 @@ class VisiblePlayingGame(PlayingGame):
             client=client, playOpen=playOpen, autoPlay=autoPlay)
 #        Internal.mainWindow.adjustMainView()
 #        Internal.mainWindow.updateGUI()
+        assert self.wall
         self.wall.decorate4()
 
     def close(self):
         """close the game"""
         scene = Internal.scene
+        assert scene
         scene.discardBoard.hide()
         if isAlive(scene):
             scene.removeTiles()
