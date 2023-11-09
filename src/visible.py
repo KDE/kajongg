@@ -53,7 +53,7 @@ class VisiblePlayer(Player):
     def front(self, value):
         """also assign handBoard to front"""
         self.__front = value
-        if value and self.handBoard:
+        if self.handBoard:
             self.handBoard.setParentItem(value)
 
     def syncHandBoard(self, adding=None):
