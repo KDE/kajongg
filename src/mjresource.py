@@ -26,7 +26,6 @@ class Resource:
     """Common code for backgrounds and tilesets"""
 
     resourceName = None # to be overridden in Tileset and Background
-    configGroupName = None
 
     """represents a complete tileset"""
 
@@ -99,14 +98,16 @@ class Resource:
             result.desktopFileName = cls.__name(name)
         else:
             result.desktopFileName = name or 'default'
-            result.path = cls.locate(result.desktopFileName + '.desktop')
-            if not result.path:
-                result.path = cls.locate('default.desktop')
+            path = cls.locate(result.desktopFileName + '.desktop')
+            if not path:
+                path = cls.locate('default.desktop')
                 result.desktopFileName = 'default'
-                if not result.path:
+                if not path:
                     cls.__noTilesetFound()
                 else:
                     logWarning(i18n('cannot find %1, using default', name))
+            assert path  # for mypy
+            result.path = path
 
         assert cls.cache is not None
         cls.cache[result.desktopFileName] = result  # pylint:disable=unsupported-assignment-operation
@@ -140,3 +141,4 @@ class Resource:
     @staticmethod
     def current():
         """the currently wanted tileset. If not yet defined, do so"""
+        return None
