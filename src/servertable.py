@@ -468,7 +468,11 @@ class ServerTable(Table, ReprMixin):
         block.tell(None, humanPlayers, Message.AssignVoices)
         block.callback(self.startHand)
 
-    def pickTile(self, unusedResults=None, deadEnd=False):
+    def __tilePicked(self, unusedResults, deadEnd:bool=False) ->None:
+        """from callback"""
+        self.pickTile(deadEnd)
+
+    def pickTile(self, deadEnd=False):
         """the active player gets a tile from wall. Tell all clients."""
         if not self.running:
             return
@@ -500,7 +504,7 @@ class ServerTable(Table, ReprMixin):
             # somebody robs my kong
             requests[0].answer.serverAction(self, requests[0])
         else:
-            self.pickTile(requests, deadEnd=True)
+            self.pickTile(deadEnd=True)
 
     def clientDiscarded(self, msg):
         """client told us he discarded a tile. Check for consistency and tell others."""
@@ -609,7 +613,11 @@ class ServerTable(Table, ReprMixin):
                            tiles=TileTuple(chain(tiles, player.bonusTiles)))
         block.callback(self.dealt)
 
-    def endHand(self, unusedResults=None):
+    def handEnded(self, unusedResults):
+        """from callback"""
+        self.endHand()
+
+    def endHand(self):
         """hand is over, show all concealed tiles to all players"""
         if not self.running:
             return
@@ -789,7 +797,7 @@ class ServerTable(Table, ReprMixin):
         block.tellAll(
             player, Message.MahJongg, melds=concealedMelds, lastTile=player.lastTile,
             lastMeld=lastMeld, withDiscardTile=withDiscard)
-        block.callback(self.endHand)
+        block.callback(self.handEnded)
 
     def dealt(self, unusedResults):
         """all tiles are dealt, ask east to discard a tile"""
@@ -797,7 +805,7 @@ class ServerTable(Table, ReprMixin):
             self.tellAll(
                 self.game.activePlayer,
                 Message.ActivePlayer,
-                self.pickTile)
+                self.__tilePicked)
 
     def nextTurn(self):
         """the next player becomes active"""
@@ -807,7 +815,7 @@ class ServerTable(Table, ReprMixin):
             self.tellAll(
                 self.game.activePlayer,
                 Message.ActivePlayer,
-                self.pickTile)
+                self.__tilePicked)
 
     def prioritize(self, requests):
         """return only requests we want to execute"""
