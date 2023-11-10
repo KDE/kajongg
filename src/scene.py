@@ -522,8 +522,8 @@ class ScoringScene(GameScene):
         uiTile = self.focusItem()
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
-            wind = windsX[moveCommands.index(wind)]
-            self.__moveTile(uiTile, wind, bool(mod & Qt.ShiftModifier))
+            wind_chr = windsX[moveCommands.index(wind)]
+            self.__moveTile(uiTile, wind_chr, bool(mod & Qt.ShiftModifier))
             return True
         if key == Qt.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
