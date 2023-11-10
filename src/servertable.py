@@ -16,16 +16,14 @@ import random
 import traceback
 from itertools import chain
 
-from typing import TYPE_CHECKING, Any, Optional, List, Callable, Tuple
+from typing import TYPE_CHECKING, Any, Optional, List, Callable, Tuple, Dict, cast, Union
 
 from common import Debug, Internal, ReprMixin
 from wind import Wind
 from tilesource import TileSource
 from util import Duration
-from message import Message, ChatMessage
 from log import logDebug, logError
 from mi18n import i18nE, i18n, i18ncE
-from deferredutil import DeferredBlock
 from tile import Tile, Piece, TileTuple, elements, Meld, MeldList
 from query import Query
 from client import Client, Table
@@ -34,6 +32,8 @@ from sound import Voice
 from servercommon import srvError
 from user import User
 from game import PlayingGame
+from message import Message, ChatMessage, ServerMessage
+from deferredutil import DeferredBlock
 
 if TYPE_CHECKING:
     from deferredutil import Request
@@ -117,9 +117,9 @@ class ServerTable(Table, ReprMixin):
         self.server = server
         self.owner = owner
         self.users = [owner] if owner else []
-        self.remotes = {}   # maps client connections to users
-        self.game = None
-        self.client = None
+        self.remotes:Dict['PlayingPlayer', Union[User, Client]] = {}   # maps client connections to users
+        self.game:Optional[ServerGame] = None
+        self.client:Optional[Client] = None
         server.tables[self.tableid] = self
         if Debug.table:
             logDebug('new table %s' % self)
@@ -165,7 +165,7 @@ class ServerTable(Table, ReprMixin):
         if Debug.chat:
             logDebug('server sends chat msg %s' % chatLine)
         if self.suspendedAt and self.game:
-            chatters = []
+            chatters:List['User'] = []
             for player in self.game.players:
                 chatters.extend(
                     x for x in self.server.srvUsers if x.name == player.name)
@@ -267,7 +267,7 @@ class ServerTable(Table, ReprMixin):
         game = self.game
         assert game
         for player in game.players:
-            remote = self.userForPlayer(player)
+            remote:Union[User, Client, None] = self.userForPlayer(player)
             if not remote:
                 # we found a robot player, its client runs in this server
                 # process
@@ -515,13 +515,13 @@ class ServerTable(Table, ReprMixin):
             block = DeferredBlock(self, where='pickTile')
             block.tellPlayer(
                 player,
-                Message.PickedTile,  # type: ignore
+                Message.PickedTile,
                 tile=tile,
                 deadEnd=deadEnd)
             showTile = tile if tile.isBonus or self.game.playOpen else Tile.unknown
             block.tellOthers(
                 player,
-                Message.PickedTile,  # type: ignore
+                Message.PickedTile,
                 tile=showTile,
                 deadEnd=deadEnd)
             block.callback(self.moved)
@@ -529,9 +529,9 @@ class ServerTable(Table, ReprMixin):
     def __pickKongReplacement(self, requests:List['Request']) ->None:
         """the active player gets a tile from the dead end. Tell all clients."""
         requests = self.prioritize(requests)
-        if requests and requests[0].answer == Message.MahJongg:  # type: ignore
+        if requests and requests[0].answer == Message.MahJongg:
             # somebody robs my kong
-            Message.MahJongg.serverAction(self, requests[0])  # type: ignore
+            Message.MahJongg.serverAction(self, requests[0])  # type:ignore[call-arg, arg-type]
         else:
             self.pickTile(deadEnd=True)
 
@@ -651,7 +651,7 @@ class ServerTable(Table, ReprMixin):
                 if player == clientPlayer or self.game.playOpen:
                     tiles = player.concealedTiles
                 else:
-                    tiles = TileTuple(Tile.unknown * 13)
+                    tiles = TileTuple(Tile.unknown * 13)  # type: ignore
                 block.tell(player, [clientPlayer], Message.SetConcealedTiles,
                            tiles=TileTuple(chain(tiles, player.bonusTiles)))
         block.callback(self.dealt)
@@ -682,8 +682,8 @@ class ServerTable(Table, ReprMixin):
         """save the hand to the database and proceed to next hand"""
         if not self.running:
             return
-        self.tellAll(None, Message.SaveHand, self.nextHand)
         assert self.game
+        self.tellAll(None, Message.SaveHand, self.nextHand)
         self.game.saveHand()
 
     def nextHand(self, unusedResults:List['Request']) ->None:
@@ -752,7 +752,7 @@ class ServerTable(Table, ReprMixin):
         self.game.discardedTiles[lastDiscard.exposed] -= 1
         self.game.activePlayer = player
         assert lastDiscard
-        player.exposeMeld(hasTiles, lastDiscard)
+        player.exposeMeld(hasTiles, lastDiscard)  # type:ignore[arg-type]
         if lastDiscard:
             player.lastTile = lastDiscard.exposed
             player.lastSource = TileSource.LivingWallDiscard
@@ -805,7 +805,7 @@ class ServerTable(Table, ReprMixin):
         assert player
         assert msg.args
         concealedMelds = MeldList(msg.args[0])
-        withDiscard = Tile(msg.args[1]) if msg.args[1] else None
+        withDiscard:Optional[Tile] = Tile(msg.args[1]) if msg.args[1] else None
         lastMeld = Meld(msg.args[2])
         if self.game.ruleset.mustDeclareCallingHand:
             assert player.isCalling, '%s %s %s says MJ but never claimed: concmelds:%s withdiscard:%s lastmeld:%s' % (
@@ -925,7 +925,7 @@ class ServerTable(Table, ReprMixin):
                 logDebug(msg)
             with Duration(msg):
                 assert answer.answer
-                answer.answer.serverAction(self, answer)
+                cast(ServerMessage, answer.answer).serverAction(self, answer)
         return answers
 
     def moved(self, requests: List['Request']) ->None:
