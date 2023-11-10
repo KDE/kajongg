@@ -408,10 +408,10 @@ class MainWindow(KXmlGuiWindow):
 
     def queryExit(self):
         """see queryClose"""
-        def quitDebug(*args, **kwargs):
+        def quitDebug(msg):
             """reducing branches in queryExit"""
             if Debug.quit:
-                logDebug(*args, **kwargs)
+                logDebug(msg)
 
         if self.exitReady:
             quitDebug('MainWindow.queryExit returns True because exitReady is set')
