@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from scene import SceneWithFocusRect
 
 
-class WindDisc(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
+class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):
 
     """a round wind tile"""
 
