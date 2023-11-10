@@ -338,7 +338,7 @@ class ClassicalChineseDMJL(ClassicalChinese):
         self.handRules.createRule('Big Four Joys', 'FBigFourJoys', doubles=2,
                                   description=i18n('4 Pungs or Kongs of winds'))
 
-        self.winnerRules['OnlyHonors'].doubles = 2
+        self.winnerRules['OnlyHonors'].doubles = 2  # type:ignore[attr-defined]
 
         self.penaltyRules.createRule(
             'False Naming of Discard, Claimed for Chow',
@@ -378,10 +378,10 @@ class ClassicalChineseBMJA(ClassicalChinese):
     def addParameterRules(self) ->None:
         """those differ for BMJA from standard"""
         ClassicalChinese.addParameterRules(self)
-        self.parameterRules['kongBoxSize'].parameter = 14
-        self.parameterRules['maxChows'].parameter = 1
-        self.parameterRules['limit'].parameter = 1000
-        self.parameterRules['mustDeclareCallingHand'].parameter = True
+        self.parameterRules['kongBoxSize'].parameter = 14  # type:ignore[attr-defined]
+        self.parameterRules['maxChows'].parameter = 1  # type:ignore[attr-defined]
+        self.parameterRules['limit'].parameter = 1000  # type:ignore[attr-defined]
+        self.parameterRules['mustDeclareCallingHand'].parameter = True  # type:ignore[attr-defined]
 
     def loadRules(self) ->None:
         ClassicalChinese.loadRules(self)
