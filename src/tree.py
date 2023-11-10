@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 Here we define classes useful for tree views
 """
 
-from typing import Any, Sequence, Optional, overload, Union, TYPE_CHECKING
+from typing import Any, List, Sequence, Optional, overload, Union, TYPE_CHECKING
 
 from qt import QAbstractItemModel, QModelIndex
 
@@ -24,8 +24,8 @@ class TreeItem:
 
     def __init__(self, content: Any) ->None:
         self.__rawContent = content
-        self.parent = None
-        self.children = []
+        self.parent:Optional['TreeItem'] = None
+        self.children:List['TreeItem'] = []
 
     def insert(self, row:int, child:'TreeItem') ->'TreeItem':
         """add a new child to this tree node"""
@@ -86,6 +86,7 @@ class TreeModel(QAbstractItemModel):
 
     def __init__(self, parent:Optional['QObject']=None) ->None:
         super().__init__(parent)
+        self.rootItem:Optional[RootItem] = None
 
     def columnCount(self, parent:QModelIndex=QModelIndex()) ->int:
         """how many columns does this node have?"""
