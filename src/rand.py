@@ -103,7 +103,7 @@ class CountingRandom(Random):
             try:
                 # Python 3.10 or earlier
                 # pylint:disable=deprecated-argument,too-many-function-args
-                Random.shuffle(self, x, random)
+                Random.shuffle(self, x, random)  # type:ignore[call-arg]
             except TypeError:
                 # Python 3.11 or later
                 # pylint:disable=deprecated-argument
