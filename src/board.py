@@ -106,6 +106,14 @@ class WindLabel(QLabel):
 
     """QLabel holding the wind tile"""
 
+    def __init__(self, wind=None, roundsFinished=0, parent=None):
+        QLabel.__init__(self, parent)
+        self.__wind = None
+        if wind is None:
+            wind = East
+        self.__roundsFinished = roundsFinished
+        self.wind = wind
+
     @property
     def wind(self):
         """the current wind on this label"""
@@ -117,14 +125,6 @@ class WindLabel(QLabel):
         if self.__wind != wind:
             self.__wind = wind
             self._refresh()
-
-    def __init__(self, wind=None, roundsFinished=0, parent=None):
-        QLabel.__init__(self, parent)
-        self.__wind = None
-        if wind is None:
-            wind = East
-        self.__roundsFinished = roundsFinished
-        self.wind = wind
 
     @property
     def roundsFinished(self):
