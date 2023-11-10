@@ -110,7 +110,7 @@ class TreeModel(QAbstractItemModel):
         return QModelIndex()
 
     def parent(self, index):
-        """find the parent index"""
+        """find the parent for index"""
         if not index.isValid():
             return QModelIndex()
         childItem = self.itemForIndex(index)
