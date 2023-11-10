@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 Copyright (C) 2009-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
@@ -8,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import weakref
-from typing import Optional, TYPE_CHECKING, Dict, Any, Union, Type
+from typing import Optional, TYPE_CHECKING, Dict, Any, Union, List, Tuple
 
 from common import ReprMixin, Internal
 from message import Message
@@ -20,16 +19,24 @@ if TYPE_CHECKING:
     from player import PlayingPlayer
 
 
-class Move(ReprMixin):
+class Move(ReprMixin):  # pylint: disable=too-many-instance-attributes
     """used for decoded move information from the game server"""
 
     def __init__(self, player:Optional['PlayingPlayer'],
-        command:Union[Type[Message], str], kwargs:Dict[Any,Any]) ->None:
+        command:Union[Message, str], kwargs:Dict[Any,Any]) ->None:
+
+        # pylint: disable=too-many-statements
+
+        self.message:Message
         if isinstance(command, Message):
             self.message = command
         else:
             assert isinstance(command, str) # for mypy
             self.message = Message.defined[command]
+        self.tile:Tile
+        self.lastTile:Tile
+        self.withDiscardTile:Tile
+        self.tiles:TileTuple
         self.table = None
         self.notifying = False
         self._player = weakref.ref(player) if player else None
@@ -37,6 +44,21 @@ class Move(ReprMixin):
         self.kwargs = kwargs.copy()
         del self.kwargs['token']
         self.score = None
+        self.lastMeld:Meld
+        self.meld:Meld
+        self.melds:MeldList
+        self.exposedMeld:Meld
+        self.source:'TileSource'
+        self.md5sum:str
+        self.wantedGame:str
+        self.show:bool
+        self.shouldSave:bool
+        self.playerNames:List[Tuple[Wind, str]]
+        self.deadEnd:bool
+        self.rotateWinds:bool
+        self.divideAt:int
+        self.tableid:int
+        self.gameid:int
         for key, value in kwargs.items():
             assert not isinstance(value, bytes), 'value is bytes:{}'.format(repr(value))
             if value is None:
@@ -59,17 +81,18 @@ class Move(ReprMixin):
                     self.__setattr__(key, value)
 
     @staticmethod
-    def __convertWinds(tuples):
+    def __convertWinds(tuples:List[Tuple[str, str]]) ->List[Tuple[Wind, str]]:
         """convert wind strings to Wind objects"""
         result = []
         for wind, name in tuples:
-            result.append(tuple([Wind(wind), name]))
+            _  = Wind(wind), name
+            result.append(_)
         return result
 
     @property
-    def player(self):
+    def player(self) ->Optional['PlayingPlayer']:
         """hide weakref"""
         return self._player() if self._player else None
 
-    def __str__(self):
+    def __str__(self) ->str:
         return '{!r} {!r} {!r}'.format(self.player, self.message, self.kwargs)
