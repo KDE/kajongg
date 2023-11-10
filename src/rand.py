@@ -27,12 +27,13 @@ class CountRandomCalls:
 
     def __exit__(self, exc_type, exc_value, trback):
         if Debug.random:
-            self.rnd.game.debug(
-                '{} out of {} calls to random by {} from {}'.format(
-                    CountingRandom.count - self.oldCount,
-                    CountingRandom.count,
-                    self.what,
-                    callers()))
+            if self.rnd.game:
+                self.rnd.game.debug(
+                    '{} out of {} calls to random by {} from {}'.format(
+                        CountingRandom.count - self.oldCount,
+                        CountingRandom.count,
+                        self.what,
+                        callers()))
 
 
 class CountingRandom(Random):
@@ -60,7 +61,8 @@ class CountingRandom(Random):
         CountingRandom.count = 0
         Random.seed(self, a, version)
         if Debug.random:
-            self.game.debug('Random gets seed %s' % a)
+            if self.game:
+                self.game.debug('Random gets seed %s' % a)
 
     def randrange(self, start, stop=None, step=1):
         with CountRandomCalls(self, 'randrange({},{},step={})'.format(
@@ -88,4 +90,5 @@ class CountingRandom(Random):
                 Random.shuffle(self, x, random)
             except TypeError:
                 # Python 3.11 or later
-                Random.shuffle(self, x)  # pylint:disable=deprecated-argument
+                # pylint:disable=deprecated-argument
+                Random.shuffle(self, x)
