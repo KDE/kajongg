@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import os
 
-from typing import Optional, Generator, List
+from typing import Optional, Generator, List, Dict
 
 from qt import QStandardPaths
 from log import logWarning, logException
@@ -28,11 +28,12 @@ class Resource:
 
     """Common code for backgrounds and tilesets"""
 
-    resourceName = None # to be overridden in Tileset and Background
+    resourceName : Optional[str] = None # to be overridden in Tileset and Background
+    configGroupName : str
 
     """represents a complete tileset"""
 
-    cache = None  # common cache: tiles and background must not share identical names!
+    cache : Optional[Dict[str, 'Resource']] = None  # common cache: tiles and background must not share identical names!
 
     def __new__(cls, name:Optional[str]=None) ->'Resource':
         if cls.cache is None:
@@ -119,6 +120,8 @@ class Resource:
 
     def __init__(self, unusedName:Optional[str]=None) ->None:
         """continue __build"""
+        self.path: str
+        self.desktopFileName: str
         self.group = KConfig(self.path).group(self.configGroupName)
 
         self.name = self.group.readEntry("Name") or i18n("unknown name")
