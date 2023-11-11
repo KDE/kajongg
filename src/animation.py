@@ -14,7 +14,7 @@ from twisted.internet.defer import Deferred, succeed, fail
 
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve
-from qt import Property, QGraphicsObject, QGraphicsItem
+from qt import Property, QGraphicsObject, QGraphicsItem, QPointF
 
 from common import Internal, Debug, isAlive, StrMixin
 from log import logDebug, logException, id4
@@ -298,7 +298,7 @@ class AnimatedMixin:
         """setter for property pos"""
         QGraphicsObject.setPos(self, pos)
 
-    pos = Property('QPointF', fget=_get_pos, fset=_set_pos)
+    pos = Property(QPointF, fget=_get_pos, fset=_set_pos)
 
     def _get_scale(self):
         """getter for property scale"""
