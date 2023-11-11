@@ -61,6 +61,8 @@ class Url(str, ReprMixin):
     def __init__(self, url:str) ->None:
         assert url
         super().__init__()
+        self.host: str
+        self.port:Optional[int]
 
     def __new__(cls, url:str) ->'Url':
         assert url
@@ -196,8 +198,8 @@ class Url(str, ReprMixin):
             if Debug.argString:
                 args.append('--debug=%s' % Debug.argString)
             if sys.platform == 'win32':
-                startupinfo = subprocess.STARTUPINFO()
-                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                startupinfo = subprocess.STARTUPINFO()  # type: ignore
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore
             else:
                 startupinfo = None
             process = subprocess.Popen(  # pylint:disable=consider-using-with
@@ -467,6 +469,12 @@ class Connection:
 
     def __init__(self, client:'HumanClient'):
         self.client = client
+        self.perspective:pb.RemoteReference
+        self.connector: 'Connector'
+        self.url: Url
+        self.username: str
+        self.password: str
+        self.__ruleset: 'Ruleset'
         self.dlg = LoginDlg()
 
     @property
@@ -507,7 +515,7 @@ class Connection:
         """user entered login data, now try to login to server"""
         if not Internal.autoPlay and self.dlg.result() == 0:
             self._loginReallyFailed(Failure(CancelledError()))
-        self.url, self.username, self.password, self.ruleset = arguments  # pylint:disable=attribute-defined-outside-init
+        self.url, self.username, self.password, self.ruleset = arguments
         if self.url.isLocalHost:
             # we have localhost if we play a Local Game: client and server are identical,
             # we have no security concerns about creating a new account
@@ -524,10 +532,10 @@ class Connection:
     def loggedIn(self, perspective:pb.RemoteReference) ->'Connection':
         """successful login on server"""
         assert perspective, type(perspective)
-        self.perspective = perspective  # pylint:disable=attribute-defined-outside-init
+        self.perspective = perspective
         self.perspective.notifyOnDisconnect(self.client.serverDisconnected)
         self.__updateServerInfoInDatabase()
-        self.dlg = None
+        self.dlg = None  # type: ignore
         self.pingLater()  # not right now, client.connection is still None
         return self
 
@@ -565,7 +573,7 @@ class Connection:
         """send a login command to server. That might be a normal login
         or adduser/deluser/change passwd encoded in the username"""
         factory = pb.PBClientFactory(unsafeTracebacks=True)
-        self.connector = self.url.connect(factory)  # pylint:disable=attribute-defined-outside-init
+        self.connector = self.url.connect(factory)
         assert self.dlg
         utf8Password = self.dlg.password.encode('utf-8')
         utf8Username = username.encode('utf-8')
@@ -632,7 +640,7 @@ class Connection:
                 logInfo(
                     i18n('removed stale socket <filename>%1</filename>', socketName()))
             msg += '\n\n\n' + i18n('Please try again')
-        self.dlg = None
+        self.dlg = None  # type: ignore
         if msg:
             logWarning(msg)
         raise CancelledError
