@@ -14,11 +14,10 @@ from twisted.internet.defer import Deferred, succeed, fail
 
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
     QAbstractAnimation, QEasingCurve
-from qt import Property, QGraphicsObject, QGraphicsItem, QPointF
+from qt import Property, QGraphicsObject, QGraphicsItem, QPointF, QObject
 
 from common import Internal, Debug, isAlive, ReprMixin, id4
 from log import logDebug, logException
-
 
 class Animation(QPropertyAnimation, ReprMixin):
 
@@ -32,8 +31,10 @@ class Animation(QPropertyAnimation, ReprMixin):
         self.debug |= 'T{}t'.format(id4(graphicsObject)) in Debug.animation
         Animation.clsUid += 1
         self.uid = Animation.clsUid
+        assert isinstance(graphicsObject, QObject)
         QPropertyAnimation.__init__(self, graphicsObject, propName.encode(), parent)
         QPropertyAnimation.setEndValue(self, endValue)
+        assert Internal.Preferences
         duration = Internal.Preferences.animationDuration()
         self.setDuration(duration)
         self.setEasingCurve(QEasingCurve.InOutQuad)
@@ -42,6 +43,7 @@ class Animation(QPropertyAnimation, ReprMixin):
         if self.debug:
             oldAnimation = graphicsObject.activeAnimation.get(propName, None)
             if isAlive(oldAnimation):
+                assert isinstance(oldAnimation, Animation)
                 logDebug(
                     'new Animation(%s) (after %s is done)' %
                     (self, oldAnimation.ident()))
@@ -85,6 +87,7 @@ class Animation(QPropertyAnimation, ReprMixin):
         """string format the wanted value from qvariant"""
         pName = self.pName()
         if pName == 'pos':
+            assert isinstance(value, QPointF)
             return '%.0f/%.0f' % (value.x(), value.y())
         if pName == 'rotation':
             return '%d' % value
@@ -120,6 +123,8 @@ class Animation(QPropertyAnimation, ReprMixin):
         """
         if Animation.nextAnimations:
             needRefresh = False
+            assert Internal.mainWindow
+            assert Internal.Preferences
             shortcutAll = (Internal.scene is None
                            or Internal.mainWindow.centralView.dragObject
                            or Internal.Preferences.animationSpeed == 99
@@ -208,14 +213,15 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             graphicsObject = animation.targetObject()
             if not isAlive(animation) or not isAlive(graphicsObject):
                 return fail()
-            graphicsObject.setActiveAnimation(animation)
+            animatedObject = graphicsObject
+            animatedObject.setActiveAnimation(animation)
             self.addAnimation(animation)
             propName = animation.pName()
-            animation.setStartValue(graphicsObject.getValue(propName))
+            animation.setStartValue(animatedObject.getValue(propName))
             if propName == 'rotation':
                 # change direction if that makes the difference smaller
                 endValue = animation.endValue()
-                currValue = graphicsObject.rotation
+                currValue = animatedObject.rotation
                 if endValue - currValue > 180:
                     animation.setStartValue(currValue + 360)
                 if currValue - endValue > 180:
@@ -224,13 +230,15 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             animation.targetObject().setDrawingOrder()
         self.finished.connect(self.allFinished)
         scene = Internal.scene
+        assert scene
         scene.focusRect.hide()
         QParallelAnimationGroup.start(
             self,
             QAbstractAnimation.DeletionPolicy.DeleteWhenStopped)
         if self.debug:
+            assert Internal.Preferences
             logDebug('%s started with speed %d (%s)' % (
-                self, Internal.Preferences.animationSpeed,
+                self, int(Internal.Preferences.animationSpeed),
                 ','.join('A%s' % id4(x) for x in self.animations)))
         return succeed(None).addErrback(logException)
 
@@ -273,8 +281,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             return 'stopped'
         if state == QAbstractAnimation.State.Running:
             return 'running'
-        assert False
-        return None
+        return 'unknown state:{}'.format(state)
 
     def __str__(self):
         """for debugging"""
@@ -325,6 +332,15 @@ class AnimatedMixin:
             if item.pName() == propertyName:
                 return item
         return None
+
+    def debug_name(self) ->str:
+        """for mypy"""
+        return ''
+
+#    this results in player names appearing BELOW their walls
+#    def setDrawingOrder(self) ->None:
+#        """for mypy"""
+#
 
     def shortcutAnimation(self, animation):
         """directly set the end value of the animation"""
@@ -386,6 +402,7 @@ class AnimatedMixin:
             else:
                 animation = self.activeAnimation.get(pName, None)
                 if isAlive(animation):
+                    assert isinstance(animation, Animation)
                     curValue = animation.endValue()
                 else:
                     curValue = self.getValue(pName)
