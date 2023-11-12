@@ -59,8 +59,8 @@ class CsvRow(ReprMixin):
         while rest:
             name, balance, wonCount, winner = rest[:4]
             player = Player(None, name)
-            player.balance = balance
-            player.wonCount = wonCount
+            player.balance = int(balance)
+            player.wonCount = int(wonCount)
             players.append(player)
             if winner:
                 self.winner = player
@@ -139,6 +139,7 @@ class CsvRow(ReprMixin):
 
     def write(self):
         """write to Options.csv"""
+        assert Options.csv
         writer = CsvWriter(Options.csv, mode='a')
         writer.writerow(self.row)
         del writer
