@@ -26,12 +26,12 @@ There are several variations of python ports for this script floating
 around, it seemed easier to me to maintain one for myself
 """
 
-from typing import List, Dict, Any, Type
+from typing import List, Dict, Any, Type, cast
 
 try:
     from PyQt5 import sip
 except ImportError:
-    import sip
+    import sip  # type:ignore[no-redef,import]
 from qt import QObject, Qt, QAbstractItemModel, QModelIndex
 from qt import QPersistentModelIndex, QFont, QColor, QSize
 from common import isAlive
@@ -52,10 +52,10 @@ class ModelTest(QObject):
         """
         QObject.__init__(self, parent)
         self._model = _model
-        self.model = sip.cast(_model, QAbstractItemModel)
-        self.insert = []
-        self.remove = []
-        self.changing = []
+        self.model = cast(QAbstractItemModel, sip.cast(_model, QAbstractItemModel))  # type:ignore[arg-type]
+        self.insert:List[Dict] = []
+        self.remove:List[Dict] = []
+        self.changing:List[QPersistentModelIndex] = []
         self.fetchingMore = False
         assert(self.model)
 
@@ -319,7 +319,7 @@ class ModelTest(QObject):
         """
         Store what is about to be inserted to make sure it actually happens
         """
-        item = {}
+        item:Dict[str, Any] = {}
         item['parent'] = parent
         item['oldSize'] = self.model.rowCount(parent)
         item['last'] = self.model.data(self.model.index(start - 1, 0, parent))
@@ -351,7 +351,7 @@ class ModelTest(QObject):
         """
         Store what is about to be inserted to make sure it actually happens
         """
-        item = {}
+        item:Dict[str, Any] = {}
         item['parent'] = parent
         item['oldSize'] = self.model.rowCount(parent)
         item['last'] = self.model.data(self.model.index(start - 1, 0, parent))
