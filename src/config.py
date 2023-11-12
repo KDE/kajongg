@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 from collections import defaultdict
-from typing import Optional, Union, TYPE_CHECKING, Callable, Any
+from typing import Dict, Optional, Union, TYPE_CHECKING, Callable, Any, cast
 
 from kde import KConfigSkeleton
 from log import logException, logDebug
@@ -30,6 +30,7 @@ class Parameter:
         self.group = group
         self.name = name
         self.default = default
+        self.item:'KConfigSkeletonItem'
 
     def add(self, skeleton:KConfigSkeleton) ->None:
         """for mypy"""
@@ -52,7 +53,7 @@ class StringParameter(Parameter):
 
     def add(self, skeleton:KConfigSkeleton) ->None:
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItem(self.name, self.value, self.default or '')  # pylint:disable=attribute-defined-outside-init
+        self.item = skeleton.addItem(self.name, self.value, self.default or '')
 
     def itemValue(self) ->str:
         """return the value of this item"""
@@ -71,7 +72,7 @@ class BoolParameter(Parameter):
 
     def add(self, skeleton:KConfigSkeleton) ->None:
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItem(self.name, self.value, self.default)  # pylint:disable=attribute-defined-outside-init
+        self.item = skeleton.addItem(self.name, self.value, self.default)
 
 
 class IntParameter(Parameter):
@@ -90,26 +91,26 @@ class IntParameter(Parameter):
 
     def add(self, skeleton:KConfigSkeleton) ->None:
         """add this parameter to the skeleton"""
-        self.item = skeleton.addItem(self.name, self.value, self.default)  # pylint:disable=attribute-defined-outside-init
+        self.item = skeleton.addItem(self.name, self.value, self.default)
         if self.minValue is not None:
-            self.item.setMinValue(self.minValue)
+            cast('ItemInt', self.item).setMinValue(self.minValue)
         if self.maxValue is not None:
-            self.item.setMaxValue(self.maxValue)
+            cast('ItemInt', self.item).setMaxValue(self.maxValue)
 
 
 class SetupPreferences(KConfigSkeleton):
 
     """Holds all Kajongg options. Only instantiate this once"""
-    _Parameters = {}
+    _Parameters : Dict[str, Parameter] = {}
 
     def __init__(self) ->None:
         if Internal.Preferences:
             logException('Preferences is not None')
-        self.__watching = defaultdict(list)
+        self.__watching = defaultdict(list)  # type:ignore
         Internal.Preferences = self
         KConfigSkeleton.__init__(self)
         self.configChanged.connect(self.callTriggers)
-        self.__oldValues = defaultdict(str)
+        self.__oldValues  = defaultdict(str)  # type:ignore
         self.addString('General', 'tilesetName', 'default')
         self.addString('General', 'windTilesetName', 'traditional')
         self.addString('General', 'backgroundName', 'wood_light')
@@ -140,6 +141,7 @@ class SetupPreferences(KConfigSkeleton):
         for name in self.__watching:
             self.callTrigger(name)
 
+    #def addWatch(self, name:str, method:Callable[List[Union[int, str, bool]], None]) ->None:
     def addWatch(self, name:str, method:Callable[..., None]) ->None:
         """If name changes, call method.
         method must accept 2 arguments: old value and new value."""
@@ -202,4 +204,4 @@ class SetupPreferences(KConfigSkeleton):
 
     def animationDuration(self) ->int:
         """in milliseconds"""
-        return max(0, (99 - self.animationSpeed) * 100 // 4)
+        return max(0, (99 - self.animationSpeed) * 100 // 4)  # type:ignore
