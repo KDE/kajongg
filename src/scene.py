@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import Optional, Union, TYPE_CHECKING, Any, Generator, Literal
+from typing import Optional, Union, TYPE_CHECKING, Any, Generator, Literal, cast
 
 from twisted.internet.defer import succeed, Deferred
 
@@ -53,7 +53,7 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
         pen.setWidth(6)
         self.setPen(pen)
         self.setZValue(ZValues.markerZ)
-        self._board = None
+        self._board:Optional[Union[SelectorBoard, DiscardBoard]] = None
         self.hide()
 
     @property
@@ -73,7 +73,7 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
             self._board = value
             self.refresh()
 
-    @afterQueuedAnimations
+    @afterQueuedAnimations  # type:ignore[arg-type]
     def refresh(self, unusedDeferredResult:Optional['Deferred']=None) ->None:
         """show/hide on correct position after queued animations end"""
         board = self.board
@@ -147,12 +147,13 @@ class GameScene(SceneWithFocusRect):
     def __init__(self, parent:Optional['QWidget']=None) ->None:
         Internal.scene = self
         assert parent
-        self.mainWindow = parent
-        self._game = None
+        self.mainWindow:'MainWindow' = parent
+        self._game:Optional['Game'] = None
         super().__init__()
 
         self.scoreTable = None
         self.explainView = None
+        self.clientDialog:Optional['ClientDialog']
         self.setupUi()
         assert Internal.Preferences
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
@@ -183,7 +184,7 @@ class GameScene(SceneWithFocusRect):
         self.mainWindow.updateGUI()
         self.mainWindow.adjustMainView()
 
-    @afterQueuedAnimations
+    @afterQueuedAnimations  # type:ignore[arg-type]
     def showShadowsChanged(self, deferredResult:'Deferred', # pylint: disable=unused-argument
         unusedOldValue:Any, unusedNewValue:Any) ->None:
         """if the wanted shadow direction changed, apply that change now"""
@@ -225,7 +226,7 @@ class GameScene(SceneWithFocusRect):
             with AnimationSpeed():
                 self.game.wall.decorate4()
                 for uiTile in self.game.wall.tiles:
-                    _ = uiTile
+                    _ = cast(UITile, uiTile)
                     if _.board:
                         _.board.placeTile(_)
 
@@ -267,14 +268,14 @@ class GameScene(SceneWithFocusRect):
         """next value"""
         assert self.game
         assert self.game.wall
-        oldIdx = LIGHTSOURCES.index(self.game.wall.lightSource)
-        return LIGHTSOURCES[(oldIdx + 1) % 4]
+        oldIdx = LIGHTSOURCES.index(cast(UIWall, self.game.wall).lightSource)
+        return cast(Union[Literal['NE'], Literal['NW'], Literal['SW'], Literal['SE']], LIGHTSOURCES[(oldIdx + 1) % 4])
 
     def changeAngle(self) ->None:
         """change the lightSource"""
         assert self.game
         assert self.game.wall
-        self.game.wall.lightSource = self.newLightSource()
+        cast(UIWall, self.game.wall).lightSource = self.newLightSource()
         self.focusRect.refresh()
         self.mainWindow.adjustMainView()
 
@@ -320,7 +321,7 @@ class PlayingScene(GameScene):
     def __init__(self, parent:Optional['QWidget']=None) ->None:
         self._game = None
         self.__startingGame = True
-        self._clientDialog = None
+        self._clientDialog:Optional['ClientDialog'] = None
 
         super().__init__(parent)
 
@@ -379,7 +380,7 @@ class PlayingScene(GameScene):
         """abort current game"""
         def gotAnswer(gotResult:'Deferred', autoPlaying:bool) ->Union[bool, 'Deferred']:
             """user answered"""
-            result = gotResult
+            result:Union[bool, 'Deferred'] = gotResult
             if result is True:
                 self.game = None
             else:
@@ -488,7 +489,7 @@ class ScoringScene(GameScene):
     def game(self, value:'Game') ->None:
         game = self._game
         changing = value != game
-        GameScene.game.fset(self, value)
+        GameScene.game.fset(self, value)  # type:ignore[attr-defined]
         if changing:
             if value is not None:
                 self.scoringDialog = ScoringDialog(scene=self)
@@ -555,7 +556,7 @@ class ScoringScene(GameScene):
         windsX = ''.join(x.char for x in Wind.all)
         moveCommands = i18nc('kajongg:keyboard commands for moving tiles to the players '
                              'with wind ESWN or to the central tile selector (X)', windsX)
-        uiTile = self.focusItem()
+        uiTile = cast(UITile, self.focusItem())
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
             wind_chr = windsX[moveCommands.index(wind)]
@@ -565,7 +566,7 @@ class ScoringScene(GameScene):
             tabItems = [self.selectorBoard]
             tabItems.extend(p.handBoard for p in self.game.players if p.handBoard.uiTiles)
             tabItems.append(tabItems[0])
-            currentBoard = uiTile.board
+            currentBoard = uiTile.board  # type: ignore[attr-defined]
             currIdx = 0
             while tabItems[currIdx] != currentBoard and currIdx < len(tabItems) - 2:
                 currIdx += 1
