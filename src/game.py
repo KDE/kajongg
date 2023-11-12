@@ -21,7 +21,7 @@ from common import Internal, IntDict, Debug, Options
 from common import ReprMixin, Speeds
 from wind import Wind, East
 from query import Query
-from rule import Ruleset
+from rule import Ruleset, UsedRule
 from tile import Tile, elements
 from tilesource import TileSource
 from sound import Voice
@@ -41,7 +41,9 @@ class HandId(ReprMixin):
     def __init__(self, game, string=None, stringIdx=0):
         self.game = game
         self.seed = game.seed
-        self.roundsFinished = self.rotated = self.notRotated = 0
+        self.roundsFinished = 0
+        self.rotated = 0
+        self.notRotated = 0
         self.moveCount = 0
         if string is None:
             self.roundsFinished = game.roundsFinished
@@ -89,12 +91,13 @@ class HandId(ReprMixin):
         handWind = Wind(handId[0])
         ruleset = self.game.ruleset
         self.roundsFinished = handWind.__index__()
-        if self.roundsFinished > ruleset.minRounds:
+        minRounds = ruleset.minRounds
+        if self.roundsFinished > minRounds:
             logWarning(
                 'Ruleset %s has %d minimum rounds but you want round %d(%s)'
-                % (ruleset.name, ruleset.minRounds, self.roundsFinished + 1,
+                % (ruleset.name, minRounds, self.roundsFinished + 1,
                    handWind))
-            self.roundsFinished = ruleset.minRounds
+            self.roundsFinished = minRounds
             return
         self.rotated = int(handId[1]) - 1
         if self.rotated > 3:
@@ -146,12 +149,12 @@ class HandId(ReprMixin):
             charId = ' ' # align to the most common case
         wind = Wind.all4[self.roundsFinished % 4]
         if withSeed:
-            seed = str(self.seed)
+            seedStr = str(self.seed)
         else:
-            seed = ''
+            seedStr = ''
         delim = '/' if withSeed or withAI else ''
         result = '%s%s%s%s%s%s' % (
-            aiVariant, seed, delim, wind, self.rotated + 1, charId)
+            aiVariant, seedStr, delim, wind, self.rotated + 1, charId)
         if withMoveCount:
             result += '/%3d' % self.moveCount
         return result
@@ -165,7 +168,7 @@ class HandId(ReprMixin):
         return self.prompt()
 
     def __eq__(self, other):
-        return (other
+        return (other is not None
                 and (self.roundsFinished, self.rotated, self.notRotated) ==
                 (other.roundsFinished, other.rotated, other.notRotated))
 
@@ -369,15 +372,15 @@ class Game:
 
     def belongsToRobotPlayer(self):
         """does this game instance belong to a robot player?"""
-        return self.client and self.client.isRobotClient()
+        return self.client is not None and self.client.isRobotClient()
 
     def belongsToHumanPlayer(self):
         """does this game instance belong to a human player?"""
-        return self.client and self.client.isHumanClient()
+        return self.client is not None and self.client.isHumanClient()
 
     def belongsToGameServer(self):
         """does this game instance belong to the game server?"""
-        return self.client and self.client.isServerClient()
+        return self.client is not None and self.client.isServerClient()
 
     @staticmethod
     def isScoringGame():
@@ -405,9 +408,13 @@ class Game:
                 self.players.append(self.playerClass(
                     self, playerNames[idx][1]))
         for wind, name in playerNames:
-            self.players.byName(name).wind = wind
+            _ = self.players.byName(name)
+            assert _
+            _.wind = wind
         if self.client and self.client.name:
-            self.myself = self.players.byName(self.client.name)
+            _ = self.players.byName(self.client.name)
+            assert _
+            self.myself = _
         self.sortPlayers()
 
     def __shufflePlayers(self):
@@ -438,10 +445,14 @@ class Game:
                 while self.players[0] != self.myself:
                     self.players = Players(self.players[1:] + self.players[:1])
                 for idx, player in enumerate(self.players):
+                    assert self.wall
                     player.front = self.wall[idx]
-                    player.sideText.board = player.front
+                    if hasattr(player, 'sideText'):
+                        player.sideText.board = player.front
                 # we want names to move simultaneously
-                self.players[1].sideText.refreshAll()
+                player1 = self.players[1]
+                if hasattr(player1, 'sideText'):
+                    player1.sideText.refreshAll()
 
     @staticmethod
     def _newGameId():
@@ -455,6 +466,7 @@ class Game:
         args = list([starttime, self.seed, int(self.autoPlay),
                      self.ruleset.rulesetId])
         args.extend([p.nameid for p in self.players])
+        assert self.gameid
         args.append(self.gameid)
         Query("update game set starttime=?,seed=?,autoplay=?,"
               "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", tuple(args))
@@ -531,6 +543,7 @@ class Game:
                                         for x in player.hand.usedRules)
             else:
                 manualrules = i18n('Score computed manually')
+            assert self.gameid
             Query(
                 "INSERT INTO SCORE "
                 "(game,hand,data,manualrules,player,scoretime,won,prevailing,"
@@ -574,6 +587,7 @@ class Game:
         if self.finished():
             endtime = datetime.datetime.now().replace(
                 microsecond=0).isoformat()
+            assert self.gameid
             with Internal.db as transaction:
                 transaction.execute(
                     'UPDATE game set endtime = "%s" where id = %d' %
@@ -613,9 +627,10 @@ class Game:
             logDebug(msg, btIndent=btIndent)
             return
         handId = self._prevHandId if prevHandId else self.handId
-        handId = handId.prompt(withMoveCount=True)
+        assert handId
+        handId_str = handId.prompt(withMoveCount=True)
         logDebug(
-            '%s%s: %s' % (prefix, handId, msg),
+            '%s%s: %s' % (prefix, handId_str, msg),
             withGamePrefix=False,
             btIndent=btIndent,
             showStack=showStack)
@@ -639,7 +654,7 @@ class Game:
         if not records:
             return None
         qGameRecord = records[0]
-        rulesetId = qGameRecord[4] or 1
+        rulesetId = int(qGameRecord[4]) or 1
         ruleset = Ruleset.cached(rulesetId)
         Players.load()  # we want to make sure we have the current definitions
         records = Query(
@@ -649,7 +664,7 @@ class Game:
         if records:
             qLastHandRecord = records[0]
         else:
-            qLastHandRecord = tuple([0, 0])
+            qLastHandRecord = [0, 0]
         qScoreRecords = Query(
             "select player, wind, balance, won, prevailing from score "
             "where game=? and hand=?",
@@ -657,7 +672,7 @@ class Game:
         if not qScoreRecords:
             # this should normally not happen
             qScoreRecords = list(
-                tuple([qGameRecord[wind], wind.char, 0, False, East.char])
+                list([qGameRecord[wind], wind.char, 0, False, East.char])
                 for wind in Wind.all4)
         if len(qScoreRecords) != 4:
             logError('game %d inconsistent: There should be exactly '
@@ -672,7 +687,7 @@ class Game:
             logError('game %d inconsistent: All score records for the same '
                      'hand must have the same prevailing wind' % gameid)
 
-        players = [tuple([Wind(x[1]), Game.__getName(x[0])]) for x in qScoreRecords]
+        players = list((Wind(x[1]), Game.__getName(x[0])) for x in qScoreRecords)
 
         # create the game instance.
         game = cls(players, ruleset, gameid=gameid, client=client,
@@ -696,6 +711,7 @@ class Game:
         game.maybeRotateWinds()
         game.sortPlayers()
         with AnimationSpeed(Speeds.windDisc):
+            assert game.wall
             animateAndDo(game.wall.decorate4)
         return game
 
@@ -711,7 +727,7 @@ class Game:
         if self.ruleset:
             # while initialising Game, ruleset might be None
             return self.roundsFinished >= self.ruleset.minRounds
-        return None
+        return False
 
     def __payHand(self):
         """pay the scores"""
@@ -727,7 +743,7 @@ class Game:
                 if Debug.dangerousGame:
                     self.debug('%s: winner %s. %s pays for all' %
                                (self.handId, winner, guilty))
-                guilty.hand.usedRules.append((payAction, None))
+                guilty.hand.usedRules.append(UsedRule(payAction))
                 score = winner.handTotal
                 score = score * 6 if winner.wind == East else score * 4
                 guilty.getsPayment(-score)
@@ -770,6 +786,7 @@ class Game:
         """set random living and kongBox
         sets divideAt: an index for the wall break"""
         breakWall = self.randomGenerator.randrange(4)
+        assert self.wall
         sideLength = len(self.wall) // 4
         # use the sum of four dices to find the divide
         self.divideAt = breakWall * sideLength + \
@@ -852,7 +869,9 @@ class PlayingGame(Game):
     @property
     def activePlayer(self):
         """the turn is on this player"""
-        return self.__activePlayer
+        result = self.__activePlayer
+        assert result
+        return result
 
     @activePlayer.setter
     def activePlayer(self, player):
@@ -873,6 +892,7 @@ class PlayingGame(Game):
             self.sortPlayers()
             self.hidePopups()
             self._setHandSeed()
+            assert self.wall
             self.wall.build(shuffleFirst=True)
 
     def hidePopups(self):
@@ -891,6 +911,7 @@ class PlayingGame(Game):
         seed = records[0][0]
 
         if not Internal.isServer and self.client:
+            assert self.client.connection
             host = self.client.connection.url
         else:
             host = None
@@ -948,6 +969,7 @@ class PlayingGame(Game):
         self._concealedTileName(tile)
         # the above has side effect, needs to be called
         if Internal.scene:
+            assert player.handBoard
             player.handBoard.discard(tile)
         self.lastDiscard = tile
         player.removeConcealedTile(self.lastDiscard)
@@ -973,7 +995,7 @@ class PlayingGame(Game):
 
     def _scanGameOption(self):
         """scan the --game option and go to start of wanted hand"""
-        if '/' in self.wantedGame:
+        if self.wantedGame and '/' in self.wantedGame:
             first, last = (HandId(self, self.wantedGame, x) for x in (0, 1))
             if first > last:
                 raise UserWarning('{}..{} is a negative range'.format(
@@ -1048,6 +1070,7 @@ class PlayingGame(Game):
     def _endWallDangerous(self):
         """if end of living wall is reached, declare all invisible tiles
         as dangerous"""
+        assert self.wall
         if len(self.wall.living) <= 5:
             allTiles = [x for x in elements.occurrence if not x.isBonus]
             for tile in allTiles:
