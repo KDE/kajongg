@@ -40,7 +40,8 @@ class BackgroundSelector(QWidget):
         self.backgroundList = Background.available()
         for aset in self.backgroundList:
             self.backgroundNameList.addItem(aset.name)
-        self.kcfg_backgroundName.setText(Internal.Preferences.backgroundName)
+        assert Internal.Preferences
+        self.kcfg_backgroundName.setText(str(Internal.Preferences.backgroundName))
 
     def backgroundNameChanged(self, name):
         """the name changed: update the current row"""
