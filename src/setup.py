@@ -17,13 +17,15 @@ Usage: see ../README.windows
 
 # pylint: disable=wrong-import-order, wrong-import-position, import-error
 
+from typing import List
+
 # ==== adapt this part =====
 AUTHOR = "Wolfgang Rohdewald"
 EMAIL = "wolfgang@rohdewald.de"
 LICENSE = 'GNU General Public License v2'
 URL = "https://apps.kde.org/kajongg"
 try:
-    from appversion import VERSION
+    from appversion import VERSION  # type:ignore[import]
 except ImportError:
     VERSION = "Unknown"
 # ==========================
@@ -33,7 +35,7 @@ import sys
 import msilib  # pylint:disable=deprecated-module
 from shutil import rmtree
 
-from cx_Freeze import setup, Executable
+from cx_Freeze import setup, Executable  # type:ignore[import]
 
 # pylint: disable=invalid-name
 
@@ -45,7 +47,7 @@ includes = [
     "twisted.internet",
     "twisted.internet.protocol",
     "pkg_resources"]
-packages = []
+packages : List[str] = []
 namespace_packages = ["zope"]
 include_files = ('share', os.path.join(sys.base_prefix, 'DLLs', 'sqlite3.dll'))
 
@@ -84,7 +86,7 @@ class bdist_msi(windist.bdist_msi):
     def add_config(self, fullname:str) ->None:
         """add the uninstaller icon"""
         windist.bdist_msi.add_config(self, fullname)
-        msilib.add_data(self.db, "Registry", [("DisplayIcon",  # Registry
+        msilib.add_data(self.db, "Registry", [("DisplayIcon",  # type:ignore[attr-defined]
                                                -1,  # Root
                                                r"Software\Microsoft\Windows\CurrentVersion\Uninstall\%s" %
                                                self.productcode(),  # Key
