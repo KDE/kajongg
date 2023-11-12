@@ -14,7 +14,7 @@ import datetime
 from enum import IntEnum
 from functools import total_ordering
 
-from typing import Tuple, List, Any, Optional
+from typing import Tuple, List, Any, Optional, Dict
 
 from common import Options, ReprMixin
 from player import Player, Players
@@ -27,7 +27,7 @@ class CsvWriter:
 
     def writerow(self, row:'CsvRow') ->None:
         """write one row"""
-        self.__writer.writerow([str(cell) for cell in row])
+        self.__writer.writerow([str(cell) for cell in row])  # type:ignore[attr-defined]
 
     def __del__(self) ->None:
         """clean up"""
@@ -42,6 +42,7 @@ class Csv:
     @staticmethod
     def reader(filename:str) ->Any:
         """return a generator for decoded strings"""
+        # see https://stackoverflow.com/questions/51264355/how-to-type-annotate-object-returned-by-csv-writer
         return csv.reader(open(filename, 'r', encoding='utf-8'), delimiter=Csv.delimiter)
 
 @total_ordering
@@ -50,14 +51,14 @@ class CsvRow(ReprMixin):
 
     fields = IntEnum('Field', 'RULESET AI COMMIT PY_VERSION GAME TAGS PLAYERS', start=0)
 
-    commitDates = {}
+    commitDates : Dict[str, datetime.datetime] = {}
 
     def __init__(self, row:List[str]) ->None:
         self.row = row
         self.ruleset, self.aiVariant, self.commit, self.py_version, self.game, self.tags = row[:6]
         self.winner = None
         rest = row[6:]
-        players = []
+        players:List[Player] = []
         while rest:
             name, balance, wonCount, winner = rest[:4]
             player = Player(None, name)
