@@ -33,7 +33,7 @@ class IgnoreEscape:
             # currently is either KDialog or QDialog
             _ = self.__class__.__mro__[1]
             assert isinstance(_, QDialog), 'dialog is:{} {}'.format(type(_), repr(_))
-            _.keyPressEvent(self, event)
+            _.keyPressEvent(event)
 
 
 class KDialogIgnoringEscape(KDialog, IgnoreEscape):
