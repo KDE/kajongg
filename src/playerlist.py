@@ -24,9 +24,8 @@ class PlayerList(QDialog):
 
     """QtSQL Model view of the players"""
 
-    def __init__(self, parent):
-        QDialog.__init__(self)
-        self.parent = parent
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
         self._data = {}
         self.table = QTableWidget(self)
         self.table.horizontalHeader().setStretchLastSection(True)
