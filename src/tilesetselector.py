@@ -27,6 +27,7 @@ class TilesetSelector(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
 
+        assert Internal.Preferences
         loadUi(self)
         self.kcfg_tilesetName = QLineEdit(self)
         self.kcfg_tilesetName.setVisible(False)
@@ -54,6 +55,7 @@ class TilesetSelector(QWidget):
     def setUp(self):
         """set-up the selector"""
 
+        assert Internal.Preferences
         # The lineEdit widget holds our tileset path, but the user does
         # not manipulate it directly
         self.kcfg_tilesetName.hide()
