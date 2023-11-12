@@ -67,9 +67,9 @@ class TwistedSocketNotifier(QObject):
     def __init__(self, parent:Optional[QObject], reactor:'QtReactor', watcher:unix.Client, socketType:QSocketNotifier.Type) ->None:
         QObject.__init__(self, parent)
         self.reactor = reactor
-        self.watcher = watcher
+        self.watcher:Optional[unix.Client] = watcher
         fd = watcher.fileno()
-        self.fn:Optional[Callable[[int], None]]
+        self.fn:Optional[Callable[...,None]]
         self.notifier = QSocketNotifier(fd, socketType, parent)
         self.notifier.setEnabled(True)
         if socketType == QSocketNotifier.Type.Read:
@@ -82,7 +82,8 @@ class TwistedSocketNotifier(QObject):
         self.notifier.setEnabled(False)
         assert self.fn
         self.notifier.activated.disconnect(self.fn)
-        self.fn = self.watcher = None
+        self.fn = None
+        self.watcher = None
         self.notifier.deleteLater()
         self.deleteLater()
 
@@ -138,12 +139,13 @@ class TwistedSocketNotifier(QObject):
 class QtReactor(posixbase.PosixReactorBase):
 
     def __init__(self) ->None:
-        self._reads:Dict[posixbase.UnixWaker, TwistedSocketNotifier] = {}
+#        self._reads:Dict[posixbase._UnixWaker, TwistedSocketNotifier] = {}
+        self._reads:Dict[unix.Client, TwistedSocketNotifier] = {}
         self._writes:Dict[Any, Any] = {}
         self._notifiers:Dict[Any, Any] = {}
         self._timer = QTimer()
         self._timer.setSingleShot(True)
-        self._timer.timeout.connect(self.iterate)
+        self._timer.timeout.connect(self.iterate)  # type:ignore[has-type]
 
         self.qApp:QCoreApplication
         if QCoreApplication.instance() is None:
@@ -153,7 +155,7 @@ class QtReactor(posixbase.PosixReactorBase):
         else:
             self.qApp = QCoreApplication.instance()
             self._ownApp = False
-        self._blockApp = None
+        self._blockApp:Union[QCoreApplication, QEventLoop, None] = None
         posixbase.PosixReactorBase.__init__(self)
 
     def _add(self, xer:unix.Client, primary:Dict[unix.Client, TwistedSocketNotifier], typus:QSocketNotifier.Type) ->None:
@@ -232,7 +234,7 @@ class QtReactor(posixbase.PosixReactorBase):
         self.runUntilCurrent()
         self.doIteration(delay, fromqt)
 
-    iterate = _iterate
+    iterate = _iterate  # type:ignore[assignment]
 
     def doIteration(self, delay:Optional[float]=None, fromqt:bool=False) ->None:
         'This method is called by a Qt timer or by network activity on a file descriptor'
