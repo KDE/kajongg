@@ -26,7 +26,10 @@ class Parameter:
         self.group = group
         self.name = name
         self.default = default
-        self.item = None
+
+    def add(self, skeleton):
+        """for mypy"""
+        raise NotImplementedError
 
     def itemValue(self):
         """return the value of this item"""
@@ -45,7 +48,7 @@ class StringParameter(Parameter):
 
     def add(self, skeleton):
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItem(self.name, self.value, self.default or '')
+        self.item = skeleton.addItem(self.name, self.value, self.default or '')  # pylint:disable=attribute-defined-outside-init
 
     def itemValue(self):
         """return the value of this item"""
@@ -64,7 +67,7 @@ class BoolParameter(Parameter):
 
     def add(self, skeleton):
         """add tis parameter to the skeleton"""
-        self.item = skeleton.addItem(self.name, self.value, self.default)
+        self.item = skeleton.addItem(self.name, self.value, self.default)  # pylint:disable=attribute-defined-outside-init
 
 
 class IntParameter(Parameter):
@@ -83,7 +86,7 @@ class IntParameter(Parameter):
 
     def add(self, skeleton):
         """add this parameter to the skeleton"""
-        self.item = skeleton.addItem(self.name, self.value, self.default)
+        self.item = skeleton.addItem(self.name, self.value, self.default)  # pylint:disable=attribute-defined-outside-init
         if self.minValue is not None:
             self.item.setMinValue(self.minValue)
         if self.maxValue is not None:
