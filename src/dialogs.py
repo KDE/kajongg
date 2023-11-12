@@ -104,7 +104,7 @@ class DeferredDialog(Deferred):
 
     def __init__(self, dlg:QDialog, modal:bool=True, always:bool=False) ->None:
         Deferred.__init__(self)
-        self.dlg = dlg
+        self.dlg:Optional[QDialog] = dlg
         self.modal = modal
         self.always = always
         if Options.gui:
