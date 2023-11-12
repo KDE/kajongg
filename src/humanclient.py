@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import random
-from typing import List, Optional, TYPE_CHECKING, Type, Any, Tuple, Union
+from typing import List, Optional, TYPE_CHECKING, Type, Any, Tuple, Union, cast
 
 from twisted.spread import pb
 from twisted.python.failure import Failure
@@ -31,6 +31,7 @@ from tables import TableList, SelectRuleset
 from sound import Voice
 from login import Connection
 from rule import Ruleset
+from player import PlayingPlayer
 from game import PlayingGame
 from visible import VisiblePlayingGame
 
@@ -78,7 +79,7 @@ class SelectChow(KDialogIgnoringEscape):
 
     def toggled(self, unusedChecked:bool) ->None:
         """a radiobutton has been toggled"""
-        button = self.sender()
+        button = cast(QPushButton, self.sender())
         if button.isChecked():
             self.selectedChow = self.chows[self.buttons.index(button)]
             self.accept()
@@ -112,7 +113,7 @@ class SelectKong(KDialogIgnoringEscape):
 
     def toggled(self, unusedChecked:bool) ->None:
         """a radiobutton has been toggled"""
-        button = self.sender()
+        button = cast(QPushButton, self.sender())
         if button.isChecked():
             self.selectedKong = self.kongs[self.buttons.index(button)]
             self.accept()
@@ -128,7 +129,7 @@ class DlgButton(QPushButton):
         self.message = message
         self.client = parent.client
         self.setMinimumHeight(25)
-        self.setText(message.buttonCaption())
+        self.setText(message.buttonCaption())  # type: ignore[call-arg]
 
     def setMeaning(self, uiTile:Optional['UITile']) ->None:
         """give me caption, shortcut, tooltip, icon"""
@@ -158,13 +159,14 @@ class DlgButton(QPushButton):
             self.setIcon(KIcon())
 
 
-class ClientDialog(QDialog):
+class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
 
     """a simple popup dialog for asking the player what he wants to do"""
 
     def __init__(self, client:'HumanClient', parent:Optional[QWidget]=None) ->None:
         QDialog.__init__(self, parent)
         decorateWindow(self, i18n('Choose'))
+        self.tables:List[ClientTable]
         self.setObjectName('ClientDialog')
         self.client = client
         self.gridLayout = QGridLayout(self)
@@ -174,13 +176,14 @@ class ClientDialog(QDialog):
         assert client.game
         if not client.game.autoPlay:
             self.timer.timeout.connect(self.timeout)
-        self.deferred = None
-        self.buttons = []
-        self.setWindowFlags(Qt.WindowType.SubWindow | Qt.WindowType.WindowStaysOnTopHint)
+        self.deferred:Optional[Deferred] = None
+        self.buttons:List[DlgButton] = []
+        self.setWindowFlags(cast(Qt.WindowType, Qt.WindowType.SubWindow | Qt.WindowType.WindowStaysOnTopHint))
         self.setModal(False)
         self.btnHeight = 0
         self.answered = False
-        self.sorry = None
+        self.move:'Move'  # type:ignore[assignment]
+        self.sorry:Optional[Sorry] = None
 
     def keyPressEvent(self, event:'QKeyEvent') ->None:
         """ESC selects default answer"""
@@ -201,7 +204,7 @@ class ClientDialog(QDialog):
         """define a button"""
         if not self.client.game:
             return
-        maySay = self.client.game.myself.sayable[message]
+        maySay = cast(PlayingPlayer, self.client.game.myself).sayable[message]
         assert Internal.Preferences
         if Internal.Preferences.showOnlyPossibleActions and not maySay:
             return
@@ -221,7 +224,7 @@ class ClientDialog(QDialog):
         for uiTile in self.client.game.myself.handBoard.lowerHalfTiles():
             txt = []
             for button in self.buttons:
-                _, _, tileTxt = button.message.toolTip(button, uiTile.tile)
+                _, _, tileTxt = button.message.toolTip(button, uiTile.tile)  # type:ignore[call-arg]
                 if tileTxt:
                     txt.append(tileTxt)
             uiTile.setToolTip('<br><br>'.join(txt))
@@ -368,7 +371,7 @@ class ClientDialog(QDialog):
             message = self.focusWidget().message
         assert any(x.message == message for x in self.buttons)
         assert self.client.game
-        if not self.client.game.myself.sayable[message]:
+        if not cast(PlayingPlayer, self.client.game.myself).sayable[message]:
             self.proposeAction().setFocus() # go back to default action
             self.sorry = Sorry(i18n('You cannot say %1', message.i18nName))
             return
@@ -386,20 +389,22 @@ class ClientDialog(QDialog):
         """the user clicked one of the buttons"""
         game = self.client.game
         if game and not game.autoPlay:
-            self.selectButton(self.sender().message)
+            self.selectButton(cast(QPushButton, self.sender()).message)
 
 
 class HumanClient(Client):
 
     """a human client"""
-    humanClients = []
+    humanClients : List['HumanClient'] = []
 
     def __init__(self) ->None:
         Client.__init__(self)
         HumanClient.humanClients.append(self)
         self.table = None
-        self.beginQuestion = None
-        self.tableList = TableList(self)
+        self.ruleset:Ruleset
+        self.connection:Optional[Connection]
+        self.beginQuestion:Optional[Deferred] = None
+        self.tableList:Optional[TableList] = TableList(self)
         Connection(self).login().addCallbacks(
             self.__loggedIn,
             self.__loginFailed)
@@ -438,7 +443,7 @@ class HumanClient(Client):
     def __loggedIn(self, connection:Connection) ->None:
         """callback after the server answered our login request"""
         self.connection = connection
-        self.ruleset = connection.ruleset  # pylint:disable=attribute-defined-outside-init
+        self.ruleset = connection.ruleset
         self.name = connection.username
         if self.tableList:
             self.tableList.show()
@@ -489,7 +494,7 @@ class HumanClient(Client):
     def __loginFailed(unused:List[Deferred]) ->None:
         """as the name says"""
         if Internal.scene:
-            Internal.scene.startingGame = False
+            cast('PlayingScene', Internal.scene).startingGame = False
 
     def isRobotClient(self) ->bool:
         """avoid using isinstance, it would import too much for kajonggserver"""
@@ -586,7 +591,7 @@ class HumanClient(Client):
                 # others will then automatically leave too
                 for name in oldTable.playerNames:
                     if name != self.name and not newTable.isOnline(name):
-                        def sorried(unused:List['Request']) ->Deferred:
+                        def sorried(unused:List['Request']) ->Optional[Deferred]:
                             """user ack"""
                             game = self.game
                             if game:
@@ -678,8 +683,8 @@ class HumanClient(Client):
         scene = Internal.scene
         assert scene
         assert self.game
-        self.game.myself.computeSayable(move, answers)
-        deferred = Deferred()
+        cast(PlayingPlayer, self.game.myself).computeSayable(move, answers)
+        deferred:Deferred = Deferred()
         deferred.addCallback(self.__askAnswered)
         deferred.addErrback(self.__answerError, move, answers)
         iAmActive = self.game.myself == self.game.activePlayer
@@ -712,15 +717,15 @@ class HumanClient(Client):
         assert self.game
         intelligence = self.game.myself.intelligence
         if self.game.autoPlay:
-            return Message.Chow, intelligence.selectChow(chows)
+            return cast('ClientMessage', Message.Chow), intelligence.selectChow(chows)
         if len(chows) == 1:
-            return Message.Chow, chows[0]
+            return cast('ClientMessage', Message.Chow), chows[0]
         assert Internal.Preferences
         if Internal.Preferences.propose:
             propose = intelligence.selectChow(chows)
         else:
             propose = None
-        deferred = Deferred()
+        deferred:Deferred = Deferred()
         selDlg = SelectChow(chows, propose, deferred)
         assert selDlg.exec_()
         return deferred
@@ -729,10 +734,10 @@ class HumanClient(Client):
         """which possible kong do we want to declare?"""
         assert self.game
         if self.game.autoPlay:
-            return Message.Kong, self.game.myself.intelligence.selectKong(kongs)
+            return cast('ClientMessage', Message.Kong), self.game.myself.intelligence.selectKong(kongs)
         if len(kongs) == 1:
-            return Message.Kong, kongs[0]
-        deferred = Deferred()
+            return cast('ClientMessage', Message.Kong), kongs[0]
+        deferred:Deferred = Deferred()
         selDlg = SelectKong(kongs, deferred)
         assert selDlg.exec_()
         return deferred
@@ -743,7 +748,7 @@ class HumanClient(Client):
                 'MeldList', Tuple['MeldList', Optional['Tile'], 'Meld'], None ]]]:
         """the user answered our question concerning move"""
         if not self.game:
-            return Message.NoClaim
+            return cast('ClientMessage', Message.NoClaim), None
         myself = self.game.myself
         if answer in [Message.Discard, Message.OriginalCall]:
             # do not remove tile from hand here, the server will tell all players
@@ -753,18 +758,19 @@ class HumanClient(Client):
             assert myself.handBoard.focusTile
             myself.handBoard.setEnabled(False)
             return answer, myself.handBoard.focusTile.tile
-        args = myself.sayable[answer]
+        args = cast(PlayingPlayer, myself).sayable[answer]
         assert args
         if answer == Message.Chow:
-            return self.__selectChow(args)
+            return self.__selectChow(cast('MeldList', args))
         if answer == Message.Kong:
-            return self.__selectKong(args)
+            return self.__selectKong(cast('MeldList', args))
         self.game.hidePopups()
         if args is True or args == []:
             # this does not specify any tiles, the server does not need this. Robot players
             # also return None in this case.
             return answer, None
         return answer, args
+
 
     def __answerError(self, answer:Message, move:'Move', answers:List[Message]) ->None:
         """an error happened while determining the answer to server"""
@@ -777,7 +783,7 @@ class HumanClient(Client):
         if self.table and self.table.tableid == tableid:
             # translate Robot to Roboter:
             if self.game:
-                args = self.game.players.translatePlayerNames(args)
+                args = self.game.players.translatePlayerNames(args)  # type:ignore[assignment]
             logWarning(i18n(message, *args))
             if self.game:
                 self.game.close()
