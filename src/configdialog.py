@@ -88,6 +88,7 @@ class ConfigDialog(KConfigDialog):
     """configuration dialog with several pages"""
 
     def __init__(self, parent, name):
+        assert Internal.Preferences
         KConfigDialog.__init__(
             self, parent, name, Internal.Preferences)
         StateSaver(self)
