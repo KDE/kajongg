@@ -35,7 +35,9 @@ class TilesetSelector(QWidget):
         self.tileScene = SceneWithFocusRect()
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
-        self.tileset = Tileset(Internal.Preferences.tilesetName)
+        _ = Internal.Preferences.tilesetName
+        assert isinstance(_, str)
+        self.tileset = Tileset(_)
         self.uiTiles = [UITile(Tile('w' + s.char.lower())) for s in Wind.all4]
         self.board = Board(2, 2, self.tileset)
         self.board.showShadows = True
