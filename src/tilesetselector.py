@@ -9,6 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 from qt import QWidget, QHBoxLayout, QLineEdit
+from tile import Tile
 from tileset import Tileset
 from uitile import UITile
 from board import Board, FittingView
@@ -35,7 +36,7 @@ class TilesetSelector(QWidget):
         self.tileView = FittingView()
         self.tileView.setScene(self.tileScene)
         self.tileset = Tileset(Internal.Preferences.tilesetName)
-        self.uiTiles = [UITile('w' + s.char.lower()) for s in Wind.all4]
+        self.uiTiles = [UITile(Tile('w' + s.char.lower())) for s in Wind.all4]
         self.board = Board(2, 2, self.tileset)
         self.board.showShadows = True
         self.tileScene.addItem(self.board)
