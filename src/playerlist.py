@@ -31,7 +31,7 @@ class PlayerList(QDialog):
 
     def __init__(self, parent:Optional['QWidget']=None):
         QDialog.__init__(self, parent)
-        self._data = {}
+        self._data:Dict[str, int] = {}
         self.table = QTableWidget(self)
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.verticalHeader().setVisible(False)
