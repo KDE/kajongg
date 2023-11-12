@@ -47,15 +47,19 @@ class User(pb.Avatar, ReprMixin):
 
     def source(self):
         """how did he connect?"""
-        result = str(self.mind.broker.transport.getPeer())
+        if self.mind is None:
+            result = 'SOURCE UNKNOWN: self.mind is None'
+        else:
+            result = str(self.mind.broker.transport.getPeer())
         if 'UNIXAddress' in result:
             # socket: we want to get the socket name
-            result = Options.socket
+            result = Options.socket or 'ERROR: Options.socket is None'
         return result
 
     def attached(self, mind):
         """override pb.Avatar.attached"""
         self.mind = mind
+        assert self.server
         self.server.login(self)
 
     def detached(self, unusedMind):
@@ -64,6 +68,7 @@ class User(pb.Avatar, ReprMixin):
             logDebug(
                 '%s: connection detached from %s' %
                 (self, self.source()))
+        assert self.server
         self.server.logout(self)
         self.mind = None
 
@@ -90,6 +95,7 @@ class User(pb.Avatar, ReprMixin):
         if Debug.table:
             logDebug('client has dbIdent={} voiceId={} maxGameId={} clientVersion {}'.format(
                 self.dbIdent, self.voiceId, self.maxGameId, clientVersion))
+        assert self.server
         self.server.sendTables(self)
         return None
 
@@ -99,24 +105,29 @@ class User(pb.Avatar, ReprMixin):
 
     def perspective_needRulesets(self, rulesetHashes):
         """perspective_* methods are to be called remotely"""
+        assert self.server
         return self.server.needRulesets(rulesetHashes)
 
     def perspective_joinTable(self, tableid):
         """perspective_* methods are to be called remotely"""
+        assert self.server
         return self.server.joinTable(self, tableid)
 
     def perspective_leaveTable(self, tableid):
         """perspective_* methods are to be called remotely"""
-        return self.server.leaveTable(self, tableid, None)
+        assert self.server
+        return self.server.leaveTable(self, tableid, 'correctly left table {}'.format(tableid))
 
     def perspective_newTable(
             self, ruleset, playOpen, autoPlay, wantedGame: str, tableId=None):
         """perspective_* methods are to be called remotely"""
+        assert self.server
         return self.server.newTable(self, ruleset, playOpen, autoPlay, wantedGame, tableId)
 
     def perspective_startGame(self, tableid):
         """perspective_* methods are to be called remotely"""
-        return self.server.startGame(self, tableid)
+        assert self.server
+        self.server.startGame(self, tableid)
 
     def perspective_logout(self):
         """perspective_* methods are to be called remotely"""
@@ -125,7 +136,8 @@ class User(pb.Avatar, ReprMixin):
     def perspective_chat(self, chatString):
         """perspective_* methods are to be called remotely"""
         self.pinged()
-        return self.server.chat(chatString)
+        assert self.server
+        self.server.chat(chatString)
 
     def __str__(self):
         return self.name
