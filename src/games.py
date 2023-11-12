@@ -198,12 +198,12 @@ class Games(QDialog):
     def __getSelectedGame(self):
         """return the game id of the selected game"""
         rows = self.selection.selectedRows()
-        return self.model.data(rows[0], 0) if rows else 0
+        return self.model.data(rows[0], 0) if rows else QModelIndex()
 
     def pendingOrNot(self, chosen):
         """do we want to see all games or only pending games?"""
-        if self.onlyPending != chosen:
-            self.onlyPending = chosen
+        if self.onlyPending != bool(chosen):
+            self.onlyPending = bool(chosen)
             prevSelected = self.__getSelectedGame()
             self.setQuery()
             idx = self.__idxForGame(prevSelected)
