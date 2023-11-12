@@ -114,7 +114,7 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
                     option.rect.x() + (2 * textMargin), option.rect.y(),
                     option.rect.width() - (2 * textMargin),
                     option.rect.height()))
-            if not checkRect.contains(event.pos()):
+            if not checkRect.contains(event.pos()):  # type: ignore[attr-defined]
                 return False
         elif event.type() == QEvent.Type.KeyPress:
             if event.key() not in (Qt.Key.Key_Space, Qt.Key.Key_Select):
