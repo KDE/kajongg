@@ -36,7 +36,7 @@ class GamesModel(QAbstractTableModel):
 
     def __init__(self) ->None:
         QAbstractTableModel.__init__(self)
-        self._resultRows = []
+        self._resultRows:List[List[Any]] = []
 
     def columnCount(self, unusedParent:QModelIndex=QModelIndex()) ->int:
         """including the hidden col 0"""
@@ -102,7 +102,7 @@ class Games(QDialog):
 
     def __init__(self, parent:Optional['QWidget']=None) ->None:
         super().__init__(parent)
-        self.selectedGame = None
+        self.selectedGame:Optional[QModelIndex] = None
         self.onlyPending = True
         decorateWindow(self, i18nc("@title:window", "Games"))
         self.setObjectName('Games')
