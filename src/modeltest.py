@@ -203,7 +203,7 @@ class ModelTest(QObject):
         # index() is tested more extensively in checkChildren()
         # but this catches the big mistakes
 
-    def parent(self):
+    def test_parent(self):
         """
         Tests self.model's implementation of QAbstractItemModel::parent()
         """
@@ -310,7 +310,7 @@ class ModelTest(QObject):
         self.columnCount()
         self.hasIndex()
         self.index()
-        self.parent()
+        self.test_parent()
         self.data()
 
     def rowsAboutToBeInserted(self, parent, start, unusedEnd):
