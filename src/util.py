@@ -19,12 +19,14 @@ import gc
 
 from locale import getpreferredencoding
 from sys import stdout
-from typing import Optional, List, Generator, Sequence, Any, Type, Iterable, TYPE_CHECKING
+from typing import Optional, List, Generator, Sequence, Any, Type, Iterable, Dict, TYPE_CHECKING
 
 from common import Debug
 
 if TYPE_CHECKING:
     from types import FrameType
+
+STDOUTENCODING: Optional[str]
 
 try:
     STDOUTENCODING = stdout.encoding
@@ -97,7 +99,7 @@ def removeIfExists(filename:str) ->bool:
 
 def uniqueList(seq:Iterable) ->List:
     """makes list content unique, keeping only the first occurrence"""
-    seen = set()
+    seen:Any = set()
     seen_add = seen.add
     return [x for x in seq if x not in seen and not seen_add(x)]
 
@@ -123,8 +125,8 @@ def get_all_objects() ->Any:
     objects are leaking"""
     gc.collect()
     gcl = gc.get_objects()
-    olist = []
-    seen = {}
+    olist:List[Any] = []
+    seen:Dict[int, Any] = {}
     # Just in case:
     seen[id(gcl)] = None
     seen[id(olist)] = None

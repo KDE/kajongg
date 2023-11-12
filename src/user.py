@@ -38,12 +38,12 @@ class User(pb.Avatar, ReprMixin):
             'select name from player where id=?',
             (userid,
             )).records[0][0]
-        self.mind = None
-        self.server = None
-        self.dbIdent = None
-        self.voiceId = None
-        self.maxGameId = None
-        self.lastPing = None
+        self.mind:Optional[pb.RemoteReference] = None
+        self.server:Optional['MJServer'] = None
+        self.dbIdent:Optional[str] = None
+        self.voiceId:Optional[str] = None
+        self.maxGameId:Optional[int] = None
+        self.lastPing:Optional['datetime.datetime'] = None
         self.pinged()
 
     def pinged(self) ->None:
