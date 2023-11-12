@@ -20,25 +20,16 @@ from qt import Qt, QDialog, QMessageBox, QWidget
 from common import Options, Internal, isAlive, ReprMixin
 
 
-class IgnoreEscape:
+class KDialogIgnoringEscape(KDialog):
 
-    """as the name says. Use as a mixin for dialogs"""
+    """as the name says"""
 
     def keyPressEvent(self, event):
         """catch and ignore the Escape key"""
         if event.key() == Qt.Key_Escape:
             event.ignore()
         else:
-            # pass on to the first declared ancestor class which
-            # currently is either KDialog or QDialog
-            _ = self.__class__.__mro__[1]
-            assert isinstance(_, QDialog), 'dialog is:{} {}'.format(type(_), repr(_))
-            _.keyPressEvent(event)
-
-
-class KDialogIgnoringEscape(KDialog, IgnoreEscape):
-
-    """as the name says"""
+            KDialog.keyPressEvent(self, event)
 
 
 class MustChooseKDialog(KDialogIgnoringEscape):
