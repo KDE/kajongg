@@ -80,6 +80,7 @@ class TwistedSocketNotifier(QObject):
 
     def shutdown(self) ->None:
         self.notifier.setEnabled(False)
+        assert self.fn
         self.notifier.activated.disconnect(self.fn)
         self.fn = self.watcher = None
         self.notifier.deleteLater()
@@ -239,15 +240,10 @@ class QtReactor(posixbase.PosixReactorBase):
         if not self.running and self._blockApp:
             self._blockApp.quit()
         self._timer.stop()
-        delay = max(delay or 0, 1)
+        delay = max(int(delay or 0), 1)
         if not fromqt:
             self.qApp.processEvents(QEventLoop.ProcessEventsFlag.AllEvents, delay * 1000)
-        if self.timeout() is None:
-            timeout = 0.1
-        elif self.timeout() == 0:
-            timeout = 0
-        else:
-            timeout = self.timeout()
+        timeout = self.timeout() or 0.1
         self._timer.setInterval(int(timeout * 1000))
         self._timer.start()
 
@@ -296,9 +292,9 @@ class QtEventReactor(QtReactor):
 
     def timeout(self) ->float:
         t = super(QtEventReactor, self).timeout()
-        if t is None:
-            return 0.0
-        return min(t, 0.01)
+        if t is not None:
+            return min(t, 0.01)
+        return None
 
     def iterate(self, delay:Optional[float]=None) ->None:  # type:ignore
         """See twisted.internet.interfaces.IReactorCore.iterate. FIXME: do not understand this
