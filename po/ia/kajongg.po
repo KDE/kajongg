@@ -447,7 +447,7 @@ msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
 msgstr ""
-"Pro favor tu usa < a href=\"http://bugs.kde.org\">https://bugs.kde.org</a> "
+"Pro favor tu usa <a href=\"http://bugs.kde.org\">https://bugs.kde.org</a> "
 "per reportar bugs."
 
 #: src/kdestub.py:1080

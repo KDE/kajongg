@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2023-10-14 20:11+0100\n"
+"PO-Revision-Date: 2023-11-12 16:39+0100\n"
 "Last-Translator: Oliver Kellogg <okellogg@users.sourceforge.net>\n"
 "Language-Team: esperanto <kde-i18n-eo@kde.org>\n"
 "Language: eo\n"
@@ -262,11 +262,11 @@ msgstr "ensalutu al HOST"
 
 #: src/kajongg.py:88
 msgid "start new TABLE"
-msgstr "komenci novan TABLON"
+msgstr "komenci novan TABLE"
 
 #: src/kajongg.py:89
 msgid "join TABLE"
-msgstr "aliĝu al TABLO"
+msgstr "join al TABLE"
 
 #: src/kajongg.py:90
 msgid "use RULESET without asking"
@@ -274,11 +274,11 @@ msgstr "uzu RULESET sen demandi"
 
 #: src/kajongg.py:91
 msgid "play only ROUNDS rounds per game. Only for debugging!"
-msgstr "ludu nur RUNDOJ raŭndojn po ludo. Nur por sencimigi!"
+msgstr "ludu nur ROUNDS raŭndojn po ludo. Nur por sencimigi!"
 
 #: src/kajongg.py:92
 msgid "prefer PLAYER for next login"
-msgstr "preferu LUDANTO por venonta ensaluto"
+msgstr "preferu PLAYER por venonta ensaluto"
 
 #: src/kajongg.py:93
 msgid "use AI variant for human player in demo mode"
