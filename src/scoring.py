@@ -16,6 +16,7 @@ from qt import QPushButton, QMessageBox, QComboBox
 
 
 from common import Internal, isAlive, Debug
+from meld import MeldList
 from wind import Wind
 from tilesource import TileSource
 from animation import animate
@@ -34,6 +35,11 @@ from uiwall import UIWall, SideText
 from guiutil import decorateWindow, BlockSignals, rotateCenter, sceneRotation
 from mi18n import i18nc
 
+def scoringScene():
+    """shortcut"""
+    result = Internal.scene
+    assert result
+    return result
 
 class SwapDialog(QMessageBox):
 
@@ -130,7 +136,7 @@ class ScoringTileAttr(TileAttr):
 
     def setDark(self):
         """should the tile appear darker?"""
-        return self.yoffset or self.tile.isConcealed
+        return bool(self.yoffset) or self.tile.isConcealed
 
     def setFocusable(self, hand, meld, idx):
         """in a scoring handboard, only the first tile of a meld is focusable"""
@@ -149,8 +155,12 @@ class ScoringHandBoard(HandBoard):
 
     def meldVariants(self, tile, lowerHalf):
         """Kong might have variants"""
-        result = []
-        meld = self.uiMeldWithTile(tile).meld
+        result = MeldList()
+        uimeld = self.uiMeldWithTile(tile)
+        if not uimeld:
+            logWarning('ScoringHandBoard.meldVariants: no meld found for %s' % tile)
+            return result
+        meld = uimeld.meld
         result.append(meld.concealed if lowerHalf else meld.exposed)
         if len(meld) == 4:
             if lowerHalf:
@@ -162,7 +172,9 @@ class ScoringHandBoard(HandBoard):
     def mapMouseTile(self, uiTile):
         """map the pressed tile to the wanted tile. For melds, this would
         be the first tile no matter which one is pressed"""
-        return self.uiMeldWithTile(uiTile)[0]
+        uiMeld = self.uiMeldWithTile(uiTile)
+        assert uiMeld
+        return uiMeld[0]
 
     def uiMeldWithTile(self, uiTile):
         """return the meld with uiTile"""
@@ -189,7 +201,7 @@ class ScoringHandBoard(HandBoard):
 
     def sync(self, adding=None):
         """place all tiles in ScoringHandBoard"""
-        self.placeTiles(chain(*self.uiMelds))
+        self.placeTiles(list(chain(*self.uiMelds)))
 
     def deselect(self, meld):
         """remove meld from old board"""
@@ -214,8 +226,9 @@ class ScoringHandBoard(HandBoard):
         elif uiTile.isBonus:
             doAccept = False
         else:
-            oldLowerHalf = uiTile.board.isHandBoard and uiTile in uiTile.board.lowerHalfTiles(
-            )
+            oldLowerHalf = False
+            if uiTile.board.isHandBoard:
+                oldLowerHalf = uiTile in uiTile.board.lowerHalfTiles()
             doAccept = oldLowerHalf != newLowerHalf
         event.setAccepted(doAccept)
 
@@ -233,6 +246,7 @@ class ScoringHandBoard(HandBoard):
     def dropTile(self, uiTile, lowerHalf):
         """drop uiTile into lower or upper half of our hand"""
         senderBoard = uiTile.board
+        assert senderBoard
         newMeld = senderBoard.chooseVariant(uiTile, lowerHalf)
         if not newMeld:
             return False
@@ -246,6 +260,7 @@ class ScoringHandBoard(HandBoard):
         senderBoard = uiMeld[0].board
         senderBoard.deselect(uiMeld)
         self.uiMelds.append(uiMeld)
+        assert self.player
         self.player.addMeld(uiMeld.meld)
         self.sync()
         self.hasLogicalFocus = senderBoard == self or not senderBoard.uiTiles
@@ -253,8 +268,8 @@ class ScoringHandBoard(HandBoard):
         senderBoard.autoSelectTile()
         senderBoard.checkTiles()
         if senderBoard is not self and senderBoard.isHandBoard:
-            Internal.scene.handSelectorChanged(senderBoard)
-        Internal.scene.handSelectorChanged(self)
+            scoringScene().handSelectorChanged(senderBoard)
+        scoringScene().handSelectorChanged(self)
         animate()
         self.checkTiles()
         return True
@@ -262,8 +277,15 @@ class ScoringHandBoard(HandBoard):
     def focusRectWidth(self):
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
-        meld = self.uiMeldWithTile(self.focusTile)
-        return len(meld) if meld else 1
+        focus = self.focusTile
+        if not focus:
+            logWarning('ScoringBoard.focusRectWidth: there is no focus tile')
+            return 1
+        meld = self.uiMeldWithTile(focus)
+        if not meld:
+            logWarning('ScoringBoard.focusRectWidth: there is no meld with focus tile %s' % focus)
+            return 1
+        return len(meld)
 
     def addUITile(self, uiTile):
         Board.addUITile(self, uiTile)
@@ -310,7 +332,8 @@ class ScoringHandBoard(HandBoard):
 
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
-        return list(self.player.concealedMelds)
+        assert self.player
+        return MeldList(self.player.concealedMelds)
 
 
 class ScoringPlayer(VisiblePlayer, Player):
@@ -328,14 +351,17 @@ class ScoringPlayer(VisiblePlayer, Player):
         """clears attributes related to current hand"""
         Player.clearHand(self)
         if self.game and self.game.wall:
+            assert self.game
+            assert self.game.wall
             # is None while __del__
             self.front = self.game.wall[self.idx]
             if hasattr(self, 'sideText'):
                 self.sideText.board = self.front
         if isAlive(self.handBoard):
-            self.handBoard.setEnabled(True)
-            self.handBoard.showMoveHelper()
-            self.handBoard.uiMelds = []
+            assert (_ := self.handBoard)
+            _.setEnabled(True)
+            _.showMoveHelper()
+            _.uiMelds = []
         self.manualRuleBoxes = []
 
     def explainHand(self):
@@ -346,19 +372,19 @@ class ScoringPlayer(VisiblePlayer, Player):
     def handTotal(self):
         """the hand total of this player"""
         if self.hasManualScore():
-            spValue = Internal.scene.scoringDialog.spValues[self.idx]
+            assert (_ := scoringScene().scoringDialog)
+            spValue = _.spValues[self.idx]
             return spValue.value()
         return self.hand.total()
 
     def hasManualScore(self):
         """True if no tiles are assigned to this player"""
-        if Internal.scene.scoringDialog:
-            return Internal.scene.scoringDialog.spValues[self.idx].isEnabled()
+        if _ := scoringScene().scoringDialog:
+            return _.spValues[self.idx].isEnabled()
         return False
 
     def refreshManualRules(self, sender=None):
         """update status of manual rules"""
-        assert Internal.scene
         if not self.handBoard:
             # might happen at program exit
             return
@@ -411,6 +437,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         """compile hand info into a string as needed by the scoring engine"""
         if not self.lastTile:
             return ''
+        assert self.handBoard
         if not self.handBoard.tilesByElement(self.lastTile):
             # this happens if we remove the meld with lastTile from the hand
             # again
@@ -419,8 +446,8 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def computeHand(self):
         """return a Hand object, using a cache"""
-        self.lastTile = Internal.scene.computeLastTile()
-        self.lastMeld = Internal.scene.computeLastMeld()
+        self.lastTile = scoringScene().computeLastTile()
+        self.lastMeld = scoringScene().computeLastMeld()
         string = ' '.join(
             [self.scoringString(),
              self.__mjstring(),
@@ -431,9 +458,10 @@ class ScoringPlayer(VisiblePlayer, Player):
         """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
         withMelds = [x for x in rules if x.meld]
         withoutMelds = [x for x in rules if x not in withMelds]
-        tuples = [tuple([x, self.handBoard.findUIMeld(x.meld)]) for x in withMelds]
-        tuples = sorted(tuples, key=lambda x: x[1][0].sortKey())
-        return [x[0] for x in tuples] + withoutMelds
+        assert (_ := self.handBoard)
+        tuples = [tuple([x, _.findUIMeld(x.meld)]) for x in withMelds]
+        sorted_tuples = sorted(tuples, key=lambda x: x[1][0].sortKey())
+        return [x[0] for x in sorted_tuples] + withoutMelds
 
     def addMeld(self, meld):
         """add meld to this hand in a scoring game"""
@@ -494,19 +522,18 @@ class ScoringGame(Game):
             client=client,
             wantedGame=wantedGame)
         self.shouldSave = True
-        scene = Internal.scene
-        scene.selectorBoard.load(self)
+        scoringScene().selectorBoard.load(self)
         self.prepareHand()
         self.initHand()
-        Internal.scene.mainWindow.adjustMainView()
-        Internal.scene.mainWindow.updateGUI()
+        scoringScene().mainWindow.adjustMainView()
+        scoringScene().mainWindow.updateGUI()
         self.wall.decorate4()
         self.throwDices()
 
     @Game.seed.getter
     def seed(self): # looks like a pylint bug pylint: disable=invalid-overridden-method
         """a scoring game never has a seed"""
-        return None
+        return 0
 
     def _setHandSeed(self):
         """a scoring game does not need this"""
@@ -516,7 +543,7 @@ class ScoringGame(Game):
         """prepare a scoring game hand"""
         Game.prepareHand(self)
         if not self.finished():
-            selector = Internal.scene.selectorBoard
+            selector = scoringScene().selectorBoard
             selector.refill()
             selector.hasLogicalFocus = True
             self.wall.build(shuffleFirst=False)
@@ -534,15 +561,15 @@ class ScoringGame(Game):
         self.maybeRotateWinds()
         self.prepareHand()
         self.initHand()
-        Internal.scene.scoringDialog.clear()
+        if _ := scoringScene().scoringDialog:
+            _.clear()
 
     def close(self):
         """log off from the server and return a Deferred"""
-        scene = Internal.scene
-        scene.selectorBoard.uiTiles = []
-        scene.selectorBoard.allSelectorTiles = []
-        if isAlive(scene):
-            scene.removeTiles()
+        scoringScene().selectorBoard.uiTiles = []
+        scoringScene().selectorBoard.allSelectorTiles = []
+        if isAlive(scoringScene()):
+            scoringScene().removeTiles()
         for player in self.players:
             player.hide()
         if self.wall:
@@ -582,6 +609,7 @@ class ScoringGame(Game):
     def savePenalty(self, player, offense, amount):
         """save computed values to database, update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
+        assert self.gameid
         Query("INSERT INTO SCORE "
               "(game,penalty,hand,data,manualrules,player,scoretime,"
               "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
@@ -591,6 +619,7 @@ class ScoringGame(Game):
                self.roundWind, player.wind, 0,
                amount, player.balance, self.rotated, self.notRotated),
               (player.hand.string, offense.name))
+        assert Internal.mainWindow
         Internal.mainWindow.updateGUI()
 
 def scoreGame():
