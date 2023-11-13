@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 from itertools import chain
-from typing import Tuple, Optional, TYPE_CHECKING, List
+from typing import Tuple, Optional, TYPE_CHECKING, List, cast, Generator
 
 from qt import QPointF, QRectF, QDialogButtonBox
 from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
@@ -47,7 +47,7 @@ if TYPE_CHECKING:
 
 def scoringScene() ->'ScoringScene':
     """shortcut"""
-    result = Internal.scene
+    result = cast('ScoringScene', Internal.scene)
     assert result
     return result
 
@@ -75,8 +75,8 @@ class SelectPlayers(SelectRuleset):
         SelectRuleset.__init__(self)
         Players.load()
         decorateWindow(self, i18nc("@title:window", "Select four players"))
-        self.names = None
-        self.nameWidgets = []
+        self.names:List[str]
+        self.nameWidgets:List['QWidget'] = []
         for idx, wind in enumerate(Wind.all4):
             cbName = QComboBox()
             cbName.manualSelect = False
@@ -159,9 +159,10 @@ class ScoringHandBoard(HandBoard):
     tileAttrClass = ScoringTileAttr
 
     def __init__(self, player:'ScoringPlayer') ->None:
-        self.__moveHelper = None
-        self.uiMelds = []
+        self.__moveHelper:Optional['QGraphicsItemGroup'] = None
+        self.uiMelds:List[UIMeld] = []
         HandBoard.__init__(self, player)
+        self.player:'ScoringPlayer'
 
     def meldVariants(self, tile:UITile, lowerHalf:bool) ->MeldList:
         """Kong might have variants"""
@@ -211,7 +212,7 @@ class ScoringHandBoard(HandBoard):
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in ScoringHandBoard"""
-        self.placeTiles(list(chain(*self.uiMelds)))
+        self.placeTiles(cast(List[UITile], list(chain(*self.uiMelds))))
 
     def deselect(self, meld:UIMeld) ->None:
         """remove meld from old board"""
@@ -224,7 +225,7 @@ class ScoringHandBoard(HandBoard):
 
     def dragMoveEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
         """allow dropping of uiTile from ourself only to other state (open/concealed)"""
-        uiTile = event.mimeData().uiTile
+        uiTile = cast('MimeData', event.mimeData()).uiTile
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
         centerY = self.rect().height() / 2.0
         newLowerHalf = localY >= centerY
@@ -238,13 +239,13 @@ class ScoringHandBoard(HandBoard):
         else:
             oldLowerHalf = False
             if uiTile.board.isHandBoard:
-                oldLowerHalf = uiTile in uiTile.board.lowerHalfTiles()
+                oldLowerHalf = uiTile in cast('HandBoard', uiTile.board).lowerHalfTiles()
             doAccept = oldLowerHalf != newLowerHalf
         event.setAccepted(doAccept)
 
     def dropEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
         """drop into this handboard"""
-        uiTile = event.mimeData().uiTile
+        uiTile = cast('MimeData', event.mimeData()).uiTile
         lowerHalf = self.mapFromScene(
             QPointF(event.scenePos())).y() >= self.rect().height() / 2.0
         if self.dropTile(uiTile, lowerHalf):
@@ -255,7 +256,7 @@ class ScoringHandBoard(HandBoard):
 
     def dropTile(self, uiTile:UITile, lowerHalf:bool) ->bool:
         """drop uiTile into lower or upper half of our hand"""
-        senderBoard = uiTile.board
+        senderBoard = cast('SelectorBoard', uiTile.board)
         assert senderBoard
         newMeld = senderBoard.chooseVariant(uiTile, lowerHalf)
         if not newMeld:
@@ -320,7 +321,7 @@ class ScoringHandBoard(HandBoard):
                     hbCenter.y(),
                     hbCenter.x() * 1,
                     1)
-                helpItems = [splitter]
+                helpItems:List['QGraphicsItem'] = [splitter]
                 for name, yFactor in [(i18n('Move Exposed Tiles Here'), 0.5),
                                       (i18n('Move Concealed Tiles Here'), 1.5)]:
                     helper = QGraphicsSimpleTextItem(name, self)
@@ -352,7 +353,7 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def __init__(self, game:'ScoringGame', name:str) ->None:
         self.handBoard = None  # because Player.init calls clearHand()
-        self.manualRuleBoxes = []
+        self.manualRuleBoxes:List['RuleBox'] = []
         Player.__init__(self, game, name)
         VisiblePlayer.__init__(self)
         self.handBoard = ScoringHandBoard(self)
@@ -369,7 +370,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             if hasattr(self, 'sideText'):
                 self.sideText.board = self.front
         if isAlive(self.handBoard):
-            assert (_ := self.handBoard)
+            assert (_ := cast(ScoringHandBoard, self.handBoard))
             _.setEnabled(True)
             _.showMoveHelper()
             _.uiMelds = []
@@ -469,8 +470,9 @@ class ScoringPlayer(VisiblePlayer, Player):
         """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
         withMelds = [x for x in rules if x.meld]
         withoutMelds = [x for x in rules if x not in withMelds]
-        assert (_ := self.handBoard)
-        tuples = [tuple([x, _.findUIMeld(x.meld)]) for x in withMelds]
+        assert (_ := cast('ScoringHandBoard', self.handBoard))
+        tuples = cast(Generator[Tuple['UsedRule', 'UIMeld'], None, None],
+            [tuple([x, _.findUIMeld(x.meld)]) for x in withMelds])
         sorted_tuples = sorted(tuples, key=lambda x: x[1][0].sortKey())
         return [x[0] for x in sorted_tuples] + withoutMelds
 
@@ -532,6 +534,7 @@ class ScoringGame(Game):
             gameid=gameid,
             client=client,
             wantedGame=wantedGame)
+        self.wall:'UIWall'
         self.shouldSave = True
         scoringScene().selectorBoard.load(self)
         self.prepareHand()
@@ -541,7 +544,7 @@ class ScoringGame(Game):
         self.wall.decorate4()
         self.throwDices()
 
-    @Game.seed.getter
+    @Game.seed.getter  # type:ignore[attr-defined]
     def seed(self) ->int: # looks like a pylint bug pylint: disable=invalid-overridden-method
         """a scoring game never has a seed"""
         return 0
@@ -647,7 +650,7 @@ def scoreGame() ->Optional[ScoringGame]:
     selected = gameSelector.selectedGame
     gameSelector.close()
     if selected is not None:
-        return ScoringGame.loadFromDB(selected)
+        return cast(ScoringGame, ScoringGame.loadFromDB(selected))
     selectDialog = SelectPlayers()
     if not selectDialog.exec_():
         return None
