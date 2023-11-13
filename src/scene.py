@@ -500,11 +500,12 @@ class ScoringScene(GameScene):
         """the user pressed a wind letter or X for center, wanting to move a uiTile there"""
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
-        currentBoard = uiTile.board
         if wind == 'X':
             receiver = self.selectorBoard
         else:
-            receiver = self.game.players[wind].handBoard
+            receiver = self.game.players[Wind(wind)].handBoard
+        currentBoard = uiTile.board
+        assert currentBoard
         movingMeld = currentBoard.uiMeldWithTile(uiTile)
         if receiver != currentBoard or toConcealed != movingMeld.meld.isConcealed:
             movingLastMeld = movingMeld.meld == self.computeLastMeld()

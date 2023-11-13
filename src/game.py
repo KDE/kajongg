@@ -789,7 +789,7 @@ class PlayingGame(Game):
         self.defaultNameBrush = None
         Game.__init__(self, names, ruleset,
                       gameid, wantedGame=wantedGame, client=client)
-        self.players['E'].lastSource = TileSource.East14th
+        self.players[East].lastSource = TileSource.East14th
         self.playOpen = playOpen
         self.autoPlay = autoPlay
         myself = self.myself

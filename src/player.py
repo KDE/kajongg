@@ -14,7 +14,7 @@ from log import logException, logWarning
 from mi18n import i18n, i18nc, i18nE
 from common import IntDict, Debug
 from common import StrMixin, Internal
-from wind import East
+from wind import East, Wind
 from query import Query
 from tile import Tile, TileList, elements
 from tilesource import TileSource
@@ -42,9 +42,11 @@ class Players(list, StrMixin):
 
     def __getitem__(self, index):
         """allow access by idx or by wind"""
-        for player in self:
-            if player.wind == index:
-                return player
+        if isinstance(index, Wind):
+            for player in self:
+                if player.wind == index:
+                    return player
+        assert isinstance(index, (int, slice)), 'index is neither Wind, int nor slice:%s' % type(index)
         return list.__getitem__(self, index)
 
     def __str__(self):
