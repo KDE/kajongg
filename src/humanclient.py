@@ -21,8 +21,7 @@ from kde import KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 from guiutil import decorateWindow
 from log import i18n, logWarning, logException, logDebug
-from message import Message, ChatMessage
-from chat import ChatWindow
+from message import Message
 from common import Options, SingleshotOptions, Internal, Debug, isAlive
 from query import Query
 from board import Board
@@ -569,17 +568,6 @@ class HumanClient(Client):
                             sorried).addCallback(self.showTableList)
                         break
         self.__updateTableList()
-
-    def remote_chat(self, data):
-        """others chat to me"""
-        chatLine = ChatMessage(data)
-        if Debug.chat:
-            logDebug('got chatLine: %s' % chatLine)
-        table = self._tableById(chatLine.tableid)
-        if not chatLine.isStatusMessage and not table.chatWindow:
-            ChatWindow(table=table)
-        if table.chatWindow:
-            table.chatWindow.receiveLine(chatLine)
 
     def readyForGameStart(
             self, tableid, gameid, wantedGame, playerNames, shouldSave=True,
