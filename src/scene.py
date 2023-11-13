@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from twisted.internet.defer import succeed
+from twisted.internet.defer import succeed, Deferred
 
 from log import logDebug, id4
 from mi18n import i18n, i18nc
@@ -191,6 +191,7 @@ class GameScene(SceneWithFocusRect):
     def abort(self):
         """abort current game"""
         # to be implemented by children
+        return Deferred()
 
     def adjustSceneView(self):
         """adjust the view such that exactly the wanted things are displayed
