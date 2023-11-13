@@ -50,7 +50,9 @@ class Tile(ReprMixin):
     # intelligence.py will define Tile('b0') or Tile('s:')
 
     unknown = None
+    unknownStr = 'Xy'
     none = None
+    noneStr = 'Xx'
 
     # Groups:
     hidden = 'x'
@@ -67,7 +69,7 @@ class Tile(ReprMixin):
 
     # Values:
     dragons = 'bgr'
-    white, green, red = dragons
+    white, green, red = tuple(dragons)
     winds = 'eswn'
     numbers = range(1, 10)
     terminals = list([1, 9])
@@ -107,7 +109,11 @@ class Tile(ReprMixin):
                 arg1 = args[0].value
             else:
                 assert isinstance(args[0], str)
-                group, arg1 = args[0]
+                try:
+                    group, arg1 = args[0]  # type:ignore[misc]
+                    # mypy: unpacking a string is disallowed
+                except ValueError:
+                    logException('cannot make a tile from {}'.format(args))
         else:
             group, arg1 = args
         self.group = group
@@ -146,7 +152,6 @@ class Tile(ReprMixin):
         if self.__class__ is Tile:
             Tile._storeInCache(self)
 
-        self.exposed = self.concealed = self.swapped = None
         self.single = self.pair = self.pung = None
         self.chow = self.kong = None
         if self.__class__ is Tile:
@@ -231,10 +236,10 @@ class Tile(ReprMixin):
         return self.key
 
     def __mul__(self, other):
-        return [self] * other
+        return TileList([self] * other)
 
     def __imul__(self, other):
-        return [self] * other
+        return TileList([self] * other)
 
     def __bool__(self):
         return self.isKnown
@@ -277,7 +282,7 @@ class Tile(ReprMixin):
 
     def name(self):
         """return name of a single tile"""
-        if self.group.lower() == Tile.wind:
+        if isinstance(self.value, Wind):
             result = {
                 East: i18n('East Wind'),
                 South: i18n('South Wind'),
@@ -377,12 +382,13 @@ class Tiles:
     def possibleChows(self, tile):
         """return my chows with tileName"""
         if tile not in self:
-            return []
+            return [] # MeldList()
         if tile.lowerGroup not in Tile.colors:
-            return []
+            return [] # MeldList()
+        assert isinstance(tile.value, int)
         group = tile.group
         values = {x.value for x in self if x.group == group}
-        chows = []
+        chows = [] # FIXME: MeldList()
         for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
             subset = {tile.value + x for x in offsets}
             if subset <= values:
@@ -398,6 +404,10 @@ class Tiles:
     def __repr__(self):
         """for debugging"""
         return '{}_{}({})'.format(self.__class__.__name__, id4(self), ','.join(repr(x) for x in self))
+
+    def __len__(self):
+        """just to make this clear to mypy"""
+        return 0
 
     def __iter__(self):
         """just to make this clear to mypy"""
@@ -531,14 +541,14 @@ class PieceList(TileList):
             return any(x.name2() == _ for x in self)
         return any(x is value for x in self)
 
-    def index(self, value):
+    def index(self, value, start=None, stop=None):
         """Also accept Tile."""
         if value.__class__ is Tile:
             for result, _ in enumerate(self):
                 if _ == value:
                     return result
             raise ValueError('{!r} is not in list {!r}'.format(value, self))
-        return TileList.index(self, value)
+        return TileList.index(self, value, start,  stop)
 
     def remove(self, value):
         """Can also remove Tile."""
@@ -551,7 +561,7 @@ class PieceList(TileList):
                     break
             else:
                 raise ValueError('{} does not contain {!r}'.format(self, value))
-        return TileList.remove(self, value)
+        TileList.remove(self, value)
 
 # those two must come first
 
@@ -632,8 +642,8 @@ class Meld(TileTuple, ReprMixin):
             self.isConcealed = not self.isExposed
             self.isSingle = self.isPair = self.isChow = self.isPung = False
             self.isKong = self.isClaimedKong = self.isKnitted = False
-            self.isDragonMeld = len(self) and self[0].isDragon
-            self.isWindMeld = len(self) and self[0].isWind
+            self.isDragonMeld = len(self) > 0 and self[0].isDragon
+            self.isWindMeld = len(self) > 0 and self[0].isWind
             self.isHonorMeld = self.isDragonMeld or self.isWindMeld
             self.isBonus = len(self) == 1 and self[0].isBonus
             self.isKnown = len(self) and self[0].isKnown
@@ -703,7 +713,7 @@ class Meld(TileTuple, ReprMixin):
 
         self.__staticDoublingRules[rulesetId] = [
             x for x in ruleset.doublingMeldRules
-            if not hasattr(x, 'mayApplyToMeld') and x.appliesToMeld(None, self)]
+            if not hasattr(x, 'mayApplyToMeld') and hasattr(x, 'appliesToMeld') and x.appliesToMeld(None, self)]
         self.__dynamicDoublingRules[rulesetId] = [x for x in ruleset.doublingMeldRules
                                                   if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self)]
 
@@ -734,13 +744,14 @@ class Meld(TileTuple, ReprMixin):
     def without(self, remove):
         """self without tile. The rest will be uppercased."""
         assert remove is not None, 'without(None) is illegal'
+        _ = remove
         tiles = []
         for tile in self:
-            if tile is remove:
-                remove = None
+            if tile is _:
+                _ = None
             else:
                 tiles.append(tile.concealed)
-        assert remove is None, 'trying to remove {} from {}'.format(remove, self)
+        assert _ is None, 'trying to remove {} from {}'.format(_, self)
         return TileTuple(tiles)
 
     def __setitem__(self, index, value):
@@ -749,7 +760,7 @@ class Meld(TileTuple, ReprMixin):
 
     def __delitem__(self, index):
         """removes a tile from the meld"""
-        raise TypeError
+        raise TypeError("'Meld' object doesn't support item deletion")
 
     def __isExposed(self):
         """meld state: exposed or not"""
@@ -829,6 +840,9 @@ class Meld(TileTuple, ReprMixin):
             return False
         if not self:
             return True
+        if not isinstance(other, Meld):
+            raise TypeError("'<' not supported between instances of {} and {}".format(
+                type(self).__name__, type(other).__name__))
         if self.isDeclared and not other.isDeclared:
             return True
         if not self.isDeclared and other.isDeclared:

@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 import weakref
 
 from qt import QGraphicsRectItem, QColor
-from tile import Tile, Meld, MeldList
+from tile import Tile, TileList, Meld, MeldList
 from tileset import Tileset
 from uitile import UITile
 from hand import Hand
@@ -30,6 +30,7 @@ class TileAttr(ReprMixin):
 
     def __init__(self, hand, meld=None, idx=None, xoffset=None, yoffset=None):
         if isinstance(hand, UITile):
+# TODO only used for Bonus tiles, should split or eliminate this
             self.tile = hand.tile
             self.xoffset = hand.xoffset
             self.yoffset = hand.yoffset
@@ -56,6 +57,7 @@ class TileAttr(ReprMixin):
     def setFocusable(self, hand, meld, idx): # pylint: disable=unused-argument
         """is it focusable?"""
         player = hand.player
+        assert player
         assert player.game
         return (
             not self.tile.isBonus
@@ -65,6 +67,7 @@ class TileAttr(ReprMixin):
             and meld.isConcealed and not meld.isKong)
 
     def __str__(self):
+        assert self.xoffset is not None
         return (
             '%s %.2f/%.1f%s%s' %
             (self.tile, self.xoffset, self.yoffset,
@@ -94,13 +97,14 @@ class HandBoard(Board):
         assert Internal.Preferences
         Internal.Preferences.addWatch(
             'rearrangeMelds', self.rearrangeMeldsChanged)
-        self.rearrangeMeldsChanged(None, Internal.Preferences.rearrangeMelds)
+        self.rearrangeMeldsChanged(False, bool(Internal.Preferences.rearrangeMelds))
         Internal.Preferences.addWatch(
             'showShadows', self.showShadowsChanged)
 
     def computeRect(self):
         """also adjust the scale for maximum usage of space"""
         Board.computeRect(self)
+        assert self.player
         sideRect = self.player.front.boundingRect()
         boardRect = self.boundingRect()
         scale = ((sideRect.width() + sideRect.height())
@@ -117,6 +121,8 @@ class HandBoard(Board):
 
     def debug_name(self):
         """for debugging messages"""
+        if self.player is None:
+            return 'None'
         return self.player.name
 
     def showShadowsChanged(self, unusedOldValue, newValue):
@@ -125,7 +131,8 @@ class HandBoard(Board):
 
     def setPosition(self):
         """Position myself"""
-        show = Internal.Preferences.showShadows
+        assert Internal.Preferences
+        show = bool(Internal.Preferences.showShadows)
         if show:
             self.setTilePos(yHeight=1.5)
         else:
@@ -152,6 +159,7 @@ class HandBoard(Board):
         return 1
 
     def __str__(self):
+        assert self.player
         return self.player.scoringString()
 
     def lowerHalfTiles(self):
@@ -161,18 +169,19 @@ class HandBoard(Board):
 
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
-        return []
+        return MeldList()
 
     def newTilePositions(self):
         """return list(TileAttr) for all tiles except bonus tiles.
         The tiles are not associated to any board."""
         result = []
+        assert self.player
         newUpperMelds = list(self.player.exposedMelds)
         newLowerMelds = self.newLowerMelds()
         for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
             meldDistance = (self.concealedMeldDistance if yPos
                             else self.exposedMeldDistance)
-            meldX = 0
+            meldX = 0.0
             for meld in melds:
                 for idx in range(len(meld)):
                     result.append(
@@ -273,7 +282,7 @@ class HandBoard(Board):
             uiTile.setBoard(self, newPos.xoffset, newPos.yoffset)
             uiTile.dark = newPos.dark
             uiTile.focusable = newPos.focusable
-        return result.keys()
+        return list(result.keys())
 
     def _avoidCrossingMovements(self, places):
         """not needed for all HandBoards"""
@@ -292,10 +301,11 @@ class HandBoard(Board):
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
-        logExposed = []
-        physExposed = []
-        logConcealed = []
-        physConcealed = []
+        logExposed:TileList = TileList()
+        physExposed:TileList = TileList()
+        logConcealed:TileList = TileList()
+        physConcealed:TileList = TileList()
+        assert self.player
         for tile in self.player.bonusTiles:
             logExposed.append(tile)
         for uiTile in self.uiTiles:
@@ -309,7 +319,8 @@ class HandBoard(Board):
             for meld in self.player.concealedMelds:
                 logConcealed.extend(meld)
         else:
-            logConcealed = sorted(self.player.concealedTiles)
+            logConcealed = TileList(self.player.concealedTiles)
+            # FIXME: oder player.concealedTiles schon immer sortieren, oder desse Type auf TileList aendern
         logExposed.sort()
         physExposed.sort()
         logConcealed.sort()
@@ -344,12 +355,15 @@ class PlayingHandBoard(HandBoard):
         focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
         if focusCandidates:
             self.focusTile = focusCandidates[0]
+        assert Internal.scene
         Internal.scene.handSelectorChanged(self)
         self.hasLogicalFocus = bool(adding)
 
     @Board.focusTile.setter
     def focusTile(self, uiTile):
         Board.focusTile.fset(self, uiTile)
+        assert self.player
+        assert Internal.scene
         if self.player and Internal.scene.clientDialog:
             Internal.scene.clientDialog.focusTileChanged()
 
@@ -358,6 +372,8 @@ class PlayingHandBoard(HandBoard):
         if isAlive(self):
             # aborting a running game: the underlying C++ object might
             # already have been destroyed
+            assert self.player
+            assert self.player.game
             self.tileDragEnabled = (
                 enabled
                 and self.player == self.player.game.myself)
@@ -416,13 +432,15 @@ class PlayingHandBoard(HandBoard):
 
     def newLowerMelds(self):
         """a list of melds for the hand as it should look after sync"""
+        assert self.player
         if self.player.concealedMelds:
             result = MeldList(self.player.concealedMelds)
         elif self.player.concealedTiles:
             content = Hand(self.player, unusedTiles=self.player.concealedTiles)
             result = MeldList(content.melds + content.bonusMelds)
         else:
-            return []
+            return MeldList()
+        assert Internal.Preferences
         if not Internal.Preferences.rearrangeMelds:
             result = MeldList(Meld(x) for x in result.tiles())
             # one meld per tile
@@ -441,6 +459,7 @@ class PlayingHandBoard(HandBoard):
             # right end of the hand# thus minimizing tile movement
             # within the hand
             lastDiscard = matchingTiles[-1]
+        assert Internal.scene
         Internal.scene.discardBoard.discardTile(lastDiscard)
         for uiTile in self.uiTiles:
             uiTile.focusable = False
@@ -448,5 +467,7 @@ class PlayingHandBoard(HandBoard):
     def addUITile(self, uiTile):
         """add uiTile to this board"""
         Board.addUITile(self, uiTile)
+        assert self.player
+        assert self.player.game
         if uiTile.isBonus and not self.player.game.isScoringGame():
             Sound.bonus()
