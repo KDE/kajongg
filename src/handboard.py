@@ -37,7 +37,11 @@ class TileAttr(ReprMixin):
             self.dark = hand.dark
             self.focusable = hand.focusable
         else:
+            assert meld
+            assert idx is not None
             self.tile = Tile(meld[idx])
+            assert xoffset is not None # FIXME: overload __init__
+            assert yoffset is not None
             self.xoffset = xoffset
             self.yoffset = yoffset
             self.dark = self.setDark()
@@ -53,6 +57,7 @@ class TileAttr(ReprMixin):
     def setFocusable(self, hand, meld, idx): # pylint: disable=unused-argument
         """is it focusable?"""
         player = hand.player
+        assert player.game
         return (
             not self.tile.isBonus
             and self.tile.isKnown
@@ -87,6 +92,7 @@ class HandBoard(Board):
         self.setParentItem(player.front)
         self.setPosition()
         self.setAcceptDrops(True)
+        assert Internal.Preferences
         Internal.Preferences.addWatch(
             'rearrangeMelds', self.rearrangeMeldsChanged)
         self.rearrangeMeldsChanged(None, Internal.Preferences.rearrangeMelds)
@@ -394,7 +400,7 @@ class PlayingHandBoard(HandBoard):
         for idx, yOld in enumerate([0, self.lowerY]):
             rowPlaces = [x for x in places.items() if x[0].yoffset == yOld]
             rowPlaces = sorted(rowPlaces, key=lambda x: x[0].xoffset)
-            smallestX = 999
+            smallestX = 999.9
             for tileItem, newPos in places.items():
                 if (tileItem.xoffset != newPos.xoffset
                         or tileItem.yoffset != newPos.yoffset):
