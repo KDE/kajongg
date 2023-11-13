@@ -8,8 +8,8 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import weakref
-from typing import List, Type, Optional, Set, Generator, Tuple, TYPE_CHECKING
-from typing import Union, Any, overload, SupportsIndex, Iterable
+from typing import Dict, List, Type, Optional, Set, Generator, Tuple, TYPE_CHECKING
+from typing import Union, Any, Callable, overload, SupportsIndex, Iterable, cast
 
 from log import logException, logWarning, logDebug
 from mi18n import i18n, i18nc, i18nE
@@ -42,9 +42,9 @@ class Players(list, ReprMixin):
     The position in the list defines the place on screen. First is on the
     screen bottom, second on the right, third top, forth left"""
 
-    allNames = {}
-    allIds = {}
-    humanNames = {}
+    allNames:Dict[int, str] = {}
+    allIds:Dict[str, int] = {}
+    humanNames:Dict[int, str] = {}
 
     def __init__(self, players:Optional[List['Player']]=None) ->None:
         list.__init__(self)
@@ -120,7 +120,7 @@ class Players(list, ReprMixin):
         """for a list of names, translates those names which are english
         player names into the local language"""
         known = {x.name for x in self}
-        return [self.byName(x).localName if x in known else x for x in names]
+        return [self.byName(x).localName if x in known else x for x in names]  # type: ignore[union-attr]
 
 
 class Player(ReprMixin):
@@ -143,7 +143,7 @@ class Player(ReprMixin):
         @type game: L{Game} or None.
         @param game: The game this player is part of. May be None.
         """
-        self._game = None
+        self._game:Optional[weakref.ReferenceType['Game']] = None
         if game:
             self._game = weakref.ref(game)
         self.__balance = 0
@@ -152,15 +152,15 @@ class Player(ReprMixin):
         self.__name = ''
         Players.createIfUnknown(name)
         self.name = name
-        self.wind = East
-        self.intelligence = AIDefaultAI(self)
-        self.visibleTiles = IntDict(game.visibleTiles) if game else IntDict()
-        self.handCache = {}
-        self.cacheHits = 0
-        self.cacheMisses = 0
-        self.__lastSource = TileSource.Unknown
+        self.wind:Wind = East
+        self.intelligence:AIDefaultAI = AIDefaultAI(self)  # type:ignore[arg-type]
+        self.visibleTiles:Dict[Tile, int] = IntDict(cast(IntDict, game.visibleTiles)) if game else IntDict()
+        self.handCache:Dict[str, 'Hand'] = {}
+        self.cacheHits:int = 0
+        self.cacheMisses:int = 0
+        self.__lastSource:Type[TileSource.SourceClass] = TileSource.Unknown
         self.clearHand()
-        self.handBoard = None
+        self.handBoard:Optional['HandBoard'] = None
 
     def __lt__(self, other:Any) ->bool:
         """Used for sorting"""
@@ -205,27 +205,27 @@ class Player(ReprMixin):
 
     def clearHand(self) -> None:
         """clear player attributes concerning the current hand"""
-        self._concealedTiles = PieceList()
-        self._exposedMelds = []
-        self._concealedMelds = []
-        self._bonusTiles = []
-        self.discarded = []
+        self._concealedTiles:PieceList = PieceList()
+        self._exposedMelds:List[Meld] = []
+        self._concealedMelds:List[Meld] = []
+        self._bonusTiles:TileList = TileList()
+        self.discarded:List[Tile] = []
         self.visibleTiles.clear()
         self.newHandContent = None
-        self.originalCallingHand = None
+        self.originalCallingHand:Optional[Hand] = None
         self.__lastTile = Tile.none
         self.lastSource = TileSource.Unknown
         self.lastMeld = Meld()
         self.__mayWin = True
         self.__payment = 0
-        self.__originalCall = False
-        self.dangerousTiles = TileList()
-        self.claimedNoChoice = False
-        self.playedDangerous = False
-        self.usedDangerousFrom = None
-        self.isCalling = False
+        self.__originalCall:bool = False
+        self.dangerousTiles:List[Tuple[Set[Tile], str]] = []
+        self.claimedNoChoice:bool = False
+        self.playedDangerous:bool = False
+        self.usedDangerousFrom:Optional['PlayingPlayer'] = None
+        self.isCalling:bool = False
         self.clearCache()
-        self._hand = None
+        self._hand:Optional['Hand'] = None
 
     @property
     def lastTile(self) ->Tile:
@@ -367,7 +367,7 @@ class Player(ReprMixin):
         assert self.game
         assert self.game.wall
         self.game.activePlayer = self
-        tile = self.game.wall.deal(tileName, deadEnd=deadEnd)[0]
+        tile = self.game.wall.deal(tileName, deadEnd=deadEnd)[0]  # type:ignore[list-item]
         if hasattr(tile, 'tile'):
             self.lastTile = tile.tile
         else:
@@ -474,13 +474,13 @@ class Player(ReprMixin):
         lowerTile = tile.exposed
         upperTile = tile.concealed
         assert self.game
-        visible = self.game.discardedTiles.count([lowerTile])
+        visible = cast(IntDict, self.game.discardedTiles).count([lowerTile])
         if visible:
             if hand.lenOffset == 0 and self.game.lastDiscard and lowerTile is self.game.lastDiscard.exposed:
                 # the last discarded one is available to us since we can claim
                 # it
                 visible -= 1
-        visible += sum(x.visibleTiles.count([lowerTile, upperTile])
+        visible += sum(cast(IntDict, x.visibleTiles).count([lowerTile, upperTile])
                        for x in self.others())
         visible += sum(x.exposed == lowerTile for x in hand.tiles)
         return 4 - visible
@@ -498,13 +498,16 @@ class Player(ReprMixin):
         return False
 
 
-class PlayingPlayer(Player):
+class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
 
     """a player in a computer game as opposed to a ScoringPlayer"""
     # too many public methods
 
     def __init__(self, game:Optional['PlayingGame'], name:str) ->None:
-        self.sayable = {}               # recompute for each move, use as cache
+        self.sayable:Dict[Message, Union[bool, MeldList, Tuple[MeldList, Optional[Tile], Meld], None ]] = {}
+        # recompute sayable for each move, use as cache
+        self.voice:Optional['Voice']
+        self.game:Optional['PlayingGame']
         Player.__init__(self, game, name)
 
     def popupMsg(self, msg:'Message') ->None:
@@ -616,17 +619,17 @@ class PlayingPlayer(Player):
         """return answer arguments for the server if calling or declaring Mah Jongg is possible"""
         game = self.game
         assert game
-        if move.message == Message.DeclaredKong:
+        if move.message == Message.DeclaredKong:  # type: ignore
             assert move.meld
             withDiscard = move.meld[0].concealed
-        elif move.message == Message.AskForClaims:
+        elif move.message == Message.AskForClaims:  # type: ignore
             withDiscard = game.lastDiscard
         else:
             withDiscard = None
         hand = self._computeHandWithDiscard(withDiscard)
         if hand.won:
             if Debug.robbingKong:
-                if move.message == Message.DeclaredKong:
+                if move.message == Message.DeclaredKong:  # type: ignore
                     game.debug('%s may rob the kong from %s/%s' %
                                (self, move.player, move.exposedMeld))
             if Debug.mahJongg:
@@ -649,7 +652,7 @@ class PlayingPlayer(Player):
                 return True
         return False
 
-    __sayables = {
+    __sayables:Dict[Any, Callable] = {
         Message.Pung: __maySayPung,
         Message.Kong: __maySayKong,
         Message.Chow: __maySayChow,
@@ -671,7 +674,7 @@ class PlayingPlayer(Player):
         where a meld is represented by a list of 2char strings"""
         result = MeldList()
         if msg in (Message.Chow, Message.Pung, Message.Kong):
-            for meld in self.sayable[msg]:
+            for meld in cast(MeldList, self.sayable[msg]):
                 if self.mustPlayDangerous(meld):
                     result.append(meld)
         return result
@@ -680,7 +683,7 @@ class PlayingPlayer(Player):
         """do I have those concealed tiles?"""
         if within is None:
             within = self._concealedTiles
-        within = PieceList(within[:])
+        within = PieceList(within[:])  # type: ignore
         for tile in tiles:
             if tile not in within:
                 return False
@@ -845,7 +848,7 @@ class PlayingPlayer(Player):
         """update the list of dangerous tile"""
         assert self.game
         pName = self.localName
-        dangerous = TileList()
+        dangerous:List[Tuple[Set[Tile], str]] = []
         expMeldCount = len(self._exposedMelds)
         if expMeldCount >= 3:
             if all(x in elements.greenHandTiles for x in self.visibleTiles):
@@ -856,7 +859,7 @@ class PlayingPlayer(Player):
             if group in Tile.colors:
                 if all(x.group == group for x in self.visibleTiles):
                     suitTiles = {Tile(group, x) for x in Tile.numbers}
-                    if self.visibleTiles.count(suitTiles) >= 9:
+                    if cast(IntDict, self.visibleTiles).count(suitTiles) >= 9:
                         dangerous.append(
                             (suitTiles, i18n('Player %1 may try a True Color Game', pName)))
                 elif all(x.value in Tile.terminals for x in self.visibleTiles):
