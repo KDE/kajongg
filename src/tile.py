@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 from itertools import chain
 from types import GeneratorType
-from typing import Dict, Any, Optional, SupportsIndex, Union, Tuple, Sequence, Type
+from typing import Dict, Any, Optional, cast, SupportsIndex, Union, Tuple, Sequence, Type
 from typing import Iterator, List, TYPE_CHECKING, Generator, Iterable
 from log import logException
 from mi18n import i18n, i18nc
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from rule import Rule, Ruleset
     from hand import Hand
 
-class Tile(ReprMixin):
+class Tile(ReprMixin):  # pylint:disable=too-many-instance-attributes
 
     """
     A single tile, represented as a string of length 2.
@@ -43,8 +43,7 @@ class Tile(ReprMixin):
         Wind for winds and boni
         bgr for dragons
     """
-    # pylint: disable=too-many-instance-attributes
-    cache = {}
+    cache:Dict[Any, 'Tile'] = {}
     hashTable = 'XxxxXyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
                 'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \
                 'B/b/B0b0B1b1B2b2B3b3B4b4B5b5B6b6B7b7B8b8B9b9B:b:B;b;' \
@@ -53,10 +52,10 @@ class Tile(ReprMixin):
     # the // is needed as separator between too many w's
     # intelligence.py will define Tile('b0') or Tile('s:')
 
-    unknown = None
-    unknownStr = 'Xy'
-    none = None
-    noneStr = 'Xx'
+    unknown:'Tile'
+    unknownStr:str = 'Xy'
+    none:'Tile'
+    noneStr:str = 'Xx'
 
     # Groups:
     hidden = 'x'
@@ -320,7 +319,7 @@ class Tile(ReprMixin):
         if element is Tile.none:
             return self
         assert element.__class__ is Tile, repr(element)
-        return element
+        return cast('Tile', element)
 
     def __eq__(self, other:Any) ->bool:
         if isinstance(other, Tile):
@@ -525,11 +524,11 @@ class Elements:
 
     def count(self, ruleset:'Ruleset') ->int:
         """how many tiles are to be used by the game"""
-        return self.occurrence.count(self.__filter(ruleset))
+        return cast(IntDict, self.occurrence).count(self.__filter(ruleset))
 
     def all(self, ruleset:'Ruleset') ->List[Tile]:
         """a list of all elements, each of them occurrence times"""
-        return self.occurrence.all(self.__filter(ruleset))
+        return cast(IntDict, self.occurrence).all(self.__filter(ruleset))
 
 
 class Piece(Tile):
@@ -539,7 +538,7 @@ class Piece(Tile):
     """
 
     def __new__(cls, *args: Any) ->'Piece':
-        result = cls._build(*args)
+        result = cast('Piece', cls._build(*args))
         return result
 
     def __init__(self, *args: Any) ->None:  # pylint: disable=unused-argument # type: ignore
@@ -571,7 +570,7 @@ class PieceList(TileList):
                 if _ == value:
                     return result
             raise ValueError('{!r} is not in list {!r}'.format(value, self))
-        return TileList.index(self, value, start,  stop)
+        return TileList.index(self, cast(Any, value), start,  stop)
 
     def remove(self, value : Tile) ->None:
         """Can also remove Tile."""
@@ -584,7 +583,7 @@ class PieceList(TileList):
                     break
             else:
                 raise ValueError('{} does not contain {!r}'.format(self, value))
-        TileList.remove(self, value)
+        TileList.remove(self, cast(Any, value))
 
 # those two must come first
 
@@ -643,7 +642,7 @@ class Meld(TileTuple, ReprMixin):
                 assert all(x.__class__ is class1 for x in iterable), repr(list(iterable))
                 if class1 is Piece:
                     superclass = TileList
-        tiles = super(Meld, cls).__new__(cls, superclass(iterable))
+        tiles = cast(Meld, super(Meld, cls).__new__(cls, superclass(iterable)))
         if tiles in cls.cache:
             return cls.cache[tiles]
         return tiles
@@ -876,9 +875,9 @@ class Meld(TileTuple, ReprMixin):
         if not isinstance(other, Meld):
             raise TypeError("'<' not supported between instances of {} and {}".format(
                 type(self).__name__, type(other).__name__))
-        if self.isDeclared and not other.isDeclared:
+        if self.isDeclared and not cast(Meld, other).isDeclared:
             return True
-        if not self.isDeclared and other.isDeclared:
+        if not self.isDeclared and cast(Meld, other).isDeclared:
             return False
         if self[0].key == other[0].key:
             return len(self) > len(other)
