@@ -74,25 +74,19 @@ class User(pb.Avatar, StrMixin):
         self.dbIdent = dbIdent
         self.voiceId = voiceId
         self.maxGameId = maxGameId
-        serverVersion = str(Internal.defaultPort)
+        serverVersion = Internal.defaultPort
         if clientVersion != serverVersion:
-            # we assume that versions x.y.* are compatible
             if clientVersion is None:
                 # client passed no version info
                 return fail(srvError(pb.Error,
                                      i18nE(
                                          'Your client has a version older than 4.9.0 but you need %1 for this server'),
                                      serverVersion))
-            commonDigits = len([x for x in zip(
-                clientVersion.split('.'),
-                serverVersion.split('.'))
-                                if x[0] == x[1]])
-            if commonDigits < 2:
-                return fail(srvError(pb.Error,
-                                     i18nE(
-                                         'Your client has version %1 but you need %2 for this server'),
-                                     clientVersion or '<4.9.0',
-                                     '.'.join(serverVersion.split('.')[:2]) + '.*'))
+            return fail(srvError(pb.Error,
+                                 i18nE(
+                                     'Your client has version %1 but you need %2 for this server'),
+                                 clientVersion or '<4.9.0',
+                                 serverVersion))
         if Debug.table:
             logDebug('client has dbIdent={} voiceId={} maxGameId={} clientVersion {}'.format(
                 self.dbIdent, self.voiceId, self.maxGameId, clientVersion))
