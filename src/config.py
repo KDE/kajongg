@@ -195,4 +195,4 @@ class SetupPreferences(KConfigSkeleton):
 
     def animationDuration(self):
         """in milliseconds"""
-        return (99 - self.animationSpeed) * 100 // 4
+        return max(0, (99 - self.animationSpeed) * 100 // 4)
