@@ -913,7 +913,7 @@ class PlayingGame(Game):
         """move activePlayer"""
         self.activePlayer = self.nextPlayer()
 
-    def __concealedTileName(self, tileName):
+    def _concealedTileName(self, tileName):
         """tileName has been discarded, by which name did we know it?"""
         player = self.activePlayer
         if self.myself and player != self.myself and not self.playOpen:
@@ -939,7 +939,7 @@ class PlayingGame(Game):
                 player, self.activePlayer))
         self.discardedTiles[tileName.exposed] += 1
         player.discarded.append(tileName)
-        self.__concealedTileName(tileName)
+        self._concealedTileName(tileName)
         # the above has side effect, needs to be called
         if Internal.scene:
             player.handBoard.discard(tileName)

@@ -75,6 +75,14 @@ class ServerGame(PlayingGame):
                 player.addConcealedTiles(self.wall.deal())
         PlayingGame.initHand(self)
 
+    def _concealedTileName(self, tileName:Tile) ->Tile:
+        """The server game instance knows everything but has no myself"""
+        player = self.activePlayer
+        if tileName not in player.concealedTiles:
+            raise ValueError('I am the server Game instance. Player %s is told to show discard '
+                            'of tile %s but does not have it, he has %s' %
+                            (player.name, tileName, player.concealedTiles))
+        return tileName
 
 class ServerTable(Table, StrMixin):
 
