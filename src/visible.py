@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import List, Any, Optional, Tuple, TYPE_CHECKING
+from typing import List, Any, Optional, Tuple, TYPE_CHECKING, cast
 
 from qt import QColor
 
@@ -39,7 +39,7 @@ class VisiblePlayer(Player):
         # pylint: disable=super-init-not-called
         assert self.game
         assert self.game.wall
-        self.__front = self.game.wall[self.idx]
+        self.__front = cast(UIWall, self.game.wall)[self.idx]
         self.sideText = SideText()
         self.sideText.board = self.__front
 
@@ -79,7 +79,7 @@ class VisiblePlayer(Player):
     def showInfo(self) ->None:
         """show player info on the wall"""
         side = self.front
-        self.sideText.text = '{} - {}'.format(self.localName, self.explainHand().total())
+        self.sideText.text = '{} - {}'.format(self.localName, self.explainHand().total())  # type:ignore[attr-defined]
         self.colorizeName()
         _ = Wind.all4[self.wind].disc
         assert _
@@ -106,7 +106,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         super().clearHand()
         if self.game and self.game.wall:
             # is None while __del__
-            self.front = self.game.wall[self.idx]
+            self.front = cast(UIWall, self.game.wall)[self.idx]
         if self.handBoard:
             self.handBoard.setEnabled(
                 self.game is not None and self.game.belongsToHumanPlayer(
@@ -173,14 +173,14 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         hbTiles = self.handBoard.uiTiles
         lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
         lastDiscard.change_name(lastDiscard.concealed)
-        Internal.scene.discardBoard.discardTile(lastDiscard)
+        cast('PlayingScene', Internal.scene).discardBoard.discardTile(lastDiscard)
         assert lastDiscard.isConcealed
         self.syncHandBoard()
 
     def addConcealedTiles(self, tiles:'Tiles', animated:bool=True) ->None:
         """add to my tiles and sync the hand board"""
         assert Internal.Preferences
-        _ = tiles
+        _ = cast(List['UITile'], tiles)
         with AnimationSpeed(speed=int(Internal.Preferences.animationSpeed) if animated else 99):
             PlayingPlayer.addConcealedTiles(self, TileList(x.tile for x in _))
             self.syncHandBoard(_)
@@ -196,7 +196,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             lastMeld)
         if withDiscard:
             # withDiscard is a Tile, we need the UITile
-            discardedTile = Internal.scene.discardBoard.claimDiscard()
+            discardedTile = cast('PlayingScene', Internal.scene).discardBoard.claimDiscard()
             if discardedTile.tile is not withDiscard:
                 assert self.game
                 self.game.debug(
@@ -227,8 +227,8 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         result = PlayingPlayer.exposeMeld(
             self,
             meldTiles,
-            calledTile.tile if calledTile else None)
-        adding = [calledTile] if calledTile else None
+            cast('UITile', calledTile).tile if calledTile else None)  # type:ignore[arg-type]
+        adding = [cast('UITile', calledTile)] if calledTile else None
         self.syncHandBoard(adding=adding)
         return result
 
@@ -252,7 +252,7 @@ class VisiblePlayingGame(PlayingGame):
 
     def close(self) ->None:
         """close the game"""
-        scene = Internal.scene
+        scene = cast('PlayingScene', Internal.scene)
         assert scene
         scene.discardBoard.hide()
         if isAlive(scene):
