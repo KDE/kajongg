@@ -927,7 +927,7 @@ class PlayingGame(Game):
             # a tile. In our game instance, tiles in handBoards of other
             # players are unknown
             player.makeTileKnown(tileName)
-            result = Tile.unknown
+            result = Tile.none
         else:
             result = tileName
         if tileName not in player.concealedTiles:
@@ -945,7 +945,7 @@ class PlayingGame(Game):
                 player, self.activePlayer))
         self.discardedTiles[tile.exposed] += 1
         player.discarded.append(tile)
-        player.lastTile = Tile.unknown
+        player.lastTile = Tile.none
         self._concealedTileName(tile)
         # the above has side effect, needs to be called
         if Internal.scene:

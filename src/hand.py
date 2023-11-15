@@ -92,14 +92,14 @@ class Hand(ReprMixin):
         self._player = weakref.ref(player)
         self.ruleset = player.game.ruleset
         self.string = string
-        self.__robbedTile = Tile.unknown
+        self.__robbedTile = Tile.none
         self.prevHand = prevHand
         self.__won = None
         self.__score = None
         self.__callingHands = None
         self.__mjRule = None
         self.ruleCache = {}
-        self.__lastTile = Tile.unknown
+        self.__lastTile = Tile.none
         self.__lastSource = TileSource.Unknown
         self.__announcements = set()
         self.__lastMeld = 0
@@ -572,7 +572,7 @@ class Hand(ReprMixin):
     def robbedTile(self):
         """cache this here for use in rulecode"""
         if self.__robbedTile is Tile.unknown:
-            self.__robbedTile = None
+            self.__robbedTile = Tile.none
             if self.player.game.moves:
                 # scoringtest does not (yet) simulate this
                 lastMove = self.player.game.moves[-1]

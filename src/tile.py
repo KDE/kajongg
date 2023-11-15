@@ -37,7 +37,7 @@ class Tile(ReprMixin):
     """
     # pylint: disable=too-many-instance-attributes
     cache = {}
-    hashTable = 'XyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
+    hashTable = 'XxxxXyxyDbdbDgdgDrdrWeweWswsWw//wwWnwn' \
                 'S/s/S0s0S1s1S2s2S3s3S4s4S5s5S6s6S7s7S8s8S9s9S:s:S;s;' \
                 'B/b/B0b0B1b1B2b2B3b3B4b4B5b5B6b6B7b7B8b8B9b9B:b:B;b;' \
                 'C/c/C0c0C1c1C2c2C3c3C4c4C5c5C6c6C7c7C8c8C9c9C:c:C;c;' \
@@ -46,6 +46,7 @@ class Tile(ReprMixin):
     # intelligence.py will define Tile('b0') or Tile('s:')
 
     unknown = None
+    none = None
 
     # Groups:
     hidden = 'x'
@@ -180,8 +181,6 @@ class Tile(ReprMixin):
             char = arg1.char.lower()
         elif isinstance(arg1, int):
             char = chr(arg1 + 48)
-        elif self.group.lower() == 'x':
-            char = 'y'
         else:
             char = arg1
         value = char  # default
@@ -289,7 +288,8 @@ class Tile(ReprMixin):
 
     def change_name(self, element):
         """FIXME: should go away when Tile/Piece is done"""
-        if element is None:
+        assert element.__class__ is Tile, repr(element)
+        if element is Tile.none:
             return self
         assert element.__class__ is Tile, repr(element)
         return element
@@ -536,9 +536,12 @@ class PieceList(TileList):
                 raise ValueError('{} does not contain {!r}'.format(self, value))
         return TileList.remove(self, value)
 
+# those two must come first
 
 Tile.unknownStr = 'Xy'
-Tile.unknown = Tile(Tile.unknownStr)  # must come first
+Tile.unknown = Tile(Tile.unknownStr)
+Tile.noneStr = 'Xx'
+Tile.none = Tile(Tile.noneStr)
 
 elements = Elements()
 assert not Tile.unknown.isKnown

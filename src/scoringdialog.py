@@ -32,6 +32,7 @@ from query import Query
 from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
 from tree import TreeItem, RootItem, TreeModel
 from wind import Wind
+from tile import Tile
 
 
 class ScoreTreeItem(TreeItem):
@@ -950,7 +951,7 @@ class ScoringDialog(QWidget):
         idx = self.cbLastTile.currentIndex()
         if idx >= 0:
             return self.cbLastTile.itemData(idx)
-        return None
+        return Tile.none
 
     def clickedPlayerIdx(self, checkbox):
         """the player whose box has been clicked"""

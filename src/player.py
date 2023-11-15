@@ -196,7 +196,7 @@ class Player(ReprMixin):
         self.visibleTiles.clear()
         self.newHandContent = None
         self.originalCallingHand = None
-        self.__lastTile = Tile.unknown
+        self.__lastTile = Tile.none
         self.lastSource = TileSource.Unknown
         self.lastMeld = Meld()
         self.__mayWin = True
@@ -220,7 +220,7 @@ class Player(ReprMixin):
         """temp for debugging"""
         assert isinstance(value, Tile), value
         self.__lastTile = value
-        if value is None:
+        if value is Tile.none:
             self.lastMeld = Meld()
 
     @property
@@ -345,7 +345,7 @@ class Player(ReprMixin):
     def pickedTile(self, deadEnd, tileName=None):
         """got a tile from wall"""
         self.game.activePlayer = self
-        tile = self.game.wall.deal([tileName], deadEnd=deadEnd)[0]
+        tile = self.game.wall.deal(tileName, deadEnd=deadEnd)[0]
         if hasattr(tile, 'tile'):
             self.lastTile = tile.tile
         else:
@@ -367,7 +367,7 @@ class Player(ReprMixin):
                             tile, self._concealedTiles))
         self._concealedTiles.remove(tile)
         if tile is self.lastTile:
-            self.lastTile = None
+            self.lastTile = Tile.none
         self._hand = None
 
     def addConcealedTiles(self, tiles, animated=False):  # pylint: disable=unused-argument
@@ -518,7 +518,7 @@ class PlayingPlayer(Player):
             self._exposedMelds.append(lastMeld)
             for tileName in lastMeld:
                 self.visibleTiles[tileName] += 1
-        self.lastTile = lastTile or Tile.unknown
+        self.lastTile = lastTile or Tile.none
         self.lastMeld = lastMeld
         self._concealedMelds = melds
         self._concealedTiles = PieceList()
@@ -707,7 +707,7 @@ class PlayingPlayer(Player):
             # TODO: should we somehow show an error and continue?
             raise ValueError('robTileFrom: no meld found with %s' % tile)
         self.game.lastDiscard = tile.concealed
-        self.lastTile = Tile.unknown  # our lastTile has just been robbed
+        self.lastTile = Tile.none  # our lastTile has just been robbed
         self._hand = None
 
     def robsTile(self):

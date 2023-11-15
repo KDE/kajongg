@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 import weakref
 
 from common import ReprMixin
-from tile import Piece
+from tile import Piece, Tile, TileList
 
 
 class WallEmpty(Exception):
@@ -80,8 +80,12 @@ class Wall(ReprMixin):
     def deal(self, tiles=None, deadEnd=False):
         """deal tiles. May raise WallEmpty.
         Returns a list of tiles"""
-        if tiles is None:
-            tiles = [None]
+        if isinstance(tiles, Tile):
+            tiles = TileList(tiles)
+        elif tiles is None:
+            tiles = TileList(Tile.none)
+        elif len(tiles) == 0:
+            raise ValueError('Wall.deal() does not accept empty TileList()')
         count = len(tiles)
         if deadEnd:
             dealTiles = self.kongBox.pop(count)

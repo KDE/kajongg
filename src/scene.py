@@ -22,6 +22,7 @@ from dialogs import QuestionYesNo
 from guiutil import decorateWindow, sceneRotation
 from board import SelectorBoard, DiscardBoard
 from tileset import Tileset
+from tile import Tile
 from meld import Meld
 from humanclient import HumanClient
 from uitile import UITile
@@ -608,7 +609,7 @@ class ScoringScene(GameScene):
         if self.scoringDialog:
             # is None while ScoringGame is created
             return self.scoringDialog.computeLastTile()
-        return None
+        return Tile.none
 
     def computeLastMeld(self):
         """compile hand info into a string as needed by the scoring engine"""
