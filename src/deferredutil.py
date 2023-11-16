@@ -397,8 +397,7 @@ class DeferredBlock(ReprMixin):
             aboutPlayer = self.playerForUser(about)
         else:
             aboutPlayer = about
-        if not isinstance(receivers, list):
-            receivers = list([receivers])
+        assert isinstance(receivers, list), 'receivers should be list: {}/{}'.format(type(receivers), repr(receivers))
         assert receivers, 'DeferredBlock.tell(%s) has no receiver' % command
         self.__enrichMessage(self.table.game, aboutPlayer, command, kwargs)
         aboutName = aboutPlayer.name if aboutPlayer else None
@@ -445,7 +444,7 @@ class DeferredBlock(ReprMixin):
 
     def tellPlayer(self, player, command, **kwargs):
         """address only one user"""
-        self.tell(player, player, command, **kwargs)
+        self.tell(player, [player], command, **kwargs)
 
     def tellOthers(self, player, command, **kwargs):
         """tell others about player'"""

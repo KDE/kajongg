@@ -430,7 +430,7 @@ class ServerTable(Table, ReprMixin):
                     # voice
                     block.tell(
                         voiceFor,
-                        voiceFor,
+                        [voiceFor],
                         Message.ServerWantsVoiceData)
         block.callback(self.sendVoiceData, voiceDataRequests)
 
@@ -449,7 +449,7 @@ class ServerTable(Table, ReprMixin):
                         (voiceFor.voice, voiceFor.name))
                 block.tell(
                     voiceFor,
-                    voiceDataRequester,
+                    [voiceDataRequester],
                     Message.VoiceData,
                     md5sum=voice.md5sum,
                     source=content)
@@ -607,7 +607,7 @@ class ServerTable(Table, ReprMixin):
                     tiles = player.concealedTiles
                 else:
                     tiles = TileTuple(Tile.unknown * 13)
-                block.tell(player, clientPlayer, Message.SetConcealedTiles,
+                block.tell(player, [clientPlayer], Message.SetConcealedTiles,
                            tiles=TileTuple(chain(tiles, player.bonusTiles)))
         block.callback(self.dealt)
 
