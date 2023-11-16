@@ -123,7 +123,7 @@ class Hand(ReprMixin):
                 self.bonusMelds = MeldList(Meld(x) for x in bonusTiles)
             self.__lastSource = lastSource or TileSource.Unknown
             if lastTile:
-                self.__lastTile= lastTile
+                self.__lastTile = lastTile
             if lastMeld:
                 self.__lastMeld= lastMeld
             self.__announcements = announcements or set()
@@ -204,7 +204,7 @@ class Hand(ReprMixin):
                           - sum(x.isKong for x in self.melds))
 
         last = self.__lastTile
-        if last.isKnown and not last.isBonus:
+        if last and last.isKnown and not last.isBonus:
 #            print('lastTile %s hand.tiles %s, string=%s hand %s' % (last, self.tiles, self.string, str(self)))
             assert last in self.tiles, \
                 'lastTile %s is not in hand.tiles %s, hand %s' % (last, self.tiles, str(self))
@@ -259,7 +259,7 @@ class Hand(ReprMixin):
 
     def hasTiles(self):
         """tiles are assigned to this hand"""
-        return self.tiles or self.bonusMelds
+        return bool(self.tiles or self.bonusMelds)
 
     @property
     def mjRule(self):
@@ -313,7 +313,7 @@ class Hand(ReprMixin):
     @property
     def won(self):
         """do we really have a winner hand?"""
-        return self.__won
+        return bool(self.__won)
 
     def debug(self, msg):
         """try to use Game.debug so we get a nice prefix"""
@@ -520,7 +520,13 @@ class Hand(ReprMixin):
                         'lastMeld {} is not in declaredMelds {}, hand is: {}'.format(
                             lastMeld, declaredMelds, self)) from _
                 tilesInHand.extend(lastMeld.concealed)
-            tilesInHand.remove(subtractTile.concealed)
+            try:
+                tilesInHand.remove(subtractTile.concealed)
+            except ValueError as _:
+                raise ValueError(
+                'subtractTile.concealed={} is not in tilesInHand {}'.format(
+                    subtractTile.concealed, tilesInHand)) from _
+
         for meld in declaredMelds[:]:
             if len(meld) < 3:
                 declaredMelds.remove(meld)
@@ -564,7 +570,6 @@ class Hand(ReprMixin):
         for rule in self.ruleset.mjRules:
             cand = rule.winningTileCandidates(self)
             if Debug.hand and cand:
-                # Py2 and Py3 show sets differently
                 candis = ''.join(str(x) for x in sorted(cand))
                 self.debug('callingHands found {} for {}'.format(candis, rule))
             candidates.extend(x.concealed for x in cand)
@@ -575,7 +580,7 @@ class Hand(ReprMixin):
             if hand.won:
                 result.append(hand)
         if Debug.hand:
-            _hiderules = ', '.join({x.mjRule.name for x in result})
+            _hiderules = ', '.join({x.mjRule.name for x in result if x.mjRule})
             if _hiderules:
                 self.debug(fmt('Is calling {_hiderules}'))
         return result
@@ -731,7 +736,7 @@ class Hand(ReprMixin):
     def maxLimitRule(usedRules):
         """return the rule with the highest limit score or None"""
         result = None
-        maxLimit = 0
+        maxLimit = 0.0
         usedRules = [x for x in usedRules if x.rule.score.limits]
         for usedRule in usedRules:
             score = usedRule.rule.score
