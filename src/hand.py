@@ -97,7 +97,7 @@ class Hand(ReprMixin):
         self.__robbedTile = Tile.none
         self.prevHand = prevHand
         self.__won = None
-        self.__score = None
+        self.__score:Score = Score()
         self.__callingHands = None
         self.__mjRule = None
         self.ruleCache = {}
@@ -256,6 +256,8 @@ class Hand(ReprMixin):
             # and with scoringtest - normally kajongg would not
             # let you declare an invalid mah jongg
             self.__applyRules()
+        if not self.__score:
+            self.__score = Score()
 
     def hasTiles(self):
         """tiles are assigned to this hand"""
@@ -271,7 +273,7 @@ class Hand(ReprMixin):
         """changing mjRule must reset score"""
         if self.__mjRule != value:
             self.__mjRule = value
-            self.__score = None
+            self.__score = Score()
 
     @property
     def lastTile(self):
@@ -292,8 +294,8 @@ class Hand(ReprMixin):
     def score(self):
         """calculate it first if not yet done"""
         if self.__score is None and self.__arranged is not None:
-            self.__score = Score()
             self.__calculate()
+        assert self.__score is not None, 'cannot calculate score for %s' % self
         return self.__score
 
     @property
