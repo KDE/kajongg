@@ -106,7 +106,7 @@ class Hand(ReprMixin):
         self.__announcements = set()
         self.__lastMeld = 0
         self.__lastMelds = MeldList()
-        self.tiles = None
+        self.tiles = TileList()
         self.melds = MeldList()
         self.bonusMelds = MeldList()
         self.usedRules = []
@@ -127,7 +127,8 @@ class Hand(ReprMixin):
             if lastMeld:
                 self.__lastMeld= lastMeld
             self.__announcements = announcements or set()
-            self.tiles = TileTuple(chain(self.melds, self.unusedTiles))
+            # FIXME: TileList() should suffice, but it does not yet resolve melds to tiles. TileTuple does.
+            self.tiles = TileList(TileTuple(chain(self.melds, self.unusedTiles)))
             string = self.newString()
         self.string = string
 
@@ -192,7 +193,7 @@ class Hand(ReprMixin):
 
     def __precompute(self):
         """precompute commonly used things"""
-        self.tiles = self.tiles.sorted()
+        self.tiles = TileList(self.tiles.sorted())
 
         self.values = tuple(x.value for x in self.tiles)
         self.suits = {x.lowerGroup for x in self.tiles}
@@ -454,7 +455,7 @@ class Hand(ReprMixin):
         """create string representing a hand. Default is current Hand, but every part
         can be overridden or excluded by passing None"""
         if melds == 1:
-            melds = chain(self.melds, self.bonusMelds)
+            melds = MeldList(chain(self.melds, self.bonusMelds))
         if unusedTiles== 1:
             unusedTiles = self.unusedTiles
         if lastSource == 1:
@@ -483,7 +484,7 @@ class Hand(ReprMixin):
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
         newString = self.newString(
-            melds=chain(self.declaredMelds, self.bonusMelds),
+            melds=MeldList(chain(self.declaredMelds, self.bonusMelds)),
             unusedTiles=self.tilesInHand + [addTile],
             lastSource=None,
             lastTile=addTile,
@@ -568,7 +569,7 @@ class Hand(ReprMixin):
         result = []
         if self.lenOffset:
             return result
-        candidates = []
+        candidates = TileList()
         for rule in self.ruleset.mjRules:
             cand = rule.winningTileCandidates(self)
             if Debug.hand and cand:
@@ -641,7 +642,7 @@ class Hand(ReprMixin):
                     unused = TileList(Tile(x) for x in self.unusedTiles)
                     for melds, rest2 in mjRule.rearrange(self, unused):
                         if rest2:
-                            melds = list(melds)
+                            melds = MeldList(melds)
                             restMelds, _ = next(
                                 stdMJ.rearrange(self, rest2[:]))
                             melds.extend(restMelds)
@@ -660,7 +661,7 @@ class Hand(ReprMixin):
             self.melds.extend([Tile.unknown.pung] * meldCount)
             if restCount:
                 self.melds.append(Meld(Tile.unknown * restCount))
-            self.unusedTiles = []
+            self.unusedTiles = TileList()
         if not self.unusedTiles:
             self.melds.sort()
             mjRules = self.__maybeMahjongg()
@@ -684,7 +685,7 @@ class Hand(ReprMixin):
                     allMelds.remove(lastMelds[0])
                     allMelds.append(lastMelds[0].exposed)
             _ = self.newString(
-                chain(allMelds, self.bonusMelds),
+                MeldList(chain(allMelds, self.bonusMelds)),
                 unusedTiles=None, lastTile=lastTile, lastMeld=None)
             tryHand = Hand(self.player, _, prevHand=self)
             if tryHand.won:
@@ -699,7 +700,7 @@ class Hand(ReprMixin):
             self.mjRule = bestRule
         self.melds.extend(bestVariant)
         self.melds.sort()
-        self.unusedTiles = []
+        self.unusedTiles = TileList()
         self.ruleCache.clear()
 
     def __gt__(self, other):
