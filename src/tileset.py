@@ -31,8 +31,6 @@ class Tileset(Resource):
     def __init__(self, name=None):
         """continue __build"""
         super().__init__(name)
-        self.tileSize = None
-        self.faceSize = None
         self.__renderer = None
         self.__shadowOffsets = None
         self.darkenerAlpha = 120 if self.desktopFileName == 'jade' else 50
@@ -84,9 +82,9 @@ class Tileset(Resource):
         if self.desktopFileName == 'classic':
             distance = 2
         distanceSize = QSizeF(distance, distance)
-        self.faceSize = self.__renderer.boundsOnElement(
+        self.faceSize = self.__renderer.boundsOnElement(  # pylint:disable=attribute-defined-outside-init
             'BAMBOO_1').size() + distanceSize
-        self.tileSize = self.__renderer.boundsOnElement(
+        self.tileSize = self.__renderer.boundsOnElement(  # pylint:disable=attribute-defined-outside-init
             'TILE_2').size() + distanceSize
         shW = self.shadowWidth()
         shH = self.shadowHeight()
