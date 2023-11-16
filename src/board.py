@@ -86,7 +86,7 @@ class WindDisc(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
             size = int(Internal.scene.windTileset.faceSize.height())
             ellRect = QRectF(QPointF(), QPointF(size, size))
             painter.drawEllipse(ellRect)
-            renderer = Internal.scene.windTileset.renderer()
+            renderer = Internal.scene.windTileset.renderer
             painter.translate(12, 12)
             painter.scale(0.60, 0.60)
             renderer.render(painter, self.wind.discSvgName, self.boundingRect())

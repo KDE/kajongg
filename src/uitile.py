@@ -193,7 +193,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         assert Internal.Preferences
         assert self.tileset
         with Painter(painter):
-            renderer = self.tileset.renderer()
+            renderer = self.tileset.renderer
             withBorders = Internal.Preferences.showShadows
             if not withBorders:
                 painter.scale(*self.tileset.tileFaceRelation())
@@ -251,7 +251,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         # draw the tile too far to the left/upper side such that its shadow is outside of the print region
         if not withBorders:
             painter.scale(*self.tileset.tileFaceRelation())
-        renderer = self.tileset.renderer()
+        renderer = self.tileset.renderer
         renderer.render(painter, self.__elementId(showShadows=withBorders))
         painter.resetTransform()
         self._drawDarkness(painter)

@@ -31,7 +31,6 @@ class Tileset(Resource):
     def __init__(self, name=None):
         """continue __build"""
         super().__init__(name)
-        self.__renderer = None
         self.__shadowOffsets = None
         self.darkenerAlpha = 120 if self.desktopFileName == 'jade' else 50
 
@@ -41,9 +40,27 @@ class Tileset(Resource):
             logException(
                 'cannot find kmahjongglib/tilesets/%s for %s' %
                 (graphName, self.desktopFileName))
-        self.renderer()
-        # now that we get the sizes from the svg, we need the
-        # renderer right away
+        self.renderer = QSvgRenderer(self.graphicsPath)
+        if not self.renderer.isValid():
+            logException(
+                i18n(
+                    'file <filename>%1</filename> contains no valid SVG',
+                self.graphicsPath))
+        distance = 0
+        if self.desktopFileName == 'classic':
+            distance = 2
+        distanceSize = QSizeF(distance, distance)
+        self.faceSize = self.renderer.boundsOnElement(
+            'BAMBOO_1').size() + distanceSize
+        self.tileSize = self.renderer.boundsOnElement(
+            'TILE_2').size() + distanceSize
+        shW = self.shadowWidth()
+        shH = self.shadowHeight()
+        self.__shadowOffsets = [
+            [(-shW, 0), (0, 0), (0, shH), (-shH, shW)],
+            [(0, 0), (shH, 0), (shW, shH), (0, shW)],
+            [(0, -shH), (shH, -shW), (shW, 0), (0, 0)],
+            [(-shW, -shH), (0, -shW), (0, 0), (-shH, 0)]]
 
         self.svgName = {
             'wn': North.svgName, 'ws': South.svgName, 'we': East.svgName, 'ww': West.svgName,
@@ -70,56 +87,19 @@ class Tileset(Resource):
         """the size of border plus shadow"""
         return int(self.tileSize.width() - self.faceSize.width())
 
-    def __initRenderer(self):
-        """initialize and cache values"""
-        self.__renderer = QSvgRenderer(self.graphicsPath)
-        if not self.__renderer.isValid():
-            logException(
-                i18n(
-                    'file <filename>%1</filename> contains no valid SVG',
-                self.graphicsPath))
-        distance = 0
-        if self.desktopFileName == 'classic':
-            distance = 2
-        distanceSize = QSizeF(distance, distance)
-        self.faceSize = self.__renderer.boundsOnElement(  # pylint:disable=attribute-defined-outside-init
-            'BAMBOO_1').size() + distanceSize
-        self.tileSize = self.__renderer.boundsOnElement(  # pylint:disable=attribute-defined-outside-init
-            'TILE_2').size() + distanceSize
-        shW = self.shadowWidth()
-        shH = self.shadowHeight()
-        self.__shadowOffsets = [
-            [(-shW, 0), (0, 0), (0, shH), (-shH, shW)],
-            [(0, 0), (shH, 0), (shW, shH), (0, shW)],
-            [(0, -shH), (shH, -shW), (shW, 0), (0, 0)],
-            [(-shW, -shH), (0, -shW), (0, 0), (-shH, 0)]]
-
     def shadowHeight(self):
         """the size of border plus shadow"""
-        if self.__renderer is None:
-            self.__initRenderer()
         return int(self.tileSize.height() - self.faceSize.height())
-
-    def renderer(self):
-        """initialise the svg renderer with the selected svg file"""
-        if self.__renderer is None:
-            self.__initRenderer()
-        assert self.__renderer
-        return self.__renderer
 
     def shadowOffsets(self, lightSource, rotation):
         """real offset of the shadow on the screen"""
         assert Internal.Preferences
         if not Internal.Preferences.showShadows:
             return (0, 0)
-        if self.__renderer is None:
-            self.__initRenderer()
         lightSourceIndex = LIGHTSOURCES.index(lightSource)
         return self.__shadowOffsets[lightSourceIndex][rotation // 90]
 
     def tileFaceRelation(self):
         """return how much bigger the tile is than the face"""
-        if self.__renderer is None:
-            self.__initRenderer()
         return (self.tileSize.width() / self.faceSize.width(),
                 self.tileSize.height() / self.faceSize.height())
