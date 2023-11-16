@@ -61,7 +61,7 @@ class Hand(ReprMixin):
         """should be won but is not a winning hand"""
 
     def __new__(cls, player, string=None, melds=None, unusedTiles=None, bonusTiles=None,  # pylint: disable=too-many-arguments
-            lastSource=None, lastTile=None, lastMeld=None, announcements=None, prevHand=None):
+            lastSource=TileSource.Unknown, lastTile=None, lastMeld=None, announcements=None, prevHand=None):
         # pylint: disable=unused-argument
         """since a Hand instance is never changed, we can use a cache"""
         if string:
@@ -81,7 +81,7 @@ class Hand(ReprMixin):
         return result
 
     def __init__(self, player, string=None, melds=None, unusedTiles=None, bonusTiles=None,  # pylint: disable=too-many-arguments
-            lastSource=None, lastTile=None, lastMeld=None, announcements=None, prevHand=None):
+            lastSource=TileSource.Unknown, lastTile=None, lastMeld=None, announcements=None, prevHand=None):
         """evaluate string for player. rules are to be applied in any case"""
 
         # pylint: disable=too-many-branches, too-many-statements
@@ -120,7 +120,7 @@ class Hand(ReprMixin):
                 self.unusedTiles.extend(unusedTiles)  # FIXME: assign
             if bonusTiles:
                 self.bonusMelds = MeldList(Meld(x) for x in bonusTiles)
-            self.__lastSource = lastSource or TileSource.Unknown
+            self.__lastSource = lastSource
             if lastTile:
                 self.__lastTile = lastTile
             if lastMeld:
