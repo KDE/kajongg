@@ -416,7 +416,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         """the face rect of a uiTile relative its origin"""
         return QRectF(self.tileFacePos(), self.tileset.faceSize)
 
-    def setTilePos(self, xWidth=0, xHeight=0, yWidth=0, yHeight=0):
+    def setTilePos(self, xWidth=0, xHeight=0.0, yWidth=0, yHeight=0.0) ->None:
         """set the position in the parent item expressing the position in tile face units.
         The X position is xWidth*facewidth + xHeight*faceheight, analog for Y"""
         self.__xWidth = xWidth
