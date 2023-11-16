@@ -605,7 +605,7 @@ class Hand(ReprMixin):
     def __maybeMahjongg(self):
         """check if this is a mah jongg hand.
         Return a sorted list of matching MJ rules, highest
-        total first. If no rule matches, return None"""
+        total first."""
         if self.lenOffset == 1 and self.player.mayWin:
             matchingMJRules = [x for x in self.ruleset.mjRules
                                if x.appliesToHand(self)]
@@ -621,7 +621,7 @@ class Hand(ReprMixin):
                     self.debug(fmt('{callers} Found {matchingMJRules}',
                                    callers=callers()))
                 return result
-        return None
+        return []
 
     def __arrangements(self):
         """find all legal arrangements.
