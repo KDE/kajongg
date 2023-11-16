@@ -248,13 +248,15 @@ class DeferredBlock(ReprMixin):
                 self.debug('ANS', request.pretty())
             if hasattr(request.answer, 'notifyAction'):
                 block = DeferredBlock(self.table, temp=True, where='__gotAnswer')
-                receivers = request.answer.receivers(request)
-                if receivers:
-                    block.tell(
-                        request.player,
-                        receivers,
-                        request.answer,
-                        notifying=True)
+                if hasattr(request.answer, 'receivers'):
+                    # if the request wants to send info to receivers:
+                    receivers = request.answer.receivers(request)
+                    if receivers:
+                        block.tell(
+                            request.player,
+                            receivers,
+                            request.answer,
+                            notifying=True)
             self.outstanding -= 1
             assert self.outstanding >= 0, '__gotAnswer: outstanding %d' % self.outstanding
             self.callbackIfDone()
