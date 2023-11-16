@@ -377,6 +377,8 @@ class Meld(TileList, StrMixin):
                             [tile, tile, tile, tile.concealed])
                         tile.concealed.kong = Meld(tile.concealed * 4)
 
+    def __repr__(self):
+        return 'Meld({}'.format(TileList.__repr__(self))
 
 class MeldList(list):
 
