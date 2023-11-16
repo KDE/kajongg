@@ -645,7 +645,9 @@ def KIcon(name=None):  # pylint: disable=invalid-name
     """simple wrapper"""
     if sys.platform == 'win32':
         return QIcon(os.path.join('share', 'icons', name) if name else None)
-    return QIcon.fromTheme(name)
+    if name:
+        return QIcon.fromTheme(name)
+    return QIcon()
 
 
 class Action(QAction):
