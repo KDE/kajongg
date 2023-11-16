@@ -653,10 +653,10 @@ class Hand(ReprMixin):
     def __arrange(self):
         """work hard to always return the variant with the highest Mah Jongg value."""
         if any(not x.isKnown for x in self.unusedTiles):
-            melds, rest = divmod(len(self.unusedTiles), 3)
-            self.melds.extend([Tile.unknown.pung] * melds)
-            if rest:
-                self.melds.append(Meld(Tile.unknown * rest))
+            meldCount, restCount = divmod(len(self.unusedTiles), 3)
+            self.melds.extend([Tile.unknown.pung] * meldCount)
+            if restCount:
+                self.melds.append(Meld(Tile.unknown * restCount))
             self.unusedTiles = []
         if not self.unusedTiles:
             self.melds.sort()
