@@ -392,18 +392,20 @@ class DeferredBlock(ReprMixin):
                     del kwargs['players']
         encodeKwargs()
         if about.__class__.__name__ == 'User':
-            about = self.playerForUser(about)
+            aboutPlayer = self.playerForUser(about)
+        else:
+            aboutPlayer = about
         if not isinstance(receivers, list):
             receivers = list([receivers])
         assert receivers, 'DeferredBlock.tell(%s) has no receiver' % command
-        self.__enrichMessage(self.table.game, about, command, kwargs)
-        aboutName = about.name if about else None
+        self.__enrichMessage(self.table.game, aboutPlayer, command, kwargs)
+        aboutName = aboutPlayer.name if aboutPlayer else None
         if self.table.running and len(receivers) in [1, 4]:
             # messages are either identical for all 4 players
             # or identical for 3 players and different for 1 player. And
             # we want to capture each message exactly once.
             assert self.table.game
-            self.table.game.moves.append(Move(about, command, kwargs))
+            self.table.game.moves.append(Move(aboutPlayer, command, kwargs))
         localDeferreds = []
         for rec in self.__convertReceivers(receivers):
 
@@ -413,12 +415,12 @@ class DeferredBlock(ReprMixin):
                 defer.addCallback(rec.remote_move, command, **kwargs).addErrback(logException)
                 defer.command = command.name
                 defer.notifying = 'notifying' in kwargs
-                self.__addRequest(defer, rec, about)
+                self.__addRequest(defer, rec, aboutPlayer)
                 localDeferreds.append(defer)
             else:
                 if Debug.traffic:
-                    message = '-> {receiver:<15} about {about} {command}{kwargs!r}'.format(
-                        receiver=rec.name[:15], about=about, command=command,
+                    message = '-> {receiver:<15} about {aboutPlayer} {command}{kwargs!r}'.format(
+                        receiver=rec.name[:15], aboutPlayer=aboutPlayer, command=command,
                         kwargs=kwargs)
                     logDebug(message)
                 defer = self.table.server.callRemote(
@@ -430,7 +432,7 @@ class DeferredBlock(ReprMixin):
                 if defer:
                     defer.command = command.name
                     defer.notifying = 'notifying' in kwargs
-                    self.__addRequest(defer, rec, about)
+                    self.__addRequest(defer, rec, aboutPlayer)
                 else:
                     msg = i18nE('The game server lost connection to player %1')
                     self.table.abort(msg, rec.name)
