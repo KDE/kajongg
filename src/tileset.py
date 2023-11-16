@@ -37,7 +37,7 @@ class Tileset(Resource):
         self.__shadowOffsets = None
         self.darkenerAlpha = 120 if self.desktopFileName == 'jade' else 50
 
-        graphName = self.group.readEntry("FileName")
+        graphName = str(self.group.readEntry("FileName"))
         self.graphicsPath = Tileset.locate(graphName)
         if not self.graphicsPath:
             logException(
@@ -65,11 +65,12 @@ class Tileset(Resource):
     @staticmethod
     def current():
         """the currently wanted tileset. If not yet defined, do so"""
-        return Tileset(Internal.Preferences.tilesetName)
+        assert Internal.Preferences
+        return Tileset(str(Internal.Preferences.tilesetName))
 
     def shadowWidth(self):
         """the size of border plus shadow"""
-        return self.tileSize.width() - self.faceSize.width()
+        return int(self.tileSize.width() - self.faceSize.width())
 
     def __initRenderer(self):
         """initialize and cache values"""
@@ -99,16 +100,18 @@ class Tileset(Resource):
         """the size of border plus shadow"""
         if self.__renderer is None:
             self.__initRenderer()
-        return self.tileSize.height() - self.faceSize.height()
+        return int(self.tileSize.height() - self.faceSize.height())
 
     def renderer(self):
         """initialise the svg renderer with the selected svg file"""
         if self.__renderer is None:
             self.__initRenderer()
+        assert self.__renderer
         return self.__renderer
 
     def shadowOffsets(self, lightSource, rotation):
         """real offset of the shadow on the screen"""
+        assert Internal.Preferences
         if not Internal.Preferences.showShadows:
             return (0, 0)
         if self.__renderer is None:
