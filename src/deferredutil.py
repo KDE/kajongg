@@ -39,12 +39,16 @@ class Request(ReprMixin):
     @property
     def block(self):
         """hide weakref"""
-        return self._block() if self._block else None
+        result = self._block()
+        assert result
+        return result
 
     @property
     def user(self):
         """hide weakref"""
-        return self._user() if self._user else None
+        result = self._user()
+        assert result
+        return result
 
     @property
     def player(self):
@@ -236,6 +240,7 @@ class DeferredBlock(ReprMixin):
                     self.debug('IGN', request.pretty())
                 return
             request.gotAnswer(result)
+            assert request.answer
             if hasattr(request.user, 'pinged'):
                 # a Client (for robots) does not have it
                 request.user.pinged()
@@ -397,6 +402,7 @@ class DeferredBlock(ReprMixin):
             # messages are either identical for all 4 players
             # or identical for 3 players and different for 1 player. And
             # we want to capture each message exactly once.
+            assert self.table.game
             self.table.game.moves.append(Move(about, command, kwargs))
         localDeferreds = []
         for rec in self.__convertReceivers(receivers):
@@ -439,6 +445,7 @@ class DeferredBlock(ReprMixin):
 
     def tellOthers(self, player, command, **kwargs):
         """tell others about player'"""
+        assert self.table.game
         self.tell(
             player,
             list(
@@ -448,4 +455,5 @@ class DeferredBlock(ReprMixin):
 
     def tellAll(self, player, command, **kwargs):
         """tell something to all players"""
+        assert self.table.game
         self.tell(player, self.table.game.players, command, **kwargs)
