@@ -407,14 +407,14 @@ class Hand(ReprMixin):
         if totals:
             totals = sorted(totals)  # sort by totalScore
             maxScore = totals[-1][0]
-            totals = [x[1] for x in totals if x[0] == maxScore]
+            bestLastMelds = [x[1] for x in totals if x[0] == maxScore]
             # now we have a list of only lastMelds reaching maximum score
-            if prev not in totals or self.__lastMeld not in totals:
-                if Debug.explain and prev not in totals:
+            if prev not in bestLastMelds or self.__lastMeld not in bestLastMelds:
+                if Debug.explain and prev not in bestLastMelds:
                     if not self.player.game.belongsToRobotPlayer():
                         self.debug(fmt(
-                            'replaced last meld {prev} with {totals[0]}'))
-                self.__lastMeld = totals[0]
+                            'replaced last meld {prev} with {bestLastMelds[0]}'))
+                self.__lastMeld = bestLastMelds[0]
                 self.__applyRules()
 
     def chancesToWin(self):
