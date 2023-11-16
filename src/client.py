@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 import datetime
 import weakref
 from types import ModuleType
-from typing import Tuple, Optional, List, Type, Any, TYPE_CHECKING, Union
+from typing import Tuple, Optional, List, Type, Any, TYPE_CHECKING, Union, cast
 
 from twisted.spread import pb
 from twisted.internet.task import deferLater
@@ -106,13 +106,13 @@ class ClientTable(Table):
             if myRuleset == self.ruleset:
                 self.myRuleset = myRuleset
                 break
-        self.chatWindow = None
+        self.chatWindow:Optional['ChatWindow'] = None
 
     def isOnline(self, player:Optional[str]) ->bool:  # TODO: why optional?
         """did he join the tabled?"""
         for idx, name in enumerate(self.playerNames):
             if player == name:
-                return self.playersOnline[idx]
+                return bool(self.playersOnline[idx])
         return False
 
     def __str__(self) ->str:
@@ -140,24 +140,25 @@ class Client(pb.Referenceable):
     def __init__(self, name:Optional[str]=None) ->None:
         """name is something like Robot 1 or None for the game server"""
         self.name = name
-        self.game = None
-        self.__connection = None
-        self.tables = []
-        self._table = None
-        self.tableList = None
+        self.game:Optional['PlayingGame'] = None
+        self.__connection:Optional['Connection'] = None
+        self.tables:List[ClientTable] = []
+        self._table:Union[ClientTable, 'ServerTable', None] = None
+        self.tableList:Optional['TableList'] = None
+        self.voiceId:Optional[str]  # only for mypy in servertable.py
 
     @property
     def table(self) ->Union[ClientTable, 'ServerTable', None]:
         """hide weakref"""
         if self._table:
-            return self._table()
+            return self._table()  # type:ignore
         return None
 
     @table.setter
     def table(self, value:Union[ClientTable, 'ServerTable', None]) ->None:
         """hide weakref"""
         if value is not None:
-            self._table = weakref.ref(value)
+            self._table = weakref.ref(value)  # type:ignore
 
     @property
     def connection(self) ->Optional['Connection']:
@@ -216,7 +217,7 @@ class Client(pb.Referenceable):
 
     def tableChanged(self, table:Any) ->Tuple[Optional[ClientTable], ClientTable]:
         """update table list"""
-        newTable = ClientTable(self, *table)
+        newTable = ClientTable(self, *table)  # type: ignore
         oldTable = self._tableById(newTable.tableid)
         if oldTable:
             self.tables.remove(oldTable)
@@ -280,10 +281,10 @@ class Client(pb.Referenceable):
         if gameClass is None:
             gameClass = PlayingGame
         if self.table.suspendedAt:
-            self.game = gameClass.loadFromDB(gameid, self)
+            self.game = cast(PlayingGame, gameClass.loadFromDB(gameid, self))
             assert self.game, 'cannot load game {}'.format(gameid)
             self.game.assignPlayers(playerNames)
-            table = self.table
+            table = cast(ClientTable, self.table)
             if self.isHumanClient():
                 if self.game.handctr != table.endValues[0]:
                     disagree('numbers for played hands: Server:%s, Client:%s' % (
@@ -304,7 +305,7 @@ class Client(pb.Referenceable):
         self.game.prepareHand()
         return succeed(Message.OK)
 
-    def readyForHandStart(self, playerNames:List[Tuple['Wind', str]],
+    def readyForHandStart(self, playerNames:List[Tuple['Wind', str]],  # pylint:disable=useless-return,useless-suppression
         rotateWinds:bool) ->Optional[Deferred]:
         """the game server asks us if we are ready. A robot is always ready..."""
         if self.game:
@@ -312,6 +313,8 @@ class Client(pb.Referenceable):
             if rotateWinds:
                 self.game.rotateWinds()
             self.game.prepareHand()
+        # mypy 1.5.1 wants an explicit return
+        return None
 
     def __delayAnswer(self, result:List['Request'], delay:float, delayStep:float) ->Any:
         """try again, may we chow now?"""
@@ -351,7 +354,7 @@ class Client(pb.Referenceable):
         delayStep = 0.1
         assert self.game
         myself = self.game.myself
-        myself.computeSayable(move, answers)
+        cast(PlayingPlayer, myself).computeSayable(move, answers)
         result = myself.intelligence.selectAnswer(answers)
         assert result
         if result[0] == Message.Chow:
@@ -377,7 +380,7 @@ class Client(pb.Referenceable):
         if Internal.scene and not isAlive(Internal.scene):
             return fail()
         if self.game:
-            player = self.game.playerByName(playerName)
+            player = cast(PlayingPlayer, self.game.playerByName(playerName))
         elif playerName:
             player = PlayingPlayer(None, playerName)
         else:
@@ -405,11 +408,11 @@ class Client(pb.Referenceable):
     def exec_move(self, move:Move) ->Deferred:
         """mirror the move of a player as told by the game server"""
         message = move.message
-        if message.needsGame and not self.game:
+        if message.needsGame and not self.game:  # type: ignore
             # server already disconnected, see
             # HumanClient.remote_ServerDisconnects
             return succeed(Message.OK)
-        action = message.notifyAction if move.notifying else message.clientAction
+        action = message.notifyAction if move.notifying else message.clientAction  # type: ignore
         game = self.game
         if game:
             game.moves.append(move)
@@ -459,7 +462,7 @@ class Client(pb.Referenceable):
         """somebody claimed a discarded tile"""
         assert self.game
         if Internal.scene:
-            calledTileItem = Internal.scene.discardBoard.claimDiscard()
+            calledTileItem = cast('PlayingScene', Internal.scene).discardBoard.claimDiscard()
             calledTile = calledTileItem.tile
         else:
             calledTileItem = None
@@ -474,11 +477,12 @@ class Client(pb.Referenceable):
         assert move.player
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
+        # FIXME: Tile/Piece
         move.player.lastTile = calledTile.exposed
         move.player.lastSource = TileSource.LivingWallDiscard
         move.exposedMeld = move.player.exposeMeld(
-            hadTiles,
-            calledTile=calledTileItem or calledTile)
+            hadTiles, # type:ignore[arg-type]
+            calledTile=calledTileItem or calledTile) # type:ignore[arg-type]
 
         if self.thatWasMe(move.player):
             if move.message != Message.Kong:
@@ -500,7 +504,7 @@ class Client(pb.Referenceable):
         possibleAnswers = [Message.Discard, Message.Kong, Message.MahJongg]
         if not move.player.discarded:
             possibleAnswers.append(Message.OriginalCall)
-        return self.ask(move, possibleAnswers)
+        return self.ask(move, list(cast('ClientMessage', x) for x in possibleAnswers))
 
     def declared(self, move:Move) ->None:
         """somebody declared something.
