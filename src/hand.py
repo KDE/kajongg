@@ -13,6 +13,7 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 import weakref
 from hashlib import md5
+from typing import List, Optional, TYPE_CHECKING, Set, Tuple, Type, Any
 
 from log import dbgIndent
 from tile import Tile, TileList, TileTuple, Meld, MeldList
@@ -22,6 +23,12 @@ from common import Debug, ReprMixin, Fmt, fmt
 from util import callers
 from message import Message
 
+if TYPE_CHECKING:
+    from player import Player
+    from tile import Tiles
+    from wind import Wind
+    from rule import Rule
+    from rulecode import MJRule
 
 class Hand(ReprMixin):
 
@@ -60,8 +67,11 @@ class Hand(ReprMixin):
 
         """should be won but is not a winning hand"""
 
-    def __new__(cls, player, string=None, melds=None, unusedTiles=None, bonusTiles=None,  # pylint: disable=too-many-arguments
-            lastSource=TileSource.Unknown, lastTile=None, lastMeld=None, announcements=None, prevHand=None):
+    def __new__(cls, player:'Player', string:Optional[str]=None, melds:Optional[MeldList]=None,  # pylint: disable=too-many-arguments
+            unusedTiles:Optional['Tiles']=None, bonusTiles:Optional['Tiles']=None,
+            lastSource:Type[TileSource.SourceClass]=TileSource.Unknown, lastTile:Optional[Tile]=None,
+            lastMeld:Optional[Meld]=None, announcements:Optional[Set[str]]=None,
+            prevHand:Optional['Hand']=None) ->'Hand':
         # pylint: disable=unused-argument
         """since a Hand instance is never changed, we can use a cache"""
         if string:
@@ -80,8 +90,11 @@ class Hand(ReprMixin):
         result.is_from_cache = False
         return result
 
-    def __init__(self, player, string=None, melds=None, unusedTiles=None, bonusTiles=None,  # pylint: disable=too-many-arguments
-            lastSource=TileSource.Unknown, lastTile=None, lastMeld=None, announcements=None, prevHand=None):
+    def __init__(self, player:'Player', string:Optional[str]=None, melds:Optional[MeldList]=None,  # pylint: disable=too-many-arguments
+            unusedTiles:Optional['Tiles']=None, bonusTiles:Optional['Tiles']=None,
+            lastSource:Type[TileSource.SourceClass]=TileSource.Unknown, lastTile:Optional[Tile]=None,
+            lastMeld:Optional[Meld]=None, announcements:Optional[Set[str]]=None,
+            prevHand:Optional['Hand']=None) ->None:
         """evaluate string for player. rules are to be applied in any case"""
 
         # pylint: disable=too-many-branches, too-many-statements
@@ -156,7 +169,7 @@ class Hand(ReprMixin):
                 self.debug('Fixing {} {}{}'.format(self, 'won ' if self.won else '', self.score))
             Hand.indent -= 1
 
-    def __parseString(self, inString):
+    def __parseString(self, inString:str) ->None:
         """parse the string passed to Hand()"""
         tileStrings = []
         for part in inString.split():
@@ -190,7 +203,7 @@ class Hand(ReprMixin):
         if tileStrings:
             self.unusedTiles.extend(TileList(tileStrings[0][1:]))
 
-    def __precompute(self):
+    def __precompute(self) ->None:
         """precompute commonly used things"""
         self.tiles = TileList(self.tiles.sorted())
 
@@ -217,29 +230,29 @@ class Hand(ReprMixin):
         self.newStr = self.newString()
 
     @property
-    def arranged(self):
+    def arranged(self) ->Optional[bool]:
         """readonly"""
         return self.__arranged
 
     @property
-    def player(self):
+    def player(self) ->'Player':
         """weakref"""
         result = self._player()
         assert result
         return result
 
     @property
-    def ownWind(self):
+    def ownWind(self) ->'Wind':
         """for easier usage"""
         return self.player.wind
 
     @property
-    def roundWind(self):
+    def roundWind(self) ->'Wind':
         """for easier usage"""
         assert self.player.game
         return self.player.game.roundWind
 
-    def __calculate(self):
+    def __calculate(self) ->None:
         """apply rules, calculate score"""
         # TODO: in __init__: self.__score == self.__calculate()
         assert not self.unusedTiles, (
@@ -259,39 +272,39 @@ class Hand(ReprMixin):
         if not self.__score:
             self.__score = Score()
 
-    def hasTiles(self):
+    def hasTiles(self) ->bool:
         """tiles are assigned to this hand"""
         return bool(self.tiles or self.bonusMelds)
 
     @property
-    def mjRule(self):
+    def mjRule(self) ->Optional['Rule']:
         """getter"""
         return self.__mjRule
 
     @mjRule.setter
-    def mjRule(self, value):
+    def mjRule(self, value:'Rule') ->None:
         """changing mjRule must reset score"""
         if self.__mjRule != value:
             self.__mjRule = value
             self.__score = Score()
 
     @property
-    def lastTile(self):
+    def lastTile(self) -> Tile:
         """compute and cache, readonly"""
         return self.__lastTile
 
     @property
-    def lastSource(self):
+    def lastSource(self) ->Type[TileSource.SourceClass]:
         """compute and cache, readonly"""
         return self.__lastSource
 
     @property
-    def announcements(self):
+    def announcements(self) ->Set[str]:
         """compute and cache, readonly"""
         return self.__announcements
 
     @property
-    def score(self):
+    def score(self) ->Score:
         """calculate it first if not yet done"""
         if self.__score is None and self.__arranged is not None:
             self.__calculate()
@@ -299,25 +312,25 @@ class Hand(ReprMixin):
         return self.__score
 
     @property
-    def lastMeld(self):
+    def lastMeld(self) ->Optional[Meld]:
         """compute and cache, readonly"""
         if self.__lastMeld == 0:
             self.__setLastMeld()
         return self.__lastMeld
 
     @property
-    def lastMelds(self):
+    def lastMelds(self) ->MeldList:
         """compute and cache, readonly"""
         if self.__lastMeld == 0:
             self.__setLastMeld()
         return self.__lastMelds
 
     @property
-    def won(self):
+    def won(self) ->bool:
         """do we really have a winner hand?"""
         return bool(self.__won)
 
-    def debug(self, msg):
+    def debug(self, msg:str) ->None:
         """try to use Game.debug so we get a nice prefix"""
         idPrefix = Fmt.num_encode(hash(self))
         if self.prevHand:
@@ -326,7 +339,7 @@ class Hand(ReprMixin):
         assert self.player.game
         self.player.game.debug(' '.join([dbgIndent(self, self.prevHand), idPrefix, msg]))
 
-    def __applyRules(self):
+    def __applyRules(self) ->None:
         """find out which rules apply, collect in self.usedRules"""
         self.usedRules = []
         for meld in chain(self.melds, self.bonusMelds):
@@ -362,13 +375,13 @@ class Hand(ReprMixin):
                 self.__score = self.__totalScore()
         self.__checkHasExclusiveRules()
 
-    def matchingWinnerRules(self):
+    def matchingWinnerRules(self) ->List[UsedRule]:
         """return a list of matching winner rules"""
         matching = [UsedRule(x) for x in self.__matchingRules(self.ruleset.winnerRules)]
         limitRule = self.maxLimitRule(matching)
         return [limitRule] if limitRule else matching
 
-    def __checkHasExclusiveRules(self):
+    def __checkHasExclusiveRules(self) ->None:
         """if we have one, remove all others"""
         exclusive = [x for x in self.usedRules if 'absolute' in x.rule.options]
         if exclusive:
@@ -377,7 +390,7 @@ class Hand(ReprMixin):
             if self.__won and not bool(self.__maybeMahjongg()):
                 raise Hand.__NotWon(fmt('exclusive rule {exclusive} does not win'))
 
-    def __setLastMeld(self):
+    def __setLastMeld(self) ->None:
         """set the shortest possible last meld. This is
         not yet the final choice, see __applyBestLastMeld"""
         self.__lastMeld = None
@@ -397,7 +410,7 @@ class Hand(ReprMixin):
                 self.__lastMeld = self.lastTile.single
                 self.__lastMelds = MeldList(self.__lastMeld)
 
-    def __applyBestLastMeld(self):
+    def __applyBestLastMeld(self) ->None:
         """select the last meld giving the highest score
         (only winning variants)"""
         assert len(self.lastMelds) > 1
@@ -426,7 +439,7 @@ class Hand(ReprMixin):
                 self.__lastMeld = bestLastMelds[0]
                 self.__applyRules()
 
-    def chancesToWin(self):
+    def chancesToWin(self) ->List[Tile]:
         """count the physical tiles that make us win and still seem available"""
         assert self.lenOffset == 0
         result = []
@@ -437,7 +450,7 @@ class Hand(ReprMixin):
                 (self.player.tileAvailable(completedHand.lastTile, self)))
         return result
 
-    def assertEqual(self, other):
+    def assertEqual(self, other:'Hand') ->None:
         """raise assertion if not equal with detailled info"""
         assert self.melds == other.melds, \
             'Melds in hands differ:{!r} != {!r}'.format(self.melds, other.melds)
@@ -450,7 +463,9 @@ class Hand(ReprMixin):
         assert self.newStr == other.newStr, \
             'newStr in hands differs:{} != {}'.format(self.newStr, other.newStr)
 
-    def newString(self, melds=1, unusedTiles=1, lastSource=1, announcements=1, lastTile=1, lastMeld=1):
+    def newString(self, melds:MeldList=1, unusedTiles:Optional['Tiles']=1,  # type:ignore[assignment]
+        lastSource:Optional[Type[TileSource.SourceClass]]=1, announcements:Set[str]=1,  # type:ignore[assignment]
+        lastTile:Tile=1, lastMeld:Optional[Meld]=1) ->str:  # type:ignore[assignment]  # type:ignore[assignment]
         """create string representing a hand. Default is current Hand, but every part
         can be overridden or excluded by passing None"""
         if melds == 1:
@@ -476,7 +491,7 @@ class Hand(ReprMixin):
             parts.append('L{}{}'.format(lastTile, lastMeld if lastMeld else ''))
         return ' '.join(parts).strip()
 
-    def __add__(self, addTile):
+    def __add__(self, addTile:Tile) ->'Hand':
         """return a new Hand built from this one plus addTile"""
         assert addTile.isConcealed, 'addTile %s should be concealed:' % addTile
         # combine all parts about hidden tiles plus the new one to one part
@@ -491,7 +506,7 @@ class Hand(ReprMixin):
             )
         return Hand(self.player, newString, prevHand=self)
 
-    def __sub__(self, subtractTile):
+    def __sub__(self, subtractTile:Tile) ->'Hand':
         """return a copy of self minus subtractTiles.
         Case of subtractTile (hidden or exposed) is ignored.
         subtractTile must either be undeclared or part of
@@ -543,7 +558,7 @@ class Hand(ReprMixin):
             declaredMelds, rest, boni, mjPart))
         return Hand(self.player, newString, prevHand=self)
 
-    def manualRuleMayApply(self, rule):
+    def manualRuleMayApply(self, rule:'Rule') ->bool:
         """return True if rule has selectable() and applies to this hand"""
         if self.__won and rule in self.ruleset.loserRules:
             return False
@@ -553,7 +568,7 @@ class Hand(ReprMixin):
         # needed for activated rules
 
     @property
-    def callingHands(self):
+    def callingHands(self) ->List['Hand']:
         """the hand is calling if it only needs one tile for mah jongg.
         Returns all hands which would only need one tile.
         If mustBeAvailable is True, make sure the missing tile might still
@@ -563,7 +578,7 @@ class Hand(ReprMixin):
             self.__callingHands = self.__findAllCallingHands()
         return self.__callingHands
 
-    def __findAllCallingHands(self):
+    def __findAllCallingHands(self) ->List['Hand']:
         """always try to find all of them"""
         result = []
         if self.lenOffset:
@@ -588,7 +603,7 @@ class Hand(ReprMixin):
         return result
 
     @property
-    def robbedTile(self):
+    def robbedTile(self) ->Optional[Tile]:
         """cache this here for use in rulecode"""
         if self.__robbedTile is Tile.unknown:
             self.__robbedTile = Tile.none
@@ -602,7 +617,7 @@ class Hand(ReprMixin):
                     # we want it concealed only for a hidden Kong
         return self.__robbedTile
 
-    def __maybeMahjongg(self):
+    def __maybeMahjongg(self) ->List['Rule']:
         """check if this is a mah jongg hand.
         Return a sorted list of matching MJ rules, highest
         total first."""
@@ -623,7 +638,7 @@ class Hand(ReprMixin):
                 return result
         return []
 
-    def __arrangements(self):
+    def __arrangements(self) ->List[Tuple['Rule', MeldList]]:
         """find all legal arrangements.
         Returns a list of tuples with the mjRule and a list of concealed melds"""
         self.unusedTiles.sort()
@@ -652,7 +667,7 @@ class Hand(ReprMixin):
                 for x in stdMJ.rearrange(self, self.unusedTiles[:]))
         return result
 
-    def __arrange(self):
+    def __arrange(self) ->None:
         """work hard to always return the variant with the highest Mah Jongg value."""
         if any(not x.isKnown for x in self.unusedTiles):
             meldCount, restCount = divmod(len(self.unusedTiles), 3)
@@ -702,7 +717,7 @@ class Hand(ReprMixin):
         self.unusedTiles = TileList()
         self.ruleCache.clear()
 
-    def __gt__(self, other):
+    def __gt__(self, other:Any) ->bool:
         """compares hand values"""
         assert self.player == other.player
         if not other.arranged:
@@ -714,29 +729,29 @@ class Hand(ReprMixin):
         _ = self.player.intelligence
         return _.handValue(self) > _.handValue(other)
 
-    def __lt__(self, other):
+    def __lt__(self, other:Any) ->bool:
         """compares hand values"""
         return other.__gt__(self)
 
-    def __eq__(self, other):
+    def __eq__(self, other:Any) ->bool:
         """compares hand values"""
         assert self.__class__ is other.__class__, \
             'Hands have different classes:{} and {}'.format(self.__class__, other.__class__)
         assert self.player == other.player
         return self.newStr == other.newStr
 
-    def __ne__(self, other):
+    def __ne__(self, other:Any) ->bool:
         """compares hand values"""
         assert self.__class__ is other.__class__
         assert self.player == other.player
         return self.newStr != other.newStr
 
-    def __matchingRules(self, rules):
+    def __matchingRules(self, rules:List['Rule']) ->List['Rule']:
         """return all matching rules for this hand"""
         return [rule for rule in rules if rule.appliesToHand(self)]
 
     @staticmethod
-    def maxLimitRule(usedRules):
+    def maxLimitRule(usedRules:List[UsedRule]) ->Optional[UsedRule]:
         """return the rule with the highest limit score or None"""
         result = None
         maxLimit = 0.0
@@ -748,7 +763,7 @@ class Hand(ReprMixin):
                 result = usedRule
         return result
 
-    def __totalScore(self):
+    def __totalScore(self) ->Score:
         """use all used rules to compute the score"""
         maxRule = self.maxLimitRule(self.usedRules)
         maxLimit = 0.0
@@ -762,12 +777,12 @@ class Hand(ReprMixin):
                 return Score(ruleset=self.ruleset, limits=maxLimit)
         return pointsTotal
 
-    def total(self):
+    def total(self) ->int:
         """total points of hand"""
         return self.score.total()
 
     @staticmethod
-    def __separateBonusMelds(tileStrings):
+    def __separateBonusMelds(tileStrings:List[str]) ->Tuple[MeldList, List[str]]:
         """One meld per bonus tile. Others depend on that."""
         bonusMelds = MeldList()
         for tileString in tileStrings[:]:
@@ -778,7 +793,7 @@ class Hand(ReprMixin):
                     tileStrings.remove(tileString)
         return bonusMelds, tileStrings
 
-    def explain(self):
+    def explain(self) ->List[str]:
         """explain what rules were used for this hand"""
         usedRules = self.player.sortRulesByX(self.usedRules)
         result = [x.rule.explain(x.meld) for x in usedRules
@@ -793,7 +808,7 @@ class Hand(ReprMixin):
             result.append(str(self))
         return result
 
-    def doublesEstimate(self, discard=None):
+    def doublesEstimate(self, discard:Optional[Tile]=None) ->int:
         """this is only an estimate because it only uses meldRules and handRules,
         but not things like mjRules, winnerRules, loserRules"""
         result = 0
@@ -808,11 +823,11 @@ class Hand(ReprMixin):
                 result += rule.score.doubles
         return result
 
-    def __str__(self):
+    def __str__(self) ->str:
         """hand as a string"""
         return self.newString()
 
-    def __hash__(self):
+    def __hash__(self) ->int:
         """used for debug logging to identify the hand"""
         if not hasattr(self, 'string'):
             return 0

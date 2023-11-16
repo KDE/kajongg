@@ -24,7 +24,7 @@ class TilesetSelector(QWidget):
 
     """presents all available tiles with previews"""
 
-    def __init__(self, parent):
+    def __init__(self, parent:QWidget) ->None:
         super().__init__(parent)
 
         assert Internal.Preferences
@@ -52,7 +52,7 @@ class TilesetSelector(QWidget):
             self.uiTiles[idx].focusable = False
         self.setUp()
 
-    def setUp(self):
+    def setUp(self) ->None:
         """set-up the selector"""
 
         assert Internal.Preferences
@@ -70,7 +70,7 @@ class TilesetSelector(QWidget):
             self.tilesetNameList.addItem(aset.name)
         self.kcfg_tilesetName.setText(Internal.Preferences.tilesetName)
 
-    def tilesetNameChanged(self, name):
+    def tilesetNameChanged(self, name:str) ->None:
         """the name changed: update the current row"""
         igrindex = 0
         for idx, aset in enumerate(self.tilesetList):
@@ -79,7 +79,7 @@ class TilesetSelector(QWidget):
                 break
         self.tilesetNameList.setCurrentRow(igrindex)
 
-    def tilesetRowChanged(self):
+    def tilesetRowChanged(self) ->None:
         """user selected a new tileset, update our information about it and
         paint preview"""
         selTileset = self.tilesetList[self.tilesetNameList.currentRow()]

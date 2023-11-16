@@ -8,6 +8,8 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import weakref
+from typing import List, Type, Optional, Set, Generator, Tuple, TYPE_CHECKING
+from typing import Union, Any, overload, SupportsIndex, Iterable
 
 from log import logException, logWarning, logDebug
 from mi18n import i18n, i18nc, i18nE
@@ -22,6 +24,17 @@ from message import Message
 from hand import Hand
 from intelligence import AIDefaultAI
 
+if TYPE_CHECKING:
+    from sound import Voice
+    from tile import Tiles, Piece
+    from game import Game, PlayingGame
+    from uitile import UITile
+    from deferredutil import Request
+    from rule import UsedRule
+    from move import Move
+    from handboard import HandBoard
+    from message import ClientMessage
+
 
 class Players(list, ReprMixin):
 
@@ -33,12 +46,17 @@ class Players(list, ReprMixin):
     allIds = {}
     humanNames = {}
 
-    def __init__(self, players=None):
+    def __init__(self, players:Optional[List['Player']]=None) ->None:
         list.__init__(self)
         if players:
             self.extend(players)
 
-    def __getitem__(self, index):
+    @overload
+    def __getitem__(self, index:SupportsIndex) ->'Player': ...
+    @overload
+    def __getitem__(self, index:slice) ->List['Player']: ...
+
+    def __getitem__(self, index:Union[SupportsIndex, slice]) ->Union['Player', List['Player']]:
         """allow access by idx or by wind"""
         if isinstance(index, Wind):
             for player in self:
@@ -47,10 +65,10 @@ class Players(list, ReprMixin):
         assert isinstance(index, (int, slice)), 'index is neither Wind, int nor slice:%s' % type(index)
         return list.__getitem__(self, index)
 
-    def __str__(self):
+    def __str__(self) ->str:
         return ', '.join('%s: %s' % (x.name, x.wind) for x in self)
 
-    def byId(self, playerid):
+    def byId(self, playerid:int) ->Optional['Player']:
         """lookup the player by id"""
         for player in self:
             if player.nameid == playerid:
@@ -58,7 +76,7 @@ class Players(list, ReprMixin):
         logException("no player has id %d" % playerid)
         return None
 
-    def byName(self, playerName):
+    def byName(self, playerName:str) ->Optional['Player']:
         """lookup the player by name"""
         for player in self:
             if player.name == playerName:
@@ -69,7 +87,7 @@ class Players(list, ReprMixin):
         return None
 
     @staticmethod
-    def load():
+    def load() -> None:
         """load all defined players into self.allIds and self.allNames"""
         Players.allIds = {}
         Players.allNames = {}
@@ -80,7 +98,7 @@ class Players(list, ReprMixin):
                 Players.humanNames[nameid] = name
 
     @staticmethod
-    def createIfUnknown(name):
+    def createIfUnknown(name:str) ->None:
         """create player in database if not there yet"""
         if not Internal.db:
             # kajonggtest
@@ -98,7 +116,7 @@ class Players(list, ReprMixin):
         assert name in Players.allNames.values(), '%s not in %s' % (
             name, Players.allNames.values())
 
-    def translatePlayerNames(self, names):
+    def translatePlayerNames(self, names:Iterable[str]) ->List[str]:
         """for a list of names, translates those names which are english
         player names into the local language"""
         known = {x.name for x in self}
@@ -118,7 +136,7 @@ class Player(ReprMixin):
     """
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, game, name):
+    def __init__(self, game:Optional['Game'], name:str) ->None:
         """
         Initialize a player for a give game.
 
@@ -144,7 +162,7 @@ class Player(ReprMixin):
         self.clearHand()
         self.handBoard = None
 
-    def __lt__(self, other):
+    def __lt__(self, other:Any) ->bool:
         """Used for sorting"""
         if not other:
             return False
@@ -152,7 +170,7 @@ class Player(ReprMixin):
             return False
         return self.name < other.name
 
-    def clearCache(self):
+    def clearCache(self) -> None:
         """clears the cache with Hands"""
         if Debug.hand and self.handCache and self.game:
             self.game.debug(
@@ -164,7 +182,7 @@ class Player(ReprMixin):
         self.cacheMisses = 0
 
     @property
-    def name(self):
+    def name(self) ->str:
         """
         The name of the player, can be changed only once.
 
@@ -173,7 +191,7 @@ class Player(ReprMixin):
         return self.__name
 
     @name.setter
-    def name(self, value):
+    def name(self, value:str) ->None:
         """write once"""
         assert self.__name == ''
         assert value
@@ -181,11 +199,11 @@ class Player(ReprMixin):
         self.__name = value
 
     @property
-    def game(self):
+    def game(self) ->Optional['Game']:
         """hide the fact that this is a weakref"""
         return self._game() if self._game else None
 
-    def clearHand(self):
+    def clearHand(self) -> None:
         """clear player attributes concerning the current hand"""
         self._concealedTiles = PieceList()
         self._exposedMelds = []
@@ -210,12 +228,12 @@ class Player(ReprMixin):
         self._hand = None
 
     @property
-    def lastTile(self):
+    def lastTile(self) ->Tile:
         """temp for debugging"""
         return self.__lastTile
 
     @lastTile.setter
-    def lastTile(self, value):
+    def lastTile(self, value:Tile) ->None:
         """temp for debugging"""
         assert isinstance(value, Tile), value
         self.__lastTile = value
@@ -223,23 +241,23 @@ class Player(ReprMixin):
             self.lastMeld = Meld()
 
     @property
-    def originalCall(self):
+    def originalCall(self) ->bool:
         """temp for debugging"""
         return self.__originalCall
 
     @originalCall.setter
-    def originalCall(self, value):
+    def originalCall(self, value:bool) ->None:
         """temp for debugging"""
         if self.__originalCall != value:
             self.__originalCall = value
             self._hand = None  # force recreation
 
-    def invalidateHand(self):
+    def invalidateHand(self) ->None:
         """some source for the computation of current hand changed"""
         self._hand = None
 
     @property
-    def hand(self):
+    def hand(self) ->'Hand':
         """readonly: the current Hand. Compute if invalidated."""
         if not self._hand:
             self._hand = self.__computeHand()
@@ -249,44 +267,44 @@ class Player(ReprMixin):
         return self._hand
 
     @property
-    def bonusTiles(self):
+    def bonusTiles(self) ->Tuple[Tile, ...]: # FIXME: TileTuple
         """a readonly tuple"""
         return tuple(self._bonusTiles)
 
     @property
-    def concealedTiles(self):
+    def concealedTiles(self) ->TileTuple:
         """a readonly tuple"""
         return TileTuple(self._concealedTiles)
 
     @property
-    def exposedMelds(self):
+    def exposedMelds(self) ->Tuple[Meld, ...]: # FIXME: Melds
         """a readonly tuple"""
         return tuple(self._exposedMelds)
 
     @property
-    def concealedMelds(self):
+    def concealedMelds(self) ->Tuple[Meld, ...]: #FIXME: Melds
         """a readonly tuple"""
         return tuple(self._concealedMelds)
 
     @property
-    def mayWin(self):
+    def mayWin(self) ->bool:
         """winning possible?"""
         return self.__mayWin
 
     @mayWin.setter
-    def mayWin(self, value):
+    def mayWin(self, value:bool) ->None:
         """winning possible?"""
         if self.__mayWin != value:
             self.__mayWin = value
             self._hand = None
 
     @property
-    def lastSource(self):
+    def lastSource(self) ->Type[TileSource.SourceClass]:
         """the source of the last tile the player got"""
         return self.__lastSource
 
     @lastSource.setter
-    def lastSource(self, value):
+    def lastSource(self, value: Type[TileSource.SourceClass]) ->None:
         """the source of the last tile the player got"""
         if self.game:
             assert self.game.wall
@@ -299,52 +317,52 @@ class Player(ReprMixin):
             self._hand = None
 
     @property
-    def nameid(self):
+    def nameid(self) ->int:
         """the name id of this player"""
         return Players.allIds[self.name]
 
     @property
-    def localName(self):
+    def localName(self) ->str:
         """the localized name of this player"""
         return i18nc('kajongg, name of robot player, to be translated', self.name)
 
     @property
-    def handTotal(self):
+    def handTotal(self) ->int:
         """the hand total of this player for the final scoring"""
         assert self.game
         return 0 if not self.game.winner else self.hand.total()
 
     @property
-    def balance(self):
+    def balance(self) ->int:
         """the balance of this player"""
         return self.__balance
 
     @balance.setter
-    def balance(self, balance):
+    def balance(self, balance:int) ->None:
         """the balance of this player"""
         self.__balance = balance
         self.__payment = 0
 
-    def getsPayment(self, payment):
+    def getsPayment(self, payment:int) ->None:
         """make a payment to this player"""
         self.__balance += payment
         self.__payment += payment
 
     @property
-    def payment(self):
+    def payment(self) ->int:
         """the payments for the current hand"""
         return self.__payment
 
     @payment.setter
-    def payment(self, payment):
+    def payment(self, payment:int) ->None:
         """the payments for the current hand"""
         assert payment == 0
         self.__payment = 0
 
-    def __str__(self):
+    def __str__(self) ->str:
         return '{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
 
-    def pickedTile(self, deadEnd, tileName=None):
+    def pickedTile(self, deadEnd:bool, tileName:Optional[Tile] =None) -> Tile:
         """got a tile from wall"""
         assert self.game
         assert self.game.wall
@@ -362,7 +380,7 @@ class Player(ReprMixin):
             self.lastSource = TileSource.LivingWall
         return self.lastTile
 
-    def removeConcealedTile(self, tile):
+    def removeConcealedTile(self, tile: Tile) -> None:
         """remove from my tiles"""
         assert not tile.isBonus, tile
         assert tile.__class__ == Tile
@@ -374,7 +392,7 @@ class Player(ReprMixin):
             self.lastTile = Tile.none
         self._hand = None
 
-    def addConcealedTiles(self, tiles, animated=False):  # pylint: disable=unused-argument
+    def addConcealedTiles(self, tiles:'Tiles', animated:bool=False) -> None:  # pylint: disable=unused-argument
         """add to my tiles"""
         assert tiles
         for tile in tiles:
@@ -385,30 +403,30 @@ class Player(ReprMixin):
                 self._concealedTiles.append(tile)
         self._hand = None
 
-    def syncHandBoard(self, adding=None):
+    def syncHandBoard(self, adding:Optional[List['UITile']]=None) ->None:
         """virtual: synchronize display"""
 
-    def colorizeName(self):
+    def colorizeName(self) ->None:
         """virtual: colorize Name on wall"""
 
-    def getsFocus(self, unusedResults=None):
+    def getsFocus(self, unusedResults:Optional[List['Request']]=None) ->None:
         """virtual: player gets focus on his hand"""
 
-    def __announcements(self):
+    def __announcements(self) -> Set:
         """used to build the Hand"""
         return set('a') if self.originalCall else set()
 
-    def mjString(self):
+    def mjString(self) -> str:
         """compile hand info into a string as needed by the scoring engine"""
         return ''.join(['m', self.lastSource.char, ''.join(self.__announcements())])
 
-    def makeTileKnown(self, tile):
+    def makeTileKnown(self, tile:Tile) -> None:
         """used when somebody else discards a tile"""
         assert not self._concealedTiles[0].isKnown
         self._concealedTiles[0] = tile
         self._hand = None
 
-    def __computeHand(self):
+    def __computeHand(self) -> Hand:
         """return Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
         return Hand(
@@ -416,7 +434,7 @@ class Player(ReprMixin):
             bonusTiles=self._bonusTiles, lastTile=self.lastTile, lastMeld=self.lastMeld,
             lastSource=self.lastSource, announcements=self.__announcements())
 
-    def _computeHandWithDiscard(self, discard):
+    def _computeHandWithDiscard(self, discard:Tile) -> Hand:
         """what if"""
         lastSource = self.lastSource # TODO: recompute
         save = (self.lastTile, self.lastSource)
@@ -431,7 +449,7 @@ class Player(ReprMixin):
             if discard:
                 self._concealedTiles.pop(-1)
 
-    def scoringString(self):
+    def scoringString(self) -> str:
         """helper for HandBoard.__str__"""
         if self._concealedMelds:
             parts = [str(x) for x in self._concealedMelds + self._exposedMelds]
@@ -441,16 +459,16 @@ class Player(ReprMixin):
         parts.extend(str(x) for x in self._bonusTiles)
         return ' '.join(parts)
 
-    def sortRulesByX(self, rules):
+    def sortRulesByX(self, rules:List['UsedRule']) ->List['UsedRule']:
         """if this game has a GUI, sort rules by GUI order"""
         return rules
 
-    def others(self):
+    def others(self) -> Generator['Player', None, None]:
         """a list of the other 3 players"""
         assert self.game
         return (x for x in self.game.players if x != self)
 
-    def tileAvailable(self, tile, hand):
+    def tileAvailable(self, tile:Tile, hand:Hand) -> int:
         """a count of how often tile might still appear in the game
         supposing we have hand"""
         lowerTile = tile.exposed
@@ -467,7 +485,7 @@ class Player(ReprMixin):
         visible += sum(x.exposed == lowerTile for x in hand.tiles)
         return 4 - visible
 
-    def violatesOriginalCall(self, discard):
+    def violatesOriginalCall(self, discard:Tile) ->bool:
         """called if discarding discard violates the Original Call"""
         if not self.originalCall or not self.mayWin:
             return False
@@ -485,20 +503,20 @@ class PlayingPlayer(Player):
     """a player in a computer game as opposed to a ScoringPlayer"""
     # too many public methods
 
-    def __init__(self, game, name):
+    def __init__(self, game:Optional['PlayingGame'], name:str) ->None:
         self.sayable = {}               # recompute for each move, use as cache
         Player.__init__(self, game, name)
 
-    def popupMsg(self, msg):
+    def popupMsg(self, msg:'Message') ->None:
         """virtual: show popup on display"""
 
-    def hidePopup(self):
+    def hidePopup(self) ->None:
         """virtual: hide popup on display"""
 
-    def speak(self, txt):
+    def speak(self, txt:str) ->None:
         """only a visible playing player can speak"""
 
-    def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
+    def declaredMahJongg(self, concealed:MeldList, withDiscard:Optional[Tile], lastTile:Tile, lastMeld:Meld) ->None:
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
         assert self.game
         if Debug.mahJongg:
@@ -534,7 +552,7 @@ class PlayingPlayer(Player):
             self.game.debug('  hand becomes {}'.format(self.hand))
             self._hand = None
 
-    def __possibleChows(self):
+    def __possibleChows(self) ->MeldList:
         """return a unique list of lists with possible claimable chow combinations"""
         if not self.game:
             return MeldList()
@@ -547,7 +565,7 @@ class PlayingPlayer(Player):
         _ = (TileTuple(self.concealedTiles) + _).possibleChows(_)
         return MeldList(Meld(x) for x in _)# FIXME: sollten direkt Melds sein
 
-    def __possibleKongs(self):
+    def __possibleKongs(self) ->MeldList:
         """return a unique list of lists with possible kong combinations"""
         if not self.game:
             return MeldList()
@@ -570,31 +588,31 @@ class PlayingPlayer(Player):
                 kongs.append(Meld(discardedTile * 4))
         return kongs
 
-    def __maySayChow(self, unusedMove):
+    def __maySayChow(self, unusedMove:'Move') ->MeldList:
         """return answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
         if not self.game:
             return MeldList()
         return self.__possibleChows() if self == self.game.nextPlayer() else MeldList()
 
-    def __maySayPung(self, unusedMove):
+    def __maySayPung(self, unusedMove:'Move') -> MeldList:
         """return answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
         if not self.game:
             return MeldList()
         lastDiscard = self.game.lastDiscard
-        if self.game.lastDiscard:
+        if lastDiscard:
             assert lastDiscard.isConcealed, lastDiscard
             if self.concealedTiles.count(lastDiscard) >= 2:
                 return MeldList([lastDiscard.pung])
         return MeldList()
 
-    def __maySayKong(self, unusedMove):
+    def __maySayKong(self, unusedMove:'Move') ->MeldList:
         """return answer arguments for the server if calling or declaring kong is possible.
         returns the meld to be completed or to be declared"""
         return self.__possibleKongs()
 
-    def __maySayMahjongg(self, move):
+    def __maySayMahjongg(self, move:'Move') ->Optional[Tuple[MeldList, Optional[Tile], Optional[Meld]]]:
         """return answer arguments for the server if calling or declaring Mah Jongg is possible"""
         game = self.game
         assert game
@@ -618,7 +636,7 @@ class PlayingPlayer(Player):
             return MeldList(x for x in hand.melds if not x.isDeclared), withDiscard, hand.lastMeld
         return None
 
-    def __maySayOriginalCall(self, unusedMove):
+    def __maySayOriginalCall(self, unusedMove:'Move') ->bool:
         """return True if Original Call is possible"""
         assert self.game
         for tileName in sorted(set(self.concealedTiles)):
@@ -638,7 +656,7 @@ class PlayingPlayer(Player):
         Message.MahJongg: __maySayMahjongg,
         Message.OriginalCall: __maySayOriginalCall}
 
-    def computeSayable(self, move, answers):
+    def computeSayable(self, move:'Move', answers:List['ClientMessage']) ->None:
         """find out what the player can legally say with this hand"""
         self.sayable = {}
         for message in Message.defined.values():
@@ -647,7 +665,7 @@ class PlayingPlayer(Player):
             else:
                 self.sayable[message] = True
 
-    def maybeDangerous(self, msg):
+    def maybeDangerous(self, msg:Message) ->MeldList:
         """could answering with msg lead to dangerous game?
         If so return a list of resulting melds
         where a meld is represented by a list of 2char strings"""
@@ -658,7 +676,7 @@ class PlayingPlayer(Player):
                     result.append(meld)
         return result
 
-    def hasConcealedTiles(self, tiles, within=None):
+    def hasConcealedTiles(self, tiles:'Tiles', within:Optional['Tiles'] =None) -> bool:
         """do I have those concealed tiles?"""
         if within is None:
             within = self._concealedTiles
@@ -669,7 +687,7 @@ class PlayingPlayer(Player):
             within.remove(tile)
         return True
 
-    def showConcealedTiles(self, tiles, show=True):
+    def showConcealedTiles(self, tiles:TileTuple, show:bool=True) ->None:
         """show or hide tiles"""
         assert isinstance(tiles, TileTuple), repr(tiles)
         assert self.game
@@ -690,7 +708,8 @@ class PlayingPlayer(Player):
             self._hand = None
             self.syncHandBoard()
 
-    def showConcealedMelds(self, concealedMelds, ignoreDiscard=None):
+    def showConcealedMelds(self, concealedMelds:MeldList,
+        ignoreDiscard:Optional[Tile] =None) ->Optional[Tuple[str, ...]]:
         """the server tells how the winner shows and melds his
         concealed tiles. In case of error, return message and arguments"""
         for meld in concealedMelds:
@@ -714,7 +733,7 @@ class PlayingPlayer(Player):
         self._hand = None
         return None
 
-    def robTileFrom(self, tile):
+    def robTileFrom(self, tile:Tile) -> None:
         """used for robbing the kong from this player"""
         if Debug.robbingKong:
             logDebug('robbed %s from %s' % (tile, self))
@@ -733,13 +752,13 @@ class PlayingPlayer(Player):
         self.lastTile = Tile.none  # our lastTile has just been robbed
         self._hand = None
 
-    def robsTile(self):
+    def robsTile(self) -> None:
         """True if the player is robbing a tile"""
         if Debug.robbingKong:
             logDebug('%s robs a tile' % self)
         self.lastSource = TileSource.RobbedKong
 
-    def scoreMatchesServer(self, score):
+    def scoreMatchesServer(self, score:Optional[str]) -> bool:
         """do we compute the same score as the server does?"""
         if score is None:
             return True
@@ -755,7 +774,7 @@ class PlayingPlayer(Player):
                 self.game.seed)
         return False
 
-    def mustPlayDangerous(self, exposing=None):
+    def mustPlayDangerous(self, exposing:Optional[Meld] =None) -> bool:
         """]
         True if the player has no choice, otherwise False.
 
@@ -782,7 +801,7 @@ class PlayingPlayer(Player):
                     afterExposed.remove(tile.exposed)
         return all(self.game.dangerousFor(self, x) for x in afterExposed)
 
-    def exposeMeld(self, meldTiles, calledTile=None):
+    def exposeMeld(self, meldTiles: 'Tiles', calledTile:Optional['Piece']=None) -> Meld:
         """exposes a meld with meldTiles: removes them from concealedTiles,
         adds the meld to exposedMelds and returns it
         calledTile: we got the last tile for the meld from discarded, otherwise
@@ -822,7 +841,7 @@ class PlayingPlayer(Player):
         game.computeDangerous(self)
         return meld
 
-    def findDangerousTiles(self):
+    def findDangerousTiles(self) -> None:
         """update the list of dangerous tile"""
         assert self.game
         pName = self.localName

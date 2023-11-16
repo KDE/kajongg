@@ -20,9 +20,15 @@ import gc
 import argparse
 from locale import getpreferredencoding
 
+from typing import List, Set, Optional, Any, Generator, Iterable, TYPE_CHECKING, Tuple
+
 from common import Debug, ReprMixin, cacheDir
 from util import removeIfExists, gitHead, checkMemory, popenReadlines
 from kajcsv import Csv, CsvRow, CsvWriter
+
+if TYPE_CHECKING:
+    from io import FileIO
+
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
@@ -32,7 +38,7 @@ class Clone:
 
     """make a temp directory for commitId"""
 
-    def __init__(self, commitId):
+    def __init__(self, commitId:str) ->None:
         self.commitId = commitId
         if commitId != 'current':
             tmpdir = os.path.expanduser(os.path.join(cacheDir(), commitId))
@@ -46,7 +52,7 @@ class Clone:
                         commitId=commitId).split(), cwd=tmpdir) as _:
                     _.wait()
 
-    def sourceDirectory(self):
+    def sourceDirectory(self) ->str:
         """the source directory for this git commit"""
         if self.commitId == 'current':
             tmpdir = os.path.abspath('..')
@@ -57,7 +63,7 @@ class Clone:
         return result
 
     @classmethod
-    def removeObsolete(cls, knownCommits):
+    def removeObsolete(cls, knownCommits:Set) ->None:
         """remove all clones for obsolete commits"""
         for commitDir in os.listdir(cacheDir()):
             if not any(x.startswith(commitDir) for x in knownCommits):
@@ -81,7 +87,7 @@ class Server(ReprMixin):
     servers = []
     count = 0
 
-    def __new__(cls, job):
+    def __new__(cls, job:'Job') ->'Server':
         """can we reuse an existing server?"""
         running = Server.allRunningJobs()
         if len(running) >= OPTIONS.clients:
@@ -108,7 +114,7 @@ class Server(ReprMixin):
             cls.servers.append(result)
         return result
 
-    def __init__(self, job):
+    def __init__(self, job:'Job') ->None:
         if not hasattr(self, 'jobs'):
             self.jobs = []
             self.process = None
@@ -122,11 +128,11 @@ class Server(ReprMixin):
             self.jobs.append(job)
 
     @classmethod
-    def allRunningJobs(cls):
+    def allRunningJobs(cls) ->List['Job']:
         """a list of all jobs on all servers"""
         return sum((x.jobs for x in cls.servers), [])
 
-    def start(self, job):
+    def start(self, job:'Job') ->None:
         """start this server"""
         job.server = self
         assert self.process is None, 'Server.start already has a process'
@@ -159,7 +165,7 @@ class Server(ReprMixin):
             self.process = subprocess.Popen(cmd, cwd=job.srcDir())  # pylint:disable=consider-using-with
         print('{} started'.format(self))
 
-    def stop(self, job=None):
+    def stop(self, job:Optional['Job']=None) ->None:
         """maybe stop the server"""
         if self not in self.servers:
             # already stopped
@@ -179,7 +185,7 @@ class Server(ReprMixin):
                 removeIfExists(self.socketName)
 
     @classmethod
-    def stopAll(cls):
+    def stopAll(cls) ->None:
         """stop all servers even if clients are still there"""
         for server in cls.servers:
             for job in server.jobs[:]:
@@ -188,7 +194,7 @@ class Server(ReprMixin):
                 server.jobs)
             server.stop()
 
-    def __str__(self):
+    def __str__(self) ->str:
         return 'Server {} Python{}{} {}'.format(
             self.commitId,
             self.pythonVersion,
@@ -200,7 +206,7 @@ class Job(ReprMixin):
 
     """a simple container"""
 
-    def __init__(self, pythonVersion, ruleset, aiVariant, commitId, game):
+    def __init__(self, pythonVersion:str, ruleset:str, aiVariant:str, commitId:str, game:str) ->None:
         self.pythonVersion = pythonVersion
         self.ruleset = ruleset
         self.aiVariant = aiVariant
@@ -209,13 +215,13 @@ class Job(ReprMixin):
         self.process = None
         self.started = False
 
-    def srcDir(self):
+    def srcDir(self) ->str:
         """the path of the directory where the particular test is running"""
         assert self.server, 'Job {} has no server'.format(self)
         assert self.server.clone, 'Job {} has no server.clone'.format(self)
         return self.server.clone.sourceDirectory()
 
-    def __startProcess(self, cmd):
+    def __startProcess(self, cmd:List[str]) ->None:
         """call Popen"""
         if OPTIONS.log:
             self.process = subprocess.Popen(
@@ -225,7 +231,7 @@ class Job(ReprMixin):
             self.process = subprocess.Popen(cmd, cwd=self.srcDir())  # pylint:disable=consider-using-with
         print('       %s started' % (self))
 
-    def start(self):
+    def start(self) ->None:
         """start this job"""
         self.server = Server(self)  # pylint:disable=attribute-defined-outside-init
         # never login to the same server twice at the
@@ -257,7 +263,7 @@ class Job(ReprMixin):
         self.__startProcess(cmd)
         self.started = True
 
-    def check(self, silent=False):
+    def check(self, silent:bool=False) ->None:
         """if done, cleanup"""
         if not self.started or not self.process:
             return
@@ -276,7 +282,7 @@ class Job(ReprMixin):
             self.server.jobs.remove(self)
 
     @property
-    def logFile(self):
+    def logFile(self) ->'FileIO':
         """open if needed"""
         if not hasattr(self, '__logFile'):
             logDir = os.path.expanduser(
@@ -289,7 +295,7 @@ class Job(ReprMixin):
             self.__logFile = open(self.logFileName, 'ab', buffering=0)  # pylint:disable=consider-using-with,attribute-defined-outside-init
         return self.__logFile
 
-    def shortRulesetName(self):
+    def shortRulesetName(self) ->str:
         """strip leading chars if they are identical for all rulesets"""
         names = OPTIONS.knownRulesets
         for prefix in range(100):
@@ -297,7 +303,7 @@ class Job(ReprMixin):
                 return self.ruleset[prefix - 1:]
         return self.ruleset
 
-    def __str__(self):
+    def __str__(self) ->str:
         pid = 'pid={}'.format(
             self.process.pid) if self.process and Debug.process else ''
         game = 'game={}'.format(self.game)
@@ -310,7 +316,7 @@ class Job(ReprMixin):
 
 
 
-def cleanup_data(csv):
+def cleanup_data(csv:'CSV') ->None:
     """remove all data referencing obsolete commits"""
     logDir = os.path.expanduser(os.path.join('~', '.kajongg', 'log'))
     knownCommits = csv.commits()
@@ -324,7 +330,7 @@ def cleanup_data(csv):
             pass  # not yet empty
     Clone.removeObsolete(knownCommits)
 
-def pairs(data):
+def pairs(data:List[CsvRow]) ->Generator[Tuple[CsvRow, CsvRow], None, None]:
     """return all consecutive pairs"""
     prev = None
     for _ in data:
@@ -338,29 +344,29 @@ class CSV(ReprMixin):
 
     knownCommits = set()
 
-    def __init__(self):
+    def __init__(self) ->None:
         self.findKnownCommits()
         self.rows = []
         if os.path.exists(OPTIONS.csv):
             self.rows = list(sorted({CsvRow(x) for x in Csv.reader(OPTIONS.csv)}))
         self.removeInvalidCommits()
 
-    def neutralize(self):
+    def neutralize(self) ->None:
         """remove things we do not want to compare"""
         for row in self.rows:
             row.neutralize()
 
-    def commits(self):
+    def commits(self) ->Set[str]:
         """return set of all our commit ids"""
         # TODO: sorted by date
         return {x.commit for x in self.rows}
 
-    def games(self):
+    def games(self) ->List[str]:
         """return a sorted unique list of all games"""
         return sorted({x.game for x in self.rows})
 
     @classmethod
-    def findKnownCommits(cls):
+    def findKnownCommits(cls) ->None:
         """find known commits"""
         if not cls.knownCommits:
             cls.knownCommits = set()
@@ -371,7 +377,7 @@ class CSV(ReprMixin):
                             branch=branch[2:]).split()).decode().split('\n'))
 
     @classmethod
-    def onlyExistingCommits(cls, commits):
+    def onlyExistingCommits(cls, commits:Iterable[str]) ->Set[str]:
         """return a set with only  existing commits"""
         result = set()
         for commit in commits:
@@ -379,7 +385,7 @@ class CSV(ReprMixin):
                 result.add(commit)
         return result
 
-    def removeInvalidCommits(self):
+    def removeInvalidCommits(self) ->None:
         """remove rows with invalid git commit ids"""
         csvCommits = {x.commit for x in self.rows}
         csvCommits = {
@@ -395,14 +401,14 @@ class CSV(ReprMixin):
             self.rows = [x for x in self.rows if x.commit not in nonExisting]
             self.write()
 
-    def write(self):
+    def write(self) ->None:
         """write new csv file"""
         writer = CsvWriter(OPTIONS.csv)
         for row in self.rows:
             writer.writerow(row)
         del writer
 
-    def evaluate(self):
+    def evaluate(self) ->None:
         """evaluate the data. Show differences as helpful as possible"""
         found_difference = False
         for ruleset, aiVariant, game in {(x.ruleset, x.aiVariant, x.game) for x in self.rows}:
@@ -421,7 +427,7 @@ class CSV(ReprMixin):
             print('found no differences in {}'.format(OPTIONS.csv))
 
     @staticmethod
-    def compareRows(rows):
+    def compareRows(rows:List[CsvRow]) ->List[CsvRow]:
         """in absence of differences, there should be only one row.
         return a list of rows which appeared in warnings"""
         if not rows:
@@ -447,12 +453,12 @@ class CSV(ReprMixin):
         return result
 
 
-def startingDir():
+def startingDir() ->str:
     """the path of the directory where kajonggtest has been started in"""
     return os.path.dirname(sys.argv[0])
 
 
-def getJobs(jobs):
+def getJobs(jobs:List[Job]) ->List[Job]:
     """fill the queue"""
     try:
         while len(jobs) < OPTIONS.clients:
@@ -462,7 +468,7 @@ def getJobs(jobs):
     return jobs
 
 
-def doJobs():
+def doJobs() ->None:
     """now execute all jobs"""
     # pylint: disable=too-many-branches
 
@@ -559,7 +565,7 @@ def parse_options() ->argparse.Namespace:
     return parser.parse_args()
 
 
-def improve_options():
+def improve_options() ->None:
     """add sensible defaults"""
     # pylint: disable=too-many-branches,too-many-statements
     OPTIONS.servers = max(OPTIONS.servers, 1)
@@ -635,7 +641,7 @@ def improve_options():
     OPTIONS.usePort = sys.platform == 'win32'
 
 
-def allGames():
+def allGames() ->Generator[str, None, None]:
     """a generator returning game ids"""
     while True:
         if OPTIONS.game:
@@ -646,7 +652,7 @@ def allGames():
         yield result
 
 
-def allJobs():
+def allJobs() ->Generator[Job, None, None]:
     """a generator returning Job instances"""
     # pylint: disable=too-many-nested-blocks
     for game in OPTIONS.games:
@@ -659,7 +665,7 @@ def allJobs():
                             return
                         yield Job(pyVersion, ruleset, aiVariant, commitId, game)
 
-def main():
+def main() ->None:
     """parse options, play, evaluate results"""
     global OPTIONS  # pylint: disable=global-variable-undefined
 
@@ -696,7 +702,7 @@ def main():
         if OPTIONS.csv:
             CSV().evaluate()
 
-def cleanup(sig, unusedFrame):
+def cleanup(sig: Any, unusedFrame: Any) ->None:
     """at program end"""
     Server.stopAll()
     sys.exit(sig)

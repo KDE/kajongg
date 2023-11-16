@@ -9,12 +9,21 @@ Read the user manual for a description of the interface to this scoring engine
 
 import types
 from hashlib import md5
+from typing import Any, List, Tuple, Dict, Type, Union, Optional, TYPE_CHECKING
+from typing import Sequence
 
 from common import Internal, Debug
 from common import ReprMixin
 from log import logException, logDebug
 from mi18n import i18n, i18nc, i18nE, i18ncE, english
 from query import Query
+
+if TYPE_CHECKING:
+    from tile import Meld
+    from rulecode import MJRule
+    from login import Url
+    from hand import Hand
+    from login import Url
 
 
 class Score(ReprMixin):
@@ -27,7 +36,7 @@ class Score(ReprMixin):
 
     __hash__ = None
 
-    def __init__(self, points=0, doubles=0, limits=0, ruleset=None):
+    def __init__(self, points:int=0, doubles:int=0, limits:float=0, ruleset:Optional['Ruleset']=None):
         self.points = 0  # define the types for those values
         self.doubles = 0
         self.limits = 0.0
@@ -41,11 +50,11 @@ class Score(ReprMixin):
                  i18ncE('kajongg', 'doubles'): 50,
                  i18ncE('kajongg', 'limits'): 9999}
 
-    def clear(self):
+    def clear(self) ->None:
         """set all to 0"""
         self.points = self.doubles = self.limits = 0
 
-    def change(self, unitName, value):
+    def change(self, unitName:str, value:Union[int, float]) ->Tuple[bool, Optional[str]]:
         """set value for unitName. If changed, return True"""
         oldValue = getattr(self, unitName)
         try:
@@ -64,7 +73,7 @@ class Score(ReprMixin):
         setattr(self, unitName, newValue)
         return True, None
 
-    def __str__(self):
+    def __str__(self) ->str:
         """make score printable"""
         parts = []
         if self.points:
@@ -75,7 +84,7 @@ class Score(ReprMixin):
             parts.append('limits=%f' % self.limits)
         return ' '.join(parts)
 
-    def i18nStr(self):
+    def i18nStr(self) ->str:
         """make score readable for humans, i18n"""
         parts = []
         if self.points:
@@ -89,39 +98,39 @@ class Score(ReprMixin):
             parts.append(i18nc('Kajongg', '%1 limits', limits))
         return ' '.join(parts)
 
-    def __eq__(self, other):
+    def __eq__(self, other:Any) ->bool:
         """ == comparison """
         assert isinstance(other, Score)
         return self.points == other.points and self.doubles == other.doubles and self.limits == other.limits
 
-    def __ne__(self, other):
+    def __ne__(self, other:Any) ->bool:
         """ != comparison """
         assert isinstance(other, Score)
         return self.points != other.points or self.doubles != other.doubles or self.limits != other.limits
 
-    def __lt__(self, other):
+    def __lt__(self, other:Any) ->bool:
         assert isinstance(other, Score)
         return self.total() < other.total()
 
-    def __le__(self, other):
+    def __le__(self, other:Any) ->bool:
         assert isinstance(other, Score)
         return self.total() <= other.total()
 
-    def __gt__(self, other):
+    def __gt__(self, other:Any) ->bool:
         assert isinstance(other, Score)
         return self.total() > other.total()
 
-    def __ge__(self, other):
+    def __ge__(self, other:Any) ->bool:
         assert isinstance(other, Score)
         return self.total() >= other.total()
 
-    def __add__(self, other):
+    def __add__(self, other:Any) ->'Score':
         """implement adding Score"""
         assert isinstance(other, Score)
         return Score(self.points + other.points, self.doubles + other.doubles,
                      max(self.limits, other.limits), self.ruleset or other.ruleset)
 
-    def total(self):
+    def total(self) ->int:
         """the total score"""
         result = int(self.points * (2 ** self.doubles))
         if self.limits:
@@ -140,11 +149,11 @@ class Score(ReprMixin):
                 result = int(min(result, self.ruleset.limit))
         return result
 
-    def __int__(self):
+    def __int__(self) ->int:
         """the total score"""
         return self.total()
 
-    def __bool__(self):
+    def __bool__(self) ->bool:
         """for bool() conversion"""
         return self.points != 0 or self.doubles != 0 or self.limits != 0
 
@@ -155,25 +164,31 @@ class RuleList(list):
     Rules can be indexed by name or index.
     Adding a rule either replaces an existing rule or appends it."""
 
-    def __init__(self, listId, name, description):
+    def __init__(self, listId:int, name:str, description:str) ->None:
         list.__init__(self)
         self.listId = listId
         self.name = name
         self.description = description
 
-    def pop(self, key):
+    def pop(self, key:str) ->'RuleBase':  # type:ignore
         """find rule, return it, delete it from this list"""
         result = self[key]
         del self[key]
-        return result
+        return result  # type:ignore
 
-    def __contains__(self, key):
+    def __contains__(self, key:Any) ->bool:
         """do we know this rule?"""
         if isinstance(key, RuleBase):
             key = key.key()
         return any(x.key() == key for x in self)
 
-    def __getitem__(self, key):
+#    @overload
+#    def __getitem__(self, index: Union[SupportsIndex, str]) -> 'RuleBase': ...
+#    @overload
+#    def __getitem__(self, index: slice) -> Sequence['RuleBase']: ...
+# see https://github.com/python/mypy/issues/10955
+
+    def __getitem__(self, key:Union[int, str]) ->'RuleBase':  # type:ignore[override]
         """find rule by key"""
         if isinstance(key, int):
             return list.__getitem__(self, key)
@@ -182,7 +197,7 @@ class RuleList(list):
                 return rule
         raise KeyError
 
-    def __setitem__(self, key, rule):
+    def __setitem__(self, key:str, rule:'RuleBase') ->None:  # type:ignore
         """set rule by key"""
         if isinstance(key, int):
             list.__setitem__(self, key, rule)
@@ -193,7 +208,7 @@ class RuleList(list):
                 return
         list.append(self, rule)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key:Union[int, str]) ->None:  # type:ignore
         """delete this rule"""
         if isinstance(key, int):
             list.__delitem__(self, key)
@@ -204,18 +219,18 @@ class RuleList(list):
                 return
         raise KeyError
 
-    def append(self, rule):
+    def append(self, rule:'RuleBase') ->None:
         """do not append"""
         raise TypeError('do not append %s' % rule)
 
-    def add(self, rule):
+    def add(self, rule:'RuleBase') ->None:
         """use add instead of append"""
         if rule.key() in self:
             logException('%s is already defined as %s, not accepting new rule %s/%s' % (
                 rule.key(), self[rule.key()].definition, rule.name, rule.definition))
         self[rule.key()] = rule
 
-    def createRule(self, name: str, definition: str = '', **kwargs):
+    def createRule(self, name:str, definition:str='', **kwargs:Any) ->None:
         """shortcut for simpler definition of predefined rulesets"""
         defParts = definition.split('||')
         rule = None
@@ -252,11 +267,11 @@ class UsedRule(ReprMixin):
     """use this in scoring, never change class Rule.
     If the rule has been used for a meld, pass it"""
 
-    def __init__(self, rule, meld=None):
+    def __init__(self, rule:'Rule', meld:Optional['Meld']=None) ->None:
         self.rule = rule
         self.meld = meld
 
-    def __str__(self):
+    def __str__(self) ->str:
         result = self.rule.name
         if self.meld:
             result += ' ' + str(self.meld)
@@ -299,7 +314,7 @@ class Ruleset:
     misses = 0
 
     @staticmethod
-    def cached(name):
+    def cached(name:Union[int, str]) ->'Ruleset':
         """If a Ruleset instance is never changed, we can use a cache"""
         if isinstance(name, list):
             # we got the rules over the wire
@@ -317,7 +332,7 @@ class Ruleset:
         cache[result.hash] = result
         return result
 
-    def __init__(self, raw_data):
+    def __init__(self, raw_data:Union[int, List[str], str]) ->None:
         """raw_data may be:
             - an integer: ruleset.id from the sql table
             - a list: the full ruleset specification (probably sent from the server)
@@ -360,35 +375,35 @@ into a situation where you have to pay a penalty"""))
         self._initRuleset()
 
     @property
-    def dirty(self):
+    def dirty(self) ->bool:
         """have we been modified since load or last save?"""
         return self.__dirty
 
     @dirty.setter
-    def dirty(self, dirty):
+    def dirty(self, dirty:bool) ->None:
         """have we been modified since load or last save?"""
         self.__dirty = dirty
         if dirty:
             self.__computeHash()
 
     @property
-    def hash(self):
+    def hash(self) ->str:
         """a md5sum computed from the rules but not name and description"""
         if not self.__hash:
             self.__computeHash()
         return self.__hash
 
-    def __eq__(self, other):
+    def __eq__(self, other:Any) ->bool:
         """two rulesets are equal if everything except name or description is identical.
         The name might be localized."""
         return other and isinstance(other, Ruleset) and self.hash == other.hash
 
-    def __ne__(self, other):
+    def __ne__(self, other:Any) ->bool:
         """two rulesets are equal if everything except name or description is identical.
         The name might be localized."""
         return not other or not isinstance(other, Ruleset) or self.hash != other.hash
 
-    def minMJTotal(self):
+    def minMJTotal(self) ->int:
         """the minimum score for Mah Jongg including all winner points. This is not accurate,
         the correct number is bigger in CC: 22 and not 20. But it is enough saveguard against
         entering impossible scores for manual games.
@@ -396,7 +411,7 @@ into a situation where you have to pay a penalty"""))
         return self.minMJPoints + min(x.score.total() for x in self.mjRules)
 
     @staticmethod
-    def hashIsKnown(value):
+    def hashIsKnown(value:str) ->bool:
         """return False or True"""
         result = any(x.hash == value for x in PredefinedRuleset.rulesets())
         if not result:
@@ -404,7 +419,7 @@ into a situation where you have to pay a penalty"""))
             result = bool(query.records)
         return result
 
-    def _initRuleset(self):
+    def _initRuleset(self) ->None:
         """load ruleset headers but not the rules"""
         if isinstance(self.raw_data, int):
             query = Query(
@@ -425,7 +440,7 @@ into a situation where you have to pay a penalty"""))
         else:
             raise ValueError('ruleset %s not found' % self.raw_data)
 
-    def __setParametersFrom(self, fromRuleset):
+    def __setParametersFrom(self, fromRuleset:'Ruleset') ->None:
         """set attributes for parameters defined in fromRuleset.
         Does NOT overwrite already set parameters: Silently ignore them"""
         for par in fromRuleset.parameterRules:
@@ -433,7 +448,7 @@ into a situation where you have to pay a penalty"""))
                 if par.parName not in self.__dict__:
                     self.__dict__[par.parName] = par.parameter
 
-    def load(self):
+    def load(self) ->'Ruleset':
         """load the ruleset from the database and compute the hash. Return self."""
         if self.__loaded:
             return self
@@ -463,20 +478,20 @@ into a situation where you have to pay a penalty"""))
         assert self.standardMJRule
         return self
 
-    def __loadQuery(self):
+    def __loadQuery(self) ->Query:
         """return a Query object with loaded ruleset"""
         return Query(
             "select ruleset, list, position, name, definition, points, doubles, limits, parameter from rule "
             "where ruleset=? order by list,position", (self.rulesetId,))
 
-    def toList(self):
+    def toList(self) -> List[List[Union[str, int, float]]]:
         """return entire ruleset encoded in a string"""
         self.load()
         result = [[self.rulesetId, self.hash, self.name, self.description]]
         result.extend(self.ruleRecord(x) for x in self.allRules)
         return result
 
-    def loadRules(self):
+    def loadRules(self) ->None:
         """load rules from database or from self.rawRules (got over the net)"""
         if self.rawRules:
             for record in self.rawRules:
@@ -485,7 +500,7 @@ into a situation where you have to pay a penalty"""))
             for record in self.__loadQuery().records:
                 self.__loadRule(record)
 
-    def __loadRule(self, record):
+    def __loadRule(self, record:List[str]) ->None:
         """loads a rule into the correct ruleList"""
         _, listNr, _, name, definition, points_str, doubles, limits, parameter = record
         try:
@@ -501,7 +516,7 @@ into a situation where you have to pay a penalty"""))
                     parameter=parameter)
                 break
 
-    def findUniqueOption(self, action):
+    def findUniqueOption(self, action:str) ->Optional['Rule']:
         """return first rule with option"""
         rulesWithAction = [x for x in self.allRules if action in x.options]
         assert len(rulesWithAction) < 2, '%s has too many matching rules for %s' % (
@@ -510,14 +525,14 @@ into a situation where you have to pay a penalty"""))
             return rulesWithAction[0]
         return None
 
-    def filterRules(self, attrName):
+    def filterRules(self, attrName:str) ->List['RuleBase']:
         """return all my Rule classes having attribute attrName"""
         if attrName not in self.__filteredLists:
             self.__filteredLists[attrName] = [x for x in self.allRules if hasattr(x, attrName)]
         return self.__filteredLists[attrName]
 
     @staticmethod
-    def newId(minus=False):
+    def newId(minus:bool=False) ->int:
         """return an unused ruleset id. This is not multi user safe."""
         func = 'min(id)-1' if minus else 'max(id)+1'
         result = -1 if minus else 1
@@ -530,7 +545,7 @@ into a situation where you have to pay a penalty"""))
         return result
 
     @staticmethod
-    def nameExists(name):
+    def nameExists(name:str) ->bool:
         """return True if ruleset name is already in use"""
         result = any(x.name == name for x in PredefinedRuleset.rulesets())
         if not result:
@@ -538,7 +553,7 @@ into a situation where you have to pay a penalty"""))
                 Query('select id from ruleset where id<0 and name=?', (name,)).records)
         return result
 
-    def _newKey(self, minus=False):
+    def _newKey(self, minus:bool=False) ->Tuple[int, str]:
         """generate a new id and a new name if the name already exists"""
         newId = self.newId(minus=minus)
         newName = str(self.name)
@@ -552,15 +567,15 @@ into a situation where you have to pay a penalty"""))
                 copyNr += 1
         return newId, newName
 
-    def clone(self):
+    def clone(self) ->'Ruleset':
         """return a clone of self, unloaded"""
         return Ruleset(self.rulesetId)
 
-    def __str__(self):
+    def __str__(self) ->str:
         return 'type=%s, id=%d,rulesetId=%d,name=%s' % (
             type(self), id(self), self.rulesetId, self.name)
 
-    def copyTemplate(self):
+    def copyTemplate(self) ->'Ruleset':
         """make a copy of self and return the new ruleset id. Returns the new ruleset.
         To be used only for ruleset templates"""
         newRuleset = self.clone().load()
@@ -569,7 +584,7 @@ into a situation where you have to pay a penalty"""))
             newRuleset = Ruleset(newRuleset.rulesetId)
         return newRuleset
 
-    def rename(self, newName):
+    def rename(self, newName:str) ->bool:
         """renames the ruleset. returns True if done, False if not"""
         with Internal.db:
             if self.nameExists(newName):
@@ -580,13 +595,13 @@ into a situation where you have to pay a penalty"""))
                 self.name = newName  # pylint:disable=attribute-defined-outside-init
             return not query.failure
 
-    def remove(self):
+    def remove(self) ->None:
         """remove this ruleset from the database."""
         with Internal.db:
             Query("DELETE FROM rule WHERE ruleset=?", (self.rulesetId,))
             Query("DELETE FROM ruleset WHERE id=?", (self.rulesetId,))
 
-    def __computeHash(self):
+    def __computeHash(self) ->None:
         """compute the hash for this ruleset using all rules but not name and
         description of the ruleset"""
         self.load()
@@ -595,8 +610,8 @@ into a situation where you have to pay a penalty"""))
             result.update(rule.hashStr().encode('utf-8'))
         self.__hash = result.hexdigest()
 
-    def ruleRecord(self, rule):
-        """return the rule as tuple, prepared for use by sql. The first three
+    def ruleRecord(self, rule:'RuleBase') ->List[Union[str, int, float]]:
+        """return the rule as a list, prepared for use by sql. The first three
         fields are the primary key."""
         score = rule.score
         ruleList = None
@@ -609,7 +624,7 @@ into a situation where you have to pay a penalty"""))
         return [self.rulesetId, ruleList.listId, ruleIdx, rule.name,
                 rule.definition, score.points, score.doubles, score.limits, rule.parameter]
 
-    def updateRule(self, rule):
+    def updateRule(self, rule:'Rule') ->None:
         """update rule in database"""
         self.__hash = ''  # invalidate, will be recomputed when needed
         with Internal.db:
@@ -622,7 +637,7 @@ into a situation where you have to pay a penalty"""))
                 (self.hash,
                  self.rulesetId))
 
-    def save(self, minus=False, forced=False):
+    def save(self, minus:bool=False, forced:bool=False) ->None:
         """save the ruleset to the database.
         If it does not yet exist in database, give it a new id
         If the name already exists in the database, also give it a new name
@@ -657,7 +672,7 @@ into a situation where you have to pay a penalty"""))
             Query(cmd, args)
 
     @staticmethod
-    def availableRulesets():
+    def availableRulesets() ->List['Ruleset']:
         """return all rulesets defined in the database plus all predefined rulesets"""
         templateIds = (x[0]
                        for x in Query("SELECT id FROM ruleset WHERE id<0").records)
@@ -668,7 +683,7 @@ into a situation where you have to pay a penalty"""))
         return result
 
     @staticmethod
-    def selectableRulesets(server=None):
+    def selectableRulesets(server:Optional[str]=None) ->List['Ruleset']:
         """return all selectable rulesets for a new game.
         server is used to find the last ruleset used by us on that server, this
         ruleset will returned first in the list."""
@@ -704,7 +719,7 @@ into a situation where you have to pay a penalty"""))
                         return [ruleset] + result
         return result
 
-    def diff(self, other):
+    def diff(self, other:Any) ->List[Tuple[Optional['RuleBase'], Optional['RuleBase']]]:
         """return a list of tuples. Every tuple holds one or two rules: tuple[0] is from self, tuple[1] is from other"""
         result = []
         leftDict = {x.name: x for x in self.allRules}
@@ -737,31 +752,30 @@ class RuleBase(ReprMixin):
         self.description = description
 
     @property
-    def name(self):
+    def name(self) ->str:
         """name is readonly"""
         return self.__name
 
-    def selectable(self, hand):  # pylint:disable=unused-argument
+    def selectable(self, hand:Optional['Hand']) ->bool:  # pylint: disable=unused-argument
         """default, for mypy"""
         return False
 
-    def appliesToHand(self, hand):  # pylint:disable=unused-argument
+    def appliesToHand(self, hand:'Hand') ->bool:  # pylint: disable=unused-argument
         """returns true if this applies to hand"""
         return False
 
-    def appliesToMeld(self, hand, meld):  # pylint:disable=unused-argument
+    def appliesToMeld(self, hand:Optional['Hand'], meld:'Meld') ->bool:  # pylint: disable=unused-argument
         """for mypy"""
         return False
 
-    def key(self):
+    def key(self) ->str:
         """for mypy"""
         return ''
 
-    def validate(self):
+    def validate(self) ->Optional[str]:
         """is the rule valid?"""
-        return True
 
-    def hashStr(self):
+    def hashStr(self) ->str:
         """
         all that is needed to hash this rule
 
@@ -770,11 +784,11 @@ class RuleBase(ReprMixin):
         """
         return ''
 
-    def __str__(self):
+    def __str__(self) ->str:
         return self.hashStr()
 
 
-def ruleKey(name):
+def ruleKey(name:str) ->str:
     """the key is used for finding a rule in a RuleList"""
     return english(name).replace(' ', '').replace('.', '')
 
@@ -791,12 +805,12 @@ class Rule(RuleBase):
     limitHand = None
 
     @classmethod
-    def memoize(cls, func, srcClass):
+    def memoize(cls, func, srcClass):  # type:ignore
         """cache results for func"""
         code = func.__code__
         clsMethod = code.co_varnames[0] == 'cls'
 
-        def wrapper(*args):
+        def wrapper(*args:Any) ->Dict[Tuple[Type, str], Any]:
             """closure"""
             hand = args[1] if clsMethod else args[0]
             cacheKey = (cls, func.__name__)
@@ -826,8 +840,8 @@ class Rule(RuleBase):
             return hand.ruleCache[cacheKey]
         return classmethod(wrapper) if clsMethod else staticmethod(wrapper)
 
-    def __init__(self, name, definition='', points=0, doubles=0, limits=0,
-                 description=None, explainTemplate=None, debug=False):
+    def __init__(self, name:str, definition:str='', points:int=0, doubles:int=0, limits:float=0,
+            description:str='', explainTemplate:str='', debug:bool=False) ->None:
         RuleBase.__init__(self, name, definition, description)
         self.hasSelectable = False
         self.explainTemplate = explainTemplate
@@ -837,7 +851,7 @@ class Rule(RuleBase):
         self.__parseDefinition()
 
     @staticmethod
-    def redirectTo(srcClass, destClass, memoize=False):
+    def redirectTo(srcClass:Any, destClass:Any, memoize:bool=False) ->None:  # xype:ignore
         """inject my static and class methods into destClass,
         converting methods to staticmethod/classmethod as needed"""
         # also for inherited methods
@@ -859,7 +873,7 @@ class Rule(RuleBase):
                 setattr(destClass, funcName, method)
 
     @classmethod
-    def importRulecode(cls):
+    def importRulecode(cls) ->None:
         """for every RuleCode class defined in this module,
         generate an instance and add it to dict Rule.ruleImpl.
         Also convert all RuleCode methods into classmethod or staticmethod"""
@@ -873,11 +887,11 @@ class Rule(RuleBase):
                         # staticmethod
                         cls.redirectTo(ruleClass, ruleClass)
 
-    def key(self):
+    def key(self) ->str:
         """the key is used for finding a rule in a RuleList"""
         return ruleKey(self.name)
 
-    def __parseDefinition(self):
+    def __parseDefinition(self) ->None:
         """private setter for definition"""
         if not self.definition:
             return  # may happen with special programmed rules
@@ -904,7 +918,7 @@ class Rule(RuleBase):
                 pass
         self.validate()
 
-    def validate(self):
+    def validate(self) ->None:
         """check for validity"""
         payers = int(self.options.get('payers', 1))
         payees = int(self.options.get('payees', 1))
@@ -914,7 +928,7 @@ class Rule(RuleBase):
                     '%1 can be a sentence', '%4 have impossible values %2/%3 in rule "%1"',
                     self.name, payers, payees, 'payers/payees'))
 
-    def explain(self, meld):
+    def explain(self, meld:Optional['Meld']) ->str:
         """use this rule for scoring"""
         return '%s: %s' % (i18n(
             self.explainTemplate if self.explainTemplate else self.name).format(
@@ -925,7 +939,7 @@ class Rule(RuleBase):
                 tileName=meld[0].name() if meld else '').replace(
                     '&', '').replace('  ', ' ').strip(), self.score.i18nStr())
 
-    def hashStr(self):
+    def hashStr(self) ->str:
         """
         all that is needed to hash this rule. Try not to change this to keep
         database congestion low.
@@ -935,16 +949,16 @@ class Rule(RuleBase):
         """
         return '%s: %s %s' % (self.name, self.definition, self.score)
 
-    def i18nStr(self):
+    def i18nStr(self) ->str:
         """return a human readable string with the content"""
         return self.score.i18nStr()
 
     @staticmethod
-    def exclusive():
+    def exclusive() ->bool:
         """True if this rule can only apply to one player"""
         return False
 
-    def hasNonValueAction(self):
+    def hasNonValueAction(self) ->bool:
         """Rule has a special action not changing the score directly"""
         return bool(any(x not in ['lastsource', 'announcements'] for x in self.options))
 
@@ -954,18 +968,18 @@ class ParameterRule(RuleBase):
     """for parameters"""
     prefix = ''
 
-    def __init__(self, name, definition, description, parameter):
+    def __init__(self, name:str, definition:str, description:str, parameter:Union[str, int, bool]):
         RuleBase.__init__(self, name, definition, description)
         defParts = definition.split('||')
         self.parName = defParts[0][len(self.prefix):]
         self.score = Score()
         self.parameter = parameter
 
-    def key(self):
+    def key(self) ->str:
         """the key is used for finding a rule in a RuleList"""
         return self.parName
 
-    def hashStr(self):
+    def hashStr(self) ->str:
         """
         all that is needed to hash this rule. Try not to change this to keep
         database congestion low.
@@ -976,7 +990,7 @@ class ParameterRule(RuleBase):
         result = '%s: %s %s' % (self.name, self.definition, self.parameter)
         return result
 
-    def i18nStr(self):
+    def i18nStr(self) ->str:
         """return a human readable string with the content"""
         return str(self.parameter)
 
@@ -986,14 +1000,14 @@ class IntRule(ParameterRule):
     """for int parameters. Duck typing with Rule"""
     prefix = 'int'
 
-    def __init__(self, name, definition, description, parameter):
+    def __init__(self, name:str, definition:str, description:str, parameter:int):
         ParameterRule.__init__(self, name, definition, description, int(parameter))
         self.minimum = 0
         for defPart in definition.split('||'):
             if defPart.startswith('Omin='):
                 self.minimum = int(defPart[5:])
 
-    def validate(self):
+    def validate(self) ->Optional[str]:
         """is the rule valid?"""
         assert isinstance(self.parameter, int)
         if self.parameter < self.minimum:
@@ -1008,7 +1022,7 @@ class BoolRule(ParameterRule):
     """for bool parameters. Duck typing with Rule"""
     prefix = 'bool'
 
-    def __init__(self, name, definition, description, parameter):
+    def __init__(self, name:str, definition:str, description:str, parameter:str):
         _ = parameter not in ('false', 'False', False, 0, '0', None, '')
         ParameterRule.__init__(self, name, definition, description, _)
 
@@ -1018,7 +1032,7 @@ class StrRule(ParameterRule):
     """for str parameters. Duck typing with Rule. Currently not used."""
     prefix = 'str'
 
-    def __init__(self, name, definition, description, parameter):
+    def __init__(self, name:str, definition:str, description:str, parameter:str) ->None:
         ParameterRule.__init__(self, name, definition, description, parameter)
 
 
@@ -1029,20 +1043,20 @@ class PredefinedRuleset(Ruleset):
     classes = set()  # only those will be playable
     preRulesets = []
 
-    def __init__(self, name=None):
+    def __init__(self, name:str='') ->None:
         Ruleset.__init__(self, name or 'general predefined ruleset')
 
     @staticmethod
-    def rulesets():
+    def rulesets() ->Sequence[Ruleset]:
         """a list of instances for all predefined rulesets"""
         if not PredefinedRuleset.preRulesets:
             PredefinedRuleset.preRulesets = [
                 x() for x in sorted(PredefinedRuleset.classes, key=lambda x: x.__name__)]
         return PredefinedRuleset.preRulesets
 
-    def rules(self):
+    def rules(self) ->None:
         """here the predefined rulesets can define their rules"""
 
-    def clone(self):
+    def clone(self) ->Ruleset:
         """return a clone, unloaded"""
         return self.__class__()

@@ -17,6 +17,7 @@ import datetime
 import random
 from collections import defaultdict
 import sqlite3
+from typing import List, Tuple, Union, Any, Optional
 
 from mi18n import i18n, i18ncE
 from util import Duration
@@ -27,7 +28,7 @@ class QueryException(Exception):
 
     """as the name says"""
 
-    def __init__(self, msg):
+    def __init__(self, msg:str) ->None:
         Exception.__init__(self, msg)
 
 
@@ -35,13 +36,13 @@ class DBCursor(sqlite3.Cursor):
 
     """logging wrapper"""
 
-    def __init__(self, dbHandle):
+    def __init__(self, dbHandle:'DBHandle') ->None:
         sqlite3.Cursor.__init__(self, dbHandle)
         self.parameters = None
         self.failure = None
 
-    def execute(self, statement, parameters=None,
-                silent=False, failSilent=False, mayFail=False):
+    def execute(self, statement:str, parameters:Optional[Tuple[Union[str, int], ...]]=None, # type:ignore[override]
+                silent:bool=False, failSilent:bool=False, mayFail:bool=False) ->None:
         """logging wrapper, returning all selected data"""
         # pylint: disable=too-many-branches
         self.statement = statement  # pylint:disable=attribute-defined-outside-init
@@ -85,7 +86,7 @@ class DBCursor(sqlite3.Cursor):
                 raise QueryException(msg) from exc
             return
 
-    def __str__(self):
+    def __str__(self) ->str:
         """the statement"""
         if self.parameters is not None:
             return "{cmd} [{args}]".format(cmd=self.statement, args=self.parameters)
@@ -96,7 +97,7 @@ class DBHandle(sqlite3.Connection):
 
     """a handle with our preferred configuration"""
 
-    def __init__(self, path: str):
+    def __init__(self, path: str) ->None:
         assert Internal.db is None, id(self)
         Internal.db = self
         self.inTransaction = None
@@ -120,20 +121,20 @@ class DBHandle(sqlite3.Connection):
             logDebug('Opened %s with identifier %s' % (
                 self.path, self.identifier))
 
-    def __enter__(self):
+    def __enter__(self) ->'DBHandle':
         self.inTransaction = datetime.datetime.now()
         if Debug.sql:
             logDebug('starting transaction')
         return sqlite3.Connection.__enter__(self)
 
-    def __exit__(self, *args):
+    def __exit__(self, *args:Any) ->None:  # type:ignore[override]
         self.inTransaction = None
         sqlite3.Connection.__exit__(self, *args)
         if Debug.sql:
             logDebug('finished transaction')
 
     @staticmethod
-    def dbPath():
+    def dbPath() ->str:
         """
         The path for the data base.
 
@@ -145,7 +146,7 @@ class DBHandle(sqlite3.Connection):
         return Options.dbPath if Options.dbPath else os.path.join(appdataDir(), name)
 
     @property
-    def debug_name(self):
+    def debug_name(self) ->str:
         """get name for log messages. Readonly."""
         stack = [x[2] for x in traceback.extract_stack()]
         name = stack[-3]
@@ -153,7 +154,7 @@ class DBHandle(sqlite3.Connection):
             name = stack[-4]
         return '%s on %s (%s)' % (name, self.path, id4(self))
 
-    def commit(self, silent=None):
+    def commit(self, silent:bool=False) ->None:
         """commit and log it"""
         try:
             sqlite3.Connection.commit(self)
@@ -163,7 +164,7 @@ class DBHandle(sqlite3.Connection):
                     '%s cannot commit: %s :' %
                     (DBHandle.dbPath(), exc))
 
-    def rollback(self, silent=None):
+    def rollback(self, silent:bool=False) ->None:
         """rollback and log it"""
         try:
             sqlite3.Connection.rollback(self)
@@ -172,7 +173,7 @@ class DBHandle(sqlite3.Connection):
         except sqlite3.Error as exc:
             logWarning('%s cannot rollback: %s' % (DBHandle.dbPath(), exc))
 
-    def close(self, silent=False):
+    def close(self, silent:bool=False) ->None:
         """just for logging"""
         if not silent and (Debug.sql or Debug.quit):
             if self is Internal.db:
@@ -191,11 +192,11 @@ class DBHandle(sqlite3.Connection):
             logDebug(exc)
 
     @staticmethod
-    def hasTable(table):
+    def hasTable(table:str) ->bool:
         """does the table contain table?"""
         return len(Query('SELECT name FROM sqlite_master WHERE type="table" AND name="%s"' % table).records) > 0
 
-    def tableHasField(self, table, field):
+    def tableHasField(self, table:str, field:str) ->bool:
         """does the table contain a column named field?"""
         cursor = self.cursor()
         cursor.execute('select * from %s' % table)
@@ -213,8 +214,9 @@ class Query:
         'kajongg name for local game server',
         'Local Game')
 
-    def __init__(self, statement, args=None,
-                 silent=False, mayFail=False, failSilent=False):
+    def __init__(self, statement:str,
+                 args:Union[None,Tuple[Union[str, int, float], ...],List[List[Union[str,int,float]]]]=None,
+                 silent:bool=False, mayFail:bool=False, failSilent:bool=False) ->None:
         """we take one sql statement.
         Do prepared queries by passing the parameters in args.
         If args is a list of lists, execute the prepared query for every sublist.
@@ -246,16 +248,16 @@ class Query:
         if self.records and Debug.sql:
             logDebug('result set:{}'.format(self.records))
 
-    def __str__(self):
+    def __str__(self) ->str:
         return '{} {}'.format(self.statement,
                               'args=' + ','.join(str(x) for x in self.args) if self.args else '')
 
-    def rowcount(self):
+    def rowcount(self) ->int:
         """how many rows were affected?"""
         return self.cursor.rowcount if self.cursor else 0
 
 
-def initDb():
+def initDb() ->bool:
     """open the db, create or update it if needed.
     sets Internal.db."""
     PrepareDB(DBHandle.dbPath())  # create or upgrade
@@ -333,14 +335,14 @@ class PrepareDB:
                 ident text,
                 schemaversion text"""
 
-    def __init__(self, path):
+    def __init__(self, path:str) ->None:
         self.path = path
         if not os.path.exists(path):
             self.__create()
         else:
             self.__upgrade()
 
-    def __create(self):
+    def __create(self) ->None:
         """create a brand new kajongg database"""
         tmpPath = '%s.new.%d' % (self.path, os.getpid())
         Internal.db = DBHandle(tmpPath)
@@ -359,7 +361,7 @@ class PrepareDB:
             os.rename(tmpPath, self.path)
 
     @staticmethod
-    def __currentVersion():
+    def __currentVersion() ->str:
         """
         Get current version of DB schema as a comparable string.
 
@@ -370,7 +372,7 @@ class PrepareDB:
             return Query('select schemaversion from general').records[0][0]
         return '1.1.1'
 
-    def __upgrade(self):
+    def __upgrade(self) ->None:
         """upgrade the structure of an existing kajongg database"""
         try:
             Internal.db = DBHandle(self.path)
@@ -396,18 +398,18 @@ class PrepareDB:
             Internal.db.close(silent=True)
 
     @classmethod
-    def sqlForCreateTable(cls, table):
+    def sqlForCreateTable(cls, table:str) ->str:
         """the SQL command for creating 'table'"""
         return "create table %s(%s)" % (table, cls.schema[table])
 
     @classmethod
-    def createTable(cls, table):
+    def createTable(cls, table:str) ->None:
         """create a single table using the predefined schema"""
         if not Internal.db.hasTable(table):
             Query(cls.sqlForCreateTable(table))
 
     @classmethod
-    def createTables(cls):
+    def createTables(cls) ->None:
         """creates empty tables"""
         for table in ['player', 'game', 'score', 'ruleset', 'rule', 'general']:
             cls.createTable(table)
@@ -423,7 +425,7 @@ class PrepareDB:
             cls.createTable('server')
 
     @staticmethod
-    def createIndex(name, cmd):
+    def createIndex(name:str, cmd:str) ->None:
         """only try to create it if it does not yet exist. Do not use create if not exists because
         we want debug output only if we really create the index"""
         if not Query(
@@ -432,7 +434,7 @@ class PrepareDB:
                 silent=True).records:
             Query("create index %s on %s" % (name, cmd))
 
-    def cleanPlayerTable(self):
+    def cleanPlayerTable(self) ->None:
         """remove now unneeded columns host, password and make names unique"""
         playerCounts = IntDict()
         names = {}
@@ -468,7 +470,7 @@ class PrepareDB:
             Query('insert into player(id,name) values(?,?)', (nameId, name))
 
     @classmethod
-    def removeGameServer(cls):
+    def removeGameServer(cls) ->None:
         """drops column server from table game. Sqlite3 cannot drop columns"""
         Query('create table gameback(%s)' % cls.schema['game'])
         Query('insert into gameback '
@@ -479,7 +481,7 @@ class PrepareDB:
               'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback')
         Query('drop table gameback')
 
-    def removeUsedRuleset(self):
+    def removeUsedRuleset(self) ->None:
         """eliminate usedruleset and usedrule"""
         if Internal.db.hasTable('usedruleset'):
             if Internal.db.hasTable('ruleset'):
@@ -522,7 +524,7 @@ class PrepareDB:
                 Query(statement)
 
     @staticmethod
-    def __generateDbIdent():
+    def __generateDbIdent() ->None:
         """make sure the database has a unique ident and get it"""
         records = Query('select ident from general').records
         assert len(records) < 2

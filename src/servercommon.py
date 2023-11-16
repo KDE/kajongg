@@ -7,11 +7,14 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import Any
+
 from twisted.spread.pb import Error
 
 from log import SERVERMARK
 
-def srvMessage(*args):
+
+def srvMessage(*args: Any) ->str:
     """
     concatenate all args needed for i18n encoded in one string.
     For an explanation see log.translateServerMessage.
@@ -27,6 +30,6 @@ def srvMessage(*args):
     return SERVERMARK + SERVERMARK.join(strArgs) + SERVERMARK
 
 
-def srvError(cls, *args):  # pylint:disable=unused-argument
+def srvError(*args: Any) ->'Error':
     """raise an exception, passing args as a single string"""
     return Error(srvMessage(*args))

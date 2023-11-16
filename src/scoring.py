@@ -9,6 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 from itertools import chain
+from typing import Tuple, Optional, TYPE_CHECKING, List
 
 from qt import QPointF, QRectF, QDialogButtonBox
 from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
@@ -35,7 +36,16 @@ from uiwall import UIWall, SideText
 from guiutil import decorateWindow, BlockSignals, rotateCenter, sceneRotation
 from mi18n import i18nc
 
-def scoringScene():
+if TYPE_CHECKING:
+    from qt import QWidget, QEvent, QGraphicsSceneDragDropEvent, QGraphicsItem, QGraphicsItemGroup, QObject
+    from tile import Tile, Meld
+    from board import MimeData, SelectorBoard
+    from scoringdialog import RuleBox
+    from scene import ScoringScene
+    from rule import Score, UsedRule, Ruleset, Rule
+    from client import Client
+
+def scoringScene() ->'ScoringScene':
     """shortcut"""
     result = Internal.scene
     assert result
@@ -45,8 +55,8 @@ class SwapDialog(QMessageBox):
 
     """ask the user if two players should change seats"""
 
-    def __init__(self, swappers):
-        QMessageBox.__init__(self)
+    def __init__(self, swappers:List[Player], parent:Optional['QWidget']=None) ->None:
+        QMessageBox.__init__(self, parent)
         decorateWindow(self, i18nc("@title:window", "Swap Seats"))
         self.setText(
             i18n("By the rules, %1 and %2 should now exchange their seats. ",
@@ -61,7 +71,7 @@ class SelectPlayers(SelectRuleset):
 
     """a dialog for selecting four players. Used only for scoring game."""
 
-    def __init__(self):
+    def __init__(self) ->None:
         SelectRuleset.__init__(self)
         Players.load()
         decorateWindow(self, i18nc("@title:window", "Select four players"))
@@ -93,15 +103,15 @@ class SelectPlayers(SelectRuleset):
                                  % playerId)
         self.slotValidate()
 
-    def showEvent(self, unusedEvent):
+    def showEvent(self, unusedEvent:'QEvent') ->None:
         """start with player 0"""
         self.nameWidgets[0].setFocus()
 
-    def __selectedNames(self):
+    def __selectedNames(self) ->set[str]:
         """A set with the currently selected names"""
         return {cbName.currentText() for cbName in self.nameWidgets}
 
-    def slotValidate(self):
+    def slotValidate(self) ->None:
         """try to find 4 different players and update status of the Ok button"""
         changedCombo = self.sender()
         if not isinstance(changedCombo, QComboBox):
@@ -134,11 +144,11 @@ class ScoringTileAttr(TileAttr):
 
     """Tile appearance is different in a ScoringHandBoard"""
 
-    def setDark(self):
+    def setDark(self) ->bool:
         """should the tile appear darker?"""
         return bool(self.yoffset) or self.tile.isConcealed
 
-    def setFocusable(self, hand, meld, idx):
+    def setFocusable(self, hand:'HandBoard', meld:'Meld', idx:Optional[int]) ->bool:
         """in a scoring handboard, only the first tile of a meld is focusable"""
         return idx == 0
 
@@ -148,12 +158,12 @@ class ScoringHandBoard(HandBoard):
     """a board showing the tiles a player holds"""
     tileAttrClass = ScoringTileAttr
 
-    def __init__(self, player):
+    def __init__(self, player:'ScoringPlayer') ->None:
         self.__moveHelper = None
         self.uiMelds = []
         HandBoard.__init__(self, player)
 
-    def meldVariants(self, tile, lowerHalf):
+    def meldVariants(self, tile:UITile, lowerHalf:bool) ->MeldList:
         """Kong might have variants"""
         result = MeldList()
         uimeld = self.uiMeldWithTile(tile)
@@ -169,14 +179,14 @@ class ScoringHandBoard(HandBoard):
                 result.append(meld.exposedClaimed)
         return result
 
-    def mapMouseTile(self, uiTile):
+    def mapMouseTile(self, uiTile:UITile) ->UITile:
         """map the pressed tile to the wanted tile. For melds, this would
         be the first tile no matter which one is pressed"""
         uiMeld = self.uiMeldWithTile(uiTile)
         assert uiMeld
         return uiMeld[0]
 
-    def uiMeldWithTile(self, uiTile):
+    def uiMeldWithTile(self, uiTile:UITile) ->UIMeld:
         """return the meld with uiTile"""
         for myMeld in self.uiMelds:
             if uiTile in myMeld:
@@ -184,7 +194,7 @@ class ScoringHandBoard(HandBoard):
         logWarning('ScoringBoard: found no meld with %s' % uiTile)
         return UIMeld(uiTile)
 
-    def findUIMeld(self, meld):
+    def findUIMeld(self, meld:Optional['Meld']) ->UIMeld:
         """find the first UIMeld matching the logical meld"""
         for result in self.uiMelds:
             if result.meld == meld:
@@ -194,16 +204,16 @@ class ScoringHandBoard(HandBoard):
             return self.uiMelds[1]
         raise ValueError('Scoring Game: findUIMeld() in absence of any uiMelds')
 
-    def assignUITiles(self, uiTile, meld):  # pylint: disable=unused-argument
+    def assignUITiles(self, uiTile:UITile, meld:'Meld') ->Optional[UIMeld]:  # pylint: disable=unused-argument
         """generate a UIMeld. First uiTile is given, the rest should be as defined by meld"""
         assert isinstance(uiTile, UITile), uiTile
         return self.uiMeldWithTile(uiTile)
 
-    def sync(self, adding=None):
+    def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in ScoringHandBoard"""
         self.placeTiles(list(chain(*self.uiMelds)))
 
-    def deselect(self, meld):
+    def deselect(self, meld:UIMeld) ->None:
         """remove meld from old board"""
         for idx, uiMeld in enumerate(self.uiMelds):
             if all(id(meld[x]) == id(uiMeld[x]) for x in range(len(meld))):
@@ -212,7 +222,7 @@ class ScoringHandBoard(HandBoard):
                 break                 # identical melds, it removes the wrong one
         self.player.removeMeld(meld)  # uiMeld must already be deleted
 
-    def dragMoveEvent(self, event):
+    def dragMoveEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
         """allow dropping of uiTile from ourself only to other state (open/concealed)"""
         uiTile = event.mimeData().uiTile
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
@@ -232,7 +242,7 @@ class ScoringHandBoard(HandBoard):
             doAccept = oldLowerHalf != newLowerHalf
         event.setAccepted(doAccept)
 
-    def dropEvent(self, event):
+    def dropEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
         """drop into this handboard"""
         uiTile = event.mimeData().uiTile
         lowerHalf = self.mapFromScene(
@@ -243,7 +253,7 @@ class ScoringHandBoard(HandBoard):
             event.ignore()
         self._noPen()
 
-    def dropTile(self, uiTile, lowerHalf):
+    def dropTile(self, uiTile:UITile, lowerHalf:bool) ->bool:
         """drop uiTile into lower or upper half of our hand"""
         senderBoard = uiTile.board
         assert senderBoard
@@ -255,7 +265,7 @@ class ScoringHandBoard(HandBoard):
             uitile.change_name(tile)
         return self.dropMeld(uiMeld)
 
-    def dropMeld(self, uiMeld):
+    def dropMeld(self, uiMeld:UIMeld) ->bool:
         """drop uiMeld into our hand"""
         senderBoard = uiMeld[0].board
         senderBoard.deselect(uiMeld)
@@ -274,7 +284,7 @@ class ScoringHandBoard(HandBoard):
         self.checkTiles()
         return True
 
-    def focusRectWidth(self):
+    def focusRectWidth(self) ->int:
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
         focus = self.focusTile
@@ -287,15 +297,15 @@ class ScoringHandBoard(HandBoard):
             return 1
         return len(meld)
 
-    def addUITile(self, uiTile):
+    def addUITile(self, uiTile:UITile) ->None:
         Board.addUITile(self, uiTile)
         self.showMoveHelper()
 
-    def removeUITile(self, uiTile):
+    def removeUITile(self, uiTile:UITile) ->None:
         Board.removeUITile(self, uiTile)
         self.showMoveHelper()
 
-    def showMoveHelper(self, visible=None):
+    def showMoveHelper(self, visible:Optional[bool]=None) ->None:
         """show help text In empty HandBoards"""
         if visible is None:
             visible = not self.uiTiles
@@ -330,7 +340,7 @@ class ScoringHandBoard(HandBoard):
             if self.__moveHelper:
                 self.__moveHelper.setVisible(False)
 
-    def newLowerMelds(self):
+    def newLowerMelds(self) ->MeldList:
         """a list of melds for the hand as it should look after sync"""
         assert self.player
         return MeldList(self.player.concealedMelds)
@@ -340,14 +350,15 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     """Player in a scoring game"""
 
-    def __init__(self, game, name):
+    def __init__(self, game:'ScoringGame', name:str) ->None:
         self.handBoard = None  # because Player.init calls clearHand()
         self.manualRuleBoxes = []
         Player.__init__(self, game, name)
         VisiblePlayer.__init__(self)
         self.handBoard = ScoringHandBoard(self)
+        self.game:'ScoringGame'
 
-    def clearHand(self):
+    def clearHand(self) ->None:
         """clears attributes related to current hand"""
         Player.clearHand(self)
         if self.game and self.game.wall:
@@ -364,12 +375,12 @@ class ScoringPlayer(VisiblePlayer, Player):
             _.uiMelds = []
         self.manualRuleBoxes = []
 
-    def explainHand(self):
+    def explainHand(self) ->'Hand':
         """return the hand to be explained"""
         return self.hand
 
     @property
-    def handTotal(self):
+    def handTotal(self) ->int:
         """the hand total of this player"""
         if self.hasManualScore():
             assert (_ := scoringScene().scoringDialog)
@@ -377,13 +388,13 @@ class ScoringPlayer(VisiblePlayer, Player):
             return spValue.value()
         return self.hand.total()
 
-    def hasManualScore(self):
+    def hasManualScore(self) ->bool:
         """True if no tiles are assigned to this player"""
         if _ := scoringScene().scoringDialog:
             return _.spValues[self.idx].isEnabled()
         return False
 
-    def refreshManualRules(self, sender=None):
+    def refreshManualRules(self, sender:Optional['QObject']=None) ->None:
         """update status of manual rules"""
         if not self.handBoard:
             # might happen at program exit
@@ -400,7 +411,7 @@ class ScoringPlayer(VisiblePlayer, Player):
                     box, currentScore)
             box.setApplicable(applicable)
 
-    def __ruleChangesScore(self, box, currentScore):
+    def __ruleChangesScore(self, box:'RuleBox', currentScore:'Score') ->bool:
         """does the rule actually influence the result?
         if the action would only influence the score and the rule does not change the score,
         ignore the rule. If however the action does other things like penalties leave it applicable"""
@@ -415,7 +426,7 @@ class ScoringPlayer(VisiblePlayer, Player):
                 box.setChecked(checked)
         return newHand.score > currentScore
 
-    def __mjstring(self):
+    def __mjstring(self) ->str:
         """compile hand info into a string as needed by the scoring engine"""
         if self.lastTile and self.lastTile.isConcealed:
             lastSource = TileSource.LivingWall.char
@@ -433,7 +444,7 @@ class ScoringPlayer(VisiblePlayer, Player):
                 announcements |= set(options['announcements'])
         return ''.join(['m', lastSource, ''.join(sorted(announcements))])
 
-    def __lastString(self):
+    def __lastString(self) ->str:
         """compile hand info into a string as needed by the scoring engine"""
         if not self.lastTile:
             return ''
@@ -444,7 +455,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             return ''
         return 'L%s%s' % (self.lastTile, self.lastMeld)
 
-    def computeHand(self):
+    def computeHand(self) ->Hand:
         """return a Hand object, using a cache"""
         self.lastTile = scoringScene().computeLastTile()
         self.lastMeld = scoringScene().computeLastMeld()
@@ -454,7 +465,7 @@ class ScoringPlayer(VisiblePlayer, Player):
              self.__lastString()])
         return Hand(self, string)
 
-    def sortRulesByX(self, rules):
+    def sortRulesByX(self, rules:List['UsedRule']) ->List['UsedRule']:
         """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
         withMelds = [x for x in rules if x.meld]
         withoutMelds = [x for x in rules if x not in withMelds]
@@ -463,7 +474,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         sorted_tuples = sorted(tuples, key=lambda x: x[1][0].sortKey())
         return [x[0] for x in sorted_tuples] + withoutMelds
 
-    def addMeld(self, meld):
+    def addMeld(self, meld:'Meld') ->None:
         """add meld to this hand in a scoring game"""
         if meld.isBonus:
             self._bonusTiles.append(meld[0])
@@ -479,7 +490,7 @@ class ScoringPlayer(VisiblePlayer, Player):
                 logDebug('{} gets exposed meld {}'.format(self, meld))
         self._hand = None
 
-    def removeMeld(self, uiMeld):
+    def removeMeld(self, uiMeld:UIMeld) ->None:
         """remove a meld from this hand in a scoring game"""
         meld = uiMeld.meld
         if meld.isBonus:
@@ -512,8 +523,8 @@ class ScoringGame(Game):
     playerClass = ScoringPlayer
     wallClass = UIWall
 
-    def __init__(self, names, ruleset,
-                 gameid=None, client=None, wantedGame=None):
+    def __init__(self, names:List[Tuple[Wind, str]], ruleset:'Ruleset', gameid:Optional[int]=None,
+        wantedGame:Optional[str]=None, client:Optional['Client']=None) ->None:
         Game.__init__(
             self,
             names,
@@ -531,15 +542,15 @@ class ScoringGame(Game):
         self.throwDices()
 
     @Game.seed.getter
-    def seed(self): # looks like a pylint bug pylint: disable=invalid-overridden-method
+    def seed(self) ->int: # looks like a pylint bug pylint: disable=invalid-overridden-method
         """a scoring game never has a seed"""
         return 0
 
-    def _setHandSeed(self):
+    def _setHandSeed(self) ->None:
         """a scoring game does not need this"""
         return None
 
-    def prepareHand(self):
+    def prepareHand(self) ->None:
         """prepare a scoring game hand"""
         Game.prepareHand(self)
         if not self.finished():
@@ -548,7 +559,7 @@ class ScoringGame(Game):
             selector.hasLogicalFocus = True
             self.wall.build(shuffleFirst=False)
 
-    def nextScoringHand(self):
+    def nextScoringHand(self) ->None:
         """save hand to database, update score table and balance in status line, prepare next hand"""
         if self.winner:
             for player in self.players:
@@ -564,7 +575,7 @@ class ScoringGame(Game):
         if _ := scoringScene().scoringDialog:
             _.clear()
 
-    def close(self):
+    def close(self) ->None:
         """log off from the server and return a Deferred"""
         scoringScene().selectorBoard.uiTiles = []
         scoringScene().selectorBoard.allSelectorTiles = []
@@ -578,11 +589,11 @@ class ScoringGame(Game):
         return Game.close(self)
 
     @staticmethod
-    def isScoringGame():
+    def isScoringGame() ->bool:
         """are we scoring a manual game?"""
         return True
 
-    def saveStartTime(self):
+    def saveStartTime(self) ->None:
         """write a new entry in the game table with the selected players"""
         Game.saveStartTime(self)
         # for PlayingGame, this one is already done in
@@ -593,20 +604,20 @@ class ScoringGame(Game):
             Query('insert into server(url,lastruleset) values(?,?)',
                   (self.ruleset.rulesetId, Query.localServerName))
 
-    def _setGameId(self):
+    def _setGameId(self) ->None:
         """get a new id"""
         if not self.gameid:
             # a loaded game has gameid already set
             self.gameid = self._newGameId()
 
-    def _mustExchangeSeats(self, pairs):
+    def _mustExchangeSeats(self, pairs:List[List[Player]]) ->List[List[Player]]:
         """filter: which player pairs should really swap places?"""
         # I do not understand the logic of the exec return value. The yes button returns 0
         # and the no button returns 1. According to the C++ doc, the return value is an
         # opaque value that should not be used."""
         return [x for x in pairs if SwapDialog(x).exec_() == 0]
 
-    def savePenalty(self, player, offense, amount):
+    def savePenalty(self, player:'ScoringPlayer', offense:'Rule', amount:int) ->None:
         """save computed values to database, update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
         assert self.gameid
@@ -622,7 +633,7 @@ class ScoringGame(Game):
         assert Internal.mainWindow
         Internal.mainWindow.updateGUI()
 
-def scoreGame():
+def scoreGame() ->Optional[ScoringGame]:
     """show all games, select an existing game or create a new game"""
     Players.load()
     if len(Players.humanNames) < 4:

@@ -20,10 +20,10 @@ class TileSource:
         """Defines defaults"""
         isDiscarded = False
 
-        def __str__(self):
+        def __str__(self) ->str:
             return self.__repr__()
 
-        def __repr__(self):
+        def __repr__(self) ->str:
             return 'TileSource.' + self.__class__.__name__.rsplit('.', maxsplit=1)[-1]
 
     class LivingWallDiscard(SourceClass):

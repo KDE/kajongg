@@ -23,8 +23,18 @@ import codecs
 import weakref
 import urllib
 from collections import defaultdict
+from typing import List, Dict, TYPE_CHECKING, Optional, Union, Callable, Any, Type
 
 # pylint: disable=wrong-import-order
+
+ParamValue = Union[str, int, bool]
+
+if TYPE_CHECKING:
+    from deferredutil import Deferred
+    from mainwindow import MainWindow
+    from config import SetupPreferences
+
+# pylint: disable=wrong-import-position
 
 from configparser import ConfigParser, NoSectionError, NoOptionError
 
@@ -58,7 +68,7 @@ class KApplication(QApplication):
 
     """stub"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         assert not Internal.isServer, 'KApplication is not supported for the server'
         QApplication.__init__(self, sys.argv)
 
@@ -72,7 +82,7 @@ class KApplication(QApplication):
 
         self.initQtTranslator()
 
-    def installTranslatorFile(self, qmName):
+    def installTranslatorFile(self, qmName:str) ->None:
         """qmName is a full path to a .qm file"""
         if os.path.exists(qmName):
             translator = KDETranslator(self)
@@ -83,7 +93,7 @@ class KApplication(QApplication):
                 Internal.logger.debug('Installed Qt translator from %s', qmName)
 
 
-    def initQtTranslator(self):
+    def initQtTranslator(self) ->None:
         """load translators using Qt .qm files"""
         for _ in self.translators:
             self.removeTranslator(_)
@@ -111,7 +121,7 @@ class CaptionMixin:
 
     """used by KDialog and KXmlGuiWindow"""
 
-    def setCaption(self, caption):
+    def setCaption(self, caption:str) ->None:
         """append app name"""
         if caption:
             if not caption.endswith(i18n('Kajongg')):
@@ -126,12 +136,12 @@ class Help:
     """Interface to the KDE help system"""
 
     @staticmethod
-    def url_for_language(lang):
+    def url_for_language(lang:str) ->str:
         """The url for a given language"""
         return 'https://docs.kde.org/stable/{}/kajongg/kajongg/index.html'.format(lang)
 
     @staticmethod
-    def find_help_url():
+    def find_help_url() ->str:
         """find an existing help url for preferred language"""
         for language in Internal.kajonggrc.group('Locale').readEntry('Language').split(':'):
             try:
@@ -144,7 +154,7 @@ class Help:
         return Help.url_for_language('en')
 
     @staticmethod
-    def start():
+    def start() ->None:
         """start the KDE help center for kajongg or go to docs.kde.org"""
         try:
             subprocess.Popen(['khelpcenter', 'help:/kajongg/index.html'])  # pylint:disable=consider-using-with
@@ -156,7 +166,7 @@ class IconLabel(QLabel):
 
     """for use in messages and about dialog"""
 
-    def __init__(self, iconName, dialog):
+    def __init__(self, iconName:str, dialog:QDialog) ->None:
         QLabel.__init__(self)
         icon = KIcon(iconName)
         option = QStyleOption()
@@ -174,7 +184,8 @@ class KMessageBox:
 
     @staticmethod
     def createKMessageBox(
-            dialog, icon, text, unusedStrlist, unusedAsk, unusedCheckboxReturn, options):
+            dialog:QDialog, icon:QIcon, text:str, unusedStrlist:List[str],
+            unusedAsk:str, unusedCheckboxReturn:bool, options:int) ->None:
         """translated as far as needed from kmessagegox.cpp"""
         mainLayout = QVBoxLayout()
 
@@ -240,14 +251,14 @@ class KDialog(CaptionMixin, QDialog):
     Default = QDialogButtonBox.RestoreDefaults
     Close = QDialogButtonBox.Close
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional[QWidget]=None) ->None:
         QDialog.__init__(self, parent)
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
         self.__mainWidget = None
 
-    def setButtons(self, buttonMask):
+    def setButtons(self, buttonMask:QDialogButtonBox.StandardButtons) ->None:
         """(re)create the buttonbox and put all wanted buttons into it"""
         if not buttonMask:
             self.buttonBox.clear()
@@ -268,10 +279,10 @@ class KDialog(CaptionMixin, QDialog):
         if KDialog.Help & buttonMask:
             self.buttonBox.button(KDialog.Help).clicked.connect(Help.start)
 
-    def restoreDefaults(self):
+    def restoreDefaults(self) ->None:
         """virtual"""
 
-    def setMainWidget(self, widget):
+    def setMainWidget(self, widget:QWidget) ->None:
         """see KDialog.setMainWidget"""
         if self.layout() is None:
             QVBoxLayout(self)
@@ -283,17 +294,17 @@ class KDialog(CaptionMixin, QDialog):
         self.layout().addWidget(widget)
         self.layout().addWidget(self.buttonBox)
 
-    def button(self, buttonCode):
+    def button(self, buttonCode:QDialogButtonBox.StandardButtons) ->QPushButton:
         """return the matching button"""
         return self.buttonBox.button(buttonCode)
 
     @staticmethod
-    def spacingHint():
+    def spacingHint() ->int:
         """stub"""
         return QApplication.style().pixelMetric(QStyle.PixelMetric.PM_DefaultLayoutSpacing)
 
     @staticmethod
-    def marginHint():
+    def marginHint() ->int:
         """stub"""
         return QApplication.style().pixelMetric(QStyle.PixelMetric.PM_DefaultChildMargin)
 
@@ -302,17 +313,17 @@ class KUser:
 
     """only the things kajongg needs"""
 
-    def __init__(self, uid=None):
+    def __init__(self, uid:Optional[int]=None) ->None:
         pass
 
-    def fullName(self):
+    def fullName(self) ->str:
         """stub"""
         if sys.platform == 'win32':
             return self.loginName()
         return pwd.getpwnam(self.loginName()).pw_gecos.replace(',', '')
 
     @staticmethod
-    def loginName():
+    def loginName() ->str:
         """stub"""
         return getpass.getuser()
 
@@ -321,7 +332,7 @@ class KStandardAction:
 
     """stub"""
     @classmethod
-    def preferences(cls, slot, actionCollection):
+    def preferences(cls, slot:Callable, actionCollection:'KActionCollection') ->None:
         """should add config dialog menu entry"""
         mainWindow = Internal.mainWindow
         assert mainWindow
@@ -363,11 +374,11 @@ class KActionCollection:
 
     """stub"""
 
-    def __init__(self, mainWindow):
-        self.__actions = {}
+    def __init__(self, mainWindow:'MainWindow') ->None:
+        self.__actions:Dict[str,'Action'] = {}
         self.mainWindow = mainWindow
 
-    def addAction(self, name, action):
+    def addAction(self, name:str, action:'Action') ->None:
         """stub"""
         self.__actions[name] = action
         for content in self.mainWindow.menus.values():
@@ -375,7 +386,7 @@ class KActionCollection:
                 content[0].addAction(action)
                 break
 
-    def actions(self):
+    def actions(self) ->Dict[str, 'Action']:
         """the actions in this collection"""
         return self.__actions
 
@@ -384,7 +395,7 @@ class MyStatusBarItem:
 
     """one of the four player items"""
 
-    def __init__(self, text, idx, stretch=0):
+    def __init__(self, text:str, idx:int, stretch:int=0) ->None:
         self.idx = idx
         self.stretch = stretch
         self.label = QLabel()
@@ -396,31 +407,31 @@ class KStatusBar(QStatusBar):
 
     """stub"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args:Any, **kwargs:Any) ->None:
         QStatusBar.__init__(self, *args, **kwargs)
         self.__items = []
 
-    def hasItem(self, idx):
+    def hasItem(self, idx:int) ->bool:
         """stub"""
         return len(self.__items) > idx
 
-    def changeItem(self, text, idx):
+    def changeItem(self, text:str, idx:int) ->None:
         """stub"""
         self.__items[idx].label.setText(text)
 
-    def insertItem(self, text, idx, stretch):
+    def insertItem(self, text:str, idx:int, stretch:int) ->None:
         """stub"""
         item = MyStatusBarItem(text, idx, stretch)
         self.__items.append(item)
         self.insertWidget(item.idx, item.label, stretch=item.stretch)
 
-    def removeItem(self, idx):
+    def removeItem(self, idx:int) ->None:
         """stub"""
         item = self.__items[idx]
         self.removeWidget(item.label)
         del self.__items[idx]
 
-    def setItemAlignment(self, idx, alignment):
+    def setItemAlignment(self, idx:int, alignment:Qt.AlignmentFlag) ->None:
         """stub"""
         self.__items[idx].label.setAlignment(alignment)
 
@@ -429,7 +440,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
 
     """stub"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         QMainWindow.__init__(self)
         self._actions = KActionCollection(self)
         self._toolBar = QToolBar(self)
@@ -464,7 +475,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.toolBar().setFloatable(False)
         self.toolBar().setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
 
-    def showEvent(self, event):
+    def showEvent(self, event:QShowEvent) ->None:
         """now that the MainWindow code has run, we know all actions"""
         self.refreshToolBar()
         assert Internal.Preferences
@@ -475,65 +486,65 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
             self.windowState() & Qt.WindowState.WindowFullScreen == Qt.WindowState.WindowFullScreen)
         QMainWindow.showEvent(self, event)
 
-    def hideEvent(self, event):
+    def hideEvent(self, event:QHideEvent) ->None:
         """save status"""
         assert Internal.Preferences
         Internal.Preferences.toolBarVisible = self.toolBar(
         ).isVisible()
         QMainWindow.hideEvent(self, event)
 
-    def toggleStatusBar(self, checked):
+    def toggleStatusBar(self, checked:bool) ->None:
         """show / hide status bar"""
         self.statusBar().setVisible(checked)
 
-    def toggleToolBar(self, checked):
+    def toggleToolBar(self, checked:bool) ->None:
         """show / hide status bar"""
         self.toolBar().setVisible(checked)
 
-    def configureToolBar(self):
+    def configureToolBar(self) ->None:
         """configure toolbar"""
         dlg = KEditToolBar(self)
         dlg.show()
 
-    def refreshToolBar(self):
+    def refreshToolBar(self) ->None:
         """reload settings for toolbar actions"""
         self.toolBar().clear()
         assert Internal.Preferences
         for name in Internal.Preferences.toolBarActions.split(','):
             self.toolBar().addAction(self.actionCollection().actions()[name])
 
-    def actionCollection(self):
+    def actionCollection(self) ->'KActionCollection':
         """stub"""
         return self._actions
 
-    def setupGUI(self):
+    def setupGUI(self) ->None:
         """stub"""
 
-    def toolBar(self):
+    def toolBar(self) ->QToolBar:
         """stub"""
         return self._toolBar
 
     @staticmethod
-    def selectLanguage():
+    def selectLanguage() ->None:
         """switch the language"""
         assert Internal.mainWindow
         KSwitchLanguageDialog(Internal.mainWindow).exec_()
 
     @staticmethod
-    def aboutKajongg():
+    def aboutKajongg() ->None:
         """show an about dialog"""
         assert Internal.mainWindow
         AboutKajonggDialog(Internal.mainWindow).exec_()
 
-    def queryClose(self):
+    def queryClose(self) ->bool:
         """default"""
         return True
 
-    def queryExit(self):
+    def queryExit(self) ->bool:
         """default"""
         return True
 
-    def closeEvent(self, event):
+    def closeEvent(self, event:QEvent) ->None:
         """call queryClose/queryExit"""
         if self.queryClose() and self.queryExit():
             event.accept()
@@ -545,17 +556,17 @@ class KConfigGroup:
 
     """mimic KConfigGroup as far as we need it"""
 
-    def __init__(self, config, groupName):
+    def __init__(self, config:'KConfig', groupName:str) ->None:
         self.config = weakref.ref(config)
         self.groupName = groupName
 
-    def __default(self, name):
+    def __default(self, name:str) ->Optional[ParamValue]:
         """defer computation of Languages until really needed"""
         if self.groupName == 'Locale' and name == 'Language':
             return QLocale().name()
         return None
 
-    def readEntry(self, name):
+    def readEntry(self, name:str) ->Optional[ParamValue]:
         """get an entry from this group."""
         try:
             _ = self.config()
@@ -581,7 +592,7 @@ class KConfigGroup:
             return items[name]
         return self.__default(name)
 
-    def readInteger(self, name):
+    def readInteger(self, name:str) ->int:
         """calls readEntry and returns it as an int or raises an Exception."""
         result = self.readEntry(name)
         if result is None:
@@ -602,7 +613,7 @@ class KGlobal:
     """stub"""
 
     @classmethod
-    def initStatic(cls):
+    def initStatic(cls) ->None:
         """init class members"""
         Internal.kajonggrc = KConfig()
 
@@ -612,7 +623,7 @@ class KConfig(ConfigParser):
     This mimics KDE KConfig but can also be used like any ConfigParser but
     without support for a default section."""
 
-    def __init__(self, path=None):
+    def __init__(self, path:Optional[str]=None) ->None:
         ConfigParser.__init__(self, delimiters=('=', ))
         if path is None:
             path = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
@@ -622,26 +633,26 @@ class KConfig(ConfigParser):
             with codecs.open(self.path, 'r', encoding='utf-8') as cfgFile:
                 self.read_file(cfgFile)
 
-    def optionxform(self, optionstr):
+    def optionxform(self, optionstr:str) ->str:
         """KDE needs upper/lowercase distinction"""
         return optionstr
 
-    def setValue(self, section, option, value):
+    def setValue(self, section:str, option:str, value:int) ->None:
         """like set but add missing section"""
         if section not in self.sections():
             self.add_section(section)
         self.set(section, option, str(value))
 
-    def writeToFile(self):
+    def writeToFile(self) ->None:
         """Write an .ini-format representation of the configuration state."""
         with open(self.path, 'w', encoding='utf-8') as filePointer:
             self.write(filePointer, space_around_delimiters=False)
 
-    def group(self, groupName):
+    def group(self, groupName:str) ->KConfigGroup:
         """just like KConfig"""
         return KConfigGroup(self, groupName)
 
-def KIcon(name=None):  # pylint: disable=invalid-name
+def KIcon(name:Optional[str]=None) ->QIcon:  # pylint: disable=invalid-name
     """simple wrapper"""
     if sys.platform == 'win32':
         return QIcon(os.path.join('share', 'icons', name) if name else None)
@@ -654,7 +665,9 @@ class Action(QAction):
 
     """helper for creation QAction"""
 
-    def __init__(self, parent, name=None, icon=None, slot=None, shortcut=None, actionData=None):
+    def __init__(self, parent:'KXmlGuiWindow', name:Optional[str]=None,
+        icon:Optional[str]=None, slot:Optional[Callable]=None,
+        shortcut:Union[QKeySequence, Qt.Key, None]=None, actionData:Optional[Union[str, Type[QWidget]]]=None) ->None:
         super().__init__(parent)
         if icon:
             self.setIcon(KIcon(icon))
@@ -679,7 +692,8 @@ class KConfigSkeletonItem:
 
     """one preferences setting used by KOnfigSkeleton"""
 
-    def __init__(self, skeleton, key, value, default=None):
+    def __init__(self, skeleton:'KConfigSkeleton', key:str, value:ParamValue,
+        default:ParamValue) ->None:
         assert skeleton
         self.skeleton = skeleton
         self.group = skeleton.currentGroup
@@ -689,32 +703,32 @@ class KConfigSkeletonItem:
             self._value = default
         self.default = default
 
-    def value(self):
+    def value(self) ->ParamValue:
         """default getter"""
         return self._value
 
-    def setValue(self, value):
+    def setValue(self, value:ParamValue) ->None:
         """default setter"""
         if self._value != value:
             self._value = value
             self.skeleton.configChanged.emit()
 
-    def getFromConfig(self):
+    def getFromConfig(self) ->None:
         """if not there, use default"""
         try:
             self._value = Internal.kajonggrc.get(self.group, self.key)
         except (NoSectionError, NoOptionError):
-            self._value = self.default
+            self._value = self.default  # type:ignore
 
 
 class ItemBool(KConfigSkeletonItem):
 
     """boolean preferences setting used by KOnfigSkeleton"""
 
-    def __init__(self, skeleton, key, value, default=None):
+    def __init__(self, skeleton:'KConfigSkeleton', key:str, value:bool, default:bool) ->None:
         KConfigSkeletonItem.__init__(self, skeleton, key, value, default)
 
-    def getFromConfig(self):
+    def getFromConfig(self) ->None:
         """if not there, use default"""
         try:
             self._value = Internal.kajonggrc.getboolean(self.group, self.key)
@@ -726,7 +740,7 @@ class ItemString(KConfigSkeletonItem):
 
     """string preferences setting used by KOnfigSkeleton"""
 
-    def __init__(self, skeleton, key, value, default=None):
+    def __init__(self, skeleton:'KConfigSkeleton', key:str, value:str, default:str) ->None:
         if value == '':
             value = default
         KConfigSkeletonItem.__init__(self, skeleton, key, value, default)
@@ -736,23 +750,23 @@ class ItemInt(KConfigSkeletonItem):
 
     """integer preferences setting used by KOnfigSkeleton"""
 
-    def __init__(self, skeleton, key, value, default=0):
+    def __init__(self, skeleton:'KConfigSkeleton', key:str, value:int, default:int) ->None:
         KConfigSkeletonItem.__init__(self, skeleton, key, value, default)
         self.minValue = -99999
         self.maxValue = 99999999
 
-    def getFromConfig(self):
+    def getFromConfig(self) ->None:
         """if not there, use default"""
         try:
             self._value = Internal.kajonggrc.getint(self.group, self.key)
         except (NoSectionError, NoOptionError):
             self._value = self.default
 
-    def setMinValue(self, value):
+    def setMinValue(self, value:int) ->None:
         """minimum value for this setting"""
         self.minValue = value
 
-    def setMaxValue(self, value):
+    def setMaxValue(self, value:int) ->None:
         """maximum value for this setting"""
         self.maxValue = value
 
@@ -762,7 +776,7 @@ class KConfigSkeleton(QObject):
     """handles preferences settings"""
     configChanged = Signal()
 
-    def __init__(self):
+    def __init__(self) ->None:
         QObject.__init__(self)
         self.items = []
         self.addBool('MainWindow', 'toolBarVisible', True)
@@ -771,35 +785,36 @@ class KConfigSkeleton(QObject):
             'toolBarActions',
             'quit,play,scoreTable,explain,players,options_configure')
 
-    def addBool(self, group, name, default=None):
+    def addBool(self, group:str, name:str, default:Optional[bool]=None) ->None:
         """to be overridden"""
 
-    def addString(self, group, name, default=None):
+    def addString(self, group:str, name:str, default:Optional[str]=None) ->None:
         """to be overridden"""
 
-    def readConfig(self):
+    def readConfig(self) ->None:
         """init already read config"""
         for item in self.items:
             item.getFromConfig()
 
-    def writeConfig(self):
+    def writeConfig(self) ->None:
         """to the same file name"""
         for item in self.items:
             Internal.kajonggrc.setValue(item.group, item.key, item.value())
         Internal.kajonggrc.writeToFile()
 
-    def as_dict(self):
+    def as_dict(self) ->defaultdict:
         """a dict of dicts"""
-        result = defaultdict(dict)
+        result: defaultdict = defaultdict(dict)
         for item in self.items:
             result[item.group][item.key] = item.value()
         return result
 
-    def setCurrentGroup(self, group):
+    def setCurrentGroup(self, group:str) ->None:
         """to be used by following add* calls"""
         self.currentGroup = group  # pylint:disable=attribute-defined-outside-init
 
-    def addItem(self, key, value, default=None):
+    def addItem(self, key:str, value:ParamValue,
+        default:ParamValue) ->KConfigSkeletonItem:
         """add a string preference"""
         if isinstance(value, bool):
             cls = ItemBool
@@ -818,7 +833,7 @@ class KConfigSkeleton(QObject):
 class KSwitchLanguageDialog(KDialog):
     """select application language"""
 
-    def __init__(self, parent):
+    def __init__(self, parent:QWidget) ->None:
         super().__init__(parent)
         self.languageRows = {}
         self.languageButtons = []
@@ -856,7 +871,7 @@ class KSwitchLanguageDialog(KDialog):
         self.setButtons(KDialog.Ok | KDialog.Cancel | KDialog.RestoreDefaults)
         self.setMainWidget(self.widget)
 
-    def addLanguageButton(self, languageCode, isPrimaryLanguage):
+    def addLanguageButton(self, languageCode: str, isPrimaryLanguage: bool) ->None:
         """add button for language"""
         labelText = i18n("Primary language:") if isPrimaryLanguage else i18n("Fallback language:")
         languageButton = KLanguageButton('', self.widget)
@@ -888,17 +903,17 @@ class KSwitchLanguageDialog(KDialog):
         self.languageRows[languageButton] = tuple([languageLabel, languageButton])
         self.languageButtons.append(languageButton)
 
-    def accept(self):
+    def accept(self) ->None:
         """OK"""
         newValue = ':'.join(x.current for x in self.languageButtons)
         Internal.kajonggrc.setValue('Locale', 'Language', newValue)
         super().accept()
 
-    def slotAddLanguageButton(self):
+    def slotAddLanguageButton(self) ->None:
         """adding a new button with en_US as it should always be present"""
         self.addLanguageButton('en_US', len(self.languageButtons) == 0)
 
-    def restoreDefaults(self):
+    def restoreDefaults(self) ->None:
         """reset values to default"""
         for _ in self.languageRows:
             if isinstance(_, KLanguageButton):
@@ -909,13 +924,13 @@ class KSwitchLanguageDialog(KDialog):
         self.languageRows = {}
         self.addLanguageButton(QLocale().name(), True)
 
-    def removeButtonClicked(self):
+    def removeButtonClicked(self) ->None:
         """remove this language"""
         _ = self.sender()
         assert isinstance(_, KLanguageButton)
         self.removeLanguage(_)
 
-    def removeLanguage(self, button):
+    def removeLanguage(self, button:'KLanguageButton') ->None:
         """remove this language"""
         label, languageButton = self.languageRows[button]
         label.deleteLater()
@@ -928,7 +943,7 @@ class KSwitchLanguageDialog(KDialog):
 class KLanguageButton(QWidget):
     """A language button for KSwitchLanguageDialog"""
 
-    def __init__(self, txt:str, parent) ->None:
+    def __init__(self, txt:str, parent:QWidget) ->None:
         super().__init__(parent)
         self.button = QPushButton(txt)
         self.popup = QMenu()
@@ -942,18 +957,18 @@ class KLanguageButton(QWidget):
         self.button.show()
         self.show()
 
-    def deleteLater(self):
+    def deleteLater(self) ->None:
         """self and children"""
         self.button.deleteLater()
         self.popup.deleteLater()
         QWidget.deleteLater(self)
 
-    def setText(self, txt):
+    def setText(self, txt:str) ->None:
         """proxy: sets the button text"""
         self.button.setText(txt)
 
 
-    def addLanguage(self, languageCode):
+    def addLanguage(self, languageCode:str) ->None:
         """add language to popup"""
         text = languageCode
         locale = QLocale(languageCode)
@@ -965,12 +980,12 @@ class KLanguageButton(QWidget):
         self.popup.addAction(action)
 
     @property
-    def current(self):
+    def current(self) ->str:
         """current languageCode"""
         return self.__currentItem
 
     @current.setter
-    def current(self, languageCode):
+    def current(self, languageCode:str) ->None:
         """point to languageCode"""
         action = (
             self.findAction(languageCode)
@@ -979,11 +994,11 @@ class KLanguageButton(QWidget):
         self.__currentItem = action.data()
         self.button.setText(action.text())
 
-    def slotTriggered(self, action):
+    def slotTriggered(self, action:Action) ->None:
         """another language has been selected from the popup"""
         self.current = action.data()
 
-    def findAction(self, data):
+    def findAction(self, data:str) ->Optional[QAction]:
         """find action by name"""
         for action in self.popup.actions():
             if action.data() == data:
@@ -995,7 +1010,7 @@ class KLanguageButton(QWidget):
 class AboutKajonggDialog(KDialog):
     """about kajongg dialog"""
 
-    def __init__(self, parent):
+    def __init__(self, parent:QWidget) ->None:
         # pylint: disable=too-many-locals, too-many-statements
         from twisted import __version__
 
@@ -1110,7 +1125,7 @@ class AboutKajonggDialog(KDialog):
         self.buttonBox.setFocus()
 
     @staticmethod
-    def licenseFile():
+    def licenseFile() ->Optional[str]:
         """which may currently only be 1: GPL_V2"""
         prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
         for path in ('COPYING', '../COPYING',
@@ -1121,7 +1136,7 @@ class AboutKajonggDialog(KDialog):
         return None
 
     @classmethod
-    def showLicense(cls):
+    def showLicense(cls) ->None:
         """as the name says"""
         assert Internal.mainWindow
         LicenseDialog(Internal.mainWindow, cls.licenseFile()).exec_()
@@ -1131,7 +1146,7 @@ class LicenseDialog(KDialog):
 
     """see kaboutapplicationdialog.cpp"""
 
-    def __init__(self, parent, licenseFile):
+    def __init__(self, parent:QWidget, licenseFile:Optional[str]) ->None:
         KDialog.__init__(self, parent)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setCaption(i18n("License Agreement"))
@@ -1151,7 +1166,7 @@ class LicenseDialog(KDialog):
         vLayout.addWidget(self.buttonBox)
         self.setLayout(vLayout)
 
-    def sizeHint(self):
+    def sizeHint(self) ->QSize:
         """try to set up the dialog such that the full width of the
         document is visible without horizontal scroll-bars being required"""
         idealWidth = self.licenseBrowser.document().idealWidth() + (2 * self.marginHint()) \
@@ -1176,7 +1191,7 @@ class KConfigDialog(KDialog):
         'QSlider': 'setValue',
         'QLineEdit': 'setText'}
 
-    def __init__(self, parent, name, preferences):
+    def __init__(self, parent:QWidget, name:str, preferences:'SetupPreferences') ->None:
         KDialog.__init__(self, parent)
         self.setCaption(i18n('Configure'))
         self.name = name
@@ -1206,7 +1221,7 @@ class KConfigDialog(KDialog):
         self.setLayout(layout)
 
     @classmethod
-    def showDialog(cls, settings):
+    def showDialog(cls, settings:str) ->None:
         """constructor"""
         assert settings == 'settings'
         if cls.dialog:
@@ -1216,19 +1231,19 @@ class KConfigDialog(KDialog):
             return cls.dialog
         return None
 
-    def showEvent(self, unusedEvent):
+    def showEvent(self, unusedEvent:QEvent) ->None:
         """if the settings dialog shows, remember current values
         and show them in the widgets"""
         self.orgPref = self.preferences.as_dict() # FIXME: unused
         self.updateWidgets()
 
-    def iconClicked(self, item):
+    def iconClicked(self, item:QListWidgetItem) ->None:
         """show the wanted config tab"""
         self.setCurrentPage(
             self.pages[self.iconList.indexFromItem(item).row()])
 
     @classmethod
-    def allChildren(cls, widget):
+    def allChildren(cls, widget:QObject) ->List[QObject]:
         """recursively find all widgets holding settings: Their object name
         starts with kcfg_"""
         result = []
@@ -1240,7 +1255,7 @@ class KConfigDialog(KDialog):
                 result.extend(cls.allChildren(child))
         return result
 
-    def addPage(self, configTab, name, iconName):
+    def addPage(self, configTab:QWidget, name:str, iconName:str) ->QWidget:
         """add a page to the config dialog"""
         item = QListWidgetItem(KIcon(iconName), name)
         item.setTextAlignment(Qt.AlignmentFlag.AlignHCenter)
@@ -1271,19 +1286,19 @@ class KConfigDialog(KDialog):
         self.updateButtons()
         return configTab
 
-    def applySettings(self):
+    def applySettings(self) ->None:
         """Apply pressed"""
         if self.updateButtons():
             self.updateSettings()
             self.updateButtons()
 
-    def accept(self):
+    def accept(self) ->None:
         """OK pressed"""
         if self.updateButtons():
             self.updateSettings()
         KDialog.accept(self)
 
-    def updateButtons(self):
+    def updateButtons(self) ->bool:
         """Updates the Apply and Default buttons. Returns True if there was a changed setting"""
         changed = False
         for name, widget in self.configWidgets.items():
@@ -1297,7 +1312,7 @@ class KConfigDialog(KDialog):
         self.buttonBox.button(KDialog.Apply).setEnabled(changed)
         return changed
 
-    def updateSettings(self):
+    def updateSettings(self) ->None:
         """Update the settings from the dialog"""
         for name, widget in self.configWidgets.items():
             self.preferences[name] = getattr(
@@ -1305,14 +1320,14 @@ class KConfigDialog(KDialog):
                 self.getFunc[widget.__class__.__name__])()
         self.preferences.writeConfig()
 
-    def updateWidgets(self):
+    def updateWidgets(self) ->None:
         """Update the dialog based on the settings"""
         self.preferences.readConfig()
         for name, widget in self.configWidgets.items():
             getattr(widget, self.setFunc[widget.__class__.__name__])(
                 getattr(self.preferences, name))
 
-    def setCurrentPage(self, page):
+    def setCurrentPage(self, page:QWidget) ->None:
         """show wanted page and select its icon"""
         self.tabSpace.setCurrentWidget(page)
         for idx in range(self.tabSpace.count()):
@@ -1324,7 +1339,7 @@ class KSeparator(QFrame):
 
     """used for toolbar editor"""
 
-    def __init__(self, parent) ->None:
+    def __init__(self, parent:QWidget) ->None:
         QFrame.__init__(self, parent)
         self.setLineWidth(1)
         self.setMidLineWidth(0)
@@ -1337,7 +1352,7 @@ class ToolBarItem(QListWidgetItem):
 
     """a toolbar item"""
 
-    def __init__(self, action, parent):
+    def __init__(self, action:Action, parent:QWidget) ->None:
         self.action = action
         self.parent = parent
         QListWidgetItem.__init__(self, self.__icon(), self.__text(), parent)
@@ -1345,7 +1360,7 @@ class ToolBarItem(QListWidgetItem):
         self.setFlags(
             (self.flags() | Qt.ItemFlag.ItemIsDragEnabled) & ~Qt.ItemFlag.ItemIsDropEnabled)
 
-    def __icon(self):
+    def __icon(self) ->QIcon:
         """the action icon, default is an empty icon"""
         result = self.action.icon()
         if result.isNull():
@@ -1358,7 +1373,7 @@ class ToolBarItem(QListWidgetItem):
             result = self.emptyIcon
         return result
 
-    def __text(self):
+    def __text(self) ->str:
         """the action text"""
         return self.action.text().replace('&', '')
 
@@ -1367,7 +1382,7 @@ class ToolBarList(QListWidget):
 
     """QListWidget without internal moves"""
 
-    def __init__(self, parent):
+    def __init__(self, parent:QWidget) ->None:
         QListWidget.__init__(self, parent)
         self.setDragDropMode(QAbstractItemView.DragDrop)  # no internal moves
 
@@ -1376,7 +1391,7 @@ class KEditToolBar(KDialog):
 
     """stub"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional[QWidget]=None) ->None:
         # pylint: disable=too-many-statements
         KDialog.__init__(self, parent)
         self.setCaption(i18n('Configure Toolbars'))
@@ -1457,23 +1472,23 @@ class KEditToolBar(KDialog):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-    def accept(self):
+    def accept(self) ->None:
         """save and close"""
         self.saveActions()
         self.hide()
 
-    def reject(self):
+    def reject(self) ->None:
         """do not save and close"""
         self.hide()
 
-    def inactiveSelectionChanged(self):
+    def inactiveSelectionChanged(self) ->None:
         """update buttons"""
         if self.inactiveList.selectedItems():
             self.insertAction.setEnabled(True)
         else:
             self.insertAction.setEnabled(False)
 
-    def activeSelectionChanged(self):
+    def activeSelectionChanged(self) ->None:
         """update buttons"""
         row = self.activeList.currentRow()
         toolItem = None
@@ -1487,15 +1502,15 @@ class KEditToolBar(KDialog):
             self.upAction.setEnabled(False)
             self.downAction.setEnabled(False)
 
-    def insertButton(self):
+    def insertButton(self) ->None:
         """activate an action"""
         self.__moveItem(toActive=True)
 
-    def removeButton(self):
+    def removeButton(self) ->None:
         """deactivate an action"""
         self.__moveItem(toActive=False)
 
-    def __moveItem(self, toActive):
+    def __moveItem(self, toActive:bool) ->None:
         """move item between the two lists"""
         if toActive:
             fromList = self.inactiveList
@@ -1506,15 +1521,15 @@ class KEditToolBar(KDialog):
         item = fromList.takeItem(fromList.currentRow())
         ToolBarItem(item.action, toList)
 
-    def upButton(self):
+    def upButton(self) ->None:
         """move action up"""
         self.__moveUpDown(moveUp=True)
 
-    def downButton(self):
+    def downButton(self) ->None:
         """move action down"""
         self.__moveUpDown(moveUp=False)
 
-    def __moveUpDown(self, moveUp):
+    def __moveUpDown(self, moveUp:bool) ->None:
         """change place of action in list"""
         active = self.activeList
         row = active.currentRow()
@@ -1524,7 +1539,7 @@ class KEditToolBar(KDialog):
         active.insertItem(newRow, item)
         active.setCurrentRow(newRow)
 
-    def loadActions(self):
+    def loadActions(self) ->None:
         """load active actions from Preferences"""
         assert Internal.mainWindow
         assert Internal.Preferences
@@ -1535,7 +1550,7 @@ class KEditToolBar(KDialog):
                 else:
                     ToolBarItem(action, self.inactiveList)
 
-    def saveActions(self):
+    def saveActions(self) ->None:
         """write active actions into Preferences"""
         if Internal.mainWindow is None:
             return

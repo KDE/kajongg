@@ -18,11 +18,12 @@ import os
 import logging
 import datetime
 import argparse
+from typing import TYPE_CHECKING, Tuple, Any, Optional, Sequence, List, Mapping, Union
 
 from zope.interface import implementer
 
 
-def cleanExit(*unusedArgs):
+def cleanExit(*unusedArgs: Any) ->None:
     """we want to cleanly close sqlite3 files"""
     if Debug.quit:
         logDebug('cleanExit')
@@ -54,11 +55,14 @@ Internal.logPrefix = 'S'
 
 from twisted.spread import pb
 from twisted.internet import error
-from twisted.internet.defer import maybeDeferred, fail, succeed
+from twisted.internet.defer import maybeDeferred, fail, succeed, Deferred
 from twisted.cred import checkers, portal, credentials, error as credError
 from twisted.internet import reactor as reactor_module
 from twisted.internet.error import ReactorNotRunning
 reactor = reactor_module
+if TYPE_CHECKING:
+    from twisted.python.failure import Failure
+
 reactor.addSystemEventTrigger('before', 'shutdown', cleanExit)
 Internal.reactor = reactor
 
@@ -82,7 +86,7 @@ class DBPasswordChecker:
     credentialInterfaces = (credentials.IUsernamePassword,
                             credentials.IUsernameHashedPassword)
 
-    def requestAvatarId(self, cred):
+    def requestAvatarId(self, cred: pb._PortalAuthChallenger) ->Deferred:
         """get user id from database"""
         cred.username = cred.username.decode('utf-8')
         args = cred.username.split(SERVERMARK)
@@ -109,8 +113,8 @@ class DBPasswordChecker:
         return defer1
 
     @staticmethod
-    def _checkedPassword(matched, userid):
-        """after the password has been checked"""
+    def _checkedPassword(matched: bool, userid:str) ->Union[str, Deferred]:
+        """after the password has been checked. TODO: is the result type correct?"""
         if not matched:
             return fail(credError.UnauthorizedLogin(srvMessage(i18nE('Wrong password'))))
         return userid
@@ -120,27 +124,27 @@ class MJServer:
 
     """the real mah jongg server"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         self.tables = {}
         self.srvUsers = []
         Players.load()
         self.lastPing = datetime.datetime.now()
         self.checkPings()
 
-    def chat(self, chatString):
+    def chat(self, chatString:str) ->None:
         """a client sent us a chat message"""
         chatLine = ChatMessage(chatString)
         if Debug.chat:
             logDebug('server got chat message %s' % chatLine)
         self.tables[chatLine.tableid].sendChatMessage(chatLine)
 
-    def login(self, user):
+    def login(self, user: User) ->None:
         """accept a new user"""
         if user not in self.srvUsers:
             self.srvUsers.append(user)
             self.loadSuspendedTables(user)
 
-    def callRemote(self, user, *args, **kwargs):
+    def callRemote(self, user:User, *args: Any, **kwargs:Mapping[Any, Any]) ->Deferred:
         """if we still have a connection, call remote, otherwise clean up"""
         if user.mind:
             try:
@@ -152,7 +156,7 @@ class MJServer:
         return succeed([])
 
     @staticmethod
-    def __stopAfterLastDisconnect():
+    def __stopAfterLastDisconnect() ->None:
         """as the name says"""
         if Options.socket and not Options.continueServer:
             try:
@@ -163,7 +167,7 @@ class MJServer:
             except ReactorNotRunning:
                 pass
 
-    def checkPings(self):
+    def checkPings(self) ->None:
         """are all clients still alive? If not log them out"""
         since = elapsedSince(self.lastPing)
         if self.srvUsers and since > 30:
@@ -183,14 +187,14 @@ class MJServer:
         reactor.callLater(10, self.checkPings)
 
     @staticmethod
-    def ignoreLostConnection(failure):
+    def ignoreLostConnection(failure: 'Failure') ->None:
         """if the client went away correctly, do not dump error messages on stdout."""
         msg = failure.getErrorMessage()
         if 'twisted.internet.error.ConnectionDone' not in msg:
             logError(msg)
         failure.trap(pb.PBConnectionLost)
 
-    def sendTables(self, user, tables=None):
+    def sendTables(self, user:User, tables:Optional[List[ServerTable]]=None) ->Deferred:
         """send tables to user. If tables is None, he gets all new tables and those
         suspended tables he was sitting on"""
         if tables is None:
@@ -206,7 +210,7 @@ class MJServer:
             return self.callRemote(user, 'newTables', data)
         return succeed([])
 
-    def _lookupTable(self, tableid):
+    def _lookupTable(self, tableid: int) ->ServerTable:
         """return table by id or raise exception"""
         if tableid not in self.tables:
             srvError(
@@ -215,16 +219,16 @@ class MJServer:
                 tableid)
         return self.tables[tableid]
 
-    def generateTableId(self):
+    def generateTableId(self) ->int:
         """generates a new table id: the first free one"""
         usedIds = set(self.tables or [0])
         availableIds = set(x for x in range(1, 2 + max(usedIds)))
         return min(availableIds - usedIds)
 
-    def newTable(self, user, ruleset, playOpen,
-                 autoPlay, wantedGame, tableId=None):
+    def newTable(self, user:User, ruleset:str, playOpen:bool,
+                 autoPlay:bool, wantedGame:str, tableId:Optional[int]=None) ->Optional[Deferred]:
         """user creates new table and joins it"""
-        def gotRuleset(ruleset):
+        def gotRuleset(ruleset:str) ->None:
             """now we have the full ruleset definition from the client"""
             Ruleset.cached(
                 ruleset).save()  # make it known to the cache and save in db
@@ -242,10 +246,10 @@ class MJServer:
                     self.__newTable, user, ruleset, playOpen, autoPlay, wantedGame, tableId).addErrback(logException)
         return None
 
-    def __newTable(self, unused, user, ruleset,
-                   playOpen, autoPlay, wantedGame, tableId=None):
+    def __newTable(self, unused:None, user:User, ruleset:str,
+                   playOpen:bool, autoPlay:bool, wantedGame:str, tableId:Optional[int]=None) ->Deferred:
         """now we know the ruleset"""
-        def sent(unused):
+        def sent(unused: Any) ->int:
             """new table sent to user who created it"""
             return table.tableid
         table = ServerTable(
@@ -266,7 +270,7 @@ class MJServer:
         assert result
         return result
 
-    def needRulesets(self, rulesetHashes):
+    def needRulesets(self, rulesetHashes: List[str]) -> List[List[List[Union[int, str, float]]]]:
         """the client wants those full rulesets"""
         result = []
         for table in self.tables.values():
@@ -274,7 +278,7 @@ class MJServer:
                 result.append(table.ruleset.toList())
         return result
 
-    def joinTable(self, user, tableid):
+    def joinTable(self, user: User, tableid: int) ->bool:
         """user joins table"""
         table = self._lookupTable(tableid)
         table.addUser(user)
@@ -288,7 +292,7 @@ class MJServer:
             if Debug.table:
                 logDebug('Table %s: All seats taken, starting' % table)
 
-            def startTable(unused):
+            def startTable(unused: Any) -> None:
                 """now all players know about our join"""
                 assert table.owner
                 table.readyForGameStart(table.owner)
@@ -297,11 +301,11 @@ class MJServer:
             block.callback(False)
         return True
 
-    def tablesWith(self, user):
+    def tablesWith(self, user: User) ->List[int]:
         """table ids with user, except table 'without'"""
         return [x.tableid for x in self.tables.values() if user in x.users]
 
-    def leaveTable(self, user, tableid, message, *args):
+    def leaveTable(self, user: User, tableid: int, message: str, *args: str) ->bool:
         """user leaves table. If no human user is left on a new table, remove it"""
         if tableid in self.tables:
             table = self.tables[tableid]
@@ -322,11 +326,11 @@ class MJServer:
                         block.callback(False)
         return True
 
-    def startGame(self, user, tableid):
+    def startGame(self, user: User, tableid: int) ->None:
         """try to start the game"""
         self._lookupTable(tableid).readyForGameStart(user)
 
-    def removeTable(self, table, reason, message, *args):
+    def removeTable(self, table: ServerTable, reason: str, message: str, *args:Union[str, int]) ->None:
         """remove a table"""
         assert reason in ('silent', 'tableRemoved', 'gameOver', 'abort')
         # HumanClient implements methods remote_tableRemoved etc.
@@ -352,7 +356,7 @@ class MJServer:
         if table.game:
             table.game.close()
 
-    def logout(self, user):
+    def logout(self, user: User) ->None:
         """remove user from all tables"""
         if user not in self.srvUsers:
             return
@@ -367,7 +371,7 @@ class MJServer:
         # we say serverDisconnects. Sometimes the order was reversed.
         reactor.callLater(1, self.__logout2, user)
 
-    def __logout2(self, user):
+    def __logout2(self, user: User) ->None:
         """now the leaveTable message had a good chance to get to the clients first"""
         self.callRemote(user, 'serverDisconnects')
         user.mind = None
@@ -376,7 +380,7 @@ class MJServer:
                 if request.user == user:
                     request.answer = Message.Abort  # type: ignore
 
-    def loadSuspendedTables(self, user):
+    def loadSuspendedTables(self, user: User) ->None:
         """loads all yet unloaded suspended tables where this
         user is participating. We do not unload them if the
         user logs out, there are filters anyway returning only
@@ -410,10 +414,11 @@ class MJRealm:
 
     """connects mind and server"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         self.server = None
 
-    def requestAvatar(self, avatarId, mind, *interfaces):
+    def requestAvatar(self, avatarId: str, mind: pb.RemoteReference,
+        *interfaces: Sequence[pb.IPerspective]) -> Tuple[pb.IPerspective, User, Any]:
         """as the tutorials do..."""
         if pb.IPerspective not in interfaces:
             raise NotImplementedError("No supported avatar interface")
@@ -424,7 +429,7 @@ class MJRealm:
             logDebug('Connection from %s ' % avatar.source())
         return pb.IPerspective, avatar, lambda a=avatar: a.detached(mind)
 
-def parseArgs():
+def parseArgs() -> argparse.Namespace:
     """as the name says"""
     parser = argparse.ArgumentParser()
     defaultPort = Internal.defaultPort
@@ -457,7 +462,7 @@ def parseArgs():
     return args
 
 
-def kajonggServer():
+def kajonggServer() ->None:
     """start the server"""
     options = parseArgs()
     if not initDb():
@@ -495,7 +500,7 @@ def kajonggServer():
         reactor.run()
 
 
-def profileMe():
+def profileMe() ->None:
     """where do we lose time?"""
     import cProfile
     cProfile.run('kajonggServer()', 'prof')

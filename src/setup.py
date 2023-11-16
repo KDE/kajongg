@@ -71,7 +71,7 @@ class bdist_msi(windist.bdist_msi):
 
     """we add an icon for the uninstaller"""
 
-    def productcode(self):
+    def productcode(self) ->str:
         """get our productcode"""
         view = self.db.OpenView(
             "SELECT Value FROM Property WHERE Property = 'ProductCode'")
@@ -81,7 +81,7 @@ class bdist_msi(windist.bdist_msi):
         view.Close()
         return result
 
-    def add_config(self, fullname):
+    def add_config(self, fullname:str) ->None:
         """add the uninstaller icon"""
         windist.bdist_msi.add_config(self, fullname)
         msilib.add_data(self.db, "Registry", [("DisplayIcon",  # Registry

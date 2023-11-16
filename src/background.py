@@ -10,12 +10,17 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import TYPE_CHECKING, Union, Optional
+
+
 from qt import Qt, QPainter, QBrush, QPalette, QPixmapCache, QPixmap
 from qt import QSvgRenderer
 
 from log import logException, i18n
 from mjresource import Resource
 
+if TYPE_CHECKING:
+    from qt import QSizeF
 
 class Background(Resource):
 
@@ -25,7 +30,7 @@ class Background(Resource):
     configGroupName = 'KMahjonggBackground'
     cache = {}
 
-    def __init__(self, name=None):
+    def __init__(self, name:Optional[str]=None) ->None:
         """continue __build"""
         super().__init__(name)
         self.graphicsPath = None
@@ -49,7 +54,7 @@ class Background(Resource):
                     'cannot find kmahjongglib/backgrounds/%s for %s' %
                     (graphName, self.desktopFileName))
 
-    def pixmap(self, size):
+    def pixmap(self, size:'QSizeF') ->Union[QBrush, QPixmap]:
         """return a background pixmap or None for isPlain"""
         self.__pmap = QBrush()  # pylint:disable=attribute-defined-outside-init
         if not self.isPlain:
@@ -72,11 +77,11 @@ class Background(Resource):
                 QPixmapCache.insert(cachekey, self.__pmap)
         return self.__pmap
 
-    def brush(self, size):
+    def brush(self, size:'QSizeF') ->QBrush:
         """background brush"""
         return QBrush(self.pixmap(size))
 
-    def setPalette(self, onto):
+    def setPalette(self, onto:QBrush) ->None:
         """set a background palette for widget onto"""
         palette = QPalette()
         mybrush = self.brush(onto.size())

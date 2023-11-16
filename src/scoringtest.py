@@ -9,6 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import unittest
+from typing import Optional, List, Tuple, Union, TYPE_CHECKING
 
 from common import Debug
 from wind import Wind, East, South, West, North
@@ -17,6 +18,9 @@ from game import PlayingGame
 from hand import Hand, Score
 from tile import TileTuple
 from predefined import ClassicalChineseDMJL, ClassicalChineseBMJA
+
+if TYPE_CHECKING:
+    from rule import Ruleset
 
 RULESETS = []
 
@@ -41,12 +45,12 @@ class Expected:
 
     """define what we expect from test"""
 
-    def __init__(self, won, points, doubles, limits):
+    def __init__(self, won:bool, points:int, doubles:int, limits:float) ->None:
         self.won = won
         self.score = Score(points, doubles, limits)
         self.ruleset = None
 
-    def __str__(self):
+    def __str__(self) ->str:
         return 'Won with %s' % self.score if self.won else 'Lost with %s' % self.score
 
 
@@ -54,7 +58,7 @@ class Nothing(Expected):
 
     """we do not expect anything"""
 
-    def __init__(self, points=0, doubles=0, limits=0.0) ->None:
+    def __init__(self, points:int=0, doubles:int=0, limits:float=0.0) ->None:
         Expected.__init__(self, True, points, doubles, limits)
 
 
@@ -62,7 +66,7 @@ class Win(Expected):
 
     """we expect a winning hand"""
 
-    def __init__(self, points=0, doubles=0, limits=0.0):
+    def __init__(self, points:int=0, doubles:int=0, limits:float=0.0) ->None:
         Expected.__init__(self, True, points, doubles, limits)
 
 
@@ -70,7 +74,7 @@ class NoWin(Expected):
 
     """we expect a losing hand"""
 
-    def __init__(self, points=0, doubles=0, limits=0.0):
+    def __init__(self, points:int=0, doubles:int=0, limits:float=0.0) ->None:
         Expected.__init__(self, False, points, doubles, limits)
 
 
@@ -81,7 +85,8 @@ class Base(unittest.TestCase):
 
     # pylint: disable=too-many-locals
 
-    def scoreTest(self, string, expected, myWind=None, roundWind=None, totals=None):
+    def scoreTest(self, string:str, expected:Union[Expected, List[Expected]],
+        myWind:Optional[Wind]=None, roundWind:Optional[Wind]=None, totals:Optional[Tuple[int, ...]]=None) ->None:
         """execute one scoreTest test"""
         if myWind is None:
             myWind = East
@@ -122,7 +127,7 @@ class Base(unittest.TestCase):
                 self.assertTrue(score.total() == totals[idx], '\n'.join(
                     self.dumpCase(x, exp, totals[idx]) for x in variants))
 
-    def callingTest(self, string, expected):
+    def callingTest(self, string:str, expected:Union[str, List[str]]) ->None:
         """test a calling hand"""
         for idx, ruleset in enumerate(RULESETS):
             game = GAMES[idx]
@@ -143,7 +148,7 @@ class Base(unittest.TestCase):
                             '%s: %s may be completed by %s but testresult is %s' % (
                                 ruleset.name, string, completingTiles or 'None', testSays or 'None'))
 
-    def dumpCase(self, hand, expected, total):
+    def dumpCase(self, hand:Hand, expected:Expected, total:Optional[int]) ->str:
         """dump test case"""
         assert self
         result = []
@@ -186,7 +191,7 @@ class Partials(Base):
 
     """some partial hands"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('drdrdr fe Ldrdrdrdr', [NoWin(8, 1), NoWin(8, 2)])
         self.scoreTest('fe', [NoWin(4), NoWin(4, 1)])
         self.scoreTest('fs fw fe fn', [NoWin(16, 1), NoWin(16, 3)])
@@ -198,7 +203,7 @@ class ZeroHand(Base):
 
     """zero hand games"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('c1c2c3 c7c8c9 b2b3b4 c5c5 s1s2s3 fw yw Lc1c1c2c3',
                        [Win(points=28, doubles=2), NoWin()], myWind=West, roundWind=North)
         self.scoreTest('c1c2c3 c7c8c9 b2b3b4 drdr s1s2s3 fw yw Lc1c1c2c3',
@@ -209,7 +214,7 @@ class FalseColorGame(Base):
 
     """false color games"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'c1c1c1 c7c7c7 c2c3c4 c5c5 c6c6c6 Lc5c5c5', [Win(32, 3), Win(28)])
         self.scoreTest('c1c2c3 wewewe drdrdr dbdb DgDgDg Ldbdbdb', [
@@ -231,7 +236,7 @@ class WrigglingSnake(Base):
 
     """the wriggling snake as in BMJA"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'c1c1 c2c3c4 c5c6c7 RC8C9WeWwWsWn Lc1c1c1', [NoWin(), NoWin()])
         self.scoreTest(
@@ -252,7 +257,7 @@ class SquirmingSnake(Base):
 
     """the winding snake"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'c1c1c1 c3c4c5 c9c9c9 c6c7c8 RC2C2 Lc1c1c1c1',
             [Win(limits=1),
@@ -290,7 +295,7 @@ class Purity(Base):
 
     """Purity BMJA"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'b1b1b1b1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw LB3B2B3B4',
             [Win(points=60, doubles=4), NoWin()])
@@ -307,7 +312,7 @@ class TrueColorGame(Base):
 
     """true color games"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'b1b1b1b1 RB2B3B4B5B6B7B8B8B2B2B2 fe fs fn fw LB3B2B3B4',
             [Win(points=60, doubles=4), NoWin()])
@@ -323,7 +328,7 @@ class OnlyConcealedMelds(Base):
 
     """only concealed melds"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'RB1B1B1B1B2B3B4B5B6B7B8B9DrDr fe ys LDrDrDr', [Win(46, 2), NoWin()])
         self.scoreTest('RB1B1B1B2B2B2B4B4B4B7B8B9DrDr fe ys LDrDrDr', [
@@ -338,7 +343,7 @@ class LimitHands(Base):
 
     """various limit hands"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'c1c1c1 c9c9 b9b9b9b9 s1s1s1 s9s9s9 Lc1c1c1c1',
             Win(limits=1))
@@ -357,7 +362,7 @@ class AllGreen(Base):
 
     """the green hand"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'c1c1c1 c7c7c7 c2c3c4 c5c5 c6c6c6 Lc5c5c5', [Win(32, 3), Win(28)])
         self.scoreTest(
@@ -376,7 +381,7 @@ class NineGates(Base):
     """the nine gates"""
         # DMJL allows 1..9 as last tile, BMJA allows only 2..8
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('RC1C1C1C2C3C4C5C6C7C8C9C9C9C5 LC5', Win(limits=1))
         self.scoreTest(
             'RC1C1C1C2C3C4C5C6C7C8C9C9C9C5 LC6',
@@ -408,7 +413,7 @@ class Manual(Base):
         # this should actually never happen but anyway we want to be sure that no rule
         # fires on this
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('', NoWin())
         self.scoreTest('', NoWin())
 
@@ -417,7 +422,7 @@ class ThirteenOrphans(Base):
 
     """The 13 orphans"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('RC1C9B9B1S1S9WeDgWsWnWwDbDrS1 LDgDg', Win(limits=1))
         self.scoreTest('ww RC1C9B9B1S1S9WeDgWsWnDbDrS8 Lwwww', NoWin())
         self.scoreTest('ww RC1C9B9B1S1S9WeDgWsWnDbDrS9 Lwwww', Win(limits=1))
@@ -437,7 +442,7 @@ class SimpleNonWinningCases(Base):
 
     """normal hands"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('s2s2s2 s2s3s4 RB1B1B1B1 c9c9c9C9 Ls2s2s3s4', NoWin(26))
 
 
@@ -445,7 +450,7 @@ class FourBlessingsOverTheDoor(Base):
 
     """lots of winds"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'b1b1 wewewe wswsws WnWnWn wwwwwwww Lb1b1b1',
             Win(limits=1))
@@ -469,7 +474,7 @@ class AllHonors(Base):
 
     """only honors"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'drdrdr wewe wswsws wnwnwn dbdbdb mz Ldrdrdrdr',
             Win(limits=1))
@@ -486,7 +491,7 @@ class BuriedTreasure(Base):
 
     """buried treasure, CC BMJA"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('RWeWeWeC3C3C3S3S3 c4c4c4C4 b8B8B8b8 me LWeWeWeWe',
                        [Win(limits=1), Win(58, 4)])
         self.scoreTest('RWeWeWeC3C3C3S3S3C4C4C4B8B8B8 me LWeWeWeWe',
@@ -503,7 +508,7 @@ class HiddenTreasure(Base):
 
     """hidden treasure, CC DMJL"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('RWeWeWeC3C3C3S3S3 c4c4c4C4 b8B8B8b8 me LWeWeWeWe',
                        [Win(limits=1), Win(58, 4)])
         self.scoreTest('RWeWeWeC3C3C3S3S3 c4c4c4C4 b8B8B8b8 LC3C3C3C3',
@@ -516,7 +521,7 @@ class FourfoldPlenty(Base):
 
     """4 kongs"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('RB3B3B3C1C1C1 b1b1b1 s3s4s5 wewe LB3B3B3B3', Win(42))
         self.scoreTest(
             'b3B3B3b3 c1C1C1c1 b1b1b1b1 s3s3s3s3 wewe Lwewewe',
@@ -538,7 +543,7 @@ class PlumBlossom(Base):
 
     """Gathering the plum blossom from the roof"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             's2s2s2 RS5S5S5B1B1B1B2B2 c9C9C9c9 me LS5S5S5S5',
             Win(limits=1))
@@ -552,7 +557,7 @@ class PluckingMoon(Base):
 
     """plucking the moon from the bottom of the sea"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             's2s2s2 RS1S1S1B1B1B1B2B2 c9C9C9c9 mz LS1S1S1S1',
             Win(limits=1))
@@ -566,7 +571,7 @@ class ScratchingPole(Base):
 
     """scratch a carrying pole"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'b2b3b4 RS1S1S1B1B1B1B4B4 c9C9C9c9 mk Lb2b2b3b4',
             Win(limits=1))
@@ -580,7 +585,7 @@ class ThreeGreatScholars(Base):
 
     """three concealed pungs"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('dgdgdg RDrDrDrDbDbDb s4s4s4 c5c5', Win(limits=1))
         self.scoreTest(
             'dgdgdg RDrDrDrDbDb s4s4s4 c5c5', [NoWin(16, 3), NoWin(limits=0.4)])
@@ -601,7 +606,7 @@ class ThreeConcealedPungs(Base):
 
     """three concealed pungs"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'RB2B2B2S1S1S1B1B1B1B4B4 c9c9c9c9 LB2B2B2B2', [Win(58, 2), Win(58, 1)])
         self.scoreTest(
@@ -614,7 +619,7 @@ class Rest(Base):
 
     """various tests"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('s1s1s1s1 s2s2s2 wewe RS3S3S3 s4s4s4 Ls2s2s2s2',
                        [Win(44, 2), Win(44, 1)], myWind=South, roundWind=West)
         self.scoreTest('s1s1s1s1 s2s2s2 RWeWeS3S3S3 s4s4s4 me LS3S3S3S3',
@@ -668,7 +673,7 @@ class TwofoldFortune(Base):
 
     """Twofold fortune"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'b1B1B1b1 RB2B3B4B5B6B7 b8b8b8b8 b5b5 fe fs fn fw m.t LB4',
             [Win(limits=1),
@@ -682,7 +687,7 @@ class OriginalCall(Base):
 
     """original call"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         # in DMJL, b4 would also win:
         self.scoreTest('s1s1s1 s1s2s3 RB6B6B6B8B8B8B5B5 fn yn m.a LB5B5B5',
                        [Win(44, 2), Win(42, 3)], myWind=North)
@@ -694,7 +699,7 @@ class RobbingKong(Base):
 
     """robbing the kong"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         # this hand is only possible if the player declared a hidden chow.
         # is that legal?
         self.scoreTest('s1s2s3 s1s2s3 RB6B6B7B7B8B8B5 fn yn m.a LB5',
@@ -711,7 +716,7 @@ class Blessing(Base):
 
     """blessing of heaven or earth"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('S4S5S6 RS1S2S3B6B6B7B7B8B8B5B5 fn yn m1',
                        [Win(limits=1), NoWin()])
         self.scoreTest('S4S5S6 RS1S2S3B6B6B7B7B8B8B5B5 fn yn m1',
@@ -726,7 +731,7 @@ class Terminals(Base):
 
     """only terminals"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         # must disallow chows:
         self.scoreTest(
             'b1b1 c1c2c3 c1c2c3 c1c2c3 c1c2c3 Lb1b1b1', [Win(26, 1), NoWin()])
@@ -745,7 +750,7 @@ class LongHand(Base):
 
     """long hand"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest('s1s2s3 s1s2s3 b3b3b3 b4b4b4 RB5B6 fn yn LB5', NoWin())
         self.scoreTest('RB2C1B2C1B2C1WeWeS4WeS4WeS6S5 LS5', NoWin())
         self.scoreTest('RB2C1B2C1B2C1WeWeS4WeS4WeS6S5S5 LS5', NoWin())
@@ -758,7 +763,7 @@ class MJ(Base):
     """test winner hands.
         Are the hidden melds grouped correctly?"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'RB1B1B1B2B2B2B3B4 wnwnwn wewewe Lwnwnwnwn', [Win(36, 3), Win(36, 2)])
         self.scoreTest(
@@ -778,7 +783,7 @@ class LastIsOnlyPossible(Base):
 
     """tests for determining if this was the only possible last tile"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             's2s3s4 DrDr S1S2S3 S6S7S8 B5B6B7 fw yw fs md Ls2s2s3s4', [Win(34), NoWin(0)])
         self.scoreTest('b3B3B3b3 wewewewe s2s2 RDbDbDbDrDrDr Ls2s2s2',
@@ -805,7 +810,7 @@ class TripleKnitting(Base):
 
     """triple knitting BMJA"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'RS2B2C2S4B4C4S6B6C6S7B7C7 s8b8 Ls8s8b8',
             [Nothing(),
@@ -848,7 +853,7 @@ class Knitting(Base):
 
     """knitting BMJA"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'RS2B2S3B3S4B4S5B5S6B6S7B7 s9b9 Ls9s9b9',
             [NoWin(),
@@ -880,7 +885,7 @@ class AllPairHonors(Base):
 
     """all pairs honors BMJA"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'RWeWeS1S1B9B9DgDgDrDrWsWsWwWw LS1S1S1',
             [NoWin(),
@@ -902,7 +907,7 @@ class BMJA(Base):
 
     """specials for chinese classical BMJA"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'RS1S1S5S6S7S8S9WeWsWwWnS2S3S4 LS3S3',
             [NoWin(),
@@ -913,7 +918,7 @@ class LastTile(Base):
 
     """will the best last meld be chosen?"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'wewewe s1s1s1 b9b9b9 RC1C1C1C2C3 LC1C1C1', [Win(38, 2), Win(34, 2)])
         self.scoreTest(
@@ -926,7 +931,7 @@ class CallingHands(Base):
 
     """diverse calling hands"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.callingTest('s1s1s1s1 b5b6b7 RB1B8C2C2C6C7C8 Lb5', '')
         self.callingTest('WnWn B1 B2 c4c5c6 b6b6b6 b8b8b8 ye yw', ['b3', ''])
         self.callingTest('WnWn B1 B2 dgdgdg b6b6b6 b8b8b8 ye yw', 'b3')
@@ -944,7 +949,7 @@ class Recursion(Base):
 
     """recursion in Hand computing should never happen"""
 
-    def testMe(self):
+    def testMe(self) ->None:
         self.scoreTest(
             'c6c6c6C6 fe fs RS8S8C1C2C3C4C5C7C8C9 LC6', [NoWin(16), NoWin(16, 1)])
         self.scoreTest(
@@ -955,7 +960,7 @@ class TstProgram(unittest.TestProgram):
 
     """we want global access to this program so we can check for verbosity in our tests"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         global PROGRAM  # pylint: disable=global-statement
         PROGRAM = self
         Debug.callers = '8'

@@ -9,6 +9,11 @@ SPDX-License-Identifier: GPL-2.0
 
 # pylint: disable=invalid-name
 
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from tile import Tile
+
 
 class Wind:
     """we want to use an wind for indices.
@@ -19,7 +24,7 @@ class Wind:
     all = []
     all4 = []
 
-    def __new__(cls, *args):
+    def __new__(cls, *args:Any) ->'Wind':
         if not Wind.all:
             Wind.all = [object.__new__(cls) for cls in (_East, _South, _West, _North, _NoWind)]
             Wind.all4 = list(Wind.all[:4])
@@ -36,7 +41,7 @@ class Wind:
                 return result
         assert False
 
-    def __eq__(self, other):
+    def __eq__(self, other:Any) ->bool:
         if not other:
             return False
         if isinstance(other, self.__class__):
@@ -48,29 +53,32 @@ class Wind:
         except AttributeError:
             return False
 
-    def __gt__(self, other):
+    def __gt__(self, other:Any) ->bool:
         assert isinstance(other, Wind)
         return self.__index__() > other.__index__()
 
-    def __lt__(self, other):
+    def __lt__(self, other:Any) ->bool:
         assert isinstance(other, Wind)
         return self.__index__() < other.__index__()
 
-    def __ge__(self, other):
+    def __ge__(self, other:Any) ->bool:
         assert isinstance(other, Wind)
         return self.__index__() >= other.__index__()
 
-    def __le__(self, other):
+    def __le__(self, other:Any) ->bool:
         assert isinstance(other, Wind)
         return self.__index__() <= other.__index__()
 
-    def __hash__(self):
+    def __hash__(self) ->int:
         return self.__index__()
 
-    def __str__(self):
+    def __index__(self) ->int:
+        raise NotImplementedError
+
+    def __str__(self) ->str:
         return self.char
 
-    def __repr__(self):
+    def __repr__(self) ->str:
         return 'Wind.{}'.format(self.char)
 
 
@@ -80,7 +88,7 @@ class _East(Wind):
     svgName = 'WIND_3'
     discSvgName = 'g4657'  # WIND_2 etc have a border
 
-    def __index__(self):
+    def __index__(self) ->int:
         return 0
 
 
@@ -90,7 +98,7 @@ class _South(Wind):
     svgName = 'WIND_2'
     discSvgName = 'g3980'
 
-    def __index__(self):
+    def __index__(self) ->int:
         return 1
 
 
@@ -100,7 +108,7 @@ class _West(Wind):
     svgName = 'WIND_4'
     discSvgName = 'g3192'
 
-    def __index__(self):
+    def __index__(self) ->int:
         return 2
 
 
@@ -110,7 +118,7 @@ class _North(Wind):
     svgName = 'WIND_1'
     discSvgName = 'g4290'
 
-    def __index__(self):
+    def __index__(self) ->int:
         return 3
 
 
@@ -119,7 +127,7 @@ class _NoWind(Wind):
     char = 'X'
     svgName = None
 
-    def __index__(self):
+    def __index__(self) ->int:
         return 4
 
 

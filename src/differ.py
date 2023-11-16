@@ -7,6 +7,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import List, Tuple, TYPE_CHECKING, Optional, Union
+
 from qt import Qt, QAbstractTableModel, QModelIndex
 from qt import QLabel, QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
@@ -17,28 +19,32 @@ from guiutil import BlockSignals
 from common import Debug
 from modeltest import ModelTest
 
+if TYPE_CHECKING:
+    from qt import QWidget
+    from rule import Ruleset
+
 
 class DifferModel(QAbstractTableModel):
 
     """a model for our ruleset differ"""
 
-    def __init__(self, diffs, view):
+    def __init__(self, diffs:List[Tuple[str,str,str]], view:'RulesetDiffer') ->None:
         super().__init__()
         self.diffs = diffs
         self.view = view
 
-    def columnCount(self, unusedIndex=QModelIndex()):
+    def columnCount(self, unusedIndex:QModelIndex=QModelIndex()) ->int:
         """how many columns does this node have?"""
         return 3  # rule name, left values, right values
 
-    def rowCount(self, parent=QModelIndex()):
+    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
         """how many items?"""
         if parent.isValid():
             # we have only top level items
             return 0
         return len(self.diffs)
 
-    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int,str,None]:
         """get from model"""
         if not index.isValid():
             return None
@@ -52,7 +58,7 @@ class DifferModel(QAbstractTableModel):
             return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         return None
 
-    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+    def headerData(self, section:int, orientation:int, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int,str,None]:
         """tell the view about the wanted headers"""
         if role == Qt.ItemDataRole.TextAlignmentRole:
             if orientation == Qt.Orientation.Horizontal:
@@ -73,7 +79,8 @@ class RulesetDiffer(QDialog):
 
     """Shows differences between rulesets"""
 
-    def __init__(self, leftRulesets, rightRulesets, parent=None):
+    def __init__(self, leftRulesets:List['Ruleset'], rightRulesets:List['Ruleset'],
+        parent:Optional['QWidget']=None) ->None:
         QDialog.__init__(self, parent)
         leftRulesets, rightRulesets = leftRulesets[:], rightRulesets[:]
         # remove rulesets from right which are also on the left side
@@ -121,20 +128,20 @@ class RulesetDiffer(QDialog):
         self.leftRulesetChanged()
         StateSaver(self)
 
-    def leftRulesetChanged(self):
+    def leftRulesetChanged(self) ->None:
         """slot to be called if the left ruleset changes"""
         if len(self.leftRulesets) == 1:
             self.orderRight()
         self.rulesetChanged()
 
-    def rulesetChanged(self):
+    def rulesetChanged(self) ->None:
         """slot to be called if the right ruleset changes"""
         self.model = DifferModel(self.formattedDiffs(), self)  # pylint:disable=attribute-defined-outside-init
         if Debug.modelTest:
             self.modelTest = ModelTest(self.model, self)  # pylint:disable=attribute-defined-outside-init
         self.view.setModel(self.model)
 
-    def orderRight(self):
+    def orderRight(self) ->None:
         """order the right rulesets by similarity to current left ruleset.
         Similarity is defined by the length of the diff list."""
         leftRuleset = self.cbRuleset1.current
@@ -145,7 +152,7 @@ class RulesetDiffer(QDialog):
             combo.items = [x[1] for x in diffPairs]
         combo.setCurrentIndex(0)
 
-    def formattedDiffs(self):
+    def formattedDiffs(self) ->List[Tuple[str, str, str]]:
         """a list of tuples with 3 values: name, left, right"""
         formatted = []
         leftRuleset = self.cbRuleset1.current

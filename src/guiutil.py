@@ -10,6 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import os
+from typing import TYPE_CHECKING, Optional, List, Any, Type, Union
 
 from qt import uic, QStandardPaths
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
@@ -19,8 +20,11 @@ from kde import KIcon
 
 from log import i18n
 
+if TYPE_CHECKING:
+    from qt import QObject, QWidget, QPainter, QGraphicsItem
+    from rule import Ruleset
 
-def loadUi(base):
+def loadUi(base:'QWidget') ->None:
     """load the ui file for class base, deriving the file name from
     the class name"""
     name = base.__class__.__name__.lower() + '.ui'
@@ -37,7 +41,7 @@ class MJTableView(QTableView):
 
     """a QTableView with app specific defaults"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional['QWidget']=None) ->None:
         QTableView.__init__(self, parent)
         self.horizontalHeader().setStretchLastSection(True)
         self.setAlternatingRowColors(True)
@@ -47,7 +51,7 @@ class MJTableView(QTableView):
         self.setSizePolicy(pol)
         self.verticalHeader().hide()
 
-    def initView(self):
+    def initView(self) ->None:
         """set some app specific defaults"""
         self.selectRow(0)
         self.resizeColumnsToContents()
@@ -59,41 +63,41 @@ class ListComboBox(QComboBox):
     """easy to use with a python list. The elements must have an
     attribute 'name'."""
 
-    def __init__(self, items, parent=None):
+    def __init__(self, items:List[Any], parent:Optional['QWidget']=None) ->None:
         QComboBox.__init__(self, parent)
         self.items = items
 
     @property
-    def items(self):
+    def items(self) ->List[Any]:
         """combo box items"""
         return [self.itemData(idx) for idx in range(self.count())]
 
     @items.setter
-    def items(self, items):
+    def items(self, items:List['Ruleset']) ->None:
         """combo box items"""
         self.clear()
         if items:
             for item in items:
                 self.addItem(i18n(item.name), item)
 
-    def findItem(self, search):
+    def findItem(self, search:Any) ->int:
         """return the index or -1 of not found """
         for idx, item in enumerate(self.items):
             if item == search:
                 return idx
         return -1
 
-    def names(self):
+    def names(self) ->List[str]:
         """a list with all item names"""
         return list(x.name for x in self.items)
 
     @property
-    def current(self):
+    def current(self) ->Any:
         """current item"""
         return self.itemData(self.currentIndex())
 
     @current.setter
-    def current(self, item):
+    def current(self, item:Any) ->None:
         """current item"""
         newIdx = self.findItem(item)
         if newIdx < 0:
@@ -105,15 +109,15 @@ class Painter:
 
     """a helper class for painting: saves/restores painter"""
 
-    def __init__(self, painter):
+    def __init__(self, painter:'QPainter') ->None:
         """painter is the painter to be saved/restored"""
         self.painter = painter
 
-    def __enter__(self):
+    def __enter__(self) ->'Painter':
         self.painter.save()
         return self
 
-    def __exit__(self, exc_type, exc_value, trback):
+    def __exit__(self, exc_type:Type[Exception], exc_value:Exception, trback:Any) ->None:
         """now check time passed"""
         self.painter.restore()
 
@@ -122,19 +126,19 @@ class BlockSignals:
 
     """a helper class for temporary blocking of Qt signals"""
 
-    def __init__(self, qobjects):
+    def __init__(self, qobjects:Union[List['QObject'], List['QWidget']]) ->None:
         self.qobjects = qobjects
 
     def __enter__(self) ->None:
         for obj in self.qobjects:
             obj.blockSignals(True)
 
-    def __exit__(self, exc_type, exc_value, trback):
+    def __exit__(self, exc_type:Type[Exception], exc_value:Exception, trback:Any) ->None:
         for obj in self.qobjects:
             obj.blockSignals(False)
 
 
-def decorateWindow(window, name=''):
+def decorateWindow(window:'QWidget', name:str='') ->None:
     """standard Kajongg window title and icon"""
     if name:
         window.setWindowTitle('{} – {}'.format(name, i18n('Kajongg')))
@@ -143,7 +147,7 @@ def decorateWindow(window, name=''):
     window.setWindowIcon(KIcon('kajongg'))
 
 
-def rotateCenter(item, angle):
+def rotateCenter(item:'QGraphicsItem', angle:float) ->None:
     """rotates a QGraphicsItem around its center
     rotateCenter and sceneRotation could be a mixin class but there are so many
     classes needing this. If and when more QGraphicsItem* classes are changed
@@ -153,7 +157,7 @@ def rotateCenter(item, angle):
     item.setTransform(QTransform().translate(
         centerX, centerY).rotate(angle).translate(-centerX, -centerY))
 
-def sceneRotation(item):
+def sceneRotation(item:'QGraphicsItem') ->int:
     """the combined rotation of item and all parents in degrees: 0,90,180 or 270"""
     transform = item.sceneTransform()
     matrix = (

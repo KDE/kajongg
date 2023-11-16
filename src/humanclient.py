@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import random
+from typing import List, Optional, TYPE_CHECKING, Type, Any, Tuple, Union
 
 from twisted.spread import pb
 from twisted.python.failure import Failure
@@ -34,11 +35,23 @@ from game import PlayingGame
 from visible import VisiblePlayingGame
 
 
+
+if TYPE_CHECKING:
+    from qt import QEvent, QKeyEvent
+    from deferredutil import Request
+    from move import Move
+    from tile import Tile, Meld, MeldList
+    from uitile import UITile
+    from message import ClientMessage, ServerMessage, ChatMessage
+    from scene import PlayingScene
+    from wind import Wind
+
+
 class SelectChow(KDialogIgnoringEscape):
 
     """asks which of the possible chows is wanted"""
 
-    def __init__(self, chows, propose, deferred):
+    def __init__(self, chows:'MeldList', propose:Optional['Meld'], deferred:Deferred) ->None:
         KDialogIgnoringEscape.__init__(self)
         decorateWindow(self)
         self.setButtons(KDialog.NoButton)
@@ -63,7 +76,7 @@ class SelectChow(KDialogIgnoringEscape):
             if chow == propose:
                 self.buttons[idx].setFocus()
 
-    def toggled(self, unusedChecked):
+    def toggled(self, unusedChecked:bool) ->None:
         """a radiobutton has been toggled"""
         button = self.sender()
         if button.isChecked():
@@ -76,7 +89,7 @@ class SelectKong(KDialogIgnoringEscape):
 
     """asks which of the possible kongs is wanted"""
 
-    def __init__(self, kongs, deferred):
+    def __init__(self, kongs:'MeldList', deferred:Deferred) ->None:
         KDialogIgnoringEscape.__init__(self)
         decorateWindow(self)
         self.setButtons(KDialog.NoButton)
@@ -97,7 +110,7 @@ class SelectKong(KDialogIgnoringEscape):
         widget.setLayout(layout)
         self.setMainWidget(widget)
 
-    def toggled(self, unusedChecked):
+    def toggled(self, unusedChecked:bool) ->None:
         """a radiobutton has been toggled"""
         button = self.sender()
         if button.isChecked():
@@ -110,14 +123,14 @@ class DlgButton(QPushButton):
 
     """special button for ClientDialog"""
 
-    def __init__(self, message, parent):
+    def __init__(self, message:'ClientMessage', parent:QWidget) ->None:
         QPushButton.__init__(self, parent)
         self.message = message
         self.client = parent.client
         self.setMinimumHeight(25)
         self.setText(message.buttonCaption())
 
-    def setMeaning(self, uiTile):
+    def setMeaning(self, uiTile:Optional['UITile']) ->None:
         """give me caption, shortcut, tooltip, icon"""
         tile = uiTile.tile if uiTile else None
         txt, warn, _ = self.message.toolTip(button=self, tile=tile)
@@ -126,7 +139,7 @@ class DlgButton(QPushButton):
         self.setToolTip(txt)
         self.setWarning(warn)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event:'QKeyEvent') ->None:
         """forward horizintal arrows to the hand board"""
         key = Board.mapChar2Arrow(event)
         if key in [Qt.Key.Key_Left, Qt.Key.Key_Right]:
@@ -137,7 +150,7 @@ class DlgButton(QPushButton):
                 return
         QPushButton.keyPressEvent(self, event)
 
-    def setWarning(self, warn):
+    def setWarning(self, warn:bool) ->None:
         """if warn, show a warning icon on the button"""
         if warn:
             self.setIcon(KIcon('dialog-warning'))
@@ -149,7 +162,7 @@ class ClientDialog(QDialog):
 
     """a simple popup dialog for asking the player what he wants to do"""
 
-    def __init__(self, client, parent=None):
+    def __init__(self, client:'HumanClient', parent:Optional[QWidget]=None) ->None:
         QDialog.__init__(self, parent)
         decorateWindow(self, i18n('Choose'))
         self.setObjectName('ClientDialog')
@@ -169,7 +182,7 @@ class ClientDialog(QDialog):
         self.answered = False
         self.sorry = None
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event:'QKeyEvent') ->None:
         """ESC selects default answer"""
         if not self.client.game or self.client.game.autoPlay:
             return
@@ -184,7 +197,7 @@ class ClientDialog(QDialog):
                     return
             QDialog.keyPressEvent(self, event)
 
-    def __declareButton(self, message):
+    def __declareButton(self, message:'ClientMessage') ->None:
         """define a button"""
         if not self.client.game:
             return
@@ -197,7 +210,7 @@ class ClientDialog(QDialog):
         btn.clicked.connect(self.selectedAnswer)
         self.buttons.append(btn)
 
-    def focusTileChanged(self):
+    def focusTileChanged(self) ->None:
         """update icon and tooltip for the discard button"""
         if not self.client.game:
             return
@@ -217,18 +230,18 @@ class ClientDialog(QDialog):
                 Internal.scene.handSelectorChanged(
                     self.client.game.myself.handBoard)
 
-    def checkTiles(self):
+    def checkTiles(self) ->None:
         """does the logical state match the displayed tiles?"""
         if not self.client.game:
             return
         for player in self.client.game.players:
             player.handBoard.checkTiles()
 
-    def messages(self):
+    def messages(self) ->List[Message]:
         """a list of all messages returned by the declared buttons"""
         return [x.message for x in self.buttons]
 
-    def proposeAction(self):
+    def proposeAction(self) ->DlgButton:
         """either intelligently or first button by default. May also
         focus a proposed tile depending on the action."""
         result = self.buttons[0]
@@ -248,7 +261,7 @@ class ClientDialog(QDialog):
                         game.myself.handBoard.focusTile = uiTile
         return result
 
-    def askHuman(self, move, answers, deferred):
+    def askHuman(self, move:'Move', answers:List['ClientMessage'], deferred:Deferred) ->None:
         """make buttons specified by answers visible. The first answer is default.
         The default button only appears with blue border when this dialog has
         focus but we always want it to be recognizable. Hence setBackgroundRole."""
@@ -277,7 +290,7 @@ class ClientDialog(QDialog):
             self.progressBar.reset()
             self.timer.start(msecs)
 
-    def placeInField(self):
+    def placeInField(self) ->None:
         """place the dialog at bottom or to the right depending on space."""
         if not Internal.scene:
             logError('placeInField: have no Internal.scene')
@@ -330,11 +343,11 @@ class ClientDialog(QDialog):
         geometry.setHeight(int(height))
         self.setGeometry(geometry)
 
-    def showEvent(self, unusedEvent):
+    def showEvent(self, unusedEvent:'QEvent') ->None:
         """try to place the dialog such that it does not cover interesting information"""
         self.placeInField()
 
-    def timeout(self):
+    def timeout(self) ->None:
         """the progressboard wants an update"""
         pBar = self.progressBar
         if isAlive(pBar):
@@ -346,7 +359,7 @@ class ClientDialog(QDialog):
                 self.selectButton()
                 pBar.setVisible(False)
 
-    def selectButton(self, message=None):
+    def selectButton(self, message:Optional[Message]=None) ->None:
         """select default answer. button may also be of type Message."""
         if self.answered:
             # sometimes we get this event twice
@@ -369,7 +382,7 @@ class ClientDialog(QDialog):
         assert self.deferred
         self.deferred.callback(message)
 
-    def selectedAnswer(self, unusedChecked):
+    def selectedAnswer(self, unusedChecked:bool) ->None:
         """the user clicked one of the buttons"""
         game = self.client.game
         if game and not game.autoPlay:
@@ -381,7 +394,7 @@ class HumanClient(Client):
     """a human client"""
     humanClients = []
 
-    def __init__(self):
+    def __init__(self) ->None:
         Client.__init__(self)
         HumanClient.humanClients.append(self)
         self.table = None
@@ -392,15 +405,15 @@ class HumanClient(Client):
             self.__loginFailed)
 
     @staticmethod
-    def shutdownHumanClients(exception=None):
+    def shutdownHumanClients(exception:Optional[Exception]=None) ->Any: # Union[Deferred, DeferredList]:
         """close connections to servers except maybe one"""
         clients = HumanClient.humanClients
 
-        def done():
+        def done() ->bool:
             """return True if clients is cleaned"""
             return len(clients) == 0 or (exception is not None and clients == [exception])
 
-        def disconnectedClient(unusedResult, client):
+        def disconnectedClient(unusedResult:Deferred, client:'HumanClient') ->None:
             """now the client is really disconnected from the server"""
             if client in clients:
                 # HumanClient.serverDisconnects also removes it!
@@ -422,7 +435,7 @@ class HumanClient(Client):
                         client).addErrback(logException))
         return DeferredList(deferreds)
 
-    def __loggedIn(self, connection):
+    def __loggedIn(self, connection:Connection) ->None:
         """callback after the server answered our login request"""
         self.connection = connection
         self.ruleset = connection.ruleset  # pylint:disable=attribute-defined-outside-init
@@ -446,7 +459,7 @@ class HumanClient(Client):
                         voiceId, maxGameId,
                         Internal.defaultPort).addCallbacks(self.__initTableList, self.__versionError)
 
-    def __initTableList(self, unused):
+    def __initTableList(self, unused:str) ->None:
         """first load of the list. Process options like --demo, --table, --join"""
         self.showTableList()
         if SingleshotOptions.table:
@@ -473,48 +486,48 @@ class HumanClient(Client):
             self.__showTables()
 
     @staticmethod
-    def __loginFailed(unused):
+    def __loginFailed(unused:List[Deferred]) ->None:
         """as the name says"""
         if Internal.scene:
             Internal.scene.startingGame = False
 
-    def isRobotClient(self):
+    def isRobotClient(self) ->bool:
         """avoid using isinstance, it would import too much for kajonggserver"""
         return False
 
     @staticmethod
-    def isHumanClient():
+    def isHumanClient() ->bool:
         """avoid using isinstance, it would import too much for kajonggserver"""
         return True
 
-    def isServerClient(self):
+    def isServerClient(self) ->bool:
         """avoid using isinstance, it would import too much for kajonggserver"""
         return False
 
-    def hasLocalServer(self):
+    def hasLocalServer(self) ->bool:
         """True if we are talking to a Local Game Server"""
         return self.connection is not None and self.connection.url.isLocalHost
 
-    def __updateTableList(self):
+    def __updateTableList(self) ->None:
         """if it exists"""
         if self.tableList:
             self.tableList.loadTables(self.tables)
 
-    def __showTables(self, unused=None):
+    def __showTables(self, unused:Optional[str]=None) ->None:
         """load and show tables. We may be used as a callback. In that case,
         clientTables is the id of a new table - which we do not need here"""
         if self.tableList:
             self.tableList.loadTables(self.tables)
             self.tableList.show()
 
-    def showTableList(self, unused=None):
+    def showTableList(self, unused:Optional[str]=None) ->None:
         """allocate it if needed"""
         if not self.tableList:
             self.tableList = TableList(self)
         self.tableList.loadTables(self.tables)
         self.tableList.activateWindow()
 
-    def remote_tableRemoved(self, tableid, message, *args):
+    def remote_tableRemoved(self, tableid:int, message:str, *args:Any) ->None:
         """update table list"""
         Client.remote_tableRemoved(self, tableid, message, *args)
         self.__updateTableList()
@@ -522,7 +535,7 @@ class HumanClient(Client):
             if self.name not in args or not message.endswith('has logged out'):
                 logWarning(i18n(message, *args))
 
-    def __receiveTables(self, tables):
+    def __receiveTables(self, tables:List[List[Any]]) ->None:
         """now we already know all rulesets for those tables"""
         Client.remote_newTables(self, tables)
         if not Internal.autoPlay:
@@ -533,11 +546,11 @@ class HumanClient(Client):
         if self.tables:
             self.__updateTableList()
 
-    def remote_newTables(self, tables):
+    def remote_newTables(self, tables:List[List[Any]]) ->None:
         """update table list"""
         assert tables
 
-        def gotRulesets(result):
+        def gotRulesets(result:List[Union[int, str]]) ->List[List[Any]]:
             """the server sent us the wanted ruleset definitions"""
             for ruleset in result:
                 Ruleset.cached(ruleset).save()  # make it known to the cache and save in db
@@ -554,13 +567,13 @@ class HumanClient(Client):
             self.__receiveTables(tables)
 
     @staticmethod
-    def remote_needRuleset(ruleset):
+    def remote_needRuleset(ruleset:str) ->List[List[Union[str, int, float]]]:
         """server only knows hash, needs full definition"""
         result = Ruleset.cached(ruleset)
         assert result and result.hash == ruleset
         return result.toList()
 
-    def tableChanged(self, table):
+    def tableChanged(self, table:ClientTable) ->Tuple[Optional[ClientTable], ClientTable]:
         """update table list"""
         oldTable, newTable = Client.tableChanged(self, table)
         if oldTable and oldTable == self.table:
@@ -573,7 +586,7 @@ class HumanClient(Client):
                 # others will then automatically leave too
                 for name in oldTable.playerNames:
                     if name != self.name and not newTable.isOnline(name):
-                        def sorried(unused):
+                        def sorried(unused:List['Request']) ->Deferred:
                             """user ack"""
                             game = self.game
                             if game:
@@ -589,8 +602,8 @@ class HumanClient(Client):
         return oldTable, newTable
 
     def readyForGameStart(
-            self, tableid, gameid, wantedGame, playerNames, shouldSave=True,
-            gameClass=None):
+            self, tableid:int, gameid:int, wantedGame:str, playerNames:List[Tuple['Wind', str]], shouldSave:bool=True,
+            gameClass:Optional[Type]=None) ->Deferred:
         """playerNames are in wind order ESWN"""
         if gameClass is None:
             if Options.gui:
@@ -598,13 +611,13 @@ class HumanClient(Client):
             else:
                 gameClass = PlayingGame
 
-        def clientReady():
+        def clientReady() ->Deferred:
             """macro"""
             return Client.readyForGameStart(
                 self, tableid, gameid, wantedGame, playerNames,
                 shouldSave, gameClass)
 
-        def answered(result):
+        def answered(result:Deferred) ->Union[Message, Deferred]:
             """callback, called after the client player said yes or no"""
             self.beginQuestion = None
             if self.connection and result:
@@ -612,7 +625,7 @@ class HumanClient(Client):
                 return clientReady()
             return Message.NoGameStart
 
-        def cancelled(unused):
+        def cancelled(unused:'Request') ->'ServerMessage':
             """the user does not want to start now. Back to table list"""
             if Debug.table:
                 logDebug('%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
@@ -641,9 +654,9 @@ class HumanClient(Client):
             answered).addErrback(cancelled)
         return self.beginQuestion
 
-    def readyForHandStart(self, playerNames, rotateWinds):
+    def readyForHandStart(self, playerNames:List[Tuple['Wind', str]], rotateWinds:bool) ->Optional[Deferred]:
         """playerNames are in wind order ESWN. Never called for first hand."""
-        def answered(unused=None):
+        def answered(unused:Optional[List['Request']]=None) ->Optional[Deferred]:
             """called after the client player said yes, I am ready"""
             return Client.readyForHandStart(self, playerNames, rotateWinds) if self.connection else None
         if not self.connection:
@@ -657,7 +670,7 @@ class HumanClient(Client):
         assert not self.game.isFirstHand()
         return Information(i18n("Ready for next hand?"), modal=False).addCallback(answered).addErrback(logException)
 
-    def ask(self, move, answers):
+    def ask(self, move:'Move', answers:List['ClientMessage']) ->Deferred:
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         if not Options.gui:
@@ -691,7 +704,7 @@ class HumanClient(Client):
         scene.clientDialog.askHuman(move, answers, deferred)
         return deferred
 
-    def __selectChow(self, chows):
+    def __selectChow(self, chows:'MeldList') ->Union[Deferred, Tuple['ClientMessage', Union['Meld', None]]]:
         """which possible chow do we want to expose?
         Since we might return a Deferred to be sent to the server,
         which contains Message.Chow plus selected Chow, we should
@@ -712,7 +725,7 @@ class HumanClient(Client):
         assert selDlg.exec_()
         return deferred
 
-    def __selectKong(self, kongs):
+    def __selectKong(self, kongs:'MeldList') ->Union[Deferred, Tuple['ClientMessage', Optional['Meld']]]:
         """which possible kong do we want to declare?"""
         assert self.game
         if self.game.autoPlay:
@@ -724,7 +737,10 @@ class HumanClient(Client):
         assert selDlg.exec_()
         return deferred
 
-    def __askAnswered(self, answer):
+    def __askAnswered(self, answer:'ClientMessage') ->Union[
+            Deferred,
+            Tuple['ClientMessage', Union[bool, 'Tile', 'Meld',
+                'MeldList', Tuple['MeldList', Optional['Tile'], 'Meld'], None ]]]:
         """the user answered our question concerning move"""
         if not self.game:
             return Message.NoClaim
@@ -750,13 +766,13 @@ class HumanClient(Client):
             return answer, None
         return answer, args
 
-    def __answerError(self, answer, move, answers):
+    def __answerError(self, answer:Message, move:'Move', answers:List[Message]) ->None:
         """an error happened while determining the answer to server"""
         logException(
             '%s %s %s %s' %
             (self.game.myself.name if self.game else 'NOGAME', answer, move, answers))
 
-    def remote_abort(self, tableid, message: str, *args):
+    def remote_abort(self, tableid:int, message: str, *args:Any) ->None:
         """the server aborted this game"""
         if self.table and self.table.tableid == tableid:
             # translate Robot to Roboter:
@@ -767,9 +783,9 @@ class HumanClient(Client):
                 self.game.close()
                 self.game = None
 
-    def remote_gameOver(self, tableid, message, *args):
+    def remote_gameOver(self, tableid:int, message:str, *args:Any) ->None:
         """the game is over"""
-        def yes(unused):
+        def yes(unused:'Request') ->None:
             """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
@@ -782,7 +798,7 @@ class HumanClient(Client):
             Internal.scene.mainWindow.updateGUI()
         Information(i18n(message, *args)).addCallback(yes).addErrback(logException)
 
-    def remote_serverDisconnects(self, result=None):
+    def remote_serverDisconnects(self, result:Optional[str]=None) ->None:
         """we logged out or lost connection to the server.
         Remove visual traces depending on that connection."""
         if Debug.connections and result:
@@ -806,7 +822,7 @@ class HumanClient(Client):
             if Internal.mainWindow:
                 Internal.mainWindow.close()
 
-    def serverDisconnected(self, unusedReference):
+    def serverDisconnected(self, unusedReference:Deferred) ->None:
         """perspective calls us back"""
         if self.connection and (Debug.traffic or Debug.connections):
             logDebug(
@@ -815,7 +831,7 @@ class HumanClient(Client):
         self.remote_serverDisconnects()
 
     @staticmethod
-    def __versionError(err):
+    def __versionError(err:Failure) ->Failure:
         """log the twisted error"""
         logWarning(err.getErrorMessage())
         if Internal.game:
@@ -824,7 +840,7 @@ class HumanClient(Client):
         return err
 
     @staticmethod
-    def __wantedGame():
+    def __wantedGame() ->str:
         """find out which game we want to start on the table"""
         result = SingleshotOptions.game
         if not result or result == '0':
@@ -832,7 +848,7 @@ class HumanClient(Client):
         SingleshotOptions.game = None
         return result
 
-    def tableError(self, err):
+    def tableError(self, err:Failure) ->None:
         """log the twisted error"""
         if not self.connection:
             # lost connection to server
@@ -842,11 +858,11 @@ class HumanClient(Client):
         else:
             logWarning(err.getErrorMessage())
 
-    def __newLocalTable(self, newId):
+    def __newLocalTable(self, newId:int) ->Deferred:
         """we just got newId from the server"""
         return self.callServer('startGame', newId).addErrback(self.tableError)
 
-    def __requestNewTableFromServer(self, tableid=None, ruleset=None):
+    def __requestNewTableFromServer(self, tableid:Optional[int]=None, ruleset:Optional[Ruleset]=None) ->Deferred:
         """as the name says"""
         if ruleset is None:
             ruleset = self.ruleset
@@ -855,7 +871,7 @@ class HumanClient(Client):
         return self.callServer('newTable', ruleset.hash, Options.playOpen,
                                Internal.autoPlay, self.__wantedGame(), tableid).addErrback(self.tableError)
 
-    def newTable(self):
+    def newTable(self) ->None:
         """TableList uses me as a slot"""
         if Options.ruleset:
             ruleset = Options.ruleset
@@ -873,7 +889,7 @@ class HumanClient(Client):
         assert self.tableList
         self.tableList.requestedNewTable = True
 
-    def joinTable(self, table=None):
+    def joinTable(self, table:Optional[ClientTable]=None) ->None:
         """join a table"""
         if not isinstance(table, ClientTable):
             assert self.tableList
@@ -881,9 +897,9 @@ class HumanClient(Client):
             assert table
         self.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
-    def logout(self, unusedResult=None):
+    def logout(self, unusedResult:Optional[List['Request']]=None) ->Deferred:
         """clean visual traces and logout from server"""
-        def loggedout(result, connection):
+        def loggedout(result:List['Request'], connection:Connection) ->List['Request']:
             """end the connection from client side"""
             if Debug.connections:
                 logDebug('server confirmed logout for {}'.format(self))
@@ -897,7 +913,7 @@ class HumanClient(Client):
             return self.callServer('logout').addCallback(loggedout, conn).addErrback(logException)
         return succeed(None)
 
-    def __logCallServer(self, *args):
+    def __logCallServer(self, *args:Any) ->None:
         """for Debug.traffic"""
         debugArgs = list(args[:])
         if Debug.neutral:
@@ -913,7 +929,7 @@ class HumanClient(Client):
         else:
             logDebug('callServer(%s)' % repr(debugArgs))
 
-    def callServer(self, *args):
+    def callServer(self, *args:Any) ->Deferred:
         """if we are online, call server"""
         if self.connection:
             if args[0] is None:
@@ -922,7 +938,7 @@ class HumanClient(Client):
                 if Debug.traffic:
                     self.__logCallServer(*args)
 
-                def callServerError(result):
+                def callServerError(result:str) ->Optional[str]:
                     """if serverDisconnected has been called meanwhile, just ignore msg about
                     connection lost in a non-clean fashion"""
                     return result if self.connection else None
@@ -937,6 +953,6 @@ class HumanClient(Client):
         else:
             return succeed(None)
 
-    def sendChat(self, chatLine):
+    def sendChat(self, chatLine:'ChatMessage') ->Deferred:
         """send chat message to server"""
         return self.callServer('chat', chatLine.asList())

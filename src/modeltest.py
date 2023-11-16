@@ -26,6 +26,8 @@ There are several variations of python ports for this script floating
 around, it seemed easier to me to maintain one for myself
 """
 
+from typing import List, Dict, Any, Type
+
 try:
     from PyQt5 import sip
 except ImportError:
@@ -36,7 +38,7 @@ from common import isAlive
 
 # pylint: skip-file
 
-def isValid(variant):
+def isValid(variant:Any) ->bool:
     return (variant is not None)
 
 
@@ -44,7 +46,7 @@ class ModelTest(QObject):
 
     """tests a model"""
 
-    def __init__(self, _model, parent):
+    def __init__(self, _model:QAbstractItemModel, parent:QObject) ->None:
         """
         Connect to all of the models signals, Whenever anything happens recheck everything.
         """
@@ -80,7 +82,7 @@ class ModelTest(QObject):
         self.model.rowsRemoved.connect(self.rowsRemoved)
         self.runAllTests()
 
-    def nonDestructiveBasicTest(self):
+    def nonDestructiveBasicTest(self) ->None:
         """
         nonDestructiveBasicTest tries to call a number of the basic functions (not all)
         to make sure the model doesn't outright segfault, testing the functions that makes sense.
@@ -114,7 +116,7 @@ class ModelTest(QObject):
         self.model.span(QModelIndex())
         self.model.supportedDropActions()
 
-    def rowCount(self):
+    def rowCount(self) ->None:
         """
         Tests self.model's implementation of QAbstractItemModel::rowCount() and hasChildren()
 
@@ -138,7 +140,7 @@ class ModelTest(QObject):
         # The self.models rowCount() is tested more extensively in checkChildren,
         # but this catches the big mistakes
 
-    def columnCount(self):
+    def columnCount(self) ->None:
         """
         Tests self.model's implementation of QAbstractItemModel::columnCount() and hasChildren()
         """
@@ -154,7 +156,7 @@ class ModelTest(QObject):
         # columnCount() is tested more extensively in checkChildren,
         # but this catches the big mistakes
 
-    def hasIndex(self):
+    def hasIndex(self) ->None:
         """
         Tests self.model's implementation of QAbstractItemModel::hasIndex()
         """
@@ -176,7 +178,7 @@ class ModelTest(QObject):
         # hasIndex() is tested more extensively in checkChildren()
         # but this catches the big mistakes
 
-    def index(self):
+    def index(self) ->None:
         """
         Tests self.model's implementation of QAbstractItemModel::index()
         """
@@ -203,7 +205,7 @@ class ModelTest(QObject):
         # index() is tested more extensively in checkChildren()
         # but this catches the big mistakes
 
-    def test_parent(self):
+    def test_parent(self) ->None:
         """
         Tests self.model's implementation of QAbstractItemModel::parent()
         """
@@ -243,7 +245,7 @@ class ModelTest(QObject):
         # parent's children correctly specify their parent
         self.checkChildren(QModelIndex())
 
-    def testRoleDataType(self, role, expectedType):
+    def testRoleDataType(self, role:Qt.ItemDataRole, expectedType:Type[Any]) ->None:
         """Tests implementation if model.data() for role"""
         model = self.model
         result = model.data(model.index(0, 0, QModelIndex()), role)
@@ -251,7 +253,7 @@ class ModelTest(QObject):
             raise Exception('returned data type is {}, should be {}'.format(
                 type(result), expectedType))
 
-    def testRoleDataValues(self, role, asserter):
+    def testRoleDataValues(self, role:Qt.ItemDataRole, asserter:Any) ->None:
         """Tests implementation if model.data() for role.
         asserter is a function returning True or False"""
         model = self.model
@@ -259,7 +261,7 @@ class ModelTest(QObject):
         if result is not None and not asserter(result):
             raise Exception('returned value {} is wrong')
 
-    def data(self):
+    def data(self) ->None:
         """
         Tests self.model's implementation of QAbstractItemModel::data()
         """
@@ -299,7 +301,7 @@ class ModelTest(QObject):
             Qt.ItemDataRole.CheckStateRole,
             lambda x: x in (Qt.CheckState.Unchecked, Qt.CheckState.PartiallyChecked, Qt.CheckState.Checked))
 
-    def runAllTests(self):
+    def runAllTests(self) ->None:
         """run all tests after the model changed"""
         if not isAlive(self):
             return
@@ -313,7 +315,7 @@ class ModelTest(QObject):
         self.test_parent()
         self.data()
 
-    def rowsAboutToBeInserted(self, parent, start, unusedEnd):
+    def rowsAboutToBeInserted(self, parent:QModelIndex, start:int, unusedEnd:int) ->None:
         """
         Store what is about to be inserted to make sure it actually happens
         """
@@ -324,7 +326,7 @@ class ModelTest(QObject):
         item['next'] = self.model.data(self.model.index(start, 0, parent))
         self.insert.append(item)
 
-    def rowsInserted(self, parent, start, end):
+    def rowsInserted(self, parent:QModelIndex, start:int, end:int) ->None:
         """
         Confirm that what was said was going to happen actually did
         """
@@ -345,7 +347,7 @@ class ModelTest(QObject):
         assert(item['next'] == self.model.data(
             self.model.index(end + 1, 0, item['parent'])))
 
-    def rowsAboutToBeRemoved(self, parent, start, end):
+    def rowsAboutToBeRemoved(self, parent:QModelIndex, start:int, end:int) ->None:
         """
         Store what is about to be inserted to make sure it actually happens
         """
@@ -356,7 +358,7 @@ class ModelTest(QObject):
         item['next'] = self.model.data(self.model.index(end + 1, 0, parent))
         self.remove.append(item)
 
-    def rowsRemoved(self, parent, start, end):
+    def rowsRemoved(self, parent:QModelIndex, start:int, end:int) ->None:
         """
         Confirm that what was said was going to happen actually did
         """
@@ -369,14 +371,14 @@ class ModelTest(QObject):
         assert(item['next'] == self.model.data(
             self.model.index(start, 0, item['parent'])))
 
-    def layoutAboutToBeChanged(self):
+    def layoutAboutToBeChanged(self) ->None:
         """
         Store what is about to be changed
         """
         for i in range(0, max(0, min(self.model.rowCount(), 100))):
             self.changing.append(QPersistentModelIndex(self.model.index(i, 0)))
 
-    def layoutChanged(self):
+    def layoutChanged(self) ->None:
         """
         Confirm that what was said was going to happen actually did
         """
@@ -387,7 +389,7 @@ class ModelTest(QObject):
                                            change.parent()))
         self.changing = []
 
-    def checkChildren(self, parent, depth=0):
+    def checkChildren(self, parent:QModelIndex, depth:int=0) ->None:
         """
         Called from parent() test.
 

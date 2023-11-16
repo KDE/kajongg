@@ -9,6 +9,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import TYPE_CHECKING, Tuple, List, Optional, Any, Union, Iterable
+
 from qt import Qt, QSize
 from qt import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
@@ -27,12 +29,16 @@ from genericdelegates import RightAlignedCheckboxDelegate, ZeroEmptyColumnDelega
 from statesaver import StateSaver
 from guiutil import decorateWindow
 
+if TYPE_CHECKING:
+    from qt import QShowEvent, QHideEvent, QItemSelection, QObject
+    from rule import RuleList
+
 
 class RuleRootItem(RootItem):
 
     """the root item for the ruleset tree"""
 
-    def columnCount(self):
+    def columnCount(self) ->int:
         return len(self.raw)
 
 
@@ -42,13 +48,13 @@ class RuleTreeItem(TreeItem):
     # pylint: disable=abstract-method
     # we know content() is abstract, this class is too
 
-    def columnCount(self):
+    def columnCount(self) ->int:
         """can be different for every rule"""
         if hasattr(self, 'colCount'):
             return self.colCount
         return len(self.raw)
 
-    def ruleset(self):
+    def ruleset(self) ->Ruleset:
         """return the ruleset containing this item"""
         item = self
         while not isinstance(item.raw, Ruleset):
@@ -61,27 +67,27 @@ class RulesetItem(RuleTreeItem):
 
     """represents a ruleset in the tree"""
 
-    def __init__(self, content):
+    def __init__(self, content:Ruleset) ->None:
         RuleTreeItem.__init__(self, content)
 
     @property
     def raw(self) ->Ruleset:
         return super().raw
 
-    def content(self, column):
+    def content(self, column:int) ->str:
         """return content stored in this item"""
         if column == 0:
             return self.raw.name
         return ''
 
-    def columnCount(self):
+    def columnCount(self) ->int:
         return 1
 
-    def remove(self):
+    def remove(self) ->None:
         """remove this ruleset from the model and the database"""
         self.raw.remove()
 
-    def tooltip(self):
+    def tooltip(self) ->str:
         """the tooltip for a ruleset"""
         return self.raw.description
 
@@ -90,20 +96,20 @@ class RuleListItem(RuleTreeItem):
 
     """represents a list of rules in the tree"""
 
-    def __init__(self, content):
+    def __init__(self, content:List[ParameterRule]) ->None:
         RuleTreeItem.__init__(self, content)
 
     @property
     def raw(self) ->'RuleList':
         return super().raw
 
-    def content(self, column):
+    def content(self, column:int) ->str:
         """return content stored in this item"""
         if column == 0:
             return self.raw.name
         return ''
 
-    def tooltip(self):
+    def tooltip(self) ->str:
         """tooltip for a list item explaining the usage of this list"""
         ruleset = self.ruleset()
         return '<b>' + i18n(ruleset.name) + '</b><br><br>' + \
@@ -114,14 +120,14 @@ class RuleItem(RuleTreeItem):
 
     """represents a rule in the tree"""
 
-    def __init__(self, content):
+    def __init__(self, content:ParameterRule) ->None:
         RuleTreeItem.__init__(self, content)
 
     @property
-    def raw(self):
+    def raw(self) ->Rule:
         return super().raw
 
-    def content(self, column):
+    def content(self, column:int) ->str:
         """return the content stored in this node"""
         colNames = self.parent.parent.parent.raw  # type:ignore
         if column == 0:
@@ -136,7 +142,7 @@ class RuleItem(RuleTreeItem):
             return getattr(self.raw.score, _)
         return ''
 
-    def tooltip(self):
+    def tooltip(self) ->str:
         """tooltip for rule: just the name of the ruleset"""
         ruleset = self.ruleset()
         if self.raw.description:
@@ -149,7 +155,7 @@ class RuleModel(TreeModel):
 
     """a model for our rule table"""
 
-    def __init__(self, rulesets, title, parent=None):
+    def __init__(self, rulesets:List[Ruleset], title:str, parent:Optional['QObject']=None) ->None:
         super().__init__(parent)
         self.rulesets = rulesets
         self.loaded = False
@@ -165,18 +171,18 @@ class RuleModel(TreeModel):
         rootData.extend(unitNames)
         self.rootItem = RuleRootItem(rootData)
 
-    def canFetchMore(self, unusedParent=None):
+    def canFetchMore(self, unusedParent:Optional['TreeItem']=None) ->bool:
         """did we already load the rules? We only want to do that
         when the config tab with rulesets is actually shown"""
         return not self.loaded
 
-    def fetchMore(self, unusedParent=None):
+    def fetchMore(self, unusedParent:Optional['TreeItem']=None) ->None:
         """load the rules"""
         for ruleset in self.rulesets:
             self.appendRuleset(ruleset)
         self.loaded = True
 
-    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Any:
         """get data fom model"""
         # pylint: disable=too-many-branches
         # too many branches
@@ -217,14 +223,14 @@ class RuleModel(TreeModel):
         return result
 
     @staticmethod
-    def isCheckboxCell(index):
+    def isCheckboxCell(index:QModelIndex) ->bool:
         """are we dealing with a checkbox?"""
         if index.column() != 1:
             return False
         item = index.internalPointer()
         return isinstance(item, RuleItem) and isinstance(item.raw, BoolRule)
 
-    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+    def headerData(self, section:int, orientation:int, role:int=Qt.ItemDataRole.DisplayRole) ->Optional[Any]:
         """tell the view about the wanted headers"""
         if Qt is None:
             # happens when kajongg exits unexpectedly
@@ -242,7 +248,7 @@ class RuleModel(TreeModel):
             return int(leftRight | Qt.AlignmentFlag.AlignVCenter)
         return None
 
-    def appendRuleset(self, ruleset):
+    def appendRuleset(self, ruleset:Ruleset) ->None:
         """append ruleset to the model"""
         if not ruleset:
             return
@@ -268,10 +274,11 @@ class EditableRuleModel(RuleModel):
 
     """add methods needed for editing"""
 
-    def __init__(self, rulesets, title, parent=None):
+    def __init__(self, rulesets:List[Ruleset], title:str, parent:Optional[QModelIndex]=None) ->None:
         RuleModel.__init__(self, rulesets, title, parent)
 
-    def __setRuleData(self, column, content, value):
+    def __setRuleData(self, column:int, content:Union[Rule, ParameterRule],
+        value:Union[str, int, bool]) ->Tuple[bool, Optional[str]]:
         """change rule data in the model"""
         dirty, message = False, None
         if column == 1 and isinstance(content, ParameterRule):
@@ -292,7 +299,7 @@ class EditableRuleModel(RuleModel):
             dirty, message = content.score.change(unitName, value)
         return dirty, message
 
-    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
+    def setData(self, index:QModelIndex, value:str, role:int=Qt.ItemDataRole.EditRole) ->bool:
         """change data in the model"""
         # pylint:  disable=too-many-branches
         if not index.isValid():
@@ -329,7 +336,7 @@ class EditableRuleModel(RuleModel):
             self.dataChanged.emit(index, index)
         return True
 
-    def flags(self, index):
+    def flags(self, index:QModelIndex) ->Qt.ItemFlags:
         """tell the view what it can do with this item"""
         if not index.isValid():
             return Qt.ItemFlag.ItemIsEnabled
@@ -357,8 +364,10 @@ class RuleTreeView(QTreeView):
 
     """Tree view for our rulesets"""
 
-    def __init__(self, name, btnCopy=None,
-                 btnRemove=None, btnCompare=None, parent=None):
+    def __init__(self, name:str,
+                 btnCopy:Optional[QPushButton]=None,
+                 btnRemove:Optional[QPushButton]=None,
+                 btnCompare:Optional[QPushButton]=None, parent:Optional[QWidget]=None) ->None:
         QTreeView.__init__(self, parent)
         self.name = name
         self.setObjectName('RuleTreeView')
@@ -375,19 +384,19 @@ class RuleTreeView(QTreeView):
         self.rulesets = []  # nasty: this generates self.ruleModel
         self.differs = []
 
-    def dataChanged(self, unusedIndex1, unusedIndex2, unusedRoles=None):
+    def dataChanged(self, unusedIndex1:int, unusedIndex2:int, unusedRoles:Optional[Iterable[int]]=None) ->None:
         """get called if the model has changed: Update all differs"""
         for differ in self.differs:
             differ.rulesetChanged()
 
     @property
-    def rulesets(self):
+    def rulesets(self) ->List[Ruleset]:
         """a list of rulesets made available by this model"""
         assert self.ruleModel
         return self.ruleModel.rulesets
 
     @rulesets.setter
-    def rulesets(self, rulesets):
+    def rulesets(self, rulesets:List[Ruleset]) ->None:
         """a new list: update display"""
         if not self.ruleModel or self.ruleModel.rulesets != rulesets:
             if self.btnRemove and self.btnCopy:
@@ -403,7 +412,7 @@ class RuleTreeView(QTreeView):
                 self.ruleModelTest = ModelTest(self.ruleModel, self)
             self.show()
 
-    def selectionChanged(self, selected, unusedDeselected=None):
+    def selectionChanged(self, selected:'QItemSelection', unused_deselected:Optional['QItemSelection']=None) ->None:
         """update editing buttons"""
         assert self.ruleModel
         enableCopy = enableRemove = enableCompare = False
@@ -423,7 +432,7 @@ class RuleTreeView(QTreeView):
         if self.btnCompare:
             self.btnCompare.setEnabled(enableCompare)
 
-    def showEvent(self, unusedEvent):
+    def showEvent(self, unusedEvent:'QShowEvent') ->None:
         """reload the models when the view comes into sight"""
         # default: make sure the name column is wide enough
         assert self.ruleModel
@@ -439,12 +448,12 @@ class RuleTreeView(QTreeView):
         for col in range(header.count()):
             self.resizeColumnToContents(col)
 
-    def selectedRow(self):
+    def selectedRow(self) ->Optional[QModelIndex]:
         """return the currently selected row index (with column 0)"""
         rows = self.selectionModel().selectedRows()
         return rows[0] if len(rows) == 1 else None
 
-    def copyRow(self):
+    def copyRow(self) ->None:
         """copy a ruleset"""
         row = self.selectedRow()
         if row:
@@ -455,7 +464,7 @@ class RuleTreeView(QTreeView):
             self.rulesets.append(ruleset)
             self.selectionChanged(self.selectionModel().selection())
 
-    def removeRow(self):
+    def removeRow(self) ->None:
         """removes a ruleset or a rule"""
         row = self.selectedRow()
         if row:
@@ -467,7 +476,7 @@ class RuleTreeView(QTreeView):
             self.rulesets.remove(ruleset)
             self.selectionChanged(self.selectionModel().selection())
 
-    def compareRow(self):
+    def compareRow(self) ->None:
         """shows the difference between two rulesets"""
         rows = self.selectionModel().selectedRows()
         ruleset = rows[0].internalPointer().raw
@@ -481,12 +490,12 @@ class RulesetSelector(QWidget):
 
     """presents all available rulesets with previews"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional[QWidget]=None):
         super().__init__(parent)
         self.setContentsMargins(0, 0, 0, 0)
         self.setupUi()
 
-    def setupUi(self):
+    def setupUi(self) ->None:
         """layout the window"""
         decorateWindow(self, i18nc("@title:window", "Customize rulesets"))
         self.setObjectName('Rulesets')
@@ -531,7 +540,7 @@ class RulesetSelector(QWidget):
         StateSaver(self)
         self.show()
 
-    def sizeHint(self):
+    def sizeHint(self) ->QSize:
         """we never want a horizontal scrollbar for player names,
         we always want to see them in full"""
         result = QWidget.sizeHint(self)
@@ -540,21 +549,21 @@ class RulesetSelector(QWidget):
         width = max(result.width(), available.width() // 2)
         return QSize(width, height)
 
-    def minimumSizeHint(self):
+    def minimumSizeHint(self) ->QSize:
         """we never want a horizontal scrollbar for player names,
         we always want to see them in full"""
         return self.sizeHint()
 
-    def showEvent(self, unusedEvent):
+    def showEvent(self, unusedEvent:'QShowEvent') ->None:
         """reload the rulesets"""
         self.refresh()
 
-    def refresh(self):
+    def refresh(self) ->None:
         """retranslate and reload rulesets"""
         self.retranslateUi()
         self.rulesetView.rulesets = Ruleset.availableRulesets()
 
-    def hideEvent(self, event):
+    def hideEvent(self, event:'QHideEvent') ->None:
         """close all differ dialogs"""
         marked = []
         for differ in self.rulesetView.differs:
@@ -564,7 +573,7 @@ class RulesetSelector(QWidget):
         for _ in marked:
             del _
 
-    def retranslateUi(self):
+    def retranslateUi(self) ->None:
         """translate to current language"""
         self.btnCopy.setText(i18n("C&opy"))
         self.btnCompare.setText(i18nc('Kajongg ruleset comparer', 'Co&mpare'))

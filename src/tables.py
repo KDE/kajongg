@@ -9,6 +9,8 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 
+from typing import TYPE_CHECKING, Optional, List, Any
+
 from qt import Qt, QAbstractTableModel, QModelIndex
 from qt import QDialog, QDialogButtonBox, QWidget
 from qt import QHBoxLayout, QVBoxLayout, QAbstractItemView
@@ -28,19 +30,25 @@ from common import Internal, Debug
 from modeltest import ModelTest
 from chat import ChatMessage, ChatWindow
 
+if TYPE_CHECKING:
+    from client import ClientTable
+    from qt import QObject, QEvent, QItemSelection
+    from login import Url
+    from humanclient import HumanClient
+    from scene import PlayingScene
 
 class TablesModel(QAbstractTableModel):
 
     """a model for our tables"""
 
-    def __init__(self, tables, parent=None):
+    def __init__(self, tables:List['ClientTable'], parent:Optional['QObject']=None) ->None:
         super().__init__(parent)
         self.tables = tables
         assert isinstance(tables, list)
 
     def headerData(
-            self, section,
-            orientation, role=Qt.ItemDataRole.DisplayRole):
+            self, section:int,
+            orientation:Qt.Orientation, role:int=Qt.ItemDataRole.DisplayRole) ->Any:
         """show header"""
         if role == Qt.ItemDataRole.TextAlignmentRole:
             if orientation == Qt.Orientation.Horizontal:
@@ -61,21 +69,21 @@ class TablesModel(QAbstractTableModel):
                       i18n('Ruleset')][section]
         return result
 
-    def rowCount(self, parent=QModelIndex()):
+    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
         """how many tables are in the model?"""
         if parent.isValid():
             # we have only top level items
             return 0
         return len(self.tables)
 
-    def columnCount(self, unusedParent=QModelIndex()):
+    def columnCount(self, unusedParent:QModelIndex=QModelIndex()) ->int:
         """for now we only have id (invisible), id (visible), players,
         status, ruleset.name.
         id(invisible) always holds the real id, also 1000 for suspended tables.
         id(visible) is what should be displayed."""
         return 5
 
-    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Any:
         """score table"""
         # pylint: disable=too-many-branches,too-many-locals
         result = None
@@ -139,7 +147,7 @@ class SelectRuleset(QDialog):
 
     """a dialog for selecting a ruleset"""
 
-    def __init__(self, server=None):
+    def __init__(self, server:Optional['Url']=None) ->None:
         QDialog.__init__(self, None)
         decorateWindow(self, i18n('Select a ruleset'))
         self.buttonBox = KDialogButtonBox(self)
@@ -162,7 +170,7 @@ class TableList(QWidget):
     """a widget for viewing, joining, leaving tables"""
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, client):
+    def __init__(self, client:'HumanClient'):
         super().__init__(None)
         self.autoStarted = False
         self.client = client
@@ -228,7 +236,7 @@ class TableList(QWidget):
         StateSaver(self, self.view.horizontalHeader())
         self.__updateButtonsForNoTable()
 
-    def hideEvent(self, unusedEvent):
+    def hideEvent(self, unusedEvent:'QEvent') ->None:
         """table window hides"""
         scene = Internal.scene
         if scene:
@@ -244,11 +252,11 @@ class TableList(QWidget):
                 # do we still need this connection?
                 self.client.logout()
 
-    def chat(self):
+    def chat(self) ->None:
         """chat. Only generate ChatWindow after the
         message has successfully been sent to the server.
         Because the server might have gone away."""
-        def initChat(_):
+        def initChat(_:Any) ->None:
             """now that we were able to send the message to the server
             instantiate the chat window"""
             assert table
@@ -272,7 +280,7 @@ class TableList(QWidget):
         else:
             table.chatWindow.show()
 
-    def show(self):
+    def show(self) ->None:
         """prepare the view and show it"""
         if self.client.hasLocalServer():
             title = i18n(
@@ -295,12 +303,12 @@ class TableList(QWidget):
                 self.view.hideColumn(2)
                 self.view.hideColumn(4)
 
-    def selectTable(self, idx):
+    def selectTable(self, idx:int) ->None:
         """select table by idx"""
         self.view.selectRow(idx)
         self.updateButtonsForTable(self.selectedTable())
 
-    def __updateButtonsForNoTable(self):
+    def __updateButtonsForNoTable(self) ->None:
         """update button status when no table is selected"""
         self.joinButton.setEnabled(False)
         self.leaveButton.setVisible(False)
@@ -313,7 +321,7 @@ class TableList(QWidget):
         self.compareButton.setEnabled(False)
         self.chatButton.setVisible(False)
 
-    def updateButtonsForTable(self, table=None):
+    def updateButtonsForTable(self, table:Optional['ClientTable']=None) ->None:
         """update button status for the currently selected table"""
         if table is None:
             self.__updateButtonsForNoTable()
@@ -360,12 +368,12 @@ class TableList(QWidget):
                 "For chatting with others on this table, "
                 "please first take a seat"))
 
-    def selectionChanged(self, selected, unusedDeselected):
+    def selectionChanged(self, selected:'QItemSelection', unusedDeselected:'QItemSelection') ->None:
         """update button states according to selection"""
         if selected.indexes():
             self.selectTable(selected.indexes()[0].row())
 
-    def selectedTable(self):
+    def selectedTable(self) ->Optional['ClientTable']:
         """return the selected table"""
         if self.view.selectionModel():
             index = self.view.selectionModel().currentIndex()
@@ -374,14 +382,14 @@ class TableList(QWidget):
                 return model.tables[index.row()]
         return None
 
-    def compareRuleset(self):
+    def compareRuleset(self) ->None:
         """compare the ruleset of this table against ours"""
         table = self.selectedTable()
         if table:
             self.__differ = RulesetDiffer([table.ruleset], Ruleset.availableRulesets())  # pylint:disable=attribute-defined-outside-init
             self.__differ.show()
 
-    def startGame(self):
+    def startGame(self) ->None:
         """start playing at the selected table"""
         table = self.selectedTable()
         if table:
@@ -391,7 +399,7 @@ class TableList(QWidget):
                 table.tableid).addErrback(
                     self.client.tableError)
 
-    def leaveTable(self):
+    def leaveTable(self) ->None:
         """leave a table"""
         table = self.selectedTable()
         if table:
@@ -400,7 +408,7 @@ class TableList(QWidget):
                 table.tableid).addErrback(
                     self.client.tableError)
 
-    def __keepChatWindows(self, tables):
+    def __keepChatWindows(self, tables:List['ClientTable']) ->None:
         """copy chatWindows from the old table list which will be
         thrown away"""
         model = self.view.model()
@@ -414,7 +422,7 @@ class TableList(QWidget):
                 if unusedWindow:
                     unusedWindow.hide()
 
-    def __preselectTableId(self, tables):
+    def __preselectTableId(self, tables:List['ClientTable']) ->int:
         """which table should be preselected?
         If we just requested a new table:
           select first new table.
@@ -438,7 +446,7 @@ class TableList(QWidget):
             return _.tableid
         return 0
 
-    def loadTables(self, tables):
+    def loadTables(self, tables:List['ClientTable']) ->None:
         """build and use a model around the tables.
         Show all new tables (no gameid given yet) and all suspended
         tables that also exist locally. In theory all suspended games should

@@ -10,6 +10,8 @@ SPDX-License-Identifier: GPL-2.0
 import functools
 import types
 
+from typing import List, Callable, Any, Optional, Union, Type, TYPE_CHECKING
+
 from twisted.internet.defer import Deferred, succeed, fail
 
 from qt import QPropertyAnimation, QParallelAnimationGroup, \
@@ -19,6 +21,11 @@ from qt import Property, QGraphicsObject, QGraphicsItem, QPointF, QObject
 from common import Internal, Debug, isAlive, ReprMixin, id4
 from log import logDebug, logException
 
+if TYPE_CHECKING:
+    from qt import QGraphicsScene
+
+PropertyType = Union[QPointF,int,float]
+
 class Animation(QPropertyAnimation, ReprMixin):
 
     """a Qt animation with helper methods"""
@@ -26,7 +33,8 @@ class Animation(QPropertyAnimation, ReprMixin):
     nextAnimations = []
     clsUid = 0
 
-    def __init__(self, graphicsObject, propName, endValue, parent=None):
+    def __init__(self, graphicsObject:'AnimatedMixin', propName:str,
+        endValue:PropertyType, parent:Optional['QObject']=None) ->None:
         self.debug = graphicsObject.debug_name() in Debug.animation or Debug.animation == 'all'
         self.debug |= 'T{}t'.format(id4(graphicsObject)) in Debug.animation
         Animation.clsUid += 1
@@ -50,7 +58,7 @@ class Animation(QPropertyAnimation, ReprMixin):
             else:
                 logDebug('Animation(%s)' % self)
 
-    def setEndValue(self, endValue):
+    def setEndValue(self, endValue:PropertyType) ->None:
         """wrapper with debugging code"""
         graphicsObject = self.targetObject()
         if not isAlive(graphicsObject):
@@ -65,14 +73,14 @@ class Animation(QPropertyAnimation, ReprMixin):
                     self.formatValue(endValue), graphicsObject))
         QPropertyAnimation.setEndValue(self, endValue)
 
-    def ident(self):
+    def ident(self) ->str:
         """the identifier to be used in debug messages"""
         pGroup = self.group() if isAlive(self) else 'notAlive'
         if pGroup or not isAlive(self):
             return '%s/A%s' % (pGroup, id4(self))
         return 'A%s-%s' % (id4(self), self.targetObject().debug_name())
 
-    def pName(self):
+    def pName(self) ->str:
         """
         Return self.propertyName() as a python string.
 
@@ -82,7 +90,7 @@ class Animation(QPropertyAnimation, ReprMixin):
             return 'notAlive'
         return bytes(self.propertyName()).decode()
 
-    def formatValue(self, value):
+    def formatValue(self, value:PropertyType) ->str:
         """string format the wanted value from qvariant"""
         pName = self.pName()
         if pName == 'pos':
@@ -94,7 +102,7 @@ class Animation(QPropertyAnimation, ReprMixin):
             return '%.2f' % value
         return 'formatValue: unexpected {}={}'.format(pName, value)
 
-    def __str__(self):
+    def __str__(self) ->str:
         """for debug messages"""
         if isAlive(self) and isAlive(self.targetObject()):
             currentValue = getattr(self.targetObject(), self.pName())
@@ -112,7 +120,7 @@ class Animation(QPropertyAnimation, ReprMixin):
             self.duration())
 
     @staticmethod
-    def removeImmediateAnimations():
+    def removeImmediateAnimations() ->None:
         """execute and remove immediate moves from the list
         We do not animate objects if
              - we are in a graphics object drag/drop operation
@@ -151,7 +159,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
     running = []  # we need a reference to active animation groups
     current = None
     clsUid = 0
-    def __init__(self, animations, parent=None):
+    def __init__(self, animations:List[Animation], parent:Optional['QObject']=None) ->None:
         QParallelAnimationGroup.__init__(self, parent)
         self.animations = animations
         self.uid = ParallelAnimationGroup.clsUid
@@ -176,7 +184,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         self.stateChanged.connect(self.showState)
 
     @staticmethod
-    def cancelAll():
+    def cancelAll() ->None:
         """cancel all animations"""
         if Debug.quit:
             logDebug('Cancelling all animations')
@@ -184,13 +192,13 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             if isAlive(group):
                 group.clear()
 
-    def showState(self, newState, oldState):
+    def showState(self, newState:int, oldState:int) ->None:
         """override Qt method"""
         if self.debug:
             logDebug('G{}: {} -> {} isAlive:{}'.format(
                 self.uid, self.stateName(oldState), self.stateName(newState), isAlive(self)))
 
-    def updateCurrentTime(self, value):
+    def updateCurrentTime(self, value:int) ->None:
         """count how many steps an animation does."""
         self.steps += 1
         if self.steps % 50 == 0:
@@ -203,7 +211,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
                     self.removeAnimation(animation)
         QParallelAnimationGroup.updateCurrentTime(self, value)
 
-    def start(self, unusedResults='DIREKT'):
+    def start(self, unusedResults:str='DIREKT') ->Deferred:  # type: ignore[override]
         """start the animation, returning its deferred"""
         if not isAlive(self):
             return fail()
@@ -241,7 +249,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
                 ','.join('A%s' % id4(x) for x in self.animations)))
         return succeed(None).addErrback(logException)
 
-    def allFinished(self):
+    def allFinished(self) ->None:
         """all animations have finished. Cleanup and callback"""
         self.fixAllBoards()
         if self == ParallelAnimationGroup.current:
@@ -261,7 +269,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         for after in self.doAfter:
             after.callback(None)
 
-    def fixAllBoards(self):
+    def fixAllBoards(self) ->None:
         """set correct drawing order for all moved graphics objects"""
         for animation in self.children():
             graphicsObject = animation.targetObject()
@@ -270,7 +278,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         if Internal.scene:
             Internal.scene.focusRect.refresh()
 
-    def stateName(self, state=None):
+    def stateName(self, state:Any=None) ->str:
         """for debug output"""
         if not isAlive(self):
             return 'not alive'
@@ -282,7 +290,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             return 'running'
         return 'unknown state:{}'.format(state)
 
-    def __str__(self):
+    def __str__(self) ->str:
         """for debugging"""
         return 'G{}({}:{})'.format(self.uid, len(self.animations), self.stateName())
 
@@ -290,42 +298,42 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
 class AnimatedMixin:
     """for UITile and WindDisc"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         super().__init__()
         self.activeAnimation = {}  # key is the property name
         self.queuedAnimations = []
 
-    def _get_pos(self):
+    def _get_pos(self) ->QPointF:
         """getter for property pos"""
         return QGraphicsObject.pos(self)
 
-    def _set_pos(self, pos):
+    def _set_pos(self, pos:QPointF) ->None:
         """setter for property pos"""
         QGraphicsObject.setPos(self, pos)
 
     pos = Property(QPointF, fget=_get_pos, fset=_set_pos)
 
-    def _get_scale(self):
+    def _get_scale(self) ->float:
         """getter for property scale"""
         return QGraphicsObject.scale(self)
 
-    def _set_scale(self, scale):
+    def _set_scale(self, scale:float) ->None:
         """setter for property scale"""
         QGraphicsObject.setScale(self, scale)
 
     scale = Property(float, fget=_get_scale, fset=_set_scale)
 
-    def _get_rotation(self):
+    def _get_rotation(self) ->float:
         """getter for property rotation"""
         return QGraphicsObject.rotation(self)
 
-    def _set_rotation(self, rotation):
+    def _set_rotation(self, rotation:float) ->None:
         """setter for property rotation"""
         QGraphicsObject.setRotation(self, rotation)
 
     rotation = Property(float, fget=_get_rotation, fset=_set_rotation)
 
-    def queuedAnimation(self, propertyName):
+    def queuedAnimation(self, propertyName:str) ->Optional['Animation']:
         """return the last queued animation for this graphics object and propertyName"""
         for item in reversed(self.queuedAnimations):
             if item.pName() == propertyName:
@@ -341,7 +349,7 @@ class AnimatedMixin:
 #        """for mypy"""
 #
 
-    def shortcutAnimation(self, animation):
+    def shortcutAnimation(self, animation:'Animation') ->None:
         """directly set the end value of the animation"""
         if animation.debug:
             logDebug('shortcut {}: UTile {}: clear queuedAnimations'.format(animation, self.debug_name()))
@@ -349,12 +357,12 @@ class AnimatedMixin:
         self.queuedAnimations = []
         self.setDrawingOrder()
 
-    def getValue(self, pName):
+    def getValue(self, pName:str) ->PropertyType:
         """get a current property value"""
         return {'pos': self.pos, 'rotation': self.rotation,
                 'scale': self.scale}[pName]
 
-    def setActiveAnimation(self, animation):
+    def setActiveAnimation(self, animation:'Animation') ->None:
         """the graphics object knows which of its properties are currently animated"""
         self.queuedAnimations = []
         propName = animation.pName()
@@ -370,7 +378,7 @@ class AnimatedMixin:
         self.activeAnimation[propName] = animation
         self.setCacheMode(QGraphicsItem.CacheMode.ItemCoordinateCache)
 
-    def clearActiveAnimation(self, animation):
+    def clearActiveAnimation(self, animation:'Animation') ->None:
         """an animation for this graphics object has ended.
         Finalize graphics object in its new position"""
         del self.activeAnimation[animation.pName()]
@@ -381,7 +389,7 @@ class AnimatedMixin:
             self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
             self.update()
 
-    def setupAnimations(self):
+    def setupAnimations(self) ->None:
         """move the item to its new place. This puts new Animation
         objects into the queue to be animated by calling animate()"""
         for pName, newValue in self.moveDict().items():
@@ -415,7 +423,7 @@ class AnimationSpeed:
 
     """a helper class for moving graphics with a given speed. 99=immediate."""
 
-    def __init__(self, speed=None):
+    def __init__(self, speed:Optional[int]=None) ->None:
         if speed is None:
             speed = 99
         if Internal.Preferences:
@@ -426,10 +434,10 @@ class AnimationSpeed:
                 if Debug.animationSpeed:
                     logDebug('AnimationSpeed sets speed %d' % speed)
 
-    def __enter__(self):
+    def __enter__(self) ->'AnimationSpeed':
         return self
 
-    def __exit__(self, exc_type, exc_value, trback):
+    def __exit__(self, exc_type:Type[Exception], exc_value:Exception, trback:Any) ->None:
         """reset previous animation speed"""
         if Internal.Preferences:
             if self.__speed < 99:
@@ -441,11 +449,11 @@ class AnimationSpeed:
                 Internal.Preferences.animationSpeed = self.prevAnimationSpeed
 
 
-def afterQueuedAnimations(doAfter):
+def afterQueuedAnimations(doAfter:Deferred) ->Callable:
     """A decorator"""
 
-    @functools.wraps(doAfter)
-    def doAfterQueuedAnimations(*args, **kwargs):
+    @functools.wraps(doAfter)  # type:ignore[arg-type]
+    def doAfterQueuedAnimations(*args:Any, **kwargs:Any) ->None:
         """do this after all queued animations have finished"""
         method = types.MethodType(doAfter, args[0])
         args = args[1:]
@@ -458,7 +466,7 @@ def afterQueuedAnimations(doAfter):
     return doAfterQueuedAnimations
 
 
-def animate():
+def animate() ->Deferred:
     """now run all prepared animations. Returns a Deferred
         so callers can attach callbacks to be executed when
         animation is over.
@@ -474,13 +482,13 @@ def animate():
     return succeed(None).addErrback(logException)
 
 
-def doCallbackWithSpeed(result, speed, callback, *args, **kwargs):
+def doCallbackWithSpeed(result:Any, speed:int, callback:Callable, *args:Any, **kwargs:Any) ->None:
     """as the name says"""
     with AnimationSpeed(speed):
         callback(result, *args, **kwargs)
 
 
-def animateAndDo(callback, *args, **kwargs):
+def animateAndDo(callback:Callable, *args:Any, **kwargs:Any) ->Deferred:
     """if we want the next animations to have the same speed as the current group,
     do not use animate().addCallback() because speed would not be kept"""
     result = animate()

@@ -7,6 +7,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import Optional, Union, TYPE_CHECKING
+
 from qt import Qt, QAbstractTableModel, QModelIndex, QSize
 from qt import QWidget, QLineEdit, QVBoxLayout, QColor, QAbstractItemView
 
@@ -17,16 +19,20 @@ from message import ChatMessage
 from common import Debug, Internal
 from modeltest import ModelTest
 
+if TYPE_CHECKING:
+    from qt import QObject
+    from client import ClientTable
+    from scene import GameScene
 
 class ChatModel(QAbstractTableModel):
 
     """a model for the chat view"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional['QObject']=None) ->None:
         super().__init__(parent)
         self.chatLines = []
 
-    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+    def headerData(self, section:int, orientation:int, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, None]:
         """show header"""
         if role == Qt.ItemDataRole.TextAlignmentRole:
             if orientation == Qt.Orientation.Horizontal:
@@ -42,7 +48,7 @@ class ChatModel(QAbstractTableModel):
             result = [i18n('Time'), i18n('Player'), i18n('Message')][section]
         return result
 
-    def rowCount(self, parent=QModelIndex()):
+    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
         """how many lines are in the model?"""
         if parent.isValid():
             # similar in tables.py
@@ -50,11 +56,11 @@ class ChatModel(QAbstractTableModel):
             return 0
         return len(self.chatLines)
 
-    def columnCount(self, unusedParent=QModelIndex()):
+    def columnCount(self, unusedParent:QModelIndex=QModelIndex()) ->int:
         """for now we only have time, who, message"""
         return 3
 
-    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, None]:
         """score table"""
         result = None
         if role == Qt.ItemDataRole.TextAlignmentRole:
@@ -80,7 +86,7 @@ class ChatModel(QAbstractTableModel):
                 result = QColor(color)
         return result
 
-    def appendLine(self, line):
+    def appendLine(self, line:ChatMessage) ->None:
         """insert a chatline"""
         old_rowCount = self.rowCount()
         self.beginInsertRows(QModelIndex(), old_rowCount, old_rowCount)
@@ -92,14 +98,14 @@ class ChatView(MJTableView):
 
     """define a minimum size"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         MJTableView.__init__(self)
 
-    def sizeHint(self):
+    def sizeHint(self) ->QSize:
         """sizeHint"""
         return QSize(400, 100)
 
-    def minimumSizeHint(self):
+    def minimumSizeHint(self) ->QSize:
         """minimumSizeHint"""
         return self.sizeHint()
 
@@ -108,7 +114,7 @@ class ChatWindow(QWidget):
 
     """a widget for showing chat messages"""
 
-    def __init__(self, table):
+    def __init__(self, table:'ClientTable') ->None:
         super().__init__(None)
         self.table = table
         self.table.chatWindow = self
@@ -138,18 +144,18 @@ class ChatWindow(QWidget):
         self.show()
         StateSaver(self)
 
-    def show(self):
+    def show(self) ->None:
         """not only show but also restore and raise"""
         self.activateWindow()
         self.setWindowState(self.windowState() & ~Qt.WindowState.WindowMinimized)
         self.raise_()
         QWidget.show(self)
 
-    def isVisible(self):
+    def isVisible(self) ->bool:
         """not only visible but also not minimized"""
         return QWidget.isVisible(self) and not self.windowState() & Qt.WindowState.WindowMinimized
 
-    def kill(self):
+    def kill(self) ->None:
         """hide and null on table"""
         if Debug.chat:
             logDebug('chat.kill for %s on table %s' % (self, self.table))
@@ -157,7 +163,7 @@ class ChatWindow(QWidget):
         assert self.table
         self.table.chatWindow = None
 
-    def sendLine(self, line=None, isStatusMessage=False):
+    def sendLine(self, line:Optional[str]=None, isStatusMessage:bool=False) ->None:
         """send line to others. Either the edited line or parameter line."""
         if line is None:
             line = self.edit.text()
@@ -174,18 +180,18 @@ class ChatWindow(QWidget):
                 isStatusMessage)
             self.table.client.sendChat(msg).addErrback(self.chatError)
 
-    def chatError(self, result):
+    def chatError(self, result:str) ->None:
         """tableList may already have gone away"""
         assert self.table
         assert self.table.client
         if self.table.client.tableList:
             self.table.client.tableList.tableError(result)
 
-    def leave(self):
+    def leave(self) ->None:
         """leaving the chat"""
         self.hide()
 
-    def receiveLine(self, chatLine):
+    def receiveLine(self, chatLine:ChatMessage) ->None:
         """show a new line in protocol"""
         self.show()
         self.messageView.model().appendLine(chatLine)

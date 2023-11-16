@@ -7,6 +7,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import Optional, Union, TYPE_CHECKING, Any, Generator, Literal
+
 from twisted.internet.defer import succeed, Deferred
 
 from log import logDebug, logException
@@ -29,6 +31,13 @@ from uiwall import UIWall
 from animation import AnimationSpeed, afterQueuedAnimations
 from scoringdialog import ScoringDialog
 
+if TYPE_CHECKING:
+    from qt import QEvent, QKeyEvent, QFocusEvent, QWidget
+    from game import Game
+    from handboard import HandBoard
+    from mainwindow import MainWindow
+    from humanclient import ClientDialog
+    from board import Board
 
 class FocusRect(QGraphicsRectItem, ReprMixin):
 
@@ -38,7 +47,7 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
     focus rect because Z order is only relevant for items having the
     same parent"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         QGraphicsRectItem.__init__(self)
         pen = QPen(QColor('blue'))
         pen.setWidth(6)
@@ -48,12 +57,12 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
         self.hide()
 
     @property
-    def board(self):
+    def board(self) ->Optional[Union[SelectorBoard, DiscardBoard]]:
         """current board the focusrect is on"""
         return self._board
 
     @board.setter
-    def board(self, value):
+    def board(self, value: Optional[Union[SelectorBoard, DiscardBoard]]) ->None:
         """assign and show/hide as needed"""
         if value and not isAlive(value):
             logDebug(
@@ -65,7 +74,7 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
             self.refresh()
 
     @afterQueuedAnimations
-    def refresh(self, unusedDeferredResult=None):
+    def refresh(self, unusedDeferredResult:Optional['Deferred']=None) ->None:
         """show/hide on correct position after queued animations end"""
         board = self.board
         if not board:
@@ -91,7 +100,7 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
             self.setVisible(board.isVisible() and bool(board.focusTile)
                         and board.isEnabled() and board.hasLogicalFocus and not game.autoPlay)
 
-    def __str__(self):
+    def __str__(self) ->str:
         """for debugging"""
         return 'FocusRect({} on {})'.format(id4(self), self.board if self.board else 'NOBOARD')
 
@@ -99,12 +108,12 @@ class SceneWithFocusRect(QGraphicsScene):
 
     """our scene with a potential Qt bug fix. FocusRect is a blue frame around a tile or meld"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         QGraphicsScene.__init__(self)
         self.focusRect = FocusRect()
         self.addItem(self.focusRect)
 
-    def focusInEvent(self, event):
+    def focusInEvent(self, event:'QFocusEvent') ->None:
         """
         Work around a qt bug. See U{https://bugreports.qt-project.org/browse/QTBUG-32890}.
         This can be reproduced as follows:
@@ -121,12 +130,12 @@ class SceneWithFocusRect(QGraphicsScene):
             self.setFocusItem(prev)
 
     @property
-    def focusBoard(self):
+    def focusBoard(self) ->Optional['Board']:
         """get / set the board that has its focusRect shown"""
         return self.focusRect.board
 
     @focusBoard.setter
-    def focusBoard(self, board):
+    def focusBoard(self, board:Optional[Union[DiscardBoard, SelectorBoard]]) ->None:
         """get / set the board that has its focusRect shown"""
         self.focusRect.board = board
 
@@ -135,7 +144,7 @@ class GameScene(SceneWithFocusRect):
 
     """the game field"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional['QWidget']=None) ->None:
         Internal.scene = self
         assert parent
         self.mainWindow = parent
@@ -149,12 +158,12 @@ class GameScene(SceneWithFocusRect):
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @property
-    def game(self):
+    def game(self) ->Optional['Game']:
         """a proxy"""
         return self._game
 
     @game.setter
-    def game(self, value):
+    def game(self, value:Optional['Game']) ->None:
         """if it changes, update GUI"""
         changing = self._game != value
         game = self._game
@@ -175,13 +184,14 @@ class GameScene(SceneWithFocusRect):
         self.mainWindow.adjustMainView()
 
     @afterQueuedAnimations
-    def showShadowsChanged(self, deferredResult, unusedOldValue, unusedNewValue): # pylint: disable=unused-argument
+    def showShadowsChanged(self, deferredResult:'Deferred', # pylint: disable=unused-argument
+        unusedOldValue:Any, unusedNewValue:Any) ->None:
         """if the wanted shadow direction changed, apply that change now"""
         for uiTile in self.graphicsTileItems():
             uiTile.setClippingFlags()
         self.applySettings()
 
-    def handSelectorChanged(self, handBoard):
+    def handSelectorChanged(self, handBoard:'HandBoard') ->None:
         """update all relevant dialogs"""
         if self.game and not self.game.finished():
             assert handBoard.player
@@ -191,23 +201,23 @@ class GameScene(SceneWithFocusRect):
         if self.explainView:
             self.explainView.refresh()
 
-    def setupUi(self):
+    def setupUi(self) ->None:
         """prepare scene"""
         assert Internal.Preferences
         assert isinstance(Internal.Preferences.windTilesetName, str)
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
 
-    def showWall(self):
+    def showWall(self) ->None:
         """shows the wall according to the game rules (length may vary)"""
         if self.game:
             UIWall(self.game)   # sets self.game.wall
 
-    def abort(self):
+    def abort(self) ->Deferred:
         """abort current game"""
         # to be implemented by children
         return Deferred()
 
-    def adjustSceneView(self):
+    def adjustSceneView(self) ->None:
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
@@ -219,7 +229,7 @@ class GameScene(SceneWithFocusRect):
                     if _.board:
                         _.board.placeTile(_)
 
-    def applySettings(self):
+    def applySettings(self) ->None:
         """apply preferences"""
         assert self.mainWindow
         assert Internal.Preferences
@@ -230,7 +240,7 @@ class GameScene(SceneWithFocusRect):
                 if hasattr(item, 'tileset'):
                     item.tileset = Tileset.current()
 
-    def prepareHand(self):
+    def prepareHand(self) ->None:
         """redecorate wall"""
         self.mainWindow.updateGUI()
         if self.game:
@@ -238,7 +248,7 @@ class GameScene(SceneWithFocusRect):
             with AnimationSpeed(Speeds.windDisc):
                 self.game.wall.decorate4()
 
-    def updateSceneGUI(self):
+    def updateSceneGUI(self) ->None:
         """update some actions, all auxiliary windows and the statusbar"""
         game = self.game
         assert Internal.Preferences
@@ -253,14 +263,14 @@ class GameScene(SceneWithFocusRect):
                 view.refresh()
         self.__showBalance()
 
-    def newLightSource(self):
+    def newLightSource(self) ->Union[Literal['NE'], Literal['NW'], Literal['SW'], Literal['SE']]:
         """next value"""
         assert self.game
         assert self.game.wall
         oldIdx = LIGHTSOURCES.index(self.game.wall.lightSource)
         return LIGHTSOURCES[(oldIdx + 1) % 4]
 
-    def changeAngle(self):
+    def changeAngle(self) ->None:
         """change the lightSource"""
         assert self.game
         assert self.game.wall
@@ -268,7 +278,7 @@ class GameScene(SceneWithFocusRect):
         self.focusRect.refresh()
         self.mainWindow.adjustMainView()
 
-    def __showBalance(self):
+    def __showBalance(self) ->None:
         """show the player balances in the status bar"""
         sBar = self.mainWindow.statusBar()
         if self.game:
@@ -284,15 +294,15 @@ class GameScene(SceneWithFocusRect):
                 if sBar.hasItem(idx):
                     sBar.removeItem(idx)
 
-    def graphicsTileItems(self):
+    def graphicsTileItems(self) ->Generator[UITile, None, None]:
         """return all UITile in the scene"""
         return (x for x in self.items() if isinstance(x, UITile))
 
-    def nonTiles(self):
+    def nonTiles(self) ->Generator[QGraphicsItem, None, None]:
         """return all other items in the scene"""
         return (x for x in self.items() if not isinstance(x, UITile))
 
-    def removeTiles(self):
+    def removeTiles(self) ->None:
         """remove all tiles from scene"""
         for item in self.graphicsTileItems():
             self.removeItem(item)
@@ -307,14 +317,14 @@ class PlayingScene(GameScene):
 
     """scene with a playing game"""
 
-    def __init__(self, parent):
+    def __init__(self, parent:Optional['QWidget']=None) ->None:
         self._game = None
         self.__startingGame = True
         self._clientDialog = None
 
         super().__init__(parent)
 
-    @GameScene.game.setter
+    @GameScene.game.setter  # type: ignore
     def game(self, value):
         game = self._game
         changing = value != game
@@ -332,19 +342,19 @@ class PlayingScene(GameScene):
             and bool(value.client.table.chatWindow))
 
     @property
-    def clientDialog(self):
+    def clientDialog(self) ->Optional['ClientDialog']:
         """wrapper: hide dialog when it is set to None"""
         return self._clientDialog
 
     @clientDialog.setter
-    def clientDialog(self, value):
+    def clientDialog(self, value:Optional['ClientDialog']) ->None:
         """wrapper: hide dialog when it is set to None"""
         if self._clientDialog and isAlive(self._clientDialog) and not value:
             self._clientDialog.timer.stop()
             self._clientDialog.hide()
         self._clientDialog = value
 
-    def setupUi(self):
+    def setupUi(self) ->None:
         """create all other widgets
         we could make the scene view the central widget but I did
         not figure out how to correctly draw the background with
@@ -360,14 +370,14 @@ class PlayingScene(GameScene):
 
         self.adjustSceneView()
 
-    def showWall(self):
+    def showWall(self) ->None:
         """shows the wall according to the game rules (length may vary)"""
         GameScene.showWall(self)
         self.discardBoard.maximize()
 
-    def abort(self):
+    def abort(self) ->'Deferred':
         """abort current game"""
-        def gotAnswer(gotResult, autoPlaying):
+        def gotAnswer(gotResult:'Deferred', autoPlaying:bool) ->Union[bool, 'Deferred']:
             """user answered"""
             result = gotResult
             if result is True:
@@ -386,7 +396,7 @@ class PlayingScene(GameScene):
         return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addBoth(
             gotAnswer, autoPlaying)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event:'QKeyEvent') ->None:
         """if we have a clientDialog, pass event to it"""
         mod = event.modifiers()
         if mod in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier):
@@ -394,7 +404,7 @@ class PlayingScene(GameScene):
                 self.clientDialog.keyPressEvent(event)
         GameScene.keyPressEvent(self, event)
 
-    def adjustSceneView(self):
+    def adjustSceneView(self) ->None:
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
@@ -403,22 +413,22 @@ class PlayingScene(GameScene):
         GameScene.adjustSceneView(self)
 
     @property
-    def startingGame(self):
+    def startingGame(self) ->bool:
         """are we trying to start a game?"""
         return self.__startingGame
 
     @startingGame.setter
-    def startingGame(self, value):
+    def startingGame(self, value:bool) ->None:
         """are we trying to start a game?"""
         if value != self.__startingGame:
             self.__startingGame = value
             self.mainWindow.updateGUI()
 
-    def applySettings(self):
+    def applySettings(self) ->None:
         """apply preferences"""
         GameScene.applySettings(self)
 
-    def toggleDemoMode(self, checked):
+    def toggleDemoMode(self, checked:bool) ->None:
         """switch on / off for autoPlay"""
         if self.game:
             self.focusRect.refresh()  # show/hide it
@@ -430,7 +440,7 @@ class PlayingScene(GameScene):
                 self.clientDialog.selectButton()
                                                # select default, abort timeout
 
-    def updateSceneGUI(self):
+    def updateSceneGUI(self) ->None:
         """update some actions, all auxiliary windows and the statusbar"""
         if not isAlive(self):
             return
@@ -459,7 +469,7 @@ class PlayingScene(GameScene):
             ) and bool(
                 game.client.table.chatWindow))
 
-    def changeAngle(self):
+    def changeAngle(self) ->None:
         """now that no animation is running, really change"""
         self.discardBoard.lightSource = self.newLightSource()
         GameScene.changeAngle(self)
@@ -469,13 +479,13 @@ class ScoringScene(GameScene):
 
     """a scoring game"""
 
-    def __init__(self, parent=None):
-        self.scoringDialog = None
+    def __init__(self, parent:Optional['QWidget']=None) ->None:
+        self.scoringDialog:Optional[ScoringDialog] = None
         super().__init__(parent)
         self.selectorBoard.hasLogicalFocus = True
 
-    @GameScene.game.setter
-    def game(self, value):
+    @GameScene.game.setter  # type: ignore
+    def game(self, value:'Game') ->None:
         game = self._game
         changing = value != game
         GameScene.game.fset(self, value)
@@ -486,13 +496,13 @@ class ScoringScene(GameScene):
                 self.scoringDialog.hide()
                 self.scoringDialog = None
 
-    def handSelectorChanged(self, handBoard):
+    def handSelectorChanged(self, handBoard:'HandBoard') ->None:
         """update all relevant dialogs"""
         GameScene.handSelectorChanged(self, handBoard)
         if self.scoringDialog:
             self.scoringDialog.slotInputChanged()
 
-    def setupUi(self):
+    def setupUi(self) ->None:
         """create all other widgets"""
         GameScene.setupUi(self)
         self.setObjectName("ScoringScene")
@@ -500,9 +510,9 @@ class ScoringScene(GameScene):
         self.addItem(self.selectorBoard)
         QMetaObject.connectSlotsByName(self)
 
-    def abort(self):
+    def abort(self) ->'Deferred':
         """abort current game"""
-        def answered(result):
+        def answered(result:'Deferred') ->'Deferred':
             """got answer"""
             if result:
                 self.game = None
@@ -517,7 +527,7 @@ class ScoringScene(GameScene):
         return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(
             answered).addErrback(logException)
 
-    def __moveTile(self, uiTile, wind, toConcealed):
+    def __moveTile(self, uiTile:UITile, wind:str, toConcealed:bool) ->None:
         """the user pressed a wind letter or X for center, wanting to move a uiTile there"""
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
@@ -537,7 +547,7 @@ class ScoringScene(GameScene):
             if movingLastMeld and receiver == currentBoard:
                 self.scoringDialog.fillLastTileCombo()
 
-    def __navigateScoringGame(self, event):
+    def __navigateScoringGame(self, event:'QKeyEvent') ->bool:
         """keyboard navigation in a scoring game"""
         mod = event.modifiers()
         key = event.key()
@@ -563,7 +573,7 @@ class ScoringScene(GameScene):
             return True
         return False
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event:'QKeyEvent') ->None:
         """navigate in the selectorboard"""
         mod = event.modifiers()
         if mod in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier):
@@ -572,7 +582,7 @@ class ScoringScene(GameScene):
                     return
         GameScene.keyPressEvent(self, event)
 
-    def adjustSceneView(self):
+    def adjustSceneView(self) ->None:
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
@@ -580,13 +590,13 @@ class ScoringScene(GameScene):
                 self.selectorBoard.maximize()
         GameScene.adjustSceneView(self)
 
-    def prepareHand(self):
+    def prepareHand(self) ->None:
         """redecorate wall"""
         GameScene.prepareHand(self)
         if self.scoringDialog:
             self.scoringDialog.clearLastTileCombo()
 
-    def updateSceneGUI(self):
+    def updateSceneGUI(self) ->None:
         """update some actions, all auxiliary windows and the statusbar"""
         if not isAlive(self):
             return
@@ -599,19 +609,19 @@ class ScoringScene(GameScene):
         self.selectorBoard.setVisible(bool(game))
         self.selectorBoard.setEnabled(bool(game))
 
-    def changeAngle(self):
+    def changeAngle(self) ->None:
         """now that no animation is running, really change"""
         self.selectorBoard.lightSource = self.newLightSource()
         GameScene.changeAngle(self)
 
-    def computeLastTile(self):
+    def computeLastTile(self) ->'Tile':
         """compile hand info into a string as needed by the scoring engine"""
         if self.scoringDialog:
             # is None while ScoringGame is created
             return self.scoringDialog.computeLastTile()
         return Tile.none
 
-    def computeLastMeld(self):
+    def computeLastMeld(self) ->Meld:
         """compile hand info into a string as needed by the scoring engine"""
         if self.scoringDialog:
             # is None while ScoringGame is created

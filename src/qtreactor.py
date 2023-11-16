@@ -45,7 +45,7 @@ Subsequent port by therve
 
 import sys
 from _collections_abc import dict_keys
-from typing import List, Any, Optional, Callable, Dict, TYPE_CHECKING, Type, Tuple
+from typing import List, Any, Optional, Callable, Dict, TYPE_CHECKING, Type, Tuple, Union
 
 from zope.interface import implementer
 from twisted.internet.interfaces import IReactorFDSet
@@ -64,7 +64,7 @@ class TwistedSocketNotifier(QObject):
     Connection between an fd event and reader/writer callbacks.
     """
 
-    def __init__(self, parent:QObject, reactor:'QtReactor', watcher:unix.Client, socketType:QSocketNotifier.Type) ->None:
+    def __init__(self, parent:Optional[QObject], reactor:'QtReactor', watcher:unix.Client, socketType:QSocketNotifier.Type) ->None:
         QObject.__init__(self, parent)
         self.reactor = reactor
         self.watcher = watcher
@@ -216,8 +216,8 @@ class QtReactor(posixbase.PosixReactorBase):
     def getWriters(self) ->Any:#dict_keys[Any, TwistedSocketNotifier]:
         return self._writes.keys()
 
-    def callLater(self, howlong:int, *args:Any, **kargs:Any) ->base.DelayedCall:
-        rval = super(QtReactor, self).callLater(howlong, *args, **kargs)
+    def callLater(self, delay:float, *args:Any, **kargs:Any) ->base.DelayedCall:
+        rval = super(QtReactor, self).callLater(delay, *args, **kargs)
         self.reactorInvocation()
         return rval
 
@@ -226,7 +226,7 @@ class QtReactor(posixbase.PosixReactorBase):
         self._timer.setInterval(0)
         self._timer.start()
 
-    def _iterate(self, delay:Optional[float]=None, fromqt:bool=False) ->None:
+    def _iterate(self, delay:Optional[int]=None, fromqt:bool=False) ->None:
         """See twisted.internet.interfaces.IReactorCore.iterate.
         """
         self.runUntilCurrent()
@@ -290,13 +290,13 @@ class QtEventReactor(QtReactor):
         if closed:
             self._disconnectSelectable(fd, closed, action == 'doRead')
 
-    def timeout(self) ->float:
+    def timeout(self) ->Optional[float]:
         t = super(QtEventReactor, self).timeout()
         if t is not None:
             return min(t, 0.01)
         return None
 
-    def iterate(self, delay:Optional[float]=None) ->None:  # type:ignore
+    def iterate(self, delay:Optional[int]=None) ->None:  # type:ignore
         """See twisted.internet.interfaces.IReactorCore.iterate. FIXME: do not understand this
         """
         self.runUntilCurrent()

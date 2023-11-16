@@ -12,6 +12,8 @@ import weakref
 import sys
 from functools import total_ordering
 
+from typing import List, Optional, Tuple, TYPE_CHECKING, Union, Iterable, Generator, Any
+
 from twisted.internet.defer import succeed
 from util import gitHead
 from kajcsv import CsvRow
@@ -32,13 +34,22 @@ from animation import animateAndDo, AnimationSpeed, ParallelAnimationGroup
 if sys.platform != 'win32':
     import resource
 
+if TYPE_CHECKING:
+    from twisted.internet.defer import Deferred
+    from move import Move
+    from client import Client
+    from uiwall import UIWall
+    from message import Message
+    from handboard import PlayingHandBoard
+    from servertable import ServerGame
+
 
 @total_ordering
 class HandId(ReprMixin):
 
     """handle a string representing a hand Id"""
 
-    def __init__(self, game, string=None, stringIdx=0):
+    def __init__(self, game:'Game', string:Optional[str]=None, stringIdx:int=0) ->None:
         self.game = game
         self.seed = game.seed
         self.roundsFinished = 0
@@ -54,13 +65,13 @@ class HandId(ReprMixin):
             self.__scanHandId(string, stringIdx)
         assert self.rotated < 4, self
 
-    def goto(self):
+    def goto(self) ->None:
         """advance game to self"""
         for _ in range(self.roundsFinished * 4 + self.rotated):
             self.game.rotateWinds()
         self.game.notRotated = self.notRotated
 
-    def __scanHandId(self, string, stringIdx):
+    def __scanHandId(self, string:str, stringIdx:int) ->None:
         """get the --game option.
         stringIdx 0 is the part in front of ..
         stringIdx 1 is the part after ..
@@ -116,7 +127,7 @@ class HandId(ReprMixin):
             self.notRotated = self.notRotated * 26 + ord(char) - ord('a') + 1
         return
 
-    def prompt(self, withSeed=True, withAI=True, withMoveCount=False):
+    def prompt(self, withSeed:bool=True, withAI:bool=True, withMoveCount:bool=False) ->str:
         """
         Identifies the hand for window title and scoring table.
 
@@ -159,23 +170,23 @@ class HandId(ReprMixin):
             result += '/%3d' % self.moveCount
         return result
 
-    def token(self):
+    def token(self) ->str:
         """server and client use this for checking if they talk about
         the same thing"""
         return self.prompt(withAI=False)
 
-    def __str__(self):
+    def __str__(self) ->str:
         return self.prompt()
 
-    def __eq__(self, other):
+    def __eq__(self, other:Optional['HandId']) ->bool:  # type:ignore[override]
         return (other is not None
                 and (self.roundsFinished, self.rotated, self.notRotated) ==
                 (other.roundsFinished, other.rotated, other.notRotated))
 
-    def __ne__(self, other):
+    def __ne__(self, other:Optional['HandId']) ->bool:  # type:ignore[override]
         return not self == other
 
-    def __lt__(self, other):
+    def __lt__(self, other:'HandId') ->bool:  # type:ignore[override]
         return (self.roundsFinished, self.rotated, self.notRotated) < (
             other.roundsFinished, other.rotated, other.notRotated)
 
@@ -187,8 +198,8 @@ class Game:
     playerClass = Player
     wallClass = Wall
 
-    def __init__(self, names, ruleset, gameid=None,
-                 wantedGame=None, client=None):
+    def __init__(self, names:List[Tuple['Wind', str]], ruleset:Ruleset, gameid:Optional[int]=None,
+                 wantedGame:Optional[str]=None, client:Optional['Client']=None):
         """a new game instance. May be shown on a field, comes from database
         if gameid is set.
 
@@ -246,19 +257,19 @@ class Game:
             player.clearHand()
 
     @property
-    def shouldSave(self):
+    def shouldSave(self) ->bool:
         """as a property"""
         return self.__shouldSave
 
     @shouldSave.setter
-    def shouldSave(self, value):
+    def shouldSave(self, value:bool) ->None:
         """if activated, save start time"""
         if value and not self.__shouldSave:
             self.saveStartTime()
         self.__shouldSave = value
 
     @property
-    def handId(self):
+    def handId(self) ->HandId:
         """current position in game"""
         result = HandId(self)
         if result != self._currentHandId:
@@ -267,25 +278,25 @@ class Game:
         return result
 
     @property
-    def fullWallSize(self):
+    def fullWallSize(self) ->int:
         """How many tiles we want to play with"""
         # the assertion for wallSize should not be done more often than needed: leave it in Wall()
         return int(Debug.wallSize) or elements.count(self.ruleset)
 
     @property
-    def client(self):
+    def client(self) ->Optional['Client']:
         """hide weakref"""
         return self._client() if self._client else None
 
     @client.setter
-    def client(self, value):
+    def client(self, value:Optional['Client']) ->None:
         """hide weakref"""
         if value:
             self._client = weakref.ref(value)
         else:
             self._client = None
 
-    def clearHand(self):
+    def clearHand(self) ->None:
         """empty all data"""
         while self.moves:
             _ = self.moves.pop()
@@ -298,16 +309,16 @@ class Game:
         self.discardedTiles.clear()
         assert self.visibleTiles.count() == 0
 
-    def _scanGameOption(self):
+    def _scanGameOption(self) ->None:
         """this is only done for PlayingGame"""
 
     @property
-    def lastDiscard(self):
+    def lastDiscard(self) ->Optional[Tile]:
         """hide weakref"""
         return self.__lastDiscard
 
     @lastDiscard.setter
-    def lastDiscard(self, value):
+    def lastDiscard(self, value:Optional[Tile]) ->None:
         """hide weakref"""
         self.__lastDiscard = value
         if value is not None:
@@ -316,12 +327,12 @@ class Game:
                 raise ValueError('lastDiscard is exposed:%s' % value)
 
     @property
-    def winner(self):
+    def winner(self) ->Optional['Player']:
         """the name of the game server this game is attached to"""
         return self.__winner
 
     @winner.setter
-    def winner(self, value):
+    def winner(self, value:Optional['Player']) ->None:
         """the name of the game server this game is attached to"""
         if self.__winner != value:
             if self.__winner:
@@ -331,32 +342,32 @@ class Game:
                 value.invalidateHand()
 
     @property
-    def roundWind(self):
+    def roundWind(self) ->Wind:
         """the round wind for Hand"""
         return Wind.all[self.roundsFinished % 4]
 
-    def addCsvTag(self, tag, forAllPlayers=False):
+    def addCsvTag(self, tag:str, forAllPlayers:bool=False) ->None:
         """tag will be written to tag field in csv row"""
         if forAllPlayers or self.belongsToHumanPlayer():
             self.csvTags.append('%s/%s' %
                                 (tag, self.handId.prompt(withSeed=False)))
 
-    def isFirstHand(self):
+    def isFirstHand(self) ->bool:
         """as the name says"""
         return self.roundHandCount == 0 and self.roundsFinished == 0
 
-    def _setGameId(self):
+    def _setGameId(self) ->None:
         """virtual"""
         assert not self  # we want it to fail, and quieten pylint
 
-    def close(self):
-        """log off from the server and return a Deferred"""
+    def close(self) ->None:
+        """log off from the server"""
         self.wall = None
         self.lastDiscard = None
         if Options.gui:
             ParallelAnimationGroup.cancelAll()
 
-    def playerByName(self, playerName):
+    def playerByName(self, playerName:str) ->Optional[Player]:
         """return None or the matching player"""
         if playerName is None:
             return None
@@ -366,33 +377,33 @@ class Game:
         logException('Move references unknown player %s' % playerName)
         return None
 
-    def losers(self):
+    def losers(self) ->List[Player]:
         """the 3 or 4 losers: All players without the winner"""
         return list(x for x in self.players if x is not self.__winner)
 
-    def belongsToRobotPlayer(self):
+    def belongsToRobotPlayer(self) ->bool:
         """does this game instance belong to a robot player?"""
         return self.client is not None and self.client.isRobotClient()
 
-    def belongsToHumanPlayer(self):
+    def belongsToHumanPlayer(self) ->bool:
         """does this game instance belong to a human player?"""
         return self.client is not None and self.client.isHumanClient()
 
-    def belongsToGameServer(self):
+    def belongsToGameServer(self) ->bool:
         """does this game instance belong to the game server?"""
         return self.client is not None and self.client.isServerClient()
 
     @staticmethod
-    def isScoringGame():
+    def isScoringGame() ->bool:
         """are we scoring a manual game?"""
         return False
 
-    def belongsToPlayer(self):
+    def belongsToPlayer(self) ->bool:
         """does this game instance belong to a player
         (as opposed to the game server)?"""
         return self.belongsToRobotPlayer() or self.belongsToHumanPlayer()
 
-    def assignPlayers(self, playerNames):
+    def assignPlayers(self, playerNames:List[Tuple[Wind, str]]) ->None:
         """
         The server tells us the seating order and player names.
 
@@ -417,14 +428,14 @@ class Game:
             self.myself = _
         self.sortPlayers()
 
-    def __shufflePlayers(self):
+    def __shufflePlayers(self) ->None:
         """assign random seats to the players and assign winds"""
         self.players.sort(key=lambda x: x.name)
         self.randomGenerator.shuffle(self.players)
         for player, wind in zip(self.players, Wind.all4):
             player.wind = wind
 
-    def __exchangeSeats(self):
+    def __exchangeSeats(self) ->None:
         """execute seat exchanges according to the rules"""
         winds = list(x for x in self.shiftRules.split(',')[(self.roundsFinished - 1) % 4])
         players = [self.players[Wind(x)] for x in winds]
@@ -432,11 +443,11 @@ class Game:
         for playerA, playerB in self._mustExchangeSeats(pairs):
             playerA.wind, playerB.wind = playerB.wind, playerA.wind
 
-    def _mustExchangeSeats(self, pairs):
+    def _mustExchangeSeats(self, pairs:List[List[Player]]) ->List[List[Player]]:
         """filter: which player pairs should really swap places?"""
         return pairs
 
-    def sortPlayers(self):
+    def sortPlayers(self) ->None:
         """sort by wind order. Place ourself at bottom (idx=0)"""
         self.players.sort(key=lambda x: x.wind)
         self.activePlayer = self.players[East]
@@ -455,12 +466,12 @@ class Game:
                     player1.sideText.refreshAll()
 
     @staticmethod
-    def _newGameId():
+    def _newGameId() ->int:
         """write a new entry in the game table
         and returns the game id of that new entry"""
         return Query("insert into game(seed) values(0)").cursor.lastrowid
 
-    def saveStartTime(self):
+    def saveStartTime(self) ->None:
         """save starttime for this game"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         args = list([starttime, self.seed, int(self.autoPlay),
@@ -471,7 +482,7 @@ class Game:
         Query("update game set starttime=?,seed=?,autoplay=?,"
               "ruleset=?,p0=?,p1=?,p2=?,p3=? where id=?", tuple(args))
 
-    def __loadRuleset(self):
+    def __loadRuleset(self) ->None:
         """use a copy of ruleset for this game, reusing an existing copy"""
         self.ruleset.load()
         if Internal.db:
@@ -487,13 +498,13 @@ class Game:
                 self.ruleset.save()
 
     @property
-    def seed(self):  # TODO: move this to PlayingGame
+    def seed(self) ->int:  # TODO: move this to PlayingGame
         """extract it from wantedGame. Set wantedGame if empty."""
         if not self.wantedGame:
             self.wantedGame = str(int(self.randomGenerator.random() * 10 ** 9))
         return int(self.wantedGame.split('/')[0])
 
-    def _setHandSeed(self):  # TODO: move this to PlayingGame
+    def _setHandSeed(self) ->None:  # TODO: move this to PlayingGame
         """set seed to a reproducible value, independent of what happened
         in previous hands/rounds.
         This makes it easier to reproduce game situations
@@ -503,7 +514,7 @@ class Game:
                       + self.notRotated * 100)
         self.randomGenerator.seed(self.seed * seedFactor)
 
-    def prepareHand(self):
+    def prepareHand(self) ->None:
         """prepare a game hand"""
         self.clearHand()
         if self.finished():
@@ -512,7 +523,7 @@ class Game:
             else:
                 self.close()
 
-    def initHand(self):
+    def initHand(self) ->None:
         """directly before starting"""
         self.dangerousTiles = []
         self.discardedTiles.clear()
@@ -522,7 +533,7 @@ class Game:
             Internal.scene.prepareHand()
         self._setHandSeed()
 
-    def saveHand(self):
+    def saveHand(self) ->None:
         """save hand to database,
         update score table and balance in status line"""
         self.__payHand()
@@ -532,7 +543,7 @@ class Game:
         self.roundHandCount += 1
         self.handDiscardCount = 0
 
-    def _saveScores(self):
+    def _saveScores(self) ->None:
         """save computed values to database,
         update score table and balance in status line"""
         scoretime = datetime.datetime.now().replace(microsecond=0).isoformat()
@@ -566,7 +577,7 @@ class Game:
         if Debug.scores:
             self.debug(logMessage)
 
-    def maybeRotateWinds(self):
+    def maybeRotateWinds(self) ->bool:
         """rules which make winds rotate"""
         result = [x for x in self.ruleset.filterRules('rotate') if x.rotate(self)]
         if result:
@@ -576,7 +587,7 @@ class Game:
             self.rotateWinds()
         return bool(result)
 
-    def rotateWinds(self):
+    def rotateWinds(self) ->None:
         """rotate winds, exchange seats. If finished, update database"""
         self.rotated += 1
         self.notRotated = 0
@@ -605,7 +616,7 @@ class Game:
                 with AnimationSpeed(Speeds.windDisc):
                     self.wall.showWindDiscs()
 
-    def debug(self, msg, btIndent=None, prevHandId=False, showStack=False):
+    def debug(self, msg:str, btIndent:Optional[int]=None, prevHandId:bool=False, showStack:bool=False) ->None:
         """
         Log a debug message.
 
@@ -636,7 +647,7 @@ class Game:
             showStack=showStack)
 
     @staticmethod
-    def __getName(playerid):
+    def __getName(playerid:int) ->str:
         """get name for playerid
         """
         try:
@@ -645,7 +656,7 @@ class Game:
             return i18n('Player %1 not known', playerid)
 
     @classmethod
-    def loadFromDB(cls, gameid, client=None):
+    def loadFromDB(cls, gameid:int, client:Optional['Client']=None) ->Optional[Union['Game', 'ServerGame']]:
         """load game by game id and return a new Game instance"""
         Internal.logPrefix = 'S' if Internal.isServer else 'C'
         records = Query(
@@ -715,7 +726,7 @@ class Game:
             animateAndDo(game.wall.decorate4)
         return game
 
-    def finished(self):
+    def finished(self) ->bool:
         """The game is over after minRounds completed rounds. Also,
         check if we reached the second handId defined by --game.
         If we did, the game is over too"""
@@ -729,7 +740,7 @@ class Game:
             return self.roundsFinished >= self.ruleset.minRounds
         return False
 
-    def __payHand(self):
+    def __payHand(self) ->None:
         """pay the scores"""
         # pylint: disable=too-many-branches
         # too many branches
@@ -767,7 +778,9 @@ class Game:
                     if player1 != winner:
                         player1.getsPayment(-player2.handTotal * efactor)
 
-    def lastMoves(self, only=None, without=None, withoutNotifications=False):
+    def lastMoves(self, only:Optional[Iterable['Message']]=None,
+        without:Optional[Iterable['Message']]=None,
+        withoutNotifications:bool=False) ->Generator['Move', None, None]:
         """filters and yields the moves in reversed order"""
         for idx in range(len(self.moves) - 1, -1, -1):
             move = self.moves[idx]
@@ -782,7 +795,7 @@ class Game:
             else:
                 yield move
 
-    def throwDices(self):
+    def throwDices(self) ->None:
         """set random living and kongBox
         sets divideAt: an index for the wall break"""
         breakWall = self.randomGenerator.randrange(4)
@@ -804,8 +817,9 @@ class PlayingGame(Game):
 
     playerClass = PlayingPlayer
 
-    def __init__(self, names, ruleset, gameid=None, wantedGame=None,
-                 client=None, playOpen=False, autoPlay=False):
+    def __init__(self, names:List[Tuple['Wind', str]], ruleset:Ruleset, gameid:Optional[int]=None,
+                 wantedGame:Optional[str]=None, client:Optional['Client']=None,
+                 playOpen:bool=False, autoPlay:bool=False) ->None:
         """a new game instance, comes from database if gameid is set"""
         self.__activePlayer = None
         self.prevActivePlayer = None
@@ -826,7 +840,7 @@ class PlayingGame(Game):
                 if Debug.sound:
                     logDebug('myself %s gets no voice' % (myself.name))
 
-    def writeCsv(self):
+    def writeCsv(self) ->None:
         """write game summary to Options.csv"""
         if self.finished() and Options.csv:
             gameWinner = max(self.players, key=lambda x: x.balance)
@@ -850,7 +864,7 @@ class PlayingGame(Game):
                 row.append(1 if player == gameWinner else 0)
             CsvRow(row).write()
 
-    def close(self):
+    def close(self) ->Any:
         """log off from the server and return a Deferred"""
         Game.close(self)
         self.writeCsv()
@@ -863,18 +877,18 @@ class PlayingGame(Game):
             result = succeed(None)
         return result
 
-    def _setGameId(self):
+    def _setGameId(self) ->None:
         """do nothing, we already went through the game id reservation"""
 
     @property
-    def activePlayer(self):
+    def activePlayer(self) ->PlayingPlayer:
         """the turn is on this player"""
         result = self.__activePlayer
         assert result
         return result
 
     @activePlayer.setter
-    def activePlayer(self, player):
+    def activePlayer(self, player:PlayingPlayer) ->None:
         """the turn is on this player"""
         if self.__activePlayer != player:
             self.prevActivePlayer = self.__activePlayer
@@ -885,7 +899,7 @@ class PlayingGame(Game):
                 for _ in self.players:
                     _.colorizeName()
 
-    def prepareHand(self):
+    def prepareHand(self) ->None:
         """prepares the next hand"""
         Game.prepareHand(self)
         if not self.finished():
@@ -895,12 +909,12 @@ class PlayingGame(Game):
             assert self.wall
             self.wall.build(shuffleFirst=True)
 
-    def hidePopups(self):
+    def hidePopups(self) ->None:
         """hide all popup messages"""
         for player in self.players:
             player.hidePopup()
 
-    def saveStartTime(self):
+    def saveStartTime(self) ->None:
         """write a new entry in the game table with the selected players"""
         if not self.gameid:
             # in server.__prepareNewGame, gameid is None here
@@ -920,7 +934,7 @@ class PlayingGame(Game):
             # we reserved the game id by writing a record with seed == host
             Game.saveStartTime(self)
 
-    def _saveScores(self):
+    def _saveScores(self) ->None:
         """save computed values to database, update score table
         and balance in status line"""
         if self.shouldSave:
@@ -928,18 +942,18 @@ class PlayingGame(Game):
                 assert False, 'shouldSave must not be True for robot player'
             Game._saveScores(self)
 
-    def nextPlayer(self, current=None):
+    def nextPlayer(self, current:Optional[PlayingPlayer]=None) ->PlayingPlayer:
         """return the player after current or after activePlayer"""
         if not current:
             current = self.activePlayer
         pIdx = self.players.index(current)
         return self.players[(pIdx + 1) % 4]
 
-    def nextTurn(self):
+    def nextTurn(self) ->None:
         """move activePlayer"""
         self.activePlayer = self.nextPlayer()
 
-    def _concealedTileName(self, tileName):
+    def _concealedTileName(self, tileName:Tile) ->Tile:
         """tileName has been discarded, by which name did we know it?"""
         player = self.activePlayer
         if player != self.myself and not self.playOpen:
@@ -957,7 +971,7 @@ class PlayingGame(Game):
                              player.name, result, player.concealedTiles))
         return result
 
-    def hasDiscarded(self, player, tile):
+    def hasDiscarded(self, player:PlayingPlayer, tile:Tile) ->None:
         """discards a tile from a player board"""
         assert isinstance(tile, Tile)
         if player != self.activePlayer:
@@ -979,7 +993,7 @@ class PlayingGame(Game):
             self._endWallDangerous()
         self.handDiscardCount += 1
 
-    def saveHand(self):
+    def saveHand(self) ->None:
         """server told us to save this hand"""
         for player in self.players:
             handWonMatches = player.hand.won == (player == self.winner)
@@ -987,13 +1001,13 @@ class PlayingGame(Game):
                 player.hand.won, player == self.winner)
         Game.saveHand(self)
 
-    def _mustExchangeSeats(self, pairs):
+    def _mustExchangeSeats(self, pairs:List[List[Player]]) ->List[List[Player]]:
         """filter: which player pairs should really swap places?"""
         # if we are a client in a remote game, the server swaps and tells
         # us the new places
         return [] if self.belongsToPlayer() else pairs
 
-    def _scanGameOption(self):
+    def _scanGameOption(self) ->None:
         """scan the --game option and go to start of wanted hand"""
         if self.wantedGame and '/' in self.wantedGame:
             first, last = (HandId(self, self.wantedGame, x) for x in (0, 1))
@@ -1002,7 +1016,7 @@ class PlayingGame(Game):
                     first, last))
             HandId(self, self.wantedGame).goto()
 
-    def assignVoices(self):
+    def assignVoices(self) ->None:
         """now we have all remote user voices"""
         assert self.belongsToHumanPlayer()
         available = Voice.availableVoices()[:]
@@ -1040,7 +1054,7 @@ class PlayingGame(Game):
                         '%s gets one of the still available voices %s' % (
                             player.name, player.voice))
 
-    def dangerousFor(self, forPlayer, tile):
+    def dangerousFor(self, forPlayer:PlayingPlayer, tile:Tile) ->List[str]:
         """return a list of explaining texts if discarding tile
         would be Dangerous game for forPlayer. One text for each
         reason - there might be more than one"""
@@ -1056,7 +1070,7 @@ class PlayingGame(Game):
                     result.append(txt)
         return result
 
-    def computeDangerous(self, playerChanged=None):
+    def computeDangerous(self, playerChanged:Optional[PlayingPlayer]=None) ->None:
         """recompute gamewide dangerous tiles. Either for playerChanged or
         for all players"""
         self.dangerousTiles = []
@@ -1067,7 +1081,7 @@ class PlayingGame(Game):
                 player.findDangerousTiles()
         self._endWallDangerous()
 
-    def _endWallDangerous(self):
+    def _endWallDangerous(self) ->None:
         """if end of living wall is reached, declare all invisible tiles
         as dangerous"""
         assert self.wall

@@ -16,6 +16,7 @@ SPDX-License-Identifier: GPL-2.0
 import sys
 import os
 import logging
+from typing import Tuple, List, Optional, Type, Any
 
 from qtpy import QT5
 from qt import QObject, QCommandLineParser, QCommandLineOption, Qt, QGuiApplication
@@ -25,7 +26,7 @@ from mi18n import i18n, MLocale
 from common import Options, SingleshotOptions, Internal, Debug
 # do not import modules using twisted before our reactor is running
 
-def initRulesets():
+def initRulesets() ->None:
     """exits if user only wanted to see available rulesets"""
     import predefined
     predefined.load()
@@ -56,8 +57,9 @@ def initRulesets():
 
 class CommandLineOption(QCommandLineOption):
     """add some helping attributes"""
-    def __init__(self, name, description, valueName=None,
-        defaultValue=None, optName=None, argType=None, singleshot=False):
+    def __init__(self, name : str, description : str, valueName : Optional[str] =None,
+        defaultValue : Optional[str]=None, optName : Optional[str]=None,
+        argType : Optional[Type]=None, singleshot:bool=False) ->None:
         QCommandLineOption.__init__(self, [name], description, valueName or '', defaultValue or '')
         if argType is None:
             if valueName is None:
@@ -68,12 +70,12 @@ class CommandLineOption(QCommandLineOption):
         self.optName = optName or name
         self.singleshot = singleshot
 
-def defineOptions():
+def defineOptions() -> Tuple[QCommandLineParser, List[CommandLineOption]]:
     """define command line options"""
     parser = QCommandLineParser()
     options = []
-    def option(name, description, valueName=None, defaultValue=None,
-        optName=None, argType=None, singleshot=False):
+    def option(name:str, description:str, valueName:Optional[str]=None, defaultValue:Optional[str]=None,
+        optName:Optional[str]=None, argType:Optional[Type]=None, singleshot:bool=False) ->None:
         """helper"""
         opt = CommandLineOption(name, description, valueName, defaultValue,
             optName=optName, argType=argType, singleshot=singleshot)
@@ -102,7 +104,7 @@ def defineOptions():
     option('debug', Debug.help(), 'DEBUG', '')
     return parser, options
 
-def parseOptions():
+def parseOptions() ->None:
     """parse command line options and save the values"""
     Options.gui = True
     parser, options = defineOptions()
@@ -142,7 +144,7 @@ class EvHandler(QObject):
 
     """an application wide event handler"""
 
-    def eventFilter(self, receiver, event):
+    def eventFilter(self, receiver: Any, event: Any) ->bool:
         """will be called for all events"""
         from log import EventData
         EventData(receiver, event)

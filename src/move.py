@@ -8,17 +8,23 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import weakref
+from typing import Optional, TYPE_CHECKING, Dict, Any, Union, Type
 
 from common import ReprMixin, Internal
 from message import Message
 from wind import Wind
 from tile import Tile, TileTuple, Meld, MeldList
 
-class Move(ReprMixin):
+if TYPE_CHECKING:
+    from tilesource import TileSource
+    from player import PlayingPlayer
 
+
+class Move(ReprMixin):
     """used for decoded move information from the game server"""
 
-    def __init__(self, player, command, kwargs):
+    def __init__(self, player:Optional['PlayingPlayer'],
+        command:Union[Type[Message], str], kwargs:Dict[Any,Any]) ->None:
         if isinstance(command, Message):
             self.message = command
         else:

@@ -17,9 +17,19 @@ import logging.handlers
 import socket
 import string
 from signal import signal, SIGABRT, SIGINT, SIGTERM
+from typing import Optional, Any, Union, List, Sequence, Mapping
+from typing import TYPE_CHECKING, Iterable, Generator
 
 from qtpy.compat import isalive as qtpy_isalive
 from qt import QStandardPaths, QObject, QSize
+
+if TYPE_CHECKING:
+    from tile import Tile
+    from mainwindow import MainWindow
+    from twisted.internet.interfaces import IReactorCore
+    from config import SetupPreferences
+    from qt import QGraphicsItem
+    from scene import GameScene
 
 # pylint: disable=invalid-name
 
@@ -33,7 +43,7 @@ else:
 
 LIGHTSOURCES = ['NE', 'NW', 'SW', 'SE']
 
-def isAlive(qobj: QObject) ->bool:
+def isAlive(qobj: Union[QObject, 'QGraphicsItem', None]) ->bool:
     """check if the underlying C++ object still exists"""
     if qobj is None:
         return False
@@ -42,7 +52,7 @@ def isAlive(qobj: QObject) ->bool:
         print('NOT alive:', repr(qobj))
     return result
 
-def serverAppdataDir():
+def serverAppdataDir() ->str:
     """
     The per user directory with kajongg application information like the database.
 
@@ -73,7 +83,7 @@ def serverAppdataDir():
     return serverDir
 
 
-def clientAppdataDir():
+def clientAppdataDir() ->str:
     """
     The per user directory with kajongg application information like the database.
 
@@ -96,7 +106,7 @@ def clientAppdataDir():
     return result
 
 
-def appdataDir():
+def appdataDir() ->str:
     """
     The per user directory with kajongg application information like the database.
 
@@ -106,7 +116,7 @@ def appdataDir():
     return serverAppdataDir() if Internal.isServer else clientAppdataDir()
 
 
-def cacheDir():
+def cacheDir() ->str:
     """the cache directory for this user"""
     result = os.path.join(appdataDir(), '.cache')
     if not os.path.exists(result):
@@ -114,7 +124,7 @@ def cacheDir():
     return result
 
 
-def socketName():
+def socketName() ->str:
     """client and server process use this socket to talk to each other"""
     serverDir = os.path.expanduser('~/.kajonggserver')
     if not os.path.exists(serverDir):
@@ -126,7 +136,7 @@ def socketName():
     return os.path.normpath('{}/socket{}'.format(serverDir, Internal.defaultPort))
 
 
-def handleSignals(handler):
+def handleSignals(handler: Any) ->None:
 
     """set up signal handling"""
 
@@ -185,13 +195,13 @@ class Debug:
     i18n = False
     isalive = False
 
-    def __init__(self):
+    def __init__(self) ->None:
         raise TypeError('Debug is not meant to be instantiated')
 
     @staticmethod
-    def help():
+    def help() ->'str':
         """a string for help texts about debug options"""
-        def optYielder(options):
+        def optYielder(options: List[str]) -> Generator[str, None, None]:
             """yields options with markers for line separation"""
             for idx, opt in enumerate(options):
                 yield opt
@@ -216,7 +226,7 @@ Options {stropt} take a string argument like {example}.
          stropt=', '.join(stringOptions), example=stringExample)
 
     @staticmethod
-    def setOptions(args):
+    def setOptions(args: 'str') ->'str':
         """args comes from the command line. Put this in the Debug class.
         If something goes wrong, return an error message."""
         if not args:
@@ -246,7 +256,7 @@ Options {stropt} take a string argument like {example}.
         return ''
 
     @staticmethod
-    def modeltest_is_supported():
+    def modeltest_is_supported() ->bool:
         """Is the QT binding supported."""
         try:
             import sip
@@ -259,7 +269,7 @@ Options {stropt} take a string argument like {example}.
             return False
 
     @staticmethod
-    def str():
+    def str() ->str:
         """__str__ does not work with class objects"""
         result = []
         for option in Debug.__dict__:
@@ -272,7 +282,7 @@ class FixedClass(type):
 
     """Metaclass: after the class variable fixed is set to True,
     all class variables become immutable"""
-    def __setattr__(cls, key, value):
+    def __setattr__(cls, key: str, value: object) ->None:
         if cls.fixed:
             raise SystemExit('{cls}.{key} may not be changed'.format(
                 cls=cls.__name__, key=key))
@@ -288,7 +298,7 @@ class ReprMixin:
     runtime overhead to check for this beforehand.
     """
 
-    def __repr__(self):
+    def __repr__(self) ->str:
         clsName = self.__class__.__name__
         content = str(self)
         if content.startswith(clsName):
@@ -317,11 +327,11 @@ class Options(metaclass=FixedClass):
     continueServer = False
     fixed = False
 
-    def __init__(self):
+    def __init__(self) ->None:
         raise TypeError('Options is not meant to be instantiated')
 
     @staticmethod
-    def str():
+    def str() -> str:
         """__str__ does not work with class objects"""
         result = []
         for option in Options.__dict__:
@@ -374,7 +384,7 @@ class __Internal:
     logger = None
     kajonggrc = None
 
-    def __init__(self):
+    def __init__(self) ->None:
         """init the loggers"""
         logName = os.path.basename(sys.argv[0]).replace('.py', '').replace('.exe', '')  + '.log'
         self.logger = logging.getLogger(logName)
@@ -407,11 +417,11 @@ class IntDict(defaultdict, ReprMixin):
     This allows us to have a tree of IntDicts, and we only have
     to update the leaves, getting the sums for free"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: Optional['IntDict']=None) ->None:
         defaultdict.__init__(self, int)
         self.parent = parent
 
-    def copy(self):
+    def copy(self) -> 'IntDict':
         """need to reimplement this because the __init__ signature of
         IntDict is not identical to that of defaultdict"""
         result = IntDict(self.parent)
@@ -419,7 +429,7 @@ class IntDict(defaultdict, ReprMixin):
         # see https://www.logilab.org/ticket/23986
         return result
 
-    def __add__(self, other):
+    def __add__(self, other: object) -> 'IntDict':
         """add two IntDicts"""
         assert isinstance(other, IntDict), other
         result = self.copy()
@@ -427,12 +437,12 @@ class IntDict(defaultdict, ReprMixin):
             result[key] += value
         return result
 
-    def __radd__(self, other):
+    def __radd__(self, other: object) -> 'IntDict':
         """we want sum to work (no start value)"""
         assert other == 0
         return self.copy()
 
-    def __sub__(self, other):
+    def __sub__(self, other: object) -> 'IntDict':
         """self - other"""
         assert isinstance(other, IntDict), other
         result = self.copy()
@@ -443,22 +453,22 @@ class IntDict(defaultdict, ReprMixin):
                 del result[key]
         return result
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) ->bool:
         assert isinstance(other, IntDict), other
         return self.all() == other.all()
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) ->bool:
         assert isinstance(other, IntDict), other
         return self.all() != other.all()
 
-    def count(self, countFilter=None):
+    def count(self, countFilter: Optional[Iterable]=None) ->int:
         """how many tiles defined by countFilter do we hold?
         countFilter is an iterator of element names. No countFilter: Take all
         So count(['we', 'ws']) should return 8"""
         return sum((defaultdict.get(self, x) or 0)
                    for x in countFilter or self)
 
-    def all(self, countFilter=None):
+    def all(self, countFilter: Optional[Iterable]=None) ->List['Tile']:
         """return a list of all tiles defined by countFilter,
         each tile multiplied by its occurrence.
         countFilter is an iterator of element names. No countFilter: take all
@@ -468,30 +478,30 @@ class IntDict(defaultdict, ReprMixin):
             result.extend([element] * self[element])
         return sorted(result)
 
-    def __contains__(self, tile):
+    def __contains__(self, tile: object) ->bool:
         """does not contain tiles with count 0"""
         return defaultdict.__contains__(self, tile) and self[tile] > 0
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: Any, value: Any) ->None:
         """also update parent if given"""
         if self.parent is not None:
             self.parent[key] += value - defaultdict.get(self, key, 0)
         defaultdict.__setitem__(self, key, value)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: Any) ->None:
         """also update parent if given"""
         if self.parent is not None:
             self.parent[key] -= defaultdict.get(self, key, 0)
         defaultdict.__delitem__(self, key)
 
-    def clear(self):
+    def clear(self) ->None:
         """also update parent if given"""
         if self.parent is not None:
             for key, value in defaultdict.items(self):
                 self.parent[key] -= value
         defaultdict.clear(self)
 
-    def __str__(self):
+    def __str__(self) ->str:
         """sort the result for better log comparison"""
         keys = sorted(self.keys())
         return ', '.join('{}:{}'.format(
@@ -518,7 +528,7 @@ class DrawOnTopMixin:
 
     """The inheriting QGraphicsObject will draw itself above all non moving tiles"""
 
-    def setDrawingOrder(self):
+    def setDrawingOrder(self) ->None:
         """we want us above all non moving tiles"""
         if self.activeAnimation.get('pos'):
             movingZ = ZValues.movingZ
@@ -527,7 +537,7 @@ class DrawOnTopMixin:
         self.setZValue(ZValues.markerZ + movingZ)
 
 
-def id4(obj):
+def id4(obj: object) ->str:
     """object id for debug messages"""
     if obj is None:
         return 'NONE'
@@ -547,7 +557,7 @@ class Fmt(string.Formatter):
     formatter = None
 
     @staticmethod
-    def num_encode(number, length=4):
+    def num_encode(number: int, length: int=4) ->str:
         """make a short unique ascii string out of number, truncate to length"""
         result = []
         while number and len(result) < length:
@@ -555,7 +565,7 @@ class Fmt(string.Formatter):
             result.append(Fmt.alphabet[remainder])
         return ''.join(reversed(result))
 
-    def get_value(self, key, args, kwargs):
+    def get_value(self, key : Union[int, str], args: Sequence[Any], kwargs: Mapping[str, Any]) ->str:
         assert isinstance(key, str), key
         if key.startswith('id(') and key.endswith(')'):
             idpar = key[3:-1]
@@ -573,7 +583,7 @@ class Fmt(string.Formatter):
 Fmt.formatter = Fmt()
 
 
-def fmt(text, **kwargs):
+def fmt(text: str, **kwargs: Any) ->str:
     """use the context dict for finding arguments.
     For something like {self} output 'self:selfValue'"""
     if '}' in text:

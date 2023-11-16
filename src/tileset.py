@@ -12,6 +12,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import Optional, Tuple, TYPE_CHECKING
+
 from qt import QSizeF, QSvgRenderer
 from log import logException, i18n
 from mjresource import Resource
@@ -19,6 +21,8 @@ from mjresource import Resource
 from common import LIGHTSOURCES, Internal
 from wind import East, South, West, North
 
+if TYPE_CHECKING:
+    from wind import Wind
 
 class Tileset(Resource):
 
@@ -28,7 +32,7 @@ class Tileset(Resource):
     configGroupName = 'KMahjonggTileset'
     cache = {}
 
-    def __init__(self, name=None):
+    def __init__(self, name:Optional[str]=None) ->None:
         """continue __build"""
         super().__init__(name)
         self.__shadowOffsets = None
@@ -73,25 +77,25 @@ class Tileset(Resource):
             self.svgName['f%s' % wind] = 'FLOWER_%d' % (idx + 1)
             self.svgName['y%s' % wind] = 'SEASON_%d' % (idx + 1)
 
-    def __str__(self):
+    def __str__(self) ->str:
         return "tileset id=%d name=%s, name id=%d" % \
             (id(self), self.desktopFileName, id(self.desktopFileName))
 
     @staticmethod
-    def current():
+    def current() ->'Tileset':
         """the currently wanted tileset. If not yet defined, do so"""
         assert Internal.Preferences
         return Tileset(str(Internal.Preferences.tilesetName))
 
-    def shadowWidth(self):
+    def shadowWidth(self) ->int:
         """the size of border plus shadow"""
         return int(self.tileSize.width() - self.faceSize.width())
 
-    def shadowHeight(self):
+    def shadowHeight(self) ->int:
         """the size of border plus shadow"""
         return int(self.tileSize.height() - self.faceSize.height())
 
-    def shadowOffsets(self, lightSource, rotation):
+    def shadowOffsets(self, lightSource:str, rotation:int) ->Tuple[int, int]:
         """real offset of the shadow on the screen"""
         assert Internal.Preferences
         if not Internal.Preferences.showShadows:
@@ -99,7 +103,7 @@ class Tileset(Resource):
         lightSourceIndex = LIGHTSOURCES.index(lightSource)
         return self.__shadowOffsets[lightSourceIndex][rotation // 90]
 
-    def tileFaceRelation(self):
+    def tileFaceRelation(self) ->Tuple[float,float]:
         """return how much bigger the tile is than the face"""
         return (self.tileSize.width() / self.faceSize.width(),
                 self.tileSize.height() / self.faceSize.height())

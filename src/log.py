@@ -9,6 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import logging
 import os
+from typing import TYPE_CHECKING, Union, Protocol, Optional
 
 from locale import getpreferredencoding
 
@@ -22,10 +23,14 @@ from mi18n import i18n
 from dialogs import Sorry, Information, NoPrompt
 
 
+if TYPE_CHECKING:
+    from twisted.internet.defer import Deferred
+    from qt import QObject
+
 SERVERMARK = '&&SERVER&&'
 
 
-def translateServerMessage(msg):
+def translateServerMessage(msg:str) ->str:
     """because a PB exception can not pass a list of arguments, the server
     encodes them into one string using SERVERMARK as separator. That
     string is always english. Here we unpack and translate it into the
@@ -34,8 +39,11 @@ def translateServerMessage(msg):
         return i18n(*tuple(msg.split(SERVERMARK)[1:-1]))
     return msg
 
+class SupportsIndent(Protocol):
+    """for mypy"""
+    indent:int
 
-def dbgIndent(this, parent):
+def dbgIndent(this:SupportsIndent, parent:Optional[SupportsIndent]) ->str:
     """show messages indented"""
     if this.indent == 0:
         return ''
@@ -43,7 +51,7 @@ def dbgIndent(this, parent):
     return (' │ ' * (pIndent)) + ' ├' + '─' * (this.indent - pIndent - 1)
 
 
-def __logUnicodeMessage(prio, msg):
+def __logUnicodeMessage(prio:int, msg:str) ->None:
     """if we can encode the str msg to ascii, do so.
     Otherwise convert the str object into an utf-8 encoded
     str object.
@@ -54,7 +62,7 @@ def __logUnicodeMessage(prio, msg):
     Internal.logger.log(prio, msg)
 
 
-def __enrichMessage(msg, withGamePrefix=True):
+def __enrichMessage(msg:str, withGamePrefix:bool=True) ->str:
     """
     Add some optional prefixes to msg: S/C, process id, time, git commit.
 
@@ -81,7 +89,7 @@ def __enrichMessage(msg, withGamePrefix=True):
     return result
 
 
-def __exceptionToString(exception):
+def __exceptionToString(exception:Exception) ->str:
     """
     Convert exception into a useful string for logging.
 
@@ -106,13 +114,14 @@ def __exceptionToString(exception):
         parts.append(exception.filename)
     return ' '.join(parts)
 
-def logSummary(summary, prio):
+def logSummary(summary:traceback.StackSummary, prio:int) ->None:
     """log traceback summary"""
     for line in summary.format():
         if 'logException' not in line:
             __logUnicodeMessage(prio, '  ' + line.strip())
 
-def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
+def logMessage(msg:Union[Exception, str], prio:int, showDialog:bool,
+    showStack:bool=False, withGamePrefix:bool=True) ->'Deferred':
     """writes info message to log and to stdout"""
     if isinstance(msg, Exception):
         msg = __exceptionToString(msg)
@@ -130,17 +139,17 @@ def logMessage(msg, prio, showDialog, showStack=False, withGamePrefix=True):
     return NoPrompt(msg)
 
 
-def logInfo(msg, showDialog=False, withGamePrefix=True):
+def logInfo(msg:Union[Exception, str], showDialog:bool=False, withGamePrefix:bool=True) ->'Deferred':
     """log an info message"""
     return logMessage(msg, logging.INFO, showDialog, withGamePrefix=withGamePrefix)
 
 
-def logError(msg, showStack=True, withGamePrefix=True):
+def logError(msg:Union[Exception, str], showStack:bool=True, withGamePrefix:bool=True) ->'Deferred':
     """log an error message"""
     return logMessage(msg, logging.ERROR, True, showStack=showStack, withGamePrefix=withGamePrefix)
 
 
-def logDebug(msg, showStack=False, withGamePrefix=True, btIndent=None):
+def logDebug(msg:str, showStack:bool=False, withGamePrefix:bool=True, btIndent:Optional[int]=None) ->'Deferred':
     """log this message and show it on stdout
     if btIndent is set, message is indented by depth(backtrace)-btIndent"""
     if btIndent:
@@ -149,12 +158,12 @@ def logDebug(msg, showStack=False, withGamePrefix=True, btIndent=None):
     return logMessage(msg, logging.DEBUG, False, showStack=showStack, withGamePrefix=withGamePrefix)
 
 
-def logWarning(msg, withGamePrefix=True):
+def logWarning(msg:Union[Exception, str], withGamePrefix:bool=True) ->'Deferred':
     """log this message and show it on stdout"""
     return logMessage(msg, logging.WARNING, True, withGamePrefix=withGamePrefix)
 
 
-def logException(exception: str, withGamePrefix=True) ->None:
+def logException(exception: Union[Exception, str], withGamePrefix:bool=True) ->None:
     """logs error message and re-raises exception if we are not server"""
     logError(exception, withGamePrefix=withGamePrefix)
     exc_type = exception.__class__
@@ -181,7 +190,7 @@ class EventData(str):
     events.update(extra)
     keys = {y: x for x, y in Qt.__dict__.items() if isinstance(y, int)}
 
-    def __new__(cls, receiver, event, prefix=None):
+    def __new__(cls, receiver:'QObject', event:'QEvent', prefix:Optional[str]=None) ->'EventData':
         """create the wanted string"""
         name = cls.eventName(event)
         msg = '%s%sreceiver:%s' % (name, cls.eventValue(event), cls.eventReceiver(receiver))
@@ -192,7 +201,7 @@ class EventData(str):
         return super().__new__(cls, msg)
 
     @classmethod
-    def eventReceiver(cls, receiver):
+    def eventReceiver(cls, receiver:'QObject') ->str:
         """Format data about event receiver"""
         text = ''
         if hasattr(receiver, 'text'):
@@ -210,7 +219,7 @@ class EventData(str):
         return ''.join([text, name, debug_name, repr(receiver)])
 
     @classmethod
-    def eventValue(cls, event):
+    def eventValue(cls, event:'QEvent') ->str:
         """Format data about event value"""
         value = ''
         if hasattr(event, 'key'):
@@ -225,7 +234,7 @@ class EventData(str):
         return value
 
     @classmethod
-    def eventName(cls, event):
+    def eventName(cls, event:'QEvent') ->str:
         """Format data about event name"""
         if not PYQT_VERSION:
             # Pyside

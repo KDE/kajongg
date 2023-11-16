@@ -7,6 +7,11 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import Tuple, List, Set, Generator, Optional, TYPE_CHECKING, Union
+
+# we disable those because of our automatic conversion to classmethod/staticmethod
+# mypy: disable-error-code="misc, override, call-arg, arg-type"
+
 from tile import Tile, TileList, elements, Meld, MeldList
 from tilesource import TileSource
 from common import IntDict
@@ -14,6 +19,12 @@ from wind import East
 from message import Message
 from query import Query
 from permutations import Permutations
+
+if TYPE_CHECKING:
+    from hand import Hand
+    from game import PlayingGame
+    from tile import Tiles
+    from intelligence import AIDefaultAI, DiscardCandidates
 
 
 # pylint:disable=missing-function-docstring,missing-class-docstring
@@ -38,7 +49,7 @@ class RuleCode:
     All methods in RuleCode classes will automatically be converted
     into staticmethods or classmethods if the 1st arg is named 'cls'.
 
-    winningTileCandidates(cls, hand):
+    winningTileCandidates(cls, hand:'Hand'):
         All rules for going MahJongg must have such a method.
         This is used to find all winning hands which only need
         one tile: The calling hands (after calling)
@@ -47,20 +58,21 @@ class RuleCode:
 
     cache = ()
 
-    def appliesToHand(self, hand):
+    def appliesToHand(self, hand:'Hand') ->bool:
         """returns true if this applies to hand"""
         return False
 
 class MJRule(RuleCode):
 
-    def computeLastMelds(hand):
+    def computeLastMelds(hand:'Hand') ->MeldList:
         """return all possible last melds"""
         return MeldList()
 
-    def shouldTry(hand, maxMissing=10):
+    def shouldTry(hand:'Hand', maxMissing:int=10) ->bool:
         return True
 
-    def rearrange(cls, hand, rest):
+    def rearrange(cls, hand:'Hand', rest:Union[TileList,
+        List[Tile]]) ->Generator[Tuple[MeldList, TileList], None, None]:
         """rest is a list of those tiles that can still
         be rearranged: No declared melds and no bonus tiles.
         done is already arranged, do not change this.
@@ -72,89 +84,89 @@ class MJRule(RuleCode):
 
 class DragonPungKong(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isPungKong and meld.isDragonMeld
 
 
 class ExposedMinorPung(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isPung and meld[0].isMinor and meld.isExposed
 
 
 class ExposedTerminalsPung(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isExposed and meld[0].isTerminal and meld.isPung
 
 
 class ExposedHonorsPung(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isExposed and meld.isHonorMeld and meld.isPung
 
 
 class ExposedMinorKong(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isExposed and meld[0].isMinor and meld.isKong
 
 
 class ExposedTerminalsKong(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isExposed and meld[0].isTerminal and meld.isKong
 
 
 class ExposedHonorsKong(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isExposed and meld.isHonorMeld and meld.isKong
 
 
 class ConcealedMinorPung(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isConcealed and meld[0].isMinor and meld.isPung
 
 
 class ConcealedTerminalsPung(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isConcealed and meld[0].isTerminal and meld.isPung
 
 
 class ConcealedHonorsPung(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isConcealed and meld.isHonorMeld and meld.isPung
 
 
 class ConcealedMinorKong(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isConcealed and meld[0].isMinor and meld.isKong
 
 
 class ConcealedTerminalsKong(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isConcealed and meld[0].isTerminal and meld.isKong
 
 
 class ConcealedHonorsKong(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isConcealed and meld.isHonorMeld and meld.isKong
 
 
 class OwnWindPungKong(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         assert hand
         return meld[0].value is hand.ownWind
 
-    def mayApplyToMeld(meld):
+    def mayApplyToMeld(meld:Meld) ->bool:
         """for meld rules which depend on context like hand.ownWind, we want
         to know if there could be a context where this rule applies. See
         Meld.rules.
@@ -165,43 +177,43 @@ class OwnWindPungKong(RuleCode):
 
 class OwnWindPair(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         assert hand
         return meld[0].value is hand.ownWind
 
-    def mayApplyToMeld(meld):
+    def mayApplyToMeld(meld:Meld) ->bool:
         return meld.isPair and meld.isWindMeld
 
 
 class RoundWindPungKong(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         assert hand
         return meld[0].value is hand.roundWind
 
-    def mayApplyToMeld(meld):
+    def mayApplyToMeld(meld:Meld) ->bool:
         return meld.isPungKong and meld.isWindMeld
 
 
 class RoundWindPair(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         assert hand
         return meld[0].value is hand.roundWind
 
-    def mayApplyToMeld(meld):
+    def mayApplyToMeld(meld:Meld) ->bool:
         return meld.isPair and meld.isWindMeld
 
 
 class DragonPair(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isDragonMeld and meld.isPair
 
 
 class LastTileCompletesPairMinor(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         if hand.lastMeld is None:
             return False
         return hand.lastMeld.isPair and hand.lastTile.isMinor
@@ -209,19 +221,19 @@ class LastTileCompletesPairMinor(RuleCode):
 
 class Flower(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isSingle and meld.group == Tile.flower
 
 
 class Season(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         return meld.isSingle and meld.group == Tile.season
 
 
 class LastTileCompletesPairMajor(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         if hand.lastMeld is None:
             return False
         return bool(hand.lastMeld) and hand.lastMeld.isPair and hand.lastTile.isMajor
@@ -229,51 +241,51 @@ class LastTileCompletesPairMajor(RuleCode):
 
 class LastFromWall(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return bool(hand.lastTile) and hand.lastTile.isConcealed
 
 
 class ZeroPointHand(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return not any(x.meld for x in hand.usedRules if x.meld and len(x.meld) > 1)
 
 
 class NoChow(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return not any(x.isChow for x in hand.melds)
 
 
 class OnlyConcealedMelds(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
 
 
 class FalseColorGame(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         dwSet = set(Tile.honors)
         return bool(dwSet & hand.suits) and len(hand.suits - dwSet) == 1
 
 
 class TrueColorGame(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return len(hand.suits) == 1 and hand.suits < set(Tile.colors)
 
 
 class Purity(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return (len(hand.suits) == 1 and hand.suits < set(Tile.colors)
                 and not any(x.isChow for x in hand.melds))
 
 
 class ConcealedTrueColorGame(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
             return False
         return not any((x.isExposed and not x.isClaimedKong) for x in hand.melds)
@@ -281,19 +293,19 @@ class ConcealedTrueColorGame(RuleCode):
 
 class OnlyMajors(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return all(x.isMajor for x in hand.tiles)
 
 
 class OnlyHonors(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return all(x.isHonor for x in hand.tiles)
 
 
 class HiddenTreasure(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return (not any(((x.isExposed and not x.isClaimedKong) or x.isChow) for x in hand.melds)
                 and bool(hand.lastTile) and hand.lastTile.isConcealed
                 and len(hand.melds) == 5)
@@ -301,7 +313,7 @@ class HiddenTreasure(RuleCode):
 
 class BuriedTreasure(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return (len(hand.suits - set(Tile.honors)) == 1
                 and sum(x.isPung for x in hand.melds) == 4
                 and all((x.isPung and x.isConcealed) or x.isPair for x in hand.melds))
@@ -309,7 +321,7 @@ class BuriedTreasure(RuleCode):
 
 class AllTerminals(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return all(x.isTerminal for x in hand.tiles)
 
 
@@ -317,11 +329,11 @@ class StandardMahJongg(MJRule):
 
     cache = ('appliesToHand',)
 
-    def computeLastMelds(hand):
+    def computeLastMelds(hand:'Hand') ->MeldList:
         """return all possible last melds"""
         return MeldList(x for x in hand.melds if hand.lastTile in x and len(x) < 4)
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         """winner rules are not yet applied to hand"""
         # pylint: disable=too-many-return-statements
         # too many return statements
@@ -347,7 +359,7 @@ class StandardMahJongg(MJRule):
             x.rule.score.doubles for x in hand.matchingWinnerRules())
         return hand.score.doubles + doublingWinnerRules >= hand.ruleset.minMJDoubles
 
-    def fillChow(group, values):
+    def fillChow(group:str, values:List[int]) ->Set[Tile]:
         val0, val1 = values
         if val0 + 1 == val1:
             if val0 == 1:
@@ -358,7 +370,7 @@ class StandardMahJongg(MJRule):
         assert val0 + 2 == val1, 'group:%s values:%s' % (group, values)
         return {Tile(group, val0 + 1)}
 
-    def winningTileCandidates(cls, hand):
+    def winningTileCandidates(cls, hand:'Hand') ->Set[Tile]:
         # pylint: disable=too-many-locals,too-many-return-statements,too-many-branches,too-many-statements
         if len(hand.melds) > 7:
             # hope 7 is sufficient, 6 was not
@@ -489,7 +501,7 @@ class StandardMahJongg(MJRule):
 class SquirmingSnake(StandardMahJongg):
     cache = ()
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         cacheKey = (hand.ruleset.standardMJRule.__class__, 'appliesToHand')
         std = hand.ruleCache.get(cacheKey, None)
         if std is False:
@@ -504,26 +516,26 @@ class SquirmingSnake(StandardMahJongg):
             return False
         return len(set(values)) == len(values) - 5
 
-    def winningTileCandidates(hand):
+    def winningTileCandidates(hand:'Hand') ->Set[Tile]:
         """they have already been found by the StandardMahJongg rule"""
         return set()
 
 
 class WrigglingSnake(MJRule):
 
-    def shouldTry(hand, maxMissing=3):
+    def shouldTry(hand:'Hand', maxMissing:int=3) ->bool:
         if hand.declaredMelds:
             return False
         return (len({x.exposed for x in hand.tiles}) + maxMissing > 12
                 and all(not x.isChow for x in hand.declaredMelds))
 
-    def computeLastMelds(hand):
+    def computeLastMelds(hand:'Hand') ->MeldList:
         if not hand.lastTile:
             return MeldList()
         _ = Tile(hand.lastTile)
         return MeldList(_.pair) if hand.lastTile.value == 1 else MeldList(_.single)
 
-    def winningTileCandidates(hand):
+    def winningTileCandidates(hand:'Hand') ->Set[Tile]:
         suits = hand.suits.copy()
         if Tile.wind not in suits or Tile.dragon in suits or len(suits) > 2:
             return set()
@@ -544,7 +556,8 @@ class WrigglingSnake(MJRule):
         # pair of 1 is not complete
         return {Tile(group, '1')}
 
-    def rearrange(cls, hand, rest):
+    def rearrange(cls, hand:'Hand', rest:Union[TileList,
+        List[Tile]]) ->Generator[Tuple[MeldList, TileList], None, None]:
         melds = MeldList()
         for tileName in rest[:]:
             if rest.count(tileName) >= 2:
@@ -556,7 +569,7 @@ class WrigglingSnake(MJRule):
                 rest.remove(tileName)
         yield melds, rest
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         if hand.declaredMelds:
             return False
         suits = hand.suits.copy()
@@ -572,7 +585,7 @@ class WrigglingSnake(MJRule):
 
 class CallingHand(RuleCode):
 
-    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
+    def appliesToHand(cls, hand:'Hand') ->bool:  # pylint:disable=arguments-renamed
         for callHand in hand.callingHands:
             used = (x.rule.__class__ for x in callHand.usedRules)
             assert hasattr(cls, 'limitHand')
@@ -583,7 +596,7 @@ class CallingHand(RuleCode):
 
 class TripleKnitting(MJRule):
 
-    def computeLastMelds(cls, hand):
+    def computeLastMelds(cls, hand:'Hand') ->MeldList:
         """return all possible last melds"""
         if not hand.lastTile:
             return MeldList()
@@ -592,7 +605,7 @@ class TripleKnitting(MJRule):
         triples.append(Meld(rest))
         return MeldList(Meld(x) for x in triples if hand.lastTile in x)
 
-    def claimness(cls, hand, discard):
+    def claimness(cls, hand:'Hand', discard:Optional[Tile]) ->IntDict:
         result = IntDict()
         if cls.shouldTry(hand):
             result[Message.Pung] = -999
@@ -600,7 +613,7 @@ class TripleKnitting(MJRule):
             result[Message.Chow] = -999
         return result
 
-    def weigh(cls, aiInstance, candidates):
+    def weigh(cls, aiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         if cls.shouldTry(candidates.hand):
             _, rest = cls.findTriples(candidates.hand)
             for candidate in candidates:
@@ -610,7 +623,8 @@ class TripleKnitting(MJRule):
                     candidate.keep -= 10
         return candidates
 
-    def rearrange(cls, hand, rest):
+    def rearrange(cls, hand:'Hand', rest:Union[TileList,
+        List[Tile]]) ->Generator[Tuple[MeldList, TileList], None, None]:
         melds = MeldList()
         for triple in cls.findTriples(hand)[0]:
             melds.append(triple)
@@ -630,7 +644,7 @@ class TripleKnitting(MJRule):
                 rest.remove(pair[1])
         yield melds, rest
 
-    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
+    def appliesToHand(cls, hand:'Hand') ->bool:  # pylint:disable=arguments-renamed
         if any(x.isHonor for x in hand.tiles):
             return False
         if len(hand.declaredMelds) > 1:
@@ -641,7 +655,7 @@ class TripleKnitting(MJRule):
         return (len(triples) == 4 and len(rest) == 2
                 and rest[0].group != rest[1].group and rest[0].value == rest[1].value)
 
-    def winningTileCandidates(cls, hand):
+    def winningTileCandidates(cls, hand:'Hand') ->Set[Tile]:
         if hand.declaredMelds:
             return set()
         if any(x.isHonor for x in hand.tiles):
@@ -655,14 +669,14 @@ class TripleKnitting(MJRule):
             result.remove(restTile)
         return set(result)
 
-    def shouldTry(cls, hand, maxMissing=3):  # pylint:disable=arguments-renamed
+    def shouldTry(cls, hand:'Hand', maxMissing:int=3) ->bool:  # pylint:disable=arguments-renamed
         if hand.declaredMelds:
             return False
         tripleWanted = 4 - maxMissing // 3  # count triples
         tripleCount = len(cls.findTriples(hand)[0])
         return tripleCount >= tripleWanted
 
-    def findTriples(hand):
+    def findTriples(hand:'Hand') ->Tuple[MeldList, TileList]:
         """return a list of triple knitted melds, including the mj triple.
         Also returns the remaining untripled tiles"""
         if hand.declaredMelds:
@@ -685,7 +699,7 @@ class TripleKnitting(MJRule):
 
 class Knitting(MJRule):
 
-    def computeLastMelds(cls, hand):
+    def computeLastMelds(cls, hand:'Hand') ->MeldList:
         """return all possible last melds"""
         if not hand.lastTile:
             return MeldList()
@@ -694,7 +708,7 @@ class Knitting(MJRule):
             hand.string, couples, rest)
         return MeldList(Meld(x) for x in couples if hand.lastTile in x)
 
-    def claimness(cls, hand, discard):
+    def claimness(cls, hand:'Hand', discard:Optional[Tile]) ->IntDict:
         result = IntDict()
         if cls.shouldTry(hand):
             result[Message.Pung] = -999
@@ -702,21 +716,21 @@ class Knitting(MJRule):
             result[Message.Chow] = -999
         return result
 
-    def weigh(cls, aiInstance, candidates):
+    def weigh(cls, aiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         if cls.shouldTry(candidates.hand):
             for candidate in candidates:
                 if candidate.group in Tile.honors:
                     candidate.keep -= 50
         return candidates
 
-    def shouldTry(cls, hand, maxMissing=4):  # pylint:disable=arguments-renamed
+    def shouldTry(cls, hand:'Hand', maxMissing:int=4) ->bool:  # pylint:disable=arguments-renamed
         if hand.declaredMelds:
             return False
         pairWanted = 7 - maxMissing // 2  # count pairs
         pairCount = len(cls.findCouples(hand)[0])
         return pairCount >= pairWanted
 
-    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
+    def appliesToHand(cls, hand:'Hand') ->bool:  # pylint:disable=arguments-renamed
         if any(x.isHonor for x in hand.tiles):
             return False
         if len(hand.declaredMelds) > 1:
@@ -725,7 +739,7 @@ class Knitting(MJRule):
             return False
         return len(cls.findCouples(hand)[0]) == 7
 
-    def winningTileCandidates(cls, hand):
+    def winningTileCandidates(cls, hand:'Hand') ->Set[Tile]:
         if hand.declaredMelds:
             return set()
         if any(x.isHonor for x in hand.tiles):
@@ -742,7 +756,8 @@ class Knitting(MJRule):
         otherTile = Tile(otherSuit, tile.value).concealed
         return {otherTile}
 
-    def rearrange(cls, hand, rest):
+    def rearrange(cls, hand:'Hand', rest:Union[TileList,
+        List[Tile]]) ->Generator[Tuple[MeldList, TileList], None, None]:
         melds = MeldList()
         for couple in cls.findCouples(hand, rest)[0]:
             if couple[0].isExposed:
@@ -753,7 +768,7 @@ class Knitting(MJRule):
             rest.remove(couple[1])
         yield melds, rest
 
-    def findCouples(cls, hand, pairs=None):
+    def findCouples(cls, hand:'Hand', pairs:TileList=TileList()) ->Tuple[MeldList, TileList]:
         """return a list of tuples, including the mj couple.
         Also returns the remaining uncoupled tiles IF they
         are of the wanted suits"""
@@ -779,7 +794,7 @@ class Knitting(MJRule):
                 result.append((tile0, tile1))
         return result, tiles0 + tiles1
 
-    def pairSuits(hand):
+    def pairSuits(hand:'Hand') ->str:
         """return a lowercase string with two suit characters. If no prevalence, returns ''"""
         suitCounts = [len([x for x in hand.tiles if x.lowerGroup == y]) for y in Tile.colors]
         minSuit = min(suitCounts)
@@ -791,10 +806,10 @@ class Knitting(MJRule):
 
 class AllPairHonors(MJRule):
 
-    def computeLastMelds(hand):
+    def computeLastMelds(hand:'Hand') ->MeldList:
         return MeldList(Tile(hand.lastTile).pair)
 
-    def claimness(cls, hand, discard):
+    def claimness(cls, hand:'Hand', discard:Optional[Tile]) ->IntDict:
         result = IntDict()
         if cls.shouldTry(hand):
             result[Message.Pung] = -999
@@ -802,19 +817,19 @@ class AllPairHonors(MJRule):
             result[Message.Chow] = -999
         return result
 
-    def maybeCallingOrWon(hand):
+    def maybeCallingOrWon(hand:'Hand') ->bool:
         if any(x.value in Tile.minors for x in hand.tiles):
             return False
         return len(hand.declaredMelds) < 2
 
-    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
+    def appliesToHand(cls, hand:'Hand') ->bool:  # pylint:disable=arguments-renamed
         if not cls.maybeCallingOrWon(hand):
             return False
         if len(set(hand.tiles)) != 7:
             return False
         return {len([x for x in hand.tiles if x == y]) for y in hand.tiles} == {2}
 
-    def winningTileCandidates(cls, hand):
+    def winningTileCandidates(cls, hand:'Hand') ->Set[Tile]:
         if not cls.maybeCallingOrWon(hand):
             return set()
         single = [x for x in hand.tiles if hand.tiles.count(x) == 1]
@@ -822,7 +837,7 @@ class AllPairHonors(MJRule):
             return set()
         return set(single)
 
-    def shouldTry(hand, maxMissing=4):
+    def shouldTry(hand:'Hand', maxMissing:int=4) ->bool:
         if hand.declaredMelds:
             return False
         tiles = [x.exposed for x in hand.tiles]
@@ -838,16 +853,17 @@ class AllPairHonors(MJRule):
             pairCount + kongCount * 2) > pairWanted
         return result
 
-    def rearrange(cls, hand, rest):
+    def rearrange(cls, hand:'Hand', rest:Union[TileList,
+        List[Tile]]) ->Generator[Tuple[MeldList, TileList], None, None]:
         melds = MeldList()
         for pair in sorted(set(rest) & elements.mAJORS):
             while rest.count(pair) >= 2:
                 melds.append(pair.pair)
                 rest.remove(pair)
                 rest.remove(pair)
-        yield tuple(melds), tuple(rest)
+        yield melds, rest
 
-    def weigh(aiInstance, candidates):
+    def weigh(aiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         hand = candidates.hand
         if not AllPairHonors.shouldTry(hand):
             return candidates
@@ -865,96 +881,96 @@ class AllPairHonors(MJRule):
 
 class FourfoldPlenty(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return len(hand.tiles) == 18
 
 
 class ThreeGreatScholars(RuleCode):
 
-    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
+    def appliesToHand(cls, hand:'Hand') ->bool:  # pylint:disable=arguments-renamed
         return (BigThreeDragons.appliesToHand(hand)
                 and ('nochow' not in cls.options or not any(x.isChow for x in hand.melds)))
 
 
 class BigThreeDragons(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return len([x for x in hand.melds if x.isDragonMeld and x.isPungKong]) == 3
 
 
 class BigFourJoys(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return len([x for x in hand.melds if x.isWindMeld and x.isPungKong]) == 4
 
 
 class LittleFourJoys(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         lengths = sorted(min(len(x), 3) for x in hand.melds if x.isWindMeld)
         return lengths == [2, 3, 3, 3]
 
 
 class LittleThreeDragons(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return sorted(min(len(x), 3) for x in hand.melds if x.isDragonMeld) == [2, 3, 3]
 
 
 class FourBlessingsHoveringOverTheDoor(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return len([x for x in hand.melds if x.isPungKong and x.isWindMeld]) == 4
 
 
 class AllGreen(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return {x.exposed for x in hand.tiles} < elements.greenHandTiles
 
 
 class LastTileFromWall(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return hand.lastSource is TileSource.LivingWall
 
 
 class LastTileFromDeadWall(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return hand.lastSource is TileSource.DeadWall
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         return hand.lastSource is TileSource.LivingWall
 
 
 class IsLastTileFromWall(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return hand.lastSource is TileSource.LivingWallEnd
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         return hand.lastSource is TileSource.LivingWall
 
 
 class IsLastTileFromWallDiscarded(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return hand.lastSource is TileSource.LivingWallEndDiscard
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         return hand.lastSource is TileSource.LivingWallDiscard
 
 
 class RobbingKong(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return hand.lastSource is TileSource.RobbedKong
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         return (hand.lastSource in (TileSource.RobbedKong, TileSource.LivingWall, TileSource.LivingWallDiscard)
                 and bool(hand.lastTile )and hand.lastTile.group.islower()
@@ -963,25 +979,25 @@ class RobbingKong(RuleCode):
 
 class GatheringPlumBlossomFromRoof(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return LastTileFromDeadWall.appliesToHand(hand) and hand.lastTile is Tile(Tile.stone, '5').concealed
 
 
 class PluckingMoon(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return IsLastTileFromWall.appliesToHand(hand) and hand.lastTile is Tile(Tile.stone, '1').concealed
 
 
 class ScratchingPole(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return RobbingKong.appliesToHand(hand) and hand.lastTile is Tile(Tile.bamboo, '2')
 
 
 class StandardRotation(RuleCode):
 
-    def rotate(game):
+    def rotate(game:'PlayingGame') ->bool:
         if game is None:
             return False
         if game.winner is None:
@@ -992,10 +1008,10 @@ class StandardRotation(RuleCode):
 class EastWonNineTimesInARow(RuleCode):
     nineTimes = 9
 
-    def appliesToHand(cls, hand):  # pylint:disable=arguments-renamed
+    def appliesToHand(cls, hand:'Hand') ->bool:  # pylint:disable=arguments-renamed
         return cls.appliesToGame(hand.player.game)
 
-    def appliesToGame(game, needWins=None):
+    def appliesToGame(game:'PlayingGame', needWins:Optional[int]=None) ->bool:
         if needWins is None:
             needWins = EastWonNineTimesInARow.nineTimes
             if game.isScoringGame():
@@ -1009,7 +1025,7 @@ class EastWonNineTimesInARow(RuleCode):
             return eastMJCount == needWins
         return False
 
-    def rotate(cls, game):
+    def rotate(cls, game:'PlayingGame') ->bool:
         return cls.appliesToGame(game, EastWonNineTimesInARow.nineTimes)
 
 
@@ -1023,10 +1039,10 @@ class GatesOfHeaven(StandardMahJongg):
     cache = ()
 
 # TODO: in BMJA, 111 and 999 must be concealed, we do not check this
-    def computeLastMelds(hand):
+    def computeLastMelds(hand:'Hand') ->MeldList:
         return MeldList(x for x in hand.melds if hand.lastTile in x)
 
-    def shouldTry(hand, maxMissing=None):
+    def shouldTry(hand:'Hand', maxMissing:Optional[int]=None) ->bool:
         if hand.declaredMelds:
             return False
         for suit in Tile.colors:
@@ -1036,7 +1052,7 @@ class GatesOfHeaven(StandardMahJongg):
                 return True
         return False
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
             return False
         if any(len(x) > 2 for x in hand.declaredMelds):
@@ -1053,7 +1069,7 @@ class GatesOfHeaven(StandardMahJongg):
         surplus = values_list[0]
         return 1 < surplus < 9
 
-    def winningTileCandidates(hand):
+    def winningTileCandidates(hand:'Hand') ->Set[Tile]:
         if hand.declaredMelds:
             return set()
         if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
@@ -1069,7 +1085,8 @@ class GatesOfHeaven(StandardMahJongg):
             return {Tile(suit, x) for x in Tile.minors}
         return set()
 
-    def rearrange(cls, hand, rest):
+    def rearrange(cls, hand:'Hand', rest:Union[TileList,
+        List[Tile]]) ->Generator[Tuple[MeldList, TileList], None, None]:
         melds = MeldList()
         for suit in hand.suits & set(Tile.colors):
             for value in Tile.numbers:
@@ -1093,7 +1110,7 @@ class GatesOfHeaven(StandardMahJongg):
 class NineGates(GatesOfHeaven):
     """as used for Classical Chinese DMJL"""
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         """last tile may also be 1 or 9"""
         if hand.declaredMelds:
             return False
@@ -1113,7 +1130,7 @@ class NineGates(GatesOfHeaven):
         surplus = values_list[0]
         return bool(hand.lastTile) and surplus == hand.lastTile.value
 
-    def winningTileCandidates(hand):
+    def winningTileCandidates(hand:'Hand') ->Set[Tile]:
         if hand.declaredMelds:
             return set()
         if len(hand.suits) != 1 or hand.suits >= set(Tile.colors):
@@ -1131,14 +1148,15 @@ class NineGates(GatesOfHeaven):
 
 class ThirteenOrphans(MJRule):
 
-    def computeLastMelds(hand):
+    def computeLastMelds(hand:'Hand') ->MeldList:
         meldSize = hand.tilesInHand.count(hand.lastTile)
         if meldSize == 0:
             # the last tile is called and not yet in the hand
             return MeldList()
         return MeldList(Tile(hand.lastTile).meld(meldSize))
 
-    def rearrange(cls, hand, rest):
+    def rearrange(cls, hand:'Hand', rest:Union[TileList,
+        List[Tile]]) ->Generator[Tuple[MeldList, TileList], None, None]:
         melds = MeldList()
         for tileName in rest:
             if rest.count(tileName) >= 2:
@@ -1150,7 +1168,7 @@ class ThirteenOrphans(MJRule):
                 rest.remove(tileName)
         yield melds, rest
 
-    def claimness(cls, hand, discard):
+    def claimness(cls, hand:'Hand', discard:Optional[Tile]) ->IntDict:
         result = IntDict()
         if cls.shouldTry(hand):
             doublesCount = hand.doublesEstimate(discard)
@@ -1162,10 +1180,10 @@ class ThirteenOrphans(MJRule):
                 result[Message.Chow] = -999
         return result
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return {x.exposed for x in hand.tiles} == elements.majors
 
-    def winningTileCandidates(cls, hand):
+    def winningTileCandidates(cls, hand:'Hand') ->Set[Tile]:
         if any(x in hand.values for x in Tile.minors):
             # no minors allowed
             return set()
@@ -1179,7 +1197,7 @@ class ThirteenOrphans(MJRule):
         assert len(missing) == 1
         return missing
 
-    def shouldTry(hand, maxMissing=4):
+    def shouldTry(hand:'Hand', maxMissing:int=4) ->bool:
         # TODO: look at how many tiles there still are on the wall
         if hand.declaredMelds:
             return False
@@ -1192,7 +1210,7 @@ class ThirteenOrphans(MJRule):
                 return False
         return True
 
-    def weigh(cls, aiInstance, candidates):
+    def weigh(cls, aiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         hand = candidates.hand
         assert hand
         if not cls.shouldTry(hand):
@@ -1215,11 +1233,11 @@ class ThirteenOrphans(MJRule):
 
 class OwnFlower(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         assert hand
         return meld[0].value is hand.ownWind
 
-    def mayApplyToMeld(meld):
+    def mayApplyToMeld(meld:Meld) ->bool:
         # pylint: disable=unsubscriptable-object
         # must be a pylint bug. meld is TileList is list
         return meld.isBonus and meld[0].group == Tile.flower
@@ -1227,11 +1245,11 @@ class OwnFlower(RuleCode):
 
 class OwnSeason(RuleCode):
 
-    def appliesToMeld(hand, meld):
+    def appliesToMeld(hand:Optional['Hand'], meld:Meld) ->bool:
         assert hand
         return meld[0].value is hand.ownWind
 
-    def mayApplyToMeld(meld):
+    def mayApplyToMeld(meld:Meld) ->bool:
         # pylint: disable=unsubscriptable-object
         # must be a pylint bug. meld is TileList is list
         return meld.isBonus and meld[0].group == Tile.season
@@ -1239,42 +1257,42 @@ class OwnSeason(RuleCode):
 
 class OwnFlowerOwnSeason(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return sum(x.isBonus and x[0].value is hand.ownWind for x in hand.bonusMelds) == 2
 
 
 class AllFlowers(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return len([x for x in hand.bonusMelds if x.group == Tile.flower]) == 4
 
 
 class AllSeasons(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return len([x for x in hand.bonusMelds if x.group == Tile.season]) == 4
 
 
 class ThreeConcealedPongs(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return len([x for x in hand.melds if (
             x.isConcealed or x.isClaimedKong) and x.isPungKong]) >= 3
 
 
 class MahJonggWithOriginalCall(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return ('a' in hand.announcements
                 and sum(x.isExposed for x in hand.melds) < 3)
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         # one tile may be claimed before declaring OC and one for going MJ
         # the previous regex was too strict
         return sum(x.isExposed for x in hand.melds) < 3
 
-    def claimness(hand, discard):
+    def claimness(hand:'Hand', discard:Optional[Tile]) ->IntDict:
         result = IntDict()
         player = hand.player
         if player.originalCall and player.mayWin:
@@ -1290,10 +1308,10 @@ class MahJonggWithOriginalCall(RuleCode):
 
 class TwofoldFortune(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return 't' in hand.announcements
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         kungs = [x for x in hand.melds if len(x) == 4]
         return len(kungs) >= 2
@@ -1301,7 +1319,7 @@ class TwofoldFortune(RuleCode):
 
 class BlessingOfHeaven(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         if hand.lastSource is not TileSource.East14th:
             return False
         if hand.ownWind is not East:
@@ -1311,7 +1329,7 @@ class BlessingOfHeaven(RuleCode):
         assert hand.lastTile is Tile.none, '{}: Blessing of Heaven: There can be no last tile'.format(hand)
         return True
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         return (hand.ownWind is East
                 and hand.lastSource in (TileSource.LivingWall, TileSource.LivingWallDiscard)
@@ -1320,14 +1338,14 @@ class BlessingOfHeaven(RuleCode):
 
 class BlessingOfEarth(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         if hand.lastSource is not TileSource.East14th:
             return False
         if hand.ownWind is East:
             return False
         return True
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         return (hand.ownWind is not East
                 and hand.lastSource in (TileSource.LivingWall, TileSource.LivingWallDiscard)
@@ -1336,26 +1354,26 @@ class BlessingOfEarth(RuleCode):
 
 class LongHand(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return hand.lenOffset > 0 if not hand.won else hand.lenOffset > 1
 
 
 class FalseDiscardForMJ(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return not hand.won
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         return not hand.won
 
 
 class DangerousGame(RuleCode):
 
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         return not hand.won
 
-    def selectable(hand):
+    def selectable(hand:'Hand') ->bool:
         """for scoring game"""
         return not hand.won
 
@@ -1363,7 +1381,7 @@ class DangerousGame(RuleCode):
 class LastOnlyPossible(RuleCode):
 
     """check if the last tile was the only one possible for winning"""
-    def appliesToHand(hand):
+    def appliesToHand(hand:'Hand') ->bool:
         if not hand.lastTile:
             return False
         if any(hand.lastTile in x for x in hand.melds if len(x) == 4):

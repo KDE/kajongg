@@ -13,6 +13,7 @@ import datetime
 import os
 import sys
 from itertools import chain
+from typing import List, Tuple, Union, Optional, TYPE_CHECKING, Any
 
 from twisted.spread import pb
 from twisted.cred import credentials
@@ -42,6 +43,11 @@ from statesaver import StateSaver
 from guiutil import ListComboBox, decorateWindow
 from rule import Ruleset
 
+if TYPE_CHECKING:
+    from twisted.internet.defer import Deferred
+    from twisted.internet.unix import Connector
+    from humanclient import HumanClient
+    from deferredutil import Request
 
 class LoginAborted(Exception):
 
@@ -52,11 +58,11 @@ class Url(str, ReprMixin):
 
     """holds connection related attributes: host, port, socketname"""
 
-    def __init__(self, url):
+    def __init__(self, url:str) ->None:
         assert url
         super().__init__()
 
-    def __new__(cls, url):
+    def __new__(cls, url:str) ->'Url':
         assert url
         host = None
         port = None
@@ -80,12 +86,12 @@ class Url(str, ReprMixin):
 
         return obj
 
-    def __str__(self):
+    def __str__(self) ->str:
         """show all info"""
         return socketName() if self.useSocket else '{}:{}'.format(self.host, self.port)
 
     @property
-    def useSocket(self):
+    def useSocket(self) ->bool:
         """do we use socket for current host?"""
         return (
             self.host == '127.0.0.1'
@@ -93,16 +99,16 @@ class Url(str, ReprMixin):
             and not Options.port)
 
     @property
-    def isLocalGame(self):
+    def isLocalGame(self) ->bool:
         """Are we playing a local game not needing the network?"""
         return self.host == '127.0.0.1'
 
     @property
-    def isLocalHost(self):
+    def isLocalHost(self) ->bool:
         """do server and client run on the same host?"""
         return self.host in ('127.0.0.1', 'localhost')
 
-    def findFreePort(self):
+    def findFreePort(self) ->Optional[int]:
         """find an unused port on the current system.
         used when we want to start a local server on windows"""
         assert self.isLocalHost
@@ -117,7 +123,7 @@ class Url(str, ReprMixin):
         logException('cannot find a free port')
         return None
 
-    def startServer(self, result, waiting=0):
+    def startServer(self, result:Any, waiting:int=0) ->'Deferred':
         """make sure we have a running local server or network connectivity"""
         if self.isLocalHost:
             # just wait for that server to appear
@@ -149,7 +155,7 @@ class Url(str, ReprMixin):
         return result
 
     @staticmethod
-    def __findServerProgram():
+    def __findServerProgram() ->List[str]:
         """how should we start the server?"""
         result = []
         if sys.argv[0].endswith('kajongg.py'):
@@ -170,7 +176,7 @@ class Url(str, ReprMixin):
             logDebug(i18n('trying to start local server %1', result))
         return result
 
-    def __startLocalServer(self):
+    def __startLocalServer(self) ->None:
         """start a local server"""
         try:
             args = self.__findServerProgram()
@@ -207,7 +213,7 @@ class Url(str, ReprMixin):
             logException(exc)
 
     @staticmethod
-    def __check_socket(proto, param):
+    def __check_socket(proto:int, param:Union[str, Tuple[str, Optional[int]]]) ->bool:
         """check connection on socket"""
         sock = socket.socket(proto, socket.SOCK_STREAM)
         sock.settimeout(1)
@@ -218,7 +224,7 @@ class Url(str, ReprMixin):
         except socket.error:
             return False
 
-    def __serverListening(self):
+    def __serverListening(self) ->bool:
         """is the expected server listening?"""
         if self.useSocket:
             socket_path = socketName()
@@ -227,7 +233,7 @@ class Url(str, ReprMixin):
             return self.__check_socket(socket.AF_UNIX, socket_path)
         return self.__check_socket(socket.AF_INET, (self.host, self.port))
 
-    def connect(self, factory):
+    def connect(self, factory:pb.PBClientFactory) ->'Connector':
         """return a twisted connector"""
         assert Internal.reactor
         if self.useSocket:
@@ -240,7 +246,7 @@ class LoginDlg(QDialog):
 
     """login dialog for server"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         """self.servers is a list of tuples containing server and last playername"""
         QDialog.__init__(self, None)
         decorateWindow(self, i18nc('kajongg', 'Login'))
@@ -272,11 +278,11 @@ class LoginDlg(QDialog):
         self.serverChanged()
         StateSaver(self)
 
-    def returns(self, unusedButton=None):
+    def returns(self, unusedButton:Optional[str]=None) ->Tuple[Url, str, str, 'Ruleset']:
         """login data returned by this dialog"""
         return (Url(self.url), self.username, self.password, self.__defineRuleset())
 
-    def setupUi(self):
+    def setupUi(self) ->None:
         """create all Ui elements but do not fill them"""
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(
@@ -306,7 +312,7 @@ class LoginDlg(QDialog):
         pol.setHorizontalPolicy(QSizePolicy.Expanding)
         self.cbUser.setSizePolicy(pol)
 
-    def serverChanged(self, unusedText=None):
+    def serverChanged(self, unusedText:Optional[str]=None) ->None:
         """the user selected a different server"""
         records = Query('select player.name from player, passwords '
                         'where passwords.url=? and passwords.player = player.id', (self.url,)).records
@@ -342,7 +348,7 @@ class LoginDlg(QDialog):
                 self.cbRuleset.items = Ruleset.selectableRulesets(self.url)
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(bool(self.url))
 
-    def __defineRuleset(self):
+    def __defineRuleset(self) ->'Ruleset':
         """find out what ruleset to use"""
         if Options.ruleset:
             return Options.ruleset
@@ -350,7 +356,7 @@ class LoginDlg(QDialog):
             return Ruleset.selectableRulesets()[0]
         return self.cbRuleset.current
 
-    def userChanged(self, text):
+    def userChanged(self, text:str) ->None:
         """the username has been changed, lookup password"""
         if text == '':
             self.edPassword.clear()
@@ -365,22 +371,22 @@ class LoginDlg(QDialog):
             self.edPassword.clear()
 
     @property
-    def url(self):
+    def url(self) ->str:
         """abstracts the url of the dialog"""
         return english(self.cbServer.currentText())
 
     @property
-    def username(self):
+    def username(self) ->str:
         """abstracts the username of the dialog"""
         return self.cbUser.currentText()
 
     @property
-    def password(self):
+    def password(self) ->str:
         """abstracts the password of the dialog"""
         return self.edPassword.text()
 
     @password.setter
-    def password(self, password):
+    def password(self, password:str) ->None:
         """abstracts the password of the dialog"""
         self.edPassword.setText(password)
 
@@ -389,7 +395,7 @@ class AddUserDialog(KDialog):
 
     """add a user account on a server: This dialog asks for the needed attributes"""
 
-    def __init__(self, url, username, password):
+    def __init__(self, url:str, username:str, password:str):
         KDialog.__init__(self)
         decorateWindow(self, i18nc("@title:window", "Create User Account"))
         self.setButtons(KDialog.Ok | KDialog.Cancel)
@@ -422,11 +428,11 @@ class AddUserDialog(KDialog):
         self.passwordChanged()
         self.edPassword2.setFocus()
 
-    def passwordChanged(self, unusedText=None):
+    def passwordChanged(self, unusedText:Optional[str]=None) ->None:
         """password changed"""
         self.validate()
 
-    def validate(self):
+    def validate(self) ->None:
         """does the dialog hold valid data?"""
         equal = self.edPassword.size(
         ) and self.edPassword.text(
@@ -435,22 +441,22 @@ class AddUserDialog(KDialog):
         self.button(KDialog.Ok).setEnabled(equal)
 
     @property
-    def username(self):
+    def username(self) ->str:
         """abstracts the username of the dialog"""
         return self.lbUser.text()
 
     @username.setter
-    def username(self, username):
+    def username(self, username:str) ->None:
         """abstracts the username of the dialog"""
         self.lbUser.setText(username)
 
     @property
-    def password(self):
+    def password(self) ->str:
         """abstracts the password of the dialog"""
         return self.edPassword.text()
 
     @password.setter
-    def password(self, password):
+    def password(self, password:str) ->None:
         """abstracts the password of the dialog"""
         self.edPassword.setText(password)
 
@@ -459,22 +465,22 @@ class Connection:
 
     """creates a connection to server"""
 
-    def __init__(self, client):
+    def __init__(self, client:'HumanClient'):
         self.client = client
         self.dlg = LoginDlg()
 
     @property
-    def ruleset(self):
+    def ruleset(self) ->'Ruleset':
         """reader"""
         return self.__ruleset
 
     @ruleset.setter
-    def ruleset(self, value):
+    def ruleset(self, value:'Ruleset') ->None:
         """save changed ruleset as last used ruleset for this server"""
         if not hasattr(self, '__ruleset'):
             self.__ruleset = value
             if value:
-                def write():
+                def write() ->Query:
                     """write to database, returns 1 for success"""
                     return Query('update server set lastruleset=? where url=?', (value.rulesetId, self.url))
                 value.save()
@@ -484,7 +490,7 @@ class Connection:
                     self.__updateServerInfoInDatabase()
                     write()
 
-    def login(self):
+    def login(self) ->DeferredDialog:
         """to be called from HumanClient"""
         result = DeferredDialog(self.dlg)
         result.addCallback(self.__haveLoginData)
@@ -497,7 +503,7 @@ class Connection:
             result.clicked()
         return result
 
-    def __haveLoginData(self, arguments):
+    def __haveLoginData(self, arguments:Tuple[Url, str, str, 'Ruleset']) ->None:
         """user entered login data, now try to login to server"""
         if not Internal.autoPlay and self.dlg.result() == 0:
             self._loginReallyFailed(Failure(CancelledError()))
@@ -507,15 +513,15 @@ class Connection:
             # we have no security concerns about creating a new account
             Players.createIfUnknown(self.dlg.cbUser.currentText())
 
-    def __startServer(self, result):
+    def __startServer(self, result:List['Request']) ->'Deferred':
         """if needed"""
         return self.url.startServer(result)
 
-    def __loginToServer(self, unused):
+    def __loginToServer(self, unused:List['Request']) ->'Deferred':
         """login to server"""
         return self.loginCommand(self.username).addErrback(self._loginFailed)
 
-    def loggedIn(self, perspective):
+    def loggedIn(self, perspective:pb.RemoteReference) ->'Connection':
         """successful login on server"""
         assert perspective, type(perspective)
         self.perspective = perspective  # pylint:disable=attribute-defined-outside-init
@@ -525,7 +531,7 @@ class Connection:
         self.pingLater()  # not right now, client.connection is still None
         return self
 
-    def __updateServerInfoInDatabase(self):
+    def __updateServerInfoInDatabase(self) ->None:
         """we are online. Update table server."""
         lasttime = datetime.datetime.now().replace(microsecond=0).isoformat()
         with Internal.db:
@@ -545,7 +551,7 @@ class Connection:
                 Query('insert into passwords(url,player,password) values(?,?,?)',
                       (self.url, playerId, self.password))
 
-    def __checkExistingConnections(self, unused=None):
+    def __checkExistingConnections(self, unused:Optional[str]=None) ->None:
         """do we already have a connection to the wanted URL?"""
         for client in self.client.humanClients:
             if client.connection and client.connection.url == self.url:
@@ -555,7 +561,7 @@ class Connection:
                     client.tableList.activateWindow()
                 raise CancelledError
 
-    def loginCommand(self, username):
+    def loginCommand(self, username:str) ->'Deferred':
         """send a login command to server. That might be a normal login
         or adduser/deluser/change passwd encoded in the username"""
         factory = pb.PBClientFactory(unsafeTracebacks=True)
@@ -566,7 +572,7 @@ class Connection:
         cred = credentials.UsernamePassword(utf8Username, utf8Password)
         return factory.login(cred, client=self.client)
 
-    def __adduser(self):
+    def __adduser(self) ->'Deferred':
         """create a user account"""
         assert self.dlg
         if not self.url.isLocalHost:
@@ -579,9 +585,9 @@ class Connection:
             ['adduser', self.dlg.username, self.dlg.password])
         return self.loginCommand(adduserCmd)
 
-    def _loginFailed(self, failure):
+    def _loginFailed(self, failure:Failure) ->Union['Deferred', Failure]:
         """login failed"""
-        def answered(result):
+        def answered(result:bool) ->Union['Deferred', Failure]:
             """user finally answered our question"""
             return self.__adduser() if result else Failure(CancelledError())
         message = failure.getErrorMessage()
@@ -595,7 +601,7 @@ class Connection:
         self._loginReallyFailed(failure)
         return Failure() # only for mypy
 
-    def _loginReallyFailed(self, failure):
+    def _loginReallyFailed(self, failure:Failure) ->None:
         """login failed, not fixable by adding missing user"""
         msg = None
         if not isAlive(Internal.mainWindow):
@@ -631,11 +637,11 @@ class Connection:
             logWarning(msg)
         raise CancelledError
 
-    def pingLater(self, unusedResult=None):
+    def pingLater(self, unusedResult:Optional[str]=None) ->None:
         """ping the server every 5 seconds"""
         Internal.reactor.callLater(5, self.ping)
 
-    def ping(self):
+    def ping(self) ->None:
         """regularly check if server is still there"""
         if self.client.connection:
             # when pinging starts, we do have a connection and when the

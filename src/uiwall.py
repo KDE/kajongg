@@ -6,6 +6,7 @@ Copyright (C) 2008-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 SPDX-License-Identifier: GPL-2.0
 
 """
+from typing import List, TYPE_CHECKING, Optional, Literal, Dict, Any, Union
 
 from common import Internal, ZValues, ReprMixin, Speeds, DrawOnTopMixin
 from wind import Wind, East
@@ -21,6 +22,14 @@ from uitile import UITile
 from animation import animate, afterQueuedAnimations, AnimationSpeed
 from animation import ParallelAnimationGroup, AnimatedMixin, animateAndDo
 
+if TYPE_CHECKING:
+    from twisted.internet.defer import Deferred
+    from qt import QGraphicsItem, QPainter, QStyleOptionGraphicsItem, QWidget
+    from tile import Piece
+    from visible import VisiblePlayingGame
+    from scoring import ScoringGame
+    from game import Game
+    from scene import PlayingScene
 
 class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
 
@@ -28,7 +37,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
 
     sideTexts = []
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional['QGraphicsItem']=None) ->None:
         assert parent is None
         assert len(self.sideTexts) < 4
         self.__name = 't%d' % len(self.sideTexts)
@@ -44,7 +53,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
         self.__boundingRect = None
         self.__font = QFont()
 
-    def adaptedFont(self):
+    def adaptedFont(self) ->QFont:
         """Font with the correct point size for the wall"""
         result = QFont()
         size = 80
@@ -57,7 +66,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
         return result
 
     @staticmethod
-    def refreshAll():
+    def refreshAll() ->None:
         """recompute ourself. Always do this for all for sides
         together because if two names change place we want the
         to move simultaneously"""
@@ -82,14 +91,14 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
         animate()
 
     @staticmethod
-    def removeAll():
+    def removeAll() ->None:
         """from the scene"""
         assert Internal.scene
         for side in SideText.sideTexts:
             Internal.scene.removeItem(side)
         SideText.sideTexts = []
 
-    def moveDict(self):
+    def moveDict(self) -> Dict[Literal['pos', 'rotation', 'scale'], Any]:
         """return a dict with new property values for our sidetext
         which move it onto us"""
         if not self.board or not self.__text:
@@ -104,40 +113,40 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
             position -= textCenter
         return {'pos': self.board.mapToScene(position), 'rotation': rotation, 'scale': self.board.scale()}
 
-    def debug_name(self):
+    def debug_name(self) ->str:
         """for identification in animations"""
         return self.__name
 
     @property
-    def board(self):
+    def board(self) ->Optional['UIWallSide']:
         """the front we are sitting on"""
         return self.__board
 
     @board.setter
-    def board(self, value):
+    def board(self, value:Optional['UIWallSide']) ->None:
         if self.__board != value:
             self.__board = value
             self.__font = self.adaptedFont()
             self.needsRefresh = True
 
     @property
-    def color(self):
+    def color(self) ->QColor:
         """text color"""
         return self.__color
 
     @color.setter
-    def color(self, value):
+    def color(self, value:QColor) ->None:
         if self.__color != value:
             self.__color = value
             self.update()
 
     @property
-    def text(self):
+    def text(self) ->str:
         """what we are saying"""
         return self.__text
 
     @text.setter
-    def text(self, value):
+    def text(self, value:str) ->None:
         if self.__text != value:
             self.__text = value
             self.prepareGeometryChange()
@@ -148,7 +157,8 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
             self.__boundingRect = QRectF(QFontMetrics(self.__font).boundingRect(txt))
             self.needsRefresh = True
 
-    def paint(self, painter, unusedOption, unusedWidget=None):
+    def paint(self, painter:'QPainter', unusedOption:'QStyleOptionGraphicsItem.StyleOptionType',
+        unusedWidget:Optional['QWidget']=None) ->None:
         """paint the disc"""
         with Painter(painter):
             pen = QPen(self.color)
@@ -156,11 +166,11 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
             painter.setFont(self.__font)
             painter.drawText(0, 0, self.__text)
 
-    def boundingRect(self):
+    def boundingRect(self) ->QRectF:
         """around the text"""
         return self.__boundingRect or QRectF()
 
-    def __str__(self):
+    def __str__(self) ->str:
         """for debugging"""
         return 'SideText(%s %s x/y= %.1f/%1f)' % (
             self.debug_name(), self.text, self.x(), self.y())
@@ -171,15 +181,15 @@ class UIWallSide(Board, ReprMixin):
     """a Board representing a wall of tiles"""
     penColor = QColor('red')
 
-    def __init__(self, tileset, boardRotation, length):
+    def __init__(self, tileset:Tileset, boardRotation:int, length:float):
         Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
         self.length = length
 
-    def debug_name(self):
+    def debug_name(self) ->str:
         """name for debug messages"""
         return 'UIWallSide {}'.format(UIWall.sideNames[int(self.rotation())])
 
-    def center(self):
+    def center(self) ->QPointF:
         """return the center point of the wall in relation to the
         faces of the upper level"""
         faceRect = self.tileFaceRect()
@@ -188,12 +198,12 @@ class UIWallSide(Board, ReprMixin):
         result.setX(result.x() + faceRect.height() / 2)  # corner tile
         return result
 
-    def hide(self):
+    def hide(self) ->None:
         """hide all my parts"""
         self.disc.hide()
         Board.hide(self)
 
-    def __str__(self):
+    def __str__(self) ->str:
         """for debugging"""
         return self.debug_name()
 
@@ -202,10 +212,10 @@ class UIKongBox(KongBox):
 
     """Kong box with UITiles"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         KongBox.__init__(self)
 
-    def fill(self, tiles):
+    def fill(self, tiles:List[Union['Piece', UITile]]) ->None:
         """fill the box"""
         for uiTile in self._tiles:
             uiTile.cross = False
@@ -213,7 +223,7 @@ class UIKongBox(KongBox):
         for uiTile in self._tiles:
             uiTile.cross = True
 
-    def pop(self, count):
+    def pop(self, count:int) ->List[Union['Piece', UITile]]:
         """get count tiles from kong box"""
         result = KongBox.pop(self, count)
         for uiTile in result:
@@ -236,7 +246,7 @@ class UIWall(Wall):
     tileClass = UITile
     kongBoxClass = UIKongBox
 
-    def __init__(self, game):
+    def __init__(self, game:'Game') ->None:
         """init and position the wall"""
         # we use only white dragons for building the wall. We could actually
         # use any tile because the face is never shown anyway.
@@ -268,7 +278,7 @@ class UIWall(Wall):
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @staticmethod
-    def initWindDiscs():
+    def initWindDiscs() ->None:
         """the 4 round wind discs on the player walls"""
         assert Internal.scene
         if not hasattr(East, 'disc'):
@@ -277,27 +287,27 @@ class UIWall(Wall):
                 Internal.scene.addItem(wind.disc)
 
     @staticmethod
-    def debug_name():
+    def debug_name() ->str:
         """name for debug messages"""
         return 'wall'
 
-    def __getitem__(self, index):
+    def __getitem__(self, index:int) ->'UIWallSide':
         """make Wall index-able"""
         return self.__sides[index]
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index:int, value:'UIWallSide') ->None:
         """only for pylint, currently not used"""
         self.__sides[index] = value
 
-    def __delitem__(self, index):
+    def __delitem__(self, index:int) ->None:
         """only for pylint, currently not used"""
         del self.__sides[index]
 
-    def __len__(self):
+    def __len__(self) ->int:
         """only for pylint, currently not used"""
         return len(self.__sides)
 
-    def hide(self):
+    def hide(self) ->None:
         """hide all four walls and their decorators"""
         # may be called twice
         self.living = []
@@ -308,7 +318,7 @@ class UIWall(Wall):
         if self.__square.scene():
             self.__square.scene().removeItem(self.__square)
 
-    def __shuffleTiles(self):
+    def __shuffleTiles(self) ->None:
         """shuffle tiles for next hand"""
         assert Internal.scene
         discardBoard = Internal.scene.discardBoard
@@ -320,7 +330,7 @@ class UIWall(Wall):
             uiTile.dark = True
             uiTile.setBoard(discardBoard, *places[idx])
 
-    def build(self, shuffleFirst=False):
+    def build(self, shuffleFirst:bool=False) ->'Deferred':
         """builds the wall without dividing"""
         # recycle used tiles
         for uiTile in self.tiles:
@@ -338,7 +348,7 @@ class UIWall(Wall):
                 uiTile.focusable = False
             return animateAndDo(self.__placeWallTiles)
 
-    def __placeWallTiles(self, unusedResult=None):
+    def __placeWallTiles(self, unusedResult:Any=None) ->'Deferred':
         """place all wall tiles"""
         tileIter = iter(self.tiles)
         tilesPerSide = len(self.tiles) // 4
@@ -353,12 +363,12 @@ class UIWall(Wall):
         return animate()
 
     @property
-    def lightSource(self):
+    def lightSource(self) ->Union[Literal['NE'], Literal['NW'], Literal['SW'], Literal['SE']]:
         """For possible values see LIGHTSOURCES"""
         return self.__square.lightSource
 
     @lightSource.setter
-    def lightSource(self, lightSource):
+    def lightSource(self, lightSource:Union[Literal['NE'], Literal['NW'], Literal['SW'], Literal['SE']]) ->None:
         """setting this actually changes the visuals"""
         if self.lightSource != lightSource:
 #            assert ParallelAnimationGroup.current is None # may trigger, reason unknown
@@ -369,12 +379,12 @@ class UIWall(Wall):
             SideText.refreshAll()
 
     @property
-    def tileset(self):
+    def tileset(self) ->Tileset:
         """The tileset of this wall"""
         return self.__square.tileset
 
     @tileset.setter
-    def tileset(self, value):
+    def tileset(self, value:Tileset) ->None:
         """setting this actually changes the visuals."""
         if self.tileset != value:
             assert ParallelAnimationGroup.current is None
@@ -382,13 +392,14 @@ class UIWall(Wall):
             self.__resizeHandBoards()
             SideText.refreshAll()
 
-    @afterQueuedAnimations
-    def showShadowsChanged(self, deferredResult, unusedOldValue, unusedNewValue): # pylint: disable=unused-argument
+    @afterQueuedAnimations  # type:ignore[arg-type]
+    def showShadowsChanged(self, deferredResult:Any, # pylint: disable=unused-argument
+        unusedOldValue:bool, unusedNewValue:bool) ->None:
         """setting this actually changes the visuals."""
         assert ParallelAnimationGroup.current is None
         self.__resizeHandBoards()
 
-    def __resizeHandBoards(self, unusedResults=None):
+    def __resizeHandBoards(self, unusedResults:Any=None) ->None:
         """we are really calling _setRect() too often. But at least it works"""
         assert self.game
         for player in self.game.players:
@@ -396,7 +407,7 @@ class UIWall(Wall):
         assert Internal.mainWindow
         Internal.mainWindow.adjustMainView()
 
-    def __setDrawingOrder(self, unusedResults=None):
+    def __setDrawingOrder(self, unusedResults:Any=None) ->None:
         """set drawing order of the wall"""
         levels = {'NW': (2, 3, 1, 0), 'NE': (
             3, 1, 0, 2), 'SE': (1, 0, 2, 3), 'SW': (0, 2, 3, 1)}
@@ -406,7 +417,7 @@ class UIWall(Wall):
                     side.lightSource][
                         idx] + 1) * ZValues.boardZFactor
 
-    def __moveDividedTile(self, uiTile, offset):
+    def __moveDividedTile(self, uiTile:UITile, offset:float) ->None:
         """moves a uiTile from the divide hole to its new place"""
         board = uiTile.board
         newOffset = uiTile.xoffset + offset
@@ -418,8 +429,8 @@ class UIWall(Wall):
         uiTile.setBoard(board, newOffset % sideLength, 0, level=2)
         uiTile.update()
 
-    @afterQueuedAnimations
-    def _placeLooseTiles(self, deferredResult=None):
+    @afterQueuedAnimations  # type:ignore[arg-type]
+    def _placeLooseTiles(self, deferredResult:Any=None) ->None:
         """place the last 2 tiles on top of kong box"""
         assert len(self.kongBox) % 2 == 0
         placeCount = len(self.kongBox) // 2
@@ -429,7 +440,7 @@ class UIWall(Wall):
             self.__moveDividedTile(self.kongBox[-1], second)
             self.__moveDividedTile(self.kongBox[-2], first)
 
-    def divide(self):
+    def divide(self) ->None:
         """divides a wall, building a living end and a dead end"""
         with AnimationSpeed():
             Wall.divide(self)
@@ -438,12 +449,12 @@ class UIWall(Wall):
                 # in kongbox in a previous game
                 # might not be there anymore. This gets rid
                 # of the cross on them.
-                uiTile.update()
                 # FIXME: Piece/UITile
+                uiTile.update()  # type:ignore[union_attr]
             # move last two tiles onto the dead end:
             return self._placeLooseTiles()
 
-    def decorate4(self, deferredResult=None):
+    def decorate4(self, deferredResult:Any=None) ->None:
         """show player info on the wall. The caller must ensure
         all are moved simultaneously and at which speed by using
         AnimationSpeed.
@@ -457,7 +468,7 @@ class UIWall(Wall):
             SideText.refreshAll()
         animateAndDo(self.showWindDiscs)
 
-    def showWindDiscs(self, unusedDeferred=None):
+    def showWindDiscs(self, unusedDeferred:Optional['Deferred']=None) ->None:
         """animate all windDiscs. The caller must ensure
         all are moved simultaneously and at which speed
         by using AnimationSpeed."""

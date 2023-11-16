@@ -14,6 +14,7 @@ import subprocess
 import datetime
 from io import BytesIO
 from hashlib import md5
+from typing import List, Any, Optional
 
 from common import Debug, Internal, ReprMixin, cacheDir
 from util import which, removeIfExists, uniqueList, elapsedSince
@@ -40,7 +41,7 @@ class SoundPopen(subprocess.Popen):
 
     """with additional attributes"""
 
-    def __init__(self, what, args):
+    def __init__(self, what:str, args:Any) ->str:
         super().__init__(args)
         self.name = what
         self.startTime = datetime.datetime.now()
@@ -56,7 +57,7 @@ class Sound:
     lastCleaned = None
 
     @staticmethod
-    def findOggBinary():
+    def findOggBinary() ->str:
         """set __oggBinary to exe name or an empty string"""
         if Sound.__oggBinary is None:
             if sys.platform == 'win32':
@@ -81,7 +82,7 @@ class Sound:
         return Sound.__oggBinary
 
     @staticmethod
-    def cleanProcesses():
+    def cleanProcesses() ->None:
         """terminate ogg123 children"""
         now = datetime.datetime.now()
         if Sound.lastCleaned and (now - Sound.lastCleaned).seconds < 2:
@@ -112,7 +113,7 @@ class Sound:
         Sound.playProcesses = remaining
 
     @staticmethod
-    def speak(what):
+    def speak(what:str) ->None:
         """this is what the user of this module will call."""
         # pylint: disable=too-many-branches
         if not Internal.scene:
@@ -171,7 +172,7 @@ class Sound:
                     reactor.callLater(6, Sound.cleanProcesses)
 
     @staticmethod
-    def bonus():
+    def bonus() ->None:
         """ring some sort of bell, if we find such a file"""
         if Sound.__bonusOgg is None:
             Sound.__bonusOgg = ''
@@ -200,7 +201,7 @@ class Voice(ReprMixin):
     __availableVoices = []
     md5sumLength = 32 # magical constant
 
-    def __init__(self, directory, content=None):
+    def __init__(self, directory:str, content:Optional[bytes]=None) ->None:
         """give this name a voice"""
         self.__md5sum = None
         if not os.path.split(directory)[0]:
@@ -210,10 +211,10 @@ class Voice(ReprMixin):
         self.directory = directory
         self.__setArchiveContent(content)
 
-    def __str__(self):
+    def __str__(self) ->str:
         return self.directory
 
-    def language(self):
+    def language(self) ->str:
         """the language code of this voice. Locally defined voices
         have no language code and return 'local'.
         remote voices received from other clients return 'remote',
@@ -237,7 +238,7 @@ class Voice(ReprMixin):
         return result
 
     @staticmethod
-    def availableVoices():
+    def availableVoices() ->List['Voice']:
         """a list of all voice directories"""
         if not Voice.__availableVoices:
             result = []
@@ -260,7 +261,7 @@ class Voice(ReprMixin):
         return Voice.__availableVoices
 
     @staticmethod
-    def locate(name):
+    def locate(name:str) ->Optional['Voice']:
         """return Voice or None if no foreign or local voice matches.
         In other words never return a predefined voice"""
         for voice in Voice.availableVoices():
@@ -281,7 +282,7 @@ class Voice(ReprMixin):
             logDebug('Personal sound for %s not found' % (name))
         return None
 
-    def buildSubvoice(self, oggName, side):
+    def buildSubvoice(self, oggName:str, side:str) ->str:
         """side is 'left' or 'right'."""
         angleDirectory = os.path.join(
             cacheDir(),
@@ -312,7 +313,7 @@ class Voice(ReprMixin):
                 logDebug('built subvoice %s' % angleName)
         return angleName
 
-    def localTextName(self, text, angle):
+    def localTextName(self, text:str, angle:float) ->str:
         """build the name of the wanted sound file"""
         oggName = text.lower().replace(' ', '') + '.ogg'
         if angle == 90:
@@ -321,7 +322,7 @@ class Voice(ReprMixin):
             return self.buildSubvoice(oggName, 'right')
         return os.path.join(self.directory, oggName)
 
-    def speak(self, text, angle):
+    def speak(self, text:str, angle:float) ->None:
         """text must be a sound filename without extension"""
         if isinstance(text, Tile):
             text = str(text.exposed)
@@ -331,13 +332,13 @@ class Voice(ReprMixin):
                 logDebug('Voice.speak: fileName %s not found' % fileName)
         Sound.speak(fileName)
 
-    def oggFiles(self):
+    def oggFiles(self) ->List[str]:
         """a list of all found ogg files"""
         if os.path.exists(self.directory):
             return sorted(x for x in os.listdir(self.directory) if x.endswith('.ogg'))
         return []
 
-    def __computeMd5sum(self):
+    def __computeMd5sum(self) ->None:
         """update md5sum file. If it changed, return True.
         If unchanged or no ogg files exist, remove archive and md5sum and return False.
         If ogg files exist but no archive, return True."""
@@ -386,7 +387,7 @@ class Voice(ReprMixin):
             if self.__md5sum != existingMd5sum or archiveIsOlder:
                 os.remove(self.archiveName())
 
-    def __buildArchive(self):
+    def __buildArchive(self) ->None:
         """write the archive file and set self.__md5sum"""
         self.__computeMd5sum()
         if not os.path.exists(self.archiveName()):
@@ -398,15 +399,15 @@ class Voice(ReprMixin):
                             oggFile),
                         arcname=oggFile)
 
-    def archiveName(self):
+    def archiveName(self) ->str:
         """ the full path of the archive file"""
         return os.path.join(self.directory, 'content.tbz')
 
-    def md5FileName(self):
+    def md5FileName(self) ->str:
         """the name of the md5sum file"""
         return os.path.join(self.directory, 'md5sum')
 
-    def savedmd5Sum(self):
+    def savedmd5Sum(self) ->Optional[str]:
         """return the current value of the md5sum file"""
         if os.path.exists(self.md5FileName()):
             try:
@@ -420,13 +421,13 @@ class Voice(ReprMixin):
         return None
 
     @property
-    def md5sum(self):
+    def md5sum(self) ->str:
         """the current checksum over all ogg files"""
         self.__computeMd5sum()
         assert self.__md5sum
         return self.__md5sum
 
-    def __setArchiveContent(self, content):
+    def __setArchiveContent(self, content:Optional[bytes]) ->None:
         """fill the Voice with ogg files"""
         if not content:
             return
@@ -440,7 +441,7 @@ class Voice(ReprMixin):
         filelike.close()
 
     @property
-    def archiveContent(self):
+    def archiveContent(self) ->Optional[bytes]:
         """the content of the tarfile"""
         self.__buildArchive()
         if os.path.exists(self.archiveName()):
@@ -448,6 +449,6 @@ class Voice(ReprMixin):
         return None
 
     @archiveContent.setter
-    def archiveContent(self, content):
+    def archiveContent(self, content:Optional[bytes]) ->None:
         """new archive content"""
         self.__setArchiveContent(content)

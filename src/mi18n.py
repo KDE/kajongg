@@ -17,6 +17,7 @@ import os
 import sys
 from locale import setlocale, LC_ALL
 from locale import _parse_localename
+from typing import Any, List, Generator, Optional
 
 # pylint: disable=wrong-import-order
 
@@ -41,7 +42,7 @@ __all__ = ['i18n', 'i18nc', 'qi18nc', 'i18nE', 'i18ncE', 'KDETranslator', 'MLoca
 
 ENGLISHDICT = {}
 
-def __insertArgs(translatedTemplate, *args):
+def __insertArgs(translatedTemplate:str, *args:Any) ->str:
     """
     put format arguments into the translated template.
     KDE semantics markup is removed.
@@ -68,7 +69,7 @@ def __insertArgs(translatedTemplate, *args):
     return result
 
 
-def i18n(englishIn, *args):
+def i18n(englishIn:str, *args:Any) ->str:
     """
     Translate. Since this is a 1:1 replacement for the
     corresponding KDE function, it accepts only C{str}.
@@ -88,7 +89,7 @@ def i18n(englishIn, *args):
     return result
 
 
-def i18nc(context, englishIn, *args):
+def i18nc(context:str, englishIn:str, *args:Any) ->str:
     """
     Translate. Since this is a 1:1 replacement for the
     corresponding KDE function, it accepts only C{str}.
@@ -113,7 +114,7 @@ def i18nc(context, englishIn, *args):
         ENGLISHDICT[_] = englishIn
     return __insertArgs(_, *args)
 
-def qi18nc(context, englishIn, *args):
+def qi18nc(context:str, englishIn:str, *args:Any) ->str:
     """This uses the Qt translation files"""
     if Internal.app is None:
         _ = englishIn
@@ -121,16 +122,16 @@ def qi18nc(context, englishIn, *args):
         _ = Internal.app.translate(context, englishIn)
     return __insertArgs(_, *args)
 
-def i18nE(englishText):
+def i18nE(englishText:str) ->str:
     """use this if you want to get the english text right now but still have the string translated"""
     return englishText
 
 
-def i18ncE(unusedContext, englishText):
+def i18ncE(unusedContext:str, englishText:str) ->str:
     """use this if you want to get the english text right now but still have the string translated"""
     return englishText
 
-def english(i18nstring):
+def english(i18nstring:str) ->str:
     """translate back from local language"""
     return ENGLISHDICT.get(i18nstring, i18nstring)
 
@@ -140,10 +141,10 @@ class KDETranslator(QTranslator):
     """we also want Qt-only strings translated. Make Qt call this
     translator for its own strings. Use this with qi18nc()"""
 
-    def __init__(self, parent):
+    def __init__(self, parent:QObject) ->None:
         QTranslator.__init__(self, parent)
 
-    def translate(self, context, text, disambiguation, numerus=-1):
+    def translate(self, context:str, text:str, disambiguation:Optional[str]=None, numerus:int=-1) ->str:
         """context should be the class name defined by qt5 or kf5"""
         if Debug.neutral:
             return text
@@ -169,7 +170,7 @@ class MLocale:
     translation = None
 
     @classmethod
-    def gettext(cls, txt):
+    def gettext(cls, txt:str) ->str:
         """with lazy installation of languages"""
         if cls.translation is None:
             cls.installTranslations()
@@ -177,7 +178,7 @@ class MLocale:
         return cls.translation.gettext(txt)
 
     @classmethod
-    def installTranslations(cls):
+    def installTranslations(cls) ->None:
         """install translations"""
         if sys.platform == 'win32':
             # on Linux, QCoreApplication initializes locale but not on Windows.
@@ -204,7 +205,7 @@ class MLocale:
         cls.translation.install()
 
     @staticmethod
-    def localeDirectories():
+    def localeDirectories() ->List[str]:
         """hard coded paths to i18n directories, all are searched"""
         candidates = (
             'share/locale', '/usr/local/share/locale', '/usr/share/locale',
@@ -218,7 +219,7 @@ class MLocale:
         return result
 
     @classmethod
-    def currentLanguages(cls):
+    def currentLanguages(cls) ->List[str]:
         """the currently used languages, primary first"""
         languages = Internal.kajonggrc.group('Locale').readEntry('Language')
         if not languages:
@@ -229,7 +230,7 @@ class MLocale:
         return languages
 
     @staticmethod
-    def extendRegionLanguages(languages):
+    def extendRegionLanguages(languages:List[str]) ->Generator[str, None, None]:
         """for de_DE, return de_DE, de"""
         for lang in languages:
             if lang is not None:
@@ -238,7 +239,7 @@ class MLocale:
                     yield lang.split('_')[0]
 
     @staticmethod
-    def get_localenames():
+    def get_localenames() ->List[str]:
         """parse environment variables"""
         result = []
         for variable in ('LANGUAGE', 'LC_ALL', 'LC_MESSAGES', 'LANG'):
@@ -258,7 +259,7 @@ class MLocale:
         return result
 
     @classmethod
-    def availableLanguages(cls):
+    def availableLanguages(cls) ->str:
         """see python lib, getdefaultlocale (which only returns the first one)"""
         if cls.__cached_availableLanguages:
             return cls.__cached_availableLanguages
@@ -291,7 +292,7 @@ class MLocale:
         return cls.__cached_availableLanguages
 
     @classmethod
-    def availableLanguages_(cls):
+    def availableLanguages_(cls) ->str:
         """like availableLanguages but if xx_yy exists, exclude xx"""
         languages = set(cls.availableLanguages().split(':'))
         for _ in list(languages):
@@ -300,7 +301,7 @@ class MLocale:
         return ':'.join(sorted(languages))
 
     @classmethod
-    def isLanguageInstalled(cls, lang):  # TODO: should be is Available
+    def isLanguageInstalled(cls, lang:str) ->bool:  # TODO: should be is Available
         """is any translation available for lang?"""
         if lang == 'en_US':
             return True
@@ -310,7 +311,7 @@ class MLocale:
         return False
 
     @classmethod
-    def __isLanguageInstalledForKajongg(cls, lang):
+    def __isLanguageInstalledForKajongg(cls, lang:str) ->bool:
         """see kdelibs, KCatalog::catalogLocaleDir"""
         for directory in cls.localeDirectories():
             _ = os.path.join(directory, lang, 'LC_MESSAGES', 'kajongg.mo')

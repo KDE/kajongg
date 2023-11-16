@@ -10,6 +10,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import TYPE_CHECKING
+
 from common import Internal
 
 from qt import Qt, QWidget, QSlider, QHBoxLayout, QLabel
@@ -22,6 +24,9 @@ from statesaver import StateSaver
 from tilesetselector import TilesetSelector
 from backgroundselector import BackgroundSelector
 
+if TYPE_CHECKING:
+    from qt import QKeyEvent
+
 __all__ = ['ConfigDialog']
 
 
@@ -29,11 +34,11 @@ class PlayConfigTab(QWidget):
 
     """Display Config tab"""
 
-    def __init__(self, parent):
+    def __init__(self, parent:QWidget) ->None:
         super().__init__(parent)
         self.setupUi()
 
-    def setupUi(self):
+    def setupUi(self) ->None:
         """layout the window"""
         self.setContentsMargins(0, 0, 0, 0)
         vlayout = QVBoxLayout(self)
@@ -79,7 +84,7 @@ class PlayConfigTab(QWidget):
         self.setSizePolicy(pol)
         self.retranslateUi()
 
-    def retranslateUi(self):
+    def retranslateUi(self) ->None:
         """translate to current language"""
 
 
@@ -87,7 +92,7 @@ class ConfigDialog(KConfigDialog):
 
     """configuration dialog with several pages"""
 
-    def __init__(self, parent, name):
+    def __init__(self, parent:QWidget, name:str) ->None:
         assert Internal.Preferences
         KConfigDialog.__init__(
             self, parent, name, Internal.Preferences)
@@ -103,7 +108,7 @@ class ConfigDialog(KConfigDialog):
                 BackgroundSelector(self),
                 i18n("Backgrounds"), "games-config-background")]
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event:'QKeyEvent') ->None:
         """The four tabs can be selected with CTRL-1 .. CTRL-4"""
         mod = event.modifiers()
         key = chr(event.key() % 128)

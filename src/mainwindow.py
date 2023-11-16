@@ -17,16 +17,16 @@ import cgitb  # pylint:disable=deprecated-module
 import tempfile
 import webbrowser
 import logging
+from typing import Any, TYPE_CHECKING, Optional, Union, Tuple, Type
 
 from log import logError, logDebug
 from common import Options, Internal, isAlive, Debug, handleSignals
-
 
 class MyHook(cgitb.Hook):
 
     """override the standard cgitb hook: invoke the browser"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         self.tmpFileName = tempfile.mkstemp(
             suffix='.html',
             prefix='bt_',
@@ -36,7 +36,7 @@ class MyHook(cgitb.Hook):
         cgitb.Hook.__init__(self, file=codecs.open(self.tmpFileName, 'w',  # pylint:disable=consider-using-with
                                                    encoding='latin-1', errors='xmlcharrefreplace'))
 
-    def handle(self, info=None):
+    def handle(self, info:Optional[Union[Tuple[Type[BaseException], Any, Any], Tuple[None, None, None]]]=None) ->None:
         """handling the exception: show backtrace in browser"""
         if getattr(cgitb, 'Hook', None):
             # if we cannot import twisted (syntax error), Hook is not yet known
@@ -89,8 +89,13 @@ if NOTFOUND:
     logError("\n".join(" * %s" % s for s in NOTFOUND), showStack=False)
     sys.exit(3)
 
+if TYPE_CHECKING:
+    from deferredutil import Request
+    from twisted.internet.defer import Deferred
+    from qt import QSize, QKeySequence
+    from scene import GameScene
 
-def cleanExit(*unusedArgs):
+def cleanExit(*unusedArgs:Any) ->None:
     """close sqlite3 files before quitting"""
     if isAlive(Internal.mainWindow):
         if Debug.quit:
@@ -112,7 +117,7 @@ class MainWindow(KXmlGuiWindow):
     """the main window"""
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(self):
+    def __init__(self) ->None:
         # see https://marc.info/?l=kde-games-devel&m=120071267328984&w=2
         super().__init__()
         Internal.app.aboutToQuit.connect(self.aboutToQuit)
@@ -153,7 +158,7 @@ class MainWindow(KXmlGuiWindow):
             HumanClient()
 
     @staticmethod
-    def __installReactor():
+    def __installReactor() ->None:
         """install the twisted reactor"""
         if not hasattr(Internal, 'reactor'):
             import qtreactor
@@ -166,12 +171,12 @@ class MainWindow(KXmlGuiWindow):
                 logDebug('Installed qtreactor')
 
     @property
-    def scene(self):
+    def scene(self) ->Optional['GameScene']:
         """a proxy"""
         return self._scene
 
     @scene.setter
-    def scene(self, value):
+    def scene(self, value:Optional['GameScene']) ->None:
         """if changing, updateGUI"""
         if not isAlive(self):
             return
@@ -194,7 +199,7 @@ class MainWindow(KXmlGuiWindow):
         self.actionExplain.setEnabled(value is not None)
         self.actionScoreTable.setEnabled(value is not None)
 
-    def sizeHint(self):
+    def sizeHint(self) ->'QSize':
         """give the main window a sensible default size"""
         result = KXmlGuiWindow.sizeHint(self)
         result.setWidth(result.height() * 3 // 2)
@@ -208,7 +213,8 @@ class MainWindow(KXmlGuiWindow):
         result.setWidth(width)
         return result
 
-    def _kajonggToggleAction(self, name, icon, shortcut=None, actionData=None):
+    def _kajonggToggleAction(self, name:str, icon:str, shortcut:Optional['Qt.Key']=None,
+        actionData:Optional[Union[str, Type['QWidget']]]=None) ->Action:
         """a checkable action"""
         res = Action(self,
             name,
@@ -220,7 +226,7 @@ class MainWindow(KXmlGuiWindow):
             res.toggled.connect(self._toggleWidget)
         return res
 
-    def setupUi(self):
+    def setupUi(self) ->None:
         """create all other widgets
         we could make the scene view the central widget but I did
         not figure out how to correctly draw the background with
@@ -305,18 +311,18 @@ class MainWindow(KXmlGuiWindow):
         self.actionAutoPlay.setChecked(Internal.autoPlay)
         QMetaObject.connectSlotsByName(self)
 
-    def playGame(self):
+    def playGame(self) ->None:
         """manual wish for a new game"""
         if not Internal.autoPlay:
             # only if no demo game is running
             self.playingScene()
 
-    def playingScene(self):
+    def playingScene(self) ->None:
         """play a computer game: log into a server and show its tables"""
         self.scene = PlayingScene(self)
         HumanClient()
 
-    def scoringScene(self):
+    def scoringScene(self) ->None:
         """start a scoring scene"""
         scene = ScoringScene(self)
         game = scoreGame()
@@ -326,7 +332,7 @@ class MainWindow(KXmlGuiWindow):
             game.throwDices()
             self.updateGUI()
 
-    def fullScreen(self, toggle):
+    def fullScreen(self, toggle:bool) ->None:
         """toggle between full screen and normal view"""
         _ = self.windowState()
         if toggle:
@@ -339,18 +345,18 @@ class MainWindow(KXmlGuiWindow):
         """for QTimer"""
         self.close()
 
-    def close(self, unusedResult=None):
+    def close(self, unusedResult:Any=None) ->bool:
         """wrap close() because we call it with a QTimer"""
         if isAlive(self):
             return KXmlGuiWindow.close(self)
         return True  # is closed
 
-    def closeEvent(self, event):
+    def closeEvent(self, event:QEvent) ->None:
         KXmlGuiWindow.closeEvent(self, event)
         if event.isAccepted() and self.exitReady:
             QTimer.singleShot(5000, self.aboutToQuit)
 
-    def queryClose(self):
+    def queryClose(self) ->bool:
         """queryClose, queryExit and aboutToQuit are no
         ideal match for the async Deferred approach.
 
@@ -381,7 +387,7 @@ class MainWindow(KXmlGuiWindow):
         and we really end the program.
         """
 
-        def confirmed(result):
+        def confirmed(result:Any) ->None:
             """quit if the active game has been aborted"""
             self.exitConfirmed = bool(result)
             if Debug.quit:
@@ -397,7 +403,7 @@ class MainWindow(KXmlGuiWindow):
             else:
                 self.exitConfirmed = None
 
-        def cancelled(result):
+        def cancelled(result:Any) ->None:
             """just do nothing"""
             if Debug.quit:
                 logDebug('mainWindow.queryClose.cancelled: {}'.format(result))
@@ -416,9 +422,9 @@ class MainWindow(KXmlGuiWindow):
                         'MainWindow.queryClose not asking, exitConfirmed=True')
         return True
 
-    def queryExit(self):
+    def queryExit(self) ->bool:
         """see queryClose"""
-        def quitDebug(msg):
+        def quitDebug(msg:str) ->None:
             """reducing branches in queryExit"""
             if Debug.quit:
                 logDebug(msg)
@@ -459,7 +465,7 @@ class MainWindow(KXmlGuiWindow):
         return bool(self.exitReady)
 
     @staticmethod
-    def aboutToQuit():
+    def aboutToQuit() ->None:
         """now all connections to servers are cleanly closed"""
         mainWindow = Internal.mainWindow
         Internal.mainWindow = None
@@ -491,14 +497,14 @@ class MainWindow(KXmlGuiWindow):
         if Debug.quit:
             logDebug('aboutToQuit ending')
 
-    def abortAction(self):
+    def abortAction(self) ->'Deferred':
         """abort current game"""
         if Debug.quit:
             logDebug('mainWindow.abortAction invoked')
         assert self.scene
         return self.scene.abort()
 
-    def retranslateUi(self):
+    def retranslateUi(self) ->None:
         """retranslate"""
         self.actionScoreGame.setText(
             i18nc('@action:inmenu', "&Score Manual Game"))
@@ -566,25 +572,25 @@ class MainWindow(KXmlGuiWindow):
             i18nc('kajongg @info:tooltip',
                   'Chat with the other players.'))
 
-    def changeEvent(self, event):
+    def changeEvent(self, event:QEvent) ->None:
         """when the applicationwide language changes, recreate GUI"""
         if event.type() == QEvent.Type.LanguageChange:
             self.setupGUI()
             self.retranslateUi()
 
-    def slotPlayers(self):
+    def slotPlayers(self) ->None:
         """show the player list"""
         if not self.playerWindow:
             self.playerWindow = PlayerList(self)
         self.playerWindow.show()
 
-    def slotRulesets(self):
+    def slotRulesets(self) ->None:
         """show the player list"""
         if not self.rulesetWindow:
             self.rulesetWindow = RulesetSelector()
         self.rulesetWindow.show()
 
-    def adjustMainView(self):
+    def adjustMainView(self) ->None:
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if not isAlive(self):
@@ -594,8 +600,8 @@ class MainWindow(KXmlGuiWindow):
             scene.adjustSceneView()
             view.fitInView(scene.itemsBoundingRect(), Qt.AspectRatioMode.KeepAspectRatio)
 
-    @afterQueuedAnimations
-    def backgroundChanged(self, unusedDeferredResult, unusedOldName, newName):
+    @afterQueuedAnimations  # type:ignore[arg-type]
+    def backgroundChanged(self, unusedDeferredResult:'Deferred', unusedOldName:str, newName:str) ->None:
         """if the wanted background changed, apply the change now"""
         centralWidget = self.centralWidget()
         if centralWidget:
@@ -603,10 +609,10 @@ class MainWindow(KXmlGuiWindow):
             self.background.setPalette(centralWidget)
             centralWidget.setAutoFillBackground(True)
 
-    @afterQueuedAnimations
+    @afterQueuedAnimations  # type:ignore[arg-type]
     def tilesetNameChanged(
-            self, unusedDeferredResult, unusedOldValue=None,
-            unusedNewValue=None):
+            self, unusedDeferredResult:'Deferred', unusedOldValue:Optional[str]=None,
+            unusedNewValue:Optional[str]=None) ->None:
         """if the wanted tileset changed, apply the change now"""
         if self.centralView:
             with AnimationSpeed():
@@ -614,8 +620,8 @@ class MainWindow(KXmlGuiWindow):
                     self.scene.applySettings()
             self.adjustMainView()
 
-    @afterQueuedAnimations
-    def showSettings(self, unusedDeferredResult, unusedChecked=None):
+    @afterQueuedAnimations  # type:ignore[arg-type]
+    def showSettings(self, unusedDeferredResult:'Request', unusedChecked:Optional[bool]=None) ->None:
         """show preferences dialog. If it already is visible, do nothing"""
         # This is called by the triggered() signal. So why does KDE
         # not return the bool checked?
@@ -627,7 +633,7 @@ class MainWindow(KXmlGuiWindow):
         self.confDialog = ConfigDialog(self, "settings")
         self.confDialog.show()
 
-    def _toggleWidget(self, checked):
+    def _toggleWidget(self, checked:bool) ->None:
         """user has toggled widget visibility with an action"""
         assert self.scene
         action = self.sender()
@@ -648,7 +654,7 @@ class MainWindow(KXmlGuiWindow):
             assert actionData
             actionData.hide()
 
-    def _toggleDemoMode(self, checked):
+    def _toggleDemoMode(self, checked:bool) ->None:
         """switch on / off for autoPlay"""
         if self.scene:
             assert isinstance(self.scene, PlayingScene)
@@ -658,7 +664,7 @@ class MainWindow(KXmlGuiWindow):
             if checked and Internal.db:
                 self.playingScene()
 
-    def updateGUI(self):
+    def updateGUI(self) ->None:
         """update some actions, all auxiliary windows and the statusbar"""
         if not isAlive(self):
             return
@@ -671,8 +677,8 @@ class MainWindow(KXmlGuiWindow):
             assert scene
             scene.updateSceneGUI()
 
-    @afterQueuedAnimations
-    def changeAngle(self, deferredResult, unusedButtons=None, unusedModifiers=None): # pylint: disable=unused-argument
+    @afterQueuedAnimations  # type:ignore[arg-type]
+    def changeAngle(self, deferredResult:'Request', unusedButtons:Any=None, unusedModifiers:Any=None) ->None: # pylint: disable=unused-argument
         """change the lightSource"""
         if self.scene:
             with AnimationSpeed():

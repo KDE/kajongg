@@ -7,24 +7,29 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import Optional, TYPE_CHECKING, Dict
+
 from mi18n import i18n, i18nc
 from kde import KIcon
 from dialogs import Sorry, QuestionYesNo
 from qt import Qt
 from qt import QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox, \
-    QTableWidget, QTableWidgetItem
+    QTableWidget, QTableWidgetItem, QWidget
 
 from common import Internal
 from query import Query
 from guiutil import decorateWindow
 from statesaver import StateSaver
 
+if TYPE_CHECKING:
+    from qt import QEvent, QKeyEvent
+
 
 class PlayerList(QDialog):
 
     """QtSQL Model view of the players"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional['QWidget']=None):
         QDialog.__init__(self, parent)
         self._data = {}
         self.table = QTableWidget(self)
@@ -57,16 +62,16 @@ class PlayerList(QDialog):
         decorateWindow(self, i18n("Players"))
         self.setObjectName('Players')
 
-    def showEvent(self, unusedEvent):
+    def showEvent(self, unusedEvent:'QEvent') ->None:
         """adapt view to content"""
         StateSaver(self, self.table)
 
     @staticmethod
-    def sortKey(text):
+    def sortKey(text:str) ->str:
         """display order in Table"""
         return text.upper() if text else 'zzzzzzzzzzzz'
 
-    def updateTable(self, data=None, currentName=None):
+    def updateTable(self, data:Optional[Dict[str, int]]=None, currentName:Optional[str]=None) ->None:
         """fills self.table from DB"""
         self.table.itemChanged.disconnect(self.itemChanged)
         table = self.table
@@ -93,7 +98,7 @@ class PlayerList(QDialog):
             table.scrollToItem(selectedItem)
         self.table.itemChanged.connect(self.itemChanged)
 
-    def itemChanged(self, item):
+    def itemChanged(self, item:QTableWidgetItem) ->None:
         """this must be new because editing is disabled for others"""
         currentName = item.text()
         if currentName in self._data:
@@ -111,7 +116,7 @@ class PlayerList(QDialog):
                     query.failure.message))
         self.updateTable(currentName=currentName)
 
-    def slotInsert(self):
+    def slotInsert(self) ->None:
         """insert a record"""
         self._data[''] = 0
         self.updateTable(data=self._data, currentName='')
@@ -121,21 +126,21 @@ class PlayerList(QDialog):
                 self.table.editItem(item)
 
     @staticmethod
-    def __deletePlayer(playerId):
+    def __deletePlayer(playerId:int) ->None:
         """delete this player and all associated games"""
         with Internal.db: # transaction
             Query("delete from score where player=?", (playerId, ))
             Query("delete from game where p0=? or p1=? or p2=? or p3=?", (playerId, ) * 4)
             Query("delete from player where id=?", (playerId,))
 
-    def delete(self):
+    def delete(self) ->None:
         """delete selected entry"""
-        def answered(result):
+        def answered(result:bool) ->None:
             """coming from QuestionYesNo"""
             if result is True:
                 self.__deletePlayer(playerId)
             cleanup()
-        def cleanup():
+        def cleanup() ->None:
             """update table view"""
             self.updateTable()
             self.table.setCurrentCell(min(currentRow, len(self._data) - 1), 0)
@@ -165,7 +170,7 @@ class PlayerList(QDialog):
                 '  This will also delete all games played by %3!',
                 finishedCount, fullCount - finishedCount, name)).addBoth(answered)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event:'QKeyEvent') ->None:
         """use insert/delete keys for insert/delete"""
         key = event.key()
         if key == Qt.Key.Key_Insert:

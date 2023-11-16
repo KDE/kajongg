@@ -16,6 +16,7 @@ import random
 import traceback
 from itertools import chain
 
+from typing import TYPE_CHECKING, Any, Optional, List, Callable, Tuple
 
 from common import Debug, Internal, ReprMixin
 from wind import Wind
@@ -34,6 +35,14 @@ from servercommon import srvError
 from user import User
 from game import PlayingGame
 
+if TYPE_CHECKING:
+    from deferredutil import Request
+    from player import Player, PlayingPlayer
+    from rule import Ruleset
+    import datetime
+    from server import MJServer
+
+
 if sys.platform != 'win32':
     import resource
 
@@ -42,8 +51,9 @@ class ServerGame(PlayingGame):
 
     """the central game instance on the server"""
 
-    def __init__(self, names, ruleset, gameid=None, wantedGame=None,
-                 client=None, playOpen=False, autoPlay=False):
+    def __init__(self, names:List[Tuple[Wind, str]], ruleset:'Ruleset',
+        gameid:Optional[int]=None, wantedGame:Optional[str]=None,
+        client:Optional[Client]=None, playOpen:bool=False, autoPlay:bool=False) ->None:
         PlayingGame.__init__(
             self,
             names,
@@ -55,7 +65,7 @@ class ServerGame(PlayingGame):
             autoPlay)
         self.shouldSave = True
 
-    def throwDices(self):
+    def throwDices(self) ->None:
         """set random living and kongBox
         sets divideAt: an index for the wall break"""
         assert self.wall
@@ -63,7 +73,7 @@ class ServerGame(PlayingGame):
         self.randomGenerator.shuffle(self.wall.tiles)
         PlayingGame.throwDices(self)
 
-    def initHand(self):
+    def initHand(self) ->None:
         """Happens only on server: every player gets 13 tiles (including east)"""
         assert self.wall
         self.throwDices()
@@ -90,8 +100,9 @@ class ServerTable(Table, ReprMixin):
     """a table on the game server"""
     # pylint: disable=too-many-arguments
 
-    def __init__(self, server, owner, ruleset, suspendedAt,
-                 playOpen, autoPlay, wantedGame, tableId=None):
+    def __init__(self, server:'MJServer', owner:Optional[User], ruleset:str,
+                 suspendedAt:Optional[str],
+                 playOpen:bool, autoPlay:bool, wantedGame:str, tableId:Optional[int]=None) ->None:
         if tableId is None:
             tableId = server.generateTableId()
         Table.__init__(
@@ -113,12 +124,12 @@ class ServerTable(Table, ReprMixin):
         if Debug.table:
             logDebug('new table %s' % self)
 
-    def hasName(self, name):
+    def hasName(self, name:str) ->bool:
         """return True if one of the players in the game is named 'name'"""
         assert self.game
         return bool(self.game) and any(x.name == name for x in self.game.players)
 
-    def asSimpleList(self, withFullRuleset=False):
+    def asSimpleList(self, withFullRuleset:bool=False) ->List[Any]:
         """return the table attributes to be sent to the client"""
         game = self.game
         onlineNames = [x.name for x in self.users]
@@ -138,7 +149,7 @@ class ServerTable(Table, ReprMixin):
             game.gameid if game else None, self.suspendedAt, self.running,
             self.playOpen, self.autoPlay, self.wantedGame, names, online, endValues])
 
-    def maxSeats(self):
+    def maxSeats(self) ->int:
         """for a new game: 4. For a suspended game: The
         number of humans before suspending"""
         result = 4
@@ -148,7 +159,7 @@ class ServerTable(Table, ReprMixin):
                           for x in self.game.players)
         return result
 
-    def sendChatMessage(self, chatLine):
+    def sendChatMessage(self, chatLine:ChatMessage) ->None:
         """sends a chat messages to all clients"""
         assert self.game
         if Debug.chat:
@@ -163,7 +174,7 @@ class ServerTable(Table, ReprMixin):
         for other in chatters:
             self.server.callRemote(other, 'chat', chatLine.asList())
 
-    def addUser(self, user):
+    def addUser(self, user:User) ->None:
         """add user to this table"""
         if user.name in (x.name for x in self.users):
             raise srvError(i18nE('You already joined this table'))
@@ -175,7 +186,7 @@ class ServerTable(Table, ReprMixin):
         self.sendChatMessage(ChatMessage(self.tableid, user.name,
                                          i18nE('takes a seat'), isStatusMessage=True))
 
-    def delUser(self, user):
+    def delUser(self, user:User) ->None:
         """remove user from this table"""
         if user in self.users:
             self.running = False
@@ -198,7 +209,7 @@ class ServerTable(Table, ReprMixin):
                     logDebug('%s leaves table %d, %s stays owner' % (
                         user.name, self.tableid, self.owner))
 
-    def __str__(self):
+    def __str__(self)->str:
         """for debugging output"""
         if self.users:
             onlineNames = [x.name + ('(Owner)' if self.owner and x == self.owner.name else '')
@@ -213,7 +224,7 @@ class ServerTable(Table, ReprMixin):
                 offlineString = ' offline:' + ','.join(offlineNames)
         return '%d(%s%s)' % (self.tableid, ','.join(onlineNames), offlineString)
 
-    def calcGameId(self):
+    def calcGameId(self)->int:
         """based upon the max gameids we got from the clients, propose
         a new one, we want to use the same gameid in all data bases"""
         serverMaxGameId = Query('select max(id) from game').records[0][0]
@@ -222,7 +233,7 @@ class ServerTable(Table, ReprMixin):
         gameIds.extend(x.maxGameId for x in self.users)
         return max(gameIds) + 1
 
-    def __prepareNewGame(self):
+    def __prepareNewGame(self)->ServerGame:
         """return a new game object"""
         names = [x.name for x in self.users]
         # the server and all databases save the english name but we
@@ -244,14 +255,14 @@ class ServerTable(Table, ReprMixin):
         return ServerGame(names, self.ruleset, client=self.client,
                           playOpen=self.playOpen, autoPlay=self.autoPlay, wantedGame=self.wantedGame)
 
-    def userForPlayer(self, player):
+    def userForPlayer(self, player:'PlayingPlayer') ->Optional[User]:
         """finds the table user corresponding to player"""
         for result in self.users:
             if result.name == player.name:
                 return result
         return None
 
-    def __connectPlayers(self):
+    def __connectPlayers(self) ->None:
         """connects client instances with the game players"""
         game = self.game
         assert game
@@ -264,7 +275,7 @@ class ServerTable(Table, ReprMixin):
                 remote.table = self
             self.remotes[player] = remote
 
-    def __checkDbIdents(self):
+    def __checkDbIdents(self) ->None:
         """for 4 players, we have up to 4 data bases:
         more than one player might use the same data base.
         However the server always needs to use its own data base.
@@ -286,7 +297,7 @@ class ServerTable(Table, ReprMixin):
                 player.shouldSave = dbIdent not in dbIdents
                 dbIdents.add(dbIdent)
 
-    def readyForGameStart(self, user):
+    def readyForGameStart(self, user:User) ->None:
         """the table initiator told us he wants to start the game"""
         assert self.owner
         if len(self.users) < self.maxSeats() and self.owner != user:
@@ -304,7 +315,7 @@ class ServerTable(Table, ReprMixin):
             self.proposeGameId(self.calcGameId())
         # TODO: remove table for all other srvUsers out of sight
 
-    def proposeGameId(self, gameid):
+    def proposeGameId(self, gameid:int) ->None:
         """server proposes an id to the clients ands waits for answers"""
         while True:
             query = Query('insert into game(id,seed) values(?,?)',
@@ -320,7 +331,7 @@ class ServerTable(Table, ReprMixin):
                 block.tellPlayer(player, Message.ProposeGameId, gameid=gameid)
         block.callback(self.collectGameIdAnswers, gameid)
 
-    def collectGameIdAnswers(self, requests, gameid):
+    def collectGameIdAnswers(self, requests:List['Request'], gameid:int) ->None:
         """clients answered if the proposed game id is free"""
         if requests:
             # when errors happen, there might be no requests left
@@ -335,7 +346,7 @@ class ServerTable(Table, ReprMixin):
             self.game.gameid = gameid
             self.initGame()
 
-    def initGame(self):
+    def initGame(self) ->None:
         """ask clients if they are ready to start"""
         game = self.game
         assert game
@@ -348,7 +359,7 @@ class ServerTable(Table, ReprMixin):
                 wantedGame=game.wantedGame, players=game.players)
         block.callback(self.startGame)
 
-    def startGame(self, requests):
+    def startGame(self, requests:List['Request']) ->None:
         """if all players said ready, start the game"""
         assert self.game
         for user in self.users:
@@ -377,7 +388,7 @@ class ServerTable(Table, ReprMixin):
         self.__adaptOtherTables()
         self.sendVoiceIds()
 
-    def __adaptOtherTables(self):
+    def __adaptOtherTables(self) ->None:
         """if the players on this table also reserved seats on other tables, clear them
         make running table invisible for other users"""
         for user in self.users:
@@ -397,7 +408,7 @@ class ServerTable(Table, ReprMixin):
                     self.tableid,
                     '')
 
-    def sendVoiceIds(self):
+    def sendVoiceIds(self) ->None:
         """tell each player what voice ids the others have. By now the client has a Game instance!"""
         assert self.game
         humanPlayers = [
@@ -422,7 +433,7 @@ class ServerTable(Table, ReprMixin):
                     source=remote.voiceId)
         block.callback(self.collectVoiceData)
 
-    def collectVoiceData(self, requests):
+    def collectVoiceData(self, requests:List['Request']) ->None:
         """collect voices of other players"""
         if not self.running:
             return
@@ -451,7 +462,7 @@ class ServerTable(Table, ReprMixin):
                         Message.ServerWantsVoiceData)
         block.callback(self.sendVoiceData, voiceDataRequests)
 
-    def sendVoiceData(self, requests, voiceDataRequests):
+    def sendVoiceData(self, requests:List['Request'], voiceDataRequests:List[Tuple[User, 'PlayingPlayer']]) ->None:
         """sends voice sounds to other human players"""
         self.processAnswers(requests)
         block = DeferredBlock(self, where='sendVoiceData')
@@ -476,7 +487,7 @@ class ServerTable(Table, ReprMixin):
                     voice, voiceFor.name))
         block.callback(self.assignVoices)
 
-    def assignVoices(self, unusedResults=None):
+    def assignVoices(self, unusedResults:Optional[List['Request']]=None) ->None:
         """now all human players have all voice data needed"""
         assert self.game
         humanPlayers = [
@@ -485,11 +496,11 @@ class ServerTable(Table, ReprMixin):
         block.tell(None, humanPlayers, Message.AssignVoices)
         block.callback(self.startHand)
 
-    def __tilePicked(self, unusedResults, deadEnd:bool=False) ->None:
+    def __tilePicked(self, unusedResults:List['Request'], deadEnd:bool=False) ->None:
         """from callback"""
         self.pickTile(deadEnd)
 
-    def pickTile(self, deadEnd=False):
+    def pickTile(self, deadEnd:bool=False) ->None:
         """the active player gets a tile from wall. Tell all clients."""
         if not self.running:
             return
@@ -515,7 +526,7 @@ class ServerTable(Table, ReprMixin):
                 deadEnd=deadEnd)
             block.callback(self.moved)
 
-    def __pickKongReplacement(self, requests) ->None:
+    def __pickKongReplacement(self, requests:List['Request']) ->None:
         """the active player gets a tile from the dead end. Tell all clients."""
         requests = self.prioritize(requests)
         if requests and requests[0].answer == Message.MahJongg:  # type: ignore
@@ -524,7 +535,7 @@ class ServerTable(Table, ReprMixin):
         else:
             self.pickTile(deadEnd=True)
 
-    def clientDiscarded(self, msg):
+    def clientDiscarded(self, msg:'Request') ->None:
         """client told us he discarded a tile. Check for consistency and tell others."""
         if not self.running:
             return
@@ -546,7 +557,8 @@ class ServerTable(Table, ReprMixin):
         block.tellAll(player, Message.Discard, tile=tile)
         block.callback(self._clientDiscarded2, msg, dangerousText, mustPlayDangerous, violates)
 
-    def _clientDiscarded2(self, unusedResults, msg, dangerousText, mustPlayDangerous, violates):
+    def _clientDiscarded2(self, unusedResults:List['Request'], msg:'Request',
+        dangerousText:str, mustPlayDangerous:bool, violates:bool) ->None:
         """client told us he discarded a tile. Continue, check for violating original call"""
         block = DeferredBlock(self, where='_clientDiscarded2')
         player = msg.player
@@ -560,7 +572,8 @@ class ServerTable(Table, ReprMixin):
             block.tellAll(player, Message.ViolatesOriginalCall)
         block.callback(self._clientDiscarded3, msg, dangerousText, mustPlayDangerous)
 
-    def _clientDiscarded3(self, unusedResults, msg, dangerousText, mustPlayDangerous):
+    def _clientDiscarded3(self, unusedResults:List['Request'], msg:'Request',
+        dangerousText:str, mustPlayDangerous:bool) ->None:
         """client told us he discarded a tile. Continue, check for calling"""
         assert self.game
         block = DeferredBlock(self, where='_clientDiscarded3')
@@ -572,7 +585,8 @@ class ServerTable(Table, ReprMixin):
                 block.tellAll(player, Message.Calling)
         block.callback(self._clientDiscarded4, msg, dangerousText, mustPlayDangerous)
 
-    def _clientDiscarded4(self, unusedResults, msg, dangerousText, mustPlayDangerous):
+    def _clientDiscarded4(self, unusedResults:List['Request'], msg:'Request',
+        dangerousText:str, mustPlayDangerous:bool) ->None:
         """client told us he discarded a tile. Continue, check for dangerous game"""
         block = DeferredBlock(self, where='_clientDiscarded4')
         player = msg.player
@@ -605,7 +619,7 @@ class ServerTable(Table, ReprMixin):
         else:
             block.callback(self._askForClaims, msg)
 
-    def clientMadeOriginalCall(self, unusedResults, msg):
+    def clientMadeOriginalCall(self, unusedResults:List['Request'], msg:'Request') ->None:
         """first tell everybody about original call
         and then treat the implicit discard"""
         assert msg.player
@@ -616,7 +630,7 @@ class ServerTable(Table, ReprMixin):
         block.tellAll(msg.player, Message.OriginalCall)
         block.callback(self._askForClaims, msg)
 
-    def startHand(self, unusedResults=None):
+    def startHand(self, unusedResults:Optional[List['Request']]=None) ->None:
         """all players are ready to start a hand, so do it"""
         if self.running:
             assert self.game
@@ -626,7 +640,7 @@ class ServerTable(Table, ReprMixin):
                                  divideAt=self.game.divideAt)
             block.callback(self.divided)
 
-    def divided(self, unusedResults=None):
+    def divided(self, unusedResults:List['Request']) ->None:
         """the wall is now divided for all clients"""
         if not self.running:
             return
@@ -642,11 +656,11 @@ class ServerTable(Table, ReprMixin):
                            tiles=TileTuple(chain(tiles, player.bonusTiles)))
         block.callback(self.dealt)
 
-    def handEnded(self, unusedResults):
+    def handEnded(self, unusedResults:List['Request']) ->None:
         """from callback"""
         self.endHand()
 
-    def endHand(self):
+    def endHand(self) ->None:
         """hand is over, show all concealed tiles to all players"""
         if not self.running:
             return
@@ -664,7 +678,7 @@ class ServerTable(Table, ReprMixin):
                         tiles=TileTuple(player.concealedTiles))
             block.callback(self.saveHand)
 
-    def saveHand(self, unusedResults=None):
+    def saveHand(self, unusedResults:Optional[List['Request']]=None) ->None:
         """save the hand to the database and proceed to next hand"""
         if not self.running:
             return
@@ -672,7 +686,7 @@ class ServerTable(Table, ReprMixin):
         assert self.game
         self.game.saveHand()
 
-    def nextHand(self, unusedResults):
+    def nextHand(self, unusedResults:List['Request']) ->None:
         """next hand: maybe rotate"""
         if not self.running:
             return
@@ -702,11 +716,12 @@ class ServerTable(Table, ReprMixin):
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,
                      players=self.game.players, rotateWinds=rotateWinds, token=token)
 
-    def abort(self, message, *args):
+    def abort(self, message:str, *args:Any) ->None:
         """abort the table. Reason: message/args"""
         self.server.removeTable(self, 'abort', message, *args)
 
-    def claimTile(self, player, claim, meld, nextMessage):
+    def claimTile(self, player:'PlayingPlayer', claim:'ServerMessage',
+        meld:Meld, nextMessage:Message) ->None:
         """a player claims a tile for pung, kong or chow.
         meld contains the claimed tile, concealed"""
         if not self.running:
@@ -760,7 +775,7 @@ class ServerTable(Table, ReprMixin):
         else:
             block.callback(self.moved)
 
-    def declareKong(self, player, kongMeld):
+    def declareKong(self, player:'PlayingPlayer', kongMeld:Meld) ->None:
         """player declares a Kong"""
         if not player.hasConcealedTiles(kongMeld) and kongMeld[0].exposed.pung not in player.exposedMelds:
             msg = i18nE('declareKong:%1 wrongly said Kong for meld %2')
@@ -780,7 +795,7 @@ class ServerTable(Table, ReprMixin):
             self.__pickKongReplacement,
             meld=kongMeld)
 
-    def claimMahJongg(self, msg):
+    def claimMahJongg(self, msg:'Request') ->None:
         """a player claims mah jongg. Check this and
         if correct, tell all. Otherwise abort game, kajongg client is faulty"""
         if not self.running:
@@ -836,7 +851,7 @@ class ServerTable(Table, ReprMixin):
             lastMeld=lastMeld, withDiscardTile=withDiscard)
         block.callback(self.handEnded)
 
-    def dealt(self, unusedResults):
+    def dealt(self, unusedResults: List['Request']) ->None:
         """all tiles are dealt, ask east to discard a tile"""
         if self.running:
             assert self.game
@@ -845,7 +860,7 @@ class ServerTable(Table, ReprMixin):
                 Message.ActivePlayer,
                 self.__tilePicked)
 
-    def nextTurn(self):
+    def nextTurn(self) ->None:
         """the next player becomes active"""
         if self.running:
             # the player might just have disconnected
@@ -856,7 +871,7 @@ class ServerTable(Table, ReprMixin):
                 Message.ActivePlayer,
                 self.__tilePicked)
 
-    def prioritize(self, requests):
+    def prioritize(self, requests: List['Request']) ->List['Request']:
         """return only requests we want to execute"""
         if not self.running:
             return []
@@ -888,7 +903,7 @@ class ServerTable(Table, ReprMixin):
                 x for x in answers if x.player == nextPlayer or x.answer != Message.MahJongg]
         return answers
 
-    def _askForClaims(self, unusedRequests, unusedMsg):
+    def _askForClaims(self, unusedRequests:List['Request'], unusedMsg:'ServerMessage') ->None:
         """ask all players if they want to claim"""
         if self.running:
             assert self.game
@@ -897,7 +912,7 @@ class ServerTable(Table, ReprMixin):
                 Message.AskForClaims,
                 self.moved)
 
-    def processAnswers(self, requests):
+    def processAnswers(self, requests: List['Request']) ->List['Request']:
         """a player did something"""
         if not self.running:
             return []
@@ -913,7 +928,7 @@ class ServerTable(Table, ReprMixin):
                 answer.answer.serverAction(self, answer)
         return answers
 
-    def moved(self, requests):
+    def moved(self, requests: List['Request']) ->None:
         """a player did something"""
         if Debug.stack:
             stck = traceback.extract_stack()
@@ -924,14 +939,16 @@ class ServerTable(Table, ReprMixin):
         if not answers:
             self.nextTurn()
 
-    def tellAll(self, player, command, callback=None, **kwargs):
+    def tellAll(self, player:Optional['PlayingPlayer'], command:Message,
+        callback:Optional[Callable[[List['Request']], None]]=None, **kwargs: Any) ->DeferredBlock:
         """tell something about player to all players"""
         block = DeferredBlock(self, where='tellAll: Player {} command {} kwargs {}'.format(player, command, kwargs))
         block.tellAll(player, command, **kwargs)
         block.callback(callback)
         return block
 
-    def tellOthers(self, player, command, callback=None, **kwargs):
+    def tellOthers(self, player:'PlayingPlayer', command:Message,
+        callback:Optional[Callable[[List['Request']], None]]=None, **kwargs: Any) ->DeferredBlock:
         """tell something about player to all other players"""
         block = DeferredBlock(self, where='tellOthers')
         block.tellOthers(player, command, **kwargs)

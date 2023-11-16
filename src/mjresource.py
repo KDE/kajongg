@@ -13,6 +13,9 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import os
+
+from typing import Optional, Generator, List
+
 from qt import QStandardPaths
 from log import logWarning, logException
 from kde import KConfig
@@ -31,7 +34,7 @@ class Resource:
 
     cache = None  # common cache: tiles and background must not share identical names!
 
-    def __new__(cls, name=None):
+    def __new__(cls, name:Optional[str]=None) ->'Resource':
         if cls.cache is None:
             cls.cache = {}
             cls.loadAll()
@@ -40,7 +43,7 @@ class Resource:
         return cls.cache.get(name) or cls.cache.get(cls.__name(name)) or cls.__build(name)
 
     @classmethod
-    def __directories(cls):
+    def __directories(cls) ->Generator[str, None,None]:
         """where to look for resources"""
         result = QStandardPaths.locateAll(
             QStandardPaths.GenericDataLocation,
@@ -49,7 +52,7 @@ class Resource:
         return (x for x in result if os.path.exists(x))
 
     @classmethod
-    def locate(cls, which):
+    def locate(cls, which:str) ->Optional[str]:
         """locate the file with a resource"""
         for directory in cls.__directories():
             path = os.path.join(directory, which)
@@ -59,7 +62,7 @@ class Resource:
         return None
 
     @classmethod
-    def loadAll(cls):
+    def loadAll(cls) ->None:
         """loads all available resources into cache"""
         resourceDirectories = cls.__directories()
         for directory in resourceDirectories:
@@ -69,14 +72,14 @@ class Resource:
                         cls(os.path.join(directory, name))
 
     @classmethod
-    def available(cls):
+    def available(cls) ->List['Resource']:
         """ready for the selector dialog, default first"""
         cls.loadAll()
         assert cls.cache is not None
         return sorted(set(cls.cache.values()), key=lambda x: x.desktopFileName != 'default')
 
     @classmethod
-    def __noTilesetFound(cls):
+    def __noTilesetFound(cls) ->None:
         """No resources found"""
         directories = '\n\n' + '\n'.join(cls.__directories())
         logException(
@@ -85,12 +88,12 @@ class Resource:
                 'is libkmahjongg installed?', cls.resourceName) + directories) # TODO: nicht schoen
 
     @staticmethod
-    def __name(path):
+    def __name(path:str) ->str:
         """extract the name from path: this is the filename minus the .desktop ending"""
         return os.path.split(path)[1].replace('.desktop', '')
 
     @classmethod
-    def __build(cls, name):
+    def __build(cls, name:str) ->'Resource':
         """build a new Resource. name is either a full file path or a desktop name. None stands for 'default'."""
         result = object.__new__(cls)
         if os.path.exists(name):
@@ -114,7 +117,7 @@ class Resource:
         cls.cache[result.path] = result  # pylint:disable=unsupported-assignment-operation
         return result
 
-    def __init__(self, unusedName=None):
+    def __init__(self, unusedName:Optional[str]=None) ->None:
         """continue __build"""
         self.group = KConfig(self.path).group(self.configGroupName)
 
@@ -134,11 +137,11 @@ class Resource:
         if resourceVersion > RESOURCEFORMAT:
             logException('version file / program: %d/%d' % (resourceVersion, RESOURCEFORMAT))
 
-    def __str__(self):
+    def __str__(self) ->str:
         return "%s id=%d name=%s, name id=%d" % \
             (self.resourceName, id(self), self.desktopFileName, id(self.desktopFileName))
 
     @staticmethod
-    def current():
+    def current() ->Optional['Resource']:
         """the currently wanted tileset. If not yet defined, do so"""
         return None

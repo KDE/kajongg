@@ -7,6 +7,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import TYPE_CHECKING, Sequence, Tuple, Union, Optional
+
 import weakref
 from itertools import chain
 
@@ -14,6 +16,10 @@ from message import Message
 from common import IntDict, Debug, ReprMixin
 from tile import Tile
 
+if TYPE_CHECKING:
+    from player import PlayingPlayer
+    from tile import Tiles, TileTuple, MeldList, Meld
+    from hand import Hand
 
 class AIDefaultAI:
 
@@ -24,22 +30,22 @@ class AIDefaultAI:
     # we could solve this by moving those filters into DiscardCandidates
     # but that would make it more complicated to define alternative AIs
 
-    def __init__(self, player):
+    def __init__(self, player:'PlayingPlayer') ->None:
         self._player = weakref.ref(player)
 
     @property
-    def player(self):
+    def player(self) ->'PlayingPlayer':
         """hide weakref"""
         result = self._player()
         assert result
         return result
 
-    def name(self):
+    def name(self) ->str:
         """return our name"""
         return self.__class__.__name__[2:]
 
     @staticmethod
-    def weighSameColors(unusedAiInstance, candidates):
+    def weighSameColors(unusedAiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         """weigh tiles of same group against each other"""
         for candidate in candidates:
             if candidate.group in Tile.colors:
@@ -57,7 +63,7 @@ class AIDefaultAI:
                     candidate.next2.keep += 0.503
         return candidates
 
-    def selectDiscard(self, hand):
+    def selectDiscard(self, hand:'Hand') ->Tile:
         # disable warning about too many branches
         """return exactly one tile for discard.
         Much of this is just trial and success - trying to get as much AI
@@ -68,7 +74,7 @@ class AIDefaultAI:
         candidates.unlink()
         return result
 
-    def weighDiscardCandidates(self, candidates):
+    def weighDiscardCandidates(self, candidates:'DiscardCandidates') ->'DiscardCandidates':
         """the standard"""
         game = self.player.game
         assert game
@@ -96,14 +102,14 @@ class AIDefaultAI:
         return candidates
 
     @staticmethod
-    def alternativeFilter(unusedAiInstance, candidates):
+    def alternativeFilter(unusedAiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         """if the alternative AI only adds tests without changing
         default filters, you can override this one to minimize
         the source size of the alternative AI"""
         return candidates
 
     @staticmethod
-    def weighBasics(aiInstance, candidates):
+    def weighBasics(aiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         """basic things"""
         # pylint: disable=too-many-branches
         # too many branches
@@ -150,7 +156,7 @@ class AIDefaultAI:
         return candidates
 
     @staticmethod
-    def weighSpecialGames(unusedAiInstance, candidates):
+    def weighSpecialGames(unusedAiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         """like color game, many dragons, many winds"""
         # pylint: disable=too-many-nested-blocks
         for candidate in candidates:
@@ -178,7 +184,7 @@ class AIDefaultAI:
         return candidates
 
     @staticmethod
-    def weighOriginalCall(aiInstance, candidates):
+    def weighOriginalCall(aiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         """if we declared Original Call, respect it"""
         myself = aiInstance.player
         game = myself.game
@@ -201,7 +207,7 @@ class AIDefaultAI:
         return candidates
 
     @staticmethod
-    def weighCallingHand(aiInstance, candidates):
+    def weighCallingHand(aiInstance:'AIDefaultAI', candidates:'DiscardCandidates') ->'DiscardCandidates':
         """if we can get a calling hand, prefer that"""
         assert aiInstance.player.game
         for candidate in candidates:
@@ -228,7 +234,7 @@ class AIDefaultAI:
                         newHand, candidates.hand, winningTiles))
         return candidates
 
-    def selectAnswer(self, answers):
+    def selectAnswer(self, answers:Sequence[Message]) ->Tuple[Message, Union[Tile, 'Meld', None]]:
         """this is where the robot AI should go.
         Returns answer and one parameter"""
         # disable warning about too many branches
@@ -267,7 +273,7 @@ class AIDefaultAI:
                 break
         return answer, parameter
 
-    def selectChow(self, chows):
+    def selectChow(self, chows:'MeldList') ->Optional['Meld']:
         """selects a chow to be completed. Add more AI here."""
         for chow in chows:
             # a robot should never play dangerous
@@ -283,14 +289,14 @@ class AIDefaultAI:
                         return chow
         return None
 
-    def selectKong(self, kongs):
+    def selectKong(self, kongs:'MeldList') ->Optional['Meld']:
         """selects a kong to be declared. Having more than one undeclared kong is quite improbable"""
         for kong in kongs:
             if not self.player.mustPlayDangerous(kong):
                 return kong
         return None
 
-    def handValue(self, hand):
+    def handValue(self, hand:'Hand') ->int:
         """compute the value of a hand.
         This is not just its current score but also
         what possibilities to evolve it has. E.g. if
@@ -335,7 +341,7 @@ class TileAI(ReprMixin):
     # pylint: disable=too-many-instance-attributes
     # we do want that many instance attributes
 
-    def __init__(self, candidates, tile):
+    def __init__(self, candidates:'DiscardCandidates', tile:Tile) ->None:
         assert candidates.player
         assert candidates.player.game
         self.tile = tile
@@ -361,11 +367,11 @@ class TileAI(ReprMixin):
         self.prev2 = None
         self.next2 = None
 
-    def __lt__(self, other):
+    def __lt__(self, other:object) ->bool:
         """for sorting"""
         return self.tile < other.tile
 
-    def __str__(self):
+    def __str__(self) ->str:
         dang = ' dang:%d' % self.dangerous if self.dangerous else ''
         return '%s:=%.4f%s' % (self.tile, self.keep, dang)
 
@@ -375,7 +381,7 @@ class DiscardCandidates(list):
     """a list of TileAI objects. This class should only hold
     AI neutral methods"""
 
-    def __init__(self, player, hand):
+    def __init__(self, player:'PlayingPlayer', hand:'Hand') ->None:
         list.__init__(self)
         self._player = weakref.ref(player)
         self._hand = weakref.ref(hand)
@@ -397,20 +403,20 @@ class DiscardCandidates(list):
         self.link()
 
     @property
-    def player(self):
+    def player(self) ->'PlayingPlayer':
         """hide weakref"""
         result = self._player()
         assert result
         return result
 
     @property
-    def hand(self):
+    def hand(self) ->'Hand':
         """hide weakref"""
         result = self._hand()
         assert result
         return result
 
-    def link(self):
+    def link(self) ->None:
         """define values for candidate.prev and candidate.next"""
         prev = prev2 = None
         for this in self:
@@ -442,7 +448,7 @@ class DiscardCandidates(list):
                 if not this.next2:
                     this.next2 = TileAI(self, this.next.tile.nextForChow)
 
-    def unlink(self):
+    def unlink(self) ->None:
         """remove links between elements. This helps garbage collection."""
         for this in self:
             this.prev = None
@@ -450,7 +456,7 @@ class DiscardCandidates(list):
             this.prev2 = None
             this.next2 = None
 
-    def best(self):
+    def best(self) ->Tile:
         """return the candidate with the lowest value"""
         lowest = min(x.keep for x in self)
         candidates = sorted(x for x in self if x.keep == lowest)

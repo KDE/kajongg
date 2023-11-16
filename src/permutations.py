@@ -8,9 +8,12 @@ Read the user manual for a description of the interface to this scoring engine
 """
 
 import itertools
+from typing import List, Tuple, TYPE_CHECKING, Iterable
 
 from tile import Tile, Meld, MeldList
 
+if TYPE_CHECKING:
+    from tile import Tiles
 
 class Permutations:
 
@@ -19,7 +22,7 @@ class Permutations:
     cache = {}
     permuteCache = {}
 
-    def __new__(cls, tiles):
+    def __new__(cls, tiles:'Tiles') ->'Permutations':
         cacheKey = tuple(x.key for x in tiles)
         if cacheKey in cls.cache:
             return cls.cache[cacheKey]
@@ -27,12 +30,12 @@ class Permutations:
         cls.cache[cacheKey] = result
         return result
 
-    def __init__(self, tiles):
+    def __init__(self, tiles:'Tiles') ->None:
         self.tiles = tiles
         if not hasattr(self, 'variants'):
             self.variants = self._variants()
 
-    def _variants(self):
+    def _variants(self) ->List[MeldList]:
         """full Meld lists"""
         honors = []
         for tile in sorted(set(self.tiles)):
@@ -58,7 +61,7 @@ class Permutations:
         return result
 
     @classmethod
-    def permute(cls, valuesTuple):
+    def permute(cls, valuesTuple:Tuple[int, ...]) ->Tuple[Tuple[Tuple[int, ...], ...], ...]:
         """return all groupings into melds.
         values is a tuple of int, range 1..9"""
         assert isinstance(valuesTuple, tuple)
@@ -97,7 +100,7 @@ class Permutations:
     colorPermCache = {}
 
     @classmethod
-    def usefulPermutations(cls, values):
+    def usefulPermutations(cls, values:Iterable) ->Tuple:
         """return all variants usable for standard MJ formt (4 melds plus 1 pair),
         and also the variant with the most pungs. At least one will be returned.
         This is meant for the standard MJ format (4 pungs/kongs/chows plus 1 pair)"""
@@ -132,7 +135,7 @@ class Permutations:
         return cls.colorPermCache[values]
 
     @classmethod
-    def __colorVariants(cls, color, values):
+    def __colorVariants(cls, color:str, values:Iterable[int]) ->List[MeldList]:
         """generates all possible meld variants out of original
         where values is a string like '113445'.
         Returns lists of Meld"""

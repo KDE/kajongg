@@ -10,43 +10,49 @@ SPDX-License-Identifier: GPL-2.0
 Here we define classes useful for tree views
 """
 
+from typing import Any, Sequence, Optional, overload, Union, TYPE_CHECKING
+
 from qt import QAbstractItemModel, QModelIndex
+
+if TYPE_CHECKING:
+    from qt import QObject
+
 
 class TreeItem:
 
     """generic class for items in a tree"""
 
-    def __init__(self, content):
+    def __init__(self, content: Any) ->None:
         self.__rawContent = content
         self.parent = None
         self.children = []
 
-    def insert(self, row, child):
+    def insert(self, row:int, child:'TreeItem') ->'TreeItem':
         """add a new child to this tree node"""
         assert isinstance(child, TreeItem)
         child.parent = self
         self.children.insert(row, child)
         return child
 
-    def remove(self):
+    def remove(self) ->None:
         """remove this item from the model and the database.
         This is an abstract method."""
         raise TypeError(
             'cannot remove this TreeItem. We should never get here.')
 
-    def child(self, row):
+    def child(self, row:int) ->'TreeItem':
         """return a specific child item"""
         return self.children[row]
 
-    def childCount(self):
+    def childCount(self) ->int:
         """how many children does this item have?"""
         return len(self.children)
 
-    def content(self, column):
+    def content(self, column:int) ->Any:
         """content held by this item"""
         raise NotImplementedError("Virtual Method")
 
-    def row(self):
+    def row(self) ->int:
         """the row of this item in parent"""
         if self.parent:
             return self.parent.children.index(self)
@@ -57,7 +63,7 @@ class TreeItem:
         return 1
 
     @property
-    def raw(self):
+    def raw(self) ->Any:
         """make it read only"""
         return self.__rawContent
 
@@ -66,10 +72,10 @@ class RootItem(TreeItem):
 
     """an item for header data"""
 
-    def __init__(self, content):
+    def __init__(self, content:Any) ->None:
         TreeItem.__init__(self, content)
 
-    def content(self, column):
+    def content(self, column:int) ->Any:
         """content held by this item"""
         return self.raw[column]
 
@@ -78,21 +84,21 @@ class TreeModel(QAbstractItemModel):
 
     """a basic class for Kajongg tree views"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional['QObject']=None) ->None:
         super().__init__(parent)
 
-    def columnCount(self, parent=QModelIndex()):
+    def columnCount(self, parent:QModelIndex=QModelIndex()) ->int:
         """how many columns does this node have?"""
         return self.itemForIndex(parent).columnCount()
 
-    def rowCount(self, parent=QModelIndex()):
+    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
         """how many items?"""
         if parent.isValid() and parent.column():
             # all children have col=0 for parent
             return 0
         return self.itemForIndex(parent).childCount()
 
-    def index(self, row, column, parent=QModelIndex()):
+    def index(self, row:int, column:int, parent:QModelIndex=QModelIndex()) ->QModelIndex:
         """generate an index for this item"""
         if self.rootItem is None:
             return QModelIndex()
@@ -108,7 +114,12 @@ class TreeModel(QAbstractItemModel):
             return self.createIndex(row, column, item)
         return QModelIndex()
 
-    def parent(self, index):
+    @overload
+    def parent(self, index:QModelIndex) ->QModelIndex: ...
+    @overload
+    def parent(self) ->'QObject': ...
+
+    def parent(self, index:Optional[QModelIndex]=None) ->Union[QModelIndex, 'QObject']:
         """find the parent for index"""
         assert isinstance(index, QModelIndex)  # we never use parent() for getting QObject
         if not index.isValid():
@@ -124,7 +135,7 @@ class TreeModel(QAbstractItemModel):
                         return self.createIndex(row, 0, parentItem)
         return QModelIndex()
 
-    def itemForIndex(self, index):
+    def itemForIndex(self, index:QModelIndex) ->TreeItem:
         """return the item at index"""
         if index.isValid():
             item = index.internalPointer()
@@ -133,7 +144,8 @@ class TreeModel(QAbstractItemModel):
         assert self.rootItem
         return self.rootItem
 
-    def insertRows(self, position, items, parent=QModelIndex()):
+    def insertRows(self, position:int, items:Sequence[TreeItem],  # type:ignore[override]
+        parent:QModelIndex=QModelIndex()) ->bool:
         """inserts items into the model"""
         parentItem = self.itemForIndex(parent)
         self.beginInsertRows(parent, position, position + len(items) - 1)
@@ -142,7 +154,7 @@ class TreeModel(QAbstractItemModel):
         self.endInsertRows()
         return True
 
-    def removeRows(self, position, rows=1, parent=QModelIndex()):
+    def removeRows(self, position:int, rows:int=1, parent:QModelIndex=QModelIndex()) ->bool:
         """reimplement QAbstractItemModel.removeRows"""
         self.beginRemoveRows(parent, position, position + rows - 1)
         parentItem = self.itemForIndex(parent)

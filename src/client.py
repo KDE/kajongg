@@ -9,6 +9,8 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 import weakref
+from types import ModuleType
+from typing import Tuple, Optional, List, Type, Any, TYPE_CHECKING, Union
 
 from twisted.spread import pb
 from twisted.internet.task import deferLater
@@ -32,12 +34,23 @@ import intelligence
 import altint
 
 
+if TYPE_CHECKING:
+    from deferredutil import Request
+    from login import Connection
+    from game import Game
+    from tables import TableList
+    from chat import ChatWindow
+    from servertable import ServerTable
+    from wind import Wind
+    from scene import PlayingScene
+    from message import ClientMessage, ServerMessage
+
 class Table(ReprMixin):
 
     """defines things common to both ClientTable and ServerTable"""
 
-    def __init__(self, tableid, ruleset, suspendedAt,
-                 running, playOpen, autoPlay, wantedGame):
+    def __init__(self, tableid:int, ruleset:Union[Ruleset, str], suspendedAt:Optional[str],
+                 running:bool, playOpen:bool, autoPlay:bool, wantedGame:str) ->None:
         self.tableid = tableid
         if isinstance(ruleset, Ruleset):
             self.ruleset = ruleset
@@ -49,7 +62,7 @@ class Table(ReprMixin):
         self.autoPlay = autoPlay
         self.wantedGame = wantedGame
 
-    def status(self):
+    def status(self) ->str:
         """a status string"""
         result = ''
         if self.suspendedAt:
@@ -61,7 +74,7 @@ class Table(ReprMixin):
             result += ' ' + i18nc('table status', 'Running')
         return result or i18nc('table status', 'New')
 
-    def __str__(self):
+    def __str__(self) ->str:
         return 'Table({})'.format(self.tableid)
 
 
@@ -70,9 +83,10 @@ class ClientTable(Table):
     """the table as seen by the client"""
     # pylint: disable=too-many-arguments
 
-    def __init__(self, client, tableid, ruleset, gameid, suspendedAt, running,
-                 playOpen, autoPlay, wantedGame, playerNames,
-                 playersOnline, endValues):
+    def __init__(self, client:'Client', tableid:int, ruleset:Ruleset, gameid:int,
+                 suspendedAt:str, running:bool,
+                 playOpen:bool, autoPlay:bool, wantedGame:str, playerNames:List[str],
+                 playersOnline:List[PlayingPlayer], endValues:Tuple[List[int], List[int]]) ->None:
         Table.__init__(
             self,
             tableid,
@@ -94,14 +108,14 @@ class ClientTable(Table):
                 break
         self.chatWindow = None
 
-    def isOnline(self, player):
+    def isOnline(self, player:Optional[str]) ->bool:  # TODO: why optional?
         """did he join the tabled?"""
         for idx, name in enumerate(self.playerNames):
             if player == name:
                 return self.playersOnline[idx]
         return False
 
-    def __str__(self):
+    def __str__(self) ->str:
         onlineNames = [x for x in self.playerNames if self.isOnline(x)]
         offlineString = ''
         offlineNames = [
@@ -111,7 +125,7 @@ class ClientTable(Table):
             offlineString = ' offline:' + ','.join(offlineNames)
         return '%d(%s %s%s)' % (self.tableid, self.ruleset.name, ','.join(onlineNames), offlineString)
 
-    def gameExistsLocally(self):
+    def gameExistsLocally(self) ->bool:
         """True if the game exists in the data base of the client"""
         assert self.gameid
         return bool(Query('select 1 from game where id=?', (self.gameid,)).records)
@@ -123,7 +137,7 @@ class Client(pb.Referenceable):
     so we can also use it on the server for robot clients. Compare
     with HumanClient(Client)"""
 
-    def __init__(self, name=None):
+    def __init__(self, name:Optional[str]=None) ->None:
         """name is something like Robot 1 or None for the game server"""
         self.name = name
         self.game = None
@@ -133,56 +147,56 @@ class Client(pb.Referenceable):
         self.tableList = None
 
     @property
-    def table(self):
+    def table(self) ->Union[ClientTable, 'ServerTable', None]:
         """hide weakref"""
         if self._table:
             return self._table()
         return None
 
     @table.setter
-    def table(self, value):
+    def table(self, value:Union[ClientTable, 'ServerTable', None]) ->None:
         """hide weakref"""
         if value is not None:
             self._table = weakref.ref(value)
 
     @property
-    def connection(self):
+    def connection(self) ->Optional['Connection']:
         """update main window title if needed"""
         return self.__connection
 
     @connection.setter
-    def connection(self, value):
+    def connection(self, value:'Connection') ->None:
         """update main window title if needed"""
         if self.__connection != value:
             self.__connection = value
             if Internal.scene:
                 Internal.scene.mainWindow.updateGUI()
 
-    def _tableById(self, tableid):
+    def _tableById(self, tableid:int) ->Optional[ClientTable]:
         """return table with tableid"""
         for table in self.tables:
             if table.tableid == tableid:
                 return table
         return None
 
-    def logout(self, unusedResult=None):
+    def logout(self, unusedResult:Optional[List['Request']]=None) ->Deferred:
         """virtual"""
         return succeed(None)
 
-    def isRobotClient(self):
+    def isRobotClient(self) ->bool:
         """avoid using isinstance because that imports too much for the server"""
         return bool(self.name)
 
     @staticmethod
-    def isHumanClient():
+    def isHumanClient() ->bool:
         """avoid using isinstance because that imports too much for the server"""
         return False
 
-    def isServerClient(self):
+    def isServerClient(self) ->bool:
         """avoid using isinstance because that imports too much for the server"""
         return bool(not self.name)
 
-    def remote_newTables(self, tables):
+    def remote_newTables(self, tables:List[Any]) ->None:
         """update table list"""
         newTables = [ClientTable(self, *x) for x in tables]
         self.tables.extend(newTables)
@@ -191,7 +205,7 @@ class Client(pb.Referenceable):
             logDebug('%s got new tables:%s' % (self.name, _))
 
     @staticmethod
-    def remote_serverRulesets(hashes):
+    def remote_serverRulesets(hashes:List[str]) ->List[str]:
         """the server will normally send us hashes of rulesets. If
         a hash is not known by us, tell the server so it will send the
         full ruleset definition instead of the hash. It would be even better if
@@ -200,7 +214,7 @@ class Client(pb.Referenceable):
         more changes to the client code"""
         return [x for x in hashes if not Ruleset.hashIsKnown(x)]
 
-    def tableChanged(self, table):
+    def tableChanged(self, table:Any) ->Tuple[Optional[ClientTable], ClientTable]:
         """update table list"""
         newTable = ClientTable(self, *table)
         oldTable = self._tableById(newTable.tableid)
@@ -209,13 +223,13 @@ class Client(pb.Referenceable):
             self.tables.append(newTable)  # FIXME: I think indent is wrong
         return oldTable, newTable
 
-    def remote_tableRemoved(self, tableid, message, *args):  # pylint: disable=unused-argument
+    def remote_tableRemoved(self, tableid:int, message:str, *args:Any) ->None:  # pylint: disable=unused-argument
         """update table list"""
         table = self._tableById(tableid)
         if table:
             self.tables.remove(table)
 
-    def reserveGameId(self, gameid):
+    def reserveGameId(self, gameid:int) ->Message:
         """the game server proposes a new game id. We check if it is available
         in our local data base - we want to use the same gameid everywhere"""
         with Internal.db:
@@ -227,7 +241,7 @@ class Client(pb.Referenceable):
         return Message.OK
 
     @staticmethod
-    def __findAI(modules, aiName):
+    def __findAI(modules:List[ModuleType], aiName:str) ->Optional[Type]:
         """list of all alternative AIs defined in altint.py"""
         for module in modules:
             for key, value in module.__dict__.items():
@@ -235,7 +249,7 @@ class Client(pb.Referenceable):
                     return value
         return None
 
-    def __assignIntelligence(self):
+    def __assignIntelligence(self) ->None:
         """assign intelligence to myself. All players already have default intelligence."""
         if self.isHumanClient():
             assert self.game
@@ -245,9 +259,10 @@ class Client(pb.Referenceable):
             self.game.myself.intelligence = aiClass(self.game.myself)
 
     def readyForGameStart(
-            self, tableid, gameid, wantedGame, playerNames, shouldSave=True, gameClass=None):
+            self, tableid:int, gameid:int, wantedGame:str, playerNames:List[Tuple['Wind', str]],
+            shouldSave:bool=True, gameClass:Optional[Type]=None) ->Deferred:
         """the game server asks us if we are ready. A robot is always ready."""
-        def disagree(about):
+        def disagree(about:str) ->None:
             """do not bother to translate this, it should normally not happen"""
             assert self.game  # mypy should be able to infer this
             self.game.close()
@@ -289,7 +304,8 @@ class Client(pb.Referenceable):
         self.game.prepareHand()
         return succeed(Message.OK)
 
-    def readyForHandStart(self, playerNames, rotateWinds):
+    def readyForHandStart(self, playerNames:List[Tuple['Wind', str]],
+        rotateWinds:bool) ->Optional[Deferred]:
         """the game server asks us if we are ready. A robot is always ready..."""
         if self.game:
             self.game.assignPlayers(playerNames)
@@ -297,7 +313,7 @@ class Client(pb.Referenceable):
                 self.game.rotateWinds()
             self.game.prepareHand()
 
-    def __delayAnswer(self, result, delay, delayStep):
+    def __delayAnswer(self, result:List['Request'], delay:float, delayStep:float) ->Any:
         """try again, may we chow now?"""
         if not self.game:
             # game has been aborted meanwhile
@@ -328,7 +344,7 @@ class Client(pb.Referenceable):
                 self.game.myself.name, self.game.lastDiscard.name()))
         return result
 
-    def ask(self, move, answers):
+    def ask(self, move:Move, answers:List['ClientMessage']) ->Deferred:
         """place the robot AI here.
         send answer and one parameter to server"""
         delay = 0.0
@@ -345,18 +361,18 @@ class Client(pb.Referenceable):
             return deferLater(Internal.reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         return succeed(result)
 
-    def thatWasMe(self, player):
+    def thatWasMe(self, player:PlayingPlayer) ->bool:
         """return True if player == myself"""
         if not self.game:
             return False
         return player == self.game.myself
 
     @staticmethod
-    def __jellyMessage(value):
+    def __jellyMessage(value:str) ->str:
         """the Message classes are not pb.copyable, convert them into their names"""
         return Message.OK.name if value is None else Message.jelly(value, value)
 
-    def remote_move(self, playerName, command, *unusedArgs, **kwargs):
+    def remote_move(self, playerName:str, command:str, *unusedArgs:Any, **kwargs:Any) ->Deferred:
         """the server sends us info or a question and always wants us to answer"""
         if Internal.scene and not isAlive(Internal.scene):
             return fail()
@@ -386,7 +402,7 @@ class Client(pb.Referenceable):
                 return fail(exc)
             return result
 
-    def exec_move(self, move):
+    def exec_move(self, move:Move) ->Deferred:
         """mirror the move of a player as told by the game server"""
         message = move.message
         if message.needsGame and not self.game:
@@ -439,7 +455,7 @@ class Client(pb.Referenceable):
         # the Deferred returned by animate().
         return animate().addCallback(lambda x: answer).addErrback(logException)
 
-    def claimed(self, move):
+    def claimed(self, move:Move) ->Optional[Deferred]:
         """somebody claimed a discarded tile"""
         assert self.game
         if Internal.scene:
@@ -474,7 +490,7 @@ class Client(pb.Referenceable):
             return self.ask(move, [Message.OK])
         return None
 
-    def myAction(self, move):
+    def myAction(self, move:Move) ->Deferred:
         """ask myself what I want to do after picking or claiming a tile"""
         # only when all animations ended, our handboard gets focus. Otherwise
         # we would see a blue focusRect in the handboard even when a tile
@@ -486,7 +502,7 @@ class Client(pb.Referenceable):
             possibleAnswers.append(Message.OriginalCall)
         return self.ask(move, possibleAnswers)
 
-    def declared(self, move):
+    def declared(self, move:Move) ->None:
         """somebody declared something.
         By declaring we mean exposing a meld, using only tiles from the hand.
         For now we only support Kong: in Classical Chinese it makes no sense
@@ -501,6 +517,6 @@ class Client(pb.Referenceable):
         if not self.thatWasMe(move.player):
             self.ask(move, [Message.OK])
 
-    def __str__(self):
+    def __str__(self) ->str:
         assert self.name
         return self.name

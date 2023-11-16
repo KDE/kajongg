@@ -24,11 +24,11 @@ from qt import QStandardPaths
 # pylint:disable=invalid-name
 
 
-def makeIcon(svgName, icoName):
+def makeIcon(svgName:str, icoName:str) ->None:
     """generates icoName.ico"""
     tmpDir = tempfile.mkdtemp(prefix='kaj')
 
-    def pngName(resolution):
+    def pngName(resolution:int) ->str:
         """name for this resolution"""
         return '{}/kajongg{}.png'.format(
             tmpDir, resolution)

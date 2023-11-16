@@ -7,6 +7,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import List, Any, Optional, Tuple, TYPE_CHECKING
+
 from qt import QColor
 
 from mi18n import i18nc
@@ -20,12 +22,20 @@ from animation import AnimationSpeed
 from uiwall import UIWall, SideText
 from wind import Wind
 
+if TYPE_CHECKING:
+    from tile import Tiles, Meld, MeldList
+    from uitile import UITile
+    from uiwall import UIWallSide
+    from hand import Hand
+    from rule import Ruleset
+    from client import Client
+    from scene import PlayingScene
 
 class VisiblePlayer(Player):
 
     """Mixin for VisiblePlayingPlayer and ScoringPlayer"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         # pylint: disable=super-init-not-called
         assert self.game
         assert self.game.wall
@@ -33,7 +43,7 @@ class VisiblePlayer(Player):
         self.sideText = SideText()
         self.sideText.board = self.__front
 
-    def hide(self):
+    def hide(self) ->None:
         """clear visible data and hide"""
         self.clearHand()
         if isAlive(self.handBoard):
@@ -41,7 +51,7 @@ class VisiblePlayer(Player):
             self.handBoard.hide()
 
     @property
-    def idx(self):
+    def idx(self) ->int:
         """our index in the player list"""
         assert self.game
         if self not in self.game.players:
@@ -50,23 +60,23 @@ class VisiblePlayer(Player):
         return self.game.players.index(self)
 
     @property
-    def front(self):
+    def front(self) ->'UIWallSide':
         """front"""
         return self.__front
 
     @front.setter
-    def front(self, value):
+    def front(self, value:'UIWallSide') ->None:
         """also assign handBoard to front"""
         self.__front = value
         if self.handBoard:
             self.handBoard.setParentItem(value)
 
-    def syncHandBoard(self, adding=None):
+    def syncHandBoard(self, adding:Optional[List['UITile']]=None) ->None:
         """update display of handBoard. Set Focus to tileName."""
         assert self.handBoard
         self.handBoard.sync(adding)
 
-    def showInfo(self):
+    def showInfo(self) ->None:
         """show player info on the wall"""
         side = self.front
         self.sideText.text = '{} - {}'.format(self.localName, self.explainHand().total())
@@ -83,7 +93,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
     """this player instance has a visual representation"""
 
-    def __init__(self, game, name):
+    def __init__(self, game:'VisiblePlayingGame', name:str) ->None:
         assert game
         self.handBoard = None  # because Player.init calls clearHand()
         PlayingPlayer.__init__(self, game, name)
@@ -91,7 +101,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         self.handBoard = PlayingHandBoard(self)
         self.voice = None
 
-    def clearHand(self):
+    def clearHand(self) ->None:
         """clears attributes related to current hand"""
         super().clearHand()
         if self.game and self.game.wall:
@@ -102,7 +112,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
                 self.game is not None and self.game.belongsToHumanPlayer(
                 ) and self == self.game.myself)
 
-    def explainHand(self):
+    def explainHand(self) ->'Hand':
         """return the hand to be explained. Same as current unless we need to discard.
         In that case, make an educated guess about the discard.
         For player==game.myself, use the focused tile."""
@@ -116,7 +126,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
                     hand -= self.handBoard.focusTile.tile
         return hand
 
-    def colorizeName(self):
+    def colorizeName(self) ->None:
         """set the color to be used for showing the player name on the wall"""
         if not isAlive(self.sideText):
             return
@@ -130,13 +140,13 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             color = 'black'
         self.sideText.color = QColor(color)
 
-    def getsFocus(self, unusedResults=None):
+    def getsFocus(self, unusedResults:Any=None) ->None:
         """give this player focus on his handBoard"""
         assert self.handBoard
         self.handBoard.setEnabled(True)
         self.handBoard.hasLogicalFocus = True
 
-    def popupMsg(self, msg):
+    def popupMsg(self, msg:Message) ->None:
         """shows a yellow message from player"""
         if msg != Message.NoClaim:
             self.speak(msg.name.lower())
@@ -144,18 +154,18 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             yellow.setText('{}  {}'.format(yellow.msg, i18nc('kajongg', msg.name)))
             yellow.setVisible(True)
 
-    def hidePopup(self):
+    def hidePopup(self) ->None:
         """hide the yellow message from player"""
         if isAlive(self.front.message):
             self.front.message.msg = ''
             self.front.message.setVisible(False)
 
-    def speak(self, txt):
+    def speak(self, txt:str) ->None:
         """speak if we have a voice"""
         if self.voice:
             self.voice.speak(txt, self.front.rotation())
 
-    def robTileFrom(self, tile):
+    def robTileFrom(self, tile:Tile) ->None:
         """used for robbing the kong from this player"""
         PlayingPlayer.robTileFrom(self, tile)
         tile = tile.exposed
@@ -167,7 +177,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         assert lastDiscard.isConcealed
         self.syncHandBoard()
 
-    def addConcealedTiles(self, tiles, animated=True):
+    def addConcealedTiles(self, tiles:'Tiles', animated:bool=True) ->None:
         """add to my tiles and sync the hand board"""
         assert Internal.Preferences
         _ = tiles
@@ -175,7 +185,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             PlayingPlayer.addConcealedTiles(self, TileList(x.tile for x in _))
             self.syncHandBoard(_)
 
-    def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
+    def declaredMahJongg(self, concealed:'MeldList', withDiscard:Optional[Tile], lastTile:Tile, lastMeld:'Meld') ->None:
         """player declared mah jongg. Determine last meld, show
         concealed tiles grouped to melds"""
         PlayingPlayer.declaredMahJongg(
@@ -198,12 +208,12 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             # show concealed tiles
             self.syncHandBoard()
 
-    def removeConcealedTile(self, tile):
+    def removeConcealedTile(self, tile:Tile) ->None:
         """remove from my melds or tiles"""
         PlayingPlayer.removeConcealedTile(self, tile)
         self.syncHandBoard()
 
-    def makeTileKnown(self, tile):
+    def makeTileKnown(self, tile:Tile) ->None:
         """give an unknown tileItem a name"""
         PlayingPlayer.makeTileKnown(self, tile)
         assert tile.isKnown
@@ -213,7 +223,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             key=lambda x: x.xoffset)
         matchingTiles[-1].change_name(tile)
 
-    def exposeMeld(self, meldTiles, calledTile=None):
+    def exposeMeld(self, meldTiles:'Tiles', calledTile:Optional[Tile]=None) ->'Meld':
         result = PlayingPlayer.exposeMeld(
             self,
             meldTiles,
@@ -229,8 +239,9 @@ class VisiblePlayingGame(PlayingGame):
     playerClass = VisiblePlayingPlayer
     wallClass = UIWall
 
-    def __init__(self, names, ruleset, gameid=None,
-                 wantedGame=None, client=None, playOpen=False, autoPlay=False):
+    def __init__(self, names:List[Tuple['Wind', str]], ruleset:'Ruleset', gameid:Optional[int]=None,
+                 wantedGame:Optional[str]=None, client:Optional['Client']=None,
+                 playOpen:bool=False, autoPlay:bool=False) ->None:
         PlayingGame.__init__(
             self, names, ruleset, gameid, wantedGame=wantedGame,
             client=client, playOpen=playOpen, autoPlay=autoPlay)
@@ -239,7 +250,7 @@ class VisiblePlayingGame(PlayingGame):
         assert self.wall
         self.wall.decorate4()
 
-    def close(self):
+    def close(self) ->None:
         """close the game"""
         scene = Internal.scene
         assert scene

@@ -11,27 +11,31 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 from collections import defaultdict
+from typing import Optional, Union, TYPE_CHECKING, Callable, Any
 
 from kde import KConfigSkeleton
 from log import logException, logDebug
 from common import Internal, Debug
+
+if TYPE_CHECKING:
+    from kdestub import KConfigSkeletonItem, ItemInt
 
 
 class Parameter:
 
     """helper class for defining configuration parameters"""
 
-    def __init__(self, group, name, default=None):
+    def __init__(self, group:str, name:str, default:Union[int, str, bool]) ->None:
         """configuration group, parameter name, default value"""
         self.group = group
         self.name = name
         self.default = default
 
-    def add(self, skeleton):
+    def add(self, skeleton:KConfigSkeleton) ->None:
         """for mypy"""
         raise NotImplementedError
 
-    def itemValue(self):
+    def itemValue(self) ->Union[int, str, bool]:
         """return the value of this item"""
         return self.item.value()
 
@@ -40,17 +44,17 @@ class StringParameter(Parameter):
 
     """helper class for defining string parameters"""
 
-    def __init__(self, group, name, default=None):
+    def __init__(self, group:str, name:str, default:Optional[str]=None) ->None:
         if default is None:
             default = ''
         Parameter.__init__(self, group, name, default)
         self.value = ''
 
-    def add(self, skeleton):
+    def add(self, skeleton:KConfigSkeleton) ->None:
         """add tis parameter to the skeleton"""
         self.item = skeleton.addItem(self.name, self.value, self.default or '')  # pylint:disable=attribute-defined-outside-init
 
-    def itemValue(self):
+    def itemValue(self) ->str:
         """return the value of this item"""
         return str(self.item.value())
 
@@ -59,13 +63,13 @@ class BoolParameter(Parameter):
 
     """helper class for defining boolean parameters"""
 
-    def __init__(self, group, name, default=None):
+    def __init__(self, group:str, name:str, default:Optional[bool]=None) ->None:
         if default is None:
             default = False
         Parameter.__init__(self, group, name, default)
         self.value = default
 
-    def add(self, skeleton):
+    def add(self, skeleton:KConfigSkeleton) ->None:
         """add tis parameter to the skeleton"""
         self.item = skeleton.addItem(self.name, self.value, self.default)  # pylint:disable=attribute-defined-outside-init
 
@@ -74,8 +78,8 @@ class IntParameter(Parameter):
 
     """helper class for defining integer parameters"""
 
-    def __init__(self, group, name, default=None,
-                 minValue=None, maxValue=None):
+    def __init__(self, group:str, name:str, default:Optional[int]=None,
+                 minValue:Optional[int]=None, maxValue:Optional[int]=None) ->None:
         """minValue and maxValue are also used by the edit widget"""
         if default is None:
             default = 0
@@ -84,7 +88,7 @@ class IntParameter(Parameter):
         self.minValue = minValue
         self.maxValue = maxValue
 
-    def add(self, skeleton):
+    def add(self, skeleton:KConfigSkeleton) ->None:
         """add this parameter to the skeleton"""
         self.item = skeleton.addItem(self.name, self.value, self.default)  # pylint:disable=attribute-defined-outside-init
         if self.minValue is not None:
@@ -98,7 +102,7 @@ class SetupPreferences(KConfigSkeleton):
     """Holds all Kajongg options. Only instantiate this once"""
     _Parameters = {}
 
-    def __init__(self):
+    def __init__(self) ->None:
         if Internal.Preferences:
             logException('Preferences is not None')
         self.__watching = defaultdict(list)
@@ -117,7 +121,7 @@ class SetupPreferences(KConfigSkeleton):
         self.addBool('Display', 'useSounds', True)
         self.addBool('Display', 'uploadVoice', False)
 
-    def callTrigger(self, name):
+    def callTrigger(self, name:str) ->None:
         """call registered callback for this attribute change"""
         newValue = getattr(self, name)
         if self.__oldValues[name] != newValue:
@@ -131,12 +135,12 @@ class SetupPreferences(KConfigSkeleton):
                 method(self.__oldValues[name], newValue)
         self.__oldValues[name] = newValue
 
-    def callTriggers(self):
+    def callTriggers(self) ->None:
         """call registered callbacks for specific attribute changes"""
         for name in self.__watching:
             self.callTrigger(name)
 
-    def addWatch(self, name, method):
+    def addWatch(self, name:str, method:Callable[..., None]) ->None:
         """If name changes, call method.
         method must accept 2 arguments: old value and new value."""
         if method not in self.__watching[name]:
@@ -146,14 +150,14 @@ class SetupPreferences(KConfigSkeleton):
                     name, method.__name__))
             self.callTrigger(name)  # initial change
 
-    def __getattr__(self, name):
+    def __getattr__(self, name:str) ->Union[int, str, bool]:
         """undefined attributes might be parameters"""
         if name not in SetupPreferences._Parameters:
             return self.__getattribute__(name)
         par = SetupPreferences._Parameters[name]
         return par.itemValue()
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name:str, value:Union[int, str, bool]) ->None:
         """undefined attributes might be parameters"""
         if name not in SetupPreferences._Parameters:
             KConfigSkeleton.__setattr__(self, name, value)
@@ -161,41 +165,41 @@ class SetupPreferences(KConfigSkeleton):
         par = SetupPreferences._Parameters[name]
         par.item.setValue(value)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key:str):  # type:ignore
         return self.__getattr__(key)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key:str, value:Any) ->None:
         self.__setattr__(key, value)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key:str) ->None:
         """pylint wants this for a complete container, but we do not need it"""
         del SetupPreferences._Parameters[key]
 
-    def __len__(self):
+    def __len__(self) ->int:
         """pylint wants this for a complete container, but we do not need it"""
         return len(SetupPreferences._Parameters)
 
-    def addParameter(self, par):
+    def addParameter(self, par:Parameter) ->None:
         """add a parameter to the skeleton"""
         if par.name not in SetupPreferences._Parameters:
             SetupPreferences._Parameters[par.name] = par
             self.setCurrentGroup(par.group)
             par.add(self)
 
-    def addString(self, group, name, default=None):
+    def addString(self, group:str, name:str, default:Optional[str]=None) ->None:
         """add a string parameter to the skeleton"""
         self.addParameter(StringParameter(group, name, default))
 
-    def addBool(self, group, name, default=None):
+    def addBool(self, group:str, name:str, default:Optional[bool]=None) ->None:
         """add a string parameter to the skeleton"""
         self.addParameter(BoolParameter(group, name, default))
 
-    def addInteger(self, group, name, default=None,
-                   minValue=None, maxValue=None):
+    def addInteger(self, group:str, name:str, default:Optional[int]=None,
+                   minValue:Optional[int]=None, maxValue:Optional[int]=None) ->None:
         """add a string parameter to the skeleton"""
         self.addParameter(IntParameter(
             group, name, default, minValue, maxValue))
 
-    def animationDuration(self):
+    def animationDuration(self) ->int:
         """in milliseconds"""
         return max(0, (99 - self.animationSpeed) * 100 // 4)

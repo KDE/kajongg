@@ -9,6 +9,8 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 
+from typing import Optional, List, Any, TYPE_CHECKING
+
 from qt import Qt, QModelIndex
 from qt import QAbstractTableModel, QDialogButtonBox, QDialog
 from qt import QHBoxLayout, QVBoxLayout, QCheckBox
@@ -24,27 +26,30 @@ from statesaver import StateSaver
 from common import Debug
 from modeltest import ModelTest
 
+if TYPE_CHECKING:
+    from qt import QWidget, QEvent, QKeyEvent
+    from game import PlayingGame
 
 class GamesModel(QAbstractTableModel):
 
     """data for the list of games"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         QAbstractTableModel.__init__(self)
         self._resultRows = []
 
-    def columnCount(self, unusedParent=QModelIndex()):
+    def columnCount(self, unusedParent:QModelIndex=QModelIndex()) ->int:
         """including the hidden col 0"""
         return 3
 
-    def rowCount(self, parent=QModelIndex()):
+    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
         """how many games"""
         if parent.isValid():
             # we have only top level items
             return 0
         return len(self._resultRows)
 
-    def setResultset(self, rows):
+    def setResultset(self, rows:List[List[Any]]) ->None:
         """new data"""
         self.beginResetModel()
         try:
@@ -52,7 +57,7 @@ class GamesModel(QAbstractTableModel):
         finally:
             self.endResetModel()
 
-    def index(self, row, column, parent=QModelIndex()):
+    def index(self, row:int, column:int, parent:QModelIndex=QModelIndex()) ->QModelIndex:
         """helper"""
         if (row < 0
                 or column < 0
@@ -62,7 +67,7 @@ class GamesModel(QAbstractTableModel):
             return QModelIndex()
         return self.createIndex(row, column, 0)
 
-    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Any:
         """get score table from view"""
         if role is None:
             role = Qt.ItemDataRole.DisplayRole
@@ -84,7 +89,7 @@ class GamesModel(QAbstractTableModel):
                 return int(unformatted)
         return QAbstractTableModel.data(self, index, role)
 
-    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+    def headerData(self, section:int, orientation:Qt.Orientation, role:int=Qt.ItemDataRole.DisplayRole) ->Optional[str]:
         """for the two visible columns"""
         if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
             return i18n('Players') if section == 2 else i18n('Started')
@@ -95,7 +100,7 @@ class Games(QDialog):
 
     """a dialog for selecting a game"""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional['QWidget']=None) ->None:
         super().__init__(parent)
         self.selectedGame = None
         self.onlyPending = True
@@ -146,14 +151,14 @@ class Games(QDialog):
         self.view.doubleClicked.connect(self.loadGame)
         chkPending.stateChanged.connect(self.pendingOrNot)
 
-    def showEvent(self, unusedEvent):
+    def showEvent(self, unusedEvent:'QEvent') ->None:
         """only now get the data set. Not doing this in__init__ would eventually
         make it easier to subclass from some generic TableEditor class"""
         self.setQuery()
         self.view.initView()
         self.selectionChanged()
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event:'QKeyEvent') ->None:
         """use insert/delete keys for insert/delete"""
         key = event.key()
         if key == Qt.Key.Key_Insert:
@@ -165,13 +170,13 @@ class Games(QDialog):
             return
         QDialog.keyPressEvent(self, event)
 
-    def selectionChanged(self):
+    def selectionChanged(self) ->None:
         """update button states according to selection"""
         selectedRows = len(self.selection.selectedRows())
         self.loadButton.setEnabled(selectedRows == 1)
         self.deleteButton.setEnabled(selectedRows >= 1)
 
-    def setQuery(self):
+    def setQuery(self) ->None:
         """define the query depending on self.OnlyPending"""
         query = Query(
             "select g.id, g.starttime, "
@@ -187,7 +192,7 @@ class Games(QDialog):
         self.model.setResultset(query.records)
         self.view.hideColumn(0)
 
-    def __idxForGame(self, game):
+    def __idxForGame(self, game:'PlayingGame') ->QModelIndex:
         """return the model index for game"""
         for row in range(self.model.rowCount()):
             idx = self.model.index(row, 0)
@@ -195,12 +200,12 @@ class Games(QDialog):
                 return idx
         return self.model.index(0, 0)
 
-    def __getSelectedGame(self):
+    def __getSelectedGame(self) ->QModelIndex:
         """return the game id of the selected game"""
         rows = self.selection.selectedRows()
         return self.model.data(rows[0], 0) if rows else QModelIndex()
 
-    def pendingOrNot(self, chosen):
+    def pendingOrNot(self, chosen:Qt.CheckState) ->None:
         """do we want to see all games or only pending games?"""
         if self.onlyPending != bool(chosen):
             self.onlyPending = bool(chosen)
@@ -210,14 +215,14 @@ class Games(QDialog):
             self.view.selectRow(idx.row())
         self.view.setFocus()
 
-    def loadGame(self):
+    def loadGame(self) ->None:
         """load a game"""
         self.selectedGame = self.__getSelectedGame()
         self.buttonBox.accepted.emit()
 
-    def delete(self):
+    def delete(self) ->None:
         """delete a game"""
-        def answered(result, games):
+        def answered(result:bool, games:List[int]) ->None:
             """question answered, result is True or False"""
             if result:
                 for game in games:

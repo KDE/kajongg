@@ -9,12 +9,16 @@ SPDX-License-Identifier: GPL-2.0
 
 from itertools import chain
 from types import GeneratorType
-from typing import Dict, Any
+from typing import Dict, Any, Optional, SupportsIndex, Union, Tuple, Sequence, Type
+from typing import Iterator, List, TYPE_CHECKING, Generator, Iterable
 from log import logException
 from mi18n import i18n, i18nc
 from common import IntDict, ReprMixin, id4
 from wind import Wind, East, South, West, North
 
+if TYPE_CHECKING:
+    from rule import Rule, Ruleset
+    from hand import Hand
 
 class Tile(ReprMixin):
 
@@ -76,7 +80,7 @@ class Tile(ReprMixin):
     minors = range(2, 9)
     majors = list(dragons) + list(winds) + terminals
 
-    def __new__(cls, *args):
+    def __new__(cls, *args: Any) ->'Tile':
         if len(args) == 1:
             if  type(args[0]) is Tile:  # pylint: disable=unidiomatic-typecheck
                 return args[0]
@@ -90,17 +94,22 @@ class Tile(ReprMixin):
             return cls._build(*args)
 
     @classmethod
-    def _build(cls, *args):
+    def _build(cls, *args: Any) ->'Tile':
         """build a new Tile object out of args"""
 
         result = super().__new__(cls)
         result.setUp(args)
         return result
 
-    def setUp(self, args):  # pylint:disable=too-many-statements, too-many-branches
+    def setUp(self, args:Any) ->None:  # pylint:disable=too-many-statements, too-many-branches
         """Initialize"""
 
+        self.group:str
+        self.char:str
+        self.value:Union[str, int, Wind]
+
         # parse args
+        arg1:Union[str, int, Wind]
         if isinstance(args, Tile):
             group, arg1 = args.group, args.char
         elif len(args) == 1:
@@ -152,8 +161,17 @@ class Tile(ReprMixin):
         if self.__class__ is Tile:
             Tile._storeInCache(self)
 
-        self.single = self.pair = self.pung = None
-        self.chow = self.kong = None
+        self.exposed:'Tile'
+        self.concealed:'Tile'
+        self.swapped:'Tile'
+        self.knitted3:'Meld'
+        self.claimedKong:'Meld'
+        self.single:'Meld'
+        self.pair:'Meld'
+        self.pung:'Meld'
+        self.chow:'Meld'
+        self.kong:'Meld'
+        self.nextForChow:'Tile'
         if self.__class__ is Tile:
             # a Piece may change
             self._fixed = True
@@ -185,7 +203,7 @@ class Tile(ReprMixin):
                         self.value +
                         1))
 
-    def parse_arg1(self, arg1):
+    def parse_arg1(self, arg1:Any) ->Tuple[str, Union[str, int, Wind]]:
         """set the interpreted Tile.value (str, Wind, int)"""
         if isinstance(arg1, Wind):
             char = arg1.char.lower()
@@ -193,7 +211,7 @@ class Tile(ReprMixin):
             char = chr(arg1 + 48)
         else:
             char = arg1
-        value = char  # default
+        value:Union[str, int, Wind] = char  # default
         if self.isWind or self.isBonus:
             if isinstance(arg1, Wind):
                 value = arg1
@@ -209,7 +227,7 @@ class Tile(ReprMixin):
         return char, value
 
     @classmethod
-    def _storeInCache(cls, result):
+    def _storeInCache(cls, result:'Tile') ->None:
         """Put the new tile into the cache"""
         for key in (
                 result, (str(result),), (result.group, result.value),
@@ -221,30 +239,30 @@ class Tile(ReprMixin):
         assert len(existingIds) == 1, 'cls is {} new is:{} existing are: {} keys are:{}'.format(cls.__name__,
             repr(result), ','.join(repr(x) for x in existing), ','.join(repr(x) for x in cls.cache if x == 1))
 
-    def name2(self):
+    def name2(self) ->str:
         """__str__ might be changed by a subclass"""
         return self.group + str(self.char)
 
-    def __repr__(self):
+    def __repr__(self) ->str:
         """ReprMixin does not seem to work on str subclass"""
         return ReprMixin.__repr__(self)
 
-    def __str__(self):
+    def __str__(self) ->str:
         return self.group + self.char
 
-    def __hash__(self):
+    def __hash__(self) ->int:
         return self.key
 
-    def __mul__(self, other):
+    def __mul__(self, other:int) ->'TileList':
         return TileList([self] * other)
 
-    def __imul__(self, other):
+    def __imul__(self, other:int) ->'TileList':
         return TileList([self] * other)
 
-    def __bool__(self):
+    def __bool__(self) ->bool:
         return self.isKnown
 
-    def meld(self, size):
+    def meld(self, size:int) ->'Meld':
         """return a meld of size. Those attributes are set
         in Meld.cacheMeldsInTiles"""
         _ = self
@@ -252,7 +270,7 @@ class Tile(ReprMixin):
             _ = Tile(_)
         return getattr(_, ('single', 'pair', 'pung', 'kong')[size - 1])
 
-    def groupName(self):
+    def groupName(self) ->str:
         """the name of the group this tile is of"""
         names = {
             Tile.hidden: i18nc('kajongg', 'hidden'),
@@ -265,7 +283,7 @@ class Tile(ReprMixin):
             Tile.season: i18nc('kajongg', 'season')}
         return names[self.lowerGroup]
 
-    def valueName(self):
+    def valueName(self) ->str:
         """the name of the value this tile has"""
         names = {
             'y': i18nc('kajongg', 'tile'),
@@ -280,7 +298,7 @@ class Tile(ReprMixin):
             names[idx] = chr(idx + 48)
         return names[self.value]
 
-    def name(self):
+    def name(self) ->str:
         """return name of a single tile"""
         if isinstance(self.value, Wind):
             result = {
@@ -292,11 +310,11 @@ class Tile(ReprMixin):
             result = i18nc('kajongg tile name', '{group} {value}')
         return result.format(value=self.valueName(), group=self.groupName())
 
-    def __lt__(self, other):
+    def __lt__(self, other:Any) ->bool:
         """needed for sort"""
         return self.key < other.key
 
-    def change_name(self, element):
+    def change_name(self, element:'Tile') ->'Tile':
         """FIXME: should go away when Tile/Piece is done"""
         assert element.__class__ is Tile, repr(element)
         if element is Tile.none:
@@ -304,12 +322,12 @@ class Tile(ReprMixin):
         assert element.__class__ is Tile, repr(element)
         return element
 
-    def __eq__(self, other):
+    def __eq__(self, other:Any) ->bool:
         if isinstance(other, Tile):
             return self.name2() == other.name2()
         return object.__eq__(self, other)
 
-    def cacheMelds(self):
+    def cacheMelds(self) ->None:
         """fill meld cache"""
         occ = elements.occurrence[self]
         self.single = Meld(self)
@@ -330,13 +348,13 @@ class Tile(ReprMixin):
                          self.concealed.nextForChow,
                          self.concealed.nextForChow.nextForChow])
                 if self.value in range(1, 10):
-                    self.knitted3 = Meld(  # pylint:disable=attribute-defined-outside-init
+                    self.knitted3 = Meld(
                         [Tile(x, self.value) for x in Tile.colors])
                     self.concealed.knitted3 = Meld(
                         [Tile(x, self.value).concealed for x in Tile.colors])
                 if occ > 3:
                     self.kong = Meld(self * 4)
-                    self.claimedKong = Meld(  # pylint:disable=attribute-defined-outside-init
+                    self.claimedKong = Meld(
                         [self, self, self, self.concealed])
                     self.concealed.kong = Meld(self.concealed * 4)
 
@@ -344,11 +362,14 @@ class Tiles:
 
     """a Mixin for TileList and TileTuple"""
 
-    def __init__(self, newContent=None):  # pylint:disable=unused-argument
+
+    tileClass:Type
+
+    def __init__(self, newContent:Any=None) ->None:  # pylint:disable=unused-argument
         ...
 
     @classmethod
-    def _parseArgs(cls, iterable):
+    def _parseArgs(cls, iterable:Any) ->Sequence:
         """flatten any args into a nice sequence"""
         if isinstance(iterable, str):
             memberList = [cls.tileClass(iterable[x:x + 2])
@@ -375,41 +396,41 @@ class Tiles:
                             cls.__name__, cls.tileClass.__name__, repr(member)))
         return memberList
 
-    def sorted(self):
+    def sorted(self) ->'Tiles':
         """sort(TileList) would not keep TileList type"""
         return self.__class__(sorted(self))
 
-    def possibleChows(self, tile):
+    def possibleChows(self, tile:Tile) ->'MeldList':
         """return my chows with tileName"""
         if tile not in self:
-            return [] # MeldList()
+            return []  # type:ignore[return-value]
         if tile.lowerGroup not in Tile.colors:
-            return [] # MeldList()
+            return []  # type:ignore[return-value]
         assert isinstance(tile.value, int)
         group = tile.group
         values = {x.value for x in self if x.group == group}
-        chows = [] # FIXME: MeldList()
+        chows:'MeldList' = []  # type:ignore[assignment]
         for offsets in [(0, 1, 2), (-2, -1, 0), (-1, 0, 1)]:
             subset = {tile.value + x for x in offsets}
             if subset <= values:
                 chow = self.__class__(self.tileClass(group, x) for x in sorted(subset))
                 if chow not in chows:
-                    chows.append(chow)
+                    chows.append(chow)  # type:ignore[arg-type]
         return chows
 
-    def __str__(self):
+    def __str__(self) ->str:
         """the content"""
         return str(''.join(str(x) for x in self))
 
-    def __repr__(self):
+    def __repr__(self) ->str:
         """for debugging"""
         return '{}_{}({})'.format(self.__class__.__name__, id4(self), ','.join(repr(x) for x in self))
 
-    def __len__(self):
+    def __len__(self) ->int:
         """just to make this clear to mypy"""
         return 0
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Tile]:
         """just to make this clear to mypy"""
         return iter(self)
 
@@ -420,14 +441,14 @@ class TileList(list, Tiles):
 
     tileClass = Tile
 
-    def __init__(self, newContent=None):
+    def __init__(self, newContent:Any=None) ->None:
         list.__init__(self)
         Tiles.__init__(self, newContent)
         self.extend(self._parseArgs(newContent))
         if self:
             self.isRest = True
 
-    def __add__(self, other):
+    def __add__(self, other:Any) ->'TileList':
         result = TileList(self)
         result.extend(self._parseArgs(other))
         return result
@@ -439,17 +460,19 @@ class TileTuple(tuple, Tiles):
 
     tileClass = Tile
 
-    def __new__(cls, iterable=None):
+    def __new__(cls, iterable:Any=None) ->'TileTuple':
         result = tuple.__new__(cls, cls._parseArgs(iterable))
         result.isRest = True
         result._hash = result._compute_hash()
         return result
 
-    def __init__(self, iterable=None):  # pylint: disable=unused-argument
+    def __init__(self, newContent:Any=None) ->None:  # pylint: disable=unused-argument
         tuple.__init__(self)
         Tiles.__init__(self)
+        self._hash:int
+        self.isRest:bool
 
-    def _compute_hash(self):
+    def _compute_hash(self) ->int:
         """usable for sorting"""
         result = 0
         factor = len(Tile.hashTable) // 2
@@ -457,10 +480,10 @@ class TileTuple(tuple, Tiles):
             result = result * factor + tile.key
         return result
 
-    def __hash__(self):
+    def __hash__(self) ->int:
         return self._hash
 
-    def __add__(self, other):
+    def __add__(self, other:Any) ->'TileTuple':  # type:ignore[override]
         return TileTuple(TileList(self) + self._parseArgs(other))
 
 
@@ -470,8 +493,8 @@ class Elements:
     # pylint: disable=too-many-instance-attributes
     # too many attributes
 
-    def __init__(self):
-        self.occurrence = IntDict()  # key: db, s3 etc. value: occurrence
+    def __init__(self) ->None:
+        self.occurrence:Dict[Tile, int] = IntDict()  # key: db, s3 etc. value: occurrence
         self.winds = {Tile(Tile.wind, x) for x in Tile.winds}
         self.wINDS = {x.concealed for x in self.winds}
         self.dragons = {Tile(Tile.dragon, x) for x in Tile.dragons}
@@ -495,16 +518,16 @@ class Elements:
             for _ in Tile.winds:
                 self.occurrence[Tile(bonus, _)] = 1
 
-    def __filter(self, ruleset):
+    def __filter(self, ruleset:'Ruleset') ->Generator[Tile, None, None]:
         """return element names"""
         return (x for x in self.occurrence
                 if ruleset.withBonusTiles or (not x.isBonus))
 
-    def count(self, ruleset):
+    def count(self, ruleset:'Ruleset') ->int:
         """how many tiles are to be used by the game"""
         return self.occurrence.count(self.__filter(ruleset))
 
-    def all(self, ruleset):
+    def all(self, ruleset:'Ruleset') ->List[Tile]:
         """a list of all elements, each of them occurrence times"""
         return self.occurrence.all(self.__filter(ruleset))
 
@@ -515,14 +538,14 @@ class Piece(Tile):
     This tile is part of the game. The wall is built from this.
     """
 
-    def __new__(cls, *args):
+    def __new__(cls, *args: Any) ->'Piece':
         result = cls._build(*args)
         return result
 
-    def __init__(self, *args):  # pylint: disable=unused-argument
+    def __init__(self, *args: Any) ->None:  # pylint: disable=unused-argument # type: ignore
         self.uiTile = None  # might be a UITile
 
-    def __hash__(self):
+    def __hash__(self) ->int:
         """this is not inherited from Tile. I am sure there is a good reason."""
         return self.key
 
@@ -533,7 +556,7 @@ class PieceList(TileList):
 
     tileClass = Piece
 
-    def __contains__(self, value):
+    def __contains__(self, value : Any) ->bool:
         """If value is Piece: must be the same object
         If value is Tile: any element having the same name"""
         if value.__class__ is Tile:
@@ -541,7 +564,7 @@ class PieceList(TileList):
             return any(x.name2() == _ for x in self)
         return any(x is value for x in self)
 
-    def index(self, value, start=None, stop=None):
+    def index(self, value : SupportsIndex, start: int =None , stop: int =None) ->int:  # type: ignore
         """Also accept Tile."""
         if value.__class__ is Tile:
             for result, _ in enumerate(self):
@@ -550,7 +573,7 @@ class PieceList(TileList):
             raise ValueError('{!r} is not in list {!r}'.format(value, self))
         return TileList.index(self, value, start,  stop)
 
-    def remove(self, value):
+    def remove(self, value : Tile) ->None:
         """Can also remove Tile."""
 # FIXME: should we do tile == piece? would remove then work?
         if value.__class__ is Tile:
@@ -604,14 +627,14 @@ class Meld(TileTuple, ReprMixin):
 
     cache : Dict[Any, 'Meld'] = {}
 
-    def __new__(cls, iterable=None):
+    def __new__(cls, iterable:Any=None) ->'Meld':
         """try to use cache"""
         if isinstance(iterable, str) and iterable in cls.cache:
             return cls.cache[iterable]
         if isinstance(iterable, Meld):
             # brauchen wir das?
             return iterable
-        superclass = TileTuple
+        superclass:Type[Tiles] = TileTuple
         if hasattr(iterable, '__iter__') and not isinstance(iterable, str):
             iterable = list(iterable)
             if iterable:
@@ -625,13 +648,24 @@ class Meld(TileTuple, ReprMixin):
             return cls.cache[tiles]
         return tiles
 
-    def __init__(self, iterable=None):
+    def __init__(self, iterable:Any=None) ->None:
         """init the meld: content can be either
         - a single string with 2 chars for every tile
         - a list containing such strings
         - another meld. Its tiles are not passed.
         - a list of Tile objects"""
+        # pylint:disable=too-many-statements
         self.exposed:'Meld'
+        self.exposedClaimed:'Meld'
+        self.declared:'Meld'
+        self.concealed:'Meld'
+        self.isPungKong:bool
+        self.isPair:bool
+        self.isPung:bool
+        self.isKong:bool
+        self.isDragonMeld:bool
+        self.isHonorMeld:bool
+        self.isWindMeld:bool
         if not hasattr(self, '_fixed'):  # already defined if I am from cache
             TileTuple.__init__(self, iterable)
             self.case = ''.join('a' if x.isExposed else 'A' for x in self)
@@ -658,12 +692,11 @@ class Meld(TileTuple, ReprMixin):
                 self.group = 'X'
                 self.lowerGroup = 'x'
             self.isRest = False
-            self.__staticRules = {}  # ruleset is key
-            self.__dynamicRules = {}  # ruleset is key
-            self.__staticDoublingRules = {}  # ruleset is key
-            self.__dynamicDoublingRules = {}  # ruleset is key
-            self.__hasRules = None  # unknown yet
-            self.concealed = self.exposed = self.declared = self.exposedClaimed = None  # to satisfy pylint
+            self.__staticRules:Dict[int, List['Rule']] = {}  # ruleset is key
+            self.__dynamicRules:Dict[int, List['Rule']] = {}  # ruleset is key
+            self.__staticDoublingRules:Dict[int, List['Rule']] = {}  # ruleset is key
+            self.__dynamicDoublingRules:Dict[int, List['Rule']] = {}  # ruleset is key
+            self.__hasRules:Optional[bool] = None
             self._fixed = True
 
             if len(self) < 4:
@@ -693,13 +726,13 @@ class Meld(TileTuple, ReprMixin):
                     self, 'exposedClaimed',
                     Meld([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed]))
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name:str, value:'Meld') ->None:
         if (hasattr(self, '_fixed')
                 and not name.endswith('__hasRules')):
             raise TypeError
         TileTuple.__setattr__(self, name, value)
 
-    def __prepareRules(self, ruleset):
+    def __prepareRules(self, ruleset:'Ruleset') ->None:
         """prepare rules from ruleset"""
         rulesetId = id(ruleset)
         self.__staticRules[rulesetId] = [
@@ -717,7 +750,7 @@ class Meld(TileTuple, ReprMixin):
         self.__dynamicDoublingRules[rulesetId] = [x for x in ruleset.doublingMeldRules
                                                   if hasattr(x, 'mayApplyToMeld') and x.mayApplyToMeld(self)]
 
-    def rules(self, hand):
+    def rules(self, hand:'Hand') ->List['Rule']:
         """all applicable rules for this meld being part of hand"""
         if self.__hasRules is False:
             return []
@@ -730,7 +763,7 @@ class Meld(TileTuple, ReprMixin):
             rulesetId] if x.appliesToMeld(hand, self))
         return result
 
-    def doublingRules(self, hand):
+    def doublingRules(self, hand:'Hand') ->List['Rule']:
         """all applicable doubling rules for this meld being part of hand"""
         ruleset = hand.ruleset
         rulesetId = id(ruleset)
@@ -741,7 +774,7 @@ class Meld(TileTuple, ReprMixin):
             rulesetId] if x.appliesToMeld(hand, self))
         return result
 
-    def without(self, remove):
+    def without(self, remove:Tile) ->TileTuple:
         """self without tile. The rest will be uppercased."""
         assert remove is not None, 'without(None) is illegal'
         _ = remove
@@ -754,15 +787,15 @@ class Meld(TileTuple, ReprMixin):
         assert _ is None, 'trying to remove {} from {}'.format(_, self)
         return TileTuple(tiles)
 
-    def __setitem__(self, index, value):
+    def __setitem__(self, index:int, value:Tile) ->None:
         """set a tile in the meld"""
         raise TypeError
 
-    def __delitem__(self, index):
+    def __delitem__(self, index:int) ->None:
         """removes a tile from the meld"""
         raise TypeError("'Meld' object doesn't support item deletion")
 
-    def __isExposed(self):
+    def __isExposed(self) ->bool:
         """meld state: exposed or not"""
         if self.case.islower():
             return True
@@ -770,7 +803,7 @@ class Meld(TileTuple, ReprMixin):
             return self.case[1:3].islower()
         return False
 
-    def __setMeldType(self):
+    def __setMeldType(self) ->None:
         """compute meld type. Except knitting melds."""
         # pylint: disable=too-many-branches,too-many-return-statements
         length = len(self)
@@ -834,7 +867,7 @@ class Meld(TileTuple, ReprMixin):
                     return
         raise UserWarning('Meld %s is malformed' % str(self))
 
-    def __lt__(self, other):
+    def __lt__(self, other:Tuple[Any, ...]) ->bool:
         """used for sorting. Smaller value is shown first."""
         if not other:
             return False
@@ -851,7 +884,7 @@ class Meld(TileTuple, ReprMixin):
             return len(self) > len(other)
         return self[0].key < other[0].key
 
-    def typeName(self):
+    def typeName(self) ->str:
         """convert int to speaking name with shortcut. ATTENTION: UNTRANSLATED!"""
         # pylint: disable=too-many-return-statements
         if self.isBonus:
@@ -870,7 +903,7 @@ class Meld(TileTuple, ReprMixin):
             return i18nc('kajongg meld type', 'k&ong')
         return i18nc('kajongg meld type', 'rest of tiles')
 
-    def __stateName(self):
+    def __stateName(self) ->str:
         """the translated name of the state"""
         if self.isBonus or self.isClaimedKong:
             return ''
@@ -878,7 +911,7 @@ class Meld(TileTuple, ReprMixin):
             return i18nc('kajongg meld state', 'Exposed')
         return i18nc('kajongg meld state', 'Concealed')
 
-    def name(self):
+    def name(self) ->str:
         """the long name"""
         result = i18nc(
             'kajongg meld name, do not translate parameter names',
@@ -889,7 +922,7 @@ class Meld(TileTuple, ReprMixin):
             name=self[0].name()).replace('  ', ' ').strip()
 
     @staticmethod
-    def cacheMeldsInTiles():
+    def cacheMeldsInTiles() ->None:
         """define all usual melds as Tile attributes"""
         Tile.unknown.single = Meld(Tile.unknown)
         Tile.unknown.pung = Meld(Tile.unknown * 3)
@@ -906,7 +939,7 @@ class MeldList(list):
 
     """a list of melds"""
 
-    def __init__(self, newContent=None):
+    def __init__(self, newContent:Any=None) ->None:
         list.__init__(self)
         if newContent is None:
             return
@@ -922,19 +955,19 @@ class MeldList(list):
             list.extend(self, [Meld(x) for x in newContent])
         self.sort()
 
-    def extend(self, values):
+    def extend(self, values:Iterable[Meld]) ->None:
         list.extend(self, values)
         self.sort()
 
-    def append(self, value):
+    def append(self, value:Meld) ->None:
         list.append(self, value)
         self.sort()
 
-    def tiles(self):
+    def tiles(self) ->TileTuple:
         """flat view of all tiles in all melds"""
         return TileTuple(self)
 
-    def __str__(self):
+    def __str__(self) ->str:
         if self:
             return ' '.join(str(x) for x in self)
         return ''

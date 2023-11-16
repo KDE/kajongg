@@ -11,6 +11,7 @@ import traceback
 import datetime
 import weakref
 import gc
+from typing import Dict, Any, TYPE_CHECKING, Optional, Union, Sequence, Generator, Type
 
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
@@ -21,12 +22,20 @@ from message import Message
 from common import Debug, ReprMixin, id4
 from move import Move
 
+if TYPE_CHECKING:
+    from player import PlayingPlayer
+    from client import Client
+    from user import User
+    from game import PlayingGame
+    from twisted.python.failure import Failure
+    from servertable import ServerTable, ServerGame
+
 
 class Request(ReprMixin):
 
     """holds a Deferred and related attributes, used as part of a DeferredBlock"""
 
-    def __init__(self, block, deferred, user):
+    def __init__(self, block:'DeferredBlock', deferred:Deferred, user:'User') ->None:
         self._block = weakref.ref(block)
         self.deferred = deferred
         self._user = weakref.ref(user)
@@ -37,25 +46,25 @@ class Request(ReprMixin):
         self._player = weakref.ref(player) if player else None
 
     @property
-    def block(self):
+    def block(self) ->'DeferredBlock':
         """hide weakref"""
         result = self._block()
         assert result
         return result
 
     @property
-    def user(self):
+    def user(self) ->'User':
         """hide weakref"""
         result = self._user()
         assert result
         return result
 
     @property
-    def player(self):
+    def player(self) ->Optional['PlayingPlayer']:
         """hide weakref"""
         return self._player() if self._player else None
 
-    def gotAnswer(self, rawAnswer):
+    def gotAnswer(self, rawAnswer:Any) ->None:
         """convert the wired answer into something more useful"""
         if isinstance(rawAnswer, tuple):
             answer = rawAnswer[0]
@@ -72,11 +81,11 @@ class Request(ReprMixin):
             if Debug.deferredBlock:
                 logDebug('Request %s ignores %s' % (self, rawAnswer))
 
-    def age(self):
+    def age(self) ->int:
         """my age in full seconds"""
         return int((datetime.datetime.now() - self.startTime).total_seconds())
 
-    def __str__(self):
+    def __str__(self) ->str:
         cmd = self.deferred.command
         if self.answer:
             answer = str(self.answer) # TODO: needed?
@@ -92,7 +101,7 @@ class Request(ReprMixin):
             result += ' after {} sec'.format(self.age())
         return result
 
-    def prettyAnswer(self):
+    def prettyAnswer(self) ->str:
         """for debug output"""
         if self.answer:
             result = str(self.answer)
@@ -102,7 +111,7 @@ class Request(ReprMixin):
             result += '(%s)' % ','.join(str(x) for x in self.args)
         return result
 
-    def pretty(self):
+    def pretty(self) ->str:
         """for debug output"""
         result = ''
         if Debug.deferredBlock:
@@ -125,7 +134,7 @@ class DeferredBlock(ReprMixin):
     blocks = []
     blockWarned = False  # did we already warn about too many blocks?
 
-    def __init__(self, table, temp=False, where=None):
+    def __init__(self, table:'ServerTable', temp:bool=False, where:Optional[str]=None) ->None:
         dummy, dummy, function, dummy = traceback.extract_stack()[-2]
         self.outstanding = 0
         self.calledBy = function
@@ -146,17 +155,17 @@ class DeferredBlock(ReprMixin):
                     for block in DeferredBlock.blocks:
                         logInfo(str(block))
 
-    def debugPrefix(self, dbgMarker=''):
+    def debugPrefix(self, dbgMarker:str='') ->str:
         """prefix for debug message"""
         return 'T{table} B[{id4:>4}] {caller:<15} {dbgMarker:<3}(out={out})'.format(
             table=self.table.tableid, id4=id4(self), caller=self.calledBy[:15],
             dbgMarker=dbgMarker, out=self.outstanding)
 
-    def debug(self, dbgMarker, msg):
+    def debug(self, dbgMarker:str, msg:str) ->None:
         """standard debug format"""
         logDebug(' '.join([self.debugPrefix(dbgMarker), msg]))
 
-    def __str__(self):
+    def __str__(self) ->str:
         return '%s requests=%s outstanding=%d %s callback=%s' % (
             self.debugPrefix(),
             '[' + ','.join(str(x) for x in self.requests) + ']',
@@ -164,13 +173,13 @@ class DeferredBlock(ReprMixin):
             'is completed' if self.completed else 'not completed',
             self.prettyCallback())
 
-    def outstandingStr(self):
+    def outstandingStr(self) ->str:
         """like __str__ but only with outstanding answers"""
         return '%s callback=%s:%s' % (self.calledBy, self.prettyCallback(),
                                       '[' + ','.join(str(x) for x in self.requests if not x.answer) + ']')
 
     @staticmethod
-    def garbageCollection():
+    def garbageCollection() ->None:
         """delete completed blocks. Only to be called before
         inserting a new block. Assuming that block creation
         never overlaps."""
@@ -191,7 +200,7 @@ class DeferredBlock(ReprMixin):
                 print('DeferredBlock {} left, allocated by {}'.format(_, _.where))
 
 
-    def __addRequest(self, deferred, user, about):
+    def __addRequest(self, deferred:Deferred, user:'User', about:Optional['PlayingPlayer']) ->None:
         """add deferred for user to this block"""
         assert self.callbackMethod is None, 'AddRequest: already have callback defined'
         assert not self.completed, 'AddRequest: already completed'
@@ -211,7 +220,7 @@ class DeferredBlock(ReprMixin):
                 about=about.name if about else '', notifying=notifying)
             self.debug('+:%d' % len(self.requests), rqString)
 
-    def removeRequest(self, request):
+    def removeRequest(self, request:Request) ->None:
         """we do not want this request anymore"""
         self.requests.remove(request)
         if not request.answer:
@@ -220,7 +229,7 @@ class DeferredBlock(ReprMixin):
             self.debug('-:%d' % self.outstanding, str(request)) # TODO: auch ohne?
         self.callbackIfDone()
 
-    def callback(self, method, *args):
+    def callback(self, method:Any, *args:Any) ->None:
         """to be done after all users answered"""
         assert not self.completed, 'callback already completed'
         assert self.callbackMethod is None, 'callback: no method defined'
@@ -230,7 +239,7 @@ class DeferredBlock(ReprMixin):
             self.debug('CB', self.prettyCallback())
         self.callbackIfDone()
 
-    def __gotAnswer(self, result, request):
+    def __gotAnswer(self, result:Deferred, request:Request) ->None:
         """got answer from user"""
         if request in self.requests:
             # after having lost connection to client, an answer could still be
@@ -264,7 +273,7 @@ class DeferredBlock(ReprMixin):
             if Debug.deferredBlock:
                 self.debug('NOP', request.pretty())
 
-    def __failed(self, result, request):
+    def __failed(self, result:'Failure', request:Request) ->None:
         """a user did not or not correctly answer"""
         if request in self.requests:
             self.removeRequest(request)
@@ -284,13 +293,13 @@ class DeferredBlock(ReprMixin):
                     result.getErrorMessage(),
                     traceBack)
 
-    def logBug(self, msg):
+    def logBug(self, msg:str) ->None:
         """log msg and raise exception"""
         for request in self.requests:
             logDebug(str(request)) # TODO:
         logException(msg)
 
-    def callbackIfDone(self):
+    def callbackIfDone(self) ->None:
         """if we are done, convert received answers to something more useful and callback"""
         if self.completed:
             return
@@ -334,7 +343,7 @@ class DeferredBlock(ReprMixin):
             if self.callbackMethod is not False:
                 self.callbackMethod(self.requests, *self.__callbackArgs)
 
-    def prettyCallback(self):
+    def prettyCallback(self) ->str:
         """pretty string for callbackMethod"""
         if self.callbackMethod is False:
             result = ''
@@ -347,7 +356,7 @@ class DeferredBlock(ReprMixin):
                     ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''))
         return result
 
-    def playerForUser(self, user):
+    def playerForUser(self, user:'User') ->Optional['PlayingPlayer']:
         """return the game player matching user"""
         if user.__class__.__name__.endswith('Player'):
             return user
@@ -358,7 +367,8 @@ class DeferredBlock(ReprMixin):
         return None
 
     @staticmethod
-    def __enrichMessage(game, about, command, kwargs):
+    def __enrichMessage(game:Optional['ServerGame'], about:Optional['PlayingPlayer'],
+        command:Type[Message], kwargs:Dict[Any,Any]) ->None:
         """add supplemental data for debugging"""
         if command.sendScore and about:
             # the clients will compare our status with theirs. This helps
@@ -371,7 +381,8 @@ class DeferredBlock(ReprMixin):
         else:
             kwargs['token'] = None
 
-    def __convertReceivers(self, receivers):
+    def __convertReceivers(self, receivers:Sequence[Union[
+        'PlayingPlayer', 'User']]) ->Generator[Union['User', 'Client'], None, None]:
         """try to convert Player to User or Client where possible"""
         for rec in receivers:
             if rec.__class__.__name__ == 'User':
@@ -379,9 +390,10 @@ class DeferredBlock(ReprMixin):
             else:
                 yield self.table.remotes[rec]
 
-    def tell(self, about, receivers, command, **kwargs):
+    def tell(self, about:Optional[Union['User', 'PlayingPlayer']],
+        receivers:Sequence[Union['User', 'PlayingPlayer']], command:Type[Message], **kwargs:Any) ->None:
         """send info about player 'about' to users 'receivers'"""
-        def encodeKwargs():
+        def encodeKwargs() ->None:
             """those values are classes like Meld, Tile etc.
                Convert to bytes"""
             _ = tuple(kwargs.keys())
@@ -442,11 +454,11 @@ class DeferredBlock(ReprMixin):
         for defer in localDeferreds:
             defer.callback(aboutName)  # callback needs an argument !
 
-    def tellPlayer(self, player, command, **kwargs):
+    def tellPlayer(self, player:'PlayingPlayer', command:Message, **kwargs:Any) ->None:
         """address only one user"""
         self.tell(player, [player], command, **kwargs)
 
-    def tellOthers(self, player, command, **kwargs):
+    def tellOthers(self, player:'PlayingPlayer', command:Message, **kwargs:Any) ->None:
         """tell others about player'"""
         assert self.table.game
         self.tell(
@@ -456,7 +468,7 @@ class DeferredBlock(ReprMixin):
             command,
             **kwargs)
 
-    def tellAll(self, player, command, **kwargs):
+    def tellAll(self, player:Optional['PlayingPlayer'], command:Message, **kwargs:Any) ->None:
         """tell something to all players"""
         assert self.table.game
         self.tell(player, self.table.game.players, command, **kwargs)

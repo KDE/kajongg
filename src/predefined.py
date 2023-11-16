@@ -11,6 +11,8 @@ SPDX-License-Identifier: GPL-2.0
 # The KDE translation teams will "automatically" translate name and
 # description into many languages.
 
+from typing import Optional
+
 from rule import PredefinedRuleset
 from mi18n import i18nE, i18n
 
@@ -21,18 +23,18 @@ class ClassicalChinese(PredefinedRuleset):
     for local variants. This should be defined such that the
     sum of the differences to the local variants is minimized."""
 
-    def __init__(self, name=None):
+    def __init__(self, name:Optional[str]=None) ->None:
         PredefinedRuleset.__init__(
             self,
             name or i18nE('Classical Chinese standard'))
 
-    def _initRuleset(self):
+    def _initRuleset(self) ->None:
         """set the description"""
         assert isinstance(self.raw_data, str)
         self.name = self.raw_data
         self.description = i18n('Classical Chinese')
 
-    def addManualRules(self):
+    def addManualRules(self) ->None:
         """those are actually winner rules but in the kajongg scoring mode they must be selected manually"""
         # applicable only if we have a concealed meld and a declared kong:
         self.winnerRules.createRule(
@@ -79,13 +81,13 @@ class ClassicalChinese(PredefinedRuleset):
             'East won nine times in a row', 'FEastWonNineTimesInARow||Orotate', limits=1,
             description=i18n('If that happens, East gets a limit score and the winds rotate'))
 
-    def addPenaltyRules(self):
+    def addPenaltyRules(self) ->None:
         """as the name says"""
         self.penaltyRules.createRule(
             'False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah Jongg',
             'Oabsolute payers=2 payees=2', points=-300)
 
-    def addHandRules(self):
+    def addHandRules(self) ->None:
         """as the name says"""
         self.handRules.createRule(
             'Own Flower and Own Season',
@@ -101,7 +103,7 @@ class ClassicalChinese(PredefinedRuleset):
             'Long Hand', r'FLongHand||Oabsolute', points=0,
             description=i18n('The hand contains too many tiles'))
 
-    def addParameterRules(self):
+    def addParameterRules(self) ->None:
         """as the name says"""
         self.parameterRules.createRule(
             'Points Needed for Mah Jongg',
@@ -151,7 +153,7 @@ class ClassicalChinese(PredefinedRuleset):
             description=i18n(
                 'Only when discarding tiles ordered: Do not place the next discard where the claimed discard was'))
 
-    def loadRules(self):
+    def loadRules(self) ->None:
         """define the rules"""
         self.addParameterRules()  # must be first!
         self.addPenaltyRules()
@@ -305,18 +307,18 @@ class ClassicalChineseDMJL(ClassicalChinese):
 
     """classical chinese rules, German rules"""
 
-    def __init__(self, name=None):
+    def __init__(self, name:Optional[str]=None) ->None:
         ClassicalChinese.__init__(
             self,
             name or i18nE('Classical Chinese DMJL'))
 
-    def _initRuleset(self):
+    def _initRuleset(self) ->None:
         """set the description"""
         ClassicalChinese._initRuleset(self)
         self.description = i18n(
             'Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.')
 
-    def loadRules(self):
+    def loadRules(self) ->None:
         ClassicalChinese.loadRules(self)
         # the squirming snake is only covered by standard mahjongg rule if
         # tiles are ordered
@@ -362,18 +364,18 @@ class ClassicalChineseBMJA(ClassicalChinese):
 
     """classical chinese rules, British rules"""
 
-    def __init__(self, name=None):
+    def __init__(self, name:Optional[str]=None) ->None:
         ClassicalChinese.__init__(
             self,
             name or i18nE('Classical Chinese BMJA'))
 
-    def _initRuleset(self):
+    def _initRuleset(self) ->None:
         """set the description"""
         ClassicalChinese._initRuleset(self)
         self.description = i18n(
             'Classical Chinese as defined by the British Mah-Jong Association')
 
-    def addParameterRules(self):
+    def addParameterRules(self) ->None:
         """those differ for BMJA from standard"""
         ClassicalChinese.addParameterRules(self)
         self.parameterRules['kongBoxSize'].parameter = 14
@@ -381,7 +383,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.parameterRules['limit'].parameter = 1000
         self.parameterRules['mustDeclareCallingHand'].parameter = True
 
-    def loadRules(self):
+    def loadRules(self) ->None:
         ClassicalChinese.loadRules(self)
         del self.winnerRules['ZeroPointHand']
         originalCall = self.winnerRules.pop('MahJonggwithOriginalCall')
@@ -497,7 +499,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
             'FCallingHand||Ohand=Purity',
             doubles=3)
 
-def load():
+def load() ->None:
     """load predefined rulesets.
     add new predefined rulesets here.
     """

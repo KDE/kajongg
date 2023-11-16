@@ -6,18 +6,23 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import TYPE_CHECKING, Optional, Callable, Any
+
 from qt import Qt, QSize, QRect, QEvent
 from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
     QStyleOptionViewItem, QApplication
 
 from guiutil import Painter
 
+if TYPE_CHECKING:
+    from qt import QLocale, QObject, QPainter, QModelIndex, QAbstractItemModel
+    from qt import QKeyEvent
 
 class ZeroEmptyColumnDelegate(QStyledItemDelegate):
 
     """Display 0 or 0.00 as empty"""
 
-    def displayText(self, value, locale):
+    def displayText(self, value:Any, locale:'QLocale') ->str:
         """Display 0 or 0.00 as empty"""
         if isinstance(value, int) and value == 0:
             return ''
@@ -30,7 +35,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
     """enables rich text in a view"""
     label = None
 
-    def __init__(self, parent=None):
+    def __init__(self, parent:Optional['QObject']=None) ->None:
         super().__init__(parent)
         if self.label is None:
             self.label = QLabel()
@@ -38,7 +43,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
             self.label.setTextFormat(Qt.TextFormat.RichText)
             self.document = QTextDocument()
 
-    def paint(self, painter, option, index):
+    def paint(self, painter:'QPainter', option:QStyleOptionViewItem, index:'QModelIndex') ->None:
         """paint richtext"""
         if option.state & QStyle.StateFlag.State_Selected:
             role = QPalette.Highlight
@@ -53,7 +58,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
             painter.translate(option.rect.topLeft())
             self.label.render(painter)
 
-    def sizeHint(self, option, index):
+    def sizeHint(self, option:QStyleOptionViewItem, index:'QModelIndex') ->QSize:
         """compute size for the final formatted richtext"""
         text = index.model().data(index)
         self.document.setDefaultFont(option.font)
@@ -67,17 +72,17 @@ class RightAlignedCheckboxDelegate(QStyledItemDelegate):
     """as the name says. From
 https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
 
-    def __init__(self, parent, cellFilter):
+    def __init__(self, parent:'QObject', cellFilter:Callable) ->None:
         super().__init__(parent)
         self.cellFilter = cellFilter
 
     @staticmethod
-    def __textMargin():
+    def __textMargin() ->int:
         """text margin"""
         return QApplication.style().pixelMetric(
             QStyle.PixelMetric.PM_FocusFrameHMargin) + 1
 
-    def paint(self, painter, option, index):
+    def paint(self, painter:'QPainter', option:QStyleOptionViewItem, index:'QModelIndex') ->None:
         """paint right aligned checkbox"""
         viewItemOption = QStyleOptionViewItem(option)
         if self.cellFilter(index):
@@ -94,7 +99,8 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
             viewItemOption.rect = newRect
         QStyledItemDelegate.paint(self, painter, viewItemOption, index)
 
-    def editorEvent(self, event, model, option, index):
+    def editorEvent(self, event:QEvent, model:'QAbstractItemModel',
+        option:QStyleOptionViewItem, index:'QModelIndex') ->bool:
         """edit right aligned checkbox"""
         flags = model.flags(index)
         # make sure that the item is checkable

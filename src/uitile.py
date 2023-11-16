@@ -7,6 +7,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import TYPE_CHECKING, Optional, Dict, Literal, Any
+
 from qt import Qt, QRectF, QPointF, QSizeF, QSize
 from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor
 
@@ -17,6 +19,11 @@ from common import LIGHTSOURCES, ZValues, Internal, Debug
 from common import ReprMixin, isAlive, id4
 from tile import Tile, Meld
 from animation import AnimatedMixin
+
+if TYPE_CHECKING:
+    from qt import QKeyEvent, QWidget, QStyleOptionGraphicsItem
+    from tileset import Tileset
+    from board import Board
 
 
 class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
@@ -30,7 +37,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
 
     clsUid = 0
 
-    def __init__(self, tile, xoffset=0.0, yoffset=0.0, level=0):
+    def __init__(self, tile:Tile, xoffset:float=0.0, yoffset:float=0.0, level:int=0) ->None:
         super().__init__()
         if not isinstance(tile, Tile):
             tile = Tile(tile)
@@ -49,11 +56,11 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         self.__dark = False
         self.level = level
 
-    def debug_name(self):
+    def debug_name(self) ->str:
         """identification for animations"""
         return self._tile.name2()
 
-    def setClippingFlags(self):
+    def setClippingFlags(self) ->None:
         """if we do not show shadows, we need to clip"""
         assert Internal.Preferences
         showShadows = Internal.Preferences.showShadows
@@ -62,7 +69,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             enabled=not showShadows)
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemClipsToShape, enabled=not showShadows)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event:'QKeyEvent') ->None:
         """redirect to the board"""
         _ = self.board
         assert _
@@ -71,7 +78,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                 (event, id4(self), self, id4(_.focusTile), _.focusTile))
         _.keyPressEvent(event)
 
-    def __lightDistance(self):
+    def __lightDistance(self) ->float:
         """the distance of item from the light source"""
         board = self.board
         if not board:
@@ -90,11 +97,11 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         return result
 
     @property
-    def tileset(self):
+    def tileset(self) ->Optional['Tileset']:
         """the active tileset"""
         return self.board.tileset if self.board else None
 
-    def moveDict(self):
+    def moveDict(self) ->Dict[Literal['pos', 'rotation', 'scale'], Any]:
         """a dict with attributes for the new position,
         normally pos, rotation and scale"""
         assert self.board
@@ -108,7 +115,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         scenePos = self.board.mapToScene(boardPos)
         return {'pos': scenePos, 'rotation': sceneRotation(self.board), 'scale': self.board.scale()}
 
-    def setDrawingOrder(self):
+    def setDrawingOrder(self) ->None:
         """set drawing order for this tile"""
         if not isAlive(self):
             return
@@ -146,7 +153,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                        * ZValues.itemZFactor +
                        self.__lightDistance())
 
-    def boundingRect(self):
+    def boundingRect(self) ->QRectF:
         """define the part of the tile we want to see. Do not return QRect()
         if tileset is not known because that makes QGraphicsscene crash"""
         assert Internal.Preferences
@@ -160,7 +167,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             self._boundingRect = QRectF(0.0, 0.0, 10.0, 10.0)
         return self._boundingRect
 
-    def facePos(self, showShadows=None):
+    def facePos(self, showShadows:Optional[bool]=None) ->QRectF:
         """return the face position relative to the tile
         depend on tileset, lightSource and shadow"""
         assert Internal.Preferences
@@ -169,11 +176,11 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         _ = self.board
         return _.tileFacePos(showShadows)
 
-    def showFace(self):
+    def showFace(self) ->bool:
         """should we show face for this tile?"""
         return self.isKnown
 
-    def __elementId(self, showShadows=None):
+    def __elementId(self, showShadows:Optional[bool]=None) ->str:
         """return the SVG element id of the tile"""
         assert Internal.Preferences
         if showShadows is None:
@@ -185,7 +192,8 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         lightSourceIndex = LIGHTSOURCES.index(_.rotatedLightSource())
         return "TILE_{}".format(lightSourceIndex % 4 + 1)
 
-    def paint(self, painter, unusedOption, unusedWidget=None):
+    def paint(self, painter:QPainter, unusedOption:'QStyleOptionGraphicsItem',
+        unusedWidget:Optional['QWidget']=None) ->None:
         """paint the entire tile.
         I tried to cache a pixmap for the tile and darkener but without face,
         but that actually made it slower."""
@@ -212,7 +220,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         if self.cross:
             self.__paintCross(painter)
 
-    def __paintCross(self, painter):
+    def __paintCross(self, painter:QPainter) ->None:
         """paint a cross on the tile"""
         with Painter(painter):
             assert self.tileset
@@ -223,7 +231,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             painter.drawLine(QPointF(0.0, 0.0), QPointF(width, height))
             painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
 
-    def pixmapFromSvg(self, pmapSize, withBorders=None):
+    def pixmapFromSvg(self, pmapSize:QRectF, withBorders:Optional[bool]=None) ->QPixmap:
         """return a pixmap with default size as given in SVG
         and optional borders/shadows"""
         assert Internal.Preferences
@@ -265,7 +273,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                             QRectF(QPointF(), QSizeF(faceSize)))
         return result
 
-    def _drawDarkness(self, painter):
+    def _drawDarkness(self, painter:QPainter) ->None:
         """if appropriate, make tiles darker. Mainly used for hidden tiles"""
         if self.dark:
             assert self.tileset
@@ -276,7 +284,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             color.setAlpha(self.tileset.darkenerAlpha)
             painter.fillRect(rect, color)
 
-    def sortKey(self, sortDir=Qt.Key.Key_Right):
+    def sortKey(self, sortDir:Qt.Key=Qt.Key.Key_Right) ->float:
         """moving order for cursor"""
         dirs = [Qt.Key.Key_Right, Qt.Key.Key_Up, Qt.Key.Key_Left, Qt.Key.Key_Down] * 2
         assert self.__board
@@ -289,7 +297,8 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             return -(self.yoffset * 100 + self.xoffset)
         return self.yoffset * 100 + self.xoffset
 
-    def setBoard(self, board, xoffset=None, yoffset=None, level=0):
+    def setBoard(self, board:Optional['Board'],
+        xoffset:Optional[float]=None, yoffset:Optional[float]=None, level:int=0) ->None:
         """change Position of tile in board"""
         placeDirty = False
         if self.__board != board:
@@ -315,11 +324,11 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             board.placeTile(self)
 
     @property
-    def tile(self):
+    def tile(self) ->Tile:
         """tile"""
         return self._tile
 
-    def change_name(self, value):
+    def change_name(self, value:Tile) ->None:
         """set tile name and update display"""
         if value is not None:
             if self.name2() != value.name2():
@@ -328,12 +337,12 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                 self.update()
 
     @property
-    def cross(self):
+    def cross(self) ->bool:
         """cross tiles in kongbox"""
         return self._cross
 
     @cross.setter
-    def cross(self, value):
+    def cross(self, value:bool) ->None:
         """cross tiles in kongbox"""
         if self._cross == value:
             return
@@ -341,24 +350,24 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         self.update()
 
     @property
-    def dark(self):
+    def dark(self) ->bool:
         """show face?"""
         return self.__dark
 
     @dark.setter
-    def dark(self, value):
+    def dark(self, value:bool) ->None:
         """toggle and update display"""
         if value != self.__dark:
             self.__dark = value
             self.update()
 
     @property
-    def focusable(self):
+    def focusable(self) ->bool:
         """as the name says"""
         return bool(self.flags() & QGraphicsItem.GraphicsItemFlag.ItemIsFocusable)
 
     @focusable.setter
-    def focusable(self, value):
+    def focusable(self, value:bool) ->None:
         """redirect and generate Debug output"""
         if self.tile.name2() in Debug.focusable:
             newStr = 'focusable' if value else 'unfocusable'
@@ -366,17 +375,17 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, value)
 
     @property
-    def board(self):
+    def board(self) ->Optional['Board']:
         """get current board of this tile. Readonly."""
         return self.__board
 
     @property
-    def xoffset(self):
+    def xoffset(self) ->float:
         """in logical board coordinates"""
         return self.__xoffset
 
     @xoffset.setter
-    def xoffset(self, value):
+    def xoffset(self, value:float) ->None:
         """in logical board coordinates"""
         if value != self.__xoffset:
             self.__xoffset = value
@@ -384,19 +393,19 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                 self.__board.placeTile(self)
 
     @property
-    def yoffset(self):
+    def yoffset(self) ->float:
         """in logical board coordinates"""
         return self.__yoffset
 
     @yoffset.setter
-    def yoffset(self, value):
+    def yoffset(self, value:float) ->None:
         """in logical board coordinates. Update board display."""
         if value != self.__yoffset:
             self.__yoffset = value
             if self.__board:
                 self.__board.placeTile(self)
 
-    def __str__(self):
+    def __str__(self) ->str:
         """printable string with tile"""
         rotation = ' rot%d' % self.rotation if self.rotation else ''
         scale = ' scale=%.2f' % self.scale if self.scale != 1 else ''
@@ -410,41 +419,41 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
              self.y(), self.zValue(), size, rotation, scale, level)
 
     @property
-    def isBonus(self):
+    def isBonus(self) ->bool:
         """proxy for tile"""
         return self.tile.isBonus
 
     @property
-    def isKnown(self):
+    def isKnown(self) ->bool:
         """proxy for tile"""
         return self.tile.isKnown
 
     @property
-    def exposed(self):
+    def exposed(self) ->Tile:
         """proxy for tile"""
         return self.tile.exposed
 
     @property
-    def concealed(self):
+    def concealed(self) ->Tile:
         """proxy for tile"""
         return self.tile.concealed
 
     @property
-    def isConcealed(self):
+    def isConcealed(self) ->bool:
         """proxy for tile"""
         return self.tile.isConcealed
 
     @property
-    def lowerGroup(self):
+    def lowerGroup(self) ->str:
         """proxy for tile"""
         return self.tile.lowerGroup
 
     @property
-    def char(self):
+    def char(self) ->str:
         """proxy for tile"""
         return self.tile.char
 
-    def name2(self):
+    def name2(self) ->str:
         """proxy for tile"""
         return self.tile.name2()
 
@@ -458,7 +467,7 @@ class UIMeld(list):
 
     __hash__ = None
 
-    def __init__(self, newContent):
+    def __init__(self, newContent:Any) ->None:
         list.__init__(self)
         if (
                 isinstance(newContent, list)
@@ -470,6 +479,6 @@ class UIMeld(list):
         assert self, newContent
 
     @property
-    def meld(self):
+    def meld(self) ->Meld:
         """return a logical meld"""
         return Meld(x.tile for x in self)

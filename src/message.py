@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import datetime
+from typing import Optional, TYPE_CHECKING, List, Any, Tuple, Union
 
 from log import logWarning, logException, logDebug
 from mi18n import i18n, i18nc, i18ncE
@@ -16,6 +17,19 @@ from tile import Tile, TileTuple, Meld, MeldList
 from common import Internal, Debug, Options, ReprMixin
 from wind import Wind
 from dialogs import Sorry
+
+if TYPE_CHECKING:
+    from servertable import ServerTable
+    from twisted.internet.defer import Deferred
+    from move import Move
+    from client import Client
+    from player import PlayingPlayer
+    from qt import QPushButton
+    from deferredutil import Request
+    from user import User
+    from humanclient import HumanClient
+    from scene import PlayingScene
+
 
 # pylint: disable=super-init-not-called
 # multiple inheritance: pylint thinks ServerMessage.__init__ does not get called.
@@ -30,7 +44,7 @@ class Message:
 
     defined = {}
 
-    def __init__(self, name=None, shortcut=None):
+    def __init__(self, name:Optional[str]=None, shortcut:Optional[str]=None) ->None:
         """those are the english values"""
         self.name = name or self.__class__.__name__.replace('Message', '')
         self.__i18nName = None
@@ -42,23 +56,23 @@ class Message:
         assert className == msgName, '%s != %s' % (className, msgName)
 
     @property
-    def i18nName(self):
+    def i18nName(self) ->str:
         """only translate when needed - most messages never need this"""
         if self.__i18nName is None:
             self.__i18nName = i18nc('kajongg', self.name)
         return self.__i18nName
 
-    def __str__(self):
+    def __str__(self) ->str:
         return self.name
 
-    def __repr__(self):
+    def __repr__(self) ->str:
         return 'Message.{}'.format(self.name)
 
-    def __lt__(self, other):
+    def __lt__(self, other:object) ->bool:
         return self.__class__.__name__ < other.__class__.__name__
 
     @staticmethod
-    def jelly(key, value):
+    def jelly(key:Any, value:Any) ->Any:
         """serialize value for wire transfer. The twisted.pb mechanism with
         pb.Copyable is too much overhead"""
         # pylint: disable=too-many-return-statements
@@ -83,7 +97,7 @@ class Message:
         return value
 
     @staticmethod
-    def jellyAll(args, kwargs):
+    def jellyAll(args:Any, kwargs:Any) ->Tuple[Any, Any]:
         """serialize args and kwargs for wire transfer. The twisted.pb mechanism with
         pb.Copyable is too much overhead"""
         args2 = Message.jelly('args', args)
@@ -101,13 +115,13 @@ class ServerMessage(Message):
     sendScore = False
     needsGame = True   # message only applies to an existing game
 
-    def clientAction(self, client, move): # pylint: disable=unused-argument
+    def clientAction(self, client:'Client', move:'Move') ->Any: # pylint: disable=unused-argument
         """default client action: none - this is a virtual class"""
         logException(
             'clientAction is not defined for %s. msg:%s' %
             (self, move))
 
-    def serverAction(self, table, msg):  # pylint: disable=unused-argument
+    def serverAction(self, table:'ServerTable', msg:'Request') ->None:  # pylint: disable=unused-argument
         """the server mirrors that and tells all others"""
         logException('serverAction is not defined for msg:%s' % msg)
 
@@ -116,10 +130,10 @@ class ClientMessage(Message):
 
     """those classes are used for messages from client to server"""
 
-    def __init__(self, name=None, shortcut=None):
+    def __init__(self, name:Optional[str]=None, shortcut:Optional[str]=None) ->None:
         Message.__init__(self, name, shortcut)
 
-    def buttonCaption(self):
+    def buttonCaption(self) ->str:
         """localized, with a & for the shortcut"""
         assert self.shortcut
         i18nShortcut = i18nc(
@@ -128,20 +142,20 @@ class ClientMessage(Message):
             self.shortcut)
         return self.i18nName.replace(i18nShortcut, '&' + i18nShortcut, 1)
 
-    def toolTip(self, button, tile): # pylint: disable=unused-argument
+    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]: # pylint: disable=unused-argument
         """return text and warning flag for button and text for tile for button and text for tile"""
         txt = 'toolTip is not defined for %s' % self.name
         logWarning(txt)
         return txt, True, ''
 
-    def serverAction(self, table, msg): # pylint: disable=unused-argument
+    def serverAction(self, table:'ServerTable',  msg:'Request') ->None: # pylint: disable=unused-argument
         """default server action: none - this is a virtual class"""
         logException(
             'serverAction is not defined for %s. msg:%s' %
             (self, msg))
 
     @staticmethod
-    def isActivePlayer(table, msg):
+    def isActivePlayer(table:'ServerTable',  msg:'Request') ->bool:
         """helper: does the message come from the active player?"""
         if table.game and msg.player == table.game.activePlayer:
             return True
@@ -168,16 +182,16 @@ class NotifyAtOnceMessage(ClientMessage):
 
     sendScore = False
 
-    def __init__(self, name=None, shortcut=None):
+    def __init__(self, name:Optional[str]=None, shortcut:Optional[str]=None) ->None:
         ClientMessage.__init__(self, name, shortcut)
 
-    def notifyAction(self, client, move): # pylint: disable=unused-argument
+    def notifyAction(self, client:'Client', move:'Move') ->Any: # pylint: disable=unused-argument
         """the default action for immediate notifications"""
         assert move.player
         move.player.popupMsg(self)
 
     @classmethod
-    def receivers(cls, request):
+    def receivers(cls, request:'Request') ->List['PlayingPlayer']:
         """who should get the notification? Default is all players except the
         player who triggered us"""
         # default: tell all except the source of the notification
@@ -191,10 +205,10 @@ class PungChowMessage(NotifyAtOnceMessage):
 
     """common code for Pung and Chow"""
 
-    def __init__(self, name=None, shortcut=None):
+    def __init__(self, name:Optional[str]=None, shortcut:Optional[str]=None) ->None:
         NotifyAtOnceMessage.__init__(self, name=name, shortcut=shortcut)
 
-    def toolTip(self, button, tile):
+    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """for the action button which will send this message"""
         myself = button.client.game.myself
         maySay = myself.sayable[self]
@@ -232,18 +246,18 @@ class MessagePung(PungChowMessage, ServerMessage):
 
     """somebody said pung and gets the tile"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         PungChowMessage.__init__(self,
                                  name=i18ncE('kajongg', 'Pung'),
                                  shortcut=i18ncE('kajongg game dialog:Key for Pung', 'P'))
 
-    def serverAction(self, table, msg):
+    def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that and tells all others"""
         assert msg.player
         assert isinstance(msg.args, list)
         table.claimTile(msg.player, self, Meld(msg.args[0]), Message.Pung)
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror pung call"""
         return client.claimed(move)
 
@@ -252,12 +266,12 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
 
     """somebody said kong and gets the tile"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         NotifyAtOnceMessage.__init__(self,
                                      name=i18ncE('kajongg', 'Kong'),
                                      shortcut=i18ncE('kajongg game dialog:Key for Kong', 'K'))
 
-    def serverAction(self, table, msg):
+    def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that and tells all others"""
         assert table.game
         assert msg.player
@@ -267,7 +281,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
         else:
             table.declareKong(msg.player, Meld(msg.args[0]))
 
-    def toolTip(self, button, tile):
+    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """for the action button which will send this message"""
         myself = button.client.game.myself
         maySay = myself.sayable[self]
@@ -284,7 +298,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
             txt = [i18n('You may say Kong for %1', Tile(maySay[0][0]).name())]
         return '<br><br>'.join(txt), warn, ''
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror kong call"""
         assert client.game
         return client.claimed(move) if client.game.lastDiscard else client.declared(move)
@@ -294,12 +308,12 @@ class MessageChow(PungChowMessage, ServerMessage):
 
     """somebody said chow and gets the tile"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         PungChowMessage.__init__(self,
                                  name=i18ncE('kajongg', 'Chow'),
                                  shortcut=i18ncE('kajongg game dialog:Key for Chow', 'C'))
 
-    def serverAction(self, table, msg):
+    def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that and tells all others"""
         assert table.game
         assert isinstance(msg.args, list)
@@ -310,7 +324,7 @@ class MessageChow(PungChowMessage, ServerMessage):
         else:
             table.claimTile(msg.player, self, Meld(msg.args[0]), Message.Chow)
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror chow call"""
         return client.claimed(move)
 
@@ -319,7 +333,7 @@ class MessageBonus(ClientMessage):
 
     """the client says he got a bonus"""
 
-    def serverAction(self, table, msg):
+    def serverAction(self, table:'ServerTable', msg:'Request') ->None:
         """the server mirrors that"""
         if self.isActivePlayer(table, msg):
             table.pickTile()
@@ -330,20 +344,20 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
     """somebody sayd mah jongg and wins"""
     sendScore = True
 
-    def __init__(self):
+    def __init__(self) ->None:
         NotifyAtOnceMessage.__init__(self,
                                      name=i18ncE('kajongg', 'Mah Jongg'),
                                      shortcut=i18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
 
-    def serverAction(self, table, msg):
+    def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that and tells all others"""
         table.claimMahJongg(msg)
 
-    def toolTip(self, button, tile):
+    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """return text and warning flag for button and text for tile"""
         return i18n('Press here and you win'), False, ''
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror the mahjongg action locally. Check if the balances are correct."""
         assert move.player
         return move.player.declaredMahJongg(move.melds, move.withDiscardTile,
@@ -354,16 +368,16 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
 
     """somebody made an original call"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         NotifyAtOnceMessage.__init__(self,
                                      name=i18ncE('kajongg', 'Original Call'),
                                      shortcut=i18ncE('kajongg game dialog:Key for Original Call', 'O'))
 
-    def serverAction(self, table, msg):
+    def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server tells all others"""
         table.clientDiscarded(msg)
 
-    def toolTip(self, button, tile):
+    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """for the action button which will send this message"""
         assert isinstance(tile, Tile), tile
         myself = button.client.game.myself
@@ -378,7 +392,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
             'tile to complete the hand and will not alter the hand in any way (except bonus tiles)'),
                 False, '')
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror the original call"""
         player = move.player
         assert player
@@ -399,16 +413,16 @@ class MessageDiscard(ClientMessage, ServerMessage):
     """somebody discarded a tile"""
  #   sendScore = True
 
-    def __init__(self):
+    def __init__(self) ->None:
         ClientMessage.__init__(self,
                                name=i18ncE('kajongg', 'Discard'),
                                shortcut=i18ncE('kajongg game dialog:Key for Discard', 'D'))
 
-    def serverAction(self, table, msg):
+    def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that action"""
         table.clientDiscarded(msg)
 
-    def toolTip(self, button, tile):
+    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """for the action button which will send this message"""
         assert isinstance(tile, Tile), tile
         game = button.client.game
@@ -427,7 +441,7 @@ class MessageDiscard(ClientMessage, ServerMessage):
         txtStr = '<br><br>'.join(txt)
         return txtStr, warn, txtStr
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """execute the discard locally"""
         assert move.player
         if client.isHumanClient() and Internal.scene:
@@ -444,7 +458,7 @@ class MessageProposeGameId(ServerMessage):
     in our local data base - we want to use the same gameid everywhere"""
     needsGame = False
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """ask the client"""
         # move.playerNames are the players in seating order
         # we cannot just use table.playerNames - the seating order is now
@@ -458,7 +472,7 @@ class MessageTableChanged(ServerMessage):
     """somebody joined or left a table"""
     needsGame = False
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """update our copy"""
         client.tableChanged(move.source)
 
@@ -468,9 +482,9 @@ class MessageReadyForGameStart(ServerMessage):
     """the game server asks us if we are ready for game start"""
     needsGame = False
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """ask the client"""
-        def hideTableList(result):
+        def hideTableList(result:Any) ->Any:
             """hide it only after player says I am ready"""
             # set scene.game first, otherwise tableList.hide()
             # sees no current game and logs out
@@ -500,7 +514,7 @@ class MessageNoGameStart(NotifyAtOnceMessage):
     """the client says he does not want to start the game after all"""
     needsGame = False
 
-    def notifyAction(self, client, move):
+    def notifyAction(self, client:'Client', move:'Move') ->Any:
         assert move.player
         if client.beginQuestion or client.game:
             Sorry(i18n('%1 is not ready to start the game', move.player.name))
@@ -511,7 +525,7 @@ class MessageNoGameStart(NotifyAtOnceMessage):
         return None
 
     @classmethod
-    def receivers(cls, request):
+    def receivers(cls, request:'Request') ->List['PlayingPlayer']:
         """notification is not needed for those who already said no game"""
         result = [x.player for x in request.block.requests if x.answer != Message.NoGameStart]
         return result
@@ -521,7 +535,7 @@ class MessageReadyForHandStart(ServerMessage):
 
     """the game server asks us if we are ready for a new hand"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """ask the client"""
         return client.readyForHandStart(move.playerNames, move.rotateWinds)
 
@@ -530,7 +544,7 @@ class MessageInitHand(ServerMessage):
 
     """the game server tells us to prepare a new hand"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """prepare a new hand"""
         assert client.game
         assert client.game.wall
@@ -552,7 +566,7 @@ class MessageSetConcealedTiles(ServerMessage):
 
     """the game server assigns tiles to player"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """set tiles for player"""
         assert move.player
         assert client.game
@@ -564,7 +578,7 @@ class MessageShowConcealedTiles(ServerMessage):
 
     """the game server assigns tiles to player"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """set tiles for player"""
         assert move.player
         return move.player.showConcealedTiles(move.tiles, move.show)
@@ -574,7 +588,7 @@ class MessageSaveHand(ServerMessage):
 
     """the game server tells us to save the hand"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """save the hand"""
         assert client.game
         return client.game.saveHand()
@@ -584,7 +598,7 @@ class MessageAskForClaims(ServerMessage):
 
     """the game server asks us if we want to claim a tile"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """ask the player"""
         assert move.player
         if client.thatWasMe(move.player):
@@ -598,7 +612,7 @@ class MessagePickedTile(ServerMessage):
 
     """the game server tells us who picked a tile"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror the picked tile"""
         assert move.player
         assert move.player.pickedTile(move.deadEnd, tileName=move.tile) == move.tile, \
@@ -612,7 +626,7 @@ class MessageActivePlayer(ServerMessage):
 
     """the game server tells us whose turn it is"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """set the active player"""
         assert client.game
         assert move.player
@@ -623,13 +637,13 @@ class MessageViolatesOriginalCall(ServerMessage):
 
     """the game server tells us who violated an original call"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         ServerMessage.__init__(
             self,
             name=i18ncE('kajongg',
                         'Violates Original Call'))
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """violation: player may not say mah jongg"""
         assert move.player
         move.player.popupMsg(self)
@@ -644,7 +658,7 @@ class MessageVoiceId(ServerMessage):
     """we got a voice id from the server. If we have no sounds for
     this voice, ask the server"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """the server gave us a voice id about another player"""
         assert Internal.Preferences
         if Internal.Preferences.useSounds and Options.gui:
@@ -659,7 +673,7 @@ class MessageVoiceData(ServerMessage):
 
     """we got voice sounds from the server, assign them to the player voice"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """server sent us voice sounds about somebody else"""
         assert move.md5sum
         assert move.player
@@ -673,7 +687,7 @@ class MessageAssignVoices(ServerMessage):
 
     """The server tells us that we now got all voice data available"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         assert Internal.Preferences
         if Internal.Preferences.useSounds and Options.gui:
             assert client.game
@@ -689,7 +703,7 @@ class MessageServerWantsVoiceData(ServerMessage):
 
     """The server wants voice sounds from a client"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """send voice sounds as requested to server"""
         assert move.player
         assert move.player.voice
@@ -703,7 +717,7 @@ class MessageServerGetsVoiceData(ClientMessage):
 
     """The server gets voice sounds from a client"""
 
-    def serverAction(self, table, msg):
+    def serverAction(self, table:'ServerTable', msg:'Request') ->None:
         """save voice sounds on the server"""
         assert isinstance(msg.args, list)
         assert msg.player
@@ -723,7 +737,7 @@ class MessageDeclaredKong(ServerMessage):
 
     """the game server tells us who declared a kong"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror the action locally"""
         prompts = None
         assert move.meld
@@ -743,7 +757,7 @@ class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):
 
     """the game server tells us who robbed the kong"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror the action locally"""
         assert client.game
         prevMove = next(client.game.lastMoves(only=[Message.DeclaredKong]))
@@ -760,7 +774,7 @@ class MessageCalling(ServerMessage):
 
     """the game server tells us who announced a calling hand"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """tell user and save this information locally"""
         assert move.player
         move.player.popupMsg(self)
@@ -772,10 +786,10 @@ class MessageDangerousGame(ServerMessage):
 
     """the game server tells us who played dangerous game"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         ServerMessage.__init__(self, name=i18ncE('kajongg', 'Dangerous Game'))
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror the dangerous game action locally"""
         assert move.player
         move.player.popupMsg(self)
@@ -787,11 +801,11 @@ class MessageNoChoice(ServerMessage):
 
     """the game server tells us who had no choice avoiding dangerous game"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         ServerMessage.__init__(self, name=i18ncE('kajongg', 'No Choice'))
         self.move = None
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror the no choice action locally"""
         self.move = move
         assert move.player
@@ -803,7 +817,7 @@ class MessageNoChoice(ServerMessage):
 #        Internal.mainWindow.centralView.resizeEvent(None)
         return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain).addErrback(logException)
 
-    def hideConcealedAgain(self, result):
+    def hideConcealedAgain(self, result:Tuple[Message, None]) ->Tuple[Message, None]:
         """only show them for explaining the 'no choice'"""
         assert self.move
         assert self.move.player
@@ -815,7 +829,7 @@ class MessageUsedDangerousFrom(ServerMessage):
 
     """the game server tells us somebody claimed a dangerous tile"""
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         assert client.game
         fromPlayer = client.game.playerByName(str(move.source))
         assert move.player
@@ -836,7 +850,7 @@ class MessageError(ServerMessage):
     """a client errors"""
     needsGame = False
 
-    def clientAction(self, client, move):
+    def clientAction(self, client:'Client', move:'Move') ->Any:
         """show the error message from server"""
         return logWarning(str(move.source))
 
@@ -850,12 +864,12 @@ class MessageOK(ClientMessage):
 
     """a client says OK"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         ClientMessage.__init__(self,
                                name=i18ncE('kajongg', 'OK'),
                                shortcut=i18ncE('kajongg game dialog:Key for OK', 'O'))
 
-    def toolTip(self, button, tile):
+    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """return text and warning flag for button and text for tile for button and text for tile"""
         return i18n('Confirm that you saw the message'), False, ''
 
@@ -864,23 +878,23 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
 
     """A player explicitly says he will not claim a tile"""
 
-    def __init__(self):
+    def __init__(self) ->None:
         NotifyAtOnceMessage.__init__(self,
                                      name=i18ncE('kajongg', 'No Claim'),
                                      shortcut=i18ncE('kajongg game dialog:Key for No claim', 'N'))
 
-    def toolTip(self, button, tile):
+    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """return text and warning flag for button and text for tile for button and text for tile"""
         return i18n('You cannot or do not want to claim this tile'), False, ''
 
     @classmethod
-    def receivers(cls, request):
+    def receivers(cls, request:'Request') ->List['PlayingPlayer']:
         """no Claim notifications are not needed for those who already answered"""
         result = [x.player for x in request.block.requests if x.answer is None]
         return result
 
 
-def __scanSelf():
+def __scanSelf() ->None:
     """for every message defined in this module which can actually be used for traffic,
     generate a class variable Message.msg where msg is the name (without spaces)
     of the message. Example: 'Message.NoClaim'.
@@ -905,8 +919,8 @@ class ChatMessage(ReprMixin):
 
     """holds relevant info about a chat message"""
 
-    def __init__(self, tableid, fromUser=None,
-                 message=None, isStatusMessage=False):
+    def __init__(self, tableid:Union[Tuple[Any, ...], int], fromUser:Optional[str]=None,
+                 message:Optional[str]=None, isStatusMessage:bool=False) ->None:
         if isinstance(tableid, tuple):
             self.tableid, hour, minute, second, self.fromUser, self.message, self.isStatusMessage = tableid
             self.timestamp = datetime.time(
@@ -920,7 +934,7 @@ class ChatMessage(ReprMixin):
             self.isStatusMessage = isStatusMessage
             self.timestamp = datetime.datetime.utcnow().time()
 
-    def localtimestamp(self):
+    def localtimestamp(self) ->datetime.datetime:
         """convert from UTC to local"""
         now = datetime.datetime.now()
         utcnow = datetime.datetime.utcnow()
@@ -929,7 +943,7 @@ class ChatMessage(ReprMixin):
             self.timestamp)
         return result + (now - utcnow)
 
-    def __str__(self):
+    def __str__(self) ->str:
         local = self.localtimestamp()
         # pylint says something about NotImplemented, check with later versions
         _ = i18n(self.message)
@@ -942,7 +956,7 @@ class ChatMessage(ReprMixin):
             self.fromUser,
             i18n(self.message))
 
-    def asList(self):
+    def asList(self) ->Tuple[Any, ...]:
         """encode me for network transfer"""
         return (
             self.tableid, self.timestamp.hour, self.timestamp.minute, self.timestamp.second,

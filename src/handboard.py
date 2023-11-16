@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import weakref
+from typing import Optional, TYPE_CHECKING, List, Dict, Union
 
 from qt import QGraphicsRectItem, QColor
 from tile import Tile, TileList, Meld, MeldList
@@ -20,6 +21,12 @@ from sound import Sound
 from log import logDebug
 from common import Internal, Debug, isAlive, ReprMixin
 
+if TYPE_CHECKING:
+    from qt import QGraphicsSceneDragDropEvent
+    from visible import VisiblePlayer
+    from scene import PlayingScene
+    from player import PlayingPlayer
+
 
 class TileAttr(ReprMixin):
 
@@ -28,7 +35,8 @@ class TileAttr(ReprMixin):
     xoffset and yoffset are expressed in number of tiles but may be
     fractional for adding distances between melds"""
 
-    def __init__(self, hand, meld=None, idx=None, xoffset=None, yoffset=None):
+    def __init__(self, hand:Union['HandBoard', UITile], meld:Optional[Meld]=None, idx:Optional[int]=None,
+        xoffset:Optional[float]=None, yoffset:Optional[float]=None) ->None:
         if isinstance(hand, UITile):
 # TODO only used for Bonus tiles, should split or eliminate this
             self.tile = hand.tile
@@ -50,11 +58,11 @@ class TileAttr(ReprMixin):
             if self.tile.name2() in Debug.focusable:
                 logDebug('TileAttr %s:%s' % (self.tile, self.focusable))
 
-    def setDark(self):
+    def setDark(self) ->bool:
         """should the tile appear darker?"""
         return self.tile.isConcealed if self.yoffset == 0 else not self.tile.isKnown
 
-    def setFocusable(self, hand, meld, idx): # pylint: disable=unused-argument
+    def setFocusable(self, hand:'HandBoard', meld:Meld, idx:Optional[int]) ->bool: # pylint: disable=unused-argument
         """is it focusable?"""
         player = hand.player
         assert player
@@ -66,7 +74,7 @@ class TileAttr(ReprMixin):
             and player == player.game.myself
             and meld.isConcealed and not meld.isKong)
 
-    def __str__(self):
+    def __str__(self) ->str:
         assert self.xoffset is not None
         return (
             '%s %.2f/%.1f%s%s' %
@@ -82,7 +90,7 @@ class HandBoard(Board):
     tileAttrClass = TileAttr
     penColor = QColor('blue')
 
-    def __init__(self, player):
+    def __init__(self, player:'VisiblePlayer') ->None:
         assert player
         self._player = weakref.ref(player)
         self.exposedMeldDistance = 0.15
@@ -101,7 +109,7 @@ class HandBoard(Board):
         Internal.Preferences.addWatch(
             'showShadows', self.showShadowsChanged)
 
-    def computeRect(self):
+    def computeRect(self) ->None:
         """also adjust the scale for maximum usage of space"""
         Board.computeRect(self)
         assert self.player
@@ -112,24 +120,24 @@ class HandBoard(Board):
         self.setScale(scale)
 
     @property
-    def player(self):
+    def player(self) ->Optional['VisiblePlayer']:
         """player is readonly and never None"""
         return self._player() if self._player else None
 
     # this is ordered such that pylint does not complain about
     # identical code in board.py
 
-    def debug_name(self):
+    def debug_name(self) ->str:
         """for debugging messages"""
         if self.player is None:
             return 'None'
         return self.player.name
 
-    def showShadowsChanged(self, unusedOldValue, newValue):
+    def showShadowsChanged(self, unusedOldValue:bool, newValue:bool) ->None:
         """Add or remove the shadows."""
         self.setPosition()
 
-    def setPosition(self):
+    def setPosition(self) ->None:
         """Position myself"""
         assert Internal.Preferences
         show = bool(Internal.Preferences.showShadows)
@@ -145,33 +153,33 @@ class HandBoard(Board):
         self._reload(self.tileset, showShadows=show)
         self.sync()
 
-    def rearrangeMeldsChanged(self, unusedOldValue, newValue):
+    def rearrangeMeldsChanged(self, unusedOldValue:bool, newValue:bool) ->None:
         """when True, concealed melds are grouped"""
         self.concealedMeldDistance = (
             self.exposedMeldDistance if newValue else 0.0)
         self._reload(self.tileset, self._lightSource)
         self.sync()
 
-    def focusRectWidth(self):
+    def focusRectWidth(self) ->int:
         """how many tiles are in focus rect? We want to focus
         the entire meld"""
         # playing game: always make only single tiles selectable
         return 1
 
-    def __str__(self):
+    def __str__(self) ->str:
         assert self.player
         return self.player.scoringString()
 
-    def lowerHalfTiles(self):
+    def lowerHalfTiles(self) ->List[UITile]:
         """return a list with all single tiles of the lower half melds
         without boni"""
         return [x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus]
 
-    def newLowerMelds(self):
+    def newLowerMelds(self) ->MeldList:
         """a list of melds for the hand as it should look after sync"""
         return MeldList()
 
-    def newTilePositions(self):
+    def newTilePositions(self) ->List[TileAttr]:
         """return list(TileAttr) for all tiles except bonus tiles.
         The tiles are not associated to any board."""
         result = []
@@ -190,7 +198,8 @@ class HandBoard(Board):
                 meldX += meldDistance
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
 
-    def placeBoniInRow(self, bonusTiles, tilePositions, bonusY, keepTogether=True):
+    def placeBoniInRow(self, bonusTiles:List[UITile], tilePositions:List[TileAttr],
+        bonusY:float, keepTogether:bool=True) ->List[TileAttr]:
         """Try to place bonusTiles in upper or in lower row.
         tilePositions are the normal tiles, already placed.
         If there is no space, return None
@@ -213,7 +222,7 @@ class HandBoard(Board):
             xPos += 1
         return result
 
-    def newBonusPositions(self, bonusTiles, newTilePositions):
+    def newBonusPositions(self, bonusTiles:List[UITile], newTilePositions:List[TileAttr]) ->List[TileAttr]:
         """return list(TileAttr)
         calculate places for bonus tiles. Put them all in one row,
         right adjusted. If necessary, extend to the right even
@@ -234,7 +243,7 @@ class HandBoard(Board):
         assert len(bonusTiles) == len(result)
         return result
 
-    def placeTiles(self, tiles):
+    def placeTiles(self, tiles:List[UITile]) ->List[UITile]:
         """tiles are all tiles for this board.
         returns a list of those uiTiles which are placed on the board"""
         oldTiles = {}
@@ -284,10 +293,10 @@ class HandBoard(Board):
             uiTile.focusable = newPos.focusable
         return list(result.keys())
 
-    def _avoidCrossingMovements(self, places):
+    def _avoidCrossingMovements(self, places:Dict[UITile, TileAttr]) ->None:
         """not needed for all HandBoards"""
 
-    def sync(self, adding=None):
+    def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in HandBoard.
         adding tiles: their board is where they come from. Those tiles
         are already in the Player tile lists.
@@ -299,7 +308,7 @@ class HandBoard(Board):
             allTiles.extend(adding)
         self.placeTiles(allTiles)
 
-    def checkTiles(self):
+    def checkTiles(self) ->None:
         """does the logical state match the displayed tiles?"""
         logExposed:TileList = TileList()
         physExposed:TileList = TileList()
@@ -338,10 +347,10 @@ class PlayingHandBoard(HandBoard):
 
     """a board showing the tiles a player holds"""
 
-    def __init__(self, player):
+    def __init__(self, player:'VisiblePlayer') ->None:
         HandBoard.__init__(self, player)
 
-    def sync(self, adding=None):
+    def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in HandBoard"""
         allTiles = self.uiTiles[:]
         if adding:
@@ -367,7 +376,7 @@ class PlayingHandBoard(HandBoard):
         if self.player and Internal.scene.clientDialog:
             Internal.scene.clientDialog.focusTileChanged()
 
-    def setEnabled(self, enabled):
+    def setEnabled(self, enabled:bool) ->None:
         """enable/disable this board"""
         if isAlive(self):
             # aborting a running game: the underlying C++ object might
@@ -379,11 +388,11 @@ class PlayingHandBoard(HandBoard):
                 and self.player == self.player.game.myself)
             QGraphicsRectItem.setEnabled(self, enabled)
 
-    def dragMoveEvent(self, event):
+    def dragMoveEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
         """only dragging to discard board should be possible"""
         event.setAccepted(False)
 
-    def _avoidCrossingMovements(self, places):
+    def _avoidCrossingMovements(self, places:Dict[UITile, TileAttr]) ->None:
         """"the above is a good approximation but if the board already had more
         than one identical tile they often switch places - this should not
         happen. So for each element, we make sure that the left-right order is
@@ -408,7 +417,7 @@ class PlayingHandBoard(HandBoard):
                         for idx, oldTile in enumerate(oldList):
                             places[oldTile] = newList[idx]
 
-    def __movingPlaces(self, places):
+    def __movingPlaces(self, places:Dict[UITile, TileAttr]) ->Dict[UITile, TileAttr]:
         """filter out the left parts of the rows which do not change
         at all"""
         rows = [[], []]
@@ -430,7 +439,7 @@ class PlayingHandBoard(HandBoard):
         result.update(dict(rows[1]))
         return result
 
-    def newLowerMelds(self):
+    def newLowerMelds(self) ->MeldList:
         """a list of melds for the hand as it should look after sync"""
         assert self.player
         if self.player.concealedMelds:
@@ -447,7 +456,7 @@ class PlayingHandBoard(HandBoard):
         result.sort()
         return result
 
-    def discard(self, tile):
+    def discard(self, tile:Tile) ->None:
         """select the rightmost matching tileItem and move it
         to DiscardBoard"""
         if self.focusTile and self.focusTile.tile is tile:
@@ -464,7 +473,7 @@ class PlayingHandBoard(HandBoard):
         for uiTile in self.uiTiles:
             uiTile.focusable = False
 
-    def addUITile(self, uiTile):
+    def addUITile(self, uiTile:UITile) ->None:
         """add uiTile to this board"""
         Board.addUITile(self, uiTile)
         assert self.player
