@@ -134,7 +134,7 @@ class BlockSignals:
             obj.blockSignals(False)
 
 
-def decorateWindow(window, name=None):
+def decorateWindow(window, name=''):
     """standard Kajongg window title and icon"""
     if name:
         window.setWindowTitle('{} – {}'.format(name, i18n('Kajongg')))
