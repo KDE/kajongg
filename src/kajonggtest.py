@@ -558,7 +558,7 @@ def parse_options() ->argparse.Namespace:
     parser.add_argument(
         '--clients', dest='clients',
         help='start a maximum of CLIENTS kajongg instances. Default is 2',
-        metavar='CLIENTS', type=int, default=1)
+        metavar='CLIENTS', type=int, default=2)
     parser.add_argument(
         '--servers', dest='servers',
         help='start a maximum of SERVERS kajonggserver instances. Default is 1',
