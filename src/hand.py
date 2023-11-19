@@ -13,7 +13,7 @@ Read the user manual for a description of the interface to this scoring engine
 from itertools import chain
 import weakref
 from hashlib import md5
-from typing import List, Optional, TYPE_CHECKING, Set, Tuple, Type, Any
+from typing import List, Optional, TYPE_CHECKING, Set, Dict, Tuple, Type, Any, Union
 
 from log import dbgIndent
 from tile import Tile, TileList, TileTuple, Meld, MeldList
@@ -27,8 +27,7 @@ if TYPE_CHECKING:
     from player import Player
     from tile import Tiles
     from wind import Wind
-    from rule import Rule
-    from rulecode import MJRule
+    from rule import Rule, Ruleset
 
 class Hand(ReprMixin):
 
@@ -105,25 +104,26 @@ class Hand(ReprMixin):
         # shortcuts for speed:
         self._player = weakref.ref(player)
         assert player.game
-        self.ruleset = player.game.ruleset
+        self.ruleset:'Ruleset' = player.game.ruleset
         self.__robbedTile = Tile.none
         self.prevHand = prevHand
         self.__won = None
         self.__score:Score = Score()
-        self.__callingHands = None
-        self.__mjRule = None
-        self.ruleCache = {}
+        self.__callingHands:Optional[List['Hand']] = None
+        self.__mjRule:Optional['Rule'] = None
+        self.ruleCache:Dict[Tuple[Type, str], Any] = {}
         self.__lastTile = Tile.none
-        self.__lastSource = TileSource.Unknown
-        self.__announcements = set()
-        self.__lastMeld = 0
+        self.__lastSource:Type[TileSource.SourceClass] = TileSource.Unknown
+        self.__announcements:Set[str] = set()
+        self.__lastMeld:Union[Meld, int, None] = 0
         self.__lastMelds = MeldList()
-        self.tiles = TileList()
-        self.melds = MeldList()
-        self.bonusMelds = MeldList()
-        self.usedRules = []
-        self.unusedTiles = TileList()
-        self.__arranged = None
+        self.tiles:TileList = TileList()
+        self.melds:MeldList = MeldList()
+        self.bonusMelds:MeldList = MeldList()
+        self.usedRules:List[UsedRule] = []
+        self.unusedTiles:TileList = TileList()
+        self.__arranged:Optional[bool] = None
+        self.lenOffset:int
 
         if string:
             self.__parseString(string)
@@ -142,7 +142,7 @@ class Hand(ReprMixin):
             # FIXME: TileList() should suffice, but it does not yet resolve melds to tiles. TileTuple does.
             self.tiles = TileList(TileTuple(chain(self.melds, self.unusedTiles)))
             string = self.newString()
-        self.string = string
+        self.string:str = string
 
         self.__precompute()
 
@@ -316,7 +316,7 @@ class Hand(ReprMixin):
         """compute and cache, readonly"""
         if self.__lastMeld == 0:
             self.__setLastMeld()
-        return self.__lastMeld
+        return self.__lastMeld  # type:ignore[return-value]
 
     @property
     def lastMelds(self) ->MeldList:
@@ -396,7 +396,7 @@ class Hand(ReprMixin):
         self.__lastMeld = None
         if self.lastTile and self.__won:
             if self.mjRule:
-                self.__lastMelds = self.mjRule.computeLastMelds(self)
+                self.__lastMelds = self.mjRule.computeLastMelds(self)  # type:ignore[call-arg,misc,attr-defined]
                 if self.__lastMelds:
                     # syncHandBoard may return nothing
                     if len(self.__lastMelds) == 1:
@@ -479,7 +479,7 @@ class Hand(ReprMixin):
         if lastTile == 1:
             lastTile = self.lastTile
         if lastMeld == 1:
-            lastMeld = self.__lastMeld
+            lastMeld = self.__lastMeld  # type:ignore[assignment]
         parts = [str(x) for x in sorted(melds)]
         if unusedTiles:
             parts.append('R' + ''.join(str(x) for x in sorted(unusedTiles)))
@@ -580,10 +580,10 @@ class Hand(ReprMixin):
 
     def __findAllCallingHands(self) ->List['Hand']:
         """always try to find all of them"""
-        result = []
+        result:List['Hand'] = []
         if self.lenOffset:
             return result
-        candidates = TileList()
+        candidates:TileList = TileList()
         for rule in self.ruleset.mjRules:
             cand = rule.winningTileCandidates(self)
             if Debug.hand and cand:
@@ -603,7 +603,7 @@ class Hand(ReprMixin):
         return result
 
     @property
-    def robbedTile(self) ->Optional[Tile]:
+    def robbedTile(self) ->Tile:
         """cache this here for use in rulecode"""
         if self.__robbedTile is Tile.unknown:
             self.__robbedTile = Tile.none
@@ -642,7 +642,7 @@ class Hand(ReprMixin):
         """find all legal arrangements.
         Returns a list of tuples with the mjRule and a list of concealed melds"""
         self.unusedTiles.sort()
-        result = []
+        result:List[Tuple['Rule', MeldList]] = []
         stdMJ = self.ruleset.standardMJRule
         assert stdMJ
         if self.mjRule:
@@ -651,20 +651,20 @@ class Hand(ReprMixin):
             rules = self.ruleset.mjRules
         for mjRule in rules:
             if ((self.lenOffset == 1 and mjRule.appliesToHand(self))
-                    or (self.lenOffset < 1 and mjRule.shouldTry(self))):
+                    or (self.lenOffset < 1 and mjRule.shouldTry(self))):  # type:ignore[attr-defined]
                 if self.unusedTiles:
                     unused = TileList(Tile(x) for x in self.unusedTiles)
-                    for melds, rest2 in mjRule.rearrange(self, unused):
+                    for melds, rest2 in mjRule.rearrange(self, unused):  # type:ignore[attr-defined]
                         if rest2:
                             melds = MeldList(melds)
                             restMelds, _ = next(
-                                stdMJ.rearrange(self, rest2[:]))
+                                stdMJ.rearrange(self, rest2[:]))  # type:ignore[attr-defined]
                             melds.extend(restMelds)
                         result.append((mjRule, melds))
         if not result:
             result.extend(
                 (stdMJ, x[0])
-                for x in stdMJ.rearrange(self, self.unusedTiles[:]))
+                for x in stdMJ.rearrange(self, self.unusedTiles[:]))  # type:ignore[attr-defined]
         return result
 
     def __arrange(self) ->None:

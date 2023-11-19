@@ -12,7 +12,7 @@ import weakref
 import sys
 from functools import total_ordering
 
-from typing import List, Optional, Tuple, TYPE_CHECKING, Union, Iterable, Generator, Any
+from typing import List, Optional, Tuple, TYPE_CHECKING, Union, Dict, Iterable, Generator, Any, Set, cast
 
 from twisted.internet.defer import succeed
 from util import gitHead
@@ -51,11 +51,11 @@ class HandId(ReprMixin):
 
     def __init__(self, game:'Game', string:Optional[str]=None, stringIdx:int=0) ->None:
         self.game = game
-        self.seed = game.seed
-        self.roundsFinished = 0
-        self.rotated = 0
-        self.notRotated = 0
-        self.moveCount = 0
+        self.seed:int = game.seed
+        self.roundsFinished:int = 0
+        self.rotated:int = 0
+        self.notRotated:int = 0
+        self.moveCount:int = 0
         if string is None:
             self.roundsFinished = game.roundsFinished
             self.rotated = game.rotated
@@ -102,7 +102,7 @@ class HandId(ReprMixin):
         handWind = Wind(handId[0])
         ruleset = self.game.ruleset
         self.roundsFinished = handWind.__index__()
-        minRounds = ruleset.minRounds
+        minRounds = ruleset.minRounds  # type:ignore[attr-defined]
         if self.roundsFinished > minRounds:
             logWarning(
                 'Ruleset %s has %d minimum rounds but you want round %d(%s)'
@@ -213,41 +213,43 @@ class Game:
             assert isinstance(name, str), 'Game.__init__: name must be string and not {}'.format(type(name))
         self.players = Players()
         # if we fail later on in init, at least we can still close the program
+        self.myself:Player
+        self.prevActivePlayer:Optional[Player]
         # the player using this client instance for talking to the server
         self.__shouldSave = False
         self._client = None
         self.client = client
-        self.rotated = 0
-        self.notRotated = 0  # counts hands since last rotation
-        self.ruleset = ruleset
-        self.roundsFinished = 0
-        self._currentHandId = None
-        self._prevHandId = None
-        self.wantedGame = wantedGame
-        self.moves = []
-        self.gameid = gameid
-        self.playOpen = False
-        self.autoPlay = False
-        self.handctr = 0
-        self.roundHandCount = 0
-        self.handDiscardCount = 0
-        self.divideAt = None
-        self.__lastDiscard = None  # always uppercase
-        self.visibleTiles = IntDict()
-        self.discardedTiles = IntDict(self.visibleTiles)
+        self.rotated:int = 0
+        self.notRotated:int = 0  # counts hands since last rotation
+        self.ruleset:Ruleset = ruleset
+        self.roundsFinished:int = 0
+        self._currentHandId:Optional[HandId] = None
+        self._prevHandId:Optional[HandId] = None
+        self.wantedGame:Optional[str] = wantedGame
+        self.moves:List['Move'] = []
+        self.gameid:Optional[int] = gameid
+        self.playOpen:bool = False
+        self.autoPlay:bool = False
+        self.handctr:int = 0
+        self.roundHandCount:int = 0
+        self.handDiscardCount:int = 0
+        self.divideAt:Optional[int] = None
+        self.__lastDiscard:Optional[Tile] = None  # always uppercase
+        self.visibleTiles:Dict[Tile, int] = IntDict()
+        self.discardedTiles:Dict[Tile, int] = IntDict(self.visibleTiles)
         # tile names are always lowercase
-        self.dangerousTiles = []
-        self.csvTags = []
-        self.randomGenerator = CountingRandom(self)
+        self.dangerousTiles:List[Tuple[Set[Tile], str]] = []
+        self.csvTags:List[str] = []
+        self.randomGenerator:CountingRandom = CountingRandom(self)
         self._setHandSeed()
-        self.activePlayer = None
-        self.__winner = None
+        self.activePlayer:Optional[Player] = None
+        self.__winner:Optional[Player] = None
         self._setGameId()
         self.__loadRuleset()
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
         self.shiftRules = 'SWEN,SE,WE'
-        self.wall = self.wallClass(self)
+        self.wall:Optional[Wall] = self.wallClass(self)  # type:ignore[arg-type]
         # FIXME:  wall nach PlayingGame verschieben?
         self.assignPlayers(names)  # also defines self.myself
         if self.belongsToGameServer():
@@ -307,7 +309,7 @@ class Game:
         self.prevActivePlayer = None
         self.dangerousTiles = []
         self.discardedTiles.clear()
-        assert self.visibleTiles.count() == 0
+        assert cast(IntDict, self.visibleTiles).count() == 0
 
     def _scanGameOption(self) ->None:
         """this is only done for PlayingGame"""
@@ -457,7 +459,7 @@ class Game:
                     self.players = Players(self.players[1:] + self.players[:1])
                 for idx, player in enumerate(self.players):
                     assert self.wall
-                    player.front = self.wall[idx]
+                    player.front = cast('UIWall', self.wall)[idx]
                     if hasattr(player, 'sideText'):
                         player.sideText.board = player.front
                 # we want names to move simultaneously
@@ -474,7 +476,7 @@ class Game:
     def saveStartTime(self) ->None:
         """save starttime for this game"""
         starttime = datetime.datetime.now().replace(microsecond=0).isoformat()
-        args = list([starttime, self.seed, int(self.autoPlay),
+        args:List[Union[str, int, float]] = list([starttime, self.seed, int(self.autoPlay),
                      self.ruleset.rulesetId])
         args.extend([p.nameid for p in self.players])
         assert self.gameid
@@ -527,7 +529,7 @@ class Game:
         """directly before starting"""
         self.dangerousTiles = []
         self.discardedTiles.clear()
-        assert self.visibleTiles.count() == 0
+        assert cast(IntDict, self.visibleTiles).count() == 0
         if Internal.scene:
             # TODO: why not self.scene?
             Internal.scene.prepareHand()
@@ -579,7 +581,7 @@ class Game:
 
     def maybeRotateWinds(self) ->bool:
         """rules which make winds rotate"""
-        result = [x for x in self.ruleset.filterRules('rotate') if x.rotate(self)]
+        result = [x for x in self.ruleset.filterRules('rotate') if x.rotate(self)]  # type:ignore[attr-defined]
         if result:
             if Debug.explain:
                 if not self.belongsToRobotPlayer():
@@ -614,7 +616,7 @@ class Game:
                 self.__exchangeSeats()
             if Internal.scene:
                 with AnimationSpeed(Speeds.windDisc):
-                    self.wall.showWindDiscs()
+                    cast('UIWall', self.wall).showWindDiscs()
 
     def debug(self, msg:str, btIndent:Optional[int]=None, prevHandId:bool=False, showStack:bool=False) ->None:
         """
@@ -658,6 +660,7 @@ class Game:
     @classmethod
     def loadFromDB(cls, gameid:int, client:Optional['Client']=None) ->Optional[Union['Game', 'ServerGame']]:
         """load game by game id and return a new Game instance"""
+        # TODO would be nice to use cls in result annotation, but how?
         Internal.logPrefix = 'S' if Internal.isServer else 'C'
         records = Query(
             "select p0,p1,p2,p3,ruleset,seed from game where id = ?",
@@ -821,8 +824,8 @@ class PlayingGame(Game):
                  wantedGame:Optional[str]=None, client:Optional['Client']=None,
                  playOpen:bool=False, autoPlay:bool=False) ->None:
         """a new game instance, comes from database if gameid is set"""
-        self.__activePlayer = None
-        self.prevActivePlayer = None
+        self.__activePlayer:Optional[PlayingPlayer] = None
+        self.prevActivePlayer:Optional[PlayingPlayer] = None
         self.defaultNameBrush = None
         Game.__init__(self, names, ruleset,
                       gameid, wantedGame=wantedGame, client=client)
@@ -830,7 +833,7 @@ class PlayingGame(Game):
         self.playOpen = playOpen
         self.autoPlay = autoPlay
         if self.belongsToHumanPlayer():
-            myself = self.myself
+            myself = cast(PlayingPlayer, self.myself)
             myself.voice = Voice.locate(myself.name)
             if myself.voice:
                 if Debug.sound:
@@ -880,7 +883,7 @@ class PlayingGame(Game):
     def _setGameId(self) ->None:
         """do nothing, we already went through the game id reservation"""
 
-    @property
+    @property  # type:ignore[override]
     def activePlayer(self) ->PlayingPlayer:
         """the turn is on this player"""
         result = self.__activePlayer
@@ -947,7 +950,7 @@ class PlayingGame(Game):
         if not current:
             current = self.activePlayer
         pIdx = self.players.index(current)
-        return self.players[(pIdx + 1) % 4]
+        return cast(PlayingPlayer, self.players[(pIdx + 1) % 4])
 
     def nextTurn(self) ->None:
         """move activePlayer"""
@@ -984,7 +987,7 @@ class PlayingGame(Game):
         # the above has side effect, needs to be called
         if Internal.scene:
             assert player.handBoard
-            player.handBoard.discard(tile)
+            cast('PlayingHandBoard', player.handBoard).discard(tile)
         self.lastDiscard = tile
         player.removeConcealedTile(self.lastDiscard)
         if any(tile.exposed in x[0] for x in self.dangerousTiles):
@@ -1060,7 +1063,7 @@ class PlayingGame(Game):
         reason - there might be more than one"""
         assert isinstance(tile, Tile), tile
         tile = tile.exposed
-        result = []
+        result:List[str] = []
         for dang, txt in self.dangerousTiles:
             if tile in dang:
                 result.append(txt)
