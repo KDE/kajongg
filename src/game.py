@@ -10,7 +10,6 @@ SPDX-License-Identifier: GPL-2.0
 import datetime
 import weakref
 import sys
-from collections import defaultdict
 from functools import total_ordering
 
 from twisted.internet.defer import succeed
@@ -1050,8 +1049,7 @@ class PlayingGame(Game):
         """if end of living wall is reached, declare all invisible tiles
         as dangerous"""
         if len(self.wall.living) <= 5:
-            allTiles = [x for x in defaultdict.keys(elements.occurrence)
-                        if not x.isBonus]
+            allTiles = [x for x in elements.occurrence if not x.isBonus]
             for tile in allTiles:
                 assert isinstance(tile, Tile), tile
             # see https://www.logilab.org/ticket/23986
