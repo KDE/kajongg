@@ -257,10 +257,12 @@ class Client(pb.Referenceable):
         else:
             assert self.isRobotClient()
             # robot client instance: self.table is already set
+        assert self.table
         if gameClass is None:
             gameClass = PlayingGame
         if self.table.suspendedAt:
             self.game = gameClass.loadFromDB(gameid, self)
+            assert self.game, 'cannot load game {}'.format(gameid)
             self.game.assignPlayers(playerNames)
             if self.isHumanClient():
                 if self.game.handctr != self.table.endValues[0]:
@@ -324,6 +326,7 @@ class Client(pb.Referenceable):
         send answer and one parameter to server"""
         delay = 0.0
         delayStep = 0.1
+        assert self.game
         myself = self.game.myself
         myself.computeSayable(move, answers)
         result = myself.intelligence.selectAnswer(answers)
@@ -434,6 +437,7 @@ class Client(pb.Referenceable):
             calledTile = self.game.lastDiscard
         self.game.lastDiscard = None
         self.game.discardedTiles[calledTile.exposed] -= 1
+        assert move.meld, 'move has no meld: {!r}'.format(move)
         assert calledTile in move.meld, '%s %s' % (calledTile, move.meld)
         hadTiles = move.meld.without(calledTile)
         if not self.thatWasMe(move.player) and not self.game.playOpen:
