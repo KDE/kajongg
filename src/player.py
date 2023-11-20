@@ -632,9 +632,12 @@ class PlayingPlayer(Player):
         """could answering with msg lead to dangerous game?
         If so return a list of resulting melds
         where a meld is represented by a list of 2char strings"""
+        result = []
         if msg in (Message.Chow, Message.Pung, Message.Kong):
-            return [x for x in self.sayable[msg] if self.mustPlayDangerous(x)]
-        return []
+            for meld in self.sayable[msg]:
+                if self.mustPlayDangerous(meld):
+                    result.append(meld)
+        return result
 
     def hasConcealedTiles(self, tiles, within=None):
         """do I have those concealed tiles?"""
