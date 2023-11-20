@@ -632,7 +632,7 @@ class PlayingPlayer(Player):
         """could answering with msg lead to dangerous game?
         If so return a list of resulting melds
         where a meld is represented by a list of 2char strings"""
-        result = []
+        result = MeldList()
         if msg in (Message.Chow, Message.Pung, Message.Kong):
             for meld in self.sayable[msg]:
                 if self.mustPlayDangerous(meld):
