@@ -252,7 +252,7 @@ class MainWindow(KXmlGuiWindow):
             self,
             "scoreGame",
             "draw-freehand",
-            self.scoringScene,
+            self.startScoringGame,
             Qt.Key.Key_C)
         self.actionPlayGame = Action(
             self,
@@ -318,14 +318,14 @@ class MainWindow(KXmlGuiWindow):
         """manual wish for a new game"""
         if not Internal.autoPlay:
             # only if no demo game is running
-            self.playingScene()
+            self.startPlayingGame()
 
-    def playingScene(self) ->None:
+    def startPlayingGame(self) ->None:
         """play a computer game: log into a server and show its tables"""
         self.scene = PlayingScene(self)
         HumanClient()
 
-    def scoringScene(self) ->None:
+    def startScoringGame(self) ->None:
         """start a scoring scene"""
         scene = ScoringScene(self)
         game = scoreGame()
@@ -665,7 +665,7 @@ class MainWindow(KXmlGuiWindow):
         else:
             Internal.autoPlay = checked
             if checked and Internal.db:
-                self.playingScene()
+                self.startPlayingGame()
 
     def updateGUI(self) ->None:
         """update some actions, all auxiliary windows and the statusbar"""
