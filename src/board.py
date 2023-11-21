@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import Dict, Union, Optional, TYPE_CHECKING, List
+from typing import Dict, Union, Optional, TYPE_CHECKING, List, Tuple, cast
 
 from qt import Qt, QPointF, QPoint, QRectF, QMimeData, QSize
 from qt import QGraphicsRectItem, QSizePolicy, QFrame, QFont
@@ -52,8 +52,9 @@ class WindDisc(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
         assert not parent
         assert isinstance(wind, Wind), 'wind {}  must be a real Wind but is {}'.format(
             wind, type(wind))
-        self.__wind = wind
+        self.__wind:Wind = wind
         self.__brush = self.whiteColor
+        self.board:'UIWallSide'
 
     def debug_name(self) ->str:
         """for identification in animations"""
@@ -121,6 +122,7 @@ class WindLabel(QLabel):
         QLabel.__init__(self, parent)
         if wind is None:
             wind = East
+        self.__wind:Wind
         self.wind = wind
         self.__roundsFinished = roundsFinished
 
@@ -132,7 +134,7 @@ class WindLabel(QLabel):
     @wind.setter
     def wind(self, wind:Wind) ->None:
         """setting the wind also changes the pixmap"""
-        if not hasattr(self, '__wind') or self.__wind != wind:  # pylint:disable=access-member-before-definition
+        if not hasattr(self, '__wind') or self.__wind != wind:
             self.__wind = wind
             self._refresh()
 
@@ -177,27 +179,27 @@ class Board(QGraphicsRectItem, ReprMixin):
 
     penColor = QColor('black')
 
-    arrows = [Qt.Key.Key_Left, Qt.Key.Key_Down, Qt.Key.Key_Up, Qt.Key.Key_Right]
+    arrows:List[Qt.Key] = [Qt.Key.Key_Left, Qt.Key.Key_Down, Qt.Key.Key_Up, Qt.Key.Key_Right]
 
     def __init__(self, width:float, height:float, tileset:Tileset, boardRotation:int=0) ->None:
         QGraphicsRectItem.__init__(self)
-        self.uiTiles = []
-        self.isHandBoard = False
-        self._focusTile = None
+        self.uiTiles:List[UITile] = []
+        self.isHandBoard:bool = False
+        self._focusTile:Optional[UITile] = None
         self.__prevPos = 0.0
         self._noPen()
         self.tileDragEnabled = False
         self.setRotation(boardRotation)
         self._lightSource = 'NW'
-        self.__xWidth = 0
-        self.__xHeight = 0
-        self.__yWidth = 0
-        self.__yHeight = 0
-        self.__fixedWidth = width
-        self.__fixedHeight = height
+        self.__xWidth:int = 0
+        self.__xHeight:float = 0
+        self.__yWidth:int = 0
+        self.__yHeight:float = 0
+        self.__fixedWidth:float = width
+        self.__fixedHeight:float = height
         self._tileset = Tileset()
         self.tileset = tileset
-        self.level = 0
+        self.level:int = 0
         assert Internal.Preferences
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
@@ -213,7 +215,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         """also update focusRect if it belongs to this board"""
         if self.scene() and isAlive(self):
             QGraphicsRectItem.setVisible(self, value)
-            self.scene().focusRect.refresh()
+            cast('SceneWithFocusRect', self.scene()).focusRect.refresh()
 
     def hide(self) ->None:
         """remove all uiTile references so they can be garbage collected"""
@@ -262,7 +264,7 @@ class Board(QGraphicsRectItem, ReprMixin):
             logDebug('%s: new focus uiTile %s from %s' % (
                 self.debug_name(), self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
         if self.hasLogicalFocus:
-            self.scene().focusBoard = self
+            cast('SceneWithFocusRect', self.scene()).focusBoard = self
 
     def setEnabled(self, enabled:bool) ->None:
         """enable/disable this board"""
@@ -285,7 +287,7 @@ class Board(QGraphicsRectItem, ReprMixin):
 
         Up to May 2021, this was called hasFocus, overriding QGraphicsItem.hasFocus
         but pylint did not like that."""
-        scene = self.scene()
+        scene = cast('SceneWithFocusRect', self.scene())
         if scene:
             return scene.focusBoard == self and bool(self._focusTile)
         return False
@@ -294,7 +296,7 @@ class Board(QGraphicsRectItem, ReprMixin):
     def hasLogicalFocus(self, value:bool) ->None:
         """set focus on this board"""
         if isAlive(self):
-            scene = self.scene()
+            scene = cast('SceneWithFocusRect', self.scene())
             if isAlive(scene):
                 if scene.focusBoard == self or value:
                     if self.focusTile:
@@ -306,10 +308,10 @@ class Board(QGraphicsRectItem, ReprMixin):
     @staticmethod
     def mapChar2Arrow(event:'QKeyEvent') ->Qt.Key:
         """map the keys hjkl to arrows like in vi and konqueror"""
-        key = event.key()
+        key = cast(Qt.Key, event.key())
         if key in Board.arrows:
             return key
-        charArrows = i18nc(
+        charArrows:str = i18nc(
             'kajongg:arrow keys hjkl like in konqueror',
             'hjklHJKL')
         keychar = event.text()
@@ -539,7 +541,7 @@ class Board(QGraphicsRectItem, ReprMixin):
                 uiTile.update()
             self.computeRect()
             if self.hasLogicalFocus:
-                self.scene().focusBoard = self
+                cast('SceneWithFocusRect', self.scene()).focusBoard = self
 
     def focusRectWidth(self) ->int:
         """how many tiles are in focus rect?"""
@@ -607,7 +609,7 @@ class CourtBoard(Board):
         """make it as big as possible within the wall"""
         assert Internal.scene
         assert Internal.scene.game
-        cWall:'UIWall' = Internal.scene.game.wall
+        cWall:'UIWall' = cast('UIWall', Internal.scene.game.wall)
         assert cWall
         newSceneX = cWall[3].sceneBoundingRect().right()
         newSceneY = cWall[2].sceneBoundingRect().bottom()
@@ -642,7 +644,7 @@ class SelectorBoard(CourtBoard):
 
     def __init__(self) ->None:
         CourtBoard.__init__(self, 9, 5)
-        self.allSelectorTiles = []
+        self.allSelectorTiles:List[UITile] = []
 
     def checkTiles(self) ->None:
         """does not apply"""
@@ -671,12 +673,12 @@ class SelectorBoard(CourtBoard):
 
     def dragMoveEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
         """allow dropping only from handboards, not from self"""
-        uiTile = event.mimeData().uiTile
+        uiTile = cast(MimeData, event.mimeData()).uiTile
         event.setAccepted(uiTile.board != self)
 
     def dropEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
         """drop a uiTile into the selector"""
-        uiTile = event.mimeData().uiTile
+        uiTile = cast(MimeData, event.mimeData()).uiTile
         self.dropTile(uiTile)
         event.accept()
 
@@ -753,7 +755,7 @@ class SelectorBoard(CourtBoard):
             else:
                 result.append(lowerName.kong)
                 result.append(lowerName.kong.exposedClaimed)
-        if wantedTile.isNumber and wantedTile.value < 8:
+        if wantedTile.isNumber and wantedTile.value < 8:  # type:ignore[operator]
             chow2 = scName.nextForChow
             chow3 = chow2.nextForChow
             if self.tilesByElement(chow2.exposed) and self.tilesByElement(chow3.exposed):
@@ -768,7 +770,7 @@ class MimeData(QMimeData):
 
     def __init__(self, uiTile:UITile) ->None:
         QMimeData.__init__(self)
-        self.uiTile = uiTile
+        self.uiTile:UITile = uiTile
         self.setText(str(uiTile))
 
 
@@ -789,8 +791,8 @@ class FittingView(QGraphicsView):
         self.setRenderHint(QPainter.SmoothPixmapTransform)
         self.setStyleSheet('background: transparent')
         self.setFrameStyle(QFrame.NoFrame)
-        self.tilePressed = None
-        self.dragObject = None
+        self.tilePressed:Optional[UITile] = None
+        self.dragObject:Optional[QDrag] = None
         self.setFocus()
 
     def wheelEvent(self, event:'QWheelEvent') ->None:
@@ -906,11 +908,11 @@ class YellowText(QGraphicsRectItem):
     def __init__(self, parent:QGraphicsRectItem) ->None:
         QGraphicsRectItem.__init__(self, parent)
         self.parent = parent
-        self.font = QFont()
+        self.font:QFont = QFont()
         self.font.setPointSize(48)
-        self.height = 62
-        self.width = 200
-        self.msg = None
+        self.height:int = 62
+        self.width:int = 200
+        self.msg:Optional[str] = None
         self.setText('')
 
     def setText(self, msg:str) ->None:
@@ -947,8 +949,9 @@ class DiscardBoard(CourtBoard):
 
     def __init__(self) ->None:
         CourtBoard.__init__(self, 11, 9)
-        self.__lastDiscarded = None
-        self.__discardTilesOrderedLeaveHole = True
+        self.__places:List[Tuple[float, float]]
+        self.__lastDiscarded:Optional[UITile] = None
+        self.__discardTilesOrderedLeaveHole:bool = True
 
     def debug_name(self) ->str:
         """to be used in debug output"""
@@ -963,7 +966,7 @@ class DiscardBoard(CourtBoard):
         """precompute random positions"""
         assert isinstance(self.width, int)
         assert isinstance(self.height, int)
-        self.__places = [(x, y) for x in range(self.width)  # pylint:disable=attribute-defined-outside-init
+        self.__places = [(x, y) for x in range(self.width)
                          for y in range(self.height)]
         if game.ruleset.discardTilesOrdered:
             self.__places.sort(key=lambda p: p[0] + p[1] * 1000)
@@ -995,11 +998,11 @@ class DiscardBoard(CourtBoard):
 
         The user uses the mouse for discarding a tile"""
         assert Internal.scene
-        uiTile = event.mimeData().uiTile
         assert Internal.scene
+        uiTile = cast(MimeData, event.mimeData()).uiTile
         assert isinstance(uiTile, UITile), uiTile
         uiTile.setPos(event.scenePos() - uiTile.boundingRect().center())
         if Internal.scene.clientDialog:
-            Internal.scene.clientDialog.selectButton(Message.Discard)
+            Internal.scene.clientDialog.selectButton(cast('ClientMessage', Message.Discard))
         event.accept()
         self._noPen()
