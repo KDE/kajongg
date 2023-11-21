@@ -10,9 +10,6 @@ SPDX-License-Identifier: GPL-2.0
 
 # pylint: disable=wrong-import-position
 
-# keyboardinterrupt should simply terminate
-# import signal
-# signal.signal(signal.SIGINT, signal.SIG_DFL)
 import sys
 import os
 import logging
