@@ -805,12 +805,12 @@ class ScoringDialog(QWidget):
         QWidget.__init__(self)
         self.scene = scene
         decorateWindow(self, i18nc("@title:window", "Scoring for this Hand"))
-        self.nameLabels = [None] * 4
-        self.spValues = [None] * 4
-        self.windLabels = [None] * 4
-        self.wonBoxes = [None] * 4
-        self.detailsLayout = [None] * 4
-        self.details = [None] * 4
+        self.nameLabels = list(QLabel() for x in range(4))
+        self.spValues = list(QSpinBox() for x in range(4))
+        self.windLabels =  list(QLabel() for x in range(4))
+        self.wonBoxes = list(QCheckBox("") for x in range(4))
+        self.detailsLayout = list(QVBoxLayout() for x in range(4))
+        self.details = list(QWidget() for x in range(4))
         self.__meldPixMaps = []
         grid = QGridLayout(self)
         pGrid = QGridLayout()
@@ -888,7 +888,6 @@ class ScoringDialog(QWidget):
         pGrid.addWidget(self.nameLabels[idx], idx + 2, 0)
         pGrid.addWidget(self.windLabels[idx], idx + 2, 1)
         pGrid.addWidget(self.spValues[idx], idx + 2, 2)
-        self.wonBoxes[idx] = QCheckBox("")
         pGrid.addWidget(self.wonBoxes[idx], idx + 2, 3)
         self.wonBoxes[idx].clicked.connect(self.wonChanged)
         self.spValues[idx].valueChanged.connect(self.slotInputChanged)
