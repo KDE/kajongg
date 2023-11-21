@@ -699,7 +699,10 @@ class SelectorBoard(CourtBoard):
             Tile.stone: (2, 0, Tile.numbers),
             Tile.character: (0, 0, Tile.numbers)}
         row, baseColumn, order = offsets[uiTile.lowerGroup]
-        column = baseColumn + order.index(uiTile.char)
+        if order is Tile.numbers:
+            column = baseColumn + order.index(int(uiTile.char))
+        else:
+            column = baseColumn + order.index(uiTile.char)
         uiTile.dark = False
         uiTile.setBoard(self, column, row)
 

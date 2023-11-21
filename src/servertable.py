@@ -690,7 +690,7 @@ class ServerTable(Table, ReprMixin):
                 player.name,
                 claim.name,
                 ' '.join(hasTiles),
-                ''.join(player.concealedTiles))
+                str(player.concealedTiles))
             return
         # update our internal state before we listen to the clients again
         self.game.discardedTiles[lastDiscard.exposed] -= 1

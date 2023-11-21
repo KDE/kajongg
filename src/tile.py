@@ -9,16 +9,17 @@ SPDX-License-Identifier: GPL-2.0
 
 from log import logException
 from mi18n import i18n, i18nc
-from common import IntDict, ReprMixin
+from common import IntDict, ReprMixin, id4
 from wind import Wind, East, South, West, North
 
-class Tile(str, ReprMixin):
+class Tile(ReprMixin):
 
     """
     A single tile, represented as a string of length 2.
 
     Always True:
       - only for suits: tile.group + chr(tile.value + 48) == str(tile)
+      - tile.group + tile.char == str(tile)
       - Tile(tile) is tile
       - Tile(tile.group, tile.value) is tile
 
@@ -69,6 +70,11 @@ class Tile(str, ReprMixin):
     majors = list(dragons) + list(winds) + terminals
 
     def __new__(cls, *args):
+        if len(args) == 1:
+            if  type(args[0]) is Tile:  # pylint: disable=unidiomatic-typecheck
+                return args[0]
+# FIXME: wirklich list als key?
+# lieber arg1, arg2 und fuer dict und _build daraus eines machen
         try:
             return cls.cache[args]
         except KeyError:
@@ -77,17 +83,20 @@ class Tile(str, ReprMixin):
     @classmethod
     def __build(cls, *args):
         """build a new Tile object out of args"""
-        # pylint: disable=too-many-statements
-        if len(args) == 1:
-            arg0, arg1 = args[0]
-        else:
-            arg0, arg1 = args
-        if isinstance(arg1, int):
-            arg1 = chr(arg1 + 48)
-        what = arg0 + arg1
-        result = str.__new__(cls, what)
-        result.group = result[0]
 
+        # set raw data attributes (group, char)
+        result = object.__new__(cls)
+        if len(args) == 1:
+            if isinstance(args[0], Tile):
+                result.group = args[0].group
+                arg1 = args[0].value
+            else:
+                assert isinstance(args[0], str)
+                result.group, arg1 = args[0]
+        else:
+            result.group, arg1 = args
+
+        # set attributes depending only on group
         result.isKnown = result.group != 'X'
         result.lowerGroup = result.group.lower()
         result.isExposed = result.group == result.lowerGroup
@@ -97,15 +106,12 @@ class Tile(str, ReprMixin):
         result.isWind = result.lowerGroup == Tile.wind
         result.isHonor = result.isDragon or result.isWind
 
-        if result.isBonus or result.isWind:
-            result.value = Wind(result[1])
-            result.char = result[1]
-        elif result.isDragon:
-            result.value = result[1]
-            result.char = result.value
-        else:
-            result.value = ord(result[1]) - 48
-            result.char = result.value
+        result.char, result.value = result.set_value(arg1)
+
+        try:
+            result.key = 1 + result.hashTable.index(str(result)) // 2
+        except ValueError:
+            logException('%s is not a valid tile string' % result)
 
         result.isTerminal = False
         result.isNumber = False
@@ -120,10 +126,6 @@ class Tile(str, ReprMixin):
 
         result.isMajor = result.isHonor or result.isTerminal
         result.isMinor = result.isKnown and not result.isMajor
-        try:
-            result.key = 1 + result.hashTable.index(result) // 2
-        except ValueError:
-            logException('%s is not a valid tile string' % result)
 
         Tile._storeInCache(result)
 
@@ -132,7 +134,7 @@ class Tile(str, ReprMixin):
         result.chow = result.kong = None
         result._fixed = True
 
-        str.__setattr__(
+        object.__setattr__(
             result,
             'exposed',
             result if not result.isKnown else Tile(result.group.lower(), result.char))
@@ -145,13 +147,13 @@ class Tile(str, ReprMixin):
             result.exposed if result.isConcealed else result.concealed)
         if isinstance(result.value, int):
             if 0 <= result.value <= 11:
-                str.__setattr__(
+                object.__setattr__(
                     result,
                     'prevForChow',
                     Tile(result.group,
                          result.value - 1))
             if -1 <= result.value <= 10:
-                str.__setattr__(
+                object.__setattr__(
                     result,
                     'nextForChow',
                     Tile(
@@ -161,17 +163,43 @@ class Tile(str, ReprMixin):
 
         return result
 
+    def set_value(self, arg1):
+        """set the interpreted Tile.value (str, Wind, int)"""
+        if isinstance(arg1, Wind):
+            char = arg1.char.lower()
+        elif isinstance(arg1, int):
+            char = chr(arg1 + 48)
+        elif self.group.lower() == 'x':
+            char = 'y'
+        else:
+            char = arg1
+        value = char  # default
+        if self.isWind or self.isBonus:
+            if isinstance(arg1, Wind):
+                value = arg1
+            else:
+                value = Wind(arg1)
+        elif self.isDragon:
+            assert char in 'gbr', arg1
+        elif self.group != 'X':
+            if isinstance(char, int):
+                value = char
+            else:
+                value = ord(char) - 48
+        return char, value
+
     @classmethod
     def _storeInCache(cls, result):
         """Put the new tile into the cache"""
         for key in (
                 result, (str(result),), (result.group, result.value),
-                (result[0], result[1])):
+                (result.group, result.char)):
             cls.cache[key] = result
 
         existing = list([x for x in cls.cache.values() if x.key == result.key]) # pylint: disable=consider-using-generator
-        existingIds = {id(x) for x in existing}
-        assert len(existingIds) == 1, 'new is:{} existing are: {} with ids {}'.format(result, existing, existingIds)
+        existingIds = {id4(x) for x in existing}
+        assert len(existingIds) == 1, 'cls is {} new is:{} existing are: {} keys are:{}'.format(cls.__name__,
+            repr(result), ','.join(repr(x) for x in existing), ','.join(repr(x) for x in cls.cache if x == 1))
 
     def name2(self):
         """__str__ might be changed by a subclass"""
@@ -181,31 +209,15 @@ class Tile(str, ReprMixin):
         """ReprMixin does not seem to work on str subclass"""
         return ReprMixin.__repr__(self)
 
-    def __getitem__(self, index):
-        if hasattr(self, '_fixed'):
-            raise TypeError
-        return str.__getitem__(self, index)
+    def __str__(self):
+        return self.group + self.char
 
-    def __setitem__(self, index, value):
-        raise TypeError
+    def __hash__(self):
+        return self.key
 
-    def __delitem__(self, index):
-        raise TypeError
-
-    def lower(self):
-        raise TypeError
-
-    def istitle(self):
-        raise TypeError
     def __mul__(self, other):
         return [self] * other
 
-
-    def upper(self):
-        raise TypeError
-
-    def capitalize(self):
-        raise TypeError
     def __imul__(self, other):
         return [self] * other
 
@@ -295,6 +307,9 @@ class TileList(list):
             result = result * factor + tile.key
         return result
 
+    def __hash__(self):
+        return self.key()
+
     def sorted(self):
         """sort(TileList) would not keep TileList type"""
         return TileList(sorted(self))
@@ -318,7 +333,7 @@ class TileList(list):
 
     def __str__(self):
         """the content"""
-        return str(''.join(self))
+        return str(''.join(str(x) for x in self))
 
 
 class Elements:
