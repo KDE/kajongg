@@ -164,7 +164,7 @@ class ScoringHandBoard(HandBoard):
         HandBoard.__init__(self, player)
         self.player:'ScoringPlayer'
 
-    def meldVariants(self, tile:UITile, lowerHalf:bool) ->MeldList:
+    def meldVariants(self, tile:UITile, forLowerHalf:bool) ->MeldList:
         """Kong might have variants"""
         result = MeldList()
         uimeld = self.uiMeldWithTile(tile)
@@ -172,9 +172,9 @@ class ScoringHandBoard(HandBoard):
             logWarning('ScoringHandBoard.meldVariants: no meld found for %s' % tile)
             return result
         meld = uimeld.meld
-        result.append(meld.concealed if lowerHalf else meld.exposed)
+        result.append(meld.concealed if forLowerHalf else meld.exposed)
         if len(meld) == 4:
-            if lowerHalf:
+            if forLowerHalf:
                 result.append(meld.declared)
             else:
                 result.append(meld.exposedClaimed)
@@ -246,19 +246,19 @@ class ScoringHandBoard(HandBoard):
     def dropEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
         """drop into this handboard"""
         uiTile = cast('MimeData', event.mimeData()).uiTile
-        lowerHalf = self.mapFromScene(
+        forLowerHalf = self.mapFromScene(
             QPointF(event.scenePos())).y() >= self.rect().height() / 2.0
-        if self.dropTile(uiTile, lowerHalf):
+        if self.dropTile(uiTile, forLowerHalf):
             event.accept()
         else:
             event.ignore()
         self._noPen()
 
-    def dropTile(self, uiTile:UITile, lowerHalf:bool) ->bool:
+    def dropTile(self, uiTile:UITile, forLowerHalf:bool) ->bool:
         """drop uiTile into lower or upper half of our hand"""
         senderBoard = cast('SelectorBoard', uiTile.board)
         assert senderBoard
-        newMeld = senderBoard.chooseVariant(uiTile, lowerHalf)
+        newMeld = senderBoard.chooseVariant(uiTile, forLowerHalf)
         if not newMeld:
             return False
         uiMeld = senderBoard.assignUITiles(uiTile, newMeld)

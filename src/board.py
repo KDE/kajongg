@@ -353,14 +353,14 @@ class Board(QGraphicsRectItem, ReprMixin):
         so default is to return a Meld with only uiTile"""
         return UIMeld(uiTile)
 
-    def meldVariants(self, tile:UITile, lowerHalf:bool) ->MeldList:  # pylint: disable=unused-argument
+    def meldVariants(self, tile:UITile, forLowerHalf:bool) ->MeldList:  # pylint: disable=unused-argument
         """all possible melds that could be meant by dragging/dropping uiTile"""
         return MeldList(Meld(tile))
 
-    def chooseVariant(self, uiTile:UITile, lowerHalf:bool=False) ->Optional[Meld]:
+    def chooseVariant(self, uiTile:UITile, forLowerHalf:bool=False) ->Optional[Meld]:
         """make the user choose from a list of possible melds for the target.
         The melds do not contain real Tiles, just the scoring strings."""
-        variants = self.meldVariants(uiTile, lowerHalf)
+        variants = self.meldVariants(uiTile, forLowerHalf)
         idx = 0
         if len(variants) > 1:
             menu = QMenu(i18n('Choose from'))
@@ -682,7 +682,7 @@ class SelectorBoard(CourtBoard):
         self.dropTile(uiTile)
         event.accept()
 
-    def dropTile(self, uiTile:UITile, lowerHalf:bool=False) ->None:  # pylint: disable=unused-argument
+    def dropTile(self, uiTile:UITile, forLowerHalf:bool=False) ->None:  # pylint: disable=unused-argument
         """drop uiTile into selector board"""
         assert uiTile.board
         uiMeld = uiTile.board.uiMeldWithTile(uiTile)
@@ -731,7 +731,7 @@ class SelectorBoard(CourtBoard):
         uiTile.dark = False
         uiTile.setBoard(self, column, row)
 
-    def meldVariants(self, tile:UITile, lowerHalf:bool) ->MeldList:
+    def meldVariants(self, tile:UITile, forLowerHalf:bool) ->MeldList:
         """return a list of possible variants based on meld. Those are logical melds."""
         assert isinstance(tile, UITile)
         wantedTile = tile.tile
@@ -739,7 +739,7 @@ class SelectorBoard(CourtBoard):
             selectorTile.change_name(selectorTile.exposed)
         lowerName = wantedTile.exposed
         upperName = wantedTile.concealed
-        if lowerHalf:
+        if forLowerHalf:
             scName = upperName
         else:
             scName = lowerName
@@ -750,7 +750,7 @@ class SelectorBoard(CourtBoard):
         if baseTiles >= 3:
             result.append(scName.pung)
         if baseTiles == 4:
-            if lowerHalf:
+            if forLowerHalf:
                 result.append(lowerName.kong.declared)
             else:
                 result.append(lowerName.kong)
