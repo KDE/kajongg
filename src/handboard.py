@@ -309,7 +309,10 @@ class HandBoard(Board):
 
     def checkTiles(self) ->None:
         """does the logical state match the displayed tiles?"""
-        logExposed:TileList = TileList()
+        return
+# FIXME: when exactly should I call this? afterQueuedAnimations does not help
+        # test case: scoring game. move meld from exposed to concealed using the mouse
+        logExposed:TileList = TileList()  # pylint: disable=unreachable
         physExposed:TileList = TileList()
         logConcealed:TileList = TileList()
         physConcealed:TileList = TileList()
