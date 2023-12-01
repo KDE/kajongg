@@ -181,6 +181,8 @@ class Board(QGraphicsRectItem, ReprMixin):
 
     arrows:List[Qt.Key] = [Qt.Key.Key_Left, Qt.Key.Key_Down, Qt.Key.Key_Up, Qt.Key.Key_Right]
 
+    showShadowsBetweenRows = False
+
     def __init__(self, width:float, height:float, tileset:Tileset, boardRotation:int=0) ->None:
         QGraphicsRectItem.__init__(self)
         self.uiTiles:List[UITile] = []
@@ -949,7 +951,7 @@ class DiscardBoard(CourtBoard):
 
     def __init__(self) ->None:
         CourtBoard.__init__(self, 11, 9)
-        self.__places:List[Tuple[float, float]]
+        self.__places:List[Tuple[float, int]]
         self.__lastDiscarded:Optional[UITile] = None
         self.__discardTilesOrderedLeaveHole:bool = True
 

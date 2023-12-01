@@ -37,7 +37,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
 
     clsUid = 0
 
-    def __init__(self, tile:Tile, xoffset:float=0.0, yoffset:float=0.0, level:int=0) ->None:
+    def __init__(self, tile:Tile, xoffset:float=0.0, yoffset:int=0, level:int=0) ->None:
         super().__init__()
         if not isinstance(tile, Tile):
             tile = Tile(tile)
@@ -106,12 +106,16 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         normally pos, rotation and scale"""
         assert self.board
         assert self.tileset
+        assert Internal.Preferences
         width = self.tileset.faceSize.width()
         height = self.tileset.faceSize.height()
         shiftZ = self.board.shiftZ(self.level)
+        _ = self.yoffset
+        if Internal.Preferences.showShadows and self.board.showShadowsBetweenRows:
+            _ *= 1.2
         boardPos = QPointF(
             self.xoffset * width,
-            self.yoffset * height) + shiftZ
+           _ * height) + shiftZ
         scenePos = self.board.mapToScene(boardPos)
 # TODO: rename to 'def get_moveDict, return class MoveDict(TypedDict)
         return {'pos': scenePos, 'rotation': sceneRotation(self.board), 'scale': self.board.scale()}
@@ -299,7 +303,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         return self.yoffset * 100 + self.xoffset
 
     def setBoard(self, board:Optional['Board'],
-        xoffset:Optional[float]=None, yoffset:Optional[float]=None, level:int=0) ->None:
+        xoffset:Optional[float]=None, yoffset:Optional[int]=None, level:int=0) ->None:
         """change Position of tile in board"""
         placeDirty = False
         if self.__board != board:
@@ -394,12 +398,12 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                 self.__board.placeTile(self)
 
     @property
-    def yoffset(self) ->float:
+    def yoffset(self) ->int:
         """in logical board coordinates"""
         return self.__yoffset
 
     @yoffset.setter
-    def yoffset(self, value:float) ->None:
+    def yoffset(self, value:int) ->None:
         """in logical board coordinates. Update board display."""
         if value != self.__yoffset:
             self.__yoffset = value
@@ -413,7 +417,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         level = ' level=%d' % self.level if self.level else ''
         _ = self.boundingRect()
         size = ' %.2dx%.2d' % (_.width(), _.height())
-        return '%s(%s) %s: x/y/z=%.1f(%.1f)/%.1f(%.1f)/%.2f%s%s%s%s' % \
+        return '%s(%s) %s: x/y/z=%.1f(%.1f)/%d(%.1f)/%.2f%s%s%s%s' % \
             (self.tile.name2(),
              self.board.debug_name() if self.board else 'None', id4(self),
              self.xoffset, self.x(), self.yoffset,

@@ -32,11 +32,11 @@ class TileAttr(ReprMixin):
 
     """a helper class for syncing the hand board, holding relevant
     tile attributes.
-    xoffset and yoffset are expressed in number of tiles but may be
+    xoffset is expressed in number of tiles but may be
     fractional for adding distances between melds"""
 
     def __init__(self, hand:Union['HandBoard', UITile], meld:Optional[Meld]=None, idx:Optional[int]=None,
-        xoffset:Optional[float]=None, yoffset:Optional[float]=None) ->None:
+        xoffset:Optional[float]=None, yoffset:Optional[int]=None) ->None:
         if isinstance(hand, UITile):
 # TODO only used for Bonus tiles, should split or eliminate this
             self.tile = hand.tile
@@ -51,7 +51,7 @@ class TileAttr(ReprMixin):
             assert xoffset is not None # FIXME: overload __init__
             assert yoffset is not None
             self.xoffset = xoffset  # type:ignore[assignment]
-            self.yoffset = yoffset  # type:ignore[assignment]
+            self.yoffset = yoffset
             self.dark = self.setDark()
             # dark and focusable are different in a ScoringHandBoard
             self.focusable = self.setFocusable(hand, meld, idx)
@@ -77,7 +77,7 @@ class TileAttr(ReprMixin):
     def __str__(self) ->str:
         assert self.xoffset is not None
         return (
-            '%s %.2f/%.1f%s%s' %
+            '%s %.2f/%d%s%s' %
             (self.tile, self.xoffset, self.yoffset,
              ' dark' if self.dark else '',
              ' focusable' if self.focusable else ''))
@@ -89,13 +89,13 @@ class HandBoard(Board):
 
     tileAttrClass = TileAttr
     penColor = QColor('blue')
+    showShadowsBetweenRows = True
 
     def __init__(self, player:'VisiblePlayer') ->None:
         assert player
         self._player = weakref.ref(player)
         self.exposedMeldDistance:float = 0.15
         self.concealedMeldDistance:float = 0.0
-        self.lowerY:float = 1.0
         Board.__init__(self, 15.6, 2.0, Tileset.current())
         self.isHandBoard = True
         self.tileDragEnabled = False
@@ -145,11 +145,7 @@ class HandBoard(Board):
             self.setTilePos(yHeight=1.5)
         else:
             self.setTilePos(yHeight=1.0)
-        if show:
-            self.lowerY = 1.2
-        else:
-            self.lowerY = 1.0
-        self.setBoardRect(15.6, 1.0 + self.lowerY)
+        self.setBoardRect(15.6, 2.2 if show else 2.0)
         self._reload(self.tileset, showShadows=show)
         self.sync()
 
@@ -186,7 +182,7 @@ class HandBoard(Board):
         assert self.player
         newUpperMelds = list(self.player.exposedMelds)
         newLowerMelds = self.newLowerMelds()
-        for yPos, melds in ((0, newUpperMelds), (self.lowerY, newLowerMelds)):
+        for yPos, melds in ((0, newUpperMelds), (1, newLowerMelds)):
             meldDistance = (self.concealedMeldDistance if yPos
                             else self.exposedMeldDistance)
             meldX:float = 0.0
@@ -198,7 +194,7 @@ class HandBoard(Board):
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
 
     def placeBoniInRow(self, bonusTiles:List[UITile], tilePositions:List[TileAttr],
-        bonusY:float, keepTogether:bool=True) ->List[TileAttr]:
+        bonusY:int, keepTogether:bool=True) ->List[TileAttr]:
         """Try to place bonusTiles in upper or in lower row.
         tilePositions are the normal tiles, already placed.
         If there is no space, return None
@@ -223,21 +219,21 @@ class HandBoard(Board):
 
     def newBonusPositions(self, bonusTiles:List[UITile], newTilePositions:List[TileAttr]) ->List[TileAttr]:
         """return list(TileAttr)
-        calculate places for bonus tiles. Put them all in one row,
+        calculate places for bonus tiles. Try to put them all in one row,
         right adjusted. If necessary, extend to the right even
         outside of our board"""
         if not bonusTiles:
             return []
         bonusTiles = sorted(bonusTiles, key=lambda x: hash(x.tile))
         result = (
-            self.placeBoniInRow(bonusTiles, newTilePositions, 0.0)
+            self.placeBoniInRow(bonusTiles, newTilePositions, 0)
             or
-            self.placeBoniInRow(bonusTiles, newTilePositions, self.lowerY))
+            self.placeBoniInRow(bonusTiles, newTilePositions, 1))
         if not result:
             # we cannot place all bonus tiles in the same row!
-            result = self.placeBoniInRow(bonusTiles, newTilePositions, 0.0, keepTogether=False)
+            result = self.placeBoniInRow(bonusTiles, newTilePositions, 0, keepTogether=False)
             result.extend(self.placeBoniInRow(
-                bonusTiles[len(result):], newTilePositions, self.lowerY, keepTogether=False))
+                bonusTiles[len(result):], newTilePositions, 1, keepTogether=False))
 
         assert len(bonusTiles) == len(result)
         return result
@@ -400,8 +396,8 @@ class PlayingHandBoard(HandBoard):
         happen. So for each element, we make sure that the left-right order is
         still the same as before. For this check, ignore all new tiles"""
         movingPlaces = self.__movingPlaces(places)
-        for yOld in 0, self.lowerY:
-            for yNew in 0, self.lowerY:
+        for yOld in 0, 1:
+            for yNew in 0, 1:
                 items = [x for x in movingPlaces.items()
                          if (x[0].board == self)
                          and x[0].yoffset == yOld
@@ -423,7 +419,7 @@ class PlayingHandBoard(HandBoard):
         """filter out the left parts of the rows which do not change
         at all"""
         rows:List[List[Any]] = [[], []]
-        for idx, yOld in enumerate([0, self.lowerY]):
+        for idx, yOld in enumerate([0, 1]):
             rowPlaces = [x for x in places.items() if x[0].yoffset == yOld]
             rowPlaces = sorted(rowPlaces, key=lambda x: x[0].xoffset)
             smallestX = 999.9
