@@ -112,12 +112,12 @@ class HandBoard(Board):
     def computeRect(self) ->None:
         """also adjust the scale for maximum usage of space"""
         Board.computeRect(self)
-        assert self.player
-        sideRect = self.player.front.boundingRect()
-        boardRect = self.boundingRect()
-        scale = ((sideRect.width() + sideRect.height())
-                 / (boardRect.width() - boardRect.height()))
-        self.setScale(scale)
+        if self.player:
+            sideRect = self.player.front.boundingRect()
+            boardRect = self.boundingRect()
+            scale = ((sideRect.width() + sideRect.height())
+                     / (boardRect.width() - boardRect.height()))
+            self.setScale(scale)
 
     @property
     def player(self) ->Optional['VisiblePlayer']:
