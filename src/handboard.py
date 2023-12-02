@@ -175,7 +175,7 @@ class HandBoard(Board):
         """a list of melds for the hand as it should look after sync"""
         return MeldList()
 
-    def newTilePositions(self) ->List[TileAttr]:
+    def listNewTilePositions(self) ->List[TileAttr]:
         """return list(TileAttr) for all tiles except bonus tiles.
         The tiles are not associated to any board."""
         result:List[TileAttr] = []
@@ -253,7 +253,7 @@ class HandBoard(Board):
                 targetDict[uiTile.tile] = []
             targetDict[uiTile.tile].append(uiTile)
         result:Dict[UITile, TileAttr] = {}
-        newPositions = self.newTilePositions()
+        newPositions = self.listNewTilePositions()
         for newPosition in newPositions:
             assert isinstance(newPosition.tile, Tile)
             matches = oldTiles.get(newPosition.tile) \
