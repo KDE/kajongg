@@ -463,7 +463,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         return self.tile.name2()
 
 
-class UIMeld(list):
+class UIMeld(list, ReprMixin):
 
     """represents a visible meld. Can be empty. Many Meld methods will
     raise exceptions if the meld is empty. But we do not care,
@@ -487,3 +487,12 @@ class UIMeld(list):
     def meld(self) ->Meld:
         """return a logical meld"""
         return Meld(x.tile for x in self)
+
+    def __str__(self) ->str:
+        """shorter than str() of the list"""
+        first_tile = self[0]
+        return 'UIMeld_%s(%s in %s x/y %.1f/%d)' % (
+                id4(self),
+                self.meld,
+                first_tile.board.debug_name(),
+                first_tile.xoffset, first_tile.yoffset)
