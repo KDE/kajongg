@@ -155,8 +155,8 @@ class ScoreItemDelegate(QStyledItemDelegate):
                         # have to draw the lines into one big pixmap and copy
                         # from the into the cells
                         painter.drawPolyline(*chart)
-            return None
-        return QStyledItemDelegate.paint(self, painter, option, index)
+            return
+        QStyledItemDelegate.paint(self, painter, option, index)
 
 
 class ScoreModel(TreeModel):
@@ -627,11 +627,12 @@ class PenaltyBox(QSpinBox):
             if int_data % self.parties != 0:
                 result = QValidator.State.Intermediate
         if result == QValidator.State.Acceptable:
-            self.prevValue = str(inputData)
+            self.prevValue = int(inputData)
         return (result, inputData, newPos)
 
-    def fixup(self, data):
+    def fixup(self, data:str) ->str:
         """change input to a legal value"""
+        # The Qt doc says return type is None but annotation says str
         value = int(str(data))
         prevValue = self.prevValue
         assert value != prevValue
@@ -804,11 +805,11 @@ class ScoringDialog(QWidget):
         self.scene = scene
         decorateWindow(self, i18nc("@title:window", "Scoring for this Hand"))
         self.nameLabels = list(QLabel() for x in range(4))
-        self.spValues = list(QSpinBox() for x in range(4))
-        self.windLabels =  list(QLabel() for x in range(4))
-        self.wonBoxes = list(QCheckBox("") for x in range(4))
-        self.detailsLayout = list(QVBoxLayout() for x in range(4))
-        self.details = list(QWidget() for x in range(4))
+        self.spValues = [QSpinBox() for x in range(4)]
+        self.windLabels = [QLabel()] * 4
+        self.wonBoxes = [QCheckBox("")] * 4
+        self.detailsLayout = [QVBoxLayout()] * 4
+        self.details = [QWidget()] * 4
         self.__meldPixMaps = []
         grid = QGridLayout(self)
         pGrid = QGridLayout()
@@ -1105,6 +1106,7 @@ class ScoringDialog(QWidget):
             return
         assert winnerTiles[0].board
         pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()
+        # mypy does not seem to understand operator*
         self.cbLastTile.setIconSize(pmSize)
         QPixmapCache.clear()
         shownTiles = set()
