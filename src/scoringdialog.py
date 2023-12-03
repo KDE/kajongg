@@ -55,7 +55,7 @@ class ScoreTreeItem(TreeItem):
         """count the hands of the first player"""
         child1 = self
         while not isinstance(child1, ScorePlayerItem) and child1.children:
-            child1 = child1.children[0]
+            child1 = cast('ScoreTreeItem', child1.children[0])
         if isinstance(child1, ScorePlayerItem):
             return len(child1.raw[1]) + 1
         return 1
@@ -68,7 +68,7 @@ class ScoreRootItem(RootItem):
     def columnCount(self) ->int:
         child1 = self
         while not isinstance(child1, ScorePlayerItem) and child1.children:
-            child1 = child1.children[0]
+            child1 = cast('ScoreRootItem', child1.children[0])
         if isinstance(child1, ScorePlayerItem):
             return len(child1.raw[1]) + 1
         return 1
@@ -153,7 +153,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
         item = index.internalPointer()
         if isinstance(item, ScorePlayerItem) and item.parent and item.parent.row() == 3 and index.column() != 0:
             for idx, playerItem in enumerate(index.parent().internalPointer().children):
-                chart = index.model().chart(option.rect, index, playerItem)
+                chart = cast('ScoreModel', index.model()).chart(option.rect, index, playerItem)
                 if chart:
                     with Painter(painter):
                         painter.translate(option.rect.topLeft())
@@ -225,7 +225,7 @@ class ScoreModel(TreeModel):
                 if not isinstance(content, HandResult):
                     return QBrush(ScoreItemDelegate.colors[index.row()])
         if column > 0 and isinstance(item, ScorePlayerItem):
-            content = item.content(column)
+            content = cast('HandResult', item.content(column))
             if role == Qt.ItemDataRole.BackgroundRole:
                 if content and content.won:
                     return QColor(165, 255, 165)
@@ -243,7 +243,7 @@ class ScoreModel(TreeModel):
             assert self.rootItem
             child1 = self.rootItem.children[0]
             if child1 and child1.children:
-                child1 = child1.children[0]
+                child1 = cast(ScorePlayerItem, child1.children[0])
                 hands = child1.hands()
                 handResult = hands[section - 1]
                 if not handResult.penalty:
@@ -265,8 +265,9 @@ class ScoreModel(TreeModel):
             (x for x in game.players if not x.name.startswith('Robot')))
         robots = sorted(
             (x for x in game.players if x.name.startswith('Robot')))
-        data = [tuple([player.localName, [HandResult(*x[1:]) for x in records
-                                          if x[0] == player.nameid]]) for player in humans + robots]
+        data =  cast(List[Tuple[str, List['HandResult']]],
+                    [tuple([player.localName, [HandResult(*x[1:]) for x in records
+                    if x[0] == player.nameid]]) for player in humans + robots])
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         assert self.rootItem
@@ -416,8 +417,8 @@ class ScoreTable(QWidget):
         super().__init__(None)
         self.setObjectName('ScoreTable')
         self.scene = scene
-        self.scoreModel = None
-        self.scoreModelTest = None
+        self.scoreModel:Optional[ScoreModel] = None
+        self.scoreModelTest:Optional[ModelTest] = None
         decorateWindow(self, i18nc('kajongg', 'Scores'))
         self.setAttribute(Qt.WidgetAttribute.WA_AlwaysShowToolTips)
         self.setMouseTracking(True)
@@ -694,8 +695,8 @@ class PenaltyDialog(QDialog):
         grid.addWidget(lblPenalty, 1, 0)
         grid.addWidget(self.spPenalty, 1, 1)
         grid.addWidget(self.lblUnits, 1, 2)
-        self.payers = []
-        self.payees = []
+        self.payers:List[ListComboBox] = []
+        self.payees:List[ListComboBox] = []
         # a penalty can never involve the winner, neither as payer nor as payee
         for idx in range(3):
             self.payers.append(ListComboBox(game.losers()))
@@ -747,7 +748,7 @@ class PenaltyDialog(QDialog):
 
     def allParties(self) ->List['Player']:
         """return all parties involved in penalty payment"""
-        return [x.current for x in self.usedCombos(self.payers + self.payees)]
+        return [cast('Player', x.current) for x in self.usedCombos(self.payers + self.payees)]
 
     def playerChanged(self) ->None:
         """shuffle players to ensure everybody only appears once.
@@ -757,7 +758,7 @@ class PenaltyDialog(QDialog):
             changedCombo = self.payers[0]
         usedPlayers = set(self.allParties())
         unusedPlayers = set(self.game.losers()) - usedPlayers
-        foundPlayers = [changedCombo.current]
+        foundPlayers = [cast('Player', changedCombo.current)]
         for combo in self.usedCombos(self.payers + self.payees):
             if combo is not changedCombo:
                 if combo.current in foundPlayers:
@@ -814,12 +815,12 @@ class ScoringDialog(QWidget):
         self.scene = scene
         decorateWindow(self, i18nc("@title:window", "Scoring for this Hand"))
         self.nameLabels = list(QLabel() for x in range(4))
-        self.spValues = [QSpinBox() for x in range(4)]
+        self.spValues:List[QSpinBox] = list(QSpinBox() for x in range(4))
         self.windLabels = [QLabel()] * 4
         self.wonBoxes = [QCheckBox("")] * 4
         self.detailsLayout = [QVBoxLayout()] * 4
         self.details = [QWidget()] * 4
-        self.__meldPixMaps = []
+        self.__meldPixMaps:List[QPixmap] = []
         grid = QGridLayout(self)
         pGrid = QGridLayout()
         grid.addLayout(pGrid, 0, 0, 2, 1)
@@ -868,14 +869,14 @@ class ScoringDialog(QWidget):
             QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
         self.lblLastMeld = QLabel(i18n('L&ast Meld:'))
-        self.prevLastTile = None
+        self.prevLastTile:Optional['Tile'] = None
         self.cbLastMeld = QComboBox()
         self.cbLastMeld.setMinimumContentsLength(1)
         self.cbLastMeld.setSizePolicy(vpol)
         self.cbLastMeld.setSizeAdjustPolicy(
             QComboBox.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastMeld.setBuddy(self.cbLastMeld)
-        self.comboTilePairs = set()
+        self.comboTilePairs:set['Tile'] = set()
         pGrid.setRowStretch(6, 5)
         pGrid.addWidget(self.lblLastTile, 7, 0, 1, 2)
         pGrid.addWidget(self.cbLastTile, 7, 2, 1, 1)
@@ -950,7 +951,7 @@ class ScoringDialog(QWidget):
         if self.prevLastTile and self.prevLastTile.isExposed != newLastTile.isExposed:
             # state of last tile (concealed/exposed) changed:
             # for all checked boxes check if they still are applicable
-            winner = self.game.winner
+            winner = cast('ScoringPlayer', self.game.winner)
             if winner:
                 for box in winner.manualRuleBoxes:
                     if box.isChecked():
@@ -1010,7 +1011,7 @@ class ScoringDialog(QWidget):
                         if pBox.rule.name == ruleBox.rule.name:
                             pBox.setChecked(False)
         try:
-            newState = bool(self.game.winner.handBoard.uiTiles)
+            newState = bool(self.game.winner.handBoard.uiTiles) # type:ignore[union-attr]
         except AttributeError:
             newState = False
         self.lblLastTile.setVisible(newState)
@@ -1114,8 +1115,8 @@ class ScoringDialog(QWidget):
         if not winnerTiles:
             return
         assert winnerTiles[0].board
-        pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()
         # mypy does not seem to understand operator*
+        pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()  # type:ignore[attr-defined]
         self.cbLastTile.setIconSize(pmSize)
         QPixmapCache.clear()
         shownTiles = set()
