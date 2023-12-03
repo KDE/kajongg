@@ -93,7 +93,7 @@ class Request(ReprMixin):
             answer = 'OPEN'
         result = ''
         if Debug.deferredBlock:
-            result += '[{id4:>4}] '.format(id4=id4(self))
+            result += '_{id4:>4} '.format(id4=id4(self))
         result += '{cmd}->{cls}({receiver:<10}): {answer}'.format(
             cls=self.user.__class__.__name__, cmd=cmd, receiver=self.user.name,
             answer=answer)
@@ -115,7 +115,7 @@ class Request(ReprMixin):
         """for debug output"""
         result = ''
         if Debug.deferredBlock:
-            result += '[{id4:>4}] '.format(id4=id4(self))
+            result += '_{id4:>4} '.format(id4=id4(self))
         result += '{cmd:<12}<-{cls:>6}({receiver:<10}): ANS={answer}'.format(
             cls=self.user.__class__.__name__,
             answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.user.name)  # type:ignore[attr-defined]
@@ -157,7 +157,7 @@ class DeferredBlock(ReprMixin):
 
     def debugPrefix(self, dbgMarker:str='') ->str:
         """prefix for debug message"""
-        return 'T{table} B[{id4:>4}] {caller:<15} {dbgMarker:<3}(out={out})'.format(
+        return 'T{table} B_{id4:>4} {caller:<15} {dbgMarker:<3}(out={out})'.format(
             table=self.table.tableid, id4=id4(self), caller=self.calledBy[:15],
             dbgMarker=dbgMarker, out=self.outstanding)
 
@@ -214,7 +214,7 @@ class DeferredBlock(ReprMixin):
                 request)
         if Debug.deferredBlock:
             notifying = ' notifying' if deferred.notifying else ''  # type:ignore[attr-defined]
-            rqString = '[{id4:>4}] {cmd}{notifying} {about}->{cls:>6}({receiver:<10})'.format(
+            rqString = '_{id4:>4} {cmd}{notifying} {about}->{cls:>6}({receiver:<10})'.format(
                 cls=user.__class__.__name__,
                 id4=id4(request), cmd=deferred.command, receiver=user.name,  # type:ignore[attr-defined]
                 about=about.name if about else '', notifying=notifying)

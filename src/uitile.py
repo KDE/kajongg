@@ -74,8 +74,8 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         _ = self.board
         assert _
         if self is not _.focusTile:
-            logDebug('keyPressEvent %s on [%s]%s but focus is on [%s]%s' % \
-                (event, id4(self), self, id4(_.focusTile), _.focusTile))
+            logDebug('keyPressEvent %s on %s_%s but focus is on %s_%s' % \
+                (event, self, id4(self), _.focusTile, id4(_.focusTile)))
         _.keyPressEvent(event)
 
     def __lightDistance(self) ->float:
@@ -423,11 +423,12 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         level = ' level=%d' % self.level if self.level else ''
         _ = self.boundingRect()
         size = ' %.2dx%.2d' % (_.width(), _.height())
-        return '%s(%s) %s: x/y/z=%.1f(%.1f)/%d(%.1f)/%.2f%s%s%s%s' % \
-            (self.tile.name2(),
-             self.board.debug_name() if self.board else 'None', id4(self),
-             self.xoffset, self.x(), self.yoffset,
-             self.y(), self.zValue(), size, rotation, scale, level)
+        return '%s_%s(%s on %s x/y/z %.1f(%.1f)/%d(%.1f)/%d %s%s%s%s' % ( \
+             self.__class__.__name__, id4(self),
+             self.tile.name2(),
+             self.board.debug_name() if self.board else 'None',
+             self.xoffset, self.x(), self.yoffset, self.y(),
+             self.zValue(), size, rotation, scale, level)
 
     @property
     def isBonus(self) ->bool:

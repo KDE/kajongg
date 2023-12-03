@@ -102,7 +102,7 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
 
     def __str__(self) ->str:
         """for debugging"""
-        return 'FocusRect({} on {})'.format(id4(self), self.board if self.board else 'NOBOARD')
+        return 'FocusRect_{}({})'.format(id4(self), self.board if self.board else 'NOBOARD')
 
 class SceneWithFocusRect(QGraphicsScene):
 

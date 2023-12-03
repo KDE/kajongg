@@ -153,7 +153,7 @@ class DBHandle(sqlite3.Connection):
         name = stack[-3]
         if name in ('__exit__', '__init__'):
             name = stack[-4]
-        return '%s on %s (%s)' % (name, self.path, id4(self))
+        return '%s on %s_%s' % (name, self.path, id4(self))
 
     def commit(self, silent:bool=False) ->None:
         """commit and log it"""

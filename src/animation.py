@@ -77,8 +77,8 @@ class Animation(QPropertyAnimation, ReprMixin):
         """the identifier to be used in debug messages"""
         pGroup = self.group() if isAlive(self) else 'notAlive'
         if pGroup or not isAlive(self):
-            return '%s/A%s' % (pGroup, id4(self))
-        return 'A%s-%s' % (id4(self), cast('AnimatedMixin', self.targetObject()).debug_name())
+            return '%s/A_%s' % (pGroup, id4(self))
+        return 'A_%s-%s' % (id4(self), cast('AnimatedMixin', self.targetObject()).debug_name())
 
     def pName(self) ->str:
         """
@@ -172,7 +172,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         self.doAfter:List[Deferred] = []
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
-                logDebug('Chaining Animation group G%s to G%s' %
+                logDebug('Chaining Animation group G_%s to G%s' %
                          (id4(self), ParallelAnimationGroup.current))
             self.doAfter = ParallelAnimationGroup.current.doAfter
             ParallelAnimationGroup.current.doAfter = []
@@ -247,7 +247,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             assert Internal.Preferences
             logDebug('%s started with speed %d (%s)' % (
                 self, int(Internal.Preferences.animationSpeed),
-                ','.join('A%s' % id4(x) for x in self.animations)))
+                ','.join('A_%s' % id4(x) for x in self.animations)))
         return succeed(None).addErrback(logException)
 
     def allFinished(self) ->None:
