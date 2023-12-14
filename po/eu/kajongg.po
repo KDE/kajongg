@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-06-10 00:45+0000\n"
-"PO-Revision-Date: 2023-10-11 23:13+0200\n"
+"PO-Revision-Date: 2023-12-13 23:21+0100\n"
 "Last-Translator: Iñigo Salvador Azurmendi <xalba@ni.eus>\n"
 "Language-Team: Basque <kde-i18n-eu@kde.org>\n"
 "Language: eu\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 23.08.1\n"
+"X-Generator: Lokalize 23.08.4\n"
 
 msgid "Preview"
 msgstr "Aurreikuspegia"
@@ -264,31 +264,31 @@ msgstr "hasi erakustaldi moduarekin"
 
 #: src/kajongg.py:86
 msgid "login to HOST"
-msgstr "saio-hasi hemen, HOST"
+msgstr "saio-hasi hemen, OSTALARIA"
 
 #: src/kajongg.py:87
 msgid "start new TABLE"
-msgstr "hasi TABLE berria"
+msgstr "hasi TAULA berria"
 
 #: src/kajongg.py:88
 msgid "join TABLE"
-msgstr "batu honetara, TABLE"
+msgstr "batu honetara, TAULA"
 
 #: src/kajongg.py:89
 msgid "use RULESET without asking"
-msgstr "erabili RULESET galdetu gabe"
+msgstr "erabili ARAUMULTZOA galdetu gabe"
 
 #: src/kajongg.py:90
 msgid "play only ROUNDS rounds per game. Only for debugging!"
-msgstr "jokatu bakarrik ROUNDS erronda jokoko. Arazteko bakarrik!"
+msgstr "jokatu bakarrik TXANDAK txanda jokoko. Arazteko bakarrik!"
 
 #: src/kajongg.py:91
 msgid "prefer PLAYER for next login"
-msgstr ""
+msgstr "hobetsi JOKALARIA hurrengo saio-hasierarako"
 
 #: src/kajongg.py:92
 msgid "use AI variant for human player in demo mode"
-msgstr ""
+msgstr "erabili AA aldaera gizaki jokalari gisa erakustaldi moduan"
 
 #: src/kajongg.py:93
 msgid "write statistics to CSV"
@@ -309,10 +309,14 @@ msgstr "ez erakutsi erabiltzailearen interfaze grafikorik. Probatarako soilik"
 #: src/kajongg.py:98
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
 msgstr ""
+"erabili HARGUNEAn entzuten duen zerbitzari dedikatua. Bakarrik probetarako "
+"helburuarekin"
 
 #: src/kajongg.py:99
 msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgstr ""
+"erabili ATAKAn entzuten duen zerbitzari dedikatu bat. Bakarrik probetarako "
+"helburuarekin"
 
 #: src/kdestub.py:251
 msgid "&OK"
@@ -1239,11 +1243,11 @@ msgstr ""
 
 #: src/predefined.py:178
 msgid "True Color Game"
-msgstr ""
+msgstr "Benetako Kolore jokoa"
 
 #: src/predefined.py:179
 msgid "Only same-colored tiles (only bamboo/stone/character)"
-msgstr ""
+msgstr "Kolore bereko fitxak bakarrik (bakarrik banbua/harria/karakterea)"
 
 #: src/predefined.py:181
 msgid "Concealed True Color Game"
@@ -1259,7 +1263,7 @@ msgstr ""
 
 #: src/predefined.py:185
 msgid "Only winds, dragons, 1 and 9"
-msgstr ""
+msgstr "Haizeak, herensugeak, 1ekoak eta 9koak bakarrik"
 
 #: src/predefined.py:186
 msgid "Only Honors"
@@ -1267,7 +1271,7 @@ msgstr ""
 
 #: src/predefined.py:187
 msgid "Only winds and dragons"
-msgstr ""
+msgstr "Haizeak eta herensugeak bakarrik"
 
 #: src/predefined.py:189
 msgid "Hidden Treasure"
@@ -1279,7 +1283,7 @@ msgstr ""
 
 #: src/predefined.py:192
 msgid "Heads and Tails"
-msgstr ""
+msgstr "Buruak eta isatsak"
 
 #: src/predefined.py:193
 msgid "Only 1 and 9"
@@ -1343,11 +1347,11 @@ msgstr ""
 
 #: src/predefined.py:219
 msgid "Standard Mah Jongg"
-msgstr ""
+msgstr "Mah-Jongg estandarra"
 
 #: src/predefined.py:224
 msgid "Nine Gates"
-msgstr ""
+msgstr "Bederatzi Ate"
 
 #: src/predefined.py:226
 msgid ""
@@ -1357,7 +1361,7 @@ msgstr ""
 
 #: src/predefined.py:228
 msgid "Thirteen Orphans"
-msgstr ""
+msgstr "Hamahiru Umezurtz"
 
 #: src/predefined.py:229
 msgid ""
@@ -1442,16 +1446,12 @@ msgid "Pair of Dragons"
 msgstr "Herensuge bikotea"
 
 #: src/predefined.py:287
-#, fuzzy
-#| msgid "Flower 1"
 msgid "Flower"
-msgstr "Lorea 1"
+msgstr "Lorea"
 
 #: src/predefined.py:289
-#, fuzzy
-#| msgid "Season 1"
 msgid "Season"
-msgstr "Urtaroa 1"
+msgstr "Urtaroa"
 
 #: src/predefined.py:300
 msgid "Classical Chinese DMJL"
@@ -1520,27 +1520,20 @@ msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr ""
 
 #: src/predefined.py:357
-#, fuzzy
-#| msgid "Classical Chinese DMJL"
 msgid "Classical Chinese BMJA"
-msgstr "DMJL Txinatar klasikoa"
+msgstr "BMJA Txinatar klasikoa"
 
 #: src/predefined.py:363
-#, fuzzy
-#| msgid ""
-#| "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
-msgstr "Txinatar klasikoa Deutsche Mah Jongg Liga (DMJL) e.V. definitu bezala"
+msgstr "Txinatar klasikoa Britainiako Mah-Jongg elkarteak definitu bezala"
 
 #: src/predefined.py:378
-#, fuzzy
-#| msgid "Original author"
 msgid "Original Call"
-msgstr "Jatorrizko egilea"
+msgstr "Jatorrizko deia"
 
 #: src/predefined.py:382
 msgid "Gates of Heaven"
-msgstr ""
+msgstr "Zeruko ateak"
 
 #: src/predefined.py:383
 msgid ""
@@ -1684,7 +1677,7 @@ msgstr ""
 #: src/query.py:219
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
-msgstr "Bertako jokoa"
+msgstr "Joko lokala"
 
 #: src/query.py:397
 msgid "Database %1 updated from schema %2 to %3"
@@ -1697,11 +1690,9 @@ msgstr "puntuak"
 #: src/rule.py:41
 msgctxt "kajongg"
 msgid "doubles"
-msgstr ""
+msgstr "bikoteak"
 
 #: src/rule.py:42
-#, fuzzy
-#| msgid "limits"
 msgctxt "kajongg"
 msgid "limits"
 msgstr "mugak"
@@ -1714,7 +1705,7 @@ msgstr "%1 puntu"
 #: src/rule.py:81
 msgctxt "Kajongg"
 msgid "%1 doubles"
-msgstr ""
+msgstr "%1 bikote"
 
 #: src/rule.py:86
 msgctxt "Kajongg"
@@ -1776,7 +1767,7 @@ msgstr "Hemen jokuarekin lotura duten zenbait aukera berezi dauzkagu"
 
 #: src/rule.py:337
 msgid "Penalties"
-msgstr "Penalizazioak"
+msgstr "Isunak"
 
 #: src/rule.py:338
 msgid ""
@@ -1795,17 +1786,17 @@ msgstr ""
 #: src/rule.py:896
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
-msgstr ""
+msgstr "%4(k) \"%1\" arauan ezinezko balioak ditu %2/%3"
 
 #: src/rule.py:992
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
-msgstr ""
+msgstr "%1: %2 txikiegia da, gutxieneko balioa %3 da"
 
 #: src/rulesetselector.py:476
 msgctxt "@title:window"
 msgid "Customize rulesets"
-msgstr ""
+msgstr "Arau-multzoa neurrira egokitu"
 
 #: src/rulesetselector.py:494
 msgctxt "kajongg"
@@ -1814,32 +1805,26 @@ msgstr "Araua"
 
 #: src/rulesetselector.py:551
 msgid "C&opy"
-msgstr ""
+msgstr "K&opiatu"
 
 #: src/rulesetselector.py:552
-#, fuzzy
-#| msgid "Compare"
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
-msgstr "Konparatu"
+msgstr "Ko&nparatu"
 
 #: src/rulesetselector.py:553
-#, fuzzy
-#| msgid "R&emove"
 msgid "&Remove"
-msgstr "E&zabatu"
+msgstr "&Kendu"
 
 #: src/rulesetselector.py:554
 msgid "&Close"
-msgstr ""
+msgstr "It&xi"
 
 #: src/scene.py:365 src/scene.py:498
 msgid "Do you really want to abort this game?"
-msgstr "Benetan galarazi nahi duzu joku hau?"
+msgstr "Benetan galarazi nahi duzu joko hori?"
 
 #: src/scoring.py:43
-#, fuzzy
-#| msgid "Swap Seats"
 msgctxt "@title:window"
 msgid "Swap Seats"
 msgstr "Aulkiak aldatu"
@@ -1857,49 +1842,48 @@ msgid "&Keep seat"
 msgstr "Aulkiak &mantendu"
 
 #: src/scoring.py:60
-#, fuzzy
-#| msgid "Select four players"
 msgctxt "@title:window"
 msgid "Select four players"
 msgstr "Hautatu lau jokalari"
 
 #: src/scoring.py:288
 msgid "Move Exposed Tiles Here"
-msgstr ""
+msgstr "Mugitu estali gabeko fitxak hona"
 
 #: src/scoring.py:289
+#, fuzzy
 msgid "Move Concealed Tiles Here"
-msgstr ""
+msgstr "Mugitu hona "
 
 #: src/scoring.py:599
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
+"Mesedez, definitu lau jokalari hemen, <interface>Ezarpenak|Jokalariak</"
+"interface>"
 
 #: src/scoringdialog.py:234
 msgid "Round/Hand"
-msgstr ""
+msgstr "Txanda/Eskua"
 
 #: src/scoringdialog.py:262 src/scoringdialog.py:813
 msgctxt "kajongg"
 msgid "Score"
-msgstr "Puntuazioak"
+msgstr "Puntuazioa"
 
 #: src/scoringdialog.py:262
-#, fuzzy
-#| msgid "Players"
 msgctxt "kajongg"
 msgid "Payments"
-msgstr "Jokalariak"
+msgstr "Ordainketak"
 
 #: src/scoringdialog.py:263
 msgctxt "kajongg"
 msgid "Balance"
-msgstr ""
+msgstr "Balantzea"
 
 #: src/scoringdialog.py:263
 msgctxt "kajongg"
 msgid "Chart"
-msgstr ""
+msgstr "Diagrama"
 
 #: src/scoringdialog.py:409
 msgctxt "kajongg"
@@ -1920,11 +1904,9 @@ msgid "Scores for game <numid>%1</numid>"
 msgstr "<numid>%1</numid> jokoarentzako puntuazioak"
 
 #: src/scoringdialog.py:559
-#, fuzzy
-#| msgid "Explain Scores"
 msgctxt "@title:window"
 msgid "Explain Scores"
-msgstr "Puntuazioak azaldu"
+msgstr "Puntuazioak azaltzea"
 
 #: src/scoringdialog.py:575
 msgid "There is no active game"
@@ -1932,7 +1914,7 @@ msgstr "Ez dago joko aktiborik"
 
 #: src/scoringdialog.py:578
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: src/scoringdialog.py:592
 msgid "Manual score for %1: %2 points"
@@ -1940,35 +1922,29 @@ msgstr ""
 
 #: src/scoringdialog.py:663
 msgid "Penalty"
-msgstr "Penalizazioa"
+msgstr "Isuna"
 
 #: src/scoringdialog.py:666
 msgid "Offense:"
-msgstr ""
+msgstr "Arau-haustea:"
 
 #: src/scoringdialog.py:673
 msgid "Total Penalty"
-msgstr ""
+msgstr "Isunak guztira"
 
 #: src/scoringdialog.py:706
 msgid "&Execute"
 msgstr "&Exekutatu"
 
 #: src/scoringdialog.py:783
-#, fuzzy
-#| msgctxt "Kajongg"
-#| msgid "%1 points"
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
-msgstr "%1 puntu"
+msgstr "%1 puntu ordaintzen ditu"
 
 #: src/scoringdialog.py:788
-#, fuzzy
-#| msgctxt "Kajongg"
-#| msgid "%1 points"
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
-msgstr "%1 puntu"
+msgstr "%1 puntu lortu ditu"
 
 #: src/scoringdialog.py:799
 #, fuzzy
@@ -1998,7 +1974,7 @@ msgstr ""
 
 #: src/scoringdialog.py:822
 msgid "&Penalties"
-msgstr "&Penalizazioak"
+msgstr "&Isunak"
 
 #: src/scoringdialog.py:824
 msgid "&Save Hand"
@@ -2025,16 +2001,13 @@ msgid "Player %1 has logged out"
 msgstr "%1 jokalariak saioa amaitu du"
 
 #: src/server.py:429
-#, fuzzy, python-format
-#| msgid "the server will listen on PORT"
+#, python-format
 msgid "the server will listen on PORT (%d)"
-msgstr "zerbitzariak ATAKAn entzungo du"
+msgstr "zerbitzariak (%d) ATAKAn entzungo du"
 
 #: src/server.py:433
-#, fuzzy
-#| msgid "the server will listen on PORT"
 msgid "the server will listen on SOCKET"
-msgstr "zerbitzariak ATAKAn entzungo du"
+msgstr "zerbitzariak HARGUNEAn entzungo du"
 
 #: src/server.py:438
 msgid "name of the database"
@@ -2042,7 +2015,7 @@ msgstr "datubasearen izena"
 
 #: src/server.py:442
 msgid "do not terminate local game server after last client disconnects"
-msgstr ""
+msgstr "ez akabatu joko lokaleko zerbitzaria azken bezeroa deskonektatu denean"
 
 #: src/server.py:447
 msgid "unrecognized arguments:%1"
@@ -2050,7 +2023,7 @@ msgstr ""
 
 #: src/servertable.py:157
 msgid "You already joined this table"
-msgstr ""
+msgstr "Dagoeneko batu zara taula horretara"
 
 #: src/servertable.py:159
 msgid "All seats are already taken"
@@ -2058,7 +2031,7 @@ msgstr "Aulki guztiak hartuta daude"
 
 #: src/servertable.py:164
 msgid "takes a seat"
-msgstr ""
+msgstr "aulki bat hartzen du"
 
 #: src/servertable.py:172
 #, fuzzy
@@ -2069,27 +2042,25 @@ msgstr "datubasearen izena"
 #: src/servertable.py:221
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 1"
-msgstr ""
+msgstr "1. robota"
 
 #: src/servertable.py:224
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 2"
-msgstr ""
+msgstr "2. robota"
 
 #: src/servertable.py:225
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 3"
-msgstr ""
+msgstr "3. robota"
 
 #: src/servertable.py:279
 msgid "Only the initiator %1 can start this game, you are %2"
-msgstr ""
+msgstr "%1 abiarazleak bakarrik has dezake joko hori, zu %2 zara"
 
 #: src/servertable.py:648
-#, fuzzy
-#| msgid "Game <numid>%1</numid>"
 msgid "Game <numid>%1</numid> is over!"
-msgstr "<numid>%1</numid> jokoa"
+msgstr "<numid>%1</numid> jokoa amaitu da!"
 
 #: src/servertable.py:677
 msgid "%1 wrongly said %2 for meld %3"
@@ -2148,7 +2119,7 @@ msgstr "&Berria"
 
 #: src/tables.py:186 src/tables.py:326
 msgid "Allocate a new table"
-msgstr ""
+msgstr "Esleitu taula berri bat"
 
 #: src/tables.py:189 src/tables.py:327
 msgid "&Join"
