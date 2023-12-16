@@ -5,19 +5,20 @@
 # Jeff Huang <s8321414@gmail.com>, 2017.
 # Frank Weng (a.k.a. Franklin) <franklin at goodhorse dot idv dot tw>, 2009, 2010.
 # pan93412 <pan93412@gmail.com>, 2019.
+# Kisaragi Hiu <mail@kisaragi-hiu.com>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2019-11-22 01:46+0800\n"
-"Last-Translator: pan93412 <pan93412@gmail.com>\n"
-"Language-Team: Chinese <zh-l10n@lists.linux.org.tw>\n"
+"PO-Revision-Date: 2023-12-15 20:19+0900\n"
+"Last-Translator: Kisaragi Hiu <mail@kisaragi-hiu.com>\n"
+"Language-Team: Traditional Chinese <zh-l10n@lists.slat.org>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 19.11.80\n"
+"X-Generator: Lokalize 24.01.80\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Preview"
@@ -148,8 +149,6 @@ msgid "Rule"
 msgstr "規則"
 
 #: src/differ.py:123
-#, fuzzy
-#| msgid "Compare"
 msgctxt "@title:window"
 msgid "Compare"
 msgstr "比較"
@@ -180,9 +179,6 @@ msgid "Started"
 msgstr "已開始"
 
 #: src/games.py:103
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Games"
 msgctxt "@title:window"
 msgid "Games"
 msgstr "遊戲"
@@ -275,16 +271,12 @@ msgid "join TABLE"
 msgstr "加入牌桌"
 
 #: src/kajongg.py:90
-#, fuzzy
-#| msgid "use ruleset without asking"
 msgid "use RULESET without asking"
-msgstr "使用規則集，不要詢問"
+msgstr "使用 RULESET 規則集，不要詢問"
 
 #: src/kajongg.py:91
-#, fuzzy
-#| msgid "play one ROUNDS rounds per game. Only for debugging!"
 msgid "play only ROUNDS rounds per game. Only for debugging!"
-msgstr "每次遊戲只玩 ROUNDS 圈。此除錯用的選項。"
+msgstr "每次遊戲只玩 ROUNDS 圈。此為除錯用的選項。"
 
 #: src/kajongg.py:92
 msgid "prefer PLAYER for next login"
@@ -357,10 +349,8 @@ msgid "Configure toolbars"
 msgstr "設定工具列"
 
 #: src/kdestub.py:364
-#, fuzzy
-#| msgid "Configure &Kajongg"
 msgid "Configure &Kajongg..."
-msgstr "設定 Kajongg(&K)"
+msgstr "設定 Kajongg(&K)..."
 
 #: src/kdestub.py:366 src/kdestub.py:1166
 msgid "Configure"
@@ -429,11 +419,8 @@ msgid "About Kajongg"
 msgstr "關於 Kajongg"
 
 #: src/kdestub.py:1017
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Using versions %1"
 msgid "Version: %1"
-msgstr "使用中版本 %1"
+msgstr "版本：%1"
 
 #: src/kdestub.py:1018
 msgid "Protocol version %1"
@@ -521,8 +508,6 @@ msgid "Ruleset:"
 msgstr "規則集："
 
 #: src/login.py:388
-#, fuzzy
-#| msgid "Create User Account"
 msgctxt "@title:window"
 msgid "Create User Account"
 msgstr "建立使用者帳號"
@@ -985,6 +970,8 @@ msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
 msgstr ""
+"%3 有 %1 個已完成與 %2 個未完成的遊戲，還是要刪除 %3 嗎？這也會刪除所有 %3 玩"
+"過的遊戲！"
 
 #: src/predefined.py:27
 msgid "Classical Chinese standard"
@@ -1776,8 +1763,6 @@ msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1：%2 太小了。最小值應為 %3"
 
 #: src/rulesetselector.py:477
-#, fuzzy
-#| msgid "Customize rulesets"
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "自訂規則集"
@@ -1809,8 +1794,6 @@ msgid "Do you really want to abort this game?"
 msgstr "您確定要中止此遊戲嗎？"
 
 #: src/scoring.py:43
-#, fuzzy
-#| msgid "Swap Seats"
 msgctxt "@title:window"
 msgid "Swap Seats"
 msgstr "交換座位"
@@ -1828,8 +1811,6 @@ msgid "&Keep seat"
 msgstr "保持原座位(&K)"
 
 #: src/scoring.py:60
-#, fuzzy
-#| msgid "Select four players"
 msgctxt "@title:window"
 msgid "Select four players"
 msgstr "選擇四個玩家"
@@ -1889,8 +1870,6 @@ msgid "Scores for game <numid>%1</numid>"
 msgstr "遊戲編號 <numid>%1</numid> 的分數"
 
 #: src/scoringdialog.py:559
-#, fuzzy
-#| msgid "Explain Scores"
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "解釋分數"
@@ -1934,8 +1913,6 @@ msgid "gets %1 points"
 msgstr "得到 %1 點"
 
 #: src/scoringdialog.py:799
-#, fuzzy
-#| msgid "Scoring for this Hand"
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
 msgstr "此手牌的分數"
