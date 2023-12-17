@@ -148,7 +148,7 @@ msgstr "Regulo"
 #: src/differ.py:123
 msgctxt "@title:window"
 msgid "Compare"
-msgstr "Komparu"
+msgstr "Kompari"
 
 #: src/differ.py:166 src/differ.py:168
 msgctxt "Kajongg-Rule"
@@ -2151,7 +2151,7 @@ msgstr "Lasi tablon"
 #: src/tables.py:202
 msgctxt "Kajongg-Ruleset"
 msgid "Compare"
-msgstr "Komparu"
+msgstr "Kompari"
 
 #: src/tables.py:207
 msgid "Compare the rules of this table with my own rulesets"
