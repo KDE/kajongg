@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2023-11-12 16:39+0100\n"
+"PO-Revision-Date: 2023-12-16 23:54+0100\n"
 "Last-Translator: Oliver Kellogg <okellogg@users.sourceforge.net>\n"
 "Language-Team: esperanto <kde-i18n-eo@kde.org>\n"
 "Language: eo\n"
@@ -148,7 +148,7 @@ msgstr "Regulo"
 #: src/differ.py:123
 msgctxt "@title:window"
 msgid "Compare"
-msgstr "Komparu"
+msgstr "Kompari"
 
 #: src/differ.py:166 src/differ.py:168
 msgctxt "Kajongg-Rule"
