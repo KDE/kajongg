@@ -137,6 +137,7 @@ GenericName[tr]=Çin'den Mahjong masa oyunu
 GenericName[uk]=Китайська гра плитками маджонґ
 GenericName[x-test]=xxMahjong tile game from Chinaxx
 GenericName[zh_CN]=来自中国的麻将牌游戏
+GenericName[zh_TW]=來自中國的麻將牌遊戲
 TryExec=kajongg
 Exec=kajongg
 Icon=kajongg
