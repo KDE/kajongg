@@ -2,12 +2,13 @@
 # This file is distributed under the same license as the kajongg package.
 #
 # SPDX-FileCopyrightText: 2023 giovanni <g.sora@tiscali.it>
+# giovanni <g.sora@tiscali.it>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2023-10-11 09:41+0200\n"
+"PO-Revision-Date: 2023-12-28 19:36+0100\n"
 "Last-Translator: giovanni <g.sora@tiscali.it>\n"
 "Language-Team: Interlingua <kde-i18n-doc@kde.org>\n"
 "Language: ia\n"
@@ -15,10 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 23.08.1\n"
+"X-Generator: Lokalize 22.12.3\n"
 
 msgid "Preview"
-msgstr ""
+msgstr "Vista preliminar"
 
 msgid "Properties"
 msgstr "Proprietates"
@@ -203,7 +204,7 @@ msgstr ""
 #: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:113 src/kdestub.py:114
 #: src/kdestub.py:116
 msgid "Kajongg"
-msgstr ""
+msgstr "Re Kajongg"
 
 #: src/humanclient.py:50
 msgid "Which chow do you want to expose?"
@@ -372,7 +373,7 @@ msgstr "Commuta le linguage de application"
 #: src/kdestub.py:470
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
-msgstr ""
+msgstr "Re &Kajongg"
 
 #: src/kdestub.py:824
 msgid "Please choose the language which should be used for this application:"
@@ -693,12 +694,12 @@ msgstr "&par"
 #: src/meld.py:324
 msgctxt "kajongg meld type"
 msgid "&chow"
-msgstr ""
+msgstr "&chow"
 
 #: src/meld.py:326
 msgctxt "kajongg meld type"
 msgid "p&ung"
-msgstr ""
+msgstr "p&ung"
 
 #: src/meld.py:328
 msgctxt "kajongg meld type"
@@ -708,7 +709,7 @@ msgstr ""
 #: src/meld.py:330
 msgctxt "kajongg meld type"
 msgid "k&ong"
-msgstr ""
+msgstr "k&ong"
 
 #: src/meld.py:331
 msgctxt "kajongg meld type"
@@ -850,7 +851,7 @@ msgstr ""
 
 #: src/message.py:519
 msgid "Kajongg <numid>%1</numid>"
-msgstr ""
+msgstr "Kajongg <numid>%1</numid>"
 
 #: src/message.py:595
 msgctxt "kajongg"
@@ -1282,7 +1283,7 @@ msgstr ""
 
 #: src/predefined.py:203
 msgid "Imperial Jade"
-msgstr ""
+msgstr "Jada Imperial"
 
 #: src/predefined.py:204
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
@@ -1914,7 +1915,7 @@ msgstr "Vento"
 
 #: src/scoringdialog.py:814
 msgid "Winner"
-msgstr ""
+msgstr "Victor"
 
 #: src/scoringdialog.py:820
 msgctxt "kajongg"
@@ -2150,7 +2151,7 @@ msgstr "stone"
 #: src/tile.py:194
 msgctxt "kajongg"
 msgid "bamboo"
-msgstr ""
+msgstr "bambu"
 
 #: src/tile.py:195
 msgctxt "kajongg"
