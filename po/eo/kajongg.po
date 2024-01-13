@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-06-10 00:45+0000\n"
-"PO-Revision-Date: 2023-11-12 16:39+0100\n"
+"PO-Revision-Date: 2024-01-04 19:44+0100\n"
 "Last-Translator: Oliver Kellogg <okellogg@users.sourceforge.net>\n"
 "Language-Team: esperanto <kde-i18n-eo@kde.org>\n"
 "Language: eo\n"
@@ -2189,7 +2189,7 @@ msgstr "Komenci novan ludon"
 #: src/tables.py:322
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
-msgstr "&Restarigi"
+msgstr "Daŭ&rigi"
 
 #: src/tables.py:324
 msgid "Resume the selected suspended game"
