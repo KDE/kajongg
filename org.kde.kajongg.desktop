@@ -143,5 +143,4 @@ Exec=kajongg
 Icon=kajongg
 Categories=Qt;KDE;Game;BoardGame;
 X-KDE-StartupNotify=true
-X-DBUS-StartupType=Multi
 X-DocPath=kajongg/index.html
