@@ -142,5 +142,5 @@ TryExec=kajongg
 Exec=kajongg
 Icon=kajongg
 Categories=Qt;KDE;Game;BoardGame;
-X-KDE-StartupNotify=true
+StartupNotify=true
 X-DocPath=kajongg/index.html
