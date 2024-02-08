@@ -3,20 +3,21 @@
 #
 # Laszlo Papp <djszapi@archlinux.us>, 2010.
 # Balázs Úr <urbalazs@gmail.com>, 2012, 2013, 2014.
+# SPDX-FileCopyrightText: 2024 Kristof Kiszel <ulysses@fsf.hu>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2014-03-19 21:59+0100\n"
-"Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
+"PO-Revision-Date: 2024-02-07 10:57+0100\n"
+"Last-Translator: Kristof Kiszel <ulysses@fsf.hu>\n"
 "Language-Team: Hungarian <kde-l10n-hu@kde.org>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 1.5\n"
+"X-Generator: Lokalize 24.01.95\n"
 
 msgid "Preview"
 msgstr "Előnézet"
@@ -146,8 +147,6 @@ msgid "Rule"
 msgstr "Szabály"
 
 #: src/differ.py:123
-#, fuzzy
-#| msgid "Compare"
 msgctxt "@title:window"
 msgid "Compare"
 msgstr "Összehasonlítás"
@@ -178,9 +177,6 @@ msgid "Started"
 msgstr "Elindítva"
 
 #: src/games.py:103
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Games"
 msgctxt "@title:window"
 msgid "Games"
 msgstr "Játékok"
@@ -314,11 +310,8 @@ msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgstr ""
 
 #: src/kdestub.py:261
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "OK"
 msgid "&OK"
-msgstr "OK"
+msgstr "&OK"
 
 #: src/kdestub.py:263
 msgid "&Apply"
@@ -337,36 +330,26 @@ msgid "&Defaults"
 msgstr "&Alapértelmezések"
 
 #: src/kdestub.py:343
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "Show St&atusbar"
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Áll&apotsor megjelenítése"
 
 #: src/kdestub.py:349
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "Show &Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "&Eszköztár megjelenítése"
 
 #: src/kdestub.py:355
-#, fuzzy
-#| msgid "Configure Toolbars"
 msgid "Configure Tool&bars..."
-msgstr "Eszköztárak beállítása"
+msgstr "Eszköztárak &beállítása…"
 
 #: src/kdestub.py:357
 msgid "Configure toolbars"
 msgstr "Eszköztárak beállítása"
 
 #: src/kdestub.py:364
-#, fuzzy
-#| msgid "Configure Kajongg"
 msgid "Configure &Kajongg..."
-msgstr "A Kajongg beállítása"
+msgstr "A &Kajongg beállítása…"
 
 #: src/kdestub.py:366 src/kdestub.py:1166
 msgid "Configure"
@@ -385,8 +368,6 @@ msgid "&Settings"
 msgstr "&Beállítások"
 
 #: src/kdestub.py:463
-#, fuzzy
-#| msgid "&Help"
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Súgó"
@@ -396,12 +377,9 @@ msgid "Switch Application Language"
 msgstr ""
 
 #: src/kdestub.py:470
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "About Kajongg"
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
-msgstr "A Kajongg névjegye"
+msgstr "A &Kajongg névjegye"
 
 #: src/kdestub.py:824
 msgid "Please choose the language which should be used for this application:"
@@ -420,8 +398,6 @@ msgid "Fallback language:"
 msgstr ""
 
 #: src/kdestub.py:861
-#, fuzzy
-#| msgid "Remove"
 msgid "Remove"
 msgstr "Eltávolítás"
 
@@ -442,33 +418,25 @@ msgid "About Kajongg"
 msgstr "A Kajongg névjegye"
 
 #: src/kdestub.py:1017
-#, fuzzy
-#| msgid "Version %1"
 msgid "Version: %1"
 msgstr "Verzió: %1"
 
 #: src/kdestub.py:1018
-#, fuzzy
-#| msgid "Version %1"
 msgid "Protocol version %1"
-msgstr "Verzió: %1"
+msgstr "Protokollverzió: %1"
 
 #: src/kdestub.py:1021
 msgid "Original author"
 msgstr "Eredeti szerző"
 
 #: src/kdestub.py:1028
-#, fuzzy
-#| msgid "KDE (not installed)"
 msgid "KDE Frameworks (not installed or not usable)"
-msgstr "KDE (nincs telepítve)"
+msgstr "KDE Frameworks (nincs telepítve vagy nem használható)"
 
 #: src/kdestub.py:1035
-#, fuzzy
-#| msgid "Version %1"
 msgctxt "kajongg"
 msgid "Using versions %1"
-msgstr "Verzió: %1"
+msgstr "A(z) %1 verzió használata"
 
 #: src/kdestub.py:1056
 msgid ""
@@ -479,16 +447,12 @@ msgstr ""
 "játékot keresi, kérjük használja a kmahjongg alkalmazást."
 
 #: src/kdestub.py:1075
-#, fuzzy
-#| msgid ""
-#| "Please use <a href=\"http://bugs.kde.org\">http://bugs.kde.org</a> to "
-#| "report bugs."
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
 msgstr ""
-"Kérjük, hogy a talált hibákat a <a href=\"http://bugs.kde.org\">http://bugs."
-"kde.org</a> címen jelentsék be."
+"Kérjük, hogy a talált hibákat a <a href=\"https://bugs.kde.org\">https://"
+"bugs.kde.org</a> címen jelentsék be."
 
 #: src/kdestub.py:1080
 msgid "Authors:"
@@ -511,10 +475,8 @@ msgid "Curr&ent actions:"
 msgstr "&Jelenlegi műveletek:"
 
 #: src/login.py:166
-#, fuzzy
-#| msgid "start a local game server"
 msgid "trying to start local server %1"
-msgstr "helyi játékkiszolgáló indítása"
+msgstr "kísérlet a(z) %1 helyi kiszolgáló indítására"
 
 #: src/login.py:177 src/login.py:621
 msgid "removed stale socket <filename>%1</filename>"
@@ -525,8 +487,6 @@ msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
 msgstr "a hely kajongg kiszolgáló elindult: pid=<numid>%1</numid> %2"
 
 #: src/login.py:238
-#, fuzzy
-#| msgid "Login"
 msgctxt "kajongg"
 msgid "Login"
 msgstr "Bejelentkezés"
@@ -549,8 +509,6 @@ msgid "Ruleset:"
 msgstr "Szabályrendszer:"
 
 #: src/login.py:388
-#, fuzzy
-#| msgid "Create User Account"
 msgctxt "@title:window"
 msgid "Create User Account"
 msgstr "Felhasználói fiók létrehozása"
@@ -594,12 +552,9 @@ msgid "Please try again"
 msgstr "Kérjük próbálja újra"
 
 #: src/mainwindow.py:498
-#, fuzzy
-#| msgctxt "@action:intoolbar"
-#| msgid "Manual Game"
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
-msgstr "Kézi játék"
+msgstr "Kézi játék pontozá&sa"
 
 #: src/mainwindow.py:500
 msgctxt "@action:intoolbar"
@@ -622,9 +577,6 @@ msgid "Start a new game."
 msgstr "Új játék indítása."
 
 #: src/mainwindow.py:510
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Abort Game"
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "Játék &megszakítása"
@@ -635,9 +587,6 @@ msgid "Abort the current game."
 msgstr "A jelenlegi játék megszakítása."
 
 #: src/mainwindow.py:516
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Quit Kajongg"
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "&Kilépés a Kajonggból"
@@ -683,9 +632,6 @@ msgid "F&ull Screen Mode"
 msgstr ""
 
 #: src/mainwindow.py:542
-#, fuzzy
-#| msgctxt "kajongg @action:inmenu"
-#| msgid "&Score Table"
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&Ponttáblázat"
@@ -701,9 +647,6 @@ msgid "Show or hide the score table for the current game."
 msgstr "A jelenlegi játék ponttáblázatának megjelenítése vagy elrejtése."
 
 #: src/mainwindow.py:548
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Explain Scores"
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "&Pontszámok magyarázata"
@@ -719,9 +662,6 @@ msgid "Explain the scoring for all players in the current game."
 msgstr ""
 
 #: src/mainwindow.py:553
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Demo Mode"
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "&Demo mód"
@@ -918,12 +858,9 @@ msgid "Kajongg <numid>%1</numid>"
 msgstr "Kajongg <numid>%1</numid>"
 
 #: src/message.py:595
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Original Call"
 msgctxt "kajongg"
 msgid "Violates Original Call"
-msgstr "Eredeti hívás"
+msgstr "Megsérti az eredeti felhívást"
 
 #: src/message.py:723
 msgctxt "kajongg"
@@ -936,9 +873,6 @@ msgid "No Choice"
 msgstr "Nincs választás"
 
 #: src/message.py:796
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "OK"
 msgctxt "kajongg"
 msgid "OK"
 msgstr "OK"
@@ -976,10 +910,8 @@ msgid "cannot find %1, using default"
 msgstr ""
 
 #: src/mjresource.py:114
-#, fuzzy
-#| msgid "unknown background"
 msgid "unknown name"
-msgstr "ismeretlen háttér"
+msgstr "ismeretlen név"
 
 #: src/mjresource.py:115
 msgid "unknown author"
@@ -1556,10 +1488,8 @@ msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr ""
 
 #: src/predefined.py:357
-#, fuzzy
-#| msgid "Classical Chinese DMJL"
 msgid "Classical Chinese BMJA"
-msgstr "Klasszikus kínai DMJL"
+msgstr "Klasszikus kínai BMJA"
 
 #: src/predefined.py:363
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
@@ -1720,15 +1650,11 @@ msgid "points"
 msgstr "pontok"
 
 #: src/rule.py:41
-#, fuzzy
-#| msgid "doubles"
 msgctxt "kajongg"
 msgid "doubles"
 msgstr "duplák"
 
 #: src/rule.py:42
-#, fuzzy
-#| msgid "limits"
 msgctxt "kajongg"
 msgid "limits"
 msgstr "korlátok"
@@ -1841,17 +1767,13 @@ msgid "C&opy"
 msgstr ""
 
 #: src/rulesetselector.py:553
-#, fuzzy
-#| msgid "Compare"
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
-msgstr "Összehasonlítás"
+msgstr "Össze&hasonlítás"
 
 #: src/rulesetselector.py:554
-#, fuzzy
-#| msgid "Remove"
 msgid "&Remove"
-msgstr "Eltávolítás"
+msgstr "&Eltávolítás"
 
 #: src/rulesetselector.py:555
 msgid "&Close"
@@ -1862,8 +1784,6 @@ msgid "Do you really want to abort this game?"
 msgstr "Biztosan meg szeretné szakítani ezt a játékot?"
 
 #: src/scoring.py:43
-#, fuzzy
-#| msgid "Swap Seats"
 msgctxt "@title:window"
 msgid "Swap Seats"
 msgstr "Ülések cseréje"
@@ -1881,8 +1801,6 @@ msgid "&Keep seat"
 msgstr "Ülés &megtartása"
 
 #: src/scoring.py:60
-#, fuzzy
-#| msgid "Select four players"
 msgctxt "@title:window"
 msgid "Select four players"
 msgstr "Válasszon négy játékost"
@@ -1944,8 +1862,6 @@ msgid "Scores for game <numid>%1</numid>"
 msgstr "Pontszámok a(z) <numid>%1</numid>. játékhoz"
 
 #: src/scoringdialog.py:559
-#, fuzzy
-#| msgid "Explain Scores"
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "Pontszámok magyarázata"
@@ -2074,10 +1990,8 @@ msgid "takes a seat"
 msgstr ""
 
 #: src/servertable.py:172
-#, fuzzy
-#| msgid "Leave a table"
 msgid "leaves the table"
-msgstr "Tábla elhagyása"
+msgstr "elhagyja a táblát"
 
 #: src/servertable.py:221
 msgctxt "kajongg, name of robot player, to be translated"
