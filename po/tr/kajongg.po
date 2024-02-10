@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-# SPDX-FileCopyrightText: 2022, 2023 Emir SARI <emir_sari@icloud.com>
+# SPDX-FileCopyrightText: 2022, 2023, 2024 Emir SARI <emir_sari@icloud.com>
 # Osman Tosun <rainman.neu@gmail.com>, 2008.
 # obsoleteman <tulliana@gmail.com>, 2009.
 # Serhat Demirkol <serhat_demirkol@yahoo.com>, 2009.
@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2023-11-21 19:59+0300\n"
+"PO-Revision-Date: 2024-02-09 19:31+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 23.11.70\n"
+"X-Generator: Lokalize 24.01.95\n"
 
 msgid "Preview"
 msgstr "Önizleme"
@@ -217,11 +217,11 @@ msgstr "Kajongg"
 
 #: src/humanclient.py:50
 msgid "Which chow do you want to expose?"
-msgstr "Hangi chow'u açık etmek istiyorsunuz?"
+msgstr "Hangi chow’u açık etmek istiyorsunuz?"
 
 #: src/humanclient.py:88
 msgid "Which kong do you want to declare?"
-msgstr "Hangi kong'u ilan etmek istersiniz?"
+msgstr "Hangi kong’u ilan etmek istersiniz?"
 
 #: src/humanclient.py:155
 msgid "Choose"
@@ -263,7 +263,7 @@ msgstr "tanıtım kipinde başlat"
 
 #: src/kajongg.py:87
 msgid "login to HOST"
-msgstr "İSTEMCİ'ye oturum aç"
+msgstr "İSTEMCİ’ye oturum aç"
 
 #: src/kajongg.py:88
 msgid "start new TABLE"
@@ -271,11 +271,11 @@ msgstr "yeni MASA başlat"
 
 #: src/kajongg.py:89
 msgid "join TABLE"
-msgstr "MASA'ya katıl"
+msgstr "MASA’ya katıl"
 
 #: src/kajongg.py:90
 msgid "use RULESET without asking"
-msgstr "KURALKÜMESİ'ni sormadan kullan"
+msgstr "KURALKÜMESİ’ni sormadan kullan"
 
 #: src/kajongg.py:91
 msgid "play only ROUNDS rounds per game. Only for debugging!"
@@ -283,7 +283,7 @@ msgstr "oyun başına yalnızca EL el oyna. Yalnızca hata ayıklama için!"
 
 #: src/kajongg.py:92
 msgid "prefer PLAYER for next login"
-msgstr "sonraki oturum açma için OYUNCU'yu tercih et"
+msgstr "sonraki oturum açma için OYUNCU’yu tercih et"
 
 #: src/kajongg.py:93
 msgid "use AI variant for human player in demo mode"
@@ -291,7 +291,7 @@ msgstr "tanıtım kipinde insan oyuncu için AI türevini kullan"
 
 #: src/kajongg.py:94
 msgid "write statistics to CSV"
-msgstr "istatistikleri CSV'ye yaz"
+msgstr "istatistikleri CSV’ye yaz"
 
 #: src/kajongg.py:95
 msgid "show all available rulesets"
@@ -307,7 +307,7 @@ msgstr "grafik arayüz gösterme. Yalnızca test için"
 
 #: src/kajongg.py:99
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
-msgstr "SOCKET'de dinleme yapan adanmış sunucu kullan. Yalnızca test için"
+msgstr "SOCKET’de dinleme yapan adanmış sunucu kullan. Yalnızca test için"
 
 #: src/kajongg.py:100
 msgid "use a dedicated server listening on PORT. Intended only for testing"
@@ -353,7 +353,7 @@ msgstr "Araç çubuklarını yapılandır"
 
 #: src/kdestub.py:364
 msgid "Configure &Kajongg..."
-msgstr "&Kajongg'u Yapılandır..."
+msgstr "&Kajongg’u Yapılandır..."
 
 #: src/kdestub.py:366 src/kdestub.py:1166
 msgid "Configure"
@@ -448,7 +448,7 @@ msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
 msgstr ""
-"Bu dört kişi için klasik Mah Jongg oyunudur. Eğer Mah Jongg solitaire'i "
+"Bu dört kişi için klasik Mah Jongg oyunudur. Eğer Mah Jongg solitaire’i "
 "arıyorsanız, lütfen kmahjongg uygulamasını kullanın."
 
 #: src/kdestub.py:1075
@@ -593,7 +593,7 @@ msgstr "Mevcut oyun hakkında."
 #: src/mainwindow.py:516
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
-msgstr "Kajongg'dan &Çık"
+msgstr "Kajongg’dan &Çık"
 
 #: src/mainwindow.py:519
 msgctxt "@action:intoolbar"
@@ -826,7 +826,8 @@ msgstr "O"
 
 #: src/message.py:360
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
-msgstr "%1'i atmak ve Asıl Çağrı ilan etmek bu eli kazanılamaz hale getirir"
+msgstr ""
+"%1 ögesini atmak ve Asıl Çağrı ilan etmek bu eli kazanılamaz hale getirir"
 
 #: src/message.py:364
 msgid ""
@@ -849,7 +850,7 @@ msgstr "D"
 
 #: src/message.py:405
 msgid "discarding %1 violates Original Call"
-msgstr "%1'i çıkarmak Asıl Çağrıyı ihlal eder"
+msgstr "%1 ögesini çıkarmak Asıl Çağrıyı ihlal eder"
 
 #: src/message.py:408
 msgid "discarding %1 is Dangerous Game"
@@ -1028,14 +1029,14 @@ msgstr ""
 
 #: src/predefined.py:51
 msgid "Robbing the Kong"
-msgstr "Kong'u Soymak"
+msgstr "Kong’u Soymak"
 
 #: src/predefined.py:52
 msgid ""
 "Winner said Mah Jong by claiming the 4th tile of a kong another player just "
 "declared"
 msgstr ""
-"Kazanan, başka bir oyuncunun ilan ettiği bir kong'un 4. taşını alarak Mah "
+"Kazanan, başka bir oyuncunun ilan ettiği bir kong’un 4. taşını alarak Mah "
 "Jong dedi"
 
 #: src/predefined.py:55
@@ -1193,7 +1194,7 @@ msgstr "çağrı eli ilan edilmeli"
 
 #: src/predefined.py:138
 msgid "Mah Jongg is only allowed after having declared to have a calling hand"
-msgstr "Mah Jongg'a çağrı eli ilan edildikten sonra izin verilir"
+msgstr "Mah Jongg’a çağrı eli ilan edildikten sonra izin verilir"
 
 #: src/predefined.py:140
 msgid "Standard Rotation"
@@ -1281,7 +1282,7 @@ msgstr "Gizli Hazine"
 
 #: src/predefined.py:190
 msgid "Only hidden Pungs or Kongs, last tile from wall"
-msgstr "Yalnızca gizli Pung veya Kong'lar, son taş duvardan"
+msgstr "Yalnızca gizli Pung veya Kong’lar, son taş duvardan"
 
 #: src/predefined.py:192
 msgid "Heads and Tails"
@@ -1305,7 +1306,7 @@ msgstr "Üç Büyük Bilgin"
 
 #: src/predefined.py:199 src/predefined.py:321
 msgid "3 Pungs or Kongs of dragons"
-msgstr "3 Pung veya ejderha Kong'ları"
+msgstr "3 Pung veya ejderha Kong’ları"
 
 #: src/predefined.py:200
 msgid "Four Blessings Hovering over the Door"
@@ -1313,7 +1314,7 @@ msgstr "Dört Kutsama Kapının üstünde Geziniyor"
 
 #: src/predefined.py:202 src/predefined.py:326
 msgid "4 Pungs or Kongs of winds"
-msgstr "4 Pung veya rüzgar Kong'ları"
+msgstr "4 Pung veya rüzgar Kong’ları"
 
 #: src/predefined.py:203
 msgid "Imperial Jade"
@@ -1345,7 +1346,7 @@ msgstr "Taşıma Direği Kazınıyor"
 
 #: src/predefined.py:213
 msgid "Robbing the Kong of bamboo 2"
-msgstr "Bambu 2 Kong'u çalınıyor"
+msgstr "Bambu 2 Kong’u çalınıyor"
 
 #: src/predefined.py:219
 msgid "Standard Mah Jongg"
@@ -1377,15 +1378,15 @@ msgstr ""
 
 #: src/predefined.py:233
 msgid "Pung/Kong of Dragons"
-msgstr "Ejderha Pung/Kong'ları"
+msgstr "Ejderha Pung/Kong’ları"
 
 #: src/predefined.py:235
 msgid "Pung/Kong of Own Wind"
-msgstr "Kendi Rüzgarının Pung/Kong'ları"
+msgstr "Kendi Rüzgarının Pung/Kong’ları"
 
 #: src/predefined.py:238
 msgid "Pung/Kong of Round Wind"
-msgstr "Halka Rüzgarın Pung/Kong'u"
+msgstr "Halka Rüzgarın Pung/Kong’u"
 
 #: src/predefined.py:242
 msgid "Exposed Kong"
@@ -1393,11 +1394,11 @@ msgstr "Açık Kong"
 
 #: src/predefined.py:245
 msgid "Exposed Kong of Terminals"
-msgstr "Uçların Açık Kong'u"
+msgstr "Uçların Açık Kong’u"
 
 #: src/predefined.py:248
 msgid "Exposed Kong of Honors"
-msgstr "Açık Onur Taşı Kong'u"
+msgstr "Açık Onur Taşı Kong’u"
 
 #: src/predefined.py:251
 msgid "Exposed Pung"
@@ -1405,11 +1406,11 @@ msgstr "Açık Pung"
 
 #: src/predefined.py:254
 msgid "Exposed Pung of Terminals"
-msgstr "Uçların Açık Pung'u"
+msgstr "Uçların Açık Pung’u"
 
 #: src/predefined.py:257
 msgid "Exposed Pung of Honors"
-msgstr "Açık Onur Taşı Pung'u"
+msgstr "Açık Onur Taşı Pung’u"
 
 #: src/predefined.py:261
 msgid "Concealed Kong"
@@ -1417,11 +1418,11 @@ msgstr "Kapalı Kong"
 
 #: src/predefined.py:264
 msgid "Concealed Kong of Terminals"
-msgstr "Uçların Kapalı Kong'u"
+msgstr "Uçların Kapalı Kong’u"
 
 #: src/predefined.py:267
 msgid "Concealed Kong of Honors"
-msgstr "Kapalı Onur Taşı Kong'u"
+msgstr "Kapalı Onur Taşı Kong’u"
 
 #: src/predefined.py:270
 msgid "Concealed Pung"
@@ -1429,11 +1430,11 @@ msgstr "Kapalı Pung"
 
 #: src/predefined.py:273
 msgid "Concealed Pung of Terminals"
-msgstr "Uçların Kapalı Pung'u"
+msgstr "Uçların Kapalı Pung’u"
 
 #: src/predefined.py:276
 msgid "Concealed Pung of Honors"
-msgstr "Kapalı Onur Taşı Pung'u"
+msgstr "Kapalı Onur Taşı Pung’u"
 
 #: src/predefined.py:279
 msgid "Pair of Own Wind"
@@ -1472,7 +1473,7 @@ msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
 msgstr ""
-"Tüm taşlar aynı renkte. 1 ve 9 pung veya kong'u, 2, 5 veya 8 çifti ve kalan "
+"Tüm taşlar aynı renkte. 1 ve 9 pung veya kong’u, 2, 5 veya 8 çifti ve kalan "
 "değerlerden iki Chow"
 
 #: src/predefined.py:317
@@ -1481,7 +1482,7 @@ msgstr "Üç Küçük Ejderha"
 
 #: src/predefined.py:318
 msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
-msgstr "2 ejderha Pung veya Kong'u ve 1 çift ejderha"
+msgstr "2 ejderha Pung veya Kong’u ve 1 çift ejderha"
 
 #: src/predefined.py:320
 msgid "Big Three Dragons"
@@ -1493,7 +1494,7 @@ msgstr "Dört Küçük Neşe"
 
 #: src/predefined.py:324
 msgid "3 Pungs or Kongs of winds and 1 pair of winds"
-msgstr "3 Pung veya rüzgar Kong'ları ve 1 çift rüzgar"
+msgstr "3 Pung veya rüzgar Kong’ları ve 1 çift rüzgar"
 
 #: src/predefined.py:325
 msgid "Big Four Joys"
@@ -1544,7 +1545,7 @@ msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
 msgstr ""
-"Tüm taşlar aynı renkte kapalı: Değerler 1112345678999 bir çift 2'den 8'e "
+"Tüm taşlar aynı renkte kapalı: Değerler 1112345678999 bir çift 2’den 8’e "
 "(duvardaki son taş veya çıkarılır)"
 
 #: src/predefined.py:386
@@ -1554,7 +1555,7 @@ msgstr "Kıvrılan Yılan"
 #: src/predefined.py:387
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
-msgstr "1ler çifti ve rüzgarların her biriyle aynı takımda 2'den 9'a koşu"
+msgstr "1ler çifti ve rüzgarların her biriyle aynı takımda 2’den 9’a koşu"
 
 #: src/predefined.py:389
 msgid "Triple Knitting"
@@ -1574,7 +1575,7 @@ msgstr "Örgü"
 #: src/predefined.py:392
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr ""
-"3 takımdan 2'sinin herhangi birinde 7 çift taş; Rüzgarlar ya da Ejderhalar "
+"3 takımdan 2’sinin herhangi birinde 7 çift taş; Rüzgarlar ya da Ejderhalar "
 "yok"
 
 #: src/predefined.py:394
@@ -1599,7 +1600,7 @@ msgstr "Gömülü Hazine"
 
 #: src/predefined.py:412
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
-msgstr "Rüzgarlı/ejderli bir takımın kapalı pung'ları ve bir çift"
+msgstr "Rüzgarlı/ejderli bir takımın kapalı pung’ları ve bir çift"
 
 #: src/predefined.py:413
 msgid "Purity"
@@ -1684,7 +1685,7 @@ msgstr "Yerel Oyun"
 
 #: src/query.py:397
 msgid "Database %1 updated from schema %2 to %3"
-msgstr "%1 veritabanı %2 şemasından %3'e güncellendi"
+msgstr "%1 veritabanı %2 şemasından %3 şemasına güncellendi"
 
 #: src/rule.py:40 src/scoringdialog.py:677 src/scoringdialog.py:760
 msgid "points"
@@ -1787,7 +1788,7 @@ msgstr ""
 #: src/rule.py:534
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
-msgstr "%2'nin %1Kopyası"
+msgstr "%1/%2 Kopyası"
 
 #: src/rule.py:896
 msgctxt "%1 can be a sentence"
@@ -2071,7 +2072,7 @@ msgstr "%1 %3 birleşimi için yanlışlıkla %2 dedi"
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
 msgstr ""
 "%1 yanlışlıkla %2 dedi: %3 kapalı taşlarına sahip olduğunu söyledi ama "
-"yalnızca %4'e sahip"
+"yalnızca %4 var"
 
 #: src/servertable.py:720
 msgid "declareKong:%1 wrongly said Kong for meld %2"
@@ -2095,7 +2096,7 @@ msgstr "Ses dosyaları değişti, sağlama toplamları değişmiş."
 
 #: src/sound.py:362
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
-msgstr "Lütfen kajongg'u yeniden kurun veya yeterli izinlerle şunu yapın:"
+msgstr "Lütfen kajongg’u yeniden kurun veya yeterli izinlerle şunu yapın:"
 
 #: src/tables.py:56
 msgid "Table"
@@ -2171,7 +2172,7 @@ msgstr "%1 Kuralkümeli Yerel Oyunlar"
 
 #: src/tables.py:283
 msgid "Tables at %1"
-msgstr "%1'deki masalar"
+msgstr "%1 konumundaki masalar"
 
 #: src/tables.py:320
 msgid "Start a new game"
@@ -2299,7 +2300,7 @@ msgstr "{group} {value}"
 #: src/user.py:84
 msgid ""
 "Your client has a version older than 4.9.0 but you need %1 for this server"
-msgstr "İstemci sürümünüz 4.9.0'dan daha eski, bu sunucu için %1 gerekiyor"
+msgstr "İstemci sürümünüz 4.9.0’dan daha eski, bu sunucu için %1 gerekiyor"
 
 #: src/user.py:93
 msgid "Your client has version %1 but you need %2 for this server"
