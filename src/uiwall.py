@@ -35,20 +35,22 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
         self.sideTexts.append(self)
         super().__init__()
         self.hide()
+        assert Internal.scene
         Internal.scene.addItem(self)
         self.__text = ''
         self.__board = None
         self.needsRefresh = False
         self.__color = QColor('black')
         self.__boundingRect = None
-        self.__font = None
+        self.__font = QFont()
 
     def adaptedFont(self):
         """Font with the correct point size for the wall"""
         result = QFont()
         size = 80
         result.setPointSize(size)
-        tileHeight = self.board.tileset.faceSize.height()
+        assert self.__board
+        tileHeight = self.__board.tileset.faceSize.height()
         while QFontMetrics(result).ascent() > tileHeight:
             size -= 1
             result.setPointSize(size)
@@ -68,6 +70,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
             if not side.needsRefresh:
                 continue
             side.needsRefresh = False
+            assert side.board
             rotating |= sceneRotation(side) != sceneRotation(side.board)
 
         alreadyMoved = any(x.x() for x in sides)
@@ -81,6 +84,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
     @staticmethod
     def removeAll():
         """from the scene"""
+        assert Internal.scene
         for side in SideText.sideTexts:
             Internal.scene.removeItem(side)
         SideText.sideTexts = []
@@ -173,7 +177,7 @@ class UIWallSide(Board, ReprMixin):
 
     def debug_name(self):
         """name for debug messages"""
-        return 'UIWallSide {}'.format(UIWall.sideNames[self.rotation()])
+        return 'UIWallSide {}'.format(UIWall.sideNames[int(self.rotation())])
 
     def center(self):
         """return the center point of the wall in relation to the
@@ -258,12 +262,15 @@ class UIWall(Wall):
         self.__sides[self.Left].setTilePos(xHeight=1)
         self.__sides[self.Upper].setTilePos(xHeight=1, xWidth=sideLength, yHeight=1)
         self.__sides[self.Right].setTilePos(xWidth=sideLength, yWidth=sideLength, yHeight=1)
+        assert Internal.scene
         Internal.scene.addItem(self.__square)
+        assert Internal.Preferences
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
     @staticmethod
     def initWindDiscs():
         """the 4 round wind discs on the player walls"""
+        assert Internal.scene
         if not hasattr(East, 'disc'):
             for wind in Wind.all4:
                 wind.disc = WindDisc(wind)
@@ -303,9 +310,11 @@ class UIWall(Wall):
 
     def __shuffleTiles(self):
         """shuffle tiles for next hand"""
+        assert Internal.scene
         discardBoard = Internal.scene.discardBoard
-        places = [(x, y) for x in range(-3, discardBoard.width + 3)
-                  for y in range(-3, discardBoard.height + 3)]
+        places = [(x, y) for x in range(-3, int(discardBoard.width) + 3)
+                  for y in range(-3, int(discardBoard.height) + 3)]
+        assert self.game
         places = self.game.randomGenerator.sample(places, len(self.tiles))
         for idx, uiTile in enumerate(self.tiles):
             uiTile.dark = True
@@ -381,8 +390,10 @@ class UIWall(Wall):
 
     def __resizeHandBoards(self, unusedResults=None):
         """we are really calling _setRect() too often. But at least it works"""
+        assert self.game
         for player in self.game.players:
             player.handBoard.computeRect()
+        assert Internal.mainWindow
         Internal.mainWindow.adjustMainView()
 
     def __setDrawingOrder(self, unusedResults=None):
@@ -401,7 +412,8 @@ class UIWall(Wall):
         newOffset = uiTile.xoffset + offset
         sideLength = len(self.tiles) // 8
         if newOffset >= sideLength:
-            sideIdx = self.__sides.index(uiTile.board)
+            assert board
+            sideIdx = self.__sides.index(board)
             board = self.__sides[(sideIdx + 1) % 4]
         uiTile.setBoard(board, newOffset % sideLength, 0, level=2)
         uiTile.update()
@@ -427,6 +439,7 @@ class UIWall(Wall):
                 # might not be there anymore. This gets rid
                 # of the cross on them.
                 uiTile.update()
+                # FIXME: Piece/UITile
             # move last two tiles onto the dead end:
             return self._placeLooseTiles()
 
@@ -437,6 +450,7 @@ class UIWall(Wall):
         already queued animations keep their speed, only the windDiscs
         are moved without animation.
         """
+        assert self.game
         with AnimationSpeed():
             for player in self.game.players:
                 player.showInfo()
@@ -447,6 +461,7 @@ class UIWall(Wall):
         """animate all windDiscs. The caller must ensure
         all are moved simultaneously and at which speed
         by using AnimationSpeed."""
+        assert self.game
         for player in self.game.players:
             side = player.front
             side.disc.setupAnimations()
