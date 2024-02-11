@@ -20,7 +20,7 @@ from qt import QDialog, QVBoxLayout, QGridLayout, \
 from kde import KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 from guiutil import decorateWindow
-from log import i18n, logWarning, logException, logDebug
+from log import i18n, logWarning, logException, logDebug, logError
 from message import Message
 from common import Options, SingleshotOptions, Internal, Debug, isAlive
 from query import Query
@@ -79,7 +79,7 @@ class SelectKong(KDialogIgnoringEscape):
     def __init__(self, kongs, deferred):
         KDialogIgnoringEscape.__init__(self)
         decorateWindow(self)
-        self.setButtons(0)
+        self.setButtons(KDialog.NoButton)
         self.kongs = kongs
         self.selectedKong = None
         self.deferred = deferred
@@ -158,6 +158,7 @@ class ClientDialog(QDialog):
         self.progressBar = QProgressBar()
         self.progressBar.setMinimumHeight(25)
         self.timer = QTimer()
+        assert client.game
         if not client.game.autoPlay:
             self.timer.timeout.connect(self.timeout)
         self.deferred = None
@@ -185,7 +186,10 @@ class ClientDialog(QDialog):
 
     def __declareButton(self, message):
         """define a button"""
+        if not self.client.game:
+            return
         maySay = self.client.game.myself.sayable[message]
+        assert Internal.Preferences
         if Internal.Preferences.showOnlyPossibleActions and not maySay:
             return
         btn = DlgButton(message, self)
@@ -209,11 +213,14 @@ class ClientDialog(QDialog):
                     txt.append(tileTxt)
             uiTile.setToolTip('<br><br>'.join(txt))
         if self.client.game.activePlayer == self.client.game.myself:
-            Internal.scene.handSelectorChanged(
-                self.client.game.myself.handBoard)
+            if Internal.scene:
+                Internal.scene.handSelectorChanged(
+                    self.client.game.myself.handBoard)
 
     def checkTiles(self):
         """does the logical state match the displayed tiles?"""
+        if not self.client.game:
+            return
         for player in self.client.game.players:
             player.handBoard.checkTiles()
 
@@ -226,9 +233,13 @@ class ClientDialog(QDialog):
         focus a proposed tile depending on the action."""
         result = self.buttons[0]
         game = self.client.game
+        assert game
+        assert game.myself
+        assert game.myself.handBoard
+        assert Internal.Preferences
         if game.autoPlay or Internal.Preferences.propose:
-            answer, parameter = game.myself.intelligence.selectAnswer(
-                self.messages())
+            mess = self.messages()
+            answer, parameter = game.myself.intelligence.selectAnswer(mess)
             result = [x for x in self.buttons if x.message == answer][0]
             result.setFocus()
             if answer in [Message.Discard, Message.OriginalCall]:
@@ -249,6 +260,7 @@ class ClientDialog(QDialog):
         self.show()
         self.checkTiles()
         game = self.client.game
+        assert game
         myTurn = game.activePlayer == game.myself
         prefButton = self.proposeAction()
         if game.autoPlay:
@@ -267,6 +279,9 @@ class ClientDialog(QDialog):
 
     def placeInField(self):
         """place the dialog at bottom or to the right depending on space."""
+        if not Internal.scene:
+            logError('placeInField: have no Internal.scene')
+            return
         mainWindow = Internal.scene.mainWindow
         cwi = mainWindow.centralWidget()
         view = mainWindow.centralView
@@ -280,6 +295,7 @@ class ClientDialog(QDialog):
             geometry.setX(cwi.width() - width)
             geometry.setY(min(cwi.height() // 3, cwi.height() - height))
         else:
+            assert self.client.game
             handBoard = self.client.game.myself.handBoard
             if not handBoard:
                 # we are in the progress of logging out
@@ -348,7 +364,9 @@ class ClientDialog(QDialog):
         if self.sorry:
             self.sorry.cancel()
         self.sorry = None
-        Internal.scene.clientDialog = None
+        if Internal.scene:
+            Internal.scene.clientDialog = None
+        assert self.deferred
         self.deferred.callback(message)
 
     def selectedAnswer(self, unusedChecked):
@@ -367,7 +385,6 @@ class HumanClient(Client):
         Client.__init__(self)
         HumanClient.humanClients.append(self)
         self.table = None
-        self.ruleset = None
         self.beginQuestion = None
         self.tableList = TableList(self)
         Connection(self).login().addCallbacks(
@@ -381,7 +398,7 @@ class HumanClient(Client):
 
         def done():
             """return True if clients is cleaned"""
-            return len(clients) == 0 or (exception and clients == [exception])
+            return len(clients) == 0 or (exception is not None and clients == [exception])
 
         def disconnectedClient(unusedResult, client):
             """now the client is really disconnected from the server"""
@@ -408,10 +425,12 @@ class HumanClient(Client):
     def __loggedIn(self, connection):
         """callback after the server answered our login request"""
         self.connection = connection
-        self.ruleset = connection.ruleset
+        self.ruleset = connection.ruleset  # pylint:disable=attribute-defined-outside-init
         self.name = connection.username
-        self.tableList.show()
+        if self.tableList:
+            self.tableList.show()
         voiceId = None
+        assert Internal.Preferences
         if Internal.Preferences.uploadVoice:
             voice = Voice.locate(self.name)
             if voice:
@@ -474,7 +493,7 @@ class HumanClient(Client):
 
     def hasLocalServer(self):
         """True if we are talking to a Local Game Server"""
-        return self.connection and self.connection.url.isLocalHost
+        return self.connection is not None and self.connection.url.isLocalHost
 
     def __updateTableList(self):
         """if it exists"""
@@ -484,8 +503,9 @@ class HumanClient(Client):
     def __showTables(self, unused=None):
         """load and show tables. We may be used as a callback. In that case,
         clientTables is the id of a new table - which we do not need here"""
-        self.tableList.loadTables(self.tables)
-        self.tableList.show()
+        if self.tableList:
+            self.tableList.loadTables(self.tables)
+            self.tableList.show()
 
     def showTableList(self, unused=None):
         """allocate it if needed"""
@@ -631,7 +651,9 @@ class HumanClient(Client):
             return None
         if Options.gui:
             # update the balances in the status bar:
-            Internal.mainWindow.updateGUI()
+            if Internal.mainWindow:
+                Internal.mainWindow.updateGUI()
+        assert self.game
         assert not self.game.isFirstHand()
         return Information(i18n("Ready for next hand?"), modal=False).addCallback(answered)
 
@@ -640,13 +662,16 @@ class HumanClient(Client):
         the default answer being the first in the list."""
         if not Options.gui:
             return Client.ask(self, move, answers)
+        scene = Internal.scene
+        assert scene
+        assert self.game
         self.game.myself.computeSayable(move, answers)
         deferred = Deferred()
         deferred.addCallback(self.__askAnswered)
         deferred.addErrback(self.__answerError, move, answers)
         iAmActive = self.game.myself == self.game.activePlayer
+        assert self.game.myself.handBoard
         self.game.myself.handBoard.setEnabled(iAmActive)
-        scene = Internal.scene
         oldDialog = scene.clientDialog
         assert oldDialog is None or oldDialog.answered, \
             'old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
@@ -661,6 +686,7 @@ class HumanClient(Client):
             scene.clientDialog = ClientDialog(
                 self,
                 scene.mainWindow.centralWidget())
+        assert scene.clientDialog
         assert scene.clientDialog.client is self
         scene.clientDialog.askHuman(move, answers, deferred)
         return deferred
@@ -670,11 +696,13 @@ class HumanClient(Client):
         Since we might return a Deferred to be sent to the server,
         which contains Message.Chow plus selected Chow, we should
         return the same tuple here"""
+        assert self.game
         intelligence = self.game.myself.intelligence
         if self.game.autoPlay:
             return Message.Chow, intelligence.selectChow(chows)
         if len(chows) == 1:
             return Message.Chow, chows[0]
+        assert Internal.Preferences
         if Internal.Preferences.propose:
             propose = intelligence.selectChow(chows)
         else:
@@ -686,6 +714,7 @@ class HumanClient(Client):
 
     def __selectKong(self, kongs):
         """which possible kong do we want to declare?"""
+        assert self.game
         if self.game.autoPlay:
             return Message.Kong, self.game.myself.intelligence.selectKong(kongs)
         if len(kongs) == 1:
@@ -704,6 +733,8 @@ class HumanClient(Client):
             # do not remove tile from hand here, the server will tell all players
             # including us that it has been discarded. Only then we will remove
             # it.
+            assert myself.handBoard
+            assert myself.handBoard.focusTile
             myself.handBoard.setEnabled(False)
             return answer, myself.handBoard.focusTile.tile
         args = myself.sayable[answer]
@@ -716,7 +747,7 @@ class HumanClient(Client):
         if args is True or args == []:
             # this does not specify any tiles, the server does not need this. Robot players
             # also return None in this case.
-            return answer
+            return answer, None
         return answer, args
 
     def __answerError(self, answer, move, answers):
@@ -742,7 +773,9 @@ class HumanClient(Client):
             """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
-                self.game.close().addCallback(Internal.mainWindow.close)
+                _ = self.game.close()
+                if Internal.mainWindow:
+                    _.addCallback(Internal.mainWindow.close).addErrback(logException)
         assert self.table and self.table.tableid == tableid
         if Internal.scene:
             # update the balances in the status bar:
@@ -770,7 +803,8 @@ class HumanClient(Client):
         if scene and game and scene.game == game:
             scene.game = None
         if not Options.gui:
-            Internal.mainWindow.close()
+            if Internal.mainWindow:
+                Internal.mainWindow.close()
 
     def serverDisconnected(self, unusedReference):
         """perspective calls us back"""
@@ -816,6 +850,7 @@ class HumanClient(Client):
         """as the name says"""
         if ruleset is None:
             ruleset = self.ruleset
+        assert self.connection
         self.connection.ruleset = ruleset  # side effect: saves ruleset as last used for server
         return self.callServer('newTable', ruleset.hash, Options.playOpen,
                                Internal.autoPlay, self.__wantedGame(), tableid).addErrback(self.tableError)
@@ -827,19 +862,23 @@ class HumanClient(Client):
         elif self.hasLocalServer():
             ruleset = self.ruleset
         else:
+            assert self.connection
             selectDialog = SelectRuleset(self.connection.url)
             if not selectDialog.exec_():
                 return
             ruleset = selectDialog.cbRuleset.current
         deferred = self.__requestNewTableFromServer(ruleset=ruleset)
         if self.hasLocalServer():
-            deferred.addCallback(self.__newLocalTable)
+            deferred.addCallback(self.__newLocalTable).addErrback(logException)
+        assert self.tableList
         self.tableList.requestedNewTable = True
 
     def joinTable(self, table=None):
         """join a table"""
         if not isinstance(table, ClientTable):
+            assert self.tableList
             table = self.tableList.selectedTable()
+            assert table
         self.callServer('joinTable', table.tableid).addErrback(self.tableError)
 
     def logout(self, unusedResult=None):
