@@ -6,7 +6,7 @@ Copyright (C) 2008-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 SPDX-License-Identifier: GPL-2.0
 
 """
-from typing import List, TYPE_CHECKING, Optional, Literal, Dict, Any, Union
+from typing import List, TYPE_CHECKING, Optional, Literal, Dict, Any, Union, cast, Sequence
 
 from common import Internal, ZValues, ReprMixin, Speeds, DrawOnTopMixin
 from wind import Wind, East
@@ -31,11 +31,12 @@ if TYPE_CHECKING:
     from game import Game
     from scene import PlayingScene
 
+
 class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
 
     """The text written on the wall"""
 
-    sideTexts = []
+    sideTexts : List['SideText'] = []
 
     def __init__(self, parent:Optional['QGraphicsItem']=None) ->None:
         assert parent is None
@@ -47,11 +48,11 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
         assert Internal.scene
         Internal.scene.addItem(self)
         self.__text = ''
-        self.__board = None
+        self.__board:Optional['UIWallSide'] = None
         self.needsRefresh = False
         self.__color = QColor('black')
-        self.__boundingRect = None
-        self.__font = QFont()
+        self.__boundingRect:Optional[QRectF] = None
+        self.__font:QFont = QFont()
 
     def adaptedFont(self) ->QFont:
         """Font with the correct point size for the wall"""
@@ -184,6 +185,8 @@ class UIWallSide(Board, ReprMixin):
     def __init__(self, tileset:Tileset, boardRotation:int, length:float):
         Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
         self.length = length
+        self.disc:'WindDisc'
+        self.message:YellowText
 
     def debug_name(self) ->str:
         """name for debug messages"""
@@ -218,16 +221,16 @@ class UIKongBox(KongBox):
     def fill(self, tiles:List[Union['Piece', UITile]]) ->None:
         """fill the box"""
         for uiTile in self._tiles:
-            uiTile.cross = False
+            cast(UITile, uiTile).cross = False
         KongBox.fill(self, tiles)
         for uiTile in self._tiles:
-            uiTile.cross = True
+            cast(UITile, uiTile).cross = True
 
     def pop(self, count:int) ->List[Union['Piece', UITile]]:
         """get count tiles from kong box"""
         result = KongBox.pop(self, count)
         for uiTile in result:
-            uiTile.cross = False
+            cast(UITile, uiTile).cross = False
         return result
 
 
@@ -253,6 +256,7 @@ class UIWall(Wall):
         self.initWindDiscs()
         game.wall = self
         Wall.__init__(self, game)
+        self.tiles:Sequence[UITile] = [cast(UITile, x) for x in self.tiles]  # type:ignore[assignment]
         self.__square = Board(1, 1, Tileset.current())
         self.__square.setZValue(ZValues.markerZ)
         sideLength = len(self.tiles) // 8
@@ -321,7 +325,7 @@ class UIWall(Wall):
     def __shuffleTiles(self) ->None:
         """shuffle tiles for next hand"""
         assert Internal.scene
-        discardBoard = Internal.scene.discardBoard
+        discardBoard = cast('PlayingScene', Internal.scene).discardBoard
         places = [(x, y) for x in range(-3, int(discardBoard.width) + 3)
                   for y in range(-3, int(discardBoard.height) + 3)]
         assert self.game
@@ -364,8 +368,8 @@ class UIWall(Wall):
 
     @property
     def lightSource(self) ->Union[Literal['NE'], Literal['NW'], Literal['SW'], Literal['SE']]:
-        """For possible values see LIGHTSOURCES"""
-        return self.__square.lightSource
+        """see LIGHTSOURCES"""
+        return cast(Union[Literal['NE'], Literal['NW'], Literal['SW'], Literal['SE']], self.__square.lightSource)
 
     @lightSource.setter
     def lightSource(self, lightSource:Union[Literal['NE'], Literal['NW'], Literal['SW'], Literal['SE']]) ->None:
@@ -424,7 +428,7 @@ class UIWall(Wall):
         sideLength = len(self.tiles) // 8
         if newOffset >= sideLength:
             assert board
-            sideIdx = self.__sides.index(board)
+            sideIdx = self.__sides.index(cast(UIWallSide, board))
             board = self.__sides[(sideIdx + 1) % 4]
         uiTile.setBoard(board, newOffset % sideLength, 0, level=2)
         uiTile.update()
@@ -437,8 +441,8 @@ class UIWall(Wall):
         if placeCount >= 4:
             first = min(placeCount - 1, 5)
             second = max(first - 2, 1)
-            self.__moveDividedTile(self.kongBox[-1], second)
-            self.__moveDividedTile(self.kongBox[-2], first)
+            self.__moveDividedTile(cast(UITile, self.kongBox[-1]), second)
+            self.__moveDividedTile(cast(UITile, self.kongBox[-2]), first)
 
     def divide(self) ->None:
         """divides a wall, building a living end and a dead end"""
