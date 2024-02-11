@@ -122,6 +122,7 @@ class ClientMessage(Message):
 
     def buttonCaption(self):
         """localized, with a & for the shortcut"""
+        assert self.shortcut
         i18nShortcut = i18nc(
             'kajongg game dialog:Key for ' +
             self.name,
@@ -143,10 +144,9 @@ class ClientMessage(Message):
     @staticmethod
     def isActivePlayer(table, msg):
         """helper: does the message come from the active player?"""
-        if msg.player == table.game.activePlayer:
+        if table.game and msg.player == table.game.activePlayer:
             return True
-        errMsg = '%s said %s but is not the active player' % (
-            msg.player, msg.answer.i18nName)
+        errMsg = '%s said %s but is not the active player' % (msg.player, msg.answer)
         table.abort(errMsg)
         return False
 
@@ -174,6 +174,7 @@ class NotifyAtOnceMessage(ClientMessage):
 
     def notifyAction(self, client, move): # pylint: disable=unused-argument
         """the default action for immediate notifications"""
+        assert move.player
         move.player.popupMsg(self)
 
     @classmethod
@@ -239,6 +240,8 @@ class MessagePung(PungChowMessage, ServerMessage):
 
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
+        assert msg.player
+        assert isinstance(msg.args, list)
         table.claimTile(msg.player, self, Meld(msg.args[0]), Message.Pung)
 
     def clientAction(self, client, move):
@@ -257,6 +260,9 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
 
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
+        assert table.game
+        assert msg.player
+        assert isinstance(msg.args, list)
         if table.game.lastDiscard:
             table.claimTile(msg.player, self, Meld(msg.args[0]), Message.Kong)
         else:
@@ -281,6 +287,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
 
     def clientAction(self, client, move):
         """mirror kong call"""
+        assert client.game
         return client.claimed(move) if client.game.lastDiscard else client.declared(move)
 
 
@@ -295,6 +302,8 @@ class MessageChow(PungChowMessage, ServerMessage):
 
     def serverAction(self, table, msg):
         """the server mirrors that and tells all others"""
+        assert table.game
+        assert isinstance(msg.args, list)
         if table.game.nextPlayer() != msg.player:
             table.abort(
                 'player %s illegally said Chow, only %s may' %
@@ -337,6 +346,7 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
 
     def clientAction(self, client, move):
         """mirror the mahjongg action locally. Check if the balances are correct."""
+        assert move.player
         return move.player.declaredMahJongg(move.melds, move.withDiscardTile,
                                             move.lastTile, move.lastMeld)
 
@@ -372,6 +382,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
     def clientAction(self, client, move):
         """mirror the original call"""
         player = move.player
+        assert player
         if client.thatWasMe(player):
             player.originalCallingHand = player.hand
             if Debug.originalCall:
@@ -379,6 +390,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
                     '%s gets originalCallingHand:%s' %
                     (player, player.originalCallingHand))
         player.originalCall = True
+        assert client.game
         client.game.addCsvTag('originalCall')
         return client.ask(move, [Message.OK])
 
@@ -418,9 +430,12 @@ class MessageDiscard(ClientMessage, ServerMessage):
 
     def clientAction(self, client, move):
         """execute the discard locally"""
+        assert move.player
         if client.isHumanClient() and Internal.scene:
+            assert move.player.handBoard
             move.player.handBoard.setEnabled(False)
-        move.player.speak(move.tile)
+        move.player.speak(move.tile.name2())
+        assert client.game
         return client.game.hasDiscarded(move.player, move.tile)
 
 
@@ -435,6 +450,7 @@ class MessageProposeGameId(ServerMessage):
         # move.playerNames are the players in seating order
         # we cannot just use table.playerNames - the seating order is now
         # different (random)
+        assert move.gameid
         return client.reserveGameId(move.gameid)
 
 
@@ -445,7 +461,7 @@ class MessageTableChanged(ServerMessage):
 
     def clientAction(self, client, move):
         """update our copy"""
-        return client.tableChanged(move.source)
+        client.tableChanged(move.source)
 
 
 class MessageReadyForGameStart(ServerMessage):
@@ -472,7 +488,9 @@ class MessageReadyForGameStart(ServerMessage):
         # move.playerNames are the players in seating order
         # we cannot just use table.playerNames - the seating order is now
         # different (random)
-        return client.readyForGameStart(
+        assert move.tableid
+        assert move.gameid
+        return client.readyForGameStart(  # type:ignore[attr-defined]
             move.tableid, move.gameid,
             move.wantedGame, move.playerNames, shouldSave=move.shouldSave).addCallback(hideTableList)
 
@@ -483,6 +501,7 @@ class MessageNoGameStart(NotifyAtOnceMessage):
     needsGame = False
 
     def notifyAction(self, client, move):
+        assert move.player
         if client.beginQuestion or client.game:
             Sorry(i18n('%1 is not ready to start the game', move.player.name))
         if client.beginQuestion:
@@ -494,7 +513,8 @@ class MessageNoGameStart(NotifyAtOnceMessage):
     @classmethod
     def receivers(cls, request):
         """notification is not needed for those who already said no game"""
-        return [x.player for x in request.block.requests if x.answer != Message.NoGameStart]
+        result = [x.player for x in request.block.requests if x.answer != Message.NoGameStart]
+        return result
 
 
 class MessageReadyForHandStart(ServerMessage):
@@ -512,6 +532,8 @@ class MessageInitHand(ServerMessage):
 
     def clientAction(self, client, move):
         """prepare a new hand"""
+        assert client.game
+        assert client.game.wall
         client.game.divideAt = move.divideAt
         client.game.wall.divide()
         if hasattr(client, 'shutdownHumanClients'):
@@ -532,7 +554,10 @@ class MessageSetConcealedTiles(ServerMessage):
 
     def clientAction(self, client, move):
         """set tiles for player"""
-        return move.player.addConcealedTiles(client.game.wall.deal(move.tiles), animated=False)
+        assert move.player
+        assert client.game
+        assert client.game.wall
+        return move.player.addConcealedTiles(client.game.wall.deal(move.tiles), animated=False)  # type:ignore[arg-type]
 
 
 class MessageShowConcealedTiles(ServerMessage):
@@ -541,6 +566,7 @@ class MessageShowConcealedTiles(ServerMessage):
 
     def clientAction(self, client, move):
         """set tiles for player"""
+        assert move.player
         return move.player.showConcealedTiles(move.tiles, move.show)
 
 
@@ -550,6 +576,7 @@ class MessageSaveHand(ServerMessage):
 
     def clientAction(self, client, move):
         """save the hand"""
+        assert client.game
         return client.game.saveHand()
 
 
@@ -559,6 +586,7 @@ class MessageAskForClaims(ServerMessage):
 
     def clientAction(self, client, move):
         """ask the player"""
+        assert move.player
         if client.thatWasMe(move.player):
             raise ValueError(
                 'Server asked me(%s) for claims but I just discarded that tile!' %
@@ -572,6 +600,7 @@ class MessagePickedTile(ServerMessage):
 
     def clientAction(self, client, move):
         """mirror the picked tile"""
+        assert move.player
         assert move.player.pickedTile(move.deadEnd, tileName=move.tile) == move.tile, \
             (move.player.lastTile, move.tile)
         if client.thatWasMe(move.player):
@@ -585,6 +614,8 @@ class MessageActivePlayer(ServerMessage):
 
     def clientAction(self, client, move):
         """set the active player"""
+        assert client.game
+        assert move.player
         client.game.activePlayer = move.player
 
 
@@ -600,6 +631,7 @@ class MessageViolatesOriginalCall(ServerMessage):
 
     def clientAction(self, client, move):
         """violation: player may not say mah jongg"""
+        assert move.player
         move.player.popupMsg(self)
         move.player.mayWin = False
         if Debug.originalCall:
@@ -614,7 +646,9 @@ class MessageVoiceId(ServerMessage):
 
     def clientAction(self, client, move):
         """the server gave us a voice id about another player"""
+        assert Internal.Preferences
         if Internal.Preferences.useSounds and Options.gui:
+            assert move.player
             move.player.voice = Voice.locate(move.source)
             if not move.player.voice:
                 return Message.ClientWantsVoiceData, move.source
@@ -627,6 +661,8 @@ class MessageVoiceData(ServerMessage):
 
     def clientAction(self, client, move):
         """server sent us voice sounds about somebody else"""
+        assert move.md5sum
+        assert move.player
         move.player.voice = Voice(move.md5sum, move.source)
         if Debug.sound:
             logDebug('%s gets voice data %s from server, language=%s' % (
@@ -638,7 +674,9 @@ class MessageAssignVoices(ServerMessage):
     """The server tells us that we now got all voice data available"""
 
     def clientAction(self, client, move):
+        assert Internal.Preferences
         if Internal.Preferences.useSounds and Options.gui:
+            assert client.game
             client.game.assignVoices()
 
 
@@ -653,6 +691,8 @@ class MessageServerWantsVoiceData(ServerMessage):
 
     def clientAction(self, client, move):
         """send voice sounds as requested to server"""
+        assert move.player
+        assert move.player.voice
         if Debug.sound:
             logDebug('%s: send wanted voice data %s to server' % (
                 move.player, move.player.voice))
@@ -665,7 +705,10 @@ class MessageServerGetsVoiceData(ClientMessage):
 
     def serverAction(self, table, msg):
         """save voice sounds on the server"""
+        assert isinstance(msg.args, list)
+        assert msg.player
         voice = msg.player.voice
+        assert voice
         voice.archiveContent = msg.args[0]
         if Debug.sound:
             if voice.oggFiles():
@@ -683,6 +726,8 @@ class MessageDeclaredKong(ServerMessage):
     def clientAction(self, client, move):
         """mirror the action locally"""
         prompts = None
+        assert move.meld
+        assert move.player
         if not client.thatWasMe(move.player):
             if len(move.meld) != 4 or move.meld[0].isConcealed:
                 # do not do this when adding a 4th tile to an exposed pung
@@ -700,8 +745,11 @@ class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):
 
     def clientAction(self, client, move):
         """mirror the action locally"""
+        assert client.game
         prevMove = next(client.game.lastMoves(only=[Message.DeclaredKong]))
+        assert prevMove.player
         prevMove.player.robTileFrom(prevMove.meld[0].concealed)
+        assert move.player
         move.player.robsTile()
         client.game.addCsvTag(
             'robbedKong%s' % prevMove.meld[1],
@@ -714,6 +762,7 @@ class MessageCalling(ServerMessage):
 
     def clientAction(self, client, move):
         """tell user and save this information locally"""
+        assert move.player
         move.player.popupMsg(self)
         move.player.isCalling = True
         return client.ask(move, [Message.OK])
@@ -728,6 +777,7 @@ class MessageDangerousGame(ServerMessage):
 
     def clientAction(self, client, move):
         """mirror the dangerous game action locally"""
+        assert move.player
         move.player.popupMsg(self)
         move.player.playedDangerous = True
         return client.ask(move, [Message.OK])
@@ -744,6 +794,7 @@ class MessageNoChoice(ServerMessage):
     def clientAction(self, client, move):
         """mirror the no choice action locally"""
         self.move = move
+        assert move.player
         move.player.popupMsg(self)
         move.player.claimedNoChoice = True
         move.player.showConcealedTiles(move.tiles)
@@ -754,6 +805,8 @@ class MessageNoChoice(ServerMessage):
 
     def hideConcealedAgain(self, result):
         """only show them for explaining the 'no choice'"""
+        assert self.move
+        assert self.move.player
         self.move.player.showConcealedTiles(self.move.tiles, False)
         return result
 
@@ -763,7 +816,9 @@ class MessageUsedDangerousFrom(ServerMessage):
     """the game server tells us somebody claimed a dangerous tile"""
 
     def clientAction(self, client, move):
-        fromPlayer = client.game.playerByName(move.source)
+        assert client.game
+        fromPlayer = client.game.playerByName(str(move.source))
+        assert move.player
         move.player.usedDangerousFrom = fromPlayer
         if Debug.dangerousGame:
             logDebug('%s claimed a dangerous tile discarded by %s' %
@@ -783,7 +838,7 @@ class MessageError(ServerMessage):
 
     def clientAction(self, client, move):
         """show the error message from server"""
-        return logWarning(move.source)
+        return logWarning(str(move.source))
 
 
 class MessageNO(ClientMessage):
@@ -821,7 +876,8 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
     @classmethod
     def receivers(cls, request):
         """no Claim notifications are not needed for those who already answered"""
-        return [x.player for x in request.block.requests if x.answer is None]
+        result = [x.player for x in request.block.requests if x.answer is None]
+        return result
 
 
 def __scanSelf():
