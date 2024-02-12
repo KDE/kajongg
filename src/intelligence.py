@@ -70,15 +70,16 @@ class AIDefaultAI:
         """the standard"""
         game = self.player.game
         weighRules = game.ruleset.filterRules('weigh')
-        for aiFilter in [self.weighBasics, self.weighSameColors,
+        for _ in [self.weighBasics, self.weighSameColors,
                          self.weighSpecialGames, self.weighCallingHand,
                          self.weighOriginalCall,
                          self.alternativeFilter] + weighRules:
-            if aiFilter in weighRules:
-                filterName = aiFilter.__class__.__name__
-                aiFilter = aiFilter.weigh
+            if _ in weighRules:
+                filterName = _.__class__.__name__
+                aiFilter = _.weigh
             else:
-                filterName = aiFilter.__name__
+                filterName = _.__name__
+                aiFilter = _
             if Debug.robotAI:
                 prevWeights = ((x.tile, x.keep) for x in candidates)
                 candidates = aiFilter(self, candidates)
