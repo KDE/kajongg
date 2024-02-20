@@ -377,7 +377,7 @@ class CSV(ReprMixin):
             for branch in subprocess.check_output(b'git branch'.split()).decode().split('\n'):
                 if 'detached' not in branch and 'no branch' not in branch:
                     cls.knownCommits |= set(subprocess.check_output(
-                        'git log --max-count=400 --pretty=%H {branch}'.format(
+                        'git log --max-count=400 --pretty=%H {branch} --abbrev=10'.format(
                             branch=branch[2:]).split()).decode().split('\n'))
 
     @classmethod
@@ -606,7 +606,7 @@ def improve_options() ->None:
             if '^' not in OPTIONS.git:
                 OPTIONS.git = OPTIONS.git.replace('..', '^..')
             commits = subprocess.check_output(
-                'git log --grep _SILENT --invert-grep --pretty=%h {range}'.format(
+                'git log --grep _SILENT --invert-grep --pretty=%h {range} --abbrev=10'.format(
                     range=OPTIONS.git).split()).decode()
             _ = list(x.strip() for x in commits.split('\n') if x.strip())
             OPTIONS.git = list(reversed(_))
