@@ -1,0 +1,12 @@
+[[tool.mypy.overrides]]
+module = [
+    "qtpy.*",
+    "sip",
+    "cx_Freeze",
+    "PySide2",
+    "kdepaths.*",
+    "appversion",
+    "zope.interface",
+    "PyQt5.*",
+    "twisted.*"]
+ignore_missing_imports = true
