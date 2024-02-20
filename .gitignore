@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: CC0-1.0
 # SPDX-FileCopyrightText: none
 .kdev4/
+.jedi/
 /build*/
 *.kdev4
 CMakeLists.txt.user*
