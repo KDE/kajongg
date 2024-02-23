@@ -377,7 +377,7 @@ class CSV(ReprMixin):
             for branch in subprocess.check_output(b'git branch'.split()).decode().split('\n'):
                 if 'detached' not in branch and 'no branch' not in branch:
                     cls.knownCommits |= set(subprocess.check_output(
-                        'git log --max-count=400 --pretty=%H {branch} --abbrev=10'.format(
+                        'git log --max-count=800 --pretty=%H {branch} --abbrev=10'.format(
                             branch=branch[2:]).split()).decode().split('\n'))
 
     @classmethod
