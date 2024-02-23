@@ -267,11 +267,12 @@ class DeferredBlock(StrMixin):
                 traceBack = result.traceback
             else:
                 traceBack = result.getBriefTraceback()
-            self.table.abort(
-                msg,
-                request.user.name,
-                result.getErrorMessage(),
-                traceBack)
+            if not isinstance(result.value, AssertionError):
+                self.table.abort(
+                    msg,
+                    request.user.name,
+                    result.getErrorMessage(),
+                    traceBack)
 
     def logBug(self, msg):
         """log msg and raise exception"""

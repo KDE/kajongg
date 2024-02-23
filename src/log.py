@@ -14,7 +14,7 @@ import string
 from locale import getpreferredencoding
 from sys import _getframe
 
-# util must not import twisted or we need to change kajongg.py
+# we must not import twisted or we need to change kajongg.py
 
 from common import Internal, Debug
 from qt import Qt, QEvent
@@ -226,10 +226,17 @@ def logWarning(msg, withGamePrefix=True):
     return logMessage(msg, logging.WARNING, True, withGamePrefix=withGamePrefix)
 
 
-def logException(exception: str, withGamePrefix=True):
-    """logs error message and re-raises exception"""
+def logException(exception: str, withGamePrefix=True) ->None:
+    """logs error message and re-raises exception if we are not server"""
     logError(exception, withGamePrefix=withGamePrefix)
-    raise Exception(exception)  # pylint:disable=broad-exception-raised
+    exc_type = exception.__class__
+    if hasattr(exception, 'type'):
+        exc_type = exception.type
+    isAssertion = 'Assertion' in exc_type.__name__
+    if not Internal.isServer or isAssertion:
+        if isinstance(exception, Exception):
+            raise exception
+        raise Exception(exception)  # pylint:disable=broad-exception-raised
 
 
 class EventData(str):
