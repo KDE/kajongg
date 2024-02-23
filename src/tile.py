@@ -121,7 +121,7 @@ class Tile(ReprMixin):  # pylint:disable=too-many-instance-attributes
                     group, arg1 = args[0]  # type:ignore[misc]
                     # mypy: unpacking a string is disallowed
                 except ValueError:
-                    logException('cannot make a tile from {}'.format(args))
+                    logException(f'cannot make a tile from {args}')
         else:
             group, arg1 = args
         self.group = group
@@ -142,7 +142,7 @@ class Tile(ReprMixin):  # pylint:disable=too-many-instance-attributes
         try:
             self.key = 1 + self.hashTable.index(Tile.__str__(self)) // 2
         except ValueError:
-            logException('%s is not a valid tile string' % self)
+            logException(f'{self} is not a valid tile string')
 
         self.isNumber = False
         self.isTerminal = False
@@ -235,8 +235,9 @@ class Tile(ReprMixin):  # pylint:disable=too-many-instance-attributes
 
         existing = list([x for x in cls.cache.values() if x.key == result.key]) # pylint: disable=consider-using-generator
         existingIds = {id4(x) for x in existing}
-        assert len(existingIds) == 1, 'cls is {} new is:{} existing are: {} keys are:{}'.format(cls.__name__,
-            repr(result), ','.join(repr(x) for x in existing), ','.join(repr(x) for x in cls.cache if x == 1))
+        assert len(existingIds) == 1, (f"cls is {cls.__name__} new is:{repr(result)} "
+                                       f"existing are: {','.join(repr(x) for x in existing)} "
+                                       f"keys are:{','.join(repr(x) for x in cls.cache if x == 1)}")
 
     def name2(self) ->str:
         """__str__ might be changed by a subclass"""
@@ -391,8 +392,7 @@ class Tiles:
                     memberList.append(member)
                 else:
                     raise ValueError(
-                        '{}() accepts only {} and str but got {}'.format(
-                            cls.__name__, cls.tileClass.__name__, repr(member)))
+                        f'{cls.__name__}() accepts only {cls.tileClass.__name__} and str but got {repr(member)}')
         return memberList
 
     def sorted(self) ->'Tiles':
@@ -423,7 +423,7 @@ class Tiles:
 
     def __repr__(self) ->str:
         """for debugging"""
-        return '{}_{}({})'.format(self.__class__.__name__, id4(self), ','.join(repr(x) for x in self))
+        return f"{self.__class__.__name__}_{id4(self)}({','.join(repr(x) for x in self)})"
 
     def __len__(self) ->int:
         """just to make this clear to mypy"""
@@ -569,7 +569,7 @@ class PieceList(TileList):
             for result, _ in enumerate(self):
                 if _ == value:
                     return result
-            raise ValueError('{!r} is not in list {!r}'.format(value, self))
+            raise ValueError(f'{value!r} is not in list {self!r}')
         return TileList.index(self, cast(Any, value), start,  stop)
 
     def remove(self, value : Tile) ->None:
@@ -582,7 +582,7 @@ class PieceList(TileList):
                     value = _
                     break
             else:
-                raise ValueError('{} does not contain {!r}'.format(self, value))
+                raise ValueError(f'{self} does not contain {value!r}')
         TileList.remove(self, cast(Any, value))
 
 # those two must come first
@@ -783,7 +783,7 @@ class Meld(TileTuple, ReprMixin):
                 _ = None
             else:
                 tiles.append(tile.concealed)
-        assert _ is None, 'trying to remove {} from {}'.format(_, self)
+        assert _ is None, f'trying to remove {_} from {self}'
         return TileTuple(tiles)
 
     def __setitem__(self, index:int, value:Tile) ->None:
@@ -809,7 +809,7 @@ class Meld(TileTuple, ReprMixin):
         if length == 0:
             return
         if length > 4:
-            raise UserWarning('Meld %s is too long' % str(self))
+            raise UserWarning(f'Meld {str(self)} is too long')
         if any(not x.isKnown for x in self):
             if len(set(self)) != 1:
                 raise UserWarning(
@@ -826,7 +826,7 @@ class Meld(TileTuple, ReprMixin):
                     and all(x.lowerGroup in Tile.colors for x in self):
                 self.isKnitted = True
             else:
-                raise UserWarning('Meld %s is malformed' % str(self))
+                raise UserWarning(f'Meld {str(self)} is malformed')
             return
         # now length is 3 or 4
         tiles = set(self)
@@ -845,17 +845,17 @@ class Meld(TileTuple, ReprMixin):
                             return
         groups = {x.group for x in self}
         if len(groups) > 2 or len({x.lower() for x in groups}) > 1:
-            raise UserWarning('Meld %s is malformed' % str(self))
+            raise UserWarning(f'Meld {str(self)} is malformed')
         values = {x.value for x in self}
         if length == 4:
             if len(values) > 1:
-                raise UserWarning('Meld %s is malformed' % str(self))
+                raise UserWarning(f'Meld {str(self)} is malformed')
             if self.case == 'aaaA':
                 self.isKong = self.isClaimedKong = True
             elif self.case == 'aAAa':
                 self.isKong = True
             else:
-                raise UserWarning('Meld %s is malformed' % str(self))
+                raise UserWarning(f'Meld {str(self)} is malformed')
             return
         # only possibilities left are CHOW and REST
         # length is 3
@@ -864,7 +864,7 @@ class Meld(TileTuple, ReprMixin):
                 if self[0].nextForChow is self[1] and self[1].nextForChow is self[2]:
                     self.isChow = True
                     return
-        raise UserWarning('Meld %s is malformed' % str(self))
+        raise UserWarning(f'Meld {str(self)} is malformed')
 
     def __lt__(self, other:Tuple[Any, ...]) ->bool:
         """used for sorting. Smaller value is shown first."""
@@ -873,8 +873,7 @@ class Meld(TileTuple, ReprMixin):
         if not self:
             return True
         if not isinstance(other, Meld):
-            raise TypeError("'<' not supported between instances of {} and {}".format(
-                type(self).__name__, type(other).__name__))
+            raise TypeError(f"'<' not supported between instances of {type(self).__name__} and {type(other).__name__}")
         if self.isDeclared and not cast(Meld, other).isDeclared:
             return True
         if not self.isDeclared and cast(Meld, other).isDeclared:
@@ -931,7 +930,7 @@ class Meld(TileTuple, ReprMixin):
 
     def __repr__(self):
         """because TileTuple.__repr__ does not indicate class Meld"""
-        return 'Meld({}'.format(TileTuple.__repr__(self))
+        return f'Meld({TileTuple.__repr__(self)}'
 
 
 class MeldList(list):

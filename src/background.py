@@ -52,8 +52,7 @@ class Background(Resource):
             self.graphicsPath = self.locate(graphName)
             if not self.graphicsPath:
                 logException(
-                    'cannot find kmahjongglib/backgrounds/%s for %s' %
-                    (graphName, self.desktopFileName))
+                    f'cannot find kmahjongglib/backgrounds/{graphName} for {self.desktopFileName}')
 
     def pixmap(self, size:'QSizeF') ->Union[QBrush, QPixmap]:
         """return a background pixmap or None for isPlain"""
@@ -64,7 +63,7 @@ class Background(Resource):
             if self.tiled:
                 width = self.imageWidth
                 height = self.imageHeight
-            cachekey = '{name}W{width}H{height}'.format(name=self.name, width=width, height=height)
+            cachekey = f'{self.name}W{width}H{height}'
             self.__pmap = QPixmapCache.find(cachekey)
             if not self.__pmap:
                 renderer = QSvgRenderer(self.graphicsPath)

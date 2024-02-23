@@ -65,7 +65,7 @@ class SelectChow(KDialogIgnoringEscape):
         layout.setAlignment(label, Qt.AlignmentFlag.AlignHCenter)
         self.buttons = []
         for chow in chows:
-            button = QRadioButton('{}-{}-{}'.format(*(x.value for x in chow)))
+            button = QRadioButton('{}-{}-{}'.format(*(x.value for x in chow))) # pylint:disable=consider-using-f-string
             self.buttons.append(button)
             layout.addWidget(button)
             layout.setAlignment(button, Qt.AlignmentFlag.AlignHCenter)
@@ -455,8 +455,7 @@ class HumanClient(Client):
                 voiceId = voice.md5sum
             if Debug.sound and voiceId:
                 logDebug(
-                    '%s sends own voice %s to server' %
-                    (self.name, voiceId))
+                    f'{self.name} sends own voice {voiceId} to server')
         maxGameId = Query('select max(id) from game').records[0][0]
         maxGameId = int(maxGameId) if maxGameId else 0
         self.callServer('setClientProperties',
@@ -473,7 +472,7 @@ class HumanClient(Client):
                 self.__showTables).addErrback(self.tableError)
             if Debug.table:
                 logDebug(
-                    '%s: --table lets us open a new table' % self.name)
+                    f'{self.name}: --table lets us open a new table')
             SingleshotOptions.table = False
         elif SingleshotOptions.join:
             Internal.autoPlay = False
@@ -481,8 +480,7 @@ class HumanClient(Client):
                 self.__showTables).addErrback(self.tableError)
             if Debug.table:
                 logDebug(
-                    '%s: --join lets us join table %s' %
-                    (self.name, self._tableById(SingleshotOptions.join)))
+                    f'{self.name}: --join lets us join table {self._tableById(SingleshotOptions.join)}')
             SingleshotOptions.join = False
         elif not self.game and (Internal.autoPlay or (not self.tables and self.hasLocalServer())):
             self.__requestNewTableFromServer().addCallback(
@@ -633,8 +631,8 @@ class HumanClient(Client):
         def cancelled(unused:'Request') ->'ServerMessage':
             """the user does not want to start now. Back to table list"""
             if Debug.table:
-                logDebug('%s: Readyforgamestart returns Message.NoGameStart for table %s' % (
-                    self.name, self._tableById(tableid)))
+                logDebug(f'{self.name}: Readyforgamestart returns Message.NoGameStart '
+                         f'for table {self._tableById(tableid)}')
             self.table = None
             self.beginQuestion = None
             if self.tableList:
@@ -650,8 +648,7 @@ class HumanClient(Client):
         self.table = self._tableById(tableid)
         if not self.table:
             raise pb.Error(
-                'client.readyForGameStart: tableid %d unknown' %
-                tableid)
+                f'client.readyForGameStart: tableid {int(tableid)} unknown')
         msg = i18n(
             "The game on table <numid>%1</numid> can begin. Are you ready to play now?",
             tableid)
@@ -691,11 +688,9 @@ class HumanClient(Client):
         assert self.game.myself.handBoard
         self.game.myself.handBoard.setEnabled(iAmActive)
         oldDialog = scene.clientDialog
-        assert oldDialog is None or oldDialog.answered, \
-            'old dialog %s:%s is unanswered, new Dialog: %s/%s' % (
-                str(oldDialog.move),
-                str([x.message.name for x in oldDialog.buttons]),
-                str(move), str(answers))
+        assert oldDialog is None or oldDialog.answered, (
+            f'old dialog {str(oldDialog.move)}:{str([x.message.name for x in oldDialog.buttons])} '
+            f'is unanswered, new Dialog: {str(move)}/{str(answers)}')
         if not oldDialog or not oldDialog.isVisible():
             # always build a new dialog because if we change its layout before
             # reshowing it, sometimes the old buttons are still visible in which
@@ -775,8 +770,7 @@ class HumanClient(Client):
     def __answerError(self, answer:Message, move:'Move', answers:List[Message]) ->None:
         """an error happened while determining the answer to server"""
         logException(
-            '%s %s %s %s' %
-            (self.game.myself.name if self.game else 'NOGAME', answer, move, answers))
+            f"{self.game.myself.name if self.game else 'NOGAME'} {answer} {move} {answers}")
 
     def remote_abort(self, tableid:int, message: str, *args:Any) ->None:
         """the server aborted this game"""
@@ -809,8 +803,7 @@ class HumanClient(Client):
         Remove visual traces depending on that connection."""
         if Debug.connections and result:
             logDebug(
-                'server %s disconnects: %s' %
-                (self.connection, result))
+                f'server {self.connection} disconnects: {result}')
         self.connection = None
         game = self.game
         self.game = None  # avoid races: messages might still arrive
@@ -832,8 +825,7 @@ class HumanClient(Client):
         """perspective calls us back"""
         if self.connection and (Debug.traffic or Debug.connections):
             logDebug(
-                'perspective notifies disconnect: %s' %
-                self.connection.url)
+                f'perspective notifies disconnect: {self.connection.url}')
         self.remote_serverDisconnects()
 
     @staticmethod
@@ -908,14 +900,14 @@ class HumanClient(Client):
         def loggedout(result:List['Request'], connection:Connection) ->List['Request']:
             """end the connection from client side"""
             if Debug.connections:
-                logDebug('server confirmed logout for {}'.format(self))
+                logDebug(f'server confirmed logout for {self}')
             connection.connector.disconnect()
             return result
         if self.connection:
             conn = self.connection
             self.connection = None
             if Debug.connections:
-                logDebug('sending logout to server for {}'.format(self))
+                logDebug(f'sending logout to server for {self}')
             return self.callServer('logout').addCallback(loggedout, conn).addErrback(logException)
         return succeed(None)
 
@@ -931,9 +923,9 @@ class HumanClient(Client):
                 if debugArgs[4] >= 8300:
                     debugArgs[4] -= 300
         if self.game:
-            self.game.debug('callServer(%s)' % repr(debugArgs))
+            self.game.debug(f'callServer({repr(debugArgs)})')
         else:
-            logDebug('callServer(%s)' % repr(debugArgs))
+            logDebug(f'callServer({repr(debugArgs)})')
 
     def callServer(self, *args:Any) ->Deferred:
         """if we are online, call server"""

@@ -50,8 +50,7 @@ class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):
         """generate new wind disc"""
         super().__init__()
         assert not parent
-        assert isinstance(wind, Wind), 'wind {}  must be a real Wind but is {}'.format(
-            wind, type(wind))
+        assert isinstance(wind, Wind), f'wind {wind}  must be a real Wind but is {type(wind)}'
         self.__wind:Wind = wind
         self.__brush = self.whiteColor
         self.board:'UIWallSide'
@@ -110,8 +109,7 @@ class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):
 
     def __str__(self) ->str:
         """for debugging"""
-        return 'WindDisc(%s x/y= %.1f/%1f)' % (
-            self.debug_name(), self.x(), self.y())
+        return f'WindDisc({self.debug_name()} x/y= {self.x():.1f}/{self.y():1f})'
 
 
 class WindLabel(QLabel):
@@ -263,8 +261,8 @@ class Board(QGraphicsRectItem, ReprMixin):
             self.__prevPos = uiTile.sortKey()
         self._focusTile = uiTile
         if self._focusTile and self._focusTile.tile.name2() in Debug.focusable:
-            logDebug('%s: new focus uiTile %s from %s' % (
-                self.debug_name(), self._focusTile.tile if self._focusTile else 'None', stack('')[-1]))
+            logDebug(f"{self.debug_name()}: new focus uiTile "
+                     f"{self._focusTile.tile if self._focusTile else 'None'} from {stack('')[-1]}")
         if self.hasLogicalFocus:
             cast('SceneWithFocusRect', self.scene()).focusBoard = self
 
@@ -302,8 +300,7 @@ class Board(QGraphicsRectItem, ReprMixin):
             if isAlive(scene):
                 if scene.focusBoard == self or value:
                     if self.focusTile:
-                        assert self.focusTile.board == self, '%s not in self %s' % (
-                            self.focusTile, self)
+                        assert self.focusTile.board == self, f'{self.focusTile} not in self {self}'
                 if value:
                     scene.focusBoard = self
 
@@ -507,7 +504,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         """set active lightSource"""
         if self._lightSource != lightSource:
             if lightSource not in LIGHTSOURCES:
-                logException('lightSource %s illegal' % lightSource)
+                logException(f'lightSource {lightSource} illegal')
             self._reload(self.tileset, lightSource)
 
     @property
@@ -850,8 +847,7 @@ class FittingView(QGraphicsView):
                 for uiTile in tiles:
                     assert uiTile.board
                     print(
-                        '%s: board.level:%s' %
-                        (str(uiTile), uiTile.board.level))
+                        f'{str(uiTile)}: board.level:{uiTile.board.level}')
             board = tiles[0].board
             assert board
             uiTile = board.mapMouseTile(tiles[0])
@@ -919,7 +915,7 @@ class YellowText(QGraphicsRectItem):
 
     def setText(self, msg:str) ->None:
         """set the text of self"""
-        self.msg = '%s  ' % msg
+        self.msg = f'{msg}  '
         metrics = QFontMetrics(self.font)
         self.width = metrics.width(self.msg)
         self.height = int(metrics.lineSpacing() * 1.1)

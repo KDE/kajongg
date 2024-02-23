@@ -41,7 +41,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
     def __init__(self, parent:Optional['QGraphicsItem']=None) ->None:
         assert parent is None
         assert len(self.sideTexts) < 4
-        self.__name = 't%d' % len(self.sideTexts)
+        self.__name = f't{len(self.sideTexts)}'
         self.sideTexts.append(self)
         super().__init__()
         self.hide()
@@ -173,8 +173,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
 
     def __str__(self) ->str:
         """for debugging"""
-        return 'SideText(%s %s x/y= %.1f/%1f)' % (
-            self.debug_name(), self.text, self.x(), self.y())
+        return f'SideText({self.debug_name()} {self.text} x/y= {self.x():.1f}/{self.y():1f})'
 
 
 class UIWallSide(Board, ReprMixin):
@@ -190,7 +189,7 @@ class UIWallSide(Board, ReprMixin):
 
     def debug_name(self) ->str:
         """name for debug messages"""
-        return 'UIWallSide {}'.format(UIWall.sideNames[int(self.rotation())])
+        return f'UIWallSide {UIWall.sideNames[int(self.rotation())]}'
 
     def center(self) ->QPointF:
         """return the center point of the wall in relation to the

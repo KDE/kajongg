@@ -369,7 +369,7 @@ class StandardMahJongg(MJRule):
             if val0 == 8:
                 return {Tile(group, val0 - 1)}
             return {Tile(group, val0 - 1), Tile(group, val0 + 2)}
-        assert val0 + 2 == val1, 'group:%s values:%s' % (group, values)
+        assert val0 + 2 == val1, f'group:{group} values:{values}'
         return {Tile(group, val0 + 1)}
 
     def winningTileCandidates(cls, hand:'Hand') ->Set[Tile]:
@@ -706,8 +706,7 @@ class Knitting(MJRule):
         if not hand.lastTile:
             return MeldList()
         couples, rest = cls.findCouples(hand)
-        assert not rest, '%s: couples=%s rest=%s' % (
-            hand.string, couples, rest)
+        assert not rest, f'{hand.string}: couples={couples} rest={rest}'
         return MeldList(Meld(x) for x in couples if hand.lastTile in x)
 
     def claimness(cls, hand:'Hand', discard:Optional[Tile]) ->IntDict:
@@ -1021,9 +1020,9 @@ class EastWonNineTimesInARow(RuleCode):
                 needWins -= 1
         if game.winner and game.winner.wind is East and game.notRotated >= needWins:
             eastMJCount = int(Query("select count(1) from score "
-                                    "where game=%s and won=1 and wind='E' and player=%d "
-                                    "and prevailing='%s'" %
-                                    (game.gameid, game.players[East].nameid, game.roundWind.char)).records[0][0])
+                                    f"where game={game.gameid} and won=1 and wind='E' "
+                                    f"and player={int(game.players[East].nameid)} "
+                                    f"and prevailing='{game.roundWind.char}'").records[0][0])
             return eastMJCount == needWins
         return False
 
@@ -1328,7 +1327,7 @@ class BlessingOfHeaven(RuleCode):
             return False
         if any(x.isExposed for x in hand.melds):
             return False
-        assert hand.lastTile is Tile.none, '{}: Blessing of Heaven: There can be no last tile'.format(hand)
+        assert hand.lastTile is Tile.none, f'{hand}: Blessing of Heaven: There can be no last tile'
         return True
 
     def selectable(hand:'Hand') ->bool:

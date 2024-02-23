@@ -79,7 +79,7 @@ class Request(ReprMixin):
             self.answer = Message.defined[answer]
         else:
             if Debug.deferredBlock:
-                logDebug('Request %s ignores %s' % (self, rawAnswer))
+                logDebug(f'Request {self} ignores {rawAnswer}')
 
     def age(self) ->int:
         """my age in full seconds"""
@@ -93,12 +93,10 @@ class Request(ReprMixin):
             answer = 'OPEN'
         result = ''
         if Debug.deferredBlock:
-            result += '_{id4:>4} '.format(id4=id4(self))
-        result += '{cmd}->{cls}({receiver:<10}): {answer}'.format(
-            cls=self.user.__class__.__name__, cmd=cmd, receiver=self.user.name,
-            answer=answer)
+            result += f'_{id4(self):>4} '
+        result += f'{cmd}->{self.user.__class__.__name__}({self.user.name:<10}): {answer}'
         if self.age():
-            result += ' after {} sec'.format(self.age())
+            result += f' after {self.age()} sec'
         return result
 
     def prettyAnswer(self) ->str:
@@ -108,19 +106,18 @@ class Request(ReprMixin):
         else:
             result = 'OPEN'
         if self.args:
-            result += '(%s)' % ','.join(str(x) for x in self.args)
+            result += f"({','.join(str(x) for x in self.args)})"
         return result
 
     def pretty(self) ->str:
         """for debug output"""
         result = ''
         if Debug.deferredBlock:
-            result += '_{id4:>4} '.format(id4=id4(self))
-        result += '{cmd:<12}<-{cls:>6}({receiver:<10}): ANS={answer}'.format(
-            cls=self.user.__class__.__name__,
-            answer=self.prettyAnswer(), cmd=self.deferred.command, receiver=self.user.name)  # type:ignore[attr-defined]
+            result += f'_{id4(self):>4} '
+        result += f'{self.deferred.command:<12}<-{self.user.__class__.__name__:>6}'  # type:ignore[attr-defined]
+        result += f'({self.user.name:<10}): ANS={self.prettyAnswer()}'
         if self.age() > 0:
-            result += ' after {} sec'.format(self.age())
+            result += f' after {self.age()} sec'
         return result
 
 
@@ -151,32 +148,28 @@ class DeferredBlock(ReprMixin):
             if not DeferredBlock.blockWarned:
                 if len([x for x in DeferredBlock.blocks if x.table == table]) > 10:
                     DeferredBlock.blockWarned = True
-                    logInfo('We have %d DBlocks:' % len(DeferredBlock.blocks))
+                    logInfo(f'We have {len(DeferredBlock.blocks)} DBlocks:')
                     for block in DeferredBlock.blocks:
                         logInfo(str(block))
 
     def debugPrefix(self, dbgMarker:str='') ->str:
         """prefix for debug message"""
-        return 'T{table} B_{id4:>4} {caller:<15} {dbgMarker:<3}(out={out})'.format(
-            table=self.table.tableid, id4=id4(self), caller=self.calledBy[:15],
-            dbgMarker=dbgMarker, out=self.outstanding)
+        return (f'T{self.table.tableid} B_{id4(self):>4} {self.calledBy[:15]:<15} '
+                f'{dbgMarker:<3}(out={self.outstanding})')
 
     def debug(self, dbgMarker:str, msg:str) ->None:
         """standard debug format"""
         logDebug(' '.join([self.debugPrefix(dbgMarker), msg]))
 
     def __str__(self) ->str:
-        return '%s requests=%s outstanding=%d %s callback=%s' % (
-            self.debugPrefix(),
-            '[' + ','.join(str(x) for x in self.requests) + ']',
-            self.outstanding,
-            'is completed' if self.completed else 'not completed',
-            self.prettyCallback())
+        req = '[' + ','.join(str(x) for x in self.requests) + ']'
+        return (f"{self.debugPrefix()} {req} {int(self.outstanding)} "
+                f"{'is completed' if self.completed else 'not completed'} {self.prettyCallback()}")
 
     def outstandingStr(self) ->str:
         """like __str__ but only with outstanding answers"""
-        return '%s callback=%s:%s' % (self.calledBy, self.prettyCallback(),
-                                      '[' + ','.join(str(x) for x in self.requests if not x.answer) + ']')
+        req = f"[{','.join(str(x) for x in self.requests if not x.answer)}]"
+        return f"{self.calledBy} callback={self.prettyCallback()}:{req}"
 
     @staticmethod
     def garbageCollection() ->None:
@@ -186,7 +179,7 @@ class DeferredBlock(ReprMixin):
         for block in DeferredBlock.blocks[:]:
             if block.callbackMethod is None:
                 try:
-                    block.logBug('DBlock %s has no callback' % str(block))
+                    block.logBug(f'DBlock {str(block)} has no callback')
                 finally:
                     # we do not want DoS for future games
                     DeferredBlock.blocks.remove(block)
@@ -194,10 +187,9 @@ class DeferredBlock(ReprMixin):
                 DeferredBlock.blocks.remove(block)
         if len(DeferredBlock.blocks) > 100:
             logDebug(
-                'We have %d DeferredBlocks, they must be leaking' %
-                len(DeferredBlock.blocks))
+                f'We have {len(DeferredBlock.blocks)} DeferredBlocks, they must be leaking')
             for _ in (id4(x) for x in gc.get_objects() if x.__class__.__name__ == 'DeferredBlock'):
-                print('DeferredBlock {} left, allocated by {}'.format(_, _.where))
+                print(f'DeferredBlock {_} left, allocated by {_.where}')
 
 
     def __addRequest(self, deferred:Deferred, user:'User', about:Optional['PlayingPlayer']) ->None:
@@ -214,11 +206,10 @@ class DeferredBlock(ReprMixin):
                 request)
         if Debug.deferredBlock:
             notifying = ' notifying' if deferred.notifying else ''  # type:ignore[attr-defined]
-            rqString = '_{id4:>4} {cmd}{notifying} {about}->{cls:>6}({receiver:<10})'.format(
-                cls=user.__class__.__name__,
-                id4=id4(request), cmd=deferred.command, receiver=user.name,  # type:ignore[attr-defined]
-                about=about.name if about else '', notifying=notifying)
-            self.debug('+:%d' % len(self.requests), rqString)
+            rqString = (f"_{id4(request):>4} {deferred.command}{notifying} "  # type:ignore[attr-defined]
+                        f"{about.name if about else ''}->"
+                        f"{user.__class__.__name__:>6}({user.name:<10})")
+            self.debug(f'+:{len(self.requests)}', rqString)
 
     def removeRequest(self, request:Request) ->None:
         """we do not want this request anymore"""
@@ -226,7 +217,7 @@ class DeferredBlock(ReprMixin):
         if not request.answer:
             self.outstanding -= 1
         if Debug.deferredBlock:
-            self.debug('-:%d' % self.outstanding, str(request)) # TODO: auch ohne?
+            self.debug(f'-:{int(self.outstanding)}', str(request)) # TODO: auch ohne?
         self.callbackIfDone()
 
     def callback(self, method:Any, *args:Any) ->None:
@@ -267,7 +258,7 @@ class DeferredBlock(ReprMixin):
                             request.answer,
                             notifying=True)
             self.outstanding -= 1
-            assert self.outstanding >= 0, '__gotAnswer: outstanding %d' % self.outstanding
+            assert self.outstanding >= 0, f'__gotAnswer: outstanding {int(self.outstanding)}'
             self.callbackIfDone()
         else:
             if Debug.deferredBlock:
@@ -303,17 +294,16 @@ class DeferredBlock(ReprMixin):
         """if we are done, convert received answers to something more useful and callback"""
         if self.completed:
             return
-        assert self.outstanding >= 0, 'callbackIfDone: outstanding %d' % self.outstanding
+        assert self.outstanding >= 0, f'callbackIfDone: outstanding {int(self.outstanding)}'
         if self.outstanding == 0 and self.callbackMethod is not None:
             self.completed = True
             if any(not x.answer for x in self.requests):
                 self.logBug(
-                    'Block %s: Some requests are unanswered' %
-                    str(self))
+                    f'Block {str(self)}: Some requests are unanswered')
             if Debug.deferredBlock:
                 commandText = []
                 for command in sorted({x.deferred.command for x in self.requests}):
-                    text = '%s:' % command
+                    text = f'{command}:'
                     answerList = []
                     for answer in sorted({x.prettyAnswer() for x in self.requests if x.deferred.command == command}):
                         answerList.append((answer, [
@@ -323,23 +313,21 @@ class DeferredBlock(ReprMixin):
                     answerTexts = []
                     if len(answerList) == 1:
                         answerTexts.append(
-                            '{answer} from all'.format(answer=answerList[-1][0]))
+                            f'{answerList[-1][0]} from all')
                     else:
                         for answer, requests in answerList[:-1]:
                             answerTexts.append(
-                                '{answer} from {players}'.format(answer=answer,
-                                                                 players=','.join(x.user.name for x in requests)))
+                                f"{answer} from {','.join(x.user.name for x in requests)}")
                         answerTexts.append(
-                            '{answer} from others'.format(answer=answerList[-1][0]))
+                            f'{answerList[-1][0]} from others')
                     text += ', '.join(answerTexts)
                     commandText.append(text)
                 methodName = self.prettyCallback()
                 if methodName:
-                    methodName = ' next:%s' % methodName
+                    methodName = f' next:{methodName}'
                 self.debug(
                     'END',
-                    '{answers} {method}'.format(method=methodName,
-                                                answers=' / '.join(commandText)))
+                    f"{' / '.join(commandText)} {methodName}")
             if self.callbackMethod is not False:
                 self.callbackMethod(self.requests, *self.__callbackArgs)
 
@@ -352,14 +340,13 @@ class DeferredBlock(ReprMixin):
         else:
             result = self.callbackMethod.__name__
             if self.__callbackArgs:
-                result += '({})'.format(
-                    ','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else ''))
+                result += f"({','.join([str(x) for x in self.__callbackArgs] if self.__callbackArgs else '')})"
         return result
 
     def playerForUser(self, user:'User') ->Optional['PlayingPlayer']:
         """return the game player matching user"""
         if user.__class__.__name__.endswith('Player'):
-            assert False, 'playerForUser must get User, not {}'.format(user)
+            assert False, f'playerForUser must get User, not {user}'
         if self.table.game:
             for player in self.table.game.players:
                 if user.name == player.name:
@@ -409,8 +396,8 @@ class DeferredBlock(ReprMixin):
             aboutPlayer = self.playerForUser(about)  # type:ignore[arg-type]
         else:
             aboutPlayer = about  # type:ignore[assignment]
-        assert isinstance(receivers, list), 'receivers should be list: {}/{}'.format(type(receivers), repr(receivers))
-        assert receivers, 'DeferredBlock.tell(%s) has no receiver' % command
+        assert isinstance(receivers, list), f'receivers should be list: {type(receivers)}/{repr(receivers)}'
+        assert receivers, f'DeferredBlock.tell({command}) has no receiver'
         self.__enrichMessage(self.table.game, aboutPlayer, command, kwargs)
         aboutName = aboutPlayer.name if aboutPlayer else None
         if self.table.running and len(receivers) in [1, 4]:
@@ -432,9 +419,8 @@ class DeferredBlock(ReprMixin):
                 localDeferreds.append(defer)
             else:
                 if Debug.traffic:
-                    message = '-> {receiver:<15} about {aboutPlayer} {command}{kwargs!r}'.format(
-                        receiver=rec.name[:15], aboutPlayer=aboutPlayer, command=command,  # type:ignore[index]
-                        kwargs=kwargs)
+                    message = (f"-> {rec.name[:15] if rec.name else 'NOBODY':<15} "
+                               f"about {aboutPlayer} {command}{kwargs!r}")
                     logDebug(message)
                 defer = self.table.server.callRemote(
                     rec,  # type:ignore[arg-type]

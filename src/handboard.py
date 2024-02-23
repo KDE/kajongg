@@ -56,7 +56,7 @@ class TileAttr(ReprMixin):
             # dark and focusable are different in a ScoringHandBoard
             self.focusable = self.setFocusable(hand, meld, idx)
             if self.tile.name2() in Debug.focusable:
-                logDebug('TileAttr %s:%s' % (self.tile, self.focusable))
+                logDebug(f'TileAttr {self.tile}:{self.focusable}')
 
     def setDark(self) ->bool:
         """should the tile appear darker?"""
@@ -77,10 +77,8 @@ class TileAttr(ReprMixin):
     def __str__(self) ->str:
         assert self.xoffset is not None
         return (
-            '%s %.2f/%d%s%s' %
-            (self.tile, self.xoffset, self.yoffset,
-             ' dark' if self.dark else '',
-             ' focusable' if self.focusable else ''))
+            f"{self.tile} {self.xoffset:.2f}/{int(self.yoffset)}{' dark' if self.dark else ''}"
+            f"{' focusable' if self.focusable else ''}")
 
 
 class HandBoard(Board):
@@ -244,7 +242,7 @@ class HandBoard(Board):
         oldTiles:Dict[Tile, List[UITile]] = {}
         oldBonusTiles:Dict[Tile, List[UITile]] = {}
         for uiTile in tiles:
-            assert isinstance(uiTile, UITile), 'uiTile is {}'.format(type(uiTile))
+            assert isinstance(uiTile, UITile), f'uiTile is {type(uiTile)}'
             if uiTile.isBonus:
                 targetDict = oldBonusTiles
             else:
@@ -333,12 +331,10 @@ class HandBoard(Board):
         logConcealed.sort()
         physConcealed.sort()
         assert logExposed == physExposed, (
-            '%s: exposed: player %s != hand %s. Check those:%s' %
-            (self.player, logExposed, physExposed,
-             set(logExposed) ^ set(physExposed)))
+            f'{self.player}: exposed: player {logExposed} != hand {physExposed}. '
+            f'Check those:{set(logExposed) ^ set(physExposed)}')
         assert logConcealed == physConcealed, (
-            '%s: concealed: player %s != hand %s' %
-            (self.player, logConcealed, physConcealed))
+            f'{self.player}: concealed: player {logConcealed} != hand {physConcealed}')
 
 
 class PlayingHandBoard(HandBoard):

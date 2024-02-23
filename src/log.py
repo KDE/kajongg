@@ -74,16 +74,13 @@ def __enrichMessage(msg:str, withGamePrefix:bool=True) ->str:
     """
     result = msg  # set the default
     if withGamePrefix and Internal.logPrefix:
-        result = '{prefix}{process}: {msg}'.format(
-            prefix=Internal.logPrefix,
-            process=os.getpid() if Debug.process else '',
-            msg=msg)
+        result = f"{Internal.logPrefix}{os.getpid() if Debug.process else ''}: {msg}"
     if Debug.timestamp:
-        result = '{:08.4f} {}'.format(elapsedSince(Debug.timestamp), result)
+        result = f'{elapsedSince(Debug.timestamp):08.4f} {result}'
     if Debug.git:
         head = gitHead()
         if head not in ('current', None):
-            result = 'git:{}/p3 {}'.format(head, result)
+            result = f'git:{head}/p3 {result}'
     if int(Debug.callers):
         result = '  ' + result
     return result
@@ -105,7 +102,7 @@ def __exceptionToString(exception:Exception) ->str:
             # but I do not know what it does differently with gettext and if
             # I can do the same with the python gettext module
             parts.append(
-                '[Errno {}] {}'.format(arg.errno, i18n(arg.strerror)))
+                f'[Errno {arg.errno}] {i18n(arg.strerror)}')
         elif arg is None:
             pass
         else:
@@ -194,7 +191,7 @@ class EventData(str):
     def __new__(cls, receiver:'QObject', event:'QEvent', prefix:Optional[str]=None) ->'EventData':
         """create the wanted string"""
         name = cls.eventName(event)
-        msg = '%s%sreceiver:%s' % (name, cls.eventValue(event), cls.eventReceiver(receiver))
+        msg = f'{name}{cls.eventValue(event)}receiver:{cls.eventReceiver(receiver)}'
         if prefix:
             msg = ': '.join([prefix, msg])
         if 'all' in Debug.events or any(x in msg for x in Debug.events.split(':')):
@@ -227,11 +224,11 @@ class EventData(str):
             if event.key() in cls.keys:
                 value = cls.keys[event.key()]
             else:
-                value = 'unknown key:%s' % event.key()
+                value = f'unknown key:{event.key()}'
         if hasattr(event, 'text'):
             eventText = str(event.text())
             if eventText and eventText != '\r':
-                value += ':%s' % eventText
+                value += f':{eventText}'
         return value
 
     @classmethod
@@ -246,5 +243,5 @@ class EventData(str):
             # ignore unknown event types
             result = cls.events[event.type()]
         else:
-            result = 'unknown :%s' % event.type()
-        return 'Event:{}'.format(result)
+            result = f'unknown :{event.type()}'
+        return f'Event:{result}'

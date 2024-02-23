@@ -90,9 +90,8 @@ class ServerGame(PlayingGame):
         """The server game instance knows everything but has no myself"""
         player = self.activePlayer
         if tileName not in player.concealedTiles:
-            raise ValueError('I am the server Game instance. Player %s is told to show discard '
-                            'of tile %s but does not have it, he has %s' %
-                            (player.name, tileName, player.concealedTiles))
+            raise ValueError(f'I am the server Game instance. Player {player.name} is told '
+                             f'to show discard of tile {tileName} but does not have it, he has {player.concealedTiles}')
         return tileName
 
 class ServerTable(Table, ReprMixin):
@@ -122,7 +121,7 @@ class ServerTable(Table, ReprMixin):
         self.client:Optional[Client] = None
         server.tables[self.tableid] = self
         if Debug.table:
-            logDebug('new table %s' % self)
+            logDebug(f'new table {self}')
 
     def hasName(self, name:str) ->bool:
         """return True if one of the players in the game is named 'name'"""
@@ -163,7 +162,7 @@ class ServerTable(Table, ReprMixin):
         """sends a chat messages to all clients"""
         assert self.game
         if Debug.chat:
-            logDebug('server sends chat msg %s' % chatLine)
+            logDebug(f'server sends chat msg {chatLine}')
         if self.suspendedAt and self.game:
             chatters:List['User'] = []
             for player in self.game.players:
@@ -182,7 +181,7 @@ class ServerTable(Table, ReprMixin):
             raise srvError(i18nE('All seats are already taken'))
         self.users.append(user)
         if Debug.table:
-            logDebug('%s seated on table %s' % (user.name, self))
+            logDebug(f'{user.name} seated on table {self}')
         self.sendChatMessage(ChatMessage(self.tableid, user.name,
                                          i18nE('takes a seat'), isStatusMessage=True))
 
@@ -198,16 +197,13 @@ class ServerTable(Table, ReprMixin):
                 if self.users:
                     self.owner = self.users[0]
                     if Debug.table:
-                        logDebug('%s leaves table %d, %s is the new owner' % (
-                            user.name, self.tableid, self.owner))
+                        logDebug(f'{user.name} leaves table {int(self.tableid)}, {self.owner} is the new owner')
                 else:
                     if Debug.table:
-                        logDebug('%s leaves table %d, table is now empty' % (
-                            user.name, self.tableid))
+                        logDebug(f'{user.name} leaves table {int(self.tableid)}, table is now empty')
             else:
                 if Debug.table:
-                    logDebug('%s leaves table %d, %s stays owner' % (
-                        user.name, self.tableid, self.owner))
+                    logDebug(f'{user.name} leaves table {int(self.tableid)}, {self.owner} stays owner')
 
     def __str__(self)->str:
         """for debugging output"""
@@ -222,7 +218,7 @@ class ServerTable(Table, ReprMixin):
                             and not x.name.startswith('Robot')]
             if offlineNames:
                 offlineString = ' offline:' + ','.join(offlineNames)
-        return '%d(%s%s)' % (self.tableid, ','.join(onlineNames), offlineString)
+        return f"{int(self.tableid)}({','.join(onlineNames)}{offlineString})"
 
     def calcGameId(self)->int:
         """based upon the max gameids we got from the clients, propose
@@ -292,8 +288,7 @@ class ServerTable(Table, ReprMixin):
             if isinstance(_, User):
                 dbIdent = _.dbIdent
                 assert dbIdent != serverIdent, \
-                    'client and server try to use the same database:%s' % \
-                    Internal.db.path
+                    f'client and server try to use the same database:{Internal.db.path}'
                 player.shouldSave = dbIdent not in dbIdents
                 dbIdents.add(dbIdent)
 
@@ -368,16 +363,14 @@ class ServerTable(Table, ReprMixin):
                 if Debug.table:
                     if not userRequests:
                         logDebug(
-                            'Server.startGame: found no request for user %s' %
-                            user.name)
+                            f'Server.startGame: found no request for user {user.name}')
                     else:
                         logDebug(
-                            'Server.startGame: %s said NoGameStart' %
-                            user.name)
+                            f'Server.startGame: {user.name} said NoGameStart')
                 self.game = None
                 return
         if Debug.table:
-            logDebug('Game starts on table %s' % self)
+            logDebug(f'Game starts on table {self}')
         elementIter = iter(elements.all(self.game.ruleset))
         assert self.game.wall
         self.game.wall.tiles = []
@@ -394,13 +387,12 @@ class ServerTable(Table, ReprMixin):
         for user in self.users:
             for tableid in self.server.tablesWith(user):
                 if tableid != self.tableid:
-                    self.server.leaveTable(user, tableid, 'now sits on table {}'.format(self.tableid))
+                    self.server.leaveTable(user, tableid, f'now sits on table {self.tableid}')
         foreigners = [x for x in self.server.srvUsers if x not in self.users]
         if foreigners:
             if Debug.table:
                 logDebug(
-                    'make running table %s invisible for %s' %
-                    (self, ','.join(str(x) for x in foreigners)))
+                    f"make running table {self} invisible for {','.join(str(x) for x in foreigners)}")
             for srvUser in foreigners:
                 self.server.callRemote(
                     srvUser,
@@ -424,8 +416,7 @@ class ServerTable(Table, ReprMixin):
                 # send it to other human players:
                 others = [x for x in humanPlayers if x != player]
                 if Debug.sound:
-                    logDebug('telling other human players that %s has voiceId %s' % (
-                        player.name, remote.voiceId))
+                    logDebug(f'telling other human players that {player.name} has voiceId {remote.voiceId}')
                 block.tell(
                     player,
                     others,
@@ -450,8 +441,7 @@ class ServerTable(Table, ReprMixin):
                 voiceFor.voice = Voice(voiceId)
                 if Debug.sound:
                     logDebug(
-                        'client %s wants voice data %s for %s' %
-                        (request.user.name, request.args[0], voiceFor))
+                        f'client {request.user.name} wants voice data {request.args[0]} for {voiceFor}')
                 voiceDataRequests.append((request.user, voiceFor))
                 if not voiceFor.voice.oggFiles():
                     # the server does not have it, ask the client with that
@@ -474,8 +464,7 @@ class ServerTable(Table, ReprMixin):
             if content:
                 if Debug.sound:
                     logDebug(
-                        'server got voice data %s for %s from client' %
-                        (voiceFor.voice, voiceFor.name))
+                        f'server got voice data {voiceFor.voice} for {voiceFor.name} from client')
                 block.tell(
                     voiceFor,
                     [voiceDataRequester],
@@ -483,8 +472,7 @@ class ServerTable(Table, ReprMixin):
                     md5sum=voice.md5sum,
                     source=content)
             elif Debug.sound:
-                logDebug('server got empty voice data %s for %s from client' % (
-                    voice, voiceFor.name))
+                logDebug(f'server got empty voice data {voice} for {voiceFor.name} from client')
         block.callback(self.assignVoices)
 
     def assignVoices(self, unusedResults:Optional[List['Request']]=None) ->None:
@@ -546,8 +534,7 @@ class ServerTable(Table, ReprMixin):
         tile = Tile(msg.args[0])
         if tile not in player.concealedTiles:
             self.abort(
-                'player %s discarded %s but does not have it. He has %s' %
-                (player, tile, player.concealedTiles))
+                f'player {player} discarded {tile} but does not have it. He has {player.concealedTiles}')
             return
         dangerousText = self.game.dangerousFor(player, tile)
         mustPlayDangerous = player.mustPlayDangerous()
@@ -567,7 +554,7 @@ class ServerTable(Table, ReprMixin):
             if Debug.originalCall:
                 assert msg.args
                 tile = Tile(msg.args[0])
-                logDebug('%s just violated OC with %s' % (player, tile))
+                logDebug(f'{player} just violated OC with {tile}')
             player.mayWin = False
             block.tellAll(player, Message.ViolatesOriginalCall)
         block.callback(self._clientDiscarded3, msg, dangerousText, mustPlayDangerous)
@@ -596,8 +583,8 @@ class ServerTable(Table, ReprMixin):
             if mustPlayDangerous and not player.lastSource.isDiscarded:
                 if Debug.dangerousGame:
                     tile = Tile(msg.args[0])
-                    logDebug('%s claims no choice. Discarded %s, keeping %s. %s' %
-                             (player, tile, player.concealedTiles, ' / '.join(dangerousText)))
+                    logDebug(f"{player} claims no choice. Discarded {tile}, "
+                             f"keeping {player.concealedTiles}. {' / '.join(dangerousText)}")
                 player.claimedNoChoice = True
                 block.tellAll(
                     player,
@@ -607,8 +594,8 @@ class ServerTable(Table, ReprMixin):
                 player.playedDangerous = True
                 if Debug.dangerousGame:
                     tile = Tile(msg.args[0])
-                    logDebug('%s played dangerous. Discarded %s, keeping %s. %s' %
-                             (player, tile, player.concealedTiles, ' / '.join(dangerousText)))
+                    logDebug(f"{player} played dangerous. Discarded {tile}, "
+                             f"keeping {player.concealedTiles}. {' / '.join(dangerousText)}")
                 block.tellAll(
                     player,
                     Message.DangerousGame,
@@ -625,7 +612,7 @@ class ServerTable(Table, ReprMixin):
         assert msg.player
         msg.player.originalCall = True
         if Debug.originalCall:
-            logDebug('server.clientMadeOriginalCall: %s' % msg.player)
+            logDebug(f'server.clientMadeOriginalCall: {msg.player}')
         block = DeferredBlock(self, where='clientMadeOriginalCall')
         block.tellAll(msg.player, Message.OriginalCall)
         block.callback(self._askForClaims, msg)
@@ -695,8 +682,7 @@ class ServerTable(Table, ReprMixin):
         for block in DeferredBlock.blocks:
             if block.table == self:
                 logError(
-                    'request left from previous hand: %s' %
-                    block.outstandingStr())
+                    f'request left from previous hand: {block.outstandingStr()}')
         token = self.game.handId.prompt(
             withAI=False)  # we need to send the old token until the
                                    # clients started the new hand
@@ -709,8 +695,7 @@ class ServerTable(Table, ReprMixin):
                 self.game.seed)
             if Debug.process and sys.platform != 'win32':
                 logDebug(
-                    'MEM:%s' %
-                    resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+                    f'MEM:{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
             return
         self.game.sortPlayers()
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,
@@ -763,8 +748,7 @@ class ServerTable(Table, ReprMixin):
                 and discardingPlayer.playedDangerous):
             player.usedDangerousFrom = discardingPlayer
             if Debug.dangerousGame:
-                logDebug('%s claims dangerous tile %s discarded by %s' %
-                         (player, lastDiscard, discardingPlayer))
+                logDebug(f'{player} claims dangerous tile {lastDiscard} discarded by {discardingPlayer}')
             block.tellAll(
                 player,
                 Message.UsedDangerousFrom,
@@ -781,11 +765,9 @@ class ServerTable(Table, ReprMixin):
             msg = i18nE('declareKong:%1 wrongly said Kong for meld %2')
             args = (player.name, str(kongMeld))
             logDebug(i18n(msg, *args))
-            logDebug('declareKong:concealedTiles:%s' % player.concealedTiles)
-            logDebug('declareKong:concealedMelds:%s' %
-                     ' '.join(str(x) for x in player.concealedMelds))
-            logDebug('declareKong:exposedMelds:%s' %
-                     ' '.join(str(x) for x in player.exposedMelds))
+            logDebug(f"declareKong:concealedTiles:{player.concealedTiles}")
+            logDebug(f"declareKong:concealedMelds:{' '.join(str(x) for x in player.concealedMelds)}")
+            logDebug(f"declareKong:exposedMelds:{' '.join(str(x) for x in player.exposedMelds)}")
             self.abort(msg, *args)
             return
         player.exposeMeld(kongMeld)
@@ -808,8 +790,8 @@ class ServerTable(Table, ReprMixin):
         withDiscard:Optional[Tile] = Tile(msg.args[1]) if msg.args[1] else None
         lastMeld = Meld(msg.args[2])
         if self.game.ruleset.mustDeclareCallingHand:
-            assert player.isCalling, '%s %s %s says MJ but never claimed: concmelds:%s withdiscard:%s lastmeld:%s' % (
-                self.game.handId, player.hand, player, concealedMelds, withDiscard, lastMeld)
+            assert player.isCalling, (f'{self.game.handId} {player.hand} {player} says MJ but never claimed: '
+                                     f'concmelds:{concealedMelds} withdiscard:{withDiscard} lastmeld:{lastMeld}')
         discardingPlayer = self.game.activePlayer
         lastMove = next(self.game.lastMoves(withoutNotifications=True))
         robbedTheKong = lastMove.message == Message.DeclaredKong
@@ -840,8 +822,7 @@ class ServerTable(Table, ReprMixin):
                 and discardingPlayer.playedDangerous):
             player.usedDangerousFrom = discardingPlayer
             if Debug.dangerousGame:
-                logDebug('%s wins with dangerous tile %s from %s' %
-                         (player, self.game.lastDiscard, discardingPlayer))
+                logDebug(f'{player} wins with dangerous tile {self.game.lastDiscard} from {discardingPlayer}')
             block.tellAll(
                 player,
                 Message.UsedDangerousFrom,
@@ -920,7 +901,7 @@ class ServerTable(Table, ReprMixin):
         if not answers:
             return []
         for answer in answers:
-            msg = '<-  %s' % answer
+            msg = f'<-  {answer}'
             if Debug.traffic:
                 logDebug(msg)
             with Duration(msg):
@@ -933,7 +914,7 @@ class ServerTable(Table, ReprMixin):
         if Debug.stack:
             stck = traceback.extract_stack()
             if len(stck) > 30:
-                logDebug('stack size:%d' % len(stck))
+                logDebug(f'stack size:{len(stck)}')
                 logDebug(str(stck))
         answers = self.processAnswers(requests)
         if not answers:
@@ -942,7 +923,7 @@ class ServerTable(Table, ReprMixin):
     def tellAll(self, player:Optional['PlayingPlayer'], command:Message,
         callback:Optional[Callable[[List['Request']], None]]=None, **kwargs: Any) ->DeferredBlock:
         """tell something about player to all players"""
-        block = DeferredBlock(self, where='tellAll: Player {} command {} kwargs {}'.format(player, command, kwargs))
+        block = DeferredBlock(self, where=f'tellAll: Player {player} command {command} kwargs {kwargs}')
         block.tellAll(player, command, **kwargs)
         block.callback(callback)
         return block

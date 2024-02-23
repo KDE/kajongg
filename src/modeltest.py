@@ -250,8 +250,7 @@ class ModelTest(QObject):
         model = self.model
         result = model.data(model.index(0, 0, QModelIndex()), role)
         if result is not None and not isinstance(result, expectedType):
-            raise Exception('returned data type is {}, should be {}'.format(
-                type(result), expectedType))
+            raise Exception(f'returned data type is {type(result)}, should be {expectedType}')
 
     def testRoleDataValues(self, role:Qt.ItemDataRole, asserter:Any) ->None:
         """Tests implementation if model.data() for role.

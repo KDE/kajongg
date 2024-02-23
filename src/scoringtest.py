@@ -51,7 +51,7 @@ class Expected:
         self.ruleset:Optional['Ruleset'] = None
 
     def __str__(self) ->str:
-        return 'Won with %s' % self.score if self.won else 'Lost with %s' % self.score
+        return f'Won with {self.score}' if self.won else f'Lost with {self.score}'
 
 
 class Nothing(Expected):
@@ -111,7 +111,7 @@ class Base(unittest.TestCase):
             game.winner.clearCache()
             if Debug.hand:
                 print('')
-                print('starting test for %s' % ruleset.name)
+                print(f'starting test for {ruleset.name}')
             variant = Hand(game.winner, string)
             score = variant.score
             assert score is not None
@@ -145,8 +145,8 @@ class Base(unittest.TestCase):
                 exp = expected
             completingTiles = TileTuple(exp)
             self.assertTrue(testSays == completingTiles,
-                            '%s: %s may be completed by %s but testresult is %s' % (
-                                ruleset.name, string, completingTiles or 'None', testSays or 'None'))
+                            f"{ruleset.name}: {string} may be completed by {completingTiles or 'None'} "
+                            f"but testresult is {testSays or 'None'}")
 
     def dumpCase(self, hand:Hand, expected:Expected, total:Optional[int]) ->str:
         """dump test case"""
@@ -158,28 +158,24 @@ class Base(unittest.TestCase):
         else:
             if hand.won != isinstance(expected, Win):
                 result.append(
-                    'hand.won is %s, expected %s' %
-                    (hand.won, isinstance(expected, Win)))
+                    f'hand.won is {hand.won}, expected {isinstance(expected, Win)}')
             result.append(hand.string)
             roofOff = ' roofOff' if hand.player.game.ruleset.roofOff else ''  #  type: ignore
             score = hand.score
             assert score is not None
             assert hand.player.game
             if score != expected.score:
-                result.append('%s%s: %s with %s should be %s' % (
-                    hand.player.game.ruleset.name, roofOff, 'Won' if hand.won else 'Lost', score, expected))
-                result.append('hand:%s' % hand)
+                result.append(f"{hand.player.game.ruleset.name}{roofOff}: "
+                              f"{'Won' if hand.won else 'Lost'} with {score} should be {expected}")
+                result.append(f'hand:{hand}')
             if total is not None:
                 if score.total() != total:
-                    result.append('%s %s%s: total %s for %s should be %s' % (
-                        id(
-                            hand.player.game.ruleset), hand.player.game.ruleset.name, roofOff,
-                        score.total(), str(score), total))
-                result.append('hand:%s' % hand)
+                    result.append(f'{id(hand.player.game.ruleset)} {hand.player.game.ruleset.name}{roofOff}: '
+                                  f'total {score.total()} for {str(score)} should be {total}')
+                result.append(f'hand:{hand}')
             result.extend(hand.explain())
             result.append(
-                'base=%d,doubles=%d,total=%d' %
-                (score.points, score.doubles, hand.total()))
+                f'base={int(score.points)},doubles={int(score.doubles)},total={int(hand.total())}')
             result.append('')
         return '\n'.join(result)
 

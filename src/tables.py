@@ -108,18 +108,14 @@ class TablesModel(QAbstractTableModel):
                         color = palette.color(
                             QPalette.Active,
                             QPalette.WindowText).name()
-                        style = ('font-weight:normal;'
-                                 'font-style:normal;color:%s'
-                                 % color)
+                        style = f'font-weight:normal;font-style:normal;color:{color}'
                     else:
                         color = palette.color(
                             QPalette.Disabled,
                             QPalette.WindowText).name()
-                        style = ('font-weight:100;font-style:italic;color:%s'
-                                 % color)
+                        style = f'font-weight:100;font-style:italic;color:{color}'
                     players.append(
-                        '<nobr style="%s">' %
-                        style +
+                        f'<nobr style="{style}">' +
                         name +
                         '</nobr>')
                 names = ''.join(players)
@@ -460,7 +456,7 @@ class TableList(QWidget):
         if Debug.table:
             for table in tables:
                 if table.gameid and not table.gameExistsLocally():
-                    logDebug('Table %s does not exist locally' % table)
+                    logDebug(f'Table {table} does not exist locally')
         tables = [x for x in tables if not x.gameid or x.gameExistsLocally()]
         tables.sort(key=lambda x: x.tableid)
         preselectTableId = self.__preselectTableId(tables)

@@ -30,7 +30,7 @@ def loadUi(base:'QWidget') ->None:
     name = base.__class__.__name__.lower() + '.ui'
     if os.path.exists(name):
         directory = os.getcwd()
-    elif os.path.exists('share/kajongg/{}'.format(name)):
+    elif os.path.exists(f'share/kajongg/{name}'):
         directory = 'share/kajongg'
     else:
         directory = os.path.dirname(QStandardPaths.locate(QStandardPaths.AppDataLocation, name))
@@ -101,7 +101,7 @@ class ListComboBox(QComboBox):
         """current item"""
         newIdx = self.findItem(item)
         if newIdx < 0:
-            raise IndexError('%s not found in ListComboBox' % item.name)
+            raise IndexError(f'{item.name} not found in ListComboBox')
         self.setCurrentIndex(newIdx)
 
 
@@ -141,7 +141,7 @@ class BlockSignals:
 def decorateWindow(window:'QWidget', name:str='') ->None:
     """standard Kajongg window title and icon"""
     if name:
-        window.setWindowTitle('{} – {}'.format(name, i18n('Kajongg')))
+        window.setWindowTitle(f"{name} – {i18n('kajongg')}")
     else:
         window.setWindowTitle(i18n('Kajongg'))
     window.setWindowIcon(KIcon('kajongg'))
@@ -169,5 +169,5 @@ def sceneRotation(item:'QGraphicsItem') ->int:
     rotations:Dict[Tuple[int, ...], int] = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
         0, 1, -1, 0): 90, (-1, 0, 0, -1): 180, (0, -1, 1, 0): 270}
     if matrix not in rotations:
-        raise ValueError('matrix unknown:%s' % str(matrix))
+        raise ValueError(f'matrix unknown:{str(matrix)}')
     return rotations[matrix]

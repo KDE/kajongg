@@ -59,7 +59,7 @@ class Score(ReprMixin):
         try:
             newValue = type(oldValue)(value)
         except ValueError:
-            return False, '{} is not of type {}'.format(value, type(oldValue))
+            return False, f'{value} is not of type {type(oldValue)}'
         if newValue == oldValue:
             return False, None
         if newValue:
@@ -76,11 +76,11 @@ class Score(ReprMixin):
         """make score printable"""
         parts = []
         if self.points:
-            parts.append('points=%d' % self.points)
+            parts.append(f'points={int(self.points)}')
         if self.doubles:
-            parts.append('doubles=%d' % self.doubles)
+            parts.append(f'doubles={int(self.doubles)}')
         if self.limits:
-            parts.append('limits=%f' % self.limits)
+            parts.append(f'limits={self.limits:f}')
         return ' '.join(parts)
 
     def i18nStr(self) ->str:
@@ -220,13 +220,13 @@ class RuleList(list):
 
     def append(self, rule:'RuleBase') ->None:
         """do not append"""
-        raise TypeError('do not append %s' % rule)
+        raise TypeError(f'do not append {rule}')
 
     def add(self, rule:'RuleBase') ->None:
         """use add instead of append"""
         if rule.key() in self:
-            logException('%s is already defined as %s, not accepting new rule %s/%s' % (
-                rule.key(), self[rule.key()].definition, rule.name, rule.definition))  # type:ignore
+            logException(f'{rule.key()} is already defined as {self[rule.key()].definition}, '
+                         f'not accepting new rule {rule.name}/{rule.definition}')  # type:ignore
         self[rule.key()] = rule
 
     def createRule(self, name:str, definition:str='', **kwargs:Any) ->None:
@@ -255,9 +255,8 @@ class RuleList(list):
                 ruleClassName = parts1[1] + 'Rule'
                 if ruleClassName not in RuleBase.ruleClasses:
                     logDebug(
-                        'we want %s, definition:%s' %
-                        (ruleClassName, definition))
-                    logDebug('we have %s' % RuleBase.ruleClasses.keys())
+                        f'we want {ruleClassName}, definition:{definition}')
+                    logDebug(f'we have {RuleBase.ruleClasses.keys()}')
                 ruleType.limitHand = RuleBase.ruleClasses[ruleClassName]
         self.add(rule)
 
@@ -451,7 +450,7 @@ into a situation where you have to pay a penalty"""))
             (self.rulesetId, self.__hash, self.name,
              self.description) = query.records[0]
         else:
-            raise ValueError('ruleset %s not found' % self.raw_data)
+            raise ValueError(f'ruleset {self.raw_data} not found')
 
     def __setParametersFrom(self, fromRuleset:'Ruleset') ->None:
         """set attributes for parameters defined in fromRuleset.
@@ -470,7 +469,7 @@ into a situation where you have to pay a penalty"""))
         self.__setParametersFrom(self)
         for ruleList in self.ruleLists:
             assert len(ruleList) == len({x.key()
-                                         for x in ruleList}), '%s has non-unique key' % ruleList.name
+                                         for x in ruleList}), f'{ruleList.name} has non-unique key'
             for rule in ruleList:
                 if hasattr(rule, 'score'):
                     rule.score.ruleset = self
@@ -532,8 +531,7 @@ into a situation where you have to pay a penalty"""))
     def findUniqueOption(self, action:str) ->Optional['Rule']:
         """return first rule with option"""
         rulesWithAction = [x for x in self.allRules if action in x.options]
-        assert len(rulesWithAction) < 2, '%s has too many matching rules for %s' % (
-            str(self), action)
+        assert len(rulesWithAction) < 2, f'{str(self)} has too many matching rules for {action}'
         if rulesWithAction:
             return rulesWithAction[0]
         return None
@@ -549,7 +547,7 @@ into a situation where you have to pay a penalty"""))
         """return an unused ruleset id. This is not multi user safe."""
         func = 'min(id)-1' if minus else 'max(id)+1'
         result = -1 if minus else 1
-        records = Query("select %s from ruleset" % func).records
+        records = Query(f"select {func} from ruleset").records
         if records and records[0] and records[0][0]:
             try:
                 result = int(records[0][0])
@@ -585,8 +583,7 @@ into a situation where you have to pay a penalty"""))
         return Ruleset(self.rulesetId)
 
     def __str__(self) ->str:
-        return 'type=%s, id=%d,rulesetId=%d,name=%s' % (
-            type(self), id(self), self.rulesetId, self.name)
+        return f'type={type(self)}, id={int(id(self))},rulesetId={int(self.rulesetId)},name={self.name}'
 
     def copyTemplate(self) ->'Ruleset':
         """make a copy of self and return the new ruleset id. Returns the new ruleset.
@@ -632,8 +629,7 @@ into a situation where you have to pay a penalty"""))
             if rule in ruleList:
                 ruleIdx = ruleList.index(rule)
                 break
-        assert rule in ruleList, '%s: %s not in list %s' % (
-            type(rule), rule, ruleList.name)
+        assert rule in ruleList, f'{type(rule)}: {rule} not in list {ruleList.name}'
         return [self.rulesetId, ruleList.listId, ruleIdx, rule.name,
                 rule.definition, score.points, score.doubles, score.limits, rule.parameter] # type:ignore
 
@@ -833,24 +829,18 @@ class Rule(RuleBase):
                 hand.ruleCache[cacheKey] = result
                 if Debug.ruleCache:
                     hand.debug(
-                        'new ruleCache entry for hand %s: %s=%s' %
-                        (id(hand) %
-                         10000, cacheKey, result))
+                        f'new ruleCache entry for hand {id(hand) % 10000}: {cacheKey}={result}')
                 return result
             if Debug.ruleCache:
                 if hand.ruleCache[cacheKey] != func(*args):
                     hand.player.game.debug(
-                        'cacheKey=%s rule=%s func:%s args:%s' %
-                        (cacheKey, srcClass, func, args))
+                        f'cacheKey={cacheKey} rule={srcClass} func:{func} args:{args}')
                     hand.player.game.debug(
-                        '  hand:%s/%s' %
-                        (id(hand), hand))
+                        f'  hand:{id(hand)}/{hand}')
                     hand.player.game.debug(
-                        '  cached:%s ' %
-                        str(hand.ruleCache[cacheKey]))
+                        f'  cached:{str(hand.ruleCache[cacheKey])} ')
                     hand.player.game.debug(
-                        '    real:%s ' %
-                        str(func(*args)))
+                        f'    real:{str(func(*args))} ')
             return hand.ruleCache[cacheKey]
         return classmethod(wrapper) if clsMethod else staticmethod(wrapper)
 
@@ -944,14 +934,15 @@ class Rule(RuleBase):
 
     def explain(self, meld:Optional['Meld']) ->str:
         """use this rule for scoring"""
-        return '%s: %s' % (i18n(
-            self.explainTemplate if self.explainTemplate else self.name).format(
+        template = i18n(self.explainTemplate if self.explainTemplate else self.name)
+        what = template.format(
                 group=meld[0].groupName() if meld else '',
                 value=meld[0].valueName() if meld else '',
                 meldType=meld.typeName() if meld else '',
                 meldName=meld.name() if meld else '',
                 tileName=meld[0].name() if meld else '').replace(
-                    '&', '').replace('  ', ' ').strip(), self.score.i18nStr())
+                    '&', '').replace('  ', ' ').strip()
+        return f'{what}: {self.score.i18nStr()}'
 
     def hashStr(self) ->str:
         """
@@ -961,7 +952,7 @@ class Rule(RuleBase):
         @return: The unique hash string
         @rtype: str
         """
-        return '%s: %s %s' % (self.name, self.definition, self.score)
+        return f'{self.name}: {self.definition} {self.score}'
 
     def i18nStr(self) ->str:
         """return a human readable string with the content"""
@@ -1001,7 +992,7 @@ class ParameterRule(RuleBase):
         @return: The unique hash string
         @rtype: str
         """
-        result = '%s: %s %s' % (self.name, self.definition, self.parameter)
+        result = f'{self.name}: {self.definition} {self.parameter}'
         return result
 
     def i18nStr(self) ->str:

@@ -43,10 +43,7 @@ def stack(msg:str, limit:int=6) ->List[str]:
             traceback.extract_stack(limit=limit + 2)[:-2]):
         fileName, line, function, txt = values
         result.append(
-            '%2d: %s %s/%d %s: %s' %
-            (idx, msg, os.path.splitext(
-                os.path.basename(fileName))[0],
-             line, function, txt))
+            f'{int(idx):2}: {msg} {os.path.splitext(os.path.basename(fileName))[0]}/{int(line)} {function}: {txt}')
     return result
 
 
@@ -67,7 +64,7 @@ def callers(count:int=5, exclude:Optional[Sequence]=None, frame:Optional['FrameT
     _ = list(x[2] for x in stck if x[2] not in excluding)
     names = reversed(_[-count:])
     result = '.'.join(names)
-    return '[{}]'.format(result)
+    return f'[{result}]'
 
 
 def elapsedSince(since:Optional[datetime.datetime]) ->float:
@@ -157,10 +154,7 @@ class Duration:
         if not Debug.neutral:
             diff = datetime.datetime.now() - self.__start
             if diff > datetime.timedelta(seconds=self.threshold):
-                msg = '%s took %d.%02d seconds' % (
-                    self.name,
-                    diff.seconds,
-                    diff.microseconds)
+                msg = f'{self.name} took {int(diff.seconds)}.{int(diff.microseconds):02} seconds'
                 if self.bug:
                     raise UserWarning(msg)
                 print(msg)
@@ -196,12 +190,10 @@ def checkMemory() ->None:
                     referrer = referrer.cell_contents
                 if referrer.__class__.__name__ in interesting:
                     for referent in gc.get_referents(referrer):
-                        print('%s refers to %s' % (referrer, referent))
+                        print(f'{referrer} refers to {referent}')
                 else:
-                    print('referrer of %s/%s is: id=%s type=%s %s' %
-                          (type(obj), obj, id(referrer),
-                           type(referrer), referrer))
-    print('unreachable:%s' % gc.collect())
+                    print(f'referrer of {type(obj)}/{obj} is: id={id(referrer)} type={type(referrer)} {referrer}')
+    print(f'unreachable:{gc.collect()}')
     gc.set_debug(0)
 
 

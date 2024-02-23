@@ -152,7 +152,7 @@ class Hand(ReprMixin):
             self.debug(fmt('{callers}',
                            callers=callers(exclude=['__init__'])))
             Hand.indent += 1
-            self.debug('New Hand {} lenOffset={}'.format(string, self.lenOffset))
+            self.debug(f'New Hand {string} lenOffset={self.lenOffset}')
 
         try:
             self.__arrange()
@@ -166,7 +166,7 @@ class Hand(ReprMixin):
         finally:
             self._fixed = True
             if Debug.hand or (Debug.mahJongg and self.lenOffset == 1):
-                self.debug('Fixing {} {}{}'.format(self, 'won ' if self.won else '', self.score))
+                self.debug(f"Fixing {self} {'won ' if self.won else ''}{self.score}")
             Hand.indent -= 1
 
     def __parseString(self, inString:str) ->None:
@@ -179,7 +179,7 @@ class Hand(ReprMixin):
                     try:
                         self.__lastSource = TileSource.byChar[part[1]]
                     except KeyError as _:
-                        raise KeyError('{} has unknown lastTile {}'.format(inString, part[1])) from _
+                        raise KeyError(f'{inString} has unknown lastTile {part[1]}') from _
                     if len(part) > 2:
                         self.__announcements = set(part[2])
             elif partId == 'L':
@@ -220,13 +220,11 @@ class Hand(ReprMixin):
         if last and last.isKnown and not last.isBonus:
 #            print('lastTile %s hand.tiles %s, string=%s hand %s' % (last, self.tiles, self.string, str(self)))
             assert last in self.tiles, \
-                'lastTile %s is not in hand.tiles %s, hand %s' % (last, self.tiles, str(self))
+                f'lastTile {last} is not in hand.tiles {self.tiles}, hand {str(self)}'
             if self.__lastSource is TileSource.RobbedKong:
                 assert self.tiles.count(last.exposed) + \
                     self.tiles.count(last.concealed) == 1, (
-                        'Robbing kong: I cannot have '
-                        'lastTile %s more than once in %s' % (
-                            last, ' '.join(self.tiles)))
+                        f"Robbing kong: I cannot have lastTile {last} more than once in {' '.join(self.tiles)}")
         self.newStr = self.newString()
 
     @property
@@ -256,7 +254,7 @@ class Hand(ReprMixin):
         """apply rules, calculate score"""
         # TODO: in __init__: self.__score == self.__calculate()
         assert not self.unusedTiles, (
-            'Hand.__calculate expects there to be no unused tiles: %s' % self)
+            f'Hand.__calculate expects there to be no unused tiles: {self}')
         oldWon = self.__won
         self.__applyRules()
         if len(self.lastMelds) > 1:
@@ -308,7 +306,7 @@ class Hand(ReprMixin):
         """calculate it first if not yet done"""
         if self.__score is None and self.__arranged is not None:
             self.__calculate()
-        assert self.__score is not None, 'cannot calculate score for %s' % self
+        assert self.__score is not None, f'cannot calculate score for {self}'
         return self.__score
 
     @property
@@ -334,8 +332,8 @@ class Hand(ReprMixin):
         """try to use Game.debug so we get a nice prefix"""
         idPrefix = Fmt.num_encode(hash(self))
         if self.prevHand:
-            idPrefix += '<{}'.format(Fmt.num_encode(hash(self.prevHand)))
-        idPrefix = 'Hand({})'.format(idPrefix)
+            idPrefix += f'<{Fmt.num_encode(hash(self.prevHand))}'
+        idPrefix = f'Hand({idPrefix})'
         assert self.player.game
         self.player.game.debug(' '.join([dbgIndent(self, self.prevHand), idPrefix, msg]))
 
@@ -453,15 +451,15 @@ class Hand(ReprMixin):
     def assertEqual(self, other:'Hand') ->None:
         """raise assertion if not equal with detailled info"""
         assert self.melds == other.melds, \
-            'Melds in hands differ:{!r} != {!r}'.format(self.melds, other.melds)
+            f'Melds in hands differ:{self.melds!r} != {other.melds!r}'
         assert self.lastTile == other.lastTile, \
-            'lastTile in hands differs:{} != {}'.format(self.lastTile, other.lastTile)
+            f'lastTile in hands differs:{self.lastTile} != {other.lastTile}'
         assert self.lastMeld == other.lastMeld, \
-            'lastMeld in hands differs:{} != {}'.format(self.lastMeld, other.lastMeld)
+            f'lastMeld in hands differs:{self.lastMeld} != {other.lastMeld}'
         assert self.newString() == other.newString(), \
-            'newString() in hands differs:{} != {}'.format(self.newString(), other.newString())
+            f'newString() in hands differs:{self.newString()} != {other.newString()}'
         assert self.newStr == other.newStr, \
-            'newStr in hands differs:{} != {}'.format(self.newStr, other.newStr)
+            f'newStr in hands differs:{self.newStr} != {other.newStr}'
 
     def newString(self, melds:MeldList=1, unusedTiles:Optional['Tiles']=1,  # type:ignore[assignment]
         lastSource:Optional[Type[TileSource.SourceClass]]=1, announcements:Set[str]=1,  # type:ignore[assignment]
@@ -484,16 +482,14 @@ class Hand(ReprMixin):
         if unusedTiles:
             parts.append('R' + ''.join(str(x) for x in sorted(unusedTiles)))
         if lastSource or announcements:
-            parts.append('m{}{}'.format(
-                self.lastSource.char,
-                ''.join(self.announcements)))
+            parts.append(f"m{self.lastSource.char}{''.join(self.announcements)}")
         if lastTile:
-            parts.append('L{}{}'.format(lastTile, lastMeld if lastMeld else ''))
+            parts.append(f"L{lastTile}{lastMeld if lastMeld else ''}")
         return ' '.join(parts).strip()
 
     def __add__(self, addTile:Tile) ->'Hand':
         """return a new Hand built from this one plus addTile"""
-        assert addTile.isConcealed, 'addTile %s should be concealed:' % addTile
+        assert addTile.isConcealed, f'addTile {addTile} should be concealed:'
         # combine all parts about hidden tiles plus the new one to one part
         # because something like DrDrS8S9 plus S7 will have to be reordered
         # anyway
@@ -534,15 +530,13 @@ class Hand(ReprMixin):
                     declaredMelds.remove(lastMeld)
                 except ValueError as _:
                     raise ValueError(
-                        'lastMeld {} is not in declaredMelds {}, hand is: {}'.format(
-                            lastMeld, declaredMelds, self)) from _
+                        f'lastMeld {lastMeld} is not in declaredMelds {declaredMelds}, hand is: {self}') from _
                 tilesInHand.extend(lastMeld.concealed)
             try:
                 tilesInHand.remove(subtractTile.concealed)
             except ValueError as _:
                 raise ValueError(
-                'subtractTile.concealed={} is not in tilesInHand {}'.format(
-                    subtractTile.concealed, tilesInHand)) from _
+                f'subtractTile.concealed={subtractTile.concealed} is not in tilesInHand {tilesInHand}') from _
 
         for meld in declaredMelds[:]:
             if len(meld) < 3:
@@ -588,7 +582,7 @@ class Hand(ReprMixin):
             cand = rule.winningTileCandidates(self)
             if Debug.hand and cand:
                 candis = ''.join(str(x) for x in sorted(cand))
-                self.debug('callingHands found {} for {}'.format(candis, rule))
+                self.debug(f'callingHands found {candis} for {rule}')
             candidates.extend(x.concealed for x in cand)
         for tile in sorted(set(candidates)):
             if sum(x.exposed == tile.exposed for x in self.tiles) == 4:
@@ -736,7 +730,7 @@ class Hand(ReprMixin):
     def __eq__(self, other:Any) ->bool:
         """compares hand values"""
         assert self.__class__ is other.__class__, \
-            'Hands have different classes:{} and {}'.format(self.__class__, other.__class__)
+            f'Hands have different classes:{self.__class__} and {other.__class__}'
         assert self.player == other.player
         return self.newStr == other.newStr
 

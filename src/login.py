@@ -90,7 +90,7 @@ class Url(str, ReprMixin):
 
     def __str__(self) ->str:
         """show all info"""
-        return socketName() if self.useSocket else '{}:{}'.format(self.host, self.port)
+        return socketName() if self.useSocket else f'{self.host}:{self.port}'
 
     @property
     def useSocket(self) ->bool:
@@ -134,8 +134,7 @@ class Url(str, ReprMixin):
             if waiting == 0:
                 self.__startLocalServer()
             elif waiting > 30:
-                logDebug('Game %s: Server %s not available after 30 seconds, aborting' % (
-                    SingleshotOptions.game, self))
+                logDebug(f'Game {SingleshotOptions.game}: Server {self} not available after 30 seconds, aborting')
                 raise CancelledError
             return deferLater(Internal.reactor, 1, self.startServer, result, waiting + 1)
         if which('qdbus'):
@@ -183,20 +182,18 @@ class Url(str, ReprMixin):
         try:
             args = self.__findServerProgram()
             if self.useSocket or sys.platform == 'win32':  # for win32 --socket tells the server to bind to 127.0.0.1
-                args.append('--socket=%s' % socketName())
+                args.append(f'--socket={socketName()}')
                 if removeIfExists(socketName()):
                     logInfo(
                         i18n('removed stale socket <filename>%1</filename>', socketName()))
             if not self.useSocket:
                 assert self.port
-                args.append('--port=%d' % self.port)
+                args.append(f'--port={int(self.port)}')
             if self.isLocalGame:
                 args.append(
-                    '--db={}'.format(
-                        os.path.normpath(
-                            os.path.join(appdataDir(), 'local3.db'))))
+                    f"--db={os.path.normpath(os.path.join(appdataDir(), 'local3.db'))}")
             if Debug.argString:
-                args.append('--debug=%s' % Debug.argString)
+                args.append(f'--debug={Debug.argString}')
             if sys.platform == 'win32':
                 startupinfo = subprocess.STARTUPINFO()  # type: ignore
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW  # type: ignore
@@ -629,10 +626,8 @@ class Connection:
                 'Login to server %1 failed: You have no network connection',
                 self.url)
         else:
-            msg = 'Login to server {} failed: {}/{} Callstack:{}'.format(
-                self.url, failure.value.__class__.__name__, failure.getErrorMessage(
-                ),
-                failure.getTraceback())
+            msg = (f'Login to server {self.url} failed: '
+                   f'{failure.value.__class__.__name__}/{failure.getErrorMessage()} Callstack:{failure.getTraceback()}')
         assert msg
         # Maybe the server is running but something is wrong with it
         if self.url and self.url.useSocket:
@@ -660,4 +655,4 @@ class Connection:
                         self.client.remote_serverDisconnects)
 
     def __str__(self) ->str:
-        return '{}@{}'.format(self.username, self.url)
+        return f'{self.username}@{self.url}'

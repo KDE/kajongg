@@ -73,8 +73,7 @@ class User(pb.Avatar, ReprMixin):
         """override pb.Avatar.detached"""
         if Debug.connections:
             logDebug(
-                '%s: connection detached from %s' %
-                (self, self.source()))
+                f'{self}: connection detached from {self.source()}')
         assert self.server
         self.server.logout(self)
         self.mind = None
@@ -100,8 +99,8 @@ class User(pb.Avatar, ReprMixin):
                                  clientVersion or '<4.9.0',
                                  serverVersion))
         if Debug.table:
-            logDebug('client has dbIdent={} voiceId={} maxGameId={} clientVersion {}'.format(
-                self.dbIdent, self.voiceId, self.maxGameId, clientVersion))
+            logDebug(f'client has dbIdent={self.dbIdent} voiceId={self.voiceId} '
+                     f'maxGameId={self.maxGameId} clientVersion {clientVersion}')
         assert self.server
         self.server.sendTables(self)
         return None
@@ -123,7 +122,7 @@ class User(pb.Avatar, ReprMixin):
     def perspective_leaveTable(self, tableid:int) ->bool:
         """perspective_* methods are to be called remotely"""
         assert self.server
-        return self.server.leaveTable(self, tableid, 'correctly left table {}'.format(tableid))
+        return self.server.leaveTable(self, tableid, f'correctly left table {tableid}')
 
     def perspective_newTable(
             self, ruleset:str, playOpen:bool, autoPlay:bool, wantedGame: str,

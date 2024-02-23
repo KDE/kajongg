@@ -75,7 +75,7 @@ class Table(ReprMixin):
         return result or i18nc('table status', 'New')
 
     def __str__(self) ->str:
-        return 'Table({})'.format(self.tableid)
+        return f'Table({self.tableid})'
 
 
 class ClientTable(Table):
@@ -123,7 +123,7 @@ class ClientTable(Table):
             and not x.startswith('Robot')]
         if offlineNames:
             offlineString = ' offline:' + ','.join(offlineNames)
-        return '%d(%s %s%s)' % (self.tableid, self.ruleset.name, ','.join(onlineNames), offlineString)
+        return f"{int(self.tableid)}({self.ruleset.name} {','.join(onlineNames)}{offlineString})"
 
     def gameExistsLocally(self) ->bool:
         """True if the game exists in the data base of the client"""
@@ -203,7 +203,7 @@ class Client(pb.Referenceable):
         self.tables.extend(newTables)
         if Debug.table:
             _ = ', '.join(str(ClientTable(self, *x)) for x in tables)
-            logDebug('%s got new tables:%s' % (self.name, _))
+            logDebug(f'{self.name} got new tables:{_}')
 
     @staticmethod
     def remote_serverRulesets(hashes:List[str]) ->List[str]:
@@ -256,7 +256,7 @@ class Client(pb.Referenceable):
             assert self.game
             aiClass = self.__findAI([intelligence, altint], Options.AI)
             if not aiClass:
-                raise ValueError('intelligence %s is undefined' % Options.AI)
+                raise ValueError(f'intelligence {Options.AI} is undefined')
             self.game.myself.intelligence = aiClass(self.game.myself)
 
     def readyForGameStart(
@@ -267,8 +267,7 @@ class Client(pb.Referenceable):
             """do not bother to translate this, it should normally not happen"""
             assert self.game  # mypy should be able to infer this
             self.game.close()
-            msg = 'The data bases for game %s have different %s' % (
-                self.game.seed, about)
+            msg = f'The data bases for game {self.game.seed} have different {about}'
             logWarning(msg)
             raise pb.Error(msg)
         if not self.table:
@@ -282,22 +281,21 @@ class Client(pb.Referenceable):
             gameClass = PlayingGame
         if self.table.suspendedAt:
             self.game = cast(PlayingGame, gameClass.loadFromDB(gameid, self))
-            assert self.game, 'cannot load game {}'.format(gameid)
+            assert self.game, f'cannot load game {gameid}'
             self.game.assignPlayers(playerNames)
             table = cast(ClientTable, self.table)
             if self.isHumanClient():
                 if self.game.handctr != table.endValues[0]:
-                    disagree('numbers for played hands: Server:%s, Client:%s' % (
-                        table.endValues[0], self.game.handctr))
+                    disagree(f'numbers for played hands: Server:{table.endValues[0]}, Client:{self.game.handctr}')
                 for player in self.game.players:
                     if player.balance != table.endValues[1][player.wind.char]:
-                        disagree('balances for wind %s: Server:%s, Client:%s' % (
-                            player.wind, table.endValues[1][player.wind], player.balance))
+                        disagree(f'balances for wind {player.wind}: '
+                                 f'Server:{table.endValues[1][player.wind]}, Client:{player.balance}')
         else:
             self.game = gameClass(playerNames, self.table.ruleset,
                                   gameid=gameid, wantedGame=wantedGame, client=self,
                                   playOpen=self.table.playOpen, autoPlay=self.table.autoPlay)
-            assert self.game, 'cannot initialize game {}'.format(gameid)
+            assert self.game, f'cannot initialize game {gameid}'
         self.game.shouldSave = shouldSave
         self.__assignIntelligence()
                                   # intelligence variant is not saved for
@@ -331,20 +329,20 @@ class Client(pb.Referenceable):
                 noClaimCount += 1
                 if noClaimCount == 2:
                     if Debug.delayChow and self.game.lastDiscard:
-                        self.game.debug('everybody said "I am not interested", so {} claims chow now for {}'.format(
-                            self.game.myself.name, self.game.lastDiscard.name()))
+                        self.game.debug(f'everybody said "I am not interested", so {self.game.myself.name} '
+                                        f'claims chow now for {self.game.lastDiscard.name()}')
                     return result
             elif move.message in (Message.Pung, Message.Kong, Message.MahJongg) and move.notifying:
                 if Debug.delayChow and self.game.lastDiscard:
-                    self.game.debug('{} said {} so {} suppresses Chow for {}'.format(
-                        move.player, move.message, self.game.myself, self.game.lastDiscard.name()).replace('  ', ' '))
+                    self.game.debug(f'{move.player} said {move.message} so {self.game.myself} '
+                                    f'suppresses Chow for {self.game.lastDiscard.name()}'.replace('  ', ' '))
                 return Message.NoClaim
         if delay < self.game.ruleset.claimTimeout * 0.95:
             # one of those slow humans is still thinking
             return deferLater(Internal.reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         if Debug.delayChow and self.game.lastDiscard:
-            self.game.debug('{} must chow now for {} because timeout is over'.format(
-                self.game.myself.name, self.game.lastDiscard.name()))
+            self.game.debug(f'{self.game.myself.name} must chow now '
+                            f'for {self.game.lastDiscard.name()} because timeout is over')
         return result
 
     def ask(self, move:Move, answers:List['ClientMessage']) ->Deferred:
@@ -359,8 +357,8 @@ class Client(pb.Referenceable):
         assert result
         if result[0] == Message.Chow:
             if Debug.delayChow and self.game.lastDiscard:
-                self.game.debug('{} waits to see if somebody says Pung or Kong before saying chow for {}'.format(
-                    self.game.myself.name, self.game.lastDiscard.name()))
+                self.game.debug(f'{self.game.myself.name} waits to see if somebody '
+                                f'says Pung or Kong before saying chow for {self.game.lastDiscard.name()}')
             return deferLater(Internal.reactor, delayStep, self.__delayAnswer, result, delay, delayStep)
         return succeed(result)
 
@@ -389,16 +387,15 @@ class Client(pb.Referenceable):
         if Debug.traffic:
             if self.isHumanClient():
                 if self.game:
-                    self.game.debug('got Move: {!r}'.format(move))
+                    self.game.debug(f'got Move: {move!r}')
                 else:
-                    logDebug('got Move: {!r}'.format(move))
+                    logDebug(f'got Move: {move!r}')
         if self.game:
             if move.token:
                 if move.token != self.game.handId.token():
                     logException(
-                        'wrong token: %s, we have %s' %
-                        (move.token, self.game.handId.token()))
-        with Duration('Move {!r}:'.format(move)):
+                        f'wrong token: {move.token}, we have {self.game.handId.token()}')
+        with Duration(f'Move {move!r}:'):
             try:
                 result = self.exec_move(move).addCallback(self.__jellyMessage)
             except (Exception, Failure) as exc:  # pylint: disable=broad-exception-caught
@@ -471,8 +468,8 @@ class Client(pb.Referenceable):
         self.game.lastDiscard = None
         assert calledTile
         self.game.discardedTiles[calledTile.exposed] -= 1
-        assert move.meld, 'move has no meld: {!r}'.format(move)
-        assert calledTile in move.meld, '%s %s' % (calledTile, move.meld)
+        assert move.meld, f'move has no meld: {move!r}'
+        assert calledTile in move.meld, f'{calledTile} {move.meld}'
         hadTiles = move.meld.without(calledTile)
         assert move.player
         if not self.thatWasMe(move.player) and not self.game.playOpen:

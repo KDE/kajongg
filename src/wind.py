@@ -37,7 +37,7 @@ class Wind:
             Wind.all4 = list(Wind.all[:4])
         if len(args) == 1:
             windIdent = args[0]
-            assert cls is Wind, '{}({}) is illegal'.format(cls.__name__, windIdent)
+            assert cls is Wind, f'{cls.__name__}({windIdent}) is illegal'
             windIdx = 'eswn'.index(windIdent.lower())
             return Wind.all[windIdx]
         assert not args and cls is not Wind, 'Wind() must have exactly one argument'
@@ -86,7 +86,7 @@ class Wind:
         return self.char
 
     def __repr__(self) ->str:
-        return 'Wind.{}'.format(self.char)
+        return f'Wind.{self.char}'
 
 
 class _East(Wind):

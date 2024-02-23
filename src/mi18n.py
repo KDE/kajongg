@@ -61,11 +61,11 @@ def __insertArgs(translatedTemplate:str, *args:Any) ->str:
     result = translatedTemplate
     if '%' in result:
         for idx in range(len(args)):
-            result = result.replace('%%%d' % (idx + 1), '{%d}' % idx)
+            result = result.replace(f'%{int(idx + 1)}', '{%d}' % idx)  # pylint:disable=consider-using-f-string
         result = result.format(*args)
     for ignore in ['numid', 'filename', 'interface']:
-        result = result.replace('<%s>' % ignore, '')
-        result = result.replace('</%s>' % ignore, '')
+        result = result.replace(f'<{ignore}>', '')
+        result = result.replace(f'</{ignore}>', '')
     return result
 
 
@@ -246,7 +246,7 @@ class MLocale:
             try:
                 localename = os.environ[variable]
                 if localename is None:
-                    raise ValueError('{} is None'.format(variable))
+                    raise ValueError(f'{variable} is None')
             except KeyError:
                 continue
             else:

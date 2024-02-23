@@ -64,20 +64,17 @@ class DBCursor(sqlite3.Cursor):
                     break
                 except sqlite3.OperationalError as exc:
                     logDebug(
-                        '{} failed after {} tries:{}'.format(self, _, ' '.join(exc.args)))
+                        f"{self} failed after {_} tries:{' '.join(exc.args)}")
                     time.sleep(1)
                 else:
                     break
             else:
                 raise sqlite3.OperationalError(
-                    'Failed after 10 tries:{}'.format(self))
+                    f'Failed after 10 tries:{self}')
             self.failure = None
         except sqlite3.Error as exc:
             self.failure = exc
-            msg = 'ERROR in %s: %s for %s' % (
-                DBHandle.dbPath(),
-                exc.message if hasattr(exc, 'message') else '',
-                self)
+            msg = f"ERROR in {DBHandle.dbPath()}: {exc.message if hasattr(exc, 'message') else ''} for {self}"
             if mayFail:
                 if not failSilent:
                     logDebug(msg)
@@ -90,7 +87,7 @@ class DBCursor(sqlite3.Cursor):
     def __str__(self) ->str:
         """the statement"""
         if self.parameters is not None:
-            return "{cmd} [{args}]".format(cmd=self.statement, args=self.parameters)
+            return f"{self.statement} [{self.parameters}]"
         return self.statement
 
 
@@ -113,14 +110,13 @@ class DBHandle(sqlite3.Connection):
                 msg = ' '.join(exc.args)
             else:
                 msg = ''
-            logException('opening %s: %s' % (self.path, msg))
+            logException(f'opening {self.path}: {msg}')
         if self.hasTable('general'):
             cursor = self.cursor()
             cursor.execute('select ident from general')
             self.identifier = cursor.fetchone()[0]
         if Debug.sql:
-            logDebug('Opened %s with identifier %s' % (
-                self.path, self.identifier))
+            logDebug(f'Opened {self.path} with identifier {self.identifier}')
 
     def __enter__(self) ->'DBHandle':
         self.inTransaction = datetime.datetime.now()
@@ -153,7 +149,7 @@ class DBHandle(sqlite3.Connection):
         name = stack[-3]
         if name in ('__exit__', '__init__'):
             name = stack[-4]
-        return '%s on %s_%s' % (name, self.path, id4(self))
+        return f'{name} on {self.path}_{id4(self)}'
 
     def commit(self, silent:bool=False) ->None:
         """commit and log it"""
@@ -162,25 +158,24 @@ class DBHandle(sqlite3.Connection):
         except sqlite3.Error as exc:
             if not silent:
                 logWarning(
-                    '%s cannot commit: %s :' %
-                    (DBHandle.dbPath(), exc))
+                    f'{DBHandle.dbPath()} cannot commit: {exc} :')
 
     def rollback(self, silent:bool=False) ->None:
         """rollback and log it"""
         try:
             sqlite3.Connection.rollback(self)
             if not silent and Debug.sql:
-                logDebug('%x rollbacked transaction' % id(self))
+                logDebug(f'{id(self):x} rollbacked transaction')
         except sqlite3.Error as exc:
-            logWarning('%s cannot rollback: %s' % (DBHandle.dbPath(), exc))
+            logWarning(f'{DBHandle.dbPath()} cannot rollback: {exc}')
 
     def close(self, silent:bool=False) ->None:
         """just for logging"""
         if not silent and (Debug.sql or Debug.quit):
             if self is Internal.db:
-                logDebug('Closing Internal.db: %s' % self.path)
+                logDebug(f'Closing Internal.db: {self.path}')
             else:
-                logDebug('Closing DBHandle %s: %s' % (self, self.path))
+                logDebug(f'Closing DBHandle {self}: {self.path}')
         if self is Internal.db:
             Internal.db = None
         try:
@@ -195,12 +190,12 @@ class DBHandle(sqlite3.Connection):
     @staticmethod
     def hasTable(table:str) ->bool:
         """does the table contain table?"""
-        return len(Query('SELECT name FROM sqlite_master WHERE type="table" AND name="%s"' % table).records) > 0
+        return len(Query(f'SELECT name FROM sqlite_master WHERE type="table" AND name="{table}"').records) > 0
 
     def tableHasField(self, table:str, field:str) ->bool:
         """does the table contain a column named field?"""
         cursor = self.cursor()
-        cursor.execute('select * from %s' % table)
+        cursor.execute(f'select * from {table}')
         return any(x[0] == field for x in cursor.description)
 
 
@@ -247,11 +242,10 @@ class Query:
             self.failure = None
             self.records = []
         if self.records and Debug.sql:
-            logDebug('result set:{}'.format(self.records))
+            logDebug(f'result set:{self.records}')
 
     def __str__(self) ->str:
-        return '{} {}'.format(self.statement,
-                              'args=' + ','.join(str(x) for x in self.args) if self.args else '')
+        return f"{self.statement} {'args=' + ','.join(str(x) for x in self.args) if self.args else ''}"
 
     def rowcount(self) ->int:
         """how many rows were affected?"""
@@ -345,7 +339,7 @@ class PrepareDB:
 
     def __create(self) ->None:
         """create a brand new kajongg database"""
-        tmpPath = '%s.new.%d' % (self.path, os.getpid())
+        tmpPath = f'{self.path}.new.{int(os.getpid())}'
         Internal.db = DBHandle(tmpPath)
         try:
             with Internal.db:
@@ -378,8 +372,7 @@ class PrepareDB:
         try:
             Internal.db = DBHandle(self.path)
             allVersions = list(['4.13.0', '8300', '8301'])
-            assert allVersions[-1] == str(Internal.defaultPort), '{} != {}'.format(
-                allVersions[-1], str(Internal.defaultPort))
+            assert allVersions[-1] == str(Internal.defaultPort), f'{allVersions[-1]} != {str(Internal.defaultPort)}'
             # skip versions before current db versions:
             currentVersion = self.__currentVersion()
             while allVersions and allVersions[0] <= currentVersion:
@@ -387,21 +380,21 @@ class PrepareDB:
             for version in allVersions:
                 currentVersion = self.__currentVersion()
                 with Internal.db:  # transaction
-                    updateMethodName = 'updateToVersion{}'.format(version.replace('.', '_'))
+                    updateMethodName = f"updateToVersion{version.replace('.', '_')}"
                     if hasattr(self, updateMethodName):
                         getattr(self, updateMethodName)()
                     Query('UPDATE general SET schemaversion=?', (version,))
                 logInfo(i18n('Database %1 updated from schema %2 to %3',
                              Internal.db.path, currentVersion, version), showDialog=True)
         except sqlite3.Error as exc:
-            logException('opening %s: %s' % (self.path, exc))
+            logException(f'opening {self.path}: {exc}')
         finally:
             Internal.db.close(silent=True)
 
     @classmethod
     def sqlForCreateTable(cls, table:str) ->str:
         """the SQL command for creating 'table'"""
-        return "create table %s(%s)" % (table, cls.schema[table])
+        return f"create table {table}({cls.schema[table]})"
 
     @classmethod
     def createTable(cls, table:str) ->None:
@@ -433,7 +426,7 @@ class PrepareDB:
                 "select 1 from sqlite_master where type='index' and name=?", (
                     name,),
                 silent=True).records:
-            Query("create index %s on %s" % (name, cmd))
+            Query(f"create index {name} on {cmd}")
 
     def cleanPlayerTable(self) ->None:
         """remove now unneeded columns host, password and make names unique"""
@@ -450,21 +443,16 @@ class PrepareDB:
             if cast(int, counter) > 1:
                 for nameId in nameIds[1:]:
                     Query(
-                        'update score set player=%d where player=%d' %
-                        (keepId, nameId))
+                        f'update score set player={int(keepId)} where player={int(nameId)}')
                     Query(
-                        'update game set p0=%d where p0=%d' %
-                        (keepId, nameId))
+                        f'update game set p0={int(keepId)} where p0={int(nameId)}')
                     Query(
-                        'update game set p1=%d where p1=%d' %
-                        (keepId, nameId))
+                        f'update game set p1={int(keepId)} where p1={int(nameId)}')
                     Query(
-                        'update game set p2=%d where p2=%d' %
-                        (keepId, nameId))
+                        f'update game set p2={int(keepId)} where p2={int(nameId)}')
                     Query(
-                        'update game set p3=%d where p3=%d' %
-                        (keepId, nameId))
-                    Query('delete from player where id=%d' % nameId)
+                        f'update game set p3={int(keepId)} where p3={int(nameId)}')
+                    Query(f'delete from player where id={int(nameId)}')
         Query('drop table player')
         self.createTable('player')
         for nameId, name in keep.items():
@@ -473,11 +461,11 @@ class PrepareDB:
     @classmethod
     def removeGameServer(cls) ->None:
         """drops column server from table game. Sqlite3 cannot drop columns"""
-        Query('create table gameback(%s)' % cls.schema['game'])
+        Query(f"create table gameback({cls.schema['game']})")
         Query('insert into gameback '
               'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from game')
         Query('drop table game')
-        Query('create table game(%s)' % cls.schema['game'])
+        Query(f"create table game({cls.schema['game']})")
         Query('insert into game '
               'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback')
         Query('drop table gameback')
@@ -504,7 +492,7 @@ class PrepareDB:
             # and we now have both ruleset templates and copies of used
             # rulesets in the same table
             for statement in list([
-                    'create table temp(%s)' % self.schema['ruleset'],
+                    f"create table temp({self.schema['ruleset']})",
                     'insert into temp select id,name,hash,description from ruleset',
                     'drop table ruleset',
                     self.sqlForCreateTable('ruleset'),
@@ -516,7 +504,7 @@ class PrepareDB:
         if int(query.records[0][0]):
             # make ruleset,name non-unique
             for statement in list([
-                    'create table temp(%s)' % self.schema['rule'],
+                    f"create table temp({self.schema['rule']})",
                     'insert into temp select * from rule',
                     'drop table rule',
                     self.sqlForCreateTable('rule'),
@@ -534,5 +522,4 @@ class PrepareDB:
             Query("INSERT INTO general(ident) values(?)", (dbIdent,))
             if Debug.sql:
                 logDebug(
-                    'generated new dbIdent %s for %s' %
-                    (dbIdent, Internal.db.path))
+                    f'generated new dbIdent {dbIdent} for {Internal.db.path}')

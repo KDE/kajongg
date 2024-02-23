@@ -164,8 +164,7 @@ class MJServer:
             try:
                 reactor.stop()  # type:ignore[misc]
                 if Debug.connections:
-                    logDebug('local server terminates from %s. Reason: last client disconnected' % (
-                        Options.socket))
+                    logDebug(f'local server terminates from {Options.socket}. Reason: last client disconnected')
             except ReactorNotRunning:
                 pass
 
@@ -174,16 +173,14 @@ class MJServer:
         since = elapsedSince(self.lastPing)
         if self.srvUsers and since > 30:
             if Debug.quit:
-                logDebug('no ping since {} seconds but we still have users:{}'.format(
-                    elapsedSince(self.lastPing), self.srvUsers))
+                logDebug(f'no ping since {elapsedSince(self.lastPing)} seconds but we still have users:{self.srvUsers}')
         if not self.srvUsers and since > 30:
             # no user at all since 30 seconds, but we did already have a user
             self.__stopAfterLastDisconnect()
         for user in self.srvUsers:
             if elapsedSince(user.lastPing) > 60:
                 logInfo(
-                    'No messages from %s since 60 seconds, clearing connection now' %
-                    user.name)
+                    f'No messages from {user.name} since 60 seconds, clearing connection now')
                 user.mind = None
                 self.logout(user)
         reactor.callLater(10, self.checkPings)
@@ -207,8 +204,7 @@ class MJServer:
             data = [x.asSimpleList() for x in tables]
             if Debug.table:
                 logDebug(
-                    'sending %d tables to %s: %s' %
-                    (len(tables), user.name, data))
+                    f'sending {len(tables)} tables to {user.name}: {data}')
             return self.callRemote(user, 'newTables', data)
         return succeed([])
 
@@ -237,8 +233,8 @@ class MJServer:
         if tableId in self.tables:
             assert tableId is not None  # for mypy
             return fail(srvError(pb.Error,
-                                 'You want a new table with id=%d but that id is already used for table %s' % (
-                                     tableId, self.tables[tableId])))
+                                 f'You want a new table with id={int(tableId)} '
+                                 f'but that id is already used for table {self.tables[tableId]}'))
         if Ruleset.hashIsKnown(ruleset):
             return self.__newTable(None, user, ruleset, playOpen, autoPlay, wantedGame, tableId)
         _ = self.callRemote(user, 'needRuleset', ruleset)
@@ -292,7 +288,7 @@ class MJServer:
             source=table.asSimpleList())
         if len(table.users) == table.maxSeats():
             if Debug.table:
-                logDebug('Table %s: All seats taken, starting' % table)
+                logDebug(f'Table {table}: All seats taken, starting')
 
             def startTable(unused: Any) -> None:
                 """now all players know about our join"""
@@ -338,8 +334,7 @@ class MJServer:
         # HumanClient implements methods remote_tableRemoved etc.
         if Debug.connections or reason == 'abort':
             logDebug(
-                '%s%s ' % (('%d:' % table.game.seed) if table.game else '',
-                           i18n(message, *args)), withGamePrefix=False)
+                f"{f'{int(table.game.seed)}:' if table.game else ''}{i18n(message, *args)} ", withGamePrefix=False)
         if table.tableid in self.tables:
             del self.tables[table.tableid]
             if reason == 'silent':
@@ -353,8 +348,7 @@ class MJServer:
                 table.delUser(user)
             if Debug.table:
                 logDebug(
-                    'removing table %d: %s %s' %
-                    (table.tableid, i18n(message, *args), reason))
+                    f'removing table {int(table.tableid)}: {i18n(message, *args)} {reason}')
         if table.game:
             table.game.close()
 
@@ -428,7 +422,7 @@ class MJRealm:
         avatar.server = self.server
         avatar.attached(mind)
         if Debug.connections:
-            logDebug('Connection from %s ' % avatar.source())
+            logDebug(f'Connection from {avatar.source()} ')
         return pb.IPerspective, avatar, lambda a=avatar: a.detached(mind)
 
 def parseArgs() -> argparse.Namespace:
@@ -437,8 +431,7 @@ def parseArgs() -> argparse.Namespace:
     defaultPort = Internal.defaultPort
     parser.add_argument('--port', dest='port',
                       help=i18n(
-                          'the server will listen on PORT (%d)' %
-                          defaultPort),
+                          f'the server will listen on PORT ({int(defaultPort)})'),
                       type=int, default=defaultPort)
     parser.add_argument('--socket', dest='socket',
                       help=i18n('the server will listen on SOCKET'), default=None)
@@ -482,18 +475,16 @@ def kajonggServer() ->None:
             if sys.platform == 'win32':
                 if Debug.connections:
                     logDebug(
-                        'local server listening on 127.0.0.1 port %d' %
-                        options.port)
+                        f'local server listening on 127.0.0.1 port {int(options.port)}')
                 reactor.listenTCP(options.port, factory, interface='127.0.0.1')
             else:
                 if Debug.connections:
                     logDebug(
-                        'local server listening on UNIX socket %s' %
-                        Options.socket)
+                        f'local server listening on UNIX socket {Options.socket}')
                 reactor.listenUNIX(Options.socket, factory)
         else:
             if Debug.connections:
-                logDebug('server listening on port %d' % options.port)
+                logDebug(f'server listening on port {int(options.port)}')
             reactor.listenTCP(options.port, pb.PBServerFactory(kajonggPortal))
     except error.CannotListenError as errObj:
         logWarning(errObj)

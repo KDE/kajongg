@@ -62,18 +62,18 @@ class Players(list, ReprMixin):
             for player in self:
                 if player.wind == index:
                     return player
-        assert isinstance(index, (int, slice)), 'index is neither Wind, int nor slice:%s' % type(index)
+        assert isinstance(index, (int, slice)), f'index is neither Wind, int nor slice:{type(index)}'
         return list.__getitem__(self, index)
 
     def __str__(self) ->str:
-        return ', '.join('%s: %s' % (x.name, x.wind) for x in self)
+        return ', '.join(f'{x.name}: {x.wind}' for x in self)
 
     def byId(self, playerid:int) ->Optional['Player']:
         """lookup the player by id"""
         for player in self:
             if player.nameid == playerid:
                 return player
-        logException("no player has id %d" % playerid)
+        logException(f"no player has id {int(playerid)}")
         return None
 
     def byName(self, playerName:str) ->Optional['Player']:
@@ -82,8 +82,7 @@ class Players(list, ReprMixin):
             if player.name == playerName:
                 return player
         logException(
-            "no player has name '%s' - we have %s" %
-            (playerName, [x.name for x in self]))
+            f"no player has name '{playerName}' - we have {[x.name for x in self]}")
         return None
 
     @staticmethod
@@ -113,8 +112,7 @@ class Players(list, ReprMixin):
             if name not in Players.allNames.values():
                 Query("insert or ignore into player(name) values(?)", (name,))
                 Players.load()
-        assert name in Players.allNames.values(), '%s not in %s' % (
-            name, Players.allNames.values())
+        assert name in Players.allNames.values(), f'{name} not in {Players.allNames.values()}'
 
     def translatePlayerNames(self, names:Iterable[str]) ->List[str]:
         """for a list of names, translates those names which are english
@@ -174,8 +172,7 @@ class Player(ReprMixin):
         """clears the cache with Hands"""
         if Debug.hand and self.handCache and self.game:
             self.game.debug(
-                '%s: cache hits:%d misses:%d' %
-                (self, self.cacheHits, self.cacheMisses))
+                f'{self}: cache hits:{int(self.cacheHits)} misses:{int(self.cacheMisses)}')
         self.handCache.clear()
         Permutations.cache.clear()
         self.cacheHits = 0
@@ -195,7 +192,7 @@ class Player(ReprMixin):
         """write once"""
         assert self.__name == ''
         assert value
-        assert isinstance(value, str), 'Player.name must be str but not {}'.format(type(value))
+        assert isinstance(value, str), f'Player.name must be str but not {type(value)}'
         self.__name = value
 
     @property
@@ -263,7 +260,7 @@ class Player(ReprMixin):
             self._hand = self.__computeHand()
         elif Debug.hand:
             _ = self.__computeHand()
-            assert self._hand == _, '{} != {}'.format(self._hand, _)
+            assert self._hand == _, f'{self.hand} != {_}'
         return self._hand
 
     @property
@@ -360,7 +357,7 @@ class Player(ReprMixin):
         self.__payment = 0
 
     def __str__(self) ->str:
-        return '{name:<10} {wind}'.format(name=self.name[:10], wind=self.wind)
+        return f'{self.name[:10]:<10} {self.wind}'
 
     def pickedTile(self, deadEnd:bool, tileName:Optional[Tile] =None) -> Tile:
         """got a tile from wall"""
@@ -385,8 +382,7 @@ class Player(ReprMixin):
         assert not tile.isBonus, tile
         assert tile.__class__ == Tile
         if tile not in self._concealedTiles:
-            raise ValueError('removeConcealedTile({!r}): tile not in concealed {!r}'.format(
-                            tile, self._concealedTiles))
+            raise ValueError(f'removeConcealedTile({tile!r}): tile not in concealed {self._concealedTiles!r}')
         self._concealedTiles.remove(tile)
         if tile is self.lastTile:
             self.lastTile = Tile.none
@@ -399,7 +395,7 @@ class Player(ReprMixin):
             if tile.isBonus:
                 self._bonusTiles.append(tile)
             else:
-                assert tile.isConcealed, '%s data=%s' % (tile, tiles)
+                assert tile.isConcealed, f'{tile} data={tiles}'
                 self._concealedTiles.append(tile)
         self._hand = None
 
@@ -492,8 +488,7 @@ class Player(ReprMixin):
         if self.lastTile and self.lastTile.exposed != discard.exposed:
             if Debug.originalCall and self.game:
                 self.game.debug(
-                    '%s would violate OC with %s, lastTile=%s' %
-                    (self, discard, self.lastTile))
+                    f'{self} would violate OC with {discard}, lastTile={self.lastTile}')
             return True
         return False
 
@@ -523,14 +518,14 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
         assert self.game
         if Debug.mahJongg:
-            self.game.debug('{} declared MJ: concealed={}, withDiscard={}, lastTile={},lastMeld={}'.format(
-                self, concealed, withDiscard, lastTile, lastMeld))
-            self.game.debug('  with hand being {}'.format(self.hand))
+            self.game.debug(f'{self} declared MJ: concealed={concealed}, '
+                            f'withDiscard={withDiscard}, lastTile={lastTile},lastMeld={lastMeld}')
+            self.game.debug(f'  with hand being {self.hand}')
         melds = concealed[:]
         self.game.winner = self
-        assert lastMeld in melds, \
-            'lastMeld %s not in melds: concealed=%s: melds=%s lastTile=%s withDiscard=%s' % (
-                lastMeld, self._concealedTiles, melds, lastTile, withDiscard)
+        assert lastMeld in melds, (
+            f'lastMeld {lastMeld} not in melds: concealed={self._concealedTiles}: '
+            f'melds={melds} lastTile={lastTile} withDiscard={withDiscard}')
         if withDiscard:
             PlayingPlayer.addConcealedTiles(
                 self,
@@ -552,7 +547,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         self._concealedTiles = PieceList()
         self._hand = None
         if Debug.mahJongg:
-            self.game.debug('  hand becomes {}'.format(self.hand))
+            self.game.debug(f'  hand becomes {self.hand}')
             self._hand = None
 
     def __possibleChows(self) ->MeldList:
@@ -630,12 +625,10 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         if hand.won:
             if Debug.robbingKong:
                 if move.message == Message.DeclaredKong:  # type: ignore
-                    game.debug('%s may rob the kong from %s/%s' %
-                               (self, move.player, move.exposedMeld))
+                    game.debug(f'{self} may rob the kong from {move.player}/{move.exposedMeld}')
             if Debug.mahJongg:
-                game.debug('%s may say MJ:%s, active=%s' % (
-                    self, list(x for x in game.players), game.activePlayer))
-                game.debug('  with hand {}'.format(hand))
+                game.debug(f'{self} may say MJ:{list(x for x in game.players)}, active={game.activePlayer}')
+                game.debug(f'  with hand {hand}')
             return MeldList(x for x in hand.melds if not x.isDeclared), withDiscard, hand.lastMeld
         return None
 
@@ -647,8 +640,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
             if newHand.callingHands:
                 if Debug.originalCall:
                     self.game.debug(
-                        '%s may say Original Call by discarding %s from %s' %
-                        (self, tileName, self.hand))
+                        f'{self} may say Original Call by discarding {tileName} from {self.hand}')
                 return True
         return False
 
@@ -696,16 +688,14 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         assert self.game
         if not self.game.playOpen and self != self.game.myself:
             assert len(tiles) <= len(self._concealedTiles), \
-                '%s: showConcealedTiles %s, we have only %s' % (
-                    self, tiles, self._concealedTiles)
+                f'{self}: showConcealedTiles {tiles}, we have only {self._concealedTiles}'
             for tileName in tiles:
                 src, dst = (Tile.unknown, tileName) if show else (
                     tileName, Tile.unknown)
                 assert src != dst, (
                     self, src, dst, tiles, self._concealedTiles)
                 if src not in self._concealedTiles:
-                    logException('%s: showConcealedTiles(%s): %s not in %s.' %
-                                 (self, tiles, src, self._concealedTiles))
+                    logException(f'{self}: showConcealedTiles({tiles}): {src} not in {self._concealedTiles}.')
                 idx = self._concealedTiles.index(src)
                 self._concealedTiles[idx] = dst
             self._hand = None
@@ -739,7 +729,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
     def robTileFrom(self, tile:Tile) -> None:
         """used for robbing the kong from this player"""
         if Debug.robbingKong:
-            logDebug('robbed %s from %s' % (tile, self))
+            logDebug(f'robbed {tile} from {self}')
         assert tile.isConcealed
         tile = tile.exposed
         for meld in self._exposedMelds:
@@ -749,7 +739,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
                 break
         else:
             # TODO: should we somehow show an error and continue?
-            raise ValueError('robTileFrom: no meld found with %s' % tile)
+            raise ValueError(f'robTileFrom: no meld found with {tile}')
         assert self.game
         self.game.lastDiscard = tile.concealed
         self.lastTile = Tile.none  # our lastTile has just been robbed
@@ -758,7 +748,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
     def robsTile(self) -> None:
         """True if the player is robbing a tile"""
         if Debug.robbingKong:
-            logDebug('%s robs a tile' % self)
+            logDebug(f'{self} robs a tile')
         self.lastSource = TileSource.RobbedKong
 
     def scoreMatchesServer(self, score:Optional[str]) -> bool:
@@ -770,11 +760,10 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         if str(self.hand) == score:
             return True
         if self.game:
-            self.game.debug('%s localScore:%s' % (self, self.hand))
-            self.game.debug('%s serverScore:%s' % (self, score))
+            self.game.debug(f'{self} localScore:{self.hand}')
+            self.game.debug(f'{self} serverScore:{score}')
             logWarning(
-                'Game %s: client and server disagree about scoring, see logfile for details' %
-                self.game.seed)
+                f'Game {self.game.seed}: client and server disagree about scoring, see logfile for details')
         return False
 
     def mustPlayDangerous(self, exposing:Optional[Meld] =None) -> bool:
@@ -824,8 +813,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
             meld = tile0.kong
             if allMeldTiles[3] not in self._concealedTiles:
                 game.debug(
-                    't3 %s not in conc %s' %
-                    (allMeldTiles[3], self._concealedTiles))
+                    f't3 {allMeldTiles[3]} not in conc {self._concealedTiles}')
             self._concealedTiles.remove(allMeldTiles[3])
             self.visibleTiles[tile0] += 1
         else:
@@ -884,4 +872,4 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
                      i18n('Player %1 exposed many dragons', pName)))
         self.dangerousTiles = dangerous
         if dangerous and Debug.dangerousGame:
-            self.game.debug('dangerous:%s' % dangerous)
+            self.game.debug(f'dangerous:{dangerous}')

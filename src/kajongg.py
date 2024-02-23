@@ -42,11 +42,9 @@ def initRulesets() ->None:
             matches = [x for x in rulesets if Options.rulesetName in x]
             if len(matches) != 1:
                 if not matches:
-                    msg = 'Ruleset %s is unknown' % Options.rulesetName
+                    msg = f'Ruleset {Options.rulesetName} is unknown'
                 else:
-                    msg = 'Ruleset %s is ambiguous: %s' % (
-                        Options.rulesetName,
-                        ', '.join(matches))
+                    msg = f"Ruleset {Options.rulesetName} is ambiguous: {', '.join(matches)}"
                 Internal.db.close()
                 raise SystemExit(msg)
             Options.ruleset = rulesets[matches[0]]

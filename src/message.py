@@ -96,7 +96,7 @@ class Message:
         # change with software updates
         className = self.__class__.__name__.replace('Message', '')
         msgName = self.name.replace(' ', '')
-        assert className == msgName, '%s != %s' % (className, msgName)
+        assert className == msgName, f'{className} != {msgName}'
 
     @property
     def i18nName(self) ->str:
@@ -109,7 +109,7 @@ class Message:
         return self.name
 
     def __repr__(self) ->str:
-        return 'Message.{}'.format(self.name)
+        return f'Message.{self.name}'
 
     def __lt__(self, other:object) ->bool:
         return self.__class__.__name__ < other.__class__.__name__
@@ -135,8 +135,7 @@ class Message:
             return {Message.jelly('key', x): Message.jelly('value', y) for x, y in value.items()}
         if not isinstance(value, (int, bytes, str, float, type(None))):
             raise TypeError(
-                'callRemote got illegal arg: %s %s(%s)' %
-                (key, type(value), str(value)))
+                f'callRemote got illegal arg: {key} {type(value)}({str(value)})')
         return value
 
     @staticmethod
@@ -161,12 +160,11 @@ class ServerMessage(Message):
     def clientAction(self, client:'Client', move:'Move') ->Any: # pylint: disable=unused-argument
         """default client action: none - this is a virtual class"""
         logException(
-            'clientAction is not defined for %s. msg:%s' %
-            (self, move))
+            f'clientAction is not defined for {self}. msg:{move}')
 
     def serverAction(self, table:'ServerTable', msg:'Request') ->None:  # pylint: disable=unused-argument
         """the server mirrors that and tells all others"""
-        logException('serverAction is not defined for msg:%s' % msg)
+        logException(f'serverAction is not defined for msg:{msg}')
 
 
 class ClientMessage(Message):
@@ -187,22 +185,21 @@ class ClientMessage(Message):
 
     def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]: # pylint: disable=unused-argument
         """return text and warning flag for button and text for tile for button and text for tile"""
-        txt = 'toolTip is not defined for %s' % self.name
+        txt = f'toolTip is not defined for {self.name}'
         logWarning(txt)
         return txt, True, ''
 
     def serverAction(self, table:'ServerTable',  msg:'Request') ->None: # pylint: disable=unused-argument
         """default server action: none - this is a virtual class"""
         logException(
-            'serverAction is not defined for %s. msg:%s' %
-            (self, msg))
+            f'serverAction is not defined for {self}. msg:{msg}')
 
     @staticmethod
     def isActivePlayer(table:'ServerTable',  msg:'Request') ->bool:
         """helper: does the message come from the active player?"""
         if table.game and msg.player == table.game.activePlayer:
             return True
-        errMsg = '%s said %s but is not the active player' % (msg.player, msg.answer)
+        errMsg = f'{msg.player} said {msg.answer} but is not the active player'
         table.abort(errMsg)
         return False
 
@@ -269,8 +266,7 @@ class PungChowMessage(NotifyAtOnceMessage):
             warn = True
             if Debug.dangerousGame and len(dangerousMelds) != len(maySay):
                 button.client.game.debug(
-                    'only some claimable melds are dangerous: %s' %
-                    dangerousMelds)
+                    f'only some claimable melds are dangerous: {dangerousMelds}')
             if len(dangerousMelds) == 1:
                 txt.append(i18n(
                     'claiming %1 is dangerous because you will have to discard a dangerous tile',
@@ -362,8 +358,7 @@ class MessageChow(PungChowMessage, ServerMessage):
         assert isinstance(msg.args, list)
         if table.game.nextPlayer() != msg.player:
             table.abort(
-                'player %s illegally said Chow, only %s may' %
-                (msg.player, table.game.nextPlayer()))
+                f'player {msg.player} illegally said Chow, only {table.game.nextPlayer()} may')
         else:
             table.claimTile(msg.player, self, Meld(msg.args[0]), Message.Chow)
 
@@ -443,8 +438,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
             player.originalCallingHand = player.hand
             if Debug.originalCall:
                 logDebug(
-                    '%s gets originalCallingHand:%s' %
-                    (player, player.originalCallingHand))
+                    f'{player} gets originalCallingHand:{player.originalCallingHand}')
         player.originalCall = True
         assert client.game
         client.game.addCsvTag('originalCall')
@@ -537,8 +531,7 @@ class MessageReadyForGameStart(ServerMessage):
             if result == Message.OK and client.tableList and client.tableList.isVisible():
                 if Debug.table:
                     logDebug(
-                        '%s hiding table list because game started' %
-                        client.name)
+                        f'{client.name} hiding table list because game started')
                 client.tableList.hide()
             return result
         # move.playerNames are the players in seating order
@@ -647,8 +640,7 @@ class MessageAskForClaims(ServerMessage):
         assert move.player
         if client.thatWasMe(move.player):
             raise ValueError(
-                'Server asked me(%s) for claims but I just discarded that tile!' %
-                move.player)
+                f'Server asked me({move.player}) for claims but I just discarded that tile!')
         _ = (Message.NoClaim, Message.Chow, Message.Pung, Message.Kong, Message.MahJongg)
         choice = list(cast(ClientMessage, x) for x in _)
         return client.ask(move, choice)
@@ -695,7 +687,7 @@ class MessageViolatesOriginalCall(ServerMessage):
         move.player.popupMsg(self)
         move.player.mayWin = False
         if Debug.originalCall:
-            logDebug('%s: cleared mayWin' % move.player)
+            logDebug(f'{move.player}: cleared mayWin')
         return client.ask(move, [Message.OK])
 
 
@@ -725,8 +717,8 @@ class MessageVoiceData(ServerMessage):
         assert move.player
         move.player.voice = Voice(move.md5sum, cast(bytes, move.source))
         if Debug.sound:
-            logDebug('%s gets voice data %s from server, language=%s' % (
-                move.player, move.player.voice, move.player.voice.language()))
+            logDebug(f'{move.player} gets voice data {move.player.voice} '
+                     f'from server, language={move.player.voice.language()}')
 
 
 class MessageAssignVoices(ServerMessage):
@@ -754,8 +746,7 @@ class MessageServerWantsVoiceData(ServerMessage):
         assert move.player
         assert move.player.voice
         if Debug.sound:
-            logDebug('%s: send wanted voice data %s to server' % (
-                move.player, move.player.voice))
+            logDebug(f'{move.player}: send wanted voice data {move.player.voice} to server')
         return Message.ServerGetsVoiceData, move.player.voice.archiveContent
 
 
@@ -772,11 +763,9 @@ class MessageServerGetsVoiceData(ClientMessage):
         voice.archiveContent = msg.args[0]
         if Debug.sound:
             if voice.oggFiles():
-                logDebug('%s: server got wanted voice data %s' % (
-                    msg.player, voice))
+                logDebug(f'{msg.player}: server got wanted voice data {voice}')
             else:
-                logDebug('%s: server got empty voice data %s (arg0=%s)' % (
-                    msg.player, voice, repr(msg.args[0][:100])))
+                logDebug(f'{msg.player}: server got empty voice data {voice} (arg0={repr(msg.args[0][:100])})')
 
 
 class MessageDeclaredKong(ServerMessage):
@@ -812,7 +801,7 @@ class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):
         assert move.player
         move.player.robsTile()
         client.game.addCsvTag(
-            'robbedKong%s' % prevMove.meld[1],
+            f'robbedKong{prevMove.meld[1]}',
             forAllPlayers=True)
 
 
@@ -881,8 +870,7 @@ class MessageUsedDangerousFrom(ServerMessage):
         assert move.player
         move.player.usedDangerousFrom = fromPlayer
         if Debug.dangerousGame:
-            logDebug('%s claimed a dangerous tile discarded by %s' %
-                     (move.player, fromPlayer))
+            logDebug(f'{move.player} claimed a dangerous tile discarded by {fromPlayer}')
 
 
 class MessageDraw(ServerMessage):
@@ -954,7 +942,7 @@ def __scanSelf() ->None:
                     try:
                         msg = glob()
                     except Exception:
-                        logDebug('cannot instantiate %s' % glob.__name__)
+                        logDebug(f'cannot instantiate {glob.__name__}')
                         raise
                     type.__setattr__(
                         Message, msg.name.replace(' ', ''), msg)
@@ -994,13 +982,9 @@ class ChatMessage(ReprMixin):
         # pylint says something about NotImplemented, check with later versions
         _ = i18n(self.message)
         if self.isStatusMessage:
-            _ = '[{}]'.format(_)
-        return '%02d:%02d:%02d %s: %s' % (
-            local.hour,
-            local.minute,
-            local.second,
-            self.fromUser,
-            i18n(self.message))
+            _ = f'[{_}]'
+        return (f'{int(local.hour):02}:{int(local.minute):02}:{int(local.second):02} '
+                f'{self.fromUser}: {i18n(self.message)}')
 
     def asList(self) ->Tuple[Any, ...]:
         """encode me for network transfer"""

@@ -217,8 +217,7 @@ class RuleModel(TreeModel):
                     font.setItalic(True)
                     result = font
             elif role == Qt.ItemDataRole.ToolTipRole:
-                tip = '<b></b>%s<b></b>' % i18n(
-                    item.tooltip()) if item else ''
+                tip = f'<b></b>{i18n(item.tooltip())}<b></b>' if item else ''
                 result = tip
         return result
 

@@ -72,10 +72,7 @@ class ChatModel(QAbstractTableModel):
             chatLine = self.chatLines[index.row()]
             if role == Qt.ItemDataRole.DisplayRole and index.column() == 0:
                 local = chatLine.localtimestamp()
-                result = '%02d:%02d:%02d' % (
-                    local.hour,
-                    local.minute,
-                    local.second)
+                result = f'{int(local.hour):02}:{int(local.minute):02}:{int(local.second):02}'
             elif role == Qt.ItemDataRole.DisplayRole and index.column() == 1:
                 result = chatLine.fromUser
             elif role == Qt.ItemDataRole.DisplayRole and index.column() == 2:
@@ -160,7 +157,7 @@ class ChatWindow(QWidget):
     def kill(self) ->None:
         """hide and null on table"""
         if Debug.chat:
-            logDebug('chat.kill for %s on table %s' % (self, self.table))
+            logDebug(f'chat.kill for {self} on table {self.table}')
         self.hide()
         assert self.table
         self.table.chatWindow = None
@@ -174,7 +171,7 @@ class ChatWindow(QWidget):
             assert self.table
             assert self.table.client
             if Debug.chat:
-                logDebug('sending line %s to others' % line)
+                logDebug(f'sending line {line} to others')
             msg = ChatMessage(
                 self.table.tableid,
                 self.table.client.name,

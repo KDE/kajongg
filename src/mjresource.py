@@ -48,8 +48,8 @@ class Resource:
         """where to look for resources"""
         result = QStandardPaths.locateAll(
             QStandardPaths.GenericDataLocation,
-            'kmahjongglib/{}s'.format(cls.resourceName), QStandardPaths.LocateDirectory)
-        result.insert(0, os.path.join('share', 'kmahjongglib', '{}s'.format(cls.resourceName)))
+            f'kmahjongglib/{cls.resourceName}s', QStandardPaths.LocateDirectory)
+        result.insert(0, os.path.join('share', 'kmahjongglib', f'{cls.resourceName}s'))
         return (x for x in result if os.path.exists(x))
 
     @classmethod
@@ -59,7 +59,7 @@ class Resource:
             path = os.path.join(directory, which)
             if os.path.exists(path):
                 return path
-        logException('cannot find kmahjongg%s %s in %s' % (cls.resourceName, which, cls.__directories()))
+        logException(f'cannot find kmahjongg{cls.resourceName} {which} in {cls.__directories()}')
         return None
 
     @classmethod
@@ -138,11 +138,11 @@ class Resource:
         # Format is increased when we have incompatible changes, meaning that
         # older clients are not able to use the remaining information safely
         if resourceVersion > RESOURCEFORMAT:
-            logException('version file / program: %d/%d' % (resourceVersion, RESOURCEFORMAT))
+            logException(f'version file / program: {int(resourceVersion)}/{int(RESOURCEFORMAT)}')
 
     def __str__(self) ->str:
-        return "%s id=%d name=%s, name id=%d" % \
-            (self.resourceName, id(self), self.desktopFileName, id(self.desktopFileName))
+        return (f"{self.resourceName} id={int(id(self))} name={self.desktopFileName}, "
+                f"name id={int(id(self.desktopFileName))}")
 
     @staticmethod
     def current() ->Optional['Resource']:

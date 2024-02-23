@@ -45,12 +45,10 @@ class Clone:
             tmpdir = os.path.expanduser(os.path.join(cacheDir(), commitId))
             if not os.path.exists(tmpdir):
                 with subprocess.Popen(
-                    'git clone --shared --no-checkout -q .. {temp}'.format(
-                        temp=tmpdir).split()) as _:
+                    f'git clone --shared --no-checkout -q .. {tmpdir}'.split()) as _:
                     _.wait()
                 with subprocess.Popen(
-                    'git checkout -q {commitId}'.format(
-                        commitId=commitId).split(), cwd=tmpdir) as _:
+                    f'git checkout -q {commitId}'.split(), cwd=tmpdir) as _:
                     _.wait()
 
     def sourceDirectory(self) ->str:
@@ -60,7 +58,7 @@ class Clone:
             result = os.path.join(tmpdir, 'src')
         else:
             result = os.path.join(cacheDir(), self.commitId, 'src')
-        assert os.path.exists(result), '{} does not exist'.format(result)
+        assert os.path.exists(result), f'{result} does not exist'
         return result
 
     @classmethod
@@ -138,24 +136,22 @@ class Server(ReprMixin):
         job.server = self
         assert self.process is None, 'Server.start already has a process'
         self.jobs.append(job)
-        assert self.commitId == job.commitId, 'Server.commitId {} != Job.commitId {}'.format(
-            self.commitId, job.commitId)
+        assert self.commitId == job.commitId, f'Server.commitId {self.commitId} != Job.commitId {job.commitId}'
         cmd = [os.path.join(
             job.srcDir(),
             'kajonggserver.py')]
-        cmd.insert(0, 'python{}'.format(self.pythonVersion))
+        cmd.insert(0, f'python{self.pythonVersion}')
         if OPTIONS.usePort:
             self.portNumber = random.randrange(1025, 65000)
-            cmd.append('--port={port}'.format(port=self.portNumber))
+            cmd.append(f'--port={self.portNumber}')
         else:
             Server.count += 1
             self.socketName = os.path.expanduser(
                 os.path.join('~', '.kajongg',
-                             'sock{commit}.py{py}.{ctr}'.format(
-                                 commit=self.commitId, py=self.pythonVersion, ctr=Server.count)))
-            cmd.append('--socket={sock}'.format(sock=self.socketName))
+                             f'sock{self.commitId}.py{self.pythonVersion}.{Server.count}'))
+            cmd.append(f'--socket={self.socketName}')
         if OPTIONS.debug:
-            cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
+            cmd.append(f"--debug={','.join(OPTIONS.debug)}")
         if OPTIONS.log:
             self.process = subprocess.Popen(
                 cmd, cwd=job.srcDir(),
@@ -164,7 +160,7 @@ class Server(ReprMixin):
             # reuse this server (otherwise it stops by itself)
             cmd.append('--continue')
             self.process = subprocess.Popen(cmd, cwd=job.srcDir())  # pylint:disable=consider-using-with
-        print('{} started'.format(self))
+        print(f'{self} started')
 
     def stop(self, job:Optional['Job']=None) ->None:
         """maybe stop the server"""
@@ -181,7 +177,7 @@ class Server(ReprMixin):
                     self.process.wait()
                 except OSError:
                     pass
-                print('{} killed'.format(self))
+                print(f'{self} killed')
             if self.socketName:
                 removeIfExists(self.socketName)
 
@@ -191,16 +187,15 @@ class Server(ReprMixin):
         for server in cls.servers:
             for job in server.jobs[:]:
                 server.stop(job)
-            assert not server.jobs, 'stopAll expects no server jobs but found {}'.format(
-                server.jobs)
+            assert not server.jobs, f'stopAll expects no server jobs but found {server.jobs}'
             server.stop()
 
     def __str__(self) ->str:
-        return 'Server {} Python{}{} {}'.format(
+        return 'Server {} Python{}{} {}'.format( # pylint:disable=consider-using-f-string
             self.commitId,
             self.pythonVersion,
-            ' pid={}'.format(self.process.pid) if Debug.process and self.process else '',
-            ' port={}'.format(self.portNumber) if self.portNumber else ' socket={}'.format(self.socketName))
+            ' pid={}'.format(self.process.pid) if Debug.process and self.process else '', # pylint:disable=consider-using-f-string
+            ' port={}'.format(self.portNumber) if self.portNumber else ' socket={}'.format(self.socketName)) # pylint:disable=consider-using-f-string
 
 
 class Job(ReprMixin):
@@ -221,8 +216,8 @@ class Job(ReprMixin):
 
     def srcDir(self) ->str:
         """the path of the directory where the particular test is running"""
-        assert self.server, 'Job {} has no server'.format(self)
-        assert self.server.clone, 'Job {} has no server.clone'.format(self)
+        assert self.server, f'Job {self} has no server'
+        assert self.server.clone, f'Job {self} has no server.clone'
         return self.server.clone.sourceDirectory()
 
     def __startProcess(self, cmd:List[str]) ->None:
@@ -233,7 +228,7 @@ class Job(ReprMixin):
                 stdout=self.logFile, stderr=self.logFile)
         else:
             self.process = subprocess.Popen(cmd, cwd=self.srcDir())  # pylint:disable=consider-using-with
-        print('       %s started' % (self))
+        print(f'       {self} started')
 
     def start(self) ->None:
         """start this job"""
@@ -242,20 +237,18 @@ class Job(ReprMixin):
         # same time with the same player name
         player = self.server.jobs.index(self) + 1
         cmd = [os.path.join(self.srcDir(), 'kajongg.py'),
-               '--game={game}'.format(game=self.game),
-               '--player={tester} {player}'.format(
-                   player=player,
-                   tester='Tüster'),
-               '--ruleset={ap}'.format(ap=self.ruleset)]
+               f'--game={self.game}',
+               f'--player=Tüster {player}',
+               f'--ruleset={self.ruleset}']
         if self.server.socketName:
-            cmd.append('--socket={sock}'.format(sock=self.server.socketName))
+            cmd.append(f'--socket={self.server.socketName}')
         if self.server.portNumber:
-            cmd.append('--port={port}'.format(port=self.server.portNumber))
-        cmd.insert(0, 'python{}'.format(self.pythonVersion))
+            cmd.append(f'--port={self.server.portNumber}')
+        cmd.insert(0, f'python{self.pythonVersion}')
         if self.aiVariant != 'DefaultAI':
-            cmd.append('--ai={ai}'.format(ai=self.aiVariant))
+            cmd.append(f'--ai={self.aiVariant}')
         if OPTIONS.csv:
-            cmd.append('--csv={csv}'.format(csv=OPTIONS.csv))
+            cmd.append(f'--csv={OPTIONS.csv}')
         if OPTIONS.gui:
             cmd.append('--demo')
         else:
@@ -263,7 +256,7 @@ class Job(ReprMixin):
         if OPTIONS.playopen:
             cmd.append('--playopen')
         if OPTIONS.debug:
-            cmd.append('--debug={dbg}'.format(dbg=','.join(OPTIONS.debug)))
+            cmd.append(f"--debug={','.join(OPTIONS.debug)}")
         self.__startProcess(cmd)
         self.started = True
 
@@ -279,10 +272,10 @@ class Job(ReprMixin):
                 if result < 0:
                     result = signal.Signals(-result).name
                 if result:
-                    result = ' with return {}'.format(result)
+                    result = f' with return {result}'
                 else:
                     result = ''
-                print('       {} done{}'.format(self, result))
+                print(f'       {self} done{result}')
             self.server.jobs.remove(self)
 
     @property
@@ -308,14 +301,12 @@ class Job(ReprMixin):
         return self.ruleset
 
     def __str__(self) ->str:
-        pid = 'pid={}'.format(
-            self.process.pid) if self.process and Debug.process else ''
-        game = 'game={}'.format(self.game)
+        pid = f'pid={self.process.pid}' if self.process and Debug.process else ''
+        game = f'game={self.game}'
         ruleset = self.shortRulesetName()
-        aiName = 'AI={}'.format(
-            self.aiVariant) if self.aiVariant != 'DefaultAI' else ''
+        aiName = f'AI={self.aiVariant}' if self.aiVariant != 'DefaultAI' else ''
         return ' '.join([
-            self.commitId, 'Python{}'.format(self.pythonVersion), pid, game, ruleset, aiName]).replace('  ', ' ')
+            self.commitId, f'Python{self.pythonVersion}', pid, game, ruleset, aiName]).replace('  ', ' ')
 
 
 
@@ -377,8 +368,7 @@ class CSV(ReprMixin):
             for branch in subprocess.check_output(b'git branch'.split()).decode().split('\n'):
                 if 'detached' not in branch and 'no branch' not in branch:
                     cls.knownCommits |= set(subprocess.check_output(
-                        'git log --max-count=800 --pretty=%H {branch} --abbrev=10'.format(
-                            branch=branch[2:]).split()).decode().split('\n'))
+                        f'git log --max-count=800 --pretty=%H {branch[2:]} --abbrev=10'.split()).decode().split('\n'))
 
     @classmethod
     def onlyExistingCommits(cls, commits:Iterable[str]) ->Set[str]:
@@ -400,8 +390,7 @@ class CSV(ReprMixin):
         nonExisting = csvCommits - self.onlyExistingCommits(set(x.commit for x in self.rows))
         if nonExisting:
             print(
-                'removing rows from kajongg.csv for commits %s' %
-                ','.join(nonExisting))
+                f"removing rows from kajongg.csv for commits {','.join(nonExisting)}")
             self.rows = [x for x in self.rows if x.commit not in nonExisting]
             self.write()
 
@@ -428,7 +417,7 @@ class CSV(ReprMixin):
             found_difference |= len(self.compareRows(rows)) > 0
             self.compareRows(rows)
         if not found_difference:
-            print('found no differences in {}'.format(OPTIONS.csv))
+            print(f'found no differences in {OPTIONS.csv}')
 
     @staticmethod
     def compareRows(rows:List[CsvRow]) ->List[CsvRow]:
@@ -450,10 +439,9 @@ class CSV(ReprMixin):
         for difference in sorted(differences, key=lambda x: len(x[2])):
             if not set(difference[:2]) & set(result):
                 if msgHeader is None:
-                    msgHeader = 'looking at game={} ruleset={} AI={}'.format(
-                        game, ruleset, aiVariant)
+                    msgHeader = f'looking at game={game} ruleset={ruleset} AI={aiVariant}'
                     print(msgHeader)
-                print('   {} {}'.format(*difference[2]))
+                print('   {} {}'.format(*difference[2])) # pylint:disable=consider-using-f-string
                 result.extend(difference[:2])
         return result
 
@@ -480,8 +468,7 @@ def doJobs() ->None:
     if not OPTIONS.git and OPTIONS.csv:
         if gitHead() in ('current', None):
             print(
-                'Disabling CSV output: %s' %
-                ('You have uncommitted changes' if gitHead() == 'current' else 'No git'))
+                f"Disabling CSV output: {'You have uncommitted changes' if gitHead() == 'current' else 'No git'}")
             print()
             OPTIONS.csv = None
 
@@ -514,7 +501,7 @@ def doJobs() ->None:
                 else:
                     job.check()
                     if job.process:
-                        print('Waiting for   %s' % job)
+                        print(f'Waiting for   {job}')
                         job.process.wait()
             time.sleep(1)
 
@@ -606,8 +593,7 @@ def improve_options() ->None:
             if '^' not in OPTIONS.git:
                 OPTIONS.git = OPTIONS.git.replace('..', '^..')
             commits = subprocess.check_output(
-                'git log --grep _SILENT --invert-grep --pretty=%h {range} --abbrev=10'.format(
-                    range=OPTIONS.git).split()).decode()
+                f'git log --grep _SILENT --invert-grep --pretty=%h {OPTIONS.git} --abbrev=10'.split()).decode()
             _ = list(x.strip() for x in commits.split('\n') if x.strip())
             OPTIONS.git = list(reversed(_))
         else:
@@ -676,7 +662,7 @@ def main() ->None:
 
     locale_encoding = getpreferredencoding()
     if locale_encoding.lower() != 'utf-8':
-        print('we need default encoding utf-8 but have {}'.format(locale_encoding))
+        print(f'we need default encoding utf-8 but have {locale_encoding}')
         sys.exit(2)
 
     # we want only english in the logs because i18n and friends

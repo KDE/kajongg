@@ -77,7 +77,7 @@ class CsvRow(ReprMixin):
             try:
                 self.commitDates[self.commit] = datetime.datetime.fromtimestamp(
                     int(subprocess.check_output(
-                        'git show -s --format=%ct {}'.format(self.commit).split(), stderr=subprocess.DEVNULL)))
+                        f'git show -s --format=%ct {self.commit}'.split(), stderr=subprocess.DEVNULL)))
             except subprocess.CalledProcessError:
                 self.commitDates[self.commit] = datetime.datetime.fromtimestamp(0)
         return self.commitDates[self.commit]
@@ -171,7 +171,7 @@ class CsvRow(ReprMixin):
         """return a string representing this field for messages"""
         result = self.row[field]
         if field == self.fields.COMMIT:
-            result = '{}({})'.format(result, self.commitDate)
+            result = f'{result}({self.commitDate})'
         return result
 
     def differs_for(self, other:'CsvRow') ->Optional[Tuple[str, str]]:
@@ -182,10 +182,10 @@ class CsvRow(ReprMixin):
             same = []
             for cause in (self.fields.COMMIT, self.fields.PY_VERSION):
                 if self.row[cause] != other.row[cause]:
-                    _ = '{} {} != {}'.format(cause.name, self.data(cause), other.data(cause))
+                    _ = f'{cause.name} {self.data(cause)} != {other.data(cause)}'
                     differing.append(_)
                 else:
-                    _ = '{} {}'.format(cause.name, self.data(cause))
+                    _ = f'{cause.name} {self.data(cause)}'
                     same.append(_)
             return ', '.join(differing), ', '.join(same)
         return None
@@ -205,5 +205,5 @@ class CsvRow(ReprMixin):
             self.row[idx] = field
 
     def __str__(self) ->str:
-        return 'Game {} {} AI={} commit={}({}) py={} {}'.format(
-            self.game, self.ruleset, self.aiVariant, self.commit, self.commitDate, self.py_version, self.tags)
+        return (f'Game {self.game} {self.ruleset} AI={self.aiVariant} '
+                f'commit={self.commit}({self.commitDate}) py={self.py_version} {self.tags}')

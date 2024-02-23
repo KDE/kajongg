@@ -79,7 +79,7 @@ class VisiblePlayer(Player):
     def showInfo(self) ->None:
         """show player info on the wall"""
         side = self.front
-        self.sideText.text = '{} - {}'.format(self.localName, self.explainHand().total())  # type:ignore[attr-defined]
+        self.sideText.text = f'{self.localName} - {self.explainHand().total()}'  # type:ignore[attr-defined]
         self.colorizeName()
         _ = Wind.all4[self.wind].disc
         assert _
@@ -151,7 +151,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         if msg != Message.NoClaim:
             self.speak(msg.name.lower())
             yellow = self.front.message
-            yellow.setText('{}  {}'.format(yellow.msg, i18nc('kajongg', msg.name)))
+            yellow.setText(f"{yellow.msg}  {i18nc('kajongg', msg.name)}")
             yellow.setVisible(True)
 
     def hidePopup(self) ->None:
@@ -200,8 +200,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
             if discardedTile.tile is not withDiscard:
                 assert self.game
                 self.game.debug(
-                    '%s is not %s' %
-                    (discardedTile.tile, withDiscard))
+                    f'{discardedTile.tile} is not {withDiscard}')
                 assert False
             self.syncHandBoard([discardedTile])
         else:

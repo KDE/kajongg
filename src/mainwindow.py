@@ -52,13 +52,13 @@ try:
     from qt import Qt, QEvent, QMetaObject, QTimer
     from qt import QWidget, QGridLayout, QAction
 except ImportError as importError:
-    NOTFOUND.append('Please install PyQt5: %s' % importError)
+    NOTFOUND.append(f'Please install PyQt5: {importError}')
 
 try:
     from twisted.spread import pb # pylint: disable=unused-import
     from twisted.internet.error import ReactorNotRunning
 except ImportError as importError:
-    NOTFOUND.append('Package python3-twisted is missing or too old (I need 16.6.0): %s' % importError)
+    NOTFOUND.append(f'Package python3-twisted is missing or too old (I need 16.6.0): {importError}')
 
 
 try:
@@ -82,11 +82,10 @@ try:
     from kdestub import Action, KApplication
 
 except ImportError as importError:
-    NOTFOUND.append('Kajongg is not correctly installed: modules: %s' %
-                    importError)
+    NOTFOUND.append(f'Kajongg is not correctly installed: modules: {importError}')
 
 if NOTFOUND:
-    logError("\n".join(" * %s" % s for s in NOTFOUND), showStack=False)
+    logError("\n".join(f" * {s}" for s in NOTFOUND), showStack=False)
     sys.exit(3)
 
 if TYPE_CHECKING:
@@ -409,7 +408,7 @@ class MainWindow(KXmlGuiWindow):
         def cancelled(result:Any) ->None:
             """just do nothing"""
             if Debug.quit:
-                logDebug('mainWindow.queryClose.cancelled: {}'.format(result))
+                logDebug(f'mainWindow.queryClose.cancelled: {result}')
             self.exitConfirmed = None
         if self.exitConfirmed is False:
             # user is currently being asked
@@ -451,8 +450,7 @@ class MainWindow(KXmlGuiWindow):
                 self.exitWaitTime += 10
                 if self.exitWaitTime % 1000 == 0:
                     logDebug(
-                        'waiting since %d seconds for reactor to stop' %
-                        (self.exitWaitTime // 1000))
+                        f'waiting since {int(self.exitWaitTime // 1000)} seconds for reactor to stop')
                 try:
                     quitDebug('now stopping reactor')
                     Internal.reactor.stop()  # type:ignore[misc]
@@ -478,8 +476,7 @@ class MainWindow(KXmlGuiWindow):
             if mainWindow.exitWaitTime is not None:
                 if mainWindow.exitWaitTime > 1000.0 or Debug.quit:
                     logDebug(
-                        'reactor stopped after %d ms' %
-                        (mainWindow.exitWaitTime))
+                        f'reactor stopped after {int(mainWindow.exitWaitTime)} ms')
         else:
             if Debug.quit:
                 logDebug('aboutToQuit: mainWindow is already None')

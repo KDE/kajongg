@@ -60,7 +60,7 @@ class Move(ReprMixin):  # pylint: disable=too-many-instance-attributes
         self.tableid:int
         self.gameid:int
         for key, value in kwargs.items():
-            assert not isinstance(value, bytes), 'value is bytes:{}'.format(repr(value))
+            assert not isinstance(value, bytes), f'value is bytes:{repr(value)}'
             if value is None:
                 self.__setattr__(key, None)
             else:
@@ -95,4 +95,4 @@ class Move(ReprMixin):  # pylint: disable=too-many-instance-attributes
         return self._player() if self._player else None
 
     def __str__(self) ->str:
-        return '{!r} {!r} {!r}'.format(self.player, self.message, self.kwargs)
+        return f'{self.player!r} {self.message!r} {self.kwargs!r}'

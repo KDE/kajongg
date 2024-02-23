@@ -99,8 +99,8 @@ class SelectPlayers(SelectRuleset):
                         if playerIdx >= 0:
                             cbName.setCurrentIndex(playerIdx)
                     except KeyError:
-                        logError('database is inconsistent: player with id %d is in game but not in player'
-                                 % playerId)
+                        logError(f'database is inconsistent: player with id {int(playerId)} '
+                                 f'is in game but not in player')
         self.slotValidate()
 
     def showEvent(self, unusedEvent:'QEvent') ->None:
@@ -169,7 +169,7 @@ class ScoringHandBoard(HandBoard):
         result = MeldList()
         uimeld = self.uiMeldWithTile(tile)
         if not uimeld:
-            logWarning('ScoringHandBoard.meldVariants: no meld found for %s' % tile)
+            logWarning(f'ScoringHandBoard.meldVariants: no meld found for {tile}')
             return result
         meld = uimeld.meld
         result.append(meld.concealed if forLowerHalf else meld.exposed)
@@ -192,7 +192,7 @@ class ScoringHandBoard(HandBoard):
         for myMeld in self.uiMelds:
             if uiTile in myMeld:
                 return myMeld
-        logWarning('ScoringBoard: found no meld with %s' % uiTile)
+        logWarning(f'ScoringBoard: found no meld with {uiTile}')
         return UIMeld(uiTile)
 
     def findUIMeld(self, meld:Optional['Meld']) ->UIMeld:
@@ -200,7 +200,7 @@ class ScoringHandBoard(HandBoard):
         for result in self.uiMelds:
             if result.meld == meld:
                 return result
-        logWarning('Scoring game: cannot find UIMeld for {}'.format(meld))
+        logWarning(f'Scoring game: cannot find UIMeld for {meld}')
         if self.uiMelds:
             return self.uiMelds[1]
         raise ValueError('Scoring Game: findUIMeld() in absence of any uiMelds')
@@ -294,7 +294,7 @@ class ScoringHandBoard(HandBoard):
             return 1
         meld = self.uiMeldWithTile(focus)
         if not meld:
-            logWarning('ScoringBoard.focusRectWidth: there is no meld with focus tile %s' % focus)
+            logWarning(f'ScoringBoard.focusRectWidth: there is no meld with focus tile {focus}')
             return 1
         return len(meld)
 
@@ -454,7 +454,7 @@ class ScoringPlayer(VisiblePlayer, Player):
             # this happens if we remove the meld with lastTile from the hand
             # again
             return ''
-        return 'L%s%s' % (self.lastTile, self.lastMeld)
+        return f'L{self.lastTile}{self.lastMeld}'
 
     def computeHand(self) ->Hand:
         """return a Hand object, using a cache"""
@@ -481,15 +481,15 @@ class ScoringPlayer(VisiblePlayer, Player):
         if meld.isBonus:
             self._bonusTiles.append(meld[0])
             if Debug.scoring:
-                logDebug('{} gets bonus tile {}'.format(self, meld[0]))
+                logDebug(f'{self} gets bonus tile {meld[0]}')
         elif meld.isConcealed and not meld.isKong:
             self._concealedMelds.append(meld)
             if Debug.scoring:
-                logDebug('{} gets concealed meld {}'.format(self, meld))
+                logDebug(f'{self} gets concealed meld {meld}')
         else:
             self._exposedMelds.append(meld)
             if Debug.scoring:
-                logDebug('{} gets exposed meld {}'.format(self, meld))
+                logDebug(f'{self} gets exposed meld {meld}')
         self._hand = None
 
     def removeMeld(self, uiMeld:UIMeld) ->None:
@@ -498,7 +498,7 @@ class ScoringPlayer(VisiblePlayer, Player):
         if meld.isBonus:
             self._bonusTiles.remove(meld[0])
             if Debug.scoring:
-                logDebug('{} loses bonus tile {}'.format(self, meld[0]))
+                logDebug(f'{self} loses bonus tile {meld[0]}')
         else:
             popped = None
             for melds in [self._concealedMelds, self._exposedMelds]:
@@ -508,13 +508,12 @@ class ScoringPlayer(VisiblePlayer, Player):
                         break
             if not popped:
                 logDebug(
-                    '%s: %s.removeMeld did not find %s' %
-                    (self.name, self.__class__.__name__, meld), showStack=True)
-                logDebug('    concealed: %s' % self._concealedMelds)
-                logDebug('      exposed: %s' % self._exposedMelds)
+                    f'{self.name}: {self.__class__.__name__}.removeMeld did not find {meld}', showStack=True)
+                logDebug(f'    concealed: {self._concealedMelds}')
+                logDebug(f'      exposed: {self._exposedMelds}')
             else:
                 if Debug.scoring:
-                    logDebug('{} lost meld {}'.format(self, popped))
+                    logDebug(f'{self} lost meld {popped}')
         self._hand = None
 
 
@@ -627,11 +626,9 @@ class ScoringGame(Game):
         Query("INSERT INTO SCORE "
               "(game,penalty,hand,data,manualrules,player,scoretime,"
               "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
-              "VALUES(%d,1,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" %
-              (self.gameid, self.handctr, player.nameid,
-               scoretime, int(player == self.winner),
-               self.roundWind, player.wind, 0,
-               amount, player.balance, self.rotated, self.notRotated),
+              f"VALUES({int(self.gameid)},1,{int(self.handctr)},?,?,{player.nameid},'{scoretime}',"
+              f"{int(player == self.winner)},'{self.roundWind}','{player.wind}',0,{amount},"
+              f"{player.balance},{int(self.rotated)}, {int(self.notRotated)})",
               (player.hand.string, offense.name))
         assert Internal.mainWindow
         Internal.mainWindow.updateGUI()

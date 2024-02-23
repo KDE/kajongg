@@ -179,7 +179,7 @@ class Games(QDialog):
     def setQuery(self) ->None:
         """define the query depending on self.OnlyPending"""
         query = Query(
-            "select g.id, g.starttime, "
+            "select g.id, g.starttime, " # pylint:disable=consider-using-f-string
             "p0.name||'///'||p1.name||'///'||p2.name||'///'||p3.name "
             "from game g, player p0,"
             "player p1, player p2, player p3 "

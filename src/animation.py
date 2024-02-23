@@ -36,7 +36,7 @@ class Animation(QPropertyAnimation, ReprMixin):
     def __init__(self, graphicsObject:'AnimatedMixin', propName:str,
         endValue:PropertyType, parent:Optional['QObject']=None) ->None:
         self.debug = graphicsObject.debug_name() in Debug.animation or Debug.animation == 'all'
-        self.debug |= 'T{}t'.format(id4(graphicsObject)) in Debug.animation
+        self.debug |= f'T{id4(graphicsObject)}t' in Debug.animation
         Animation.clsUid += 1
         self.uid = Animation.clsUid
         assert isinstance(graphicsObject, QObject)
@@ -53,10 +53,9 @@ class Animation(QPropertyAnimation, ReprMixin):
             if isAlive(oldAnimation):
                 assert isinstance(oldAnimation, Animation)
                 logDebug(
-                    'new Animation(%s) (after %s is done)' %
-                    (self, oldAnimation.ident()))
+                    f'new Animation({self}) (after {oldAnimation.ident()} is done)')
             else:
-                logDebug('Animation(%s)' % self)
+                logDebug(f'Animation({self})')
 
     def setEndValue(self, endValue:PropertyType) ->None:
         """wrapper with debugging code"""
@@ -67,18 +66,16 @@ class Animation(QPropertyAnimation, ReprMixin):
             return
         if cast('AnimatedMixin', graphicsObject).debug_name() in Debug.animation or Debug.animation == 'all':
             logDebug(
-                '%s: change endValue for %s: %s->%s  %s' % (
-                    self.ident(), self.pName(),
-                    self.formatValue(self.endValue()),
-                    self.formatValue(endValue), graphicsObject))
+                f'{self.ident()}: change endValue for {self.pName()}: '
+                f'{self.formatValue(self.endValue())}->{self.formatValue(endValue)}  {graphicsObject}')
         QPropertyAnimation.setEndValue(self, endValue)
 
     def ident(self) ->str:
         """the identifier to be used in debug messages"""
         pGroup = self.group() if isAlive(self) else 'notAlive'
         if pGroup or not isAlive(self):
-            return '%s/A_%s' % (pGroup, id4(self))
-        return 'A_%s-%s' % (id4(self), cast('AnimatedMixin', self.targetObject()).debug_name())
+            return f'{pGroup}/A_{id4(self)}'
+        return f"A_{id4(self)}-{cast('AnimatedMixin', self.targetObject()).debug_name()}"
 
     def pName(self) ->str:
         """
@@ -95,12 +92,12 @@ class Animation(QPropertyAnimation, ReprMixin):
         pName = self.pName()
         if pName == 'pos':
             assert isinstance(value, QPointF)
-            return '%.0f/%.0f' % (value.x(), value.y())
+            return f'{value.x():.0f}/{value.y():.0f}'
         if pName == 'rotation':
-            return '%d' % value
+            return f'{int(value)}'
         if pName == 'scale':
-            return '%.2f' % value
-        return 'formatValue: unexpected {}={}'.format(pName, value)
+            return f'{value:.2f}'
+        return f'formatValue: unexpected {pName}={value}'
 
     def __str__(self) ->str:
         """for debug messages"""
@@ -112,12 +109,8 @@ class Animation(QPropertyAnimation, ReprMixin):
             currentValue = 'notAlive'
             endValue = 'notAlive'
             targetObject = 'notAlive'
-        return '%s %s: %s->%s for %s duration=%dms' % (
-            self.ident(), self.pName(),
-            self.formatValue(currentValue),
-            self.formatValue(endValue),
-            targetObject,
-            self.duration())
+        return (f'{self.ident()} {self.pName()}: {self.formatValue(currentValue)}->'
+                f'{self.formatValue(endValue)} for {targetObject} duration={int(self.duration())}ms')
 
     @staticmethod
     def removeImmediateAnimations() ->None:
@@ -168,12 +161,11 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         self.deferred.addErrback(logException)
         self.steps = 0
         self.debug = any(x.debug for x in self.animations)
-        self.debug |= 'G{}g'.format(id4(self)) in Debug.animation
+        self.debug |= f'G{id4(self)}g' in Debug.animation
         self.doAfter:List[Deferred] = []
         if ParallelAnimationGroup.current:
             if self.debug or ParallelAnimationGroup.current.debug:
-                logDebug('Chaining Animation group G_%s to G%s' %
-                         (id4(self), ParallelAnimationGroup.current))
+                logDebug(f'Chaining Animation group G_{id4(self)} to G{ParallelAnimationGroup.current}')
             self.doAfter = ParallelAnimationGroup.current.doAfter
             ParallelAnimationGroup.current.doAfter = []
             ParallelAnimationGroup.current.deferred.addCallback(self.start).addErrback(logException)
@@ -195,8 +187,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
     def showState(self, newState:int, oldState:int) ->None:
         """override Qt method"""
         if self.debug:
-            logDebug('G{}: {} -> {} isAlive:{}'.format(
-                self.uid, self.stateName(oldState), self.stateName(newState), isAlive(self)))
+            logDebug(f'G{self.uid}: {self.stateName(oldState)} -> {self.stateName(newState)} isAlive:{isAlive(self)}')
 
     def updateCurrentTime(self, value:int) ->None:
         """count how many steps an animation does."""
@@ -245,9 +236,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             QAbstractAnimation.DeletionPolicy.DeleteWhenStopped)
         if self.debug:
             assert Internal.Preferences
-            logDebug('%s started with speed %d (%s)' % (
-                self, int(Internal.Preferences.animationSpeed),
-                ','.join('A_%s' % id4(x) for x in self.animations)))
+            _ = ','.join(f'A_{id4(x)}' for x in self.animations)
+            logDebug(f'{self} started with speed {int(Internal.Preferences.animationSpeed)} ({_})')
         return succeed(None).addErrback(logException)
 
     def allFinished(self) ->None:
@@ -259,12 +249,11 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         if Debug.animationSpeed and self.duration():
             perSecond = self.steps * 1000.0 / self.duration()
             if perSecond < 50:
-                logDebug('%d steps for %d animations, %.1f/sec' %
-                         (self.steps, len(self.children()), perSecond))
+                logDebug(f'{int(self.steps)} steps for {len(self.children())} animations, {perSecond:.1f}/sec')
         # if we have a deferred, callback now
         assert self.deferred
         if self.debug:
-            logDebug('Done: {}'.format(self))
+            logDebug(f'Done: {self}')
         if self.deferred:
             self.deferred.callback(None)
         for after in self.doAfter:
@@ -289,11 +278,11 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             return 'stopped'
         if state == QAbstractAnimation.State.Running:
             return 'running'
-        return 'unknown state:{}'.format(state)
+        return f'unknown state:{state}'
 
     def __str__(self) ->str:
         """for debugging"""
-        return 'G{}({}:{})'.format(self.uid, len(self.animations), self.stateName())
+        return f'G{self.uid}({len(self.animations)}:{self.stateName()})'
 
 
 class AnimatedMixin:
@@ -353,7 +342,7 @@ class AnimatedMixin:
     def shortcutAnimation(self, animation:'Animation') ->None:
         """directly set the end value of the animation"""
         if animation.debug:
-            logDebug('shortcut {}: UTile {}: clear queuedAnimations'.format(animation, self.debug_name()))
+            logDebug(f'shortcut {animation}: UTile {self.debug_name()}: clear queuedAnimations')
         setattr(self, animation.pName(), animation.endValue())
         self.queuedAnimations = []
         self.setDrawingOrder()  # type:ignore[attr-defined] # TODO: mypy protocol?
@@ -372,10 +361,10 @@ class AnimatedMixin:
             if not isAlive(oldAnimation):
                 oldAnimation = None
             if oldAnimation:
-                logDebug('**** setActiveAnimation {} {}: {} OVERRIDES {}'.format(
-                    self.debug_name(), propName, animation, oldAnimation))
+                logDebug(f'**** setActiveAnimation {self.debug_name()} {propName}: '
+                         f'{animation} OVERRIDES {oldAnimation}')
             else:
-                logDebug('setActiveAnimation {} {}: set {}'.format(self.debug_name(), propName, animation))
+                logDebug(f'setActiveAnimation {self.debug_name()} {propName}: set {animation}')
         self.activeAnimation[propName] = animation
         self.setCacheMode(QGraphicsItem.CacheMode.ItemCoordinateCache)  # type: ignore[attr-defined]
 
@@ -384,7 +373,7 @@ class AnimatedMixin:
         Finalize graphics object in its new position"""
         del self.activeAnimation[animation.pName()]
         if self.debug_name() in Debug.animation:
-            logDebug('UITile {}: clear activeAnimation_{}'.format(self.debug_name(), animation.pName()))
+            logDebug(f'UITile {self.debug_name()}: clear activeAnimation_{animation.pName()}')
         self.setDrawingOrder()  # type:ignore[attr-defined] # TODO: mypy protocol?
         if not self.activeAnimation:
             self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)  # type: ignore[attr-defined]
@@ -404,8 +393,8 @@ class AnimatedMixin:
                 if curValue != newValue:
                     # change a queued animation
                     if self.debug_name() in Debug.animation:
-                        logDebug('setEndValue for {}: {}: {}->{}'.format(
-                            animation, pName, animation.formatValue(curValue), animation.formatValue(newValue)))
+                        logDebug(f'setEndValue for {animation}: {pName}: '
+                                 f'{animation.formatValue(curValue)}->{animation.formatValue(newValue)}')
                     animation.setEndValue(newValue)
             else:
                 animation = self.activeAnimation.get(pName, None)
@@ -433,7 +422,7 @@ class AnimationSpeed:
             if Internal.Preferences.animationSpeed != speed:
                 Internal.Preferences.animationSpeed = speed
                 if Debug.animationSpeed:
-                    logDebug('AnimationSpeed sets speed %d' % speed)
+                    logDebug(f'AnimationSpeed sets speed {int(speed)}')
 
     def __enter__(self) ->'AnimationSpeed':
         return self
@@ -445,8 +434,8 @@ class AnimationSpeed:
                 animate()
             if Internal.Preferences.animationSpeed != self.prevAnimationSpeed:
                 if Debug.animationSpeed:
-                    logDebug('AnimationSpeed restores speed {} to {}'.format(
-                        Internal.Preferences.animationSpeed, self.prevAnimationSpeed))
+                    logDebug(f'AnimationSpeed restores speed '
+                             f'{Internal.Preferences.animationSpeed} to {self.prevAnimationSpeed}')
                 Internal.Preferences.animationSpeed = self.prevAnimationSpeed
 
 
@@ -460,8 +449,7 @@ def afterQueuedAnimations(doAfter:Deferred) ->Callable:
         args = args[1:]
         varnames = doAfter.__code__.co_varnames  # type:ignore[attr-defined]
         assert varnames[1] in ('deferredResult', 'unusedDeferredResult'), \
-            '{} passed {} instead of deferredResult'.format(
-                doAfter.__qualname__, varnames[1])  # type:ignore[attr-defined]
+            f'{doAfter.__qualname__} passed {varnames[1]} instead of deferredResult'  # type:ignore[attr-defined]
         animateAndDo(method, *args, **kwargs)
 
     return doAfterQueuedAnimations

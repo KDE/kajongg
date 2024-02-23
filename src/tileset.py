@@ -42,8 +42,7 @@ class Tileset(Resource):
         self.graphicsPath = Tileset.locate(graphName)
         if not self.graphicsPath:
             logException(
-                'cannot find kmahjongglib/tilesets/%s for %s' %
-                (graphName, self.desktopFileName))
+                f'cannot find kmahjongglib/tilesets/{graphName} for {self.desktopFileName}')
         self.renderer = QSvgRenderer(self.graphicsPath)
         if not self.renderer.isValid():
             logException(
@@ -70,16 +69,15 @@ class Tileset(Resource):
             'wn': North.svgName, 'ws': South.svgName, 'we': East.svgName, 'ww': West.svgName,
             'db': 'DRAGON_1', 'dg': 'DRAGON_2', 'dr': 'DRAGON_3'}
         for value in '123456789':
-            self.svgName['s%s' % value] = 'ROD_%s' % value
-            self.svgName['b%s' % value] = 'BAMBOO_%s' % value
-            self.svgName['c%s' % value] = 'CHARACTER_%s' % value
+            self.svgName[f's{value}'] = f'ROD_{value}'
+            self.svgName[f'b{value}'] = f'BAMBOO_{value}'
+            self.svgName[f'c{value}'] = f'CHARACTER_{value}'
         for idx, wind in enumerate('eswn'):
-            self.svgName['f%s' % wind] = 'FLOWER_%d' % (idx + 1)
-            self.svgName['y%s' % wind] = 'SEASON_%d' % (idx + 1)
+            self.svgName[f'f{wind}'] = f'FLOWER_{int(idx + 1)}'
+            self.svgName[f'y{wind}'] = f'SEASON_{int(idx + 1)}'
 
     def __str__(self) ->str:
-        return "tileset id=%d name=%s, name id=%d" % \
-            (id(self), self.desktopFileName, id(self.desktopFileName))
+        return f"tileset id={int(id(self))} name={self.desktopFileName}, name id={int(id(self.desktopFileName))}"
 
     @staticmethod
     def current() ->'Tileset':

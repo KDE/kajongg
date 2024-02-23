@@ -104,8 +104,8 @@ class KApplication(QApplication):
         self.installTranslator(_)
         for language in reversed(list(MLocale.extendRegionLanguages(MLocale.currentLanguages()))):
             self.installTranslatorFile(os.path.join(
-                QLibraryInfo.location(QLibraryInfo.TranslationsPath), 'qtbase_{}.qm'.format(language)))
-            self.installTranslatorFile('/usr/share/locale/{}/LC_MESSAGES/kwidgetsaddons5_qt.qm'.format(language))
+                QLibraryInfo.location(QLibraryInfo.TranslationsPath), f'qtbase_{language}.qm'))
+            self.installTranslatorFile(f'/usr/share/locale/{language}/LC_MESSAGES/kwidgetsaddons5_qt.qm')
 
     @classmethod
     def desktopSize(cls) -> QSize:
@@ -126,7 +126,7 @@ class CaptionMixin:
         """append app name"""
         if caption:
             if not caption.endswith(i18n('Kajongg')):
-                caption += ' – {}'.format(i18n('Kajongg'))
+                caption += f" – {i18n('Kajongg')}"
         else:
             caption = i18n('Kajongg')
         self.setWindowTitle(caption)  # type:ignore
@@ -139,7 +139,7 @@ class Help:
     @staticmethod
     def url_for_language(lang:str) ->str:
         """The url for a given language"""
-        return 'https://docs.kde.org/stable/{}/kajongg/kajongg/index.html'.format(lang)
+        return f'https://docs.kde.org/stable/{lang}/kajongg/kajongg/index.html'
 
     @staticmethod
     def find_help_url() ->str:
@@ -581,7 +581,7 @@ class KConfigGroup:
             languages = Internal.kajonggrc.group('Locale').readEntry('Language').split(':')
             languages = [x.split('_')[0] for x in languages]
             for language in languages:
-                key = '%s[%s]' % (name, language)
+                key = f'{name}[{language}]'
                 if key in i18nItems:
                     return i18nItems[key]
         if name in items:
@@ -597,16 +597,16 @@ class KConfigGroup:
         """calls readEntry and returns it as an int or raises an Exception."""
         result = self.readEntry(name)
         if result is None:
-            raise ValueError('{}: cannot find {}'.format(self, name))
+            raise ValueError(f'{self}: cannot find {name}')
         try:
             return int(result)
         except ValueError as _:
-            raise ValueError('{}: cannot parse {}'.format(self, name)) from _
+            raise ValueError(f'{self}: cannot parse {name}') from _
 
     def __str__(self) ->str:
         config = self.config()
         path = config.path if config else 'NO_PATH'
-        return '{}:[{}]'.format(path, self.groupName)
+        return f'{path}:[{self.groupName}]'
 
 
 class KGlobal:
@@ -827,7 +827,7 @@ class KConfigSkeleton(QObject):
         elif isinstance(value, str):
             cls = ItemString
         else:
-            raise TypeError('addiItem accepts only bool, int, str but not {}/{}'.format(type(value), value))
+            raise TypeError(f'addiItem accepts only bool, int, str but not {type(value)}/{value}')
         result = cls(self, key, value, default)
         result.getFromConfig()
         self.items.append(result)
@@ -1052,12 +1052,11 @@ class AboutKajonggDialog(KDialog):
         try:
             versions = popenReadlines('kf5-config -v')
             versionsDict = dict(x.split(': ') for x in versions if ':' in x)
-            underVersions.append('KDE Frameworks %s' % versionsDict['KDE Frameworks'])
+            underVersions.append(f"KDE Frameworks {versionsDict['KDE Frameworks']}")
         except OSError:
             underVersions.append(i18n('KDE Frameworks (not installed or not usable)'))
-        underVersions.append('Twisted %s' % __version__)
-        underVersions.append(
-            'Python {}.{}.{} {}'.format(*sys.version_info[:5]))
+        underVersions.append(f'Twisted {__version__}')
+        underVersions.append('Python {}.{}.{} {}'.format(*sys.version_info[:5]))  # pylint:disable=consider-using-f-string
         h1vLayout.addWidget(
             QLabel(
                 i18nc('kajongg',
@@ -1086,12 +1085,10 @@ class AboutKajonggDialog(KDialog):
                      "If you are looking for Mah Jongg solitaire please "
                      "use the application kmahjongg."),
                 "(C) 2008-2017 Wolfgang Rohdewald",
-                '<a href="{link}">{link}</a>'.format(
-                    link='https://apps.kde.org/kajongg')]))
+                '<a href="https://apps.kde.org/kajongg">https://apps.kde.org/kajongg</a>']))
         licenseLabel = QLabel()
         licenseLabel.setText(
-            '<a href="file://{link}">GNU General Public License Version 2</a>'.format(
-                link=self.licenseFile()))
+            f'<a href="file://{self.licenseFile()}">GNU General Public License Version 2</a>')
         licenseLabel.linkActivated.connect(self.showLicense)
         aboutLayout.addWidget(aboutLabel)
         aboutLayout.addWidget(licenseLabel)
@@ -1110,8 +1107,7 @@ class AboutKajonggDialog(KDialog):
         authorLayout.addWidget(titleLabel)
 
         for name, description, mail in authors:
-            label = QLabel('{name} <a href="mailto:{mail}">{mail}</a>: {description}'.format(
-                name=name, mail=mail, description=description))
+            label = QLabel(f'{name} <a href="mailto:{mail}">{mail}</a>: {description}')
             label.setOpenExternalLinks(True)
             authorLayout.addWidget(label)
         spacerItem = QSpacerItem(
@@ -1133,7 +1129,7 @@ class AboutKajonggDialog(KDialog):
         """which may currently only be 1: GPL_V2"""
         prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
         for path in ('COPYING', '../COPYING',
-                     '%s/share/kf5/licenses/GPL_V2' % prefix):
+                     f'{prefix}/share/kf5/licenses/GPL_V2'):
             path = os.path.abspath(path)
             if os.path.exists(path):
                 return path
@@ -1252,7 +1248,7 @@ class KConfigDialog(KDialog):
         starts with kcfg_"""
         result:List[QObject] = []
         for child in widget.children():
-            assert isinstance(child, QObject), 'child is:{}'.format(type(child))
+            assert isinstance(child, QObject), f'child is:{type(child)}'
             if child.objectName().startswith('kcfg_'):
                 result.append(child)
             else:

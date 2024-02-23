@@ -127,11 +127,8 @@ class SetupPreferences(KConfigSkeleton):
         newValue = getattr(self, name)
         if self.__oldValues[name] != newValue:
             if Debug.preferences:
-                logDebug('{}: {} -> {} calling {}'.format(
-                    name,
-                    self.__oldValues[name],
-                    newValue,
-                    ','.join(x.__name__ for x in self.__watching[name])))
+                logDebug(f"{name}: {self.__oldValues[name]} -> "
+                         f"{newValue} calling {','.join(x.__name__ for x in self.__watching[name])}")
             for method in self.__watching[name]:
                 method(self.__oldValues[name], newValue)
         self.__oldValues[name] = newValue
@@ -148,8 +145,7 @@ class SetupPreferences(KConfigSkeleton):
         if method not in self.__watching[name]:
             self.__watching[name].append(method)
             if Debug.preferences:
-                logDebug('addWatch on {}, hook {}'.format(
-                    name, method.__name__))
+                logDebug(f'addWatch on {name}, hook {method.__name__}')
             self.callTrigger(name)  # initial change
 
     def __getattr__(self, name:str) ->Union[int, str, bool]:

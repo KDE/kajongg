@@ -74,8 +74,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         _ = self.board
         assert _
         if self is not _.focusTile:
-            logDebug('keyPressEvent %s on %s_%s but focus is on %s_%s' % \
-                (event, self, id4(self), _.focusTile, id4(_.focusTile)))
+            logDebug(f'keyPressEvent {event} on {self}_{id4(self)} but focus is on {_.focusTile}_{id4(_.focusTile)}')
         _.keyPressEvent(event)
 
     def __lightDistance(self) ->float:
@@ -195,7 +194,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         _ = self.board
         assert _
         lightSourceIndex = LIGHTSOURCES.index(_.rotatedLightSource())
-        return "TILE_{}".format(lightSourceIndex % 4 + 1)
+        return f"TILE_{lightSourceIndex % 4 + 1}"
 
     def paint(self, painter:QPainter, unusedOption:'QStyleOptionGraphicsItem',
         unusedWidget:Optional['QWidget']=None) ->None:
@@ -252,8 +251,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         painter = QPainter(result)
         if not painter.isActive():
             logException(
-                'painter is not active. Wanted size: %s' %
-                str(pmapSize))
+                f'painter is not active. Wanted size: {str(pmapSize)}')
         try:
             xScale = float(pmapSize.width()) / originalSize.width()
             yScale = float(pmapSize.height()) / originalSize.height()
@@ -376,7 +374,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
         """redirect and generate Debug output"""
         if self.tile.name2() in Debug.focusable:
             newStr = 'focusable' if value else 'unfocusable'
-            logDebug('%s: %s from %s' % (newStr, self.tile.name2(), stack('')[-2]))
+            logDebug(f"{newStr}: {self.tile.name2()} from {stack('')[-2]}")
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, value)
 
     @property
@@ -413,22 +411,18 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
     def __str__(self) ->str:
         """printable string with tile"""
         if not Debug.graphics:
-            return '%s_%s(%s on %s x/y %.1f/%d)' % (
-                 self.__class__.__name__, id4(self),
-                 self.tile.name2(),
-                 self.board.debug_name() if self.board else 'None',
-                 self.xoffset, self.yoffset)
-        rotation = ' rot%d' % self.rotation if self.rotation else ''
-        scale = ' scale=%.2f' % self.scale if self.scale != 1 else ''
-        level = ' level=%d' % self.level if self.level else ''
+            return (f"{self.__class__.__name__}_{id4(self)}({self.tile.name2()} on "
+                    f"{self.board.debug_name() if self.board else 'None'} "
+                    f"x/y {self.xoffset:.1f}/{int(self.yoffset)})")
+        rotation = f' rot{int(self.rotation)}' if self.rotation else ''
+        scale = f' scale={self.scale:.2f}' if self.scale != 1 else ''
+        level = f' level={int(self.level)}' if self.level else ''
         _ = self.boundingRect()
-        size = ' %.2dx%.2d' % (_.width(), _.height())
-        return '%s_%s(%s on %s x/y/z %.1f(%.1f)/%d(%.1f)/%d %s%s%s%s' % ( \
-             self.__class__.__name__, id4(self),
-             self.tile.name2(),
-             self.board.debug_name() if self.board else 'None',
-             self.xoffset, self.x(), self.yoffset, self.y(),
-             self.zValue(), size, rotation, scale, level)
+        size = f' {int(_.width()):02}x{int(_.height()):02}'
+        return (f"{self.__class__.__name__}_{id4(self)}({self.tile.name2()}"
+                f" on {self.board.debug_name() if self.board else 'None'} "
+                f" x/y/z {self.xoffset:.1f}/{self.x():.1f}/{self.yoffset:.1f} "
+                f"{self.zValue():.1f}/{size}){rotation}{scale}{level}")
 
     @property
     def isBonus(self) ->bool:
@@ -498,8 +492,5 @@ class UIMeld(list, ReprMixin):
     def __str__(self) ->str:
         """shorter than str() of the list"""
         first_tile = self[0]
-        return 'UIMeld_%s(%s in %s x/y %.1f/%d)' % (
-                id4(self),
-                self.meld,
-                first_tile.board.debug_name(),
-                first_tile.xoffset, first_tile.yoffset)
+        return (f'UIMeld_{id4(self)}({self.meld} in {first_tile.board.debug_name()} '
+                f'x/y {first_tile.xoffset:.1f}/{int(first_tile.yoffset)})')

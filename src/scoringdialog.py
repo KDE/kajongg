@@ -207,7 +207,7 @@ class ScoreModel(TreeModel):
                     parentRow = item.parent.row()
                     if parentRow == 0:
                         if not content.penalty:
-                            content = '%d %s' % (content.points, content.wind)
+                            content = f'{int(content.points)} {content.wind}'
                     elif parentRow == 1:
                         content = str(content.payments)
                     else:
@@ -315,14 +315,14 @@ class HandResult:
         self.manualrules = manualrules
 
     def __str__(self) ->str:
-        return '%d %d %s %d %d %s' % (
-            self.penalty, self.points, self.wind, self.payments, self.balance, self.manualrules)
+        return (f'{int(self.penalty)} {int(self.points)} {self.wind} '
+                f'{int(self.payments)} {int(self.balance)} {self.manualrules}')
 
     def handId(self) ->str:
         """identifies the hand for window title and scoring table"""
         character = chr(
             ord('a') - 1 + self.notRotated) if self.notRotated else ''
-        return '%s%s%s' % (self.prevailing, self.rotated + 1, character)
+        return f'{self.prevailing}{self.rotated + 1}{character}'
 
     def roundHand(self, allHands:List['HandResult']) ->int:
         """the nth hand in the current round, starting with 1"""
@@ -595,7 +595,7 @@ class ExplainView(QListView):
                 if explainHand.hasTiles():
                     total = explainHand.total()
                     if total:
-                        pLines = ['%s: %s' % (player.localName, total)]
+                        pLines = [f'{player.localName}: {total}']
                         for line in explainHand.explain():
                             pLines.append('- ' + line)
                 elif player.handTotal:
@@ -1217,8 +1217,7 @@ class ScoringDialog(QWidget):
             lastTile = cast('ScoringScene', Internal.scene).computeLastTile()
             winnerMelds = MeldList(m for m in self.game.winner.hand.melds if len(m) < 4
                            and lastTile in m)
-            assert winnerMelds, 'lastTile %s missing in %s' % (
-                lastTile, self.game.winner.hand.melds)
+            assert winnerMelds, f'lastTile {lastTile} missing in {self.game.winner.hand.melds}'
             if len(winnerMelds) == 1:
                 self.cbLastMeld.addItem(QIcon(), '', str(winnerMelds[0]))
                 self.cbLastMeld.setCurrentIndex(0)

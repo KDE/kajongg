@@ -44,11 +44,8 @@ class CountRandomCalls:
         if Debug.random:
             if self.rnd.game:
                 self.rnd.game.debug(
-                    '{} out of {} calls to random by {} from {}'.format(
-                        CountingRandom.count - self.oldCount,
-                        CountingRandom.count,
-                        self.what,
-                        callers()))
+                    f'{CountingRandom.count - self.oldCount} out of '
+                    f'{CountingRandom.count} calls to random by {self.what} from {callers()}')
 
 
 class CountingRandom(Random):
@@ -77,29 +74,28 @@ class CountingRandom(Random):
         Random.seed(self, a, version)
         if Debug.random:
             if self.game:
-                self.game.debug('Random gets seed %s' % a)
+                self.game.debug(f'Random gets seed {a}')
 
     def randrange(self, start:int, stop:Optional[int]=None, step:int=1) ->int:
-        with CountRandomCalls(self, 'randrange({},{},step={})'.format(
-            start, stop, step)):
+        with CountRandomCalls(self, f'randrange({start},{stop},step={step})'):
             return Random.randrange(self, start, stop, step)
 
     def choice(self, seq:SupportsLenAndGetItem[_T]) ->_T:
         """Choose a random element from a non-empty sequence."""
         if len(seq) == 1:
             return seq[0]
-        with CountRandomCalls(self, 'choice({})'.format(seq)):
+        with CountRandomCalls(self, f'choice({seq})'):
             return Random.choice(self, seq)
 
     def sample(self, population:Sequence[_T],
         k:int, *, counts:Optional[Iterable[int]]=None) ->list[_T]:
         """add debug output to sample. Chooses k unique random elements"""
-        with CountRandomCalls(self, 'sample({}, {})'.format(population, k)):
+        with CountRandomCalls(self, f'sample({population}, {k})'):
             return Random.sample(self, population, k, counts=counts)
 
     def shuffle(self, x:MutableSequence[Any], random:Optional[Any]=None) ->None:
         """add debug output to shuffle. Shuffles list x in place."""
-        with CountRandomCalls(self, 'shuffle({})'.format(x)):
+        with CountRandomCalls(self, f'shuffle({x})'):
             try:
                 # Python 3.10 or earlier
                 # pylint:disable=deprecated-argument,too-many-function-args

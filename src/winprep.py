@@ -30,20 +30,13 @@ def makeIcon(svgName:str, icoName:str) ->None:
 
     def pngName(resolution:int) ->str:
         """name for this resolution"""
-        return '{}/kajongg{}.png'.format(
-            tmpDir, resolution)
+        return f'{tmpDir}/kajongg{resolution}.png'
     resolutions = (16, 24, 32, 40, 48, 64, 96, 128)
     try:
         for resolution in resolutions:
             call(
-                'inkscape -z -e {outfile} -w {resolution} '
-                '-h {resolution} {infile}'.format(
-                    outfile=pngName(resolution),
-                    resolution=resolution,
-                    infile=svgName).split())
-        call('convert {pngFiles} {icoName}.ico'.format(
-            pngFiles=' '.join(pngName(x)
-                              for x in resolutions), icoName=icoName).split())
+                f'inkscape -z -e {pngName(resolution)} -w {resolution} -h {resolution} {svgName}'.split())
+        call(f"convert {' '.join(pngName(x) for x in resolutions)} {icoName}.ico".split())
     finally:
         for resolution2 in resolutions:
             # if we re-use resolution, pylint sees a problem ...
@@ -69,7 +62,7 @@ kmjLibDir = QStandardPaths.locate(QStandardPaths.AppDataLocation, 'kmahjongglib'
 copytree(kmjLibDir, targetDir)
 for tileset in ('alphabet', 'egypt'):
     for extension in ('copyright', 'desktop', 'svgz'):
-        os.remove(targetDir + '/tilesets/{}.{}'.format(tileset, extension))
+        os.remove(targetDir + f'/tilesets/{tileset}.{extension}')
 
 os.makedirs(DEST + '/kajongg')
 voiceDir = QStandardPaths.locate(QStandardPaths.AppDataLocation, 'kajongg/voices', QStandardPaths.LocateDirectory)
@@ -97,11 +90,11 @@ for png in (
         'document-new', 'edit-delete', 'document-open', 'list-add-user',
         'list-remove-user', 'configure-toolbars',
         'go-up', 'go-down', 'go-next', 'go-previous'):
-    copy('{}/{}.png'.format(oxy48Act, png), DEST + '/icons')
+    copy(f'{oxy48Act}/{png}.png', DEST + '/icons')
 
 oggdec = 'oggdecV1.10.1.zip'
 try:
-    call('wget https://www.rarewares.org/files/ogg/{}'.format(oggdec).split())
+    call(f'wget https://www.rarewares.org/files/ogg/{oggdec}'.split())
     with zipfile.ZipFile(oggdec) as ziparch:
         ziparch.extract('oggdec.exe')
 finally:
@@ -132,7 +125,7 @@ languages = (
 
 for lang in languages:
     print('getting language', lang)
-    os.makedirs(DEST + '/locale/{}/LC_MESSAGES'.format(lang))
+    os.makedirs(DEST + f'/locale/{lang}/LC_MESSAGES')
     with open(os.devnull, 'wb') as DEVNULL:
         for filename in (
                 'kdegames/kajongg',
@@ -140,17 +133,13 @@ for lang in languages:
                 'kdegames/desktop_kdegames_libkmahjongg'):
             try:
                 mo_data = check_output(
-                    'svn cat svn://anonsvn.kde.org/home/kde/'
-                    'trunk/l10n-kf5/{}/messages/{}.po'.format(
-                        lang, filename).split(), stderr=DEVNULL)
+                    f'svn cat svn://anonsvn.kde.org/home/kde/trunk/l10n-kf5/{lang}/messages/{filename}.po'.split(),
+                    stderr=DEVNULL)
                 print('found:', lang, filename)
                 with open('x.po', 'wb') as outfile:
                     outfile.write(mo_data)
                 call(
-                    'msgfmt x.po -o {}/locale/{}/LC_MESSAGES/{}.mo'.format(
-                        DEST,
-                        lang,
-                        filename.split('/')[1]).split())
+                    f"msgfmt x.po -o {DEST}/locale/{lang}/LC_MESSAGES/{filename.split('/')[1]}.mo".split())
                 os.remove('x.po')
             except CalledProcessError:
                 print('not found:', lang, filename)

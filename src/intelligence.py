@@ -95,8 +95,7 @@ class AIDefaultAI:
                 newWeights = ((x.tile, x.keep) for x in candidates)
                 for oldW, newW in zip(prevWeights, newWeights):
                     if oldW != newW:
-                        game.debug('%s: %s: %.3f->%.3f' % (
-                            filterName, oldW[0], oldW[1], newW[1]))
+                        game.debug(f'{filterName}: {oldW[0]}: {oldW[1]:.3f}->{newW[1]:.3f}')
             else:
                 candidates = aiFilter(self, candidates)
         return candidates
@@ -192,17 +191,16 @@ class AIDefaultAI:
         if myself.originalCall and myself.mayWin:
             last = myself.lastTile
             if Debug.originalCall:
-                game.debug('weighOriginalCall: lastTile=%s, candidates=%s' %
-                           (last, [str(x) for x in candidates]))
+                game.debug(f'weighOriginalCall: lastTile={last}, candidates={[str(x) for x in candidates]}')
             for candidate in candidates:
                 if last and last.exposed and candidate.tile:
                     assert myself.originalCallingHand
                     winningTiles = myself.originalCallingHand.chancesToWin()
                     if Debug.originalCall:
-                        game.debug('weighOriginalCall: winningTiles=%s for %s' %
-                                   (winningTiles, str(myself.originalCallingHand)))
-                        game.debug('weighOriginalCall respects originalCall: %s with %d' %
-                                   (candidate.tile, -99 * len(winningTiles)))
+                        game.debug(f'weighOriginalCall: winningTiles={winningTiles} '
+                                   f'for {str(myself.originalCallingHand)}')
+                        game.debug(f'weighOriginalCall respects originalCall: '
+                                   f'{candidate.tile} with {int(-99 * len(winningTiles))}')
                     candidate.keep -= 99 * len(winningTiles)
         return candidates
 
@@ -217,21 +215,23 @@ class AIDefaultAI:
                 for winnerTile in sorted(set(winningTiles)):
                     winnerHand = newHand + winnerTile.concealed
                     if Debug.robotAI:
-                        aiInstance.player.game.debug('weighCallingHand %s cand %s winnerTile %s winnerHand %s: %s' % (
-                            newHand, candidate, winnerTile, winnerHand, '     '.join(winnerHand.explain())))
+                        aiInstance.player.game.debug(f"weighCallingHand {newHand} cand {candidate} "
+                                                     f"winnerTile {winnerTile} "
+                                                     f"winnerHand {winnerHand}: "
+                                                     f"{'     '.join(winnerHand.explain())}")
                     keep = winnerHand.total() / 10.017
                     candidate.keep -= keep
                     if Debug.robotAI:
                         aiInstance.player.game.debug(
-                            'weighCallingHand %s winnerTile %s: discardCandidate %s keep -= %.4f' % (
-                                newHand, winnerTile, candidate, keep))
+                            f'weighCallingHand {newHand} winnerTile {winnerTile}: '
+                            f'discardCandidate {candidate} keep -= {keep:.4f}')
                 # more weight if we have several chances to win
                 candidate.keep -= float(len(winningTiles)) / len(
                     set(winningTiles)) * 5.031
                 if Debug.robotAI:
                     assert aiInstance.player.game
-                    aiInstance.player.game.debug('weighCallingHand %s for %s winningTiles:%s' % (
-                        newHand, candidates.hand, winningTiles))
+                    aiInstance.player.game.debug(f'weighCallingHand {newHand} for '
+                                                 f'{candidates.hand} winningTiles:{winningTiles}')
         return candidates
 
     def selectAnswer(self, answers:Sequence[Message]) ->Tuple[Message, Union[Tile, 'Meld', None]]:
@@ -252,8 +252,7 @@ class AIDefaultAI:
                 claimness += rule.claimness(hand, discard)  # type:ignore[attr-defined]
                 if Debug.robotAI:
                     hand.debug(
-                        '%s: claimness in selectAnswer:%s' %
-                        (rule.name, claimness))
+                        f'{rule.name}: claimness in selectAnswer:{claimness}')
         for tryAnswer in tryAnswers:
             parameter = self.player.sayable[tryAnswer]
             if not parameter:
@@ -372,8 +371,8 @@ class TileAI(ReprMixin):
         return self.tile < cast('TileAI', other).tile
 
     def __str__(self) ->str:
-        dang = ' dang:%d' % self.dangerous if self.dangerous else ''
-        return '%s:=%.4f%s' % (self.tile, self.keep, dang)
+        dang = f' dang:{int(self.dangerous)}' if self.dangerous else ''
+        return f'{self.tile}:={self.keep:.4f}{dang}'
 
 
 class DiscardCandidates(list):
@@ -387,8 +386,7 @@ class DiscardCandidates(list):
         self._hand = weakref.ref(hand)
         if Debug.robotAI:
             assert player.game
-            player.game.debug('DiscardCandidates for hand %s are %s' % (
-                hand, hand.tilesInHand))
+            player.game.debug(f'DiscardCandidates for hand {hand} are {hand.tilesInHand}')
         self.hiddenTiles:List[Tile] = [x.exposed for x in hand.tilesInHand]
         self.groupCounts:Dict[str, int] = IntDict()
                                    # counts for tile groups (sbcdw), exposed
@@ -465,6 +463,5 @@ class DiscardCandidates(list):
             candidates).tile.concealed
         if Debug.robotAI:
             self.player.game.debug(
-                '%s: discards %s out of %s' %
-                (self.player, result, ' '.join(str(x) for x in self)))
+                f"{self.player}: discards {result} out of {' '.join(str(x) for x in self)}")
         return result

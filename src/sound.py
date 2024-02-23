@@ -108,7 +108,7 @@ class Sound:
                     assert Internal.scene
                     game = Internal.scene.game
                     assert game
-                    game.debug('10 seconds passed. Killing %s' % process.name)
+                    game.debug(f'10 seconds passed. Killing {process.name}')
             else:
                 remaining.append(process)
         Sound.playProcesses = remaining
@@ -141,22 +141,21 @@ class Sound:
                 if sys.platform == 'win32':
                     # convert to .wav, store .wav in cacheDir
                     name, ext = os.path.splitext(what)
-                    assert ext == '.ogg', 'what: {} name: {} ext: {}'.format(what, name, ext)
+                    assert ext == '.ogg', f'what: {what} name: {name} ext: {ext}'
                     if 'bell' in name:
                         nameParts = ['bell']
                     else:
                         nameParts = os.path.normpath(name).split(os.sep)
                         nameParts = nameParts[nameParts.index('voices') + 1:]
                     wavName = os.path.normpath(
-                        '{}/{}.wav'.format(cacheDir(),
-                                           '_'.join(nameParts)))
+                        f"{cacheDir()}/{'_'.join(nameParts)}.wav")
                     if not os.path.exists(wavName):
                         args = [oggBinary, '-a', '-w', wavName, os.path.normpath(what)]
                         startupinfo = subprocess.STARTUPINFO()
                         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                         subprocess.call(args, startupinfo=startupinfo)
                         if Debug.sound:
-                            logDebug('converted {} to wav {}'.format(what, wavName))
+                            logDebug(f'converted {what} to wav {wavName}')
                     try:
                         winsound.PlaySound(
                             wavName,
@@ -183,7 +182,7 @@ class Sound:
                 if os.path.exists(oggName):
                     Sound.__bonusOgg = oggName
                     if Debug.sound:
-                        logDebug('Bonus sound found:{}'.format(oggName))
+                        logDebug(f'Bonus sound found:{oggName}')
                     break
             if Debug.sound and not Sound.__bonusOgg:
                 logDebug('No bonus sound found')
@@ -207,7 +206,7 @@ class Voice(ReprMixin):
         self.__md5sum:Optional[str] = None
         if not os.path.split(directory)[0]:
             if Debug.sound:
-                logDebug('place voice %s in %s' % (directory, cacheDir()))
+                logDebug(f'place voice {directory} in {cacheDir()}')
             directory = os.path.join(cacheDir(), directory)
         self.directory = directory
         self.__setArchiveContent(content)
@@ -257,7 +256,7 @@ class Voice(ReprMixin):
             result = sorted(
                 result, key=lambda x: prefLanguages.get(x.language(), 9999))
             if Debug.sound:
-                logDebug('found voices:%s' % [str(x) for x in result])
+                logDebug(f'found voices:{[str(x) for x in result]}')
             Voice.__availableVoices = result
         return Voice.__availableVoices
 
@@ -270,17 +269,15 @@ class Voice(ReprMixin):
             if name == voice.md5sum:
                 if Debug.sound:
                     logDebug(
-                        'locate found %s by md5sum in %s' %
-                        (name, voice.directory))
+                        f'locate found {name} by md5sum in {voice.directory}')
                 return voice
             if name == dirname and voice.language() == 'local':
                 if Debug.sound:
                     logDebug(
-                        'locate found %s by name in %s' %
-                        (name, voice.directory))
+                        f'locate found {name} by name in {voice.directory}')
                 return voice
         if Debug.sound:
-            logDebug('Personal sound for %s not found' % (name))
+            logDebug(f'Personal sound for {name} not found')
         return None
 
     def buildSubvoice(self, oggName:str, side:str) ->str:
@@ -307,11 +304,10 @@ class Voice(ReprMixin):
             if callResult:
                 if Debug.sound:
                     logDebug(
-                        'failed to build subvoice %s: return code=%s' %
-                        (angleName, callResult))
+                        f'failed to build subvoice {angleName}: return code={callResult}')
                 return stdName
             if Debug.sound:
-                logDebug('built subvoice %s' % angleName)
+                logDebug(f'built subvoice {angleName}')
         return angleName
 
     def localTextName(self, text:str, angle:float) ->str:
@@ -330,7 +326,7 @@ class Voice(ReprMixin):
         fileName = self.localTextName(text, angle)
         if not os.path.exists(fileName):
             if Debug.sound:
-                logDebug('Voice.speak: fileName %s not found' % fileName)
+                logDebug(f'Voice.speak: fileName {fileName} not found')
         Sound.speak(fileName)
 
     def oggFiles(self) ->List[str]:
@@ -353,7 +349,7 @@ class Voice(ReprMixin):
             removeIfExists(self.archiveName())
             removeIfExists(md5FileName)
             self.__md5sum = None
-            logDebug('no ogg files in %s' % self)
+            logDebug(f'no ogg files in {self}')
             return
         md5sum = md5()
         for oggFile in ogg:
@@ -366,14 +362,13 @@ class Voice(ReprMixin):
         if self.__md5sum != existingMd5sum:
             if Debug.sound:
                 if not os.path.exists(md5Name):
-                    logDebug('creating new %s' % md5Name)
+                    logDebug(f'creating new {md5Name}')
                 else:
                     logDebug(
-                        'md5sum %s changed, rewriting %s with %s' %
-                        (existingMd5sum, md5Name, self.__md5sum))
+                        f'md5sum {existingMd5sum} changed, rewriting {md5Name} with {self.__md5sum}')
             try:
                 with open(md5Name, 'w', encoding='ascii') as _:
-                    _.write('%s\n' % self.__md5sum)
+                    _.write(f'{self.__md5sum}\n')
             except OSError as exception:
                 logException(
                     '\n'.join([i18n('cannot write <filename>%1</filename>: %2',
@@ -381,7 +376,7 @@ class Voice(ReprMixin):
                                     str(exception)),
                                i18n('The voice files have changed, their checksum has changed.'),
                                i18n('Please reinstall kajongg or do, with sufficient permissions:'),
-                               'cd {} ; cat *.ogg | md5sum > md5sum'.format(self.directory)]))
+                               f'cd {self.directory} ; cat *.ogg | md5sum > md5sum']))
         if archiveExists:
             archiveIsOlder = os.path.getmtime(
                 md5Name) > os.path.getmtime(self.archiveName())
@@ -416,9 +411,9 @@ class Voice(ReprMixin):
                     line = _.readlines()[0].replace(' -', '').strip()
                 if len(line) == self.md5sumLength:
                     return line
-                logWarning('{} has wrong content: {}'.format(self.md5FileName(), line))
+                logWarning(f'{self.md5FileName()} has wrong content: {line}')
             except OSError as exc:
-                logWarning('{} has wrong content: {}'.format(self.md5FileName(), exc))
+                logWarning(f'{self.md5FileName()} has wrong content: {exc}')
         return None
 
     @property
@@ -438,7 +433,7 @@ class Voice(ReprMixin):
         with tarfile.open(mode='r|bz2', fileobj=filelike) as tarFile:
             tarFile.extractall(path=self.directory)
             if Debug.sound:
-                logDebug('extracted archive into %s' % self.directory)
+                logDebug(f'extracted archive into {self.directory}')
         filelike.close()
 
     @property

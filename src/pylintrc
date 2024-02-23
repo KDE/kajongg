@@ -56,7 +56,7 @@ enable=useless-suppression
 # W0122 exec statement
 # E0211 method has no argument
 # disable=R0903,R0902,W0122
-disable=R0903,E0211,I0011,I0013,too-many-ancestors,no-member,import-outside-toplevel,fixme,consider-using-f-string
+disable=R0903,E0211,I0011,I0013,too-many-ancestors,no-member,import-outside-toplevel,fixme
 
 
 [REPORTS]

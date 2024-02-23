@@ -68,11 +68,10 @@ def serverAppdataDir() ->str:
     # but only if .kajonggserver does not yet exist
     kdehome = os.environ.get('KDEHOME', '~/.kde')
     oldPath = os.path.expanduser(
-        kdehome +
-        '/share/apps/kajongg/kajonggserver.db')
+        f"{kdehome}/share/apps/kajongg/kajonggserver.db")
     if not os.path.exists(oldPath):
         oldPath = os.path.expanduser(
-            '~/.kde' +'4/share/apps/kajongg/kajonggserver.db')
+            '~/.kde4/share/apps/kajongg/kajonggserver.db')
     if os.path.exists(oldPath) and not os.path.exists(serverDir):
         # upgrading an old kajonggserver installation
         os.makedirs(serverDir)
@@ -135,7 +134,7 @@ def socketName() ->str:
                    # there
     if Options.socket:
         return Options.socket
-    return os.path.normpath('{}/socket{}'.format(serverDir, Internal.defaultPort))
+    return os.path.normpath(f'{serverDir}/socket{Internal.defaultPort}')
 
 
 def handleSignals(handler: Any) ->None:
@@ -214,18 +213,16 @@ class Debug:
                              if isinstance(Debug.__dict__[x], bool))
         stringOptions = sorted(x for x in options
                                if isinstance(Debug.__dict__[x], str))
-        stringExample = '%s:%s' % (stringOptions[0], 's3s4')
+        stringExample = f'{stringOptions[0]}:s3s4'
         allOptions = sorted(boolOptions + stringOptions)
         opt = '\n'.join(
             ', '.join(optYielder(allOptions)).split(' SEPARATOR, '))
         # TODO: i18n for this string. First move i18n out of kde so we can import it here
-        return """set debug options. Pass a comma separated list of options.
+        return f"""set debug options. Pass a comma separated list of options.
 Options are: {opt}.
-Options {stropt} take a string argument like {example}.
+Options {', '.join(stringOptions)} take a string argument like {stringExample}.
 --debug=events can get suboptions like in --debug=events:Mouse:Hide
-     showing all event messages with 'Mouse' or 'Hide' in them""".format(
-         opt=opt,
-         stropt=', '.join(stringOptions), example=stringExample)
+     showing all event messages with 'Mouse' or 'Hide' in them"""
 
     @staticmethod
     def setOptions(args: 'str') ->'str':
@@ -243,12 +240,10 @@ Options {stropt} take a string argument like {example}.
             else:
                 value = ':'.join(parts[1:])
             if option not in Debug.__dict__:
-                return '--debug: unknown option %s' % option
+                return f'--debug: unknown option {option}'
             if not isinstance(Debug.__dict__[option], type(value)):
-                return ('--debug: wrong type for option %s: '
-                        'given %s/%s, should be %s') % (
-                            option, value, type(value),
-                            type(Debug.__dict__[option]))
+                return (f"--debug: wrong type for option {option}: "
+                        f"given {value}/{type(value)}, should be {type(Debug.__dict__[option])}")
             if option != 'scores' or not Internal.isServer:
                 type.__setattr__(Debug, option, value)
         if Debug.time:
@@ -277,7 +272,7 @@ Options {stropt} take a string argument like {example}.
         result = []
         for option in Debug.__dict__:
             if not option.startswith('_'):
-                result.append('{}={}'.format(option, getattr(Debug, option)))
+                result.append(f'{option}={getattr(Debug, option)}')
         return ' '.join(result)
 
 
@@ -287,8 +282,7 @@ class FixedClass(type):
     all class variables become immutable"""
     def __setattr__(cls, key: str, value: object) ->None:
         if cls.fixed:  # type: ignore
-            raise SystemExit('{cls}.{key} may not be changed'.format(
-                cls=cls.__name__, key=key))
+            raise SystemExit(f'{cls.__name__}.{key} may not be changed')
         type.__setattr__(cls, key, value)
 
 
@@ -306,7 +300,7 @@ class ReprMixin:
         content = str(self)
         if content.startswith(clsName):
             return content
-        return '{cls}_{id4}({content})'.format(cls=clsName, id4=id4(self), content=content)
+        return f'{clsName}_{id4(self)}({content})'
 
 
 class Options(metaclass=FixedClass):
@@ -341,7 +335,7 @@ class Options(metaclass=FixedClass):
             if not option.startswith('_'):
                 value = getattr(Options, option)
                 if isinstance(value, (bool, int, str)):
-                    result.append('{}={}'.format(option, value))
+                    result.append(f'{option}={value}')
         return ' '.join(result)
 
 class SingleshotOptions:
@@ -391,7 +385,7 @@ class __Internal:
     def __init__(self) ->None:
         """init the loggers"""
         handler: Any
-        logName = os.path.basename(sys.argv[0]).replace('.py', '').replace('.exe', '')  + '.log'
+        logName = f"{os.path.basename(sys.argv[0]).replace('.py', '').replace('.exe', '')}.log"
         self.logger = logging.getLogger(logName)
         if sys.platform == 'win32':
             haveDevLog = False
@@ -509,8 +503,7 @@ class IntDict(defaultdict, ReprMixin):
     def __str__(self) ->str:
         """sort the result for better log comparison"""
         keys = sorted(self.keys())
-        return ', '.join('{}:{}'.format(
-            str(x), str(self[x])) for x in keys)
+        return ', '.join(f'{str(x)}:{str(self[x])}' for x in keys)
 
 
 class ZValues:
@@ -600,16 +593,16 @@ def fmt(text: str, **kwargs: Any) ->str:
                 part2 = part.split('{')
                 if part2[1] == 'callers':
                     if part2[0]:
-                        parts.append('%s:{%s}' % (part2[0], part2[1]))
+                        parts.append(f'{part2[0]}:{{{part2[1]}}}')
                     else:
-                        parts.append('{%s}' % part2[1])
+                        parts.append(f'{{{part2[1]}}}')
                 else:
-                    showName = part2[1] + ':'
+                    showName = f"{part2[1]}:"
                     if showName.startswith('_hide'):
                         showName = ''
                     if showName.startswith('self.'):
                         showName = showName[5:]
-                    parts.append('%s%s{%s}' % (part2[0], showName, part2[1]))
+                    parts.append(f'{part2[0]}{showName}{{{part2[1]}}}')
         text = ''.join(parts)
     argdict = sys._getframe(1).f_locals  # pylint: disable=protected-access
     argdict.update(kwargs)

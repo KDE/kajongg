@@ -88,7 +88,7 @@ class bdist_msi(windist.bdist_msi):
         windist.bdist_msi.add_config(self, fullname)
         msilib.add_data(self.db, "Registry", [("DisplayIcon",  # type:ignore[attr-defined]
                                                -1,  # Root
-                                               r"Software\Microsoft\Windows\CurrentVersion\Uninstall\%s" %
+                                               r"Software\Microsoft\Windows\CurrentVersion\Uninstall\%s" % # pylint: disable=consider-using-f-string
                                                self.productcode(),  # Key
                                                "DisplayIcon",  # Name
                                                r"[icons]kajongg.ico",  # Value
