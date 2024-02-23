@@ -13,6 +13,7 @@ import weakref
 from twisted.spread import pb
 from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed, fail
+from twisted.python.failure import Failure
 from util import Duration
 from log import logDebug, logException, logWarning
 from mi18n import i18nc
@@ -379,7 +380,11 @@ class Client(pb.Referenceable):
                         'wrong token: %s, we have %s' %
                         (move.token, self.game.handId.token()))
         with Duration('Move {!r}:'.format(move)):
-            return self.exec_move(move).addCallback(self.__jellyMessage).addErrback(logException)
+            try:
+                result = self.exec_move(move).addCallback(self.__jellyMessage)
+            except (Exception, Failure) as exc:  # pylint: disable=broad-exception-caught
+                return fail(exc)
+            return result
 
     def exec_move(self, move):
         """mirror the move of a player as told by the game server"""
