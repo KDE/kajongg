@@ -15,14 +15,13 @@ import traceback
 import time
 import datetime
 import random
-from collections import defaultdict
 import sqlite3
-from typing import List, Tuple, Union, Any, Optional, cast, Literal
+from typing import List, Tuple, Union, Any, Optional, Literal
 
 from mi18n import i18n, i18ncE
 from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug
-from common import IntDict, Options, Internal, Debug, appdataDir, id4
+from common import Options, Internal, Debug, appdataDir, id4
 
 class QueryException(Exception):
 
@@ -427,90 +426,6 @@ class PrepareDB:
                     name,),
                 silent=True).records:
             Query(f"create index {name} on {cmd}")
-
-    def cleanPlayerTable(self) ->None:
-        """remove now unneeded columns host, password and make names unique"""
-        playerCounts = IntDict()
-        names = {}
-        keep = {}
-        for nameId, name in Query('select id,name from player').records:
-            playerCounts[name] += 1
-            names[int(nameId)] = name
-        for name, counter in defaultdict.items(playerCounts):
-            nameIds = [x[0] for x in names.items() if x[1] == name]
-            keepId = nameIds[0]
-            keep[keepId] = name
-            if cast(int, counter) > 1:
-                for nameId in nameIds[1:]:
-                    Query(
-                        f'update score set player={int(keepId)} where player={int(nameId)}')
-                    Query(
-                        f'update game set p0={int(keepId)} where p0={int(nameId)}')
-                    Query(
-                        f'update game set p1={int(keepId)} where p1={int(nameId)}')
-                    Query(
-                        f'update game set p2={int(keepId)} where p2={int(nameId)}')
-                    Query(
-                        f'update game set p3={int(keepId)} where p3={int(nameId)}')
-                    Query(f'delete from player where id={int(nameId)}')
-        Query('drop table player')
-        self.createTable('player')
-        for nameId, name in keep.items():
-            Query('insert into player(id,name) values(?,?)', (nameId, name))
-
-    @classmethod
-    def removeGameServer(cls) ->None:
-        """drops column server from table game. Sqlite3 cannot drop columns"""
-        Query(f"create table gameback({cls.schema['game']})")
-        Query('insert into gameback '
-              'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from game')
-        Query('drop table game')
-        Query(f"create table game({cls.schema['game']})")
-        Query('insert into game '
-              'select id,seed,autoplay,starttime,endtime,ruleset,p0,p1,p2,p3 from gameback')
-        Query('drop table gameback')
-
-    def removeUsedRuleset(self) ->None:
-        """eliminate usedruleset and usedrule"""
-        if Internal.db.hasTable('usedruleset'):
-            if Internal.db.hasTable('ruleset'):
-                Query('UPDATE ruleset set id=-id where id>0')
-                Query(
-                    'INSERT OR IGNORE INTO usedruleset SELECT * FROM ruleset')
-                Query('DROP TABLE ruleset')
-            Query('ALTER TABLE usedruleset RENAME TO ruleset')
-        if Internal.db.hasTable('usedrule'):
-            if Internal.db.hasTable('rule'):
-                Query('UPDATE rule set ruleset=-ruleset where ruleset>0')
-                Query('INSERT OR IGNORE INTO usedrule SELECT * FROM rule')
-                Query('DROP TABLE rule')
-            Query('ALTER TABLE usedrule RENAME TO rule')
-        query = Query("select count(1) from sqlite_master "
-                      "where type='table' and tbl_name='ruleset' and sql like '%name text unique,%'", silent=True)
-        if int(query.records[0][0]):
-            # make name non-unique. Needed for used rulesets: Content may change with identical name
-            # and we now have both ruleset templates and copies of used
-            # rulesets in the same table
-            for statement in list([
-                    f"create table temp({self.schema['ruleset']})",
-                    'insert into temp select id,name,hash,description from ruleset',
-                    'drop table ruleset',
-                    self.sqlForCreateTable('ruleset'),
-                    'insert into ruleset select * from temp',
-                    'drop table temp']):
-                Query(statement)
-        query = Query("select count(1) from sqlite_master "
-                      "where type='table' and tbl_name='rule' and sql like '%unique (ruleset,name)%'", silent=True)
-        if int(query.records[0][0]):
-            # make ruleset,name non-unique
-            for statement in list([
-                    f"create table temp({self.schema['rule']})",
-                    'insert into temp select * from rule',
-                    'drop table rule',
-                    self.sqlForCreateTable('rule'),
-                    'insert into rule select * from temp',
-                    'drop table temp']):
-                Query(statement)
 
     @staticmethod
     def __generateDbIdent() ->None:

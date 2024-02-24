@@ -299,7 +299,7 @@ class QtEventReactor(QtReactor):
         return None
 
     def iterate(self, delay:Optional[int]=None) ->None:  # type:ignore
-        """See twisted.internet.interfaces.IReactorCore.iterate. FIXME: do not understand this
+        """See twisted.internet.interfaces.IReactorCore.iterate
         """
         self.runUntilCurrent()
         self.doIteration(delay)

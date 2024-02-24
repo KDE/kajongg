@@ -221,7 +221,7 @@ class Client(pb.Referenceable):
         oldTable = self._tableById(newTable.tableid)
         if oldTable:
             self.tables.remove(oldTable)
-            self.tables.append(newTable)  # FIXME: I think indent is wrong
+            self.tables.append(newTable) # this indent wants a comment
         return oldTable, newTable
 
     def remote_tableRemoved(self, tableid:int, message:str, *args:Any) ->None:  # pylint: disable=unused-argument
@@ -474,7 +474,6 @@ class Client(pb.Referenceable):
         assert move.player
         if not self.thatWasMe(move.player) and not self.game.playOpen:
             move.player.showConcealedTiles(hadTiles)
-        # FIXME: Tile/Piece
         move.player.lastTile = calledTile.exposed
         move.player.lastSource = TileSource.LivingWallDiscard
         move.exposedMeld = move.player.exposeMeld(
@@ -508,7 +507,6 @@ class Client(pb.Referenceable):
         By declaring we mean exposing a meld, using only tiles from the hand.
         For now we only support Kong: in Classical Chinese it makes no sense
         to declare a Pung."""
-        # FIXME: need a test case
         assert move.message == Message.Kong
         assert self.game
         assert move.player

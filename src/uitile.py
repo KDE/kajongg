@@ -167,7 +167,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
                 self.tileset.tileSize if Internal.Preferences.showShadows
                 else self.tileset.faceSize)
         else:
-            # just something. QRectF() gives segfault. FIXME: Still true?
+            # just something. QRectF() gives segfault.
             self._boundingRect = QRectF(0.0, 0.0, 10.0, 10.0)
         return self._boundingRect
 
