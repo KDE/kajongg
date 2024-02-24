@@ -694,6 +694,7 @@ def main():
     improve_options()
 
     csv.evaluate()
+    cleanup_data(csv)
 
     errorMessage = Debug.setOptions(','.join(OPTIONS.debug))
     if errorMessage:
