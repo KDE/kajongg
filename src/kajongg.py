@@ -94,8 +94,10 @@ def defineOptions() -> Tuple[QCommandLineParser, List[CommandLineOption]]:
     option('game', i18n('for testing purposes: Initializes the random generator'),
            'seed(/firsthand)(..(lasthand))', '0')
     option('nogui', i18n('show no graphical user interface. Intended only for testing'), optName='gui')
-    option('socket', i18n('use a dedicated server listening on SOCKET. Intended only for testing'), 'SOCKET', '')
-    option('port', i18n('use a dedicated server listening on PORT. Intended only for testing'), 'PORT', '')
+    option('socket', i18n(
+        'use a dedicated server already running and listening on SOCKET. Intended only for testing'), 'SOCKET', '')
+    option('port', i18n(
+        'use a dedicated server already running and listening on PORT. Intended only for testing'), 'PORT', '')
     option('debug', Debug.help(), 'DEBUG', '')
     return parser, options
 
