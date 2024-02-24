@@ -412,10 +412,6 @@ class Player(ReprMixin):
         """used to build the Hand"""
         return set('a') if self.originalCall else set()
 
-    def mjString(self) -> str:
-        """compile hand info into a string as needed by the scoring engine"""
-        return ''.join(['m', self.lastSource.char, ''.join(self.__announcements())])
-
     def makeTileKnown(self, tile:Tile) -> None:
         """used when somebody else discards a tile"""
         assert not self._concealedTiles[0].isKnown
