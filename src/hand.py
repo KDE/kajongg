@@ -92,6 +92,7 @@ class Hand(ReprMixin):
 
         # shortcuts for speed:
         self._player = weakref.ref(player)
+        assert player.game
         self.ruleset = player.game.ruleset
         self.__robbedTile = Tile.none
         self.prevHand = prevHand
@@ -223,7 +224,9 @@ class Hand(ReprMixin):
     @property
     def player(self):
         """weakref"""
-        return self._player()
+        result = self._player()
+        assert result
+        return result
 
     @property
     def ownWind(self):
@@ -233,10 +236,12 @@ class Hand(ReprMixin):
     @property
     def roundWind(self):
         """for easier usage"""
+        assert self.player.game
         return self.player.game.roundWind
 
     def __calculate(self):
         """apply rules, calculate score"""
+        # TODO: in __init__: self.__score == self.__calculate()
         assert not self.unusedTiles, (
             'Hand.__calculate expects there to be no unused tiles: %s' % self)
         oldWon = self.__won
@@ -316,6 +321,7 @@ class Hand(ReprMixin):
         if self.prevHand:
             idPrefix += '<{}'.format(Fmt.num_encode(hash(self.prevHand)))
         idPrefix = 'Hand({})'.format(idPrefix)
+        assert self.player.game
         self.player.game.debug(' '.join([dbgIndent(self, self.prevHand), idPrefix, msg]))
 
     def __applyRules(self):
@@ -411,6 +417,7 @@ class Hand(ReprMixin):
             # now we have a list of only lastMelds reaching maximum score
             if prev not in bestLastMelds or self.__lastMeld not in bestLastMelds:
                 if Debug.explain and prev not in bestLastMelds:
+                    assert self.player.game
                     if not self.player.game.belongsToRobotPlayer():
                         self.debug(fmt(
                             'replaced last meld {prev} with {bestLastMelds[0]}'))
@@ -422,6 +429,7 @@ class Hand(ReprMixin):
         assert self.lenOffset == 0
         result = []
         for completedHand in self.callingHands:
+            assert completedHand.lastTile
             result.extend(
                 [completedHand.lastTile] *
                 (self.player.tileAvailable(completedHand.lastTile, self)))
@@ -488,7 +496,8 @@ class Hand(ReprMixin):
         lastMeld. Exposed melds of length<3 will be hidden."""
         # If lastMeld is given, it must be first in the list.
         # Next try undeclared melds, then declared melds
-        assert self.lenOffset == 1
+        assert self.lenOffset == 1, \
+             f'lenOffset != 1: {self.lenOffset} for {self}'  # correct winner hand or long loser hand
         if self.lastTile:
             if self.lastTile is subtractTile and self.prevHand:
                 return self.prevHand
@@ -576,6 +585,7 @@ class Hand(ReprMixin):
         """cache this here for use in rulecode"""
         if self.__robbedTile is Tile.unknown:
             self.__robbedTile = Tile.none
+            assert self.player.game
             if self.player.game.moves:
                 # scoringtest does not (yet) simulate this
                 lastMove = self.player.game.moves[-1]
@@ -612,6 +622,7 @@ class Hand(ReprMixin):
         self.unusedTiles.sort()
         result = []
         stdMJ = self.ruleset.standardMJRule
+        assert stdMJ
         if self.mjRule:
             rules = [self.mjRule]
         else:
