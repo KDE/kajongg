@@ -39,7 +39,7 @@ def dbgIndent(this, parent):
     """show messages indented"""
     if this.indent == 0:
         return ''
-    pIndent = parent.indent if parent else 0
+    pIndent = parent.indent if parent and parent.indent else 0
     return (' │ ' * (pIndent)) + ' ├' + '─' * (this.indent - pIndent - 1)
 
 
