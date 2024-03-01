@@ -304,7 +304,7 @@ class UITile(AnimatedMixin, QGraphicsObject, StrMixin):
     def tile(self, value):  # pylint: disable=arguments-differ
         """set tile name and update display"""
         if value is not self._tile:
-            assert not self._tile.isKnown or (self._tile.exposed == value.exposed)
+            assert not self._tile.isKnown or not value.isKnown or (self._tile.exposed == value.exposed)
             self._tile = value
             self.setDrawingOrder() # because known tiles are above unknown tiles
             self.update()
