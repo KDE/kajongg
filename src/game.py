@@ -779,8 +779,6 @@ class Game:
 class PlayingGame(Game):
     """this game is played using the computer"""
 
-    # pylint: disable=too-many-instance-attributes
-
     playerClass = PlayingPlayer
 
     def __init__(self, names, ruleset, gameid=None, wantedGame=None,
