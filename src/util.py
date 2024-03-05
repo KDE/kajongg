@@ -44,9 +44,9 @@ def stack(msg, limit=6):
     return result
 
 
-def callers(count=5, exclude=None):
+def callers(count=5, exclude=None, frame=None):
     """return the name of the calling method"""
-    stck = traceback.extract_stack(limit=30)
+    stck = traceback.extract_stack(f=frame, limit=30)
     excluding = list(exclude) if exclude else []
     excluding.extend(['<genexpr>', '__call__', 'run', '<module>', 'runTests'])
     excluding.extend(['_startRunCallbacks', '_runCallbacks', 'remote_move', 'exec_move'])
