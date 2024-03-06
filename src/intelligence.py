@@ -30,7 +30,9 @@ class AIDefaultAI:
     @property
     def player(self):
         """hide weakref"""
-        return self._player() if self._player else None
+        result = self._player()
+        assert result
+        return result
 
     def name(self):
         """return our name"""
@@ -69,6 +71,7 @@ class AIDefaultAI:
     def weighDiscardCandidates(self, candidates):
         """the standard"""
         game = self.player.game
+        assert game
         weighRules = game.ruleset.filterRules('weigh')
         for _ in [self.weighBasics, self.weighSameColors,
                          self.weighSpecialGames, self.weighCallingHand,
@@ -179,6 +182,7 @@ class AIDefaultAI:
         """if we declared Original Call, respect it"""
         myself = aiInstance.player
         game = myself.game
+        assert game
         if myself.originalCall and myself.mayWin:
             last = myself.lastTile
             if Debug.originalCall:
@@ -199,6 +203,7 @@ class AIDefaultAI:
     @staticmethod
     def weighCallingHand(aiInstance, candidates):
         """if we can get a calling hand, prefer that"""
+        assert aiInstance.player.game
         for candidate in candidates:
             newHand = candidates.hand - candidate.tile.concealed
             winningTiles = newHand.chancesToWin()
@@ -218,6 +223,7 @@ class AIDefaultAI:
                 candidate.keep -= float(len(winningTiles)) / len(
                     set(winningTiles)) * 5.031
                 if Debug.robotAI:
+                    assert aiInstance.player.game
                     aiInstance.player.game.debug('weighCallingHand %s for %s winningTiles:%s' % (
                         newHand, candidates.hand, winningTiles))
         return candidates
@@ -226,6 +232,7 @@ class AIDefaultAI:
         """this is where the robot AI should go.
         Returns answer and one parameter"""
         # disable warning about too many branches
+        assert self.player.game
         answer = answers[0]
         parameter = None
         tryAnswers = (
@@ -329,6 +336,8 @@ class TileAI(ReprMixin):
     # we do want that many instance attributes
 
     def __init__(self, candidates, tile):
+        assert candidates.player
+        assert candidates.player.game
         self.tile = tile
         self.group, self.value = tile.group, tile.value
         if tile.isReal:
@@ -371,6 +380,7 @@ class DiscardCandidates(list):
         self._player = weakref.ref(player)
         self._hand = weakref.ref(hand)
         if Debug.robotAI:
+            assert player.game
             player.game.debug('DiscardCandidates for hand %s are %s' % (
                 hand, hand.tilesInHand))
         self.hiddenTiles = [x.exposed for x in hand.tilesInHand]
@@ -389,12 +399,16 @@ class DiscardCandidates(list):
     @property
     def player(self):
         """hide weakref"""
-        return self._player() if self._player else None
+        result = self._player()
+        assert result
+        return result
 
     @property
     def hand(self):
         """hide weakref"""
-        return self._hand() if self._hand else None
+        result = self._hand()
+        assert result
+        return result
 
     def link(self):
         """define values for candidate.prev and candidate.next"""
@@ -440,6 +454,7 @@ class DiscardCandidates(list):
         """return the candidate with the lowest value"""
         lowest = min(x.keep for x in self)
         candidates = sorted(x for x in self if x.keep == lowest)
+        assert self.player.game
         result = self.player.game.randomGenerator.choice(
             candidates).tile.concealed
         if Debug.robotAI:
