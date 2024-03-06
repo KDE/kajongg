@@ -20,7 +20,6 @@ from tilesource import TileSource
 from meld import Meld, MeldList
 from rule import Score, UsedRule
 from common import Debug, ReprMixin, Fmt, fmt
-from intelligence import AIDefaultAI
 from util import callers
 from message import Message
 
@@ -85,7 +84,6 @@ class Hand(ReprMixin):
         # shortcuts for speed:
         self._player = weakref.ref(player)
         self.ruleset = player.game.ruleset
-        self.intelligence = player.intelligence if player else AIDefaultAI()
         self.string = string
         self.__robbedTile = Tile.unknown
         self.prevHand = prevHand
@@ -643,8 +641,8 @@ class Hand(ReprMixin):
             return True
         if not (self.arranged and self.won) and other.won:
             return False
-        return (self.intelligence.handValue(self)
-                > self.intelligence.handValue(other))
+        _ = self.player.intelligence
+        return _.handValue(self) > _.handValue(other)
 
     def __lt__(self, other):
         """compares hand values"""

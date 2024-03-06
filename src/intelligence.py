@@ -24,13 +24,13 @@ class AIDefaultAI:
     # we could solve this by moving those filters into DiscardCandidates
     # but that would make it more complicated to define alternative AIs
 
-    def __init__(self, player=None):
-        self._player = weakref.ref(player) if player else None
+    def __init__(self, player):
+        self._player = weakref.ref(player)
 
     @property
     def player(self):
         """hide weakref"""
-        return self._player() if self._player else None  # pylint: disable=not-callable
+        return self._player() if self._player else None
 
     def name(self):
         """return our name"""
