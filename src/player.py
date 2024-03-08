@@ -16,7 +16,7 @@ from common import IntDict, Debug
 from common import ReprMixin, Internal
 from wind import East, Wind
 from query import Query
-from tile import Tile, TileTuple, PieceList, elements
+from tile import Tile, TileList, TileTuple, PieceList, elements
 from tilesource import TileSource
 from meld import Meld, MeldList
 from permutations import Permutations
@@ -203,7 +203,7 @@ class Player(ReprMixin):
         self.__mayWin = True
         self.__payment = 0
         self.__originalCall = False
-        self.dangerousTiles = []
+        self.dangerousTiles = TileList()
         self.claimedNoChoice = False
         self.playedDangerous = False
         self.usedDangerousFrom = None
@@ -356,7 +356,7 @@ class Player(ReprMixin):
             self.lastTile = tile.tile
         else:
             self.lastTile = tile
-        self.addConcealedTiles([tile])
+        self.addConcealedTiles(TileList(tile))
         if deadEnd:
             self.lastSource = TileSource.DeadWall
         else:
@@ -515,7 +515,7 @@ class PlayingPlayer(Player):
         if withDiscard:
             PlayingPlayer.addConcealedTiles(
                 self,
-                [withDiscard])  # this should NOT invoke syncHandBoard
+                TileList(withDiscard))  # this should NOT invoke syncHandBoard
             if len(list(self.game.lastMoves(only=(Message.Discard, )))) == 1:
                 self.lastSource = TileSource.East14th
             elif self.lastSource is not TileSource.RobbedKong:
@@ -766,12 +766,12 @@ class PlayingPlayer(Player):
             return False
         afterExposed = [x.exposed for x in self._concealedTiles]
         if exposing:
-            exposing = list(exposing)
+            exposingTiles = TileList(exposing)
             if self.game.lastDiscard:
                 # if this is about claiming a discarded tile, ignore it
                 # the player who discarded it is responsible
-                exposing.remove(self.game.lastDiscard)
-            for tile in exposing:
+                exposingTiles.remove(self.game.lastDiscard)
+            for tile in exposingTiles:
                 if tile.exposed in afterExposed:
                     # the "if" is needed for claimed pung
                     afterExposed.remove(tile.exposed)
@@ -821,7 +821,7 @@ class PlayingPlayer(Player):
         """update the list of dangerous tile"""
         assert self.game
         pName = self.localName
-        dangerous = []
+        dangerous = TileList()
         expMeldCount = len(self._exposedMelds)
         if expMeldCount >= 3:
             if all(x in elements.greenHandTiles for x in self.visibleTiles):
