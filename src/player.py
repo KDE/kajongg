@@ -413,7 +413,7 @@ class Player(ReprMixin):
         """return Hand for this player"""
         assert not (self._concealedMelds and self._concealedTiles)
         return Hand(
-            self, melds=self._exposedMelds + self._concealedMelds, unusedTiles=self._concealedTiles,
+            self, melds=MeldList(self._exposedMelds + self._concealedMelds), unusedTiles=self._concealedTiles,
             bonusTiles=self._bonusTiles, lastTile=self.lastTile, lastMeld=self.lastMeld,
             lastSource=self.lastSource, announcements=self.__announcements())
 
@@ -537,17 +537,22 @@ class PlayingPlayer(Player):
 
     def __possibleChows(self):
         """return a unique list of lists with possible claimable chow combinations"""
+        if not self.game:
+            return MeldList()
         if self.game.lastDiscard is None:
-            return []
+            return MeldList()
         exposedChows = [x for x in self._exposedMelds if x.isChow]
         if len(exposedChows) >= self.game.ruleset.maxChows:
-            return []
+            return MeldList()
         _ = self.game.lastDiscard
-        return (TileTuple(self.concealedTiles) + _).possibleChows(_)
+        _ = (TileTuple(self.concealedTiles) + _).possibleChows(_)
+        return MeldList(Meld(x) for x in _)# FIXME: sollten direkt Melds sein
 
     def __possibleKongs(self):
         """return a unique list of lists with possible kong combinations"""
-        kongs = []
+        if not self.game:
+            return MeldList()
+        kongs = MeldList()
         if self == self.game.activePlayer:
             # declaring a kong
             for tileName in sorted({x for x in self._concealedTiles if not x.isBonus}):
@@ -569,17 +574,21 @@ class PlayingPlayer(Player):
     def __maySayChow(self, unusedMove):
         """return answer arguments for the server if calling chow is possible.
         returns the meld to be completed"""
-        return self.__possibleChows() if self == self.game.nextPlayer() else None
+        if not self.game:
+            return MeldList()
+        return self.__possibleChows() if self == self.game.nextPlayer() else MeldList()
 
     def __maySayPung(self, unusedMove):
         """return answer arguments for the server if calling pung is possible.
         returns the meld to be completed"""
+        if not self.game:
+            return MeldList()
         lastDiscard = self.game.lastDiscard
         if self.game.lastDiscard:
             assert lastDiscard.isConcealed, lastDiscard
             if self.concealedTiles.count(lastDiscard) >= 2:
                 return MeldList([lastDiscard.pung])
-        return None
+        return MeldList()
 
     def __maySayKong(self, unusedMove):
         """return answer arguments for the server if calling or declaring kong is possible.
