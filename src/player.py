@@ -127,10 +127,9 @@ class Player(ReprMixin):
         @type game: L{Game} or None.
         @param game: The game this player is part of. May be None.
         """
+        self._game = None
         if game:
             self._game = weakref.ref(game)
-        else:
-            self._game = None
         self.__balance = 0
         self.__payment = 0
         self.wonCount = 0
@@ -155,7 +154,7 @@ class Player(ReprMixin):
 
     def clearCache(self):
         """clears the cache with Hands"""
-        if Debug.hand and self.handCache:
+        if Debug.hand and self.handCache and self.game:
             self.game.debug(
                 '%s: cache hits:%d misses:%d' %
                 (self, self.cacheHits, self.cacheMisses))
@@ -289,10 +288,12 @@ class Player(ReprMixin):
     @lastSource.setter
     def lastSource(self, value):
         """the source of the last tile the player got"""
-        if value is TileSource.LivingWallDiscard and not self.game.wall.living:
-            value = TileSource.LivingWallEndDiscard
-        if value is TileSource.LivingWall and not self.game.wall.living:
-            value = TileSource.LivingWallEnd
+        if self.game:
+            assert self.game.wall
+            if value is TileSource.LivingWallDiscard and not self.game.wall.living:
+                value = TileSource.LivingWallEndDiscard
+            if value is TileSource.LivingWall and not self.game.wall.living:
+                value = TileSource.LivingWallEnd
         if self.__lastSource != value:
             self.__lastSource = value
             self._hand = None
@@ -310,6 +311,7 @@ class Player(ReprMixin):
     @property
     def handTotal(self):
         """the hand total of this player for the final scoring"""
+        assert self.game
         return 0 if not self.game.winner else self.hand.total()
 
     @property
@@ -344,6 +346,8 @@ class Player(ReprMixin):
 
     def pickedTile(self, deadEnd, tileName=None):
         """got a tile from wall"""
+        assert self.game
+        assert self.game.wall
         self.game.activePlayer = self
         tile = self.game.wall.deal(tileName, deadEnd=deadEnd)[0]
         if hasattr(tile, 'tile'):
@@ -443,6 +447,7 @@ class Player(ReprMixin):
 
     def others(self):
         """a list of the other 3 players"""
+        assert self.game
         return (x for x in self.game.players if x != self)
 
     def tileAvailable(self, tileName, hand):
@@ -450,6 +455,7 @@ class Player(ReprMixin):
         supposing we have hand"""
         lowerTile = tileName.exposed
         upperTile = tileName.concealed
+        assert self.game
         visible = self.game.discardedTiles.count([lowerTile])
         if visible:
             if hand.lenOffset == 0 and self.game.lastDiscard and lowerTile is self.game.lastDiscard.exposed:
@@ -494,6 +500,7 @@ class PlayingPlayer(Player):
 
     def declaredMahJongg(self, concealed, withDiscard, lastTile, lastMeld):
         """player declared mah jongg. Determine last meld, show concealed tiles grouped to melds"""
+        assert self.game
         if Debug.mahJongg:
             self.game.debug('{} declared MJ: concealed={}, withDiscard={}, lastTile={},lastMeld={}'.format(
                 self, concealed, withDiscard, lastTile, lastMeld))
@@ -581,7 +588,9 @@ class PlayingPlayer(Player):
     def __maySayMahjongg(self, move):
         """return answer arguments for the server if calling or declaring Mah Jongg is possible"""
         game = self.game
+        assert game
         if move.message == Message.DeclaredKong:
+            assert move.meld
             withDiscard = move.meld[0].concealed
         elif move.message == Message.AskForClaims:
             withDiscard = game.lastDiscard
@@ -602,6 +611,7 @@ class PlayingPlayer(Player):
 
     def __maySayOriginalCall(self, unusedMove):
         """return True if Original Call is possible"""
+        assert self.game
         for tileName in sorted(set(self.concealedTiles)):
             newHand = self.hand - tileName
             if newHand.callingHands:
@@ -652,6 +662,8 @@ class PlayingPlayer(Player):
 
     def showConcealedTiles(self, tiles, show=True):
         """show or hide tiles"""
+        assert isinstance(tiles, TileTuple), repr(tiles)
+        assert self.game
         if not self.game.playOpen and self != self.game.myself:
             if not isinstance(tiles, (list, tuple)):
                 tiles = [tiles]
@@ -709,6 +721,7 @@ class PlayingPlayer(Player):
         else:
             # TODO: should we somehow show an error and continue?
             raise ValueError('robTileFrom: no meld found with %s' % tile)
+        assert self.game
         self.game.lastDiscard = tile.concealed
         self.lastTile = Tile.none  # our lastTile has just been robbed
         self._hand = None
@@ -727,11 +740,12 @@ class PlayingPlayer(Player):
             return True
         if str(self.hand) == score:
             return True
-        self.game.debug('%s localScore:%s' % (self, self.hand))
-        self.game.debug('%s serverScore:%s' % (self, score))
-        logWarning(
-            'Game %s: client and server disagree about scoring, see logfile for details' %
-            self.game.seed)
+        if self.game:
+            self.game.debug('%s localScore:%s' % (self, self.hand))
+            self.game.debug('%s serverScore:%s' % (self, score))
+            logWarning(
+                'Game %s: client and server disagree about scoring, see logfile for details' %
+                self.game.seed)
         return False
 
     def mustPlayDangerous(self, exposing=None):
@@ -743,6 +757,7 @@ class PlayingPlayer(Player):
         @type exposing: L{Meld}
         @rtype: C{Boolean}
         """
+        assert self.game
         if self == self.game.activePlayer and exposing and len(exposing) == 4:
             # declaring a kong is never dangerous because we get
             # an unknown replacement
@@ -766,6 +781,7 @@ class PlayingPlayer(Player):
         calledTile: we got the last tile for the meld from discarded, otherwise
         from the wall"""
         game = self.game
+        assert game
         game.activePlayer = self
         allMeldTiles = list(meldTiles)
         if calledTile:
@@ -791,6 +807,7 @@ class PlayingPlayer(Player):
             for meldTile in allMeldTiles:
                 self.visibleTiles[meldTile.exposed] += 1
             meld = meld.exposedClaimed if calledTile else meld.declared
+        assert meld
         if self.lastTile in allMeldTiles:
             self.lastTile = self.lastTile.exposed
         self._exposedMelds.append(meld)
@@ -800,6 +817,7 @@ class PlayingPlayer(Player):
 
     def findDangerousTiles(self):
         """update the list of dangerous tile"""
+        assert self.game
         pName = self.localName
         dangerous = []
         expMeldCount = len(self._exposedMelds)
