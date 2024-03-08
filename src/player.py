@@ -450,11 +450,11 @@ class Player(ReprMixin):
         assert self.game
         return (x for x in self.game.players if x != self)
 
-    def tileAvailable(self, tileName, hand):
-        """a count of how often tileName might still appear in the game
+    def tileAvailable(self, tile, hand):
+        """a count of how often tile might still appear in the game
         supposing we have hand"""
-        lowerTile = tileName.exposed
-        upperTile = tileName.concealed
+        lowerTile = tile.exposed
+        upperTile = tile.concealed
         assert self.game
         visible = self.game.discardedTiles.count([lowerTile])
         if visible:
