@@ -666,8 +666,6 @@ class PlayingPlayer(Player):
         assert isinstance(tiles, TileTuple), repr(tiles)
         assert self.game
         if not self.game.playOpen and self != self.game.myself:
-            if not isinstance(tiles, (list, tuple)):
-                tiles = [tiles]
             assert len(tiles) <= len(self._concealedTiles), \
                 '%s: showConcealedTiles %s, we have only %s' % (
                     self, tiles, self._concealedTiles)
