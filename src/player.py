@@ -468,7 +468,7 @@ class Player(ReprMixin):
         visible += sum(x.exposed == lowerTile for x in hand.tiles)
         return 4 - visible
 
-    def violatesOriginalCall(self, discard=None):
+    def violatesOriginalCall(self, discard):
         """called if discarding discard violates the Original Call"""
         if not self.originalCall or not self.mayWin:
             return False
