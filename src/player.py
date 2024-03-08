@@ -150,6 +150,8 @@ class Player(ReprMixin):
         """Used for sorting"""
         if not other:
             return False
+        if not isinstance(other, Player):
+            return False
         return self.name < other.name
 
     def clearCache(self):
