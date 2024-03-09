@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-# SPDX-FileCopyrightText: 2022, 2023 Emir SARI <emir_sari@icloud.com>
+# SPDX-FileCopyrightText: 2022, 2023, 2024 Emir SARI <emir_sari@icloud.com>
 # Osman Tosun <rainman.neu@gmail.com>, 2008.
 # obsoleteman <tulliana@gmail.com>, 2009.
 # Serhat Demirkol <serhat_demirkol@yahoo.com>, 2009.
@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2023-11-21 19:59+0300\n"
+"PO-Revision-Date: 2024-03-08 19:34+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 23.11.70\n"
+"X-Generator: Lokalize 24.02.0\n"
 
 msgid "Preview"
 msgstr "Önizleme"
@@ -937,7 +937,7 @@ msgstr "E-Posta adresi yok"
 
 #: src/player.py:687
 msgid "%1 claiming MahJongg: She does not really have tile %2"
-msgstr "%1 MahJongg dedi: Gerçekten %2 taşına sahip değil"
+msgstr "%1 MahJongg dedi: %2 taşına gerçekten sahip değil"
 
 #: src/player.py:696
 msgid ""
