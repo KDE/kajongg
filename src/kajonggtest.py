@@ -286,7 +286,7 @@ class Job(ReprMixin):
                 os.makedirs(logDir)
             logFileName = self.commitId
             self.logFileName = os.path.join(logDir, logFileName)  # pylint:disable=attribute-defined-outside-init
-            self.__logFile = open(self.logFileName, 'wb', buffering=0)  # pylint:disable=consider-using-with,attribute-defined-outside-init
+            self.__logFile = open(self.logFileName, 'ab', buffering=0)  # pylint:disable=consider-using-with,attribute-defined-outside-init
         return self.__logFile
 
     def shortRulesetName(self):
