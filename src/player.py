@@ -199,7 +199,7 @@ class Player(StrMixin):
         self.lastMeld = Meld()
         self.__mayWin = True
         self.__payment = 0
-        self.originalCall = False
+        self.__originalCall = False
         self.dangerousTiles = list()
         self.claimedNoChoice = False
         self.playedDangerous = False
@@ -221,6 +221,18 @@ class Player(StrMixin):
         if value is None:
             self.lastMeld = Meld()
 
+    @property
+    def originalCall(self):
+        """temp for debugging"""
+        return self.__originalCall
+
+    @originalCall.setter
+    def originalCall(self, value):
+        """temp for debugging"""
+        if self.__originalCall != value:
+            self.__originalCall = value
+            self._hand = None  # force recreation
+
     def invalidateHand(self):
         """some source for the computation of current hand changed"""
         self._hand = None
@@ -232,7 +244,7 @@ class Player(StrMixin):
             self._hand = self.__computeHand()
         elif Debug.hand:
             _ = self.__computeHand()
-            assert self._hand == self.__computeHand(), '{} != {}'.format(_, self._hand)
+            assert self._hand == _, '{} != {}'.format(self._hand, _)
         return self._hand
 
     @property
