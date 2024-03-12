@@ -507,6 +507,8 @@ class WrigglingSnake(MJRule):
                 and all(not x.isChow for x in hand.declaredMelds))
 
     def computeLastMelds(hand):
+        if not hand.lastTile:
+            return []
         return [hand.lastTile.pair] if hand.lastTile.value == 1 else [hand.lastTile.single]
 
     def winningTileCandidates(hand):
