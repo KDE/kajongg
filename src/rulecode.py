@@ -508,8 +508,9 @@ class WrigglingSnake(MJRule):
 
     def computeLastMelds(hand):
         if not hand.lastTile:
-            return []
-        return [hand.lastTile.pair] if hand.lastTile.value == 1 else [hand.lastTile.single]
+            return MeldList()
+        _ = Tile(hand.lastTile)
+        return MeldList(_.pair) if hand.lastTile.value == 1 else MeldList(_.single)
 
     def winningTileCandidates(hand):
         suits = hand.suits.copy()
@@ -780,7 +781,7 @@ class Knitting(MJRule):
 class AllPairHonors(MJRule):
 
     def computeLastMelds(hand):
-        return [hand.lastTile.pair]
+        return MeldList(Tile(hand.lastTile).pair)
 
     def claimness(hand, discard):
         result = IntDict()
@@ -1117,8 +1118,8 @@ class ThirteenOrphans(MJRule):
         meldSize = hand.tilesInHand.count(hand.lastTile)
         if meldSize == 0:
             # the last tile is called and not yet in the hand
-            return [Meld()]
-        return [hand.lastTile.meld(meldSize)]
+            return MeldList()
+        return MeldList(Tile(hand.lastTile).meld(meldSize))
 
     def rearrange(hand, rest):
         melds = []
