@@ -241,7 +241,7 @@ class Tile(ReprMixin):  # pylint:disable=too-many-instance-attributes
 
     def name2(self) ->str:
         """__str__ might be changed by a subclass"""
-        return self.group + str(self.char)
+        return self.group + self.char
 
     def __repr__(self) ->str:
         """ReprMixin does not seem to work on str subclass"""
