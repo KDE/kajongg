@@ -571,9 +571,8 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         exposedChows = [x for x in self._exposedMelds if x.isChow]
         if len(exposedChows) >= self.game.ruleset.maxChows:
             return MeldList()
-        _ = self.game.lastDiscard
-        _ = (TileTuple(self.concealedTiles) + _).possibleChows(_)
-        return MeldList(Meld(x) for x in _)# FIXME: sollten direkt Melds sein
+        ladi = self.game.lastDiscard
+        return (TileTuple(self.concealedTiles) + ladi).possibleChows(ladi)
 
     def __possibleKongs(self) ->MeldList:
         """return a unique list of lists with possible kong combinations"""
