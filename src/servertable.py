@@ -766,8 +766,8 @@ class ServerTable(Table, ReprMixin):
             args = (player.name, str(kongMeld))
             logDebug(i18n(msg, *args))
             logDebug(f"declareKong:concealedTiles:{player.concealedTiles}")
-            logDebug(f"declareKong:concealedMelds:{' '.join(str(x) for x in player.concealedMelds)}")
-            logDebug(f"declareKong:exposedMelds:{' '.join(str(x) for x in player.exposedMelds)}")
+            logDebug(f"declareKong:concealedMelds:{player.concealedMelds}")
+            logDebug(f"declareKong:exposedMelds:{player.exposedMelds}")
             self.abort(msg, *args)
             return
         player.exposeMeld(kongMeld)

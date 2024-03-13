@@ -203,8 +203,8 @@ class Player(ReprMixin):
     def clearHand(self) -> None:
         """clear player attributes concerning the current hand"""
         self._concealedTiles:PieceList = PieceList()
-        self._exposedMelds:List[Meld] = []
-        self._concealedMelds:List[Meld] = []
+        self._exposedMelds = MeldList()
+        self._concealedMelds = MeldList()
         self._bonusTiles:TileList = TileList()
         self.discarded:List[Tile] = []
         self.visibleTiles.clear()
@@ -277,14 +277,14 @@ class Player(ReprMixin):
         return TileTuple(self._concealedTiles)
 
     @property
-    def exposedMelds(self) ->Tuple[Meld, ...]: # FIXME: Melds
+    def exposedMelds(self) ->MeldList:
         """a readonly tuple"""
-        return tuple(self._exposedMelds)
+        return self._exposedMelds
 
     @property
-    def concealedMelds(self) ->Tuple[Meld, ...]: #FIXME: Melds
+    def concealedMelds(self) ->MeldList:
         """a readonly tuple"""
-        return tuple(self._concealedMelds)
+        return self._concealedMelds
 
     @property
     def mayWin(self) ->bool:
@@ -821,8 +821,8 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         if len(allMeldTiles) == 4 and allMeldTiles[0].isExposed:
             tile0 = allMeldTiles[0].exposed
             # we are adding a 4th tile to an exposed pung
-            self._exposedMelds = [
-                x for x in self._exposedMelds if x != tile0.pung]
+            self._exposedMelds = MeldList(
+                x for x in self._exposedMelds if x != tile0.pung)
             meld = tile0.kong
             if allMeldTiles[3] not in self._concealedTiles:
                 game.debug(
