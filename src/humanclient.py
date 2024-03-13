@@ -55,6 +55,7 @@ class SelectChow(KDialogIgnoringEscape):
     def __init__(self, chows:'MeldList', propose:Optional['Meld'], deferred:Deferred) ->None:
         KDialogIgnoringEscape.__init__(self)
         decorateWindow(self)
+        self.setWindowFlags(cast(Qt.WindowType, Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowTitleHint))
         self.setButtons(KDialog.NoButton)
         self.chows = chows
         self.selectedChow = None
