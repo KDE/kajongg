@@ -953,6 +953,11 @@ class MeldList(list):
             list.extend(self, [Meld(x) for x in newContent])
         self.sort()
 
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            return type(self)(list.__getitem__(self, key))
+        return list.__getitem__(self, key)
+
     def extend(self, values:Iterable[Meld]) ->None:
         list.extend(self, values)
         self.sort()
