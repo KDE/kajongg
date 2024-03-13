@@ -267,9 +267,9 @@ class Player(ReprMixin):
         return self._hand
 
     @property
-    def bonusTiles(self) ->Tuple[Tile, ...]: # FIXME: TileTuple
+    def bonusTiles(self) ->TileList:
         """a readonly tuple"""
-        return tuple(self._bonusTiles)
+        return self._bonusTiles
 
     @property
     def concealedTiles(self) ->TileTuple:
