@@ -51,6 +51,8 @@ class DBCursor(sqlite3.Cursor):
             logDebug(str(self))
         try:
             for _ in range(10):
+                if _:
+                    logDebug(f'execute try #{_} {statement}')
                 try:
                     with Duration(statement, 60.0 if Debug.neutral else 2.0):
                         if isinstance(parameters, list):
@@ -74,6 +76,7 @@ class DBCursor(sqlite3.Cursor):
         except sqlite3.Error as exc:
             self.failure = exc
             msg = f"ERROR in {DBHandle.dbPath()}: {exc.message if hasattr(exc, 'message') else ''} for {self}"
+            logDebug(msg)
             if mayFail:
                 if not failSilent:
                     logDebug(msg)
