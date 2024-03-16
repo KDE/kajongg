@@ -457,11 +457,9 @@ class Game:
                     assert self.wall
                     player.front = cast('UIWall', self.wall)[idx]
                     if hasattr(player, 'sideText'):
+                        if player.sideText.board is not player.front:
+                            player.sideText.animateNextChange = True
                         player.sideText.board = player.front
-                # we want names to move simultaneously
-                player1 = self.players[1]
-                if hasattr(player1, 'sideText'):
-                    player1.sideText.refreshAll()
 
     @staticmethod
     def _newGameId() ->int:

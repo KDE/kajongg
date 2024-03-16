@@ -222,7 +222,7 @@ class GameScene(SceneWithFocusRect):
         without having to scroll"""
         if self.game:
             assert self.game.wall
-            with AnimationSpeed():
+            with AnimationSpeed(99):
                 self.game.wall.decorate4()
                 for uiTile in self.game.wall.tiles:
                     _ = cast(UITile, uiTile)

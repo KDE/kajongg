@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from scene import PlayingScene
 
 
-class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
+class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):  # pylint:disable=too-many-instance-attributes
 
     """The text written on the wall"""
 
@@ -53,6 +53,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
         self.__color = QColor('black')
         self.__boundingRect:Optional[QRectF] = None
         self.__font:QFont = QFont()
+        self.animateNextChange = False
 
     def adaptedFont(self) ->QFont:
         """Font with the correct point size for the wall"""
@@ -84,7 +85,12 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):
             rotating |= sceneRotation(side) != sceneRotation(side.board)
 
         alreadyMoved = any(x.x() for x in sides)
-        with AnimationSpeed(speed=Speeds.windDisc if rotating and alreadyMoved else 99):
+        speed = 99
+        for side in sides:
+            if side.animateNextChange:
+                speed = Speeds.windDisc if rotating and alreadyMoved else 99
+                side.animateNextChange = False
+        with AnimationSpeed(speed=speed):
             # first round: just place the winds. Only animate moving them
             # for later rounds.
             for side in sides:
@@ -399,7 +405,6 @@ class UIWall(Wall):
     def showShadowsChanged(self, deferredResult:Any, # pylint: disable=unused-argument
         unusedOldValue:bool, unusedNewValue:bool) ->None:
         """setting this actually changes the visuals."""
-        assert ParallelAnimationGroup.current is None
         self.__resizeHandBoards()
 
     def __resizeHandBoards(self, unusedResults:Any=None) ->None:
@@ -465,7 +470,7 @@ class UIWall(Wall):
         are moved without animation.
         """
         assert self.game
-        with AnimationSpeed():
+        with AnimationSpeed(99):
             for player in self.game.players:
                 player.showInfo()
             SideText.refreshAll()
