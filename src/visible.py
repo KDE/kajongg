@@ -81,9 +81,12 @@ class VisiblePlayer(Player):
         side = self.front
         self.sideText.text = f'{self.localName} - {self.explainHand().total()}'  # type:ignore[attr-defined]
         self.colorizeName()
-        _ = Wind.all4[self.wind].disc
-        assert _
-        side.disc = _
+        myWind = Wind.all4[self.wind]
+        if hasattr(myWind, 'disc'):
+            # sometimes this is not the case. TODO: when/why?
+            _ = myWind.disc
+            assert _
+            side.disc = _
         assert self.game
         side.disc.prevailing = self.game.roundsFinished > 0
         side.disc.board = self.front
