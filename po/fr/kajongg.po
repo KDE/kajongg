@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2023-09-17 00:42+0000\n"
+"POT-Creation-Date: 2024-03-16 00:36+0000\n"
 "PO-Revision-Date: 2022-01-31 19:49+0100\n"
 "Last-Translator: Xavier Besnard <xavier.besnard@neuf.fr>\n"
 "Language-Team: French <kde-francophone@kde.org>\n"
@@ -53,7 +53,7 @@ msgstr "Vue"
 msgid "Toolbar"
 msgstr "Barre d'outils"
 
-#: src/background.py:68 src/tileset.py:81
+#: src/background.py:67 src/tileset.py:80
 msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "le fichier <filename>%1</filename> ne contient pas de SVG valable"
 
@@ -78,7 +78,7 @@ msgstr "Joueur"
 msgid "Message"
 msgstr "Message"
 
-#: src/chat.py:122
+#: src/chat.py:121
 msgid "Chat on table %1 at %2"
 msgstr "Discussion à la table %1 sur le serveur %2"
 
@@ -125,24 +125,24 @@ msgstr "Utiliser les sons s'ils sont disponibles"
 msgid "Let others hear my voice"
 msgstr "Permettre aux autres d'entendre ma voix"
 
-#: src/configdialog.py:98
+#: src/configdialog.py:97
 msgctxt "kajongg"
 msgid "Play"
 msgstr "Jouer"
 
-#: src/configdialog.py:101
+#: src/configdialog.py:100
 msgid "Tiles"
 msgstr "Tuiles"
 
-#: src/configdialog.py:104
+#: src/configdialog.py:103
 msgid "Backgrounds"
 msgstr "Arrière-plans"
 
-#: src/deferredutil.py:262 src/deferredutil.py:421
+#: src/deferredutil.py:266 src/deferredutil.py:426
 msgid "The game server lost connection to player %1"
 msgstr "Le serveur de jeu a perdu la connexion avec le joueur %1"
 
-#: src/deferredutil.py:265
+#: src/deferredutil.py:269
 msgid ""
 "Error for player %1: %2\n"
 "%3"
@@ -150,64 +150,64 @@ msgstr ""
 "Erreur pour le joueur %1 : %2\n"
 "%3"
 
-#: src/differ.py:65
+#: src/differ.py:64
 msgctxt "Kajongg"
 msgid "Rule"
 msgstr "Règle"
 
-#: src/differ.py:123
+#: src/differ.py:122
 msgctxt "@title:window"
 msgid "Compare"
 msgstr "Comparer"
 
-#: src/differ.py:166 src/differ.py:168
+#: src/differ.py:165 src/differ.py:167
 msgctxt "Kajongg-Rule"
 msgid "not defined"
 msgstr "non défini"
 
-#: src/game.py:535
+#: src/game.py:531
 msgid "Score computed manually"
 msgstr "Score calculé manuellement"
 
-#: src/game.py:631
+#: src/game.py:627
 msgid "Player %1 not known"
 msgstr "Joueur %1 inconnu"
 
-#: src/game.py:1059
+#: src/game.py:1051
 msgid "Short living wall: Tile is invisible, hence dangerous"
 msgstr "Mur court : la tuile est invisible et donc dangereuse"
 
-#: src/games.py:91 src/playerlist.py:58 src/tables.py:58
+#: src/games.py:90 src/playerlist.py:58 src/tables.py:58
 msgid "Players"
 msgstr "Joueurs"
 
-#: src/games.py:91
+#: src/games.py:90
 msgid "Started"
 msgstr "Démarrée"
 
-#: src/games.py:103
+#: src/games.py:102
 msgctxt "@title:window"
 msgid "Games"
 msgstr "Parties"
 
-#: src/games.py:120
+#: src/games.py:119
 msgctxt "start a new game"
 msgid "&New"
 msgstr "&Nouveau"
 
-#: src/games.py:124
+#: src/games.py:123
 msgid "&Load"
 msgstr "&Charger"
 
-#: src/games.py:128 src/playerlist.py:48
+#: src/games.py:127 src/playerlist.py:48
 msgid "&Delete"
 msgstr "&Supprimer"
 
-#: src/games.py:132
+#: src/games.py:131
 msgid "Show only pending games"
 msgstr "N'afficher que les parties suspendues"
 
-#: src/games.py:235
+#: src/games.py:234
 msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
@@ -216,188 +216,183 @@ msgstr ""
 "définitif, vous ne pourrez pas annuler cette suppression avec le bouton "
 "« Annuler »"
 
-#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:113 src/kdestub.py:114
-#: src/kdestub.py:116
+#: src/guiutil.py:146 src/guiutil.py:148 src/kdestub.py:115 src/kdestub.py:116
+#: src/kdestub.py:118
 msgid "Kajongg"
 msgstr "Kajongg"
 
-#: src/humanclient.py:50
+#: src/humanclient.py:49
 msgid "Which chow do you want to expose?"
 msgstr "Quelle séquence voulez-vous montrer ?"
 
-#: src/humanclient.py:88
+#: src/humanclient.py:87
 msgid "Which kong do you want to declare?"
 msgstr "Quel Carré voulez-vous déclarer ?"
 
-#: src/humanclient.py:155
+#: src/humanclient.py:154
 msgid "Choose"
 msgstr "Choisir"
 
-#: src/humanclient.py:347
+#: src/humanclient.py:346
 msgid "You cannot say %1"
 msgstr "Vous ne pouvez pas annoncer %1"
 
-#: src/humanclient.py:569
+#: src/humanclient.py:567
 msgid "Player %1 has left the table"
 msgstr "Le joueur %1 a quitté la table de jeu"
 
-#: src/humanclient.py:632
+#: src/humanclient.py:619
 msgid ""
 "The game on table <numid>%1</numid> can begin. Are you ready to play now?"
 msgstr ""
 "Le jeu sur la table <numid>%1</numid> peut commencer. Êtes-vous prêt à "
 "jouer ? "
 
-#: src/humanclient.py:650
+#: src/humanclient.py:637
 msgid "Ready for next hand?"
 msgstr "Prêt pour la manche suivante ?"
 
-#: src/humanclient.py:907
+#: src/humanclient.py:894
 msgid "The connection to the server %1 broke, please try again later."
 msgstr ""
 "La connexion au serveur %1 est interrompue, veuillez ré-essayer plus tard."
 
-#: src/kajongg.py:81 src/kdestub.py:1055
+#: src/kajongg.py:83 src/kdestub.py:1054
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Mah Jongg - le très ancien jeu de plateau chinois pour 4 joueurs"
 
-#: src/kajongg.py:85
+#: src/kajongg.py:87
 msgid "all robots play with visible concealed tiles"
 msgstr "tous les robots jouent avec des tuiles cachées"
 
-#: src/kajongg.py:86
+#: src/kajongg.py:88
 msgid "start with demo mode"
 msgstr "Démarrer en mode « Démonstration »"
 
-#: src/kajongg.py:87
+#: src/kajongg.py:89
 msgid "login to HOST"
 msgstr "Connexion à « HOST »"
 
-#: src/kajongg.py:88
+#: src/kajongg.py:90
 msgid "start new TABLE"
 msgstr "Commencer une nouvelle TABLE"
 
-#: src/kajongg.py:89
+#: src/kajongg.py:91
 msgid "join TABLE"
 msgstr "Joindre la TABLE"
 
-#: src/kajongg.py:90
+#: src/kajongg.py:92
 msgid "use RULESET without asking"
 msgstr "Utiliser un ensemble de règles sans demander"
 
-#: src/kajongg.py:91
-msgid "play only ROUNDS rounds per game. Only for debugging!"
-msgstr ""
-"Jouer uniquement ROUNDS tours par partie. Uniquement à des fins de débogage."
-
-#: src/kajongg.py:92
+#: src/kajongg.py:93
 msgid "prefer PLAYER for next login"
 msgstr "Préférez « Joueur » pour la prochaine connexion"
 
-#: src/kajongg.py:93
+#: src/kajongg.py:94
 msgid "use AI variant for human player in demo mode"
 msgstr ""
 "utiliser une variante d'IA pour un joueur humain dans le mode de "
 "démonstration"
 
-#: src/kajongg.py:94
+#: src/kajongg.py:95
 msgid "write statistics to CSV"
 msgstr "écrire des statistiques au format « csv »"
 
-#: src/kajongg.py:95
+#: src/kajongg.py:96
 msgid "show all available rulesets"
 msgstr "afficher tous les ensembles de règles disponibles"
 
-#: src/kajongg.py:96
+#: src/kajongg.py:97
 msgid "for testing purposes: Initializes the random generator"
 msgstr "à des fins de tests : initialise le générateur aléatoire"
 
-#: src/kajongg.py:98
+#: src/kajongg.py:99
 msgid "show no graphical user interface. Intended only for testing"
 msgstr ""
 "ne pas utiliser d'interface graphique. Réservé uniquement à des fins de "
 "tests."
 
-#: src/kajongg.py:99
+#: src/kajongg.py:100
 msgid "use a dedicated server listening on SOCKET. Intended only for testing"
 msgstr ""
 "utiliser un serveur dédié écoutant sur « SOCKET ». Réservé uniquement à des "
 "fins de tests."
 
-#: src/kajongg.py:100
+#: src/kajongg.py:101
 msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgstr ""
 "utiliser un serveur dédié écoutant sur PORT. Réservé uniquement à des fins "
 "de tests."
 
-#: src/kdestub.py:261
+#: src/kdestub.py:262
 msgid "&OK"
 msgstr "&Ok"
 
-#: src/kdestub.py:263
+#: src/kdestub.py:264
 msgid "&Apply"
 msgstr "&Appliquer"
 
-#: src/kdestub.py:265
+#: src/kdestub.py:266
 msgid "&Cancel"
 msgstr "Annu&ler"
 
-#: src/kdestub.py:267 src/kdestub.py:457
+#: src/kdestub.py:268 src/kdestub.py:458
 msgid "&Help"
 msgstr "&Aide"
 
-#: src/kdestub.py:270
+#: src/kdestub.py:271
 msgid "&Defaults"
 msgstr "Réglages par &défaut"
 
-#: src/kdestub.py:343
+#: src/kdestub.py:344
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Afficher la barre d'ét&at"
 
-#: src/kdestub.py:349
+#: src/kdestub.py:350
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Afficher la barre d'ou&tils"
 
-#: src/kdestub.py:355
+#: src/kdestub.py:356
 msgid "Configure Tool&bars..."
 msgstr "Configurer les &barres d'outils"
 
-#: src/kdestub.py:357
+#: src/kdestub.py:358
 msgid "Configure toolbars"
 msgstr "Configurer les barres d'outils"
 
-#: src/kdestub.py:364
+#: src/kdestub.py:365
 msgid "Configure &Kajongg..."
 msgstr "Configurer &Kajongg..."
 
-#: src/kdestub.py:366 src/kdestub.py:1166
+#: src/kdestub.py:367 src/kdestub.py:1166
 msgid "Configure"
 msgstr "Configurer"
 
-#: src/kdestub.py:453
+#: src/kdestub.py:454
 msgid "&Game"
 msgstr "&Partie"
 
-#: src/kdestub.py:454
+#: src/kdestub.py:455
 msgid "&View"
 msgstr "&Vue"
 
-#: src/kdestub.py:455
+#: src/kdestub.py:456
 msgid "&Settings"
 msgstr "&Configuration"
 
-#: src/kdestub.py:463
+#: src/kdestub.py:464
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Aide"
 
-#: src/kdestub.py:466 src/kdestub.py:819
+#: src/kdestub.py:467 src/kdestub.py:819
 msgid "Switch Application Language"
 msgstr "Changer la langue de l'application"
 
-#: src/kdestub.py:470
+#: src/kdestub.py:471
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "À propos de &Kajongg"
@@ -443,28 +438,28 @@ msgstr ""
 msgid "About Kajongg"
 msgstr "À propos de Kajongg"
 
-#: src/kdestub.py:1017
+#: src/kdestub.py:1016
 msgid "Version: %1"
 msgstr "Version : %1"
 
-#: src/kdestub.py:1018
+#: src/kdestub.py:1017
 msgid "Protocol version %1"
 msgstr "Version du protocole %1"
 
-#: src/kdestub.py:1021
+#: src/kdestub.py:1020
 msgid "Original author"
 msgstr "Auteur original"
 
-#: src/kdestub.py:1028
+#: src/kdestub.py:1027
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "KDE Frameworks (non installé ou non utilisable)"
 
-#: src/kdestub.py:1035
+#: src/kdestub.py:1034
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "Utilise les versions %1"
 
-#: src/kdestub.py:1056
+#: src/kdestub.py:1055
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -472,7 +467,7 @@ msgstr ""
 "Il s'agit du jeu classique Mah Jongg pour quatre joueurs. Si vous cherchez "
 "le solitaire nommé Mah Jongg, veuillez utiliser l'application KMahjongg."
 
-#: src/kdestub.py:1075
+#: src/kdestub.py:1074
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -480,11 +475,11 @@ msgstr ""
 "Veuillez utiliser <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> "
 "pour signaler des bogues."
 
-#: src/kdestub.py:1080
+#: src/kdestub.py:1079
 msgid "Authors:"
 msgstr "Auteurs :"
 
-#: src/kdestub.py:1126
+#: src/kdestub.py:1125
 msgid "License Agreement"
 msgstr "Contrat de licence"
 
@@ -500,265 +495,265 @@ msgstr "Ac&tions disponibles :"
 msgid "Curr&ent actions:"
 msgstr "Actions en &cours :"
 
-#: src/login.py:166
+#: src/login.py:165
 msgid "trying to start local server %1"
 msgstr "tentative de démarrage d'un serveur de jeu local %1"
 
-#: src/login.py:177 src/login.py:621
+#: src/login.py:176 src/login.py:618
 msgid "removed stale socket <filename>%1</filename>"
 msgstr "a supprimé la connexion obsolète <filename>%1</filename>"
 
-#: src/login.py:198
+#: src/login.py:197
 msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
 msgstr "a démarré le serveur Kajongg local : pid = <numid>%1</numid> %2"
 
-#: src/login.py:238
+#: src/login.py:237
 msgctxt "kajongg"
 msgid "Login"
 msgstr "Identifiant"
 
-#: src/login.py:286 src/login.py:394
+#: src/login.py:285 src/login.py:391
 msgid "Game server:"
 msgstr "Serveur de jeu :"
 
-#: src/login.py:289 src/login.py:396
+#: src/login.py:288 src/login.py:393
 msgid "Username:"
 msgstr "Nom d'utilisateur :"
 
-#: src/login.py:292 src/login.py:399
+#: src/login.py:291 src/login.py:396
 msgid "Password:"
 msgstr "Mot de passe :"
 
-#: src/login.py:294
+#: src/login.py:293
 msgctxt "kajongg"
 msgid "Ruleset:"
 msgstr "Ensemble des règles :"
 
-#: src/login.py:388
+#: src/login.py:385
 msgctxt "@title:window"
 msgid "Create User Account"
 msgstr "Créer un compte d'utilisateur"
 
-#: src/login.py:402
+#: src/login.py:399
 msgid "Repeat password:"
 msgstr "Répéter le mot de passe :"
 
-#: src/login.py:552
+#: src/login.py:549
 msgid "You are already connected to server %1"
 msgstr "Vous êtes déjà connecté au serveur %1"
 
-#: src/login.py:589
+#: src/login.py:586
 msgctxt "USER is not known on SERVER"
 msgid "%1 is not known on %2, do you want to open an account?"
 msgstr "%1 n'est pas connu sur %2, voulez-vous lui ouvrir un compte ?"
 
-#: src/login.py:601
+#: src/login.py:598
 msgid "Server %1 did not answer"
 msgstr "Le serveur %1 n'a pas répondu"
 
-#: src/login.py:603
+#: src/login.py:600
 msgid "Server %1 refused connection"
 msgstr "Le serveur %1 a refusé la connexion"
 
-#: src/login.py:605
+#: src/login.py:602
 msgid "Server %1 does not run a kajongg server"
 msgstr "Le serveur %1 ne fait pas tourner de serveur kajongg"
 
-#: src/login.py:607
+#: src/login.py:604
 msgid "Address for server %1 cannot be found"
 msgstr "Impossible de trouver l'adresse du serveur %1"
 
-#: src/login.py:610
+#: src/login.py:607
 msgid "Login to server %1 failed: You have no network connection"
 msgstr ""
 "La connexion au serveur %1 a échoué : vous n'avez pas de connexion réseau."
 
-#: src/login.py:622
+#: src/login.py:619
 msgid "Please try again"
 msgstr "Veuillez essayer à nouveau"
 
-#: src/mainwindow.py:498
+#: src/mainwindow.py:496
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "&Compter les points d'une partie manuelle"
 
-#: src/mainwindow.py:500
+#: src/mainwindow.py:498
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Partie manuelle"
 
-#: src/mainwindow.py:503
+#: src/mainwindow.py:501
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "&Compter les points d'une partie manuelle."
 
-#: src/mainwindow.py:505
+#: src/mainwindow.py:503
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Jouer"
 
-#: src/mainwindow.py:508
+#: src/mainwindow.py:506
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Démarrer une nouvelle partie."
 
-#: src/mainwindow.py:510
+#: src/mainwindow.py:508
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "&Arrêter la partie"
 
-#: src/mainwindow.py:514
+#: src/mainwindow.py:512
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Arrêter la partie en cours."
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:514
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "&Quitter Kajongg"
 
-#: src/mainwindow.py:519
+#: src/mainwindow.py:517
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Joueurs"
 
-#: src/mainwindow.py:522
+#: src/mainwindow.py:520
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "Identifiez vos joueurs."
 
-#: src/mainwindow.py:524
+#: src/mainwindow.py:522
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "Ensemble des &Règles"
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:525
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "règles personnalisées."
 
-#: src/mainwindow.py:531
+#: src/mainwindow.py:529
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "&Modifier l'angle de vue"
 
-#: src/mainwindow.py:532
+#: src/mainwindow.py:530
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Angle"
 
-#: src/mainwindow.py:535
+#: src/mainwindow.py:533
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Modifie l'apparence visuelle des tuiles."
 
-#: src/mainwindow.py:539
+#: src/mainwindow.py:537
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "&Mode plein écran"
 
-#: src/mainwindow.py:542
+#: src/mainwindow.py:540
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "Tableau des scores"
 
-#: src/mainwindow.py:544
+#: src/mainwindow.py:542
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "&Scores"
 
-#: src/mainwindow.py:546
+#: src/mainwindow.py:544
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Afficher / cacher le tableau des scores pour la partie en cours."
 
-#: src/mainwindow.py:548
+#: src/mainwindow.py:546
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "&Expliquer les scores"
 
-#: src/mainwindow.py:549
+#: src/mainwindow.py:547
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "&Expliquer"
 
-#: src/mainwindow.py:551
+#: src/mainwindow.py:549
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Expliquer le score pour tous les joueurs de la partie en cours."
 
-#: src/mainwindow.py:553
+#: src/mainwindow.py:551
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "Mode &démonstration "
 
-#: src/mainwindow.py:556
+#: src/mainwindow.py:554
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr ""
 "Laisse l'ordinateur jouer pour vous. Commence une partie nouvelle en local "
 "si nécessaire."
 
-#: src/mainwindow.py:558
+#: src/mainwindow.py:556
 msgid "C&hat"
 msgstr "&Discuter"
 
-#: src/mainwindow.py:561
+#: src/mainwindow.py:559
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Discuter avec les autres joueurs."
 
-#: src/meld.py:318
+#: src/meld.py:314
 msgctxt "kajongg meld type"
 msgid "Bonus"
 msgstr "Bonus"
 
-#: src/meld.py:320
+#: src/meld.py:316
 msgctxt "kajongg meld type"
 msgid "&single"
 msgstr "&seul"
 
-#: src/meld.py:322
+#: src/meld.py:318
 msgctxt "kajongg meld type"
 msgid "&pair"
 msgstr "&paire"
 
-#: src/meld.py:324
+#: src/meld.py:320
 msgctxt "kajongg meld type"
 msgid "&chow"
 msgstr "&Séquence"
 
-#: src/meld.py:326
+#: src/meld.py:322
 msgctxt "kajongg meld type"
 msgid "p&ung"
 msgstr "B&relan"
 
-#: src/meld.py:328
+#: src/meld.py:324
 msgctxt "kajongg meld type"
 msgid "c&laimed kong"
 msgstr "Carré appe&lé"
 
-#: src/meld.py:330
+#: src/meld.py:326
 msgctxt "kajongg meld type"
 msgid "k&ong"
 msgstr "C&arré"
 
-#: src/meld.py:331
+#: src/meld.py:327
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
 msgstr "reste des tuiles"
 
-#: src/meld.py:338
+#: src/meld.py:334
 msgctxt "kajongg meld state"
 msgid "Exposed"
 msgstr "Découvert"
 
-#: src/meld.py:339
+#: src/meld.py:335
 msgctxt "kajongg meld state"
 msgid "Concealed"
 msgstr "Caché"
 
-#: src/meld.py:345
+#: src/meld.py:341
 #, python-brace-format
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
@@ -937,60 +932,60 @@ msgstr "N"
 msgid "You cannot or do not want to claim this tile"
 msgstr "Vous ne pouvez ou ne voulez pas appeler cette tuile"
 
-#: src/mjresource.py:80
+#: src/mjresource.py:79
 msgid ""
 "cannot find any %1 in the following directories, is libkmahjongg installed?"
 msgstr ""
 "impossible de trouver le moindre %1 dans les dossiers suivants, est-ce que "
 "la bibliothèque « libkmahjongg » est installée ?"
 
-#: src/mjresource.py:104
+#: src/mjresource.py:103
 msgid "cannot find %1, using default"
 msgstr "impossible de trouver %1, utilisation de la valeur par défaut"
 
-#: src/mjresource.py:114
+#: src/mjresource.py:113
 msgid "unknown name"
 msgstr "nom inconnu"
 
-#: src/mjresource.py:115
+#: src/mjresource.py:114
 msgid "unknown author"
 msgstr "auteur inconnu"
 
-#: src/mjresource.py:118
+#: src/mjresource.py:117
 msgid "no description available"
 msgstr "aucune description disponible"
 
-#: src/mjresource.py:121
+#: src/mjresource.py:120
 msgid "no E-Mail address available"
 msgstr "aucune adresse e-mail disponible"
 
-#: src/player.py:687
+#: src/player.py:700
 msgid "%1 claiming MahJongg: She does not really have tile %2"
 msgstr "%1 annonce « Mahjongg » : il n'a pas vraiment la tuile %2"
 
-#: src/player.py:696
+#: src/player.py:709
 msgid ""
 "%1 claiming MahJongg: She did not pass all concealed tiles to the server"
 msgstr ""
 "%1 annonce Mahjongg : il n'a pas donné toutes les tuiles cachées au serveur"
 
-#: src/player.py:807
+#: src/player.py:825
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
 msgstr "Le joueur %1 a 3 ou 4 combinaisons découvertes qui sont toutes vertes"
 
-#: src/player.py:816
+#: src/player.py:834
 msgid "Player %1 may try a True Color Game"
 msgstr "Le joueur %1 pourrait essayer une main de couleur pure"
 
-#: src/player.py:819
+#: src/player.py:837
 msgid "Player %1 may try an All Terminals Game"
 msgstr "Le joueur %1 pourrait essayer une main avec seulement des Extrémités"
 
-#: src/player.py:832
+#: src/player.py:850
 msgid "Player %1 exposed many winds"
 msgstr "Le joueur %1 a découvert plusieurs Vents"
 
-#: src/player.py:836
+#: src/player.py:854
 msgid "Player %1 exposed many dragons"
 msgstr "Le joueur %1 a découvert plusieurs Dragons"
 
@@ -1731,16 +1726,16 @@ msgstr "Appel pour le Quadruple Plein"
 msgid "Calling for Purity"
 msgstr "Appel pour la Pureté"
 
-#: src/query.py:219
+#: src/query.py:215
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
 msgstr "Partie locale"
 
-#: src/query.py:397
+#: src/query.py:392
 msgid "Database %1 updated from schema %2 to %3"
 msgstr "Base de données %1 mise à jour du schéma %2 au schéma %3"
 
-#: src/rule.py:40 src/scoringdialog.py:677 src/scoringdialog.py:760
+#: src/rule.py:40 src/scoringdialog.py:674 src/scoringdialog.py:757
 msgid "points"
 msgstr "points"
 
@@ -1754,83 +1749,83 @@ msgctxt "kajongg"
 msgid "limits"
 msgstr "limites"
 
-#: src/rule.py:79
+#: src/rule.py:82
 msgctxt "Kajongg"
 msgid "%1 points"
 msgstr "%1 points"
 
-#: src/rule.py:81
+#: src/rule.py:84
 msgctxt "Kajongg"
 msgid "%1 doubles"
 msgstr "%1 doubles"
 
-#: src/rule.py:86
+#: src/rule.py:89
 msgctxt "Kajongg"
 msgid "%1 limits"
 msgstr "%1 limites"
 
-#: src/rule.py:325
+#: src/rule.py:328
 msgid "Meld Rules"
 msgstr "Règles de combinaison"
 
-#: src/rule.py:326
+#: src/rule.py:329
 msgid ""
 "Meld rules are applied to single melds independent of the rest of the hand"
 msgstr ""
 "Les règles de combinaison sont appliquées aux combinaisons simples "
 "indépendamment du reste de la main"
 
-#: src/rule.py:327
+#: src/rule.py:330
 msgid "Hand Rules"
 msgstr "Règles de main"
 
-#: src/rule.py:328
+#: src/rule.py:331
 msgid "Hand rules are applied to the entire hand, for all players"
 msgstr ""
 "Les règles de main sont appliquées à toute la main, pour tous les joueurs"
 
-#: src/rule.py:329
+#: src/rule.py:332
 msgid "Winner Rules"
 msgstr "Règles du vainqueur"
 
-#: src/rule.py:330
+#: src/rule.py:333
 msgid "Winner rules are applied to the entire hand but only for the winner"
 msgstr ""
 "Les règles du vainqueur sont appliquées à toute la main mais seulement pour "
 "le vainqueur"
 
-#: src/rule.py:331
+#: src/rule.py:334
 msgid "Loser Rules"
 msgstr "Règles des perdants"
 
-#: src/rule.py:332
+#: src/rule.py:335
 msgid "Loser rules are applied to the entire hand but only for non-winners"
 msgstr ""
 "Les règles des perdants sont appliquées à toute la main mais seulement pour "
 "les perdants"
 
-#: src/rule.py:333
+#: src/rule.py:336
 msgid "Mah Jongg Rules"
 msgstr "Règles de Mah Jongg"
 
-#: src/rule.py:334
+#: src/rule.py:337
 msgid "Only hands matching a Mah Jongg rule can win"
 msgstr "Seules les mains correspondant à une règle de Mah Jongg peuvent gagner"
 
-#: src/rule.py:335
+#: src/rule.py:338
 msgctxt "kajongg"
 msgid "Options"
 msgstr "Options"
 
-#: src/rule.py:336
+#: src/rule.py:339
 msgid "Here we have several special game related options"
 msgstr "Nous avons ici diverses options spéciales relatives à la partie"
 
-#: src/rule.py:337
+#: src/rule.py:340
 msgid "Penalties"
 msgstr "Amendes"
 
-#: src/rule.py:338
+#: src/rule.py:341
 msgid ""
 "Penalties are applied manually by the user. They are only used for scoring "
 "games.\n"
@@ -1843,17 +1838,17 @@ msgstr ""
 "En jouant contre l'ordinateur ou sur Internet, Kajongg s'assure que nous "
 "n'aurez aucune amende à payer."
 
-#: src/rule.py:534
+#: src/rule.py:537
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
 msgstr "Copie de %1 de %2"
 
-#: src/rule.py:896
+#: src/rule.py:887
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
 msgstr "%4 ont des valeurs non valables %2 / %3 dans la règle « %1 »"
 
-#: src/rule.py:992
+#: src/rule.py:983
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1 : %2 est trop faible, la valeur minimale est %3"
@@ -1868,24 +1863,24 @@ msgctxt "kajongg"
 msgid "Rule"
 msgstr "Règle"
 
-#: src/rulesetselector.py:552
+#: src/rulesetselector.py:555
 msgid "C&opy"
 msgstr "C&opier"
 
-#: src/rulesetselector.py:553
+#: src/rulesetselector.py:556
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "Co&mparer"
 
-#: src/rulesetselector.py:554
+#: src/rulesetselector.py:557
 msgid "&Remove"
 msgstr "&Supprimer"
 
-#: src/rulesetselector.py:555
+#: src/rulesetselector.py:558
 msgid "&Close"
 msgstr "&Fermer"
 
-#: src/scene.py:365 src/scene.py:498
+#: src/scene.py:366 src/scene.py:498
 msgid "Do you really want to abort this game?"
 msgstr "Voulez-vous vraiment annuler cette partie ?"
 
@@ -1911,249 +1906,245 @@ msgctxt "@title:window"
 msgid "Select four players"
 msgstr "Sélectionnez quatre joueurs"
 
-#: src/scoring.py:288
+#: src/scoring.py:287
 msgid "Move Exposed Tiles Here"
 msgstr "Déplacer les tuiles découvertes à cet endroit"
 
-#: src/scoring.py:289
+#: src/scoring.py:288
 msgid "Move Concealed Tiles Here"
 msgstr "Déplacer les tuiles cachées à cet endroit"
 
-#: src/scoring.py:599
+#: src/scoring.py:596
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
 "Veuillez définir quatre joueurs dans <interface>Configuration / Joueurs</"
 "interface>"
 
-#: src/scoringdialog.py:234
+#: src/scoringdialog.py:230
 msgid "Round/Hand"
 msgstr "Tour / Manche"
 
-#: src/scoringdialog.py:262 src/scoringdialog.py:813
+#: src/scoringdialog.py:258 src/scoringdialog.py:809
 msgctxt "kajongg"
 msgid "Score"
 msgstr "Score"
 
-#: src/scoringdialog.py:262
+#: src/scoringdialog.py:258
 msgctxt "kajongg"
 msgid "Payments"
 msgstr "Paiements"
 
-#: src/scoringdialog.py:263
+#: src/scoringdialog.py:259
 msgctxt "kajongg"
 msgid "Balance"
 msgstr "Solde"
 
-#: src/scoringdialog.py:263
+#: src/scoringdialog.py:259
 msgctxt "kajongg"
 msgid "Chart"
 msgstr "Graphique"
 
-#: src/scoringdialog.py:409
+#: src/scoringdialog.py:405
 msgctxt "kajongg"
 msgid "Scores"
 msgstr "Scores"
 
-#: src/scoringdialog.py:451
+#: src/scoringdialog.py:445
 msgctxt "kajongg"
 msgid "Used Rules"
 msgstr "Règles employées"
 
-#: src/scoringdialog.py:485
+#: src/scoringdialog.py:479
 msgid "Final scores for game <numid>%1</numid>"
 msgstr "Scores finaux pour la partie <numid>%1</numid>"
 
-#: src/scoringdialog.py:487
+#: src/scoringdialog.py:481
 msgid "Scores for game <numid>%1</numid>"
 msgstr "Scores pour la partie <numid>%1</numid>"
 
-#: src/scoringdialog.py:559
+#: src/scoringdialog.py:553
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "Expliquer les scores"
 
-#: src/scoringdialog.py:575
+#: src/scoringdialog.py:569
 msgid "There is no active game"
 msgstr "Il n'y a aucune partie active"
 
-#: src/scoringdialog.py:578
+#: src/scoringdialog.py:572
 msgid "%1"
 msgstr "%1"
 
-#: src/scoringdialog.py:592
+#: src/scoringdialog.py:586
 msgid "Manual score for %1: %2 points"
 msgstr "Score manuel pour %1 : %2 points"
 
-#: src/scoringdialog.py:663
+#: src/scoringdialog.py:660
 msgid "Penalty"
 msgstr "Amende"
 
-#: src/scoringdialog.py:666
+#: src/scoringdialog.py:663
 msgid "Offense:"
 msgstr "Faute :"
 
-#: src/scoringdialog.py:673
+#: src/scoringdialog.py:670
 msgid "Total Penalty"
 msgstr "Amende totale"
 
-#: src/scoringdialog.py:706
+#: src/scoringdialog.py:703
 msgid "&Execute"
 msgstr "Réalis&er"
 
-#: src/scoringdialog.py:783
+#: src/scoringdialog.py:780
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
 msgstr "verse %1 points"
 
-#: src/scoringdialog.py:788
+#: src/scoringdialog.py:785
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
 msgstr "obtient %1 points"
 
-#: src/scoringdialog.py:799
+#: src/scoringdialog.py:796
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
 msgstr "Score pour cette manche"
 
-#: src/scoringdialog.py:811
+#: src/scoringdialog.py:807
 msgctxt "kajongg"
 msgid "Player"
 msgstr "Joueur"
 
-#: src/scoringdialog.py:812
+#: src/scoringdialog.py:808
 msgctxt "kajongg"
 msgid "Wind"
 msgstr "Vent"
 
-#: src/scoringdialog.py:814
+#: src/scoringdialog.py:810
 msgid "Winner"
 msgstr "Vainqueur"
 
-#: src/scoringdialog.py:820
+#: src/scoringdialog.py:816
 msgctxt "kajongg"
 msgid "Draw"
 msgstr "Tirage"
 
-#: src/scoringdialog.py:822
+#: src/scoringdialog.py:818
 msgid "&Penalties"
 msgstr "&Amendes"
 
-#: src/scoringdialog.py:824
+#: src/scoringdialog.py:820
 msgid "&Save Hand"
 msgstr "&Enregistrer la manche"
 
-#: src/scoringdialog.py:846
+#: src/scoringdialog.py:842
 msgid "&Last Tile:"
 msgstr "Dernière tui&le :"
 
-#: src/scoringdialog.py:855
+#: src/scoringdialog.py:851
 msgid "L&ast Meld:"
 msgstr "Dernière combin&aison :"
 
-#: src/server.py:113
+#: src/server.py:114
 msgid "Wrong password"
 msgstr "Mauvais mot de passe"
 
-#: src/server.py:212
+#: src/server.py:213
 msgid "table with id <numid>%1</numid> not found"
 msgstr "impossible de trouver la table portant l'identifiant <numid>%1</numid>"
 
-#: src/server.py:358
+#: src/server.py:359
 msgid "Player %1 has logged out"
 msgstr "Le joueur %1 s'est déconnecté"
 
-#: src/server.py:429
+#: src/server.py:428
 #, python-format
 msgid "the server will listen on PORT (%d)"
 msgstr "Le serveur écoutera sur le port (%d)"
 
-#: src/server.py:433
+#: src/server.py:432
 msgid "the server will listen on SOCKET"
 msgstr "Le serveur écoutera sur le SOCKET"
 
-#: src/server.py:438
+#: src/server.py:436
 msgid "name of the database"
 msgstr "nom de la base de données"
 
-#: src/server.py:442
+#: src/server.py:440
 msgid "do not terminate local game server after last client disconnects"
 msgstr ""
 "ne pas arrêter le serveur local de jeu après la déconnexion du dernier joueur"
 
-#: src/server.py:447
-msgid "unrecognized arguments:%1"
-msgstr "paramètres non reconnus : %1"
-
-#: src/servertable.py:157
+#: src/servertable.py:156
 msgid "You already joined this table"
 msgstr "Vous avez déjà rejoint cette table"
 
-#: src/servertable.py:159
+#: src/servertable.py:158
 msgid "All seats are already taken"
 msgstr "Tous les sièges sont déjà pris"
 
-#: src/servertable.py:164
+#: src/servertable.py:163
 msgid "takes a seat"
 msgstr "Prends un siège"
 
-#: src/servertable.py:172
+#: src/servertable.py:171
 msgid "leaves the table"
 msgstr "Quitte la table"
 
-#: src/servertable.py:221
+#: src/servertable.py:220
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 1"
 msgstr "Robot 1"
 
-#: src/servertable.py:224
+#: src/servertable.py:223
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 2"
 msgstr "Robot 2"
 
-#: src/servertable.py:225
+#: src/servertable.py:224
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 3"
 msgstr "Robot 3"
 
-#: src/servertable.py:279
+#: src/servertable.py:278
 msgid "Only the initiator %1 can start this game, you are %2"
 msgstr "Seul l'initiateur %1 peut démarrer cette partie ; vous êtes %2"
 
-#: src/servertable.py:648
+#: src/servertable.py:647
 msgid "Game <numid>%1</numid> is over!"
 msgstr "Jeu <numid>%1</numid> terminé ! "
 
-#: src/servertable.py:677
+#: src/servertable.py:676
 msgid "%1 wrongly said %2 for meld %3"
 msgstr "%1 a dit par erreur %2 pour la combinaison %3"
 
-#: src/servertable.py:682
+#: src/servertable.py:681
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
 msgstr ""
 "%1 a dit par erreur %2 : affirme avoir dissimulé les tuiles %3 mais n'a en "
 "fait que %4"
 
-#: src/servertable.py:720
+#: src/servertable.py:719
 msgid "declareKong:%1 wrongly said Kong for meld %2"
 msgstr "Déclare Carré : %1 a dit par erreur Carré pour la combinaison %2"
 
-#: src/servertable.py:768
+#: src/servertable.py:767
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
 msgstr "%1 annonce Mahjongg : ce n'est pas une main gagnante : %2"
 
-#: src/sound.py:58
+#: src/sound.py:67
 msgid "No voices will be heard because the program %1 is missing"
 msgstr "Vous n'entendrez aucune voix car le programme %1 est manquant"
 
-#: src/sound.py:358
+#: src/sound.py:366
 msgid "cannot write <filename>%1</filename>: %2"
 msgstr "Impossible d'écrire <filename>%1</filename> : %2"
 
-#: src/sound.py:361
+#: src/sound.py:369
 msgid "The voice files have changed, their checksum has changed."
 msgstr "Les fichiers de voix ont changé, leur somme de contrôle a changé."
 
-#: src/sound.py:362
+#: src/sound.py:370
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
 msgstr ""
 "Veuillez réinstaller kajongg ou effectuer l'action suivante avec les "
@@ -2361,18 +2352,26 @@ msgctxt "kajongg tile name"
 msgid "{group} {value}"
 msgstr "{group} {value}"
 
-#: src/user.py:84
+#: src/user.py:83
 msgid ""
 "Your client has a version older than 4.9.0 but you need %1 for this server"
 msgstr ""
 "Votre logiciel client est à une version antérieure à 4.9.0 mais il vous faut "
 "%1 pour ce serveur"
 
-#: src/user.py:93
+#: src/user.py:87
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "Votre logiciel client est à la version %1 mais il vous faut la version %2 "
 "pour ce serveur"
+
+#~ msgid "play only ROUNDS rounds per game. Only for debugging!"
+#~ msgstr ""
+#~ "Jouer uniquement ROUNDS tours par partie. Uniquement à des fins de "
+#~ "débogage."
+
+#~ msgid "unrecognized arguments:%1"
+#~ msgstr "paramètres non reconnus : %1"
 
 #~ msgid "Not using broken Python KDE bindings"
 #~ msgstr "Ne pas utiliser les liaisons Python pour KDE cassées"
