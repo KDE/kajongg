@@ -259,12 +259,6 @@ def initDb() ->bool:
     sets Internal.db."""
     PrepareDB(DBHandle.dbPath())  # create or upgrade
     DBHandle(DBHandle.dbPath())
-# if not Internal.db = DBHandle.default:  # had to create it. Close and reopen
-#        Internal.db = DBHandle()
-#        assert Internal.db = DBHandle.default
-#    except sqlite3.Error as exc:
-#        logException(exc)
-#        return False
     return True
 
 
