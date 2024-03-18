@@ -23,8 +23,9 @@ from mi18n import i18n, MLocale
 from common import Options, SingleshotOptions, Internal, Debug
 # do not import modules using twisted before our reactor is running
 
-def initRulesets() ->None:
-    """exits if user only wanted to see available rulesets"""
+def __initRulesetsOrExit() ->None:
+    """exits if user only wanted to see available rulesets
+    or if the given ruleset does not exist"""
     import predefined
     predefined.load()
     if Options.showRulesets or Options.rulesetName:
@@ -134,7 +135,7 @@ def parseOptions() ->None:
     from query import initDb
     if not initDb():
         raise SystemExit('Cannot initialize database')
-    initRulesets()
+    __initRulesetsOrExit()
     Options.fixed = True  # may not be changed anymore
 
 
