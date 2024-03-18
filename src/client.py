@@ -395,7 +395,7 @@ class Client(pb.Referenceable):
                 if move.token != self.game.handId.token():
                     logException(
                         f'wrong token: {move.token}, we have {self.game.handId.token()}')
-        with Duration(f'Move {move!r}:'):
+        with Duration(f'{move!r}:'):
             try:
                 result = self.exec_move(move).addCallback(self.__jellyMessage)
             except (Exception, Failure) as exc:  # pylint: disable=broad-exception-caught

@@ -21,7 +21,7 @@ from typing import List, Tuple, Union, Any, Optional, Literal
 from mi18n import i18n, i18ncE
 from util import Duration
 from log import logInfo, logWarning, logException, logError, logDebug
-from common import Options, Internal, Debug, appdataDir, id4
+from common import Options, Internal, Debug, appdataDir, ReprMixin
 
 class QueryException(Exception):
 
@@ -31,7 +31,7 @@ class QueryException(Exception):
         Exception.__init__(self, msg)
 
 
-class DBCursor(sqlite3.Cursor):
+class DBCursor(sqlite3.Cursor, ReprMixin):
 
     """logging wrapper"""
 
@@ -48,13 +48,13 @@ class DBCursor(sqlite3.Cursor):
         self.statement = statement
         self.parameters = parameters
         if not silent:
-            logDebug(str(self))
+            logDebug(repr(self))
         try:
             for _ in range(10):
                 if _:
                     logDebug(f'execute try #{_} {statement}')
                 try:
-                    with Duration(statement, 60.0 if Debug.neutral else 2.0):
+                    with Duration(f'{self!r}', 60.0 if Debug.neutral else 2.0):
                         if isinstance(parameters, list):
                             sqlite3.Cursor.executemany(
                                 self, statement, parameters)
@@ -89,11 +89,11 @@ class DBCursor(sqlite3.Cursor):
     def __str__(self) ->str:
         """the statement"""
         if self.parameters is not None:
-            return f"{self.statement} [{self.parameters}]"
-        return self.statement
+            return f"{self.connection}:{self.statement} [{self.parameters}]"
+        return f"{self.connection}:{self.statement}"
 
 
-class DBHandle(sqlite3.Connection):
+class DBHandle(sqlite3.Connection, ReprMixin):
 
     """a handle with our preferred configuration"""
 
@@ -118,7 +118,7 @@ class DBHandle(sqlite3.Connection):
             cursor.execute('select ident from general')
             self.identifier = cursor.fetchone()[0]
         if Debug.sql:
-            logDebug(f'Opened {self.path} with identifier {self.identifier}')
+            logDebug(f'{self} opened with identifier {self.identifier}')
 
     def __enter__(self) ->'DBHandle':
         self.inTransaction = datetime.datetime.now()
@@ -131,6 +131,9 @@ class DBHandle(sqlite3.Connection):
         if Debug.sql:
             logDebug('finished transaction')
         return False
+
+    def __str__(self):
+        return f'{self.dbPath()}'
 
     @staticmethod
     def dbPath() ->str:
@@ -151,7 +154,7 @@ class DBHandle(sqlite3.Connection):
         name = stack[-3]
         if name in ('__exit__', '__init__'):
             name = stack[-4]
-        return f'{name} on {self.path}_{id4(self)}'
+        return f'{name} on {self!r}'
 
     def commit(self, silent:bool=False) ->None:
         """commit and log it"""
@@ -160,24 +163,24 @@ class DBHandle(sqlite3.Connection):
         except sqlite3.Error as exc:
             if not silent:
                 logWarning(
-                    f'{DBHandle.dbPath()} cannot commit: {exc} :')
+                    f'{self!r} cannot commit: {exc} :')
 
     def rollback(self, silent:bool=False) ->None:
         """rollback and log it"""
         try:
             sqlite3.Connection.rollback(self)
             if not silent and Debug.sql:
-                logDebug(f'{id(self):x} rollbacked transaction')
+                logDebug(f'{self!r} rollback')
         except sqlite3.Error as exc:
-            logWarning(f'{DBHandle.dbPath()} cannot rollback: {exc}')
+            logWarning(f'{self!r} cannot rollback: {exc}')
 
     def close(self, silent:bool=False) ->None:
         """just for logging"""
         if not silent and (Debug.sql or Debug.quit):
             if self is Internal.db:
-                logDebug(f'Closing Internal.db: {self.path}')
+                logDebug(f'{self!r} closing Internal.db')
             else:
-                logDebug(f'Closing DBHandle {self}: {self.path}')
+                logDebug(f'{self!r} closing')
         if self is Internal.db:
             Internal.db = None
         try:
@@ -201,7 +204,7 @@ class DBHandle(sqlite3.Connection):
         return any(x[0] == field for x in cursor.description)
 
 
-class Query:
+class Query(ReprMixin):
 
     """a wrapper arout python sqlite3, adding logging and some exception handling.
     For selecting queries we fill a list with ALL records which is never much.
@@ -247,7 +250,7 @@ class Query:
             logDebug(f'result set:{self.records}')
 
     def __str__(self) ->str:
-        return f"{self.statement} {'args=' + ','.join(str(x) for x in self.args) if self.args else ''}"
+        return f"{Internal.db!r}:{self.statement} {'args=' + ','.join(str(x) for x in self.args) if self.args else ''}"
 
     def rowcount(self) ->int:
         """how many rows were affected?"""

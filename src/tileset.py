@@ -18,11 +18,11 @@ from qt import QSizeF, QSvgRenderer
 from log import logException, i18n
 from mjresource import Resource
 
-from common import LIGHTSOURCES, Internal
+from common import LIGHTSOURCES, Internal, ReprMixin
 from wind import East, South, West, North
 
 
-class Tileset(Resource):
+class Tileset(Resource, ReprMixin):
 
     """represents a complete tileset"""
 
@@ -77,7 +77,7 @@ class Tileset(Resource):
             self.svgName[f'y{wind}'] = f'SEASON_{int(idx + 1)}'
 
     def __str__(self) ->str:
-        return f"tileset id={int(id(self))} name={self.desktopFileName}, name id={int(id(self.desktopFileName))}"
+        return self.desktopFileName
 
     @staticmethod
     def current() ->'Tileset':
