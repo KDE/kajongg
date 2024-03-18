@@ -22,7 +22,7 @@ from log import logError, logWarning, logException, logDebug, i18n
 from common import Internal, IntDict, Debug, Options
 from common import ReprMixin, Speeds
 from wind import Wind, East
-from query import Query
+from query import Query, openDb, closeDb
 from rule import Ruleset, UsedRule
 from tile import Tile, elements
 from tilesource import TileSource
@@ -64,6 +64,7 @@ class HandId(ReprMixin):
         else:
             self.__scanHandId(string, stringIdx)
         assert self.rotated < 4, self
+        openDb()
 
     def goto(self) ->None:
         """advance game to self"""
@@ -362,6 +363,7 @@ class Game:
         """log off from the server"""
         self.wall = None
         self.lastDiscard = None
+        closeDb()
         if Options.gui:
             ParallelAnimationGroup.cancelAll()
 

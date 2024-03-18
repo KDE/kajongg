@@ -258,8 +258,19 @@ def initDb() ->bool:
     """open the db, create or update it if needed.
     sets Internal.db."""
     PrepareDB(DBHandle.dbPath())  # create or upgrade
-    DBHandle(DBHandle.dbPath())
+    openDb()
     return True
+
+def closeDb() ->None:
+    """if open, close"""
+    if Internal.db:
+        Internal.db.close()
+        Internal.db = None
+
+def openDb() ->None:
+    """open the db"""
+    closeDb()
+    DBHandle(DBHandle.dbPath())
 
 
 class PrepareDB:
