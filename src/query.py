@@ -130,6 +130,7 @@ class DBHandle(sqlite3.Connection, ReprMixin):
         sqlite3.Connection.__exit__(self, *args)
         if Debug.sql:
             logDebug('finished transaction')
+        self.inTransaction = None
         return False
 
     def __str__(self):
