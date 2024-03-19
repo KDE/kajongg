@@ -11,6 +11,7 @@ import types
 from hashlib import md5
 from typing import Any, List, Tuple, Dict, Type, Union, Optional, TYPE_CHECKING
 from typing import Sequence, Set
+import sqlite3
 
 from common import Internal, Debug
 from common import ReprMixin
@@ -599,11 +600,12 @@ into a situation where you have to pay a penalty"""))
         with Internal.db:
             if self.nameExists(newName):
                 return False
-            query = Query(
-                "update ruleset set name=? where id<0 and name=?", (newName, self.name))
-            if not query.failure:
+            try:
+                Query("update ruleset set name=? where id<0 and name=?", (newName, self.name))
                 self.name = newName
-            return not query.failure
+                return True
+            except sqlite3.Error:
+                return False
 
     def remove(self) ->None:
         """remove this ruleset from the database."""

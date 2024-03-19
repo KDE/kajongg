@@ -12,7 +12,6 @@ SPDX-License-Identifier: GPL-2.0
 
 import os
 import traceback
-import time
 import datetime
 import random
 import sqlite3
@@ -39,52 +38,32 @@ class DBCursor(sqlite3.Cursor, ReprMixin):
         sqlite3.Cursor.__init__(self, dbHandle)
         self.statement:str
         self.parameters:Optional[Tuple[Union[str, int], ...]] = None
-        self.failure:Optional[Exception] = None
 
     def execute(self, statement:str, parameters:Optional[Tuple[Union[str, int], ...]]=None, # type:ignore[override]
                 silent:bool=False, failSilent:bool=False, mayFail:bool=False) ->None:
         """logging wrapper, returning all selected data"""
-        # pylint: disable=too-many-branches
         self.statement = statement
         self.parameters = parameters
         if not silent:
             logDebug(repr(self))
         try:
-            for _ in range(10):
-                if _:
-                    logDebug(f'execute try #{_} {statement}')
-                try:
-                    with Duration(f'{self!r}', 60.0 if Debug.neutral else 2.0):
-                        if isinstance(parameters, list):
-                            sqlite3.Cursor.executemany(
-                                self, statement, parameters)
-                        elif parameters:
-                            sqlite3.Cursor.execute(self, statement, parameters)
-                        else:
-                            sqlite3.Cursor.execute(self, statement)
-                    break
-                except sqlite3.OperationalError as exc:
-                    logDebug(
-                        f"{self} failed after {_} tries:{' '.join(exc.args)}")
-                    time.sleep(1)
+            with Duration(f'{self!r}', 60.0 if Debug.neutral else 3.0):
+                if isinstance(parameters, list):
+                    sqlite3.Cursor.executemany(
+                        self, statement, parameters)
+                elif parameters:
+                    sqlite3.Cursor.execute(self, statement, parameters)
                 else:
-                    break
-            else:
-                raise sqlite3.OperationalError(
-                    f'Failed after 10 tries:{self}')
-            self.failure = None
+                    sqlite3.Cursor.execute(self, statement)
         except sqlite3.Error as exc:
-            self.failure = exc
-            msg = f"ERROR in {DBHandle.dbPath()}: {exc.message if hasattr(exc, 'message') else ''} for {self}"
-            logDebug(msg)
+            msg = f"{self!r}: ERROR {exc}"
             if mayFail:
-                if not failSilent:
+                if not failSilent and Debug.sql:
                     logDebug(msg)
             else:
                 if not failSilent:
                     logError(msg)
-                raise QueryException(msg) from exc
-            return
+                raise
 
     def __str__(self) ->str:
         """the statement"""
@@ -238,14 +217,12 @@ class Query(ReprMixin):
                 silent=silent,
                 mayFail=mayFail,
                 failSilent=failSilent)
-            self.failure = self.cursor.failure
             self.records = list(self.cursor.fetchall())
             if not Internal.db.inTransaction:
                 Internal.db.commit()
         else:
             # may happen at shutdown
             self.cursor = None
-            self.failure = None
             self.records = []
         if self.records and Debug.sql:
             logDebug(f'result set:{self.records}')

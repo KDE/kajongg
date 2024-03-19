@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 from typing import Optional, TYPE_CHECKING, Dict
+import sqlite3
 
 from mi18n import i18n, i18nc
 from kde import KIcon
@@ -107,13 +108,14 @@ class PlayerList(QDialog):
             del self._data[self.table.item(self.table.currentRow(), 0).text()]
             self.updateTable(currentName=currentName)
             return
-        query = Query('insert into player(name) values(?)', (currentName, ))
-        if query.failure:
+        try:
+            Query('insert into player(name) values(?)', (currentName, ))
+        except sqlite3.Error as exc:
             Sorry(
                 i18n(
                     'Error while adding player %1: %2',
                     currentName,
-                    query.failure.message))
+                    str(exc)))
         self.updateTable(currentName=currentName)
 
     def slotInsert(self) ->None:

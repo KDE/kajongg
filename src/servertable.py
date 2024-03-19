@@ -15,6 +15,7 @@ import sys
 import random
 import traceback
 from itertools import chain
+import sqlite3
 
 from typing import TYPE_CHECKING, Any, Optional, List, Callable, Tuple, Dict, cast, Union
 
@@ -312,12 +313,17 @@ class ServerTable(Table, ReprMixin):
 
     def proposeGameId(self, gameid:int) ->None:
         """server proposes an id to the clients ands waits for answers"""
+        counter = 0
         while True:
-            query = Query('insert into game(id,seed) values(?,?)',
+            try:
+                Query('insert into game(id,seed) values(?,?)',
                           (gameid, 'proposed'), mayFail=True, failSilent=True)
-            if not query.failure:
                 break
-            gameid += random.randrange(1, 100)
+            except sqlite3.IntegrityError:
+                if counter > 100:
+                    raise
+                counter += 1
+                gameid += random.randrange(1, 10)
         block = DeferredBlock(self, where='proposeGameId')
         assert self.game
         for player in self.game.players:
