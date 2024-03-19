@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-16 00:36+0000\n"
-"PO-Revision-Date: 2024-03-08 19:34+0300\n"
+"PO-Revision-Date: 2024-03-18 19:41+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -955,11 +955,11 @@ msgstr "%1 oyuncusu Tüm Uçlar Oyunu deneyebilir"
 
 #: src/player.py:850
 msgid "Player %1 exposed many winds"
-msgstr "%1 oyuncusu bir çok rüzgar açık etti"
+msgstr "%1 oyuncusu birçok rüzgar açık etti"
 
 #: src/player.py:854
 msgid "Player %1 exposed many dragons"
-msgstr "%1 oyuncusu bir çok ejderha açık etti"
+msgstr "%1 oyuncusu birçok ejderha açık etti"
 
 #: src/playerlist.py:43
 msgctxt "define a new player"
