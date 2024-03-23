@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-16 00:36+0000\n"
-"PO-Revision-Date: 2024-03-18 19:41+0300\n"
+"PO-Revision-Date: 2024-03-22 16:14+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 24.02.0\n"
+"X-Generator: Lokalize 24.02.1\n"
 
 msgid "Preview"
 msgstr "Önizleme"
@@ -1825,7 +1825,7 @@ msgstr "&Kapat"
 
 #: src/scene.py:366 src/scene.py:498
 msgid "Do you really want to abort this game?"
-msgstr "Bu oyundan çıkmak istediğinize emin misiniz?"
+msgstr "Bu oyundan çıkmak istediğinizden emin misiniz?"
 
 #: src/scoring.py:43
 msgctxt "@title:window"
