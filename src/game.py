@@ -176,15 +176,18 @@ class HandId(ReprMixin):
     def __str__(self) ->str:
         return self.prompt()
 
-    def __eq__(self, other:Optional['HandId']) ->bool:  # type:ignore[override]
-        return (other is not None
-                and (self.roundsFinished, self.rotated, self.notRotated) ==
-                (other.roundsFinished, other.rotated, other.notRotated))
+    def __eq__(self, other:object) ->bool:
+        if not isinstance(other, HandId):
+            return NotImplemented
+        return (self.roundsFinished, self.rotated, self.notRotated) == \
+                (other.roundsFinished, other.rotated, other.notRotated)
 
-    def __ne__(self, other:Optional['HandId']) ->bool:  # type:ignore[override]
+    def __ne__(self, other:object) ->bool:
         return not self == other
 
-    def __lt__(self, other:'HandId') ->bool:  # type:ignore[override]
+    def __lt__(self, other:object) ->bool:
+        if not isinstance(other, HandId):
+            return NotImplemented
         return (self.roundsFinished, self.rotated, self.notRotated) < (
             other.roundsFinished, other.rotated, other.notRotated)
 
