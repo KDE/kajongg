@@ -497,13 +497,13 @@ class Game:
                 self.ruleset.save()
 
     @property
-    def seed(self) ->int:  # TODO: move this to PlayingGame
+    def seed(self) ->int:
         """extract it from wantedGame. Set wantedGame if empty."""
         if not self.wantedGame:
             self.wantedGame = str(int(self.randomGenerator.random() * 10 ** 9))
         return int(self.wantedGame.split('/')[0])
 
-    def _setHandSeed(self) ->None:  # TODO: move this to PlayingGame
+    def _setHandSeed(self) ->None:
         """set seed to a reproducible value, independent of what happened
         in previous hands/rounds.
         This makes it easier to reproduce game situations
