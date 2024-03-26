@@ -133,10 +133,9 @@ class DlgButton(QPushButton):
         self.setMinimumHeight(25)
         self.setText(message.buttonCaption())  # type: ignore[call-arg]
 
-    def setMeaning(self, uiTile:Optional['UITile']) ->None:
+    def setMeaning(self, uiTile:'UITile') ->None:
         """give me caption, shortcut, tooltip, icon"""
-        tile = uiTile.tile if uiTile else None
-        txt, warn, _ = self.message.toolTip(button=self, tile=tile)
+        txt, warn, _ = self.message.toolTip(self, uiTile.tile)
         if not txt:
             txt = self.message.i18nName  # .replace(i18nShortcut, '&'+i18nShortcut, 1)
         self.setToolTip(txt)
@@ -222,12 +221,14 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
             return
         assert self.client.game.myself  # FIXME: needed?
         assert self.client.game.myself.handBoard
-        for button in self.buttons:
-            button.setMeaning(self.client.game.myself.handBoard.focusTile)
+        newFocusTile = self.client.game.myself.handBoard.focusTile
+        if newFocusTile:
+            for button in self.buttons:
+                button.setMeaning(newFocusTile)
         for uiTile in self.client.game.myself.handBoard.lowerHalfTiles():
             txt = []
             for button in self.buttons:
-                _, _, tileTxt = button.message.toolTip(button, uiTile.tile)  # type:ignore[call-arg]
+                _, _, tileTxt = button.message.toolTip(button, uiTile.tile)
                 if tileTxt:
                     txt.append(tileTxt)
             uiTile.setToolTip('<br><br>'.join(txt))
