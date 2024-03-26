@@ -231,7 +231,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
                 _, _, tileTxt = button.message.toolTip(button, uiTile.tile)
                 if tileTxt:
                     txt.append(tileTxt)
-            uiTile.setToolTip('<br><br>'.join(txt))
+            uiTile.setToolTip(f'<font color=yellow>{"<br><br>".join(txt)}')
         if self.client.game.activePlayer == self.client.game.myself:
             if Internal.scene:
                 Internal.scene.handSelectorChanged(
