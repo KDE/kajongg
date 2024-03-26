@@ -582,6 +582,17 @@ class HumanClient(Client):
         if table.chatWindow:
             table.chatWindow.receiveLine(chatLine)
 
+    def remote_chat(self, data):
+        """others chat to me"""
+        chatLine = ChatMessage(data)
+        if Debug.chat:
+            logDebug(f'got chatLine: {chatLine}')
+        table = self._tableById(chatLine.tableid)
+        if not chatLine.isStatusMessage and not table.chatWindow:
+            ChatWindow(table=table)
+        if table.chatWindow:
+            table.chatWindow.receiveLine(chatLine)
+
     def readyForGameStart(
             self, tableid, gameid, wantedGame, playerNames, shouldSave=True,
             gameClass=None):
