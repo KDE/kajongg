@@ -3,20 +3,20 @@
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# Yuri Chornoivan <yurchor@ukr.net>, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
+# Yuri Chornoivan <yurchor@ukr.net>, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-26 00:36+0000\n"
-"PO-Revision-Date: 2022-01-31 09:58+0200\n"
+"PO-Revision-Date: 2024-03-26 17:45+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 20.12.0\n"
+"X-Generator: Lokalize 23.04.1\n"
 "Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
 "%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
@@ -302,25 +302,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "не показувати графічний інтерфейс. Призначено для тестування"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
 msgstr ""
-"використати спеціальний сервер, що очікуватиме на дані на сокеті SOCKET. "
-"Призначено лише для тестування."
+"використати спеціальний сервер, який вже запущено і який очікуватиме на дані "
+"на сокеті SOCKET. Призначено лише для тестування."
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
 msgstr ""
-"використати спеціальний сервер, що очікуватиме на дані на порту PORT. "
-"Призначено лише для тестування."
+"використати спеціальний сервер, який вже запущено і який очікуватиме на дані "
+"на порту PORT. Призначено лише для тестування."
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1169,21 +1164,23 @@ msgstr "Стандартне обертання"
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "Відкинути замовлені плитки"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Відкинути замовлені плитки згори ліворуч"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Лишати дірки для оголошених відкидань"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Лише при відкиданні замовлених плиток: не розташовувати наступне відкидання "
+"там, де було оголошене відкидання"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1994,10 +1991,8 @@ msgid "Player %1 has logged out"
 msgstr "Гравець %1 вийшов з облікового запису на сервері"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "сервер очікуватиме на дані на порту ПОРТ (%d)"
+msgstr "сервер очікуватиме на дані на порту ПОРТ ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-26 00:36+0000\n"
-"PO-Revision-Date: 2024-03-25 19:39\n"
+"PO-Revision-Date: 2024-03-26 19:25\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -294,21 +294,16 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "不显示图形用户界面。仅用于测试"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr "使用侦听 SOCKET 的专用服务器。仅用于测试"
+msgstr ""
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
-msgstr "使用侦听端口的专用服务器。仅用于测试"
+msgstr ""
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1915,10 +1910,8 @@ msgid "Player %1 has logged out"
 msgstr "玩家 %1 已注销"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "服务器将监听于端口(%d)"
+msgstr ""
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"

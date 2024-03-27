@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-26 00:36+0000\n"
-"PO-Revision-Date: 2022-01-31 10:09+0100\n"
-"Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
+"PO-Revision-Date: 2024-03-26 07:04+0100\n"
+"Last-Translator: Matjaž Jeran <matjaz.jeran@amis.net>\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
 "%100==4 ? 3 : 0);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.4.2\n"
 
 msgid "Preview"
 msgstr "Predogled"
@@ -299,25 +299,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "ne kaži grafičnega vmesnika. Namenjeno samo za preizkušanje"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
 msgstr ""
-"uporabi namenski strežnik, ki posluša na VTIČ-u. Namenjeno samo za "
-"preizkušanje"
+"uporabi namenski strežnik, ki že deluje in posluša SOCKET. Namenjeno samo za "
+"testiranje"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
 msgstr ""
-"uporabi namenski strežnik, ki posluša na VRAT-ih. Namenjeno samo za "
-"preizkušanje"
+"uporabi namenski strežnik, ki že deluje in posluša na PORTu. Namenjeno samo "
+"za testiranje"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1157,21 +1152,23 @@ msgstr "Običajno vrtenje"
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "Zavrzi naročene ploščice"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Zavrzi ploščice, razvrščene od zgoraj levo"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Pusti luknje za zahtevane zavržke"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Samo ko je naročeno zavrženje ploščic: Naslednjega zavrženja ne postavljaj "
+"na mesto, kjer je bil zahtevani zavržek"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1951,7 +1948,7 @@ msgstr "Poteza"
 
 #: src/scoringdialog.py:838
 msgid "&Penalties"
-msgstr "&Kazni"
+msgstr "Kazni"
 
 #: src/scoringdialog.py:840
 msgid "&Save Hand"
@@ -1959,7 +1956,7 @@ msgstr "&Shrani zbirko"
 
 #: src/scoringdialog.py:862
 msgid "&Last Tile:"
-msgstr "&Zadnja ploščica:"
+msgstr "Zadnja ploščica:"
 
 #: src/scoringdialog.py:871
 msgid "L&ast Meld:"
@@ -1978,14 +1975,12 @@ msgid "Player %1 has logged out"
 msgstr "Igralec %1 se je odjavil"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "strežnik bo poslušal na VRATIH (%d)"
+msgstr "strežnik bo poslušal na PORTu ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
-msgstr "strežnik bo poslušal na VTIČU"
+msgstr "strežnik bo poslušal na SOCKETu"
 
 #: src/server.py:441
 msgid "name of the database"

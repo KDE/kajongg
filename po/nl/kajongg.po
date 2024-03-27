@@ -2,7 +2,7 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Freek de Kruijf <freekdekruijf@kde.nl>, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023.
+# SPDX-FileCopyrightText: 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023, 2024 Freek de Kruijf <freekdekruijf@kde.nl>
 # Antoon Tolboom <atolboo@gmail.com>, 2010.
 # Wolfgang Rohdewald <wolfgang@rohdewald.de>, 2012.
 # Ronald Stroethoff <stroet43@zonnet.nl>, 2015.
@@ -11,14 +11,14 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-26 00:36+0000\n"
-"PO-Revision-Date: 2023-01-26 14:25+0100\n"
+"PO-Revision-Date: 2024-03-26 11:12+0100\n"
 "Last-Translator: Freek de Kruijf <freekdekruijf@kde.nl>\n"
 "Language-Team: \n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 22.12.1\n"
+"X-Generator: Lokalize 24.02.0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 msgid "Preview"
@@ -300,25 +300,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "geen grafische gebruikersinterface tonen. Alleen bedoeld voor testen"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
 msgstr ""
-"een speciale server gebruiken die luistert op een SOCKET. Alleen bedoeld "
-"voor testen"
+"een speciale server gebruiken die al actief is en luistert op een SOCKET. "
+"Alleen bedoeld voor testen"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
 msgstr ""
-"een speciale server gebruiken die luistert op POORT. Alleen bedoeld voor "
-"testen"
+"een speciale server gebruiken die al actief is en luistert op een POORT. "
+"Alleen bedoeld voor testen"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1167,24 +1162,24 @@ msgid "Standard Rotation"
 msgstr "Standaard rotatie"
 
 #: src/predefined.py:147
-#, fuzzy
-#| msgid "Discarded tile %1 is not in meld %2"
 msgid "Discard tiles ordered"
-msgstr "Weggegooide tegel %1 is niet in meld %2"
+msgstr "Tegels geordend afleggen"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Tegels geordend vanaf linksboven afleggen"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Gaten achterlaten voor geclaimde afleggers"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Alleen bij geordend afleggen van tegels: de volgende aflegger niet plaatsen "
+"waar de geclaimde aflegger was"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -2000,10 +1995,8 @@ msgid "Player %1 has logged out"
 msgstr "Speler %1 is uitgelogd"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "de server zal luisteren op POORT (%d)"
+msgstr "de server zal luisteren op POORT ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"

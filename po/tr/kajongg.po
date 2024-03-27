@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-26 00:36+0000\n"
-"PO-Revision-Date: 2024-03-22 16:14+0300\n"
+"PO-Revision-Date: 2024-03-26 13:50+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -250,7 +250,7 @@ msgstr "%1 sunucusuna bağlantı koptu, lütfen daha sonra yeniden deneyin."
 
 #: src/kajongg.py:81 src/kdestub.py:1083
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
-msgstr "Mah Jongg - 4 kişilik tarihi Çin masa oyunu"
+msgstr "Mah Jongg — 4 kişilik tarihi Çin masa oyunu"
 
 #: src/kajongg.py:85
 msgid "all robots play with visible concealed tiles"
@@ -301,21 +301,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "grafik arayüz gösterme. Yalnızca test için"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr "SOCKET’de dinleme yapan adanmış sunucu kullan. Yalnızca test için"
+msgstr ""
+"YUVA üzerinde halihazırda çalışan ve dinleyen özel bir sunucu kullanın. "
+"Yalnızca sınama amaçlıdır"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
-msgstr "PORT üzerinde dinleme yapan adanmış sunucu kullan. Yalnızca test için"
+msgstr ""
+"KAPI üzerinde halihazırda çalışan ve dinleyen özel bir sunucu kullanın. "
+"Yalnızca sınama amaçlıdır"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -481,7 +480,7 @@ msgstr "Kullanılabilir &eylemler:"
 
 #: src/kdestub.py:1411
 msgid "Curr&ent actions:"
-msgstr "&Mevcut eylemler:"
+msgstr "&Geçerli eylemler:"
 
 #: src/login.py:177
 msgid "trying to start local server %1"
@@ -582,7 +581,7 @@ msgstr "&Oyna"
 #: src/mainwindow.py:520
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
-msgstr "Yeni bir oyun başlat."
+msgstr "Yeni bir oyun başlatın."
 
 #: src/mainwindow.py:522
 msgctxt "@action:inmenu"
@@ -1150,21 +1149,23 @@ msgstr "Standart Dönüş"
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "Sıralı taşları at"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Sol üstten sıralı taşları at"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Talep edilen atıklar için delikler bırak"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Yalnızca sıralı taşları atarken: Bir sonraki atılan parçayı, atıldığı talep "
+"edilen yere koymayın."
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1759,7 +1760,7 @@ msgstr "%1/%2 Kopyası"
 #: src/rule.py:934
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
-msgstr "%4 \"%1\" kuralında imkansız değerlere sahip %2/%3"
+msgstr "%4, “%1” kuralında olanaksız değerlere sahip %2/%3"
 
 #: src/rule.py:1022
 msgctxt "wrong value for rule"
@@ -1952,11 +1953,11 @@ msgstr "&Eli Kaydet"
 
 #: src/scoringdialog.py:862
 msgid "&Last Tile:"
-msgstr "&Son Taş:"
+msgstr "&Son taş:"
 
 #: src/scoringdialog.py:871
 msgid "L&ast Meld:"
-msgstr "S&on Birleşme:"
+msgstr "S&on birleşme:"
 
 #: src/server.py:120
 msgid "Wrong password"
@@ -1971,14 +1972,12 @@ msgid "Player %1 has logged out"
 msgstr "%1 oyuncusu çıktı"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "sunucu PORT (%d) üstünde dinleme yapacak"
+msgstr "sunucu, KAPI üzerinde dinleme yapacak ({int(öntanımlıKapı)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
-msgstr "sunucu SOCKET üstünde dinleme yapacak"
+msgstr "sunucu YUVA üstünde dinleme yapacak"
 
 #: src/server.py:441
 msgid "name of the database"

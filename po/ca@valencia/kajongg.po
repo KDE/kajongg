@@ -1,9 +1,9 @@
 # Translation of kajongg.po to Catalan (Valencian)
-# Copyright (C) 2010-2023 This_file_is_part_of_KDE
+# Copyright (C) 2010-2024 This_file_is_part_of_KDE
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# Josep M. Ferrer <txemaq@gmail.com>, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023.
+# Josep M. Ferrer <txemaq@gmail.com>, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023, 2024.
 # Manuel Tortosa Moreno <manutortosa@chakra-project.org>, 2010, 2011.
 # Antoni Bella Pérez <antonibella5@yahoo.com>, 2014, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
 msgid ""
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-26 00:36+0000\n"
-"PO-Revision-Date: 2023-10-18 20:19+0200\n"
+"PO-Revision-Date: 2024-03-26 10:19+0100\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca@valencia\n"
@@ -302,25 +302,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "no mostres interfície gràfica d'usuari. Està pensat només per a proves"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
 msgstr ""
-"utilitza un servidor dedicat escoltant en un sòcol. Està pensat només per a "
-"proves"
+"utilitza un servidor dedicat que ja s'està executant i escoltant en un "
+"sòcol. Està pensat només per a proves"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
 msgstr ""
-"utilitza un servidor dedicat escoltant en un PORT. Està pensat només per a "
-"proves"
+"utilitza un servidor dedicat que ja s'està executant i escoltant en un PORT. "
+"Està pensat només per a proves"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1164,21 +1159,23 @@ msgstr "Rotació estàndard"
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "Descarta les fitxes ordenades"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Descarta les fitxes ordenades des de la part superior esquerra"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Deixa forats per a les descartades reclamades"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Només quan es descarten les fitxes ordenades: no col·loqueu la descartada "
+"següent a on estava la descartada reclamada"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1991,10 +1988,8 @@ msgid "Player %1 has logged out"
 msgstr "El jugador %1 s'ha desconnectat"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "el servidor escoltarà en el PORT (%d)"
+msgstr "el servidor escoltarà en el PORT ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
@@ -2350,9 +2345,3 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "El vostre client té la versió %1 però necessiteu %2 per a este servidor"
-
-#~ msgid "play only ROUNDS rounds per game. Only for debugging!"
-#~ msgstr "juga només una tanda ROUNDS per joc. Només per a depuració!"
-
-#~ msgid "unrecognized arguments:%1"
-#~ msgstr "arguments no reconeguts:%1"
