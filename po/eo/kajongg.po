@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-26 00:36+0000\n"
-"PO-Revision-Date: 2024-01-04 19:44+0100\n"
+"PO-Revision-Date: 2024-03-27 09:18+0100\n"
 "Last-Translator: Oliver Kellogg <okellogg@users.sourceforge.net>\n"
 "Language-Team: esperanto <kde-i18n-eo@kde.org>\n"
 "Language: eo\n"
@@ -211,7 +211,7 @@ msgstr "Kajongg"
 
 #: src/humanclient.py:64
 msgid "Which chow do you want to expose?"
-msgstr "Kiun manĝaĵon vi volas elmontri?"
+msgstr "Kiun ĉaŭon vi volas elmontri?"
 
 #: src/humanclient.py:102
 msgid "Which kong do you want to declare?"
@@ -296,23 +296,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "montri neniun grafikan uzantinterfacon. Destinita nur por testado"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
 msgstr ""
-"uzu dediĉitan servilon aŭskultantan sur SOCKET. Destinita nur por testado"
+"uzi dediĉitan servilon jam rulantan kaj aŭskultantan sur SOCKET. Destinita "
+"nur por testado"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
 msgstr ""
-"uzu dediĉitan servilon aŭskultantan sur PORT. Destinita nur por testado"
+"uzi dediĉitan servilon jam rulantan kaj aŭskultantan sur PORT. Destinita nur "
+"por testado"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1134,11 +1131,11 @@ msgstr "Minimuma nombro da ĉirkaŭvojoj en ludo"
 
 #: src/predefined.py:137
 msgid "number of allowed chows"
-msgstr "nombro da permesitaj manĝaĵoj"
+msgstr "nombro da permesitaj ĉaŭoj"
 
 #: src/predefined.py:138
 msgid "The number of chows a player may build"
-msgstr "La nombro da manĝaĵoj kiujn ludanto povas konstrui"
+msgstr "La nombro da ĉaŭoj kiujn ludanto povas konstrui"
 
 #: src/predefined.py:140
 msgid "must declare calling hand"
@@ -1154,21 +1151,23 @@ msgstr "Norma Rotacio"
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "Forĵeti kahelojn menditajn"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Forĵeti kahelojn menditajn de supra maldekstro"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Lasi truojn por asertitaj forĵetoj"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Nur dum forĵeto je kaheloj menditaj: Ne lokigi la sekvan forĵeton kie estis "
+"la asertita forĵeto"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1579,7 +1578,7 @@ msgstr "Pureco"
 
 #: src/predefined.py:427
 msgid "Only same-colored tiles (no chows, dragons or winds)"
-msgstr "Nur samkoloraj kaheloj (neniu manĝo, drakoj aŭ ventoj)"
+msgstr "Nur samkoloraj kaheloj (neniuj ĉaŭoj, drakoj aŭ ventoj)"
 
 #: src/predefined.py:430
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
@@ -1977,10 +1976,8 @@ msgid "Player %1 has logged out"
 msgstr "Ludanto %1 elsalutis"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "la servilo aŭskultos ĉe PORT (%d)"
+msgstr "la servilo aŭskultos ĉe PORT ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
@@ -2330,9 +2327,3 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Via kliento havas version %1 sed vi bezonas %2 por ĉi tiu servilo"
-
-#~ msgid "play only ROUNDS rounds per game. Only for debugging!"
-#~ msgstr "ludu nur ROUNDS raŭndojn po ludo. Nur por sencimigi!"
-
-#~ msgid "unrecognized arguments:%1"
-#~ msgstr "nerekonitaj argumentoj:%1"
