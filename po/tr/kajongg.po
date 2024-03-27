@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2024-03-08 19:34+0300\n"
+"PO-Revision-Date: 2024-03-26 13:50+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 24.02.0\n"
+"X-Generator: Lokalize 24.02.1\n"
 
 msgid "Preview"
 msgstr "Önizleme"
@@ -251,7 +251,7 @@ msgstr "%1 sunucusuna bağlantı koptu, lütfen daha sonra yeniden deneyin."
 
 #: src/kajongg.py:81 src/kdestub.py:1055
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
-msgstr "Mah Jongg - 4 kişilik tarihi Çin masa oyunu"
+msgstr "Mah Jongg — 4 kişilik tarihi Çin masa oyunu"
 
 #: src/kajongg.py:85
 msgid "all robots play with visible concealed tiles"
@@ -477,7 +477,7 @@ msgstr "Kullanılabilir &eylemler:"
 
 #: src/kdestub.py:1379
 msgid "Curr&ent actions:"
-msgstr "&Mevcut eylemler:"
+msgstr "&Geçerli eylemler:"
 
 #: src/login.py:166
 msgid "trying to start local server %1"
@@ -578,7 +578,7 @@ msgstr "&Oyna"
 #: src/mainwindow.py:508
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
-msgstr "Yeni bir oyun başlat."
+msgstr "Yeni bir oyun başlatın."
 
 #: src/mainwindow.py:510
 msgctxt "@action:inmenu"
@@ -1792,7 +1792,7 @@ msgstr "%2'nin %1Kopyası"
 #: src/rule.py:896
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
-msgstr "%4 \"%1\" kuralında imkansız değerlere sahip %2/%3"
+msgstr "%4, “%1” kuralında olanaksız değerlere sahip %2/%3"
 
 #: src/rule.py:992
 msgctxt "wrong value for rule"
@@ -1985,11 +1985,11 @@ msgstr "&Eli Kaydet"
 
 #: src/scoringdialog.py:846
 msgid "&Last Tile:"
-msgstr "&Son Taş:"
+msgstr "&Son taş:"
 
 #: src/scoringdialog.py:855
 msgid "L&ast Meld:"
-msgstr "S&on Birleşme:"
+msgstr "S&on birleşme:"
 
 #: src/server.py:113
 msgid "Wrong password"
@@ -2010,7 +2010,7 @@ msgstr "sunucu PORT (%d) üstünde dinleme yapacak"
 
 #: src/server.py:433
 msgid "the server will listen on SOCKET"
-msgstr "sunucu SOCKET üstünde dinleme yapacak"
+msgstr "sunucu YUVA üstünde dinleme yapacak"
 
 #: src/server.py:438
 msgid "name of the database"
