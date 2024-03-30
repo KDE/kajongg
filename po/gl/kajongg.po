@@ -6,22 +6,22 @@
 # marce villarino <mvillarino@users.sourceforge.net>, 2009.
 # Xosé <xosecalvo@gmail.com>, 2010, 2012.
 # Adrián Chaves Fernández <adriyetichaves@gmail.com>, 2012, 2015, 2017.
-# Adrián Chaves (Gallaecio) <adrian@chaves.io>, 2017, 2018, 2019, 2023.
+# SPDX-FileCopyrightText: 2024 Adrián Chaves (Gallaecio)
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-26 00:36+0000\n"
-"PO-Revision-Date: 2023-06-05 13:53+0200\n"
+"PO-Revision-Date: 2024-03-29 11:03+0100\n"
 "Last-Translator: Adrián Chaves (Gallaecio) <adrian@chaves.io>\n"
-"Language-Team: Galician <proxecto@trasno.gal>\n"
+"Language-Team: Proxecto Trasno (proxecto@trasno.gal)\n"
 "Language: gl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 23.04.1\n"
+"X-Generator: Lokalize 24.02.1\n"
 
 msgid "Preview"
 msgstr "Vista previa"
@@ -303,21 +303,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "amosar a interface gráfica de usuario. Só para probas"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr "Usar un servidor dedicado que escoite polo SOCKET. Só para probas."
+msgstr ""
+"Usar un servidor dedicado en execución que escoite polo SOCKET. Só para "
+"probas."
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
-msgstr "Usar un servidor dedicado que escoite polo PORTO. Só para probas."
+msgstr ""
+"Usar un servidor dedicado en execución que escoite polo PORTO. Só para "
+"probas."
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1159,21 +1158,23 @@ msgstr "Rotación estándar"
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "Descartar as teselas ordenadas"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Descartar as teselas ordenadas desde a parte superior esquerda"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Deixar ocos para os descartes reclamados"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Só ao descartar teselas ordenadas: non colocar o seguinte descarte onte "
+"estaba o descarte reclamado."
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1980,10 +1981,8 @@ msgid "Player %1 has logged out"
 msgstr "O xogador %1 desconectouse"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "o servidor vai escoitar polo PORTO (%d)"
+msgstr "o servidor vai escoitar polo PORTO ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
