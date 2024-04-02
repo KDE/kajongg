@@ -3,13 +3,13 @@
 #
 # Michał Lachowski <michal@lachowski.info>, 2010, 2011.
 # Marta Rybczyńska <kde-i18n@rybczynska.net>, 2010, 2013.
-# Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>, 2011, 2012, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022.
+# SPDX-FileCopyrightText: 2011, 2012, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2024 Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-03-26 00:36+0000\n"
-"PO-Revision-Date: 2022-01-31 19:14+0100\n"
+"PO-Revision-Date: 2024-04-01 07:59+0200\n"
 "Last-Translator: Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>\n"
 "Language-Team: Polish <kde-i18n-doc@kde.org>\n"
 "Language: pl\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Lokalize 22.03.70\n"
+"X-Generator: Lokalize 23.08.5\n"
 
 msgid "Preview"
 msgstr "Podgląd"
@@ -302,25 +302,20 @@ msgstr ""
 "testowania"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
 msgstr ""
-"użyj dedykowanego serwera nasłuchującego na SOCKET. Przeznaczone tylko do "
-"testowania"
+"użyj osobnego serwera już uruchomionego i nasłuchującego na SOCKET. "
+"Przeznaczone tylko do prób"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
 msgstr ""
-"użyj dedykowanego serwera nasłuchującego na PORT. Przeznaczone tylko do "
-"testowania"
+"użyj osobnego serwera już uruchomionego i nasłuchującego na PORT. "
+"Przeznaczone tylko do prób"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -466,7 +461,8 @@ msgstr ""
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
-msgstr "Do zgłaszania skorzystaj z <a href=\"https://bugs.kde.org\">."
+msgstr ""
+"Błędy zgłaszaj na <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a>."
 
 #: src/kdestub.py:1106
 msgid "Authors:"
@@ -799,7 +795,7 @@ msgstr ""
 #: src/message.py:455
 msgctxt "kajongg"
 msgid "Discard"
-msgstr "Porzuć"
+msgstr "Odrzuć"
 
 #: src/message.py:456
 msgctxt "kajongg game dialog:Key for Discard"
@@ -1013,7 +1009,7 @@ msgid ""
 "she needs only one tile to complete the hand and announces she will not "
 "alter the hand in any way (except bonus tiles)"
 msgstr ""
-"Tuż przed pierwszym porzuceniem, gracz może zadeklarować Oryginalne "
+"Tuż przed pierwszym odrzuceniem, gracz może zadeklarować Oryginalne "
 "Zgłoszenie, co oznacza, że potrzebuje tylko jednego kamienia do ukończenia "
 "ręki i ogłasza, że nie zmieni ręki w żaden sposób (poza kamieniami "
 "bonusowymi)"
@@ -1172,21 +1168,23 @@ msgstr "Standardowy obrót"
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "Odrzuć ułożone kamienie"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Porzuć kamienie ułożone od górnego, lewego narożnika"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Pozostawiaj dziury po żądanych odrzuceniach"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Tylko przy odrzucaniu ułożonych kamieni: Nie umieszczaj następnego "
+"odrzucenia kamieni w miejscu, w którym występowało żądane odrzucenie kamieni"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1993,10 +1991,8 @@ msgid "Player %1 has logged out"
 msgstr "Gracz %1 wylogował się"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "serwer będzie nasłuchiwał na PORT (%d)"
+msgstr "serwer będzie nasłuchiwał na PORT ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
