@@ -1,7 +1,7 @@
 # Translation for kajongg.po to Euskara/Basque (eu).
 # Copyright (C) 2020-2023 This file is copyright:
 # This file is distributed under the same license as the kajongg package.
-# SPDX-FileCopyrightText: 2023 KDE euskaratzeko proiektuko arduraduna <xalba@ni.eus>
+# SPDX-FileCopyrightText: 2023, 2024 KDE euskaratzeko proiektuko arduraduna <xalba@ni.eus>
 #
 # Translators:
 # SPDX-FileCopyrightText: 2010, 2020, 2023 Iñigo Salvador Azurmendi <xalba@ni.eus>
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2023-09-17 00:42+0000\n"
-"PO-Revision-Date: 2023-12-13 23:21+0100\n"
+"PO-Revision-Date: 2024-04-05 09:25+0200\n"
 "Last-Translator: Iñigo Salvador Azurmendi <xalba@ni.eus>\n"
 "Language-Team: Basque <kde-i18n-eu@kde.org>\n"
 "Language: eu\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 23.08.4\n"
+"X-Generator: Lokalize 24.02.1\n"
 
 msgid "Preview"
 msgstr "Aurreikuspegia"
@@ -766,6 +766,8 @@ msgid ""
 "claiming %1 for %2 is dangerous because you will have to discard a dangerous "
 "tile"
 msgstr ""
+"%2(e)ren ordez %1 erreklamatzea arriskutsia da, fitxa arriskutsua baztertu "
+"beharko duzulako"
 
 #: src/message.py:223
 msgid "You may say %1"
@@ -945,7 +947,7 @@ msgstr "ez dago e-pota helbiderik erabilgarri"
 
 #: src/player.py:687
 msgid "%1 claiming MahJongg: She does not really have tile %2"
-msgstr ""
+msgstr "%1(e)k Mahjongg aldarrikatzen du: Berak ez du %2 fitxarik"
 
 #: src/player.py:696
 msgid ""
@@ -962,7 +964,7 @@ msgstr "%1 jokalaria kolore errealeko jokaldia egiten saia daiteke"
 
 #: src/player.py:819
 msgid "Player %1 may try an All Terminals Game"
-msgstr ""
+msgstr "Baliteke %1 jokalaria saia daiteke jokoa muturrekin jokatzen"
 
 #: src/player.py:832
 #, fuzzy
