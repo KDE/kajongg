@@ -7,7 +7,7 @@ Dependencies:
     'frameworks/extra-cmake-modules': '@latest-kf6'
     'frameworks/kdoctools': '@latest-kf6'
     'frameworks/ki18n': '@latest-kf6'
-    'games/libkmahjongg': '@latest-kf6'
+    'games/libkmahjongg': '@same'
 
 Options:
   require-passing-tests-on: ['Linux', 'FreeBSD', 'Windows']
