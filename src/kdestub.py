@@ -993,7 +993,6 @@ class AboutKajonggDialog(KDialog):
 
         underVersions = ['Qt' + QT_VERSION +' API=' + API_NAME]
         if PYQT_VERSION:
-            from sip import SIP_VERSION_STR
             underVersions.append('sip ' + SIP_VERSION_STR)
         if PYSIDE2:
             import PySide2  # pylint: disable=import-error

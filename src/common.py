@@ -17,7 +17,7 @@ import logging.handlers
 import socket
 from signal import signal, SIGABRT, SIGINT, SIGTERM
 
-from qt import QStandardPaths, QObject, QGraphicsItem, QSize
+from qt import QStandardPaths, QObject, modeltest_is_supported
 from qtpy import PYSIDE_VERSION, QT5, QT6, compat
 from qtpy.compat import isalive as qtpy_isalive
 
@@ -241,23 +241,10 @@ Options {stropt} take a string argument like {example}.
                 type.__setattr__(Debug, option, value)
         if Debug.time:
             Debug.time = datetime.datetime.now()
-        if Debug.modelTest and not Debug.modeltest_is_supported():
+        if Debug.modelTest and not modeltest_is_supported():
             print('--debug=modelTest is not yet supported for pyside, use pyqt')
             sys.exit(2)
         return None
-
-    @staticmethod
-    def modeltest_is_supported():
-        """Is the QT binding supported."""
-        try:
-            import sip
-        except ImportError:
-            return False
-        try:
-            _ = sip.cast(QSize(), QSize)
-            return True
-        except TypeError:
-            return False
 
     @staticmethod
     def str():
