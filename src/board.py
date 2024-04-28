@@ -121,8 +121,8 @@ class WindLabel(QLabel):
         if wind is None:
             wind = East
         self.__wind:Wind
-        self.wind = wind
         self.__roundsFinished = roundsFinished
+        self.wind = wind
 
     @property
     def wind(self) ->Wind:
