@@ -190,8 +190,7 @@ class KMessageBox:
         iconName = {
             QMessageBox.Information: 'dialog-information',
             QMessageBox.Warning: 'dialog-warning',
-            QMessageBox.Question: 'dialog-information'}[icon]
-        icon = KIcon(iconName)
+            QMessageBox.Question: 'dialog-question'}[icon]
         iconLayout = QVBoxLayout()
         iconLayout.addStretch(1)
         iconLayout.addWidget(IconLabel(iconName, dialog))
