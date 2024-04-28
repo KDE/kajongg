@@ -19,7 +19,6 @@ from qt import QItemSelectionModel, QAbstractItemView
 from dialogs import WarningYesNo
 from kde import KIcon
 from mi18n import i18n, i18nc
-from log import logException
 from query import Query
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
@@ -219,9 +218,9 @@ class Games(QDialog):
 
     def delete(self) ->None:
         """delete a game"""
-        def answered(result:bool, games:List[int]) ->None:
+        def answered(result:Any, games:List[int]) ->None:
             """question answered, result is True or False"""
-            if result:
+            if result is True:
                 for game in games:
                     Query("DELETE FROM score WHERE game = ?", (game, ))
                     Query("DELETE FROM game WHERE id = ?", (game, ))
@@ -235,4 +234,4 @@ class Games(QDialog):
                 "Do you really want to delete <numid>%1</numid> games?<br>"
                 "This will be final, you cannot cancel it with "
                 "the cancel button",
-                len(deleteGames))).addCallback(answered, deleteGames).addErrback(logException)
+                len(deleteGames))).addBoth(answered, deleteGames)
