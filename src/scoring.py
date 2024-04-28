@@ -22,7 +22,7 @@ from wind import Wind
 from tilesource import TileSource
 from animation import animate
 from log import logError, logDebug, logWarning, i18n
-from query import Query
+from query import Query, openDb
 from uitile import UITile, UIMeld
 from board import WindLabel, Board
 from game import Game
@@ -635,6 +635,7 @@ class ScoringGame(Game):
 
 def scoreGame() ->Optional[ScoringGame]:
     """show all games, select an existing game or create a new game"""
+    openDb()
     Players.load()
     if len(Players.humanNames) < 4:
         logWarning(
