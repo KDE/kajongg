@@ -295,16 +295,6 @@ class KDialog(CaptionMixin, QDialog):
         """not needed in Python"""
         return value
 
-    @staticmethod
-    def spacingHint():
-        """stub"""
-        return QApplication.style().pixelMetric(QStyle.PM_DefaultLayoutSpacing)
-
-    @staticmethod
-    def marginHint():
-        """stub"""
-        return QApplication.style().pixelMetric(QStyle.PM_DefaultChildMargin)
-
 
 class KUser:
 
@@ -1138,8 +1128,10 @@ class LicenseDialog(KDialog):
     def sizeHint(self):
         """try to set up the dialog such that the full width of the
         document is visible without horizontal scroll-bars being required"""
-        idealWidth = self.licenseBrowser.document().idealWidth() + (2 * self.marginHint()) \
-            + self.licenseBrowser.verticalScrollBar().width() * 2 + 1
+        idealWidth = self.licenseBrowser.document().idealWidth()
+        idealWidth += self.style().pixelMetric(QStyle.PixelMetric.PM_LayoutLeftMargin)
+        idealWidth += self.style().pixelMetric(QStyle.PixelMetric.PM_LayoutRightMargin)
+        idealWidth += self.licenseBrowser.verticalScrollBar().width() * 2 + 1
         # try to allow enough height for a reasonable number of lines to be
         # shown
         metrics = QFontMetrics(self.licenseBrowser.font())
