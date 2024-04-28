@@ -359,7 +359,7 @@ class PrepareDB:
         """upgrade the structure of an existing kajongg database"""
         try:
             Internal.db = DBHandle(self.path)
-            allVersions = list(['4.13.0', '8300', '8301'])
+            allVersions = list(['4.13.0', '8300', '8301', '8302'])
             assert allVersions[-1] == str(Internal.defaultPort), f'{allVersions[-1]} != {str(Internal.defaultPort)}'
             # skip versions before current db versions:
             currentVersion = self.__currentVersion()
@@ -378,6 +378,10 @@ class PrepareDB:
             logException(f'opening {self.path}: {exc}')
         finally:
             Internal.db.close(silent=True)
+
+    def updateToVersion8302(self) ->None:
+        """seed now is 0 instead of Null"""
+        Query('UPDATE game SET seed=0 WHERE seed IS NULL', silent=True)
 
     @classmethod
     def sqlForCreateTable(cls, table:str) ->str:

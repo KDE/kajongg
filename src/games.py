@@ -180,7 +180,7 @@ class Games(QDialog):
             "p0.name||'///'||p1.name||'///'||p2.name||'///'||p3.name "
             "from game g, player p0,"
             "player p1, player p2, player p3 "
-            "where seed is null"
+            "where seed=0"
             " and p0.id=g.p0 and p1.id=g.p1 "
             " and p2.id=g.p2 and p3.id=g.p3 "
             "%s"
