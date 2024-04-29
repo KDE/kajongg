@@ -8,11 +8,14 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import TYPE_CHECKING
 from qt import QWidget, QLineEdit
 from background import Background
 from common import Internal
 from guiutil import loadUi
 
+if TYPE_CHECKING:
+    from qt import QListWidget, QLabel
 
 class BackgroundSelector(QWidget):
 
@@ -24,6 +27,11 @@ class BackgroundSelector(QWidget):
         self.kcfg_backgroundName = QLineEdit(self)
         self.kcfg_backgroundName.setVisible(False)
         self.kcfg_backgroundName.setObjectName('kcfg_backgroundName')
+        self.backgroundNameList:'QListWidget'
+        self.backgroundAuthor:'QLabel'
+        self.backgroundContact:'QLabel'
+        self.backgroundDescription:'QLabel'
+        self.backgroundPreview:'QLabel'
         self.setUp()
 
     def setUp(self) ->None:
