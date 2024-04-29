@@ -88,12 +88,6 @@ class Prompt(MustChooseKDialog, ReprMixin):
             assert defaultButton & buttons, buttons
             self.button(defaultButton).setFocus()
 
-    def returns(self, button:Optional['QPushButton']=None) ->bool:
-        """the user answered"""
-        if button is None:
-            button = self.default
-        return button in (KDialog.Yes, KDialog.Ok)
-
     def __str__(self) ->str:
         return self.msg
 

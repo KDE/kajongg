@@ -298,10 +298,11 @@ class KDialog(CaptionMixin, QDialog):
         """return the matching button"""
         return self.buttonBox.button(buttonCode)
 
-    @staticmethod
-    def spacingHint() ->int:
-        """stub"""
-        return QApplication.style().pixelMetric(QStyle.PixelMetric.PM_DefaultLayoutSpacing)
+    def returns(self, button:Optional['QPushButton']=None) ->Any:
+        """the user answered"""
+        if button is None:
+            button = self.default  # type:ignore[attr-defined]
+        return button in (KDialog.Yes, KDialog.Ok)
 
 
 class KUser:
