@@ -131,7 +131,7 @@ class DeferredDialog(Deferred):
         autoPlay = bool(scene and scene.game and scene.game.autoPlay)
         autoAnswerDelayed = autoPlay and not self.always
         if self.modal and not autoAnswerDelayed:
-            self.dlg.exec_()
+            self.dlg.exec()
         else:
             self.dlg.show()
         if autoAnswerDelayed:

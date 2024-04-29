@@ -523,13 +523,13 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
     def selectLanguage() ->None:
         """switch the language"""
         assert Internal.mainWindow
-        KSwitchLanguageDialog(Internal.mainWindow).exec_()
+        KSwitchLanguageDialog(Internal.mainWindow).exec()
 
     @staticmethod
     def aboutKajongg() ->None:
         """show an about dialog"""
         assert Internal.mainWindow
-        AboutKajonggDialog(Internal.mainWindow).exec_()
+        AboutKajonggDialog(Internal.mainWindow).exec()
 
     def queryClose(self) ->bool:
         """default"""
@@ -1133,7 +1133,7 @@ class AboutKajonggDialog(KDialog):
     def showLicense(cls) ->None:
         """as the name says"""
         assert Internal.mainWindow
-        LicenseDialog(Internal.mainWindow, cls.licenseFile()).exec_()
+        LicenseDialog(Internal.mainWindow, cls.licenseFile()).exec()
 
 
 class LicenseDialog(KDialog):

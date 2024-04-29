@@ -583,7 +583,7 @@ class Connection:
         if not self.url.isLocalHost:
             if not AddUserDialog(self.url,
                                  self.dlg.username,
-                                 self.dlg.password).exec_():
+                                 self.dlg.password).exec():
                 raise CancelledError
             Players.createIfUnknown(self.username)
         adduserCmd = SERVERMARK.join(

@@ -190,4 +190,4 @@ from mainwindow import MainWindow
 if QT5:
     QGuiApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)
 MainWindow()
-Internal.app.exec_()
+Internal.app.exec()

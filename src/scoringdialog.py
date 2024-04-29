@@ -944,7 +944,7 @@ class ScoringDialog(QWidget):
     def penalty(self) ->None:
         """penalty button clicked"""
         dlg = PenaltyDialog(self.game)
-        dlg.exec_()
+        dlg.exec()
 
     def slotLastTile(self) ->None:
         """called when the last tile changes"""

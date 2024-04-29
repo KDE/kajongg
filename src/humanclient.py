@@ -735,7 +735,7 @@ class HumanClient(Client):
             propose = None
         deferred:Deferred = Deferred()
         selDlg = SelectChow(chows, propose, deferred)
-        assert selDlg.exec_()
+        assert selDlg.exec()
         return deferred
 
     def __selectKong(self, kongs:'MeldList') ->Union[Deferred, Tuple['ClientMessage', Optional['Meld']]]:
@@ -747,7 +747,7 @@ class HumanClient(Client):
             return cast('ClientMessage', Message.Kong), kongs[0]
         deferred:Deferred = Deferred()
         selDlg = SelectKong(kongs, deferred)
-        assert selDlg.exec_()
+        assert selDlg.exec()
         return deferred
 
     def __askAnswered(self, answer:'ClientMessage') ->Union[
@@ -891,7 +891,7 @@ class HumanClient(Client):
         else:
             assert self.connection
             selectDialog = SelectRuleset(self.connection.url)
-            if not selectDialog.exec_():
+            if not selectDialog.exec():
                 return
             ruleset = selectDialog.cbRuleset.current
         deferred = self.__requestNewTableFromServer(ruleset=ruleset)

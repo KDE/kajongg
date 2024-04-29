@@ -375,7 +375,7 @@ class Board(QGraphicsRectItem, ReprMixin):
                 view = Internal.scene.mainWindow.centralView
                 menuPoint = view.mapToGlobal(
                     view.mapFromScene(uiTile.mapToScene(menuPoint)))
-            action = menu.exec_(menuPoint)
+            action = menu.exec(menuPoint)
             if not action:
                 return None
             idx = action.data()
@@ -878,7 +878,7 @@ class FittingView(QGraphicsView):
             board = tilePressed.board
             if board and board.tileDragEnabled:
                 self.dragObject = self.drag(tilePressed)
-                self.dragObject.exec_(Qt.DropAction.MoveAction)
+                self.dragObject.exec(Qt.DropAction.MoveAction)
                 self.dragObject = None
                 return None
         return QGraphicsView.mouseMoveEvent(self, event)

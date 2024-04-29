@@ -624,7 +624,7 @@ class ScoringGame(Game):
         # I do not understand the logic of the exec return value. The yes button returns 0
         # and the no button returns 1. According to the C++ doc, the return value is an
         # opaque value that should not be used."""
-        return [x for x in pairs if SwapDialog(x).exec_() == 0]
+        return [x for x in pairs if SwapDialog(x).exec() == 0]
 
     def savePenalty(self, player:'ScoringPlayer', offense:'Rule', amount:int) ->None:
         """save computed values to database, update score table and balance in status line"""
@@ -650,13 +650,13 @@ def scoreGame() ->Optional[ScoringGame]:
         return None
     gameSelector = Games(Internal.mainWindow)
     selected = None
-    if not gameSelector.exec_():
+    if not gameSelector.exec():
         return None
     selected = gameSelector.selectedGame
     gameSelector.close()
     if selected is not None:
         return cast(ScoringGame, ScoringGame.loadFromDB(selected))
     selectDialog = SelectPlayers()
-    if not selectDialog.exec_():
+    if not selectDialog.exec():
         return None
     return ScoringGame(list(zip(Wind.all4, selectDialog.names)), selectDialog.cbRuleset.current)
