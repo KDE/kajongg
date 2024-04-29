@@ -67,6 +67,14 @@ class SwapDialog(QMessageBox):
         self.addButton(self.noAnswer, QMessageBox.ButtonRole.NoRole)
 
 
+class ScoringComboBox(QComboBox):
+
+    """with flag manualSelect"""
+
+    def __init__(self, parent:Optional['QWidget']=None):
+        super().__init__(parent)
+        self.manualSelect = False
+
 class SelectPlayers(SelectRuleset):
 
     """a dialog for selecting four players. Used only for scoring game."""
@@ -76,10 +84,9 @@ class SelectPlayers(SelectRuleset):
         Players.load()
         decorateWindow(self, i18nc("@title:window", "Select four players"))
         self.names:List[str]
-        self.nameWidgets:List['QWidget'] = []
+        self.nameWidgets:List[ScoringComboBox] = []
         for idx, wind in enumerate(Wind.all4):
-            cbName = QComboBox()
-            cbName.manualSelect = False
+            cbName = ScoringComboBox()
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350)  # is this good for all platforms?
             cbName.addItems(list(Players.humanNames.values()))
@@ -114,7 +121,7 @@ class SelectPlayers(SelectRuleset):
     def slotValidate(self) ->None:
         """try to find 4 different players and update status of the Ok button"""
         changedCombo = self.sender()
-        if not isinstance(changedCombo, QComboBox):
+        if not isinstance(changedCombo, ScoringComboBox):
             changedCombo = self.nameWidgets[0]
         changedCombo.manualSelect = True
         allNames = set(Players.humanNames.values())
