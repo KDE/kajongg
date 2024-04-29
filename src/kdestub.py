@@ -1418,16 +1418,16 @@ class KEditToolBar(KDialog):
         self.upAction.setEnabled(False)
         self.upAction.setAutoRepeat(True)
         self.upAction.clicked.connect(self.upButton)
-        self.insertAction:QToolButton = QToolButton(self)
-        self.insertAction.setIcon(
+        self._insertAction:QToolButton = QToolButton(self)
+        self._insertAction.setIcon(
             KIcon('go-next' if QApplication.isRightToLeft() else 'go-previous'))
-        self.insertAction.setEnabled(False)
-        self.insertAction.clicked.connect(self.insertButton)
-        self.removeAction:QToolButton = QToolButton(self)
-        self.removeAction.setIcon(
+        self._insertAction.setEnabled(False)
+        self._insertAction.clicked.connect(self.insertButton)
+        self._removeAction:QToolButton = QToolButton(self)
+        self._removeAction.setIcon(
             KIcon('go-previous' if QApplication.isRightToLeft() else 'go-next'))
-        self.removeAction.setEnabled(False)
-        self.removeAction.clicked.connect(self.removeButton)
+        self._removeAction.setEnabled(False)
+        self._removeAction.clicked.connect(self.removeButton)
         self.downAction = QToolButton(self)
         self.downAction.setIcon(KIcon('go-down'))
         self.downAction.setEnabled(False)
@@ -1446,8 +1446,8 @@ class KEditToolBar(KDialog):
         button_layout.setSpacing(0)
         button_layout.setRowStretch(0, 10)
         button_layout.addWidget(self.upAction, 1, 1)
-        button_layout.addWidget(self.removeAction, 2, 0)
-        button_layout.addWidget(self.insertAction, 2, 2)
+        button_layout.addWidget(self._removeAction, 2, 0)
+        button_layout.addWidget(self._insertAction, 2, 2)
         button_layout.addWidget(self.downAction, 3, 1)
         button_layout.setRowStretch(4, 10)
 
@@ -1482,9 +1482,9 @@ class KEditToolBar(KDialog):
     def inactiveSelectionChanged(self) ->None:
         """update buttons"""
         if self.inactiveList.selectedItems():
-            self.insertAction.setEnabled(True)
+            self._insertAction.setEnabled(True)
         else:
-            self.insertAction.setEnabled(False)
+            self._insertAction.setEnabled(False)
 
     def activeSelectionChanged(self) ->None:
         """update buttons"""
@@ -1492,7 +1492,7 @@ class KEditToolBar(KDialog):
         toolItem = None
         if self.activeList.selectedItems():
             toolItem = self.activeList.selectedItems()[0]
-        self.removeAction.setEnabled(bool(toolItem))
+        self._removeAction.setEnabled(bool(toolItem))
         if toolItem:
             self.upAction.setEnabled(bool(row))
             self.downAction.setEnabled(row < len(self.activeList) - 1)
