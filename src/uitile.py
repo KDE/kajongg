@@ -114,7 +114,8 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             _ *= 1.2
         boardPos = QPointF(
             self.xoffset * width,
-           _ * height) + shiftZ
+           _ * height)
+        boardPos += shiftZ # QPointF + QPointF is unknown by given annotations
         scenePos = self.board.mapToScene(boardPos)
 # TODO: rename to 'def get_moveDict, return class MoveDict(TypedDict)
         return {'pos': scenePos, 'rotation': sceneRotation(self.board), 'scale': self.board.scale()}

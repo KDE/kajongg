@@ -1119,7 +1119,9 @@ class ScoringDialog(QWidget):
             return
         assert winnerTiles[0].board
         # mypy does not seem to understand operator*
-        pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()  # type:ignore[attr-defined]
+        _ = winnerTiles[0].board.tileset.faceSize
+        _ *= 0.5
+        pmSize = _.toSize()
         self.cbLastTile.setIconSize(pmSize)
         QPixmapCache.clear()
         shownTiles = set()

@@ -999,7 +999,9 @@ class DiscardBoard(CourtBoard):
         assert Internal.scene
         uiTile = cast(MimeData, event.mimeData()).uiTile
         assert isinstance(uiTile, UITile), uiTile
-        uiTile.setPos(event.scenePos() - uiTile.boundingRect().center())
+        _ = event.scenePos()
+        _ -= uiTile.boundingRect().center()
+        uiTile.setPos(_)
         if Internal.scene.clientDialog:
             Internal.scene.clientDialog.selectButton(cast('ClientMessage', Message.Discard))
         event.accept()

@@ -338,7 +338,9 @@ class ScoringHandBoard(HandBoard):
                         helper.mapToParent(helper.boundingRect()).boundingRect().size())
                     center = QPointF(hbCenter)
                     center.setY(center.y() * yFactor)
-                    helper.setPos(center - nameRect.center())
+                    _ = center
+                    _ -= nameRect.center()
+                    helper.setPos(_)
                     if sceneRotation(self) == 180:
                         rotateCenter(helper, 180)
                     helpItems.append(helper)

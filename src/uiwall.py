@@ -201,8 +201,9 @@ class UIWallSide(Board, ReprMixin):
         """return the center point of the wall in relation to the
         faces of the upper level"""
         faceRect = self.tileFaceRect()
-        result = faceRect.topLeft() + self.shiftZ(1) + \
-            QPointF(self.length // 2 * faceRect.width(), faceRect.height() / 2)
+        result = faceRect.topLeft()
+        result += self.shiftZ(1)
+        result += QPointF(self.length // 2 * faceRect.width(), faceRect.height() / 2)
         result.setX(result.x() + faceRect.height() / 2)  # corner tile
         return result
 

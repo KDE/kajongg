@@ -53,10 +53,10 @@ class Tileset(Resource, ReprMixin):
         if self.desktopFileName == 'classic':
             distance = 2
         distanceSize = QSizeF(distance, distance)
-        self.faceSize = self.renderer.boundsOnElement(
-            'BAMBOO_1').size() + distanceSize
-        self.tileSize = self.renderer.boundsOnElement(
-            'TILE_2').size() + distanceSize
+        self.faceSize = self.renderer.boundsOnElement('BAMBOO_1').size()
+        self.faceSize += distanceSize
+        self.tileSize = self.renderer.boundsOnElement('TILE_2').size()
+        self.tileSize += distanceSize
         shW = self.shadowWidth()
         shH = self.shadowHeight()
         self.__shadowOffsets = [

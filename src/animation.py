@@ -40,7 +40,8 @@ class Animation(QPropertyAnimation, ReprMixin):
         Animation.clsUid += 1
         self.uid = Animation.clsUid
         assert isinstance(graphicsObject, QObject)
-        QPropertyAnimation.__init__(self, graphicsObject, propName.encode(), parent)
+        _ = propName.encode()
+        QPropertyAnimation.__init__(self, graphicsObject, _, parent)
         QPropertyAnimation.setEndValue(self, endValue)
         assert Internal.Preferences
         duration = Internal.Preferences.animationDuration()
@@ -85,7 +86,8 @@ class Animation(QPropertyAnimation, ReprMixin):
         """
         if not isAlive(self):
             return 'notAlive'
-        return bytes(self.propertyName()).decode()
+        _ = self.propertyName()
+        return bytes(_).decode()
 
     def formatValue(self, value:PropertyType) ->str:
         """string format the wanted value from qvariant"""
