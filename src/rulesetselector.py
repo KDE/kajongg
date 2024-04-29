@@ -566,12 +566,13 @@ class RulesetSelector(QWidget):
     def hideEvent(self, event:'QHideEvent') ->None:
         """close all differ dialogs"""
         marked:List[RulesetDiffer] = []
-        for differ in self.rulesetView.differs:
+        differs = self.rulesetView.differs
+        for differ in differs:
             differ.hide()
-            marked += differ
+            marked.append(differ)
         QWidget.hideEvent(self, event)
         for _ in marked:
-            del _
+            del differs[_]
 
     def retranslateUi(self) ->None:
         """translate to current language"""
