@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import TYPE_CHECKING, Union, Optional
+from typing import TYPE_CHECKING, Optional
 
 
 from qt import Qt, QPainter, QBrush, QPalette, QPixmapCache, QPixmap
@@ -33,7 +33,6 @@ class Background(Resource):
     def __init__(self, name:Optional[str]=None) ->None:
         """continue __build"""
         super().__init__(name)
-        self.__pmap:QPixmap
         self.graphicsPath = None
         QPixmapCache.setCacheLimit(20480)  # the chinese landscape needs much
 
@@ -54,32 +53,32 @@ class Background(Resource):
                 logException(
                     f'cannot find kmahjongglib/backgrounds/{graphName} for {self.desktopFileName}')
 
-    def pixmap(self, size:'QSizeF') ->Union[QBrush, QPixmap]:
-        """return a background pixmap or None for isPlain"""
-        self.__pmap = QBrush()
-        if not self.isPlain:
-            width = size.width()
-            height = size.height()
-            if self.tiled:
-                width = self.imageWidth
-                height = self.imageHeight
-            cachekey = f'{self.name}W{width}H{height}'
-            self.__pmap = QPixmapCache.find(cachekey)
-            if not self.__pmap:
-                renderer = QSvgRenderer(self.graphicsPath)
-                if not renderer.isValid():
-                    logException(
-                        i18n('file <filename>%1</filename> contains no valid SVG', self.graphicsPath))
-                self.__pmap = QPixmap(int(width), int(height))
-                self.__pmap.fill(Qt.GlobalColor.transparent)
-                painter = QPainter(self.__pmap)
-                renderer.render(painter)
-                QPixmapCache.insert(cachekey, self.__pmap)
-        return self.__pmap
+    def __pixmap(self, size:'QSize') ->QPixmap:
+        """return a background pixmap"""
+        if self.isPlain:
+            return QPixmap()
+        width = size.width()
+        height = size.height()
+        if self.tiled:
+            width = self.imageWidth
+            height = self.imageHeight
+        cachekey = f'{self.name}W{width}H{height}'
+        result = QPixmapCache.find(cachekey)
+        if not result:
+            renderer = QSvgRenderer(self.graphicsPath)
+            if not renderer.isValid():
+                logException(
+                    i18n('file <filename>%1</filename> contains no valid SVG', self.graphicsPath))
+            result = QPixmap(int(width), int(height))
+            result.fill(Qt.GlobalColor.transparent)
+            painter = QPainter(result)
+            renderer.render(painter)
+            QPixmapCache.insert(cachekey, result)
+        return result
 
     def brush(self, size:'QSize') ->QBrush:
         """background brush"""
-        return QBrush(self.pixmap(size))
+        return QBrush(self.__pixmap(size))
 
     def setPalette(self, onto:'QWidget') ->None:
         """set a background palette for widget onto"""
