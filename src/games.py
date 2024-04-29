@@ -188,7 +188,7 @@ class Games(QDialog):
         self.model.setResultset(query.records)
         self.view.hideColumn(0)
 
-    def __idxForGame(self, game:'PlayingGame') ->QModelIndex:
+    def __idxForGame(self, game:int) ->QModelIndex:
         """return the model index for game"""
         for row in range(self.model.rowCount()):
             idx = self.model.index(row, 0)

@@ -42,7 +42,7 @@ class MustChooseKDialog(KDialogIgnoringEscape):
     So this dialog can only be closed by calling accept() or reject()"""
 
     def __init__(self) ->None:
-        parent = Internal.mainWindow  # default
+        parent:Optional[QWidget] = Internal.mainWindow  # default
         # if we are (maybe indirectly) called from a method belonging to a QWidget, take that as parent
         # this does probably not work for classmethod or staticmethod but it is
         # good enough right now
@@ -65,9 +65,9 @@ class Prompt(MustChooseKDialog, ReprMixin):
 
     """common code for things like QuestionYesNo, Information"""
 
-    def __init__(self, msg:str, icon:'QIcon'=QMessageBox.Icon.Information,
-                 buttons:'QDialogButtonBox.StandardButtons'=KDialog.Ok,
-                 caption:Optional[str]=None, default:Optional['QPushButton']=None) ->None:
+    def __init__(self, msg:str, icon:'QMessageBox.Icon'=QMessageBox.Icon.Information,
+                 buttons:'QDialogButtonBox.StandardButton'=KDialog.Ok,
+                 caption:Optional[str]=None, default:Optional['QDialogButtonBox.StandardButton']=None) ->None:
         """buttons is button codes or-ed like KDialog.Ok | KDialog.Cancel. First one is default."""
         if r'\n' in msg:
             print(r'*********************** Fix this! Prompt gets \n in', msg)
@@ -96,9 +96,9 @@ class DeferredDialog(Deferred):
 
     """make dialogs usable as Deferred"""
 
-    def __init__(self, dlg:QDialog, modal:bool=True, always:bool=False) ->None:
+    def __init__(self, dlg:KDialog, modal:bool=True, always:bool=False) ->None:
         Deferred.__init__(self)
-        self.dlg:Optional[QDialog] = dlg
+        self.dlg:Optional[KDialog] = dlg
         self.modal = modal
         self.always = always
         if Options.gui:
@@ -134,7 +134,7 @@ class DeferredDialog(Deferred):
                 Internal.Preferences.animationDuration() / 500.0,
                 self.clicked)
 
-    def clicked(self, button:Optional['QPushButton']=None) ->None:
+    def clicked(self, button:Optional['QDialogButtonBox.StandardButton']=None) ->None:
         """we got a reaction"""
         if self.dlg:
             result = self.dlg.returns(button)

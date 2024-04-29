@@ -185,7 +185,7 @@ class KMessageBox:
 
     @staticmethod
     def createKMessageBox(
-            dialog:QDialog, icon:QIcon, text:str, unusedStrlist:List[str],
+            dialog:'KDialog', icon:QMessageBox.Icon, text:str, unusedStrlist:List[str],
             unusedAsk:str, unusedCheckboxReturn:bool, options:int) ->None:
         """translated as far as needed from kmessagegox.cpp"""
         mainLayout = QVBoxLayout()
@@ -298,7 +298,7 @@ class KDialog(CaptionMixin, QDialog):
         """return the matching button"""
         return self.buttonBox.button(buttonCode)
 
-    def returns(self, button:Optional['QPushButton']=None) ->Any:
+    def returns(self, button:Optional['QDialogButtonBox.StandardButton']=None) ->Any:
         """the user answered"""
         if button is None:
             button = self.default  # type:ignore[attr-defined]
@@ -370,7 +370,7 @@ class KActionCollection:
 
     """stub"""
 
-    def __init__(self, mainWindow:'MainWindow') ->None:
+    def __init__(self, mainWindow:'KXmlGuiWindow') ->None:
         self.__actions:Dict[str,'Action'] = {}
         self.mainWindow = mainWindow
 
@@ -438,6 +438,9 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
 
     def __init__(self) ->None:
         QMainWindow.__init__(self)
+        self.actionStatusBar: 'Action'
+        self.actionToolBar: 'Action'
+        self.actionFullscreen: 'Action'
         self._actions = KActionCollection(self)
         self._toolBar = QToolBar(self)
         self._toolBar.setObjectName('Toolbar')
@@ -835,7 +838,7 @@ class KSwitchLanguageDialog(KDialog):
 
     def __init__(self, parent:QWidget) ->None:
         super().__init__(parent)
-        self.languageRows:Dict[QPushButton, Any] = {}
+        self.languageRows:Dict[QWidget, Any] = {}
         self.languageButtons:List[KLanguageButton] = []
         self.setCaption(i18n('Switch Application Language'))
         self.widget = QWidget()
@@ -1351,7 +1354,7 @@ class ToolBarItem(QListWidgetItem):
     """a toolbar item"""
     emptyIcon:QIcon
 
-    def __init__(self, action:Action, parent:QWidget) ->None:
+    def __init__(self, action:Action, parent:QListWidget) ->None:
         self.action = action
         self.parent = parent
         QListWidgetItem.__init__(self, self.__icon(), self.__text(), parent)

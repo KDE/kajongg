@@ -31,7 +31,7 @@ from common import DrawOnTopMixin
 from wind import Wind, East
 
 if TYPE_CHECKING:
-    from qt import QGraphicsSceneDragDropEvent, QWidget
+    from qt import QGraphicsSceneDragDropEvent, QWidget, QSizeF
     from qt import QKeyEvent, QMouseEvent, QWheelEvent, QResizeEvent
     from uiwall import UIWallSide, UIWall
     from game import PlayingGame, Game
@@ -59,7 +59,7 @@ class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):
         """for identification in animations"""
         return self.__wind.tile.name2()
 
-    def moveDict(self) ->Dict[str, Union[str, int]]:
+    def moveDict(self) ->Dict[str, Union[QPointF, str, int]]:
         """a dict with attributes for the new position,
         normally pos, rotation and scale"""
         sideCenter = self.board.center()
@@ -570,11 +570,11 @@ class Board(QGraphicsRectItem, ReprMixin):
                 shiftY = stepY
         return QPointF(shiftX, shiftY)
 
-    def tileSize(self) ->QRectF:
+    def tileSize(self) ->'QSizeF':
         """the current uiTile size"""
         return self._tileset.tileSize
 
-    def faceSize(self) ->QRectF:
+    def faceSize(self) ->'QSizeF':
         """the current face size"""
         return self._tileset.faceSize
 

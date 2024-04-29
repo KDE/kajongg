@@ -81,7 +81,7 @@ class SelectChow(KDialogIgnoringEscape):
 
     def toggled(self, unusedChecked:bool) ->None:
         """a radiobutton has been toggled"""
-        button = cast(QPushButton, self.sender())
+        button = cast(QRadioButton, self.sender())
         if button.isChecked():
             self.selectedChow = self.chows[self.buttons.index(button)]
             self.accept()
@@ -115,7 +115,7 @@ class SelectKong(KDialogIgnoringEscape):
 
     def toggled(self, unusedChecked:bool) ->None:
         """a radiobutton has been toggled"""
-        button = cast(QPushButton, self.sender())
+        button = cast(QRadioButton, self.sender())
         if button.isChecked():
             self.selectedKong = self.kongs[self.buttons.index(button)]
             self.accept()
@@ -126,10 +126,10 @@ class DlgButton(QPushButton):
 
     """special button for ClientDialog"""
 
-    def __init__(self, message:'ClientMessage', parent:QWidget) ->None:
+    def __init__(self, message:'ClientMessage', parent:'ClientDialog') ->None:
         QPushButton.__init__(self, parent)
         self.message = message
-        self.client = parent.client
+        self.client:'HumanClient' = parent.client
         self.setMinimumHeight(25)
         self.setText(message.buttonCaption())  # type: ignore[call-arg]
 
@@ -170,7 +170,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
         decorateWindow(self, i18n('Choose'))
         self.tables:List[ClientTable]
         self.setObjectName('ClientDialog')
-        self.client = client
+        self.client:'HumanClient' = client
         self.gridLayout = QGridLayout(self)
         self.progressBar = QProgressBar()
         self.progressBar.setMinimumHeight(25)
@@ -370,7 +370,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
             # sometimes we get this event twice
             return
         if message is None:
-            message = self.focusWidget().message
+            message = cast(DlgButton, self.focusWidget()).message
         assert any(x.message == message for x in self.buttons)
         assert self.client.game
         if not cast(PlayingPlayer, self.client.game.myself).sayable[message]:
@@ -391,7 +391,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
         """the user clicked one of the buttons"""
         game = self.client.game
         if game and not game.autoPlay:
-            self.selectButton(cast(QPushButton, self.sender()).message)
+            self.selectButton(cast(DlgButton, self.sender()).message)
 
 
 class HumanClient(Client):

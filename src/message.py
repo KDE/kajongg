@@ -24,10 +24,9 @@ if TYPE_CHECKING:
     from move import Move
     from client import Client
     from player import PlayingPlayer
-    from qt import QPushButton
     from deferredutil import Request
     from user import User
-    from humanclient import HumanClient
+    from humanclient import HumanClient, DlgButton
     from scene import PlayingScene
 
 
@@ -183,7 +182,7 @@ class ClientMessage(Message):
             self.shortcut)
         return self.i18nName.replace(i18nShortcut, '&' + i18nShortcut, 1)
 
-    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]: # pylint: disable=unused-argument
+    def toolTip(self, button:'DlgButton', tile:Optional[Tile]) ->Tuple[str, bool, str]: # pylint: disable=unused-argument
         """return text and warning flag for button and text for tile for button and text for tile"""
         txt = f'toolTip is not defined for {self.name}'
         logWarning(txt)
@@ -248,7 +247,7 @@ class PungChowMessage(NotifyAtOnceMessage):
     def __init__(self, name:Optional[str]=None, shortcut:Optional[str]=None) ->None:
         NotifyAtOnceMessage.__init__(self, name=name, shortcut=shortcut)
 
-    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
+    def toolTip(self, button:'DlgButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """for the action button which will send this message"""
         myself = button.client.game.myself
         maySay = myself.sayable[self]
@@ -320,7 +319,7 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
         else:
             table.declareKong(msg.player, Meld(msg.args[0]))
 
-    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
+    def toolTip(self, button:'DlgButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """for the action button which will send this message"""
         myself = button.client.game.myself
         maySay = myself.sayable[self]
@@ -391,7 +390,7 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
         """the server mirrors that and tells all others"""
         table.claimMahJongg(msg)
 
-    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
+    def toolTip(self, button:'DlgButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """return text and warning flag for button and text for tile"""
         return i18n('Press here and you win'), False, ''
 
@@ -415,7 +414,7 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
         """the server tells all others"""
         table.clientDiscarded(msg)
 
-    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
+    def toolTip(self, button:'DlgButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """for the action button which will send this message"""
         assert isinstance(tile, Tile), tile
         myself = button.client.game.myself
@@ -459,7 +458,7 @@ class MessageDiscard(ClientMessage, ServerMessage):
         """the server mirrors that action"""
         table.clientDiscarded(msg)
 
-    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
+    def toolTip(self, button:'DlgButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """for the action button which will send this message"""
         assert isinstance(tile, Tile), tile
         game = button.client.game
@@ -903,7 +902,7 @@ class MessageOK(ClientMessage):
                                name=i18ncE('kajongg', 'OK'),
                                shortcut=i18ncE('kajongg game dialog:Key for OK', 'O'))
 
-    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
+    def toolTip(self, button:'DlgButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """return text and warning flag for button and text for tile for button and text for tile"""
         return i18n('Confirm that you saw the message'), False, ''
 
@@ -917,7 +916,7 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
                                      name=i18ncE('kajongg', 'No Claim'),
                                      shortcut=i18ncE('kajongg game dialog:Key for No claim', 'N'))
 
-    def toolTip(self, button:'QPushButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
+    def toolTip(self, button:'DlgButton', tile:Optional[Tile]) ->Tuple[str, bool, str]:
         """return text and warning flag for button and text for tile for button and text for tile"""
         return i18n('You cannot or do not want to claim this tile'), False, ''
 

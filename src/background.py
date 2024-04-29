@@ -20,7 +20,7 @@ from log import logException, i18n
 from mjresource import Resource
 
 if TYPE_CHECKING:
-    from qt import QSizeF
+    from qt import QWidget, QSize
 
 class Background(Resource):
 
@@ -77,11 +77,11 @@ class Background(Resource):
                 QPixmapCache.insert(cachekey, self.__pmap)
         return self.__pmap
 
-    def brush(self, size:'QSizeF') ->QBrush:
+    def brush(self, size:'QSize') ->QBrush:
         """background brush"""
         return QBrush(self.pixmap(size))
 
-    def setPalette(self, onto:QBrush) ->None:
+    def setPalette(self, onto:'QWidget') ->None:
         """set a background palette for widget onto"""
         palette = QPalette()
         mybrush = self.brush(onto.size())

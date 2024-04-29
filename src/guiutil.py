@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import os
-from typing import TYPE_CHECKING, Optional, List, Any, Type, Union, Tuple, Dict
+from typing import TYPE_CHECKING, Optional, List, Any, Type, Tuple, Dict, Sequence
 
 from qt import uic, QStandardPaths
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
@@ -126,7 +126,7 @@ class BlockSignals:
 
     """a helper class for temporary blocking of Qt signals"""
 
-    def __init__(self, qobjects:Union[List['QObject'], List['QWidget']]) ->None:
+    def __init__(self, qobjects:Sequence['QObject']) ->None:
         self.qobjects = qobjects
 
     def __enter__(self) ->None:

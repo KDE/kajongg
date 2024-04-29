@@ -22,7 +22,7 @@ from twisted.internet.task import deferLater
 import twisted.internet.error
 from twisted.python.failure import Failure
 
-from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
+from qt import QDialogButtonBox, QVBoxLayout, \
     QLabel, QComboBox, QLineEdit, QFormLayout, \
     QSizePolicy, QWidget
 
@@ -241,13 +241,13 @@ class Url(str, ReprMixin):
         return Internal.reactor.connectTCP(host, self.port, factory, timeout=5)
 
 
-class LoginDlg(QDialog):
+class LoginDlg(KDialog):
 
     """login dialog for server"""
 
     def __init__(self) ->None:
         """self.servers is a list of tuples containing server and last playername"""
-        QDialog.__init__(self, None)
+        KDialog.__init__(self, None)
         decorateWindow(self, i18nc('kajongg', 'Login'))
         self.setupUi()
 
@@ -277,7 +277,7 @@ class LoginDlg(QDialog):
         self.serverChanged()
         StateSaver(self)
 
-    def returns(self, unusedButton:Optional[str]=None) ->Tuple[Url, str, str, 'Ruleset']:
+    def returns(self, button:Optional[QDialogButtonBox.StandardButton]=None) ->Any:
         """login data returned by this dialog"""
         return (Url(self.url), self.username, self.password, self.__defineRuleset())
 
