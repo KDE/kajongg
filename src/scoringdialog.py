@@ -669,6 +669,14 @@ class RuleBox(QCheckBox):
         if not applicable:
             self.setChecked(False)
 
+class PlayerSelection(ListComboBox):
+
+    """just add a label"""
+
+    def __init__(self, items:List[Any], parent:Optional['QWidget']=None) ->None:
+        super().__init__(items, parent)
+        self.label = QLabel()
+
 
 class PenaltyDialog(QDialog):
 
@@ -695,20 +703,15 @@ class PenaltyDialog(QDialog):
         grid.addWidget(lblPenalty, 1, 0)
         grid.addWidget(self.spPenalty, 1, 1)
         grid.addWidget(self.lblUnits, 1, 2)
-        self.payers:List[ListComboBox] = []
-        self.payees:List[ListComboBox] = []
-        # a penalty can never involve the winner, neither as payer nor as payee
-        for idx in range(3):
-            self.payers.append(ListComboBox(game.losers()))
-            self.payees.append(ListComboBox(game.losers()))
+        # a penalty can never involve the winner, neither as payer nor as payee, so max 3
+        self.payers = list(PlayerSelection(game.losers()) for x in range(3))
+        self.payees = list(PlayerSelection(game.losers()) for x in range(3))
         for idx, payer in enumerate(self.payers):
             grid.addWidget(payer, 3 + idx, 0)
-            payer.lblPayment = QLabel()
-            grid.addWidget(payer.lblPayment, 3 + idx, 1)
+            grid.addWidget(payer.label, 3 + idx, 1)
         for idx, payee in enumerate(self.payees):
             grid.addWidget(payee, 3 + idx, 3)
-            payee.lblPayment = QLabel()
-            grid.addWidget(payee.lblPayment, 3 + idx, 4)
+            grid.addWidget(payee.label, 3 + idx, 4)
         grid.addWidget(QLabel(''), 6, 0)
         grid.setRowStretch(6, 10)
         for player in self.payers + self.payees:
@@ -742,7 +745,7 @@ class PenaltyDialog(QDialog):
             self.game.savePenalty(player, offense, amount)
         QDialog.accept(self)
 
-    def usedCombos(self, partyCombos:List[ListComboBox]) ->List[ListComboBox]:
+    def usedCombos(self, partyCombos:List[PlayerSelection]) ->List[PlayerSelection]:
         """return all used player combos for this offense"""
         return [x for x in partyCombos if x.isVisibleTo(self)]
 
@@ -754,7 +757,7 @@ class PenaltyDialog(QDialog):
         """shuffle players to ensure everybody only appears once.
         enable execution if all input is valid"""
         changedCombo = self.sender()
-        if not isinstance(changedCombo, ListComboBox):
+        if not isinstance(changedCombo, PlayerSelection):
             changedCombo = self.payers[0]
         usedPlayers = set(self.allParties())
         unusedPlayers = set(self.game.losers()) - usedPlayers
@@ -791,15 +794,15 @@ class PenaltyDialog(QDialog):
         for pList, amount, count in ((self.payers, payerAmount, payers), (self.payees, payeeAmount, payees)):
             for idx, player in enumerate(pList):
                 player.setVisible(idx < count)
-                player.lblPayment.setVisible(idx < count)
+                player.label.setVisible(idx < count)
                 if idx < count:
                     if pList == self.payers:
-                        player.lblPayment.setText(
+                        player.label.setText(
                             i18nc(
                                 'penalty dialog, appears behind paying player combobox',
                                 'pays %1 points', -amount))
                     else:
-                        player.lblPayment.setText(
+                        player.label.setText(
                             i18nc(
                                 'penalty dialog, appears behind profiting player combobox',
                                 'gets %1 points', amount))
