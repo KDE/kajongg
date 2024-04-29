@@ -917,7 +917,7 @@ class YellowText(QGraphicsRectItem):
         """set the text of self"""
         self.msg = f'{msg}  '
         metrics = QFontMetrics(self.font)
-        self.width = metrics.width(self.msg)
+        self.width = metrics.horizontalAdvance(self.msg)
         self.height = int(metrics.lineSpacing() * 1.1)
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()

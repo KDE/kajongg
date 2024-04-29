@@ -282,8 +282,7 @@ class ModelTest(QObject):
         self.testRoleDataType(Qt.ItemDataRole.SizeHintRole, QSize)
         self.testRoleDataType(Qt.ItemDataRole.FontRole, QFont)
         self.testRoleDataType(Qt.ItemDataRole.ForegroundRole, QColor)
-        self.testRoleDataType(Qt.ItemDataRole.BackgroundColorRole, QColor)
-        self.testRoleDataType(Qt.ItemDataRole.TextColorRole, QColor)
+        self.testRoleDataType(Qt.ItemDataRole.BackgroundRole, QColor)
 
         # Check that the alignment is one we know about
         self.testRoleDataValues(
