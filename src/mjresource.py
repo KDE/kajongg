@@ -47,8 +47,8 @@ class Resource:
     def __directories(cls) ->Generator[str, None,None]:
         """where to look for resources"""
         result = QStandardPaths.locateAll(
-            QStandardPaths.GenericDataLocation,
-            f'kmahjongglib/{cls.resourceName}s', QStandardPaths.LocateDirectory)
+            QStandardPaths.StandardLocation.GenericDataLocation,
+            f'kmahjongglib/{cls.resourceName}s', QStandardPaths.LocateOption.LocateDirectory)
         result.insert(0, os.path.join('share', 'kmahjongglib', f'{cls.resourceName}s'))
         return (x for x in result if os.path.exists(x))
 

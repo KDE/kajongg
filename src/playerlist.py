@@ -36,21 +36,21 @@ class PlayerList(QDialog):
         self.table = QTableWidget(self)
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.verticalHeader().setVisible(False)
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.itemChanged.connect(self.itemChanged)
         self.updateTable()
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.setStandardButtons(
-            QDialogButtonBox.Close)  # Close has the Rejected role
+            QDialogButtonBox.StandardButton.Close)  # Close has the Rejected role
         self.buttonBox.rejected.connect(self.accept)
         self.newButton = self.buttonBox.addButton(
             i18nc('define a new player',
                   "&New"),
-            QDialogButtonBox.ActionRole)
+            QDialogButtonBox.ButtonRole.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.slotInsert)
         self.deleteButton = self.buttonBox.addButton(
-            i18n("&Delete"), QDialogButtonBox.ActionRole)
+            i18n("&Delete"), QDialogButtonBox.ButtonRole.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.deleteButton.clicked.connect(self.delete)
 
@@ -84,8 +84,8 @@ class PlayerList(QDialog):
         table.setColumnCount(1)
         table.setRowCount(len(self._data))
         table.setHorizontalHeaderLabels([i18n("Player")])
-        table.setSelectionBehavior(QTableWidget.SelectRows)
-        table.setSelectionMode(QTableWidget.SingleSelection)
+        table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         selectedItem = None
         for row, name in enumerate(sorted(self._data, key=self.sortKey)):
             item = QTableWidgetItem(name)

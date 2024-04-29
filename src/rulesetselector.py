@@ -229,7 +229,7 @@ class RuleModel(TreeModel):
         item = index.internalPointer()
         return isinstance(item, RuleItem) and isinstance(item.raw, BoolRule)
 
-    def headerData(self, section:int, orientation:int, role:int=Qt.ItemDataRole.DisplayRole) ->Optional[Any]:
+    def headerData(self, section:int, orientation:Qt.Orientation, role:int=Qt.ItemDataRole.DisplayRole) ->Optional[Any]:
         """tell the view about the wanted headers"""
         if Qt is None:
             # happens when kajongg exits unexpectedly
@@ -356,7 +356,7 @@ class EditableRuleModel(RuleModel):
             result |= Qt.ItemFlag.ItemIsEditable
         if checkable:
             result |= Qt.ItemFlag.ItemIsUserCheckable
-        return cast(Qt.ItemFlags, result)
+        return cast(Qt.ItemFlag, result)
 
 
 class RuleTreeView(QTreeView):
@@ -377,7 +377,7 @@ class RuleTreeView(QTreeView):
             if button:
                 button.setEnabled(False)
         self.header().setObjectName('RuleTreeViewHeader')
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.ruleModel:Optional[RuleModel] = None
         self.ruleModelTest = None
         self.rulesets:List[Ruleset] = []  # nasty: this generates self.ruleModel
@@ -442,8 +442,8 @@ class RuleTreeView(QTreeView):
         header.setStretchLastSection(False)
         header.setMinimumSectionSize(-1)
         for col in range(1, header.count()):
-            header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         for col in range(header.count()):
             self.resizeColumnToContents(col)
 
@@ -525,8 +525,8 @@ class RulesetSelector(QWidget):
         spacerItem = QSpacerItem(
             20,
             20,
-            QSizePolicy.Minimum,
-            QSizePolicy.Expanding)
+            QSizePolicy.Policy.Minimum,
+            QSizePolicy.Policy.Expanding)
         v2layout.addWidget(self.btnCopy)
         v2layout.addWidget(self.btnRemove)
         v2layout.addWidget(self.btnCompare)

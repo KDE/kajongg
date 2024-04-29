@@ -142,7 +142,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
     # contrast colors are not optimal as long as our lines have a width of
     # only one pixel: antialiasing is not sufficient
     colors = [KApplication.palette().color(x)
-              for x in [QPalette.Text, QPalette.Link, QPalette.LinkVisited]]
+              for x in [QPalette.ColorRole.Text, QPalette.ColorRole.Link, QPalette.ColorRole.LinkVisited]]
     colors.append(QColor('orange'))
 
     def __init__(self, parent:Optional['QObject']=None) ->None:
@@ -158,7 +158,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
                     with Painter(painter):
                         painter.translate(option.rect.topLeft())
                         painter.setPen(self.colors[idx])
-                        painter.setRenderHint(QPainter.Antialiasing)
+                        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
                         # if we want to use a pen width > 1, we can no longer directly drawPolyline
                         # separately per cell beause the lines spread vertically over two rows: We would
                         # have to draw the lines into one big pixmap and copy
@@ -442,11 +442,11 @@ class ScoreTable(QWidget):
         self.viewLeft = ScoreViewLeft(self)
         self.viewRight = ScoreViewRight(self)
         self.viewRight.setHorizontalScrollBar(HorizontalScrollBar(self))
-        self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
+        self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
         self.viewRight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.viewRight.header().setSectionsClickable(False)
         self.viewRight.header().setSectionsMovable(False)
-        self.viewRight.setSelectionMode(QAbstractItemView.NoSelection)
+        self.viewRight.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Orientation.Vertical)
         self.splitter.setObjectName('ScoreTableSplitter')
@@ -506,14 +506,14 @@ class ScoreTable(QWidget):
             header = view.header()
             header.setStretchLastSection(False)
             view.setAlternatingRowColors(True)
-        self.viewRight.header().setSectionResizeMode(QHeaderView.Fixed)
+        self.viewRight.header().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         for col in range(self.viewLeft.header().count()):
             self.viewLeft.header().setSectionHidden(col, col > 0)
             self.viewRight.header().setSectionHidden(col, col == 0)
         self.scoreLayout.setStretch(1, 100)
         self.scoreLayout.setSpacing(0)
-        self.viewLeft.setFrameStyle(QFrame.NoFrame)
-        self.viewRight.setFrameStyle(QFrame.NoFrame)
+        self.viewLeft.setFrameStyle(QFrame.Shape.NoFrame)
+        self.viewRight.setFrameStyle(QFrame.Shape.NoFrame)
         self.viewLeft.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         for master, slave in ((self.viewRight, self.viewLeft), (self.viewLeft, self.viewRight)):
             master.expanded.connect(slave.expand)
@@ -720,11 +720,11 @@ class PenaltyDialog(QDialog):
         self.cbCrime.currentIndexChanged.connect(self.crimeChanged)
         buttonBox = KDialogButtonBox(self)
         grid.addWidget(buttonBox, 7, 0, 1, 5)
-        buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
+        buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel)
         buttonBox.rejected.connect(self.reject)
         self.btnExecute = buttonBox.addButton(
             i18n("&Execute"),
-            QDialogButtonBox.AcceptRole)
+            QDialogButtonBox.ButtonRole.AcceptRole)
         self.btnExecute.clicked.connect(self.accept)
         self.crimeChanged()
         StateSaver(self)
@@ -866,10 +866,10 @@ class ScoringDialog(QWidget):
         self.cbLastTile = QComboBox()
         self.cbLastTile.setMinimumContentsLength(1)
         vpol = QSizePolicy()
-        vpol.setHorizontalPolicy(QSizePolicy.Fixed)
+        vpol.setHorizontalPolicy(QSizePolicy.Policy.Fixed)
         self.cbLastTile.setSizePolicy(vpol)
         self.cbLastTile.setSizeAdjustPolicy(
-            QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
         self.lblLastMeld = QLabel(i18n('L&ast Meld:'))
         self.prevLastTile:Optional['Tile'] = None
@@ -877,7 +877,7 @@ class ScoringDialog(QWidget):
         self.cbLastMeld.setMinimumContentsLength(1)
         self.cbLastMeld.setSizePolicy(vpol)
         self.cbLastMeld.setSizeAdjustPolicy(
-            QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastMeld.setBuddy(self.cbLastMeld)
         self.comboTilePairs:set['Tile'] = set()
         pGrid.setRowStretch(6, 5)

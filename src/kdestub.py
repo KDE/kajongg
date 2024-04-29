@@ -196,9 +196,9 @@ class KMessageBox:
         mainLayout.addLayout(hLayout, 5)
 
         iconName = {
-            QMessageBox.Information: 'dialog-information',
-            QMessageBox.Warning: 'dialog-warning',
-            QMessageBox.Question: 'dialog-question'}[icon]
+            QMessageBox.Icon.Information: 'dialog-information',
+            QMessageBox.Icon.Warning: 'dialog-warning',
+            QMessageBox.Icon.Question: 'dialog-question'}[icon]
         iconLayout = QVBoxLayout()
         iconLayout.addStretch(1)
         iconLayout.addWidget(IconLabel(iconName, dialog))
@@ -240,16 +240,16 @@ KDialogButtonBox = QDialogButtonBox
 class KDialog(CaptionMixin, QDialog):
 
     """QDialog should be enough for kajongg"""
-    NoButton = QDialogButtonBox.NoButton
-    Ok = QDialogButtonBox.Ok
-    Cancel = QDialogButtonBox.Cancel
-    Yes = QDialogButtonBox.Yes
-    No = QDialogButtonBox.No
-    Help = QDialogButtonBox.Help
-    Apply = QDialogButtonBox.Apply
-    RestoreDefaults = QDialogButtonBox.RestoreDefaults
-    Default = QDialogButtonBox.RestoreDefaults
-    Close = QDialogButtonBox.Close
+    NoButton = QDialogButtonBox.StandardButton.NoButton
+    Ok = QDialogButtonBox.StandardButton.Ok
+    Cancel = QDialogButtonBox.StandardButton.Cancel
+    Yes = QDialogButtonBox.StandardButton.Yes
+    No = QDialogButtonBox.StandardButton.No
+    Help = QDialogButtonBox.StandardButton.Help
+    Apply = QDialogButtonBox.StandardButton.Apply
+    RestoreDefaults = QDialogButtonBox.StandardButton.RestoreDefaults
+    Default = QDialogButtonBox.StandardButton.RestoreDefaults
+    Close = QDialogButtonBox.StandardButton.Close
 
     def __init__(self, parent:Optional[QWidget]=None) ->None:
         QDialog.__init__(self, parent)
@@ -258,7 +258,7 @@ class KDialog(CaptionMixin, QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.__mainWidget:Optional[QWidget] = None
 
-    def setButtons(self, buttonMask:QDialogButtonBox.StandardButtons) ->None:
+    def setButtons(self, buttonMask:QDialogButtonBox.StandardButton) ->None:
         """(re)create the buttonbox and put all wanted buttons into it"""
         if not buttonMask:
             self.buttonBox.clear()
@@ -294,7 +294,7 @@ class KDialog(CaptionMixin, QDialog):
         self.layout().addWidget(widget)
         self.layout().addWidget(self.buttonBox)
 
-    def button(self, buttonCode:QDialogButtonBox.StandardButtons) ->QPushButton:
+    def button(self, buttonCode:QDialogButtonBox.StandardButton) ->QPushButton:
         """return the matching button"""
         return self.buttonBox.button(buttonCode)
 
@@ -621,7 +621,7 @@ class KConfig(ConfigParser):
     def __init__(self, path:Optional[str]=None) ->None:
         ConfigParser.__init__(self, delimiters=('=', ))
         if path is None:
-            path = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
+            path = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppConfigLocation)
             path = os.path.join(path, 'kajonggrc')
         self.path = os.path.expanduser(path)
         if os.path.exists(self.path):
@@ -677,7 +677,8 @@ class Action(QAction):
                 if isinstance(shortcut, QKeyCombination):
                     shortcut = shortcut.key()
                     assert shortcut
-            self.setShortcut(QKeySequence(shortcut | Qt.Modifier.CTRL))
+            shortcut = cast(Qt.Key, shortcut)
+            self.setShortcut(QKeySequence(shortcut | Qt.KeyboardModifier.ControlModifier))  # type:ignore[operator]
             self.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
         if actionData is not None:
             self.setData(actionData)
@@ -1120,7 +1121,7 @@ class AboutKajonggDialog(KDialog):
     @staticmethod
     def licenseFile() ->Optional[str]:
         """which may currently only be 1: GPL_V2"""
-        prefix = QLibraryInfo.location(QLibraryInfo.PrefixPath)
+        prefix = QLibraryInfo.location(QLibraryInfo.LibraryPath.PrefixPath)  # type:ignore[attr-defined]
         for path in ('COPYING', '../COPYING',
                      f'{prefix}/share/kf5/licenses/GPL_V2'):
             path = os.path.abspath(path)
@@ -1151,7 +1152,7 @@ class LicenseDialog(KDialog):
             with open('x' + licenseFile, 'r', encoding='utf-8') as _:
                 licenseText = _.read()
         self.licenseBrowser = QTextBrowser()
-        self.licenseBrowser.setLineWrapMode(QTextEdit.NoWrap)
+        self.licenseBrowser.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
         self.licenseBrowser.setText(licenseText)
 
         vLayout = QVBoxLayout()
@@ -1188,14 +1189,15 @@ class KConfigDialog(KDialog):
 
     def __init__(self, parent:QWidget, name:str, preferences:'SetupPreferences') ->None:
         KDialog.__init__(self, parent)
+        self.pages: List[QWidget]
         self.setCaption(i18n('Configure'))
         self.name = name
         self.preferences = preferences
         self.orgPref:defaultdict[Any, Any]
         self.configWidgets:Dict[str, QWidget] = {}
         self.iconList = QListWidget()
-        self.iconList.setViewMode(QListWidget.IconMode)
-        self.iconList.setFlow(QListWidget.TopToBottom)
+        self.iconList.setViewMode(QListWidget.ViewMode.IconMode)
+        self.iconList.setFlow(QListWidget.Flow.TopToBottom)
         self.iconList.setUniformItemSizes(True)
         self.iconList.itemClicked.connect(self.iconClicked)
         self.iconList.currentItemChanged.connect(self.iconClicked)
@@ -1338,8 +1340,8 @@ class KSeparator(QFrame):
         QFrame.__init__(self, parent)
         self.setLineWidth(1)
         self.setMidLineWidth(0)
-        self.setFrameShape(QFrame.HLine)
-        self.setFrameShadow(QFrame.Sunken)
+        self.setFrameShape(QFrame.Shape.HLine)
+        self.setFrameShadow(QFrame.Shadow.Sunken)
         self.setMinimumSize(0, 2)
 
 
@@ -1380,7 +1382,7 @@ class ToolBarList(QListWidget):
 
     def __init__(self, parent:QWidget) ->None:
         QListWidget.__init__(self, parent)
-        self.setDragDropMode(QAbstractItemView.DragDrop)  # no internal moves
+        self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)  # no internal moves
 
 
 class KEditToolBar(KDialog):

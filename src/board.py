@@ -87,7 +87,7 @@ class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):
             newPrevailing = self.wind == Wind.all4[value % 4]
         self.__brush = self.roundWindColor if newPrevailing else self.whiteColor
 
-    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem.StyleOptionType,
+    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem,
         unusedWidget:Optional['QWidget']=None) ->None:
         """paint the disc"""
         with Painter(painter):
@@ -159,7 +159,7 @@ class WindLabel(QLabel):
         pMap = QPixmap(40, 40)
         pMap.fill(Qt.GlobalColor.transparent)
         painter = QPainter(pMap)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.scale(0.40, 0.40)
         pwind.paint(painter, QStyleOptionGraphicsItem())
         for child in pwind.childItems():
@@ -783,13 +783,13 @@ class FittingView(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         vpol = QSizePolicy()
-        vpol.setHorizontalPolicy(QSizePolicy.Expanding)
-        vpol.setVerticalPolicy(QSizePolicy.Expanding)
+        vpol.setHorizontalPolicy(QSizePolicy.Policy.Expanding)
+        vpol.setVerticalPolicy(QSizePolicy.Policy.Expanding)
         self.setSizePolicy(vpol)
-        self.setRenderHint(QPainter.Antialiasing)
-        self.setRenderHint(QPainter.SmoothPixmapTransform)
+        self.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
         self.setStyleSheet('background: transparent')
-        self.setFrameStyle(QFrame.NoFrame)
+        self.setFrameStyle(QFrame.Shape.NoFrame)
         self.tilePressed:Optional[UITile] = None
         self.dragObject:Optional[QDrag] = None
         self.setFocus()
@@ -931,7 +931,7 @@ class YellowText(QGraphicsRectItem):
         else:
             self.moveBy(xOffset, yOffset)
 
-    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem.StyleOptionType,
+    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem,
         unusedWidget:Optional['QWidget']=None) ->None:
         """override predefined paint"""
         painter.setFont(self.font)

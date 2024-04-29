@@ -299,7 +299,8 @@ class MainWindow(KXmlGuiWindow):
             Qt.Key.Key_E, actionData=ExplainView)
         self.actionExplain.setEnabled(False)
         self.actionFullscreen = self._kajonggToggleAction(
-            "fullscreen", "view-fullscreen", shortcut=cast(Qt.Key, Qt.Key.Key_F | Qt.KeyboardModifier.ShiftModifier))
+            "fullscreen", "view-fullscreen",
+            shortcut=cast(Qt.Key, Qt.Key.Key_F | Qt.KeyboardModifier.ShiftModifier))  # type:ignore[operator]
         self.actionFullscreen.toggled.connect(self.fullScreen)
         self.actionAutoPlay = Action(
             self,

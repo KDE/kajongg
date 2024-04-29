@@ -114,21 +114,21 @@ class Games(QDialog):
         self.view.setModel(self.model)
         self.selection = QItemSelectionModel(self.model, self.view)
         self.view.setSelectionModel(self.selection)
-        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.view.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
         self.buttonBox = QDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel)
         self.newButton = self.buttonBox.addButton(
-            i18nc('start a new game', "&New"), QDialogButtonBox.ActionRole)
+            i18nc('start a new game', "&New"), QDialogButtonBox.ButtonRole.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.accept)
         self.loadButton = self.buttonBox.addButton(
-            i18n("&Load"), QDialogButtonBox.AcceptRole)
+            i18n("&Load"), QDialogButtonBox.ButtonRole.AcceptRole)
         self.loadButton.clicked.connect(self.loadGame)
         self.loadButton.setIcon(KIcon("document-open"))
         self.deleteButton = self.buttonBox.addButton(
-            i18n("&Delete"), QDialogButtonBox.ActionRole)
+            i18n("&Delete"), QDialogButtonBox.ButtonRole.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.deleteButton.clicked.connect(self.delete)
 

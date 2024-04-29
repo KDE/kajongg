@@ -62,9 +62,9 @@ class SwapDialog(QMessageBox):
             i18n("By the rules, %1 and %2 should now exchange their seats. ",
                  swappers[0].name, swappers[1].name))
         self.yesAnswer = QPushButton(i18n("&Exchange"))
-        self.addButton(self.yesAnswer, QMessageBox.YesRole)
+        self.addButton(self.yesAnswer, QMessageBox.ButtonRole.YesRole)
         self.noAnswer = QPushButton(i18n("&Keep seat"))
-        self.addButton(self.noAnswer, QMessageBox.NoRole)
+        self.addButton(self.noAnswer, QMessageBox.ButtonRole.NoRole)
 
 
 class SelectPlayers(SelectRuleset):
@@ -135,7 +135,7 @@ class SelectPlayers(SelectRuleset):
                 combo.addItems(sorted(
                     allNames - self.__selectedNames() - {comboName}))
                 combo.setCurrentIndex(0)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(
             len(self.__selectedNames()) == 4)
         self.names = [cbName.currentText() for cbName in self.nameWidgets]
 

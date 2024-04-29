@@ -243,7 +243,7 @@ class Voice(ReprMixin):
         if not Voice.__availableVoices:
             result:List['Voice'] = []
             directories = QStandardPaths.locateAll(
-                QStandardPaths.AppDataLocation, 'voices', QStandardPaths.LocateDirectory)
+                QStandardPaths.StandardLocation.AppDataLocation, 'voices', QStandardPaths.LocateOption.LocateDirectory)
             directories.insert(0, os.path.join('share', 'kajongg', 'voices'))
             for parentDirectory in directories:
                 for (dirpath, _, _) in os.walk(parentDirectory, followlinks=True):

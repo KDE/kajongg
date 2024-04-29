@@ -85,5 +85,5 @@ class Background(Resource):
         """set a background palette for widget onto"""
         palette = QPalette()
         mybrush = self.brush(onto.size())
-        palette.setBrush(QPalette.Window, mybrush)
+        palette.setBrush(QPalette.ColorRole.Window, mybrush)
         onto.setPalette(palette)

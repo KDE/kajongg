@@ -91,8 +91,8 @@ class ModelTest(QObject):
         self.model.fetchMore(QModelIndex())
         self.fetchingMore = False
         flags = self.model.flags(QModelIndex())
-        assert(int(flags & Qt.ItemFlag.ItemIsEnabled) == Qt.ItemFlag.ItemIsEnabled or
-               int(flags & Qt.ItemFlag.ItemIsEnabled) == 0)
+        assert(flags & Qt.ItemFlag.ItemIsEnabled == Qt.ItemFlag.ItemIsEnabled or
+               flags & Qt.ItemFlag.ItemIsEnabled == 0)
         self.model.hasChildren(QModelIndex())
         self.model.hasIndex(0, 0)
         self.model.headerData(0, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)

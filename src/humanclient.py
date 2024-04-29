@@ -337,8 +337,8 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
         spacer = QSpacerItem(
             20,
             20,
-            QSizePolicy.Expanding,
-            QSizePolicy.Expanding)
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding)
         self.gridLayout.addItem(
             spacer,
             idx if vertical else 0,

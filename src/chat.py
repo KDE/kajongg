@@ -33,7 +33,8 @@ class ChatModel(QAbstractTableModel):
         super().__init__(parent)
         self.chatLines:List[ChatMessage] = []
 
-    def headerData(self, section:int, orientation:int, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, None]:
+    def headerData(self, section:int, orientation:Qt.Orientation,
+        role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, None]:
         """show header"""
         if role == Qt.ItemDataRole.TextAlignmentRole:
             if orientation == Qt.Orientation.Horizontal:
@@ -128,7 +129,7 @@ class ChatWindow(QWidget):
         self.messageView.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.messageView.setShowGrid(False)
         self.messageView.setWordWrap(False)
-        self.messageView.setSelectionMode(QAbstractItemView.NoSelection)
+        self.messageView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         if Debug.modelTest:
             self.debugModelTest = ModelTest(
                 self.messageView.model(),

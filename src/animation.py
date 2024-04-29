@@ -45,7 +45,7 @@ class Animation(QPropertyAnimation, ReprMixin):
         assert Internal.Preferences
         duration = Internal.Preferences.animationDuration()
         self.setDuration(duration)
-        self.setEasingCurve(QEasingCurve.InOutQuad)
+        self.setEasingCurve(QEasingCurve.Type.InOutQuad)
         graphicsObject.queuedAnimations.append(self)
         Animation.nextAnimations.append(self)
         if self.debug:

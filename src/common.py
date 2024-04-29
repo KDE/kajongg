@@ -95,7 +95,7 @@ def clientAppdataDir() ->str:
     if not os.path.exists(serverDir):
         # the client wants to place the socket in serverDir
         os.makedirs(serverDir)
-    result = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+    result = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppDataLocation)
     # this may end with kajongg.py or .pyw or whatever, so fix that:
     if not os.path.isdir(result):
         result = os.path.dirname(result)
