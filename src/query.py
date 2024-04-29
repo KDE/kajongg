@@ -222,6 +222,7 @@ class Query(ReprMixin):
                 Internal.db.commit()
         else:
             # may happen at shutdown
+            logDebug(f'Internal.db is None for {self}')
             self.cursor = None
             self.records = []
         if self.records and Debug.sql:
