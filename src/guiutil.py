@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import os
-from typing import TYPE_CHECKING, Optional, List, Any, Type, Union, Tuple, Dict
+from typing import TYPE_CHECKING, Optional, List, Any, Type, Tuple, Dict, Sequence
 
 from qt import uic, QStandardPaths
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
@@ -33,7 +33,7 @@ def loadUi(base:'QWidget') ->None:
     elif os.path.exists(f'share/kajongg/{name}'):
         directory = 'share/kajongg'
     else:
-        directory = os.path.dirname(QStandardPaths.locate(QStandardPaths.AppDataLocation, name))
+        directory = os.path.dirname(QStandardPaths.locate(QStandardPaths.StandardLocation.AppDataLocation, name))
     uic.loadUi(os.path.join(directory, name), base)
 
 
@@ -46,8 +46,8 @@ class MJTableView(QTableView):
         self.horizontalHeader().setStretchLastSection(True)
         self.setAlternatingRowColors(True)
         pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
-        pol.setVerticalPolicy(QSizePolicy.Expanding)
+        pol.setHorizontalPolicy(QSizePolicy.Policy.Expanding)
+        pol.setVerticalPolicy(QSizePolicy.Policy.Expanding)
         self.setSizePolicy(pol)
         self.verticalHeader().hide()
 
@@ -55,7 +55,7 @@ class MJTableView(QTableView):
         """set some app specific defaults"""
         self.selectRow(0)
         self.resizeColumnsToContents()
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
 
 
 class ListComboBox(QComboBox):
@@ -126,7 +126,7 @@ class BlockSignals:
 
     """a helper class for temporary blocking of Qt signals"""
 
-    def __init__(self, qobjects:Union[List['QObject'], List['QWidget']]) ->None:
+    def __init__(self, qobjects:Sequence['QObject']) ->None:
         self.qobjects = qobjects
 
     def __enter__(self) ->None:

@@ -176,15 +176,18 @@ class HandId(ReprMixin):
     def __str__(self) ->str:
         return self.prompt()
 
-    def __eq__(self, other:Optional['HandId']) ->bool:  # type:ignore[override]
-        return (other is not None
-                and (self.roundsFinished, self.rotated, self.notRotated) ==
-                (other.roundsFinished, other.rotated, other.notRotated))
+    def __eq__(self, other:object) ->bool:
+        if not isinstance(other, HandId):
+            return NotImplemented
+        return (self.roundsFinished, self.rotated, self.notRotated) == \
+                (other.roundsFinished, other.rotated, other.notRotated)
 
-    def __ne__(self, other:Optional['HandId']) ->bool:  # type:ignore[override]
+    def __ne__(self, other:object) ->bool:
         return not self == other
 
-    def __lt__(self, other:'HandId') ->bool:  # type:ignore[override]
+    def __lt__(self, other:object) ->bool:
+        if not isinstance(other, HandId):
+            return NotImplemented
         return (self.roundsFinished, self.rotated, self.notRotated) < (
             other.roundsFinished, other.rotated, other.notRotated)
 
@@ -233,6 +236,7 @@ class Game:
         self.handDiscardCount:int = 0
         self.divideAt:Optional[int] = None
         self.__lastDiscard:Optional[Tile] = None  # always uppercase
+        # TODO: use Tile.none and remove assertions in message.py and otherwhere
         self.visibleTiles:Dict[Tile, int] = IntDict()
         self.discardedTiles:Dict[Tile, int] = IntDict(self.visibleTiles)
         # tile names are always lowercase
@@ -496,13 +500,13 @@ class Game:
                 self.ruleset.save()
 
     @property
-    def seed(self) ->int:  # TODO: move this to PlayingGame
+    def seed(self) ->int:
         """extract it from wantedGame. Set wantedGame if empty."""
         if not self.wantedGame:
             self.wantedGame = str(int(self.randomGenerator.random() * 10 ** 9))
         return int(self.wantedGame.split('/')[0])
 
-    def _setHandSeed(self) ->None:  # TODO: move this to PlayingGame
+    def _setHandSeed(self) ->None:
         """set seed to a reproducible value, independent of what happened
         in previous hands/rounds.
         This makes it easier to reproduce game situations

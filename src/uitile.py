@@ -114,7 +114,8 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             _ *= 1.2
         boardPos = QPointF(
             self.xoffset * width,
-           _ * height) + shiftZ
+           _ * height)
+        boardPos += shiftZ # QPointF + QPointF is unknown by given annotations
         scenePos = self.board.mapToScene(boardPos)
 # TODO: rename to 'def get_moveDict, return class MoveDict(TypedDict)
         return {'pos': scenePos, 'rotation': sceneRotation(self.board), 'scale': self.board.scale()}
@@ -171,7 +172,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             self._boundingRect = QRectF(0.0, 0.0, 10.0, 10.0)
         return self._boundingRect
 
-    def facePos(self, showShadows:Optional[bool]=None) ->QRectF:
+    def facePos(self, showShadows:Optional[bool]=None) ->QPointF:
         """return the face position relative to the tile
         depend on tileset, lightSource and shadow"""
         assert Internal.Preferences
@@ -235,7 +236,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             painter.drawLine(QPointF(0.0, 0.0), QPointF(width, height))
             painter.drawLine(QPointF(width, 0.0), QPointF(0.0, height))
 
-    def pixmapFromSvg(self, pmapSize:QRectF, withBorders:Optional[bool]=None) ->QPixmap:
+    def pixmapFromSvg(self, pmapSize:QSize, withBorders:Optional[bool]=None) ->QPixmap:
         """return a pixmap with default size as given in SVG
         and optional borders/shadows"""
         assert Internal.Preferences

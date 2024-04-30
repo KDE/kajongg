@@ -28,11 +28,7 @@ around, it seemed easier to me to maintain one for myself
 
 from typing import List, Dict, Any, Type, cast
 
-try:
-    from PyQt5 import sip
-except ImportError:
-    import sip  # type:ignore[no-redef,import]
-from qt import QObject, Qt, QAbstractItemModel, QModelIndex
+from qt import QObject, Qt, QAbstractItemModel, QModelIndex, sip_cast
 from qt import QPersistentModelIndex, QFont, QColor, QSize
 from common import isAlive
 
@@ -52,7 +48,7 @@ class ModelTest(QObject):
         """
         QObject.__init__(self, parent)
         self._model = _model
-        self.model = cast(QAbstractItemModel, sip.cast(_model, QAbstractItemModel))  # type:ignore[arg-type]
+        self.model = cast(QAbstractItemModel, sip_cast(_model, QAbstractItemModel))  # type:ignore[arg-type]
         self.insert:List[Dict] = []
         self.remove:List[Dict] = []
         self.changing:List[QPersistentModelIndex] = []
@@ -95,8 +91,8 @@ class ModelTest(QObject):
         self.model.fetchMore(QModelIndex())
         self.fetchingMore = False
         flags = self.model.flags(QModelIndex())
-        assert(int(flags & Qt.ItemFlag.ItemIsEnabled) == Qt.ItemFlag.ItemIsEnabled or
-               int(flags & Qt.ItemFlag.ItemIsEnabled) == 0)
+        assert(flags & Qt.ItemFlag.ItemIsEnabled == Qt.ItemFlag.ItemIsEnabled or
+               flags & Qt.ItemFlag.ItemIsEnabled == 0)
         self.model.hasChildren(QModelIndex())
         self.model.hasIndex(0, 0)
         self.model.headerData(0, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
@@ -286,8 +282,7 @@ class ModelTest(QObject):
         self.testRoleDataType(Qt.ItemDataRole.SizeHintRole, QSize)
         self.testRoleDataType(Qt.ItemDataRole.FontRole, QFont)
         self.testRoleDataType(Qt.ItemDataRole.ForegroundRole, QColor)
-        self.testRoleDataType(Qt.ItemDataRole.BackgroundColorRole, QColor)
-        self.testRoleDataType(Qt.ItemDataRole.TextColorRole, QColor)
+        self.testRoleDataType(Qt.ItemDataRole.BackgroundRole, QColor)
 
         # Check that the alignment is one we know about
         self.testRoleDataValues(

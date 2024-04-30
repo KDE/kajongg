@@ -21,7 +21,7 @@ from typing import Optional, Any, Union, List, Sequence, Mapping
 from typing import TYPE_CHECKING, Iterable, Generator, Literal, cast
 
 from qtpy.compat import isalive as qtpy_isalive
-from qt import QStandardPaths, QObject, QSize
+from qt import QStandardPaths, QObject, modeltest_is_supported
 
 if TYPE_CHECKING:
     from tile import Tile
@@ -95,7 +95,7 @@ def clientAppdataDir() ->str:
     if not os.path.exists(serverDir):
         # the client wants to place the socket in serverDir
         os.makedirs(serverDir)
-    result = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
+    result = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppDataLocation)
     # this may end with kajongg.py or .pyw or whatever, so fix that:
     if not os.path.isdir(result):
         result = os.path.dirname(result)
@@ -248,23 +248,10 @@ Options {', '.join(stringOptions)} take a string argument like {stringExample}.
                 type.__setattr__(Debug, option, value)
         if Debug.time:
             Debug.timestamp = datetime.datetime.now()
-        if Debug.modelTest and not Debug.modeltest_is_supported():
+        if Debug.modelTest and not modeltest_is_supported():
             print('--debug=modelTest is not yet supported for pyside, use pyqt')
             sys.exit(2)
         return ''
-
-    @staticmethod
-    def modeltest_is_supported() ->bool:
-        """Is the QT binding supported."""
-        try:
-            import sip  # type:ignore[import]
-        except ImportError:
-            return False
-        try:
-            _ = sip.cast(QSize(), QSize)
-            return True
-        except TypeError:
-            return False
 
     @staticmethod
     def str() ->str:
@@ -369,7 +356,7 @@ class __Internal:
     @type scene: L{GameScene}: L{PlayingScene} or L{ScoringScene}
     """
     Preferences:Optional['SetupPreferences'] = None
-    defaultPort = 8301
+    defaultPort = 8302
     logPrefix = 'C'
     isServer = False
     reactor:'IReactorCore'

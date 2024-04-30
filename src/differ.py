@@ -58,7 +58,8 @@ class DifferModel(QAbstractTableModel):
             return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         return None
 
-    def headerData(self, section:int, orientation:int, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int,str,None]:
+    def headerData(self, section:int, orientation:Qt.Orientation,
+        role:int=Qt.ItemDataRole.DisplayRole) ->Union[int,str,None]:
         """tell the view about the wanted headers"""
         if role == Qt.ItemDataRole.TextAlignmentRole:
             if orientation == Qt.Orientation.Horizontal:
@@ -101,7 +102,7 @@ class RulesetDiffer(QDialog):
         self.modelTest:ModelTest
         self.view = MJTableView(self)
         self.buttonBox = QDialogButtonBox()
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 

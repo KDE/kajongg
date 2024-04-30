@@ -22,7 +22,8 @@ from kde import KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 from guiutil import decorateWindow
 from log import i18n, logWarning, logException, logDebug, logError
-from message import Message
+from message import Message, ChatMessage
+from chat import ChatWindow
 from common import Options, SingleshotOptions, Internal, Debug, isAlive
 from query import Query
 from board import Board
@@ -43,7 +44,7 @@ if TYPE_CHECKING:
     from move import Move
     from tile import Tile, Meld, MeldList
     from uitile import UITile
-    from message import ClientMessage, ServerMessage, ChatMessage
+    from message import ClientMessage, ServerMessage
     from scene import PlayingScene
     from wind import Wind
 
@@ -80,7 +81,7 @@ class SelectChow(KDialogIgnoringEscape):
 
     def toggled(self, unusedChecked:bool) ->None:
         """a radiobutton has been toggled"""
-        button = cast(QPushButton, self.sender())
+        button = cast(QRadioButton, self.sender())
         if button.isChecked():
             self.selectedChow = self.chows[self.buttons.index(button)]
             self.accept()
@@ -114,7 +115,7 @@ class SelectKong(KDialogIgnoringEscape):
 
     def toggled(self, unusedChecked:bool) ->None:
         """a radiobutton has been toggled"""
-        button = cast(QPushButton, self.sender())
+        button = cast(QRadioButton, self.sender())
         if button.isChecked():
             self.selectedKong = self.kongs[self.buttons.index(button)]
             self.accept()
@@ -125,17 +126,16 @@ class DlgButton(QPushButton):
 
     """special button for ClientDialog"""
 
-    def __init__(self, message:'ClientMessage', parent:QWidget) ->None:
+    def __init__(self, message:'ClientMessage', parent:'ClientDialog') ->None:
         QPushButton.__init__(self, parent)
         self.message = message
-        self.client = parent.client
+        self.client:'HumanClient' = parent.client
         self.setMinimumHeight(25)
         self.setText(message.buttonCaption())  # type: ignore[call-arg]
 
-    def setMeaning(self, uiTile:Optional['UITile']) ->None:
+    def setMeaning(self, uiTile:'UITile') ->None:
         """give me caption, shortcut, tooltip, icon"""
-        tile = uiTile.tile if uiTile else None
-        txt, warn, _ = self.message.toolTip(button=self, tile=tile)
+        txt, warn, _ = self.message.toolTip(self, uiTile.tile)
         if not txt:
             txt = self.message.i18nName  # .replace(i18nShortcut, '&'+i18nShortcut, 1)
         self.setToolTip(txt)
@@ -147,7 +147,8 @@ class DlgButton(QPushButton):
         if key in [Qt.Key.Key_Left, Qt.Key.Key_Right]:
             game = self.client.game
             if game and game.activePlayer == game.myself:
-                game.myself.handBoard.keyPressEvent(event)
+                if game.myself.handBoard:
+                    game.myself.handBoard.keyPressEvent(event)
                 self.setFocus()
                 return
         QPushButton.keyPressEvent(self, event)
@@ -169,7 +170,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
         decorateWindow(self, i18n('Choose'))
         self.tables:List[ClientTable]
         self.setObjectName('ClientDialog')
-        self.client = client
+        self.client:'HumanClient' = client
         self.gridLayout = QGridLayout(self)
         self.progressBar = QProgressBar()
         self.progressBar.setMinimumHeight(25)
@@ -220,15 +221,17 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
             return
         assert self.client.game.myself  # FIXME: needed?
         assert self.client.game.myself.handBoard
-        for button in self.buttons:
-            button.setMeaning(self.client.game.myself.handBoard.focusTile)
+        newFocusTile = self.client.game.myself.handBoard.focusTile
+        if newFocusTile:
+            for button in self.buttons:
+                button.setMeaning(newFocusTile)
         for uiTile in self.client.game.myself.handBoard.lowerHalfTiles():
             txt = []
             for button in self.buttons:
-                _, _, tileTxt = button.message.toolTip(button, uiTile.tile)  # type:ignore[call-arg]
+                _, _, tileTxt = button.message.toolTip(button, uiTile.tile)
                 if tileTxt:
                     txt.append(tileTxt)
-            uiTile.setToolTip('<br><br>'.join(txt))
+            uiTile.setToolTip(f'<font color=yellow>{"<br><br>".join(txt)}')
         if self.client.game.activePlayer == self.client.game.myself:
             if Internal.scene:
                 Internal.scene.handSelectorChanged(
@@ -336,8 +339,8 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
         spacer = QSpacerItem(
             20,
             20,
-            QSizePolicy.Expanding,
-            QSizePolicy.Expanding)
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding)
         self.gridLayout.addItem(
             spacer,
             idx if vertical else 0,
@@ -369,7 +372,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
             # sometimes we get this event twice
             return
         if message is None:
-            message = self.focusWidget().message
+            message = cast(DlgButton, self.focusWidget()).message
         assert any(x.message == message for x in self.buttons)
         assert self.client.game
         if not cast(PlayingPlayer, self.client.game.myself).sayable[message]:
@@ -390,7 +393,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
         """the user clicked one of the buttons"""
         game = self.client.game
         if game and not game.autoPlay:
-            self.selectButton(cast(QPushButton, self.sender()).message)
+            self.selectButton(cast(DlgButton, self.sender()).message)
 
 
 class HumanClient(Client):
@@ -605,6 +608,17 @@ class HumanClient(Client):
         self.__updateTableList()
         return oldTable, newTable
 
+    def remote_chat(self, data):
+        """others chat to me"""
+        chatLine = ChatMessage(data)
+        if Debug.chat:
+            logDebug(f'got chatLine: {chatLine}')
+        table = self._tableById(chatLine.tableid)
+        if not chatLine.isStatusMessage and not table.chatWindow:
+            ChatWindow(table=table)
+        if table.chatWindow:
+            table.chatWindow.receiveLine(chatLine)
+
     def readyForGameStart(
             self, tableid:int, gameid:int, wantedGame:str, playerNames:List[Tuple['Wind', str]], shouldSave:bool=True,
             gameClass:Optional[Type]=None) ->Deferred:
@@ -723,7 +737,7 @@ class HumanClient(Client):
             propose = None
         deferred:Deferred = Deferred()
         selDlg = SelectChow(chows, propose, deferred)
-        assert selDlg.exec_()
+        assert selDlg.exec()
         return deferred
 
     def __selectKong(self, kongs:'MeldList') ->Union[Deferred, Tuple['ClientMessage', Optional['Meld']]]:
@@ -735,7 +749,7 @@ class HumanClient(Client):
             return cast('ClientMessage', Message.Kong), kongs[0]
         deferred:Deferred = Deferred()
         selDlg = SelectKong(kongs, deferred)
-        assert selDlg.exec_()
+        assert selDlg.exec()
         return deferred
 
     def __askAnswered(self, answer:'ClientMessage') ->Union[
@@ -879,7 +893,7 @@ class HumanClient(Client):
         else:
             assert self.connection
             selectDialog = SelectRuleset(self.connection.url)
-            if not selectDialog.exec_():
+            if not selectDialog.exec():
                 return
             ruleset = selectDialog.cbRuleset.current
         deferred = self.__requestNewTableFromServer(ruleset=ruleset)

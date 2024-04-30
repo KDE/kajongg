@@ -30,7 +30,7 @@ installing the reactor, a QCoreApplication will be constructed
 by the reactor.  QCoreApplication does not require a GUI so trial testing
 can occur normally.
 
-Twisted can be initialized after QApplication.exec_() with a call to
+Twisted can be initialized after QApplication.exec() with a call to
 reactor.runReturn().  calling reactor.stop() will unhook twisted but
 leave your Qt application running
 
@@ -260,7 +260,7 @@ class QtReactor(posixbase.PosixReactorBase):
             self._blockApp = QEventLoop()
         self.runReturn()
         assert self._blockApp
-        self._blockApp.exec_()
+        self._blockApp.exec()
 
 
 class QtEventReactor(QtReactor):

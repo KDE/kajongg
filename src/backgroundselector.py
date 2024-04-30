@@ -8,11 +8,14 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
+from typing import TYPE_CHECKING, cast
 from qt import QWidget, QLineEdit
 from background import Background
 from common import Internal
 from guiutil import loadUi
 
+if TYPE_CHECKING:
+    from qt import QListWidget, QLabel
 
 class BackgroundSelector(QWidget):
 
@@ -24,6 +27,11 @@ class BackgroundSelector(QWidget):
         self.kcfg_backgroundName = QLineEdit(self)
         self.kcfg_backgroundName.setVisible(False)
         self.kcfg_backgroundName.setObjectName('kcfg_backgroundName')
+        self.backgroundNameList:'QListWidget'
+        self.backgroundAuthor:'QLabel'
+        self.backgroundContact:'QLabel'
+        self.backgroundDescription:'QLabel'
+        self.backgroundPreview:'QLabel'
         self.setUp()
 
     def setUp(self) ->None:
@@ -54,8 +62,8 @@ class BackgroundSelector(QWidget):
 
     def backgroundRowChanged(self) ->None:
         """user selected a new background, update our information about it and paint preview"""
-        selBackground = self.backgroundList[
-            self.backgroundNameList.currentRow()]
+        selBackground = cast(Background, self.backgroundList[
+            self.backgroundNameList.currentRow()])
         self.kcfg_backgroundName.setText(selBackground.desktopFileName)
         self.backgroundAuthor.setText(selBackground.author)
         self.backgroundContact.setText(selBackground.authorEmail)

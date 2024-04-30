@@ -42,7 +42,7 @@ class MustChooseKDialog(KDialogIgnoringEscape):
     So this dialog can only be closed by calling accept() or reject()"""
 
     def __init__(self) ->None:
-        parent = Internal.mainWindow  # default
+        parent:Optional[QWidget] = Internal.mainWindow  # default
         # if we are (maybe indirectly) called from a method belonging to a QWidget, take that as parent
         # this does probably not work for classmethod or staticmethod but it is
         # good enough right now
@@ -65,9 +65,9 @@ class Prompt(MustChooseKDialog, ReprMixin):
 
     """common code for things like QuestionYesNo, Information"""
 
-    def __init__(self, msg:str, icon:'QIcon'=QMessageBox.Information,
-                 buttons:'QDialogButtonBox.StandardButtons'=KDialog.Ok,
-                 caption:Optional[str]=None, default:Optional['QPushButton']=None) ->None:
+    def __init__(self, msg:str, icon:'QMessageBox.Icon'=QMessageBox.Icon.Information,
+                 buttons:'QDialogButtonBox.StandardButton'=KDialog.Ok,
+                 caption:Optional[str]=None, default:Optional['QDialogButtonBox.StandardButton']=None) ->None:
         """buttons is button codes or-ed like KDialog.Ok | KDialog.Cancel. First one is default."""
         if r'\n' in msg:
             print(r'*********************** Fix this! Prompt gets \n in', msg)
@@ -88,12 +88,6 @@ class Prompt(MustChooseKDialog, ReprMixin):
             assert defaultButton & buttons, buttons
             self.button(defaultButton).setFocus()
 
-    def returns(self, button:Optional['QPushButton']=None) ->bool:
-        """the user answered"""
-        if button is None:
-            button = self.default
-        return button in (KDialog.Yes, KDialog.Ok)
-
     def __str__(self) ->str:
         return self.msg
 
@@ -102,9 +96,9 @@ class DeferredDialog(Deferred):
 
     """make dialogs usable as Deferred"""
 
-    def __init__(self, dlg:QDialog, modal:bool=True, always:bool=False) ->None:
+    def __init__(self, dlg:KDialog, modal:bool=True, always:bool=False) ->None:
         Deferred.__init__(self)
-        self.dlg:Optional[QDialog] = dlg
+        self.dlg:Optional[KDialog] = dlg
         self.modal = modal
         self.always = always
         if Options.gui:
@@ -131,7 +125,7 @@ class DeferredDialog(Deferred):
         autoPlay = bool(scene and scene.game and scene.game.autoPlay)
         autoAnswerDelayed = autoPlay and not self.always
         if self.modal and not autoAnswerDelayed:
-            self.dlg.exec_()
+            self.dlg.exec()
         else:
             self.dlg.show()
         if autoAnswerDelayed:
@@ -140,7 +134,7 @@ class DeferredDialog(Deferred):
                 Internal.Preferences.animationDuration() / 500.0,
                 self.clicked)
 
-    def clicked(self, button:Optional['QPushButton']=None) ->None:
+    def clicked(self, button:Optional['QDialogButtonBox.StandardButton']=None) ->None:
         """we got a reaction"""
         if self.dlg:
             result = self.dlg.returns(button)
@@ -166,7 +160,7 @@ class QuestionYesNo(DeferredDialog):
     """wrapper, see class Prompt"""
 
     def __init__(self, msg:str, modal:bool=True, always:bool=False, caption:Optional[str]=None) ->None:
-        dialog = Prompt(msg, icon=QMessageBox.Question,
+        dialog = Prompt(msg, icon=QMessageBox.Icon.Question,
                         buttons=KDialog.Yes | KDialog.No, default=KDialog.Yes, caption=caption)
         DeferredDialog.__init__(self, dialog, modal=modal, always=always)
 
@@ -176,7 +170,7 @@ class WarningYesNo(DeferredDialog):
     """wrapper, see class Prompt"""
 
     def __init__(self, msg:str, modal:bool=True, caption:Optional[str]=None) ->None:
-        dialog = Prompt(msg, icon=QMessageBox.Warning,
+        dialog = Prompt(msg, icon=QMessageBox.Icon.Warning,
                         buttons=KDialog.Yes | KDialog.No, default=KDialog.Yes, caption=caption)
         DeferredDialog.__init__(self, dialog, modal=modal)
 
@@ -186,7 +180,7 @@ class Information(DeferredDialog):
     """wrapper, see class Prompt"""
 
     def __init__(self, msg:str, modal:bool=True, caption:Optional[str]=None) ->None:
-        dialog = Prompt(msg, icon=QMessageBox.Information,
+        dialog = Prompt(msg, icon=QMessageBox.Icon.Information,
                         buttons=KDialog.Ok, caption=caption)
         DeferredDialog.__init__(self, dialog, modal=modal)
 
@@ -196,7 +190,7 @@ class Sorry(DeferredDialog):
     """wrapper, see class Prompt"""
 
     def __init__(self, msg:str, modal:bool=True, caption:Optional[str]=None, always:bool=False) ->None:
-        dialog = Prompt(msg, icon=QMessageBox.Information,
+        dialog = Prompt(msg, icon=QMessageBox.Icon.Information,
                         buttons=KDialog.Ok, caption=caption or 'Sorry')
         DeferredDialog.__init__(self, dialog, modal=modal, always=always)
 

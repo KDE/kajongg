@@ -14,7 +14,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import os
 
-from typing import Optional, Generator, List, Dict
+from typing import Optional, Generator, List, Dict, cast
 
 from qt import QStandardPaths
 from log import logWarning, logException
@@ -47,8 +47,8 @@ class Resource:
     def __directories(cls) ->Generator[str, None,None]:
         """where to look for resources"""
         result = QStandardPaths.locateAll(
-            QStandardPaths.GenericDataLocation,
-            f'kmahjongglib/{cls.resourceName}s', QStandardPaths.LocateDirectory)
+            QStandardPaths.StandardLocation.GenericDataLocation,
+            f'kmahjongglib/{cls.resourceName}s', QStandardPaths.LocateOption.LocateDirectory)
         result.insert(0, os.path.join('share', 'kmahjongglib', f'{cls.resourceName}s'))
         return (x for x in result if os.path.exists(x))
 
@@ -124,13 +124,13 @@ class Resource:
         self.desktopFileName: str
         self.group = KConfig(self.path).group(self.configGroupName)
 
-        self.name = self.group.readEntry("Name") or i18n("unknown name")
-        self.author = self.group.readEntry("Author") or i18n("unknown author")
-        self.description = self.group.readEntry(
-            "Description") or i18n(
+        self.name = cast(str, self.group.readEntry("Name")) or i18n("unknown name")
+        self.author = cast(str, self.group.readEntry("Author")) or i18n("unknown author")
+        self.description = cast(str, self.group.readEntry(
+            "Description")) or i18n(
                 "no description available")
-        self.authorEmail = self.group.readEntry(
-            "AuthorEmail") or i18n(
+        self.authorEmail = cast(str, self.group.readEntry(
+            "AuthorEmail")) or i18n(
                 "no E-Mail address available")
 
         # Version control

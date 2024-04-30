@@ -705,7 +705,7 @@ into a situation where you have to pay a penalty"""))
         # meanwhile
         if server is None:  # scoring game
             # the exists clause is only needed for inconsistent data bases
-            qData = Query("select ruleset from game where seed is null "
+            qData = Query("select ruleset from game where seed=0 "
                           " and exists(select id from ruleset where game.ruleset=ruleset.id)"
                           "order by starttime desc limit 1").records
         else:

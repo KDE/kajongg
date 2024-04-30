@@ -31,7 +31,7 @@ from common import DrawOnTopMixin
 from wind import Wind, East
 
 if TYPE_CHECKING:
-    from qt import QGraphicsSceneDragDropEvent, QWidget
+    from qt import QGraphicsSceneDragDropEvent, QWidget, QSizeF
     from qt import QKeyEvent, QMouseEvent, QWheelEvent, QResizeEvent
     from uiwall import UIWallSide, UIWall
     from game import PlayingGame, Game
@@ -59,7 +59,7 @@ class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):
         """for identification in animations"""
         return self.__wind.tile.name2()
 
-    def moveDict(self) ->Dict[str, Union[str, int]]:
+    def moveDict(self) ->Dict[str, Union[QPointF, str, int]]:
         """a dict with attributes for the new position,
         normally pos, rotation and scale"""
         sideCenter = self.board.center()
@@ -87,7 +87,7 @@ class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):
             newPrevailing = self.wind == Wind.all4[value % 4]
         self.__brush = self.roundWindColor if newPrevailing else self.whiteColor
 
-    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem.StyleOptionType,
+    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem,
         unusedWidget:Optional['QWidget']=None) ->None:
         """paint the disc"""
         with Painter(painter):
@@ -121,8 +121,8 @@ class WindLabel(QLabel):
         if wind is None:
             wind = East
         self.__wind:Wind
-        self.wind = wind
         self.__roundsFinished = roundsFinished
+        self.wind = wind
 
     @property
     def wind(self) ->Wind:
@@ -159,7 +159,7 @@ class WindLabel(QLabel):
         pMap = QPixmap(40, 40)
         pMap.fill(Qt.GlobalColor.transparent)
         painter = QPainter(pMap)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.scale(0.40, 0.40)
         pwind.paint(painter, QStyleOptionGraphicsItem())
         for child in pwind.childItems():
@@ -371,11 +371,11 @@ class Board(QGraphicsRectItem, ReprMixin):
                 menuPoint = QCursor.pos()
             else:
                 assert uiTile.board
-                menuPoint = uiTile.board.tileFaceRect().bottomRight()
+                _ = uiTile.board.tileFaceRect().bottomRight()
                 view = Internal.scene.mainWindow.centralView
                 menuPoint = view.mapToGlobal(
-                    view.mapFromScene(uiTile.mapToScene(menuPoint)))
-            action = menu.exec_(menuPoint)
+                    view.mapFromScene(uiTile.mapToScene(_)))
+            action = menu.exec(menuPoint)
             if not action:
                 return None
             idx = action.data()
@@ -570,11 +570,11 @@ class Board(QGraphicsRectItem, ReprMixin):
                 shiftY = stepY
         return QPointF(shiftX, shiftY)
 
-    def tileSize(self) ->QRectF:
+    def tileSize(self) ->'QSizeF':
         """the current uiTile size"""
         return self._tileset.tileSize
 
-    def faceSize(self) ->QRectF:
+    def faceSize(self) ->'QSizeF':
         """the current face size"""
         return self._tileset.faceSize
 
@@ -783,13 +783,13 @@ class FittingView(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         vpol = QSizePolicy()
-        vpol.setHorizontalPolicy(QSizePolicy.Expanding)
-        vpol.setVerticalPolicy(QSizePolicy.Expanding)
+        vpol.setHorizontalPolicy(QSizePolicy.Policy.Expanding)
+        vpol.setVerticalPolicy(QSizePolicy.Policy.Expanding)
         self.setSizePolicy(vpol)
-        self.setRenderHint(QPainter.Antialiasing)
-        self.setRenderHint(QPainter.SmoothPixmapTransform)
+        self.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
         self.setStyleSheet('background: transparent')
-        self.setFrameStyle(QFrame.NoFrame)
+        self.setFrameStyle(QFrame.Shape.NoFrame)
         self.tilePressed:Optional[UITile] = None
         self.dragObject:Optional[QDrag] = None
         self.setFocus()
@@ -878,7 +878,7 @@ class FittingView(QGraphicsView):
             board = tilePressed.board
             if board and board.tileDragEnabled:
                 self.dragObject = self.drag(tilePressed)
-                self.dragObject.exec_(Qt.DropAction.MoveAction)
+                self.dragObject.exec(Qt.DropAction.MoveAction)
                 self.dragObject = None
                 return None
         return QGraphicsView.mouseMoveEvent(self, event)
@@ -917,7 +917,7 @@ class YellowText(QGraphicsRectItem):
         """set the text of self"""
         self.msg = f'{msg}  '
         metrics = QFontMetrics(self.font)
-        self.width = metrics.width(self.msg)
+        self.width = metrics.horizontalAdvance(self.msg)
         self.height = int(metrics.lineSpacing() * 1.1)
         self.setRect(0, 0, self.width, self.height)
         self.resetTransform()
@@ -931,7 +931,7 @@ class YellowText(QGraphicsRectItem):
         else:
             self.moveBy(xOffset, yOffset)
 
-    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem.StyleOptionType,
+    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem,
         unusedWidget:Optional['QWidget']=None) ->None:
         """override predefined paint"""
         painter.setFont(self.font)
@@ -999,7 +999,9 @@ class DiscardBoard(CourtBoard):
         assert Internal.scene
         uiTile = cast(MimeData, event.mimeData()).uiTile
         assert isinstance(uiTile, UITile), uiTile
-        uiTile.setPos(event.scenePos() - uiTile.boundingRect().center())
+        _ = event.scenePos()
+        _ -= uiTile.boundingRect().center()
+        uiTile.setPos(_)
         if Internal.scene.clientDialog:
             Internal.scene.clientDialog.selectButton(cast('ClientMessage', Message.Discard))
         event.accept()

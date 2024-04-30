@@ -171,12 +171,12 @@ class RuleModel(TreeModel):
         rootData.extend(unitNames)
         self.rootItem = RuleRootItem(rootData)
 
-    def canFetchMore(self, unusedParent:Optional['TreeItem']=None) ->bool:
+    def canFetchMore(self, unusedParent:QModelIndex=QModelIndex()) ->bool:
         """did we already load the rules? We only want to do that
         when the config tab with rulesets is actually shown"""
         return not self.loaded
 
-    def fetchMore(self, unusedParent:Optional['TreeItem']=None) ->None:
+    def fetchMore(self, unusedParent:QModelIndex=QModelIndex()) ->None:
         """load the rules"""
         for ruleset in self.rulesets:
             self.appendRuleset(ruleset)
@@ -229,7 +229,7 @@ class RuleModel(TreeModel):
         item = index.internalPointer()
         return isinstance(item, RuleItem) and isinstance(item.raw, BoolRule)
 
-    def headerData(self, section:int, orientation:int, role:int=Qt.ItemDataRole.DisplayRole) ->Optional[Any]:
+    def headerData(self, section:int, orientation:Qt.Orientation, role:int=Qt.ItemDataRole.DisplayRole) ->Optional[Any]:
         """tell the view about the wanted headers"""
         if Qt is None:
             # happens when kajongg exits unexpectedly
@@ -273,7 +273,7 @@ class EditableRuleModel(RuleModel):
 
     """add methods needed for editing"""
 
-    def __init__(self, rulesets:List[Ruleset], title:str, parent:Optional[QModelIndex]=None) ->None:
+    def __init__(self, rulesets:List[Ruleset], title:str, parent:Optional['QObject']=None) ->None:
         RuleModel.__init__(self, rulesets, title, parent)
 
     def __setRuleData(self, column:int, content:Union[Rule, ParameterRule],
@@ -335,10 +335,10 @@ class EditableRuleModel(RuleModel):
             self.dataChanged.emit(index, index)
         return True
 
-    def flags(self, index:QModelIndex) ->Qt.ItemFlags:
+    def flags(self, index:QModelIndex) ->Qt.ItemFlag:  # type:ignore[override]
         """tell the view what it can do with this item"""
         if not index.isValid():
-            return cast(Qt.ItemFlags, Qt.ItemFlag.ItemIsEnabled)
+            return Qt.ItemFlag.ItemIsEnabled
         column = index.column()
         item = index.internalPointer()
         content = item.raw
@@ -356,7 +356,7 @@ class EditableRuleModel(RuleModel):
             result |= Qt.ItemFlag.ItemIsEditable
         if checkable:
             result |= Qt.ItemFlag.ItemIsUserCheckable
-        return cast(Qt.ItemFlags, result)
+        return cast(Qt.ItemFlag, result)
 
 
 class RuleTreeView(QTreeView):
@@ -377,13 +377,14 @@ class RuleTreeView(QTreeView):
             if button:
                 button.setEnabled(False)
         self.header().setObjectName('RuleTreeViewHeader')
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.ruleModel:Optional[RuleModel] = None
         self.ruleModelTest = None
         self.rulesets:List[Ruleset] = []  # nasty: this generates self.ruleModel
         self.differs:List[RulesetDiffer] = []
 
-    def dataChanged(self, unusedIndex1:int, unusedIndex2:int, unusedRoles:Optional[Iterable[int]]=None) ->None:
+    def dataChanged(self, unusedIndex1:QModelIndex, unusedIndex2:QModelIndex,
+        unusedRoles:Optional[Iterable[int]]=None) ->None:
         """get called if the model has changed: Update all differs"""
         for differ in self.differs:
             differ.rulesetChanged()
@@ -442,8 +443,8 @@ class RuleTreeView(QTreeView):
         header.setStretchLastSection(False)
         header.setMinimumSectionSize(-1)
         for col in range(1, header.count()):
-            header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         for col in range(header.count()):
             self.resizeColumnToContents(col)
 
@@ -525,8 +526,8 @@ class RulesetSelector(QWidget):
         spacerItem = QSpacerItem(
             20,
             20,
-            QSizePolicy.Minimum,
-            QSizePolicy.Expanding)
+            QSizePolicy.Policy.Minimum,
+            QSizePolicy.Policy.Expanding)
         v2layout.addWidget(self.btnCopy)
         v2layout.addWidget(self.btnRemove)
         v2layout.addWidget(self.btnCompare)
@@ -566,12 +567,13 @@ class RulesetSelector(QWidget):
     def hideEvent(self, event:'QHideEvent') ->None:
         """close all differ dialogs"""
         marked:List[RulesetDiffer] = []
-        for differ in self.rulesetView.differs:
+        differs = self.rulesetView.differs
+        for differ in differs:
             differ.hide()
-            marked += differ
+            marked.append(differ)
         QWidget.hideEvent(self, event)
         for _ in marked:
-            del _
+            del differs[_]
 
     def retranslateUi(self) ->None:
         """translate to current language"""

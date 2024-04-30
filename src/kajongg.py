@@ -188,6 +188,6 @@ if Options.csv:
 
 from mainwindow import MainWindow
 if QT5:
-    QGuiApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)
+    QGuiApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)  # type:ignore[attr-defined]
 MainWindow()
-Internal.app.exec_()
+Internal.app.exec()

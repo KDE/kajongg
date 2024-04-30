@@ -20,6 +20,7 @@ from common import Debug, Internal
 from modeltest import ModelTest
 
 if TYPE_CHECKING:
+    from twisted.python.failure import Failure
     from qt import QObject
     from client import ClientTable
     from scene import GameScene
@@ -33,7 +34,8 @@ class ChatModel(QAbstractTableModel):
         super().__init__(parent)
         self.chatLines:List[ChatMessage] = []
 
-    def headerData(self, section:int, orientation:int, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, None]:
+    def headerData(self, section:int, orientation:Qt.Orientation,
+        role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, None]:
         """show header"""
         if role == Qt.ItemDataRole.TextAlignmentRole:
             if orientation == Qt.Orientation.Horizontal:
@@ -61,9 +63,9 @@ class ChatModel(QAbstractTableModel):
         """for now we only have time, who, message"""
         return 3
 
-    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, None]:
+    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, QColor, None]:
         """score table"""
-        result = None
+        result:Union[int, str, QColor, None] = None
         if role == Qt.ItemDataRole.TextAlignmentRole:
             if index.column() == 1:
                 return int(Qt.AlignmentFlag.AlignRight)
@@ -128,7 +130,7 @@ class ChatWindow(QWidget):
         self.messageView.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.messageView.setShowGrid(False)
         self.messageView.setWordWrap(False)
-        self.messageView.setSelectionMode(QAbstractItemView.NoSelection)
+        self.messageView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         if Debug.modelTest:
             self.debugModelTest = ModelTest(
                 self.messageView.model(),
@@ -179,12 +181,11 @@ class ChatWindow(QWidget):
                 isStatusMessage)
             cast('HumanClient', self.table.client).sendChat(msg).addErrback(self.chatError)
 
-    def chatError(self, result:str) ->None:
+    def chatError(self, result:'Failure') ->None:
         """tableList may already have gone away"""
         assert self.table
         assert self.table.client
-        if self.table.client.tableList:
-            self.table.client.tableList.tableError(result)
+        cast('HumanClient', self.table.client).tableError(result)
 
     def leave(self) ->None:
         """leaving the chat"""

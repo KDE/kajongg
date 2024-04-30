@@ -47,9 +47,9 @@ class RichTextColumnDelegate(QStyledItemDelegate):
     def paint(self, painter:'QPainter', option:QStyleOptionViewItem, index:'QModelIndex') ->None:
         """paint richtext"""
         if option.state & QStyle.StateFlag.State_Selected:
-            role = QPalette.Highlight
+            role = QPalette.ColorRole.Highlight
         else:
-            role = QPalette.AlternateBase if index.row() % 2 else QPalette.Base
+            role = QPalette.ColorRole.AlternateBase if index.row() % 2 else QPalette.ColorRole.Base
         assert self.label
         self.label.setBackgroundRole(role)
         text = index.model().data(index, Qt.ItemDataRole.DisplayRole)

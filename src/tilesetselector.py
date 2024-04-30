@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import cast
+from typing import cast, TYPE_CHECKING
 
 from qt import QWidget, QHBoxLayout, QLineEdit
 from tile import Tile
@@ -21,13 +21,24 @@ from wind import Wind
 from guiutil import loadUi
 from animation import AnimationSpeed
 
+if TYPE_CHECKING:
+    from qt import QLabel, QListWidget
+
 
 class TilesetSelector(QWidget):
+
+    # pylint:disable=too-many-instance-attributes
 
     """presents all available tiles with previews"""
 
     def __init__(self, parent:QWidget) ->None:
         super().__init__(parent)
+
+        self.tilesetNameList:'QListWidget'
+        self.tilesetAuthor:'QLabel'
+        self.tilesetContact:'QLabel'
+        self.tilesetDescription:'QLabel'
+        self.tilesetPreview:'QLabel'
 
         assert Internal.Preferences
         loadUi(self)
@@ -84,7 +95,7 @@ class TilesetSelector(QWidget):
     def tilesetRowChanged(self) ->None:
         """user selected a new tileset, update our information about it and
         paint preview"""
-        selTileset = self.tilesetList[self.tilesetNameList.currentRow()]
+        selTileset = cast(Tileset, self.tilesetList[self.tilesetNameList.currentRow()])
         self.kcfg_tilesetName.setText(selTileset.desktopFileName)
         self.tilesetAuthor.setText(selTileset.author)
         self.tilesetContact.setText(selTileset.authorEmail)

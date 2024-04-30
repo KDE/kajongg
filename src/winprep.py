@@ -58,14 +58,16 @@ if os.path.exists(DEST):
     rmtree(DEST)
 
 targetDir = DEST + '/kmahjongglib'
-kmjLibDir = QStandardPaths.locate(QStandardPaths.AppDataLocation, 'kmahjongglib', QStandardPaths.LocateDirectory)
+kmjLibDir = QStandardPaths.locate(QStandardPaths.StandardLocation.AppDataLocation,
+    'kmahjongglib', QStandardPaths.LocateOption.LocateDirectory)
 copytree(kmjLibDir, targetDir)
 for tileset in ('alphabet', 'egypt'):
     for extension in ('copyright', 'desktop', 'svgz'):
         os.remove(targetDir + f'/tilesets/{tileset}.{extension}')
 
 os.makedirs(DEST + '/kajongg')
-voiceDir = QStandardPaths.locate(QStandardPaths.AppDataLocation, 'kajongg/voices', QStandardPaths.LocateDirectory)
+voiceDir = QStandardPaths.locate(QStandardPaths.StandardLocation.AppDataLocation,
+    'kajongg/voices', QStandardPaths.LocateOption.LocateDirectory)
 copytree(voiceDir, DEST + '/kajongg/voices')
 
 for bellSound in ('/usr/share/sounds/KDE-Im-Message-In.ogg', ):

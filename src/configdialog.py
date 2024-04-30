@@ -69,10 +69,10 @@ class PlayConfigTab(QWidget):
             'Let others hear my voice'), self)
         self.kcfg_uploadVoice.setObjectName('kcfg_uploadVoice')
         pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
-        pol.setVerticalPolicy(QSizePolicy.Expanding)
+        pol.setHorizontalPolicy(QSizePolicy.Policy.Expanding)
+        pol.setVerticalPolicy(QSizePolicy.Policy.Expanding)
         spacerItem = QSpacerItem(
-            20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         vlayout.addWidget(self.kcfg_showShadows)
         vlayout.addWidget(self.kcfg_rearrangeMelds)
         vlayout.addWidget(self.kcfg_showOnlyPossibleActions)

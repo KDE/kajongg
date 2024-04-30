@@ -142,7 +142,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
     # contrast colors are not optimal as long as our lines have a width of
     # only one pixel: antialiasing is not sufficient
     colors = [KApplication.palette().color(x)
-              for x in [QPalette.Text, QPalette.Link, QPalette.LinkVisited]]
+              for x in [QPalette.ColorRole.Text, QPalette.ColorRole.Link, QPalette.ColorRole.LinkVisited]]
     colors.append(QColor('orange'))
 
     def __init__(self, parent:Optional['QObject']=None) ->None:
@@ -158,7 +158,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
                     with Painter(painter):
                         painter.translate(option.rect.topLeft())
                         painter.setPen(self.colors[idx])
-                        painter.setRenderHint(QPainter.Antialiasing)
+                        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
                         # if we want to use a pen width > 1, we can no longer directly drawPolyline
                         # separately per cell beause the lines spread vertically over two rows: We would
                         # have to draw the lines into one big pixmap and copy
@@ -442,11 +442,11 @@ class ScoreTable(QWidget):
         self.viewLeft = ScoreViewLeft(self)
         self.viewRight = ScoreViewRight(self)
         self.viewRight.setHorizontalScrollBar(HorizontalScrollBar(self))
-        self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollPerItem)
+        self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
         self.viewRight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.viewRight.header().setSectionsClickable(False)
         self.viewRight.header().setSectionsMovable(False)
-        self.viewRight.setSelectionMode(QAbstractItemView.NoSelection)
+        self.viewRight.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Orientation.Vertical)
         self.splitter.setObjectName('ScoreTableSplitter')
@@ -506,14 +506,14 @@ class ScoreTable(QWidget):
             header = view.header()
             header.setStretchLastSection(False)
             view.setAlternatingRowColors(True)
-        self.viewRight.header().setSectionResizeMode(QHeaderView.Fixed)
+        self.viewRight.header().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
         for col in range(self.viewLeft.header().count()):
             self.viewLeft.header().setSectionHidden(col, col > 0)
             self.viewRight.header().setSectionHidden(col, col == 0)
         self.scoreLayout.setStretch(1, 100)
         self.scoreLayout.setSpacing(0)
-        self.viewLeft.setFrameStyle(QFrame.NoFrame)
-        self.viewRight.setFrameStyle(QFrame.NoFrame)
+        self.viewLeft.setFrameStyle(QFrame.Shape.NoFrame)
+        self.viewRight.setFrameStyle(QFrame.Shape.NoFrame)
         self.viewLeft.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         for master, slave in ((self.viewRight, self.viewLeft), (self.viewLeft, self.viewRight)):
             master.expanded.connect(slave.expand)
@@ -669,6 +669,14 @@ class RuleBox(QCheckBox):
         if not applicable:
             self.setChecked(False)
 
+class PlayerSelection(ListComboBox):
+
+    """just add a label"""
+
+    def __init__(self, items:List[Any], parent:Optional['QWidget']=None) ->None:
+        super().__init__(items, parent)
+        self.label = QLabel()
+
 
 class PenaltyDialog(QDialog):
 
@@ -695,20 +703,15 @@ class PenaltyDialog(QDialog):
         grid.addWidget(lblPenalty, 1, 0)
         grid.addWidget(self.spPenalty, 1, 1)
         grid.addWidget(self.lblUnits, 1, 2)
-        self.payers:List[ListComboBox] = []
-        self.payees:List[ListComboBox] = []
-        # a penalty can never involve the winner, neither as payer nor as payee
-        for idx in range(3):
-            self.payers.append(ListComboBox(game.losers()))
-            self.payees.append(ListComboBox(game.losers()))
+        # a penalty can never involve the winner, neither as payer nor as payee, so max 3
+        self.payers = list(PlayerSelection(game.losers()) for x in range(3))
+        self.payees = list(PlayerSelection(game.losers()) for x in range(3))
         for idx, payer in enumerate(self.payers):
             grid.addWidget(payer, 3 + idx, 0)
-            payer.lblPayment = QLabel()
-            grid.addWidget(payer.lblPayment, 3 + idx, 1)
+            grid.addWidget(payer.label, 3 + idx, 1)
         for idx, payee in enumerate(self.payees):
             grid.addWidget(payee, 3 + idx, 3)
-            payee.lblPayment = QLabel()
-            grid.addWidget(payee.lblPayment, 3 + idx, 4)
+            grid.addWidget(payee.label, 3 + idx, 4)
         grid.addWidget(QLabel(''), 6, 0)
         grid.setRowStretch(6, 10)
         for player in self.payers + self.payees:
@@ -717,11 +720,11 @@ class PenaltyDialog(QDialog):
         self.cbCrime.currentIndexChanged.connect(self.crimeChanged)
         buttonBox = KDialogButtonBox(self)
         grid.addWidget(buttonBox, 7, 0, 1, 5)
-        buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
+        buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel)
         buttonBox.rejected.connect(self.reject)
         self.btnExecute = buttonBox.addButton(
             i18n("&Execute"),
-            QDialogButtonBox.AcceptRole)
+            QDialogButtonBox.ButtonRole.AcceptRole)
         self.btnExecute.clicked.connect(self.accept)
         self.crimeChanged()
         StateSaver(self)
@@ -742,7 +745,7 @@ class PenaltyDialog(QDialog):
             self.game.savePenalty(player, offense, amount)
         QDialog.accept(self)
 
-    def usedCombos(self, partyCombos:List[ListComboBox]) ->List[ListComboBox]:
+    def usedCombos(self, partyCombos:List[PlayerSelection]) ->List[PlayerSelection]:
         """return all used player combos for this offense"""
         return [x for x in partyCombos if x.isVisibleTo(self)]
 
@@ -754,7 +757,7 @@ class PenaltyDialog(QDialog):
         """shuffle players to ensure everybody only appears once.
         enable execution if all input is valid"""
         changedCombo = self.sender()
-        if not isinstance(changedCombo, ListComboBox):
+        if not isinstance(changedCombo, PlayerSelection):
             changedCombo = self.payers[0]
         usedPlayers = set(self.allParties())
         unusedPlayers = set(self.game.losers()) - usedPlayers
@@ -791,15 +794,15 @@ class PenaltyDialog(QDialog):
         for pList, amount, count in ((self.payers, payerAmount, payers), (self.payees, payeeAmount, payees)):
             for idx, player in enumerate(pList):
                 player.setVisible(idx < count)
-                player.lblPayment.setVisible(idx < count)
+                player.label.setVisible(idx < count)
                 if idx < count:
                     if pList == self.payers:
-                        player.lblPayment.setText(
+                        player.label.setText(
                             i18nc(
                                 'penalty dialog, appears behind paying player combobox',
                                 'pays %1 points', -amount))
                     else:
-                        player.lblPayment.setText(
+                        player.label.setText(
                             i18nc(
                                 'penalty dialog, appears behind profiting player combobox',
                                 'gets %1 points', amount))
@@ -816,10 +819,10 @@ class ScoringDialog(QWidget):
         decorateWindow(self, i18nc("@title:window", "Scoring for this Hand"))
         self.nameLabels = list(QLabel() for x in range(4))
         self.spValues:List[QSpinBox] = list(QSpinBox() for x in range(4))
-        self.windLabels = [QLabel()] * 4
-        self.wonBoxes = [QCheckBox("")] * 4
-        self.detailsLayout = [QVBoxLayout()] * 4
-        self.details = [QWidget()] * 4
+        self.windLabels = list(WindLabel() for x in range(4))
+        self.wonBoxes = list(QCheckBox("") for x in range(4))
+        self.detailsLayout = list(QVBoxLayout() for x in range(4))
+        self.details = list(QWidget() for x in range(4))
         self.__meldPixMaps:List[QPixmap] = []
         grid = QGridLayout(self)
         pGrid = QGridLayout()
@@ -863,10 +866,10 @@ class ScoringDialog(QWidget):
         self.cbLastTile = QComboBox()
         self.cbLastTile.setMinimumContentsLength(1)
         vpol = QSizePolicy()
-        vpol.setHorizontalPolicy(QSizePolicy.Fixed)
+        vpol.setHorizontalPolicy(QSizePolicy.Policy.Fixed)
         self.cbLastTile.setSizePolicy(vpol)
         self.cbLastTile.setSizeAdjustPolicy(
-            QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastTile.setBuddy(self.cbLastTile)
         self.lblLastMeld = QLabel(i18n('L&ast Meld:'))
         self.prevLastTile:Optional['Tile'] = None
@@ -874,7 +877,7 @@ class ScoringDialog(QWidget):
         self.cbLastMeld.setMinimumContentsLength(1)
         self.cbLastMeld.setSizePolicy(vpol)
         self.cbLastMeld.setSizeAdjustPolicy(
-            QComboBox.AdjustToMinimumContentsLengthWithIcon)
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self.lblLastMeld.setBuddy(self.cbLastMeld)
         self.comboTilePairs:set['Tile'] = set()
         pGrid.setRowStretch(6, 5)
@@ -941,7 +944,7 @@ class ScoringDialog(QWidget):
     def penalty(self) ->None:
         """penalty button clicked"""
         dlg = PenaltyDialog(self.game)
-        dlg.exec_()
+        dlg.exec()
 
     def slotLastTile(self) ->None:
         """called when the last tile changes"""
@@ -1116,7 +1119,9 @@ class ScoringDialog(QWidget):
             return
         assert winnerTiles[0].board
         # mypy does not seem to understand operator*
-        pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()  # type:ignore[attr-defined]
+        _ = winnerTiles[0].board.tileset.faceSize
+        _ *= 0.5
+        pmSize = _.toSize()
         self.cbLastTile.setIconSize(pmSize)
         QPixmapCache.clear()
         shownTiles = set()

@@ -22,7 +22,7 @@ from twisted.internet.task import deferLater
 import twisted.internet.error
 from twisted.python.failure import Failure
 
-from qt import QDialog, QDialogButtonBox, QVBoxLayout, \
+from qt import QDialogButtonBox, QVBoxLayout, \
     QLabel, QComboBox, QLineEdit, QFormLayout, \
     QSizePolicy, QWidget
 
@@ -241,13 +241,13 @@ class Url(str, ReprMixin):
         return Internal.reactor.connectTCP(host, self.port, factory, timeout=5)
 
 
-class LoginDlg(QDialog):
+class LoginDlg(KDialog):
 
     """login dialog for server"""
 
     def __init__(self) ->None:
         """self.servers is a list of tuples containing server and last playername"""
-        QDialog.__init__(self, None)
+        KDialog.__init__(self, None)
         decorateWindow(self, i18nc('kajongg', 'Login'))
         self.setupUi()
 
@@ -277,7 +277,7 @@ class LoginDlg(QDialog):
         self.serverChanged()
         StateSaver(self)
 
-    def returns(self, unusedButton:Optional[str]=None) ->Tuple[Url, str, str, 'Ruleset']:
+    def returns(self, button:Optional[QDialogButtonBox.StandardButton]=None) ->Any:
         """login data returned by this dialog"""
         return (Url(self.url), self.username, self.password, self.__defineRuleset())
 
@@ -285,11 +285,11 @@ class LoginDlg(QDialog):
         """create all Ui elements but do not fill them"""
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(
-            QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
+            QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
         # Ubuntu 11.10 unity is a bit strange - without this, it sets focus on
         # the cancel button (which it shows on the left). I found no obvious
         # way to use setDefault and setAutoDefault for fixing this.
-        self.buttonBox.button(QDialogButtonBox.Ok).setFocus()
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setFocus()
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
         vbox = QVBoxLayout(self)
@@ -301,14 +301,14 @@ class LoginDlg(QDialog):
         self.cbUser.setEditable(True)
         self.grid.addRow(i18n('Username:'), self.cbUser)
         self.edPassword = QLineEdit()
-        self.edPassword.setEchoMode(QLineEdit.PasswordEchoOnEdit)
+        self.edPassword.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self.grid.addRow(i18n('Password:'), self.edPassword)
         self.cbRuleset = ListComboBox([])
         self.grid.addRow(i18nc('kajongg', 'Ruleset:'), self.cbRuleset)
         vbox.addLayout(self.grid)
         vbox.addWidget(self.buttonBox)
         pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
+        pol.setHorizontalPolicy(QSizePolicy.Policy.Expanding)
         self.cbUser.setSizePolicy(pol)
 
     def serverChanged(self, unusedText:Optional[str]=None) ->None:
@@ -345,7 +345,7 @@ class LoginDlg(QDialog):
                 self.cbRuleset.items = [Options.ruleset]
             else:
                 self.cbRuleset.items = Ruleset.selectableRulesets(self.url)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(bool(self.url))
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(bool(self.url))
 
     def __defineRuleset(self) ->'Ruleset':
         """find out what ruleset to use"""
@@ -406,17 +406,17 @@ class AddUserDialog(KDialog):
         self.lbUser = QLabel()
         grid.addRow(i18n('Username:'), self.lbUser)
         self.edPassword = QLineEdit()
-        self.edPassword.setEchoMode(QLineEdit.PasswordEchoOnEdit)
+        self.edPassword.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         grid.addRow(i18n('Password:'), self.edPassword)
         self.edPassword2 = QLineEdit()
-        self.edPassword2.setEchoMode(QLineEdit.PasswordEchoOnEdit)
+        self.edPassword2.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         grid.addRow(i18n('Repeat password:'), self.edPassword2)
         vbox.addLayout(grid)
         widget = QWidget(self)
         widget.setLayout(vbox)
         self.setMainWidget(widget)
         pol = QSizePolicy()
-        pol.setHorizontalPolicy(QSizePolicy.Expanding)
+        pol.setHorizontalPolicy(QSizePolicy.Policy.Expanding)
         self.lbUser.setSizePolicy(pol)
 
         self.edPassword.textChanged.connect(self.passwordChanged)
@@ -433,8 +433,8 @@ class AddUserDialog(KDialog):
 
     def validate(self) ->None:
         """does the dialog hold valid data?"""
-        equal = self.edPassword.size(
-        ) and self.edPassword.text(
+        equal = bool(self.edPassword.size(
+        )) and self.edPassword.text(
         ) == self.edPassword2.text(
         )
         self.button(KDialog.Ok).setEnabled(equal)
@@ -583,7 +583,7 @@ class Connection:
         if not self.url.isLocalHost:
             if not AddUserDialog(self.url,
                                  self.dlg.username,
-                                 self.dlg.password).exec_():
+                                 self.dlg.password).exec():
                 raise CancelledError
             Players.createIfUnknown(self.username)
         adduserCmd = SERVERMARK.join(

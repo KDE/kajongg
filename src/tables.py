@@ -106,13 +106,13 @@ class TablesModel(QAbstractTableModel):
                     palette = KApplication.palette()
                     if online:
                         color = palette.color(
-                            QPalette.Active,
-                            QPalette.WindowText).name()
+                            QPalette.ColorGroup.Active,
+                            QPalette.ColorRole.WindowText).name()
                         style = f'font-weight:normal;font-style:normal;color:{color}'
                     else:
                         color = palette.color(
-                            QPalette.Disabled,
-                            QPalette.WindowText).name()
+                            QPalette.ColorGroup.Disabled,
+                            QPalette.ColorRole.WindowText).name()
                         style = f'font-weight:100;font-style:italic;color:{color}'
                     players.append(
                         f'<nobr style="{style}">' +
@@ -148,7 +148,7 @@ class SelectRuleset(QDialog):
         decorateWindow(self, i18n('Select a ruleset'))
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(
-            QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
+            QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
         self.cbRuleset = ListComboBox(Ruleset.selectableRulesets(server))
@@ -184,38 +184,38 @@ class TableList(QWidget):
         self.newButton = buttonBox.addButton(
             i18nc('allocate a new table',
                   "&New"),
-            QDialogButtonBox.ActionRole)
+            QDialogButtonBox.ButtonRole.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.setToolTip(i18n("Allocate a new table"))
         self.newButton.clicked.connect(self.client.newTable)
         self.joinButton = buttonBox.addButton(
             i18n("&Join"),
-            QDialogButtonBox.AcceptRole)
+            QDialogButtonBox.ButtonRole.AcceptRole)
         self.joinButton.clicked.connect(client.joinTable)
         self.joinButton.setIcon(KIcon("list-add-user"))
         self.joinButton.setToolTip(i18n("Join a table"))
         self.leaveButton = buttonBox.addButton(
             i18n("&Leave"),
-            QDialogButtonBox.AcceptRole)
+            QDialogButtonBox.ButtonRole.AcceptRole)
         self.leaveButton.clicked.connect(self.leaveTable)
         self.leaveButton.setIcon(KIcon("list-remove-user"))
         self.leaveButton.setToolTip(i18n("Leave a table"))
         self.compareButton = buttonBox.addButton(
             i18nc('Kajongg-Ruleset',
                   'Compare'),
-            QDialogButtonBox.AcceptRole)
+            QDialogButtonBox.ButtonRole.AcceptRole)
         self.compareButton.clicked.connect(self.compareRuleset)
         self.compareButton.setIcon(KIcon("preferences-plugin-script"))
         self.compareButton.setToolTip(
             i18n('Compare the rules of this table with my own rulesets'))
         self.chatButton = buttonBox.addButton(
             i18n('&Chat'),
-            QDialogButtonBox.AcceptRole)
+            QDialogButtonBox.ButtonRole.AcceptRole)
         self.chatButton.setIcon(KIcon("call-start"))
         self.chatButton.clicked.connect(self.chat)
         self.startButton = buttonBox.addButton(
             i18n('&Start'),
-            QDialogButtonBox.AcceptRole)
+            QDialogButtonBox.ButtonRole.AcceptRole)
         self.startButton.clicked.connect(self.startGame)
         self.startButton.setIcon(KIcon("arrow-right"))
         self.startButton.setToolTip(
@@ -468,8 +468,8 @@ class TableList(QWidget):
         selection = QItemSelectionModel(model, self.view)
         self.view.initView()
         self.view.setSelectionModel(selection)
-        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.view.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         selection.selectionChanged.connect(self.selectionChanged)
         if len(tables) == 1:
             self.selectTable(0)

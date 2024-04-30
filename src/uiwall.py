@@ -164,7 +164,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):  # py
             self.__boundingRect = QRectF(QFontMetrics(self.__font).boundingRect(txt))
             self.needsRefresh = True
 
-    def paint(self, painter:'QPainter', unusedOption:'QStyleOptionGraphicsItem.StyleOptionType',
+    def paint(self, painter:'QPainter', unusedOption:'QStyleOptionGraphicsItem',
         unusedWidget:Optional['QWidget']=None) ->None:
         """paint the disc"""
         with Painter(painter):
@@ -201,8 +201,9 @@ class UIWallSide(Board, ReprMixin):
         """return the center point of the wall in relation to the
         faces of the upper level"""
         faceRect = self.tileFaceRect()
-        result = faceRect.topLeft() + self.shiftZ(1) + \
-            QPointF(self.length // 2 * faceRect.width(), faceRect.height() / 2)
+        result = faceRect.topLeft()
+        result += self.shiftZ(1)
+        result += QPointF(self.length // 2 * faceRect.width(), faceRect.height() / 2)
         result.setX(result.x() + faceRect.height() / 2)  # corner tile
         return result
 

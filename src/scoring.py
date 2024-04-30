@@ -22,7 +22,7 @@ from wind import Wind
 from tilesource import TileSource
 from animation import animate
 from log import logError, logDebug, logWarning, i18n
-from query import Query
+from query import Query, openDb
 from uitile import UITile, UIMeld
 from board import WindLabel, Board
 from game import Game
@@ -62,10 +62,18 @@ class SwapDialog(QMessageBox):
             i18n("By the rules, %1 and %2 should now exchange their seats. ",
                  swappers[0].name, swappers[1].name))
         self.yesAnswer = QPushButton(i18n("&Exchange"))
-        self.addButton(self.yesAnswer, QMessageBox.YesRole)
+        self.addButton(self.yesAnswer, QMessageBox.ButtonRole.YesRole)
         self.noAnswer = QPushButton(i18n("&Keep seat"))
-        self.addButton(self.noAnswer, QMessageBox.NoRole)
+        self.addButton(self.noAnswer, QMessageBox.ButtonRole.NoRole)
 
+
+class ScoringComboBox(QComboBox):
+
+    """with flag manualSelect"""
+
+    def __init__(self, parent:Optional['QWidget']=None):
+        super().__init__(parent)
+        self.manualSelect = False
 
 class SelectPlayers(SelectRuleset):
 
@@ -76,10 +84,9 @@ class SelectPlayers(SelectRuleset):
         Players.load()
         decorateWindow(self, i18nc("@title:window", "Select four players"))
         self.names:List[str]
-        self.nameWidgets:List['QWidget'] = []
+        self.nameWidgets:List[ScoringComboBox] = []
         for idx, wind in enumerate(Wind.all4):
-            cbName = QComboBox()
-            cbName.manualSelect = False
+            cbName = ScoringComboBox()
             # increase width, we want to see the full window title
             cbName.setMinimumWidth(350)  # is this good for all platforms?
             cbName.addItems(list(Players.humanNames.values()))
@@ -89,7 +96,7 @@ class SelectPlayers(SelectRuleset):
             cbName.currentIndexChanged.connect(self.slotValidate)
 
         query = Query(
-            "select p0,p1,p2,p3 from game where seed is null and game.id = (select max(id) from game)")
+            "select p0,p1,p2,p3 from game where seed=0 and game.id = (select max(id) from game)")
         if query.records:
             with BlockSignals(self.nameWidgets):
                 for cbName, playerId in zip(self.nameWidgets, query.records[0]):
@@ -114,7 +121,7 @@ class SelectPlayers(SelectRuleset):
     def slotValidate(self) ->None:
         """try to find 4 different players and update status of the Ok button"""
         changedCombo = self.sender()
-        if not isinstance(changedCombo, QComboBox):
+        if not isinstance(changedCombo, ScoringComboBox):
             changedCombo = self.nameWidgets[0]
         changedCombo.manualSelect = True
         allNames = set(Players.humanNames.values())
@@ -135,7 +142,7 @@ class SelectPlayers(SelectRuleset):
                 combo.addItems(sorted(
                     allNames - self.__selectedNames() - {comboName}))
                 combo.setCurrentIndex(0)
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(
             len(self.__selectedNames()) == 4)
         self.names = [cbName.currentText() for cbName in self.nameWidgets]
 
@@ -331,7 +338,9 @@ class ScoringHandBoard(HandBoard):
                         helper.mapToParent(helper.boundingRect()).boundingRect().size())
                     center = QPointF(hbCenter)
                     center.setY(center.y() * yFactor)
-                    helper.setPos(center - nameRect.center())
+                    _ = center
+                    _ -= nameRect.center()
+                    helper.setPos(_)
                     if sceneRotation(self) == 180:
                         rotateCenter(helper, 180)
                     helpItems.append(helper)
@@ -617,7 +626,7 @@ class ScoringGame(Game):
         # I do not understand the logic of the exec return value. The yes button returns 0
         # and the no button returns 1. According to the C++ doc, the return value is an
         # opaque value that should not be used."""
-        return [x for x in pairs if SwapDialog(x).exec_() == 0]
+        return [x for x in pairs if SwapDialog(x).exec() == 0]
 
     def savePenalty(self, player:'ScoringPlayer', offense:'Rule', amount:int) ->None:
         """save computed values to database, update score table and balance in status line"""
@@ -635,6 +644,7 @@ class ScoringGame(Game):
 
 def scoreGame() ->Optional[ScoringGame]:
     """show all games, select an existing game or create a new game"""
+    openDb()
     Players.load()
     if len(Players.humanNames) < 4:
         logWarning(
@@ -642,13 +652,13 @@ def scoreGame() ->Optional[ScoringGame]:
         return None
     gameSelector = Games(Internal.mainWindow)
     selected = None
-    if not gameSelector.exec_():
+    if not gameSelector.exec():
         return None
     selected = gameSelector.selectedGame
     gameSelector.close()
-    if selected is not None:
+    if selected:
         return cast(ScoringGame, ScoringGame.loadFromDB(selected))
     selectDialog = SelectPlayers()
-    if not selectDialog.exec_():
+    if not selectDialog.exec():
         return None
     return ScoringGame(list(zip(Wind.all4, selectDialog.names)), selectDialog.cbRuleset.current)

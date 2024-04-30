@@ -19,7 +19,6 @@ from qt import QItemSelectionModel, QAbstractItemView
 from dialogs import WarningYesNo
 from kde import KIcon
 from mi18n import i18n, i18nc
-from log import logException
 from query import Query
 from guiutil import MJTableView, decorateWindow
 from statesaver import StateSaver
@@ -102,7 +101,7 @@ class Games(QDialog):
 
     def __init__(self, parent:Optional['QWidget']=None) ->None:
         super().__init__(parent)
-        self.selectedGame:Optional[QModelIndex] = None
+        self.selectedGame = 0
         self.onlyPending = True
         decorateWindow(self, i18nc("@title:window", "Games"))
         self.setObjectName('Games')
@@ -115,21 +114,21 @@ class Games(QDialog):
         self.view.setModel(self.model)
         self.selection = QItemSelectionModel(self.model, self.view)
         self.view.setSelectionModel(self.selection)
-        self.view.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.view.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.view.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
         self.buttonBox = QDialogButtonBox(self)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel)
         self.newButton = self.buttonBox.addButton(
-            i18nc('start a new game', "&New"), QDialogButtonBox.ActionRole)
+            i18nc('start a new game', "&New"), QDialogButtonBox.ButtonRole.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.accept)
         self.loadButton = self.buttonBox.addButton(
-            i18n("&Load"), QDialogButtonBox.AcceptRole)
+            i18n("&Load"), QDialogButtonBox.ButtonRole.AcceptRole)
         self.loadButton.clicked.connect(self.loadGame)
         self.loadButton.setIcon(KIcon("document-open"))
         self.deleteButton = self.buttonBox.addButton(
-            i18n("&Delete"), QDialogButtonBox.ActionRole)
+            i18n("&Delete"), QDialogButtonBox.ButtonRole.ActionRole)
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.deleteButton.clicked.connect(self.delete)
 
@@ -161,9 +160,6 @@ class Games(QDialog):
     def keyPressEvent(self, event:'QKeyEvent') ->None:
         """use insert/delete keys for insert/delete"""
         key = event.key()
-        if key == Qt.Key.Key_Insert:
-            self.newEntry()
-            return
         if key == Qt.Key.Key_Delete:
             self.delete()
             event.ignore()
@@ -183,7 +179,7 @@ class Games(QDialog):
             "p0.name||'///'||p1.name||'///'||p2.name||'///'||p3.name "
             "from game g, player p0,"
             "player p1, player p2, player p3 "
-            "where seed is null"
+            "where seed=0"
             " and p0.id=g.p0 and p1.id=g.p1 "
             " and p2.id=g.p2 and p3.id=g.p3 "
             "%s"
@@ -192,7 +188,7 @@ class Games(QDialog):
         self.model.setResultset(query.records)
         self.view.hideColumn(0)
 
-    def __idxForGame(self, game:'PlayingGame') ->QModelIndex:
+    def __idxForGame(self, game:int) ->QModelIndex:
         """return the model index for game"""
         for row in range(self.model.rowCount()):
             idx = self.model.index(row, 0)
@@ -200,10 +196,12 @@ class Games(QDialog):
                 return idx
         return self.model.index(0, 0)
 
-    def __getSelectedGame(self) ->QModelIndex:
+    def __getSelectedGame(self) ->int:
         """return the game id of the selected game"""
         rows = self.selection.selectedRows()
-        return self.model.data(rows[0], 0) if rows else QModelIndex()
+        if rows:
+            return self.model.data(rows[0], 0)
+        return 0
 
     def pendingOrNot(self, chosen:Qt.CheckState) ->None:
         """do we want to see all games or only pending games?"""
@@ -211,8 +209,9 @@ class Games(QDialog):
             self.onlyPending = bool(chosen)
             prevSelected = self.__getSelectedGame()
             self.setQuery()
-            idx = self.__idxForGame(prevSelected)
-            self.view.selectRow(idx.row())
+            if prevSelected:
+                idx = self.__idxForGame(prevSelected)
+                self.view.selectRow(idx.row())
         self.view.setFocus()
 
     def loadGame(self) ->None:
@@ -222,9 +221,9 @@ class Games(QDialog):
 
     def delete(self) ->None:
         """delete a game"""
-        def answered(result:bool, games:List[int]) ->None:
+        def answered(result:Any, games:List[int]) ->None:
             """question answered, result is True or False"""
-            if result:
+            if result is True:
                 for game in games:
                     Query("DELETE FROM score WHERE game = ?", (game, ))
                     Query("DELETE FROM game WHERE id = ?", (game, ))
@@ -232,11 +231,10 @@ class Games(QDialog):
         allGames = self.view.selectionModel().selectedRows(0)
         deleteGames = [x.data() for x in allGames]
         if not deleteGames:
-            # should never happen
-            logException('delete: 0 rows selected')
+            return
         WarningYesNo(
             i18n(
                 "Do you really want to delete <numid>%1</numid> games?<br>"
                 "This will be final, you cannot cancel it with "
                 "the cancel button",
-                len(deleteGames))).addCallback(answered, deleteGames).addErrback(logException)
+                len(deleteGames))).addBoth(answered, deleteGames)
