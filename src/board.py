@@ -371,10 +371,10 @@ class Board(QGraphicsRectItem, ReprMixin):
                 menuPoint = QCursor.pos()
             else:
                 assert uiTile.board
-                menuPoint = uiTile.board.tileFaceRect().bottomRight()
+                _ = uiTile.board.tileFaceRect().bottomRight()
                 view = Internal.scene.mainWindow.centralView
                 menuPoint = view.mapToGlobal(
-                    view.mapFromScene(uiTile.mapToScene(menuPoint)))
+                    view.mapFromScene(uiTile.mapToScene(_)))
             action = menu.exec(menuPoint)
             if not action:
                 return None

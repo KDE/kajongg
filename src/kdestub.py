@@ -103,8 +103,9 @@ class KApplication(QApplication):
         self.translators.append(_)
         self.installTranslator(_)
         for language in reversed(list(MLocale.extendRegionLanguages(MLocale.currentLanguages()))):
-            self.installTranslatorFile(os.path.join(
-                QLibraryInfo.location(QLibraryInfo.TranslationsPath), f'qtbase_{language}.qm'))
+            _ = QLibraryInfo.location(QLibraryInfo.TranslationsPath)  # type:ignore[attr-defined]
+            # qtpy maps location() to path() for Qt6
+            self.installTranslatorFile(os.path.join( _, f'qtbase_{language}.qm'))
             self.installTranslatorFile(f'/usr/share/locale/{language}/LC_MESSAGES/kwidgetsaddons5_qt.qm')
 
     @classmethod
@@ -473,6 +474,10 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.toolBar().setMovable(False)
         self.toolBar().setFloatable(False)
         self.toolBar().setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+
+    def statusBar(self) -> KStatusBar:
+        """for mypy"""
+        return cast(KStatusBar, QMainWindow.statusBar(self))
 
     def showEvent(self, event:QShowEvent) ->None:
         """now that the MainWindow code has run, we know all actions"""

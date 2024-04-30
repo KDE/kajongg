@@ -93,12 +93,14 @@ class Animation(QPropertyAnimation, ReprMixin):
         """string format the wanted value from qvariant"""
         pName = self.pName()
         if pName == 'pos':
-            assert isinstance(value, QPointF)
-            return f'{value.x():.0f}/{value.y():.0f}'
+            _ = cast(QPointF, value)
+            return f'{_.x():.0f}/{_.y():.0f}'
         if pName == 'rotation':
-            return f'{int(value)}'
+            _ = cast(int, value)
+            return str(_)
         if pName == 'scale':
-            return f'{value:.2f}'
+            _ = cast(float, value)
+            return f'{_:.2f}'
         return f'formatValue: unexpected {pName}={value}'
 
     def __str__(self) ->str:

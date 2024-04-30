@@ -148,7 +148,8 @@ class DlgButton(QPushButton):
         if key in [Qt.Key.Key_Left, Qt.Key.Key_Right]:
             game = self.client.game
             if game and game.activePlayer == game.myself:
-                game.myself.handBoard.keyPressEvent(event)
+                if game.myself.handBoard:
+                    game.myself.handBoard.keyPressEvent(event)
                 self.setFocus()
                 return
         QPushButton.keyPressEvent(self, event)

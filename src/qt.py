@@ -132,7 +132,7 @@ try:
     from qtpy.QtSvgWidgets import QGraphicsSvgItem  # type: ignore
 except ImportError:
     # as it was in Qt5:
-    from qtpy.QtSvg import QGraphicsSvgItem  # type:ignore[assignment]
+    from qtpy.QtSvg import QGraphicsSvgItem  # type:ignore[assignment,attr-defined,no-redef]
 from qtpy.QtSvg import QSvgRenderer
 
 # pylint:disable=c-extension-no-member

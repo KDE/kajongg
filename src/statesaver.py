@@ -53,7 +53,7 @@ class StateSaver(QObject):
         state = QByteArray.fromHex(Internal.Preferences[name].encode())
         if state:
             if canRestore(name, 'State'):
-                widget.restoreState(state)
+                widget.restoreState(state)  # type:ignore[attr-defined]
             elif canRestore(name, 'Geometry'):
                 widget.restoreGeometry(state)
             else:

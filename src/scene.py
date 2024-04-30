@@ -146,7 +146,7 @@ class GameScene(SceneWithFocusRect):
     def __init__(self, parent:Optional['QWidget']=None) ->None:
         Internal.scene = self
         assert parent
-        self.mainWindow:'MainWindow' = parent
+        self.mainWindow = cast('MainWindow', parent)
         self._game:Optional['Game'] = None
         super().__init__()
 

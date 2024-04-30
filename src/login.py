@@ -433,8 +433,8 @@ class AddUserDialog(KDialog):
 
     def validate(self) ->None:
         """does the dialog hold valid data?"""
-        equal = self.edPassword.size(
-        ) and self.edPassword.text(
+        equal = bool(self.edPassword.size(
+        )) and self.edPassword.text(
         ) == self.edPassword2.text(
         )
         self.button(KDialog.Ok).setEnabled(equal)

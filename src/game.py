@@ -233,6 +233,7 @@ class Game:
         self.handDiscardCount:int = 0
         self.divideAt:Optional[int] = None
         self.__lastDiscard:Optional[Tile] = None  # always uppercase
+        # TODO: use Tile.none and remove assertions in message.py and otherwhere
         self.visibleTiles:Dict[Tile, int] = IntDict()
         self.discardedTiles:Dict[Tile, int] = IntDict(self.visibleTiles)
         # tile names are always lowercase

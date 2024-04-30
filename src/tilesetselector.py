@@ -95,7 +95,7 @@ class TilesetSelector(QWidget):
     def tilesetRowChanged(self) ->None:
         """user selected a new tileset, update our information about it and
         paint preview"""
-        selTileset = self.tilesetList[self.tilesetNameList.currentRow()]
+        selTileset = cast(Tileset, self.tilesetList[self.tilesetNameList.currentRow()])
         self.kcfg_tilesetName.setText(selTileset.desktopFileName)
         self.tilesetAuthor.setText(selTileset.author)
         self.tilesetContact.setText(selTileset.authorEmail)
