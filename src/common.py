@@ -20,8 +20,8 @@ from signal import signal, SIGABRT, SIGINT, SIGTERM
 from typing import Optional, Any, Union, List, Sequence, Mapping
 from typing import TYPE_CHECKING, Iterable, Generator, Literal, cast
 
-from qt import QStandardPaths, QObject, QSize, modeltest_is_supported
 from qtpy.compat import isalive as qtpy_isalive
+from qt import QStandardPaths, QObject, modeltest_is_supported
 
 if TYPE_CHECKING:
     from tile import Tile
