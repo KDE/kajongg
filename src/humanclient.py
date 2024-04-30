@@ -605,6 +605,17 @@ class HumanClient(Client):
         self.__updateTableList()
         return oldTable, newTable
 
+    def remote_chat(self, data):
+        """others chat to me"""
+        chatLine = ChatMessage(data)
+        if Debug.chat:
+            logDebug(f'got chatLine: {chatLine}')
+        table = self._tableById(chatLine.tableid)
+        if not chatLine.isStatusMessage and not table.chatWindow:
+            ChatWindow(table=table)
+        if table.chatWindow:
+            table.chatWindow.receiveLine(chatLine)
+
     def readyForGameStart(
             self, tableid:int, gameid:int, wantedGame:str, playerNames:List[Tuple['Wind', str]], shouldSave:bool=True,
             gameClass:Optional[Type]=None) ->Deferred:

@@ -161,9 +161,6 @@ class Games(QDialog):
     def keyPressEvent(self, event:'QKeyEvent') ->None:
         """use insert/delete keys for insert/delete"""
         key = event.key()
-        if key == Qt.Key.Key_Insert:
-            self.newEntry()
-            return
         if key == Qt.Key.Key_Delete:
             self.delete()
             event.ignore()
@@ -232,8 +229,7 @@ class Games(QDialog):
         allGames = self.view.selectionModel().selectedRows(0)
         deleteGames = [x.data() for x in allGames]
         if not deleteGames:
-            # should never happen
-            logException('delete: 0 rows selected')
+            return
         WarningYesNo(
             i18n(
                 "Do you really want to delete <numid>%1</numid> games?<br>"

@@ -28,11 +28,7 @@ around, it seemed easier to me to maintain one for myself
 
 from typing import List, Dict, Any, Type, cast
 
-try:
-    from PyQt5 import sip
-except ImportError:
-    import sip  # type:ignore[no-redef,import]
-from qt import QObject, Qt, QAbstractItemModel, QModelIndex
+from qt import QObject, Qt, QAbstractItemModel, QModelIndex, sip_cast
 from qt import QPersistentModelIndex, QFont, QColor, QSize
 from common import isAlive
 
@@ -52,7 +48,7 @@ class ModelTest(QObject):
         """
         QObject.__init__(self, parent)
         self._model = _model
-        self.model = cast(QAbstractItemModel, sip.cast(_model, QAbstractItemModel))  # type:ignore[arg-type]
+        self.model = cast(QAbstractItemModel, sip_cast(_model, QAbstractItemModel))  # type:ignore[arg-type]
         self.insert:List[Dict] = []
         self.remove:List[Dict] = []
         self.changing:List[QPersistentModelIndex] = []

@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 # pylint: disable=unused-import
 
-from qtpy import uic
+from qtpy import uic, QT5, QT6
 from qtpy.QtCore import QAbstractAnimation
 from qtpy.QtCore import QAbstractItemModel
 from qtpy.QtCore import QAbstractTableModel
@@ -134,3 +134,33 @@ except ImportError:
     # as it was in Qt5:
     from qtpy.QtSvg import QGraphicsSvgItem  # type:ignore[assignment]
 from qtpy.QtSvg import QSvgRenderer
+
+# pylint:disable=c-extension-no-member
+
+HAVE_SIP = True
+if QT5:
+    from PyQt5 import sip
+    def sip_cast(obj, _type):
+        """hide not so nice things in qt.py"""
+        return sip.cast(obj, _type)
+elif QT6:
+    from PyQt6 import sip  # type:ignore[no-redef]
+    def sip_cast(obj, _type):
+        """hide not so nice things in qt.py"""
+        return sip.cast(obj, _type)
+else:
+    HAVE_SIP = False
+
+def modeltest_is_supported() ->bool:
+    """Is the QT binding supported."""
+    if not HAVE_SIP:
+        return False
+    try:
+        _ = sip_cast(QSize(), QSize)
+        return True
+    except TypeError:
+        return False
+
+SIP_VERSION_STR = 'no sip'
+if HAVE_SIP:
+    SIP_VERSION_STR = sip.SIP_VERSION_STR

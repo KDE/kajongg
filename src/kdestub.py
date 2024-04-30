@@ -198,8 +198,7 @@ class KMessageBox:
         iconName = {
             QMessageBox.Information: 'dialog-information',
             QMessageBox.Warning: 'dialog-warning',
-            QMessageBox.Question: 'dialog-information'}[icon]
-        icon = KIcon(iconName)
+            QMessageBox.Question: 'dialog-question'}[icon]
         iconLayout = QVBoxLayout()
         iconLayout.addStretch(1)
         iconLayout.addWidget(IconLabel(iconName, dialog))
@@ -303,11 +302,6 @@ class KDialog(CaptionMixin, QDialog):
     def spacingHint() ->int:
         """stub"""
         return QApplication.style().pixelMetric(QStyle.PixelMetric.PM_DefaultLayoutSpacing)
-
-    @staticmethod
-    def marginHint() ->int:
-        """stub"""
-        return QApplication.style().pixelMetric(QStyle.PixelMetric.PM_DefaultChildMargin)
 
 
 class KUser:
@@ -1034,7 +1028,6 @@ class AboutKajonggDialog(KDialog):
         assert isinstance(QT_VERSION, str)
         underVersions = ['Qt' + QT_VERSION +' API=' + API_NAME]
         if PYQT_VERSION:
-            from sip import SIP_VERSION_STR  # type:ignore[import]
             underVersions.append('sip ' + SIP_VERSION_STR)
         if PYSIDE2:
             import PySide2
@@ -1169,8 +1162,10 @@ class LicenseDialog(KDialog):
     def sizeHint(self) ->QSize:
         """try to set up the dialog such that the full width of the
         document is visible without horizontal scroll-bars being required"""
-        idealWidth = self.licenseBrowser.document().idealWidth() + (2 * self.marginHint()) \
-            + self.licenseBrowser.verticalScrollBar().width() * 2 + 1
+        idealWidth = self.licenseBrowser.document().idealWidth()
+        idealWidth += self.style().pixelMetric(QStyle.PixelMetric.PM_LayoutLeftMargin)
+        idealWidth += self.style().pixelMetric(QStyle.PixelMetric.PM_LayoutRightMargin)
+        idealWidth += self.licenseBrowser.verticalScrollBar().width() * 2 + 1
         # try to allow enough height for a reasonable number of lines to be
         # shown
         metrics = QFontMetrics(self.licenseBrowser.font())

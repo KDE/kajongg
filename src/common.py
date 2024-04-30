@@ -20,8 +20,8 @@ from signal import signal, SIGABRT, SIGINT, SIGTERM
 from typing import Optional, Any, Union, List, Sequence, Mapping
 from typing import TYPE_CHECKING, Iterable, Generator, Literal, cast
 
+from qt import QStandardPaths, QObject, QSize, modeltest_is_supported
 from qtpy.compat import isalive as qtpy_isalive
-from qt import QStandardPaths, QObject, QSize
 
 if TYPE_CHECKING:
     from tile import Tile
@@ -248,23 +248,10 @@ Options {', '.join(stringOptions)} take a string argument like {stringExample}.
                 type.__setattr__(Debug, option, value)
         if Debug.time:
             Debug.timestamp = datetime.datetime.now()
-        if Debug.modelTest and not Debug.modeltest_is_supported():
+        if Debug.modelTest and not modeltest_is_supported():
             print('--debug=modelTest is not yet supported for pyside, use pyqt')
             sys.exit(2)
         return ''
-
-    @staticmethod
-    def modeltest_is_supported() ->bool:
-        """Is the QT binding supported."""
-        try:
-            import sip  # type:ignore[import]
-        except ImportError:
-            return False
-        try:
-            _ = sip.cast(QSize(), QSize)
-            return True
-        except TypeError:
-            return False
 
     @staticmethod
     def str() ->str:
