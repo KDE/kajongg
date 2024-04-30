@@ -22,7 +22,8 @@ from kde import KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 from guiutil import decorateWindow
 from log import i18n, logWarning, logException, logDebug, logError
-from message import Message
+from message import Message, ChatMessage
+from chat import ChatWindow
 from common import Options, SingleshotOptions, Internal, Debug, isAlive
 from query import Query
 from board import Board
@@ -43,7 +44,7 @@ if TYPE_CHECKING:
     from move import Move
     from tile import Tile, Meld, MeldList
     from uitile import UITile
-    from message import ClientMessage, ServerMessage, ChatMessage
+    from message import ClientMessage, ServerMessage
     from scene import PlayingScene
     from wind import Wind
 
