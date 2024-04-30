@@ -225,8 +225,7 @@ class Games(QDialog):
         allGames = self.view.selectionModel().selectedRows(0)
         deleteGames = [x.data() for x in allGames]
         if not deleteGames:
-            # should never happen
-            logException('delete: 0 rows selected')
+            return
         WarningYesNo(
             i18n(
                 "Do you really want to delete <numid>%1</numid> games?<br>"
