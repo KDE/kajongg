@@ -816,10 +816,10 @@ class ScoringDialog(QWidget):
         decorateWindow(self, i18nc("@title:window", "Scoring for this Hand"))
         self.nameLabels = list(QLabel() for x in range(4))
         self.spValues:List[QSpinBox] = list(QSpinBox() for x in range(4))
-        self.windLabels = [QLabel()] * 4
-        self.wonBoxes = [QCheckBox("")] * 4
-        self.detailsLayout = [QVBoxLayout()] * 4
-        self.details = [QWidget()] * 4
+        self.windLabels = list(QLabel() for x in range(4))
+        self.wonBoxes = list(QCheckBox("") for x in range(4))
+        self.detailsLayout = list(QVBoxLayout() for x in range(4))
+        self.details = list(QWidget() for x in range(4))
         self.__meldPixMaps:List[QPixmap] = []
         grid = QGridLayout(self)
         pGrid = QGridLayout()
