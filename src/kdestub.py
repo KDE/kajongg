@@ -33,6 +33,7 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 from qt import *
 from qtpy import QT5, QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
 if QT6:
+    # pylint: disable=no-name-in-module
     from qtpy.QtCore import QKeyCombination
 
 from mi18n import MLocale, KDETranslator, i18n, i18nc
