@@ -171,12 +171,12 @@ class RuleModel(TreeModel):
         rootData.extend(unitNames)
         self.rootItem = RuleRootItem(rootData)
 
-    def canFetchMore(self, unusedParent:Optional['TreeItem']=None) ->bool:
+    def canFetchMore(self, unusedParent:QModelIndex=QModelIndex()) ->bool:
         """did we already load the rules? We only want to do that
         when the config tab with rulesets is actually shown"""
         return not self.loaded
 
-    def fetchMore(self, unusedParent:Optional['TreeItem']=None) ->None:
+    def fetchMore(self, unusedParent:QModelIndex=QModelIndex()) ->None:
         """load the rules"""
         for ruleset in self.rulesets:
             self.appendRuleset(ruleset)
@@ -273,7 +273,7 @@ class EditableRuleModel(RuleModel):
 
     """add methods needed for editing"""
 
-    def __init__(self, rulesets:List[Ruleset], title:str, parent:Optional[QModelIndex]=None) ->None:
+    def __init__(self, rulesets:List[Ruleset], title:str, parent:Optional['QObject']=None) ->None:
         RuleModel.__init__(self, rulesets, title, parent)
 
     def __setRuleData(self, column:int, content:Union[Rule, ParameterRule],
@@ -335,10 +335,10 @@ class EditableRuleModel(RuleModel):
             self.dataChanged.emit(index, index)
         return True
 
-    def flags(self, index:QModelIndex) ->Qt.ItemFlags:
+    def flags(self, index:QModelIndex) ->Qt.ItemFlag:  # type:ignore[override]
         """tell the view what it can do with this item"""
         if not index.isValid():
-            return cast(Qt.ItemFlags, Qt.ItemFlag.ItemIsEnabled)
+            return Qt.ItemFlag.ItemIsEnabled
         column = index.column()
         item = index.internalPointer()
         content = item.raw
@@ -383,7 +383,8 @@ class RuleTreeView(QTreeView):
         self.rulesets:List[Ruleset] = []  # nasty: this generates self.ruleModel
         self.differs:List[RulesetDiffer] = []
 
-    def dataChanged(self, unusedIndex1:int, unusedIndex2:int, unusedRoles:Optional[Iterable[int]]=None) ->None:
+    def dataChanged(self, unusedIndex1:QModelIndex, unusedIndex2:QModelIndex,
+        unusedRoles:Optional[Iterable[int]]=None) ->None:
         """get called if the model has changed: Update all differs"""
         for differ in self.differs:
             differ.rulesetChanged()

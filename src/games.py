@@ -101,7 +101,7 @@ class Games(QDialog):
 
     def __init__(self, parent:Optional['QWidget']=None) ->None:
         super().__init__(parent)
-        self.selectedGame:Optional[QModelIndex] = None
+        self.selectedGame = 0
         self.onlyPending = True
         decorateWindow(self, i18nc("@title:window", "Games"))
         self.setObjectName('Games')
@@ -196,10 +196,12 @@ class Games(QDialog):
                 return idx
         return self.model.index(0, 0)
 
-    def __getSelectedGame(self) ->QModelIndex:
+    def __getSelectedGame(self) ->int:
         """return the game id of the selected game"""
         rows = self.selection.selectedRows()
-        return self.model.data(rows[0], 0) if rows else QModelIndex()
+        if rows:
+            return self.model.data(rows[0], 0)
+        return 0
 
     def pendingOrNot(self, chosen:Qt.CheckState) ->None:
         """do we want to see all games or only pending games?"""
@@ -207,8 +209,9 @@ class Games(QDialog):
             self.onlyPending = bool(chosen)
             prevSelected = self.__getSelectedGame()
             self.setQuery()
-            idx = self.__idxForGame(prevSelected)
-            self.view.selectRow(idx.row())
+            if prevSelected:
+                idx = self.__idxForGame(prevSelected)
+                self.view.selectRow(idx.row())
         self.view.setFocus()
 
     def loadGame(self) ->None:

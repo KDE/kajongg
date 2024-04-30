@@ -656,7 +656,7 @@ def scoreGame() ->Optional[ScoringGame]:
         return None
     selected = gameSelector.selectedGame
     gameSelector.close()
-    if selected is not None:
+    if selected:
         return cast(ScoringGame, ScoringGame.loadFromDB(selected))
     selectDialog = SelectPlayers()
     if not selectDialog.exec():
