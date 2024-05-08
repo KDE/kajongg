@@ -349,7 +349,7 @@ msgstr "Mostra la barra d'&eines"
 
 #: src/kdestub.py:355
 msgid "Configure Tool&bars..."
-msgstr "Configura les &barres d'eines..."
+msgstr "Configura les &barres d'eines…"
 
 #: src/kdestub.py:357
 msgid "Configure toolbars"
@@ -357,7 +357,7 @@ msgstr "Configura les barres d'eines"
 
 #: src/kdestub.py:364
 msgid "Configure &Kajongg..."
-msgstr "Configura &Kajongg..."
+msgstr "Configura &Kajongg…"
 
 #: src/kdestub.py:366 src/kdestub.py:1202
 msgid "Configure"
