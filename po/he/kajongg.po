@@ -1,209 +1,206 @@
-# Translation of kajongg.pot into esperanto.
-# Copyright (C) 2009 Free Software Foundation, Inc.
-# Axel Rousseau <axel@esperanto-jeunes.org>, 2009.
-# Oliver Kellogg <olivermkellogg@gmail.com>, 2023.
+# Copyright (C) 2024 This file is copyright:
+# This file is distributed under the same license as the kajongg package.
 #
+# SPDX-FileCopyrightText: 2024 Yaron Shahrabani <sh.yaron@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-05-01 00:36+0000\n"
-"PO-Revision-Date: 2024-03-27 09:18+0100\n"
-"Last-Translator: Oliver Kellogg <olivermkellogg@gmail.com>\n"
-"Language-Team: esperanto <kde-i18n-eo@kde.org>\n"
-"Language: eo\n"
+"PO-Revision-Date: 2024-05-15 22:33+0300\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
+"Language-Team: צוות התרגום של KDE ישראל\n"
+"Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: translate-po (https://github.com/zcribe/translate-po)\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 24.02.2\n"
 
 msgid "Preview"
-msgstr "Antaŭrigardo"
+msgstr "תצוגה מקדימה"
 
 msgid "Properties"
-msgstr "Ecoj"
+msgstr "מאפיינים"
 
 msgid "Author:"
-msgstr "Aŭtoro:"
+msgstr "יוצר/ת:"
 
 msgid "Contact:"
-msgstr "Kontakto:"
+msgstr "פרטי קשר:"
 
 msgid "Description:"
-msgstr "Priskribo:"
+msgstr "תיאור:"
 
 msgctxt "kajongg"
 msgid "Game"
-msgstr "Ludo"
+msgstr "משחק"
 
 msgid "View"
-msgstr "Vido"
+msgstr "תצוגה"
 
 msgid "Toolbar"
-msgstr "Ilobreto"
+msgstr "סרגל כלים"
 
 #: src/background.py:71 src/tileset.py:50
 msgid "file <filename>%1</filename> contains no valid SVG"
-msgstr "dosiero <filename>%1</filename> enhavas neniun validan SVG"
+msgstr "הקובץ <filename>%1</filename> לא מכיל SVG תקני"
 
 #: src/board.py:315
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
 msgid "hjklHJKL"
-msgstr "hjklHJKL"
+msgstr "יחלךHJKL"
 
 #: src/board.py:365
 msgid "Choose from"
-msgstr "Elektu el"
+msgstr "בחירה מבין"
 
 #: src/chat.py:51
 msgid "Time"
-msgstr "Tempo"
+msgstr "זמן"
 
 #: src/chat.py:51 src/playerlist.py:86
 msgid "Player"
-msgstr "Ludanto"
+msgstr "שחקן"
 
 #: src/chat.py:51
 msgid "Message"
-msgstr "Mesaĝo"
+msgstr "הודעה"
 
 #: src/chat.py:124
 msgid "Chat on table %1 at %2"
-msgstr "Babilado sur la tablo %1 ĉe %2"
+msgstr ""
 
 #: src/client.py:69
 msgctxt "table status"
 msgid "Suspended"
-msgstr "Nuligita"
+msgstr "מושהה"
 
 #: src/client.py:74
 msgctxt "table status"
 msgid "Running"
-msgstr "Ruliĝas"
+msgstr "פעיל"
 
 #: src/client.py:75
 msgctxt "table status"
 msgid "New"
-msgstr "Nova"
+msgstr "חדש"
 
 #: src/configdialog.py:47
 msgid "Show tile shadows"
-msgstr "Montru kahelajn ombrojn"
+msgstr "הצגת צלליות אריחים"
 
 #: src/configdialog.py:50
 msgid "Rearrange undisclosed tiles to melds"
-msgstr "Reordigu sekretajn kahelojn al kunfandiĝoj"
+msgstr ""
 
 #: src/configdialog.py:53
 msgid "Show only possible actions"
-msgstr "Montru nur eblajn agojn"
+msgstr "להציג רק אפשרויות זמינות"
 
 #: src/configdialog.py:56
 msgid "Propose what to do"
-msgstr "Proponu kion fari"
+msgstr "להציע מה לעשות"
 
 #: src/configdialog.py:62
 msgid "Animation speed:"
-msgstr "Animacia rapideco:"
+msgstr "מהירות הנפשה:"
 
 #: src/configdialog.py:66
 msgid "Use sounds if available"
-msgstr "Uzu sonojn se disponeblas"
+msgstr "להשתמש בצלילים אם אפשר"
 
 #: src/configdialog.py:69
 msgid "Let others hear my voice"
-msgstr "Lasu aliajn aŭdi mian voĉon"
+msgstr "לאפשר לאחרים לשמוע אותי"
 
 #: src/configdialog.py:103
 msgctxt "kajongg"
 msgid "Play"
-msgstr "Ludi"
+msgstr "משחק"
 
 #: src/configdialog.py:106
 msgid "Tiles"
-msgstr "Tegoloj"
+msgstr "אריחים"
 
 #: src/configdialog.py:109
 msgid "Backgrounds"
-msgstr "Fonoj"
+msgstr "רקעים"
 
 #: src/deferredutil.py:272 src/deferredutil.py:436
 msgid "The game server lost connection to player %1"
-msgstr "La ludservilo perdis konekton al ludanto %1"
+msgstr "שרת המשחק איבד את החיבור לשחקן %1"
 
 #: src/deferredutil.py:275
 msgid ""
 "Error for player %1: %2\n"
 "%3"
 msgstr ""
-"Eraro por ludanto %1: %2\n"
+"שגיאה לשחקן %1:‏ %2\n"
 "%3"
 
 #: src/differ.py:71
 msgctxt "Kajongg"
 msgid "Rule"
-msgstr "Regulo"
+msgstr "כלל"
 
 #: src/differ.py:126
 msgctxt "@title:window"
 msgid "Compare"
-msgstr "Kompari"
+msgstr "השוואה"
 
 #: src/differ.py:169 src/differ.py:171
 msgctxt "Kajongg-Rule"
 msgid "not defined"
-msgstr "ne difinita"
+msgstr "לא מוגדר"
 
 #: src/game.py:558
 msgid "Score computed manually"
-msgstr "Poentaro komputita permane"
+msgstr "הניקוד חושב ידנית"
 
 #: src/game.py:655
 msgid "Player %1 not known"
-msgstr "Ludanto %1 ne konata"
+msgstr "שחקן %1 לא מוכר"
 
 #: src/game.py:1082
 msgid "Short living wall: Tile is invisible, hence dangerous"
-msgstr "Mallonga viva muro: Kahelo estas nevidebla, do danĝera"
+msgstr ""
 
 #: src/games.py:94 src/playerlist.py:63 src/tables.py:66
 msgid "Players"
-msgstr "Ludantoj"
+msgstr "שחקנים"
 
 #: src/games.py:94
 msgid "Started"
-msgstr "Komenciĝis"
+msgstr ""
 
 #: src/games.py:106
 msgctxt "@title:window"
 msgid "Games"
-msgstr "Ludoj"
+msgstr "משחקים"
 
 #: src/games.py:123
 msgctxt "start a new game"
 msgid "&New"
-msgstr "&Nova"
+msgstr "&חדש"
 
 #: src/games.py:127
 msgid "&Load"
-msgstr "&Ŝargi"
+msgstr "&טעינה"
 
 #: src/games.py:131 src/playerlist.py:53
 msgid "&Delete"
-msgstr "&Forigi"
+msgstr "מ&חיקה"
 
 #: src/games.py:135
 msgid "Show only pending games"
-msgstr "Montru nur pritraktatajn ludojn"
+msgstr "להציג משחקים ממתינים בלבד"
 
 #: src/games.py:237
 msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
 msgstr ""
-"Ĉu vi vere volas forigi <numid>%1</numid> ludojn?<br>Ĉi tio estos "
-"definitiva, vi ne povas nuligi ĝin per la nuligi butonon"
 
 #: src/guiutil.py:146 src/kdestub.py:129 src/kdestub.py:132
 msgid "Kajongg"
@@ -211,600 +208,583 @@ msgstr "Kajongg"
 
 #: src/humanclient.py:65
 msgid "Which chow do you want to expose?"
-msgstr "Kiun ĉaŭon vi volas elmontri?"
+msgstr ""
 
 #: src/humanclient.py:103
 msgid "Which kong do you want to declare?"
-msgstr "Kiun kongon vi volas deklari?"
+msgstr ""
 
 #: src/humanclient.py:170
 msgid "Choose"
-msgstr "Elektu"
+msgstr "בחירה"
 
 #: src/humanclient.py:380
 msgid "You cannot say %1"
-msgstr "Vi ne povas diri %1"
+msgstr ""
 
 #: src/humanclient.py:605
 msgid "Player %1 has left the table"
-msgstr "Ludanto %1 forlasis la tablon"
+msgstr ""
 
 #: src/humanclient.py:668
 msgid ""
 "The game on table <numid>%1</numid> can begin. Are you ready to play now?"
 msgstr ""
-"La ludo sur tablo <numid>%1</numid> povas komenciĝi. Ĉu vi pretas ludi nun?"
 
 #: src/humanclient.py:688
 msgid "Ready for next hand?"
-msgstr "Preta por la sekva mano?"
+msgstr ""
 
 #: src/humanclient.py:962
 msgid "The connection to the server %1 broke, please try again later."
-msgstr "La konekto al la servilo %1 rompiĝis, bonvolu provi denove poste."
+msgstr ""
 
 #: src/kajongg.py:81 src/kdestub.py:1086
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
-msgstr "Mah Jongg - la antikva ĉina tabulludo por 4 ludantoj"
+msgstr ""
 
 #: src/kajongg.py:85
 msgid "all robots play with visible concealed tiles"
-msgstr "ĉiuj robotoj ludas per videblaj kaŝitaj kaheloj"
+msgstr ""
 
 #: src/kajongg.py:86
 msgid "start with demo mode"
-msgstr "komencu kun demo-reĝimo"
+msgstr ""
 
 #: src/kajongg.py:87
 msgid "login to HOST"
-msgstr "ensalutu al HOST"
+msgstr ""
 
 #: src/kajongg.py:88
 msgid "start new TABLE"
-msgstr "komenci novan TABLE"
+msgstr ""
 
 #: src/kajongg.py:89
 msgid "join TABLE"
-msgstr "join al TABLE"
+msgstr ""
 
 #: src/kajongg.py:90
 msgid "use RULESET without asking"
-msgstr "uzu RULESET sen demandi"
+msgstr ""
 
 #: src/kajongg.py:91
 msgid "prefer PLAYER for next login"
-msgstr "preferu PLAYER por venonta ensaluto"
+msgstr ""
 
 #: src/kajongg.py:92
 msgid "use AI variant for human player in demo mode"
-msgstr "uzu AI-variaĵon por homa ludanto en demo-reĝimo"
+msgstr ""
 
 #: src/kajongg.py:93
 msgid "write statistics to CSV"
-msgstr "skribi statistikojn al CSV"
+msgstr ""
 
 #: src/kajongg.py:94
 msgid "show all available rulesets"
-msgstr "montri ĉiujn disponeblajn regulojn"
+msgstr ""
 
 #: src/kajongg.py:95
 msgid "for testing purposes: Initializes the random generator"
-msgstr "por testoceloj: Pravalorizas la hazardan generatoron"
+msgstr ""
 
 #: src/kajongg.py:97
 msgid "show no graphical user interface. Intended only for testing"
-msgstr "montri neniun grafikan uzantinterfacon. Destinita nur por testado"
+msgstr ""
 
 #: src/kajongg.py:99
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
 msgstr ""
-"uzi dediĉitan servilon jam rulantan kaj aŭskultantan sur SOCKET. Destinita "
-"nur por testado"
 
 #: src/kajongg.py:101
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
 msgstr ""
-"uzi dediĉitan servilon jam rulantan kaj aŭskultantan sur PORT. Destinita nur "
-"por testado"
 
 #: src/kdestub.py:269
 msgid "&OK"
-msgstr "B&one"
+msgstr "&אישור"
 
 #: src/kdestub.py:271
 msgid "&Apply"
-msgstr "&Apliki"
+msgstr "ה&חלה"
 
 #: src/kdestub.py:273
 msgid "&Cancel"
-msgstr "&Rezigni"
+msgstr "&ביטול"
 
 #: src/kdestub.py:275 src/kdestub.py:460
 msgid "&Help"
-msgstr "&Helpo"
+msgstr "ע&זרה"
 
 #: src/kdestub.py:278
 msgid "&Defaults"
-msgstr "&Defaŭltoj"
+msgstr "&ברירות מחדל"
 
 #: src/kdestub.py:343
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
-msgstr "Montri St&atobreton"
+msgstr "הצגת סרגל &מצב"
 
 #: src/kdestub.py:349
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
-msgstr "Montri illis&telon"
+msgstr "ה&צגת סרגל כלים"
 
 #: src/kdestub.py:355
 msgid "Configure Tool&bars..."
-msgstr "Agordi Il&bretojn..."
+msgstr "הגדרת &סרגלי כלים…"
 
 #: src/kdestub.py:357
 msgid "Configure toolbars"
-msgstr "Agordi ilbretojn"
+msgstr "הגדרת סרגלי כלים"
 
 #: src/kdestub.py:364
 msgid "Configure &Kajongg..."
-msgstr "Agordi &Kajongg..."
+msgstr "ה&גדרת Kajongg…"
 
 #: src/kdestub.py:366 src/kdestub.py:1202
 msgid "Configure"
-msgstr "Agordi"
+msgstr "הגדרה"
 
 #: src/kdestub.py:456
 msgid "&Game"
-msgstr "&Ludo"
+msgstr "מ&שחק"
 
 #: src/kdestub.py:457
 msgid "&View"
-msgstr "&Vido"
+msgstr "ת&צוגה"
 
 #: src/kdestub.py:458
 msgid "&Settings"
-msgstr "&Agordoj"
+msgstr "ה&גדרות"
 
 #: src/kdestub.py:466
 msgctxt "@action:inmenu"
 msgid "&Help"
-msgstr "&Helpo"
+msgstr "ע&זרה"
 
 #: src/kdestub.py:469 src/kdestub.py:848
 msgid "Switch Application Language"
-msgstr "Ŝaltu Aplikan Lingvon"
+msgstr "החלפת שפת היישום"
 
 #: src/kdestub.py:473
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
-msgstr "Pri &Kajongg"
+msgstr "&על Kajongg"
 
 #: src/kdestub.py:853
 msgid "Please choose the language which should be used for this application:"
-msgstr "Bonvolu elekti la lingvon, kiu devus esti uzata por ĉi tiu aplikaĵo:"
+msgstr ""
 
 #: src/kdestub.py:872
 msgid "Add Fallback Language"
-msgstr "Aldoni Retrodefaŭltan Lingvon"
+msgstr ""
 
 #: src/kdestub.py:884
 msgid "Primary language:"
-msgstr "Ĉefa lingvo:"
+msgstr ""
 
 #: src/kdestub.py:884
 msgid "Fallback language:"
-msgstr "Rezerva lingvo:"
+msgstr ""
 
 #: src/kdestub.py:890
 msgid "Remove"
-msgstr "Forpreni"
+msgstr "הסרה"
 
 #: src/kdestub.py:894
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr ""
-"Ĉi tiu estas la ĉefa aplika lingvo, kiu estos uzata unue, antaŭ iuj aliaj "
-"lingvoj."
 
 #: src/kdestub.py:896
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
 msgstr ""
-"Ĉi tiu estas la lingvo kiu estos uzata se iuj antaŭaj lingvoj ne enhavas "
-"taŭgan tradukon."
 
 #: src/kdestub.py:1026
 msgid "About Kajongg"
-msgstr "Pri Kajongg"
+msgstr "על Kajongg"
 
 #: src/kdestub.py:1049
 msgid "Version: %1"
-msgstr "Versio: %1"
+msgstr "גרסה: %1"
 
 #: src/kdestub.py:1050
 msgid "Protocol version %1"
-msgstr "Protokola versio %1"
+msgstr "פרוטוקול בגרסת %1"
 
 #: src/kdestub.py:1053
 msgid "Original author"
-msgstr "Origina aŭtoro"
+msgstr "יוצר מקורי"
 
 #: src/kdestub.py:1060
 msgid "KDE Frameworks (not installed or not usable)"
-msgstr "KDE-Frameworks (ne instalitaj aŭ ne uzeblaj)"
+msgstr ""
 
 #: src/kdestub.py:1066
 msgctxt "kajongg"
 msgid "Using versions %1"
-msgstr "Uzante versiojn %1"
+msgstr ""
 
 #: src/kdestub.py:1087
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
 msgstr ""
-"Ĉi tiu estas la klasika Mah Jongg por kvar ludantoj. Se vi serĉas Mah Jongg "
-"solitaire bonvolu uzi la aplikaĵon kmahjongg."
 
 #: src/kdestub.py:1104
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
 msgstr ""
-"Bonvolu uzi <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> por "
-"raporti erarojn."
 
 #: src/kdestub.py:1109
 msgid "Authors:"
-msgstr "Aŭtoroj:"
+msgstr "יוצרים:"
 
 #: src/kdestub.py:1155
 msgid "License Agreement"
-msgstr "Licenca Interkonsento"
+msgstr "הסכם רישוי"
 
 #: src/kdestub.py:1404
 msgid "Configure Toolbars"
-msgstr "Agordi Ilobretojn"
+msgstr "הגדרת סרגלי כלים"
 
 #: src/kdestub.py:1406
 msgid "A&vailable actions:"
-msgstr "Ha&veblaj agoj:"
+msgstr "פעולות &זמינות:"
 
 #: src/kdestub.py:1417
 msgid "Curr&ent actions:"
-msgstr "Aktu&alaj agoj:"
+msgstr "פעולות &נוכחיות:"
 
 #: src/login.py:177
 msgid "trying to start local server %1"
-msgstr "provante lanĉi lokan servilon %1"
+msgstr ""
 
 #: src/login.py:188 src/login.py:636
 msgid "removed stale socket <filename>%1</filename>"
-msgstr "forigita malnoviĝinta ingo <filename>%1</filename>"
+msgstr ""
 
 #: src/login.py:208
 msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
-msgstr "startigis la lokan kajongg-servilon: pid=<numid>%1</numid> %2"
+msgstr ""
 
 #: src/login.py:251
 msgctxt "kajongg"
 msgid "Login"
-msgstr "Ensaluti"
+msgstr "כניסה"
 
 #: src/login.py:299 src/login.py:405
 msgid "Game server:"
-msgstr "Ludservilo:"
+msgstr "שרת משחק:"
 
 #: src/login.py:302 src/login.py:407
 msgid "Username:"
-msgstr "Uzantnomo:"
+msgstr "שם משתמש:"
 
 #: src/login.py:305 src/login.py:410
 msgid "Password:"
-msgstr "Pasvorto:"
+msgstr "סיסמה:"
 
 #: src/login.py:307
 msgctxt "kajongg"
 msgid "Ruleset:"
-msgstr "Regularo:"
+msgstr "ערכת כללים:"
 
 #: src/login.py:399
 msgctxt "@title:window"
 msgid "Create User Account"
-msgstr "Krei Uzantan Konton"
+msgstr "יצירת חשבון משתמש"
 
 #: src/login.py:413
 msgid "Repeat password:"
-msgstr "Ripetu pasvorton:"
+msgstr "הסיסמה שוב:"
 
 #: src/login.py:564
 msgid "You are already connected to server %1"
-msgstr "Vi jam estas konektita al la servilo %1"
+msgstr "כבר התחברת לשרת %1"
 
 #: src/login.py:604
 msgctxt "USER is not known on SERVER"
 msgid "%1 is not known on %2, do you want to open an account?"
-msgstr "%1 ne estas konata ĉe %2, ĉu vi volas malfermi konton?"
+msgstr ""
 
 #: src/login.py:617
 msgid "Server %1 did not answer"
-msgstr "Servilo %1 ne respondis"
+msgstr ""
 
 #: src/login.py:619
 msgid "Server %1 refused connection"
-msgstr "Servilo %1 rifuzis konekton"
+msgstr ""
 
 #: src/login.py:621
 msgid "Server %1 does not run a kajongg server"
-msgstr "Servilo %1 ne funkcias kajongg-servilon"
+msgstr ""
 
 #: src/login.py:623
 msgid "Address for server %1 cannot be found"
-msgstr "Adreso por servilo %1 ne troveblas"
+msgstr ""
 
 #: src/login.py:626
 msgid "Login to server %1 failed: You have no network connection"
-msgstr "Ensaluto al servilo %1 malsukcesis: Vi ne havas retkonekton"
+msgstr ""
 
 #: src/login.py:637
 msgid "Please try again"
-msgstr "Bonvolu reprovi"
+msgstr "נא לנסות שוב"
 
 #: src/mainwindow.py:511
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
-msgstr "&Poentaro de Permana Ludo"
+msgstr ""
 
 #: src/mainwindow.py:513
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
-msgstr "Permana Ludo"
+msgstr ""
 
 #: src/mainwindow.py:516
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
-msgstr "&Poentigi manan ludon."
+msgstr ""
 
 #: src/mainwindow.py:518
 msgctxt "@action:intoolbar"
 msgid "&Play"
-msgstr "&Ludi"
+msgstr ""
 
 #: src/mainwindow.py:521
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
-msgstr "Komenci novan ludon."
+msgstr ""
 
 #: src/mainwindow.py:523
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
-msgstr "Mald&aŭrigi Ludon"
+msgstr ""
 
 #: src/mainwindow.py:527
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
-msgstr "Ĉesigi la nunan ludon."
+msgstr ""
 
 #: src/mainwindow.py:529
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
-msgstr "&Forlasi Kajongg"
+msgstr ""
 
 #: src/mainwindow.py:532
 msgctxt "@action:intoolbar"
 msgid "&Players"
-msgstr "Lu&dantoj"
+msgstr ""
 
 #: src/mainwindow.py:535
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
-msgstr "difinu viajn ludantojn."
+msgstr ""
 
 #: src/mainwindow.py:537
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
-msgstr "&Regularoj"
+msgstr ""
 
 #: src/mainwindow.py:540
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
-msgstr "personecigi regulojn."
+msgstr ""
 
 #: src/mainwindow.py:544
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
-msgstr "Ŝanĝi &Vidan Angulon"
+msgstr ""
 
 #: src/mainwindow.py:545
 msgctxt "@action:intoolbar"
 msgid "Angle"
-msgstr "Angulo"
+msgstr ""
 
 #: src/mainwindow.py:548
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
-msgstr "Ŝanĝi la vidan aspekton de la kaheloj."
+msgstr ""
 
 #: src/mainwindow.py:552
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
-msgstr "Plenekrana Reĝim&o"
+msgstr ""
 
 #: src/mainwindow.py:555
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
-msgstr "&Poentotabelo"
+msgstr ""
 
 #: src/mainwindow.py:557
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
-msgstr "&Poentoj"
+msgstr ""
 
 #: src/mainwindow.py:559
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
-msgstr "Montri aŭ kaŝi la poentartabelon por la nuna ludo."
+msgstr ""
 
 #: src/mainwindow.py:561
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
-msgstr "&Klarigi Poentojn"
+msgstr ""
 
 #: src/mainwindow.py:562
 msgctxt "@action:intoolbar"
 msgid "&Explain"
-msgstr "&Klarigi"
+msgstr ""
 
 #: src/mainwindow.py:564
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
-msgstr "Klarigi la poentadon por ĉiuj ludantoj en la nuna ludo."
+msgstr ""
 
 #: src/mainwindow.py:566
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
-msgstr "&Demonstra Reĝimo"
+msgstr ""
 
 #: src/mainwindow.py:569
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr ""
-"Lasi la komputilon transpreni por vi. Komenci novan lokan ludon se necese."
 
 #: src/mainwindow.py:571
 msgid "C&hat"
-msgstr "&Babili"
+msgstr ""
 
 #: src/mainwindow.py:574
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
-msgstr "Babilu kun la aliaj ludantoj."
+msgstr ""
 
 #: src/message.py:262
 msgid "saying %1 violates Original Call"
-msgstr "dirante %1 malobservas Originan Vokon"
+msgstr ""
 
 #: src/message.py:275
 msgid ""
 "claiming %1 is dangerous because you will have to discard a dangerous tile"
-msgstr "aserti %1 estas danĝera ĉar vi devos forĵeti danĝeran kahelon"
+msgstr ""
 
 #: src/message.py:280
 msgid ""
 "claiming %1 for %2 is dangerous because you will have to discard a dangerous "
 "tile"
-msgstr "aserti %1 por %2 estas danĝera ĉar vi devos forĵeti danĝeran kahelon"
+msgstr ""
 
 #: src/message.py:283
 msgid "You may say %1"
-msgstr "Vi povas diri %1"
+msgstr ""
 
 #: src/message.py:293
 msgctxt "kajongg"
 msgid "Pung"
-msgstr "Pung"
+msgstr ""
 
 #: src/message.py:294
 msgctxt "kajongg game dialog:Key for Pung"
 msgid "P"
-msgstr "P"
+msgstr ""
 
 #: src/message.py:313
 msgctxt "kajongg"
 msgid "Kong"
-msgstr "Kong"
+msgstr ""
 
 #: src/message.py:314
 msgctxt "kajongg game dialog:Key for Kong"
 msgid "K"
-msgstr "K"
+msgstr ""
 
 #: src/message.py:340
 msgid "saying Kong for %1 violates Original Call"
-msgstr "dirante Kong por %1 malobservas Originan Vokon"
+msgstr ""
 
 #: src/message.py:344
 msgid "You may say Kong for %1"
-msgstr "Vi povas diri Kong por %1"
+msgstr ""
 
 #: src/message.py:359
 msgctxt "kajongg"
 msgid "Chow"
-msgstr "Chow"
+msgstr ""
 
 #: src/message.py:360
 msgctxt "kajongg game dialog:Key for Chow"
 msgid "C"
-msgstr "C"
+msgstr ""
 
 #: src/message.py:394
 msgctxt "kajongg"
 msgid "Mah Jongg"
-msgstr "Mah Jongg"
+msgstr ""
 
 #: src/message.py:395
 msgctxt "kajongg game dialog:Key for Mah Jongg"
 msgid "M"
-msgstr "M"
+msgstr ""
 
 #: src/message.py:403
 msgid "Press here and you win"
-msgstr "Premu ĉi tie kaj vi gajnas"
+msgstr ""
 
 #: src/message.py:418
 msgctxt "kajongg"
 msgid "Original Call"
-msgstr "Origina Voko"
+msgstr ""
 
 #: src/message.py:419
 msgctxt "kajongg game dialog:Key for Original Call"
 msgid "O"
-msgstr "O"
+msgstr ""
 
 #: src/message.py:435
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
-msgstr "forĵeti %1 kaj deklari Originan Vokon igas ĉi tiun manon negajnebla"
+msgstr ""
 
 #: src/message.py:439
 msgid ""
 "Discard a tile, declaring Original Call meaning you need only one tile to "
 "complete the hand and will not alter the hand in any way (except bonus tiles)"
 msgstr ""
-"Forĵetu kahelon, deklarante Originan Vokon, kio signifas, ke vi bezonas nur "
-"unu kahelon por kompletigi la manon kaj neniel ŝanĝos la manon (krom bonusaj "
-"kaheloj)"
 
 #: src/message.py:465
 msgctxt "kajongg"
 msgid "Discard"
-msgstr "Forigi"
+msgstr ""
 
 #: src/message.py:466
 msgctxt "kajongg game dialog:Key for Discard"
 msgid "D"
-msgstr "D"
+msgstr ""
 
 #: src/message.py:483
 msgid "discarding %1 violates Original Call"
-msgstr "forĵeti %1 malobservas Originan Vokon"
+msgstr ""
 
 #: src/message.py:486
 msgid "discarding %1 is Dangerous Game"
-msgstr "forĵeti %1 estas Danĝera Ludo"
+msgstr ""
 
 #: src/message.py:489
 msgid "discard the least useful tile"
-msgstr "forĵeti la malplej utilan kahelon"
+msgstr ""
 
 #: src/message.py:569
 msgid "%1 is not ready to start the game"
-msgstr "%1 ne pretas komenci la ludon"
+msgstr ""
 
 #: src/message.py:608
 msgid "Kajongg <numid>%1</numid>"
@@ -813,181 +793,169 @@ msgstr "Kajongg <numid>%1</numid>"
 #: src/message.py:694
 msgctxt "kajongg"
 msgid "Violates Original Call"
-msgstr "Malobservas Originan Vokon"
+msgstr "מפר את הקריאה המקורית"
 
 #: src/message.py:837
 msgctxt "kajongg"
 msgid "Dangerous Game"
-msgstr "Danĝera Ludo"
+msgstr "משחק מסוכן"
 
 #: src/message.py:852
 msgctxt "kajongg"
 msgid "No Choice"
-msgstr "Ne Elekto"
+msgstr "אין בחירה"
 
 #: src/message.py:915
 msgctxt "kajongg"
 msgid "OK"
-msgstr "Bone"
+msgstr "אישור"
 
 #: src/message.py:916
 msgctxt "kajongg game dialog:Key for OK"
 msgid "O"
-msgstr "O"
+msgstr "א"
 
 #: src/message.py:920
 msgid "Confirm that you saw the message"
-msgstr "Konfirmu, ke vi vidis la mesaĝon"
+msgstr "נא לאשר שראית את ההודעה"
 
 #: src/message.py:929
 msgctxt "kajongg"
 msgid "No Claim"
-msgstr "Neniu Aserto"
+msgstr ""
 
 #: src/message.py:930
 msgctxt "kajongg game dialog:Key for No claim"
 msgid "N"
-msgstr "N"
+msgstr ""
 
 #: src/message.py:934
 msgid "You cannot or do not want to claim this tile"
-msgstr "Vi ne povas aŭ ne volas postuli ĉi tiun kahelon"
+msgstr ""
 
 #: src/mjresource.py:88
 msgid ""
 "cannot find any %1 in the following directories, is libkmahjongg installed?"
 msgstr ""
-"ne povas trovi %1 en la sekvaj dosierujoj, ĉu libkmahjongg estas instalita?"
 
 #: src/mjresource.py:112
 msgid "cannot find %1, using default"
-msgstr "ne povas trovi %1, uzante defaŭltan"
+msgstr ""
 
 #: src/mjresource.py:127
 msgid "unknown name"
-msgstr "nekonata nomo"
+msgstr ""
 
 #: src/mjresource.py:128
 msgid "unknown author"
-msgstr "nekonata aŭtoro"
+msgstr ""
 
 #: src/mjresource.py:131
 msgid "no description available"
-msgstr "neniu priskribo havebla"
+msgstr ""
 
 #: src/mjresource.py:134
 msgid "no E-Mail address available"
-msgstr "neniu Retpoŝta adreso havebla"
+msgstr ""
 
 #: src/player.py:726
 msgid "%1 claiming MahJongg: She does not really have tile %2"
-msgstr "%1 asertante MahJongg: Ŝi vere ne havas kahelon %2"
+msgstr ""
 
 #: src/player.py:735
 msgid ""
 "%1 claiming MahJongg: She did not pass all concealed tiles to the server"
 msgstr ""
-"%1 asertante MahJongg: Ŝi ne transdonis ĉiujn kaŝitajn kahelojn al la servilo"
 
 #: src/player.py:856
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
-msgstr "Ludanto %1 havas 3 aŭ 4 elmontritajn kunfandaĵojn, ĉiuj estas verdaj"
+msgstr ""
 
 #: src/player.py:864
 msgid "Player %1 may try a True Color Game"
-msgstr "Ludanto %1 povas provi Veran Koloran Ludon"
+msgstr ""
 
 #: src/player.py:867
 msgid "Player %1 may try an All Terminals Game"
-msgstr "Ludanto %1 povas provi All Terminals Game"
+msgstr ""
 
 #: src/player.py:880
 msgid "Player %1 exposed many winds"
-msgstr "Ludanto %1 elmontris multajn ventojn"
+msgstr ""
 
 #: src/player.py:884
 msgid "Player %1 exposed many dragons"
-msgstr "Ludanto %1 elmontris multajn drakojn"
+msgstr ""
 
 #: src/playerlist.py:48
 msgctxt "define a new player"
 msgid "&New"
-msgstr "&Nova"
+msgstr ""
 
 #: src/playerlist.py:106
 msgid "Player %1 already exists"
-msgstr "Ludanto %1 jam ekzistas"
+msgstr ""
 
 #: src/playerlist.py:116
 msgid "Error while adding player %1: %2"
-msgstr "Eraro dum aldono de ludanto %1: %2"
+msgstr ""
 
 #: src/playerlist.py:171
 msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
 msgstr ""
-"Estas %1 finitaj kaj %2 nefinitaj ludoj por %3, ĉu forviŝi %3 tamen? Ĉi tio "
-"ankaŭ forigos ĉiujn ludojn luditajn de %3!"
 
 #: src/predefined.py:29
 msgid "Classical Chinese standard"
-msgstr "Klasika ĉina normo"
+msgstr ""
 
 #: src/predefined.py:35
 msgid "Classical Chinese"
-msgstr "Klasika ĉino"
+msgstr ""
 
 #: src/predefined.py:41
 msgid "Last Tile Taken from Dead Wall"
-msgstr "Lasta Kahelo Prenita de Dead Wall"
+msgstr ""
 
 #: src/predefined.py:43
 msgid ""
 "The dead wall is also called kong box: The last 16 tiles of the wall used as "
 "source of replacement tiles"
 msgstr ""
-"La morta muro ankaŭ estas nomita kong-skatolo: La lastaj 16 kaheloj de la "
-"muro uzataj kiel fonto de anstataŭaj kaheloj"
 
 #: src/predefined.py:46
 msgid "Last Tile is Last Tile of Wall"
-msgstr "Lasta Kahelo estas Lasta Kahelo de Muro"
+msgstr ""
 
 #: src/predefined.py:48
 msgid ""
 "Winner said Mah Jong with the last tile taken from the living end of the wall"
 msgstr ""
-"Venkinto diris Mah Jong kun la lasta kahelo prenita de la vivanta fino de la "
-"muro"
 
 #: src/predefined.py:50
 msgid "Last Tile is Last Tile of Wall Discarded"
-msgstr "Lasta Kahelo estas Lasta Kahelo de Muro Forĵetita"
+msgstr ""
 
 #: src/predefined.py:52
 msgid ""
 "Winner said Mah Jong by claiming the last tile taken from the living end of "
 "the wall, discarded by another player"
 msgstr ""
-"Gajninto diris Mah Jong postulante la lastan kahelon prenitan de la vivanta "
-"fino de la muro, forĵetita fare de alia ludanto."
 
 #: src/predefined.py:55
 msgid "Robbing the Kong"
-msgstr "Ŝtelante la Kong"
+msgstr ""
 
 #: src/predefined.py:56
 msgid ""
 "Winner said Mah Jong by claiming the 4th tile of a kong another player just "
 "declared"
 msgstr ""
-"Venkinto diris Mah Jong postulante la 4-an kahelon de kong, kiun alia "
-"ludanto ĵus deklaris"
 
 #: src/predefined.py:59
 msgid "Mah Jongg with Original Call"
-msgstr "Mah Jongg kun Origina Voko"
+msgstr ""
 
 #: src/predefined.py:62
 msgid ""
@@ -995,13 +963,10 @@ msgid ""
 "she needs only one tile to complete the hand and announces she will not "
 "alter the hand in any way (except bonus tiles)"
 msgstr ""
-"Ĵus antaŭ la unua forĵeto, ludanto povas deklari Original Call signifante ke "
-"ŝi bezonas nur unu kahelon por kompletigi la manon kaj sciigas ke ŝi ne "
-"ŝanĝos la manon iel ajn (krom bonuskaheloj)"
 
 #: src/predefined.py:65
 msgid "Dangerous Game"
-msgstr "Danĝera Ludo"
+msgstr ""
 
 #: src/predefined.py:66
 msgid ""
@@ -1009,740 +974,710 @@ msgid ""
 "to win is declared to be dangerous, and if that tile actually makes somebody "
 "win, the discarder pays the winner for all"
 msgstr ""
-"En kelkaj situacioj forĵeti kahelon kiu havas altan ŝancon helpi iun venki "
-"estas deklarita kiel danĝera, kaj se tiu kahelo efektive igas iun venki, la "
-"forĵetinto pagas la gajninton por ĉio."
 
 #: src/predefined.py:70
 msgid "Twofold Fortune"
-msgstr "Duobla Fortuno"
+msgstr ""
 
 #: src/predefined.py:71
 msgid ""
 "Kong after Kong: Declare Kong and a second Kong with the replacement tile "
 "and Mah Jong with the second replacement tile"
 msgstr ""
-"Kong post Kong: Deklaru Kong kaj duan Kong kun la anstataŭiga kahelo kaj Mah "
-"Jong kun la dua anstataŭiga kahelo"
 
 #: src/predefined.py:75
 msgid "Blessing of Heaven"
-msgstr "Beno de Ĉielo"
+msgstr ""
 
 #: src/predefined.py:76
 msgid "East says Mah Jong with the unmodified dealt tiles"
-msgstr "Orienta diras Mah Jong kun la nemodifitaj kaheloj"
+msgstr ""
 
 #: src/predefined.py:78
 msgid "Blessing of Earth"
-msgstr "Beno de la Tero"
+msgstr ""
 
 #: src/predefined.py:79
 msgid ""
 "South, West or North says Mah Jong with the first tile discarded by East"
 msgstr ""
-"Suda, Okcidenta aŭ Norda diras Mah Jong kun la unua kahelo forĵetita de "
-"Oriento"
 
 #: src/predefined.py:81
 msgid "East won nine times in a row"
-msgstr "Oriento venkis naŭ fojojn en vico"
+msgstr ""
 
 #: src/predefined.py:82
 msgid "If that happens, East gets a limit score and the winds rotate"
-msgstr "Se tio okazas, Orienta ricevas limpoentaron kaj la ventoj rotacias"
+msgstr ""
 
 #: src/predefined.py:87
 msgid ""
 "False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah "
 "Jongg"
 msgstr ""
-"Falsa Nomado de Forĵeto, Asertita por Mah Jongg kaj Falsa Deklaro de Mah "
-"Jongg"
 
 #: src/predefined.py:93
 msgid "Own Flower and Own Season"
-msgstr "Propra Floro kaj Propra Sezono"
+msgstr ""
 
 #: src/predefined.py:96
 msgid "All Flowers"
-msgstr "Ĉiuj Floroj"
+msgstr ""
 
 #: src/predefined.py:97
 msgid "All Seasons"
-msgstr "Ĉiuj Sezonoj"
+msgstr ""
 
 #: src/predefined.py:99
 msgid "Three Concealed Pongs"
-msgstr "Tri Kaŝitaj Pongs"
+msgstr ""
 
 #: src/predefined.py:103
 msgid "Long Hand"
-msgstr "Longa Mano"
+msgstr ""
 
 #: src/predefined.py:104
 msgid "The hand contains too many tiles"
-msgstr "La mano enhavas tro da kaheloj"
+msgstr ""
 
 #: src/predefined.py:109
 msgid "Points Needed for Mah Jongg"
-msgstr "Poentoj Bezonataj por Mah Jongg"
+msgstr ""
 
 #: src/predefined.py:113
 msgid "Minimum number of doubles needed for Mah Jongg"
-msgstr "Minimuma nombro da duobloj necesaj por Mah Jongg"
+msgstr ""
 
 #: src/predefined.py:116
 msgid "Points for a Limit Hand"
-msgstr "Poentoj por Limmano"
+msgstr ""
 
 #: src/predefined.py:120
 msgid "Play with the roof off"
-msgstr "Ludi kun la tegmento forigita"
+msgstr ""
 
 #: src/predefined.py:121
 msgid "Play with no upper scoring limit"
-msgstr "Ludu sen supra limo de poentado"
+msgstr ""
 
 #: src/predefined.py:123
 msgid "Claim Timeout"
-msgstr "Aserti Eltempiĝon"
+msgstr ""
 
 #: src/predefined.py:127
 msgid "Size of Kong Box"
-msgstr "Grandeco de Kong-Kesto"
+msgstr ""
 
 #: src/predefined.py:128
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
 msgstr ""
-"La Kong-Kesto estas uzata por anstataŭigaj kaheloj dum deklarado de kongs"
 
 #: src/predefined.py:130
 msgid "Play with Bonus Tiles"
-msgstr "Ludi kun Bonusaj Kaheloj"
+msgstr ""
 
 #: src/predefined.py:131
 msgid "Bonus tiles increase the luck factor"
-msgstr "Bonusaj kaheloj pliigas la sortfaktoron"
+msgstr ""
 
 #: src/predefined.py:133
 msgid "Minimum number of rounds in game"
-msgstr "Minimuma nombro da ĉirkaŭvojoj en ludo"
+msgstr ""
 
 #: src/predefined.py:137
 msgid "number of allowed chows"
-msgstr "nombro da permesitaj ĉaŭoj"
+msgstr ""
 
 #: src/predefined.py:138
 msgid "The number of chows a player may build"
-msgstr "La nombro da ĉaŭoj kiujn ludanto povas konstrui"
+msgstr ""
 
 #: src/predefined.py:140
 msgid "must declare calling hand"
-msgstr "devas deklari vokan manon"
+msgstr ""
 
 #: src/predefined.py:142
 msgid "Mah Jongg is only allowed after having declared to have a calling hand"
-msgstr "Mah Jongg estas permesita nur post kiam ĝi deklaris havi vokan manon"
+msgstr ""
 
 #: src/predefined.py:144
 msgid "Standard Rotation"
-msgstr "Norma Rotacio"
+msgstr ""
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr "Forĵeti kahelojn menditajn"
+msgstr ""
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr "Forĵeti kahelojn menditajn de supra maldekstro"
+msgstr ""
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr "Lasi truojn por asertitaj forĵetoj"
+msgstr ""
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
-"Nur dum forĵeto je kaheloj menditaj: Ne lokigi la sekvan forĵeton kie estis "
-"la asertita forĵeto"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
-msgstr "Lasta Kahelo Kompletigas Paron de 2..8"
+msgstr ""
 
 #: src/predefined.py:167
 msgid "Last Tile Completes Pair of Terminals or Honors"
-msgstr "Lasta Kahelo Kompletigas Paron de Terminaloj aŭ Honoroj"
+msgstr ""
 
 #: src/predefined.py:170
 msgid "Last Tile is Only Possible Tile"
-msgstr "Lasta Kahelo estas Nur Ebla Kahelo"
+msgstr ""
 
 #: src/predefined.py:174
 msgid "Won with Last Tile Taken from Wall"
-msgstr "Gajnite kun Lasta Kahelo Prenita de Muro"
+msgstr ""
 
 #: src/predefined.py:179
 msgid "Zero Point Hand"
-msgstr "Nula Punkta Mano"
+msgstr ""
 
 #: src/predefined.py:180
 msgid "The hand has 0 basis points excluding bonus tiles"
-msgstr "La mano havas 0 bazajn poentojn krom kromkaheloj"
+msgstr ""
 
 #: src/predefined.py:181
 msgid "No Chow"
-msgstr "Ne Chow"
+msgstr ""
 
 #: src/predefined.py:183
 msgid "Only Concealed Melds"
-msgstr "Nur Kaŝitaj Kunfandaĵoj"
+msgstr ""
 
 #: src/predefined.py:187
 msgid "False Color Game"
-msgstr "Falsa Kolora Ludo"
+msgstr ""
 
 #: src/predefined.py:188
 msgid ""
 "Only same-colored tiles (only bamboo/stone/character) plus any number of "
 "winds and dragons"
 msgstr ""
-"Nur samkoloraj kaheloj (nur bambuo/ŝtono/karaktero) kaj plie ajna nombro da "
-"ventoj kaj drakoj"
 
 #: src/predefined.py:191
 msgid "True Color Game"
-msgstr "Vera Kolora Ludo"
+msgstr ""
 
 #: src/predefined.py:192
 msgid "Only same-colored tiles (only bamboo/stone/character)"
-msgstr "Nur samkoloraj kaheloj (nur bambuo/ŝtono/karaktero)"
+msgstr ""
 
 #: src/predefined.py:194
 msgid "Concealed True Color Game"
-msgstr "Kaŝita Vera Kolora Ludo"
+msgstr ""
 
 #: src/predefined.py:195
 msgid "All tiles concealed and of the same suit, no honors"
-msgstr "Ĉiuj kaheloj kaŝitaj kaj de la sama kostumo, neniuj honoroj"
+msgstr ""
 
 #: src/predefined.py:197
 msgid "Only Terminals and Honors"
-msgstr "Nur Terminaloj kaj Honoroj"
+msgstr ""
 
 #: src/predefined.py:198
 msgid "Only winds, dragons, 1 and 9"
-msgstr "Nur ventoj, drakoj, 1 kaj 9"
+msgstr ""
 
 #: src/predefined.py:199
 msgid "Only Honors"
-msgstr "Nur Honoroj"
+msgstr ""
 
 #: src/predefined.py:200
 msgid "Only winds and dragons"
-msgstr "Nur ventoj kaj drakoj"
+msgstr ""
 
 #: src/predefined.py:202
 msgid "Hidden Treasure"
-msgstr "Kaŝita Trezoro"
+msgstr ""
 
 #: src/predefined.py:203
 msgid "Only hidden Pungs or Kongs, last tile from wall"
-msgstr "Nur kaŝitaj Pung-oj aŭ Kong-oj, lasta kahelo de muro"
+msgstr ""
 
 #: src/predefined.py:205
 msgid "Heads and Tails"
-msgstr "Kapoj kaj Vostoj"
+msgstr ""
 
 #: src/predefined.py:206
 msgid "Only 1 and 9"
-msgstr "Nur 1 kaj 9"
+msgstr ""
 
 #: src/predefined.py:208
 msgid "Fourfold Plenty"
-msgstr "Kvarobla Abundo"
+msgstr ""
 
 #: src/predefined.py:209
 msgid "4 Kongs"
-msgstr "4 Kongoj"
+msgstr ""
 
 #: src/predefined.py:211 src/predefined.py:429
 msgid "Three Great Scholars"
-msgstr "Tri Grandaj Akademiuloj"
+msgstr ""
 
 #: src/predefined.py:212 src/predefined.py:334
 msgid "3 Pungs or Kongs of dragons"
-msgstr "3 Reĝoj aŭ Reĝoj de drakoj"
+msgstr ""
 
 #: src/predefined.py:213
 msgid "Four Blessings Hovering over the Door"
-msgstr "Kvar Benoj Ŝvebante super la Pordo"
+msgstr ""
 
 #: src/predefined.py:215 src/predefined.py:339
 msgid "4 Pungs or Kongs of winds"
-msgstr "4 Pungoj aŭ Kongoj de ventoj"
+msgstr ""
 
 #: src/predefined.py:216
 msgid "Imperial Jade"
-msgstr "Imperia Jado"
+msgstr ""
 
 #: src/predefined.py:217
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
-msgstr "Nur verdaj kaheloj: Verda drako kaj Bambuo 2,3,4,6,8"
+msgstr ""
 
 #: src/predefined.py:218
 msgid "Gathering the Plum Blossom from the Roof"
-msgstr "Kolektante la Prunfloron de la Tegmento"
+msgstr ""
 
 #: src/predefined.py:220
 msgid "Mah Jong with stone 5 from the dead wall"
-msgstr "Mah Jong kun ŝtono 5 el la morta muro"
+msgstr ""
 
 #: src/predefined.py:222
 msgid "Plucking the Moon from the Bottom of the Sea"
-msgstr "Plukante la Lunon de la Fundo de la Maro"
+msgstr ""
 
 #: src/predefined.py:223
 msgid "Mah Jong with the last tile from the wall being a stone 1"
-msgstr "Mah Jong kun la lasta kahelo de la muro estas ŝtono 1"
+msgstr ""
 
 #: src/predefined.py:225
 msgid "Scratching a Carrying Pole"
-msgstr "Gratante Portstangon"
+msgstr ""
 
 #: src/predefined.py:226
 msgid "Robbing the Kong of bamboo 2"
-msgstr "Rabante la Kong de bambuo 2"
+msgstr ""
 
 #: src/predefined.py:232
 msgid "Standard Mah Jongg"
-msgstr "Norma Mah Jongg"
+msgstr ""
 
 #: src/predefined.py:237
 msgid "Nine Gates"
-msgstr "Naŭ Pordegoj"
+msgstr ""
 
 #: src/predefined.py:239
 msgid ""
 "A concealed hand in one color 1112345678999 plus last tile of this suit "
 "(from wall or discarded)"
 msgstr ""
-"Kaŝita mano en unu koloro 1112345678999 plus lasta kahelo de ĉi tiu kostumo "
-"(de muro aŭ forĵetita)"
 
 #: src/predefined.py:241
 msgid "Thirteen Orphans"
-msgstr "Dek tri Orfoj"
+msgstr ""
 
 #: src/predefined.py:242
 msgid ""
 "13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
 "with one of them"
 msgstr ""
-"13 ununuraj kaheloj: Ĉiuj drakoj, ventoj, 1, 9 kaj 14-a kahelo konstruante "
-"paron kun unu el ili"
 
 #: src/predefined.py:246
 msgid "Pung/Kong of Dragons"
-msgstr "Pung/Kongo de Drakoj"
+msgstr ""
 
 #: src/predefined.py:248
 msgid "Pung/Kong of Own Wind"
-msgstr "Pung/Kongo de Propra Vento"
+msgstr ""
 
 #: src/predefined.py:251
 msgid "Pung/Kong of Round Wind"
-msgstr "Pung/Kongo de Ronda Vento"
+msgstr ""
 
 #: src/predefined.py:255
 msgid "Exposed Kong"
-msgstr "Malkovrita Kong"
+msgstr ""
 
 #: src/predefined.py:258
 msgid "Exposed Kong of Terminals"
-msgstr "Malkovrita Kong de Terminaloj"
+msgstr ""
 
 #: src/predefined.py:261
 msgid "Exposed Kong of Honors"
-msgstr "Eksponita Kong de Honoroj"
+msgstr ""
 
 #: src/predefined.py:264
 msgid "Exposed Pung"
-msgstr "Malkovrita Pung"
+msgstr ""
 
 #: src/predefined.py:267
 msgid "Exposed Pung of Terminals"
-msgstr "Malkovrita Pung de Terminaloj"
+msgstr ""
 
 #: src/predefined.py:270
 msgid "Exposed Pung of Honors"
-msgstr "Eksponita Pung de Honoroj"
+msgstr ""
 
 #: src/predefined.py:274
 msgid "Concealed Kong"
-msgstr "Kaŝita Kong"
+msgstr ""
 
 #: src/predefined.py:277
 msgid "Concealed Kong of Terminals"
-msgstr "Kaŝita Kong de Terminaloj"
+msgstr ""
 
 #: src/predefined.py:280
 msgid "Concealed Kong of Honors"
-msgstr "Kaŝita Kong de Honoroj"
+msgstr ""
 
 #: src/predefined.py:283
 msgid "Concealed Pung"
-msgstr "Kaŝita Pung"
+msgstr ""
 
 #: src/predefined.py:286
 msgid "Concealed Pung of Terminals"
-msgstr "Kaŝita Pung de Terminaloj"
+msgstr ""
 
 #: src/predefined.py:289
 msgid "Concealed Pung of Honors"
-msgstr "Kaŝita Pung de Honoroj"
+msgstr ""
 
 #: src/predefined.py:292
 msgid "Pair of Own Wind"
-msgstr "Paro de Propra Vento"
+msgstr ""
 
 #: src/predefined.py:294
 msgid "Pair of Round Wind"
-msgstr "Paro de Ronda Vento"
+msgstr ""
 
 #: src/predefined.py:296
 msgid "Pair of Dragons"
-msgstr "Paro de Drakoj"
+msgstr ""
 
 #: src/predefined.py:300
 msgid "Flower"
-msgstr "Floro"
+msgstr ""
 
 #: src/predefined.py:302
 msgid "Season"
-msgstr "Sezono"
+msgstr ""
 
 #: src/predefined.py:313
 msgid "Classical Chinese DMJL"
-msgstr "Klasika ĉina DMJL"
+msgstr ""
 
 #: src/predefined.py:319
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgstr ""
-"Klasika ĉina kiel difinite fare de la Deutsche Mah Jongg Liga (DMJL) e.V."
 
 #: src/predefined.py:326
 msgid "Squirming Snake"
-msgstr "Tordiĝanta Serpento"
+msgstr ""
 
 #: src/predefined.py:327
 msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
 msgstr ""
-"Ĉiuj kaheloj de la sama koloro. Pung aŭ Kong de 1 kaj 9, paro de 2, 5 aŭ 8 "
-"kaj du Chows de la ceteraj valoroj"
 
 #: src/predefined.py:330
 msgid "Little Three Dragons"
-msgstr "Malgrandaj Tri Drakoj"
+msgstr ""
 
 #: src/predefined.py:331
 msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
-msgstr "2 Pung-oj aŭ Kong-oj de drakoj kaj 1 paro de drakoj"
+msgstr ""
 
 #: src/predefined.py:333
 msgid "Big Three Dragons"
-msgstr "Grandaj Tri Drakoj"
+msgstr ""
 
 #: src/predefined.py:336
 msgid "Little Four Joys"
-msgstr "Malgrandaj Kvar Ĝojoj"
+msgstr ""
 
 #: src/predefined.py:337
 msgid "3 Pungs or Kongs of winds and 1 pair of winds"
-msgstr "3 Pungoj aŭ Kongoj de ventoj kaj 1 paro de ventoj"
+msgstr ""
 
 #: src/predefined.py:338
 msgid "Big Four Joys"
-msgstr "Grandaj Kvar Ĝojoj"
+msgstr ""
 
 #: src/predefined.py:344
 msgid "False Naming of Discard, Claimed for Chow"
-msgstr "Falsa Nomado de Forĵeto, Asertita por Chow"
+msgstr ""
 
 #: src/predefined.py:347
 msgid "False Naming of Discard, Claimed for Pung/Kong"
-msgstr "Falsa Nomado de Forĵeto, Asertita por Pung/Kong"
+msgstr ""
 
 #: src/predefined.py:350 src/predefined.py:443
 msgid "False Declaration of Mah Jongg by One Player"
-msgstr "Falsa Deklaro de Mah Jongg de Unu Ludanto"
+msgstr ""
 
 #: src/predefined.py:353
 msgid "False Declaration of Mah Jongg by Two Players"
-msgstr "Falsa Deklaro de Mah Jongg de Du Ludantoj"
+msgstr ""
 
 #: src/predefined.py:356
 msgid "False Declaration of Mah Jongg by Three Players"
-msgstr "Falsa Deklaro de Mah Jongg de Tri Ludantoj"
+msgstr ""
 
 #: src/predefined.py:359 src/predefined.py:446
 msgid "False Naming of Discard, Claimed for Mah Jongg"
-msgstr "Falsa Nomado de Forĵeto, Asertita por Mah Jongg"
+msgstr ""
 
 #: src/predefined.py:370
 msgid "Classical Chinese BMJA"
-msgstr "Klasika ĉina BMJA"
+msgstr ""
 
 #: src/predefined.py:376
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
-msgstr "Klasika ĉina kiel difinite fare de la brita Mah-Jong Association"
+msgstr ""
 
 #: src/predefined.py:391
 msgid "Original Call"
-msgstr "Origina Voko"
+msgstr ""
 
 #: src/predefined.py:395
 msgid "Gates of Heaven"
-msgstr "Pordegoj de la Ĉielo"
+msgstr ""
 
 #: src/predefined.py:396
 msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
 msgstr ""
-"Ĉiuj kaheloj kaŝitaj de sama koloro: Valoroj 1112345678999 kun unu paro de 2 "
-"ĝis 8 (lasta kahelo de muro aŭ forĵetita)"
 
 #: src/predefined.py:399
 msgid "Wriggling Snake"
-msgstr "Svinganta Serpento"
+msgstr ""
 
 #: src/predefined.py:400
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
-msgstr "Paro de 1s kaj kuro de 2 ĝis 9 en la sama kostumo kun ĉiu el la ventoj"
+msgstr ""
 
 #: src/predefined.py:402
 msgid "Triple Knitting"
-msgstr "Triobla Trikado"
+msgstr ""
 
 #: src/predefined.py:403
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
 msgstr ""
-"Kvar aroj de tri kaheloj en la malsamaj foliokompletoj kaj paro: Neniuj "
-"Ventoj aŭ Drakoj"
 
 #: src/predefined.py:404
 msgid "Knitting"
-msgstr "Trikado"
+msgstr ""
 
 #: src/predefined.py:405
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr ""
-"7 paroj da kaheloj en iu ajn 2 el 3 foliokompletoj; neniuj Ventoj aŭ Drakoj"
 
 #: src/predefined.py:407
 msgid "All pair honors"
-msgstr "Ĉiuj paro honoroj"
+msgstr ""
 
 #: src/predefined.py:408
 msgid "7 pairs of 1s/9s/Winds/Dragons"
-msgstr "7 paroj de 1s/9s/Ventos/Drakoj"
+msgstr ""
 
 #: src/predefined.py:411
 msgid "Own Flower"
-msgstr "Propra Floro"
+msgstr ""
 
 #: src/predefined.py:412
 msgid "Own Season"
-msgstr "Propra Sezono"
+msgstr ""
 
 #: src/predefined.py:424
 msgid "Buried Treasure"
-msgstr "Entombigita Trezoro"
+msgstr ""
 
 #: src/predefined.py:425
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
-msgstr "Kaŝitaj pungoj de unu foliokompleto kun ventoj/drakoj kaj paro"
+msgstr ""
 
 #: src/predefined.py:426
 msgid "Purity"
-msgstr "Pureco"
+msgstr ""
 
 #: src/predefined.py:427
 msgid "Only same-colored tiles (no chows, dragons or winds)"
-msgstr "Nur samkoloraj kaheloj (neniuj ĉaŭoj, drakoj aŭ ventoj)"
+msgstr ""
 
 #: src/predefined.py:430
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
-msgstr "3 Reĝoj aŭ Reĝoj de drakoj plus ajna pung/kong kaj paro"
+msgstr ""
 
 #: src/predefined.py:433
 msgid "The 13 Unique Wonders"
-msgstr "La 13 Unikaj Mirindaĵoj"
+msgstr ""
 
 #: src/predefined.py:440
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
-msgstr "Falsa Nomado de Forĵeto, Asertita por Chow/Pung/Kong"
+msgstr ""
 
 #: src/predefined.py:450
 msgid "Calling for Only Honors"
-msgstr "Alvokante Nur Honorojn"
+msgstr ""
 
 #: src/predefined.py:454
 msgid "Calling for Wriggling Snake"
-msgstr "Alvokante Wriggling Snake"
+msgstr ""
 
 #: src/predefined.py:458
 msgid "Calling for Triple Knitting"
-msgstr "Alvoko por Triobla Trikado"
+msgstr ""
 
 #: src/predefined.py:462
 msgid "Calling for Gates of Heaven"
-msgstr "Alvokante Pordegojn de Ĉielo"
+msgstr ""
 
 #: src/predefined.py:465
 msgid "Calling for Knitting"
-msgstr "Vokante por Trikado"
+msgstr ""
 
 #: src/predefined.py:469
 msgid "Calling for Imperial Jade"
-msgstr "Alvokante Imperial Jade"
+msgstr ""
 
 #: src/predefined.py:473
 msgid "Calling for The 13 Unique Wonders"
-msgstr "Alvoko por La 13 Unikaj Mirindaĵoj"
+msgstr ""
 
 #: src/predefined.py:476
 msgid "Calling for Three Great Scholars"
-msgstr "Alvokante Tri Grandajn Akademiulojn"
+msgstr ""
 
 #: src/predefined.py:479
 msgid "Calling for All pair honors"
-msgstr "Vokante por Ĉiuj paro honoroj"
+msgstr ""
 
 #: src/predefined.py:483
 msgid "Calling for Heads and Tails"
-msgstr "Alvokante Kapojn kaj Vostojn"
+msgstr ""
 
 #: src/predefined.py:487
 msgid "Calling for Four Blessings Hovering over the Door"
-msgstr "Alvokante Kvar Benojn Ŝvebante super la Pordo"
+msgstr ""
 
 #: src/predefined.py:490
 msgid "Calling for Buried Treasure"
-msgstr "Alvokante Buried Treasure"
+msgstr ""
 
 #: src/predefined.py:494
 msgid "Calling for Fourfold Plenty"
-msgstr "Alvokante kvaroblan abundon"
+msgstr ""
 
 #: src/predefined.py:498
 msgid "Calling for Purity"
-msgstr "Alvokante Purecon"
+msgstr ""
 
 #: src/query.py:196
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
-msgstr "Loka Ludo"
+msgstr ""
 
 #: src/query.py:376
 msgid "Database %1 updated from schema %2 to %3"
-msgstr "Datumbazo %1 ĝisdatigita de skemo %2 al %3"
+msgstr ""
 
 #: src/rule.py:49 src/scoringdialog.py:702 src/scoringdialog.py:780
 msgid "points"
-msgstr "punktoj"
+msgstr ""
 
 #: src/rule.py:50
 msgctxt "kajongg"
 msgid "doubles"
-msgstr "duobloj"
+msgstr ""
 
 #: src/rule.py:51
 msgctxt "kajongg"
 msgid "limits"
-msgstr "limoj"
+msgstr ""
 
 #: src/rule.py:91
 msgctxt "Kajongg"
 msgid "%1 points"
-msgstr "%1 poentoj"
+msgstr ""
 
 #: src/rule.py:93
 msgctxt "Kajongg"
 msgid "%1 doubles"
-msgstr "%1 duobligas"
+msgstr ""
 
 #: src/rule.py:98
 msgctxt "Kajongg"
 msgid "%1 limits"
-msgstr "%1 limoj"
+msgstr ""
 
 #: src/rule.py:365
 msgid "Meld Rules"
-msgstr "Meld Reguloj"
+msgstr ""
 
 #: src/rule.py:366
 msgid ""
 "Meld rules are applied to single melds independent of the rest of the hand"
 msgstr ""
-"Meld-reguloj estas aplikitaj al ununuraj kunfandaĵoj sendependa de la resto "
-"de la mano"
 
 #: src/rule.py:367
 msgid "Hand Rules"
-msgstr "Manaj Reguloj"
+msgstr ""
 
 #: src/rule.py:368
 msgid "Hand rules are applied to the entire hand, for all players"
-msgstr "Manreguloj estas aplikataj al la tuta mano, por ĉiuj ludantoj"
+msgstr ""
 
 #: src/rule.py:369
 msgid "Winner Rules"
-msgstr "Reguloj de Gajninto"
+msgstr ""
 
 #: src/rule.py:370
 msgid "Winner rules are applied to the entire hand but only for the winner"
 msgstr ""
-"Gajninto-reguloj estas aplikataj al la tuta mano sed nur por la gajninto"
 
 #: src/rule.py:371
 msgid "Loser Rules"
-msgstr "Reguloj de Malgajninto"
+msgstr ""
 
 #: src/rule.py:372
 msgid "Loser rules are applied to the entire hand but only for non-winners"
 msgstr ""
-"Malgajninto-reguloj estas aplikataj al la tuta mano sed nur por ne-gajnantoj"
 
 #: src/rule.py:373
 msgid "Mah Jongg Rules"
-msgstr "Mah Jongg Reguloj"
+msgstr ""
 
 #: src/rule.py:374
 msgid "Only hands matching a Mah Jongg rule can win"
-msgstr "Nur manoj kongruantaj kun regulo de Mah Jongg povas venki"
+msgstr ""
 
 #: src/rule.py:375
 msgctxt "kajongg"
 msgid "Options"
-msgstr "Opcioj"
+msgstr ""
 
 #: src/rule.py:376
 msgid "Here we have several special game related options"
-msgstr "Ĉi tie ni havas plurajn specialajn lud-rilatajn eblojn"
+msgstr ""
 
 #: src/rule.py:377
 msgid "Penalties"
-msgstr "Punoj"
+msgstr ""
 
 #: src/rule.py:378
 msgid ""
@@ -1752,508 +1687,502 @@ msgid ""
 "you get\n"
 "into a situation where you have to pay a penalty"
 msgstr ""
-"Punoj estas aplikataj permane de la uzanto. Ili estas uzataj nur por "
-"poentado de ludoj.\n"
-"Ludante kontraŭ la komputilo aŭ tra la reto, Kajongg neniam lasos vin eniri\n"
-"en situacion kie vi devas pagi punon."
 
 #: src/rule.py:578
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
-msgstr "Kopio%1 de %2"
+msgstr ""
 
 #: src/rule.py:934
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
-msgstr "%4 havas neeblajn valorojn %2/%3 en regulo \"%1\""
+msgstr ""
 
 #: src/rule.py:1022
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
-msgstr "%1: %2 estas tro malgranda, minimuma valoro estas %3"
+msgstr ""
 
 #: src/rulesetselector.py:500
 msgctxt "@title:window"
 msgid "Customize rulesets"
-msgstr "Agordi regulojn"
+msgstr ""
 
 #: src/rulesetselector.py:519
 msgctxt "kajongg"
 msgid "Rule"
-msgstr "Regulo"
+msgstr ""
 
 #: src/rulesetselector.py:580
 msgid "C&opy"
-msgstr "K&opii"
+msgstr ""
 
 #: src/rulesetselector.py:581
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
-msgstr "Kom&pari"
+msgstr ""
 
 #: src/rulesetselector.py:582
 msgid "&Remove"
-msgstr "Fo&rpreni"
+msgstr ""
 
 #: src/rulesetselector.py:583
 msgid "&Close"
-msgstr "&Fermi"
+msgstr ""
 
 #: src/scene.py:396 src/scene.py:527
 msgid "Do you really want to abort this game?"
-msgstr "Ĉu vi vere volas ĉesigi ĉi tiun ludon?"
+msgstr ""
 
 #: src/scoring.py:60
 msgctxt "@title:window"
 msgid "Swap Seats"
-msgstr "Interŝanĝi Sidlokojn"
+msgstr ""
 
 #: src/scoring.py:62
 msgid "By the rules, %1 and %2 should now exchange their seats. "
-msgstr "Laŭ la reguloj, %1 kaj %2 nun devus interŝanĝi siajn sidlokojn."
+msgstr ""
 
 #: src/scoring.py:64
 msgid "&Exchange"
-msgstr "&Interŝanĝi"
+msgstr ""
 
 #: src/scoring.py:66
 msgid "&Keep seat"
-msgstr "&Konservi sidlokon"
+msgstr ""
 
 #: src/scoring.py:85
 msgctxt "@title:window"
 msgid "Select four players"
-msgstr "Elekti kvar ludantojn"
+msgstr ""
 
 #: src/scoring.py:332
 msgid "Move Exposed Tiles Here"
-msgstr "Movi Malkovritajn Kahelojn Ĉi tien"
+msgstr ""
 
 #: src/scoring.py:333
 msgid "Move Concealed Tiles Here"
-msgstr "Movi Kaŝitajn Kahelojn Ĉi tien"
+msgstr ""
 
 #: src/scoring.py:651
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
-"Bonvolu difini kvar ludantojn en <interface>Agordoj|Ludantoj</interface>"
 
 #: src/scoringdialog.py:242
 msgid "Round/Hand"
-msgstr "Ronda/Mano"
+msgstr ""
 
 #: src/scoringdialog.py:275 src/scoringdialog.py:832
 msgctxt "kajongg"
 msgid "Score"
-msgstr "Poentaro"
+msgstr ""
 
 #: src/scoringdialog.py:275
 msgctxt "kajongg"
 msgid "Payments"
-msgstr "Pagoj"
+msgstr ""
 
 #: src/scoringdialog.py:276
 msgctxt "kajongg"
 msgid "Balance"
-msgstr "Bilanco"
+msgstr ""
 
 #: src/scoringdialog.py:276
 msgctxt "kajongg"
 msgid "Chart"
-msgstr "Diagramo"
+msgstr ""
 
 #: src/scoringdialog.py:422
 msgctxt "kajongg"
 msgid "Scores"
-msgstr "Poentoj"
+msgstr ""
 
 #: src/scoringdialog.py:462
 msgctxt "kajongg"
 msgid "Used Rules"
-msgstr "Uzitaj Reguloj"
+msgstr ""
 
 #: src/scoringdialog.py:496
 msgid "Final scores for game <numid>%1</numid>"
-msgstr "Finaj poentoj por ludo <numid>%1</numid>"
+msgstr ""
 
 #: src/scoringdialog.py:498
 msgid "Scores for game <numid>%1</numid>"
-msgstr "Poentoj por ludo <numid>%1</numid>"
+msgstr ""
 
 #: src/scoringdialog.py:571
 msgctxt "@title:window"
 msgid "Explain Scores"
-msgstr "Klarigi Poentojn"
+msgstr ""
 
 #: src/scoringdialog.py:587
 msgid "There is no active game"
-msgstr "Ne estas aktiva ludo"
+msgstr ""
 
 #: src/scoringdialog.py:590
 msgid "%1"
-msgstr "%1"
+msgstr ""
 
 #: src/scoringdialog.py:604
 msgid "Manual score for %1: %2 points"
-msgstr "Mana poento por %1: %2 poentoj"
+msgstr ""
 
 #: src/scoringdialog.py:688
 msgid "Penalty"
-msgstr "Puno"
+msgstr ""
 
 #: src/scoringdialog.py:691
 msgid "Offense:"
-msgstr "Delikto:"
+msgstr ""
 
 #: src/scoringdialog.py:698
 msgid "Total Penalty"
-msgstr "Suma Puno"
+msgstr ""
 
 #: src/scoringdialog.py:726
 msgid "&Execute"
-msgstr "&Plenumi"
+msgstr ""
 
 #: src/scoringdialog.py:803
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
-msgstr "pagas %1 poentojn"
+msgstr ""
 
 #: src/scoringdialog.py:808
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
-msgstr "ricevas %1 poentojn"
+msgstr ""
 
 #: src/scoringdialog.py:819
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
-msgstr "Poentado por ĉi tiu Mano"
+msgstr ""
 
 #: src/scoringdialog.py:830
 msgctxt "kajongg"
 msgid "Player"
-msgstr "Ludanto"
+msgstr ""
 
 #: src/scoringdialog.py:831
 msgctxt "kajongg"
 msgid "Wind"
-msgstr "Vento"
+msgstr ""
 
 #: src/scoringdialog.py:833
 msgid "Winner"
-msgstr "Gajninto"
+msgstr ""
 
 #: src/scoringdialog.py:839
 msgctxt "kajongg"
 msgid "Draw"
-msgstr "Egaliĝo"
+msgstr ""
 
 #: src/scoringdialog.py:841
 msgid "&Penalties"
-msgstr "&Punoj"
+msgstr ""
 
 #: src/scoringdialog.py:843
 msgid "&Save Hand"
-msgstr "&Konservi manon"
+msgstr ""
 
 #: src/scoringdialog.py:865
 msgid "&Last Tile:"
-msgstr "&Lasta Kahelo:"
+msgstr ""
 
 #: src/scoringdialog.py:874
 msgid "L&ast Meld:"
-msgstr "L&asta Meld:"
+msgstr ""
 
 #: src/server.py:120
 msgid "Wrong password"
-msgstr "Erara pasvorto"
+msgstr ""
 
 #: src/server.py:216
 msgid "table with id <numid>%1</numid> not found"
-msgstr "tabelo kun id <numid>%1</numid> ne trovita"
+msgstr ""
 
 #: src/server.py:364
 msgid "Player %1 has logged out"
-msgstr "Ludanto %1 elsalutis"
+msgstr ""
 
 #: src/server.py:434
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "la servilo aŭskultos ĉe PORT ({int(defaultPort)})"
+msgstr ""
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
-msgstr "la servilo aŭskultos sur SOCKET"
+msgstr ""
 
 #: src/server.py:441
 msgid "name of the database"
-msgstr "nomo de la datumbazo"
+msgstr "שם מסד הנתונים"
 
 #: src/server.py:445
 msgid "do not terminate local game server after last client disconnects"
-msgstr "ne ĉesigi lokan ludservilon post malkonekto de la lasta kliento"
+msgstr ""
 
 #: src/servertable.py:180
 msgid "You already joined this table"
-msgstr "Vi jam aliĝis al ĉi tiu tablo"
+msgstr "כבר הצטרפת לשולחן הזה"
 
 #: src/servertable.py:182
 msgid "All seats are already taken"
-msgstr "Ĉiuj sidlokoj jam estas okupitaj"
+msgstr "כל המושבים תפוסים"
 
 #: src/servertable.py:187
 msgid "takes a seat"
-msgstr "prenas sidlokon"
+msgstr ""
 
 #: src/servertable.py:195
 msgid "leaves the table"
-msgstr "forlasas la tablon"
+msgstr ""
 
 #: src/servertable.py:241
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 1"
-msgstr "Roboto 1"
+msgstr "רובוט 1"
 
 #: src/servertable.py:244
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 2"
-msgstr "Roboto 2"
+msgstr "רובוט 2"
 
 #: src/servertable.py:245
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 3"
-msgstr "Roboto 3"
+msgstr "רובוט 3"
 
 #: src/servertable.py:301
 msgid "Only the initiator %1 can start this game, you are %2"
-msgstr "Nur la iniciatinto %1 povas komenci ĉi tiun ludon, vi estas %2"
+msgstr ""
 
 #: src/servertable.py:700
 msgid "Game <numid>%1</numid> is over!"
-msgstr "Ludo <numid>%1</numid> finiĝis!"
+msgstr ""
 
 #: src/servertable.py:729
 msgid "%1 wrongly said %2 for meld %3"
-msgstr "%1 erare diris %2 por kunfandi %3"
+msgstr ""
 
 #: src/servertable.py:734
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
-msgstr "%1 erare diris %2: asertas esti kaŝinta kahelojn %3 sed nur havas %4"
+msgstr ""
 
 #: src/servertable.py:771
 msgid "declareKong:%1 wrongly said Kong for meld %2"
-msgstr "declareKong:%1 malĝuste diris Kong por meld %2"
+msgstr ""
 
 #: src/servertable.py:820
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
-msgstr "%1 pretendante MahJongg: Ĉi tio ne estas venka mano: %2"
+msgstr ""
 
 #: src/sound.py:70
 msgid "No voices will be heard because the program %1 is missing"
-msgstr "Neniuj voĉoj estos aŭditaj ĉar la programo %1 mankas"
+msgstr ""
 
 #: src/sound.py:374
 msgid "cannot write <filename>%1</filename>: %2"
-msgstr "ne povas skribi <filename>%1</filename>: %2"
+msgstr ""
 
 #: src/sound.py:377
 msgid "The voice files have changed, their checksum has changed."
-msgstr "La voĉaj dosieroj ŝanĝiĝis, ilia kontrolsumo ŝanĝiĝis."
+msgstr ""
 
 #: src/sound.py:378
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
-msgstr "Bonvolu reinstali kajongg aŭ faru, kun sufiĉaj permesoj:"
+msgstr ""
 
 #: src/tables.py:64
 msgid "Table"
-msgstr "Tabelo"
+msgstr ""
 
 #: src/tables.py:68
 msgctxt "table status"
 msgid "Status"
-msgstr "Stato"
+msgstr ""
 
 #: src/tables.py:69
 msgid "Ruleset"
-msgstr "Regularo"
+msgstr ""
 
 #: src/tables.py:148
 msgid "Select a ruleset"
-msgstr "Elekti regularon"
+msgstr ""
 
 #: src/tables.py:186
 msgctxt "allocate a new table"
 msgid "&New"
-msgstr "&Nova"
+msgstr ""
 
 #: src/tables.py:189 src/tables.py:316 src/tables.py:348
 msgid "Allocate a new table"
-msgstr "Asigni novan tabelon"
+msgstr ""
 
 #: src/tables.py:192 src/tables.py:317 src/tables.py:349
 msgid "&Join"
-msgstr "&Aliĝu"
+msgstr ""
 
 #: src/tables.py:196 src/tables.py:318 src/tables.py:350
 msgid "Join a table"
-msgstr "Aliĝi al tablo"
+msgstr ""
 
 #: src/tables.py:198
 msgid "&Leave"
-msgstr "&Foriri"
+msgstr ""
 
 #: src/tables.py:202
 msgid "Leave a table"
-msgstr "Lasi tablon"
+msgstr ""
 
 #: src/tables.py:205
 msgctxt "Kajongg-Ruleset"
 msgid "Compare"
-msgstr "Kompari"
+msgstr ""
 
 #: src/tables.py:210
 msgid "Compare the rules of this table with my own rulesets"
-msgstr "Kompari la regulojn de ĉi tiu tabelo kun miaj propraj reguloj"
+msgstr ""
 
 #: src/tables.py:212
 msgid "&Chat"
-msgstr "&Babili"
+msgstr ""
 
 #: src/tables.py:217
 msgid "&Start"
-msgstr "&Starti"
+msgstr ""
 
 #: src/tables.py:222
 msgid "Start playing on a table. Empty seats will be taken by robot players."
 msgstr ""
-"Komencu ludi sur tablo. Malplenaj sidlokoj estos prenitaj de robotludantoj."
 
 #: src/tables.py:267
 msgid "opens a chat window"
-msgstr "malfermas babilejon"
+msgstr ""
 
 #: src/tables.py:286
 msgid "Local Games with Ruleset %1"
-msgstr "Lokaj Ludoj kun Regularo %1"
+msgstr ""
 
 #: src/tables.py:290
 msgid "Tables at %1"
-msgstr "Tabeloj ĉe %1"
+msgstr ""
 
 #: src/tables.py:342
 msgid "Start a new game"
-msgstr "Komenci novan ludon"
+msgstr ""
 
 #: src/tables.py:344
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
-msgstr "Daŭ&rigi"
+msgstr ""
 
 #: src/tables.py:346
 msgid "Resume the selected suspended game"
-msgstr "Repreni la elektitan suspenditan ludon"
+msgstr ""
 
 #: src/tables.py:364
 msgid "Chat with others on this table"
-msgstr "Babilu kun aliaj sur ĉi tiu tablo"
+msgstr ""
 
 #: src/tables.py:367
 msgid "For chatting with others on this table, please first take a seat"
-msgstr "Por babili kun aliaj sur ĉi tiu tablo, bonvolu unue sidiĝi"
+msgstr ""
 
 #: src/tile.py:276
 msgctxt "kajongg"
 msgid "hidden"
-msgstr "kaŝita"
+msgstr ""
 
 #: src/tile.py:277
 msgctxt "kajongg"
 msgid "stone"
-msgstr "ŝtono"
+msgstr "אבן"
 
 #: src/tile.py:278
 msgctxt "kajongg"
 msgid "bamboo"
-msgstr "bambuo"
+msgstr "במבוק"
 
 #: src/tile.py:279
 msgctxt "kajongg"
 msgid "character"
-msgstr "karaktero"
+msgstr "תו"
 
 #: src/tile.py:280
 msgctxt "kajongg"
 msgid "wind"
-msgstr "vento"
+msgstr "רוח"
 
 #: src/tile.py:281
 msgctxt "kajongg"
 msgid "dragon"
-msgstr "drako"
+msgstr "דרקון"
 
 #: src/tile.py:282
 msgctxt "kajongg"
 msgid "flower"
-msgstr "floro"
+msgstr "פרח"
 
 #: src/tile.py:283
 msgctxt "kajongg"
 msgid "season"
-msgstr "sezono"
+msgstr "עונה"
 
 #: src/tile.py:289
 msgctxt "kajongg"
 msgid "tile"
-msgstr "kahelo"
+msgstr "אריח"
 
 #: src/tile.py:290
 msgctxt "kajongg"
 msgid "white"
-msgstr "blanka"
+msgstr "לבן"
 
 #: src/tile.py:291
 msgctxt "kajongg"
 msgid "red"
-msgstr "ruĝa"
+msgstr "אדום"
 
 #: src/tile.py:292
 msgctxt "kajongg"
 msgid "green"
-msgstr "verda"
+msgstr "ירוק"
 
 #: src/tile.py:293
 msgctxt "kajongg"
 msgid "East"
-msgstr "Oriento"
+msgstr "מזרח"
 
 #: src/tile.py:294
 msgctxt "kajongg"
 msgid "South"
-msgstr "Sudo"
+msgstr "דרום"
 
 #: src/tile.py:295
 msgctxt "kajongg"
 msgid "West"
-msgstr "Okcidenta"
+msgstr "מערב"
 
 #: src/tile.py:296
 msgctxt "kajongg"
 msgid "North"
-msgstr "Nordo"
+msgstr "צפון"
 
 #: src/tile.py:305
 msgid "East Wind"
-msgstr "Orienta Vento"
+msgstr "רוח מזרחית"
 
 #: src/tile.py:306
 msgid "South Wind"
-msgstr "Suda Vento"
+msgstr "רוח דרומית"
 
 #: src/tile.py:307
 msgid "West Wind"
-msgstr "Okcidenta Vento"
+msgstr "רוח מערבית"
 
 #: src/tile.py:308
 msgid "North Wind"
-msgstr "Norda Vento"
+msgstr "רוח צפונית"
 
 #: src/tile.py:310
 #, python-brace-format
@@ -2264,52 +2193,52 @@ msgstr "{group} {value}"
 #: src/tile.py:889
 msgctxt "kajongg meld type"
 msgid "Bonus"
-msgstr "Gratifiko"
+msgstr "בונוס"
 
 #: src/tile.py:891
 msgctxt "kajongg meld type"
 msgid "&single"
-msgstr "unuop&a"
+msgstr ""
 
 #: src/tile.py:893
 msgctxt "kajongg meld type"
 msgid "&pair"
-msgstr "&paro"
+msgstr ""
 
 #: src/tile.py:895
 msgctxt "kajongg meld type"
 msgid "&chow"
-msgstr "&chow"
+msgstr ""
 
 #: src/tile.py:897
 msgctxt "kajongg meld type"
 msgid "p&ung"
-msgstr "p&ung"
+msgstr ""
 
 #: src/tile.py:899
 msgctxt "kajongg meld type"
 msgid "c&laimed kong"
-msgstr "p&retendita kong"
+msgstr ""
 
 #: src/tile.py:901
 msgctxt "kajongg meld type"
 msgid "k&ong"
-msgstr "k&ong"
+msgstr ""
 
 #: src/tile.py:902
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
-msgstr "resto de kaheloj"
+msgstr "שאר האריחים"
 
 #: src/tile.py:909
 msgctxt "kajongg meld state"
 msgid "Exposed"
-msgstr "Eksponita"
+msgstr "חשוף"
 
 #: src/tile.py:910
 msgctxt "kajongg meld state"
 msgid "Concealed"
-msgstr "Kaŝita"
+msgstr "נסתר"
 
 #: src/tile.py:916
 #, python-brace-format
@@ -2321,9 +2250,7 @@ msgstr "{state} {meldType} {name}"
 msgid ""
 "Your client has a version older than 4.9.0 but you need %1 for this server"
 msgstr ""
-"Via kliento havas version pli malnovan ol 4.9.0 sed vi bezonas %1 por ĉi tiu "
-"servilo"
 
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
-msgstr "Via kliento havas version %1 sed vi bezonas %2 por ĉi tiu servilo"
+msgstr ""
