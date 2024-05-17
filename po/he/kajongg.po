@@ -7,14 +7,15 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-05-01 00:36+0000\n"
-"PO-Revision-Date: 2024-05-15 22:33+0300\n"
+"PO-Revision-Date: 2024-05-16 23:08+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
+"n % 10 == 0) ? 2 : 3));\n"
 "X-Generator: Lokalize 24.02.2\n"
 
 msgid "Preview"
@@ -1238,7 +1239,7 @@ msgstr ""
 
 #: src/predefined.py:216
 msgid "Imperial Jade"
-msgstr ""
+msgstr "ג׳ייד האימפריאלית"
 
 #: src/predefined.py:217
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
@@ -1274,7 +1275,7 @@ msgstr ""
 
 #: src/predefined.py:237
 msgid "Nine Gates"
-msgstr ""
+msgstr "תשעה שערים"
 
 #: src/predefined.py:239
 msgid ""
@@ -1284,7 +1285,7 @@ msgstr ""
 
 #: src/predefined.py:241
 msgid "Thirteen Orphans"
-msgstr ""
+msgstr "שלושה עשר יתומים"
 
 #: src/predefined.py:242
 msgid ""
@@ -1354,23 +1355,23 @@ msgstr ""
 
 #: src/predefined.py:292
 msgid "Pair of Own Wind"
-msgstr ""
+msgstr "צמד רוחות עצמיות"
 
 #: src/predefined.py:294
 msgid "Pair of Round Wind"
-msgstr ""
+msgstr "צמד רוחות עגולות"
 
 #: src/predefined.py:296
 msgid "Pair of Dragons"
-msgstr ""
+msgstr "צמד דרקונים"
 
 #: src/predefined.py:300
 msgid "Flower"
-msgstr ""
+msgstr "פרח"
 
 #: src/predefined.py:302
 msgid "Season"
-msgstr ""
+msgstr "עונה"
 
 #: src/predefined.py:313
 msgid "Classical Chinese DMJL"
@@ -1706,29 +1707,29 @@ msgstr ""
 #: src/rulesetselector.py:500
 msgctxt "@title:window"
 msgid "Customize rulesets"
-msgstr ""
+msgstr "התאמת ערכות כללים"
 
 #: src/rulesetselector.py:519
 msgctxt "kajongg"
 msgid "Rule"
-msgstr ""
+msgstr "כלל"
 
 #: src/rulesetselector.py:580
 msgid "C&opy"
-msgstr ""
+msgstr "ה&עתקה"
 
 #: src/rulesetselector.py:581
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
-msgstr ""
+msgstr "הש&וואה"
 
 #: src/rulesetselector.py:582
 msgid "&Remove"
-msgstr ""
+msgstr "הס&רה"
 
 #: src/rulesetselector.py:583
 msgid "&Close"
-msgstr ""
+msgstr "&סגירה"
 
 #: src/scene.py:396 src/scene.py:527
 msgid "Do you really want to abort this game?"
@@ -1737,7 +1738,7 @@ msgstr ""
 #: src/scoring.py:60
 msgctxt "@title:window"
 msgid "Swap Seats"
-msgstr ""
+msgstr "החלפת מושבים"
 
 #: src/scoring.py:62
 msgid "By the rules, %1 and %2 should now exchange their seats. "
@@ -1745,7 +1746,7 @@ msgstr ""
 
 #: src/scoring.py:64
 msgid "&Exchange"
-msgstr ""
+msgstr "ה&חלפה"
 
 #: src/scoring.py:66
 msgid "&Keep seat"
@@ -1754,53 +1755,53 @@ msgstr ""
 #: src/scoring.py:85
 msgctxt "@title:window"
 msgid "Select four players"
-msgstr ""
+msgstr "בחירת ארבעה שחקנים"
 
 #: src/scoring.py:332
 msgid "Move Exposed Tiles Here"
-msgstr ""
+msgstr "העברת האריחים שנחשפו לכאן"
 
 #: src/scoring.py:333
 msgid "Move Concealed Tiles Here"
-msgstr ""
+msgstr "העברת האריחים המוסתרים לכאן"
 
 #: src/scoring.py:651
 msgid "Please define four players in <interface>Settings|Players</interface>"
-msgstr ""
+msgstr "נא להגדיר ארבעה שחקנים דרך <interface>הגדרות|שחקנים</interface>"
 
 #: src/scoringdialog.py:242
 msgid "Round/Hand"
-msgstr ""
+msgstr "סיבוב/יד"
 
 #: src/scoringdialog.py:275 src/scoringdialog.py:832
 msgctxt "kajongg"
 msgid "Score"
-msgstr ""
+msgstr "ניקוד"
 
 #: src/scoringdialog.py:275
 msgctxt "kajongg"
 msgid "Payments"
-msgstr ""
+msgstr "תשלומים"
 
 #: src/scoringdialog.py:276
 msgctxt "kajongg"
 msgid "Balance"
-msgstr ""
+msgstr "יתרה"
 
 #: src/scoringdialog.py:276
 msgctxt "kajongg"
 msgid "Chart"
-msgstr ""
+msgstr "תרשים"
 
 #: src/scoringdialog.py:422
 msgctxt "kajongg"
 msgid "Scores"
-msgstr ""
+msgstr "נקודות"
 
 #: src/scoringdialog.py:462
 msgctxt "kajongg"
 msgid "Used Rules"
-msgstr ""
+msgstr "כללים בשימוש"
 
 #: src/scoringdialog.py:496
 msgid "Final scores for game <numid>%1</numid>"
@@ -1808,16 +1809,16 @@ msgstr ""
 
 #: src/scoringdialog.py:498
 msgid "Scores for game <numid>%1</numid>"
-msgstr ""
+msgstr "נקודות למשחק <numid>%1</numid>"
 
 #: src/scoringdialog.py:571
 msgctxt "@title:window"
 msgid "Explain Scores"
-msgstr ""
+msgstr "הסברת ניקוד"
 
 #: src/scoringdialog.py:587
 msgid "There is no active game"
-msgstr ""
+msgstr "אין משחק פעיל"
 
 #: src/scoringdialog.py:590
 msgid "%1"
@@ -1833,7 +1834,7 @@ msgstr ""
 
 #: src/scoringdialog.py:691
 msgid "Offense:"
-msgstr ""
+msgstr "התקפה:"
 
 #: src/scoringdialog.py:698
 msgid "Total Penalty"
@@ -1856,26 +1857,26 @@ msgstr ""
 #: src/scoringdialog.py:819
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
-msgstr ""
+msgstr "ניקוד ליד הזאת"
 
 #: src/scoringdialog.py:830
 msgctxt "kajongg"
 msgid "Player"
-msgstr ""
+msgstr "שחקן"
 
 #: src/scoringdialog.py:831
 msgctxt "kajongg"
 msgid "Wind"
-msgstr ""
+msgstr "רוח"
 
 #: src/scoringdialog.py:833
 msgid "Winner"
-msgstr ""
+msgstr "מנצח"
 
 #: src/scoringdialog.py:839
 msgctxt "kajongg"
 msgid "Draw"
-msgstr ""
+msgstr "תיקו"
 
 #: src/scoringdialog.py:841
 msgid "&Penalties"
@@ -1994,95 +1995,95 @@ msgstr ""
 
 #: src/tables.py:64
 msgid "Table"
-msgstr ""
+msgstr "שולחן"
 
 #: src/tables.py:68
 msgctxt "table status"
 msgid "Status"
-msgstr ""
+msgstr "מצב"
 
 #: src/tables.py:69
 msgid "Ruleset"
-msgstr ""
+msgstr "ערכת כללים"
 
 #: src/tables.py:148
 msgid "Select a ruleset"
-msgstr ""
+msgstr "בחירת ערכת כללים"
 
 #: src/tables.py:186
 msgctxt "allocate a new table"
 msgid "&New"
-msgstr ""
+msgstr "&חדש"
 
 #: src/tables.py:189 src/tables.py:316 src/tables.py:348
 msgid "Allocate a new table"
-msgstr ""
+msgstr "הקצאת שולחן חדש"
 
 #: src/tables.py:192 src/tables.py:317 src/tables.py:349
 msgid "&Join"
-msgstr ""
+msgstr "ה&צטרפות"
 
 #: src/tables.py:196 src/tables.py:318 src/tables.py:350
 msgid "Join a table"
-msgstr ""
+msgstr "הצטרפות לשולחן"
 
 #: src/tables.py:198
 msgid "&Leave"
-msgstr ""
+msgstr "&נטישה"
 
 #: src/tables.py:202
 msgid "Leave a table"
-msgstr ""
+msgstr "נטישת שולחן"
 
 #: src/tables.py:205
 msgctxt "Kajongg-Ruleset"
 msgid "Compare"
-msgstr ""
+msgstr "השוואה"
 
 #: src/tables.py:210
 msgid "Compare the rules of this table with my own rulesets"
-msgstr ""
+msgstr "השוואת כללי השולחן הזה עם ערכת הכללים העצמית שלי"
 
 #: src/tables.py:212
 msgid "&Chat"
-msgstr ""
+msgstr "&שיחה"
 
 #: src/tables.py:217
 msgid "&Start"
-msgstr ""
+msgstr "ה&תחלה"
 
 #: src/tables.py:222
 msgid "Start playing on a table. Empty seats will be taken by robot players."
-msgstr ""
+msgstr "התחלת משחק בשולחן. מושבים ריקים יתפסו על ידי שחקנים רובוטיים."
 
 #: src/tables.py:267
 msgid "opens a chat window"
-msgstr ""
+msgstr "פתיחת חלון שיחה"
 
 #: src/tables.py:286
 msgid "Local Games with Ruleset %1"
-msgstr ""
+msgstr "משחק מקומי עם ערכת הכללים %1"
 
 #: src/tables.py:290
 msgid "Tables at %1"
-msgstr ""
+msgstr "שולחנות ב־%1"
 
 #: src/tables.py:342
 msgid "Start a new game"
-msgstr ""
+msgstr "התחלת משחק חדש"
 
 #: src/tables.py:344
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
-msgstr ""
+msgstr "ה&משך"
 
 #: src/tables.py:346
 msgid "Resume the selected suspended game"
-msgstr ""
+msgstr "המשך המשחק הנבחר המושהה"
 
 #: src/tables.py:364
 msgid "Chat with others on this table"
-msgstr ""
+msgstr "שיחה עם משתתפים נוספים בשולחן הזה"
 
 #: src/tables.py:367
 msgid "For chatting with others on this table, please first take a seat"
