@@ -2,21 +2,21 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Andrew Coles <andrew_coles@yahoo.co.uk>, 2009, 2010, 2011.
-# Steve Allewell <steve.allewell@gmail.com>, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022.
+# SPDX-FileCopyrightText: 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2024 Steve Allewell <steve.allewell@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-05-01 00:36+0000\n"
-"PO-Revision-Date: 2022-02-19 12:08+0000\n"
+"PO-Revision-Date: 2024-05-20 19:38+0100\n"
 "Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
-"Language-Team: British English <kde-l10n-en_gb@kde.org>\n"
+"Language-Team: British English\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 21.12.1\n"
+"X-Generator: Lokalize 24.02.2\n"
 
 msgid "Preview"
 msgstr "Preview"
@@ -296,21 +296,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "show no graphical user interface. Intended only for testing"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr "use a dedicated server listening on SOCKET. Intended only for testing"
+msgstr ""
+"use a dedicated server already running and listening on SOCKET. Intended "
+"only for testing"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
-msgstr "use a dedicated server listening on PORT. Intended only for testing"
+msgstr ""
+"use a dedicated server already running and listening on PORT. Intended only "
+"for testing"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1149,24 +1148,24 @@ msgid "Standard Rotation"
 msgstr "Standard Rotation"
 
 #: src/predefined.py:147
-#, fuzzy
-#| msgid "Discarded tile %1 is not in meld %2"
 msgid "Discard tiles ordered"
-msgstr "Discarded tile %1 is not in meld %2"
+msgstr "Discard tiles ordered"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Discard tiles ordered from top left"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Leave holes for claimed discards"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Only when discarding tiles ordered: Do not place the next discard where the "
+"claimed discard was"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1972,10 +1971,8 @@ msgid "Player %1 has logged out"
 msgstr "Player %1 has logged out"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "the server will listen on PORT (%d)"
+msgstr "the server will listen on PORT ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
