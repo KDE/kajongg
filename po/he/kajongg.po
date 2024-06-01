@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-05-01 00:36+0000\n"
-"PO-Revision-Date: 2024-05-16 23:08+0300\n"
+"PO-Revision-Date: 2024-05-31 09:26+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -1591,40 +1591,40 @@ msgstr ""
 #: src/query.py:196
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
-msgstr ""
+msgstr "משחק מקומי"
 
 #: src/query.py:376
 msgid "Database %1 updated from schema %2 to %3"
-msgstr ""
+msgstr "מסד הנתונים %1 עודכן מהסכמה %1 לכדי %2"
 
 #: src/rule.py:49 src/scoringdialog.py:702 src/scoringdialog.py:780
 msgid "points"
-msgstr ""
+msgstr "נקודות"
 
 #: src/rule.py:50
 msgctxt "kajongg"
 msgid "doubles"
-msgstr ""
+msgstr "כפולים"
 
 #: src/rule.py:51
 msgctxt "kajongg"
 msgid "limits"
-msgstr ""
+msgstr "מגבלות"
 
 #: src/rule.py:91
 msgctxt "Kajongg"
 msgid "%1 points"
-msgstr ""
+msgstr "%1 נקודות"
 
 #: src/rule.py:93
 msgctxt "Kajongg"
 msgid "%1 doubles"
-msgstr ""
+msgstr "%1 כפולים"
 
 #: src/rule.py:98
 msgctxt "Kajongg"
 msgid "%1 limits"
-msgstr ""
+msgstr "%1 מגבלות"
 
 #: src/rule.py:365
 msgid "Meld Rules"
@@ -1670,11 +1670,11 @@ msgstr ""
 #: src/rule.py:375
 msgctxt "kajongg"
 msgid "Options"
-msgstr ""
+msgstr "אפשרויות"
 
 #: src/rule.py:376
 msgid "Here we have several special game related options"
-msgstr ""
+msgstr "כאן יש מספר אפשרויות מיוחדות שקשורות במשחק"
 
 #: src/rule.py:377
 msgid "Penalties"
@@ -1692,7 +1692,7 @@ msgstr ""
 #: src/rule.py:578
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
-msgstr ""
+msgstr "עותק%1 מתוך %2"
 
 #: src/rule.py:934
 msgctxt "%1 can be a sentence"
