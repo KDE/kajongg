@@ -2,21 +2,21 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Stefan Asserhäll <stefan.asserhall@gmail.com>, 2008, 2009, 2010.
+# SPDX-FileCopyrightText: 2008, 2009, 2010, 2024 Stefan Asserhäll <stefan.asserhall@gmail.com>
 # Stefan Asserhall <stefan.asserhall@gmail.com>, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-05-01 00:36+0000\n"
-"PO-Revision-Date: 2022-01-31 21:38+0100\n"
-"Last-Translator: Stefan Asserhäll <stefan.asserhall@gmail.com>\n"
+"PO-Revision-Date: 2024-06-17 21:18+0200\n"
+"Last-Translator: Stefan Asserhäll <stefan.asserhall@bredband.net>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 20.08.1\n"
+"X-Generator: Lokalize 23.08.5\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 msgid "Preview"
@@ -297,21 +297,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "visa inget grafiskt gränssnitt. Bara avsett för test"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr "visa en specifik server som lyssnar på UTTAG. Bara avsett för test"
+msgstr ""
+"använd en specifik server som redan körs och lyssnar på UTTAG. Endast avsedd "
+"för testning"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
-msgstr "visa en specifik server som lyssnar på PORT. Bara avsett för test"
+msgstr ""
+"använd en specifik server som redan körs och lyssnar på PORT. Endast avsedd "
+"för testning"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1150,24 +1149,24 @@ msgid "Standard Rotation"
 msgstr "Standardrotation"
 
 #: src/predefined.py:147
-#, fuzzy
-#| msgid "Discarded tile %1 is not in meld %2"
 msgid "Discard tiles ordered"
-msgstr "Kastad bricka %1 ingår inte i kombinationen %2"
+msgstr "Kastade brickor ordnade"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Kastade brickor ordnade från uppe till vänster"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Lämna hål för kungjorda kastade brickor"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Bara när kastade brickor ordnade: Placera inte nästa kastade bricka där den "
+"kungjorda kastade brickan fanns"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1979,10 +1978,8 @@ msgid "Player %1 has logged out"
 msgstr "Spelaren %1 har loggat ut"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "Servern lyssnar på PORT (%d)"
+msgstr "servern lyssnar på PORT ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
