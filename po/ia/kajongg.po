@@ -1,14 +1,14 @@
 # Copyright (C) 2023 This file is copyright:
 # This file is distributed under the same license as the kajongg package.
 #
-# SPDX-FileCopyrightText: 2023 giovanni <g.sora@tiscali.it>
+# SPDX-FileCopyrightText: 2023, 2024 giovanni <g.sora@tiscali.it>
 # giovanni <g.sora@tiscali.it>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-05-01 00:36+0000\n"
-"PO-Revision-Date: 2023-12-28 19:36+0100\n"
+"PO-Revision-Date: 2024-07-12 16:13+0200\n"
 "Last-Translator: giovanni <g.sora@tiscali.it>\n"
 "Language-Team: Interlingua <kde-i18n-doc@kde.org>\n"
 "Language: ia\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 22.12.3\n"
+"X-Generator: Lokalize 23.08.5\n"
 
 msgid "Preview"
 msgstr "Vista preliminar"
@@ -569,7 +569,7 @@ msgstr "&Reproduce"
 #: src/mainwindow.py:521
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
-msgstr ""
+msgstr "Initia un Nove Joco"
 
 #: src/mainwindow.py:523
 msgctxt "@action:inmenu"
@@ -850,7 +850,7 @@ msgstr ""
 
 #: src/mjresource.py:127
 msgid "unknown name"
-msgstr ""
+msgstr "nomine incognite"
 
 #: src/mjresource.py:128
 msgid "unknown author"
@@ -1988,7 +1988,7 @@ msgstr ""
 
 #: src/sound.py:374
 msgid "cannot write <filename>%1</filename>: %2"
-msgstr ""
+msgstr "Non pote scriber <filename>%1</filename>: %2"
 
 #: src/sound.py:377
 msgid "The voice files have changed, their checksum has changed."
@@ -2075,7 +2075,7 @@ msgstr ""
 
 #: src/tables.py:342
 msgid "Start a new game"
-msgstr ""
+msgstr "Initia un Nove Joco"
 
 #: src/tables.py:344
 msgctxt "resuming a local suspended game"
