@@ -2347,15 +2347,3 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "El vostre client té la versió %1 però necessiteu %2 per a aquest servidor"
-
-#~ msgid "play only ROUNDS rounds per game. Only for debugging!"
-#~ msgstr "juga només una tanda ROUNDS per joc. Només per a depuració!"
-
-#~ msgid "unrecognized arguments:%1"
-#~ msgstr "arguments no reconeguts:%1"
-
-#~ msgid "Not using broken Python KDE bindings"
-#~ msgstr "No utilitza les vinculacions trencades del KDE de Python"
-
-#~ msgid "This player cannot be deleted. There are games associated with %1."
-#~ msgstr "Aquest jugador no es pot eliminar. Hi ha jocs associats amb %1."
