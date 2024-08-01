@@ -3,7 +3,7 @@
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# Josep M. Ferrer <txemaq@gmail.com>, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023, 2024.
+# SPDX-FileCopyrightText: 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023, 2024 Josep M. Ferrer <txemaq@gmail.com>
 # Manuel Tortosa Moreno <manutortosa@chakra-project.org>, 2010, 2011.
 # Antoni Bella Pérez <antonibella5@yahoo.com>, 2014, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
 msgid ""
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-05-01 00:36+0000\n"
-"PO-Revision-Date: 2024-03-26 10:19+0100\n"
+"PO-Revision-Date: 2024-07-31 11:51+0200\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: &\n"
-"X-Generator: Lokalize 22.12.3\n"
+"X-Generator: Lokalize 24.05.2\n"
 
 msgid "Preview"
 msgstr "Vista prèvia"
@@ -206,7 +206,7 @@ msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
 msgstr ""
-"Realment voleu eliminar <numid>%1</numid> jocs?<br>Això serà definitiu. No "
+"Realment voleu suprimir <numid>%1</numid> jocs?<br>Això serà definitiu. No "
 "podreu cancel·lar-ho amb el botó Cancel·la"
 
 #: src/guiutil.py:146 src/kdestub.py:129 src/kdestub.py:132
@@ -939,7 +939,7 @@ msgid ""
 "This will also delete all games played by %3!"
 msgstr ""
 "Hi ha %1 partida acabada i %2 sense acabar per %3, suprimeixo %3 igualment?  "
-"Això també eliminarà tots els jocs jugats per %3!"
+"Això també suprimirà tots els jocs jugats per %3!"
 
 #: src/predefined.py:29
 msgid "Classical Chinese standard"
