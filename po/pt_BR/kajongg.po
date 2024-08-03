@@ -6,20 +6,21 @@
 # Marcus Vinícius de Andrade Gama <marcus.gama@gmail.com>, 2010, 2012.
 # André Marcelo Alvarenga <alvarenga@kde.org>, 2010, 2011, 2012, 2013, 2014, 2015.
 # Aracele Torres <araceletorres@gmail.com>, 2010.
+# SPDX-FileCopyrightText: 2024 Geraldo Simiao <geraldosimiao@fedoraproject.org>
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-05-01 00:36+0000\n"
-"PO-Revision-Date: 2022-02-02 09:01-0300\n"
-"Last-Translator: Luiz Fernando Ranghetti <elchevive@opensuse.org>\n"
-"Language-Team: Portuguese <kde-i18n-pt_BR@kde.org>\n"
+"PO-Revision-Date: 2024-08-02 11:47-0300\n"
+"Last-Translator: Geraldo Simiao <geraldosimiao@fedoraproject.org>\n"
+"Language-Team: Brazilian Portuguese <kde-i18n-pt_BR@kde.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 20.04.2\n"
+"X-Generator: Lokalize 24.05.2\n"
 
 msgid "Preview"
 msgstr "Visualização"
@@ -300,21 +301,20 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "não mostrar qualquer interface de usuário. Usado apenas para testes"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr "usar um servidor dedicado à espera em SOCKET. Usado apenas para testes"
+msgstr ""
+"use um servidor dedicado já em execução e escutando o SOCKET. Destinado "
+"apenas para teste"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
-msgstr "usar um servidor dedicado à espera em PORTA. Usado apenas para testes"
+msgstr ""
+"use um servidor dedicado já em execução e escutando em PORTA. Destinado "
+"apenas para teste"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1168,21 +1168,23 @@ msgstr "Rotação normal"
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "Descartar peças ordenadas"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Descartar peças ordenadas a partir do canto superior esquerdo"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Deixe buracos para descartes reivindicados"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Somente ao descartar peças ordenadas: Não coloque o próximo descarte onde "
+"estava o descarte reivindicado"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1992,10 +1994,8 @@ msgid "Player %1 has logged out"
 msgstr "O jogador %1 desconectou-se"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "o servidor irá estar escutando na PORTA (%d)"
+msgstr "o servidor escutará na PORTA ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
