@@ -1918,7 +1918,6 @@ msgstr "Spelar %1 har logga av"
 
 #: src/server.py:434
 #, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
 msgstr "tenaren vil lytta på PORT (%d)"
 
