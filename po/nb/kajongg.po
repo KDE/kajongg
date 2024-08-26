@@ -298,8 +298,6 @@ msgstr "ikke vis grafisk brukerflate. Bare ment for testing"
 
 #: src/kajongg.py:99
 #, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
@@ -307,8 +305,6 @@ msgstr "bruk en dedikert tjener som lytter på SOCKET. Bare ment for testing"
 
 #: src/kajongg.py:101
 #, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
@@ -1955,7 +1951,6 @@ msgstr "Spiller %1 har logget ut"
 
 #: src/server.py:434
 #, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
 msgstr "tjeneren vil lytte på PORT (%d)"
 
