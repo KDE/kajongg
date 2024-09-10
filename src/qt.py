@@ -150,6 +150,9 @@ elif QT6:
         return sip.cast(obj, _type)
 else:
     HAVE_SIP = False
+    def sip_cast(obj, _type):
+        """hide not so nice things in qt.py"""
+        raise NotImplementedError
 
 def modeltest_is_supported() ->bool:
     """Is the QT binding supported."""
@@ -158,7 +161,7 @@ def modeltest_is_supported() ->bool:
     try:
         _ = sip_cast(QSize(), QSize)
         return True
-    except TypeError:
+    except (TypeError, NotImplementedError):
         return False
 
 SIP_VERSION_STR = 'no sip'
