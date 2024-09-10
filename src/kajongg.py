@@ -15,7 +15,7 @@ import os
 import logging
 from typing import Tuple, List, Optional, Type, Any
 
-from qtpy import QT5
+from qtpy import QT5, PYSIDE2
 from qt import QObject, QCommandLineParser, QCommandLineOption, Qt, QGuiApplication
 from kde import KApplication
 from mi18n import i18n, MLocale
@@ -190,4 +190,7 @@ from mainwindow import MainWindow
 if QT5:
     QGuiApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)  # type:ignore[attr-defined]
 MainWindow()
-Internal.app.exec()
+if PYSIDE2:
+    Internal.app.exec_()
+else:
+    Internal.app.exec()
