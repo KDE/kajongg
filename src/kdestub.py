@@ -42,7 +42,7 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
-from qtpy import QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
+from qtpy import QT5, QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
 if QT6:
     # pylint:disable=no-name-in-module
     from qtpy.QtCore import QKeyCombination  # type: ignore
@@ -1130,7 +1130,11 @@ class AboutKajonggDialog(KDialog):
     @staticmethod
     def licenseFile() ->Optional[str]:
         """which may currently only be 1: GPL_V2"""
-        prefix = QLibraryInfo.location(QLibraryInfo.LibraryPath.PrefixPath)  # type:ignore[attr-defined]
+        if QT5:
+            # pyqt 2.3.0 does not seem to handle this
+            prefix = QLibraryInfo.location(QLibraryInfo.LibraryLocation.PrefixPath)  # type:ignore[attr-defined]
+        else:
+            prefix = QLibraryInfo.path(QLibraryInfo.LibraryPath.PrefixPath)  # type:ignore[attr-defined]
         for path in ('COPYING', '../COPYING',
                      f'{prefix}/share/kf5/licenses/GPL_V2'):
             path = os.path.abspath(path)
