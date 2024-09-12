@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 # pylint: disable=unused-import
 
-from qtpy import uic, QT5, QT6
+from qtpy import uic, QT5, QT6, PYQT5, PYQT6
 from qtpy.QtCore import QAbstractAnimation
 from qtpy.QtCore import QAbstractItemModel
 from qtpy.QtCore import QAbstractTableModel
@@ -138,12 +138,12 @@ from qtpy.QtSvg import QSvgRenderer
 # pylint:disable=c-extension-no-member
 
 HAVE_SIP = True
-if QT5:
+if PYQT5:
     from PyQt5 import sip
     def sip_cast(obj, _type):
         """hide not so nice things in qt.py"""
         return sip.cast(obj, _type)
-elif QT6:
+elif PYQT6:
     from PyQt6 import sip  # type:ignore[no-redef]
     def sip_cast(obj, _type):
         """hide not so nice things in qt.py"""
