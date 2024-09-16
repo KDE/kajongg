@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 1.0\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 1.0\n"
 
 msgid "Preview"
 msgstr "Προεπισκόπηση"
@@ -33,9 +33,6 @@ msgstr "Επαφή:"
 msgid "Description:"
 msgstr "Περιγραφή:"
 
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Game"
 msgctxt "kajongg"
 msgid "Game"
 msgstr "Παιχνίδι"
@@ -64,9 +61,6 @@ msgid "Time"
 msgstr ""
 
 #: src/chat.py:51 src/playerlist.py:86
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Player"
 msgid "Player"
 msgstr "Παίκτης"
 
@@ -89,11 +83,9 @@ msgid "Running"
 msgstr ""
 
 #: src/client.py:75
-#, fuzzy
-#| msgid "&New"
 msgctxt "table status"
 msgid "New"
-msgstr "&Νέο"
+msgstr "Νέο"
 
 #: src/configdialog.py:47
 msgid "Show tile shadows"
@@ -126,9 +118,6 @@ msgid "Let others hear my voice"
 msgstr ""
 
 #: src/configdialog.py:103
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Play"
 msgctxt "kajongg"
 msgid "Play"
 msgstr "Αναπαραγωγή"
@@ -152,8 +141,6 @@ msgid ""
 msgstr ""
 
 #: src/differ.py:71
-#, fuzzy
-#| msgid "Rule"
 msgctxt "Kajongg"
 msgid "Rule"
 msgstr "Κανόνας"
@@ -192,16 +179,11 @@ msgid "Started"
 msgstr "Ξεκίνησε"
 
 #: src/games.py:106
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Games"
 msgctxt "@title:window"
 msgid "Games"
 msgstr "Παιχνίδια"
 
 #: src/games.py:123
-#, fuzzy
-#| msgid "&New"
 msgctxt "start a new game"
 msgid "&New"
 msgstr "&Νέο"
@@ -386,11 +368,8 @@ msgid "Configure"
 msgstr ""
 
 #: src/kdestub.py:456
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Game"
 msgid "&Game"
-msgstr "Παιχνίδι"
+msgstr "Παιχνί&δι"
 
 #: src/kdestub.py:457
 msgid "&View"
@@ -435,10 +414,8 @@ msgid "Fallback language:"
 msgstr ""
 
 #: src/kdestub.py:890
-#, fuzzy
-#| msgid "R&emove"
 msgid "Remove"
-msgstr "Α&φαίρεση"
+msgstr "Αφαίρεση"
 
 #: src/kdestub.py:894
 msgid ""
@@ -623,12 +600,9 @@ msgid "&Score a manual game."
 msgstr "&Πίνακας βαθμών"
 
 #: src/mainwindow.py:518
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Play"
 msgctxt "@action:intoolbar"
 msgid "&Play"
-msgstr "Αναπαραγωγή"
+msgstr "Αναπαρα&γωγή"
 
 #: src/mainwindow.py:521
 #, fuzzy
@@ -658,8 +632,6 @@ msgid "&Quit Kajongg"
 msgstr "Βαθμός"
 
 #: src/mainwindow.py:532
-#, fuzzy
-#| msgid "&Players"
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Παίκτες"
@@ -672,11 +644,9 @@ msgid "define your players."
 msgstr "Επιλέξτε τέσσερις παίκτες"
 
 #: src/mainwindow.py:537
-#, fuzzy
-#| msgid "Rulesets"
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
-msgstr "Λίστα συνόλου κανόνων"
+msgstr "Λίστα συ&νόλου κανόνων"
 
 #: src/mainwindow.py:540
 msgctxt "kajongg @info:tooltip"
@@ -707,9 +677,6 @@ msgid "F&ull Screen Mode"
 msgstr ""
 
 #: src/mainwindow.py:555
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "&Score Table"
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&Πίνακας βαθμών"
@@ -902,8 +869,6 @@ msgid "Violates Original Call"
 msgstr ""
 
 #: src/message.py:837
-#, fuzzy
-#| msgid "Dangerous Game"
 msgctxt "kajongg"
 msgid "Dangerous Game"
 msgstr "Επικίνδυνο παιχνίδι"
@@ -1012,8 +977,6 @@ msgid "Player %1 exposed many dragons"
 msgstr "Ο παίκτης %1 δεν είναι γνωστός"
 
 #: src/playerlist.py:48
-#, fuzzy
-#| msgid "&New"
 msgctxt "define a new player"
 msgid "&New"
 msgstr "&Νέο"
@@ -1774,39 +1737,26 @@ msgid "points"
 msgstr "πόντοι"
 
 #: src/rule.py:50
-#, fuzzy
-#| msgid "doubles"
 msgctxt "kajongg"
 msgid "doubles"
 msgstr "διπλά"
 
 #: src/rule.py:51
-#, fuzzy
-#| msgid "limits"
 msgctxt "kajongg"
 msgid "limits"
 msgstr "όρια"
 
 #: src/rule.py:91
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "%1 points"
 msgctxt "Kajongg"
 msgid "%1 points"
 msgstr "%1 πόντοι"
 
 #: src/rule.py:93
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "%1 doubles"
 msgctxt "Kajongg"
 msgid "%1 doubles"
 msgstr "%1 διπλά"
 
 #: src/rule.py:98
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "%1 limits"
 msgctxt "Kajongg"
 msgid "%1 limits"
 msgstr "%1 όρια"
@@ -1901,8 +1851,6 @@ msgid "Customize rulesets"
 msgstr ""
 
 #: src/rulesetselector.py:519
-#, fuzzy
-#| msgid "Rule"
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "Κανόνας"
@@ -1920,8 +1868,6 @@ msgid "Co&mpare"
 msgstr "&ζευγάρι"
 
 #: src/rulesetselector.py:582
-#, fuzzy
-#| msgid "R&emove"
 msgid "&Remove"
 msgstr "Α&φαίρεση"
 
@@ -1934,8 +1880,6 @@ msgid "Do you really want to abort this game?"
 msgstr ""
 
 #: src/scoring.py:60
-#, fuzzy
-#| msgid "Swap Seats"
 msgctxt "@title:window"
 msgid "Swap Seats"
 msgstr "Ανταλλαγή Θέσεων"
@@ -1953,8 +1897,6 @@ msgid "&Keep seat"
 msgstr ""
 
 #: src/scoring.py:85
-#, fuzzy
-#| msgid "Select four players"
 msgctxt "@title:window"
 msgid "Select four players"
 msgstr "Επιλέξτε τέσσερις παίκτες"
@@ -1976,9 +1918,6 @@ msgid "Round/Hand"
 msgstr ""
 
 #: src/scoringdialog.py:275 src/scoringdialog.py:832
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Score"
 msgctxt "kajongg"
 msgid "Score"
 msgstr "Βαθμολογία"
@@ -2009,8 +1948,6 @@ msgid "Scores"
 msgstr "Βαθμολογία"
 
 #: src/scoringdialog.py:462
-#, fuzzy
-#| msgid "Used Rules"
 msgctxt "kajongg"
 msgid "Used Rules"
 msgstr "Κανόνες που Χρησιμοποιήθηκαν"
@@ -2084,17 +2021,11 @@ msgid "Scoring for this Hand"
 msgstr ""
 
 #: src/scoringdialog.py:830
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Player"
 msgctxt "kajongg"
 msgid "Player"
 msgstr "Παίκτης"
 
 #: src/scoringdialog.py:831
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Wind"
 msgctxt "kajongg"
 msgid "Wind"
 msgstr "Αέρας"
@@ -2104,9 +2035,6 @@ msgid "Winner"
 msgstr "Νικητής"
 
 #: src/scoringdialog.py:839
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "Draw"
 msgctxt "kajongg"
 msgid "Draw"
 msgstr "Ισοπαλία"
@@ -2264,8 +2192,6 @@ msgid "Select a ruleset"
 msgstr "Επιλέξτε τέσσερις παίκτες"
 
 #: src/tables.py:186
-#, fuzzy
-#| msgid "&New"
 msgctxt "allocate a new table"
 msgid "&New"
 msgstr "&Νέο"
@@ -2356,57 +2282,36 @@ msgid "hidden"
 msgstr ""
 
 #: src/tile.py:277
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "stone"
 msgctxt "kajongg"
 msgid "stone"
 msgstr "πέτρα"
 
 #: src/tile.py:278
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "bamboo"
 msgctxt "kajongg"
 msgid "bamboo"
 msgstr "μπαμπού"
 
 #: src/tile.py:279
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "character"
 msgctxt "kajongg"
 msgid "character"
 msgstr "χαρακτήρας"
 
 #: src/tile.py:280
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "wind"
 msgctxt "kajongg"
 msgid "wind"
 msgstr "αέρας"
 
 #: src/tile.py:281
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "dragon"
 msgctxt "kajongg"
 msgid "dragon"
 msgstr "δράκος"
 
 #: src/tile.py:282
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "flower"
 msgctxt "kajongg"
 msgid "flower"
 msgstr "άνθος"
 
 #: src/tile.py:283
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "season"
 msgctxt "kajongg"
 msgid "season"
 msgstr "περίοδος"
@@ -2419,25 +2324,16 @@ msgid "tile"
 msgstr "Κομμάτια"
 
 #: src/tile.py:290
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "white"
 msgctxt "kajongg"
 msgid "white"
 msgstr "λευκό"
 
 #: src/tile.py:291
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "red"
 msgctxt "kajongg"
 msgid "red"
 msgstr "κόκκινο"
 
 #: src/tile.py:292
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "green"
 msgctxt "kajongg"
 msgid "green"
 msgstr "πράσινο"
@@ -2448,12 +2344,9 @@ msgid "East"
 msgstr ""
 
 #: src/tile.py:294
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "south"
 msgctxt "kajongg"
 msgid "South"
-msgstr "νότος"
+msgstr "Νότος"
 
 #: src/tile.py:295
 msgctxt "kajongg"
@@ -2461,12 +2354,9 @@ msgid "West"
 msgstr ""
 
 #: src/tile.py:296
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "north"
 msgctxt "kajongg"
 msgid "North"
-msgstr "βορράς"
+msgstr "Βορράς"
 
 #: src/tile.py:305
 #, fuzzy
@@ -2502,17 +2392,11 @@ msgid "Bonus"
 msgstr ""
 
 #: src/tile.py:891
-#, fuzzy
-#| msgctxt "kmj meld type"
-#| msgid "&single"
 msgctxt "kajongg meld type"
 msgid "&single"
 msgstr "&μονό"
 
 #: src/tile.py:893
-#, fuzzy
-#| msgctxt "kmj meld type"
-#| msgid "&pair"
 msgctxt "kajongg meld type"
 msgid "&pair"
 msgstr "&ζευγάρι"
@@ -2549,20 +2433,14 @@ msgid "rest of tiles"
 msgstr ""
 
 #: src/tile.py:909
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "exposed"
 msgctxt "kajongg meld state"
 msgid "Exposed"
-msgstr "εκτεθειμένο"
+msgstr "Εκτεθειμένο"
 
 #: src/tile.py:910
-#, fuzzy
-#| msgctxt "kmj"
-#| msgid "concealed"
 msgctxt "kajongg meld state"
 msgid "Concealed"
-msgstr "κρυμμένο"
+msgstr "Κρυμμένο"
 
 #: src/tile.py:916
 #, python-brace-format
