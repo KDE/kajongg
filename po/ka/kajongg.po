@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-05-01 00:36+0000\n"
+"POT-Creation-Date: 2024-09-20 02:37+0000\n"
 "PO-Revision-Date: 2024-03-26 05:49+0100\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
@@ -353,7 +353,7 @@ msgstr "ხელსაწყოთა ზოლების გამართ�
 msgid "Configure &Kajongg..."
 msgstr "&Kajongg-ის მორგება..."
 
-#: src/kdestub.py:366 src/kdestub.py:1202
+#: src/kdestub.py:366 src/kdestub.py:1206
 msgid "Configure"
 msgstr "მორგება"
 
@@ -462,19 +462,19 @@ msgstr ""
 msgid "Authors:"
 msgstr "ავტორები:"
 
-#: src/kdestub.py:1155
+#: src/kdestub.py:1159
 msgid "License Agreement"
 msgstr "სა&ლიცენზიო შეთანხმება"
 
-#: src/kdestub.py:1404
+#: src/kdestub.py:1408
 msgid "Configure Toolbars"
 msgstr "ხელსაწყოთა ზოლების გამართვა"
 
-#: src/kdestub.py:1406
+#: src/kdestub.py:1410
 msgid "A&vailable actions:"
 msgstr "&შესაძლო ქმედებები:"
 
-#: src/kdestub.py:1417
+#: src/kdestub.py:1421
 msgid "Curr&ent actions:"
 msgstr "&მიმდინარე ქმედებები:"
 

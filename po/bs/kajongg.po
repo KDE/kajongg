@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kdegames\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-05-01 00:36+0000\n"
+"POT-Creation-Date: 2024-09-20 02:37+0000\n"
 "PO-Revision-Date: 2015-02-04 15:43+0000\n"
 "Last-Translator: Samir Ribić <Unknown>\n"
 "Language-Team: Bosnian <bs@li.org>\n"
@@ -383,7 +383,7 @@ msgstr "Podesi alatne trake"
 msgid "Configure &Kajongg..."
 msgstr "Konfiguriši Kajongg"
 
-#: src/kdestub.py:366 src/kdestub.py:1202
+#: src/kdestub.py:366 src/kdestub.py:1206
 msgid "Configure"
 msgstr "Konfiguriši"
 
@@ -509,19 +509,19 @@ msgstr ""
 msgid "Authors:"
 msgstr "Autori:"
 
-#: src/kdestub.py:1155
+#: src/kdestub.py:1159
 msgid "License Agreement"
 msgstr "Ugovor o korišćenju"
 
-#: src/kdestub.py:1404
+#: src/kdestub.py:1408
 msgid "Configure Toolbars"
 msgstr "Podesi alatne trake"
 
-#: src/kdestub.py:1406
+#: src/kdestub.py:1410
 msgid "A&vailable actions:"
 msgstr "D&ostupne akcije:"
 
-#: src/kdestub.py:1417
+#: src/kdestub.py:1421
 msgid "Curr&ent actions:"
 msgstr "&Trenutne radnje:"
 

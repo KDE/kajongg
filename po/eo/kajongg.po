@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-05-01 00:36+0000\n"
+"POT-Creation-Date: 2024-09-20 02:37+0000\n"
 "PO-Revision-Date: 2024-03-27 09:18+0100\n"
 "Last-Translator: Oliver Kellogg <olivermkellogg@gmail.com>\n"
 "Language-Team: esperanto <kde-i18n-eo@kde.org>\n"
@@ -353,7 +353,7 @@ msgstr "Agordi ilbretojn"
 msgid "Configure &Kajongg..."
 msgstr "Agordi &Kajongg..."
 
-#: src/kdestub.py:366 src/kdestub.py:1202
+#: src/kdestub.py:366 src/kdestub.py:1206
 msgid "Configure"
 msgstr "Agordi"
 
@@ -464,19 +464,19 @@ msgstr ""
 msgid "Authors:"
 msgstr "Aŭtoroj:"
 
-#: src/kdestub.py:1155
+#: src/kdestub.py:1159
 msgid "License Agreement"
 msgstr "Licenca Interkonsento"
 
-#: src/kdestub.py:1404
+#: src/kdestub.py:1408
 msgid "Configure Toolbars"
 msgstr "Agordi Ilobretojn"
 
-#: src/kdestub.py:1406
+#: src/kdestub.py:1410
 msgid "A&vailable actions:"
 msgstr "Ha&veblaj agoj:"
 
-#: src/kdestub.py:1417
+#: src/kdestub.py:1421
 msgid "Curr&ent actions:"
 msgstr "Aktu&alaj agoj:"
 

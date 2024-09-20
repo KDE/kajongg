@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-05-01 00:36+0000\n"
+"POT-Creation-Date: 2024-09-20 02:37+0000\n"
 "PO-Revision-Date: 2023-12-25 01:06+0900\n"
 "Last-Translator: Kisaragi Hiu <mail@kisaragi-hiu.com>\n"
 "Language-Team: Traditional Chinese <zh-l10n@lists.slat.org>\n"
@@ -354,7 +354,7 @@ msgstr "設定工具列"
 msgid "Configure &Kajongg..."
 msgstr "設定 Kajongg(&K)..."
 
-#: src/kdestub.py:366 src/kdestub.py:1202
+#: src/kdestub.py:366 src/kdestub.py:1206
 msgid "Configure"
 msgstr "設定"
 
@@ -459,19 +459,19 @@ msgstr ""
 msgid "Authors:"
 msgstr "作者："
 
-#: src/kdestub.py:1155
+#: src/kdestub.py:1159
 msgid "License Agreement"
 msgstr "授權協議"
 
-#: src/kdestub.py:1404
+#: src/kdestub.py:1408
 msgid "Configure Toolbars"
 msgstr "設定工具列"
 
-#: src/kdestub.py:1406
+#: src/kdestub.py:1410
 msgid "A&vailable actions:"
 msgstr "可用的動作(&V)："
 
-#: src/kdestub.py:1417
+#: src/kdestub.py:1421
 msgid "Curr&ent actions:"
 msgstr "目前的動作(&E)："
 

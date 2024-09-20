@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-05-01 00:36+0000\n"
+"POT-Creation-Date: 2024-09-20 02:37+0000\n"
 "PO-Revision-Date: 2020-09-18 22:31+0100\n"
 "Last-Translator: Sergiu Bivol <sergiu@cip.md>\n"
 "Language-Team: Romanian\n"
@@ -359,7 +359,7 @@ msgstr "Configurează barele de unelte"
 msgid "Configure &Kajongg..."
 msgstr "Configurează Kajongg"
 
-#: src/kdestub.py:366 src/kdestub.py:1202
+#: src/kdestub.py:366 src/kdestub.py:1206
 msgid "Configure"
 msgstr "Configurează"
 
@@ -472,19 +472,19 @@ msgstr ""
 msgid "Authors:"
 msgstr "Autori:"
 
-#: src/kdestub.py:1155
+#: src/kdestub.py:1159
 msgid "License Agreement"
 msgstr "Acord de licență"
 
-#: src/kdestub.py:1404
+#: src/kdestub.py:1408
 msgid "Configure Toolbars"
 msgstr "Configurează barele de unelte"
 
-#: src/kdestub.py:1406
+#: src/kdestub.py:1410
 msgid "A&vailable actions:"
 msgstr "Acțiuni &disponibile:"
 
-#: src/kdestub.py:1417
+#: src/kdestub.py:1421
 msgid "Curr&ent actions:"
 msgstr "Acțiuni cur&ente:"
 
