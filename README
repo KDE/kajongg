@@ -52,3 +52,12 @@ menu commmand Help / Report Bug or mail me directly to the Mail
 Address given in that bug reporting dialog. I will not follow links
 to pages I do not trust like upload pages, shortlink services or
 similar.
+
+
+[b][u]Server ports[/b][/u]
+
+default ports correspond to protocol versions:
+
+8302 release/24.05, release/24.08, master
+8301 Applications/16.12, release/24.02
+84xx KDE4: 8000 plus major version: 4.9.5 is 8409
