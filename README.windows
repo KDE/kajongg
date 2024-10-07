@@ -2,14 +2,17 @@ Generating the windows installer *.msi
 --------------------------------------
 
 Rewritten in December 2016
+Removed in October 2024
 
-Since kajongg now works with Python3, the windows version
-will not use Python2 anymore.
+I never got feedback from windows users, and I am not a
+Microsoft fan anyway ...
 
-My setup:
-- host system is ubuntu 16.10 64bit
-- virtualbox guest with windows 7 32bit
-- guest has only Python3.5.2
+Since the module msilib is removed in Python3.13, I would
+have to fix the windows installer. I prefer to remove it.
+
+If you want a windows installer - you are very welcome
+to write it and create a merge request at https://invent.kde.org/games/kajongg
+
 
 on the linux host:
 - cd kajongg/src
