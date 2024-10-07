@@ -13,7 +13,6 @@ import sys
 import codecs
 from itertools import chain
 
-import cgitb  # pylint:disable=deprecated-module
 import tempfile
 import webbrowser
 import logging
@@ -21,30 +20,6 @@ from typing import Any, TYPE_CHECKING, Optional, Union, Tuple, Type, cast
 
 from log import logError, logDebug
 from common import Options, Internal, isAlive, Debug, handleSignals
-
-class MyHook(cgitb.Hook):
-
-    """override the standard cgitb hook: invoke the browser"""
-
-    def __init__(self) ->None:
-        self.tmpFileName = tempfile.mkstemp(
-            suffix='.html',
-            prefix='bt_',
-            text=True)[1]
-        # cgitb can only handle ascii, work around that.
-        # See https://bugs.python.org/issue22746
-        cgitb.Hook.__init__(self, file=codecs.open(self.tmpFileName, 'w',  # pylint:disable=consider-using-with
-                                                   encoding='latin-1', errors='xmlcharrefreplace'))
-
-    def handle(self, info:Optional[Union[Tuple[Type[BaseException], Any, Any], Tuple[None, None, None]]]=None) ->None:
-        """handling the exception: show backtrace in browser"""
-        if getattr(cgitb, 'Hook', None):
-            # if we cannot import twisted (syntax error), Hook is not yet known
-            cgitb.Hook.handle(self, info)
-            webbrowser.open(self.tmpFileName)
-
-# sys.excepthook = MyHook()
-
 
 NOTFOUND = []
 
