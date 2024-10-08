@@ -9,10 +9,8 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-import os
 from typing import TYPE_CHECKING, Optional, List, Any, Type, Tuple, Dict, Sequence
 
-from qt import uic, QStandardPaths
 from qt import QComboBox, QTableView, QSizePolicy, QAbstractItemView
 from qt import QTransform
 
@@ -23,18 +21,6 @@ from log import i18n
 if TYPE_CHECKING:
     from qt import QObject, QWidget, QPainter, QGraphicsItem
     from rule import Ruleset
-
-def loadUi(base:'QWidget') ->None:
-    """load the ui file for class base, deriving the file name from
-    the class name"""
-    name = base.__class__.__name__.lower() + '.ui'
-    if os.path.exists(name):
-        directory = os.getcwd()
-    elif os.path.exists(f'share/kajongg/{name}'):
-        directory = 'share/kajongg'
-    else:
-        directory = os.path.dirname(QStandardPaths.locate(QStandardPaths.StandardLocation.AppDataLocation, name))
-    uic.loadUi(os.path.join(directory, name), base)
 
 
 class MJTableView(QTableView):

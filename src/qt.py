@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 # pylint: disable=unused-import
 
-from qtpy import uic, QT5, QT6, PYQT5, PYQT6
+from qtpy import QT5, QT6, PYQT5, PYQT6
 from qtpy.QtCore import QAbstractAnimation
 from qtpy.QtCore import QAbstractItemModel
 from qtpy.QtCore import QAbstractTableModel
@@ -78,6 +78,7 @@ from qtpy.QtWidgets import QGraphicsSceneDragDropEvent
 from qtpy.QtWidgets import QGridLayout
 from qtpy.QtWidgets import QHBoxLayout
 from qtpy.QtWidgets import QHeaderView
+from qtpy.QtWidgets import QGroupBox
 from qtpy.QtGui import QIcon
 from qtpy.QtGui import QImageReader
 from qtpy.QtCore import QItemSelectionModel
