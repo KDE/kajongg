@@ -13,11 +13,12 @@ SPDX-License-Identifier: GPL-2.0
 """
 
 import os
+import sys
 
 from typing import Optional, Generator, List, Dict, cast
 
 from qt import QStandardPaths
-from log import logWarning, logException
+from log import logWarning, logException, logError
 from kde import KConfig
 from mi18n import i18n
 
@@ -49,6 +50,9 @@ class Resource:
         result = QStandardPaths.locateAll(
             QStandardPaths.StandardLocation.GenericDataLocation,
             f'kmahjongglib/{cls.resourceName}s', QStandardPaths.LocateOption.LocateDirectory)
+        if not result:
+            logError('cannot find kmahjongg resources. Is kdegames-mahjongg-data installed?', showStack=False)
+            sys.exit(1)
         result.insert(0, os.path.join('share', 'kmahjongglib', f'{cls.resourceName}s'))
         return (x for x in result if os.path.exists(x))
 
