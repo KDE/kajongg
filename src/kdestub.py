@@ -1361,11 +1361,11 @@ class KSeparator(QFrame):
 class ToolBarItem(QListWidgetItem):
 
     """a toolbar item"""
-    emptyIcon:QIcon
 
     def __init__(self, action:Action, parent:QListWidget) ->None:
         self.action = action
         self.parent = parent
+        self.emptyIcon:QIcon
         QListWidgetItem.__init__(self, self.__icon(), self.__text(), parent)
         # drop between items, not onto items
         self.setFlags(
@@ -1375,7 +1375,7 @@ class ToolBarItem(QListWidgetItem):
         """the action icon, default is an empty icon"""
         result = self.action.icon()
         if result.isNull():
-            if not self.emptyIcon:
+            if not hasattr(self, 'emptyIcon'):
                 iconSize = self.parent.style().pixelMetric(
                     QStyle.PixelMetric.PM_SmallIconSize)
                 _ = QPixmap(iconSize, iconSize)
