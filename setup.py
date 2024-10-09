@@ -42,7 +42,7 @@ for type in 'exe', 'data', 'xdgdata-apps', 'icon', 'html':
 kdeDirs['iconApps'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'apps')
 kdeDirs['iconActions'] = os.path.join(kdeDirs['icon'], 'hicolor', 'scalable', 'actions')
 
-app_files = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.py') or x.endswith('.ui')]
+app_files = [os.path.join('src', x) for x in os.listdir('src') if x.endswith('.py')]
 app_files.append('src/kajonggui.rc')
 app_files.append('COPYING')
 app_files.append('COPYING.DOC')

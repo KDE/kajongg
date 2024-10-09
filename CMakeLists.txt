@@ -112,8 +112,6 @@ set(SRCFILES
     src/kajcsv.py)
 
 set(DATAFILES
-    src/tilesetselector.ui
-    src/backgroundselector.ui
     src/kajonggui.rc)
 
 

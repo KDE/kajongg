@@ -6,7 +6,7 @@
 # currently, the .pot lives at
 # https://websvn.kde.org/trunk/l10n-kf5/templates/messages/kajongg/kajongg.pot
 
-${EXTRACTRC:-extractrc} src/*.ui src/*.rc >> rc.cpp
+${EXTRACTRC:-extractrc} src/*.rc >> rc.cpp
 
 ${XGETTEXT:-xgettext} \
 		-ci18n --from-code=UTF-8 --language=Python -k \

@@ -1,4 +1,3 @@
-include src/*.ui
 include src/*.py
 include src/*.rc
 include *.svgz
