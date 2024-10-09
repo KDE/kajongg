@@ -353,7 +353,7 @@ class KStandardAction:
         action = Action(mainWindow)
         action.triggered.connect(mainWindow.configureToolBar)
         action.setText(i18n('Configure Tool&bars...'))
-        action.setIcon(KIcon('configure-toolbars'))  # TODO: winprep
+        action.setIcon(KIcon('configure-toolbars'))
         action.setIconText(i18n('Configure toolbars'))
         separator = Action(mainWindow)
         separator.setSeparator(True)
