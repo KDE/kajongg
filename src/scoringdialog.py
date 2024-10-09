@@ -163,7 +163,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
                         # separately per cell beause the lines spread vertically over two rows: We would
                         # have to draw the lines into one big pixmap and copy
                         # from the into the cells
-                        painter.drawPolyline(*chart)
+                        painter.drawPolyline(chart)
             return
         QStyledItemDelegate.paint(self, painter, option, index)
 
