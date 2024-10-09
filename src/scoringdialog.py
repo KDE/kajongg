@@ -633,7 +633,7 @@ class PenaltyBox(QSpinBox):
         self.parties = parties
         self.prevValue = 0
 
-    def validate(self, inputData:str, pos:int) -> Tuple[QValidator.State, str, int]:
+    def validate(self, inputData:str, pos:int) -> Tuple[QValidator.State, str, int]:  # type:ignore[override]
         """check if value is a multiple of parties"""
         _ = QSpinBox.validate(self, inputData, pos)
         result = _[0]
@@ -650,7 +650,7 @@ class PenaltyBox(QSpinBox):
             self.prevValue = int(inputData)
         return (result, inputData, newPos)
 
-    def fixup(self, data:str) ->str:
+    def fixup(self, data:str) ->str:  # type:ignore[override]
         """change input to a legal value"""
         # The Qt doc says return type is None but annotation says str
         value = int(str(data))

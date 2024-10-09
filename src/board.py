@@ -87,7 +87,7 @@ class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):  # ty
             newPrevailing = self.wind == Wind.all4[value % 4]
         self.__brush = self.roundWindColor if newPrevailing else self.whiteColor
 
-    def paint(self, painter:Optional[QPainter], unusedOption:QStyleOptionGraphicsItem,
+    def paint(self, painter:Optional[QPainter], unusedOption:Optional[QStyleOptionGraphicsItem],
         unusedWidget:Optional['QWidget']=None) ->None:
         """paint the disc"""
         if painter:
@@ -940,7 +940,7 @@ class YellowText(QGraphicsRectItem):
         else:
             self.moveBy(xOffset, yOffset)
 
-    def paint(self, painter:Optional[QPainter], unusedOption:QStyleOptionGraphicsItem,
+    def paint(self, painter:Optional[QPainter], unusedOption:Optional[QStyleOptionGraphicsItem],
         unusedWidget:Optional['QWidget']=None) ->None:
         """override predefined paint"""
         if painter:

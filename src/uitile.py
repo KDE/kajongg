@@ -199,7 +199,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
         lightSourceIndex = LIGHTSOURCES.index(_.rotatedLightSource())
         return f"TILE_{lightSourceIndex % 4 + 1}"
 
-    def paint(self, painter:Optional[QPainter], unusedOption:'QStyleOptionGraphicsItem',
+    def paint(self, painter:Optional[QPainter], unusedOption:Optional['QStyleOptionGraphicsItem'],
         unusedWidget:Optional['QWidget']=None) ->None:
         """paint the entire tile.
         I tried to cache a pixmap for the tile and darkener but without face,
