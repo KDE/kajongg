@@ -164,14 +164,15 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin): # typ
             self.__boundingRect = QRectF(QFontMetrics(self.__font).boundingRect(txt))
             self.needsRefresh = True
 
-    def paint(self, painter:'QPainter', unusedOption:'QStyleOptionGraphicsItem',
+    def paint(self, painter:Optional['QPainter'], unusedOption:'QStyleOptionGraphicsItem',
         unusedWidget:Optional['QWidget']=None) ->None:
         """paint the disc"""
-        with Painter(painter):
-            pen = QPen(self.color)
-            painter.setPen(pen)
-            painter.setFont(self.__font)
-            painter.drawText(0, 0, self.__text)
+        if painter:
+            with Painter(painter):
+                pen = QPen(self.color)
+                painter.setPen(pen)
+                painter.setFont(self.__font)
+                painter.drawText(0, 0, self.__text)
 
     def boundingRect(self) ->QRectF:
         """around the text"""

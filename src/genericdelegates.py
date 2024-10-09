@@ -48,7 +48,7 @@ class RichTextColumnDelegate(QStyledItemDelegate):
             self.label.setTextFormat(Qt.TextFormat.RichText)
             self.document = QTextDocument()
 
-    def paint(self, painter:'QPainter', option:QStyleOptionViewItem,
+    def paint(self, painter:Optional['QPainter'], option:QStyleOptionViewItem,
         index:Union[QModelIndex,'QPersistentModelIndex']) ->None:
         """paint richtext"""
         assert isinstance(index, QModelIndex)
@@ -61,9 +61,10 @@ class RichTextColumnDelegate(QStyledItemDelegate):
         text = index.model().data(index, Qt.ItemDataRole.DisplayRole)
         self.label.setText(text)
         self.label.setFixedSize(option.rect.size())
-        with Painter(painter):
-            painter.translate(option.rect.topLeft())
-            self.label.render(painter)
+        if painter:
+            with Painter(painter):
+                painter.translate(option.rect.topLeft())
+                self.label.render(painter)
 
     def sizeHint(self, option:QStyleOptionViewItem, index:Union[QModelIndex,'QPersistentModelIndex']) ->QSize:
         """compute size for the final formatted richtext"""
@@ -90,7 +91,7 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
         return QApplication.style().pixelMetric(
             QStyle.PixelMetric.PM_FocusFrameHMargin) + 1
 
-    def paint(self, painter:'QPainter', option:QStyleOptionViewItem,
+    def paint(self, painter:Optional['QPainter'], option:QStyleOptionViewItem,
         index:Union[QModelIndex,'QPersistentModelIndex']) ->None:
         """paint right aligned checkbox"""
         assert isinstance(index, QModelIndex)
@@ -107,7 +108,8 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
                     option.rect.width() - (2 * textMargin),
                     option.rect.height()))
             viewItemOption.rect = newRect
-        QStyledItemDelegate.paint(self, painter, viewItemOption, index)
+        if painter:
+            QStyledItemDelegate.paint(self, painter, viewItemOption, index)
 
     def editorEvent(self, event:Optional[QEvent], model:Optional['QAbstractItemModel'],
         option:QStyleOptionViewItem, index:Union[QModelIndex,'QPersistentModelIndex']) ->bool:

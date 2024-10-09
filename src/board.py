@@ -87,19 +87,20 @@ class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):  # ty
             newPrevailing = self.wind == Wind.all4[value % 4]
         self.__brush = self.roundWindColor if newPrevailing else self.whiteColor
 
-    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem,
+    def paint(self, painter:Optional[QPainter], unusedOption:QStyleOptionGraphicsItem,
         unusedWidget:Optional['QWidget']=None) ->None:
         """paint the disc"""
-        with Painter(painter):
-            painter.setBrush(self.__brush)
-            assert Internal.scene
-            size = int(Internal.scene.windTileset.faceSize.height())
-            ellRect = QRectF(QPointF(), QPointF(size, size))
-            painter.drawEllipse(ellRect)
-            renderer = Internal.scene.windTileset.renderer
-            painter.translate(12, 12)
-            painter.scale(0.60, 0.60)
-            renderer.render(painter, self.wind.discSvgName, self.boundingRect())
+        if painter:
+            with Painter(painter):
+                painter.setBrush(self.__brush)
+                assert Internal.scene
+                size = int(Internal.scene.windTileset.faceSize.height())
+                ellRect = QRectF(QPointF(), QPointF(size, size))
+                painter.drawEllipse(ellRect)
+                renderer = Internal.scene.windTileset.renderer
+                painter.translate(12, 12)
+                painter.scale(0.60, 0.60)
+                renderer.render(painter, self.wind.discSvgName, self.boundingRect())
 
     def boundingRect(self) ->QRectF:
         """define the part of the tile we want to see"""
@@ -939,13 +940,14 @@ class YellowText(QGraphicsRectItem):
         else:
             self.moveBy(xOffset, yOffset)
 
-    def paint(self, painter:QPainter, unusedOption:QStyleOptionGraphicsItem,
+    def paint(self, painter:Optional[QPainter], unusedOption:QStyleOptionGraphicsItem,
         unusedWidget:Optional['QWidget']=None) ->None:
         """override predefined paint"""
-        painter.setFont(self.font)
-        painter.fillRect(self.rect(), QBrush(QColor('yellow')))
-        if self.msg:
-            painter.drawText(self.rect(), self.msg)
+        if painter:
+            painter.setFont(self.font)
+            painter.fillRect(self.rect(), QBrush(QColor('yellow')))
+            if self.msg:
+                painter.drawText(self.rect(), self.msg)
 
 
 class DiscardBoard(CourtBoard):

@@ -148,9 +148,10 @@ class ScoreItemDelegate(QStyledItemDelegate):
     def __init__(self, parent:Optional['QObject']=None) ->None:
         QStyledItemDelegate.__init__(self, parent)
 
-    def paint(self, painter:QPainter, option:'QStyleOptionViewItem',
+    def paint(self, painter:Optional[QPainter], option:'QStyleOptionViewItem',
         index:Union[QModelIndex,'QPersistentModelIndex']) ->None:
         """where the real work is done..."""
+        assert painter
         assert isinstance(index, ScorePlayerItem)
         item = index.internalPointer()
         if isinstance(item, ScorePlayerItem) and item.parent and item.parent.row() == 3 and index.column() != 0:
