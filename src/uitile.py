@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import TYPE_CHECKING, Optional, Dict, Literal, Any
+from typing import TYPE_CHECKING, Optional, Dict, Literal, Any, cast
 
 from qt import Qt, QRectF, QPointF, QSizeF, QSize
 from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from board import Board
 
 
-class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
+class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
 
     """A tile visible on the screen. Every tile is only allocated once
     and then reshuffled and reused for every game.
@@ -144,7 +144,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             movingZ += ZValues.movingZ
             movingZ += ZValues.boardZFactor
         elif changePos:
-            if self.rotation % 180 == 0:
+            if cast(float, self.rotation) % 180 == 0:
                 currentY = self.y()
                 newY = changePos.endValue().y()
             else:
@@ -415,7 +415,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):
             return (f"{self.__class__.__name__}_{id4(self)}({self.tile.name2()} on "
                     f"{self.board.debug_name() if self.board else 'None'} "
                     f"x/y {self.xoffset:.1f}/{int(self.yoffset)})")
-        rotation = f' rot{int(self.rotation)}' if self.rotation else ''
+        rotation = f' rot{int(cast(float, self.rotation))}' if self.rotation else ''
         scale = f' scale={self.scale:.2f}' if self.scale != 1 else ''
         level = f' level={int(self.level)}' if self.level else ''
         _ = self.boundingRect()

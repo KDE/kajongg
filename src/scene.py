@@ -32,7 +32,7 @@ from animation import AnimationSpeed, afterQueuedAnimations
 from scoringdialog import ScoringDialog
 
 if TYPE_CHECKING:
-    from qt import QEvent, QKeyEvent, QFocusEvent, QWidget
+    from qt import QEvent, QKeyEvent, QFocusEvent, QWidget, QPointF
     from game import Game
     from handboard import HandBoard
     from mainwindow import MainWindow
@@ -90,7 +90,7 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
         self.setScale(board.scale())
         if board.focusTile:
             board.focusTile.setFocus()
-            self.setPos(board.focusTile.pos)
+            self.setPos(cast('QPointF', board.focusTile.pos))
         assert Internal.scene
         game = Internal.scene.game
         if game is None:

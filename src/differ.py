@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 from typing import List, Tuple, TYPE_CHECKING, Optional, Union
 
-from qt import Qt, QAbstractTableModel, QModelIndex
+from qt import Qt, QAbstractTableModel, QModelIndex, QPersistentModelIndex
 from qt import QLabel, QDialog, QHBoxLayout, QVBoxLayout, QDialogButtonBox
 
 from mi18n import i18n, i18nc
@@ -33,18 +33,19 @@ class DifferModel(QAbstractTableModel):
         self.diffs = diffs
         self.view = view
 
-    def columnCount(self, unusedIndex:QModelIndex=QModelIndex()) ->int:
+    def columnCount(self, unusedIndex:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->int:
         """how many columns does this node have?"""
         return 3  # rule name, left values, right values
 
-    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
+    def rowCount(self, parent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->int:
         """how many items?"""
         if parent.isValid():
             # we have only top level items
             return 0
         return len(self.diffs)
 
-    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int,str,None]:
+    def data(self, index:Union[QModelIndex,QPersistentModelIndex],
+        role:int=Qt.ItemDataRole.DisplayRole) ->Union[int,str,None]:
         """get from model"""
         if not index.isValid():
             return None

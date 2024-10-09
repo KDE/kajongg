@@ -119,7 +119,7 @@ def qi18nc(context:str, englishIn:str, *args:Any) ->str:
     if Internal.app is None:
         _ = englishIn
     else:
-        _ = Internal.app.translate(context, englishIn)
+        _ = Internal.app.translate(context.encode(), englishIn.encode())
     return __insertArgs(_, *args)
 
 def i18nE(englishText:str) ->str:
@@ -144,13 +144,16 @@ class KDETranslator(QTranslator):
     def __init__(self, parent:QObject) ->None:
         QTranslator.__init__(self, parent)
 
-    def translate(self, context:str, text:str, disambiguation:Optional[str]=None, numerus:int=-1) ->str:
-        """context should be the class name defined by qt5 or kf5"""
+    def translate(self, context:str, text:str,  # type:ignore[override]
+        disambiguation:Optional[bytes]=None, numerus:int=-1) ->str:
+        """context should be the class name defined by qt5 or kf5.
+        PyQt uses str, Pyside uses bytes - so just ignore typing warnings"""
+        # Qt doc says str but on Debian Bookworm, .pyi says bytes
         if Debug.neutral:
-            return text
-        result = QTranslator.translate(self, context, text, disambiguation, numerus)
+            return text  # type:ignore[return-value]
+        result = QTranslator.translate(self, context, text, disambiguation, numerus)  # type:ignore[arg-type]
         if result:
-            return result
+            return result  # type:ignore[return-value]
         if not MLocale.currentLanguages():
             # when starting kajongg.py, qt5 loads translators for the system default
             # language. I do not know how to avoid that. And I cannot delete
@@ -158,7 +161,7 @@ class KDETranslator(QTranslator):
             # But we still need to install our own QTranslator overriding the ones
             # mentioned above. It will never find a translation, so we come here.
             assert Internal.app.translators == [self]
-        return text
+        return text  # type:ignore[return-value]
 
 
 

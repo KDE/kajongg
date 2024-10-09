@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 from typing import List, Optional, Union, TYPE_CHECKING, cast
 
-from qt import Qt, QAbstractTableModel, QModelIndex, QSize
+from qt import Qt, QAbstractTableModel, QModelIndex, QPersistentModelIndex, QSize
 from qt import QWidget, QLineEdit, QVBoxLayout, QColor, QAbstractItemView
 
 from log import i18n, logDebug
@@ -51,7 +51,7 @@ class ChatModel(QAbstractTableModel):
             result = [i18n('Time'), i18n('Player'), i18n('Message')][section]
         return result
 
-    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
+    def rowCount(self, parent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->int:
         """how many lines are in the model?"""
         if parent.isValid():
             # similar in tables.py
@@ -59,11 +59,12 @@ class ChatModel(QAbstractTableModel):
             return 0
         return len(self.chatLines)
 
-    def columnCount(self, unusedParent:QModelIndex=QModelIndex()) ->int:
+    def columnCount(self, unusedParent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->int:
         """for now we only have time, who, message"""
         return 3
 
-    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, QColor, None]:
+    def data(self, index:Union[QModelIndex,QPersistentModelIndex],
+        role:int=Qt.ItemDataRole.DisplayRole) ->Union[int, str, QColor, None]:
         """score table"""
         result:Union[int, str, QColor, None] = None
         if role == Qt.ItemDataRole.TextAlignmentRole:

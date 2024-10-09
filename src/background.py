@@ -63,7 +63,7 @@ class Background(Resource):
             width = self.imageWidth
             height = self.imageHeight
         cachekey = f'{self.name}W{width}H{height}'
-        result = QPixmapCache.find(cachekey)
+        result = QPixmapCache.find(cachekey)  # type:ignore[call-overload]
         if not result:
             renderer = QSvgRenderer(self.graphicsPath)
             if not renderer.isValid():

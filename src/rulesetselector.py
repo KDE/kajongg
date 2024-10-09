@@ -15,7 +15,7 @@ from qt import Qt, QSize
 from qt import QWidget, QHBoxLayout, QVBoxLayout, \
     QPushButton, QSpacerItem, QSizePolicy, \
     QTreeView, QFont, QAbstractItemView, QHeaderView
-from qt import QModelIndex
+from qt import QModelIndex, QPersistentModelIndex
 from kdestub import KApplication
 from rule import Rule, Ruleset, PredefinedRuleset, ParameterRule, BoolRule
 from util import uniqueList
@@ -171,24 +171,24 @@ class RuleModel(TreeModel):
         rootData.extend(unitNames)
         self.rootItem = RuleRootItem(rootData)
 
-    def canFetchMore(self, unusedParent:QModelIndex=QModelIndex()) ->bool:
+    def canFetchMore(self, unusedParent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->bool:
         """did we already load the rules? We only want to do that
         when the config tab with rulesets is actually shown"""
         return not self.loaded
 
-    def fetchMore(self, unusedParent:QModelIndex=QModelIndex()) ->None:
+    def fetchMore(self, unusedParent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->None:
         """load the rules"""
         for ruleset in self.rulesets:
             self.appendRuleset(ruleset)
         self.loaded = True
 
-    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Any:
+    def data(self, index:Union[QModelIndex,QPersistentModelIndex], role:int=Qt.ItemDataRole.DisplayRole) ->Any:
         """get data fom model"""
         # pylint: disable=too-many-branches
         # too many branches
         result = None
-        if index.isValid():
-            item = index.internalPointer()
+        if index.isValid() and isinstance(index, QModelIndex):
+            item = cast(RuleTreeItem, index.internalPointer())
             if role in (Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole):
                 if index.column() == 1:
                     if isinstance(item, RuleItem) and isinstance(item.raw, BoolRule):
@@ -217,6 +217,7 @@ class RuleModel(TreeModel):
                     font.setItalic(True)
                     result = font
             elif role == Qt.ItemDataRole.ToolTipRole:
+                assert isinstance(item, RulesetItem)
                 tip = f'<b></b>{i18n(item.tooltip())}<b></b>' if item else ''
                 result = tip
         return result
@@ -298,14 +299,15 @@ class EditableRuleModel(RuleModel):
             dirty, message = content.score.change(unitName, value)
         return dirty, message
 
-    def setData(self, index:QModelIndex, value:str, role:int=Qt.ItemDataRole.EditRole) ->bool:
+    def setData(self, index:Union[QModelIndex,QPersistentModelIndex], value:str,
+        role:int=Qt.ItemDataRole.EditRole) ->bool:
         """change data in the model"""
         # pylint:  disable=too-many-branches
-        if not index.isValid():
+        if not index.isValid() or not isinstance(index, QModelIndex):
             return False
         dirty = False
         column = index.column()
-        item = index.internalPointer()
+        item = cast(RuleTreeItem, index.internalPointer())
         ruleset = item.ruleset()
         content = item.raw
         if role == Qt.ItemDataRole.EditRole:
@@ -340,7 +342,7 @@ class EditableRuleModel(RuleModel):
         if not index.isValid():
             return Qt.ItemFlag.ItemIsEnabled
         column = index.column()
-        item = index.internalPointer()
+        item = cast(RuleTreeItem, index.internalPointer())
         content = item.raw
         checkable = False
         if isinstance(content, Ruleset) and column == 0:
@@ -383,7 +385,8 @@ class RuleTreeView(QTreeView):
         self.rulesets:List[Ruleset] = []  # nasty: this generates self.ruleModel
         self.differs:List[RulesetDiffer] = []
 
-    def dataChanged(self, unusedIndex1:QModelIndex, unusedIndex2:QModelIndex,
+    def dataChanged(self, unusedIndex1:Union[QModelIndex,QPersistentModelIndex],
+        unusedIndex2:Union[QModelIndex,QPersistentModelIndex],
         unusedRoles:Optional[Iterable[int]]=None) ->None:
         """get called if the model has changed: Update all differs"""
         for differ in self.differs:
@@ -417,7 +420,7 @@ class RuleTreeView(QTreeView):
         assert self.ruleModel
         enableCopy = enableRemove = enableCompare = False
         if selected.indexes():
-            item = selected.indexes()[0].internalPointer()
+            item = cast(RuleTreeItem, selected.indexes()[0].internalPointer())
             isPredefined = isinstance(item.ruleset(), PredefinedRuleset)
             if isinstance(item, RulesetItem):
                 enableCompare = True
@@ -468,7 +471,7 @@ class RuleTreeView(QTreeView):
         """removes a ruleset or a rule"""
         row = self.selectedRow()
         if row:
-            item = row.internalPointer()
+            item = cast(RuleTreeItem, row.internalPointer())
             assert not isinstance(item.ruleset(), PredefinedRuleset)
             assert isinstance(item, RulesetItem)
             ruleset = item.ruleset()
@@ -479,7 +482,7 @@ class RuleTreeView(QTreeView):
     def compareRow(self) ->None:
         """shows the difference between two rulesets"""
         rows = self.selectionModel().selectedRows()
-        ruleset = rows[0].internalPointer().raw
+        ruleset = cast(RuleTreeItem, rows[0].internalPointer()).raw
         assert isinstance(ruleset, Ruleset)
         differ = RulesetDiffer([ruleset], self.rulesets)
         differ.show()

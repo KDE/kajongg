@@ -213,7 +213,6 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         assert self.state() != QAbstractAnimation.State.Running
         for animation in self.animations:
             graphicsObject = animation.targetObject()
- #            graphicsObject = cast(AnimatedMixin, animation.targetObject())
             if not isAlive(animation) or not isAlive(graphicsObject):
                 return fail()
             animatedObject = cast(AnimatedMixin, graphicsObject)
@@ -224,7 +223,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             if propName == 'rotation':
                 # change direction if that makes the difference smaller
                 endValue = animation.endValue()
-                currValue = animatedObject.rotation
+                currValue = cast(float, animatedObject.rotation)
                 if endValue - currValue > 180:
                     animation.setStartValue(currValue + 360)
                 if currValue - endValue > 180:
@@ -351,10 +350,15 @@ class AnimatedMixin:
         self.queuedAnimations = []
         self.setDrawingOrder()  # type:ignore[attr-defined] # TODO: mypy protocol?
 
-    def getValue(self, pName:str) ->PropertyType:
+    def getValue(self, pName:str) ->Union[QPointF,int,float]:
         """get a current property value"""
-        return {'pos': self.pos, 'rotation': self.rotation,
-                'scale': self.scale}[pName]
+        if pName == 'pos':
+            return cast(QPointF, self.pos)
+        if pName == 'rotation':
+            return cast(int, self.rotation)
+        if pName == 'scale':
+            return cast(float, self.scale)
+        assert False
 
     def setActiveAnimation(self, animation:'Animation') ->None:
         """the graphics object knows which of its properties are currently animated"""

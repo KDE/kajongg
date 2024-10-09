@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from scene import SceneWithFocusRect
 
 
-class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):
+class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
 
     """a round wind tile"""
 
@@ -374,7 +374,7 @@ class Board(QGraphicsRectItem, ReprMixin):
                 _ = uiTile.board.tileFaceRect().bottomRight()
                 view = Internal.scene.mainWindow.centralView
                 menuPoint = view.mapToGlobal(
-                    view.mapFromScene(uiTile.mapToScene(_)))
+                    view.mapFromScene(cast(QPointF, uiTile.mapToScene(_))))
             action = menu.exec(menuPoint)
             if not action:
                 return None
@@ -891,8 +891,8 @@ class FittingView(QGraphicsView):
         tRect = uiTile.boundingRect()
         tRect = self.viewportTransform().mapRect(tRect)
         pmapSize = QSize(
-            int(tRect.width() * uiTile.scale),
-            int(tRect.height() * uiTile.scale))
+            int(tRect.width() * cast(float, uiTile.scale)),
+            int(tRect.height() * cast(float, uiTile.scale)))
         pMap = uiTile.pixmapFromSvg(pmapSize)
         drag.setPixmap(pMap)
         drag.setHotSpot(QPoint(pMap.width() // 2, pMap.height() // 2))

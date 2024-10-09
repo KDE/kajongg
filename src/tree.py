@@ -10,9 +10,9 @@ SPDX-License-Identifier: GPL-2.0
 Here we define classes useful for tree views
 """
 
-from typing import Any, List, Sequence, Optional, overload, Union, TYPE_CHECKING
+from typing import Any, List, Sequence, Optional, overload, Union, TYPE_CHECKING, cast
 
-from qt import QAbstractItemModel, QModelIndex
+from qt import QAbstractItemModel, QModelIndex, QPersistentModelIndex
 
 if TYPE_CHECKING:
     from qt import QObject
@@ -88,18 +88,18 @@ class TreeModel(QAbstractItemModel):
         super().__init__(parent)
         self.rootItem:Optional[RootItem] = None
 
-    def columnCount(self, parent:QModelIndex=QModelIndex()) ->int:
+    def columnCount(self, parent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->int:
         """how many columns does this node have?"""
-        return self.itemForIndex(parent).columnCount()
+        return self.itemForIndex(cast(QModelIndex, parent)).columnCount()
 
-    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
+    def rowCount(self, parent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->int:
         """how many items?"""
         if parent.isValid() and parent.column():
             # all children have col=0 for parent
             return 0
-        return self.itemForIndex(parent).childCount()
+        return self.itemForIndex(cast(QModelIndex, parent)).childCount()
 
-    def index(self, row:int, column:int, parent:QModelIndex=QModelIndex()) ->QModelIndex:
+    def index(self, row:int, column:int, parent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->QModelIndex:
         """generate an index for this item"""
         if self.rootItem is None:
             return QModelIndex()
@@ -108,19 +108,19 @@ class TreeModel(QAbstractItemModel):
                 or row >= self.rowCount(parent)
                 or column >= self.columnCount(parent)):
             return QModelIndex()
-        parentItem = self.itemForIndex(parent)
+        parentItem = self.itemForIndex(cast(QModelIndex, parent))
         assert parentItem
         item = parentItem.child(row)
         if item:
             return self.createIndex(row, column, item)
         return QModelIndex()
 
-    @overload
-    def parent(self, index:QModelIndex) ->QModelIndex: ...
-    @overload
+    @overload  # type:ignore[override]
     def parent(self) ->'QObject': ...
+    @overload
+    def parent(self, index:Union[QModelIndex,QPersistentModelIndex]) ->QModelIndex: ...
 
-    def parent(self, index:Optional[QModelIndex]=None) ->Union[QModelIndex, 'QObject']:
+    def parent(self, index:Optional[Union[QModelIndex,QPersistentModelIndex]]=None) ->Union[QModelIndex, 'QObject']:
         """find the parent for index"""
         assert isinstance(index, QModelIndex)  # we never use parent() for getting QObject
         if not index.isValid():
@@ -139,7 +139,7 @@ class TreeModel(QAbstractItemModel):
     def itemForIndex(self, index:QModelIndex) ->TreeItem:
         """return the item at index"""
         if index.isValid():
-            item = index.internalPointer()
+            item = cast(TreeItem, index.internalPointer())
             if item:
                 return item
         assert self.rootItem
@@ -155,8 +155,10 @@ class TreeModel(QAbstractItemModel):
         self.endInsertRows()
         return True
 
-    def removeRows(self, position:int, rows:int=1, parent:QModelIndex=QModelIndex()) ->bool:
+    def removeRows(self, position:int, rows:int=1,
+        parent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->bool:
         """reimplement QAbstractItemModel.removeRows"""
+        assert isinstance(parent, QModelIndex)
         self.beginRemoveRows(parent, position, position + rows - 1)
         parentItem = self.itemForIndex(parent)
         for row in parentItem.children[position:position + rows]:

@@ -36,7 +36,7 @@ from wind import Wind
 from tile import Tile, MeldList
 
 if TYPE_CHECKING:
-    from qt import QObject, QRect, QStyleOptionViewItem
+    from qt import QObject, QRect, QStyleOptionViewItem, QPersistentModelIndex
     from tile import Meld
     from rule import Rule, Score
     from scene import ScoringScene
@@ -148,15 +148,19 @@ class ScoreItemDelegate(QStyledItemDelegate):
     def __init__(self, parent:Optional['QObject']=None) ->None:
         QStyledItemDelegate.__init__(self, parent)
 
-    def paint(self, painter:QPainter, option:'QStyleOptionViewItem', index:QModelIndex) ->None:
+    def paint(self, painter:QPainter, option:'QStyleOptionViewItem',
+        index:Union[QModelIndex,'QPersistentModelIndex']) ->None:
         """where the real work is done..."""
+        assert isinstance(index, ScorePlayerItem)
         item = index.internalPointer()
         if isinstance(item, ScorePlayerItem) and item.parent and item.parent.row() == 3 and index.column() != 0:
-            for idx, playerItem in enumerate(index.parent().internalPointer().children):
-                chart = cast('ScoreModel', index.model()).chart(option.rect, index, playerItem)
+            parent_item = cast(TreeItem, index.parent().internalPointer())
+            for idx, playerItem in enumerate(parent_item.children):
+                rect = option.rect  # type:ignore[attr-defined]
+                chart = cast('ScoreModel', index.model()).chart(rect, index, playerItem)
                 if chart:
                     with Painter(painter):
-                        painter.translate(option.rect.topLeft())
+                        painter.translate(rect.topLeft())
                         painter.setPen(self.colors[idx])
                         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
                         # if we want to use a pen width > 1, we can no longer directly drawPolyline
@@ -192,13 +196,14 @@ class ScoreModel(TreeModel):
         xValues = [x * stepX for x in range(self.steps + 1)]
         return [QPointF(x, y) for x, y in zip(xValues, yValues)]
 
-    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Any:  # pylint: disable=too-many-branches
+    def data(self, index:Union[QModelIndex,'QPersistentModelIndex'], role:int=Qt.ItemDataRole.DisplayRole) ->Any:  # pylint: disable=too-many-branches
         """score table"""
         # pylint: disable=too-many-return-statements
+        assert isinstance(index, QModelIndex)
         if not index.isValid():
             return None
         column = index.column()
-        item = index.internalPointer()
+        item = cast(TreeItem, index.internalPointer())
         assert item.parent
         if role == Qt.ItemDataRole.DisplayRole:
             if isinstance(item, ScorePlayerItem):
@@ -628,7 +633,10 @@ class PenaltyBox(QSpinBox):
 
     def validate(self, inputData:str, pos:int) -> Tuple[QValidator.State, str, int]:
         """check if value is a multiple of parties"""
-        result, inputData, newPos = QSpinBox.validate(self, inputData, pos)
+        _ = QSpinBox.validate(self, inputData, pos)
+        result = _[0]
+        inputData = _[1]
+        newPos = _[2]
         if result == QValidator.State.Acceptable:
             try:
                 int_data = int(inputData)

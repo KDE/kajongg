@@ -9,9 +9,9 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 
-from typing import Optional, List, Any, TYPE_CHECKING
+from typing import Optional, List, Any, TYPE_CHECKING, Union
 
-from qt import Qt, QModelIndex
+from qt import Qt, QModelIndex, QPersistentModelIndex
 from qt import QAbstractTableModel, QDialogButtonBox, QDialog
 from qt import QHBoxLayout, QVBoxLayout, QCheckBox
 from qt import QItemSelectionModel, QAbstractItemView
@@ -37,11 +37,11 @@ class GamesModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self)
         self._resultRows:List[List[Any]] = []
 
-    def columnCount(self, unusedParent:QModelIndex=QModelIndex()) ->int:
+    def columnCount(self, unusedParent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->int:
         """including the hidden col 0"""
         return 3
 
-    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
+    def rowCount(self, parent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->int:
         """how many games"""
         if parent.isValid():
             # we have only top level items
@@ -56,7 +56,7 @@ class GamesModel(QAbstractTableModel):
         finally:
             self.endResetModel()
 
-    def index(self, row:int, column:int, parent:QModelIndex=QModelIndex()) ->QModelIndex:
+    def index(self, row:int, column:int, parent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->QModelIndex:
         """helper"""
         if (row < 0
                 or column < 0
@@ -66,8 +66,9 @@ class GamesModel(QAbstractTableModel):
             return QModelIndex()
         return self.createIndex(row, column, 0)
 
-    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Any:
+    def data(self, index:Union[QModelIndex,QPersistentModelIndex], role:int=Qt.ItemDataRole.DisplayRole) ->Any:
         """get score table from view"""
+        assert isinstance(index, QModelIndex)
         if role is None:
             role = Qt.ItemDataRole.DisplayRole
         if not (index.isValid() and role == Qt.ItemDataRole.DisplayRole):

@@ -32,7 +32,9 @@ if TYPE_CHECKING:
     from scene import PlayingScene
 
 
-class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin):  # pylint:disable=too-many-instance-attributes
+class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin): # type:ignore[misc]
+
+    # pylint:disable=too-many-instance-attributes
 
     """The text written on the wall"""
 

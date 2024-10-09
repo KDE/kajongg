@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 import datetime
 
-from typing import TYPE_CHECKING, Optional, List, Any, cast
+from typing import TYPE_CHECKING, Optional, List, Any, cast, Union
 
 from qt import Qt, QAbstractTableModel, QModelIndex
 from qt import QDialog, QDialogButtonBox, QWidget
@@ -32,7 +32,7 @@ from chat import ChatMessage, ChatWindow
 
 if TYPE_CHECKING:
     from client import ClientTable
-    from qt import QObject, QEvent, QItemSelection
+    from qt import QObject, QEvent, QItemSelection, QPersistentModelIndex
     from login import Url
     from humanclient import HumanClient
     from scene import PlayingScene
@@ -69,21 +69,21 @@ class TablesModel(QAbstractTableModel):
                       i18n('Ruleset')][section]
         return result
 
-    def rowCount(self, parent:QModelIndex=QModelIndex()) ->int:
+    def rowCount(self, parent:Union[QModelIndex,'QPersistentModelIndex']=QModelIndex()) ->int:
         """how many tables are in the model?"""
         if parent.isValid():
             # we have only top level items
             return 0
         return len(self.tables)
 
-    def columnCount(self, unusedParent:QModelIndex=QModelIndex()) ->int:
+    def columnCount(self, unusedParent:Union[QModelIndex,'QPersistentModelIndex']=QModelIndex()) ->int:
         """for now we only have id (invisible), id (visible), players,
         status, ruleset.name.
         id(invisible) always holds the real id, also 1000 for suspended tables.
         id(visible) is what should be displayed."""
         return 5
 
-    def data(self, index:QModelIndex, role:int=Qt.ItemDataRole.DisplayRole) ->Any:
+    def data(self, index:Union[QModelIndex,'QPersistentModelIndex'], role:int=Qt.ItemDataRole.DisplayRole) ->Any:
         """score table"""
         # pylint: disable=too-many-branches,too-many-locals
         result:Any = None

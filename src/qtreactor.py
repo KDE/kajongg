@@ -153,7 +153,9 @@ class QtReactor(posixbase.PosixReactorBase):
             self.qApp = QCoreApplication([])
             self._ownApp = True
         else:
-            self.qApp = QCoreApplication.instance()
+            _ = QCoreApplication.instance()
+            assert _
+            self.qApp = _
             self._ownApp = False
         self._blockApp:Union[QCoreApplication, QEventLoop, None] = None
         posixbase.PosixReactorBase.__init__(self)

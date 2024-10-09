@@ -635,7 +635,7 @@ into a situation where you have to pay a penalty"""))
         return [self.rulesetId, ruleList.listId, ruleIdx, rule.name,
                 rule.definition, score.points, score.doubles, score.limits, rule.parameter] # type:ignore
 
-    def updateRule(self, rule:'Rule') ->None:
+    def updateRule(self, rule:'RuleBase') ->None:
         """update rule in database"""
         self.__hash = ''  # invalidate, will be recomputed when needed
         with Internal.db:

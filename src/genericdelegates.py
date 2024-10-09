@@ -6,23 +6,27 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import TYPE_CHECKING, Optional, Callable, Any, cast
+# mypy: disable_error_code="attr-defined,call-overload"
+# Pyside6 does not seem to have complete/correct annotations for QStyleOptionViewItem
 
-from qt import Qt, QSize, QRect, QEvent
+from typing import TYPE_CHECKING, Optional, Callable, Any, cast, Union
+
+from qt import Qt, QSize, QRect, QEvent, QModelIndex
 from qt import QStyledItemDelegate, QLabel, QTextDocument, QStyle, QPalette, \
     QStyleOptionViewItem, QApplication
 
 from guiutil import Painter
 
 if TYPE_CHECKING:
-    from qt import QLocale, QObject, QPainter, QModelIndex, QAbstractItemModel
+    from qt import QLocale, QObject, QPainter, QPersistentModelIndex, QAbstractItemModel
     from qt import QKeyEvent
+
 
 class ZeroEmptyColumnDelegate(QStyledItemDelegate):
 
     """Display 0 or 0.00 as empty"""
 
-    def displayText(self, value:Any, locale:'QLocale') ->str:
+    def displayText(self, value:Any, locale:'QLocale') ->str:  # type:ignore[override]
         """Display 0 or 0.00 as empty"""
         if isinstance(value, int) and value == 0:
             return ''
@@ -44,8 +48,10 @@ class RichTextColumnDelegate(QStyledItemDelegate):
             self.label.setTextFormat(Qt.TextFormat.RichText)
             self.document = QTextDocument()
 
-    def paint(self, painter:'QPainter', option:QStyleOptionViewItem, index:'QModelIndex') ->None:
+    def paint(self, painter:'QPainter', option:QStyleOptionViewItem,
+        index:Union[QModelIndex,'QPersistentModelIndex']) ->None:
         """paint richtext"""
+        assert isinstance(index, QModelIndex)
         if option.state & QStyle.StateFlag.State_Selected:
             role = QPalette.ColorRole.Highlight
         else:
@@ -59,8 +65,9 @@ class RichTextColumnDelegate(QStyledItemDelegate):
             painter.translate(option.rect.topLeft())
             self.label.render(painter)
 
-    def sizeHint(self, option:QStyleOptionViewItem, index:'QModelIndex') ->QSize:
+    def sizeHint(self, option:QStyleOptionViewItem, index:Union[QModelIndex,'QPersistentModelIndex']) ->QSize:
         """compute size for the final formatted richtext"""
+        assert isinstance(index, QModelIndex)
         text = index.model().data(index)
         self.document.setDefaultFont(option.font)
         self.document.setHtml(text)
@@ -83,8 +90,10 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
         return QApplication.style().pixelMetric(
             QStyle.PixelMetric.PM_FocusFrameHMargin) + 1
 
-    def paint(self, painter:'QPainter', option:QStyleOptionViewItem, index:'QModelIndex') ->None:
+    def paint(self, painter:'QPainter', option:QStyleOptionViewItem,
+        index:Union[QModelIndex,'QPersistentModelIndex']) ->None:
         """paint right aligned checkbox"""
+        assert isinstance(index, QModelIndex)
         viewItemOption = QStyleOptionViewItem(option)
         if self.cellFilter(index):
             textMargin = self.__textMargin()
@@ -101,8 +110,9 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
         QStyledItemDelegate.paint(self, painter, viewItemOption, index)
 
     def editorEvent(self, event:QEvent, model:'QAbstractItemModel',
-        option:QStyleOptionViewItem, index:'QModelIndex') ->bool:
+        option:QStyleOptionViewItem, index:Union[QModelIndex,'QPersistentModelIndex']) ->bool:
         """edit right aligned checkbox"""
+        assert isinstance(index, QModelIndex)
         flags = model.flags(index)
         # make sure that the item is checkable
         if not flags & Qt.ItemFlag.ItemIsUserCheckable or not flags & Qt.ItemFlag.ItemIsEnabled:

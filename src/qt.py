@@ -167,4 +167,4 @@ def modeltest_is_supported() ->bool:
 
 SIP_VERSION_STR = 'no sip'
 if HAVE_SIP:
-    SIP_VERSION_STR = sip.SIP_VERSION_STR
+    SIP_VERSION_STR = sip.SIP_VERSION_STR  # type:ignore[name-defined]
