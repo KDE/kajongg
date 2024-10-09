@@ -435,7 +435,7 @@ class RuleTreeView(QTreeView):
         if self.btnCompare:
             self.btnCompare.setEnabled(enableCompare)
 
-    def showEvent(self, unusedEvent:'QShowEvent') ->None:
+    def showEvent(self, unusedEvent:Optional['QShowEvent']) ->None:
         """reload the models when the view comes into sight"""
         # default: make sure the name column is wide enough
         assert self.ruleModel
@@ -558,7 +558,7 @@ class RulesetSelector(QWidget):
         we always want to see them in full"""
         return self.sizeHint()
 
-    def showEvent(self, unusedEvent:'QShowEvent') ->None:
+    def showEvent(self, unusedEvent:Optional['QShowEvent']) ->None:
         """reload the rulesets"""
         self.refresh()
 
@@ -567,14 +567,15 @@ class RulesetSelector(QWidget):
         self.retranslateUi()
         self.rulesetView.rulesets = Ruleset.availableRulesets()
 
-    def hideEvent(self, event:'QHideEvent') ->None:
+    def hideEvent(self, event:Optional['QHideEvent']) ->None:
         """close all differ dialogs"""
         marked:List[RulesetDiffer] = []
         differs = self.rulesetView.differs
         for differ in differs:
             differ.hide()
             marked.append(differ)
-        QWidget.hideEvent(self, event)
+        if event:
+            QWidget.hideEvent(self, event)
         for _ in marked:
             del differs[_]
 

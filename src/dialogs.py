@@ -27,12 +27,13 @@ class KDialogIgnoringEscape(KDialog):
 
     """as the name says"""
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """catch and ignore the Escape key"""
-        if event.key() == Qt.Key.Key_Escape:
-            event.ignore()
-        else:
-            KDialog.keyPressEvent(self, event)
+        if event:
+            if event.key() == Qt.Key.Key_Escape:
+                event.ignore()
+            else:
+                KDialog.keyPressEvent(self, event)
 
 
 class MustChooseKDialog(KDialogIgnoringEscape):
@@ -56,9 +57,10 @@ class MustChooseKDialog(KDialogIgnoringEscape):
             parent = None
         KDialogIgnoringEscape.__init__(self, parent)
 
-    def closeEvent(self, event:'QEvent') ->None:
+    def closeEvent(self, event:Optional['QEvent']) ->None:
         """self.chosen is currently not used, never allow this"""
-        event.ignore()
+        if event:
+            event.ignore()
 
 
 class Prompt(MustChooseKDialog, ReprMixin):

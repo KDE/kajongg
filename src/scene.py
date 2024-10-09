@@ -112,7 +112,7 @@ class SceneWithFocusRect(QGraphicsScene):
         self.focusRect = FocusRect()
         self.addItem(self.focusRect)
 
-    def focusInEvent(self, event:'QFocusEvent') ->None:
+    def focusInEvent(self, event:Optional['QFocusEvent']) ->None:
         """
         Work around a qt bug. See U{https://bugreports.qt-project.org/browse/QTBUG-32890}.
         This can be reproduced as follows:
@@ -124,7 +124,8 @@ class SceneWithFocusRect(QGraphicsScene):
          - this will violate the assertion in UITile.keyPressEvent.
         """
         prev = self.focusItem()
-        QGraphicsScene.focusInEvent(self, event)
+        if event:
+            QGraphicsScene.focusInEvent(self, event)
         if prev and bool(prev.flags() & QGraphicsItem.GraphicsItemFlag.ItemIsFocusable) and prev != self.focusItem():
             self.setFocusItem(prev)
 
@@ -396,13 +397,14 @@ class PlayingScene(GameScene):
         return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addBoth(
             gotAnswer, autoPlaying)
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """if we have a clientDialog, pass event to it"""
-        mod = event.modifiers()
-        if mod in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier):
-            if self.clientDialog:
-                self.clientDialog.keyPressEvent(event)
-        GameScene.keyPressEvent(self, event)
+        if event:
+            mod = event.modifiers()
+            if mod in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier):
+                if self.clientDialog:
+                    self.clientDialog.keyPressEvent(event)
+            GameScene.keyPressEvent(self, event)
 
     def adjustSceneView(self) ->None:
         """adjust the view such that exactly the wanted things are displayed
@@ -573,14 +575,15 @@ class ScoringScene(GameScene):
             return True
         return False
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """navigate in the selectorboard"""
-        mod = event.modifiers()
-        if mod in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier):
-            if self.game:
-                if self.__navigateScoringGame(event):
-                    return
-        GameScene.keyPressEvent(self, event)
+        if event:
+            mod = event.modifiers()
+            if mod in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier):
+                if self.game:
+                    if self.__navigateScoringGame(event):
+                        return
+            GameScene.keyPressEvent(self, event)
 
     def adjustSceneView(self) ->None:
         """adjust the view such that exactly the wanted things are displayed

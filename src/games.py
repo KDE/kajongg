@@ -151,21 +151,22 @@ class Games(QDialog):
         self.view.doubleClicked.connect(self.loadGame)
         chkPending.stateChanged.connect(self.pendingOrNot)
 
-    def showEvent(self, unusedEvent:'QEvent') ->None:
+    def showEvent(self, unusedEvent:Optional['QEvent']) ->None:
         """only now get the data set. Not doing this in__init__ would eventually
         make it easier to subclass from some generic TableEditor class"""
         self.setQuery()
         self.view.initView()
         self.selectionChanged()
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """use insert/delete keys for insert/delete"""
-        key = event.key()
-        if key == Qt.Key.Key_Delete:
-            self.delete()
-            event.ignore()
-            return
-        QDialog.keyPressEvent(self, event)
+        if event:
+            key = event.key()
+            if key == Qt.Key.Key_Delete:
+                self.delete()
+                event.ignore()
+                return
+            QDialog.keyPressEvent(self, event)
 
     def selectionChanged(self) ->None:
         """update button states according to selection"""

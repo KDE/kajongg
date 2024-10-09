@@ -110,7 +110,7 @@ class SelectPlayers(SelectRuleset):
                                  f'is in game but not in player')
         self.slotValidate()
 
-    def showEvent(self, unusedEvent:'QEvent') ->None:
+    def showEvent(self, unusedEvent:Optional['QEvent']) ->None:
         """start with player 0"""
         self.nameWidgets[0].setFocus()
 
@@ -230,8 +230,10 @@ class ScoringHandBoard(HandBoard):
                 break                 # identical melds, it removes the wrong one
         self.player.removeMeld(meld)  # uiMeld must already be deleted
 
-    def dragMoveEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
+    def dragMoveEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """allow dropping of uiTile from ourself only to other state (open/concealed)"""
+        if not event:
+            return
         uiTile = cast('MimeData', event.mimeData()).uiTile
         localY = self.mapFromScene(QPointF(event.scenePos())).y()
         centerY = self.rect().height() / 2.0
@@ -250,8 +252,10 @@ class ScoringHandBoard(HandBoard):
             doAccept = oldLowerHalf != newLowerHalf
         event.setAccepted(doAccept)
 
-    def dropEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
+    def dropEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """drop into this handboard"""
+        if not event:
+            return
         uiTile = cast('MimeData', event.mimeData()).uiTile
         forLowerHalf = self.mapFromScene(
             QPointF(event.scenePos())).y() >= self.rect().height() / 2.0

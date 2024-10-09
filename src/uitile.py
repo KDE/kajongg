@@ -69,13 +69,15 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
             enabled=not showShadows)
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemClipsToShape, enabled=not showShadows)
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """redirect to the board"""
-        _ = self.board
-        assert _
-        if self is not _.focusTile:
-            logDebug(f'keyPressEvent {event} on {self}_{id4(self)} but focus is on {_.focusTile}_{id4(_.focusTile)}')
-        _.keyPressEvent(event)
+        if event:
+            _ = self.board
+            assert _
+            if self is not _.focusTile:
+                logDebug(
+                    f'keyPressEvent {event} on {self}_{id4(self)} but focus is on {_.focusTile}_{id4(_.focusTile)}')
+            _.keyPressEvent(event)
 
     def __lightDistance(self) ->float:
         """the distance of item from the light source"""

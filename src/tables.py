@@ -234,7 +234,7 @@ class TableList(QWidget):
         StateSaver(self, self.view.horizontalHeader())
         self.__updateButtonsForNoTable()
 
-    def hideEvent(self, unusedEvent:'QEvent') ->None:
+    def hideEvent(self, unusedEvent:Optional['QEvent']) ->None:
         """table window hides"""
         scene = Internal.scene
         if scene:

@@ -374,10 +374,11 @@ class ScoreViewRight(QTreeView):
         QTreeView.__init__(self, parent)
         self.setItemDelegate(ScoreItemDelegate(self))
 
-    def changeEvent(self, event:QEvent) ->None:
+    def changeEvent(self, event:Optional[QEvent]) ->None:
         """recompute column width if font changes"""
-        if event.type() == QEvent.Type.FontChange:
-            self.setColWidth()
+        if event:
+            if event.type() == QEvent.Type.FontChange:
+                self.setColWidth()
 
     def setColWidth(self) ->None:
         """we want a fixed column width sufficient for all values"""
@@ -398,11 +399,11 @@ class HorizontalScrollBar(QScrollBar):
         QScrollBar.__init__(self, parent)
         self.scoreTable = scoreTable
 
-    def showEvent(self, unusedEvent:QEvent) ->None:
+    def showEvent(self, unusedEvent:Optional[QEvent]) ->None:
         """adjust the left view"""
         self.scoreTable.adaptLeftViewHeight()
 
-    def hideEvent(self, unusedEvent:QEvent) ->None:
+    def hideEvent(self, unusedEvent:Optional[QEvent]) ->None:
         """adjust the left view"""
         self.scoreTable.viewRight.header().setOffset(
             0)  # we should not have to do this...
@@ -541,7 +542,7 @@ class ScoreTable(QWidget):
         scrollBar = self.viewRight.horizontalScrollBar()
         scrollBar.setValue(scrollBar.maximum())
 
-    def showEvent(self, unusedEvent:QEvent) ->None:
+    def showEvent(self, unusedEvent:Optional[QEvent]) ->None:
         """Only now the views and scrollbars have useful sizes, so we can compute the spacer
         for the left view"""
         self.adaptLeftViewHeight()
@@ -560,7 +561,7 @@ class ScoreTable(QWidget):
         if height:
             self.leftLayout.addSpacing(height)
 
-    def closeEvent(self, unusedEvent:QEvent) ->None:
+    def closeEvent(self, unusedEvent:Optional[QEvent]) ->None:
         """update action button state"""
         assert Internal.mainWindow
         Internal.mainWindow.actionScoreTable.setChecked(False)
@@ -616,7 +617,7 @@ class ExplainView(QListView):
             # QStringListModel does not optimize identical lists away, so we do
             self._model.setStringList(lines)
 
-    def closeEvent(self, unusedEvent:QEvent) ->None:
+    def closeEvent(self, unusedEvent:Optional[QEvent]) ->None:
         """update action button state"""
         assert Internal.mainWindow
         Internal.mainWindow.actionExplain.setChecked(False)

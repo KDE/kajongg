@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import Dict, TYPE_CHECKING, Any
+from typing import Dict, TYPE_CHECKING, Any, Optional
 from qt import QObject, QByteArray, QEvent, QSplitter, QHeaderView
 
 from common import Internal, isAlive
@@ -82,10 +82,10 @@ class StateSaver(QObject):
             name = orgWidget.__class__.__name__
         return str(name)
 
-    def eventFilter(self, unusedWatched:QObject, event:QEvent) ->bool:
+    def eventFilter(self, unusedWatched:Optional[QObject], event:Optional[QEvent]) ->bool:
         """if the watched widget hides, save its state.
         Return False if the event should be handled further"""
-        if QEvent is not None:
+        if QEvent is not None and event:
             # while appquit, QEvent may be None. Maybe not anymore
             # with later versions?
             if event.type() in(QEvent.Type.Hide, QEvent.Type.Move, QEvent.Type.Resize):

@@ -382,9 +382,10 @@ class PlayingHandBoard(HandBoard):
                 and self.player == self.player.game.myself)
             QGraphicsRectItem.setEnabled(self, enabled)
 
-    def dragMoveEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
+    def dragMoveEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """only dragging to discard board should be possible"""
-        event.setAccepted(False)
+        if event:
+            event.setAccepted(False)
 
     def _avoidCrossingMovements(self, places:Dict[UITile, TileAttr]) ->None:
         """"the above is a good approximation but if the board already had more

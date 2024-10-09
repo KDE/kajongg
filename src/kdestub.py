@@ -478,7 +478,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         """for mypy"""
         return cast(KStatusBar, QMainWindow.statusBar(self))
 
-    def showEvent(self, event:QShowEvent) ->None:
+    def showEvent(self, event:Optional[QShowEvent]) ->None:
         """now that the MainWindow code has run, we know all actions"""
         self.refreshToolBar()
         assert Internal.Preferences
@@ -487,14 +487,16 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.actionToolBar.setChecked(self.toolBar().isVisible())
         self.actionFullscreen.setChecked(
             self.windowState() & Qt.WindowState.WindowFullScreen == Qt.WindowState.WindowFullScreen)
-        QMainWindow.showEvent(self, event)
+        if event:
+            QMainWindow.showEvent(self, event)
 
-    def hideEvent(self, event:QHideEvent) ->None:
+    def hideEvent(self, event:Optional[QHideEvent]) ->None:
         """save status"""
         assert Internal.Preferences
         Internal.Preferences.toolBarVisible = self.toolBar(
         ).isVisible()
-        QMainWindow.hideEvent(self, event)
+        if event:
+            QMainWindow.hideEvent(self, event)
 
     def toggleStatusBar(self, checked:bool) ->None:
         """show / hide status bar"""
@@ -547,12 +549,13 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         """default"""
         return True
 
-    def closeEvent(self, event:QEvent) ->None:
+    def closeEvent(self, event:Optional[QEvent]) ->None:
         """call queryClose/queryExit"""
-        if self.queryClose() and self.queryExit():
-            event.accept()
-        else:
-            event.ignore()
+        if event:
+            if self.queryClose() and self.queryExit():
+                event.accept()
+            else:
+                event.ignore()
 
 
 class KConfigGroup:
@@ -1240,7 +1243,7 @@ class KConfigDialog(KDialog):
             return cls.dialog
         return None
 
-    def showEvent(self, unusedEvent:QEvent) ->None:
+    def showEvent(self, unusedEvent:Optional[QEvent]) ->None:
         """if the settings dialog shows, remember current values
         and show them in the widgets"""
         self.orgPref = self.preferences.as_dict() # FIXME: unused

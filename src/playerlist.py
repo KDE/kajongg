@@ -63,7 +63,7 @@ class PlayerList(QDialog):
         decorateWindow(self, i18n("Players"))
         self.setObjectName('Players')
 
-    def showEvent(self, unusedEvent:'QEvent') ->None:
+    def showEvent(self, unusedEvent:Optional['QEvent']) ->None:
         """adapt view to content"""
         StateSaver(self, self.table)
 
@@ -172,12 +172,13 @@ class PlayerList(QDialog):
                 '  This will also delete all games played by %3!',
                 finishedCount, fullCount - finishedCount, name)).addBoth(answered)
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """use insert/delete keys for insert/delete"""
-        key = event.key()
-        if key == Qt.Key.Key_Insert:
-            self.slotInsert()
-        elif key == Qt.Key.Key_Delete:
-            self.delete()
-        else:
-            QDialog.keyPressEvent(self, event)
+        if event:
+            key = event.key()
+            if key == Qt.Key.Key_Insert:
+                self.slotInsert()
+            elif key == Qt.Key.Key_Delete:
+                self.delete()
+            else:
+                QDialog.keyPressEvent(self, event)

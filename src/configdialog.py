@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0
 
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from common import Internal
 
@@ -108,8 +108,10 @@ class ConfigDialog(KConfigDialog):
                 BackgroundSelector(self),
                 i18n("Backgrounds"), "games-config-background")]
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """The four tabs can be selected with CTRL-1 .. CTRL-4"""
+        if not event:
+            return
         mod = event.modifiers()
         key = chr(event.key() % 128)
         if Qt.KeyboardModifier.ControlModifier | mod and key in '123456789'[:len(self.pages)]:

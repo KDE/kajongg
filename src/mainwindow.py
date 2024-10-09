@@ -326,10 +326,11 @@ class MainWindow(KXmlGuiWindow):
             return KXmlGuiWindow.close(self)
         return True  # is closed
 
-    def closeEvent(self, event:QEvent) ->None:
+    def closeEvent(self, event:Optional[QEvent]) ->None:
         KXmlGuiWindow.closeEvent(self, event)
-        if event.isAccepted() and self.exitReady:
-            QTimer.singleShot(5000, self.aboutToQuit)
+        if event:
+            if event.isAccepted() and self.exitReady:
+                QTimer.singleShot(5000, self.aboutToQuit)
 
     def queryClose(self) ->bool:
         """queryClose, queryExit and aboutToQuit are no
@@ -545,11 +546,12 @@ class MainWindow(KXmlGuiWindow):
             i18nc('kajongg @info:tooltip',
                   'Chat with the other players.'))
 
-    def changeEvent(self, event:QEvent) ->None:
+    def changeEvent(self, event:Optional[QEvent]) ->None:
         """when the applicationwide language changes, recreate GUI"""
-        if event.type() == QEvent.Type.LanguageChange:
-            self.setupGUI()
-            self.retranslateUi()
+        if event:
+            if event.type() == QEvent.Type.LanguageChange:
+                self.setupGUI()
+                self.retranslateUi()
 
     def slotPlayers(self) ->None:
         """show the player list"""

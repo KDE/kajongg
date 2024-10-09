@@ -109,9 +109,12 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
             viewItemOption.rect = newRect
         QStyledItemDelegate.paint(self, painter, viewItemOption, index)
 
-    def editorEvent(self, event:QEvent, model:'QAbstractItemModel',
+    def editorEvent(self, event:Optional[QEvent], model:Optional['QAbstractItemModel'],
         option:QStyleOptionViewItem, index:Union[QModelIndex,'QPersistentModelIndex']) ->bool:
         """edit right aligned checkbox"""
+        # pylint: disable=too-many-return-statements
+        if not event or not model:
+            return False
         assert isinstance(index, QModelIndex)
         flags = model.flags(index)
         # make sure that the item is checkable

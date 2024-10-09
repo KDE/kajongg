@@ -318,13 +318,14 @@ class Board(QGraphicsRectItem, ReprMixin):
             key = Board.arrows[charArrows.index(keychar) % 4]
         return key
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """navigate in the board"""
-        key = Board.mapChar2Arrow(event)
-        if key in Board.arrows:
-            self.__moveCursor(key)
-        else:
-            QGraphicsRectItem.keyPressEvent(self, event)
+        if event:
+            key = Board.mapChar2Arrow(event)
+            if key in Board.arrows:
+                self.__moveCursor(key)
+            else:
+                QGraphicsRectItem.keyPressEvent(self, event)
 
     def __moveCursor(self, key:Qt.Key) ->None:
         """move focus"""
@@ -381,11 +382,11 @@ class Board(QGraphicsRectItem, ReprMixin):
             idx = action.data()
         return variants[idx]
 
-    def dragEnterEvent(self, unusedEvent:'QGraphicsSceneDragDropEvent') ->None:
+    def dragEnterEvent(self, unusedEvent:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """drag enters the HandBoard: highlight it"""
         self.setPen(QPen(self.penColor))
 
-    def dragLeaveEvent(self, unusedEvent:'QGraphicsSceneDragDropEvent') ->None:
+    def dragLeaveEvent(self, unusedEvent:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """drag leaves the HandBoard"""
         self._noPen()
 
@@ -670,16 +671,18 @@ class SelectorBoard(CourtBoard):
         """for debugging messages"""
         return 'selector'
 
-    def dragMoveEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
+    def dragMoveEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """allow dropping only from handboards, not from self"""
-        uiTile = cast(MimeData, event.mimeData()).uiTile
-        event.setAccepted(uiTile.board != self)
+        if event:
+            uiTile = cast(MimeData, event.mimeData()).uiTile
+            event.setAccepted(uiTile.board != self)
 
-    def dropEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
+    def dropEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """drop a uiTile into the selector"""
-        uiTile = cast(MimeData, event.mimeData()).uiTile
-        self.dropTile(uiTile)
-        event.accept()
+        if event:
+            uiTile = cast(MimeData, event.mimeData()).uiTile
+            self.dropTile(uiTile)
+            event.accept()
 
     def dropTile(self, uiTile:UITile, forLowerHalf:bool=False) ->None:  # pylint: disable=unused-argument
         """drop uiTile into selector board"""
@@ -794,17 +797,18 @@ class FittingView(QGraphicsView):
         self.dragObject:Optional[QDrag] = None
         self.setFocus()
 
-    def wheelEvent(self, event:'QWheelEvent') ->None:
+    def wheelEvent(self, event:Optional['QWheelEvent']) ->None:
         """we do not want scrolling for the scene view.
         Instead scrolling down changes perspective like in kmahjongg"""
-        angleX = event.angleDelta().x()
-        angleY = event.angleDelta().y()
-        if angleX > 15 or angleY > -50:
-            return
-        assert Internal.mainWindow
-        Internal.mainWindow.changeAngle()
+        if event:
+            angleX = event.angleDelta().x()
+            angleY = event.angleDelta().y()
+            if angleX > 15 or angleY > -50:
+                return
+            assert Internal.mainWindow
+            Internal.mainWindow.changeAngle()
 
-    def resizeEvent(self, unusedEvent:'QResizeEvent') ->None:
+    def resizeEvent(self, unusedEvent:Optional['QResizeEvent']) ->None:
         """scale the scene and its background for new view size"""
         assert Internal.Preferences
         Internal.Preferences.callTrigger(
@@ -839,8 +843,10 @@ class FittingView(QGraphicsView):
                         items.append(other)
         return uniqueList(sorted(items, key=lambda x: -x.level))
 
-    def mousePressEvent(self, event:'QMouseEvent') ->None:
+    def mousePressEvent(self, event:Optional['QMouseEvent']) ->None:
         """set blue focus frame"""
+        if not event:
+            return
         tiles = self.tileAt(event.pos())  # qtpy makes sure pos() does the same in Qt5 and Qt6
         if tiles:
             if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
@@ -865,23 +871,25 @@ class FittingView(QGraphicsView):
             self.tilePressed = None
             event.ignore()
 
-    def mouseReleaseEvent(self, event:'QMouseEvent') ->None:
+    def mouseReleaseEvent(self, event:Optional['QMouseEvent']) ->None:
         """release self.tilePressed"""
-        self.tilePressed = None
-        return QGraphicsView.mouseReleaseEvent(self, event)
+        if event:
+            self.tilePressed = None
+            QGraphicsView.mouseReleaseEvent(self, event)
 
-    def mouseMoveEvent(self, event:'QMouseEvent') ->None:
+    def mouseMoveEvent(self, event:Optional['QMouseEvent']) ->None:
         """selects the correct uiTile"""
-        tilePressed = self.tilePressed
-        self.tilePressed = None
-        if tilePressed:
-            board = tilePressed.board
-            if board and board.tileDragEnabled:
-                self.dragObject = self.drag(tilePressed)
-                self.dragObject.exec(Qt.DropAction.MoveAction)
-                self.dragObject = None
-                return None
-        return QGraphicsView.mouseMoveEvent(self, event)
+        if event:
+            tilePressed = self.tilePressed
+            self.tilePressed = None
+            if tilePressed:
+                board = tilePressed.board
+                if board and board.tileDragEnabled:
+                    self.dragObject = self.drag(tilePressed)
+                    self.dragObject.exec(Qt.DropAction.MoveAction)
+                    self.dragObject = None
+                    return
+            QGraphicsView.mouseMoveEvent(self, event)
 
     def drag(self, uiTile:UITile) ->QDrag:
         """return a drag object"""
@@ -991,18 +999,19 @@ class DiscardBoard(CourtBoard):
             self.__places.insert(0, (result.xoffset, result.yoffset))
         return result
 
-    def dropEvent(self, event:'QGraphicsSceneDragDropEvent') ->None:
+    def dropEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """drop a uiTile into the discard board
 
         The user uses the mouse for discarding a tile"""
-        assert Internal.scene
-        assert Internal.scene
-        uiTile = cast(MimeData, event.mimeData()).uiTile
-        assert isinstance(uiTile, UITile), uiTile
-        _ = event.scenePos()
-        _ -= uiTile.boundingRect().center()
-        uiTile.setPos(_)
-        if Internal.scene.clientDialog:
-            Internal.scene.clientDialog.selectButton(cast('ClientMessage', Message.Discard))
-        event.accept()
+        if event:
+            assert Internal.scene
+            assert Internal.scene
+            uiTile = cast(MimeData, event.mimeData()).uiTile
+            assert isinstance(uiTile, UITile), uiTile
+            _ = event.scenePos()
+            _ -= uiTile.boundingRect().center()
+            uiTile.setPos(_)
+            if Internal.scene.clientDialog:
+                Internal.scene.clientDialog.selectButton(cast('ClientMessage', Message.Discard))
+            event.accept()
         self._noPen()

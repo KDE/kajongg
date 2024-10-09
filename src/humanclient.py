@@ -141,17 +141,18 @@ class DlgButton(QPushButton):
         self.setToolTip(txt)
         self.setWarning(warn)
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """forward horizintal arrows to the hand board"""
-        key = Board.mapChar2Arrow(event)
-        if key in [Qt.Key.Key_Left, Qt.Key.Key_Right]:
-            game = self.client.game
-            if game and game.activePlayer == game.myself:
-                if game.myself.handBoard:
-                    game.myself.handBoard.keyPressEvent(event)
-                self.setFocus()
-                return
-        QPushButton.keyPressEvent(self, event)
+        if event:
+            key = Board.mapChar2Arrow(event)
+            if key in [Qt.Key.Key_Left, Qt.Key.Key_Right]:
+                game = self.client.game
+                if game and game.activePlayer == game.myself:
+                    if game.myself.handBoard:
+                        game.myself.handBoard.keyPressEvent(event)
+                    self.setFocus()
+                    return
+            QPushButton.keyPressEvent(self, event)
 
     def setWarning(self, warn:bool) ->None:
         """if warn, show a warning icon on the button"""
@@ -187,9 +188,9 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
         self.move:'Move'  # type:ignore[assignment]
         self.sorry:Optional[Sorry] = None
 
-    def keyPressEvent(self, event:'QKeyEvent') ->None:
+    def keyPressEvent(self, event:Optional['QKeyEvent']) ->None:
         """ESC selects default answer"""
-        if not self.client.game or self.client.game.autoPlay:
+        if not event or not self.client.game or self.client.game.autoPlay:
             return
         if event.key() in [Qt.Key.Key_Escape, Qt.Key.Key_Space]:
             self.selectButton()
@@ -350,7 +351,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
         geometry.setHeight(int(height))
         self.setGeometry(geometry)
 
-    def showEvent(self, unusedEvent:'QEvent') ->None:
+    def showEvent(self, unusedEvent:Optional['QEvent']) ->None:
         """try to place the dialog such that it does not cover interesting information"""
         self.placeInField()
 
