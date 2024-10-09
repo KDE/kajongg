@@ -1508,7 +1508,7 @@ class KEditToolBar(KDialog):
         self._removeAction.setEnabled(bool(toolItem))
         if toolItem:
             self.upAction.setEnabled(bool(row))
-            self.downAction.setEnabled(row < len(self.activeList) - 1)
+            self.downAction.setEnabled(row < self.activeList.count() - 1)
         else:
             self.upAction.setEnabled(False)
             self.downAction.setEnabled(False)
@@ -1566,7 +1566,7 @@ class KEditToolBar(KDialog):
         if Internal.mainWindow is None:
             return
         activeActions = (cast(ToolBarItem, self.activeList.item(
-            x)).action for x in range(len(self.activeList)))
+            x)).action for x in range(self.activeList.count()))
         names = {
             v: k for k,
             v in Internal.mainWindow.actionCollection(
