@@ -33,6 +33,7 @@ from chat import ChatMessage, ChatWindow
 if TYPE_CHECKING:
     from client import ClientTable
     from qt import QObject, QEvent, QItemSelection, QPersistentModelIndex
+    from qt import QPushButton
     from login import Url
     from humanclient import HumanClient
     from scene import PlayingScene
@@ -180,27 +181,27 @@ class TableList(QWidget):
             2,
             RichTextColumnDelegate(self.view))
 
-        buttonBox = QDialogButtonBox(self)
-        self.newButton = buttonBox.addButton(
+        self.buttonBox = QDialogButtonBox(self)
+        self.newButton = self.buttonBox.addButton(
             i18nc('allocate a new table',
                   "&New"),
             QDialogButtonBox.ButtonRole.ActionRole)
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.setToolTip(i18n("Allocate a new table"))
         self.newButton.clicked.connect(self.client.newTable)
-        self.joinButton = buttonBox.addButton(
+        self.joinButton = self.buttonBox.addButton(
             i18n("&Join"),
             QDialogButtonBox.ButtonRole.AcceptRole)
         self.joinButton.clicked.connect(client.joinTable)
         self.joinButton.setIcon(KIcon("list-add-user"))
         self.joinButton.setToolTip(i18n("Join a table"))
-        self.leaveButton = buttonBox.addButton(
+        self.leaveButton = self.buttonBox.addButton(
             i18n("&Leave"),
             QDialogButtonBox.ButtonRole.AcceptRole)
         self.leaveButton.clicked.connect(self.leaveTable)
         self.leaveButton.setIcon(KIcon("list-remove-user"))
         self.leaveButton.setToolTip(i18n("Leave a table"))
-        self.compareButton = buttonBox.addButton(
+        self.compareButton = self.buttonBox.addButton(
             i18nc('Kajongg-Ruleset',
                   'Compare'),
             QDialogButtonBox.ButtonRole.AcceptRole)
@@ -208,12 +209,12 @@ class TableList(QWidget):
         self.compareButton.setIcon(KIcon("preferences-plugin-script"))
         self.compareButton.setToolTip(
             i18n('Compare the rules of this table with my own rulesets'))
-        self.chatButton = buttonBox.addButton(
+        self.chatButton = self.buttonBox.addButton(
             i18n('&Chat'),
             QDialogButtonBox.ButtonRole.AcceptRole)
         self.chatButton.setIcon(KIcon("call-start"))
         self.chatButton.clicked.connect(self.chat)
-        self.startButton = buttonBox.addButton(
+        self.startButton = self.buttonBox.addButton(
             i18n('&Start'),
             QDialogButtonBox.ButtonRole.AcceptRole)
         self.startButton.clicked.connect(self.startGame)
@@ -223,7 +224,7 @@ class TableList(QWidget):
                  "Empty seats will be taken by robot players."))
 
         cmdLayout = QHBoxLayout()
-        cmdLayout.addWidget(buttonBox)
+        cmdLayout.addWidget(self.buttonBox)
 
         layout = QVBoxLayout()
         layout.addWidget(self.view)
