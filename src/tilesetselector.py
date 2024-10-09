@@ -12,7 +12,7 @@ from typing import cast
 
 from qt import QWidget, QHBoxLayout, QLineEdit
 from qt import QSize, QVBoxLayout, QSizePolicy, QGroupBox, QListWidget
-from qt import QFormLayout, QLabel, QSpacerItem, QMetaObject, QCoreApplication
+from qt import QFormLayout, QLabel, QSpacerItem, QMetaObject
 from tile import Tile
 from tileset import Tileset
 from uitile import UITile

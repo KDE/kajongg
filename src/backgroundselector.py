@@ -11,7 +11,7 @@ SPDX-License-Identifier: GPL-2.0
 from typing import cast
 from qt import QWidget, QLineEdit
 from qt import QSize, QMetaObject, QFormLayout, QVBoxLayout, QHBoxLayout, QSizePolicy
-from qt import QLabel, QGroupBox, QListWidget, QFrame, QSpacerItem, QCoreApplication
+from qt import QLabel, QGroupBox, QListWidget, QFrame, QSpacerItem
 from background import Background
 from common import Internal
 from mi18n import i18nc
