@@ -10,13 +10,10 @@ SPDX-License-Identifier: GPL-2.0
 # pylint: disable=wrong-import-order
 
 import sys
-import codecs
 from itertools import chain
 
-import tempfile
-import webbrowser
 import logging
-from typing import Any, TYPE_CHECKING, Optional, Union, Tuple, Type, cast
+from typing import Any, TYPE_CHECKING, Optional, Union, Type, cast
 
 from log import logError, logDebug
 from common import Options, Internal, isAlive, Debug, handleSignals
