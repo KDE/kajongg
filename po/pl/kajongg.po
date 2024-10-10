@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-09-11 00:37+0000\n"
+"POT-Creation-Date: 2024-10-10 00:37+0000\n"
 "PO-Revision-Date: 2024-04-01 07:59+0200\n"
 "Last-Translator: Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>\n"
 "Language-Team: Polish <kde-i18n-doc@kde.org>\n"
@@ -18,21 +18,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-
-msgid "Preview"
-msgstr "Podgląd"
-
-msgid "Properties"
-msgstr "Właściwości"
-
-msgid "Author:"
-msgstr "Autor:"
-
-msgid "Contact:"
-msgstr "Kontakt:"
-
-msgid "Description:"
-msgstr "Opis:"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -47,6 +32,41 @@ msgstr "Pasek narzędzi"
 #: src/background.py:71 src/tileset.py:50
 msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "plik <filename>%1</filename> nie zawiera poprawnych SVG"
+
+#: src/backgroundselector.py:107
+#, fuzzy
+#| msgid "Preview"
+msgctxt "BackgroundSelector"
+msgid "Preview"
+msgstr "Podgląd"
+
+#: src/backgroundselector.py:108
+#, fuzzy
+#| msgid "Properties"
+msgctxt "BackgroundSelector"
+msgid "Properties"
+msgstr "Właściwości"
+
+#: src/backgroundselector.py:109
+#, fuzzy
+#| msgid "Author:"
+msgctxt "BackgroundSelector"
+msgid "Author:"
+msgstr "Autor:"
+
+#: src/backgroundselector.py:110
+#, fuzzy
+#| msgid "Contact:"
+msgctxt "BackgroundSelector"
+msgid "Contact:"
+msgstr "Kontakt:"
+
+#: src/backgroundselector.py:111
+#, fuzzy
+#| msgid "Description:"
+msgctxt "BackgroundSelector"
+msgid "Description:"
+msgstr "Opis:"
 
 #: src/board.py:315
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
@@ -69,7 +89,7 @@ msgstr "Gracz"
 msgid "Message"
 msgstr "Wiadomość"
 
-#: src/chat.py:124
+#: src/chat.py:125
 msgid "Chat on table %1 at %2"
 msgstr "Rozmowa przy stole %1 w %2"
 
@@ -141,17 +161,17 @@ msgstr ""
 "Błąd dla gracza %1: %2\n"
 "%3"
 
-#: src/differ.py:71
+#: src/differ.py:72
 msgctxt "Kajongg"
 msgid "Rule"
 msgstr "Zasada"
 
-#: src/differ.py:126
+#: src/differ.py:127
 msgctxt "@title:window"
 msgid "Compare"
 msgstr "Porównaj"
 
-#: src/differ.py:169 src/differ.py:171
+#: src/differ.py:170 src/differ.py:172
 msgctxt "Kajongg-Rule"
 msgid "not defined"
 msgstr "nie określono"
@@ -168,37 +188,37 @@ msgstr "Nieznany gracz %1"
 msgid "Short living wall: Tile is invisible, hence dangerous"
 msgstr "Krótko żyjący mur: Kamień jest niewidoczny, a przez to niebezpieczny"
 
-#: src/games.py:94 src/playerlist.py:63 src/tables.py:66
+#: src/games.py:95 src/playerlist.py:63 src/tables.py:66
 msgid "Players"
 msgstr "Gracze"
 
-#: src/games.py:94
+#: src/games.py:95
 msgid "Started"
 msgstr "Rozpoczęte"
 
-#: src/games.py:106
+#: src/games.py:107
 msgctxt "@title:window"
 msgid "Games"
 msgstr "Gry"
 
-#: src/games.py:123
+#: src/games.py:124
 msgctxt "start a new game"
 msgid "&New"
 msgstr "&Nowa"
 
-#: src/games.py:127
+#: src/games.py:128
 msgid "&Load"
 msgstr "&Wczytaj"
 
-#: src/games.py:131 src/playerlist.py:53
+#: src/games.py:132 src/playerlist.py:53
 msgid "&Delete"
 msgstr "&Usuń"
 
-#: src/games.py:135
+#: src/games.py:136
 msgid "Show only pending games"
 msgstr "Pokaż tylko gry w oczekiwaniu"
 
-#: src/games.py:237
+#: src/games.py:238
 msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
@@ -206,7 +226,7 @@ msgstr ""
 "Czy na pewno chcesz usunąć <numid>%1</numid> gier?<br>To działanie jest "
 "ostateczne, nie możesz go zaniechać przy pomocy odpowiedniego przycisku."
 
-#: src/guiutil.py:146 src/kdestub.py:129 src/kdestub.py:132
+#: src/guiutil.py:132 src/kdestub.py:129 src/kdestub.py:132
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -559,133 +579,133 @@ msgstr "Nieudane logowanie do serwera %1: Nie masz połączenia sieciowego"
 msgid "Please try again"
 msgstr "Proszę spróbować ponownie"
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:483
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "&Punktacja ręcznej gry"
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:485
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Ręczna gra"
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:488
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "&Punktacja ręcznej gry."
 
-#: src/mainwindow.py:518
+#: src/mainwindow.py:490
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Graj"
 
-#: src/mainwindow.py:521
+#: src/mainwindow.py:493
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Rozpocznij nową grę."
 
-#: src/mainwindow.py:523
+#: src/mainwindow.py:495
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "&Przerwij grę"
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:499
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Przerwij bieżącą grę."
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:501
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "&Wyjdź z Kajongg"
 
-#: src/mainwindow.py:532
+#: src/mainwindow.py:504
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Gracze"
 
-#: src/mainwindow.py:535
+#: src/mainwindow.py:507
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "określ swoich graczy."
 
-#: src/mainwindow.py:537
+#: src/mainwindow.py:509
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "&Zestawy zasad"
 
-#: src/mainwindow.py:540
+#: src/mainwindow.py:512
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "własne zestawy zasad."
 
-#: src/mainwindow.py:544
+#: src/mainwindow.py:516
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "&Zmień kąt patrzenia"
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:517
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Kąt"
 
-#: src/mainwindow.py:548
+#: src/mainwindow.py:520
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Zmień wygląd zewnętrzny kamieni."
 
-#: src/mainwindow.py:552
+#: src/mainwindow.py:524
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "Tryb pełno&ekranowy"
 
-#: src/mainwindow.py:555
+#: src/mainwindow.py:527
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&Punktacja stołu"
 
-#: src/mainwindow.py:557
+#: src/mainwindow.py:529
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "&Punktacja"
 
-#: src/mainwindow.py:559
+#: src/mainwindow.py:531
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Pokaż lub ukryj punktację stołu dla bieżącej gry."
 
-#: src/mainwindow.py:561
+#: src/mainwindow.py:533
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "&Wyjaśnij punktację"
 
-#: src/mainwindow.py:562
+#: src/mainwindow.py:534
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "&Wyjaśnij"
 
-#: src/mainwindow.py:564
+#: src/mainwindow.py:536
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Wyjaśnij punktację wszystkim graczom w bieżącej grze."
 
-#: src/mainwindow.py:566
+#: src/mainwindow.py:538
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "Tryb &demo"
 
-#: src/mainwindow.py:569
+#: src/mainwindow.py:541
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr ""
 "Pozwól komputerowi przejąć stery. Rozpocznij nową lokalną grę, jeśli jest to "
 "potrzebne."
 
-#: src/mainwindow.py:571
+#: src/mainwindow.py:543
 msgid "C&hat"
 msgstr "&Rozmowa"
 
-#: src/mainwindow.py:574
+#: src/mainwindow.py:546
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Rozmawiaj z innymi graczami"
@@ -864,30 +884,30 @@ msgstr "N"
 msgid "You cannot or do not want to claim this tile"
 msgstr "Nie możesz lub nie chcesz żądać tego kamienia"
 
-#: src/mjresource.py:88
+#: src/mjresource.py:92
 msgid ""
 "cannot find any %1 in the following directories, is libkmahjongg installed?"
 msgstr ""
 "nie można znaleźć żadnego %1 w następujących katalogach, czy libmahjongg "
 "jest zainstalowane?"
 
-#: src/mjresource.py:112
+#: src/mjresource.py:116
 msgid "cannot find %1, using default"
 msgstr "nie można znaleźć %1, użyto domyślnego"
 
-#: src/mjresource.py:127
+#: src/mjresource.py:131
 msgid "unknown name"
 msgstr "nieznana nazwa"
 
-#: src/mjresource.py:128
+#: src/mjresource.py:132
 msgid "unknown author"
 msgstr "nieznany autor"
 
-#: src/mjresource.py:131
+#: src/mjresource.py:135
 msgid "no description available"
 msgstr "brak opisu"
 
-#: src/mjresource.py:134
+#: src/mjresource.py:138
 msgid "no E-Mail address available"
 msgstr "Brak adresów pocztowych"
 
@@ -1671,7 +1691,7 @@ msgstr "Gra lokalna"
 msgid "Database %1 updated from schema %2 to %3"
 msgstr "Uaktualniono schemat bazy danych %1 z %2 do %3"
 
-#: src/rule.py:49 src/scoringdialog.py:702 src/scoringdialog.py:780
+#: src/rule.py:49 src/scoringdialog.py:710 src/scoringdialog.py:788
 msgid "points"
 msgstr "punkty"
 
@@ -1786,30 +1806,30 @@ msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 jest zbyt mała, minimalna wartość to %3"
 
-#: src/rulesetselector.py:500
+#: src/rulesetselector.py:503
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "Własne zestawy zasad"
 
-#: src/rulesetselector.py:519
+#: src/rulesetselector.py:522
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "Zasada"
 
-#: src/rulesetselector.py:580
+#: src/rulesetselector.py:583
 msgid "C&opy"
 msgstr "S&kopiuj"
 
-#: src/rulesetselector.py:581
+#: src/rulesetselector.py:584
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "Porów&naj"
 
-#: src/rulesetselector.py:582
+#: src/rulesetselector.py:585
 msgid "&Remove"
 msgstr "&Usuń"
 
-#: src/rulesetselector.py:583
+#: src/rulesetselector.py:586
 msgid "&Close"
 msgstr "&Zamknij"
 
@@ -1852,128 +1872,128 @@ msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
 "Proszę określić czterech graczy w <interface>Ustawienia|Gracze</interface>"
 
-#: src/scoringdialog.py:242
+#: src/scoringdialog.py:247
 msgid "Round/Hand"
 msgstr "Runda/Ręka"
 
-#: src/scoringdialog.py:275 src/scoringdialog.py:832
+#: src/scoringdialog.py:280 src/scoringdialog.py:840
 msgctxt "kajongg"
 msgid "Score"
 msgstr "Punktacja"
 
-#: src/scoringdialog.py:275
+#: src/scoringdialog.py:280
 msgctxt "kajongg"
 msgid "Payments"
 msgstr "Płatności"
 
-#: src/scoringdialog.py:276
+#: src/scoringdialog.py:281
 msgctxt "kajongg"
 msgid "Balance"
 msgstr "Saldo"
 
-#: src/scoringdialog.py:276
+#: src/scoringdialog.py:281
 msgctxt "kajongg"
 msgid "Chart"
 msgstr "Wykres"
 
-#: src/scoringdialog.py:422
+#: src/scoringdialog.py:427
 msgctxt "kajongg"
 msgid "Scores"
 msgstr "Punktacja"
 
-#: src/scoringdialog.py:462
+#: src/scoringdialog.py:467
 msgctxt "kajongg"
 msgid "Used Rules"
 msgstr "Używane zasady"
 
-#: src/scoringdialog.py:496
+#: src/scoringdialog.py:501
 msgid "Final scores for game <numid>%1</numid>"
 msgstr "Ostateczna punktacja dla gry <numid>%1</numid>"
 
-#: src/scoringdialog.py:498
+#: src/scoringdialog.py:503
 msgid "Scores for game <numid>%1</numid>"
 msgstr "Punktacja dla gry <numid>%1</numid>"
 
-#: src/scoringdialog.py:571
+#: src/scoringdialog.py:576
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "Wyjaśnij punktacje"
 
-#: src/scoringdialog.py:587
+#: src/scoringdialog.py:592
 msgid "There is no active game"
 msgstr "Nie ma żadnej aktywnej gry"
 
-#: src/scoringdialog.py:590
+#: src/scoringdialog.py:595
 msgid "%1"
 msgstr "%1"
 
-#: src/scoringdialog.py:604
+#: src/scoringdialog.py:609
 msgid "Manual score for %1: %2 points"
 msgstr "Ręczna punktacja dla %1: %2 punktów"
 
-#: src/scoringdialog.py:688
+#: src/scoringdialog.py:696
 msgid "Penalty"
 msgstr "Kara"
 
-#: src/scoringdialog.py:691
+#: src/scoringdialog.py:699
 msgid "Offense:"
 msgstr "Ofensywa:"
 
-#: src/scoringdialog.py:698
+#: src/scoringdialog.py:706
 msgid "Total Penalty"
 msgstr "Kara całkowita"
 
-#: src/scoringdialog.py:726
+#: src/scoringdialog.py:734
 msgid "&Execute"
 msgstr "&Wykonaj"
 
-#: src/scoringdialog.py:803
+#: src/scoringdialog.py:811
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
 msgstr "płaci %1 punktów"
 
-#: src/scoringdialog.py:808
+#: src/scoringdialog.py:816
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
 msgstr "dostaje %1 punktów"
 
-#: src/scoringdialog.py:819
+#: src/scoringdialog.py:827
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
 msgstr "Punktacja dla tej ręki"
 
-#: src/scoringdialog.py:830
+#: src/scoringdialog.py:838
 msgctxt "kajongg"
 msgid "Player"
 msgstr "Gracz"
 
-#: src/scoringdialog.py:831
+#: src/scoringdialog.py:839
 msgctxt "kajongg"
 msgid "Wind"
 msgstr "Wiatr"
 
-#: src/scoringdialog.py:833
+#: src/scoringdialog.py:841
 msgid "Winner"
 msgstr "Zwycięzca"
 
-#: src/scoringdialog.py:839
+#: src/scoringdialog.py:847
 msgctxt "kajongg"
 msgid "Draw"
 msgstr "Remis"
 
-#: src/scoringdialog.py:841
+#: src/scoringdialog.py:849
 msgid "&Penalties"
 msgstr "&Kary"
 
-#: src/scoringdialog.py:843
+#: src/scoringdialog.py:851
 msgid "&Save Hand"
 msgstr "&Zapisz rękę"
 
-#: src/scoringdialog.py:865
+#: src/scoringdialog.py:873
 msgid "&Last Tile:"
 msgstr "&Ostatni kamień:"
 
-#: src/scoringdialog.py:874
+#: src/scoringdialog.py:882
 msgid "L&ast Meld:"
 msgstr "O&statni meldunek:"
 
@@ -2336,6 +2356,41 @@ msgstr "Zakryty"
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
+
+#: src/tilesetselector.py:141
+#, fuzzy
+#| msgid "Preview"
+msgctxt "TilesetSelector"
+msgid "Preview"
+msgstr "Podgląd"
+
+#: src/tilesetselector.py:142
+#, fuzzy
+#| msgid "Properties"
+msgctxt "TilesetSelector"
+msgid "Properties"
+msgstr "Właściwości"
+
+#: src/tilesetselector.py:143
+#, fuzzy
+#| msgid "Author:"
+msgctxt "TilesetSelector"
+msgid "Author:"
+msgstr "Autor:"
+
+#: src/tilesetselector.py:144
+#, fuzzy
+#| msgid "Contact:"
+msgctxt "TilesetSelector"
+msgid "Contact:"
+msgstr "Kontakt:"
+
+#: src/tilesetselector.py:145
+#, fuzzy
+#| msgid "Description:"
+msgctxt "TilesetSelector"
+msgid "Description:"
+msgstr "Opis:"
 
 #: src/user.py:94
 msgid ""

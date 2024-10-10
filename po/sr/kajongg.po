@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-09-11 00:37+0000\n"
+"POT-Creation-Date: 2024-10-10 00:37+0000\n"
 "PO-Revision-Date: 2017-09-29 16:44+0200\n"
 "Last-Translator: Chusslove Illich <caslav.ilic@gmx.net>\n"
 "Language-Team: Serbian <kde-i18n-sr@kde.org>\n"
@@ -19,21 +19,6 @@ msgstr ""
 "X-Text-Markup: kde4\n"
 "X-Environment: kde, kajongg\n"
 "X-Generator: Lokalize 1.0\n"
-
-msgid "Preview"
-msgstr "Преглед"
-
-msgid "Properties"
-msgstr "Својства"
-
-msgid "Author:"
-msgstr "Аутор:"
-
-msgid "Contact:"
-msgstr "Контакт:"
-
-msgid "Description:"
-msgstr "Опис:"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -49,6 +34,41 @@ msgstr "Трака алатки"
 #: src/background.py:71 src/tileset.py:50
 msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "Фајл ‘%1’ не садржи добар СВГ."
+
+#: src/backgroundselector.py:107
+#, fuzzy
+#| msgid "Preview"
+msgctxt "BackgroundSelector"
+msgid "Preview"
+msgstr "Преглед"
+
+#: src/backgroundselector.py:108
+#, fuzzy
+#| msgid "Properties"
+msgctxt "BackgroundSelector"
+msgid "Properties"
+msgstr "Својства"
+
+#: src/backgroundselector.py:109
+#, fuzzy
+#| msgid "Author:"
+msgctxt "BackgroundSelector"
+msgid "Author:"
+msgstr "Аутор:"
+
+#: src/backgroundselector.py:110
+#, fuzzy
+#| msgid "Contact:"
+msgctxt "BackgroundSelector"
+msgid "Contact:"
+msgstr "Контакт:"
+
+#: src/backgroundselector.py:111
+#, fuzzy
+#| msgid "Description:"
+msgctxt "BackgroundSelector"
+msgid "Description:"
+msgstr "Опис:"
 
 #: src/board.py:315
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
@@ -76,7 +96,7 @@ msgid "Message"
 msgstr "порука"
 
 # >> %1 table ID, %2 client URL
-#: src/chat.py:124
+#: src/chat.py:125
 msgid "Chat on table %1 at %2"
 msgstr "Ћаскање на табли %1 на %2"
 
@@ -151,20 +171,20 @@ msgstr ""
 "Грешка за играча %1: %2\n"
 "%3"
 
-#: src/differ.py:71
+#: src/differ.py:72
 msgctxt "Kajongg"
 msgid "Rule"
 msgstr "Правило"
 
 # >> @title:window
-#: src/differ.py:126
+#: src/differ.py:127
 #, fuzzy
 #| msgid "Compare"
 msgctxt "@title:window"
 msgid "Compare"
 msgstr "Поређење"
 
-#: src/differ.py:169 src/differ.py:171
+#: src/differ.py:170 src/differ.py:172
 msgctxt "Kajongg-Rule"
 msgid "not defined"
 msgstr "није дефинисано"
@@ -184,17 +204,17 @@ msgstr "Краткоживећи зид: плочица је невидљива,
 # >> @title:window
 # >> @title:column
 # >! Contexts.
-#: src/games.py:94 src/playerlist.py:63 src/tables.py:66
+#: src/games.py:95 src/playerlist.py:63 src/tables.py:66
 msgid "Players"
 msgstr "играчи"
 
 # >> @title:column
-#: src/games.py:94
+#: src/games.py:95
 msgid "Started"
 msgstr "покренуто"
 
 # >> @title:window
-#: src/games.py:106
+#: src/games.py:107
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "Games"
@@ -202,26 +222,26 @@ msgctxt "@title:window"
 msgid "Games"
 msgstr "Партије"
 
-#: src/games.py:123
+#: src/games.py:124
 msgctxt "start a new game"
 msgid "&New"
 msgstr "&Нова"
 
-#: src/games.py:127
+#: src/games.py:128
 msgid "&Load"
 msgstr "&Учитај"
 
-#: src/games.py:131 src/playerlist.py:53
+#: src/games.py:132 src/playerlist.py:53
 msgid "&Delete"
 msgstr "&Обриши"
 
-#: src/games.py:135
+#: src/games.py:136
 msgid "Show only pending games"
 msgstr "Прикажи само наступајуће партије"
 
 # >! Plurals.
 # rewrite-msgid: /This will .* button/This cannot be undone/
-#: src/games.py:237
+#: src/games.py:238
 msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
@@ -230,7 +250,7 @@ msgstr ""
 "</html>|/|<html>Желите ли заиста да обришете %1 $[множ ^1 партију партије "
 "партија]?<br />Ово се не може опозвати.</html>"
 
-#: src/guiutil.py:146 src/kdestub.py:129 src/kdestub.py:132
+#: src/guiutil.py:132 src/kdestub.py:129 src/kdestub.py:132
 msgid "Kajongg"
 msgstr "Каџонг"
 
@@ -608,131 +628,131 @@ msgstr "Пријава на сервер %1 пропала: немате вез�
 msgid "Please try again"
 msgstr "Покушајте поново."
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:483
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "&Бодуј ручну партију"
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:485
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Ручна партија"
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:488
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "Бодујте ручну партију."
 
-#: src/mainwindow.py:518
+#: src/mainwindow.py:490
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Играј"
 
-#: src/mainwindow.py:521
+#: src/mainwindow.py:493
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Започиње нову партију."
 
-#: src/mainwindow.py:523
+#: src/mainwindow.py:495
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "&Обустави партију"
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:499
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Обуставља текућу партију."
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:501
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "&Напусти Каџонг"
 
-#: src/mainwindow.py:532
+#: src/mainwindow.py:504
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Играчи"
 
-#: src/mainwindow.py:535
+#: src/mainwindow.py:507
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "Дефинишите играче."
 
-#: src/mainwindow.py:537
+#: src/mainwindow.py:509
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "&Скупови правила"
 
-#: src/mainwindow.py:540
+#: src/mainwindow.py:512
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "Прилагодите скупове правила."
 
-#: src/mainwindow.py:544
+#: src/mainwindow.py:516
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "&Промени угао гледања"
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:517
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Угао"
 
-#: src/mainwindow.py:548
+#: src/mainwindow.py:520
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Промените визуелну појаву плочица."
 
-#: src/mainwindow.py:552
+#: src/mainwindow.py:524
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "Преко &целог екрана"
 
-#: src/mainwindow.py:555
+#: src/mainwindow.py:527
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&Табела резултата"
 
-#: src/mainwindow.py:557
+#: src/mainwindow.py:529
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "&Резултати"
 
-#: src/mainwindow.py:559
+#: src/mainwindow.py:531
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Приказује или сакрива табелу резултата за текућу партију."
 
-#: src/mainwindow.py:561
+#: src/mainwindow.py:533
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "&Објашњавај резултате"
 
-#: src/mainwindow.py:562
+#: src/mainwindow.py:534
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "&Објашњавај"
 
-#: src/mainwindow.py:564
+#: src/mainwindow.py:536
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Објашњава бодовање за све играче у текућој партији."
 
-#: src/mainwindow.py:566
+#: src/mainwindow.py:538
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "&Демо режим"
 
-#: src/mainwindow.py:569
+#: src/mainwindow.py:541
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr "Нека рачунар ради за вас. Покрените нову локалну партију ако треба."
 
-#: src/mainwindow.py:571
+#: src/mainwindow.py:543
 msgid "C&hat"
 msgstr "&Ћаскање"
 
-#: src/mainwindow.py:574
+#: src/mainwindow.py:546
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Ћаскајте са другим играчима."
@@ -909,7 +929,7 @@ msgstr "Не можете или не желите да тврдите ову п
 
 # ! Скриптуј кад добије ознаку kde-format.
 # rewrite-msgid: /find any %1/find any resource of type %1/
-#: src/mjresource.py:88
+#: src/mjresource.py:92
 msgid ""
 "cannot find any %1 in the following directories, is libkmahjongg installed?"
 msgstr ""
@@ -917,23 +937,23 @@ msgstr ""
 "libkmahjongg инсталирана?"
 
 # ! Скриптуј кад добије ознаку kde-format.
-#: src/mjresource.py:112
+#: src/mjresource.py:116
 msgid "cannot find %1, using default"
 msgstr "Не могу да нађем %1. Користим подразумевано."
 
-#: src/mjresource.py:127
+#: src/mjresource.py:131
 msgid "unknown name"
 msgstr "непознато име"
 
-#: src/mjresource.py:128
+#: src/mjresource.py:132
 msgid "unknown author"
 msgstr "непознат аутор"
 
-#: src/mjresource.py:131
+#: src/mjresource.py:135
 msgid "no description available"
 msgstr "опис није доступан"
 
-#: src/mjresource.py:134
+#: src/mjresource.py:138
 msgid "no E-Mail address available"
 msgstr "адреса е‑поште није доступна"
 
@@ -1703,7 +1723,7 @@ msgstr "Локална партија"
 msgid "Database %1 updated from schema %2 to %3"
 msgstr "База података %1 ажурирана према шеми %2 на %3."
 
-#: src/rule.py:49 src/scoringdialog.py:702 src/scoringdialog.py:780
+#: src/rule.py:49 src/scoringdialog.py:710 src/scoringdialog.py:788
 msgid "points"
 msgstr "поена"
 
@@ -1819,32 +1839,32 @@ msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 је премало, најмања вредност је %3."
 
 # >> @title:window
-#: src/rulesetselector.py:500
+#: src/rulesetselector.py:503
 #, fuzzy
 #| msgid "Customize rulesets"
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "Прилагођавање скупова правила"
 
-#: src/rulesetselector.py:519
+#: src/rulesetselector.py:522
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "Правило"
 
-#: src/rulesetselector.py:580
+#: src/rulesetselector.py:583
 msgid "C&opy"
 msgstr "&Копирај"
 
-#: src/rulesetselector.py:581
+#: src/rulesetselector.py:584
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "У&пореди"
 
-#: src/rulesetselector.py:582
+#: src/rulesetselector.py:585
 msgid "&Remove"
 msgstr "&Уклони"
 
-#: src/rulesetselector.py:583
+#: src/rulesetselector.py:586
 msgid "&Close"
 msgstr "&Затвори"
 
@@ -1892,99 +1912,99 @@ msgstr "Премести овде скривене плочице"
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr "Дефинишите четири играча преко „Подешавање→Играчи“."
 
-#: src/scoringdialog.py:242
+#: src/scoringdialog.py:247
 msgid "Round/Hand"
 msgstr "Рунда/рука"
 
-#: src/scoringdialog.py:275 src/scoringdialog.py:832
+#: src/scoringdialog.py:280 src/scoringdialog.py:840
 msgctxt "kajongg"
 msgid "Score"
 msgstr "Резултат"
 
-#: src/scoringdialog.py:275
+#: src/scoringdialog.py:280
 msgctxt "kajongg"
 msgid "Payments"
 msgstr "Плаћања"
 
-#: src/scoringdialog.py:276
+#: src/scoringdialog.py:281
 msgctxt "kajongg"
 msgid "Balance"
 msgstr "Обрачун"
 
-#: src/scoringdialog.py:276
+#: src/scoringdialog.py:281
 msgctxt "kajongg"
 msgid "Chart"
 msgstr "График"
 
-#: src/scoringdialog.py:422
+#: src/scoringdialog.py:427
 msgctxt "kajongg"
 msgid "Scores"
 msgstr "Резултати"
 
-#: src/scoringdialog.py:462
+#: src/scoringdialog.py:467
 msgctxt "kajongg"
 msgid "Used Rules"
 msgstr "Коришћена правила"
 
 # rewrite-msgid: /<.?numid>//
-#: src/scoringdialog.py:496
+#: src/scoringdialog.py:501
 msgid "Final scores for game <numid>%1</numid>"
 msgstr "Крајњи резултат партије %1"
 
 # rewrite-msgid: /<.?numid>//
-#: src/scoringdialog.py:498
+#: src/scoringdialog.py:503
 msgid "Scores for game <numid>%1</numid>"
 msgstr "Резултат партије %1"
 
 # >> @title:window
-#: src/scoringdialog.py:571
+#: src/scoringdialog.py:576
 #, fuzzy
 #| msgid "Explain Scores"
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "Објашњење резултата"
 
-#: src/scoringdialog.py:587
+#: src/scoringdialog.py:592
 msgid "There is no active game"
 msgstr "Нема активних партија."
 
-#: src/scoringdialog.py:590
+#: src/scoringdialog.py:595
 msgid "%1"
 msgstr "%1"
 
-#: src/scoringdialog.py:604
+#: src/scoringdialog.py:609
 msgid "Manual score for %1: %2 points"
 msgstr "%1 — ручни резултат: %2 поена"
 
-#: src/scoringdialog.py:688
+#: src/scoringdialog.py:696
 msgid "Penalty"
 msgstr "Казна"
 
-#: src/scoringdialog.py:691
+#: src/scoringdialog.py:699
 msgid "Offense:"
 msgstr "Прекршај:"
 
-#: src/scoringdialog.py:698
+#: src/scoringdialog.py:706
 msgid "Total Penalty"
 msgstr "Укупна казна"
 
-#: src/scoringdialog.py:726
+#: src/scoringdialog.py:734
 msgid "&Execute"
 msgstr "&Изврши"
 
 # >! Plurals.
-#: src/scoringdialog.py:803
+#: src/scoringdialog.py:811
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
 msgstr "плаћа %1 поена|/|плаћа %1 $[множ ^1 поен поена поена]"
 
 # >! Plurals.
-#: src/scoringdialog.py:808
+#: src/scoringdialog.py:816
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
 msgstr "добија %1 поена|/|добија %1 $[множ ^1 поен поена поена]"
 
-#: src/scoringdialog.py:819
+#: src/scoringdialog.py:827
 #, fuzzy
 #| msgid "Scoring for this Hand"
 msgctxt "@title:window"
@@ -1992,40 +2012,40 @@ msgid "Scoring for this Hand"
 msgstr "Бодовање за ову руку"
 
 # >> @title:tab
-#: src/scoringdialog.py:830
+#: src/scoringdialog.py:838
 msgctxt "kajongg"
 msgid "Player"
 msgstr "Играч"
 
 # >> @title:tab
-#: src/scoringdialog.py:831
+#: src/scoringdialog.py:839
 msgctxt "kajongg"
 msgid "Wind"
 msgstr "Ветар"
 
 # >> @title:tab
-#: src/scoringdialog.py:833
+#: src/scoringdialog.py:841
 msgid "Winner"
 msgstr "Победник"
 
-#: src/scoringdialog.py:839
+#: src/scoringdialog.py:847
 msgctxt "kajongg"
 msgid "Draw"
 msgstr "Нерешено"
 
-#: src/scoringdialog.py:841
+#: src/scoringdialog.py:849
 msgid "&Penalties"
 msgstr "&Казне"
 
-#: src/scoringdialog.py:843
+#: src/scoringdialog.py:851
 msgid "&Save Hand"
 msgstr "&Сачувај руку"
 
-#: src/scoringdialog.py:865
+#: src/scoringdialog.py:873
 msgid "&Last Tile:"
 msgstr "&Последња плочица:"
 
-#: src/scoringdialog.py:874
+#: src/scoringdialog.py:882
 msgid "L&ast Meld:"
 msgstr "П&оследњи слог:"
 
@@ -2393,6 +2413,41 @@ msgstr "скривен"
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
+
+#: src/tilesetselector.py:141
+#, fuzzy
+#| msgid "Preview"
+msgctxt "TilesetSelector"
+msgid "Preview"
+msgstr "Преглед"
+
+#: src/tilesetselector.py:142
+#, fuzzy
+#| msgid "Properties"
+msgctxt "TilesetSelector"
+msgid "Properties"
+msgstr "Својства"
+
+#: src/tilesetselector.py:143
+#, fuzzy
+#| msgid "Author:"
+msgctxt "TilesetSelector"
+msgid "Author:"
+msgstr "Аутор:"
+
+#: src/tilesetselector.py:144
+#, fuzzy
+#| msgid "Contact:"
+msgctxt "TilesetSelector"
+msgid "Contact:"
+msgstr "Контакт:"
+
+#: src/tilesetselector.py:145
+#, fuzzy
+#| msgid "Description:"
+msgctxt "TilesetSelector"
+msgid "Description:"
+msgstr "Опис:"
 
 #: src/user.py:94
 msgid ""

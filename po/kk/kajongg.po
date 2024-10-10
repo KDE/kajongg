@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-09-11 00:37+0000\n"
+"POT-Creation-Date: 2024-10-10 00:37+0000\n"
 "PO-Revision-Date: 2013-11-20 06:55+0600\n"
 "Last-Translator: Sairan Kikkarin <sairan@computer.org>\n"
 "Language-Team: Kazakh <kde-i18n-doc@kde.org>\n"
@@ -16,21 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Lokalize 1.2\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-msgid "Preview"
-msgstr "Карап-шығу"
-
-msgid "Properties"
-msgstr "Қасиеттері"
-
-msgid "Author:"
-msgstr "Авторы:"
-
-msgid "Contact:"
-msgstr "Контакт:"
-
-msgid "Description:"
-msgstr "Сипатама:"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -45,6 +30,41 @@ msgstr "Негізгі құралдар"
 #: src/background.py:71 src/tileset.py:50
 msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "<filename>%1</filename> файлында жарамды SVG жоқ"
+
+#: src/backgroundselector.py:107
+#, fuzzy
+#| msgid "Preview"
+msgctxt "BackgroundSelector"
+msgid "Preview"
+msgstr "Карап-шығу"
+
+#: src/backgroundselector.py:108
+#, fuzzy
+#| msgid "Properties"
+msgctxt "BackgroundSelector"
+msgid "Properties"
+msgstr "Қасиеттері"
+
+#: src/backgroundselector.py:109
+#, fuzzy
+#| msgid "Author:"
+msgctxt "BackgroundSelector"
+msgid "Author:"
+msgstr "Авторы:"
+
+#: src/backgroundselector.py:110
+#, fuzzy
+#| msgid "Contact:"
+msgctxt "BackgroundSelector"
+msgid "Contact:"
+msgstr "Контакт:"
+
+#: src/backgroundselector.py:111
+#, fuzzy
+#| msgid "Description:"
+msgctxt "BackgroundSelector"
+msgid "Description:"
+msgstr "Сипатама:"
 
 #: src/board.py:315
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
@@ -67,7 +87,7 @@ msgstr "Ойыншы"
 msgid "Message"
 msgstr "Хабарлама"
 
-#: src/chat.py:124
+#: src/chat.py:125
 msgid "Chat on table %1 at %2"
 msgstr "%1 үстелдегі әңгіме - %2"
 
@@ -139,19 +159,19 @@ msgstr ""
 "%1 ойыншыға қатысты қате: %2\n"
 "%3"
 
-#: src/differ.py:71
+#: src/differ.py:72
 msgctxt "Kajongg"
 msgid "Rule"
 msgstr "Ереже"
 
-#: src/differ.py:126
+#: src/differ.py:127
 #, fuzzy
 #| msgid "Compare"
 msgctxt "@title:window"
 msgid "Compare"
 msgstr "Салыстыру"
 
-#: src/differ.py:169 src/differ.py:171
+#: src/differ.py:170 src/differ.py:172
 msgctxt "Kajongg-Rule"
 msgid "not defined"
 msgstr "анықталмаған"
@@ -168,15 +188,15 @@ msgstr "%1 деген ойыншы беймәлім"
 msgid "Short living wall: Tile is invisible, hence dangerous"
 msgstr "Шолақ тірі қорған: Тас көрінбейді, қауіпті"
 
-#: src/games.py:94 src/playerlist.py:63 src/tables.py:66
+#: src/games.py:95 src/playerlist.py:63 src/tables.py:66
 msgid "Players"
 msgstr "Ойыншылар"
 
-#: src/games.py:94
+#: src/games.py:95
 msgid "Started"
 msgstr "Басталған"
 
-#: src/games.py:106
+#: src/games.py:107
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "Games"
@@ -184,24 +204,24 @@ msgctxt "@title:window"
 msgid "Games"
 msgstr "Ойындар"
 
-#: src/games.py:123
+#: src/games.py:124
 msgctxt "start a new game"
 msgid "&New"
 msgstr "&Жаңа"
 
-#: src/games.py:127
+#: src/games.py:128
 msgid "&Load"
 msgstr "Жүк&теу"
 
-#: src/games.py:131 src/playerlist.py:53
+#: src/games.py:132 src/playerlist.py:53
 msgid "&Delete"
 msgstr "&Кетіру"
 
-#: src/games.py:135
+#: src/games.py:136
 msgid "Show only pending games"
 msgstr "Тек кезектегі ойындар ғана көрсетілсін"
 
-#: src/games.py:237
+#: src/games.py:238
 msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
@@ -209,7 +229,7 @@ msgstr ""
 "Шынымен <numid>%1</numid> деген ойынды өшірмексіз бе?<br>Осымен өшіріледі, "
 "енді қайту амалы болмайды"
 
-#: src/guiutil.py:146 src/kdestub.py:129 src/kdestub.py:132
+#: src/guiutil.py:132 src/kdestub.py:129 src/kdestub.py:132
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -595,7 +615,7 @@ msgstr "Желі қосылымыңыз жоқ: %1"
 msgid "Please try again"
 msgstr "Қайталап көріңіз"
 
-#: src/mainwindow.py:511
+#: src/mainwindow.py:483
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Score Manual Game"
@@ -603,27 +623,27 @@ msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "Қолмен ойнаған &есебі"
 
-#: src/mainwindow.py:513
+#: src/mainwindow.py:485
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Қолмен ойнаған"
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:488
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "Қолмен ойнаған &есебі."
 
-#: src/mainwindow.py:518
+#: src/mainwindow.py:490
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Ойнау"
 
-#: src/mainwindow.py:521
+#: src/mainwindow.py:493
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Жаңа ойынды бастау."
 
-#: src/mainwindow.py:523
+#: src/mainwindow.py:495
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Abort Game"
@@ -631,12 +651,12 @@ msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "Ойынды &доғару"
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:499
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Ойнап жатқанды доғару."
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:501
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
@@ -644,27 +664,27 @@ msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "Kajongg-тан &шығу"
 
-#: src/mainwindow.py:532
+#: src/mainwindow.py:504
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Ойыншылар"
 
-#: src/mainwindow.py:535
+#: src/mainwindow.py:507
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "ойыншыларыңызды анықтау."
 
-#: src/mainwindow.py:537
+#: src/mainwindow.py:509
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "&Ереже жиындары"
 
-#: src/mainwindow.py:540
+#: src/mainwindow.py:512
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "ереже жиындарын ыңғайлау."
 
-#: src/mainwindow.py:544
+#: src/mainwindow.py:516
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Change Visual Angle"
@@ -672,22 +692,22 @@ msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "К&өзқарас бұрышы"
 
-#: src/mainwindow.py:545
+#: src/mainwindow.py:517
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Бұрыш"
 
-#: src/mainwindow.py:548
+#: src/mainwindow.py:520
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Тастарының көрінісін өзгерту."
 
-#: src/mainwindow.py:552
+#: src/mainwindow.py:524
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr ""
 
-#: src/mainwindow.py:555
+#: src/mainwindow.py:527
 #, fuzzy
 #| msgctxt "kajongg @action:inmenu"
 #| msgid "&Score Table"
@@ -695,17 +715,17 @@ msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&Есеп кестесі"
 
-#: src/mainwindow.py:557
+#: src/mainwindow.py:529
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "Ұ&пайлар"
 
-#: src/mainwindow.py:559
+#: src/mainwindow.py:531
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Ойынның ұпай кестесін көрсету/жасыру."
 
-#: src/mainwindow.py:561
+#: src/mainwindow.py:533
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Explain Scores"
@@ -713,17 +733,17 @@ msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "Есебін &түсіндіру"
 
-#: src/mainwindow.py:562
+#: src/mainwindow.py:534
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "&Түсіндіру"
 
-#: src/mainwindow.py:564
+#: src/mainwindow.py:536
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Ойнап жатқан бүкіл ойншыларының ұпай есебін түсіндіру."
 
-#: src/mainwindow.py:566
+#: src/mainwindow.py:538
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Demo Mode"
@@ -731,18 +751,18 @@ msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "&Демо режімі"
 
-#: src/mainwindow.py:569
+#: src/mainwindow.py:541
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr ""
 "Керек болса жаңа ойынды бастап, компьютерге өзіне ойынды жалғастыруға "
 "мүмкіндік беру. "
 
-#: src/mainwindow.py:571
+#: src/mainwindow.py:543
 msgid "C&hat"
 msgstr "Ч&ат-әңгіме"
 
-#: src/mainwindow.py:574
+#: src/mainwindow.py:546
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Басқа ойыншылармен әңгімелесу."
@@ -919,7 +939,7 @@ msgstr "N"
 msgid "You cannot or do not want to claim this tile"
 msgstr "Бұл тасты ала алмайсыз не алуын қаламайсыз"
 
-#: src/mjresource.py:88
+#: src/mjresource.py:92
 #, fuzzy
 #| msgid ""
 #| "cannot find any tileset in the following directories, is libkmahjongg "
@@ -930,27 +950,27 @@ msgstr ""
 "келесі каталогтарда ешбір тастар жиыны табылған жоқ, libkmahjongg орнатылған "
 "ба өзі?"
 
-#: src/mjresource.py:112
+#: src/mjresource.py:116
 #, fuzzy
 #| msgid "cannot find tileset %1, using default"
 msgid "cannot find %1, using default"
 msgstr "%1 тастар жиыны табылған жоқ, әдеттегісі қолданылады"
 
-#: src/mjresource.py:127
+#: src/mjresource.py:131
 #, fuzzy
 #| msgid "Backgrounds"
 msgid "unknown name"
 msgstr "Аясы"
 
-#: src/mjresource.py:128
+#: src/mjresource.py:132
 msgid "unknown author"
 msgstr ""
 
-#: src/mjresource.py:131
+#: src/mjresource.py:135
 msgid "no description available"
 msgstr ""
 
-#: src/mjresource.py:134
+#: src/mjresource.py:138
 msgid "no E-Mail address available"
 msgstr ""
 
@@ -1741,7 +1761,7 @@ msgstr "Жергілікті ойын"
 msgid "Database %1 updated from schema %2 to %3"
 msgstr ""
 
-#: src/rule.py:49 src/scoringdialog.py:702 src/scoringdialog.py:780
+#: src/rule.py:49 src/scoringdialog.py:710 src/scoringdialog.py:788
 msgid "points"
 msgstr "ұпай"
 
@@ -1859,36 +1879,36 @@ msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 тым аз, минимумы: %3"
 
-#: src/rulesetselector.py:500
+#: src/rulesetselector.py:503
 #, fuzzy
 #| msgid "Customize rulesets"
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "Ереже жиындарын ыңғайлау"
 
-#: src/rulesetselector.py:519
+#: src/rulesetselector.py:522
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "Ереже"
 
-#: src/rulesetselector.py:580
+#: src/rulesetselector.py:583
 msgid "C&opy"
 msgstr ""
 
-#: src/rulesetselector.py:581
+#: src/rulesetselector.py:584
 #, fuzzy
 #| msgid "Compare"
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "Салыстыру"
 
-#: src/rulesetselector.py:582
+#: src/rulesetselector.py:585
 #, fuzzy
 #| msgid "Remove"
 msgid "&Remove"
 msgstr "Өшіру"
 
-#: src/rulesetselector.py:583
+#: src/rulesetselector.py:586
 #, fuzzy
 #| msgid "Close"
 msgid "&Close"
@@ -1937,132 +1957,132 @@ msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
 "Төрт ойыншыны <interface>Баптау|Ойыншылар</interface> мәзірі арқылы таңдаңыз"
 
-#: src/scoringdialog.py:242
+#: src/scoringdialog.py:247
 msgid "Round/Hand"
 msgstr "Раунд/Қиыстырма"
 
-#: src/scoringdialog.py:275 src/scoringdialog.py:832
+#: src/scoringdialog.py:280 src/scoringdialog.py:840
 msgctxt "kajongg"
 msgid "Score"
 msgstr "Есеп"
 
-#: src/scoringdialog.py:275
+#: src/scoringdialog.py:280
 msgctxt "kajongg"
 msgid "Payments"
 msgstr "Төлемдер"
 
-#: src/scoringdialog.py:276
+#: src/scoringdialog.py:281
 msgctxt "kajongg"
 msgid "Balance"
 msgstr "Баланс"
 
-#: src/scoringdialog.py:276
+#: src/scoringdialog.py:281
 msgctxt "kajongg"
 msgid "Chart"
 msgstr "Диаграмма"
 
-#: src/scoringdialog.py:422
+#: src/scoringdialog.py:427
 msgctxt "kajongg"
 msgid "Scores"
 msgstr "Ұпайлар"
 
-#: src/scoringdialog.py:462
+#: src/scoringdialog.py:467
 msgctxt "kajongg"
 msgid "Used Rules"
 msgstr "Қолданатын ережелері"
 
-#: src/scoringdialog.py:496
+#: src/scoringdialog.py:501
 msgid "Final scores for game <numid>%1</numid>"
 msgstr "<numid>%1</numid> ойынның қортынды есебі"
 
-#: src/scoringdialog.py:498
+#: src/scoringdialog.py:503
 msgid "Scores for game <numid>%1</numid>"
 msgstr "<numid>%1</numid> ойынның есебі"
 
-#: src/scoringdialog.py:571
+#: src/scoringdialog.py:576
 #, fuzzy
 #| msgid "Explain Scores"
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "Есебін түсіндіру"
 
-#: src/scoringdialog.py:587
+#: src/scoringdialog.py:592
 msgid "There is no active game"
 msgstr "Белсенді ойын жоқ"
 
-#: src/scoringdialog.py:590
+#: src/scoringdialog.py:595
 msgid "%1"
 msgstr "%1"
 
-#: src/scoringdialog.py:604
+#: src/scoringdialog.py:609
 msgid "Manual score for %1: %2 points"
 msgstr "%1 дегеннің қолмен есептелгені: %2 ұпай"
 
-#: src/scoringdialog.py:688
+#: src/scoringdialog.py:696
 msgid "Penalty"
 msgstr "Айып"
 
-#: src/scoringdialog.py:691
+#: src/scoringdialog.py:699
 msgid "Offense:"
 msgstr "Ереже бұзуы:"
 
-#: src/scoringdialog.py:698
+#: src/scoringdialog.py:706
 msgid "Total Penalty"
 msgstr "Жалпы айыпы"
 
-#: src/scoringdialog.py:726
+#: src/scoringdialog.py:734
 msgid "&Execute"
 msgstr "&Орындау"
 
-#: src/scoringdialog.py:803
+#: src/scoringdialog.py:811
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
 msgstr "%1 ұпай төлеу"
 
-#: src/scoringdialog.py:808
+#: src/scoringdialog.py:816
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
 msgstr "%1 ұпай алу"
 
-#: src/scoringdialog.py:819
+#: src/scoringdialog.py:827
 #, fuzzy
 #| msgid "Scoring for this Hand"
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
 msgstr "Осы қиыстырманың есебі"
 
-#: src/scoringdialog.py:830
+#: src/scoringdialog.py:838
 msgctxt "kajongg"
 msgid "Player"
 msgstr "Ойыншы"
 
-#: src/scoringdialog.py:831
+#: src/scoringdialog.py:839
 msgctxt "kajongg"
 msgid "Wind"
 msgstr "Жел"
 
-#: src/scoringdialog.py:833
+#: src/scoringdialog.py:841
 msgid "Winner"
 msgstr "Жеңімпаз"
 
-#: src/scoringdialog.py:839
+#: src/scoringdialog.py:847
 msgctxt "kajongg"
 msgid "Draw"
 msgstr "Тепе-тең"
 
-#: src/scoringdialog.py:841
+#: src/scoringdialog.py:849
 msgid "&Penalties"
 msgstr "&Айыптар"
 
-#: src/scoringdialog.py:843
+#: src/scoringdialog.py:851
 msgid "&Save Hand"
 msgstr "Қиыстырманы &сақтау"
 
-#: src/scoringdialog.py:865
+#: src/scoringdialog.py:873
 msgid "&Last Tile:"
 msgstr "С&оңғы тасы:"
 
-#: src/scoringdialog.py:874
+#: src/scoringdialog.py:882
 msgid "L&ast Meld:"
 msgstr "Соңғ&ы септеуі:"
 
@@ -2421,6 +2441,41 @@ msgstr "Ашылмаған"
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
+
+#: src/tilesetselector.py:141
+#, fuzzy
+#| msgid "Preview"
+msgctxt "TilesetSelector"
+msgid "Preview"
+msgstr "Карап-шығу"
+
+#: src/tilesetselector.py:142
+#, fuzzy
+#| msgid "Properties"
+msgctxt "TilesetSelector"
+msgid "Properties"
+msgstr "Қасиеттері"
+
+#: src/tilesetselector.py:143
+#, fuzzy
+#| msgid "Author:"
+msgctxt "TilesetSelector"
+msgid "Author:"
+msgstr "Авторы:"
+
+#: src/tilesetselector.py:144
+#, fuzzy
+#| msgid "Contact:"
+msgctxt "TilesetSelector"
+msgid "Contact:"
+msgstr "Контакт:"
+
+#: src/tilesetselector.py:145
+#, fuzzy
+#| msgid "Description:"
+msgctxt "TilesetSelector"
+msgid "Description:"
+msgstr "Сипатама:"
 
 #: src/user.py:94
 msgid ""
