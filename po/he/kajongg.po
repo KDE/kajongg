@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-10-10 00:37+0000\n"
-"PO-Revision-Date: 2024-05-31 09:26+0300\n"
+"PO-Revision-Date: 2024-10-11 16:16+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
 "n % 10 == 0) ? 2 : 3));\n"
-"X-Generator: Lokalize 24.02.2\n"
+"X-Generator: Lokalize 24.05.2\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -33,36 +33,26 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "הקובץ <filename>%1</filename> לא מכיל SVG תקני"
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "תצוגה מקדימה"
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "מאפיינים"
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
 msgstr "יוצר/ת:"
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "פרטי קשר:"
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "תיאור:"
@@ -1999,11 +1989,11 @@ msgstr ""
 
 #: src/sound.py:70
 msgid "No voices will be heard because the program %1 is missing"
-msgstr ""
+msgstr "לא יושמעו קולות כיוון שחסר %1"
 
 #: src/sound.py:374
 msgid "cannot write <filename>%1</filename>: %2"
-msgstr ""
+msgstr "לא ניתן לכתוב את <filename>%1</filename>: %2"
 
 #: src/sound.py:377
 msgid "The voice files have changed, their checksum has changed."
@@ -2107,7 +2097,7 @@ msgstr "שיחה עם משתתפים נוספים בשולחן הזה"
 
 #: src/tables.py:367
 msgid "For chatting with others on this table, please first take a seat"
-msgstr ""
+msgstr "כדי לשוחח עם אחרים סביב השולחן, נא לתפוס מושב קודם"
 
 #: src/tile.py:276
 msgctxt "kajongg"
@@ -2268,36 +2258,26 @@ msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "תצוגה מקדימה"
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "מאפיינים"
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
 msgstr "יוצר/ת:"
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "פרטי קשר:"
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "תיאור:"
@@ -2305,8 +2285,8 @@ msgstr "תיאור:"
 #: src/user.py:94
 msgid ""
 "Your client has a version older than 4.9.0 but you need %1 for this server"
-msgstr ""
+msgstr "הלקוח שלך הוא בגרסה שלפני 4.9.0 אבל צריך %1 לשרת הזה"
 
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
-msgstr ""
+msgstr "גרסת הלקוח שלך היא %1 אבל צריך %2 לשרת הזה"
