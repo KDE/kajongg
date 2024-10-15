@@ -33,36 +33,26 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "το αρχείο <filename>%1</filename> δεν περιέχει έγκυρο SVG"
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "Προεπισκόπηση"
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "Ιδιότητες"
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
 msgstr "Συγγραφέας:"
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "Επαφή:"
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "Περιγραφή:"
@@ -2469,36 +2459,26 @@ msgid "{state} {meldType} {name}"
 msgstr ""
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "Προεπισκόπηση"
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "Ιδιότητες"
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
 msgstr "Συγγραφέας:"
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "Επαφή:"
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "Περιγραφή:"
