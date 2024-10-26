@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-10-10 00:37+0000\n"
-"PO-Revision-Date: 2024-10-10 10:05+0200\n"
+"PO-Revision-Date: 2024-10-25 14:55+0200\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: &\n"
-"X-Generator: Lokalize 24.08.1\n"
+"X-Generator: Lokalize 24.08.2\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -289,7 +289,7 @@ msgstr "usa un JOC DE REGLES sense preguntar"
 
 #: src/kajongg.py:91
 msgid "prefer PLAYER for next login"
-msgstr "prefereix un JUGADOR per a la propera connexió"
+msgstr "prefereix un JUGADOR per a la pròxima connexió"
 
 #: src/kajongg.py:92
 msgid "use AI variant for human player in demo mode"
