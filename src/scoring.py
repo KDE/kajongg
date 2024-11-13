@@ -302,7 +302,6 @@ class ScoringHandBoard(HandBoard):
         the entire meld"""
         focus = self.focusTile
         if not focus:
-            logWarning('ScoringBoard.focusRectWidth: there is no focus tile')
             return 1
         meld = self.uiMeldWithTile(focus)
         if not meld:
