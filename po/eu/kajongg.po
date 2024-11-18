@@ -1,17 +1,17 @@
 # Translation for kajongg.po to Euskara/Basque (eu).
-# Copyright (C) 2020-2023 This file is copyright:
+# Copyright (C) 2020-2024 This file is copyright:
 # This file is distributed under the same license as the kajongg package.
 # SPDX-FileCopyrightText: 2023, 2024 KDE euskaratzeko proiektuko arduraduna <xalba@ni.eus>
 #
 # Translators:
-# SPDX-FileCopyrightText: 2010, 2020, 2023 Iñigo Salvador Azurmendi <xalba@ni.eus>
+# SPDX-FileCopyrightText: 2010, 2020, 2023, 2024 Iñigo Salvador Azurmendi <xalba@ni.eus>
 # marcos <marcos@euskalgnu.org>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-10-10 00:37+0000\n"
-"PO-Revision-Date: 2024-04-05 09:25+0200\n"
+"PO-Revision-Date: 2024-11-16 15:40+0100\n"
 "Last-Translator: Iñigo Salvador Azurmendi <xalba@ni.eus>\n"
 "Language-Team: Basque <kde-i18n-eu@kde.org>\n"
 "Language: eu\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 24.02.1\n"
+"X-Generator: Lokalize 24.08.3\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -36,36 +36,26 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "<filename>%1</filename> fitxategiak balio ez duen SVG dauka"
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "Aurreikuspegia"
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "Propietateak"
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
 msgstr "Egilea:"
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "Kontaktua:"
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "Deskribapena:"
@@ -1658,7 +1648,7 @@ msgstr "Joko lokala"
 
 #: src/query.py:376
 msgid "Database %1 updated from schema %2 to %3"
-msgstr ""
+msgstr "%1 datu-basea %2 eskematik %3(e)ra eguneratu da"
 
 #: src/rule.py:49 src/scoringdialog.py:710 src/scoringdialog.py:788
 msgid "points"
@@ -1978,10 +1968,8 @@ msgid "Player %1 has logged out"
 msgstr "%1 jokalariak saioa amaitu du"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "zerbitzariak (%d) ATAKAn entzungo du"
+msgstr "zerbitzariak ({int(defaultPort)}) ATAKAn entzungo du"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
@@ -2005,13 +1993,11 @@ msgstr "Aulki guztiak hartuta daude"
 
 #: src/servertable.py:187
 msgid "takes a seat"
-msgstr "aulki bat hartzen du"
+msgstr "eserlekua hartu du"
 
 #: src/servertable.py:195
-#, fuzzy
-#| msgid "name of the database"
 msgid "leaves the table"
-msgstr "datubasearen izena"
+msgstr "mahaitik altxatu da"
 
 #: src/servertable.py:241
 msgctxt "kajongg, name of robot player, to be translated"
@@ -2327,36 +2313,26 @@ msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "Aurreikuspegia"
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "Propietateak"
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
 msgstr "Egilea:"
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "Kontaktua:"
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "Deskribapena:"
