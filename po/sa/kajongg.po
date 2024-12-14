@@ -1,0 +1,2336 @@
+# Sanskrit translations for kajongg package.
+# Copyright (C) 2024 This file is copyright:
+# This file is distributed under the same license as the kajongg package.
+# Kali <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kajongg\n"
+"Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
+"POT-Creation-Date: 2024-10-10 00:37+0000\n"
+"PO-Revision-Date: 2024-12-13 19:10+0530\n"
+"Last-Translator: Kali <EMAIL@ADDRESS>\n"
+"Language-Team: Sanskrit\n"
+"Language: sa\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgctxt "kajongg"
+msgid "Game"
+msgstr ""
+
+msgid "View"
+msgstr "दृश्यं"
+
+msgid "Toolbar"
+msgstr "टूलबार"
+
+#: src/background.py:71 src/tileset.py:50
+msgid "file <filename>%1</filename> contains no valid SVG"
+msgstr "<filename>%1</filename> सञ्चिकायां वैधं SVG नास्ति"
+
+#: src/backgroundselector.py:107
+msgctxt "BackgroundSelector"
+msgid "Preview"
+msgstr ""
+
+#: src/backgroundselector.py:108
+msgctxt "BackgroundSelector"
+msgid "Properties"
+msgstr ""
+
+#: src/backgroundselector.py:109
+msgctxt "BackgroundSelector"
+msgid "Author:"
+msgstr ""
+
+#: src/backgroundselector.py:110
+msgctxt "BackgroundSelector"
+msgid "Contact:"
+msgstr ""
+
+#: src/backgroundselector.py:111
+msgctxt "BackgroundSelector"
+msgid "Description:"
+msgstr ""
+
+#: src/board.py:315
+msgctxt "kajongg:arrow keys hjkl like in konqueror"
+msgid "hjklHJKL"
+msgstr ""
+
+#: src/board.py:365
+msgid "Choose from"
+msgstr "तः चिनुत"
+
+#: src/chat.py:51
+msgid "Time"
+msgstr "कालः"
+
+#: src/chat.py:51 src/playerlist.py:86
+msgid "Player"
+msgstr "खिलाडी"
+
+#: src/chat.py:51
+msgid "Message"
+msgstr "सन्देशः"
+
+#: src/chat.py:125
+msgid "Chat on table %1 at %2"
+msgstr "%2 इत्यत्र %1 सारणीयां गपशपं कुर्वन्तु"
+
+#: src/client.py:69
+msgctxt "table status"
+msgid "Suspended"
+msgstr ""
+
+#: src/client.py:74
+msgctxt "table status"
+msgid "Running"
+msgstr ""
+
+#: src/client.py:75
+msgctxt "table status"
+msgid "New"
+msgstr ""
+
+#: src/configdialog.py:47
+msgid "Show tile shadows"
+msgstr "टाइल् छायाः दर्शयतु"
+
+#: src/configdialog.py:50
+msgid "Rearrange undisclosed tiles to melds"
+msgstr "अप्रकटित टाइल्स् पुनः मेल्ड्स् मध्ये व्यवस्थितं कुर्वन्तु"
+
+#: src/configdialog.py:53
+msgid "Show only possible actions"
+msgstr "केवलं सम्भाव्यकर्माणि दर्शयतु"
+
+#: src/configdialog.py:56
+msgid "Propose what to do"
+msgstr "किं कर्तव्यमिति प्रस्तावयतु"
+
+#: src/configdialog.py:62
+msgid "Animation speed:"
+msgstr "एनिमेशनवेगः : १."
+
+#: src/configdialog.py:66
+msgid "Use sounds if available"
+msgstr "यदि उपलब्धं भवति तर्हि ध्वनयः उपयुज्यताम्"
+
+#: src/configdialog.py:69
+msgid "Let others hear my voice"
+msgstr "अन्ये मम वाणीं शृण्वन्तु"
+
+#: src/configdialog.py:103
+msgctxt "kajongg"
+msgid "Play"
+msgstr ""
+
+#: src/configdialog.py:106
+msgid "Tiles"
+msgstr "टाइल्स"
+
+#: src/configdialog.py:109
+msgid "Backgrounds"
+msgstr "पृष्ठभूमिः"
+
+#: src/deferredutil.py:272 src/deferredutil.py:436
+msgid "The game server lost connection to player %1"
+msgstr "क्रीडासर्वरः खिलाडी %1 इत्यनेन सह सम्पर्कं त्यक्तवान्"
+
+#: src/deferredutil.py:275
+msgid ""
+"Error for player %1: %2\n"
+"%3"
+msgstr ""
+"खिलाडी %1 कृते त्रुटिः: %2\n"
+"%3"
+
+#: src/differ.py:72
+msgctxt "Kajongg"
+msgid "Rule"
+msgstr ""
+
+#: src/differ.py:127
+msgctxt "@title:window"
+msgid "Compare"
+msgstr ""
+
+#: src/differ.py:170 src/differ.py:172
+msgctxt "Kajongg-Rule"
+msgid "not defined"
+msgstr ""
+
+#: src/game.py:558
+msgid "Score computed manually"
+msgstr "स्कोरः मैन्युअल् रूपेण गणितः"
+
+#: src/game.py:655
+msgid "Player %1 not known"
+msgstr "खिलाडी %1 न ज्ञायते"
+
+#: src/game.py:1082
+msgid "Short living wall: Tile is invisible, hence dangerous"
+msgstr "लघुजीवितभित्तिः : टाइल् अदृश्यः अस्ति, अतः खतरनाकः अस्ति"
+
+#: src/games.py:95 src/playerlist.py:63 src/tables.py:66
+msgid "Players"
+msgstr "क्रीडकाः"
+
+#: src/games.py:95
+msgid "Started"
+msgstr "आरंभित"
+
+#: src/games.py:107
+msgctxt "@title:window"
+msgid "Games"
+msgstr ""
+
+#: src/games.py:124
+msgctxt "start a new game"
+msgid "&New"
+msgstr ""
+
+#: src/games.py:128
+msgid "&Load"
+msgstr "&भार"
+
+#: src/games.py:132 src/playerlist.py:53
+msgid "&Delete"
+msgstr "&लुप्"
+
+#: src/games.py:136
+msgid "Show only pending games"
+msgstr "केवलं लम्बितक्रीडाः दर्शयतु"
+
+#: src/games.py:238
+msgid ""
+"Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
+"you cannot cancel it with the cancel button"
+msgstr ""
+"किं भवन्तः वास्तवमेव विलोपयितुम् इच्छन्ति<numid> %1</numid> क्रीडाः ?<br> इदं अन्तिमं "
+"भविष्यति, रद्दीकरणबटनेन रद्दं कर्तुं न शक्नुथ"
+
+#: src/guiutil.py:132 src/kdestub.py:129 src/kdestub.py:132
+msgid "Kajongg"
+msgstr "कजोङ्ग्"
+
+#: src/humanclient.py:65
+msgid "Which chow do you want to expose?"
+msgstr "भवन्तः कस्य चाउ इत्यस्य प्रकाशनं कर्तुम् इच्छन्ति ?"
+
+#: src/humanclient.py:103
+msgid "Which kong do you want to declare?"
+msgstr "भवन्तः कस्य काङ्गस्य घोषणां कर्तुम् इच्छन्ति ?"
+
+#: src/humanclient.py:170
+msgid "Choose"
+msgstr "चिनोतु"
+
+#: src/humanclient.py:380
+msgid "You cannot say %1"
+msgstr "%1 इति वक्तुं न शक्नोषि"
+
+#: src/humanclient.py:605
+msgid "Player %1 has left the table"
+msgstr "%1 खिलाडी सारणीं त्यक्तवान् अस्ति"
+
+#: src/humanclient.py:668
+msgid ""
+"The game on table <numid>%1</numid> can begin. Are you ready to play now?"
+msgstr ""
+"तालिका <numid>%1</numid> इत्यत्र क्रीडा आरभ्यतुं शक्नोति । इदानीं क्रीडितुं सज्जः असि "
+"वा ?"
+
+#: src/humanclient.py:688
+msgid "Ready for next hand?"
+msgstr "अग्रिमहस्तस्य कृते सज्जाः?"
+
+#: src/humanclient.py:962
+msgid "The connection to the server %1 broke, please try again later."
+msgstr "%1 सर्वरेण सह संयोजनं भग्नम्, कृपया पश्चात् पुनः प्रयासं कुर्वन्तु ।"
+
+#: src/kajongg.py:81 src/kdestub.py:1086
+msgid "Mah Jongg - the ancient Chinese board game for 4 players"
+msgstr "मह जोङ्ग् - ४ खिलाडिनां कृते प्राचीनः चीनीयः बोर्डक्रीडा"
+
+#: src/kajongg.py:85
+msgid "all robots play with visible concealed tiles"
+msgstr "सर्वे रोबोट् दृश्यमानैः गुप्त-टाइलैः सह क्रीडन्ति"
+
+#: src/kajongg.py:86
+msgid "start with demo mode"
+msgstr "डेमो मोड् इत्यनेन आरभ्यताम्"
+
+#: src/kajongg.py:87
+msgid "login to HOST"
+msgstr "HOST इत्यत्र प्रवेशं कुर्वन्तु"
+
+#: src/kajongg.py:88
+msgid "start new TABLE"
+msgstr "नूतनं TABLE आरभत"
+
+#: src/kajongg.py:89
+msgid "join TABLE"
+msgstr "join TABLE इति"
+
+#: src/kajongg.py:90
+msgid "use RULESET without asking"
+msgstr "न पृष्ट्वा RULESET इत्यस्य उपयोगं कुर्वन्तु"
+
+#: src/kajongg.py:91
+msgid "prefer PLAYER for next login"
+msgstr "अग्रिमप्रवेशार्थं PLAYER इत्येतत् प्राधान्यं ददातु"
+
+#: src/kajongg.py:92
+msgid "use AI variant for human player in demo mode"
+msgstr "डेमो मोड् इत्यस्मिन् मानवक्रीडकस्य कृते AI variant इत्यस्य उपयोगं कुर्वन्तु"
+
+#: src/kajongg.py:93
+msgid "write statistics to CSV"
+msgstr "CSV कृते आँकडानि लिखन्तु"
+
+#: src/kajongg.py:94
+msgid "show all available rulesets"
+msgstr "सर्वाणि उपलब्धानि नियमसमूहानि दर्शयन्तु"
+
+#: src/kajongg.py:95
+msgid "for testing purposes: Initializes the random generator"
+msgstr "परीक्षणार्थं: यादृच्छिकजनरेटरं आरभते"
+
+#: src/kajongg.py:97
+msgid "show no graphical user interface. Intended only for testing"
+msgstr "चित्रात्मकं उपयोक्तृ-अन्तरफलकं न दर्शयन्तु । केवलं परीक्षणार्थं अभिप्रेतम्"
+
+#: src/kajongg.py:99
+msgid ""
+"use a dedicated server already running and listening on SOCKET. Intended "
+"only for testing"
+msgstr ""
+"SOCKET इत्यत्र पूर्वमेव चालितं शृण्वन् च समर्पितं सर्वरं उपयुज्यताम् । केवलं परीक्षणार्थं अभिप्रेतम्"
+
+#: src/kajongg.py:101
+msgid ""
+"use a dedicated server already running and listening on PORT. Intended only "
+"for testing"
+msgstr ""
+"PORT इत्यत्र पूर्वमेव चालितं शृण्वन् च समर्पितं सर्वरं उपयुज्यताम् । केवलं परीक्षणार्थं अभिप्रेतम्"
+
+#: src/kdestub.py:269
+msgid "&OK"
+msgstr "&अस्तु"
+
+#: src/kdestub.py:271
+msgid "&Apply"
+msgstr "&आचरतु"
+
+#: src/kdestub.py:273
+msgid "&Cancel"
+msgstr "&निरसयतु"
+
+#: src/kdestub.py:275 src/kdestub.py:460
+msgid "&Help"
+msgstr "&साहाय्यम्‌"
+
+#: src/kdestub.py:278
+msgid "&Defaults"
+msgstr "&पूर्वनिर्धारित"
+
+#: src/kdestub.py:343
+msgctxt "@action:inmenu"
+msgid "Show St&atusbar"
+msgstr ""
+
+#: src/kdestub.py:349
+msgctxt "@action:inmenu"
+msgid "Show &Toolbar"
+msgstr ""
+
+#: src/kdestub.py:355
+msgid "Configure Tool&bars..."
+msgstr "Tool&bars विन्यस्तं कुर्वन्तु..."
+
+#: src/kdestub.py:357
+msgid "Configure toolbars"
+msgstr "साधनपट्टिकाः विन्यस्यताम्"
+
+#: src/kdestub.py:364
+msgid "Configure &Kajongg..."
+msgstr "विन्यस्तं कुर्वन्तु & Kajongg..."
+
+#: src/kdestub.py:366 src/kdestub.py:1206
+msgid "Configure"
+msgstr "विन्यस्तं कुर्वन्तु"
+
+#: src/kdestub.py:456
+msgid "&Game"
+msgstr "&क्रीडा"
+
+#: src/kdestub.py:457
+msgid "&View"
+msgstr "&दृश्यं"
+
+#: src/kdestub.py:458
+msgid "&Settings"
+msgstr "&सेटिंग्स"
+
+#: src/kdestub.py:466
+msgctxt "@action:inmenu"
+msgid "&Help"
+msgstr "&साहाय्यम्‌"
+
+#: src/kdestub.py:469 src/kdestub.py:848
+msgid "Switch Application Language"
+msgstr "अनुप्रयोग भाषा स्विच करें"
+
+#: src/kdestub.py:473
+msgctxt "@action:inmenu"
+msgid "About &Kajongg"
+msgstr ""
+
+#: src/kdestub.py:853
+msgid "Please choose the language which should be used for this application:"
+msgstr "कृपया अस्य अनुप्रयोगस्य कृते या भाषायाः उपयोगः करणीयः इति चिनुत:"
+
+#: src/kdestub.py:872
+msgid "Add Fallback Language"
+msgstr "Fallback Language योजयतु"
+
+#: src/kdestub.py:884
+msgid "Primary language:"
+msgstr "प्राथमिक भाषा : १."
+
+#: src/kdestub.py:884
+msgid "Fallback language:"
+msgstr "Fallback भाषा : १."
+
+#: src/kdestub.py:890
+msgid "Remove"
+msgstr "अपाकरोति"
+
+#: src/kdestub.py:894
+msgid ""
+"This is the main application language which will be used first, before any "
+"other languages."
+msgstr "एषा मुख्या अनुप्रयोगभाषा यस्याः उपयोगः प्रथमं भविष्यति, अन्यभाषाभ्यः पूर्वं ।"
+
+#: src/kdestub.py:896
+msgid ""
+"This is the language which will be used if any previous languages do not "
+"contain a proper translation."
+msgstr "एषा एव भाषा यस्याः उपयोगः भविष्यति यदि पूर्वभाषासु सम्यक् अनुवादः नास्ति।"
+
+#: src/kdestub.py:1026
+msgid "About Kajongg"
+msgstr "कपासस्य विषये"
+
+#: src/kdestub.py:1049
+msgid "Version: %1"
+msgstr "संस्करणम् : %1"
+
+#: src/kdestub.py:1050
+msgid "Protocol version %1"
+msgstr "प्रोटोकॉल संस्करण %1"
+
+#: src/kdestub.py:1053
+msgid "Original author"
+msgstr "मूल लेखक"
+
+#: src/kdestub.py:1060
+msgid "KDE Frameworks (not installed or not usable)"
+msgstr "KDE Frameworks (न संस्थापितम् अथवा अप्रयोज्यम्)"
+
+#: src/kdestub.py:1066
+msgctxt "kajongg"
+msgid "Using versions %1"
+msgstr ""
+
+#: src/kdestub.py:1087
+msgid ""
+"This is the classical Mah Jongg for four players. If you are looking for Mah "
+"Jongg solitaire please use the application kmahjongg."
+msgstr ""
+"चतुर्णां क्रीडकानां कृते एषः शास्त्रीयः माह जोङ्ग् अस्ति । यदि भवान् Mah Jongg solitaire "
+"इत्यस्य अन्वेषणं करोति तर्हि कृपया kmahjongg इति अनुप्रयोगस्य उपयोगं कुर्वन्तु।"
+
+#: src/kdestub.py:1104
+msgid ""
+"Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
+"report bugs."
+msgstr ""
+"कृपया दोषाणां सूचनां दातुं <a href=\"https://bugs.kde.org\">https://bugs.kde.org "
+"इत्यस्य</a> उपयोगं कुर्वन्तु ।"
+
+#: src/kdestub.py:1109
+msgid "Authors:"
+msgstr "लेखकाः : १."
+
+#: src/kdestub.py:1159
+msgid "License Agreement"
+msgstr "अनुज्ञापत्रसम्झौता"
+
+#: src/kdestub.py:1408
+msgid "Configure Toolbars"
+msgstr "Toolbars विन्यस्तं कुर्वन्तु"
+
+#: src/kdestub.py:1410
+msgid "A&vailable actions:"
+msgstr "अ&उपलब्धा क्रियाः : १."
+
+#: src/kdestub.py:1421
+msgid "Curr&ent actions:"
+msgstr "वर्तमान क्रियाः : १."
+
+#: src/login.py:177
+msgid "trying to start local server %1"
+msgstr "स्थानीयसर्वरं %1 आरभ्यतुं प्रयतते"
+
+#: src/login.py:188 src/login.py:636
+msgid "removed stale socket <filename>%1</filename>"
+msgstr "बासी सॉकेट् <filename>%1</filename> निष्कासितम्"
+
+#: src/login.py:208
+msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
+msgstr "स्थानीयं kajongg सर्वरं प्रारब्धवान्: pid=<numid>%1</numid> %2"
+
+#: src/login.py:251
+msgctxt "kajongg"
+msgid "Login"
+msgstr ""
+
+#: src/login.py:299 src/login.py:405
+msgid "Game server:"
+msgstr "गेम सर्वरः : १."
+
+#: src/login.py:302 src/login.py:407
+msgid "Username:"
+msgstr "उपयोक्तृनाम : १."
+
+#: src/login.py:305 src/login.py:410
+msgid "Password:"
+msgstr "समाभाष्:"
+
+#: src/login.py:307
+msgctxt "kajongg"
+msgid "Ruleset:"
+msgstr ""
+
+#: src/login.py:399
+msgctxt "@title:window"
+msgid "Create User Account"
+msgstr ""
+
+#: src/login.py:413
+msgid "Repeat password:"
+msgstr "कूटशब्दं पुनः कुर्वन्तु : १."
+
+#: src/login.py:564
+msgid "You are already connected to server %1"
+msgstr "भवान् पूर्वमेव सर्वर %1 इत्यनेन सह सम्बद्धः अस्ति"
+
+#: src/login.py:604
+msgctxt "USER is not known on SERVER"
+msgid "%1 is not known on %2, do you want to open an account?"
+msgstr ""
+
+#: src/login.py:617
+msgid "Server %1 did not answer"
+msgstr "सर्वर %1 उत्तरं न दत्तवान्"
+
+#: src/login.py:619
+msgid "Server %1 refused connection"
+msgstr "सर्वर %1 संयोजनं अङ्गीकृतवान्"
+
+#: src/login.py:621
+msgid "Server %1 does not run a kajongg server"
+msgstr "सर्वर् %1 कजोङ्ग् सर्वरं न चालयति"
+
+#: src/login.py:623
+msgid "Address for server %1 cannot be found"
+msgstr "सर्वर %1 कृते पता न लभ्यते"
+
+#: src/login.py:626
+msgid "Login to server %1 failed: You have no network connection"
+msgstr "सर्वर %1 मध्ये प्रवेशः विफलः: भवतः संजालसम्बद्धता नास्ति"
+
+#: src/login.py:637
+msgid "Please try again"
+msgstr "कृपया पुनः प्रयासं कुर्वन्तु"
+
+#: src/mainwindow.py:483
+msgctxt "@action:inmenu"
+msgid "&Score Manual Game"
+msgstr ""
+
+#: src/mainwindow.py:485
+msgctxt "@action:intoolbar"
+msgid "Manual Game"
+msgstr ""
+
+#: src/mainwindow.py:488
+msgctxt "kajongg @info:tooltip"
+msgid "&Score a manual game."
+msgstr ""
+
+#: src/mainwindow.py:490
+msgctxt "@action:intoolbar"
+msgid "&Play"
+msgstr ""
+
+#: src/mainwindow.py:493
+msgctxt "kajongg @info:tooltip"
+msgid "Start a new game."
+msgstr ""
+
+#: src/mainwindow.py:495
+msgctxt "@action:inmenu"
+msgid "&Abort Game"
+msgstr ""
+
+#: src/mainwindow.py:499
+msgctxt "kajongg @info:tooltip"
+msgid "Abort the current game."
+msgstr ""
+
+#: src/mainwindow.py:501
+msgctxt "@action:inmenu"
+msgid "&Quit Kajongg"
+msgstr ""
+
+#: src/mainwindow.py:504
+msgctxt "@action:intoolbar"
+msgid "&Players"
+msgstr ""
+
+#: src/mainwindow.py:507
+msgctxt "kajongg @info:tooltip"
+msgid "define your players."
+msgstr ""
+
+#: src/mainwindow.py:509
+msgctxt "@action:intoolbar"
+msgid "&Rulesets"
+msgstr ""
+
+#: src/mainwindow.py:512
+msgctxt "kajongg @info:tooltip"
+msgid "customize rulesets."
+msgstr ""
+
+#: src/mainwindow.py:516
+msgctxt "@action:inmenu"
+msgid "&Change Visual Angle"
+msgstr ""
+
+#: src/mainwindow.py:517
+msgctxt "@action:intoolbar"
+msgid "Angle"
+msgstr ""
+
+#: src/mainwindow.py:520
+msgctxt "kajongg @info:tooltip"
+msgid "Change the visual appearance of the tiles."
+msgstr ""
+
+#: src/mainwindow.py:524
+msgctxt "@action:inmenu"
+msgid "F&ull Screen Mode"
+msgstr ""
+
+#: src/mainwindow.py:527
+msgctxt "kajongg @action:inmenu"
+msgid "&Score Table"
+msgstr ""
+
+#: src/mainwindow.py:529
+msgctxt "kajongg @action:intoolbar"
+msgid "&Scores"
+msgstr ""
+
+#: src/mainwindow.py:531
+msgctxt "kajongg @info:tooltip"
+msgid "Show or hide the score table for the current game."
+msgstr ""
+
+#: src/mainwindow.py:533
+msgctxt "@action:inmenu"
+msgid "&Explain Scores"
+msgstr ""
+
+#: src/mainwindow.py:534
+msgctxt "@action:intoolbar"
+msgid "&Explain"
+msgstr ""
+
+#: src/mainwindow.py:536
+msgctxt "kajongg @info:tooltip"
+msgid "Explain the scoring for all players in the current game."
+msgstr ""
+
+#: src/mainwindow.py:538
+msgctxt "@action:inmenu"
+msgid "&Demo Mode"
+msgstr ""
+
+#: src/mainwindow.py:541
+msgctxt "kajongg @info:tooltip"
+msgid "Let the computer take over for you. Start a new local game if needed."
+msgstr ""
+
+#: src/mainwindow.py:543
+msgid "C&hat"
+msgstr "संवाद"
+
+#: src/mainwindow.py:546
+msgctxt "kajongg @info:tooltip"
+msgid "Chat with the other players."
+msgstr ""
+
+#: src/message.py:262
+msgid "saying %1 violates Original Call"
+msgstr "%1 इति वदन् Original Call इत्यस्य उल्लङ्घनं करोति"
+
+#: src/message.py:275
+msgid ""
+"claiming %1 is dangerous because you will have to discard a dangerous tile"
+msgstr "%1 इति दावान् करणं भयङ्करं यतः भवद्भिः खतरनाकं टाइल् परित्यक्तव्यं भविष्यति"
+
+#: src/message.py:280
+msgid ""
+"claiming %1 for %2 is dangerous because you will have to discard a dangerous "
+"tile"
+msgstr "%2 कृते %1 इति दावान् करणं भयङ्करं यतः भवद्भिः खतरनाकं टाइल् परित्यक्तव्यं भविष्यति"
+
+#: src/message.py:283
+msgid "You may say %1"
+msgstr "भवान् %1 इति वक्तुं शक्नोति"
+
+#: src/message.py:293
+msgctxt "kajongg"
+msgid "Pung"
+msgstr ""
+
+#: src/message.py:294
+msgctxt "kajongg game dialog:Key for Pung"
+msgid "P"
+msgstr ""
+
+#: src/message.py:313
+msgctxt "kajongg"
+msgid "Kong"
+msgstr ""
+
+#: src/message.py:314
+msgctxt "kajongg game dialog:Key for Kong"
+msgid "K"
+msgstr ""
+
+#: src/message.py:340
+msgid "saying Kong for %1 violates Original Call"
+msgstr "%1 कृते Kong इति वदन् Original Call इत्यस्य उल्लङ्घनं भवति"
+
+#: src/message.py:344
+msgid "You may say Kong for %1"
+msgstr "%1 कृते Kong इति वक्तुं शक्नुवन्ति"
+
+#: src/message.py:359
+msgctxt "kajongg"
+msgid "Chow"
+msgstr ""
+
+#: src/message.py:360
+msgctxt "kajongg game dialog:Key for Chow"
+msgid "C"
+msgstr ""
+
+#: src/message.py:394
+msgctxt "kajongg"
+msgid "Mah Jongg"
+msgstr ""
+
+#: src/message.py:395
+msgctxt "kajongg game dialog:Key for Mah Jongg"
+msgid "M"
+msgstr ""
+
+#: src/message.py:403
+msgid "Press here and you win"
+msgstr "अत्र नुदन्तु तर्हि भवन्तः विजयं प्राप्नुवन्ति"
+
+#: src/message.py:418
+msgctxt "kajongg"
+msgid "Original Call"
+msgstr "मूल आह्वान"
+
+#: src/message.py:419
+msgctxt "kajongg game dialog:Key for Original Call"
+msgid "O"
+msgstr ""
+
+#: src/message.py:435
+msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
+msgstr "%1 परित्यज्य Original Call इति घोषयित्वा एतत् हस्तं अविजयी भवति"
+
+#: src/message.py:439
+msgid ""
+"Discard a tile, declaring Original Call meaning you need only one tile to "
+"complete the hand and will not alter the hand in any way (except bonus tiles)"
+msgstr ""
+"एकं टाइलं परित्यजन्तु, Original Call इति घोषयन्तु अर्थात् हस्तं पूर्णं कर्तुं केवलं एकं टाइल् "
+"आवश्यकं भवति तथा च हस्ते किमपि प्रकारेण परिवर्तनं न करिष्यति (बोनस टाइल्स् विहाय)"
+
+#: src/message.py:465
+msgctxt "kajongg"
+msgid "Discard"
+msgstr ""
+
+#: src/message.py:466
+msgctxt "kajongg game dialog:Key for Discard"
+msgid "D"
+msgstr ""
+
+#: src/message.py:483
+msgid "discarding %1 violates Original Call"
+msgstr "%1 परित्यागः मूल-आह्वानस्य उल्लङ्घनं करोति"
+
+#: src/message.py:486
+msgid "discarding %1 is Dangerous Game"
+msgstr "%1 परित्यज्य खतरनाकः क्रीडा अस्ति"
+
+#: src/message.py:489
+msgid "discard the least useful tile"
+msgstr "न्यूनतमं उपयोगी टाइल् परित्यजन्तु"
+
+#: src/message.py:569
+msgid "%1 is not ready to start the game"
+msgstr "%1 क्रीडायाः आरम्भार्थं सज्जः नास्ति"
+
+#: src/message.py:608
+msgid "Kajongg <numid>%1</numid>"
+msgstr "अहं <numid>%1</numid> इति अन्वेषयामि"
+
+#: src/message.py:694
+msgctxt "kajongg"
+msgid "Violates Original Call"
+msgstr ""
+
+#: src/message.py:837
+msgctxt "kajongg"
+msgid "Dangerous Game"
+msgstr "खतरनाक खेल"
+
+#: src/message.py:852
+msgctxt "kajongg"
+msgid "No Choice"
+msgstr ""
+
+#: src/message.py:915
+msgctxt "kajongg"
+msgid "OK"
+msgstr ""
+
+#: src/message.py:916
+msgctxt "kajongg game dialog:Key for OK"
+msgid "O"
+msgstr ""
+
+#: src/message.py:920
+msgid "Confirm that you saw the message"
+msgstr "भवता सन्देशः दृष्टः इति पुष्टिं कुरुत"
+
+#: src/message.py:929
+msgctxt "kajongg"
+msgid "No Claim"
+msgstr ""
+
+#: src/message.py:930
+msgctxt "kajongg game dialog:Key for No claim"
+msgid "N"
+msgstr ""
+
+#: src/message.py:934
+msgid "You cannot or do not want to claim this tile"
+msgstr "भवान् एतत् टाइल् दावान् कर्तुं न शक्नोति वा न इच्छति वा"
+
+#: src/mjresource.py:92
+msgid ""
+"cannot find any %1 in the following directories, is libkmahjongg installed?"
+msgstr "निम्नलिखितनिर्देशिकासु किमपि %1 न प्राप्नोति, libkmahjongg संस्थापितम् अस्ति वा?"
+
+#: src/mjresource.py:116
+msgid "cannot find %1, using default"
+msgstr "%1 न प्राप्नुयात्, पूर्वनिर्धारितस्य उपयोगेन"
+
+#: src/mjresource.py:131
+msgid "unknown name"
+msgstr "अज्ञात नाम"
+
+#: src/mjresource.py:132
+msgid "unknown author"
+msgstr "अज्ञात लेखक"
+
+#: src/mjresource.py:135
+msgid "no description available"
+msgstr "न वर्णनं लभ्यते"
+
+#: src/mjresource.py:138
+msgid "no E-Mail address available"
+msgstr "कोऽपि E-Mail पता उपलब्धः नास्ति"
+
+#: src/player.py:726
+msgid "%1 claiming MahJongg: She does not really have tile %2"
+msgstr "%1 claiming MahJongg: तस्याः वस्तुतः टाइल् %2 नास्ति"
+
+#: src/player.py:735
+msgid ""
+"%1 claiming MahJongg: She did not pass all concealed tiles to the server"
+msgstr "%1 claiming MahJongg: सा सर्वाणि गुप्त टाइल्स् सर्वरं प्रति न पारितवती"
+
+#: src/player.py:856
+msgid "Player %1 has 3 or 4 exposed melds, all are green"
+msgstr "खिलाडी %1 3 अथवा 4 उजागरित मेल्ड्स् सन्ति, सर्वे हरिताः सन्ति"
+
+#: src/player.py:864
+msgid "Player %1 may try a True Color Game"
+msgstr "%1 खिलाडी True Color Game इत्यस्य प्रयासं कर्तुं शक्नोति"
+
+#: src/player.py:867
+msgid "Player %1 may try an All Terminals Game"
+msgstr "%1 खिलाडी All Terminals Game इत्यस्य प्रयासं कर्तुं शक्नोति"
+
+#: src/player.py:880
+msgid "Player %1 exposed many winds"
+msgstr "खिलाडी %1 अनेकवायुः उजागरितवान्"
+
+#: src/player.py:884
+msgid "Player %1 exposed many dragons"
+msgstr "%1 खिलाडी अनेके अजगराः उजागरितवान्"
+
+#: src/playerlist.py:48
+msgctxt "define a new player"
+msgid "&New"
+msgstr ""
+
+#: src/playerlist.py:106
+msgid "Player %1 already exists"
+msgstr "खिलाडी %1 पूर्वमेव अस्ति"
+
+#: src/playerlist.py:116
+msgid "Error while adding player %1: %2"
+msgstr "प्लेयर %1 योजयन् त्रुटिः: %2"
+
+#: src/playerlist.py:171
+msgid ""
+"There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
+"This will also delete all games played by %3!"
+msgstr ""
+"%3 कृते %1 समाप्ताः %2 असमाप्ताः च क्रीडाः सन्ति, तथापि %3 विलोपयन्तु?  एतेन %3 द्वारा "
+"क्रीडितानि सर्वाणि क्रीडाः अपि विलोपिताः भविष्यन्ति!"
+
+#: src/predefined.py:29
+msgid "Classical Chinese standard"
+msgstr "शास्त्रीय चीनी मानक"
+
+#: src/predefined.py:35
+msgid "Classical Chinese"
+msgstr "शास्त्रीय चीनी"
+
+#: src/predefined.py:41
+msgid "Last Tile Taken from Dead Wall"
+msgstr "अन्तिमः टाइलः मृतप्राचीरतः गृहीतः"
+
+#: src/predefined.py:43
+msgid ""
+"The dead wall is also called kong box: The last 16 tiles of the wall used as "
+"source of replacement tiles"
+msgstr ""
+"मृतभित्तिः kong box इति अपि कथ्यते : भित्तिस्य अन्तिमाः १६ टाइल्स् प्रतिस्थापनटाइल्स् "
+"इत्यस्य स्रोतःरूपेण उपयुज्यन्ते"
+
+#: src/predefined.py:46
+msgid "Last Tile is Last Tile of Wall"
+msgstr "Last Tile इति Last Tile of Wall इति"
+
+#: src/predefined.py:48
+msgid ""
+"Winner said Mah Jong with the last tile taken from the living end of the wall"
+msgstr "विजेता भित्तिस्य जीवितान्तात् गृहीतेन अन्तिमेन टाइलेन सह मह जोङ्गः अवदत्"
+
+#: src/predefined.py:50
+msgid "Last Tile is Last Tile of Wall Discarded"
+msgstr "अन्तिमः टाइलः भित्तिः परित्यक्तस्य अन्तिमः टाइल् अस्ति"
+
+#: src/predefined.py:52
+msgid ""
+"Winner said Mah Jong by claiming the last tile taken from the living end of "
+"the wall, discarded by another player"
+msgstr ""
+"विजेता भित्तिस्य जीवितान्तात् गृहीतं अन्तिमं टाइल् अन्येन क्रीडकेन परित्यक्तं दावान् कृत्वा मह "
+"जोङ्गः अवदत्"
+
+#: src/predefined.py:55
+msgid "Robbing the Kong"
+msgstr "कोङ्गस्य लुण्ठनम्"
+
+#: src/predefined.py:56
+msgid ""
+"Winner said Mah Jong by claiming the 4th tile of a kong another player just "
+"declared"
+msgstr ""
+"विजेता अन्यः खिलाडी अधुना एव घोषितस्य काङ्गस्य चतुर्थं टाइल् दावान् कृत्वा मह जोङ्गः अवदत्"
+
+#: src/predefined.py:59
+msgid "Mah Jongg with Original Call"
+msgstr "मह जोङ्ग मूल आह्वान सहित"
+
+#: src/predefined.py:62
+msgid ""
+"Just before the first discard, a player can declare Original Call meaning "
+"she needs only one tile to complete the hand and announces she will not "
+"alter the hand in any way (except bonus tiles)"
+msgstr ""
+"प्रथमस्य परित्यागस्य पूर्वमेव एकः खिलाडी Original Call इति घोषयितुं शक्नोति अर्थात् "
+"तस्याः हस्तं पूर्णं कर्तुं केवलं एकस्य टाइल् इत्यस्य आवश्यकता वर्तते तथा च घोषयति यत् सा हस्ते "
+"किमपि प्रकारेण परिवर्तनं न करिष्यति (बोनस टाइल्स् विहाय)"
+
+#: src/predefined.py:65
+msgid "Dangerous Game"
+msgstr "खतरनाक खेल"
+
+#: src/predefined.py:66
+msgid ""
+"In some situations discarding a tile that has a high chance to help somebody "
+"to win is declared to be dangerous, and if that tile actually makes somebody "
+"win, the discarder pays the winner for all"
+msgstr ""
+"केषुचित् परिस्थितिषु कस्यचित् विजयस्य साहाय्यस्य उच्चसंभावनायुक्तं टाइल् परित्यक्तुं भयङ्करं घोषितं "
+"भवति, यदि सा टाइल् वस्तुतः कस्यचित् विजयं जनयति तर्हि परित्यक्तः सर्वेषां कृते विजेतारं "
+"दापयति"
+
+#: src/predefined.py:70
+msgid "Twofold Fortune"
+msgstr "द्विविधं भाग्यं"
+
+#: src/predefined.py:71
+msgid ""
+"Kong after Kong: Declare Kong and a second Kong with the replacement tile "
+"and Mah Jong with the second replacement tile"
+msgstr ""
+"कोङ्गस्य अनन्तरं कोङ्गः : प्रतिस्थापनटाइलेन सह कोङ्गं द्वितीयं च कोङ्गं "
+"द्वितीयप्रतिस्थापनटाइलेन च मह जोङ्गं च घोषयन्तु"
+
+#: src/predefined.py:75
+msgid "Blessing of Heaven"
+msgstr "स्वर्गस्य आशीर्वादः"
+
+#: src/predefined.py:76
+msgid "East says Mah Jong with the unmodified dealt tiles"
+msgstr "पूर्वः अविकृतैः व्यवहारैः टाइलैः सह मह जोङ्गः वदति"
+
+#: src/predefined.py:78
+msgid "Blessing of Earth"
+msgstr "पृथिव्याः आशीर्वादः"
+
+#: src/predefined.py:79
+msgid ""
+"South, West or North says Mah Jong with the first tile discarded by East"
+msgstr "दक्षिणः, पश्चिमः वा उत्तरः पूर्वेण परित्यक्तेन प्रथमेन टाइलेन सह मह जोङ्गः वदति"
+
+#: src/predefined.py:81
+msgid "East won nine times in a row"
+msgstr "पूर्वः क्रमशः नववारं विजयं प्राप्तवान्"
+
+#: src/predefined.py:82
+msgid "If that happens, East gets a limit score and the winds rotate"
+msgstr "यदि तत् भवति तर्हि पूर्वः सीमाङ्कं प्राप्नोति, वायुः च परिभ्रमति"
+
+#: src/predefined.py:87
+msgid ""
+"False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah "
+"Jongg"
+msgstr ""
+"Discard इत्यस्य False Naming, Mah Jongg इत्यस्य कृते दावाः तथा Mah Jongg इत्यस्य "
+"False Declaration इति"
+
+#: src/predefined.py:93
+msgid "Own Flower and Own Season"
+msgstr "स्वकीयं पुष्पं स्वऋतुः च"
+
+#: src/predefined.py:96
+msgid "All Flowers"
+msgstr "सर्वाणि पुष्पाणि"
+
+#: src/predefined.py:97
+msgid "All Seasons"
+msgstr "सर्वे ऋतवः"
+
+#: src/predefined.py:99
+msgid "Three Concealed Pongs"
+msgstr "त्रयः गुप्ताः पोङ्गाः"
+
+#: src/predefined.py:103
+msgid "Long Hand"
+msgstr "दीर्घः हस्तः"
+
+#: src/predefined.py:104
+msgid "The hand contains too many tiles"
+msgstr "हस्ते बहु टाइल्स् भवति"
+
+#: src/predefined.py:109
+msgid "Points Needed for Mah Jongg"
+msgstr "मह जोङ्गस्य कृते आवश्यकाः बिन्दवः"
+
+#: src/predefined.py:113
+msgid "Minimum number of doubles needed for Mah Jongg"
+msgstr "मह जोङ्ग् इत्यस्य कृते न्यूनतमं युगलसङ्ख्या आवश्यकी अस्ति"
+
+#: src/predefined.py:116
+msgid "Points for a Limit Hand"
+msgstr "एकस्य सीमाहस्तस्य कृते बिन्दवः"
+
+#: src/predefined.py:120
+msgid "Play with the roof off"
+msgstr "छतम् अवरुद्ध्य क्रीडन्तु"
+
+#: src/predefined.py:121
+msgid "Play with no upper scoring limit"
+msgstr "उपरिष्टाङ्कस्य सीमां विना क्रीडन्तु"
+
+#: src/predefined.py:123
+msgid "Claim Timeout"
+msgstr "दावा समय समाप्त"
+
+#: src/predefined.py:127
+msgid "Size of Kong Box"
+msgstr "कोङ्ग बॉक्सस्य आकारः"
+
+#: src/predefined.py:128
+msgid "The Kong Box is used for replacement tiles when declaring kongs"
+msgstr "काङ्ग्-घोषणे प्रतिस्थापन-टाइल्-कृते कोङ्ग-पेटिकायाः उपयोगः भवति"
+
+#: src/predefined.py:130
+msgid "Play with Bonus Tiles"
+msgstr "बोनस टाइल्स् इत्यनेन सह क्रीडन्तु"
+
+#: src/predefined.py:131
+msgid "Bonus tiles increase the luck factor"
+msgstr "बोनस टाइल्स् भाग्यकारकं वर्धयन्ति"
+
+#: src/predefined.py:133
+msgid "Minimum number of rounds in game"
+msgstr "क्रीडायां न्यूनतमं गोलानां संख्या"
+
+#: src/predefined.py:137
+msgid "number of allowed chows"
+msgstr "अनुमतचाउषु संख्या"
+
+#: src/predefined.py:138
+msgid "The number of chows a player may build"
+msgstr "खिलाडी यावन्तः चाउस् निर्मातुं शक्नोति"
+
+#: src/predefined.py:140
+msgid "must declare calling hand"
+msgstr "आह्वानहस्तं घोषयितुं अवश्यं"
+
+#: src/predefined.py:142
+msgid "Mah Jongg is only allowed after having declared to have a calling hand"
+msgstr "मह जोङ्ग् इत्यस्य अनुमतिः केवलं आह्वानहस्तः इति घोषितस्य अनन्तरं भवति"
+
+#: src/predefined.py:144
+msgid "Standard Rotation"
+msgstr "मानक परिभ्रमण"
+
+#: src/predefined.py:147
+msgid "Discard tiles ordered"
+msgstr "आदेशितं टाइल्स् परित्यजन्तु"
+
+#: src/predefined.py:149
+msgid "Discard tiles ordered from top left"
+msgstr "उपरि वामतः आदेशितानि टाइल्स् परित्यजन्तु"
+
+#: src/predefined.py:151
+msgid "Leave holes for claimed discards"
+msgstr "दावानां परित्यागानां कृते छिद्राणि त्यजन्तु"
+
+#: src/predefined.py:154
+msgid ""
+"Only when discarding tiles ordered: Do not place the next discard where the "
+"claimed discard was"
+msgstr ""
+"केवलं आदेशित-टाइल-परित्यागकाले एव : अग्रिम-परिक्षेपणं यत्र दावितः परित्यागः आसीत् तत्र न "
+"स्थापयन्तु"
+
+#: src/predefined.py:163
+msgid "Last Tile Completes Pair of 2..8"
+msgstr "अन्तिमः टाइलः 2..8 इत्यस्य युग्मं सम्पूर्णं करोति"
+
+#: src/predefined.py:167
+msgid "Last Tile Completes Pair of Terminals or Honors"
+msgstr "अन्तिमः टाइलः टर्मिनल् अथवा सम्मानस्य युग्मं सम्पूर्णं करोति"
+
+#: src/predefined.py:170
+msgid "Last Tile is Only Possible Tile"
+msgstr "अन्तिमः टाइल् केवलं सम्भवः टाइल् अस्ति"
+
+#: src/predefined.py:174
+msgid "Won with Last Tile Taken from Wall"
+msgstr "वालात् गृहीतस्य अन्तिम टाइल् इत्यनेन सह विजयः"
+
+#: src/predefined.py:179
+msgid "Zero Point Hand"
+msgstr "शून्य बिन्दु हस्त"
+
+#: src/predefined.py:180
+msgid "The hand has 0 basis points excluding bonus tiles"
+msgstr "हस्ते बोनस टाइल्स् विहाय 0 आधारबिन्दवः सन्ति"
+
+#: src/predefined.py:181
+msgid "No Chow"
+msgstr "नो चाउ"
+
+#: src/predefined.py:183
+msgid "Only Concealed Melds"
+msgstr "केवलं गुप्तमेल्ड्स् एव"
+
+#: src/predefined.py:187
+msgid "False Color Game"
+msgstr "मिथ्या रङ्ग खेल"
+
+#: src/predefined.py:188
+msgid ""
+"Only same-colored tiles (only bamboo/stone/character) plus any number of "
+"winds and dragons"
+msgstr "केवलं समानवर्णीयं टाइल्स् (केवलं वेणु/शिला/चरित्रम्) प्लस् किमपि संख्यायां वायुः अजगरः च"
+
+#: src/predefined.py:191
+msgid "True Color Game"
+msgstr "सच्चा रङ्ग खेल"
+
+#: src/predefined.py:192
+msgid "Only same-colored tiles (only bamboo/stone/character)"
+msgstr "केवलं समानवर्णीयाः टाइल्स् (केवलं वेणु/शिला/चरित्रम्) २."
+
+#: src/predefined.py:194
+msgid "Concealed True Color Game"
+msgstr "गुप्त सत्य रङ्ग खेल"
+
+#: src/predefined.py:195
+msgid "All tiles concealed and of the same suit, no honors"
+msgstr "सर्वाणि टाइल्स् गुप्ताः समानसूटस्य च, न सम्मानाः"
+
+#: src/predefined.py:197
+msgid "Only Terminals and Honors"
+msgstr "केवलं टर्मिनल् तथा ऑनर्स्"
+
+#: src/predefined.py:198
+msgid "Only winds, dragons, 1 and 9"
+msgstr "केवलं वायुः, अजगरः, १, ९ च"
+
+#: src/predefined.py:199
+msgid "Only Honors"
+msgstr "केवलं सम्मानः"
+
+#: src/predefined.py:200
+msgid "Only winds and dragons"
+msgstr "केवलं वाताः अजगराः च"
+
+#: src/predefined.py:202
+msgid "Hidden Treasure"
+msgstr "गुप्त निधि"
+
+#: src/predefined.py:203
+msgid "Only hidden Pungs or Kongs, last tile from wall"
+msgstr "केवलं गुप्ताः पुङ्ग्स् वा कोङ्ग्स्, भित्तितः अन्तिमः टाइल्"
+
+#: src/predefined.py:205
+msgid "Heads and Tails"
+msgstr "शिरः पुच्छं च"
+
+#: src/predefined.py:206
+msgid "Only 1 and 9"
+msgstr "केवलं १ तथा ९"
+
+#: src/predefined.py:208
+msgid "Fourfold Plenty"
+msgstr "चतुर्गुणं बहु"
+
+#: src/predefined.py:209
+msgid "4 Kongs"
+msgstr "४ राजानः"
+
+#: src/predefined.py:211 src/predefined.py:429
+msgid "Three Great Scholars"
+msgstr "त्रयः महान् विद्वांसः"
+
+#: src/predefined.py:212 src/predefined.py:334
+msgid "3 Pungs or Kongs of dragons"
+msgstr "३ अजगरस्य पुङ्गः कोङ्गः वा"
+
+#: src/predefined.py:213
+msgid "Four Blessings Hovering over the Door"
+msgstr "द्वारस्य उपरि चत्वारः आशीर्वादाः भ्रमन्ति"
+
+#: src/predefined.py:215 src/predefined.py:339
+msgid "4 Pungs or Kongs of winds"
+msgstr "४ वातानां पुङ्गा वा कोङ्गे वा"
+
+#: src/predefined.py:216
+msgid "Imperial Jade"
+msgstr "शाही जेड"
+
+#: src/predefined.py:217
+msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
+msgstr "केवलं हरित-टाइल्स् : हरित-अजगरः वेणुः च २,३,४,६,८"
+
+#: src/predefined.py:218
+msgid "Gathering the Plum Blossom from the Roof"
+msgstr "छततः प्लमपुष्पं सङ्गृह्य"
+
+#: src/predefined.py:220
+msgid "Mah Jong with stone 5 from the dead wall"
+msgstr "मृतभित्तितः पाषाणः ५ सह मह जोङ्गः"
+
+#: src/predefined.py:222
+msgid "Plucking the Moon from the Bottom of the Sea"
+msgstr "समुद्रतलात् चन्द्रं उद्धृत्य"
+
+#: src/predefined.py:223
+msgid "Mah Jong with the last tile from the wall being a stone 1"
+msgstr "भित्तितः अन्तिमः टाइल् पाषाणः इति सह मह जोङ्गः १"
+
+#: src/predefined.py:225
+msgid "Scratching a Carrying Pole"
+msgstr "एकं वहनध्रुवं खरचयन्"
+
+#: src/predefined.py:226
+msgid "Robbing the Kong of bamboo 2"
+msgstr "वेणुस्य कोङ्गस्य लुण्ठनम् २"
+
+#: src/predefined.py:232
+msgid "Standard Mah Jongg"
+msgstr "मानक मह जोंग"
+
+#: src/predefined.py:237
+msgid "Nine Gates"
+msgstr "नव द्वारम्"
+
+#: src/predefined.py:239
+msgid ""
+"A concealed hand in one color 1112345678999 plus last tile of this suit "
+"(from wall or discarded)"
+msgstr ""
+"एकस्मिन् वर्णे एकः गुप्तः हस्तः 1112345678999 प्लस् अस्य सूटस्य अन्तिमः टाइलः (भित्तितः वा "
+"परित्यक्तः वा)"
+
+#: src/predefined.py:241
+msgid "Thirteen Orphans"
+msgstr "त्रयोदश अनाथाः"
+
+#: src/predefined.py:242
+msgid ""
+"13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
+"with one of them"
+msgstr ""
+"१३ एकल-टाइल्स् : सर्वे अजगराः, वायुः, १, ९ तथा च १४ तमः टाइल् तेषु एकेन सह युग्मं निर्मायते"
+
+#: src/predefined.py:246
+msgid "Pung/Kong of Dragons"
+msgstr "पुङ्ग/अजगरस्य राजा"
+
+#: src/predefined.py:248
+msgid "Pung/Kong of Own Wind"
+msgstr "स्वस्य वायुस्य पुङ्ग/कोंग"
+
+#: src/predefined.py:251
+msgid "Pung/Kong of Round Wind"
+msgstr "गोलवायुस्य पुङ्ग/कोंग"
+
+#: src/predefined.py:255
+msgid "Exposed Kong"
+msgstr "उजागरः कोङ्गः"
+
+#: src/predefined.py:258
+msgid "Exposed Kong of Terminals"
+msgstr "टर्मिनल्स् इत्यस्य कोङ्गः उजागरितः"
+
+#: src/predefined.py:261
+msgid "Exposed Kong of Honors"
+msgstr "उजागरः कोङ्ग आफ् ऑनर्स"
+
+#: src/predefined.py:264
+msgid "Exposed Pung"
+msgstr "उदघाटितः पुङ्गः"
+
+#: src/predefined.py:267
+msgid "Exposed Pung of Terminals"
+msgstr "टर्मिनलस्य उजागरितः पुङ्गः"
+
+#: src/predefined.py:270
+msgid "Exposed Pung of Honors"
+msgstr "उजागरः पुङ्ग आफ् ऑनर्स"
+
+#: src/predefined.py:274
+msgid "Concealed Kong"
+msgstr "गुप्तः कोङ्गः"
+
+#: src/predefined.py:277
+msgid "Concealed Kong of Terminals"
+msgstr "टर्मिनल्स् इत्यस्य गुप्तः कोङ्गः"
+
+#: src/predefined.py:280
+msgid "Concealed Kong of Honors"
+msgstr "गुप्तः कोङ्ग आफ् ऑनर्स"
+
+#: src/predefined.py:283
+msgid "Concealed Pung"
+msgstr "गुप्त पुङ"
+
+#: src/predefined.py:286
+msgid "Concealed Pung of Terminals"
+msgstr "टर्मिनलस्य गुप्तपुङ्गः"
+
+#: src/predefined.py:289
+msgid "Concealed Pung of Honors"
+msgstr "गुप्त पुङ्ग ऑफ ऑनर्स"
+
+#: src/predefined.py:292
+msgid "Pair of Own Wind"
+msgstr "स्वस्य वायुस्य युग्मम्"
+
+#: src/predefined.py:294
+msgid "Pair of Round Wind"
+msgstr "गोलवायुयुगलम्"
+
+#: src/predefined.py:296
+msgid "Pair of Dragons"
+msgstr "अजगरस्य युग्मम्"
+
+#: src/predefined.py:300
+msgid "Flower"
+msgstr "पुष्पं"
+
+#: src/predefined.py:302
+msgid "Season"
+msgstr "ऋतु"
+
+#: src/predefined.py:313
+msgid "Classical Chinese DMJL"
+msgstr "शास्त्रीय चीनी DMJL"
+
+#: src/predefined.py:319
+msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
+msgstr "शास्त्रीय चीनी यथा परिभाषितं Deutsche Mah Jongg Liga (DMJL) e.V."
+
+#: src/predefined.py:326
+msgid "Squirming Snake"
+msgstr "स्क्विर्मिंग सर्प"
+
+#: src/predefined.py:327
+msgid ""
+"All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
+"Chows of the remaining values"
+msgstr ""
+"सर्वाणि टाइल्स् समानवर्णस्य। १ तथा ९ इत्येतयोः पुङ्गः वा कोङ्गः, २, ५ वा ८ इत्येतयोः युग्मं "
+"शेषमूल्यानां चौ द्वौ च"
+
+#: src/predefined.py:330
+msgid "Little Three Dragons"
+msgstr "लघु त्रयः अजगराः"
+
+#: src/predefined.py:331
+msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
+msgstr "२ अजगरस्य पुङ्गे वा कोङ्गे १ अजगरयुगलं च"
+
+#: src/predefined.py:333
+msgid "Big Three Dragons"
+msgstr "बृहत् त्रयः अजगराः"
+
+#: src/predefined.py:336
+msgid "Little Four Joys"
+msgstr "लघु चत्वारि आनन्दाः"
+
+#: src/predefined.py:337
+msgid "3 Pungs or Kongs of winds and 1 pair of winds"
+msgstr "३ पङ्गो वा कोङ्गो वातानां १ वातयुग्मः"
+
+#: src/predefined.py:338
+msgid "Big Four Joys"
+msgstr "बृहत् चत्वारि आनन्दाः"
+
+#: src/predefined.py:344
+msgid "False Naming of Discard, Claimed for Chow"
+msgstr "Discard इत्यस्य False Naming, Claimed for Chow"
+
+#: src/predefined.py:347
+msgid "False Naming of Discard, Claimed for Pung/Kong"
+msgstr "Discard इत्यस्य False Naming, Pung/Kong इत्यस्य कृते दावान् कृतः"
+
+#: src/predefined.py:350 src/predefined.py:443
+msgid "False Declaration of Mah Jongg by One Player"
+msgstr "एकेन खिलाडिना मह जोङ्गस्य मिथ्याघोषणा"
+
+#: src/predefined.py:353
+msgid "False Declaration of Mah Jongg by Two Players"
+msgstr "द्वयोः खिलाडयोः मह जोङ्गस्य मिथ्याघोषणा"
+
+#: src/predefined.py:356
+msgid "False Declaration of Mah Jongg by Three Players"
+msgstr "त्रयः खिलाडयः मह जोङ्गस्य मिथ्याघोषणा"
+
+#: src/predefined.py:359 src/predefined.py:446
+msgid "False Naming of Discard, Claimed for Mah Jongg"
+msgstr "Discard इत्यस्य False Naming, Mah Jongg इत्यस्य कृते दावान् कृतः"
+
+#: src/predefined.py:370
+msgid "Classical Chinese BMJA"
+msgstr "शास्त्रीय चीनी बीएमजेए"
+
+#: src/predefined.py:376
+msgid "Classical Chinese as defined by the British Mah-Jong Association"
+msgstr "ब्रिटिश-माह-जोङ्ग-सङ्घेन परिभाषितं शास्त्रीय-चीनी-भाषा"
+
+#: src/predefined.py:391
+msgid "Original Call"
+msgstr "मूल आह्वान"
+
+#: src/predefined.py:395
+msgid "Gates of Heaven"
+msgstr "स्वर्गस्य द्वाराणि"
+
+#: src/predefined.py:396
+msgid ""
+"All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
+"to 8 (last tile from wall or discarded)"
+msgstr ""
+"समानवर्णस्य गुप्ताः सर्वे टाइल्स्: मूल्यानि १११२३४५६७८९९९ २ तः ८ पर्यन्तं एकयुग्मेन सह "
+"(अन्तिम टाइल् भित्तितः अथवा परित्यक्तम्)"
+
+#: src/predefined.py:399
+msgid "Wriggling Snake"
+msgstr "विवर्तमानः सर्पः"
+
+#: src/predefined.py:400
+msgid ""
+"Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
+msgstr "१ युग्मं २ तः ९ पर्यन्तं धावनं च प्रत्येकं वायुना सह एकस्मिन् सूटे"
+
+#: src/predefined.py:402
+msgid "Triple Knitting"
+msgstr "त्रिगुण बुनाई"
+
+#: src/predefined.py:403
+msgid ""
+"Four sets of three tiles in the different suits and a pair: No Winds or "
+"Dragons"
+msgstr ""
+"भिन्न-भिन्न-सूट्-मध्ये त्रीणां टाइल्-समूहानां चत्वारि सेट्-युग्मं च : नो विन्ड्स् वा ड्रैगन्स् इति"
+
+#: src/predefined.py:404
+msgid "Knitting"
+msgstr "बुनाई"
+
+#: src/predefined.py:405
+msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
+msgstr "३ सूट् मध्ये कस्मिन् अपि २ मध्ये ७ टाइल्-युग्मानि; न वाताः अजगराः वा"
+
+#: src/predefined.py:407
+msgid "All pair honors"
+msgstr "सर्वे युग्मसम्मानाः"
+
+#: src/predefined.py:408
+msgid "7 pairs of 1s/9s/Winds/Dragons"
+msgstr "१s/९s/वायु/अजगरस्य ७ युग्मानि"
+
+#: src/predefined.py:411
+msgid "Own Flower"
+msgstr "स्वकीयं पुष्पम्"
+
+#: src/predefined.py:412
+msgid "Own Season"
+msgstr "स्वकीयः ऋतुः"
+
+#: src/predefined.py:424
+msgid "Buried Treasure"
+msgstr "दफन निधि"
+
+#: src/predefined.py:425
+msgid "Concealed pungs of one suit with winds/dragons and a pair"
+msgstr "एकस्य सूटस्य गुप्तपुङ्ग्स् वायुभिः/अजगरैः सह युग्मेन च"
+
+#: src/predefined.py:426
+msgid "Purity"
+msgstr "शुद्धि"
+
+#: src/predefined.py:427
+msgid "Only same-colored tiles (no chows, dragons or winds)"
+msgstr "केवलं समानवर्णाः टाइल्स् (न चाउस्, ड्रैगनः, वायुः वा)"
+
+#: src/predefined.py:430
+msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
+msgstr "३ अजगरस्य पुङ्गः वा कोङ्गः प्लस् कोऽपि पुङ्गः/कोङ्गः युग्मं च"
+
+#: src/predefined.py:433
+msgid "The 13 Unique Wonders"
+msgstr "१३ अद्वितीय आश्चर्य"
+
+#: src/predefined.py:440
+msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
+msgstr "डिस्कार्डस्य मिथ्यानामकरणं, चाउ/पुङ्ग/काङ्गस्य कृते दावान्"
+
+#: src/predefined.py:450
+msgid "Calling for Only Honors"
+msgstr "केवलं सम्मानस्य आह्वानम्"
+
+#: src/predefined.py:454
+msgid "Calling for Wriggling Snake"
+msgstr "विवर्तमानसर्पस्य आह्वानम्"
+
+#: src/predefined.py:458
+msgid "Calling for Triple Knitting"
+msgstr "त्रिगुण बुनाई इत्यस्य आह्वानम्"
+
+#: src/predefined.py:462
+msgid "Calling for Gates of Heaven"
+msgstr "स्वर्गद्वाराणां आह्वानं कुर्वन्"
+
+#: src/predefined.py:465
+msgid "Calling for Knitting"
+msgstr "बुनाई कृते आह्वानम्"
+
+#: src/predefined.py:469
+msgid "Calling for Imperial Jade"
+msgstr "इम्पेरियल् जेड् इत्यस्य आह्वानम्"
+
+#: src/predefined.py:473
+msgid "Calling for The 13 Unique Wonders"
+msgstr "The 13 Unique Wonders इत्यस्य आह्वानम्"
+
+#: src/predefined.py:476
+msgid "Calling for Three Great Scholars"
+msgstr "त्रयः महान् विद्वांसः आह्वयन्"
+
+#: src/predefined.py:479
+msgid "Calling for All pair honors"
+msgstr "आह्वानं सर्वेषां युग्मसम्मानानां कृते"
+
+#: src/predefined.py:483
+msgid "Calling for Heads and Tails"
+msgstr "शिरः पुच्छं च आह्वयन्"
+
+#: src/predefined.py:487
+msgid "Calling for Four Blessings Hovering over the Door"
+msgstr "द्वारस्य उपरि भ्रमन्तः चत्वारः आशीर्वादाः आह्वयन्"
+
+#: src/predefined.py:490
+msgid "Calling for Buried Treasure"
+msgstr "दफननिधिं आह्वयति"
+
+#: src/predefined.py:494
+msgid "Calling for Fourfold Plenty"
+msgstr "चतुर्गुणं बहु आह्वयति"
+
+#: src/predefined.py:498
+msgid "Calling for Purity"
+msgstr "शुद्धतायाः आह्वानम्"
+
+#: src/query.py:196
+msgctxt "kajongg name for local game server"
+msgid "Local Game"
+msgstr ""
+
+#: src/query.py:376
+msgid "Database %1 updated from schema %2 to %3"
+msgstr "%1 दत्तांशकोशः स्कीमा %2 तः %3 पर्यन्तं अद्यतनः"
+
+#: src/rule.py:49 src/scoringdialog.py:710 src/scoringdialog.py:788
+msgid "points"
+msgstr "बिन्दवः"
+
+#: src/rule.py:50
+msgctxt "kajongg"
+msgid "doubles"
+msgstr ""
+
+#: src/rule.py:51
+msgctxt "kajongg"
+msgid "limits"
+msgstr ""
+
+#: src/rule.py:91
+msgctxt "Kajongg"
+msgid "%1 points"
+msgstr ""
+
+#: src/rule.py:93
+msgctxt "Kajongg"
+msgid "%1 doubles"
+msgstr ""
+
+#: src/rule.py:98
+msgctxt "Kajongg"
+msgid "%1 limits"
+msgstr ""
+
+#: src/rule.py:365
+msgid "Meld Rules"
+msgstr "मेल्ड नियम"
+
+#: src/rule.py:366
+msgid ""
+"Meld rules are applied to single melds independent of the rest of the hand"
+msgstr "शेषहस्तात् स्वतन्त्रतया एकमेल्ड् मध्ये मेल्ड् नियमाः प्रयुक्ताः भवन्ति"
+
+#: src/rule.py:367
+msgid "Hand Rules"
+msgstr "हस्त नियम"
+
+#: src/rule.py:368
+msgid "Hand rules are applied to the entire hand, for all players"
+msgstr "हस्तनियमाः सम्पूर्णे हस्ते प्रयुक्ताः भवन्ति, सर्वेषां क्रीडकानां कृते"
+
+#: src/rule.py:369
+msgid "Winner Rules"
+msgstr "विजेता नियम"
+
+#: src/rule.py:370
+msgid "Winner rules are applied to the entire hand but only for the winner"
+msgstr "विजेता नियमाः सम्पूर्णे हस्ते प्रयुक्ताः सन्ति किन्तु केवलं विजेतायाः कृते एव"
+
+#: src/rule.py:371
+msgid "Loser Rules"
+msgstr "हारिणी नियम"
+
+#: src/rule.py:372
+msgid "Loser rules are applied to the entire hand but only for non-winners"
+msgstr "हारिणः नियमाः सम्पूर्णे हस्ते प्रयुक्ताः सन्ति किन्तु केवलं अविजेतानां कृते एव"
+
+#: src/rule.py:373
+msgid "Mah Jongg Rules"
+msgstr "मह जोङ्ग नियम"
+
+#: src/rule.py:374
+msgid "Only hands matching a Mah Jongg rule can win"
+msgstr "केवलं मह जोङ्ग-नियमस्य मेलनं कुर्वन्तः हस्ताः एव विजयं प्राप्तुं शक्नुवन्ति"
+
+#: src/rule.py:375
+msgctxt "kajongg"
+msgid "Options"
+msgstr ""
+
+#: src/rule.py:376
+msgid "Here we have several special game related options"
+msgstr "अत्र अस्माकं कृते अनेकाः विशेषाः क्रीडासम्बद्धाः विकल्पाः सन्ति"
+
+#: src/rule.py:377
+msgid "Penalties"
+msgstr "दण्डाः"
+
+#: src/rule.py:378
+msgid ""
+"Penalties are applied manually by the user. They are only used for scoring "
+"games.\n"
+"When playing against the computer or over the net, Kajongg will never let "
+"you get\n"
+"into a situation where you have to pay a penalty"
+msgstr ""
+"दण्डाः उपयोक्त्रा हस्तचलितरूपेण प्रयुक्ताः भवन्ति । तेषां उपयोगः केवलं स्कोरिंग् क्रीडायाः कृते "
+"एव भवति ।\n"
+"सङ्गणकस्य विरुद्धं वा जालस्य उपरि वा क्रीडन् काजोङ्ग् भवन्तं कदापि प्राप्तुं न ददाति\n"
+"यस्मिन् परिस्थितौ भवद्भिः दण्डः दातव्यः भवति"
+
+#: src/rule.py:578
+msgctxt "Ruleset._newKey:%1 is empty or space plus number"
+msgid "Copy%1 of %2"
+msgstr ""
+
+#: src/rule.py:934
+msgctxt "%1 can be a sentence"
+msgid "%4 have impossible values %2/%3 in rule \"%1\""
+msgstr ""
+
+#: src/rule.py:1022
+msgctxt "wrong value for rule"
+msgid "%1: %2 is too small, minimal value is %3"
+msgstr ""
+
+#: src/rulesetselector.py:503
+msgctxt "@title:window"
+msgid "Customize rulesets"
+msgstr ""
+
+#: src/rulesetselector.py:522
+msgctxt "kajongg"
+msgid "Rule"
+msgstr ""
+
+#: src/rulesetselector.py:583
+msgid "C&opy"
+msgstr "C&opy"
+
+#: src/rulesetselector.py:584
+msgctxt "Kajongg ruleset comparer"
+msgid "Co&mpare"
+msgstr ""
+
+#: src/rulesetselector.py:585
+msgid "&Remove"
+msgstr "&अपाकरोति"
+
+#: src/rulesetselector.py:586
+msgid "&Close"
+msgstr "&पिधानं करोतु"
+
+#: src/scene.py:396 src/scene.py:527
+msgid "Do you really want to abort this game?"
+msgstr "किं भवन्तः वास्तवमेव एतत् क्रीडां गर्भपातं कर्तुम् इच्छन्ति ?"
+
+#: src/scoring.py:60
+msgctxt "@title:window"
+msgid "Swap Seats"
+msgstr ""
+
+#: src/scoring.py:62
+msgid "By the rules, %1 and %2 should now exchange their seats. "
+msgstr "नियमानुसारं %1 %2 च इदानीं स्वपीठानां आदानप्रदानं कुर्वन्तु । "
+
+#: src/scoring.py:64
+msgid "&Exchange"
+msgstr "&विनिमयः"
+
+#: src/scoring.py:66
+msgid "&Keep seat"
+msgstr "&आसनं स्थापयतु"
+
+#: src/scoring.py:85
+msgctxt "@title:window"
+msgid "Select four players"
+msgstr ""
+
+#: src/scoring.py:332
+msgid "Move Exposed Tiles Here"
+msgstr "Exposed Tiles अत्र स्थानान्तरयन्तु"
+
+#: src/scoring.py:333
+msgid "Move Concealed Tiles Here"
+msgstr "अत्र गुप्त टाइल्स् चालयन्तु"
+
+#: src/scoring.py:651
+msgid "Please define four players in <interface>Settings|Players</interface>"
+msgstr ""
+"कृपया <interface>Settings|Players</interface> इत्यत्र चत्वारि खिलाडयः परिभाषयन्तु"
+
+#: src/scoringdialog.py:247
+msgid "Round/Hand"
+msgstr "गोल/हस्त"
+
+#: src/scoringdialog.py:280 src/scoringdialog.py:840
+msgctxt "kajongg"
+msgid "Score"
+msgstr ""
+
+#: src/scoringdialog.py:280
+msgctxt "kajongg"
+msgid "Payments"
+msgstr ""
+
+#: src/scoringdialog.py:281
+msgctxt "kajongg"
+msgid "Balance"
+msgstr ""
+
+#: src/scoringdialog.py:281
+msgctxt "kajongg"
+msgid "Chart"
+msgstr ""
+
+#: src/scoringdialog.py:427
+msgctxt "kajongg"
+msgid "Scores"
+msgstr ""
+
+#: src/scoringdialog.py:467
+msgctxt "kajongg"
+msgid "Used Rules"
+msgstr ""
+
+#: src/scoringdialog.py:501
+msgid "Final scores for game <numid>%1</numid>"
+msgstr "<numid>%1</numid> इति क्रीडायाः अन्तिमाङ्काः"
+
+#: src/scoringdialog.py:503
+msgid "Scores for game <numid>%1</numid>"
+msgstr "<numid>%1</numid> इति क्रीडायाः स्कोरः"
+
+#: src/scoringdialog.py:576
+msgctxt "@title:window"
+msgid "Explain Scores"
+msgstr ""
+
+#: src/scoringdialog.py:592
+msgid "There is no active game"
+msgstr "सक्रियक्रीडा नास्ति"
+
+#: src/scoringdialog.py:595
+msgid "%1"
+msgstr "%1"
+
+#: src/scoringdialog.py:609
+msgid "Manual score for %1: %2 points"
+msgstr "%1 कृते मैनुअल् स्कोरः: %2 बिन्दवः"
+
+#: src/scoringdialog.py:696
+msgid "Penalty"
+msgstr "दण्डः"
+
+#: src/scoringdialog.py:699
+msgid "Offense:"
+msgstr "अपराधः : १."
+
+#: src/scoringdialog.py:706
+msgid "Total Penalty"
+msgstr "कुल दण्ड"
+
+#: src/scoringdialog.py:734
+msgid "&Execute"
+msgstr "&प्रभज्"
+
+#: src/scoringdialog.py:811
+msgctxt "penalty dialog, appears behind paying player combobox"
+msgid "pays %1 points"
+msgstr ""
+
+#: src/scoringdialog.py:816
+msgctxt "penalty dialog, appears behind profiting player combobox"
+msgid "gets %1 points"
+msgstr ""
+
+#: src/scoringdialog.py:827
+msgctxt "@title:window"
+msgid "Scoring for this Hand"
+msgstr ""
+
+#: src/scoringdialog.py:838
+msgctxt "kajongg"
+msgid "Player"
+msgstr "खिलाडी"
+
+#: src/scoringdialog.py:839
+msgctxt "kajongg"
+msgid "Wind"
+msgstr ""
+
+#: src/scoringdialog.py:841
+msgid "Winner"
+msgstr "विजेता"
+
+#: src/scoringdialog.py:847
+msgctxt "kajongg"
+msgid "Draw"
+msgstr ""
+
+#: src/scoringdialog.py:849
+msgid "&Penalties"
+msgstr "&दण्डाः"
+
+#: src/scoringdialog.py:851
+msgid "&Save Hand"
+msgstr "&हस्तं रक्षतु"
+
+#: src/scoringdialog.py:873
+msgid "&Last Tile:"
+msgstr "&अन्तिम टाइलः : १."
+
+#: src/scoringdialog.py:882
+msgid "L&ast Meld:"
+msgstr "L&ast Meld: 1।"
+
+#: src/server.py:120
+msgid "Wrong password"
+msgstr "गलतगुप्तशब्दः"
+
+#: src/server.py:216
+msgid "table with id <numid>%1</numid> not found"
+msgstr "id <numid>%1</numid> इत्यनेन सह सारणी न प्राप्ता"
+
+#: src/server.py:364
+msgid "Player %1 has logged out"
+msgstr "खिलाडी %1 बहिः गतः"
+
+#: src/server.py:434
+msgid "the server will listen on PORT ({int(defaultPort)})"
+msgstr "सर्वरः PORT ({int(defaultPort)}) इत्यत्र श्रोष्यति ।"
+
+#: src/server.py:437
+msgid "the server will listen on SOCKET"
+msgstr "सर्वरः SOCKET इत्यत्र श्रोष्यति"
+
+#: src/server.py:441
+msgid "name of the database"
+msgstr "दत्तांशकोशस्य नाम"
+
+#: src/server.py:445
+msgid "do not terminate local game server after last client disconnects"
+msgstr "अन्तिमग्राहकस्य विच्छेदनानन्तरं स्थानीयक्रीडासर्वरं न समाप्तं कुर्वन्तु"
+
+#: src/servertable.py:180
+msgid "You already joined this table"
+msgstr "भवान् पूर्वमेव अस्मिन् सारणीयां सम्मिलितवान्"
+
+#: src/servertable.py:182
+msgid "All seats are already taken"
+msgstr "सर्वाणि आसनानि पूर्वमेव गृहीताः सन्ति"
+
+#: src/servertable.py:187
+msgid "takes a seat"
+msgstr "आसनं गृह्णाति"
+
+#: src/servertable.py:195
+msgid "leaves the table"
+msgstr "मेजं त्यजति"
+
+#: src/servertable.py:241
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 1"
+msgstr ""
+
+#: src/servertable.py:244
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 2"
+msgstr ""
+
+#: src/servertable.py:245
+msgctxt "kajongg, name of robot player, to be translated"
+msgid "Robot 3"
+msgstr ""
+
+#: src/servertable.py:301
+msgid "Only the initiator %1 can start this game, you are %2"
+msgstr "केवलं प्रवर्तकः %1 एव एतत् क्रीडां आरभुं शक्नोति, भवान् %2 अस्ति"
+
+#: src/servertable.py:700
+msgid "Game <numid>%1</numid> is over!"
+msgstr "<numid>%1</numid> इति क्रीडा समाप्तम्!"
+
+#: src/servertable.py:729
+msgid "%1 wrongly said %2 for meld %3"
+msgstr "%1 गलत् उक्तवान् %2 for meld %3"
+
+#: src/servertable.py:734
+msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
+msgstr "%1 गलत् उक्तवान् %2: %3 टाइल्स् गोपनीयं इति दावान् करोति परन्तु केवलं %4 अस्ति"
+
+#: src/servertable.py:771
+msgid "declareKong:%1 wrongly said Kong for meld %2"
+msgstr "declareKong:%1 इत्यनेन meld %2 इत्यस्य कृते Kong इति गलत् उक्तम्"
+
+#: src/servertable.py:820
+msgid "%1 claiming MahJongg: This is not a winning hand: %2"
+msgstr "%1 claiming MahJongg: एषः विजयी हस्तः नास्ति: %2"
+
+#: src/sound.py:70
+msgid "No voices will be heard because the program %1 is missing"
+msgstr "%1 इति कार्यक्रमः अनुपलब्धः इति कारणेन कोऽपि स्वरः न श्रूयते"
+
+#: src/sound.py:374
+msgid "cannot write <filename>%1</filename>: %2"
+msgstr "<filename>%1</filename>: %2 इति लिखितुं न शक्नोति"
+
+#: src/sound.py:377
+msgid "The voice files have changed, their checksum has changed."
+msgstr "स्वरसञ्चिकाः परिवर्तिताः, तेषां चेकसमः परिवर्तितः।"
+
+#: src/sound.py:378
+msgid "Please reinstall kajongg or do, with sufficient permissions:"
+msgstr "कृपया kajongg अथवा do पुनः संस्थापयन्तु, पर्याप्तानुमतिभिः सह:"
+
+#: src/tables.py:64
+msgid "Table"
+msgstr "पीठिका"
+
+#: src/tables.py:68
+msgctxt "table status"
+msgid "Status"
+msgstr ""
+
+#: src/tables.py:69
+msgid "Ruleset"
+msgstr "नियमः निर्धारितः"
+
+#: src/tables.py:148
+msgid "Select a ruleset"
+msgstr "एकं नियमसमूहं चिनोतु"
+
+#: src/tables.py:186
+msgctxt "allocate a new table"
+msgid "&New"
+msgstr ""
+
+#: src/tables.py:189 src/tables.py:316 src/tables.py:348
+msgid "Allocate a new table"
+msgstr "नूतनं सारणीं आवंटयन्तु"
+
+#: src/tables.py:192 src/tables.py:317 src/tables.py:349
+msgid "&Join"
+msgstr "&आबन्धम्"
+
+#: src/tables.py:196 src/tables.py:318 src/tables.py:350
+msgid "Join a table"
+msgstr "एकं मेजं सम्मिलितं कुर्वन्तु"
+
+#: src/tables.py:198
+msgid "&Leave"
+msgstr "&त्यजतु"
+
+#: src/tables.py:202
+msgid "Leave a table"
+msgstr "एकं मेजं त्यजतु"
+
+#: src/tables.py:205
+msgctxt "Kajongg-Ruleset"
+msgid "Compare"
+msgstr ""
+
+#: src/tables.py:210
+msgid "Compare the rules of this table with my own rulesets"
+msgstr "अस्य सारणीयाः नियमानाम् तुलना मम स्वस्य नियमसमूहेन सह कुर्वन्तु"
+
+#: src/tables.py:212
+msgid "&Chat"
+msgstr "&संवाद"
+
+#: src/tables.py:217
+msgid "&Start"
+msgstr "&प्रारंभः"
+
+#: src/tables.py:222
+msgid "Start playing on a table. Empty seats will be taken by robot players."
+msgstr "मेजस्य उपरि क्रीडितुं आरभत। रिक्तानि आसनानि रोबोट् क्रीडकाः गृह्णन्ति।"
+
+#: src/tables.py:267
+msgid "opens a chat window"
+msgstr "एकं गपशप-विण्डो उद्घाटयति"
+
+#: src/tables.py:286
+msgid "Local Games with Ruleset %1"
+msgstr "Ruleset %1 इत्यनेन सह स्थानीयक्रीडाः"
+
+#: src/tables.py:290
+msgid "Tables at %1"
+msgstr "%1 इत्यत्र सारणीः"
+
+#: src/tables.py:342
+msgid "Start a new game"
+msgstr "नूतनं क्रीडां आरभत"
+
+#: src/tables.py:344
+msgctxt "resuming a local suspended game"
+msgid "&Resume"
+msgstr ""
+
+#: src/tables.py:346
+msgid "Resume the selected suspended game"
+msgstr "चयनितं निलम्बितं क्रीडां पुनः आरभत"
+
+#: src/tables.py:364
+msgid "Chat with others on this table"
+msgstr "अस्मिन् सारणीयां अन्यैः सह गपशपं कुर्वन्तु"
+
+#: src/tables.py:367
+msgid "For chatting with others on this table, please first take a seat"
+msgstr "अस्मिन् मेजस्य उपरि अन्यैः सह गपशपार्थं प्रथमं आसनं गृह्यताम्"
+
+#: src/tile.py:276
+msgctxt "kajongg"
+msgid "hidden"
+msgstr ""
+
+#: src/tile.py:277
+msgctxt "kajongg"
+msgid "stone"
+msgstr ""
+
+#: src/tile.py:278
+msgctxt "kajongg"
+msgid "bamboo"
+msgstr ""
+
+#: src/tile.py:279
+msgctxt "kajongg"
+msgid "character"
+msgstr ""
+
+#: src/tile.py:280
+msgctxt "kajongg"
+msgid "wind"
+msgstr ""
+
+#: src/tile.py:281
+msgctxt "kajongg"
+msgid "dragon"
+msgstr ""
+
+#: src/tile.py:282
+msgctxt "kajongg"
+msgid "flower"
+msgstr ""
+
+#: src/tile.py:283
+msgctxt "kajongg"
+msgid "season"
+msgstr ""
+
+#: src/tile.py:289
+msgctxt "kajongg"
+msgid "tile"
+msgstr ""
+
+#: src/tile.py:290
+msgctxt "kajongg"
+msgid "white"
+msgstr ""
+
+#: src/tile.py:291
+msgctxt "kajongg"
+msgid "red"
+msgstr ""
+
+#: src/tile.py:292
+msgctxt "kajongg"
+msgid "green"
+msgstr ""
+
+#: src/tile.py:293
+msgctxt "kajongg"
+msgid "East"
+msgstr ""
+
+#: src/tile.py:294
+msgctxt "kajongg"
+msgid "South"
+msgstr ""
+
+#: src/tile.py:295
+msgctxt "kajongg"
+msgid "West"
+msgstr ""
+
+#: src/tile.py:296
+msgctxt "kajongg"
+msgid "North"
+msgstr ""
+
+#: src/tile.py:305
+msgid "East Wind"
+msgstr "पूर्ववायुः"
+
+#: src/tile.py:306
+msgid "South Wind"
+msgstr "दक्षिणवायुः"
+
+#: src/tile.py:307
+msgid "West Wind"
+msgstr "पश्चिमवायुः"
+
+#: src/tile.py:308
+msgid "North Wind"
+msgstr "उत्तरवायुः"
+
+#: src/tile.py:310
+#, python-brace-format
+msgctxt "kajongg tile name"
+msgid "{group} {value}"
+msgstr ""
+
+#: src/tile.py:889
+msgctxt "kajongg meld type"
+msgid "Bonus"
+msgstr ""
+
+#: src/tile.py:891
+msgctxt "kajongg meld type"
+msgid "&single"
+msgstr ""
+
+#: src/tile.py:893
+msgctxt "kajongg meld type"
+msgid "&pair"
+msgstr ""
+
+#: src/tile.py:895
+msgctxt "kajongg meld type"
+msgid "&chow"
+msgstr ""
+
+#: src/tile.py:897
+msgctxt "kajongg meld type"
+msgid "p&ung"
+msgstr ""
+
+#: src/tile.py:899
+msgctxt "kajongg meld type"
+msgid "c&laimed kong"
+msgstr ""
+
+#: src/tile.py:901
+msgctxt "kajongg meld type"
+msgid "k&ong"
+msgstr ""
+
+#: src/tile.py:902
+msgctxt "kajongg meld type"
+msgid "rest of tiles"
+msgstr ""
+
+#: src/tile.py:909
+msgctxt "kajongg meld state"
+msgid "Exposed"
+msgstr ""
+
+#: src/tile.py:910
+msgctxt "kajongg meld state"
+msgid "Concealed"
+msgstr ""
+
+#: src/tile.py:916
+#, python-brace-format
+msgctxt "kajongg meld name, do not translate parameter names"
+msgid "{state} {meldType} {name}"
+msgstr ""
+
+#: src/tilesetselector.py:141
+msgctxt "TilesetSelector"
+msgid "Preview"
+msgstr ""
+
+#: src/tilesetselector.py:142
+msgctxt "TilesetSelector"
+msgid "Properties"
+msgstr ""
+
+#: src/tilesetselector.py:143
+msgctxt "TilesetSelector"
+msgid "Author:"
+msgstr ""
+
+#: src/tilesetselector.py:144
+msgctxt "TilesetSelector"
+msgid "Contact:"
+msgstr ""
+
+#: src/tilesetselector.py:145
+msgctxt "TilesetSelector"
+msgid "Description:"
+msgstr ""
+
+#: src/user.py:94
+msgid ""
+"Your client has a version older than 4.9.0 but you need %1 for this server"
+msgstr ""
+"भवतः क्लायन्ट् इत्यस्य संस्करणं 4.9.0 इत्यस्मात् प्राचीनम् अस्ति किन्तु भवतः अस्य सर्वरस्य कृते "
+"%1 आवश्यकम्"
+
+#: src/user.py:98
+msgid "Your client has version %1 but you need %2 for this server"
+msgstr "भवतः क्लायन्ट् इत्यस्य संस्करणं %1 अस्ति किन्तु भवतः अस्य सर्वरस्य कृते %2 आवश्यकम्"
