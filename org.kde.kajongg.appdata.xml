@@ -35,6 +35,7 @@
   <name xml:lang="pt">Kajongg</name>
   <name xml:lang="pt-BR">Kajongg</name>
   <name xml:lang="ru">Kajongg</name>
+  <name xml:lang="sa">कजोङ्ग्</name>
   <name xml:lang="sk">Kajongg</name>
   <name xml:lang="sl">Kajongg</name>
   <name xml:lang="sr">Каџонг</name>
@@ -72,6 +73,7 @@
   <summary xml:lang="pt">Jogo de peças de Mahjong da China</summary>
   <summary xml:lang="pt-BR">Jogo de peças Mahjong da China</summary>
   <summary xml:lang="ru">Маджонг — игра в кости из Китая</summary>
+  <summary xml:lang="sa">चीनदेशात् महजोङ्ग टाइल् क्रीडा</summary>
   <summary xml:lang="sk">Dlaždicová hra z Číny Mahjong</summary>
   <summary xml:lang="sl">Mahjong je kitajska namizna igra</summary>
   <summary xml:lang="sv">Mahjong-brickspel från Kina</summary>
@@ -111,6 +113,7 @@
     <p xml:lang="pt">O Kajongg é o antigo jogo chinês de tabuleiro para 4 jogadores. O Kajongg pode ser usado de duas diferentes formas: A pontuação de um jogo manual, onde poderá jogar como sempre, e usar o Kajongg como calculadora de pontos e para registo posterior. Poderá ainda usar o Kajongg para jogar contra uma combinação qualquer de outros jogadores humanos ou por computador.</p>
     <p xml:lang="pt-BR">O Kajongg é o antigo jogo de tabuleiro chinês para 4 jogadores. O Kajongg pode ser usado de duas diferentes formas: A pontuação de um jogo manual, onde poderá jogar como sempre, e usar o Kajongg como calculadora de pontos e para registro posterior. Poderá ainda usar o Kajongg para jogar contra uma combinação qualquer de outros jogadores humanos ou por computador.</p>
     <p xml:lang="ru">Kajongg — древняя китайская настольная игра для 4 игроков. Есть два варианта работы с Kajongg. Можно играть в игру обычным способом, используя Kajongg для подсчёта очков и ведения записей об игре. Также Kajongg можно использовать для игры с произвольной комбинацией игроков-людей и компьютерных игроков.</p>
+    <p xml:lang="sa">काजोङ्ग् इति ४ क्रीडकानां कृते प्राचीनः चीनीयः बोर्डक्रीडा अस्ति । काजोङ्ग् इत्यस्य उपयोगः द्वयोः भिन्नयोः प्रकारयोः कर्तुं शक्यते : हस्तक्रीडायाः स्कोरिंग् यत्र भवान् सर्वदा इव क्रीडति तथा च स्कोरस्य गणनायै बहीखापालनार्थं च काजोङ्ग् इत्यस्य उपयोगं करोति। अथवा अन्येषां मानवक्रीडकानां सङ्गणकक्रीडकानां वा कस्यापि संयोजनस्य विरुद्धं क्रीडितुं काजोङ्ग् इत्यस्य उपयोगं कर्तुं शक्नुवन्ति ।</p>
     <p xml:lang="sk">Kajongg je stará čínska dosková hra pre 4 hráčov. Kajongg sa dá použiť dvoma odlišnými spôsobmi: Bodovanie ručnej hry, kde hráte ako vždy a použite Kajongg na výpočet bodov a na účtovníctvo. Alebo môžete použiť Kajongg na hranie proti kombinácii iného ľudského hráča alebo počítačových hráčov.</p>
     <p xml:lang="sl">Kajongg je starodavna kitajska namizna igra za štiri igralce. Kajongg lahko uporabite na dva načina: kot vmesnik za ročno igro, kjer igrate kot običajno in uporabite Kajongg za izračun rezultatov in njihovo shranjevanje ali pa kot vmesnik za igro proti katerikoli kombinaciji človeških ali računalniških igralcev.</p>
     <p xml:lang="sr">Каџонг је древна кинеска игра на табли за четири играча. Каџонг се може користити на два начина. Један је оцењивање ручне игре, где играте као и обично док вам Каџонг служи за израчунавање резултата и праћење. Или можете у Каџонгу заиграти против комбинације других људских и рачунарских играча.</p>
@@ -155,6 +158,7 @@
       <caption xml:lang="pt">Jogo do Kajongg</caption>
       <caption xml:lang="pt-BR">Jogando Kajongg</caption>
       <caption xml:lang="ru">Игра в Kajongg</caption>
+      <caption xml:lang="sa">कजोङ्गं क्रीडन्</caption>
       <caption xml:lang="sk">Hranie Kajongg</caption>
       <caption xml:lang="sl">Igra Kajongg</caption>
       <caption xml:lang="sv">Spela Kajongg</caption>
