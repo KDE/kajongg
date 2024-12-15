@@ -3,22 +3,25 @@
 # This file is distributed under the same license as the kajongg package.
 # Kali <EMAIL@ADDRESS>, 2024.
 #
+# SPDX-FileCopyrightText: 2024 kali <skkalwar999@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-10-10 00:37+0000\n"
-"PO-Revision-Date: 2024-12-13 19:10+0530\n"
-"Last-Translator: Kali <EMAIL@ADDRESS>\n"
-"Language-Team: Sanskrit\n"
+"PO-Revision-Date: 2024-12-14 02:14+0530\n"
+"Last-Translator: kali <skkalwar999@gmail.com>\n"
+"Language-Team: Sanskrit <kde-i18n-doc@kde.org>\n"
 "Language: sa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Poedit 3.5\n"
 
 msgctxt "kajongg"
 msgid "Game"
-msgstr ""
+msgstr "क्रीडा"
 
 msgid "View"
 msgstr "दृश्यं"
@@ -33,32 +36,32 @@ msgstr "<filename>%1</filename> सञ्चिकायां वैधं SVG 
 #: src/backgroundselector.py:107
 msgctxt "BackgroundSelector"
 msgid "Preview"
-msgstr ""
+msgstr "पूर्वावलोकनम्"
 
 #: src/backgroundselector.py:108
 msgctxt "BackgroundSelector"
 msgid "Properties"
-msgstr ""
+msgstr "गुणाः"
 
 #: src/backgroundselector.py:109
 msgctxt "BackgroundSelector"
 msgid "Author:"
-msgstr ""
+msgstr "लेखकः:"
 
 #: src/backgroundselector.py:110
 msgctxt "BackgroundSelector"
 msgid "Contact:"
-msgstr ""
+msgstr "संपर्कः:"
 
 #: src/backgroundselector.py:111
 msgctxt "BackgroundSelector"
 msgid "Description:"
-msgstr ""
+msgstr "वर्णनम्‌:"
 
 #: src/board.py:315
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
 msgid "hjklHJKL"
-msgstr ""
+msgstr "hjklHJKL"
 
 #: src/board.py:365
 msgid "Choose from"
@@ -83,17 +86,17 @@ msgstr "%2 इत्यत्र %1 सारणीयां गपशपं क
 #: src/client.py:69
 msgctxt "table status"
 msgid "Suspended"
-msgstr ""
+msgstr "निलंबित"
 
 #: src/client.py:74
 msgctxt "table status"
 msgid "Running"
-msgstr ""
+msgstr "चलति"
 
 #: src/client.py:75
 msgctxt "table status"
 msgid "New"
-msgstr ""
+msgstr "नूतनम्‌"
 
 #: src/configdialog.py:47
 msgid "Show tile shadows"
@@ -126,7 +129,7 @@ msgstr "अन्ये मम वाणीं शृण्वन्तु"
 #: src/configdialog.py:103
 msgctxt "kajongg"
 msgid "Play"
-msgstr ""
+msgstr "क्रीडतु"
 
 #: src/configdialog.py:106
 msgid "Tiles"
@@ -151,17 +154,17 @@ msgstr ""
 #: src/differ.py:72
 msgctxt "Kajongg"
 msgid "Rule"
-msgstr ""
+msgstr "नियम"
 
 #: src/differ.py:127
 msgctxt "@title:window"
 msgid "Compare"
-msgstr ""
+msgstr "तूल"
 
 #: src/differ.py:170 src/differ.py:172
 msgctxt "Kajongg-Rule"
 msgid "not defined"
-msgstr ""
+msgstr "न विवक्षितम्"
 
 #: src/game.py:558
 msgid "Score computed manually"
@@ -186,12 +189,12 @@ msgstr "आरंभित"
 #: src/games.py:107
 msgctxt "@title:window"
 msgid "Games"
-msgstr ""
+msgstr "क्रीडाः"
 
 #: src/games.py:124
 msgctxt "start a new game"
 msgid "&New"
-msgstr ""
+msgstr "&नूतनम्‌"
 
 #: src/games.py:128
 msgid "&Load"
@@ -341,12 +344,12 @@ msgstr "&पूर्वनिर्धारित"
 #: src/kdestub.py:343
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
-msgstr ""
+msgstr "St&atusbar दर्शयतु"
 
 #: src/kdestub.py:349
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
-msgstr ""
+msgstr "&Toolbar दर्शयतु"
 
 #: src/kdestub.py:355
 msgid "Configure Tool&bars..."
@@ -388,7 +391,7 @@ msgstr "अनुप्रयोग भाषा स्विच करें"
 #: src/kdestub.py:473
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
-msgstr ""
+msgstr "&Calmonum विषये"
 
 #: src/kdestub.py:853
 msgid "Please choose the language which should be used for this application:"
@@ -445,7 +448,7 @@ msgstr "KDE Frameworks (न संस्थापितम् अथवा अ�
 #: src/kdestub.py:1066
 msgctxt "kajongg"
 msgid "Using versions %1"
-msgstr ""
+msgstr "%1 संस्करणानाम् उपयोगः"
 
 #: src/kdestub.py:1087
 msgid ""
@@ -498,7 +501,7 @@ msgstr "स्थानीयं kajongg सर्वरं प्रारब�
 #: src/login.py:251
 msgctxt "kajongg"
 msgid "Login"
-msgstr ""
+msgstr "प्रवेशः"
 
 #: src/login.py:299 src/login.py:405
 msgid "Game server:"
@@ -515,12 +518,12 @@ msgstr "समाभाष्:"
 #: src/login.py:307
 msgctxt "kajongg"
 msgid "Ruleset:"
-msgstr ""
+msgstr "नियमसमूहः : १."
 
 #: src/login.py:399
 msgctxt "@title:window"
 msgid "Create User Account"
-msgstr ""
+msgstr "उपयोक्तृलेखं रचयन्तु"
 
 #: src/login.py:413
 msgid "Repeat password:"
@@ -533,7 +536,7 @@ msgstr "भवान् पूर्वमेव सर्वर %1 इत्य
 #: src/login.py:604
 msgctxt "USER is not known on SERVER"
 msgid "%1 is not known on %2, do you want to open an account?"
-msgstr ""
+msgstr "%1 %2 इत्यत्र न ज्ञायते, भवान् खातं उद्घाटयितुम् इच्छति वा?"
 
 #: src/login.py:617
 msgid "Server %1 did not answer"
@@ -562,122 +565,122 @@ msgstr "कृपया पुनः प्रयासं कुर्वन्
 #: src/mainwindow.py:483
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
-msgstr ""
+msgstr "&स्कोर मैनुअल गेम"
 
 #: src/mainwindow.py:485
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
-msgstr ""
+msgstr "मैनुअल गेम"
 
 #: src/mainwindow.py:488
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
-msgstr ""
+msgstr "&एकं मैनुअल् क्रीडां स्कोरं कुर्वन्तु।"
 
 #: src/mainwindow.py:490
 msgctxt "@action:intoolbar"
 msgid "&Play"
-msgstr ""
+msgstr "&क्रीडतु"
 
 #: src/mainwindow.py:493
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
-msgstr ""
+msgstr "नूतनं क्रीडां आरभत।"
 
 #: src/mainwindow.py:495
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
-msgstr ""
+msgstr "&Abort Game"
 
 #: src/mainwindow.py:499
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
-msgstr ""
+msgstr "वर्तमानं क्रीडां निरस्तं कुर्वन्तु।"
 
 #: src/mainwindow.py:501
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
-msgstr ""
+msgstr "& कजोङ्ग् त्यजतु"
 
 #: src/mainwindow.py:504
 msgctxt "@action:intoolbar"
 msgid "&Players"
-msgstr ""
+msgstr "&क्रीडकाः"
 
 #: src/mainwindow.py:507
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
-msgstr ""
+msgstr "भवतः क्रीडकान् परिभाषयन्तु।"
 
 #: src/mainwindow.py:509
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
-msgstr ""
+msgstr "&नियमसमूहाः"
 
 #: src/mainwindow.py:512
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
-msgstr ""
+msgstr "नियमसमूहान् अनुकूलितं कुर्वन्तु।"
 
 #: src/mainwindow.py:516
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
-msgstr ""
+msgstr "&दृश्यकोणं परिवर्तयतु"
 
 #: src/mainwindow.py:517
 msgctxt "@action:intoolbar"
 msgid "Angle"
-msgstr ""
+msgstr "कोण"
 
 #: src/mainwindow.py:520
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
-msgstr ""
+msgstr "टाइल्स् इत्यस्य दृश्यरूपं परिवर्तयन्तु ।"
 
 #: src/mainwindow.py:524
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
-msgstr ""
+msgstr "F&ull स्क्रीन मोड"
 
 #: src/mainwindow.py:527
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
-msgstr ""
+msgstr "&स्कोर सारणी"
 
 #: src/mainwindow.py:529
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
-msgstr ""
+msgstr "&स्कोर"
 
 #: src/mainwindow.py:531
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
-msgstr ""
+msgstr "वर्तमानक्रीडायाः स्कोरसारणीं दर्शयतु वा गोपयन्तु वा।"
 
 #: src/mainwindow.py:533
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
-msgstr ""
+msgstr "&अङ्कं व्याख्यातव्यम्"
 
 #: src/mainwindow.py:534
 msgctxt "@action:intoolbar"
 msgid "&Explain"
-msgstr ""
+msgstr "&व्याख्याति"
 
 #: src/mainwindow.py:536
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
-msgstr ""
+msgstr "वर्तमानक्रीडायां सर्वेषां क्रीडकानां स्कोरिंग् व्याख्यातव्यम्।"
 
 #: src/mainwindow.py:538
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
-msgstr ""
+msgstr "& डेमो मोड"
 
 #: src/mainwindow.py:541
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
-msgstr ""
+msgstr "सङ्गणकः भवतः कृते कार्यभारं गृह्णातु। आवश्यकतानुसारं नूतनं स्थानीयं क्रीडां आरभत।"
 
 #: src/mainwindow.py:543
 msgid "C&hat"
@@ -686,7 +689,7 @@ msgstr "संवाद"
 #: src/mainwindow.py:546
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
-msgstr ""
+msgstr "अन्यैः क्रीडकैः सह गपशपं कुर्वन्तु।"
 
 #: src/message.py:262
 msgid "saying %1 violates Original Call"
@@ -710,22 +713,22 @@ msgstr "भवान् %1 इति वक्तुं शक्नोति"
 #: src/message.py:293
 msgctxt "kajongg"
 msgid "Pung"
-msgstr ""
+msgstr "उद्गम"
 
 #: src/message.py:294
 msgctxt "kajongg game dialog:Key for Pung"
 msgid "P"
-msgstr ""
+msgstr "पु"
 
 #: src/message.py:313
 msgctxt "kajongg"
 msgid "Kong"
-msgstr ""
+msgstr "कोंग"
 
 #: src/message.py:314
 msgctxt "kajongg game dialog:Key for Kong"
 msgid "K"
-msgstr ""
+msgstr "के"
 
 #: src/message.py:340
 msgid "saying Kong for %1 violates Original Call"
@@ -738,22 +741,22 @@ msgstr "%1 कृते Kong इति वक्तुं शक्नुवन�
 #: src/message.py:359
 msgctxt "kajongg"
 msgid "Chow"
-msgstr ""
+msgstr "चाउ"
 
 #: src/message.py:360
 msgctxt "kajongg game dialog:Key for Chow"
 msgid "C"
-msgstr ""
+msgstr "ग"
 
 #: src/message.py:394
 msgctxt "kajongg"
 msgid "Mah Jongg"
-msgstr ""
+msgstr "महजोङ्ग"
 
 #: src/message.py:395
 msgctxt "kajongg game dialog:Key for Mah Jongg"
 msgid "M"
-msgstr ""
+msgstr "म"
 
 #: src/message.py:403
 msgid "Press here and you win"
@@ -767,7 +770,7 @@ msgstr "मूल आह्वान"
 #: src/message.py:419
 msgctxt "kajongg game dialog:Key for Original Call"
 msgid "O"
-msgstr ""
+msgstr "THE"
 
 #: src/message.py:435
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
@@ -784,12 +787,12 @@ msgstr ""
 #: src/message.py:465
 msgctxt "kajongg"
 msgid "Discard"
-msgstr ""
+msgstr "तनूकृ"
 
 #: src/message.py:466
 msgctxt "kajongg game dialog:Key for Discard"
 msgid "D"
-msgstr ""
+msgstr "घ"
 
 #: src/message.py:483
 msgid "discarding %1 violates Original Call"
@@ -814,7 +817,7 @@ msgstr "अहं <numid>%1</numid> इति अन्वेषयामि"
 #: src/message.py:694
 msgctxt "kajongg"
 msgid "Violates Original Call"
-msgstr ""
+msgstr "मूल आह्वानस्य उल्लङ्घनं करोति"
 
 #: src/message.py:837
 msgctxt "kajongg"
@@ -824,17 +827,17 @@ msgstr "खतरनाक खेल"
 #: src/message.py:852
 msgctxt "kajongg"
 msgid "No Choice"
-msgstr ""
+msgstr "न विकल्पः"
 
 #: src/message.py:915
 msgctxt "kajongg"
 msgid "OK"
-msgstr ""
+msgstr "अस्तु"
 
 #: src/message.py:916
 msgctxt "kajongg game dialog:Key for OK"
 msgid "O"
-msgstr ""
+msgstr "THE"
 
 #: src/message.py:920
 msgid "Confirm that you saw the message"
@@ -843,12 +846,12 @@ msgstr "भवता सन्देशः दृष्टः इति पु�
 #: src/message.py:929
 msgctxt "kajongg"
 msgid "No Claim"
-msgstr ""
+msgstr "न दावाः"
 
 #: src/message.py:930
 msgctxt "kajongg game dialog:Key for No claim"
 msgid "N"
-msgstr ""
+msgstr "न॰"
 
 #: src/message.py:934
 msgid "You cannot or do not want to claim this tile"
@@ -911,7 +914,7 @@ msgstr "%1 खिलाडी अनेके अजगराः उजागर
 #: src/playerlist.py:48
 msgctxt "define a new player"
 msgid "&New"
-msgstr ""
+msgstr "&नूतनम्‌"
 
 #: src/playerlist.py:106
 msgid "Player %1 already exists"
@@ -1638,7 +1641,7 @@ msgstr "शुद्धतायाः आह्वानम्"
 #: src/query.py:196
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
-msgstr ""
+msgstr "स्थानीय खेल"
 
 #: src/query.py:376
 msgid "Database %1 updated from schema %2 to %3"
@@ -1651,27 +1654,27 @@ msgstr "बिन्दवः"
 #: src/rule.py:50
 msgctxt "kajongg"
 msgid "doubles"
-msgstr ""
+msgstr "द्विगुणं भवति"
 
 #: src/rule.py:51
 msgctxt "kajongg"
 msgid "limits"
-msgstr ""
+msgstr "सीमाः"
 
 #: src/rule.py:91
 msgctxt "Kajongg"
 msgid "%1 points"
-msgstr ""
+msgstr "%1 बिन्दुः"
 
 #: src/rule.py:93
 msgctxt "Kajongg"
 msgid "%1 doubles"
-msgstr ""
+msgstr "%1 द्विगुणं भवति"
 
 #: src/rule.py:98
 msgctxt "Kajongg"
 msgid "%1 limits"
-msgstr ""
+msgstr "%1 सीमाः"
 
 #: src/rule.py:365
 msgid "Meld Rules"
@@ -1717,7 +1720,7 @@ msgstr "केवलं मह जोङ्ग-नियमस्य मेल�
 #: src/rule.py:375
 msgctxt "kajongg"
 msgid "Options"
-msgstr ""
+msgstr "विकल्पाः"
 
 #: src/rule.py:376
 msgid "Here we have several special game related options"
@@ -1743,27 +1746,27 @@ msgstr ""
 #: src/rule.py:578
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
-msgstr ""
+msgstr "%2 इत्यस्य%1 प्रतिलिपिं कुर्वन्तु"
 
 #: src/rule.py:934
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
-msgstr ""
+msgstr "%4 इत्यस्य \"%1\" नियमे %2/%3 असम्भवमूल्यानि सन्ति ।"
 
 #: src/rule.py:1022
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
-msgstr ""
+msgstr "%1: %2 अतीव लघु, न्यूनतमं मूल्यं %3 अस्ति"
 
 #: src/rulesetselector.py:503
 msgctxt "@title:window"
 msgid "Customize rulesets"
-msgstr ""
+msgstr "नियमसमूहं अनुकूलितं कुर्वन्तु"
 
 #: src/rulesetselector.py:522
 msgctxt "kajongg"
 msgid "Rule"
-msgstr ""
+msgstr "नियम"
 
 #: src/rulesetselector.py:583
 msgid "C&opy"
@@ -1772,7 +1775,7 @@ msgstr "C&opy"
 #: src/rulesetselector.py:584
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
-msgstr ""
+msgstr "सह&amp;re"
 
 #: src/rulesetselector.py:585
 msgid "&Remove"
@@ -1789,7 +1792,7 @@ msgstr "किं भवन्तः वास्तवमेव एतत् �
 #: src/scoring.py:60
 msgctxt "@title:window"
 msgid "Swap Seats"
-msgstr ""
+msgstr "आसनानि स्वैप कुर्वन्तु"
 
 #: src/scoring.py:62
 msgid "By the rules, %1 and %2 should now exchange their seats. "
@@ -1806,7 +1809,7 @@ msgstr "&आसनं स्थापयतु"
 #: src/scoring.py:85
 msgctxt "@title:window"
 msgid "Select four players"
-msgstr ""
+msgstr "चत्वारि क्रीडकाः चिनुत"
 
 #: src/scoring.py:332
 msgid "Move Exposed Tiles Here"
@@ -1828,32 +1831,32 @@ msgstr "गोल/हस्त"
 #: src/scoringdialog.py:280 src/scoringdialog.py:840
 msgctxt "kajongg"
 msgid "Score"
-msgstr ""
+msgstr "अंक"
 
 #: src/scoringdialog.py:280
 msgctxt "kajongg"
 msgid "Payments"
-msgstr ""
+msgstr "भुक्तिः"
 
 #: src/scoringdialog.py:281
 msgctxt "kajongg"
 msgid "Balance"
-msgstr ""
+msgstr "संतुलन"
 
 #: src/scoringdialog.py:281
 msgctxt "kajongg"
 msgid "Chart"
-msgstr ""
+msgstr "तालिका"
 
 #: src/scoringdialog.py:427
 msgctxt "kajongg"
 msgid "Scores"
-msgstr ""
+msgstr "स्कोर"
 
 #: src/scoringdialog.py:467
 msgctxt "kajongg"
 msgid "Used Rules"
-msgstr ""
+msgstr "प्रयुक्त नियम"
 
 #: src/scoringdialog.py:501
 msgid "Final scores for game <numid>%1</numid>"
@@ -1866,7 +1869,7 @@ msgstr "<numid>%1</numid> इति क्रीडायाः स्कोर�
 #: src/scoringdialog.py:576
 msgctxt "@title:window"
 msgid "Explain Scores"
-msgstr ""
+msgstr "स्कोरं व्याख्यातव्यम्"
 
 #: src/scoringdialog.py:592
 msgid "There is no active game"
@@ -1899,17 +1902,17 @@ msgstr "&प्रभज्"
 #: src/scoringdialog.py:811
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
-msgstr ""
+msgstr "%1 अंकं ददाति"
 
 #: src/scoringdialog.py:816
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
-msgstr ""
+msgstr "%1 बिन्दवः प्राप्नोति"
 
 #: src/scoringdialog.py:827
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
-msgstr ""
+msgstr "अस्य हस्तस्य कृते स्कोरिंग्"
 
 #: src/scoringdialog.py:838
 msgctxt "kajongg"
@@ -1919,7 +1922,7 @@ msgstr "खिलाडी"
 #: src/scoringdialog.py:839
 msgctxt "kajongg"
 msgid "Wind"
-msgstr ""
+msgstr "वायुः"
 
 #: src/scoringdialog.py:841
 msgid "Winner"
@@ -1928,7 +1931,7 @@ msgstr "विजेता"
 #: src/scoringdialog.py:847
 msgctxt "kajongg"
 msgid "Draw"
-msgstr ""
+msgstr "आकर्षयतु"
 
 #: src/scoringdialog.py:849
 msgid "&Penalties"
@@ -1993,17 +1996,17 @@ msgstr "मेजं त्यजति"
 #: src/servertable.py:241
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 1"
-msgstr ""
+msgstr "रोबोट् १"
 
 #: src/servertable.py:244
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 2"
-msgstr ""
+msgstr "रोबोट् २"
 
 #: src/servertable.py:245
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 3"
-msgstr ""
+msgstr "रोबोट् ३"
 
 #: src/servertable.py:301
 msgid "Only the initiator %1 can start this game, you are %2"
@@ -2052,7 +2055,7 @@ msgstr "पीठिका"
 #: src/tables.py:68
 msgctxt "table status"
 msgid "Status"
-msgstr ""
+msgstr "स्थितिः"
 
 #: src/tables.py:69
 msgid "Ruleset"
@@ -2065,7 +2068,7 @@ msgstr "एकं नियमसमूहं चिनोतु"
 #: src/tables.py:186
 msgctxt "allocate a new table"
 msgid "&New"
-msgstr ""
+msgstr "&नूतनम्‌"
 
 #: src/tables.py:189 src/tables.py:316 src/tables.py:348
 msgid "Allocate a new table"
@@ -2090,7 +2093,7 @@ msgstr "एकं मेजं त्यजतु"
 #: src/tables.py:205
 msgctxt "Kajongg-Ruleset"
 msgid "Compare"
-msgstr ""
+msgstr "तूल"
 
 #: src/tables.py:210
 msgid "Compare the rules of this table with my own rulesets"
@@ -2127,7 +2130,7 @@ msgstr "नूतनं क्रीडां आरभत"
 #: src/tables.py:344
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
-msgstr ""
+msgstr "&पुनर्प्रारम्भय"
 
 #: src/tables.py:346
 msgid "Resume the selected suspended game"
@@ -2144,82 +2147,82 @@ msgstr "अस्मिन् मेजस्य उपरि अन्यैः
 #: src/tile.py:276
 msgctxt "kajongg"
 msgid "hidden"
-msgstr ""
+msgstr "अदृष्ट"
 
 #: src/tile.py:277
 msgctxt "kajongg"
 msgid "stone"
-msgstr ""
+msgstr "प्रस्तरं"
 
 #: src/tile.py:278
 msgctxt "kajongg"
 msgid "bamboo"
-msgstr ""
+msgstr "वेणुः"
 
 #: src/tile.py:279
 msgctxt "kajongg"
 msgid "character"
-msgstr ""
+msgstr "स्वभावः"
 
 #: src/tile.py:280
 msgctxt "kajongg"
 msgid "wind"
-msgstr ""
+msgstr "वायुः"
 
 #: src/tile.py:281
 msgctxt "kajongg"
 msgid "dragon"
-msgstr ""
+msgstr "अजगरः"
 
 #: src/tile.py:282
 msgctxt "kajongg"
 msgid "flower"
-msgstr ""
+msgstr "पुष्पं"
 
 #: src/tile.py:283
 msgctxt "kajongg"
 msgid "season"
-msgstr ""
+msgstr "ऋतु"
 
 #: src/tile.py:289
 msgctxt "kajongg"
 msgid "tile"
-msgstr ""
+msgstr "टाइल्"
 
 #: src/tile.py:290
 msgctxt "kajongg"
 msgid "white"
-msgstr ""
+msgstr "श्वेतः"
 
 #: src/tile.py:291
 msgctxt "kajongg"
 msgid "red"
-msgstr ""
+msgstr "रक्त"
 
 #: src/tile.py:292
 msgctxt "kajongg"
 msgid "green"
-msgstr ""
+msgstr "हरित"
 
 #: src/tile.py:293
 msgctxt "kajongg"
 msgid "East"
-msgstr ""
+msgstr "पूर्वं"
 
 #: src/tile.py:294
 msgctxt "kajongg"
 msgid "South"
-msgstr ""
+msgstr "दक्षिण"
 
 #: src/tile.py:295
 msgctxt "kajongg"
 msgid "West"
-msgstr ""
+msgstr "पश्चिमाम्"
 
 #: src/tile.py:296
 msgctxt "kajongg"
 msgid "North"
-msgstr ""
+msgstr "उत्तर"
 
 #: src/tile.py:305
 msgid "East Wind"
@@ -2241,88 +2244,88 @@ msgstr "उत्तरवायुः"
 #, python-brace-format
 msgctxt "kajongg tile name"
 msgid "{group} {value}"
-msgstr ""
+msgstr "{group} {value}"
 
 #: src/tile.py:889
 msgctxt "kajongg meld type"
 msgid "Bonus"
-msgstr ""
+msgstr "बोनस"
 
 #: src/tile.py:891
 msgctxt "kajongg meld type"
 msgid "&single"
-msgstr ""
+msgstr "&एकैकः"
 
 #: src/tile.py:893
 msgctxt "kajongg meld type"
 msgid "&pair"
-msgstr ""
+msgstr "&युग्म"
 
 #: src/tile.py:895
 msgctxt "kajongg meld type"
 msgid "&chow"
-msgstr ""
+msgstr "&चौ"
 
 #: src/tile.py:897
 msgctxt "kajongg meld type"
 msgid "p&ung"
-msgstr ""
+msgstr "प&उङ"
 
 #: src/tile.py:899
 msgctxt "kajongg meld type"
 msgid "c&laimed kong"
-msgstr ""
+msgstr "c&laimed kong"
 
 #: src/tile.py:901
 msgctxt "kajongg meld type"
 msgid "k&ong"
-msgstr ""
+msgstr "k&ong"
 
 #: src/tile.py:902
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
-msgstr ""
+msgstr "शेषं टाइल्स्"
 
 #: src/tile.py:909
 msgctxt "kajongg meld state"
 msgid "Exposed"
-msgstr ""
+msgstr "निरावरित"
 
 #: src/tile.py:910
 msgctxt "kajongg meld state"
 msgid "Concealed"
-msgstr ""
+msgstr "गुप्तम्"
 
 #: src/tile.py:916
 #, python-brace-format
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
-msgstr ""
+msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
 msgctxt "TilesetSelector"
 msgid "Preview"
-msgstr ""
+msgstr "पूर्वावलोकन"
 
 #: src/tilesetselector.py:142
 msgctxt "TilesetSelector"
 msgid "Properties"
-msgstr ""
+msgstr "गुणाः"
 
 #: src/tilesetselector.py:143
 msgctxt "TilesetSelector"
 msgid "Author:"
-msgstr ""
+msgstr "लेखकः:"
 
 #: src/tilesetselector.py:144
 msgctxt "TilesetSelector"
 msgid "Contact:"
-msgstr ""
+msgstr "संपर्कः:"
 
 #: src/tilesetselector.py:145
 msgctxt "TilesetSelector"
 msgid "Description:"
-msgstr ""
+msgstr "वर्णनम्‌:"
 
 #: src/user.py:94
 msgid ""
