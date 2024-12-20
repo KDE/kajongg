@@ -37,6 +37,9 @@ parts:
   libkmahjongg:
     plugin: cmake
     source: https://invent.kde.org/games/libkmahjongg.git
+    stage-packages:
+      - rsync
+      - libpopt0
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DCMAKE_BUILD_TYPE=Release
@@ -54,6 +57,9 @@ parts:
       - -DCMAKE_INSTALL_LIBDIR=lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR
       - --log-level=STATUS
       - -DCMAKE_LIBRARY_PATH=lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR
+    override-stage: |
+        craftctl default
+        rsync -a --ignore-existing $CRAFT_PART_INSTALL/ /
   kajongg:
     after:
     - libkmahjongg
@@ -62,6 +68,11 @@ parts:
     plugin: cmake
     source: .
     source-type: local
+    build-packages:
+      - python3-twisted
+      - libxkbcommon-dev
+    stage-packages:
+      - libxkbcommon0
     cmake-parameters:
       - -DCMAKE_INSTALL_PREFIX=/usr
       - -DCMAKE_BUILD_TYPE=Release
@@ -79,6 +90,8 @@ parts:
       - -DCMAKE_INSTALL_LIBDIR=lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR
       - --log-level=STATUS
       - -DCMAKE_LIBRARY_PATH=lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR
+    build-environment:
+      - LD_LIBRARY_PATH: /snap/kf6-core22-sdk/current/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}:/snap/kf6-core22-sdk/current/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/blas:/snap/kf6-core22-sdk/current/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}/lapack:/snap/kf6-core22-sdk/current/usr/lib:$CRAFT_STAGE/usr/lib/${CRAFT_ARCH_TRIPLET_BUILD_FOR}:$CRAFT_STAGE/usr/lib:$CRAFT_STAGE/lib/${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
     prime:
       - -usr/lib/*/cmake/*
       - -usr/include/*
@@ -88,6 +101,12 @@ parts:
       - -usr/lib/gcc/$CRAFT_ARCH_TRIPLET_BUILD_FOR/6.0.0
       - -usr/lib/aspell/*
       - -usr/share/lintian
+    override-build: |
+        craftctl default
+        rm $CRAFT_PART_INSTALL/usr/bin/kajongg
+        cp $CRAFT_PART_INSTALL/usr/share/kajongg/kajongg.py $CRAFT_PART_INSTALL/usr/bin/kajongg
+        rm $CRAFT_PART_INSTALL/usr/bin/kajonggserver
+        cp $CRAFT_PART_INSTALL/usr/share/kajongg/kajonggserver.py $CRAFT_PART_INSTALL/usr/bin/kajonggserver
   cleanup:
     after:
       - kajongg
@@ -95,10 +114,8 @@ parts:
     build-snaps:
       - core22
       - kf6-core22
-      - qt-common-themes
     override-prime: |
       set -eux
-      for snap in "core22" "kf6-core22" "qt-common-themes"; do
+      for snap in "core22" "kf6-core22"; do
           cd "/snap/$snap/current" && find . -type f,l -exec rm -rf "${CRAFT_PRIME}/{}" \;
       done
-
