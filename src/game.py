@@ -51,11 +51,11 @@ class HandId(ReprMixin):
 
     def __init__(self, game:'Game', string:Optional[str]=None, stringIdx:int=0) ->None:
         self.game = game
-        self.seed:int = game.seed
-        self.roundsFinished:int = 0
-        self.rotated:int = 0
-        self.notRotated:int = 0
-        self.moveCount:int = 0
+        self.seed = game.seed
+        self.roundsFinished = 0
+        self.rotated = 0
+        self.notRotated = 0
+        self.moveCount = 0
         if string is None:
             self.roundsFinished = game.roundsFinished
             self.rotated = game.rotated
@@ -231,9 +231,9 @@ class Game:
         self.gameid:Optional[int] = gameid
         self.playOpen:bool = False
         self.autoPlay:bool = False
-        self.handctr:int = 0
-        self.roundHandCount:int = 0
-        self.handDiscardCount:int = 0
+        self.handctr = 0
+        self.roundHandCount = 0
+        self.handDiscardCount = 0
         self.divideAt:Optional[int] = None
         self.__lastDiscard:Optional[Tile] = None  # always uppercase
         # TODO: use Tile.none and remove assertions in message.py and otherwhere
