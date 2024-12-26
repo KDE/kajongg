@@ -310,6 +310,8 @@ class Client(pb.Referenceable):
             self.game.assignPlayers(playerNames)
             if mustRotateWinds:
                 self.game.rotateWinds()
+                if self.game.finished():
+                    self.game.finish_in_db()
             self.game.prepareHand()
         # mypy 1.5.1 wants an explicit return
         return None

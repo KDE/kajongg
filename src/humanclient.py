@@ -806,6 +806,8 @@ class HumanClient(Client):
             """now that the user clicked the 'game over' prompt away, clean up"""
             if self.game:
                 self.game.rotateWinds()
+                if self.game.finished():
+                    self.game.finish_in_db()
                 _ = self.game.close()
                 if Internal.mainWindow:
                     _.addCallback(Internal.mainWindow.close).addErrback(logFailure)

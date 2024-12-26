@@ -577,6 +577,8 @@ class Game:
                 if not self.belongsToRobotPlayer():
                     self.debug(','.join(x.name for x in result), prevHandId=True)
             self.rotateWinds()
+            if self.finished():
+                self.finish_in_db()
         return bool(result)
 
     def rotateWinds(self) ->None:
@@ -599,8 +601,6 @@ class Game:
             if Internal.scene:
                 with AnimationSpeed(Speeds.windDisc):
                     cast('UIWall', self.wall).showWindDiscs()
-        if self.finished():
-            self.finish_in_db()
 
     def finish_in_db(self) ->None:
         """write endtime into db"""
