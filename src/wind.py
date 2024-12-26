@@ -11,9 +11,12 @@ SPDX-License-Identifier: GPL-2.0-only
 
 from typing import Any, List, TYPE_CHECKING
 
+from mi18n import i18nc
+
 if TYPE_CHECKING:
     from tile import Tile
     from board import WindDisc
+
 
 
 class Wind:
@@ -31,10 +34,16 @@ class Wind:
     tile : 'Tile'
     disc:'WindDisc'
 
+    # X is used in scoring games for moving back a tile to the central court
+    eswnx = 'ESWNX'
+    eswnx_i18n = 'ESWNX'
+
     def __new__(cls, *args:Any) ->'Wind':
         if not Wind.all:
             Wind.all = [object.__new__(cls) for cls in (_East, _South, _West, _North, _NoWind)]
             Wind.all4 = list(Wind.all[:4])
+            Wind.eswnx_i18n = i18nc('kajongg:keyboard commands for moving tiles to the players '
+                             'with wind ESWN or to the central tile selector (X)', Wind.eswnx)
         if len(args) == 1:
             windIdent = args[0]
             assert cls is Wind, f'{cls.__name__}({windIdent}) is illegal'

@@ -12,7 +12,7 @@ from typing import Optional, Union, TYPE_CHECKING, Any, Generator, Literal, cast
 from twisted.internet.defer import succeed, Deferred
 
 from log import logDebug, logFailure
-from mi18n import i18n, i18nc
+from mi18n import i18n
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import ReprMixin, Speeds, id4
 from wind import Wind
@@ -556,8 +556,7 @@ class ScoringScene(GameScene):
         key = event.key()
         wind = chr(key % 128)
         windsX = ''.join(x.char for x in Wind.all)
-        moveCommands = i18nc('kajongg:keyboard commands for moving tiles to the players '
-                             'with wind ESWN or to the central tile selector (X)', windsX)
+        moveCommands = Wind.eswnx_i18n
         uiTile = cast(UITile, self.focusItem())
         if wind in moveCommands:
             # translate i18n wind key to ESWN:
