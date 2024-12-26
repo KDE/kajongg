@@ -152,7 +152,8 @@ class ScoreItemDelegate(QStyledItemDelegate):
         index:Union[QModelIndex,'QPersistentModelIndex']) ->None:
         """where the real work is done..."""
         assert painter
-        assert isinstance(index, ScorePlayerItem)
+        assert isinstance(index, ScorePlayerItem), \
+            f'ScoreItemDelegate.paint(index={index}): index should be ScorePlayeritem'
         item = index.internalPointer()
         if isinstance(item, ScorePlayerItem) and item.parent and item.parent.row() == 3 and index.column() != 0:
             parent_item = cast(TreeItem, index.parent().internalPointer())
