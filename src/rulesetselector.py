@@ -62,6 +62,10 @@ class RuleTreeItem(TreeItem):
             item = item.parent
         return item.raw
 
+    def tooltip(self) ->str:
+        """the tooltip"""
+        return ""
+
 
 class RulesetItem(RuleTreeItem):
 
@@ -217,7 +221,7 @@ class RuleModel(TreeModel):
                     font.setItalic(True)
                     result = font
             elif role == Qt.ItemDataRole.ToolTipRole:
-                assert isinstance(item, RulesetItem)
+                assert isinstance(item, RuleTreeItem), item
                 tip = f'<b></b>{i18n(item.tooltip())}<b></b>' if item else ''
                 result = tip
         return result
