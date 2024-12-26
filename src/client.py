@@ -304,11 +304,11 @@ class Client(pb.Referenceable):
         return succeed(Message.OK)
 
     def readyForHandStart(self, playerNames:List[Tuple['Wind', str]],  # pylint:disable=useless-return,useless-suppression
-        rotateWinds:bool) ->Optional[Deferred]:
+        mustRotateWinds:bool) ->Optional[Deferred]:
         """the game server asks us if we are ready. A robot is always ready..."""
         if self.game:
             self.game.assignPlayers(playerNames)
-            if rotateWinds:
+            if mustRotateWinds:
                 self.game.rotateWinds()
             self.game.prepareHand()
         # mypy 1.5.1 wants an explicit return

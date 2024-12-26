@@ -55,7 +55,7 @@ class Move(ReprMixin):  # pylint: disable=too-many-instance-attributes
         self.shouldSave:bool
         self.playerNames:List[Tuple[Wind, str]]
         self.deadEnd:bool
-        self.rotateWinds:bool
+        self.mustRotateWinds:bool
         self.divideAt:int
         self.tableid:int
         self.gameid:int

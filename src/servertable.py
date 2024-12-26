@@ -692,7 +692,7 @@ class ServerTable(Table, ReprMixin):
         token = self.game.handId.prompt(
             withAI=False)  # we need to send the old token until the
                                    # clients started the new hand
-        rotateWinds = self.game.maybeRotateWinds()
+        mustRotateWinds = self.game.maybeRotateWinds()
         if self.game.finished():
             self.server.removeTable(
                 self,
@@ -705,7 +705,7 @@ class ServerTable(Table, ReprMixin):
             return
         self.game.sortPlayers()
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,
-                     players=self.game.players, rotateWinds=rotateWinds, token=token)
+                     players=self.game.players, mustRotateWinds=mustRotateWinds, token=token)
 
     def abort(self, message:str, *args:Any) ->None:
         """abort the table. Reason: message/args"""

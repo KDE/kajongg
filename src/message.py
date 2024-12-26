@@ -586,7 +586,7 @@ class MessageReadyForHandStart(ServerMessage):
 
     def clientAction(self, client:'Client', move:'Move') ->Any:
         """ask the client"""
-        return client.readyForHandStart(move.playerNames, move.rotateWinds)
+        return client.readyForHandStart(move.playerNames, move.mustRotateWinds)
 
 
 class MessageInitHand(ServerMessage):

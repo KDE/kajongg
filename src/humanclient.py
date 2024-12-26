@@ -673,11 +673,11 @@ class HumanClient(Client):
             answered).addErrback(cancelled)
         return self.beginQuestion
 
-    def readyForHandStart(self, playerNames:List[Tuple['Wind', str]], rotateWinds:bool) ->Optional[Deferred]:
+    def readyForHandStart(self, playerNames:List[Tuple['Wind', str]], mustRotateWinds:bool) ->Optional[Deferred]:
         """playerNames are in wind order ESWN. Never called for first hand."""
         def answered(unused:Optional[List['Request']]=None) ->Optional[Deferred]:
             """called after the client player said yes, I am ready"""
-            return Client.readyForHandStart(self, playerNames, rotateWinds) if self.connection else None
+            return Client.readyForHandStart(self, playerNames, mustRotateWinds) if self.connection else None
         if not self.connection:
             # disconnected meanwhile
             return None
