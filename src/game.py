@@ -459,6 +459,12 @@ class Game:
                             player.sideText.animateNextChange = True
                         player.sideText.board = player.front
 
+    def goto(self, handId:HandId) ->None:
+        """go to the position defined by handId"""
+        for _ in range(handId.roundsFinished * 4 + handId.rotated):
+            self.rotateWinds()
+        self.notRotated = handId.notRotated
+
     @staticmethod
     def _newGameId() ->int:
         """write a new entry in the game table
@@ -1002,9 +1008,7 @@ class PlayingGame(Game):
             if first > last:
                 raise UserWarning(f'{first}..{last} is a negative range')
             handId = HandId(self, self.wantedGame)
-            for _ in range(handId.roundsFinished * 4 + handId.rotated):
-                self.rotateWinds()
-            self.notRotated = handId.notRotated
+            self.goto(handId)
 
     def assignVoices(self) ->None:
         """now we have all remote user voices"""
