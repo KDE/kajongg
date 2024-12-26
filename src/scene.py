@@ -15,7 +15,7 @@ from log import logDebug, logFailure
 from mi18n import i18n
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import ReprMixin, Speeds, id4
-from wind import Wind
+from wind import Wind, NoWind
 
 from qt import Qt, QMetaObject
 from qt import QGraphicsScene, QGraphicsItem, QGraphicsRectItem, QPen, QColor
@@ -530,14 +530,14 @@ class ScoringScene(GameScene):
         return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(
             answered).addErrback(logFailure)
 
-    def __moveTile(self, uiTile:UITile, wind:str, toConcealed:bool) ->None:
+    def __moveTile(self, uiTile:UITile, wind:Wind, toConcealed:bool) ->None:
         """the user pressed a wind letter or X for center, wanting to move a uiTile there"""
         # this tells the receiving board that this is keyboard, not mouse navigation>
         # needed for useful placement of the popup menu
-        if wind == 'X':
+        if wind is NoWind:
             receiver = self.selectorBoard
         else:
-            receiver = self.game.players[Wind(wind)].handBoard
+            receiver = self.game.players[wind].handBoard
         currentBoard = uiTile.board
         assert currentBoard
         movingMeld = currentBoard.uiMeldWithTile(uiTile)
@@ -552,16 +552,12 @@ class ScoringScene(GameScene):
 
     def __navigateScoringGame(self, event:'QKeyEvent') ->bool:
         """keyboard navigation in a scoring game"""
-        mod = event.modifiers()
         key = event.key()
-        wind = chr(key % 128)
-        windsX = ''.join(x.char for x in Wind.all)
-        moveCommands = Wind.eswnx_i18n
         uiTile = cast(UITile, self.focusItem())
-        if wind in moveCommands:
-            # translate i18n wind key to ESWN:
-            wind_chr = windsX[moveCommands.index(wind)]
-            self.__moveTile(uiTile, wind_chr, bool(mod & Qt.KeyboardModifier.ShiftModifier))
+        wind = Wind.normalized(key)
+        if wind is not None:
+            shift = bool(event.modifiers() & Qt.KeyboardModifier.ShiftModifier)
+            self.__moveTile(uiTile, wind, shift)
             return True
         if key == Qt.Key.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
