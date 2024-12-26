@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0-only
 
 # pylint: disable=invalid-name
 
-from typing import Any, List, TYPE_CHECKING
+from typing import Any, List, Optional, TYPE_CHECKING
 
 from mi18n import i18nc
 
@@ -97,6 +97,13 @@ class Wind:
     def __repr__(self) ->str:
         return f'Wind.{self.char}'
 
+    @classmethod
+    def normalized(cls, key:int) -> Optional['Wind']:
+        """translate i18n key to wanted Wind. None if key is not a Wind character"""
+        try:
+            return Wind.all[cls.eswnx_i18n.index(chr(key))]
+        except ValueError:
+            return None
 
 class _East(Wind):
     """East"""
