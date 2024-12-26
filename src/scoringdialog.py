@@ -20,6 +20,7 @@ from qt import QAbstractItemView, QHeaderView
 from qt import QTreeView, QFont, QFrame
 from qt import QStyledItemDelegate
 from qt import QBrush, QPalette
+from qt import PYQT6
 from kde import KDialogButtonBox, KApplication
 
 from modeltest import ModelTest
@@ -152,12 +153,12 @@ class ScoreItemDelegate(QStyledItemDelegate):
         index:Union[QModelIndex,'QPersistentModelIndex']) ->None:
         """where the real work is done..."""
         assert painter
-        assert isinstance(index, ScorePlayerItem), \
-            f'ScoreItemDelegate.paint(index={index}): index should be ScorePlayeritem'
+        assert isinstance(index, QModelIndex), index
         item = index.internalPointer()
         if isinstance(item, ScorePlayerItem) and item.parent and item.parent.row() == 3 and index.column() != 0:
             parent_item = cast(TreeItem, index.parent().internalPointer())
             for idx, playerItem in enumerate(parent_item.children):
+                assert isinstance(playerItem, ScorePlayerItem), playerItem
                 rect = option.rect  # type:ignore[attr-defined]
                 chart = cast('ScoreModel', index.model()).chart(rect, index, playerItem)
                 if chart:
@@ -169,7 +170,11 @@ class ScoreItemDelegate(QStyledItemDelegate):
                         # separately per cell beause the lines spread vertically over two rows: We would
                         # have to draw the lines into one big pixmap and copy
                         # from the into the cells
-                        painter.drawPolyline(chart)
+                        if PYQT6:
+                            # seems the annotations are wrong: list(QPointF) does work
+                            painter.drawPolyline(chart)  # type:ignore[call-overload]
+                        else:
+                            painter.drawPolyline(chart)
             return
         QStyledItemDelegate.paint(self, painter, option, index)
 
