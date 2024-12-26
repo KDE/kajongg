@@ -593,14 +593,7 @@ class Game:
             self.roundsFinished += 1
             self.rotated = 0
             self.roundHandCount = 0
-        if self.finished():
-            endtime = datetime.datetime.now().replace(
-                microsecond=0).isoformat()
-            assert self.gameid
-            with Internal.db as transaction:
-                transaction.execute(
-                    f'UPDATE game set endtime = "{endtime}" where id = {int(self.gameid)}')
-        elif not self.belongsToPlayer():
+        if not self.finished() and not self.belongsToPlayer():
             # the game server already told us the new placement and winds
             winds = [player.wind for player in self.players]
             winds = winds[3:] + winds[0:3]
@@ -612,6 +605,17 @@ class Game:
             if Internal.scene:
                 with AnimationSpeed(Speeds.windDisc):
                     cast('UIWall', self.wall).showWindDiscs()
+        if self.finished():
+            self.finish_in_db()
+
+    def finish_in_db(self) ->None:
+        """write endtime into db"""
+        endtime = datetime.datetime.now().replace(
+            microsecond=0).isoformat()
+        assert self.gameid
+        with Internal.db as transaction:
+            transaction.execute(
+                f'UPDATE game set endtime = "{endtime}" where id = {int(self.gameid)}')
 
     def debug(self, msg:str, btIndent:Optional[int]=None, prevHandId:bool=False, showStack:bool=False) ->None:
         """
