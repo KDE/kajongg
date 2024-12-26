@@ -65,12 +65,6 @@ class HandId(ReprMixin):
             self.__scanHandId(string, stringIdx)
         assert self.rotated < 4, self
 
-    def goto(self) ->None:
-        """advance game to self"""
-        for _ in range(self.roundsFinished * 4 + self.rotated):
-            self.game.rotateWinds()
-        self.game.notRotated = self.notRotated
-
     def __scanHandId(self, string:str, stringIdx:int) ->None:
         """get the --game option.
         stringIdx 0 is the part in front of ..
@@ -1007,7 +1001,10 @@ class PlayingGame(Game):
             first, last = (HandId(self, self.wantedGame, x) for x in (0, 1))
             if first > last:
                 raise UserWarning(f'{first}..{last} is a negative range')
-            HandId(self, self.wantedGame).goto()
+            handId = HandId(self, self.wantedGame)
+            for _ in range(handId.roundsFinished * 4 + handId.rotated):
+                self.rotateWinds()
+            self.notRotated = handId.notRotated
 
     def assignVoices(self) ->None:
         """now we have all remote user voices"""
