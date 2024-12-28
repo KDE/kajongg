@@ -130,7 +130,7 @@ def logMessage(msg:Union[Exception, str], prio:int, showDialog:bool,
         summary = traceback.StackSummary.extract(_, limit=3, capture_locals=True)
         logSummary(summary, prio)
     if int(Debug.callers):
-        __logUnicodeMessage(prio, callers(int(Debug.callers)))
+        __logUnicodeMessage(prio, '    ' + callers(int(Debug.callers)))
     if showDialog and not Internal.isServer:
         return Information(msg) if prio == logging.INFO else Sorry(msg, always=True)
     return NoPrompt(msg)
