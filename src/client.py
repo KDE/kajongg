@@ -395,9 +395,9 @@ class Client(pb.Referenceable):
                     logDebug(f'got Move: {move!r}')
         if self.game:
             if move.token:
-                if move.token != self.game.handId.token():
+                if move.token != self.game.point.token():
                     logException(
-                        f'wrong token: {move.token}, we have {self.game.handId.token()}')
+                        f'wrong token: {move.token}, we have {self.game.point.token()}')
         with Duration(f'{move!r}:'):
             try:
                 result = self.exec_move(move).addCallback(self.__jellyMessage)
@@ -438,7 +438,7 @@ class Client(pb.Referenceable):
 #                            if game.myself.sayable[Message.Chow]:
 # I may say Chow
 #                                logDebug('FOUND EXAMPLE FOR %s IN %s' % (game.myself,
-#                                       game.handId.prompt(withMoveCount=True)))
+#                                       game.point.prompt(withMoveCount=True)))
 
         if message == Message.Discard:
             # do not block here, we want to get the clientDialog

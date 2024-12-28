@@ -364,7 +364,7 @@ class DeferredBlock(ReprMixin):
         if game and game.gameid and 'token' not in kwargs:
             # this lets the client assert that the message is meant for the
             # current hand
-            kwargs['token'] = game.handId.token()
+            kwargs['token'] = game.point.token()
         else:
             kwargs['token'] = None
 

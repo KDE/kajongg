@@ -259,7 +259,7 @@ class ScoreModel(TreeModel):
                 hands = child1.hands()
                 handResult = hands[section - 1]
                 if not handResult.penalty:
-                    return handResult.handId()
+                    return handResult.point()
         elif role == Qt.ItemDataRole.TextAlignmentRole:
             return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter) \
                 if section == 0 else int(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
@@ -330,7 +330,7 @@ class HandResult:
         return (f'{int(self.penalty)} {int(self.points)} {self.wind} '
                 f'{int(self.payments)} {int(self.balance)} {self.manualrules}')
 
-    def handId(self) ->str:
+    def point(self) ->str:
         """identifies the hand for window title and scoring table"""
         character = chr(
             ord('a') - 1 + self.notRotated) if self.notRotated else ''

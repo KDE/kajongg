@@ -45,9 +45,9 @@ if TYPE_CHECKING:
 
 
 @total_ordering
-class HandId(ReprMixin):
+class Point(ReprMixin):
 
-    """handle a string representing a hand Id"""
+    """A point in time of a game. Useful for positioning after abort/restart"""
 
     def __init__(self, game:'Game', string:Optional[str]=None, stringIdx:int=0) ->None:
         self.game = game
@@ -62,10 +62,10 @@ class HandId(ReprMixin):
             self.notRotated = game.notRotated
             self.moveCount = len(game.moves)
         else:
-            self.__scanHandId(string, stringIdx)
+            self.__scanPoint(string, stringIdx)
         assert self.rotated < 4, self
 
-    def __scanHandId(self, string:str, stringIdx:int) ->None:
+    def __scanPoint(self, string:str, stringIdx:int) ->None:
         """get the --game option.
         stringIdx 0 is the part in front of ..
         stringIdx 1 is the part after ..
@@ -90,10 +90,10 @@ class HandId(ReprMixin):
             if stringIdx == 1 and parts[1] == '':
                 self.roundsFinished = 100
                 return
-        handId = parts[min(stringIdx, len(parts) - 1)]
-        if handId[0].lower() not in 'eswn':
+        point = parts[min(stringIdx, len(parts) - 1)]
+        if point[0].lower() not in 'eswn':
             logException(f'--game={string} must specify the round wind')
-        handWind = Wind(handId[0])
+        handWind = Wind(point[0])
         ruleset = self.game.ruleset
         self.roundsFinished = handWind.__index__()
         minRounds = ruleset.minRounds  # type:ignore[attr-defined]
@@ -103,13 +103,13 @@ class HandId(ReprMixin):
                 f'but you want round {int(self.roundsFinished + 1)}({handWind})')
             self.roundsFinished = minRounds
             return
-        self.rotated = int(handId[1]) - 1
+        self.rotated = int(point[1]) - 1
         if self.rotated > 3:
             logWarning(
                 f'You want {int(self.rotated)} rotations, reducing to maximum of 3')
             self.rotated = 3
             return
-        for char in handId[2:]:
+        for char in point[2:]:
             if char < 'a':
                 logWarning(f'you want {char}, changed to a')
                 char = 'a'
@@ -170,7 +170,7 @@ class HandId(ReprMixin):
         return self.prompt()
 
     def __eq__(self, other:object) ->bool:
-        if not isinstance(other, HandId):
+        if not isinstance(other, Point):
             return NotImplemented
         return (self.roundsFinished, self.rotated, self.notRotated) == \
                 (other.roundsFinished, other.rotated, other.notRotated)
@@ -179,7 +179,7 @@ class HandId(ReprMixin):
         return not self == other
 
     def __lt__(self, other:object) ->bool:
-        if not isinstance(other, HandId):
+        if not isinstance(other, Point):
             return NotImplemented
         return (self.roundsFinished, self.rotated, self.notRotated) < (
             other.roundsFinished, other.rotated, other.notRotated)
@@ -217,8 +217,8 @@ class Game:
         self.notRotated:int = 0  # counts hands since last rotation
         self.ruleset:Ruleset = ruleset
         self.roundsFinished:int = 0
-        self._currentHandId:Optional[HandId] = None
-        self._prevHandId:Optional[HandId] = None
+        self._currentPoint:Optional[Point] = None
+        self._prevPoint:Optional[Point] = None
         self.wantedGame:Optional[str] = wantedGame
         self.moves:List['Move'] = []
         self.gameid:Optional[int] = gameid
@@ -266,12 +266,12 @@ class Game:
         self.__shouldSave = value
 
     @property
-    def handId(self) ->HandId:
+    def point(self) ->Point:
         """current position in game"""
-        result = HandId(self)
-        if result != self._currentHandId:
-            self._prevHandId = self._currentHandId
-            self._currentHandId = result
+        result = Point(self)
+        if result != self._currentPoint:
+            self._prevPoint = self._currentPoint
+            self._currentPoint = result
         return result
 
     @property
@@ -346,7 +346,7 @@ class Game:
     def addCsvTag(self, tag:str, forAllPlayers:bool=False) ->None:
         """tag will be written to tag field in csv row"""
         if forAllPlayers or self.belongsToHumanPlayer():
-            self.csvTags.append(f'{tag}/{self.handId.prompt(withSeed=False)}')
+            self.csvTags.append(f'{tag}/{self.point.prompt(withSeed=False)}')
 
     def isFirstHand(self) ->bool:
         """as the name says"""
@@ -459,11 +459,11 @@ class Game:
                             player.sideText.animateNextChange = True
                         player.sideText.board = player.front
 
-    def goto(self, handId:HandId) ->None:
-        """go to the position defined by handId"""
-        for _ in range(handId.roundsFinished * 4 + handId.rotated):
+    def goto(self, point:Point) ->None:
+        """go to the position defined by point"""
+        for _ in range(point.roundsFinished * 4 + point.rotated):
             self.rotateWinds()
-        self.notRotated = handId.notRotated
+        self.notRotated = point.notRotated
 
     @staticmethod
     def _newGameId() ->int:
@@ -581,7 +581,7 @@ class Game:
         if result:
             if Debug.explain:
                 if not self.belongsToRobotPlayer():
-                    self.debug(','.join(x.name for x in result), prevHandId=True)
+                    self.debug(','.join(x.name for x in result), prevPoint=True)
             self.rotateWinds()
             if self.finished():
                 self.finish_in_db()
@@ -617,7 +617,7 @@ class Game:
             transaction.execute(
                 f'UPDATE game set endtime = "{endtime}" where id = {int(self.gameid)}')
 
-    def debug(self, msg:str, btIndent:Optional[int]=None, prevHandId:bool=False, showStack:bool=False) ->None:
+    def debug(self, msg:str, btIndent:Optional[int]=None, prevPoint:bool=False, showStack:bool=False) ->None:
         """
         Log a debug message.
 
@@ -626,8 +626,8 @@ class Game:
         @param btIndent: If given, message is indented by
         depth(backtrace)-btIndent
         @type btIndent: C{int}
-        @param prevHandId: If True, do not use current handId but previous
-        @type prevHandId: C{bool}
+        @param prevPoint: If True, do not use current point but previous
+        @type prevPoint: C{bool}
         """
         if self.belongsToRobotPlayer():
             prefix = 'R'
@@ -638,11 +638,11 @@ class Game:
         else:
             logDebug(msg, btIndent=btIndent)
             return
-        handId = self._prevHandId if prevHandId else self.handId
-        assert handId
-        handId_str = handId.prompt(withMoveCount=True)
+        point = self._prevPoint if prevPoint else self.point
+        assert point
+        point_str = point.prompt(withMoveCount=True)
         logDebug(
-            f'{prefix}{handId_str}: {msg}',
+            f'{prefix}{point_str}: {msg}',
             withGamePrefix=False,
             btIndent=btIndent,
             showStack=showStack)
@@ -728,10 +728,10 @@ class Game:
 
     def finished(self) ->bool:
         """The game is over after minRounds completed rounds. Also,
-        check if we reached the second handId defined by --game.
+        check if we reached the second point defined by --game.
         If we did, the game is over too"""
-        last = HandId(self, self.wantedGame, 1)
-        if self.handId > last:
+        last = Point(self, self.wantedGame, 1)
+        if self.point > last:
             return True
         if Options.rounds:
             return self.roundsFinished >= Options.rounds
@@ -752,7 +752,7 @@ class Game:
             if payAction:
                 assert isinstance(guilty, Player)  # mypy should be able to infer this
                 if Debug.dangerousGame:
-                    self.debug(f'{self.handId}: winner {winner}. {guilty} pays for all')
+                    self.debug(f'{self.point}: winner {winner}. {guilty} pays for all')
                 guilty.hand.usedRules.append(UsedRule(payAction))
                 score = winner.handTotal
                 score = score * 6 if winner.wind == East else score * 4
@@ -1004,11 +1004,11 @@ class PlayingGame(Game):
     def _scanGameOption(self) ->None:
         """scan the --game option and go to start of wanted hand"""
         if self.wantedGame and '/' in self.wantedGame:
-            first, last = (HandId(self, self.wantedGame, x) for x in (0, 1))
+            first, last = (Point(self, self.wantedGame, x) for x in (0, 1))
             if first > last:
                 raise UserWarning(f'{first}..{last} is a negative range')
-            handId = HandId(self, self.wantedGame)
-            self.goto(handId)
+            point = Point(self, self.wantedGame)
+            self.goto(point)
 
     def assignVoices(self) ->None:
         """now we have all remote user voices"""

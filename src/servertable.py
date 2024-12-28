@@ -689,7 +689,7 @@ class ServerTable(Table, ReprMixin):
             if block.table == self:
                 logError(
                     f'request left from previous hand: {block.outstandingStr()}')
-        token = self.game.handId.prompt(
+        token = self.game.point.prompt(
             withAI=False)  # we need to send the old token until the
                                    # clients started the new hand
         mustRotateWinds = self.game.maybeRotateWinds()
@@ -796,7 +796,7 @@ class ServerTable(Table, ReprMixin):
         withDiscard:Optional[Tile] = Tile(msg.args[1]) if msg.args[1] else None
         lastMeld = Meld(msg.args[2])
         if self.game.ruleset.mustDeclareCallingHand:
-            assert player.isCalling, (f'{self.game.handId} {player.hand} {player} says MJ but never claimed: '
+            assert player.isCalling, (f'{self.game.point} {player.hand} {player} says MJ but never claimed: '
                                      f'concmelds:{concealedMelds} withdiscard:{withDiscard} lastmeld:{lastMeld}')
         discardingPlayer = self.game.activePlayer
         lastMove = next(self.game.lastMoves(withoutNotifications=True))

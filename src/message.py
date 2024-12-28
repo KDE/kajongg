@@ -606,7 +606,7 @@ class MessageInitHand(ServerMessage):
             scene.mainWindow.setWindowTitle(
                 i18n(
                     'Kajongg <numid>%1</numid>',
-                    client.game.handId.seed))
+                    client.game.point.seed))
             scene.discardBoard.setRandomPlaces(client.game)
         client.game.initHand()
 
