@@ -75,12 +75,12 @@ class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):  # ty
         return self.__wind
 
     @property
-    def prevailing(self) ->bool:
+    def is_prevailing(self) ->bool:
         """is this the prevailing wind?"""
         return self.__brush is self.roundWindColor
 
-    @prevailing.setter
-    def prevailing(self, value:bool) ->None:
+    @is_prevailing.setter
+    def is_prevailing(self, value:bool) ->None:
         if isinstance(value, bool):
             newPrevailing = value
         else:
@@ -156,7 +156,7 @@ class WindLabel(QLabel):
     def genWindPixmap(self) ->QPixmap:
         """prepare wind tiles"""
         pwind = WindDisc(self.__wind)
-        pwind.prevailing = self.__wind == Wind.all4[min(self.__roundsFinished, 3)]
+        pwind.is_prevailing = self.__wind == Wind.all4[min(self.__roundsFinished, 3)]
         pMap = QPixmap(40, 40)
         pMap.fill(Qt.GlobalColor.transparent)
         painter = QPainter(pMap)
