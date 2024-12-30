@@ -157,6 +157,7 @@ class GameScene(SceneWithFocusRect):
         self.setupUi()
         assert Internal.Preferences
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
+        Internal.Preferences.addWatch('animationSpeed', Speeds.refresh)
 
     @property
     def game(self) ->Optional['Game']:

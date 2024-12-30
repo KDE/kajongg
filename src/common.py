@@ -529,9 +529,21 @@ class ZValues:
 
 
 class Speeds:
-    """some fixed animation speeds"""
-    windDisc = 20
-    sideText = 60
+    """some animation speeds in % of animationSpeed"""
+
+    windDiscPercent = 70
+    sideTextPercent = 80
+
+    # The values below will change when animationSpeed changes.
+
+    windDisc = 0
+    sideText = 0
+
+    @classmethod
+    def refresh(cls, unusedOldValue:int, newValue:int) ->None:
+        """recompute"""
+        cls.windDisc = int(newValue * cls.windDiscPercent / 100)
+        cls.sideText = int(newValue * cls.sideTextPercent / 100)
 
 
 class DrawOnTopMixin:
