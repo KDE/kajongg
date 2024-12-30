@@ -78,7 +78,7 @@ class Point(ReprMixin):
         self.seed = seed
         if '/' not in string:
             if stringIdx == 1:
-                self.roundsFinished = 100
+                self.roundsFinished = 4
             return
         string1 = string.split('/')[1]
         if not string1:
@@ -88,7 +88,7 @@ class Point(ReprMixin):
             if stringIdx == 0 and parts[0] == '':
                 return
             if stringIdx == 1 and parts[1] == '':
-                self.roundsFinished = 100
+                self.roundsFinished = 4
                 return
         point = parts[min(stringIdx, len(parts) - 1)]
         if point[0].lower() not in 'eswn':
@@ -216,7 +216,7 @@ class Game:
         self.rotated:int = 0
         self.notRotated:int = 0  # counts hands since last rotation
         self.ruleset:Ruleset = ruleset
-        self.roundsFinished:int = 0
+        self.roundWind:Wind = East
         self._currentPoint:Optional[Point] = None
         self._prevPoint:Optional[Point] = None
         self.wantedGame:Optional[str] = wantedGame
@@ -339,9 +339,14 @@ class Game:
                 value.invalidateHand()
 
     @property
-    def roundWind(self) ->Wind:
-        """the round wind for Hand"""
-        return Wind.all[self.roundsFinished % 4]
+    def roundsFinished(self) ->int:
+        """rounds finished as given by round wind"""
+        return self.roundWind.__index__()
+
+    @roundsFinished.setter
+    def roundsFinished(self, value:int) ->None:
+        """next round"""
+        self.roundWind = Wind.all[value]
 
     def addCsvTag(self, tag:str, forAllPlayers:bool=False) ->None:
         """tag will be written to tag field in csv row"""
