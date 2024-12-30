@@ -28,7 +28,7 @@ from log import logDebug, logException
 from mi18n import i18n, i18nc
 from common import LIGHTSOURCES, Internal, Debug, isAlive, ReprMixin
 from common import DrawOnTopMixin
-from wind import Wind, East
+from wind import Wind, East, NoWind
 
 if TYPE_CHECKING:
     from qt import QGraphicsSceneDragDropEvent, QWidget, QSizeF
@@ -117,12 +117,12 @@ class WindLabel(QLabel):
 
     """QLabel holding the wind tile"""
 
-    def __init__(self, wind:Optional[Wind]=None, roundsFinished:int=0, parent:Optional['QWidget']=None):
+    def __init__(self, wind:Optional[Wind]=None, parent:Optional['QWidget']=None):
         QLabel.__init__(self, parent)
         if wind is None:
             wind = East
         self.__wind:Wind
-        self.__roundsFinished = roundsFinished
+        self.__prevailing:Wind = NoWind
         self.wind = wind
 
     @property
@@ -138,15 +138,15 @@ class WindLabel(QLabel):
             self._refresh()
 
     @property
-    def roundsFinished(self) ->int:
-        """setting roundsFinished also changes graphics if needed"""
-        return self.__roundsFinished
+    def prevailing(self) ->Wind:
+        """setting prevailing also changes graphics if needed"""
+        return self.__prevailing
 
-    @roundsFinished.setter
-    def roundsFinished(self, roundsFinished:int) ->None:
-        """setting roundsFinished also changes graphics if needed"""
-        if self.__roundsFinished != roundsFinished:
-            self.__roundsFinished = roundsFinished
+    @prevailing.setter
+    def prevailing(self, value:Wind) ->None:
+        """setting prevailing also changes graphics if needed"""
+        if self.__prevailing != value:
+            self.__prevailing = value
             self._refresh()
 
     def _refresh(self) ->None:
@@ -156,7 +156,7 @@ class WindLabel(QLabel):
     def genWindPixmap(self) ->QPixmap:
         """prepare wind tiles"""
         pwind = WindDisc(self.__wind)
-        pwind.is_prevailing = self.__wind == Wind.all4[min(self.__roundsFinished, 3)]
+        pwind.is_prevailing = self.__wind == self.__prevailing
         pMap = QPixmap(40, 40)
         pMap.fill(Qt.GlobalColor.transparent)
         painter = QPainter(pMap)
