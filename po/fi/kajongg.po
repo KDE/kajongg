@@ -1,6 +1,6 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
-# Tommi Nieminen <translator@legisign.org>, 2011, 2014, 2015, 2016, 2018, 2021, 2023.
+# SPDX-FileCopyrightText: 2011, 2014, 2015, 2016, 2018, 2021, 2023, 2024 Tommi Nieminen <translator@legisign.org>
 # Lasse Liehu <lasse.liehu@gmail.com>, 2012, 2013, 2014.
 #
 # KDE Finnish translation sprint participants:
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-10-10 00:37+0000\n"
-"PO-Revision-Date: 2023-05-15 18:57+0300\n"
+"PO-Revision-Date: 2024-12-14 20:58+0200\n"
 "Last-Translator: Tommi Nieminen <translator@legisign.org>\n"
 "Language-Team: Finnish <kde-i18n-doc@kde.org>\n"
 "Language: fi\n"
@@ -19,6 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 23.08.5\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -35,36 +36,26 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "tiedosto <filename>%1</filename> ei sisällä kelvollista SVG:tä"
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "Esikatselu"
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "Ominaisuudet"
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
 msgstr "Tekijä:"
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "Yhteystiedot:"
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "Kuvaus:"
@@ -321,9 +312,6 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "älä näytä graafista käyttöliittymää (tarkoitettu vain testaukseen)"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
@@ -331,8 +319,6 @@ msgstr ""
 "käytä PISTOKEtta kuuntelevaa erityispalvelinta. Tarkoitettu vain testaukseen"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
@@ -1620,10 +1606,8 @@ msgid "Calling for Only Honors"
 msgstr ""
 
 #: src/predefined.py:454
-#, fuzzy
-#| msgid "Winding Snake"
 msgid "Calling for Wriggling Snake"
-msgstr "Kiemurtava käärme"
+msgstr "Kutsutaan kiemurtavaa käärmettä"
 
 #: src/predefined.py:458
 msgid "Calling for Triple Knitting"
@@ -1631,7 +1615,7 @@ msgstr ""
 
 #: src/predefined.py:462
 msgid "Calling for Gates of Heaven"
-msgstr ""
+msgstr "Kutsutaan taivaan portteja"
 
 #: src/predefined.py:465
 msgid "Calling for Knitting"
@@ -1639,17 +1623,15 @@ msgstr ""
 
 #: src/predefined.py:469
 msgid "Calling for Imperial Jade"
-msgstr ""
+msgstr "Kutsutaan keisarillista jadea"
 
 #: src/predefined.py:473
-#, fuzzy
-#| msgid "All Seasons"
 msgid "Calling for The 13 Unique Wonders"
-msgstr "Kaikki vuodenajat"
+msgstr "Kutsuttaa 13:a ainutkertaista ihmettä"
 
 #: src/predefined.py:476
 msgid "Calling for Three Great Scholars"
-msgstr ""
+msgstr "Kutsutaan kolmea suurta oppinutta"
 
 #: src/predefined.py:479
 #, fuzzy
@@ -1659,17 +1641,15 @@ msgstr "Kaikki vuodenajat"
 
 #: src/predefined.py:483
 msgid "Calling for Heads and Tails"
-msgstr ""
+msgstr "Kutsutaan kruunia ja klaavoja"
 
 #: src/predefined.py:487
 msgid "Calling for Four Blessings Hovering over the Door"
-msgstr ""
+msgstr "Kutsutaan neljä oven yllä leijuvaa siunausta"
 
 #: src/predefined.py:490
-#, fuzzy
-#| msgid "Hidden Treasure"
 msgid "Calling for Buried Treasure"
-msgstr "Kätketty aarre"
+msgstr "Kutsutaan kätkettyä aarretta"
 
 #: src/predefined.py:494
 msgid "Calling for Fourfold Plenty"
@@ -2009,10 +1989,8 @@ msgid "Player %1 has logged out"
 msgstr "Pelaaja %1 on kirjautunut ulos"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "palvelin kuuntelee PORTTIA (%d)"
+msgstr "palvelin kuuntelee PORTTIA ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
@@ -2356,36 +2334,26 @@ msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "Esikatselu"
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "Ominaisuudet"
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
 msgstr "Tekijä:"
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "Yhteystiedot:"
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "Kuvaus:"
