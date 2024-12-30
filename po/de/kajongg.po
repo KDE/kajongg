@@ -1,7 +1,7 @@
+# SPDX-FileCopyrightText: 2010, 2024 Johannes Obermayr <johannesobermayr@gmx.de>
 # Wolfgang Rohdewald <wolfgang@rohdewald.de>, 2008, 2009, 2010, 2011, 2012, 2013.
 # Thomas Reitelbach <tr@erdfunkstelle.de>, 2008.
 # Burkhard Lück <lueck@hube-lueck.de>, 2009, 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2019, 2020, 2021.
-# Johannes Obermayr <johannesobermayr@gmx.de>, 2010.
 # Panagiotis Papadopoulos <pano_90@gmx.net>, 2010.
 # Frederik Schwarzer <schwarzer@kde.org>, 2010, 2011, 2012, 2015, 2016, 2022.
 # Jonas Schürmann <jonasschuermann@aol.de>, 2012.
@@ -11,15 +11,15 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-10-10 00:37+0000\n"
-"PO-Revision-Date: 2022-11-10 20:26+0100\n"
-"Last-Translator: Frank Steinmetzger <dev-kde@felsenfleischer.de>\n"
+"PO-Revision-Date: 2024-12-28 23:07+0100\n"
+"Last-Translator: Johannes Obermayr <johannesobermayr@gmx.de>\n"
 "Language-Team: German <kde-i18n-de@kde.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 22.08.3\n"
+"X-Generator: Lokalize 25.03.70\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -36,36 +36,26 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "Datei <filename>%1</filename> enthält keine gültigen SVG-Daten"
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "Vorschau"
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "Eigenschaften"
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
 msgstr "Autor:"
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "Kontakt:"
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "Beschreibung:"
@@ -324,21 +314,20 @@ msgstr ""
 "Keine grafische Benutzeroberfläche anzeigen. Dies ist nur zum Testen gedacht."
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr "Einen eigenen Server auf SOCKET starten. Wird nur zum Testen verwendet"
+msgstr ""
+"Einen eigenen bereits laufenden Server auf SOCKET verwenden. Wird nur zum "
+"Testen verwendet"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
-msgstr "Einen eigenen Server auf PORT starten. Wird nur zum Testen verwendet"
+msgstr ""
+"Einen eigenen bereits laufenden Server auf PORT verwenden. Wird nur zum "
+"Testen verwendet"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1197,24 +1186,24 @@ msgid "Standard Rotation"
 msgstr "Standarddrehung"
 
 #: src/predefined.py:147
-#, fuzzy
-#| msgid "Discarded tile %1 is not in meld %2"
 msgid "Discard tiles ordered"
-msgstr "Abgelegter Ziegel %1 ist nicht im Bild %2"
+msgstr "Ziegel geordnet ablegen"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Ziegel von oben links geordnet ablegen"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Löcher bei gerufenen Ablagen belassen"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Nur bei geordneter Ablage der Ziegel: Die nächste Ablage sollte nicht an der "
+"Stelle der gerufenen Ablage erfolgen"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -2031,10 +2020,8 @@ msgid "Player %1 has logged out"
 msgstr "Spieler %1 hat sich abgemeldet"
 
 #: src/server.py:434
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "der Server wird auf PORT (%d) lauschen"
+msgstr "der Server wird auf PORT ({int(defaultPort)}) lauschen"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
@@ -2385,36 +2372,26 @@ msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "Vorschau"
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "Eigenschaften"
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
 msgstr "Autor:"
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "Kontakt:"
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "Beschreibung:"
