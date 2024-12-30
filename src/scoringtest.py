@@ -107,7 +107,7 @@ class Base(unittest.TestCase):
                 game.players[widx].wind = wind
             game.winner = game.players[myWind]
             game.myself = game.winner
-            game.roundsFinished = roundWind.__index__()
+            game.roundWind = roundWind
             game.winner.clearCache()
             if Debug.hand:
                 print('')

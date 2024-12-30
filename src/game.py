@@ -354,7 +354,7 @@ class Game:
 
     def isFirstHand(self) ->bool:
         """as the name says"""
-        return self.roundHandCount == 0 and self.roundsFinished == 0
+        return self.roundHandCount == 0 and self.roundWind == East
 
     def _setGameId(self) ->None:
         """virtual"""
@@ -598,7 +598,7 @@ class Game:
         self.rotated += 1
         self.notRotated = 0
         if self.rotated == 4:
-            self.roundsFinished += 1
+            self.roundWind = next(self.roundWind)
             self.rotated = 0
             self.roundHandCount = 0
         if not self.finished() and not self.belongsToPlayer():
@@ -607,7 +607,7 @@ class Game:
             winds = winds[3:] + winds[0:3]
             for idx, newWind in enumerate(winds):
                 self.players[idx].wind = newWind
-            if self.roundsFinished % 4 and self.rotated == 0:
+            if self.rotated == 0:
                 # exchange seats between rounds
                 self.__exchangeSeats()
             if Internal.scene:
@@ -722,7 +722,7 @@ class Game:
                 player.getsPayment(record[2])
             if record[3]:
                 game.winner = player
-        game.roundsFinished = Wind(qScoreRecords[0][4]).__index__()
+        game.roundWind = Wind(qScoreRecords[0][4])
         game.handctr += 1
         game.notRotated += 1
         game.maybeRotateWinds()
