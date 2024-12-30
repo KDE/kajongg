@@ -97,6 +97,10 @@ class Wind:
     def __repr__(self) ->str:
         return f'Wind.{self.char}'
 
+    def __next__(self) ->'Wind':
+        """after North, return NoWind"""
+        return Wind.all[self.__index__() +1]
+
     @classmethod
     def normalized(cls, key:int) -> Optional['Wind']:
         """translate i18n key to wanted Wind. None if key is not a Wind character"""
