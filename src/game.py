@@ -21,7 +21,7 @@ from rand import CountingRandom
 from log import logError, logWarning, logException, logDebug, i18n
 from common import Internal, IntDict, Debug, Options
 from common import ReprMixin, Speeds
-from wind import Wind, East
+from wind import Wind, East, South, West, North
 from query import Query
 from rule import Ruleset, UsedRule
 from tile import Tile, elements
@@ -63,7 +63,7 @@ class Point(ReprMixin):
             self.moveCount = len(game.moves)
         else:
             self.__scanPoint(string, stringIdx)
-        assert self.rotated < 4, self
+        assert self.rotated < 5, self
 
     def __scanPoint(self, string:str, stringIdx:int) ->None:
         """get the --game option.
@@ -216,7 +216,7 @@ class Game:
         self.rotated:int = 0
         self.notRotated:int = 0  # counts hands since last rotation
         self.ruleset:Ruleset = ruleset
-        self.roundWind:Wind = East
+        self.roundWind:Wind = East  # after 4 rounds, roundWind is NoWind
         self._currentPoint:Optional[Point] = None
         self._prevPoint:Optional[Point] = None
         self.wantedGame:Optional[str] = wantedGame
@@ -243,7 +243,6 @@ class Game:
         self.__loadRuleset()
         # shift rules taken from the OEMC 2005 rules
         # 2nd round: S and W shift, E and N shift
-        self.shiftRules = 'SWEN,SE,WE'
         self.wall:Optional[Wall] = self.wallClass(self)  # type:ignore[arg-type]
         # FIXME:  wall nach PlayingGame verschieben?
         self.assignPlayers(names)  # also defines self.myself
@@ -438,8 +437,10 @@ class Game:
 
     def __exchangeSeats(self) ->None:
         """execute seat exchanges according to the rules"""
-        winds = list(x for x in self.shiftRules.split(',')[(self.roundsFinished - 1) % 4])
-        players = [self.players[Wind(x)] for x in winds]
+        _ = {East: (), South: (South, West, East, North), West: (South, East), North: (West, East)}
+        winds = _[self.roundWind]
+
+        players = [self.players[x] for x in winds]
         pairs = [players[x:x + 2] for x in range(0, len(winds), 2)]
         for playerA, playerB in self._mustExchangeSeats(pairs):
             playerA.wind, playerB.wind = playerB.wind, playerA.wind
