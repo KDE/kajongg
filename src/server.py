@@ -28,8 +28,10 @@ def cleanExit(*unusedArgs: Any) ->None:
     if Debug.quit:
         logDebug('cleanExit')
     if Options.socket and sys.platform != 'win32':
-        if os.path.exists(Options.socket):
+        try:
             os.remove(Options.socket)
+        except FileNotFoundError:
+            pass
     try:
         if Internal.db:
             Internal.db.close()
