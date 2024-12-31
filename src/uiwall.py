@@ -347,12 +347,8 @@ class UIWall(Wall):
         for uiTile in self.tiles:
             uiTile.change_name(Tile.unknown)
             uiTile.dark = True
-#        scene = Internal.scene
-# if not scene.game.isScoringGame() and not self.game.isFirstHand():
-#    speed = Internal.preferences.animationSpeed
-# else:
-        speed = 99
-        with AnimationSpeed(speed=speed):
+        with AnimationSpeed(speed=99):
+            # FIXME: introduce Speeds.shuffle = 90, but then tiles appear in wrong places
             if shuffleFirst:
                 self.__shuffleTiles()
             for uiTile in self.tiles:
