@@ -336,18 +336,6 @@ class HandResult:
             ord('a') - 1 + self.notRotated) if self.notRotated else ''
         return f'{self.prevailing}{self.rotated + 1}{character}'
 
-    def roundHand(self, allHands:List['HandResult']) ->int:
-        """the nth hand in the current round, starting with 1"""
-        idx = allHands.index(self)
-        _ = reversed(allHands[:idx])
-        allHands = [x for x in _ if not x.penalty]
-        if not allHands:
-            return 1
-        for idx, hand in enumerate(allHands):
-            if hand.prevailing != self.prevailing:
-                return idx + 1
-        return idx + 2
-
 
 class ScoreViewLeft(QTreeView):
 
