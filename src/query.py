@@ -15,7 +15,8 @@ import traceback
 import datetime
 import random
 import sqlite3
-from typing import List, Tuple, Union, Any, Optional, Literal
+from collections import namedtuple
+from typing import List, Tuple, Union, Any, Optional, Literal, Generator
 
 from mi18n import i18n, i18ncE
 from util import Duration
@@ -197,7 +198,8 @@ class Query(ReprMixin):
 
     def __init__(self, statement:str,
                  args:Union[None,Tuple[Union[str, int, float], ...],List[List[Union[str,int,float]]]]=None,
-                 silent:bool=False, mayFail:bool=False, failSilent:bool=False) ->None:
+                 silent:bool=False, mayFail:bool=False, failSilent:bool=False,
+                 fields:Optional[str]=None) ->None:
         """we take one sql statement.
         Do prepared queries by passing the parameters in args.
         If args is a list of lists, execute the prepared query for every sublist.
@@ -208,11 +210,17 @@ class Query(ReprMixin):
         self.records:List[List[Any]] = []
         self.statement = statement
         self.args = args
+        self.fields = fields  # a field name might be "lastname as playername"
+        self.tuplefields:Optional[List[str]] = None
+        if fields:
+            self.tuplefields = list(self.__tuple_fieldnames())
+            self.statement = self.statement.format(fields=fields)
+
         if Internal.db:
             self.cursor = Internal.db.cursor(
                 DBCursor)
             self.cursor.execute(
-                statement,
+                self.statement,
                 args,
                 silent=silent,
                 mayFail=mayFail,
@@ -228,6 +236,33 @@ class Query(ReprMixin):
         if self.records and Debug.sql:
             logDebug(f'result set:{self.records}')
 
+    def __tuple_fieldnames(self) ->Generator[str, None, None]:
+        """translates 'fieldname as myname' into 'myname' """
+        if not isinstance(self.fields, str):
+            raise ValueError(f'must be str:{self.fields}')
+        for _ in self.fields.split(','):
+            words = [x.strip() for x in _.strip().split(' ')]
+            if len(words) == 1:
+                yield words[0]
+            elif len(words) == 3 and words[1] == 'as':
+                yield words[2]
+            else:
+                raise ValueError(f'cannot parse {_} out of {self.fields}, words={words}')
+
+    def tuples(self) -> List[Any]:
+        """named tuples for query records"""
+        tupleclass = namedtuple('Fields', self.tuplefields)  # type: ignore
+        return [tupleclass._make(x) for x in self.records]
+
+    def tuple(self) -> Any:
+        """Valid only for queries returning exactly one record"""
+        if not self.fields:
+            raise ValueError
+        if len(self.records) != 1:
+            raise ValueError(f'{self!r} did not return exactly 1 record but {len(self.records)}')
+        tupleclass = namedtuple('Fields', self.tuplefields)  # type: ignore
+        return tupleclass._make(self.records[0])
+
     def __str__(self) ->str:
         return f"{Internal.db!r}:{self.statement} {'args=' + ','.join(str(x) for x in self.args) if self.args else ''}"
 
@@ -235,6 +270,15 @@ class Query(ReprMixin):
         """how many rows were affected?"""
         return self.cursor.rowcount if self.cursor else 0
 
+    def map(self, namedTuple) ->Optional[List[Any]]:  # FIXME: remove again
+        """A list of namedtuple"""
+        if self.records is None:
+            return None
+        return [namedTuple._make(x) for x in self.records]
+
+    def column(self, idx:int) -> List[Any]:
+        """A list with only that column"""
+        return [x[idx] for x in self.records]
 
 def initDb() ->bool:
     """open the db, create or update it if needed.

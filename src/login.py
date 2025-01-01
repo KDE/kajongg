@@ -252,9 +252,9 @@ class LoginDlg(KDialog):
         self.setupUi()
 
         localName = i18nc('kajongg name for local game server', Query.localServerName)
-        self.servers = Query(
-            'select url,lastname from server order by lasttime desc').records
-        servers = [x[0] for x in self.servers if x[0] != Query.localServerName]
+        self._servers = Query(
+            'select {fields} from server order by lasttime desc', fields='url, lastname as playername').tuples()
+        servers = [x.url for x in self._servers if x.url != Query.localServerName]
         # the first server combobox item should be default: either the last used server
         # or localName for autoPlay
         if localName not in servers:
@@ -314,9 +314,8 @@ class LoginDlg(KDialog):
 
     def serverChanged(self, unusedText:Optional[str]=None) ->None:
         """the user selected a different server"""
-        records = Query('select player.name from player, passwords '
-                        'where passwords.url=? and passwords.player = player.id', (self.url,)).records
-        players = [x[0] for x in records]
+        players = Query('select player.name from player, passwords '
+                        'where passwords.url=? and passwords.player = player.id', (self.url,)).column(0)
         preferPlayer = Options.player
         if preferPlayer:
             if preferPlayer in players:
@@ -328,7 +327,7 @@ class LoginDlg(KDialog):
             user = KUser() if sys.platform == 'win32' else KUser(os.geteuid())
             self.cbUser.addItem(user.fullName() or user.loginName())
         if not preferPlayer:
-            userNames = [x[1] for x in self.servers if x[0] == self.url]
+            userNames = [x.playername for x in self._servers if x.url == self.url]
             if userNames:
                 userIdx = self.cbUser.findText(userNames[0])
                 if userIdx >= 0:
