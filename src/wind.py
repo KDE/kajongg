@@ -9,6 +9,8 @@ SPDX-License-Identifier: GPL-2.0-only
 
 # pylint: disable=invalid-name
 
+import sqlite3
+
 from typing import Any, List, Optional, TYPE_CHECKING
 
 from mi18n import i18nc
@@ -101,6 +103,11 @@ class Wind:
         """after North, return NoWind"""
         return Wind.all[self.__index__() +1]
 
+    def __conform__(self, protocol) ->Optional[str]:
+        if protocol is sqlite3.PrepareProtocol:
+            return self.char
+        return None
+
     @classmethod
     def normalized(cls, key:int) -> Optional['Wind']:
         """translate i18n key to wanted Wind. None if key is not a Wind character"""
@@ -163,3 +170,10 @@ South = _South()
 West = _West()
 North = _North()
 NoWind = _NoWind()
+
+def convert_from_sql(raw:bytes) -> 'Wind':
+    """see https://docs.python.org/3/library/sqlite3.html"""
+    return Wind(raw.decode())
+
+
+sqlite3.register_converter("wind", convert_from_sql)

@@ -568,7 +568,7 @@ class Game:
                 "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" %
                 (self.gameid, self.handctr, player.nameid,
                  scoretime, int(player == self.__winner),
-                 self.roundWind.char, player.wind,
+                 self.roundWind, player.wind,
                  player.handTotal, player.payment, player.balance,
                  self.rotated, self.notRotated),
                 (player.hand.string, manualrules))
@@ -691,7 +691,7 @@ class Game:
         if not qScoreRecords:
             # this should normally not happen
             qScoreRecords = list(
-                list([qGameRecord[wind], wind.char, 0, False, East.char])
+                list([qGameRecord[wind], wind, 0, False, East])
                 for wind in Wind.all4)
         if len(qScoreRecords) != 4:
             logError(f'game {int(gameid)} inconsistent: There should be exactly 4 score records for the last hand')
@@ -705,7 +705,7 @@ class Game:
             logError(f'game {int(gameid)} inconsistent: '
                      f'All score records for the same hand must have the same prevailing wind')
 
-        players = list((Wind(x[1]), Game.__getName(x[0])) for x in qScoreRecords)
+        players = list((x[1], Game.__getName(x[0])) for x in qScoreRecords)
 
         # create the game instance.
         game = cls(players, ruleset, gameid=gameid, client=client,
@@ -722,7 +722,7 @@ class Game:
                 player.getsPayment(record[2])
             if record[3]:
                 game.winner = player
-        game.roundWind = Wind(qScoreRecords[0][4])
+        game.roundWind = qScoreRecords[0][4]
         game.handctr += 1
         game.notRotated += 1
         game.maybeRotateWinds()

@@ -1022,7 +1022,7 @@ class EastWonNineTimesInARow(RuleCode):
             eastMJCount = int(Query("select count(1) from score "
                                     f"where game={game.gameid} and won=1 and wind='E' "
                                     f"and player={int(game.players[East].nameid)} "
-                                    f"and prevailing='{game.roundWind.char}'").records[0][0])
+                                    f"and prevailing='{game.roundWind}'").records[0][0])
             return eastMJCount == needWins
         return False
 

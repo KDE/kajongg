@@ -83,7 +83,7 @@ class DBHandle(sqlite3.Connection, ReprMixin):
         self.path = path
         self.identifier = None
         try:
-            sqlite3.Connection.__init__(self, self.path, timeout=10.0)
+            sqlite3.Connection.__init__(self, self.path, timeout=10.0, detect_types=sqlite3.PARSE_DECLTYPES)
         except sqlite3.Error as exc:
             if hasattr(exc, 'message'):
                 msg = exc.message
@@ -273,8 +273,8 @@ class PrepareDB:
             scoretime text,
             won integer,
             penalty integer default 0,
-            prevailing text,
-            wind text,
+            prevailing wind,
+            wind wind,
             points integer,
             payments integer,
             balance integer"""
@@ -349,7 +349,7 @@ class PrepareDB:
         """upgrade the structure of an existing kajongg database"""
         try:
             Internal.db = DBHandle(self.path)
-            allVersions = list(['4.13.0', '8300', '8301', '8302'])
+            allVersions = list(['4.13.0', '8300', '8301', '8302', '8303'])
             assert allVersions[-1] == str(Internal.defaultPort), f'{allVersions[-1]} != {str(Internal.defaultPort)}'
             # skip versions before current db versions:
             currentVersion = self.__currentVersion()
@@ -372,6 +372,32 @@ class PrepareDB:
     def updateToVersion8302(self) ->None:
         """seed now is 0 instead of Null"""
         Query('UPDATE game SET seed=0 WHERE seed IS NULL', silent=True)
+
+    def __needs_type_wind(self) ->bool:
+        """helper for updating to 8303"""
+        rows = Query("PRAGMA table_info('score')").records
+        for row in rows:
+            name = row[1]
+            typ = row[2]
+            if name == 'wind' and typ != 'wind':
+                logInfo(f'score.wind has not yet type wind: {typ}')
+                return True
+            if name == 'prevailing' and typ != 'wind':
+                logInfo(f'score.prevailing has not yet type wind: {typ}')
+                return True
+        return False
+
+    def updateToVersion8303(self) ->None:
+        """new type 'wind'"""
+        if self.__needs_type_wind():
+            with Internal.db:
+                Query('ALTER TABLE score add prevailingw wind', mayFail=True)
+                Query('ALTER TABLE score add windw wind', mayFail=True)
+                Query('UPDATE score set prevailingw = prevailing, windw=wind')
+                Query('ALTER TABLE score drop prevailing')
+                Query('ALTER TABLE score drop wind')
+                Query('ALTER TABLE score rename windw to wind')
+                Query('ALTER TABLE score rename prevailingw to prevailing')
 
     @classmethod
     def sqlForCreateTable(cls, table:str) ->str:

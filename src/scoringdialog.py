@@ -314,13 +314,13 @@ class HandResult:
     # we have too many arguments
 
     def __init__(self, rotated:int, notRotated:int, penalty:bool, won:bool,
-                 prevailing:str, wind:str, points:int, payments:int, balance:int, manualrules:str) ->None:
+                 prevailing:Wind, wind:Wind, points:int, payments:int, balance:int, manualrules:str) ->None:
         self.rotated = rotated
         self.notRotated = notRotated
         self.penalty = penalty
         self.won = won
-        self.prevailing = Wind(prevailing)
-        self.wind = Wind(wind)
+        self.prevailing = prevailing
+        self.wind = wind
         self.points = points
         self.payments = payments
         self.balance = balance

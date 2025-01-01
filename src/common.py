@@ -381,7 +381,7 @@ class __Internal:
     @type scene: L{GameScene}: L{PlayingScene} or L{ScoringScene}
     """
     Preferences:Optional['SetupPreferences'] = None
-    defaultPort = 8302
+    defaultPort = 8303
     logPrefix = 'C'
     isServer = False
     reactor:'IReactorCore'
