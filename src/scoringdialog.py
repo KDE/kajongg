@@ -33,7 +33,6 @@ from statesaver import StateSaver
 from query import Query
 from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
 from tree import TreeItem, RootItem, TreeModel
-from wind import Wind
 from tile import Tile, MeldList
 
 if TYPE_CHECKING:
@@ -91,10 +90,10 @@ class ScorePlayerItem(ScoreTreeItem):
 
     """represents a player in the tree"""
 
-    def __init__(self, content:Tuple[str, List['HandResult']]) ->None:
+    def __init__(self, content:Tuple[str, List[Any]]) ->None:
         ScoreTreeItem.__init__(self, content)
 
-    def content(self, column:int) ->Union[str, 'HandResult', None]:
+    def content(self, column:int) ->Union[str, Any, None]:
         """return the content stored in this node"""
         if column == 0:
             return i18n(self.raw[0])
@@ -105,7 +104,7 @@ class ScorePlayerItem(ScoreTreeItem):
             # not happen in practical use
             return None
 
-    def hands(self) ->List['HandResult']:
+    def hands(self) ->List[Any]:
         """a small helper"""
         return self.raw[1]
 
@@ -184,6 +183,8 @@ class ScoreModel(TreeModel):
     """a model for our score table"""
     steps = 30  # how fine do we want the stepping in the chart spline
 
+    tupleType: Any = type(None)
+
     def __init__(self, scoreTable:'ScoreTable', parent:Optional['QObject']=None) ->None:
         super().__init__(parent)
         self.scoreTable = scoreTable
@@ -215,7 +216,8 @@ class ScoreModel(TreeModel):
         if role == Qt.ItemDataRole.DisplayRole:
             if isinstance(item, ScorePlayerItem):
                 content = item.content(column)
-                if isinstance(content, HandResult):
+                # if content.__class__.__name__ == 'Score':
+                if isinstance(content, ScoreModel.tupleType):
                     parentRow = item.parent.row()
                     if parentRow == 0:
                         if not content.penalty:
@@ -234,15 +236,16 @@ class ScoreModel(TreeModel):
         if role == Qt.ItemDataRole.ForegroundRole:
             if isinstance(item, ScorePlayerItem) and item.parent.row() == 3:
                 content = item.content(column)
-                if not isinstance(content, HandResult):
+                if not isinstance(content, ScoreModel.tupleType):
                     return QBrush(ScoreItemDelegate.colors[index.row()])
         if column > 0 and isinstance(item, ScorePlayerItem):
-            content = cast('HandResult', item.content(column))
+            content = item.content(column)  # type:ignore
             if role == Qt.ItemDataRole.BackgroundRole:
+                assert isinstance(content, ScoreModel.tupleType)
                 if content and content.won:
                     return QColor(165, 255, 165)
             if role == Qt.ItemDataRole.ToolTipRole:
-                englishHints = content.manualrules.split('||')
+                englishHints = content.manualrules.split('||')  # type:ignore
                 tooltip = '<br />'.join(i18n(x) for x in englishHints)
                 return tooltip
         return None
@@ -259,7 +262,7 @@ class ScoreModel(TreeModel):
                 hands = child1.hands()
                 handResult = hands[section - 1]
                 if not handResult.penalty:
-                    return handResult.handTitle()
+                    return self.handTitle(handResult)
         elif role == Qt.ItemDataRole.TextAlignmentRole:
             return int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter) \
                 if section == 0 else int(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
@@ -270,17 +273,24 @@ class ScoreModel(TreeModel):
         game = self.scoreTable.game
         assert game
         assert game.gameid
-        records = Query(
-            'select player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
-            ' from score where game=? order by player,hand', (game.gameid,)).records
+
+        fields = 'player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
+        tuples = Query('select {fields} from score where game=? order by hand', (game.gameid, ),
+            fields=fields).tuples()
+#        if not tuples:
+#            return
+        if tuples:
+            ScoreModel.tupleType = tuples[0].__class__
         humans = sorted(
             (x for x in game.players if not x.name.startswith('Robot')))
         robots = sorted(
             (x for x in game.players if x.name.startswith('Robot')))
-        data =  cast(List[Tuple[str, List['HandResult']]],
-                    [tuple([player.localName,
-                     [HandResult(*x) for x in records
-                        if x[0] == player.nameid]]) for player in humans + robots])
+        data =  cast(List[Tuple[str, List[Any]]],
+                    [tuple([player.localName, [x for x in tuples  # type:ignore
+                    if x.player == player.nameid]]) for player in humans + robots])
+#        print(f'players: {Players.allNames}')
+#        for idx, _ in enumerate(data):
+#            print(f'{idx}: {_}')
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         assert self.rootItem
@@ -293,7 +303,7 @@ class ScoreModel(TreeModel):
             for idx1, item in enumerate(data):
                 self.insertRows(idx1, list([ScorePlayerItem(item)]), listIndex)
 
-    def __findMinMaxChartPoints(self, data:List[Tuple[str, List['HandResult']]]) ->None:
+    def __findMinMaxChartPoints(self, data:List[Tuple[str, List[Any]]]) ->None:
         """find and save the extremes of the spline. They can be higher than
         the pure balance values"""
         self.minY = 9999999.9
@@ -307,36 +317,11 @@ class ScoreModel(TreeModel):
         self.minY -= 2  # antialiasing might cross the cell border
         self.maxY += 2
 
-
-class HandResult:
-
-    """holds the results of a hand for the scoring table"""
-    # pylint: disable=too-many-arguments,too-many-instance-attributes
-    # we have too many arguments
-
-    def __init__(self, nameid:int, rotated:int, notRotated:int, penalty:bool, won:bool,  # pylint:disable=too-many-positional-arguments
-                 prevailing:Wind, wind:Wind, points:int, payments:int, balance:int, manualrules:str) ->None:
-        self.nameid = nameid
-        self.rotated = rotated
-        self.notRotated = notRotated
-        self.penalty = penalty
-        self.won = won
-        self.prevailing = prevailing
-        self.wind = wind
-        self.points = points
-        self.payments = payments
-        self.balance = balance
-        self.manualrules = manualrules
-
-    def __str__(self) ->str:
-        return (f'{int(self.penalty)} {int(self.points)} {self.wind} '
-                f'{int(self.payments)} {int(self.balance)} {self.manualrules}')
-
-    def handTitle(self) ->str:
+    def handTitle(self, handResult:Any) ->str:
         """identifies the hand for window title and scoring table"""
         character = chr(
-            ord('a') - 1 + self.notRotated) if self.notRotated else ''
-        return f'{self.prevailing}{self.rotated + 1}{character}'
+            ord('a') - 1 + handResult.notrotated) if handResult.notrotated else ''
+        return f'{handResult.prevailing}{handResult.rotated + 1}{character}'
 
 
 class ScoreViewLeft(QTreeView):
