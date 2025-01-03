@@ -278,8 +278,9 @@ class ScoreModel(TreeModel):
         robots = sorted(
             (x for x in game.players if x.name.startswith('Robot')))
         data =  cast(List[Tuple[str, List['HandResult']]],
-                    [tuple([player.localName, [HandResult(*x[1:]) for x in records
-                    if x[0] == player.nameid]]) for player in humans + robots])
+                    [tuple([player.localName,
+                     [HandResult(*x) for x in records
+                        if x[0] == player.nameid]]) for player in humans + robots])
         self.__findMinMaxChartPoints(data)
         parent = QModelIndex()
         assert self.rootItem
@@ -310,11 +311,12 @@ class ScoreModel(TreeModel):
 class HandResult:
 
     """holds the results of a hand for the scoring table"""
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,too-many-instance-attributes
     # we have too many arguments
 
-    def __init__(self, rotated:int, notRotated:int, penalty:bool, won:bool,
+    def __init__(self, nameid:int, rotated:int, notRotated:int, penalty:bool, won:bool,  # pylint:disable=too-many-positional-arguments
                  prevailing:Wind, wind:Wind, points:int, payments:int, balance:int, manualrules:str) ->None:
+        self.nameid = nameid
         self.rotated = rotated
         self.notRotated = notRotated
         self.penalty = penalty
