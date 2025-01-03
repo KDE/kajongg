@@ -236,6 +236,21 @@ class Query(ReprMixin):
         if self.records and Debug.sql:
             logDebug(f'result set:{self.records}')
 
+    def __tupleName(self) ->str:
+        """the class name of the returned tuples.
+           For now:
+
+           - use first table name from statement.
+           - If none found: use 'Fields'
+
+           Query might get an arg tupleName which would override this
+        """
+        lower = self.statement.lower()
+        parts = lower.split(' from ')
+        if len(parts) > 1:
+            return parts[1].split()[0].strip().capitalize()
+        return 'Fields'
+
     def __tuple_fieldnames(self) ->Generator[str, None, None]:
         """translates 'fieldname as myname' into 'myname' """
         if not isinstance(self.fields, str):
@@ -251,7 +266,7 @@ class Query(ReprMixin):
 
     def tuples(self) -> List[Any]:
         """named tuples for query records"""
-        tupleclass = namedtuple('Fields', self.tuplefields)  # type: ignore
+        tupleclass = namedtuple(self.__tupleName(), self.tuplefields)  # type: ignore
         return [tupleclass._make(x) for x in self.records]
 
     def tuple(self) -> Any:
