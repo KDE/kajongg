@@ -226,7 +226,6 @@ class Game:
         self.autoPlay:bool = False
         self.handctr = 0
         self.roundHandCount = 0
-        self.handDiscardCount = 0
         self.divideAt:Optional[int] = None
         self.__lastDiscard:Optional[Tile] = None  # always uppercase
         # TODO: use Tile.none and remove assertions in message.py and otherwhere
@@ -547,7 +546,6 @@ class Game:
         self.handctr += 1
         self.notRotated += 1
         self.roundHandCount += 1
-        self.handDiscardCount = 0
 
     def _saveScores(self) ->None:
         """save computed values to database,
@@ -992,7 +990,6 @@ class PlayingGame(Game):
             self.computeDangerous()
         else:
             self._endWallDangerous()
-        self.handDiscardCount += 1
 
     def saveHand(self) ->None:
         """server told us to save this hand"""
