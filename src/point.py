@@ -105,6 +105,10 @@ class Point(ReprMixin):
             'select {fields} from score where game=? order by hand desc limit 1', (gameid, ),
             fields='hand, rotated, notrotated, prevailing').tuple()
 
+    def is_in_first_hand(self) ->bool:
+        """True only if this point is in the first hand of a game"""
+        return self.handCount == 0
+
     def prompt(self, game:'Game', withSeed:bool=True, withAI:bool=True, withMoveCount:bool=False) ->str:
         """
         Identifies the hand for window title and scoring table.

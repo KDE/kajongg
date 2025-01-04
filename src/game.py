@@ -84,7 +84,6 @@ class Game:
         self.playOpen:bool = False
         self.autoPlay:bool = False
         self.handctr:int = 0
-        self.roundHandCount = 0
         self.divideAt:Optional[int] = None
         self.__lastDiscard:Optional[Tile] = None  # always uppercase
         # TODO: use Tile.none and remove assertions in message.py and otherwhere
@@ -212,7 +211,7 @@ class Game:
 
     def isFirstHand(self) ->bool:
         """as the name says"""
-        return self.roundHandCount == 0 and self.roundWind == East
+        return Point(self).is_in_first_hand()
 
     def _setGameId(self) ->None:
         """virtual"""
@@ -404,7 +403,6 @@ class Game:
         self._saveScores()
         self.handctr += 1
         self.notRotated += 1
-        self.roundHandCount += 1
 
     def _saveScores(self) ->None:
         """save computed values to database,
@@ -457,7 +455,6 @@ class Game:
         if self.rotated == 4:
             self.roundWind = next(self.roundWind)
             self.rotated = 0
-            self.roundHandCount = 0
         if not self.finished() and not self.belongsToPlayer():
             # the game server already told us the new placement and winds
             winds = [player.wind for player in self.players]
