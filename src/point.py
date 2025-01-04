@@ -117,23 +117,25 @@ class Point(ReprMixin):
                 aiName = 'DefaultAI'
             if aiName != 'DefaultAI':
                 aiVariant = aiName + '/'
-        num = self.notRotated
-        assert isinstance(num, int), num
-        charId = ''
-        while num:
-            charId = chr(ord('a') + (num - 1) % 26) + charId
-            num = (num - 1) // 26
-        if not charId:
-            charId = ' ' # align to the most common case
+        _ = self.notRotated_as_str() or ' '
         wind = Wind.all4[self.roundsFinished % 4]
         if withSeed:
             seedStr = str(self.seed)
         else:
             seedStr = ''
         delim = '/' if withSeed or withAI else ''
-        result = f'{aiVariant}{seedStr}{delim}{wind}{self.rotated + 1}{charId}'
+        result = f'{aiVariant}{seedStr}{delim}{wind}{self.rotated + 1}{_}'
         if withMoveCount:
             result += f'/{int(self.moveCount):3}'
+        return result
+
+    def notRotated_as_str(self) ->str:
+        """encode into a..z"""
+        result = ''
+        num = self.notRotated
+        while num:
+            result = chr(ord('a') + (num - 1) % 26) + result
+            num = (num - 1) // 26
         return result
 
     def token(self) ->str:
