@@ -79,6 +79,7 @@ set(SRCFILES
     src/move.py
     src/modeltest.py
     src/playerlist.py
+    src/point.py
     src/predefined.py
     src/qtreactor.py
     src/query.py
