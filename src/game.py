@@ -325,12 +325,12 @@ class Game:
                         player.sideText.board = player.front
 
     def goto(self, point:Point) ->None:
-        """go to the position defined by point"""
+        """go to the point"""
         if point.moveCount > 0:
             raise NotImplementedError('Game.goto() only accepts moveCount 0')
-        for _ in range(point.roundsFinished * 4 + point.rotated):
+        while self.point < point:
             self.rotateWinds()
-        self.notRotated = point.notRotated
+            self.notRotated = point.notRotated
 
     @staticmethod
     def _newGameId() ->int:
