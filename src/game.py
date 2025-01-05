@@ -587,7 +587,7 @@ class Game:
         if result:
             if Debug.explain:
                 if not self.belongsToRobotPlayer():
-                    self.debug(','.join(x.name for x in result), prevPoint=True)
+                    self.debug(','.join(x.name for x in result), showPrevPoint=True)
             self.rotateWinds()
             if self.finished():
                 self.finish_in_db()
@@ -623,7 +623,7 @@ class Game:
             transaction.execute(
                 f'UPDATE game set endtime = "{endtime}" where id = {int(self.gameid)}')
 
-    def debug(self, msg:str, btIndent:Optional[int]=None, prevPoint:bool=False, showStack:bool=False) ->None:
+    def debug(self, msg:str, btIndent:Optional[int]=None, showPrevPoint:bool=False, showStack:bool=False) ->None:
         """
         Log a debug message.
 
@@ -632,8 +632,8 @@ class Game:
         @param btIndent: If given, message is indented by
         depth(backtrace)-btIndent
         @type btIndent: C{int}
-        @param prevPoint: If True, do not use current point but previous
-        @type prevPoint: C{bool}
+        @param showPrevPoint: If True, do not use current point but previous
+        @type showPrevPoint: C{bool}
         """
         if self.belongsToRobotPlayer():
             prefix = 'R'
@@ -644,7 +644,7 @@ class Game:
         else:
             logDebug(msg, btIndent=btIndent)
             return
-        point = self._prevPoint if prevPoint else self.point
+        point = self._prevPoint if showPrevPoint else self.point
         assert point
         point_str = point.prompt(withMoveCount=True)
         logDebug(
