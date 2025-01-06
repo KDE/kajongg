@@ -125,7 +125,7 @@ class Game:
     @property
     def point(self) ->Point:
         """current position in game"""
-        result = Point(self, self)
+        result = Point(self)
         if result != self._currentPoint:
             self._prevPoint = self._currentPoint
             self._currentPoint = result
@@ -208,7 +208,7 @@ class Game:
     def addCsvTag(self, tag:str, forAllPlayers:bool=False) ->None:
         """tag will be written to tag field in csv row"""
         if forAllPlayers or self.belongsToHumanPlayer():
-            self.csvTags.append(f'{tag}/{self.point.prompt(withSeed=False)}')
+            self.csvTags.append(f'{tag}/{self.point.prompt(self, withSeed=False)}')
 
     def isFirstHand(self) ->bool:
         """as the name says"""
@@ -503,7 +503,7 @@ class Game:
             return
         point = self._prevPoint if showPrevPoint else self.point
         assert point
-        point_str = point.prompt(withMoveCount=True)
+        point_str = point.prompt(self, withMoveCount=True)
         logDebug(
             f'{prefix}{point_str}: {msg}',
             withGamePrefix=False,
@@ -594,9 +594,9 @@ class Game:
         check if we reached the second point defined by --game.
         If we did, the game is over too"""
         # FIXME: re-enable
-        # last = Point(self, self.wantedGame)
+        # last = Point(self, self.wantedGame, 1)
         # if self.point > last:
-        #     return True
+        #    return True
         if Options.rounds:
             return self.roundsFinished >= Options.rounds
         if self.ruleset:
@@ -871,7 +871,7 @@ class PlayingGame(Game):
             # first, last = (Point(self, self.wantedGame, x) for x in (0, 1))
             # if first > last:
             #     raise UserWarning(f'{first}..{last} is a negative range')
-            point = Point(self, self.wantedGame)
+            point = Point(self.wantedGame)
             self.goto(point)
 
     def assignVoices(self) ->None:

@@ -689,7 +689,7 @@ class ServerTable(Table, ReprMixin):
             if block.table == self:
                 logError(
                     f'request left from previous hand: {block.outstandingStr()}')
-        token = self.game.point.prompt(
+        token = self.game.point.prompt(self.game,
             withAI=False)  # we need to send the old token until the
                                    # clients started the new hand
         mustRotateWinds = self.game.maybeRotateWinds()

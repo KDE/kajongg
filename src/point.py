@@ -33,9 +33,8 @@ class Point(ReprMixin):
         moveCount: Number of executed moves within current hand
     """
 
-    def __init__(self, game:'Game', source:Union[str, int, 'Game', 'Point']) -> None:
+    def __init__(self, source:Union[str, int, 'Game', 'Point']) -> None:
         """Default values point to start of game"""
-        self.game = game
         self.seed = 0
         self.prevailing:Wind = East
         self.rotated = 0
@@ -106,7 +105,7 @@ class Point(ReprMixin):
             'select {fields} from score where game=? order by hand desc limit 1', (gameid, ),
             fields='hand, rotated, notrotated, prevailing').tuple()
 
-    def prompt(self, withSeed:bool=True, withAI:bool=True, withMoveCount:bool=False) ->str:
+    def prompt(self, game:'Game', withSeed:bool=True, withAI:bool=True, withMoveCount:bool=False) ->str:
         """
         Identifies the hand for window title and scoring table.
 
@@ -122,9 +121,9 @@ class Point(ReprMixin):
         @rtype:          C{str}
         """
         aiVariant = ''
-        if withAI and self.game.belongsToHumanPlayer():
-            if self.game.myself:
-                aiName = self.game.myself.intelligence.name()
+        if withAI and game and game.belongsToHumanPlayer():
+            if game.myself:
+                aiName = game.myself.intelligence.name()
             else:
                 aiName = 'DefaultAI'
             if aiName != 'DefaultAI':
@@ -154,13 +153,13 @@ class Point(ReprMixin):
             num = (num - 1) // 26
         return result
 
-    def token(self) ->str:
-        """server and client use this for checking if they talk about
+    def token(self, game:'Game') ->str:
+        """server and client use this for checking whether they talk about
         the same thing"""
-        return self.prompt(withAI=False)
+        return self.prompt(game, withAI=False)
 
     def __str__(self) ->str:
-        return self.prompt()
+        return f'{self.prevailing}{self.rotated}{self.notRotated_as_str()}'
 
     def __eq__(self, other:object) ->bool:
         if other is None:
@@ -203,7 +202,7 @@ class PointRange(ReprMixin):
             last_point:Optional[Point]=None) ->None:
 
         if first_point is None:
-            first_point = Point(game, game.seed)
+            first_point = Point(game.seed)
         if first_point > last_point:
             raise UserWarning(f'{first_point}..{last_point} is a negative range')
         self.first_point = first_point
@@ -222,11 +221,11 @@ class PointRange(ReprMixin):
         seed = int(seed_str)
 
         positions = pos_str.split('..')
-        first_pos = Point(game, f'{seed}/{positions[0]}')
+        first_pos = Point(f'{seed}/{positions[0]}')
 
         last_pos:Optional[Point] = None   # default
         if len(positions) > 1:
-            last_pos = Point(game, f'{seed}/{positions[1]}')
+            last_pos = Point(f'{seed}/{positions[1]}')
 
         return PointRange(game, first_pos, last_pos)
 
