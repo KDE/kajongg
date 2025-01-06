@@ -476,7 +476,8 @@ class Game:
             transaction.execute(
                 f'UPDATE game set endtime = "{endtime}" where id = {int(self.gameid)}')
 
-    def debug(self, msg:str, btIndent:Optional[int]=None, showPrevPoint:bool=False, showStack:bool=False) ->None:
+    def debug(self, msg:str, btIndent:Optional[int]=None,
+        showPrevPoint:bool=False, showStack:bool=False) ->None:  # pylint: disable=unused-argument
         """
         Log a debug message.
 
@@ -497,7 +498,8 @@ class Game:
         else:
             logDebug(msg, btIndent=btIndent)
             return
-        point = self._prevPoint if showPrevPoint else self.point
+        # FIXME temp disabled point = self._prevPoint if showPrevPoint else self.point
+        point = self.point
         assert point
         point_str = point.prompt(self, withMoveCount=True)
         logDebug(
