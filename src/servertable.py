@@ -35,6 +35,7 @@ from user import User
 from game import PlayingGame
 from message import Message, ChatMessage, ServerMessage
 from deferredutil import DeferredBlock
+from point import PointRange
 
 if TYPE_CHECKING:
     from deferredutil import Request
@@ -357,7 +358,7 @@ class ServerTable(Table, ReprMixin):
             block.tellPlayer(
                 player, Message.ReadyForGameStart, tableid=self.tableid,
                 gameid=game.gameid, shouldSave=player.shouldSave,
-                wantedGame=str(game.pos_range), players=game.players)
+                wantedGame=str(PointRange(game, game.first_point, game.last_point)), players=game.players)
         block.callback(self.startGame)
 
     def startGame(self, requests:List['Request']) ->None:

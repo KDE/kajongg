@@ -80,7 +80,9 @@ class Game:
         self.randomGenerator:CountingRandom = CountingRandom(self)
         if wantedGame is None:
             wantedGame = str(int(self.randomGenerator.random() * 10 ** 9))
-        self.pos_range = PointRange.from_string(self, wantedGame)
+        self.first_point: Point
+        self.last_point: Optional[Point]
+        self.first_point, self.last_point = PointRange.from_string(wantedGame)
         self.ruleset:Ruleset = ruleset
         self._currentPoint:Optional[Point] = None
         self._prevPoint:Optional[Point] = None
@@ -108,7 +110,7 @@ class Game:
         self.assignPlayers(names)  # also defines self.myself
         if self.belongsToGameServer():
             self.__shufflePlayers()
-        self.goto(self.pos_range.first_point)
+        self.goto(self.first_point)
         for player in self.players:
             player.clearHand()
 
@@ -365,7 +367,7 @@ class Game:
     @property
     def seed(self) ->int:
         """extract it from wantedGame. Set wantedGame if empty."""
-        return self.pos_range.first_point.seed
+        return self.first_point.seed
 
     def _setHandSeed(self) ->None:
         """set seed to a reproducible value, independent of what happened
@@ -610,10 +612,8 @@ class Game:
         """The game is over after minRounds completed rounds. Also,
         check if we reached the second point defined by --game.
         If we did, the game is over too"""
-        if self.pos_range:
-            last = self.pos_range.last_point
-            if last and self.point >= last:
-                return True
+        if self.point >= self.last_point:
+            return True
         if Options.rounds:
             return self.roundsFinished >= Options.rounds
         if self.ruleset:

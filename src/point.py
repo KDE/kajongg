@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0-only
 
 from functools import total_ordering
 
-from typing import Optional, Union, TYPE_CHECKING
+from typing import Optional, Union, Tuple, TYPE_CHECKING
 
 from common import ReprMixin
 from wind import Wind, East
@@ -213,7 +213,7 @@ class PointRange(ReprMixin):
         self.last_point = last_point
 
     @classmethod
-    def from_string(cls, game: 'Game', string:str) -> 'PointRange':
+    def from_string(cls, string:str) -> Tuple[Point, Union[Point, None]]:
         """parse a string like first..last"""
         if string is None:
             string = ''
@@ -231,7 +231,7 @@ class PointRange(ReprMixin):
         if len(positions) > 1:
             last_pos = Point(f'{seed}/{positions[1]}')
 
-        return PointRange(game, first_pos, last_pos)
+        return first_pos, last_pos
 
     @property
     def seed(self) ->int:
