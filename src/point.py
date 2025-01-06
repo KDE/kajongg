@@ -205,12 +205,19 @@ class PointRange(ReprMixin):
             first_point:Optional[Point]=None,
             last_point:Optional[Point]=None) ->None:
 
-        if first_point is None:
-            first_point = Point(game.seed)
-        if first_point > last_point:
+        self.first_point: Point
+        self.last_point: Union[Point, None]  # None means open end
+
+        if first_point is None and last_point is None:
+            self.first_point = game.first_point
+            self.last_point = game.last_point
+        else:
+            assert first_point
+            self.first_point = first_point
+            self.last_point = last_point
+
+        if self.first_point > self.last_point:
             raise UserWarning(f'{first_point}..{last_point} is a negative range')
-        self.first_point = first_point
-        self.last_point = last_point
 
     @classmethod
     def from_string(cls, string:str) -> Tuple[Point, Union[Point, None]]:
