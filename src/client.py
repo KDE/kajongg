@@ -393,11 +393,13 @@ class Client(pb.Referenceable):
                     self.game.debug(f'got Move: {move!r}')
                 else:
                     logDebug(f'got Move: {move!r}')
-        if self.game:
+        game = self.game
+        if game:
             if move.token:
-                if move.token != self.game.point.token(self.game):
+                game_token = game.point.token(game)
+                if move.token != game_token:
                     logException(
-                        f'wrong token: {move.token}, we have {self.game.point.token(self.game)}')
+                        f'wrong token: {move.token}, we have {game_token}')
         with Duration(f'{move!r}:'):
             try:
                 result = self.exec_move(move).addCallback(self.__jellyMessage)
