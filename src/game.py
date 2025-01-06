@@ -324,6 +324,8 @@ class Game:
 
     def goto(self, point:Point) ->None:
         """go to the position defined by point"""
+        if point.moveCount > 0:
+            raise NotImplementedError('Game.goto() only accepts moveCount 0')
         for _ in range(point.roundsFinished * 4 + point.rotated):
             self.rotateWinds()
         self.notRotated = point.notRotated
