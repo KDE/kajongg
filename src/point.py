@@ -13,7 +13,7 @@ from typing import Optional, TYPE_CHECKING
 
 from log import logWarning, logException
 from common import ReprMixin
-from wind import Wind
+from wind import Wind, East, NoWind
 
 if TYPE_CHECKING:
     from game import Game
@@ -27,12 +27,12 @@ class Point(ReprMixin):
     def __init__(self, game:'Game', string:Optional[str]=None, stringIdx:int=0) ->None:
         self.game = game
         self.seed = game.seed
-        self.roundsFinished = 0
+        self.prevailing:Wind = East
         self.rotated = 0
         self.notRotated = 0
         self.moveCount = 0
         if string is None:
-            self.roundsFinished = game.roundsFinished
+            self.prevailing = game.roundWind
             self.rotated = game.rotated
             self.notRotated = game.notRotated
             self.moveCount = len(game.moves)
@@ -53,7 +53,7 @@ class Point(ReprMixin):
         self.seed = seed
         if '/' not in string:
             if stringIdx == 1:
-                self.roundsFinished = 4
+                self.prevailing = NoWind
             return
         string1 = string.split('/')[1]
         if not string1:
@@ -63,20 +63,20 @@ class Point(ReprMixin):
             if stringIdx == 0 and parts[0] == '':
                 return
             if stringIdx == 1 and parts[1] == '':
-                self.roundsFinished = 4
+                self.prevailing = NoWind
                 return
         point = parts[min(stringIdx, len(parts) - 1)]
         if point[0].lower() not in 'eswn':
             logException(f'--game={string} must specify the round wind')
         handWind = Wind(point[0])
         ruleset = self.game.ruleset
-        self.roundsFinished = handWind.__index__()
+        self.prevailing = handWind
         minRounds = ruleset.minRounds  # type:ignore[attr-defined]
         if self.roundsFinished > minRounds:
             logWarning(
                 f'Ruleset {ruleset.name} has {int(minRounds)} minimum rounds '
                 f'but you want round {int(self.roundsFinished + 1)}({handWind})')
-            self.roundsFinished = minRounds
+            self.prevailing = Wind.all4[minRounds - 1]
             return
         self.rotated = int(point[1]) - 1
         if self.rotated > 3:
@@ -117,17 +117,21 @@ class Point(ReprMixin):
                 aiName = 'DefaultAI'
             if aiName != 'DefaultAI':
                 aiVariant = aiName + '/'
-        _ = self.notRotated_as_str() or ' '
-        wind = Wind.all4[self.roundsFinished % 4]
         if withSeed:
             seedStr = str(self.seed)
         else:
             seedStr = ''
         delim = '/' if withSeed or withAI else ''
-        result = f'{aiVariant}{seedStr}{delim}{wind}{self.rotated + 1}{_}'
+        _ = self.notRotated_as_str() or ' '
+        result = f'{aiVariant}{seedStr}{delim}{self.prevailing}{self.rotated + 1}{_}'
         if withMoveCount:
             result += f'/{int(self.moveCount):3}'
         return result
+
+    @property
+    def roundsFinished(self) -> int:
+        """wind index"""
+        return self.prevailing.__index__()
 
     def notRotated_as_str(self) ->str:
         """encode into a..z"""
@@ -151,8 +155,8 @@ class Point(ReprMixin):
             return False
         if not isinstance(other, Point):
             return NotImplemented
-        return (self.roundsFinished, self.rotated, self.notRotated) == \
-                (other.roundsFinished, other.rotated, other.notRotated)
+        return (self.prevailing, self.rotated, self.notRotated) == \
+                (other.prevailing, other.rotated, other.notRotated)
 
     def __ne__(self, other:object) ->bool:
         return not self == other
@@ -163,8 +167,8 @@ class Point(ReprMixin):
             return False
         if not isinstance(other, Point):
             return NotImplemented
-        return (self.roundsFinished, self.rotated, self.notRotated) > (
-            other.roundsFinished, other.rotated, other.notRotated)
+        return (self.prevailing, self.rotated, self.notRotated) > (
+            other.prevailing, other.rotated, other.notRotated)
 
     def __lt__(self, other:object) ->bool:
         if other is None:
@@ -172,5 +176,5 @@ class Point(ReprMixin):
             return True
         if not isinstance(other, Point):
             return NotImplemented
-        return (self.roundsFinished, self.rotated, self.notRotated) < (
-            other.roundsFinished, other.rotated, other.notRotated)
+        return (self.prevailing, self.rotated, self.notRotated) < (
+            other.prevailing, other.rotated, other.notRotated)
