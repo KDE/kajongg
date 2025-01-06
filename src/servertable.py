@@ -357,7 +357,7 @@ class ServerTable(Table, ReprMixin):
             block.tellPlayer(
                 player, Message.ReadyForGameStart, tableid=self.tableid,
                 gameid=game.gameid, shouldSave=player.shouldSave,
-                wantedGame=game.wantedGame, players=game.players)
+                wantedGame=str(game.pos_range), players=game.players)
         block.callback(self.startGame)
 
     def startGame(self, requests:List['Request']) ->None:

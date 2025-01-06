@@ -29,7 +29,7 @@ from sound import Voice
 from wall import Wall
 from player import Players, Player, PlayingPlayer
 from animation import animateAndDo, AnimationSpeed, ParallelAnimationGroup
-from point import Point
+from point import Point, PointRange
 
 if sys.platform != 'win32':
     import resource
@@ -79,7 +79,7 @@ class Game:
         self.randomGenerator:CountingRandom = CountingRandom(self)
         if wantedGame is None:
             wantedGame = str(int(self.randomGenerator.random() * 10 ** 9))
-        self.wantedGame:Optional[str] = wantedGame
+        self.pos_range = PointRange.from_string(self, wantedGame)
         self.ruleset:Ruleset = ruleset
         self._currentPoint:Optional[Point] = None
         self._prevPoint:Optional[Point] = None
@@ -107,7 +107,7 @@ class Game:
         self.assignPlayers(names)  # also defines self.myself
         if self.belongsToGameServer():
             self.__shufflePlayers()
-        self._scanGameOption()
+        self.goto(self.pos_range.first_point)
         for player in self.players:
             player.clearHand()
 
@@ -163,9 +163,6 @@ class Game:
         self.dangerousTiles = []
         self.discardedTiles.clear()
         assert cast(IntDict, self.visibleTiles).count() == 0
-
-    def _scanGameOption(self) ->None:
-        """this is only done for PlayingGame"""
 
     @property
     def lastDiscard(self) ->Optional[Tile]:
@@ -367,9 +364,7 @@ class Game:
     @property
     def seed(self) ->int:
         """extract it from wantedGame. Set wantedGame if empty."""
-        if not self.wantedGame:
-            self.wantedGame = str(int(self.randomGenerator.random() * 10 ** 9))
-        return int(self.wantedGame.split('/')[0])
+        return self.pos_range.first_point.seed
 
     def _setHandSeed(self) ->None:
         """set seed to a reproducible value, independent of what happened
@@ -594,10 +589,10 @@ class Game:
         """The game is over after minRounds completed rounds. Also,
         check if we reached the second point defined by --game.
         If we did, the game is over too"""
-        # FIXME: re-enable
-        # last = Point(self, self.wantedGame, 1)
-        # if self.point > last:
-        #    return True
+        if self.pos_range:
+            last = self.pos_range.last_point
+            if last and self.point >= last:
+                return True
         if Options.rounds:
             return self.roundsFinished >= Options.rounds
         if self.ruleset:
@@ -864,16 +859,6 @@ class PlayingGame(Game):
         # if we are a client in a remote game, the server swaps and tells
         # us the new places
         return [] if self.belongsToPlayer() else pairs
-
-    def _scanGameOption(self) ->None:
-        """scan the --game option and go to start of wanted hand"""
-        if self.wantedGame and '/' in self.wantedGame:
-            # FIXME re-enable
-            # first, last = (Point(self, self.wantedGame, x) for x in (0, 1))
-            # if first > last:
-            #     raise UserWarning(f'{first}..{last} is a negative range')
-            point = Point(self.wantedGame)
-            self.goto(point)
 
     def assignVoices(self) ->None:
         """now we have all remote user voices"""
