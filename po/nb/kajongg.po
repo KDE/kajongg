@@ -35,35 +35,30 @@ msgstr "fila <filename>%1</filename> inneholder ingen gyldig SVG"
 
 #: src/backgroundselector.py:107
 #, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "Forhåndsvis"
 
 #: src/backgroundselector.py:108
 #, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "Egenskaper"
 
 #: src/backgroundselector.py:109
 #, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
 msgstr "Forfatter:"
 
 #: src/backgroundselector.py:110
 #, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "Kontakt:"
 
 #: src/backgroundselector.py:111
 #, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "Beskrivelse:"
@@ -2313,35 +2308,30 @@ msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
 #, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "Forhåndsvis"
 
 #: src/tilesetselector.py:142
 #, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "Egenskaper"
 
 #: src/tilesetselector.py:143
 #, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
 msgstr "Forfatter:"
 
 #: src/tilesetselector.py:144
 #, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "Kontakt:"
 
 #: src/tilesetselector.py:145
 #, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "Beskrivelse:"
