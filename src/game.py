@@ -70,16 +70,19 @@ class Game:
         self.prevActivePlayer:Optional[Player]
         # the player using this client instance for talking to the server
         self.__shouldSave = False
-        self._client = None
-        self.client = client
+        self._client = None  # FIXME: add comment
+        self.client = client  # FIXME: add comment
+        self.roundWind:Wind = East  # after 4 rounds, roundWind is NoWind
         self.rotated:int = 0
         self.notRotated:int = 0  # counts hands since last rotation
+        self.moves:List['Move'] = []  # only the current hand
+        self.randomGenerator:CountingRandom = CountingRandom(self)
+        if wantedGame is None:
+            wantedGame = str(int(self.randomGenerator.random() * 10 ** 9))
+        self.wantedGame:Optional[str] = wantedGame
         self.ruleset:Ruleset = ruleset
-        self.roundWind:Wind = East  # after 4 rounds, roundWind is NoWind
         self._currentPoint:Optional[Point] = None
         self._prevPoint:Optional[Point] = None
-        self.wantedGame:Optional[str] = wantedGame
-        self.moves:List['Move'] = []
         self.gameid:Optional[int] = gameid
         self.playOpen:bool = False
         self.autoPlay:bool = False
@@ -92,7 +95,6 @@ class Game:
         # tile names are always lowercase
         self.dangerousTiles:List[Tuple[Set[Tile], str]] = []
         self.csvTags:List[str] = []
-        self.randomGenerator:CountingRandom = CountingRandom(self)
         self._setHandSeed()
         self.activePlayer:Optional[Player] = None
         self.__winner:Optional[Player] = None
