@@ -558,6 +558,9 @@ class Game:
         if len(qScores) != 4:
             logError(
                 f'game {int(qGame.id)}: last hand should have 4 score records, found {len(qScores)}')
+        if len({x[4] for x in qScores}) != 1:
+            logError(f'game {qGame.id} inconsistent: '
+                     f'All score records for the same hand must have the same prevailing wind')
         return qScores
 
     @classmethod
@@ -572,15 +575,6 @@ class Game:
         Players.load()  # we want to make sure we have the current definitions
         qLastHandRecord = cls._loadLastHand(gameid)
         qScores = cls._loadScores(qGame, qLastHandRecord.hand)  # FIXME: war 1, aber 1 ist doch rotated
-
-        # after loading SQL, prepare values.
-
-        # default value. If the server saved a score entry but our client
-        # did not, we get no record here. Should we try to fix this or
-        # exclude such a game from the list of resumable games?
-        if len({x[4] for x in qScores}) != 1:
-            logError(f'game {int(gameid)} inconsistent: '
-                     f'All score records for the same hand must have the same prevailing wind')
 
         players = list((x[1], Game.__getName(x[0])) for x in qScores)
 
