@@ -6,14 +6,14 @@
 # marce villarino <mvillarino@users.sourceforge.net>, 2009.
 # Xosé <xosecalvo@gmail.com>, 2010, 2012.
 # Adrián Chaves Fernández <adriyetichaves@gmail.com>, 2012, 2015, 2017.
-# SPDX-FileCopyrightText: 2024 Adrián Chaves (Gallaecio)
+# SPDX-FileCopyrightText: 2024, 2025 Adrián Chaves (Gallaecio)
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-10-10 00:37+0000\n"
-"PO-Revision-Date: 2024-11-09 16:14+0100\n"
+"PO-Revision-Date: 2025-01-06 13:23+0100\n"
 "Last-Translator: Adrián Chaves (Gallaecio) <adrian@chaves.io>\n"
 "Language-Team: Proxecto Trasno (proxecto@trasno.gal)\n"
 "Language: gl\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 24.08.3\n"
+"X-Generator: Lokalize 24.12.0\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -1988,7 +1988,7 @@ msgstr "Non se atopou a mesa co identificador <numid>%1</numid>."
 
 #: src/server.py:364
 msgid "Player %1 has logged out"
-msgstr "O xogador %1 desconectouse"
+msgstr "O xogador %1 saíu"
 
 #: src/server.py:434
 msgid "the server will listen on PORT ({int(defaultPort)})"
