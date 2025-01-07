@@ -546,19 +546,21 @@ class Game:
         """If the server saved a score entry but our client
            did not, we get no record here. Should we try to fix this or
            exclude such a game from the list of resumable games?"""
+        scoreFields = 'player, wind, balance, won, prevailing'
         qScores = Query(
-            "select player, wind, balance, won, prevailing from score "
+            "select {fields} from score "
             "where game=? and hand=?",
-            (qGame.id, hand)).records
+            (qGame.id, hand), fields=scoreFields).tuples()  # type: ignore
         if not qScores:
             # this should normally not happen
+            my_class = namedtuple('_', scoreFields)  # type: ignore
             qScores = list(
-                list([qGame[wind], wind, 0, False, East])
-                for wind in Wind.all4)
+                my_class(qGame[wind], wind.char, 0, False, East.char)  # type:ignore
+                for wind in Wind.all4)  # type: ignore[call-arg]
         if len(qScores) != 4:
             logError(
                 f'game {int(qGame.id)}: last hand should have 4 score records, found {len(qScores)}')
-        if len({x[4] for x in qScores}) != 1:
+        if len({x.prevailing for x in qScores}) != 1:
             logError(f'game {qGame.id} inconsistent: '
                      f'All score records for the same hand must have the same prevailing wind')
         return qScores
@@ -576,7 +578,7 @@ class Game:
         qLastHandRecord = cls._loadLastHand(gameid)
         qScores = cls._loadScores(qGame, qLastHandRecord.hand)  # FIXME: war 1, aber 1 ist doch rotated
 
-        players = list((x[1], Game.__getName(x[0])) for x in qScores)
+        players = list((x.wind, Game.__getName(x.player)) for x in qScores)
 
         # create the game instance. It gets the starting point from DB itself
         game = cls(players, ruleset, gameid=gameid, client=client, wantedGame=qGame.seed)
@@ -587,13 +589,13 @@ class Game:
         # Game.__init__ verwendet dazu nur wantedGame, also ganz von vorne
 
         for qScore in qScores:
-            player = game.players.byId(qScore[0])
+            player = game.players.byId(qScore.player)
             if not player:
                 logError(
-                    f'game {int(gameid)} inconsistent: player {qScore[0]} missing in game table')
+                    f'game {int(gameid)} inconsistent: player {qScore.player} missing in game table')
             else:
-                player.getsPayment(qScore[2])
-            if qScore[3]:
+                player.getsPayment(qScore.balance)
+            if qScore.won:
                 game.winner = player
         game.handctr += 1
         game.notRotated += 1
