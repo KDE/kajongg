@@ -518,19 +518,18 @@ class Game:
             return i18n('Player %1 not known', playerid)
 
     @classmethod
-    def loadFromDB(cls, gameid:int, client:Optional['Client']=None) ->Optional[Union['Game', 'ServerGame']]:
-        """load game by game id and return a new Game instance"""
-        # TODO would be nice to use cls in result annotation, but how?
-        Internal.logPrefix = 'S' if Internal.isServer else 'C'
+    def _loadGameRecord(cls, gameid:int) ->Optional[Any]:
+        """load and sanitize"""
         records = Query(
             "select p0,p1,p2,p3,ruleset,seed from game where id = ?",
             (gameid,)).records
         if not records:
             return None
-        qGameRecord = records[0]
-        rulesetId = int(qGameRecord[4]) or 1
-        ruleset = Ruleset.cached(rulesetId)
-        Players.load()  # we want to make sure we have the current definitions
+        return records[0]
+
+    @classmethod
+    def _loadLastHand(cls, gameid:int) ->Any:
+        """load or invent"""
         records = Query(
             "select hand,rotated from score where game=? and hand="
             "(select max(hand) from score where game=?)",
@@ -539,10 +538,17 @@ class Game:
             qLastHandRecord = records[0]
         else:
             qLastHandRecord = [0, 0]
+        return qLastHandRecord
+
+    @classmethod
+    def _loadScores(cls, gameid:int, qGameRecord: Any, hand:int) ->Any:
+        """If the server saved a score entry but our client
+           did not, we get no record here. Should we try to fix this or
+           exclude such a game from the list of resumable games?"""
         qScoreRecords = Query(
             "select player, wind, balance, won, prevailing from score "
             "where game=? and hand=?",
-            (gameid, qLastHandRecord[0])).records
+            (gameid, hand)).records
         if not qScoreRecords:
             # this should normally not happen
             qScoreRecords = list(
@@ -550,6 +556,21 @@ class Game:
                 for wind in Wind.all4)
         if len(qScoreRecords) != 4:
             logError(f'game {int(gameid)} inconsistent: There should be exactly 4 score records for the last hand')
+        return qScoreRecords
+
+    @classmethod
+    def loadFromDB(cls, gameid:int, client:Optional['Client']=None) ->Optional[Union['Game', 'ServerGame']]:
+        """load game by game id and return a new Game instance"""
+        # TODO would be nice to use cls in result annotation, but how?
+        Internal.logPrefix = 'S' if Internal.isServer else 'C'
+        qGameRecord = cls._loadGameRecord(gameid)
+        if qGameRecord is None:
+            return None
+        rulesetId = int(qGameRecord[4]) or 1
+        ruleset = Ruleset.cached(rulesetId)
+        Players.load()  # we want to make sure we have the current definitions
+        qLastHandRecord = cls._loadLastHand(gameid)
+        qScoreRecords = cls._loadScores(gameid, qGameRecord, qLastHandRecord[1])
 
         # after loading SQL, prepare values.
 
@@ -562,7 +583,7 @@ class Game:
 
         players = list((x[1], Game.__getName(x[0])) for x in qScoreRecords)
 
-        # create the game instance.
+        # create the game instance. It gets the starting point from DB itself
         game = cls(players, ruleset, gameid=gameid, client=client,
                    wantedGame=qGameRecord[5])
         game.handctr, game.rotated = qLastHandRecord
