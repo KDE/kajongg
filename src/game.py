@@ -10,6 +10,7 @@ SPDX-License-Identifier: GPL-2.0-only
 import datetime
 import weakref
 import sys
+from collections import namedtuple
 
 from typing import List, Optional, Tuple, TYPE_CHECKING, Union, Dict, Iterable, Generator, Any, Set, cast
 
@@ -531,14 +532,14 @@ class Game:
     def _loadLastHand(cls, gameid:int) ->Any:
         """load or invent"""
         records = Query(
-            "select hand,rotated from score where game=? and hand="
-            "(select max(hand) from score where game=?)",
-            (gameid, gameid)).records
+            "select {fields} from score "
+            "where game=? "
+                "and hand=(select max(hand) from score where game=?) ",
+            (gameid, gameid), fields='hand,rotated').tuples()
         if records:
-            qLastHandRecord = records[0]
-        else:
-            qLastHandRecord = [0, 0]
-        return qLastHandRecord
+            return records[0]
+        _ = namedtuple('_', 'hand,rotated')
+        return _(0, 0)
 
     @classmethod
     def _loadScores(cls, qGame: Any, hand:int) ->Any:
@@ -569,7 +570,7 @@ class Game:
         ruleset = Ruleset.cached(qGame.ruleset)
         Players.load()  # we want to make sure we have the current definitions
         qLastHandRecord = cls._loadLastHand(gameid)
-        qScores = cls._loadScores(qGame, qLastHandRecord[1])
+        qScores = cls._loadScores(qGame, qLastHandRecord.hand)  # FIXME: war 1, aber 1 ist doch rotated
 
         # after loading SQL, prepare values.
 
@@ -584,7 +585,8 @@ class Game:
 
         # create the game instance. It gets the starting point from DB itself
         game = cls(players, ruleset, gameid=gameid, client=client, wantedGame=qGame.seed)
-        game.handctr, game.rotated = qLastHandRecord
+        game.handctr = qLastHandRecord.hand
+        game.rotated = qLastHandRecord.rotated
 
         # FIXME wie geht game zum richtigen Startpunkt? Hier ist kein goto,
         # Game.__init__ verwendet dazu nur wantedGame, also ganz von vorne
