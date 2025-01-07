@@ -556,7 +556,8 @@ class Game:
                 list([qGame[wind], wind, 0, False, East])
                 for wind in Wind.all4)
         if len(qScores) != 4:
-            logError(f'game {qGame.id} inconsistent: There should be exactly 4 score records for the last hand')
+            logError(
+                f'game {int(qGame.id)}: last hand should have 4 score records, found {len(qScores)}')
         return qScores
 
     @classmethod
@@ -591,17 +592,15 @@ class Game:
         # FIXME wie geht game zum richtigen Startpunkt? Hier ist kein goto,
         # Game.__init__ verwendet dazu nur wantedGame, also ganz von vorne
 
-        for record in qScores:
-            playerid = record[0]
-            player = game.players.byId(playerid)
+        for qScore in qScores:
+            player = game.players.byId(qScore[0])
             if not player:
                 logError(
-                    f'game {int(gameid)} inconsistent: player {int(playerid)} missing in game table')
+                    f'game {int(gameid)} inconsistent: player {qScore[0]} missing in game table')
             else:
-                player.getsPayment(record[2])
-            if record[3]:
+                player.getsPayment(qScore[2])
+            if qScore[3]:
                 game.winner = player
-        game.roundWind = qScores[0][4]
         game.handctr += 1
         game.notRotated += 1
         game.maybeRotateWinds()
