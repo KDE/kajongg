@@ -541,54 +541,57 @@ class Game:
         return qLastHandRecord
 
     @classmethod
-    def _loadScores(cls, qGameRecord: Any, hand:int) ->Any:
+    def _loadScores(cls, qGame: Any, hand:int) ->Any:
         """If the server saved a score entry but our client
            did not, we get no record here. Should we try to fix this or
            exclude such a game from the list of resumable games?"""
-        qScoreRecords = Query(
+        qScores = Query(
             "select player, wind, balance, won, prevailing from score "
             "where game=? and hand=?",
-            (qGameRecord[5], hand)).records
-        if not qScoreRecords:
+            (qGame[5], hand)).records
+        if not qScores:
             # this should normally not happen
-            qScoreRecords = list(
-                list([qGameRecord[wind], wind, 0, False, East])
+            qScores = list(
+                list([qGame[wind], wind, 0, False, East])
                 for wind in Wind.all4)
-        if len(qScoreRecords) != 4:
-            logError(f'game {qGameRecord[5]} inconsistent: There should be exactly 4 score records for the last hand')
-        return qScoreRecords
+        if len(qScores) != 4:
+            logError(f'game {qGame[5]} inconsistent: There should be exactly 4 score records for the last hand')
+        return qScores
 
     @classmethod
     def loadFromDB(cls, gameid:int, client:Optional['Client']=None) ->Optional[Union['Game', 'ServerGame']]:
         """load game by game id and return a new Game instance"""
         # TODO would be nice to use cls in result annotation, but how?
         Internal.logPrefix = 'S' if Internal.isServer else 'C'
-        qGameRecord = cls._loadGameRecord(gameid)
-        if qGameRecord is None:
+        qGame = cls._loadGameRecord(gameid)
+        if qGame is None:
             return None
-        rulesetId = int(qGameRecord[4]) or 1
+        rulesetId = int(qGame[4]) or 1
         ruleset = Ruleset.cached(rulesetId)
         Players.load()  # we want to make sure we have the current definitions
         qLastHandRecord = cls._loadLastHand(gameid)
-        qScoreRecords = cls._loadScores(qGameRecord, qLastHandRecord[1])
+        qScores = cls._loadScores(qGame, qLastHandRecord[1])
 
         # after loading SQL, prepare values.
 
         # default value. If the server saved a score entry but our client
         # did not, we get no record here. Should we try to fix this or
         # exclude such a game from the list of resumable games?
-        if len({x[4] for x in qScoreRecords}) != 1:
+        if len({x[4] for x in qScores}) != 1:
             logError(f'game {int(gameid)} inconsistent: '
                      f'All score records for the same hand must have the same prevailing wind')
 
-        players = list((x[1], Game.__getName(x[0])) for x in qScoreRecords)
+        players = list((x[1], Game.__getName(x[0])) for x in qScores)
 
         # create the game instance. It gets the starting point from DB itself
         game = cls(players, ruleset, gameid=gameid, client=client,
-                   wantedGame=qGameRecord[6])
+                   wantedGame=qGame[6])
         game.handctr, game.rotated = qLastHandRecord
 
-        for record in qScoreRecords:
+        # FIXME wie geht game zum richtigen Startpunkt? Hier ist kein goto,
+        # Game.__init__ verwendet dazu nur wantedGame, also ganz von vorne
+
+        for record in qScores:
             playerid = record[0]
             player = game.players.byId(playerid)
             if not player:
@@ -598,7 +601,7 @@ class Game:
                 player.getsPayment(record[2])
             if record[3]:
                 game.winner = player
-        game.roundWind = qScoreRecords[0][4]
+        game.roundWind = qScores[0][4]
         game.handctr += 1
         game.notRotated += 1
         game.maybeRotateWinds()
