@@ -521,7 +521,7 @@ class Game:
     def _loadGameRecord(cls, gameid:int) ->Optional[Any]:
         """load and sanitize"""
         records = Query(
-            "select p0,p1,p2,p3,ruleset,seed from game where id = ?",
+            "select p0,p1,p2,p3,ruleset,id,seed from game where id = ?",
             (gameid,)).records
         if not records:
             return None
@@ -541,21 +541,21 @@ class Game:
         return qLastHandRecord
 
     @classmethod
-    def _loadScores(cls, gameid:int, qGameRecord: Any, hand:int) ->Any:
+    def _loadScores(cls, qGameRecord: Any, hand:int) ->Any:
         """If the server saved a score entry but our client
            did not, we get no record here. Should we try to fix this or
            exclude such a game from the list of resumable games?"""
         qScoreRecords = Query(
             "select player, wind, balance, won, prevailing from score "
             "where game=? and hand=?",
-            (gameid, hand)).records
+            (qGameRecord[5], hand)).records
         if not qScoreRecords:
             # this should normally not happen
             qScoreRecords = list(
                 list([qGameRecord[wind], wind, 0, False, East])
                 for wind in Wind.all4)
         if len(qScoreRecords) != 4:
-            logError(f'game {int(gameid)} inconsistent: There should be exactly 4 score records for the last hand')
+            logError(f'game {qGameRecord[5]} inconsistent: There should be exactly 4 score records for the last hand')
         return qScoreRecords
 
     @classmethod
@@ -570,7 +570,7 @@ class Game:
         ruleset = Ruleset.cached(rulesetId)
         Players.load()  # we want to make sure we have the current definitions
         qLastHandRecord = cls._loadLastHand(gameid)
-        qScoreRecords = cls._loadScores(gameid, qGameRecord, qLastHandRecord[1])
+        qScoreRecords = cls._loadScores(qGameRecord, qLastHandRecord[1])
 
         # after loading SQL, prepare values.
 
@@ -585,7 +585,7 @@ class Game:
 
         # create the game instance. It gets the starting point from DB itself
         game = cls(players, ruleset, gameid=gameid, client=client,
-                   wantedGame=qGameRecord[5])
+                   wantedGame=qGameRecord[6])
         game.handctr, game.rotated = qLastHandRecord
 
         for record in qScoreRecords:
