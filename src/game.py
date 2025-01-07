@@ -520,12 +520,12 @@ class Game:
     @classmethod
     def _loadGameRecord(cls, gameid:int) ->Optional[Any]:
         """load and sanitize"""
-        records = Query(
-            "select p0,p1,p2,p3,ruleset,id,seed from game where id = ?",
-            (gameid,)).records
-        if not records:
-            return None
-        return records[0]
+        record = Query(
+            "select {fields} from game where id = ?",
+            (gameid,), fields='p0,p1,p2,p3,ruleset,id,seed').tuple()
+        if record:
+            return record._replace(ruleset=int(record.ruleset) or 1)
+        return None
 
     @classmethod
     def _loadLastHand(cls, gameid:int) ->Any:
@@ -548,14 +548,14 @@ class Game:
         qScores = Query(
             "select player, wind, balance, won, prevailing from score "
             "where game=? and hand=?",
-            (qGame[5], hand)).records
+            (qGame.id, hand)).records
         if not qScores:
             # this should normally not happen
             qScores = list(
                 list([qGame[wind], wind, 0, False, East])
                 for wind in Wind.all4)
         if len(qScores) != 4:
-            logError(f'game {qGame[5]} inconsistent: There should be exactly 4 score records for the last hand')
+            logError(f'game {qGame.id} inconsistent: There should be exactly 4 score records for the last hand')
         return qScores
 
     @classmethod
@@ -566,8 +566,7 @@ class Game:
         qGame = cls._loadGameRecord(gameid)
         if qGame is None:
             return None
-        rulesetId = int(qGame[4]) or 1
-        ruleset = Ruleset.cached(rulesetId)
+        ruleset = Ruleset.cached(qGame.ruleset)
         Players.load()  # we want to make sure we have the current definitions
         qLastHandRecord = cls._loadLastHand(gameid)
         qScores = cls._loadScores(qGame, qLastHandRecord[1])
@@ -584,8 +583,7 @@ class Game:
         players = list((x[1], Game.__getName(x[0])) for x in qScores)
 
         # create the game instance. It gets the starting point from DB itself
-        game = cls(players, ruleset, gameid=gameid, client=client,
-                   wantedGame=qGame[6])
+        game = cls(players, ruleset, gameid=gameid, client=client, wantedGame=qGame.seed)
         game.handctr, game.rotated = qLastHandRecord
 
         # FIXME wie geht game zum richtigen Startpunkt? Hier ist kein goto,
