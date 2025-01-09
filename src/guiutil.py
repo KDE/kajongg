@@ -29,13 +29,15 @@ class MJTableView(QTableView):
 
     def __init__(self, parent:Optional['QWidget']=None) ->None:
         QTableView.__init__(self, parent)
-        self.horizontalHeader().setStretchLastSection(True)
+        if header := self.horizontalHeader():
+            header.setStretchLastSection(True)
         self.setAlternatingRowColors(True)
         pol = QSizePolicy()
         pol.setHorizontalPolicy(QSizePolicy.Policy.Expanding)
         pol.setVerticalPolicy(QSizePolicy.Policy.Expanding)
         self.setSizePolicy(pol)
-        self.verticalHeader().hide()
+        if header := self.verticalHeader():
+            header.hide()
 
     def initView(self) ->None:
         """set some app specific defaults"""

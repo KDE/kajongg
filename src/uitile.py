@@ -327,7 +327,8 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
             placeDirty = True
         if board and placeDirty:
             if board.scene() and not self.scene():
-                board.scene().addItem(self)
+                if scene := board.scene():
+                    scene.addItem(self)
             board.placeTile(self)
 
     @property

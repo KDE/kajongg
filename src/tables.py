@@ -231,7 +231,9 @@ class TableList(QWidget):
         self.setLayout(layout)
 
         self.view.doubleClicked.connect(client.joinTable)
-        StateSaver(self, self.view.horizontalHeader())
+        header = self.view.horizontalHeader()
+        if header:
+            StateSaver(self, header)
         self.__updateButtonsForNoTable()
 
     def hideEvent(self, unusedEvent:Optional['QEvent']) ->None:
@@ -291,7 +293,8 @@ class TableList(QWidget):
         assert self.client.name
         decorateWindow(self, ' - '.join([self.client.name, title]))
         self.view.hideColumn(1)
-        tableCount = self.view.model().rowCount() if self.view.model() else 0
+        model = self.view.model()
+        tableCount = model.rowCount() if model else 0
         self.view.showColumn(0)
         self.view.showColumn(2)
         self.view.showColumn(4)
@@ -374,8 +377,9 @@ class TableList(QWidget):
 
     def selectedTable(self) ->Optional['ClientTable']:
         """return the selected table"""
-        if self.view.selectionModel():
-            index = self.view.selectionModel().currentIndex()
+        sel_model = self.view.selectionModel()
+        if sel_model:
+            index = sel_model.currentIndex()
             model = cast(TablesModel, self.view.model())
             if index.isValid() and model:
                 return model.tables[index.row()]

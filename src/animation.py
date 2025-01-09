@@ -105,14 +105,14 @@ class Animation(QPropertyAnimation, ReprMixin):
 
     def __str__(self) ->str:
         """for debug messages"""
+        currentValue = 'notAlive'
+        endValue = 'notAlive'
+        targetObject = 'notAlive'
         if isAlive(self) and isAlive(self.targetObject()):
             currentValue = getattr(self.targetObject(), self.pName())
             endValue = self.endValue()
-            targetObject:Union[QObject, str] = self.targetObject()
-        else:
-            currentValue = 'notAlive'
-            endValue = 'notAlive'
-            targetObject = 'notAlive'
+            if _ := self.targetObject():
+                targetObject:Union[QObject, str] = _
         return (f'{self.ident()} {self.pName()}: {self.formatValue(currentValue)}->'
                 f'{self.formatValue(endValue)} for {targetObject} duration={int(self.duration())}ms')
 
@@ -229,7 +229,8 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
                 if currValue - endValue > 180:
                     animation.setStartValue(currValue - 360)
         for animation in self.animations:
-            animation.targetObject().setDrawingOrder()  # type:ignore[attr-defined]
+            if target := animation.targetObject():
+                target.setDrawingOrder()  # type:ignore[attr-defined]
         self.finished.connect(self.allFinished)
         scene = Internal.scene
         assert scene
@@ -265,8 +266,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
     def fixAllBoards(self) ->None:
         """set correct drawing order for all moved graphics objects"""
         for animation in self.children():
-            graphicsObject = animation.targetObject()  # type:ignore[attr-defined]
-            if graphicsObject:
+            if graphicsObject := animation.targetObject():  # type:ignore[attr-defined]
                 graphicsObject.clearActiveAnimation(animation)
         if Internal.scene:
             Internal.scene.focusRect.refresh()

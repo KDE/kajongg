@@ -58,8 +58,9 @@ class RichTextColumnDelegate(QStyledItemDelegate):
             role = QPalette.ColorRole.AlternateBase if index.row() % 2 else QPalette.ColorRole.Base
         assert self.label
         self.label.setBackgroundRole(role)
-        text = index.model().data(index, Qt.ItemDataRole.DisplayRole)
-        self.label.setText(text)
+        if model := index.model():
+            text = model.data(index, Qt.ItemDataRole.DisplayRole)
+            self.label.setText(text)
         self.label.setFixedSize(option.rect.size())
         if painter:
             with Painter(painter):
@@ -69,9 +70,9 @@ class RichTextColumnDelegate(QStyledItemDelegate):
     def sizeHint(self, option:QStyleOptionViewItem, index:Union[QModelIndex,'QPersistentModelIndex']) ->QSize:
         """compute size for the final formatted richtext"""
         assert isinstance(index, QModelIndex)
-        text = index.model().data(index)
         self.document.setDefaultFont(option.font)
-        self.document.setHtml(text)
+        if model := index.model():
+            self.document.setHtml(model.data(index))
         return QSize(int(self.document.idealWidth()) + 5,
                      option.fontMetrics.height())
 
@@ -88,8 +89,10 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
     @staticmethod
     def __textMargin() ->int:
         """text margin"""
-        return QApplication.style().pixelMetric(
-            QStyle.PixelMetric.PM_FocusFrameHMargin) + 1
+        if style := QApplication.style():
+            return style.pixelMetric(
+                QStyle.PixelMetric.PM_FocusFrameHMargin) + 1
+        return 1
 
     def paint(self, painter:Optional['QPainter'], option:QStyleOptionViewItem,
         index:Union[QModelIndex,'QPersistentModelIndex']) ->None:

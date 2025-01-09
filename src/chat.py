@@ -133,9 +133,8 @@ class ChatWindow(QWidget):
         self.messageView.setWordWrap(False)
         self.messageView.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         if Debug.modelTest:
-            self.debugModelTest = ModelTest(
-                self.messageView.model(),
-                self.messageView)
+            if model := self.messageView.model():
+                self.debugModelTest = ModelTest(model, self.messageView)
         self.edit = QLineEdit()
         layout = QVBoxLayout()
         layout.addWidget(self.messageView)
@@ -195,10 +194,11 @@ class ChatWindow(QWidget):
     def receiveLine(self, chatLine:ChatMessage) ->None:
         """show a new line in protocol"""
         self.show()
-        cast(ChatModel, self.messageView.model()).appendLine(chatLine)
-        for row in range(self.messageView.model().rowCount()):
-            self.messageView.setRowHeight(
-                row,
-                self.messageView.fontMetrics().height())
+        if model := self.messageView.model():
+            cast(ChatModel, model).appendLine(chatLine)
+            for row in range(model.rowCount()):
+                self.messageView.setRowHeight(
+                    row,
+                    self.messageView.fontMetrics().height())
         self.messageView.resizeColumnsToContents()
         self.messageView.scrollToBottom()

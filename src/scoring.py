@@ -142,8 +142,9 @@ class SelectPlayers(SelectRuleset):
                 combo.addItems(sorted(
                     allNames - self.__selectedNames() - {comboName}))
                 combo.setCurrentIndex(0)
-        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(
-            len(self.__selectedNames()) == 4)
+        ok_button = self.buttonBox.button(QDialogButtonBox.StandardButton.Ok)
+        if ok_button:
+            ok_button.setEnabled(len(self.__selectedNames()) == 4)
         self.names = [cbName.currentText() for cbName in self.nameWidgets]
 
 
@@ -348,8 +349,11 @@ class ScoringHandBoard(HandBoard):
                     if sceneRotation(self) == 180:
                         rotateCenter(helper, 180)
                     helpItems.append(helper)
-                self.__moveHelper = self.scene().createItemGroup(helpItems)
-            self.__moveHelper.setVisible(True)
+                scene = self.scene()
+                if scene:
+                    self.__moveHelper = scene.createItemGroup(helpItems)
+            if self.__moveHelper:
+                self.__moveHelper.setVisible(True)
         else:
             if self.__moveHelper:
                 self.__moveHelper.setVisible(False)

@@ -383,13 +383,14 @@ class ScoreViewRight(QTreeView):
 
     def setColWidth(self) ->None:
         """we want a fixed column width sufficient for all values"""
-        colRange = range(1, self.header().count())
-        if colRange:
-            for col in colRange:
-                self.resizeColumnToContents(col)
-            width = max(self.columnWidth(x) for x in colRange)
-            for col in colRange:
-                self.setColumnWidth(col, width)
+        if header := self.header():
+            colRange = range(1, header.count())
+            if colRange:
+                for col in colRange:
+                    self.resizeColumnToContents(col)
+                width = max(self.columnWidth(x) for x in colRange)
+                for col in colRange:
+                    self.setColumnWidth(col, width)
 
 
 class HorizontalScrollBar(QScrollBar):
@@ -406,8 +407,8 @@ class HorizontalScrollBar(QScrollBar):
 
     def hideEvent(self, unusedEvent:Optional[QEvent]) ->None:
         """adjust the left view"""
-        self.scoreTable.viewRight.header().setOffset(
-            0)  # we should not have to do this...
+        if header := self.scoreTable.viewRight.header():
+            header.setOffset(0)  # we should not have to do this...
         # how to reproduce problem without setOffset:
         # show table with hor scroll, scroll to right, extend window
         # width very fast. The faster we do that, the wronger the
@@ -451,8 +452,9 @@ class ScoreTable(QWidget):
         self.viewRight.setHorizontalScrollBar(HorizontalScrollBar(self))
         self.viewRight.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
         self.viewRight.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.viewRight.header().setSectionsClickable(False)
-        self.viewRight.header().setSectionsMovable(False)
+        if header := self.viewRight.header():
+            header.setSectionsClickable(False)
+            header.setSectionsMovable(False)
         self.viewRight.setSelectionMode(QAbstractItemView.SelectionMode.NoSelection)
         windowLayout = QVBoxLayout(self)
         self.splitter = QSplitter(Qt.Orientation.Vertical)
@@ -488,6 +490,7 @@ class ScoreTable(QWidget):
     def refresh(self) ->None:
         """load this game and this player. Keep parameter list identical with
         ExplainView"""
+        # pylint:disable=too-many-branches
         if not self.game:
             # keep scores of previous game on display
             return
@@ -510,13 +513,17 @@ class ScoreTable(QWidget):
             self.scoreModelTest = ModelTest(self.scoreModel, self)
         for view in [self.viewLeft, self.viewRight]:
             view.setModel(self.scoreModel)
-            header = view.header()
-            header.setStretchLastSection(False)
+            if header := view.header():
+                header.setStretchLastSection(False)
             view.setAlternatingRowColors(True)
-        self.viewRight.header().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        for col in range(self.viewLeft.header().count()):
-            self.viewLeft.header().setSectionHidden(col, col > 0)
-            self.viewRight.header().setSectionHidden(col, col == 0)
+        left_header = self.viewLeft.header()
+        right_header = self.viewRight.header()
+        if not left_header or not right_header:
+            return
+        right_header.setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        for col in range(left_header.count()):
+            left_header.setSectionHidden(col, col > 0)
+            right_header.setSectionHidden(col, col == 0)
         self.scoreLayout.setStretch(1, 100)
         self.scoreLayout.setSpacing(0)
         self.viewLeft.setFrameStyle(QFrame.Shape.NoFrame)
@@ -525,8 +532,10 @@ class ScoreTable(QWidget):
         for master, slave in ((self.viewRight, self.viewLeft), (self.viewLeft, self.viewRight)):
             master.expanded.connect(slave.expand)
             master.collapsed.connect(slave.collapse)
-            master.verticalScrollBar().valueChanged.connect(
-                slave.verticalScrollBar().setValue)
+            master_sb = master.verticalScrollBar()
+            slave_sb = slave.verticalScrollBar()
+            if master_sb and slave_sb:
+                master_sb.valueChanged.connect(slave_sb.setValue)
         for row, expand in enumerate(expandGroups):
             self.viewLeft.setExpanded(
                 self.scoreModel.index(row,
@@ -540,8 +549,8 @@ class ScoreTable(QWidget):
 
     def scrollRight(self) ->None:
         """make sure the latest hand is visible"""
-        scrollBar = self.viewRight.horizontalScrollBar()
-        scrollBar.setValue(scrollBar.maximum())
+        if scrollBar := self.viewRight.horizontalScrollBar():
+            scrollBar.setValue(scrollBar.maximum())
 
     def showEvent(self, unusedEvent:Optional[QEvent]) ->None:
         """Only now the views and scrollbars have useful sizes, so we can compute the spacer
@@ -552,8 +561,9 @@ class ScoreTable(QWidget):
         """if the right view has a horizontal scrollbar, make sure both
         view have the same vertical scroll area. Otherwise scrolling to
         bottom results in unsyncronized views."""
-        if self.viewRight.horizontalScrollBar().isVisible():
-            height = self.viewRight.horizontalScrollBar().height()
+        h_bar = self.viewRight.horizontalScrollBar()
+        if h_bar and h_bar.isVisible():
+            height = h_bar.height()
         else:
             height = 0
         if self.leftLayout.count() > 1:
@@ -735,6 +745,7 @@ class PenaltyDialog(QDialog):
         self.btnExecute = buttonBox.addButton(
             i18n("&Execute"),
             QDialogButtonBox.ButtonRole.AcceptRole)
+        assert self.btnExecute
         self.btnExecute.clicked.connect(self.accept)
         self.crimeChanged()
         StateSaver(self)
@@ -993,12 +1004,13 @@ class ScoringDialog(QWidget):
     def wonChanged(self) ->None:
         """if a new winner has been defined, uncheck any previous winner"""
         newWinner = None
-        if self.sender() != self.draw:
-            clicked = self.clickedPlayerIdx(self.sender())
-            if self.wonBoxes[clicked].isChecked():
-                newWinner = self.game.players[clicked]
-            else:
-                newWinner = None
+        if sender := self.sender():
+            if sender != self.draw:
+                clicked = self.clickedPlayerIdx(sender)
+                if self.wonBoxes[clicked].isChecked():
+                    newWinner = self.game.players[clicked]
+                else:
+                    newWinner = None
         self.game.winner = newWinner
         for idx in range(4):
             if newWinner != self.game.players[idx]:

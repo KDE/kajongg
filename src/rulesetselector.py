@@ -378,7 +378,8 @@ class RuleTreeView(QTreeView):
         for button in [self.btnCopy, self.btnRemove, self.btnCompare]:
             if button:
                 button.setEnabled(False)
-        self.header().setObjectName('RuleTreeViewHeader')
+        if header := self.header():
+            header.setObjectName('RuleTreeViewHeader')
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.ruleModel:Optional[RuleModel] = None
         self.ruleModelTest = None
@@ -442,19 +443,22 @@ class RuleTreeView(QTreeView):
         if self.ruleModel.canFetchMore():
             # we want to load all before adjusting column width
             self.ruleModel.fetchMore()
-        header = self.header()
-        header.setStretchLastSection(False)
-        header.setMinimumSectionSize(-1)
-        for col in range(1, header.count()):
-            header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-        for col in range(header.count()):
-            self.resizeColumnToContents(col)
+        if header := self.header():
+            header.setStretchLastSection(False)
+            header.setMinimumSectionSize(-1)
+            for col in range(1, header.count()):
+                header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+            header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+            for col in range(header.count()):
+                self.resizeColumnToContents(col)
 
     def selectedRow(self) ->Optional[QModelIndex]:
         """return the currently selected row index (with column 0)"""
-        rows = self.selectionModel().selectedRows()
-        return rows[0] if len(rows) == 1 else None
+        if model := self.selectionModel():
+            rows = model.selectedRows()
+            if len(rows) == 1:
+                return rows[0]
+        return None
 
     def copyRow(self) ->None:
         """copy a ruleset"""
@@ -465,7 +469,8 @@ class RuleTreeView(QTreeView):
             ruleset = item.raw.copyTemplate()
             cast(RuleModel, self.model()).appendRuleset(ruleset)
             self.rulesets.append(ruleset)
-            self.selectionChanged(self.selectionModel().selection())
+            if model := self.selectionModel():
+                self.selectionChanged(model.selection())
 
     def removeRow(self) ->None:
         """removes a ruleset or a rule"""
@@ -475,18 +480,20 @@ class RuleTreeView(QTreeView):
             assert not isinstance(item.ruleset(), PredefinedRuleset)
             assert isinstance(item, RulesetItem)
             ruleset = item.ruleset()
-            self.model().removeRow(row.row(), parent=row.parent())
+            if model := self.model():
+                model.removeRow(row.row(), parent=row.parent())
             self.rulesets.remove(ruleset)
-            self.selectionChanged(self.selectionModel().selection())
+            if sel_model := self.selectionModel():
+                self.selectionChanged(sel_model.selection())
 
     def compareRow(self) ->None:
         """shows the difference between two rulesets"""
-        rows = self.selectionModel().selectedRows()
-        ruleset = cast(RuleTreeItem, rows[0].internalPointer()).raw
-        assert isinstance(ruleset, Ruleset)
-        differ = RulesetDiffer([ruleset], self.rulesets)
-        differ.show()
-        self.differs.append(differ)
+        if row0 := self.selectedRow():
+            ruleset = cast(RuleTreeItem, row0.internalPointer()).raw
+            assert isinstance(ruleset, Ruleset)
+            differ = RulesetDiffer([ruleset], self.rulesets)
+            differ.show()
+            self.differs.append(differ)
 
 
 class RulesetSelector(QWidget):

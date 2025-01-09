@@ -289,7 +289,8 @@ class LoginDlg(KDialog):
         # Ubuntu 11.10 unity is a bit strange - without this, it sets focus on
         # the cancel button (which it shows on the left). I found no obvious
         # way to use setDefault and setAutoDefault for fixing this.
-        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setFocus()
+        if button := self.buttonBox.button(QDialogButtonBox.StandardButton.Ok):
+            button.setFocus()
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
         vbox = QVBoxLayout(self)
@@ -333,11 +334,11 @@ class LoginDlg(KDialog):
                 if userIdx >= 0:
                     self.cbUser.setCurrentIndex(userIdx)
         showPW = bool(self.url) and not Url(self.url).isLocalHost
-        self.grid.labelForField(self.edPassword).setVisible(showPW)
+        if label := self.grid.labelForField(self.edPassword):
+            label.setVisible(showPW)
         self.edPassword.setVisible(showPW)
-        self.grid.labelForField(
-            self.cbRuleset).setVisible(
-                not showPW and not Options.ruleset)
+        if label := self.grid.labelForField(self.cbRuleset):
+            label.setVisible( not showPW and not Options.ruleset)
         self.cbRuleset.setVisible(not showPW and not Options.ruleset)
         if not showPW:
             self.cbRuleset.clear()
@@ -345,7 +346,8 @@ class LoginDlg(KDialog):
                 self.cbRuleset.items = [Options.ruleset]
             else:
                 self.cbRuleset.items = Ruleset.selectableRulesets(self.url)
-        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(bool(self.url))
+        if button := self.buttonBox.button(QDialogButtonBox.StandardButton.Ok):
+            button.setEnabled(bool(self.url))
 
     def __defineRuleset(self) ->'Ruleset':
         """find out what ruleset to use"""

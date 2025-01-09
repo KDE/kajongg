@@ -122,14 +122,17 @@ class Games(QDialog):
         self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel)
         self.newButton = self.buttonBox.addButton(
             i18nc('start a new game', "&New"), QDialogButtonBox.ButtonRole.ActionRole)
+        assert self.newButton
         self.newButton.setIcon(KIcon("document-new"))
         self.newButton.clicked.connect(self.accept)
         self.loadButton = self.buttonBox.addButton(
             i18n("&Load"), QDialogButtonBox.ButtonRole.AcceptRole)
+        assert self.loadButton
         self.loadButton.clicked.connect(self.loadGame)
         self.loadButton.setIcon(KIcon("document-open"))
         self.deleteButton = self.buttonBox.addButton(
             i18n("&Delete"), QDialogButtonBox.ButtonRole.ActionRole)
+        assert self.deleteButton
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.deleteButton.clicked.connect(self.delete)
 
@@ -171,8 +174,10 @@ class Games(QDialog):
     def selectionChanged(self) ->None:
         """update button states according to selection"""
         selectedRows = len(self.selection.selectedRows())
-        self.loadButton.setEnabled(selectedRows == 1)
-        self.deleteButton.setEnabled(selectedRows >= 1)
+        if button := self.loadButton:
+            button.setEnabled(selectedRows == 1)
+        if button := self.deleteButton:
+            button.setEnabled(selectedRows >= 1)
 
     def setQuery(self) ->None:
         """define the query depending on self.OnlyPending"""
@@ -230,9 +235,12 @@ class Games(QDialog):
                     Query("DELETE FROM score WHERE game = ?", (game, ))
                     Query("DELETE FROM game WHERE id = ?", (game, ))
                 self.setQuery()  # just reload entire table
-        allGames = self.view.selectionModel().selectedRows(0)
-        deleteGames = [x.data() for x in allGames]
-        if not deleteGames:
+        if model := self.view.selectionModel():
+            allGames = model.selectedRows(0)
+            deleteGames = [x.data() for x in allGames]
+            if not deleteGames:
+                return
+        else:
             return
         WarningYesNo(
             i18n(

@@ -305,6 +305,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
             return
         mainWindow = Internal.scene.mainWindow
         cwi = mainWindow.centralWidget()
+        assert cwi
         view = mainWindow.centralView
         geometry = self.geometry()
         if not self.btnHeight:

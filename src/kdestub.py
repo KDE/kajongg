@@ -114,7 +114,9 @@ class KApplication(QApplication):
             result = Internal.app.desktop().availableGeometry()
         except AttributeError:
             assert Internal.mainWindow
-            result = Internal.mainWindow.screen().availableGeometry()
+            screen = Internal.mainWindow.screen()
+            assert screen
+            result = screen.availableGeometry()
         return result
 
 
@@ -172,8 +174,9 @@ class IconLabel(QLabel):
         icon = KIcon(iconName)
         option = QStyleOption()
         option.initFrom(dialog)
-        self.setPixmap(icon.pixmap(dialog.style().pixelMetric(
-            QStyle.PixelMetric.PM_MessageBoxIconSize, option, dialog)))
+        style = dialog.style()
+        assert style
+        self.setPixmap(icon.pixmap(style.pixelMetric(QStyle.PixelMetric.PM_MessageBoxIconSize, option, dialog)))
 
 
 class KMessageBox:
@@ -226,7 +229,9 @@ class KMessageBox:
             scrollArea.setWidgetResizable(True)
             scrollArea.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             scrollPal = QPalette(scrollArea.palette())
-            scrollArea.viewport().setPalette(scrollPal)
+            viewport = scrollArea.viewport()
+            if viewport:
+                viewport.setPalette(scrollPal)
             hLayout.addWidget(scrollArea, 5)
         else:
             hLayout.addWidget(messageLabel, 5)
@@ -258,26 +263,35 @@ class KDialog(CaptionMixin, QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.__mainWidget:Optional[QWidget] = None
 
+    def __set_text(self, buttonMask: QDialogButtonBox.StandardButton,
+        which:QDialogButtonBox.StandardButton, text:str) ->None:
+        """set button text"""
+        if which & buttonMask:
+            button = self.buttonBox.button(which)
+            if button:
+                button.setText(text)
+
+    def __connect_button(self, buttonMask: QDialogButtonBox.StandardButton,
+        which:QDialogButtonBox.StandardButton, connector:Any) ->None:
+        """set connector"""
+        if which & buttonMask:
+            button = self.buttonBox.button(which)
+            if button:
+                button.clicked.connect(connector)
+
     def setButtons(self, buttonMask:QDialogButtonBox.StandardButton) ->None:
         """(re)create the buttonbox and put all wanted buttons into it"""
         if not buttonMask:
             self.buttonBox.clear()
             return
         self.buttonBox.setStandardButtons(buttonMask)
-        if KDialog.Ok & buttonMask:
-            self.buttonBox.button(KDialog.Ok).setText(i18n('&OK'))
-        if KDialog.Apply & buttonMask:
-            self.buttonBox.button(KDialog.Apply).setText(i18n('&Apply'))
-        if KDialog.Cancel & buttonMask:
-            self.buttonBox.button(KDialog.Cancel).setText(i18n('&Cancel'))
-        if KDialog.Help & buttonMask:
-            self.buttonBox.button(KDialog.Help).setText(i18n('&Help'))
-        if KDialog.RestoreDefaults & buttonMask:
-            self.buttonBox.button(
-                KDialog.RestoreDefaults).setText(i18n('&Defaults'))
-            self.buttonBox.button(KDialog.RestoreDefaults).clicked.connect(self.restoreDefaults)
-        if KDialog.Help & buttonMask:
-            self.buttonBox.button(KDialog.Help).clicked.connect(Help.start)
+        self.__set_text(buttonMask, KDialog.Ok, i18n('&OK'))
+        self.__set_text(buttonMask, KDialog.Apply, i18n('&Apply'))
+        self.__set_text(buttonMask, KDialog.Cancel, i18n('&Cancel'))
+        self.__set_text(buttonMask, KDialog.Help, i18n('&Help'))
+        self.__set_text(buttonMask, KDialog.RestoreDefaults, i18n('&Defaults'))
+        self.__connect_button(buttonMask, KDialog.RestoreDefaults, self.restoreDefaults)
+        self.__connect_button(buttonMask, KDialog.Help, Help.start)
 
     def restoreDefaults(self) ->None:
         """virtual"""
@@ -286,17 +300,23 @@ class KDialog(CaptionMixin, QDialog):
         """see KDialog.setMainWidget"""
         if self.layout() is None:
             QVBoxLayout(self)
-            self.layout().addWidget(self.buttonBox)
+            _ = self.layout()
+            assert _ is not None
+            _.addWidget(self.buttonBox)
+        layout = self.layout()
+        assert layout is not None
         if self.__mainWidget:
-            self.layout().removeWidget(self.__mainWidget)
-            self.layout().removeWidget(self.buttonBox)
+            layout.removeWidget(self.__mainWidget)
+            layout.removeWidget(self.buttonBox)
         self.__mainWidget = widget
-        self.layout().addWidget(widget)
-        self.layout().addWidget(self.buttonBox)
+        layout.addWidget(widget)
+        layout.addWidget(self.buttonBox)
 
     def button(self, buttonCode:QDialogButtonBox.StandardButton) ->QPushButton:
         """return the matching button"""
-        return self.buttonBox.button(buttonCode)
+        result = self.buttonBox.button(buttonCode)
+        assert result
+        return result
 
     def returns(self, button:Optional['QDialogButtonBox.StandardButton']=None) ->Any:
         """the user answered"""
@@ -459,7 +479,9 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
                 (i18n('&Help'), ('help', 'language', 'aboutkajongg'))):
             mainMenu = QMenu(menu)
             self.menus[menu] = (mainMenu, menuItems)
-            self.menuBar().addMenu(mainMenu)
+            menu_bar = self.menuBar()
+            if menu_bar:
+                menu_bar.addMenu(mainMenu)
         self.setCaption('')
         self.actionHelp = Action(self, "help", "help-contents", Help.start)
         self.actionHelp.setText(i18nc('@action:inmenu', '&Help'))
@@ -1178,10 +1200,13 @@ class LicenseDialog(KDialog):
     def sizeHint(self) ->QSize:
         """try to set up the dialog such that the full width of the
         document is visible without horizontal scroll-bars being required"""
-        idealWidth = self.licenseBrowser.document().idealWidth()
-        idealWidth += self.style().pixelMetric(QStyle.PixelMetric.PM_LayoutLeftMargin)
-        idealWidth += self.style().pixelMetric(QStyle.PixelMetric.PM_LayoutRightMargin)
-        idealWidth += self.licenseBrowser.verticalScrollBar().width() * 2 + 1
+        if document := self.licenseBrowser.document():
+            idealWidth = document.idealWidth()
+        if style := self.style():
+            idealWidth += style.pixelMetric(QStyle.PixelMetric.PM_LayoutLeftMargin)
+            idealWidth += style.pixelMetric(QStyle.PixelMetric.PM_LayoutRightMargin)
+        if scrollbar := self.licenseBrowser.verticalScrollBar():
+            idealWidth += scrollbar.width() * 2 + 1
         # try to allow enough height for a reasonable number of lines to be
         # shown
         metrics = QFontMetrics(self.licenseBrowser.font())
@@ -1219,9 +1244,8 @@ class KConfigDialog(KDialog):
         self.tabSpace = QStackedWidget()
         self.setButtons(KDialog.Help | KDialog.Ok |
                         KDialog.Apply | KDialog.Cancel | KDialog.RestoreDefaults)
-        self.buttonBox.button(
-            KDialog.Apply).clicked.connect(
-                self.applySettings)
+        if button := self.buttonBox.button(KDialog.Apply):
+            button.clicked.connect(self.applySettings)
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(self.buttonBox)
         self.contentLayout = QHBoxLayout()
@@ -1321,7 +1345,8 @@ class KConfigDialog(KDialog):
             if oldValue != newValue:
                 changed = True
                 break
-        self.buttonBox.button(KDialog.Apply).setEnabled(changed)
+        if button := self.buttonBox.button(KDialog.Apply):
+            button.setEnabled(changed)
         return changed
 
     def updateSettings(self) ->None:
@@ -1343,8 +1368,8 @@ class KConfigDialog(KDialog):
         """show wanted page and select its icon"""
         self.tabSpace.setCurrentWidget(page)
         for idx in range(self.tabSpace.count()):
-            self.iconList.item(idx).setSelected(
-                idx == self.tabSpace.currentIndex())
+            if item := self.iconList.item(idx):
+                item.setSelected(idx == self.tabSpace.currentIndex())
 
 
 class KSeparator(QFrame):
@@ -1378,11 +1403,12 @@ class ToolBarItem(QListWidgetItem):
         result = self.action.icon()
         if result.isNull():
             if not hasattr(self, 'emptyIcon'):
-                iconSize = self.parent.style().pixelMetric(
-                    QStyle.PixelMetric.PM_SmallIconSize)
-                _ = QPixmap(iconSize, iconSize)
-                _.fill(Qt.GlobalColor.transparent)
-                self.emptyIcon = QIcon(_)
+                if style := self.parent.style():
+                    iconSize = style.pixelMetric(
+                        QStyle.PixelMetric.PM_SmallIconSize)
+                    _ = QPixmap(iconSize, iconSize)
+                    _.fill(Qt.GlobalColor.transparent)
+                    self.emptyIcon = QIcon(_)
             result = self.emptyIcon
         return result
 

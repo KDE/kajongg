@@ -326,8 +326,8 @@ class UIWall(Wall):
         for side in self.__sides:
             side.hide()
         self.tiles = []
-        if self.__square.scene():
-            self.__square.scene().removeItem(self.__square)
+        if scene := self.__square.scene():
+            scene.removeItem(self.__square)
 
     def __shuffleTiles(self) ->None:
         """shuffle tiles for next hand"""

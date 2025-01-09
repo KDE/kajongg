@@ -34,8 +34,10 @@ class PlayerList(QDialog):
         QDialog.__init__(self, parent)
         self._data:Dict[str, int] = {}
         self.table = QTableWidget(self)
-        self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.verticalHeader().setVisible(False)
+        if header := self.table.horizontalHeader():
+            header.setStretchLastSection(True)
+        if header := self.table.verticalHeader():
+            header.setVisible(False)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.itemChanged.connect(self.itemChanged)
         self.updateTable()
@@ -47,10 +49,12 @@ class PlayerList(QDialog):
             i18nc('define a new player',
                   "&New"),
             QDialogButtonBox.ButtonRole.ActionRole)
-        self.newButton.setIcon(KIcon("document-new"))
-        self.newButton.clicked.connect(self.slotInsert)
+        if button := self.newButton:
+            button.setIcon(KIcon("document-new"))
+            button.clicked.connect(self.slotInsert)
         self.deleteButton = self.buttonBox.addButton(
             i18n("&Delete"), QDialogButtonBox.ButtonRole.ActionRole)
+        assert self.deleteButton
         self.deleteButton.setIcon(KIcon("edit-delete"))
         self.deleteButton.clicked.connect(self.delete)
 
@@ -105,7 +109,8 @@ class PlayerList(QDialog):
         if currentName in self._data:
             Sorry(i18n('Player %1 already exists', currentName))
             self.setFocus()
-            del self._data[self.table.item(self.table.currentRow(), 0).text()]
+            if _ := self.table.item(self.table.currentRow(), 0):
+                del self._data[_.text()]
             self.updateTable(currentName=currentName)
             return
         try:
@@ -123,9 +128,9 @@ class PlayerList(QDialog):
         self._data[''] = 0
         self.updateTable(data=self._data, currentName='')
         for row in range(len(self._data)):
-            item = self.table.item(row, 0)
-            if not item.text():
-                self.table.editItem(item)
+            if item := self.table.item(row, 0):
+                if not item.text():
+                    self.table.editItem(item)
 
     @staticmethod
     def __deletePlayer(playerId:int) ->None:
