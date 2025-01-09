@@ -180,48 +180,49 @@ class TableList(QWidget):
         self.view.setItemDelegateForColumn(
             2,
             RichTextColumnDelegate(self.view))
-
         self.buttonBox = QDialogButtonBox(self)
-        self.newButton = self.buttonBox.addButton(
-            i18nc('allocate a new table',
-                  "&New"),
-            QDialogButtonBox.ButtonRole.ActionRole)
-        self.newButton.setIcon(KIcon("document-new"))
-        self.newButton.setToolTip(i18n("Allocate a new table"))
-        self.newButton.clicked.connect(self.client.newTable)
-        self.joinButton = self.buttonBox.addButton(
+
+        self.newButton = self.add_button(
+            i18nc('allocate a new table', "&New"),
+            i18n("Allocate a new table"),
+            "document-new",
+            QDialogButtonBox.ButtonRole.ActionRole,
+            self.client.newTable)
+
+        self.joinButton = self.add_button(
             i18n("&Join"),
-            QDialogButtonBox.ButtonRole.AcceptRole)
-        self.joinButton.clicked.connect(client.joinTable)
-        self.joinButton.setIcon(KIcon("list-add-user"))
-        self.joinButton.setToolTip(i18n("Join a table"))
-        self.leaveButton = self.buttonBox.addButton(
+            i18n("Join a table"),
+            "list-add-user",
+            QDialogButtonBox.ButtonRole.AcceptRole,
+            client.joinTable)
+
+        self.leaveButton = self.add_button(
             i18n("&Leave"),
-            QDialogButtonBox.ButtonRole.AcceptRole)
-        self.leaveButton.clicked.connect(self.leaveTable)
-        self.leaveButton.setIcon(KIcon("list-remove-user"))
-        self.leaveButton.setToolTip(i18n("Leave a table"))
-        self.compareButton = self.buttonBox.addButton(
-            i18nc('Kajongg-Ruleset',
-                  'Compare'),
-            QDialogButtonBox.ButtonRole.AcceptRole)
-        self.compareButton.clicked.connect(self.compareRuleset)
-        self.compareButton.setIcon(KIcon("preferences-plugin-script"))
-        self.compareButton.setToolTip(
-            i18n('Compare the rules of this table with my own rulesets'))
-        self.chatButton = self.buttonBox.addButton(
+            i18n("Leave a table"),
+            "list-remove-user",
+            QDialogButtonBox.ButtonRole.AcceptRole,
+            self.leaveTable)
+
+        self.compareButton = self.add_button(
+            i18nc('Kajongg-Ruleset', 'Compare'),
+            i18n('Compare the rules of this table with my own rulesets'),
+            "preferences-plugin-script",
+            QDialogButtonBox.ButtonRole.AcceptRole,
+            self.compareRuleset)
+
+        self.chatButton = self.add_button(
             i18n('&Chat'),
-            QDialogButtonBox.ButtonRole.AcceptRole)
-        self.chatButton.setIcon(KIcon("call-start"))
-        self.chatButton.clicked.connect(self.chat)
-        self.startButton = self.buttonBox.addButton(
+            "",
+            "call-start",
+            QDialogButtonBox.ButtonRole.AcceptRole,
+            self.chat)
+
+        self.startButton = self.add_button(
             i18n('&Start'),
-            QDialogButtonBox.ButtonRole.AcceptRole)
-        self.startButton.clicked.connect(self.startGame)
-        self.startButton.setIcon(KIcon("arrow-right"))
-        self.startButton.setToolTip(
-            i18n("Start playing on a table. "
-                 "Empty seats will be taken by robot players."))
+            i18n("Start playing on a table. Empty seats will be taken by robot players."),
+            "arrow-right",
+            QDialogButtonBox.ButtonRole.AcceptRole,
+            self.startGame)
 
         cmdLayout = QHBoxLayout()
         cmdLayout.addWidget(self.buttonBox)
@@ -236,6 +237,16 @@ class TableList(QWidget):
         if header:
             StateSaver(self, header)
         self.__updateButtonsForNoTable()
+
+    def add_button(self, text:str, tooltip:str, icon_name:str,
+        role:QDialogButtonBox.ButtonRole, connector:Any) ->'QPushButton':
+        """the wrapped add_button might return None, mypy does not like that"""
+        result = self.buttonBox.addButton(text, role)
+        assert result
+        result.setIcon(KIcon(icon_name))
+        result.setToolTip(tooltip)
+        result.clicked.connect(connector)
+        return result
 
     def hideEvent(self, unusedEvent:Optional['QEvent']) ->None:
         """table window hides"""
