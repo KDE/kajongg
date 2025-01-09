@@ -141,7 +141,7 @@ class ServerTable(Table, ReprMixin):
             names = tuple(x.name for x in self.users)
         online = tuple(bool(x in onlineNames) for x in names)
         if game:
-            endValues = game.handctr, {x.wind.char: x.balance for x in game.players}
+            endValues = game.point.handCount, {x.wind.char: x.balance for x in game.players}
         else:
             endValues = None
         return list([

@@ -73,9 +73,6 @@ class Game:
         self.__shouldSave = False
         self._client = None  # FIXME: add comment
         self.client = client  # FIXME: add comment
-        self.roundWind:Wind = East  # after 4 rounds, roundWind is NoWind
-        self.rotated:int = 0
-        self.notRotated:int = 0  # counts hands since last rotation
         self.moves:List['Move'] = []  # only the current hand
         self.randomGenerator:CountingRandom = CountingRandom(self)
         if wantedGame is None:
@@ -83,13 +80,13 @@ class Game:
         self.first_point: Point
         self.last_point: Optional[Point]
         self.first_point, self.last_point = PointRange.from_string(wantedGame)
+        self._point = Point(self.first_point)
         self.ruleset:Ruleset = ruleset
         self._currentPoint:Optional[Point] = None
         self._prevPoint:Optional[Point] = None
         self.gameid:Optional[int] = gameid
         self.playOpen:bool = False
         self.autoPlay:bool = False
-        self.handctr:int = 0
         self.divideAt:Optional[int] = None
         self.__lastDiscard:Optional[Tile] = None  # always uppercase
         # TODO: use Tile.none and remove assertions in message.py and otherwhere
@@ -110,9 +107,26 @@ class Game:
         self.assignPlayers(names)  # also defines self.myself
         if self.belongsToGameServer():
             self.__shufflePlayers()
-        self.goto(self.first_point)
         for player in self.players:
             player.clearHand()
+
+    @property
+    def point(self) ->Point:
+        """current position"""
+        return self._point
+
+    @point.setter
+    def point(self, value:Point) ->None:
+        """go there"""
+        if value.moveCount > 0:
+            raise NotImplementedError('Game: changing position only accepts moveCount 0')
+        # the while loop should only compare prevailing and rotated
+        final_notRotated = value.notRotated
+        value.notRotated = 0
+        self._point.notRotated = 0
+        while self.point < value: # here we use the getter for updating prevPoint
+            self.rotateWinds()
+        self._point.notRotated = final_notRotated
 
     @property
     def shouldSave(self) ->bool:
@@ -125,15 +139,6 @@ class Game:
         if value and not self.__shouldSave:
             self.saveStartTime()
         self.__shouldSave = value
-
-    @property
-    def point(self) ->Point:
-        """current position in game"""
-        result = Point(self)
-        if result != self._currentPoint:
-            self._prevPoint = self._currentPoint
-            self._currentPoint = result
-        return result
 
     @property
     def fullWallSize(self) ->int:
@@ -199,12 +204,7 @@ class Game:
     @property
     def roundsFinished(self) ->int:
         """rounds finished as given by round wind"""
-        return self.roundWind.__index__()
-
-    @roundsFinished.setter
-    def roundsFinished(self, value:int) ->None:
-        """next round"""
-        self.roundWind = Wind.all[value]
+        return self.point.prevailing.__index__()
 
     def addCsvTag(self, tag:str, forAllPlayers:bool=False) ->None:
         """tag will be written to tag field in csv row"""
@@ -213,7 +213,7 @@ class Game:
 
     def isFirstHand(self) ->bool:
         """as the name says"""
-        return Point(self).is_in_first_hand()
+        return self.point.is_in_first_hand()
 
     def _setGameId(self) ->None:
         """virtual"""
@@ -297,7 +297,7 @@ class Game:
     def __exchangeSeats(self) ->None:
         """execute seat exchanges according to the rules"""
         _ = {East: (), South: (South, West, East, North), West: (South, East), North: (West, East)}
-        winds = _[self.roundWind]
+        winds = _[self.point.prevailing]
 
         players = [self.players[x] for x in winds]
         pairs = [players[x:x + 2] for x in range(0, len(winds), 2)]
@@ -323,14 +323,6 @@ class Game:
                         if player.sideText.board is not player.front:
                             player.sideText.animateNextChange = True
                         player.sideText.board = player.front
-
-    def goto(self, point:Point) ->None:
-        """go to the point"""
-        if point.moveCount > 0:
-            raise NotImplementedError('Game.goto() only accepts moveCount 0')
-        while self.point < point:
-            self.rotateWinds()
-            self.notRotated = point.notRotated
 
     @staticmethod
     def _newGameId() ->int:
@@ -375,8 +367,8 @@ class Game:
         This makes it easier to reproduce game situations
         in later hands without having to exactly replay all previous hands"""
         seedFactor = ((self.roundsFinished + 1) * 10000
-                      + self.rotated * 1000
-                      + self.notRotated * 100)
+                      + self.point.rotated * 1000
+                      + self.point.notRotated * 100)
         self.randomGenerator.seed(self.seed * seedFactor)
 
     def prepareHand(self) ->None:
@@ -403,8 +395,8 @@ class Game:
         update score table and balance in status line"""
         self.__payHand()
         self._saveScores()
-        self.handctr += 1
-        self.notRotated += 1
+        self.point.handCount += 1
+        self.point.notRotated += 1
 
     def _saveScores(self) ->None:
         """save computed values to database,
@@ -423,11 +415,11 @@ class Game:
                 "(game,hand,data,manualrules,player,scoretime,won,prevailing,"
                 "wind,points,payments, balance,rotated,notrotated) "
                 "VALUES(%d,%d,?,?,%d,'%s',%d,'%s','%s',%d,%d,%d,%d,%d)" %
-                (self.gameid, self.handctr, player.nameid,
+                (self.gameid, self.point.handCount, player.nameid,
                  scoretime, int(player == self.__winner),
-                 self.roundWind, player.wind,
+                 self.point.prevailing, player.wind,
                  player.handTotal, player.payment, player.balance,
-                 self.rotated, self.notRotated),
+                 self.point.rotated, self.point.notRotated),
                 (player.hand.string, manualrules))
             logMessage += (f"{str(player)[:12]:<12} {player.handTotal:>4} {player.balance:>5} "
                           f"{'WON' if player == self.winner else '   '} | ")
@@ -452,18 +444,18 @@ class Game:
 
     def rotateWinds(self) ->None:
         """rotate winds, exchange seats. If finished, update database"""
-        self.rotated += 1
-        self.notRotated = 0
-        if self.rotated == 4:
-            self.roundWind = next(self.roundWind)
-            self.rotated = 0
+        self.point.rotated += 1
+        self.point.notRotated = 0
+        if self.point.rotated == 4:
+            self.point.prevailing = next(self.point.prevailing)
+            self.point.rotated = 0
         if not self.finished() and not self.belongsToPlayer():
             # the game server already told us the new placement and winds
             winds = [player.wind for player in self.players]
             winds = winds[3:] + winds[0:3]
             for idx, newWind in enumerate(winds):
                 self.players[idx].wind = newWind
-            if self.rotated == 0:
+            if self.point.rotated == 0:
                 # exchange seats between rounds
                 self.__exchangeSeats()
             if Internal.scene:
@@ -531,17 +523,16 @@ class Game:
         return None
 
     @classmethod
-    def _loadLastHand(cls, gameid:int) ->Any:
+    def _loadLastHand(cls, gameid:int) ->int:
         """load or invent"""
         records = Query(
             "select {fields} from score "
             "where game=? "
                 "and hand=(select max(hand) from score where game=?) ",
-            (gameid, gameid), fields='hand,rotated').tuples()
+            (gameid, gameid), fields='hand').records
         if records:
-            return records[0]
-        _ = namedtuple('_', 'hand,rotated')
-        return _(0, 0)
+            return int(records[0][0])
+        return 0
 
     @classmethod
     def _loadScores(cls, qGame: Any, hand:int) ->Any:
@@ -577,15 +568,13 @@ class Game:
             return None
         ruleset = Ruleset.cached(qGame.ruleset)
         Players.load()  # we want to make sure we have the current definitions
-        qLastHandRecord = cls._loadLastHand(gameid)
-        qScores = cls._loadScores(qGame, qLastHandRecord.hand)  # FIXME: war 1, aber 1 ist doch rotated
+        hand = cls._loadLastHand(qGame.id)
+        qScores = cls._loadScores(qGame, hand)
 
         players = list((x.wind, Game.__getName(x.player)) for x in qScores)
 
         # create the game instance. It gets the starting point from DB itself
         game = cls(players, ruleset, gameid=gameid, client=client, wantedGame=qGame.seed)
-        game.handctr = qLastHandRecord.hand
-        game.rotated = qLastHandRecord.rotated
 
         # FIXME wie geht game zum richtigen Startpunkt? Hier ist kein goto,
         # Game.__init__ verwendet dazu nur wantedGame, also ganz von vorne
@@ -599,8 +588,6 @@ class Game:
                 player.getsPayment(qScore.balance)
             if qScore.won:
                 game.winner = player
-        game.handctr += 1
-        game.notRotated += 1
         game.maybeRotateWinds()
         game.sortPlayers()
         with AnimationSpeed(Speeds.windDisc):

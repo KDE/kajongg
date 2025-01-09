@@ -88,7 +88,7 @@ class VisiblePlayer(Player):
             assert _
             side.disc = _
         assert self.game
-        side.disc.is_prevailing = self.wind == self.game.roundWind
+        side.disc.is_prevailing = self.wind == self.game.point.prevailing
         side.disc.board = self.front
 
 

@@ -642,9 +642,9 @@ class ScoringGame(Game):
         Query("INSERT INTO SCORE "
               "(game,penalty,hand,data,manualrules,player,scoretime,"
               "won,prevailing,wind,points,payments, balance,rotated,notrotated) "
-              f"VALUES({int(self.gameid)},1,{int(self.handctr)},?,?,{player.nameid},'{scoretime}',"
-              f"{int(player == self.winner)},'{self.roundWind}','{player.wind}',0,{amount},"
-              f"{player.balance},{int(self.rotated)}, {int(self.notRotated)})",
+              f"VALUES({int(self.gameid)},1,{int(self.point.handCount)},?,?,{player.nameid},'{scoretime}',"
+              f"{int(player == self.winner)},'{self.point.prevailing}','{player.wind}',0,{amount},"
+              f"{player.balance},{int(self.point.rotated)}, {int(self.point.notRotated)})",
               (player.hand.string, offense.name))
         assert Internal.mainWindow
         Internal.mainWindow.updateGUI()

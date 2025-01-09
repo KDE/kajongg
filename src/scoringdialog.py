@@ -1052,7 +1052,7 @@ class ScoringDialog(QWidget):
         """update their wind and prevailing"""
         for idx, player in enumerate(self.game.players):
             self.windLabels[idx].wind = player.wind
-            self.windLabels[idx].prevailing = self.game.roundWind
+            self.windLabels[idx].prevailing = self.game.point.prevailing
 
     def computeScores(self) ->None:
         """if tiles have been selected, compute their value"""

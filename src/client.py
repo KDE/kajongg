@@ -280,14 +280,14 @@ class Client(pb.Referenceable):
         if gameClass is None:
             gameClass = PlayingGame
         if self.table.suspendedAt:
-            self.game = cast(PlayingGame, gameClass.loadFromDB(gameid, self))
-            assert self.game, f'cannot load game {gameid}'
-            self.game.assignPlayers(playerNames)
+            game = cast(PlayingGame, gameClass.loadFromDB(gameid, self))
+            self.game = game
+            game.assignPlayers(playerNames)
             table = cast(ClientTable, self.table)
             if self.isHumanClient():
-                if self.game.handctr != table.endValues[0]:
-                    disagree(f'numbers for played hands: Server:{table.endValues[0]}, Client:{self.game.handctr}')
-                for player in self.game.players:
+                if game.point.handCount != table.endValues[0]:
+                    disagree(f'numbers for played hands: Server:{table.endValues[0]}, Client:{game.point.handCount}')
+                for player in game.players:
                     if player.balance != table.endValues[1][player.wind.char]:
                         disagree(f'balances for wind {player.wind}: '
                                  f'Server:{table.endValues[1][player.wind]}, Client:{player.balance}')
@@ -434,7 +434,7 @@ class Client(pb.Referenceable):
 # somebody claimed a pung
 #                    if move.player != game.myself:
 # it was not me
-#                        if game.handctr == 0 and len(game.moves) < 30:
+#                        if game.point.handCount == 0 and len(game.moves) < 30:
 # early on in the game
 #                            game.myself.computeSayable(move, [Message.Chow])
 #                            if game.myself.sayable[Message.Chow]:

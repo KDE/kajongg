@@ -246,7 +246,7 @@ class Hand(ReprMixin):
     def roundWind(self) ->'Wind':
         """for easier usage"""
         assert self.player.game
-        return self.player.game.roundWind
+        return self.player.game.point.prevailing
 
     def __calculate(self) ->None:
         """apply rules, calculate score"""

@@ -1018,11 +1018,11 @@ class EastWonNineTimesInARow(RuleCode):
             if game.isScoringGame():
                 # we are only proposing for the last needed Win
                 needWins -= 1
-        if game.winner and game.winner.wind is East and game.notRotated >= needWins:
+        if game.winner and game.winner.wind is East and game.point.notRotated >= needWins:
             eastMJCount = int(Query("select count(1) from score "
                                     f"where game={game.gameid} and won=1 and wind='E' "
                                     f"and player={int(game.players[East].nameid)} "
-                                    f"and prevailing='{game.roundWind}'").records[0][0])
+                                    f"and prevailing='{game.point.prevailing}'").records[0][0])
             return eastMJCount == needWins
         return False
 

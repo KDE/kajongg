@@ -33,7 +33,7 @@ class Point(ReprMixin):
         moveCount: Number of executed moves within current hand
     """
 
-    def __init__(self, source:Union[str, int, 'Game', 'Point']) -> None:
+    def __init__(self, source:Union[str, int, 'Point']) -> None:
         """Default values point to start of game"""
         self.seed = 0
         self.prevailing:Wind = East
@@ -49,7 +49,7 @@ class Point(ReprMixin):
         elif isinstance(source, Point):
             self.__init_from_point(source)
         else:
-            self.__init_from_game(source)
+            raise ValueError(f'Point() does not accept source {source}')
 
     def __init_from_string(self, string:str) ->None:
         """Init myself from string
@@ -90,18 +90,9 @@ class Point(ReprMixin):
         self.moveCount = other.moveCount
         self.handCount = other.handCount
 
-    def __init_from_game(self, game:'Game') ->None:
-        """Init myself from a Game instance"""
-        self.seed = game.seed
-        self.prevailing = game.roundWind
-        self.rotated = game.rotated
-        self.notRotated = game.notRotated
-        self.moveCount = len(game.moves)
-        self.handCount = game.handctr
-
     def __init_from_db(self, gameid:int) ->None:
         """last recorded position"""
-        self.handctr, self.rotated, self.notRotated, self.prevailing = Query(
+        self.handCount, self.rotated, self.notRotated, self.prevailing = Query(
             'select {fields} from score where game=? order by hand desc limit 1', (gameid, ),
             fields='hand, rotated, notrotated, prevailing').tuple()
 
