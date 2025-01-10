@@ -19,6 +19,7 @@ from qt import QT5, PYSIDE2
 from qt import QObject, QCommandLineParser, QCommandLineOption, Qt, QGuiApplication
 from kde import KApplication
 from mi18n import i18n, MLocale
+from point import PointRange
 
 from common import Options, SingleshotOptions, Internal, Debug
 # do not import modules using twisted before our reactor is running
@@ -131,6 +132,8 @@ def parseOptions() ->None:
 
     Options.demo |= not Options.gui
     Internal.autoPlay = Options.demo
+    if SingleshotOptions.game:
+        PointRange.from_string(SingleshotOptions.game)  # checks for valid syntax
 
     from query import initDb
     if not initDb():

@@ -8,12 +8,14 @@ SPDX-License-Identifier: GPL-2.0-only
 """
 
 from functools import total_ordering
+import sys
 
 from typing import Optional, Union, Tuple, TYPE_CHECKING
 
 from common import ReprMixin
 from wind import Wind, East
 from query import Query
+from log import logError
 
 if TYPE_CHECKING:
     from game import Game
@@ -226,7 +228,11 @@ class PointRange(ReprMixin):
         if '/' not in full_str:
             full_str += '/'
         seed_str, pos_str = full_str.split('/')
-        seed = int(seed_str)
+        try:
+            seed = int(seed_str)
+        except ValueError:
+            logError(f'Cannot parse seed from {full_str}, I need something like 15/E0..W4', showStack=False)
+            sys.exit(1)
 
         positions = pos_str.split('..')
         first_pos = Point(f'{seed}/{positions[0]}')
@@ -235,6 +241,9 @@ class PointRange(ReprMixin):
         if len(positions) > 1:
             last_pos = Point(f'{seed}/{positions[1]}')
 
+        if first_pos > last_pos:
+            logError(f'start is after end:{full_str}', showStack=False)
+            sys.exit(1)
         return first_pos, last_pos
 
     @property
