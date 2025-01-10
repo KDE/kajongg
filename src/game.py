@@ -568,8 +568,13 @@ class Game:
 
         players = list((x.wind, Game.__getName(x.player)) for x in qScores)
 
-        # create the game instance. It gets the starting point from DB itself
-        game = cls(players, ruleset, gameid=gameid, client=client, wantedGame=qGame.seed)
+        last_point = Point(gameid)
+        last_point.endHand()
+
+        resume_at = f'{qGame.seed}/{last_point.full_str()}'
+
+        # create the game instance
+        game = cls(players, ruleset, gameid=gameid, client=client, wantedGame=resume_at)
 
         # FIXME wie geht game zum richtigen Startpunkt? Hier ist kein goto,
         # Game.__init__ verwendet dazu nur wantedGame, also ganz von vorne
