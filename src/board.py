@@ -611,7 +611,8 @@ class CourtBoard(Board):
         assert Internal.scene
         assert Internal.scene.game
         cWall:'UIWall' = cast('UIWall', Internal.scene.game.wall)
-        assert cWall
+        if not cWall:
+            return
         newSceneX = cWall[3].sceneBoundingRect().right()
         newSceneY = cWall[2].sceneBoundingRect().bottom()
         tileset = self.tileset

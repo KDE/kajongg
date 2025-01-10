@@ -307,11 +307,11 @@ class Player(ReprMixin):
     def lastSource(self, value: Type[TileSource.SourceClass]) ->None:
         """the source of the last tile the player got"""
         if self.game:
-            assert self.game.wall
-            if value is TileSource.LivingWallDiscard and not self.game.wall.living:
-                value = TileSource.LivingWallEndDiscard
-            if value is TileSource.LivingWall and not self.game.wall.living:
-                value = TileSource.LivingWallEnd
+            if self.game.wall:
+                if value is TileSource.LivingWallDiscard and not self.game.wall.living:
+                    value = TileSource.LivingWallEndDiscard
+                if value is TileSource.LivingWall and not self.game.wall.living:
+                    value = TileSource.LivingWallEnd
         if self.__lastSource != value:
             self.__lastSource = value
             self._hand = None

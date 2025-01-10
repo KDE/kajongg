@@ -223,13 +223,13 @@ class GameScene(SceneWithFocusRect):
         """adjust the view such that exactly the wanted things are displayed
         without having to scroll"""
         if self.game:
-            assert self.game.wall
-            with AnimationSpeed(99):
-                self.game.wall.decorate4()
-                for uiTile in self.game.wall.tiles:
-                    _ = cast(UITile, uiTile)
-                    if _.board:
-                        _.board.placeTile(_)
+            if self.game.wall:
+                with AnimationSpeed(99):
+                    self.game.wall.decorate4()
+                    for uiTile in self.game.wall.tiles:
+                        _ = cast(UITile, uiTile)
+                        if _.board:
+                            _.board.placeTile(_)
 
     def applySettings(self) ->None:
         """apply preferences"""
