@@ -82,7 +82,8 @@ class Game:
         self.first_point, self.last_point = PointRange.from_string(wantedGame)
         self._point = Point(self.first_point)
         self.ruleset:Ruleset = ruleset
-        self._currentPoint:Optional[Point] = None
+        self.__prevPoint = self._point
+        self.__currentPoint = self._point
         self._prevPoint:Optional[Point] = None
         self.gameid:Optional[int] = gameid
         self.playOpen:bool = False
@@ -113,6 +114,9 @@ class Game:
     @property
     def point(self) ->Point:
         """current position"""
+        if self._point != self.__currentPoint:
+            self.__prevPoint = self.__currentPoint
+            self.__currentPoint = self._point
         return self._point
 
     @point.setter
@@ -472,7 +476,7 @@ class Game:
                 f'UPDATE game set endtime = "{endtime}" where id = {int(self.gameid)}')
 
     def debug(self, msg:str, btIndent:Optional[int]=None,
-        showPrevPoint:bool=False, showStack:bool=False) ->None:  # pylint: disable=unused-argument
+        showPrevPoint:bool=False, showStack:bool=False) ->None:
         """
         Log a debug message.
 
@@ -493,7 +497,7 @@ class Game:
         else:
             logDebug(msg, btIndent=btIndent)
             return
-        # FIXME temp disabled point = self._prevPoint if showPrevPoint else self.point
+        point = self.__prevPoint if showPrevPoint else self.point
         point = self.point
         assert point
         point_str = point.prompt(self, withMoveCount=True)
