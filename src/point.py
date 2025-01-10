@@ -77,9 +77,7 @@ class Point(ReprMixin):
             if rest:
                 self.rotated = int(rest[0])
                 rest = rest[1:]
-                while rest and rest[0] >= 'a' and rest[0] <= 'z':
-                    self.notRotated = self.notRotated * 26 + ord(rest[0]) - ord('a') + 1
-                    rest = rest[1:]
+                self.notRotated, rest = self.decode_from_az(rest)
                 if rest:
                     self.moveCount = int(rest)
 
@@ -160,14 +158,27 @@ class Point(ReprMixin):
                + self.rotated * 1000
                + self.notRotated * 100)
 
-    def notRotated_as_str(self) ->str:
-        """encode into a..z"""
+    def encode_to_az(self, value:int) ->str:
+        """encode an integer into string"""
         result = ''
-        num = self.notRotated
+        num = value
         while num:
             result = chr(ord('a') + (num - 1) % 26) + result
             num = (num - 1) // 26
         return result
+
+    def decode_from_az(self, value:str) ->Tuple[int, str]:
+        """decode and return rest"""
+        rest = value[:]
+        result = 0
+        while rest and rest[0] >= 'a' and rest[0] <= 'z':
+            result = result * 26 + ord(rest[0]) - ord('a') + 1
+            rest = rest[1:]
+        return result, rest
+
+    def notRotated_as_str(self) ->str:
+        """encode into a..z"""
+        return self.encode_to_az(self.notRotated)
 
     def token(self, game:'Game') ->str:
         """server and client use this for checking whether they talk about
