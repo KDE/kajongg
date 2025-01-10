@@ -80,6 +80,8 @@ class Game:
         self.first_point: Point
         self.last_point: Optional[Point]
         self.first_point, self.last_point = PointRange.from_string(wantedGame)
+        # last_point is included like in 'N4'
+        # here, last_point might be None meaning "open end" - it will be limited after loading ruleset
         self._point = Point(self.first_point)
         self.ruleset:Ruleset = ruleset
         self.__prevPoint = self._point
@@ -354,6 +356,11 @@ class Game:
             else:
                 # generate a new ruleset
                 self.ruleset.save()
+        rule_last_point = Point(f'{self.seed}/{Wind.all4[self.ruleset.minRounds - 1]}4')
+        if self.last_point is None:
+            self.last_point = rule_last_point
+        else:
+            self.last_point = min(rule_last_point, self.last_point)
 
     @property
     def seed(self) ->int:
@@ -592,12 +599,7 @@ class Game:
         """The game is over after minRounds completed rounds. Also,
         check if we reached the second point defined by --game.
         If we did, the game is over too"""
-        if self.point >= self.last_point:
-            return True
-        if self.ruleset:
-            # while initialising Game, ruleset might be None
-            return self.point.roundsFinished >= self.ruleset.minRounds
-        return False
+        return self.point > self.last_point
 
     def __payHand(self) ->None:
         """pay the scores"""
