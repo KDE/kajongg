@@ -102,6 +102,19 @@ class Point(ReprMixin):
         """True only if this point is in the first hand of a game"""
         return self.handCount == 0
 
+    def endHand(self) ->None:
+        """hand is done"""
+        self.handCount += 1
+        self.notRotated += 1  # if we rotate, we will call Point.rotate()
+
+    def rotate(self) ->None:
+        """rotate winds"""
+        self.notRotated = 0
+        self.rotated += 1
+        if self.rotated == 4:
+            self.prevailing = next(self.prevailing)
+            self.rotated = 0
+
     def prompt(self, game:'Game', withSeed:bool=True, withAI:bool=True, withMoveCount:bool=False) ->str:
         """
         Identifies the hand for window title and scoring table.

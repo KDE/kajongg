@@ -395,8 +395,7 @@ class Game:
         update score table and balance in status line"""
         self.__payHand()
         self._saveScores()
-        self.point.handCount += 1
-        self.point.notRotated += 1
+        self.point.endHand()
 
     def _saveScores(self) ->None:
         """save computed values to database,
@@ -444,11 +443,7 @@ class Game:
 
     def rotateWinds(self) ->None:
         """rotate winds, exchange seats. If finished, update database"""
-        self.point.rotated += 1
-        self.point.notRotated = 0
-        if self.point.rotated == 4:
-            self.point.prevailing = next(self.point.prevailing)
-            self.point.rotated = 0
+        self.point.rotate()
         if not self.finished() and not self.belongsToPlayer():
             # the game server already told us the new placement and winds
             winds = [player.wind for player in self.players]
