@@ -175,9 +175,10 @@ class MLocale:
     @classmethod
     def gettext(cls, txt:str) ->str:
         """with lazy installation of languages"""
-        if cls.translation is None:
+        if cls.translation is None and Internal.kajonggrc:
             cls.installTranslations()
-        assert cls.translation is not None
+        if cls.translation is None:
+            return txt
         return cls.translation.gettext(txt)
 
     @classmethod
