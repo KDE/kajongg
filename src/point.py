@@ -188,6 +188,10 @@ class Point(ReprMixin):
         the same thing"""
         return self.prompt(game, withAI=False)
 
+    def full_str(self) ->str:
+        """with all attributes, opposite to __init_from_string"""
+        return f'{self}{self.handCount}{self.encode_to_az(self.moveCount)}'
+
     def __str__(self) ->str:
         return f'{self.prevailing}{self.rotated}{self.notRotated_as_str()}'
 
