@@ -41,8 +41,8 @@ class Point(ReprMixin):
         self.prevailing:Wind = East
         self.rotated = 0
         self.notRotated = 0
-        self.moveCount = 0   # within current hand
         self.handCount = 0   # unique ID over all hands of a game for data base
+        self.moveCount = 0   # within current hand
 
         if isinstance(source, str):
             self.__init_from_string(source)
@@ -63,7 +63,8 @@ class Point(ReprMixin):
             W: 1 char:         prevailing wind
             r: 0..1 digit:     rotations within current round
             n: 0..n chars:     how often we currently did not rotate. Encoded in letters a..z
-            m: 0..n digits:    Number of current move within current hand
+            c: 0..n digits:    handCount
+            m: 0..n chars:     Number of current move within current hand. Encoded in letters a..z
         """
 
         self.seed = int(string.split('/')[0])
@@ -79,7 +80,9 @@ class Point(ReprMixin):
                 rest = rest[1:]
                 self.notRotated, rest = self.decode_from_az(rest)
                 if rest:
-                    self.moveCount = int(rest)
+                    digits = ''.join(filter(str.isdigit, rest))
+                    self.handCount = int(digits)
+                    self.moveCount, _ = self.decode_from_az(rest[len(digits):])
 
     def __init_from_point(self, other:'Point') ->None:
         """Init myself from a Game instance"""
