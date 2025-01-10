@@ -205,11 +205,6 @@ class Game:
             if value:
                 value.invalidateHand()
 
-    @property
-    def roundsFinished(self) ->int:
-        """rounds finished as given by round wind"""
-        return self.point.prevailing.__index__()
-
     def addCsvTag(self, tag:str, forAllPlayers:bool=False) ->None:
         """tag will be written to tag field in csv row"""
         if forAllPlayers or self.belongsToHumanPlayer():
@@ -370,10 +365,7 @@ class Game:
         in previous hands/rounds.
         This makes it easier to reproduce game situations
         in later hands without having to exactly replay all previous hands"""
-        seedFactor = ((self.roundsFinished + 1) * 10000
-                      + self.point.rotated * 1000
-                      + self.point.notRotated * 100)
-        self.randomGenerator.seed(self.seed * seedFactor)
+        self.randomGenerator.seed(self.seed * self.point.seedFactor())
 
     def prepareHand(self) ->None:
         """prepare a game hand"""
@@ -606,10 +598,10 @@ class Game:
         if self.point >= self.last_point:
             return True
         if Options.rounds:
-            return self.roundsFinished >= Options.rounds
+            return self.point.roundsFinished >= Options.rounds
         if self.ruleset:
             # while initialising Game, ruleset might be None
-            return self.roundsFinished >= self.ruleset.minRounds
+            return self.point.roundsFinished >= self.ruleset.minRounds
         return False
 
     def __payHand(self) ->None:

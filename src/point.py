@@ -139,6 +139,12 @@ class Point(ReprMixin):
         """wind index"""
         return self.prevailing.__index__()
 
+    def seedFactor(self) -> int:
+        """we want a predictable but different seed for every starting point"""
+        return ((self.roundsFinished + 1) * 10000
+               + self.rotated * 1000
+               + self.notRotated * 100)
+
     def notRotated_as_str(self) ->str:
         """encode into a..z"""
         result = ''
