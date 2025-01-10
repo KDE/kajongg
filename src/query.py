@@ -248,8 +248,8 @@ class Query(ReprMixin):
         lower = self.statement.lower()
         parts = lower.split(' from ')
         if len(parts) > 1:
-            return parts[1].split()[0].strip().capitalize()
-        return 'Fields'
+            return 'Query_' + parts[1].split()[0].strip().capitalize()
+        return 'Query_Fields'
 
     def __tuple_fieldnames(self) ->Generator[str, None, None]:
         """translates 'fieldname as myname' into 'myname' """
