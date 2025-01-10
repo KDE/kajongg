@@ -34,6 +34,7 @@ from query import Query
 from guiutil import ListComboBox, Painter, decorateWindow, BlockSignals
 from tree import TreeItem, RootItem, TreeModel
 from tile import Tile, MeldList
+from point import Point
 
 if TYPE_CHECKING:
     from qt import QObject, QRect, QStyleOptionViewItem, QPersistentModelIndex
@@ -274,7 +275,7 @@ class ScoreModel(TreeModel):
         assert game
         assert game.gameid
 
-        fields = 'player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
+        fields = 'game,hand,player,rotated,notrotated,penalty,won,prevailing,wind,points,payments,balance,manualrules'
         tuples = Query('select {fields} from score where game=? order by hand', (game.gameid, ),
             fields=fields).tuples()
 #        if not tuples:
@@ -319,9 +320,7 @@ class ScoreModel(TreeModel):
 
     def handTitle(self, handResult:Any) ->str:
         """identifies the hand for window title and scoring table"""
-        character = chr(
-            ord('a') - 1 + handResult.notrotated) if handResult.notrotated else ''
-        return f'{handResult.prevailing}{handResult.rotated + 1}{character}'
+        return str(Point(handResult))
 
 
 class ScoreViewLeft(QTreeView):
