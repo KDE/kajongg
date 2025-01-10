@@ -371,10 +371,7 @@ class Game:
         """prepare a game hand"""
         self.clearHand()
         if self.finished():
-            if Options.rounds:
-                self.close().addCallback(Internal.mainWindow.close).addErrback(logException)
-            else:
-                self.close()
+            self.close()
 
     def initHand(self) ->None:
         """directly before starting"""
@@ -597,8 +594,6 @@ class Game:
         If we did, the game is over too"""
         if self.point >= self.last_point:
             return True
-        if Options.rounds:
-            return self.point.roundsFinished >= Options.rounds
         if self.ruleset:
             # while initialising Game, ruleset might be None
             return self.point.roundsFinished >= self.ruleset.minRounds
@@ -708,8 +703,6 @@ class PlayingGame(Game):
             gameWinner = max(self.players, key=lambda x: x.balance)
             if Debug.process and sys.platform != 'win32':
                 self.csvTags.append(f'MEM:{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')  # pylint:disable=possibly-used-before-assignment
-            if Options.rounds:
-                self.csvTags.append(f'ROUNDS:{Options.rounds}')
             _ = CsvRow.Fields
             row = [''] * CsvRow.Fields.PLAYERS
             row[_.GAME] = str(self.seed)
