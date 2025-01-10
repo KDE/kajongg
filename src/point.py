@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0-only
 from functools import total_ordering
 import sys
 
-from typing import Optional, Union, Tuple, TYPE_CHECKING
+from typing import Optional, Union, Tuple, Any, TYPE_CHECKING
 
 from common import ReprMixin
 from wind import Wind, East
@@ -35,7 +35,7 @@ class Point(ReprMixin):
         moveCount: Number of executed moves within current hand
     """
 
-    def __init__(self, source:Union[str, int, 'Point']) -> None:
+    def __init__(self, source:Any) -> None:
         """Default values point to start of game"""
         self.seed = 0
         self.prevailing:Wind = East
@@ -50,6 +50,8 @@ class Point(ReprMixin):
             self.__init_from_db(source)
         elif isinstance(source, Point):
             self.__init_from_point(source)
+        elif source.__class__.__name__.startswith('Query_'):
+            self.__init_from_query(source)
         else:
             raise ValueError(f'Point() does not accept source {source}')
 
@@ -98,6 +100,14 @@ class Point(ReprMixin):
         self.handCount, self.rotated, self.notRotated, self.prevailing = Query(
             'select {fields} from score where game=? order by hand desc limit 1', (gameid, ),
             fields='hand, rotated, notrotated, prevailing').tuple()
+
+    def __init_from_query(self, query:Any) ->None:
+        """last recorded position"""
+        self.seed = query.game
+        self.prevailing = query.prevailing
+        self.rotated = query.rotated
+        self.notRotated = query.notrotated
+        self.handCount = query.hand
 
     def is_in_first_hand(self) ->bool:
         """True only if this point is in the first hand of a game"""
