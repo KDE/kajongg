@@ -19,7 +19,7 @@ from log import dbgIndent
 from tile import Tile, TileList, TileTuple, Meld, MeldList
 from tilesource import TileSource
 from rule import Score, UsedRule
-from common import Debug, ReprMixin, Fmt, fmt
+from common import Debug, ReprMixin, num_encode
 from util import callers
 from message import Message
 
@@ -148,8 +148,7 @@ class Hand(ReprMixin):
         self.__won = self.lenOffset == 1 and player.mayWin
 
         if Debug.hand or (Debug.mahJongg and self.lenOffset == 1):
-            self.debug(fmt('{callers}',
-                           callers=callers(exclude=['__init__'])))
+            self.debug(f'{callers(exclude=["__init__"])}')
             Hand.indent += 1
             self.debug(f'New Hand {string} lenOffset={self.lenOffset}')
 
@@ -159,7 +158,7 @@ class Hand(ReprMixin):
             self.__arranged = True
         except Hand.__NotWon as notwon:
             if Debug.mahJongg:
-                self.debug(fmt(str(notwon)))
+                self.debug(str(notwon))
             self.__won = False
             self.__score = Score()
         finally:
@@ -329,9 +328,9 @@ class Hand(ReprMixin):
 
     def debug(self, msg:str) ->None:
         """try to use Game.debug so we get a nice prefix"""
-        idPrefix = Fmt.num_encode(hash(self))
+        idPrefix = num_encode(hash(self))
         if self.prevHand:
-            idPrefix += f'<{Fmt.num_encode(hash(self.prevHand))}'
+            idPrefix += f'<{num_encode(hash(self.prevHand))}'
         idPrefix = f'Hand({idPrefix})'
         assert self.player.game
         self.player.game.debug(' '.join([dbgIndent(self, self.prevHand), idPrefix, msg]))
@@ -385,7 +384,7 @@ class Hand(ReprMixin):
             self.usedRules = exclusive
             self.__score = self.__totalScore()
             if self.__won and not bool(self.__maybeMahjongg()):
-                raise Hand.__NotWon(fmt('exclusive rule {exclusive} does not win'))
+                raise Hand.__NotWon(f'exclusive rule {exclusive} does not win')
 
     def __setLastMeld(self) ->None:
         """set the shortest possible last meld. This is
@@ -431,8 +430,7 @@ class Hand(ReprMixin):
                 if Debug.explain and prev not in bestLastMelds:
                     assert self.player.game
                     if not self.player.game.belongsToRobotPlayer():
-                        self.debug(fmt(
-                            'replaced last meld {prev} with {bestLastMelds[0]}'))
+                        self.debug(f'replaced last meld {prev} with {bestLastMelds[0]}')
                 self.__lastMeld = bestLastMelds[0]
                 self.__applyRules()
 
@@ -593,7 +591,7 @@ class Hand(ReprMixin):
         if Debug.hand:
             _hiderules = ', '.join({x.mjRule.name for x in result if x.mjRule})
             if _hiderules:
-                self.debug(fmt('Is calling {_hiderules}'))
+                self.debug(f'Is calling {_hiderules}')
         return result
 
     @property
@@ -627,8 +625,7 @@ class Hand(ReprMixin):
                         if 'mayrobhiddenkong' in x.options]
                 result = sorted(matchingMJRules, key=lambda x: -x.score.total())
                 if Debug.mahJongg:
-                    self.debug(fmt('{callers} Found {matchingMJRules}',
-                                   callers=callers()))
+                    self.debug(f'{callers()} Found {matchingMJRules}')
                 return result
         return []
 

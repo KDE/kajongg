@@ -17,7 +17,7 @@ import logging.handlers
 import socket
 import string
 from signal import signal, SIGABRT, SIGINT, SIGTERM
-from typing import Optional, Any, Union, List, Sequence, Mapping
+from typing import Optional, Any, Union, List
 from typing import TYPE_CHECKING, Iterable, Generator, Literal, cast
 
 from qt import QStandardPaths, QObject, modeltest_is_supported, qtpy_isalive
@@ -272,6 +272,31 @@ class FixedClass(type):
         type.__setattr__(cls, key, value)
 
 
+def num_encode(number: int, length: int=4) ->str:
+    """make a short unique ascii string out of number, truncate to length"""
+    alphabet = string.ascii_uppercase + string.ascii_lowercase
+    base = len(alphabet)
+    result : List[str] = []
+    while number and len(result) < length:
+        number, remainder = divmod(number, base)
+        result.append(alphabet[remainder])
+    return ''.join(reversed(result))
+
+
+def id4(obj: object) ->str:
+    """object id for debug messages"""
+    if obj is None:
+        return 'NONE'
+    try:
+        if hasattr(obj, 'uid'):
+            return obj.uid
+    except Exception:  # pylint: disable=broad-except
+        pass
+    if Debug.neutral:
+        return '.'
+    return num_encode(id(obj))
+
+
 class ReprMixin:
 
     """
@@ -519,82 +544,3 @@ class DrawOnTopMixin:
         else:
             movingZ = 0
         self.setZValue(ZValues.markerZ + movingZ)  # type: ignore
-
-
-def id4(obj: object) ->str:
-    """object id for debug messages"""
-    if obj is None:
-        return 'NONE'
-    try:
-        if hasattr(obj, 'uid'):
-            return obj.uid
-    except Exception:  # pylint: disable=broad-except
-        pass
-    return '.' if Debug.neutral else Fmt.num_encode(id(obj))
-
-
-class Fmt(string.Formatter):
-
-    """this formatter can parse {id(x)} and output a short ascii form for id"""
-    alphabet = string.ascii_uppercase + string.ascii_lowercase
-    base = len(alphabet)
-    formatter : Optional['Fmt'] = None
-
-    @staticmethod
-    def num_encode(number: int, length: int=4) ->str:
-        """make a short unique ascii string out of number, truncate to length"""
-        result : List[str] = []
-        while number and len(result) < length:
-            number, remainder = divmod(number, Fmt.base)
-            result.append(Fmt.alphabet[remainder])
-        return ''.join(reversed(result))
-
-    def get_value(self, key : Union[int, str], args: Sequence[Any], kwargs: Mapping[str, Any]) ->str:
-        assert isinstance(key, str), key
-        if key.startswith('id(') and key.endswith(')'):
-            idpar = key[3:-1]
-            if idpar == 'self':
-                idpar = 'SELF'
-            if kwargs[idpar] is None:
-                return 'None'
-            if Debug.neutral:
-                return '....'
-            return Fmt.num_encode(id(kwargs[idpar]))
-        if key == 'self':
-            return kwargs['SELF']
-        return kwargs[key]
-
-Fmt.formatter = Fmt()
-
-
-def fmt(text: str, **kwargs: Any) ->str:
-    """use the context dict for finding arguments.
-    For something like {self} output 'self:selfValue'"""
-    if '}' in text:
-        parts = []
-        for part in text.split('}'):
-            if '{' not in part:
-                parts.append(part)
-            else:
-                part2 = part.split('{')
-                if part2[1] == 'callers':
-                    if part2[0]:
-                        parts.append(f'{part2[0]}:{{{part2[1]}}}')
-                    else:
-                        parts.append(f'{{{part2[1]}}}')
-                else:
-                    showName = f"{part2[1]}:"
-                    if showName.startswith('_hide'):
-                        showName = ''
-                    if showName.startswith('self.'):
-                        showName = showName[5:]
-                    parts.append(f'{part2[0]}{showName}{{{part2[1]}}}')
-        text = ''.join(parts)
-    argdict = sys._getframe(1).f_locals  # pylint: disable=protected-access
-    argdict.update(kwargs)
-    if 'self' in argdict:
-        # formatter.format will not accept 'self' as keyword
-        argdict['SELF'] = argdict['self']
-        del argdict['self']
-    assert Fmt.formatter is not None
-    return Fmt.formatter.format(text, **argdict)
