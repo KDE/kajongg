@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-# SPDX-FileCopyrightText: 2022, 2023, 2024 Emir SARI <emir_sari@icloud.com>
+# SPDX-FileCopyrightText: 2022, 2023, 2024, 2025 Emir SARI <emir_sari@icloud.com>
 # Osman Tosun <rainman.neu@gmail.com>, 2008.
 # obsoleteman <tulliana@gmail.com>, 2009.
 # Serhat Demirkol <serhat_demirkol@yahoo.com>, 2009.
@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2024-10-10 00:37+0000\n"
-"PO-Revision-Date: 2024-10-10 12:05+0300\n"
+"PO-Revision-Date: 2025-01-11 17:25+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 24.11.70\n"
+"X-Generator: Lokalize 25.03.70\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -916,7 +916,7 @@ msgstr "%1 oyuncusu Tüm Uçlar Oyunu deneyebilir"
 
 #: src/player.py:880
 msgid "Player %1 exposed many winds"
-msgstr "%1 oyuncusu birçok rüzgar açık etti"
+msgstr "%1 oyuncusu birçok rüzgâr açık etti"
 
 #: src/player.py:884
 msgid "Player %1 exposed many dragons"
@@ -1060,7 +1060,7 @@ msgstr "Doğu dokuz kere üst üste kazandı"
 
 #: src/predefined.py:82
 msgid "If that happens, East gets a limit score and the winds rotate"
-msgstr "Bu gerçekleşirse, Doğu sınır skoru alır ve rüzgarlar döner"
+msgstr "Bu gerçekleşirse, Doğu sınır skoru alır ve rüzgârlar döner"
 
 #: src/predefined.py:87
 msgid ""
@@ -1219,7 +1219,7 @@ msgid ""
 "winds and dragons"
 msgstr ""
 "Yalnızca aynı renkli taşlar (yalnızca bambu/taş/karakter) artı herhangi "
-"sayıda rüzgar ve ejderler"
+"sayıda rüzgâr ve ejderler"
 
 #: src/predefined.py:191
 msgid "True Color Game"
@@ -1243,7 +1243,7 @@ msgstr "Yalnızca Uçlar ve Onur Taşları"
 
 #: src/predefined.py:198
 msgid "Only winds, dragons, 1 and 9"
-msgstr "Yalnızca rüzgarlar, ejderler, 1 ve 9"
+msgstr "Yalnızca rüzgârlar, ejderler, 1 ve 9"
 
 #: src/predefined.py:199
 msgid "Only Honors"
@@ -1251,7 +1251,7 @@ msgstr "Yalnızca Onur Taşları"
 
 #: src/predefined.py:200
 msgid "Only winds and dragons"
-msgstr "Yalnızca rüzgarlar ve ejderhalar"
+msgstr "Yalnızca rüzgârlar ve ejderhalar"
 
 #: src/predefined.py:202
 msgid "Hidden Treasure"
@@ -1291,7 +1291,7 @@ msgstr "Dört Kutsama Kapının üstünde Geziniyor"
 
 #: src/predefined.py:215 src/predefined.py:339
 msgid "4 Pungs or Kongs of winds"
-msgstr "4 Pung veya rüzgar Kong’ları"
+msgstr "4 Pung veya rüzgâr Kong’ları"
 
 #: src/predefined.py:216
 msgid "Imperial Jade"
@@ -1350,7 +1350,7 @@ msgid ""
 "13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
 "with one of them"
 msgstr ""
-"13 tekli taş: Hepsi ejder, rüzgarlar, 1, 9 ve 14. taş bunlardan biriyle çift "
+"13 tekli taş: Hepsi ejder, rüzgârlar, 1, 9 ve 14. taş bunlardan biriyle çift "
 "oluşturuyor"
 
 #: src/predefined.py:246
@@ -1359,11 +1359,11 @@ msgstr "Ejderha Pung/Kong’ları"
 
 #: src/predefined.py:248
 msgid "Pung/Kong of Own Wind"
-msgstr "Kendi Rüzgarının Pung/Kong’ları"
+msgstr "Kendi Rüzgârının Pung/Kong’ları"
 
 #: src/predefined.py:251
 msgid "Pung/Kong of Round Wind"
-msgstr "Halka Rüzgarın Pung/Kong’u"
+msgstr "Halka Rüzgârın Pung/Kong’u"
 
 #: src/predefined.py:255
 msgid "Exposed Kong"
@@ -1415,11 +1415,11 @@ msgstr "Kapalı Onur Taşı Pung’u"
 
 #: src/predefined.py:292
 msgid "Pair of Own Wind"
-msgstr "Kendi Rüzgarının Çifti"
+msgstr "Kendi Rüzgârının Çifti"
 
 #: src/predefined.py:294
 msgid "Pair of Round Wind"
-msgstr "Halka Rüzgar Çifti"
+msgstr "Halka Rüzgâr Çifti"
 
 #: src/predefined.py:296
 msgid "Pair of Dragons"
@@ -1471,7 +1471,7 @@ msgstr "Dört Küçük Neşe"
 
 #: src/predefined.py:337
 msgid "3 Pungs or Kongs of winds and 1 pair of winds"
-msgstr "3 Pung veya rüzgar Kong’ları ve 1 çift rüzgar"
+msgstr "3 Pung veya rüzgâr Kong’ları ve 1 çift rüzgâr"
 
 #: src/predefined.py:338
 msgid "Big Four Joys"
@@ -1532,7 +1532,7 @@ msgstr "Kıvrılan Yılan"
 #: src/predefined.py:400
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
-msgstr "1ler çifti ve rüzgarların her biriyle aynı takımda 2’den 9’a koşu"
+msgstr "1’ler çifti ve rüzgârların her biriyle aynı takımda 2’den 9’a koşu"
 
 #: src/predefined.py:402
 msgid "Triple Knitting"
@@ -1543,7 +1543,7 @@ msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
 msgstr ""
-"4 tane Farklı takımlarda üçlü taş ve bir çift: Rüzgarlar veya Ejderhalar yok"
+"4 tane Farklı takımlarda üçlü taş ve bir çift: Rüzgârlar veya Ejderhalar yok"
 
 #: src/predefined.py:404
 msgid "Knitting"
@@ -1552,7 +1552,7 @@ msgstr "Örgü"
 #: src/predefined.py:405
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr ""
-"3 takımdan 2’sinin herhangi birinde 7 çift taş; Rüzgarlar ya da Ejderhalar "
+"3 takımdan 2’sinin herhangi birinde 7 çift taş; Rüzgârlar ya da Ejderhalar "
 "yok"
 
 #: src/predefined.py:407
@@ -1577,7 +1577,7 @@ msgstr "Gömülü Hazine"
 
 #: src/predefined.py:425
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
-msgstr "Rüzgarlı/ejderli bir takımın kapalı pung’ları ve bir çift"
+msgstr "Rüzgârlı/ejderli bir takımın kapalı pung’ları ve bir çift"
 
 #: src/predefined.py:426
 msgid "Purity"
@@ -1585,7 +1585,7 @@ msgstr "Saflık"
 
 #: src/predefined.py:427
 msgid "Only same-colored tiles (no chows, dragons or winds)"
-msgstr "Yalnızca aynı renk taşlar (chow, ejderha veya rüzgar yok)"
+msgstr "Yalnızca aynı renk taşlar (chow, ejderha veya rüzgâr yok)"
 
 #: src/predefined.py:430
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
@@ -1942,7 +1942,7 @@ msgstr "Oyuncu"
 #: src/scoringdialog.py:839
 msgctxt "kajongg"
 msgid "Wind"
-msgstr "Rüzgar"
+msgstr "Rüzgâr"
 
 #: src/scoringdialog.py:841
 msgid "Winner"
@@ -2190,7 +2190,7 @@ msgstr "karakter"
 #: src/tile.py:280
 msgctxt "kajongg"
 msgid "wind"
-msgstr "rüzgar"
+msgstr "rüzgâr"
 
 #: src/tile.py:281
 msgctxt "kajongg"
@@ -2249,19 +2249,19 @@ msgstr "Kuzey"
 
 #: src/tile.py:305
 msgid "East Wind"
-msgstr "Doğu Rüzgarı"
+msgstr "Doğu Rüzgârı"
 
 #: src/tile.py:306
 msgid "South Wind"
-msgstr "Güney Rüzgarı"
+msgstr "Güney Rüzgârı"
 
 #: src/tile.py:307
 msgid "West Wind"
-msgstr "Batı Rüzgarı"
+msgstr "Batı Rüzgârı"
 
 #: src/tile.py:308
 msgid "North Wind"
-msgstr "Kuzey Rüzgarı"
+msgstr "Kuzey Rüzgârı"
 
 #: src/tile.py:310
 #, python-brace-format
