@@ -126,6 +126,8 @@ class DeferredDialog(Deferred):
             return
         autoPlay = bool(scene and scene.game and scene.game.autoPlay)
         autoAnswerDelayed = autoPlay and not self.always
+        if Options.demo:
+            self.dlg.setWindowFlags(self.dlg.windowFlags() | Qt.WindowType.Tool)
         if self.modal and not autoAnswerDelayed:
             self.dlg.exec()
         else:

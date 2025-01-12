@@ -125,6 +125,8 @@ class MainWindow(KXmlGuiWindow):
                 self.scene = PlayingScene(self)
                 HumanClient()
             StateSaver(self)
+            if Options.demo:
+                self.setWindowFlags(self.windowFlags() | Qt.WindowType.Tool)
             self.show()
         else:
             HumanClient()
