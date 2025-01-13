@@ -19,7 +19,6 @@ from log import logException, i18n
 from mjresource import Resource
 
 from common import LIGHTSOURCES, Internal, ReprMixin
-from wind import East, South, West, North
 
 
 class Tileset(Resource, ReprMixin):
@@ -65,7 +64,7 @@ class Tileset(Resource, ReprMixin):
             [(-shW, -shH), (0, -shW), (0, 0), (-shH, 0)]]
 
         self.svgName = {
-            'wn': North.svgName, 'ws': South.svgName, 'we': East.svgName, 'ww': West.svgName,
+            'wn': 'WIND_1', 'ws': 'WIND_2', 'we': 'WIND_3', 'ww': 'WIND_4',
             'db': 'DRAGON_1', 'dg': 'DRAGON_2', 'dr': 'DRAGON_3'}
         for value in '123456789':
             self.svgName[f's{value}'] = f'ROD_{value}'

@@ -25,7 +25,6 @@ class Wind:
     """we want to use an wind for indices.
 
     char is the wind as a char (native string)
-    svgName is the name of the wind in the SVG files.
     """
 
     char: str
@@ -119,7 +118,6 @@ class Wind:
 class _East(Wind):
     """East"""
     char = 'E'
-    svgName = 'WIND_3'
     discSvgName = 'g4657'  # WIND_2 etc have a border
 
     def __index__(self) ->int:
@@ -129,7 +127,6 @@ class _East(Wind):
 class _South(Wind):
     """South"""
     char = 'S'
-    svgName = 'WIND_2'
     discSvgName = 'g3980'
 
     def __index__(self) ->int:
@@ -139,7 +136,6 @@ class _South(Wind):
 class _West(Wind):
     """West"""
     char = 'W'
-    svgName = 'WIND_4'
     discSvgName = 'g3192'
 
     def __index__(self) ->int:
@@ -149,7 +145,6 @@ class _West(Wind):
 class _North(Wind):
     """North"""
     char = 'N'
-    svgName = 'WIND_1'
     discSvgName = 'g4290'
 
     def __index__(self) ->int:
@@ -159,7 +154,6 @@ class _North(Wind):
 class _NoWind(Wind):
     """no wind"""
     char = 'X'
-    svgName = None
 
     def __index__(self) ->int:
         return 4
