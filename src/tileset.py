@@ -28,7 +28,6 @@ class Tileset(Resource, ReprMixin):
 
     resourceName : Optional[str] = 'tileset'
     configGroupName : str = 'KMahjonggTileset'
-    cache = {}
 
     def __init__(self, name:Optional[str]=None) ->None:
         """continue __build"""
