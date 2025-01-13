@@ -1120,10 +1120,8 @@ class ScoringDialog(QWidget):
         if not winnerTiles:
             return
         assert winnerTiles[0].board
-        # mypy does not seem to understand operator*
-        _ = winnerTiles[0].board.tileset.faceSize
-        _ *= 0.5
-        pmSize = _.toSize()
+        # the following is OK with pyside6 annotations. PyQt6 cannot find a matching overload, which seems wrong
+        pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()  # type:ignore[operator]
         self.cbLastTile.setIconSize(pmSize)
         QPixmapCache.clear()
         shownTiles = set()
