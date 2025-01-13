@@ -110,6 +110,10 @@ class HandBoard(Board):
     def computeRect(self) ->None:
         """also adjust the scale for maximum usage of space"""
         Board.computeRect(self)
+        rect = self.rect()
+        rect.setWidth(rect.width() + 2 * self.tileset.shadowHeight())
+        self.setRect(rect)
+
         if self.player:
             sideRect = self.player.front.boundingRect()
             boardRect = self.boundingRect()

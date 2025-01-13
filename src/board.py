@@ -450,12 +450,11 @@ class Board(QGraphicsRectItem, ReprMixin):
         """translate from our rect coordinates to scene coord"""
         sizeX = self.tileset.faceSize.width() * self.__fixedWidth
         sizeY = self.tileset.faceSize.height() * self.__fixedHeight
-        assert Internal.Preferences
-        if Internal.Preferences.showShadows:
-            sizeX += self.tileset.shadowWidth() + \
-                2 * self.tileset.shadowHeight()
-            sizeY += self.tileset.shadowHeight()
         rect = self.rect()
+        if Internal.Preferences:
+            if Internal.Preferences.showShadows:
+                sizeX += self.tileset.shadowWidth()
+                sizeY += self.tileset.shadowHeight()
         rect.setWidth(sizeX)
         rect.setHeight(sizeY)
         self.prepareGeometryChange()
