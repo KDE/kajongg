@@ -219,11 +219,11 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
                 if withBorders:
                     faceSize = self.tileset.faceSize.toSize()
                     renderer.render(
-                        painter, self.tileset.svgName[str(self.exposed)],
+                        painter, self.tileset.svgName[self.exposed.name2()],
                         QRectF(self.facePos(), QSizeF(faceSize)))
                 else:
                     renderer.render(
-                        painter, self.tileset.svgName[str(self.exposed)],
+                        painter, self.tileset.svgName[self.exposed.name2()],
                         self.boundingRect())
         if self.cross:
             self.__paintCross(painter)
