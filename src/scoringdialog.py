@@ -1120,8 +1120,7 @@ class ScoringDialog(QWidget):
         if not winnerTiles:
             return
         assert winnerTiles[0].board
-        # the following is OK with pyside6 annotations. PyQt6 cannot find a matching overload, which seems wrong
-        pmSize = (winnerTiles[0].board.tileset.faceSize * 0.5).toSize()  # type:ignore[operator]
+        pmSize = winnerTiles[0].board.tileset.faceSize.toSize()
         self.cbLastTile.setIconSize(pmSize)
         QPixmapCache.clear()
         shownTiles = set()
@@ -1169,8 +1168,8 @@ class ScoringDialog(QWidget):
         winner = self.game.winner
         assert winner
         assert winner.handBoard
-        faceWidth = int(winner.handBoard.tileset.faceSize.width() * 0.5)
-        faceHeight = int(winner.handBoard.tileset.faceSize.height() * 0.5)
+        faceWidth = int(winner.handBoard.tileset.faceSize.width())
+        faceHeight = int(winner.handBoard.tileset.faceSize.height())
         restoredIdx = None
         for meld in winnerMelds:
             pixMap = QPixmap(faceWidth * len(meld), faceHeight)
