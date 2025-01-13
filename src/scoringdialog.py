@@ -1184,7 +1184,7 @@ class ScoringDialog(QWidget):
                                    winner.handBoard.tilesByElement(element)
                                    [0].pixmapFromSvg(QSize(faceWidth, faceHeight), withBorders=False))
                 painter.translate(QPointF(faceWidth, 0.0))
-            self.cbLastMeld.addItem(QIcon(pixMap), '', str(meld))
+            self.cbLastMeld.addItem(QIcon(pixMap), '', meld)
             if indexedMeld == meld:
                 restoredIdx = self.cbLastMeld.count() - 1
         if not restoredIdx and indexedMeld:
@@ -1192,7 +1192,7 @@ class ScoringDialog(QWidget):
             indexedMeld = indexedMeld.exposed
             for idx in range(self.cbLastMeld.count()):
                 meldContent = self.cbLastMeld.itemData(idx)
-                if indexedMeld == meldContent.lower():
+                if indexedMeld == meldContent.exposed:
                     restoredIdx = idx
                     if lastTile is not None and lastTile not in meldContent:
                         lastTile = lastTile.swapped
@@ -1226,7 +1226,7 @@ class ScoringDialog(QWidget):
                            and lastTile in m)
             assert winnerMelds, f'lastTile {lastTile} missing in {self.game.winner.hand.melds}'
             if len(winnerMelds) == 1:
-                self.cbLastMeld.addItem(QIcon(), '', str(winnerMelds[0]))
+                self.cbLastMeld.addItem(QIcon(), '', winnerMelds[0])
                 self.cbLastMeld.setCurrentIndex(0)
                 self.lblLastMeld.setVisible(False)
                 self.cbLastMeld.setVisible(False)
