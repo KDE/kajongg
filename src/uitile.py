@@ -219,11 +219,11 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
                 if withBorders:
                     faceSize = self.tileset.faceSize.toSize()
                     renderer.render(
-                        painter, self.tileset.svgName[self.exposed.name2()],
+                        painter, self.svgName,
                         QRectF(self.facePos(), QSizeF(faceSize)))
                 else:
                     renderer.render(
-                        painter, self.tileset.svgName[self.exposed.name2()],
+                        painter, self.svgName,
                         self.boundingRect())
         if self.cross:
             self.__paintCross(painter)
@@ -335,6 +335,12 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
     def tile(self) ->Tile:
         """tile"""
         return self._tile
+
+    @property
+    def svgName(self) -> str:
+        """shortcut"""
+        assert self.tileset
+        return self.tileset.svgName[self.exposed.name2()]
 
     def change_name(self, value:Tile) ->None:
         """set tile name and update display"""
