@@ -21,7 +21,7 @@ from tile import MeldList
 from wind import Wind
 from tilesource import TileSource
 from animation import animate
-from log import logError, logDebug, logWarning, i18n
+from log import logException, logDebug, logWarning, i18n
 from query import Query
 from uitile import UITile, UIMeld
 from board import WindLabel, Board
@@ -104,15 +104,14 @@ class SelectPlayers(SelectRuleset):
             max_game_id = record[0]
             with BlockSignals(self.nameWidgets):
                 for cbName, playerId in zip(self.nameWidgets, record[1:]):
-                    try:
-                        playerName = Players.humanNames[playerId]
-                        playerIdx = cbName.findText(playerName)
-                        if playerIdx >= 0:
-                            cbName.setCurrentIndex(playerIdx)
-                    except KeyError:
-                        logError(f'database is inconsistent: '
-                                 f'game {max_game_id}: player with id {int(playerId)} '
-                                 f'is in game but not in player')
+                    if playerId not in Players.humanNames:
+                        logException(f'database {Internal.db.path} is inconsistent: '
+                                     f'game {max_game_id}: player with id {playerId} '
+                                     f'is in game but not in player')
+                    playerName = Players.humanNames[playerId]
+                    playerIdx = cbName.findText(playerName)
+                    if playerIdx >= 0:
+                        cbName.setCurrentIndex(playerIdx)
         self.slotValidate()
 
     def showEvent(self, unusedEvent:Optional['QEvent']) ->None:
