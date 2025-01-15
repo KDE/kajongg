@@ -218,7 +218,7 @@ class Game:
 
     def _setGameId(self) ->None:
         """virtual"""
-        assert not self  # we want it to fail, and quieten pylint
+        raise NotImplementedError
 
     def close(self) ->None:
         """log off from the server"""
@@ -324,12 +324,6 @@ class Game:
                         if player.sideText.board is not player.front:
                             player.sideText.animateNextChange = True
                         player.sideText.board = player.front
-
-    @staticmethod
-    def _newGameId() ->int:
-        """write a new entry in the game table
-        and returns the game id of that new entry"""
-        return Query("insert into game(seed) values(0)").cursor.lastrowid
 
     def saveStartTime(self) ->None:
         """save starttime for this game"""

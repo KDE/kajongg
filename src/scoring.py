@@ -630,7 +630,7 @@ class ScoringGame(Game):
         """get a new id"""
         if not self.gameid:
             # a loaded game has gameid already set
-            self.gameid = self._newGameId()
+            self.gameid = Query("insert into game(seed) values(0)").cursor.lastrowid
 
     def _mustExchangeSeats(self, pairs:List[List[Player]]) ->List[List[Player]]:
         """filter: which player pairs should really swap places?"""
