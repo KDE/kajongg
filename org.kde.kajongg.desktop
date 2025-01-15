@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Kajongg
-Name[ar]=كاونج
+Name[ar]=كاجونغ
 Name[ast]=Kajongg
 Name[bs]=Kajongg
 Name[ca]=Kajongg
@@ -106,7 +106,7 @@ Comment[x-test]=xxThe ancient Chinese board game for 4 playersxx
 Comment[zh_CN]=中国传统的四人桌上游戏
 Comment[zh_TW]=古老的中國四人遊戲
 GenericName=Mahjong tile game from China
-GenericName[ar]=لعبة قطع ماجونغ من الصين
+GenericName[ar]=لعبة قطع ماه كونغ من الصين
 GenericName[ca]=Joc de fitxes de Mahjong de la Xina
 GenericName[ca@valencia]=Joc de fitxes de Mahjong de la Xina
 GenericName[de]=Mahjong-Spiel aus China
