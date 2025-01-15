@@ -96,18 +96,20 @@ class SelectPlayers(SelectRuleset):
             cbName.currentIndexChanged.connect(self.slotValidate)
 
         query = Query(
-            "select p0,p1,p2,p3 from game where seed=0 order by id desc limit 1")
+            "select id,p0,p1,p2,p3 from game where seed=0 order by id desc limit 1")
         if query.records:
             record = query.record()
+            max_game_id = record[0]
             with BlockSignals(self.nameWidgets):
-                for cbName, playerId in zip(self.nameWidgets, record):
+                for cbName, playerId in zip(self.nameWidgets, record[1:]):
                     try:
                         playerName = Players.humanNames[playerId]
                         playerIdx = cbName.findText(playerName)
                         if playerIdx >= 0:
                             cbName.setCurrentIndex(playerIdx)
                     except KeyError:
-                        logError(f'database is inconsistent: player with id {int(playerId)} '
+                        logError(f'database is inconsistent: '
+                                 f'game {max_game_id}: player with id {int(playerId)} '
                                  f'is in game but not in player')
         self.slotValidate()
 
