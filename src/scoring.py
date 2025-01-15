@@ -98,8 +98,9 @@ class SelectPlayers(SelectRuleset):
         query = Query(
             "select p0,p1,p2,p3 from game where seed=0 order by id desc limit 1")
         if query.records:
+            record = query.record()
             with BlockSignals(self.nameWidgets):
-                for cbName, playerId in zip(self.nameWidgets, query.records[0]):
+                for cbName, playerId in zip(self.nameWidgets, record):
                     try:
                         playerName = Players.humanNames[playerId]
                         playerIdx = cbName.findText(playerName)

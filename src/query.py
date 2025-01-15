@@ -278,6 +278,12 @@ class Query(ReprMixin):
         tupleclass = namedtuple('Fields', self.tuplefields)  # type: ignore
         return tupleclass._make(self.records[0])
 
+    def record(self) -> Any:
+        """Valid only for queries returning exactly one record"""
+        if len(self.records) != 1:
+            raise ValueError(f'{self!r} did not return exactly 1 record but {len(self.records)}')
+        return self.records[0]
+
     def __str__(self) ->str:
         return f"{Internal.db!r}:{self.statement} {'args=' + ','.join(str(x) for x in self.args) if self.args else ''}"
 
