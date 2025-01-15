@@ -95,8 +95,10 @@ class SelectPlayers(SelectRuleset):
             self.grid.addWidget(WindLabel(wind), idx + 1, 0)
             cbName.currentIndexChanged.connect(self.slotValidate)
 
+        # scoring games have seed 0
+        # a scoring game which only just started or threw an exception might have p0,p1,p2,p3 = null
         query = Query(
-            "select id,p0,p1,p2,p3 from game where seed=0 order by id desc limit 1")
+            "select id,p0,p1,p2,p3 from game where seed=0 and p0 is not null order by id desc limit 1")
         if query.records:
             record = query.record()
             max_game_id = record[0]
