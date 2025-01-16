@@ -220,8 +220,8 @@ class ScoringHandBoard(HandBoard):
             return self.uiMelds[1] # FIXME why not 0 ?
         raise ValueError('Scoring Game: findUIMeld() in absence of any uiMelds')
 
-    def loseMeld(self, uiTile:UITile, meld:'Meld') ->Optional[UIMeld]:  # pylint: disable=unused-argument
-        """loses a UIMeld. First uiTile is given, the rest should be as defined by meld"""
+    def loseMeld(self, uiTile:UITile, meld:'Meld') ->UIMeld:  # pylint: disable=unused-argument
+        """loses a UIMeld. Only first uiTile is given"""
         assert isinstance(uiTile, UITile), uiTile
         uiMeld = self.uiMeldWithTile(uiTile)
         for idx, myMeld in enumerate(self.uiMelds):
