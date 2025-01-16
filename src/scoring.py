@@ -223,13 +223,7 @@ class ScoringHandBoard(HandBoard):
     def loseMeld(self, uiTile:UITile, meld:'Meld') ->UIMeld:  # pylint: disable=unused-argument
         """loses a UIMeld. Only first uiTile is given"""
         assert isinstance(uiTile, UITile), uiTile
-        uiMeld = self.uiMeldWithTile(uiTile)
-        for idx, myMeld in enumerate(self.uiMelds):
-            if all(id(uiMeld[x]) == id(myMeld[x]) for x in range(len(uiMeld))):
-                print(f'{self}: deselect UIMeld {uiMeld} deletes {self.uiMelds[idx]}')
-                del self.uiMelds[
-                    idx]  # do not use uiMelds.remove: If we have 2
-                break                 # identical melds, it removes the wrong one
+        uiMeld = self.uiMeldWithTile(uiTile, remove=True)
         self.player.removeMeld(uiMeld)  # uiMeld must already be deleted
         return uiMeld
 
