@@ -118,7 +118,8 @@ def appdataDir() ->str:
 
 def cacheDir() ->str:
     """the cache directory for this user"""
-    result = os.path.join(appdataDir(), '.cache')
+    cachedir = os.environ.get('XDG_CACHE_HOME', '~/.cache')
+    result = os.path.expanduser(cachedir + '/kajongg')
     if not os.path.exists(result):
         os.makedirs(result)
     return result
