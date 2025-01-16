@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-2.0-only
 """
 
 import weakref
-from typing import Optional, TYPE_CHECKING, List, Dict, Union, Any, cast
+from typing import Optional, TYPE_CHECKING, List, Dict, Union, cast
 
 from qt import QGraphicsRectItem, QColor
 from tile import Tile, TileList, Meld, MeldList
@@ -271,7 +271,7 @@ class HandBoard(Board):
                 matches = sorted(
                     matches, key=lambda x:
                     + abs(newPosition.yoffset - x.yoffset) * 100 # pylint: disable=cell-var-from-loop
-                    + abs(newPosition.xoffset - x.xoffset)) # pylint: disable=cell-var-from-loop
+                    + x.xoffset)
                 # pylint is too cautious here. Check with later versions.
                 match = matches[0]
                 result[match] = newPosition
@@ -281,7 +281,6 @@ class HandBoard(Board):
         for newBonusPosition in self.newBonusPositions(
                 [x for x in tiles if x.isBonus], newPositions):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
-        self._avoidCrossingMovements(result)
         for uiTile, newPos in result.items():
             uiTile.level = 0  # for tiles coming from the wall
             uiTile.change_name(newPos.tile)
@@ -289,9 +288,6 @@ class HandBoard(Board):
             uiTile.dark = newPos.dark
             uiTile.focusable = newPos.focusable
         return list(result.keys())
-
-    def _avoidCrossingMovements(self, places:Dict[UITile, TileAttr]) ->None:
-        """not needed for all HandBoards"""
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in HandBoard.
@@ -390,53 +386,6 @@ class PlayingHandBoard(HandBoard):
         """only dragging to discard board should be possible"""
         if event:
             event.setAccepted(False)
-
-    def _avoidCrossingMovements(self, places:Dict[UITile, TileAttr]) ->None:
-        """"the above is a good approximation but if the board already had more
-        than one identical tile they often switch places - this should not
-        happen. So for each element, we make sure that the left-right order is
-        still the same as before. For this check, ignore all new tiles"""
-        movingPlaces = self.__movingPlaces(places)
-        for yOld in 0, 1:
-            for yNew in 0, 1:
-                items = [x for x in movingPlaces.items()
-                         if (x[0].board == self)
-                         and x[0].yoffset == yOld
-                         and x[1] and x[1].yoffset == yNew
-                         and not x[0].isBonus]
-                for element in {x[1].tile for x in items}:
-                    items = [x for x in movingPlaces.items()
-                             if x[1].tile is element]
-                    if len(items) > 1:
-                        oldList = sorted((x[0] for x in items),
-                                         key=lambda x:
-                                         bool(x.board != self) * 1000 + x.xoffset)
-                        newList = sorted((x[1] for x in items),
-                                         key=lambda x: x.xoffset)
-                        for idx, oldTile in enumerate(oldList):
-                            places[oldTile] = newList[idx]
-
-    def __movingPlaces(self, places:Dict[UITile, TileAttr]) ->Dict[UITile, TileAttr]:
-        """filter out the left parts of the rows which do not change
-        at all"""
-        rows:List[List[Any]] = [[], []]
-        for idx, yOld in enumerate([0, 1]):
-            rowPlaces = [x for x in places.items() if x[0].yoffset == yOld]
-            rowPlaces = sorted(rowPlaces, key=lambda x: x[0].xoffset)
-            smallestX = 999.9
-            for tileItem, newPos in places.items():
-                if (tileItem.xoffset != newPos.xoffset
-                        or tileItem.yoffset != newPos.yoffset):
-                    if newPos.yoffset == yOld:
-                        smallestX = min(smallestX, newPos.xoffset)
-                    else:
-                        smallestX = min(smallestX, tileItem.xoffset)
-            rows[idx] = [x for x in rowPlaces
-                         if x[0].xoffset >= smallestX
-                         and x[1].xoffset >= smallestX]
-        result = dict(rows[0])
-        result.update(dict(rows[1]))
-        return result
 
     def newLowerMelds(self) ->MeldList:
         """a list of melds for the hand as it should look after sync"""
