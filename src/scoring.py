@@ -206,8 +206,6 @@ class ScoringHandBoard(HandBoard):
                 if remove:
                     del self.uiMelds[idx]
                 return myMeld
-        logWarning(f'ScoringBoard: found no meld with {uiTile}')
-# FIXME: when can this happen?
         return UIMeld(uiTile)
 
     def findUIMeld(self, meld:Optional['Meld']) ->UIMeld:
