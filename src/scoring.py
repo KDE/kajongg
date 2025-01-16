@@ -222,10 +222,6 @@ class ScoringHandBoard(HandBoard):
         assert isinstance(uiTile, UITile), uiTile
         return self.uiMeldWithTile(uiTile)
 
-    def sync(self, adding:Optional[List[UITile]]=None) ->None:
-        """place all tiles in ScoringHandBoard"""
-        self.placeTiles(cast(List[UITile], list(chain(*self.uiMelds))))
-
     def deselect(self, meld:UIMeld) ->None:
         """remove meld from old board"""
         for idx, uiMeld in enumerate(self.uiMelds):
@@ -234,6 +230,10 @@ class ScoringHandBoard(HandBoard):
                     idx]  # do not use uiMelds.remove: If we have 2
                 break                 # identical melds, it removes the wrong one
         self.player.removeMeld(meld)  # uiMeld must already be deleted
+
+    def sync(self, adding:Optional[List[UITile]]=None) ->None:
+        """place all tiles in ScoringHandBoard"""
+        self.placeTiles(cast(List[UITile], list(chain(*self.uiMelds))))
 
     def dragMoveEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """allow dropping of uiTile from ourself only to other state (open/concealed)"""
