@@ -291,7 +291,7 @@ class ScoringHandBoard(HandBoard):
         senderBoard.autoSelectTile()
         senderBoard.checkTiles()
         if senderBoard is not self and senderBoard.isHandBoard:
-            scoringScene().handSelectorChanged(senderBoard)
+            scoringScene().handSelectorChanged(cast('HandBoard', senderBoard))
         scoringScene().handSelectorChanged(self)
         animate()
         self.checkTiles()

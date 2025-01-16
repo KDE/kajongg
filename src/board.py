@@ -715,7 +715,7 @@ class SelectorBoard(CourtBoard):
             result.append(baseTiles[0])
         return result
 
-    def deselect(self, meld:Meld) ->None:
+    def deselect(self, meld:UIMeld) ->None:
         """we are going to lose those tiles or melds"""
 
     def __placeAvailable(self, uiTile:UITile) ->None:
