@@ -9,8 +9,8 @@ SPDX-License-Identifier: GPL-2.0-only
 
 from typing import TYPE_CHECKING, Optional, Dict, Literal, Any, cast
 
-from qt import Qt, QRectF, QPointF, QSizeF, QSize
-from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor
+from qt import Qt, QRectF, QPointF, QSizeF, QSize, QPen
+from qt import QGraphicsObject, QGraphicsItem, QPixmap, QPainter, QColor, QFont
 
 from util import stack
 from log import logException, logDebug
@@ -227,6 +227,22 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
                         self.boundingRect())
         if self.cross:
             self.__paintCross(painter)
+        if Debug.graphics:
+            self.__paintId(painter)
+
+    def __paintId(self, painter:QPainter) ->None:
+        """for debugging, paint uid"""
+        with Painter(painter):
+            assert self.tileset
+            faceSize = self.tileset.faceSize
+            height = faceSize.height()
+            painter.translate(self.facePos())
+            font = QFont()
+            font.setPixelSize(24)
+            painter.setFont(font)
+            pen = QPen(QColor('orange'))
+            painter.setPen(pen)
+            painter.drawText(10, int(height / 2), str(self.uid))
 
     def __paintCross(self, painter:QPainter) ->None:
         """paint a cross on the tile"""
