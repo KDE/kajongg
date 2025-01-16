@@ -222,14 +222,14 @@ class ScoringHandBoard(HandBoard):
         assert isinstance(uiTile, UITile), uiTile
         return self.uiMeldWithTile(uiTile)
 
-    def deselect(self, meld:UIMeld) ->None:
-        """remove meld from old board"""
-        for idx, uiMeld in enumerate(self.uiMelds):
-            if all(id(meld[x]) == id(uiMeld[x]) for x in range(len(meld))):
+    def deselect(self, uiMeld:UIMeld) ->None:
+        """remove uiMeld from old board"""
+        for idx, myMeld in enumerate(self.uiMelds):
+            if all(id(uiMeld[x]) == id(myMeld[x]) for x in range(len(uiMeld))):
                 del self.uiMelds[
                     idx]  # do not use uiMelds.remove: If we have 2
                 break                 # identical melds, it removes the wrong one
-        self.player.removeMeld(meld)  # uiMeld must already be deleted
+        self.player.removeMeld(uiMeld)  # uiMeld must already be deleted
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in ScoringHandBoard"""
