@@ -199,12 +199,15 @@ class ScoringHandBoard(HandBoard):
         assert uiMeld
         return uiMeld[0]
 
-    def uiMeldWithTile(self, uiTile:UITile) ->UIMeld:
-        """return the meld with uiTile"""
-        for myMeld in self.uiMelds:
+    def uiMeldWithTile(self, uiTile:UITile, remove:bool=False) ->UIMeld:
+        """return the meld with uiTile, optionally removing it"""
+        for idx, myMeld in enumerate(self.uiMelds):
             if uiTile in myMeld:
+                if remove:
+                    del self.uiMelds[idx]
                 return myMeld
         logWarning(f'ScoringBoard: found no meld with {uiTile}')
+# FIXME: when can this happen?
         return UIMeld(uiTile)
 
     def findUIMeld(self, meld:Optional['Meld']) ->UIMeld:

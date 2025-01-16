@@ -349,7 +349,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         be the first tile no matter which one is pressed"""
         return uiTile
 
-    def uiMeldWithTile(self, uiTile:UITile) ->UIMeld:
+    def uiMeldWithTile(self, uiTile:UITile, remove:bool=False) ->UIMeld:  # pylint: disable=unused-argument
         """return the UI Meld with uiTile. A Board does not know about melds,
         so default is to return a Meld with only uiTile"""
         return UIMeld(uiTile)
