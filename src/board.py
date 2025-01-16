@@ -692,20 +692,19 @@ class SelectorBoard(CourtBoard):
     def dropMeld(self, uiTile:UITile, forLowerHalf:bool=False) ->None:  # pylint: disable=unused-argument
         """drop UIMeld containing uiTile into selector board"""
         assert uiTile.board
-        uiMeld = uiTile.board.uiMeldWithTile(uiTile)
+        uiMeld = uiTile.board.uiMeldWithTile(uiTile, remove=True)
         senderHand = uiMeld[0].board
         if senderHand == self:
             return
         for myTile in uiMeld:
             self.__placeAvailable(myTile)
             myTile.focusable = True
-        senderHand.deselect(uiMeld)
         (senderHand if senderHand.uiTiles else self).hasLogicalFocus = True
         self._noPen()
         animate()
 
-    def assignUITiles(self, uiTile:UITile, meld:Meld) ->UIMeld:
-        """generate a UIMeld. First uiTile is given, the rest should be as defined by meld"""
+    def loseMeld(self, uiTile:UITile, meld:Meld) ->UIMeld:
+        """loses a UIMeld. First uiTile is given, the rest should be as defined by meld"""
         assert isinstance(uiTile, UITile), uiTile
         result = UIMeld(uiTile)
         for tile in meld[1:]:
@@ -714,9 +713,6 @@ class SelectorBoard(CourtBoard):
                     tile.exposed) if x not in result]
             result.append(baseTiles[0])
         return result
-
-    def deselect(self, meld:UIMeld) ->None:
-        """we are going to lose those tiles or melds"""
 
     def __placeAvailable(self, uiTile:UITile) ->None:
         """place the uiTile in the selector at its place"""

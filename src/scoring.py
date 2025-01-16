@@ -217,22 +217,21 @@ class ScoringHandBoard(HandBoard):
                 return result
         logWarning(f'Scoring game: cannot find UIMeld for {meld}')
         if self.uiMelds:
-            return self.uiMelds[1]
+            return self.uiMelds[1] # FIXME why not 0 ?
         raise ValueError('Scoring Game: findUIMeld() in absence of any uiMelds')
 
-    def assignUITiles(self, uiTile:UITile, meld:'Meld') ->Optional[UIMeld]:  # pylint: disable=unused-argument
-        """generate a UIMeld. First uiTile is given, the rest should be as defined by meld"""
+    def loseMeld(self, uiTile:UITile, meld:'Meld') ->Optional[UIMeld]:  # pylint: disable=unused-argument
+        """loses a UIMeld. First uiTile is given, the rest should be as defined by meld"""
         assert isinstance(uiTile, UITile), uiTile
-        return self.uiMeldWithTile(uiTile)
-
-    def deselect(self, meld:UIMeld) ->None:
-        """remove meld from old board"""
-        for idx, uiMeld in enumerate(self.uiMelds):
-            if all(id(meld[x]) == id(uiMeld[x]) for x in range(len(meld))):
+        uiMeld = self.uiMeldWithTile(uiTile)
+        for idx, myMeld in enumerate(self.uiMelds):
+            if all(id(uiMeld[x]) == id(myMeld[x]) for x in range(len(uiMeld))):
+                print(f'{self}: deselect UIMeld {uiMeld} deletes {self.uiMelds[idx]}')
                 del self.uiMelds[
                     idx]  # do not use uiMelds.remove: If we have 2
                 break                 # identical melds, it removes the wrong one
-        self.player.removeMeld(meld)  # uiMeld must already be deleted
+        self.player.removeMeld(uiMeld)  # uiMeld must already be deleted
+        return uiMeld
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in ScoringHandBoard"""
@@ -280,10 +279,9 @@ class ScoringHandBoard(HandBoard):
         newMeld = senderBoard.chooseVariant(uiTile, forLowerHalf)
         if not newMeld:
             return False
-        uiMeld = senderBoard.assignUITiles(uiTile, newMeld)
+        uiMeld = senderBoard.loseMeld(uiTile, newMeld)
         for uitile, tile in zip(uiMeld, newMeld):
             uitile.change_name(tile)
-        senderBoard.deselect(uiMeld)
         self.uiMelds.append(uiMeld)
         assert self.player
         self.player.addMeld(uiMeld.meld)
