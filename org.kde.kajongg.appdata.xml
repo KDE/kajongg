@@ -7,7 +7,7 @@
     <name translate="no">KDE</name>
   </developer>
   <name>Kajongg</name>
-  <name xml:lang="ar">كونج</name>
+  <name xml:lang="ar">كاجونغ</name>
   <name xml:lang="ast">Kajongg</name>
   <name xml:lang="bs">Kajongg</name>
   <name xml:lang="ca">Kajongg</name>
@@ -48,7 +48,7 @@
   <name xml:lang="zh-CN">Kajongg</name>
   <name xml:lang="zh-TW">Kajongg</name>
   <summary>Mahjong tile game from China</summary>
-  <summary xml:lang="ar">لعبة قطع كونج من الصين</summary>
+  <summary xml:lang="ar">لعبة قطع ماه كونغ من الصين</summary>
   <summary xml:lang="ca">Joc de fitxes de Mahjong de la Xina</summary>
   <summary xml:lang="ca-valencia">Joc de fitxes de Mahjong de la Xina</summary>
   <summary xml:lang="de">Mahjong-Spiel aus China</summary>
@@ -87,7 +87,7 @@
       computation of scores and for bookkeeping. Or you can use Kajongg to play against any combination of other human players
       or computer players.
     </p>
-    <p xml:lang="ar">كونج هي لعبة لوحية صينية قديمة لأربعة لاعبين. يمكن استخدام كونج بطريقتين مختلفتين: احتساب أهداف لعبة يدوية حيث تلعب ماجونغ يدويا وتستخدم كونج لحساب الدرجات ولإمساك الدفاتر. أو يمكنك استخدام كونج للعب ضد اللاعبين الآخرين أو ضد الحاسوب.</p>
+    <p xml:lang="ar">كاجونغ هي لعبة لوحية صينية قديمة لأربعة لاعبين. يمكن استخدام كونج بطريقتين مختلفتين: احتساب أهداف لعبة يدوية حيث تلعب ماجونغ يدويا وتستخدم كونج لحساب الدرجات ولإمساك الدفاتر. أو يمكنك استخدام كونج للعب ضد اللاعبين الآخرين أو ضد الحاسوب.</p>
     <p xml:lang="bs">Kajongg je drevna kineska igra na ploči za 4 igrača. Kajongg se može koristiti na dva različita načina: Igranje ručne igre u kojoj igrate kao i uvijek i koristiti Kajongg za izračunavanje rezultata i za knjigovodstvo. Ili možete koristiti Kajongg igrati protiv bilo koje kombinacije drugih ljudskih igrača ili računarskih igrača.</p>
     <p xml:lang="ca">El Kajongg és l'antic joc de tauler xinès per a 4 jugadors. El Kajongg es pot usar de dues maneres diferents: Puntuant un joc manual a on jugueu com sempre i useu el Kajongg pel càlcul de les puntuacions i l'enregistrament. O podeu usar el Kajongg per a jugar contra qualsevol combinació d'altres jugadors humans o ordinadors.</p>
     <p xml:lang="ca-valencia">Kajongg és l'antic joc de tauler xinés per a 4 jugadors. Kajongg es pot utilitzar de dues maneres diferents: Puntuant un joc manual a on jugueu com sempre i utilitzeu Kajongg pel càlcul de les puntuacions i la gravació. O podeu utilitzar Kajongg per a jugar contra qualsevol combinació d'altres jugadors humans o ordinadors.</p>
@@ -130,7 +130,7 @@
   <screenshots>
     <screenshot type="default">
       <caption>Playing Kajongg</caption>
-      <caption xml:lang="ar">يعلب كونج</caption>
+      <caption xml:lang="ar">يعلب كاجونغ</caption>
       <caption xml:lang="ca">Jugant al Kajongg</caption>
       <caption xml:lang="ca-valencia">Jugant a Kajongg</caption>
       <caption xml:lang="cs">Hraní Kajongg</caption>
