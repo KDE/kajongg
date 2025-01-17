@@ -222,7 +222,7 @@ class ScoringHandBoard(HandBoard):
         """loses a UIMeld. Only first uiTile is given"""
         assert isinstance(uiTile, UITile), uiTile
         uiMeld = self.uiMeldWithTile(uiTile, remove=True)
-        self.player.removeMeld(uiMeld)  # uiMeld must already be deleted
+        self.player.removeMeld(uiMeld.meld)  # uiMeld must already be deleted
         self.sync()
         return uiMeld
 
@@ -501,9 +501,8 @@ class ScoringPlayer(VisiblePlayer, Player):
                 logDebug(f'{self} gets exposed meld {meld}')
         self._hand = None
 
-    def removeMeld(self, uiMeld:UIMeld) ->None:
+    def removeMeld(self, meld:'Meld') ->None:
         """remove a meld from this hand in a scoring game"""
-        meld = uiMeld.meld
         if meld.isBonus:
             self._bonusTiles.remove(meld[0])
             if Debug.scoring:
