@@ -648,7 +648,7 @@ class SelectorBoard(CourtBoard):
     """a board containing all possible tiles for selection"""
 
     def __init__(self) ->None:
-        CourtBoard.__init__(self, 9, 5)
+        CourtBoard.__init__(self, 9, 7)
         self.allSelectorTiles:List[UITile] = []
 
     def checkTiles(self) ->None:
