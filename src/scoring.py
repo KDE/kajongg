@@ -223,6 +223,7 @@ class ScoringHandBoard(HandBoard):
         assert isinstance(uiTile, UITile), uiTile
         uiMeld = self.uiMeldWithTile(uiTile, remove=True)
         self.player.removeMeld(uiMeld)  # uiMeld must already be deleted
+        self.sync()
         return uiMeld
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
