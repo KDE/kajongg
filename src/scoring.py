@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0-only
 
 import datetime
 from itertools import chain
-from typing import Tuple, Optional, TYPE_CHECKING, List, cast, Generator
+from typing import Tuple, Optional, TYPE_CHECKING, List, cast, Any
 
 from qt import QPointF, QRectF, QDialogButtonBox
 from qt import QGraphicsRectItem, QGraphicsSimpleTextItem
@@ -479,9 +479,8 @@ class ScoringPlayer(VisiblePlayer, Player):
         """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
         rulesWithMelds = [x for x in rules if x.meld]
         rulesWithoutMelds = [x for x in rules if x not in rulesWithMelds]
-        assert (_ := cast('ScoringHandBoard', self.handBoard))
-        tuples = cast(Generator[Tuple['UsedRule', 'UIMeld'], None, None],
-            [tuple([x, _.findUIMeld(x.meld)]) for x in rulesWithMelds])
+        assert (handBoard := cast('ScoringHandBoard', self.handBoard))
+        tuples:Any = [tuple([x, handBoard.findUIMeld(x.meld)]) for x in rulesWithMelds]
         sorted_tuples = sorted(tuples, key=lambda x: x[1][0].sortKey())
         return [x[0] for x in sorted_tuples] + rulesWithoutMelds
 
