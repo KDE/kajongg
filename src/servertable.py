@@ -806,7 +806,7 @@ class ServerTable(Table, ReprMixin):
             player.robsTile()
             assert lastMove.player
             _ = lastMove.meld[0].concealed
-            lastMove.player.robTileFrom(_)
+            lastMove.player.getsRobbed(_)
             withDiscard = _
         msgArgs = player.showConcealedMelds(concealedMelds, withDiscard)
         if msgArgs:

@@ -737,7 +737,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         self._hand = None
         return None
 
-    def robTileFrom(self, tile:Tile) -> None:
+    def getsRobbed(self, tile:Tile) -> None:
         """used for robbing the kong from this player"""
         if Debug.robbingKong:
             logDebug(f'robbed {tile} from {self}')
@@ -750,7 +750,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
                 break
         else:
             # TODO: should we somehow show an error and continue?
-            raise ValueError(f'robTileFrom: no meld found with {tile}')
+            raise ValueError(f'getsRobbed: no meld found with {tile}')
         assert self.game
         self.game.lastDiscard = tile.concealed
         self.lastTile = Tile.none  # our lastTile has just been robbed

@@ -809,7 +809,7 @@ class MessageRobbedTheKong(NotifyAtOnceMessage, ServerMessage):
         assert client.game
         prevMove = next(client.game.lastMoves(only=[Message.DeclaredKong]))
         assert prevMove.player
-        prevMove.player.robTileFrom(prevMove.meld[0].concealed)
+        prevMove.player.getsRobbed(prevMove.meld[0].concealed)
         assert move.player
         move.player.robsTile()
         client.game.addCsvTag(

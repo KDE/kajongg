@@ -168,9 +168,9 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         if self.voice:
             self.voice.speak(txt, self.front.rotation())
 
-    def robTileFrom(self, tile:Tile) ->None:
+    def getsRobbed(self, tile:Tile) ->None:
         """used for robbing the kong from this player"""
-        PlayingPlayer.robTileFrom(self, tile)
+        PlayingPlayer.getsRobbed(self, tile)
         tile = tile.exposed
         assert self.handBoard
         hbTiles = self.handBoard.uiTiles
