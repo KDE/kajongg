@@ -172,7 +172,7 @@ class ScoringHandBoard(HandBoard):
 
     def __init__(self, player:'ScoringPlayer') ->None:
         self.__moveHelper:Optional['QGraphicsItemGroup'] = None
-        self.uiMelds:List[UIMeld] = []
+        self.uiMelds:List[UIMeld] = []  # uiMelds and uiTiles are administered independently
         HandBoard.__init__(self, player)
         self.player:'ScoringPlayer'
 
@@ -477,13 +477,13 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def sortRulesByX(self, rules:List['UsedRule']) ->List['UsedRule']:
         """if this game has a GUI, sort rules by GUI order of the melds they are applied to"""
-        withMelds = [x for x in rules if x.meld]
-        withoutMelds = [x for x in rules if x not in withMelds]
+        rulesWithMelds = [x for x in rules if x.meld]
+        rulesWithoutMelds = [x for x in rules if x not in rulesWithMelds]
         assert (_ := cast('ScoringHandBoard', self.handBoard))
         tuples = cast(Generator[Tuple['UsedRule', 'UIMeld'], None, None],
-            [tuple([x, _.findUIMeld(x.meld)]) for x in withMelds])
+            [tuple([x, _.findUIMeld(x.meld)]) for x in rulesWithMelds])
         sorted_tuples = sorted(tuples, key=lambda x: x[1][0].sortKey())
-        return [x[0] for x in sorted_tuples] + withoutMelds
+        return [x[0] for x in sorted_tuples] + rulesWithoutMelds
 
     def addMeld(self, meld:'Meld') ->None:
         """add meld to this hand in a scoring game"""
