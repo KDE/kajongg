@@ -294,7 +294,7 @@ class HandBoard(Board):
         adding tiles: their board is where they come from. Those tiles
         are already in the Player tile lists.
         The sender board must not be self, see ScoringPlayer.moveMeld"""
-        if not self.uiTiles and not adding:
+        if self.empty and not adding:
             return
         allTiles = self.uiTiles[:]
         if adding:

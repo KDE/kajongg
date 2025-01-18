@@ -204,6 +204,11 @@ class Board(QGraphicsRectItem, ReprMixin):
         assert Internal.Preferences
         Internal.Preferences.addWatch('showShadows', self.showShadowsChanged)
 
+    @property
+    def empty(self) -> bool:
+        """True if we have no uiTiles"""
+        return not bool(self.uiTiles)
+
     def debug_name(self) ->str:
         """default board name, used for debugging messages"""
         return 'board'
@@ -678,9 +683,10 @@ class SelectorBoard(CourtBoard):
 
     def load(self, game:'Game') ->None:
         """load the tiles according to game.ruleset"""
-        for uiTile in self:
-            uiTile.setBoard(None)
-        self.uiTiles = []
+        if not self.empty:
+            for uiTile in self:
+                uiTile.setBoard(None)
+            self.uiTiles = []
         self.allSelectorTiles = [UITile(x) for x in elements.all(game.ruleset)]
         self.refill()
 
@@ -721,7 +727,7 @@ class SelectorBoard(CourtBoard):
         for myTile in uiMeld:
             self.__placeAvailable(myTile)
             myTile.focusable = True
-        (senderHand if senderHand.uiTiles else self).hasLogicalFocus = True
+        (senderHand if not senderHand.empty else self).hasLogicalFocus = True
         self._noPen()
         animate()
 

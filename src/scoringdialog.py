@@ -1015,10 +1015,9 @@ class ScoringDialog(QWidget):
                     for pBox in player.manualRuleBoxes:
                         if pBox.rule.name == ruleBox.rule.name:
                             pBox.setChecked(False)
-        try:
-            newState = bool(self.game.winner.handBoard.uiTiles) # type:ignore[union-attr]
-        except AttributeError:
-            newState = False
+        newState = False
+        if self.game.winner and self.game.winner.handBoard:
+            newState = self.game.winner.handBoard.empty
         self.lblLastTile.setVisible(newState)
         self.cbLastTile.setVisible(newState)
         if self.game:
@@ -1065,7 +1064,7 @@ class ScoringDialog(QWidget):
                 self.nameLabels, self.wonBoxes, self.spValues, self.game.players):
             with BlockSignals([spValue, wonBox]):
                 # we do not want that change to call computeScores again
-                if player.handBoard and player.handBoard.uiTiles:
+                if player.handBoard and not player.handBoard.empty:
                     spValue.setEnabled(False)
                     nameLabel.setBuddy(wonBox)
                     for _ in range(10):

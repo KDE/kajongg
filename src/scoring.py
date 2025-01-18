@@ -279,7 +279,7 @@ class ScoringHandBoard(HandBoard):
         assert self.player
         self.player.addMeld(uiMeld.meld)
         self.sync()
-        self.hasLogicalFocus = senderBoard == self or not senderBoard.uiTiles
+        self.hasLogicalFocus = senderBoard == self or senderBoard.empty
         self.checkTiles()
         senderBoard.autoSelectTile()
         senderBoard.checkTiles()
@@ -313,7 +313,7 @@ class ScoringHandBoard(HandBoard):
     def showMoveHelper(self, visible:Optional[bool]=None) ->None:
         """show help text In empty HandBoards"""
         if visible is None:
-            visible = not self.uiTiles
+            visible = self.empty
         if self.__moveHelper and not isAlive(self.__moveHelper):
             return
         if visible:

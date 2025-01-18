@@ -561,7 +561,7 @@ class ScoringScene(GameScene):
             return True
         if key == Qt.Key.Key_Tab and self.game:
             tabItems = [self.selectorBoard]
-            tabItems.extend(p.handBoard for p in self.game.players if p.handBoard.uiTiles)
+            tabItems.extend(p.handBoard for p in self.game.players if not p.handBoard.empty)
             tabItems.append(tabItems[0])
             currentBoard = uiTile.board  # type: ignore[attr-defined]
             currIdx = 0
