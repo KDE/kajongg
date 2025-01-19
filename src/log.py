@@ -194,7 +194,7 @@ class EventData(str):
     def __new__(cls, receiver:'QObject', event:'QEvent', prefix:Optional[str]=None) ->'EventData':
         """create the wanted string"""
         name = cls.eventName(event)
-        msg = f'{name}{cls.eventValue(event)}receiver:{cls.eventReceiver(receiver)}'
+        msg = f'{name}.{cls.eventValue(event)}.receiver:{cls.eventReceiver(receiver)}'
         if prefix:
             msg = ': '.join([prefix, msg])
         if 'all' in Debug.events or any(x in msg for x in Debug.events.split(':')):
@@ -206,10 +206,14 @@ class EventData(str):
         """Format data about event receiver"""
         text = ''
         if hasattr(receiver, 'text'):
-            try:
-                text = receiver.text()
-            except TypeError:
-                text = receiver.text
+            if receiver.__class__.__name__ in ('QAbstractSpinBox', ):
+                # this would segfault in text()
+                text = ''
+            else:
+                try:
+                    text = receiver.text()
+                except TypeError:
+                    text = receiver.text
         name = ''
         if hasattr(receiver, 'objectName') and receiver.objectName():
             name = receiver.objectName()
