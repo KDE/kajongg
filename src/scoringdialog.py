@@ -409,6 +409,7 @@ class ScoreTable(QWidget):
         self.scoreModelTest:Optional[ModelTest] = None
         decorateWindow(self, i18nc('kajongg', 'Scores'))
         self.setAttribute(Qt.WidgetAttribute.WA_AlwaysShowToolTips)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.Tool)
         self.setMouseTracking(True)
         self.setupUi()
         self.refresh()
