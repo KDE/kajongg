@@ -11,7 +11,7 @@ from typing import Optional, Union, TYPE_CHECKING, Any, Generator, Literal, cast
 
 from twisted.internet.defer import succeed, Deferred
 
-from log import logDebug, logFailure
+from log import logDebug, logFailure, logError
 from mi18n import i18n
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import ReprMixin, Speeds, id4
@@ -555,6 +555,9 @@ class ScoringScene(GameScene):
         key = event.key()
         uiTile = cast(UITile, self.focusItem())
         wind = Wind.normalized(key)
+        if uiTile is None:
+            logError(f'received key {key}/{chr(key)} but focusItem() is None')
+            return False
         if wind is not None:
             shift = bool(event.modifiers() & Qt.KeyboardModifier.ShiftModifier)
             self.__moveTile(uiTile, wind, shift)
