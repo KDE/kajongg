@@ -307,13 +307,13 @@ msgstr "不显示图形用户界面。仅用于测试"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr ""
+msgstr "使用已在运行且正侦听 SOCKET 的专用服务器。仅用于测试"
 
 #: src/kajongg.py:101
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
-msgstr ""
+msgstr "使用已在运行且正侦听 PORT 的专用服务器。仅用于测试"
 
 #: src/kdestub.py:269
 msgid "&OK"
@@ -1120,21 +1120,21 @@ msgstr ""
 
 #: src/predefined.py:147
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "打出依次摸取的牌"
 
 #: src/predefined.py:149
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "从左上角开始打出依次摸取的牌"
 
 #: src/predefined.py:151
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "为所获取的别家打出的牌留出空位"
 
 #: src/predefined.py:154
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
-msgstr ""
+msgstr "仅当打出已摸的牌时：不要将下一张打出的牌放在所获取的别家打出的牌的位置"
 
 #: src/predefined.py:163
 msgid "Last Tile Completes Pair of 2..8"
@@ -1921,7 +1921,7 @@ msgstr "玩家 %1 已注销"
 
 #: src/server.py:434
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr ""
+msgstr "服务器将监听 PORT ({int(defaultPort)})"
 
 #: src/server.py:437
 msgid "the server will listen on SOCKET"
