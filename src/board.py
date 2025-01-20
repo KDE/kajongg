@@ -606,6 +606,14 @@ class Board(QGraphicsRectItem, ReprMixin):
         """just to make this clear to mypy"""
         return iter(self.uiTiles)
 
+    def __len__(self) ->int:
+        """len(Board) returns # of UITiles"""
+        return len(self.uiTiles)
+
+    def __bool__(self) ->bool:
+        """because a Board with len == 0 would return False"""
+        return True
+
     def placeTile(self, uiTile:UITile) ->None:
         """places the uiTile in the scene"""
         assert isinstance(uiTile, UITile)
