@@ -59,7 +59,7 @@ class Nothing(Expected):
     """we do not expect anything"""
 
     def __init__(self, points:int=0, doubles:int=0, limits:float=0.0) ->None:
-        Expected.__init__(self, True, points, doubles, limits)
+        super().__init__(True, points, doubles, limits)
 
 
 class Win(Expected):
@@ -67,7 +67,7 @@ class Win(Expected):
     """we expect a winning hand"""
 
     def __init__(self, points:int=0, doubles:int=0, limits:float=0.0) ->None:
-        Expected.__init__(self, True, points, doubles, limits)
+        super().__init__(True, points, doubles, limits)
 
 
 class NoWin(Expected):
@@ -75,7 +75,7 @@ class NoWin(Expected):
     """we expect a losing hand"""
 
     def __init__(self, points:int=0, doubles:int=0, limits:float=0.0) ->None:
-        Expected.__init__(self, False, points, doubles, limits)
+        super().__init__(False, points, doubles, limits)
 
 
 class Base(unittest.TestCase):

@@ -308,18 +308,16 @@ class ClassicalChineseDMJL(ClassicalChinese):
     """classical chinese rules, German rules"""
 
     def __init__(self, name:Optional[str]=None) ->None:
-        ClassicalChinese.__init__(
-            self,
-            name or i18nE('Classical Chinese DMJL'))
+        super().__init__(name or i18nE('Classical Chinese DMJL'))
 
     def _initRuleset(self) ->None:
         """set the description"""
-        ClassicalChinese._initRuleset(self)
+        super()._initRuleset()
         self.description = i18n(
             'Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V.')
 
     def loadRules(self) ->None:
-        ClassicalChinese.loadRules(self)
+        super().loadRules()
         # the squirming snake is only covered by standard mahjongg rule if
         # tiles are ordered
         self.mjRules.createRule(
@@ -365,26 +363,24 @@ class ClassicalChineseBMJA(ClassicalChinese):
     """classical chinese rules, British rules"""
 
     def __init__(self, name:Optional[str]=None) ->None:
-        ClassicalChinese.__init__(
-            self,
-            name or i18nE('Classical Chinese BMJA'))
+        super().__init__(name or i18nE('Classical Chinese BMJA'))
 
     def _initRuleset(self) ->None:
         """set the description"""
-        ClassicalChinese._initRuleset(self)
+        super()._initRuleset()
         self.description = i18n(
             'Classical Chinese as defined by the British Mah-Jong Association')
 
     def addParameterRules(self) ->None:
         """those differ for BMJA from standard"""
-        ClassicalChinese.addParameterRules(self)
+        super().addParameterRules()
         self.parameterRules['kongBoxSize'].parameter = 14  # type:ignore[attr-defined]
         self.parameterRules['maxChows'].parameter = 1  # type:ignore[attr-defined]
         self.parameterRules['limit'].parameter = 1000  # type:ignore[attr-defined]
         self.parameterRules['mustDeclareCallingHand'].parameter = True  # type:ignore[attr-defined]
 
     def loadRules(self) ->None:
-        ClassicalChinese.loadRules(self)
+        super().loadRules()
         del self.winnerRules['ZeroPointHand']
         originalCall = self.winnerRules.pop('MahJonggwithOriginalCall')
         self.winnerRules.createRule(

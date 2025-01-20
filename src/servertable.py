@@ -73,7 +73,7 @@ class ServerGame(PlayingGame):
         assert self.wall
         self.wall.tiles.sort()
         self.randomGenerator.shuffle(self.wall.tiles)
-        PlayingGame.throwDices(self)
+        super().throwDices()
 
     def initHand(self) ->None:
         """Happens only on server: every player gets 13 tiles (including east)"""
@@ -86,7 +86,7 @@ class ServerGame(PlayingGame):
             # compensate boni
             while len(player.concealedTiles) != 13:
                 player.addConcealedTiles(self.wall.deal())
-        PlayingGame.initHand(self)
+        super().initHand()
 
     def _concealedTileName(self, tileName:Tile) ->Tile:
         """The server game instance knows everything but has no myself"""

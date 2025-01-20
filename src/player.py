@@ -63,7 +63,7 @@ class Players(list, ReprMixin):
                 if player.wind == index:
                     return player
         assert isinstance(index, (int, slice)), f'index is neither Wind, int nor slice:{type(index)}'
-        return list.__getitem__(self, index)
+        return super().__getitem__(index)
 
     def __str__(self) ->str:
         return ', '.join(f'{x.name}: {x.wind}' for x in self)
@@ -515,7 +515,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
         # recompute sayable for each move, use as cache
         self.voice:Optional['Voice']
         self.game:Optional['PlayingGame']
-        Player.__init__(self, game, name)
+        super().__init__(game, name)
 
     def popupMsg(self, msg:'Message') ->None:
         """virtual: show popup on display"""

@@ -30,12 +30,6 @@ if TYPE_CHECKING:
     from scene import PlayingScene
 
 
-# pylint: disable=super-init-not-called
-# multiple inheritance: pylint thinks ServerMessage.__init__ does not get called.
-# this is no problem: ServerMessage has no __init__ and its parent Message.__init__
-# will be called anyway
-
-
 class Message:
 
     """those are the message types between client and server. They have no state
@@ -170,9 +164,6 @@ class ClientMessage(Message):
 
     """those classes are used for messages from client to server"""
 
-    def __init__(self, name:Optional[str]=None, shortcut:Optional[str]=None) ->None:
-        Message.__init__(self, name, shortcut)
-
     def buttonCaption(self) ->str:
         """localized, with a & for the shortcut"""
         assert self.shortcut
@@ -221,9 +212,6 @@ class NotifyAtOnceMessage(ClientMessage):
 
     sendScore = False
 
-    def __init__(self, name:Optional[str]=None, shortcut:Optional[str]=None) ->None:
-        ClientMessage.__init__(self, name, shortcut)
-
     def notifyAction(self, client:'Client', move:'Move') ->Any: # pylint: disable=unused-argument
         """the default action for immediate notifications"""
         assert move.player
@@ -245,7 +233,7 @@ class PungChowMessage(NotifyAtOnceMessage):
     """common code for Pung and Chow"""
 
     def __init__(self, name:Optional[str]=None, shortcut:Optional[str]=None) ->None:
-        NotifyAtOnceMessage.__init__(self, name=name, shortcut=shortcut)
+        super().__init__(name=name, shortcut=shortcut)
 
     def toolTip(self, button:'DlgButton', tile:Tile) ->Tuple[str, bool, str]:
         """for the action button which will send this message"""
@@ -289,9 +277,8 @@ class MessagePung(PungChowMessage, ServerMessage):
     """somebody said pung and gets the tile"""
 
     def __init__(self) ->None:
-        PungChowMessage.__init__(self,
-                                 name=i18ncE('kajongg', 'Pung'),
-                                 shortcut=i18ncE('kajongg game dialog:Key for Pung', 'P'))
+        super().__init__(name=i18ncE('kajongg', 'Pung'),
+                         shortcut=i18ncE('kajongg game dialog:Key for Pung', 'P'))
 
     def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that and tells all others"""
@@ -309,9 +296,8 @@ class MessageKong(NotifyAtOnceMessage, ServerMessage):
     """somebody said kong and gets the tile"""
 
     def __init__(self) ->None:
-        NotifyAtOnceMessage.__init__(self,
-                                     name=i18ncE('kajongg', 'Kong'),
-                                     shortcut=i18ncE('kajongg game dialog:Key for Kong', 'K'))
+        super().__init__(name=i18ncE('kajongg', 'Kong'),
+                         shortcut=i18ncE('kajongg game dialog:Key for Kong', 'K'))
 
     def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that and tells all others"""
@@ -355,9 +341,8 @@ class MessageChow(PungChowMessage, ServerMessage):
     """somebody said chow and gets the tile"""
 
     def __init__(self) ->None:
-        PungChowMessage.__init__(self,
-                                 name=i18ncE('kajongg', 'Chow'),
-                                 shortcut=i18ncE('kajongg game dialog:Key for Chow', 'C'))
+        super().__init__(name=i18ncE('kajongg', 'Chow'),
+                         shortcut=i18ncE('kajongg game dialog:Key for Chow', 'C'))
 
     def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that and tells all others"""
@@ -390,9 +375,8 @@ class MessageMahJongg(NotifyAtOnceMessage, ServerMessage):
     sendScore = True
 
     def __init__(self) ->None:
-        NotifyAtOnceMessage.__init__(self,
-                                     name=i18ncE('kajongg', 'Mah Jongg'),
-                                     shortcut=i18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
+        super().__init__(name=i18ncE('kajongg', 'Mah Jongg'),
+                         shortcut=i18ncE('kajongg game dialog:Key for Mah Jongg', 'M'))
 
     def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that and tells all others"""
@@ -414,9 +398,8 @@ class MessageOriginalCall(NotifyAtOnceMessage, ServerMessage):
     """somebody made an original call"""
 
     def __init__(self) ->None:
-        NotifyAtOnceMessage.__init__(self,
-                                     name=i18ncE('kajongg', 'Original Call'),
-                                     shortcut=i18ncE('kajongg game dialog:Key for Original Call', 'O'))
+        super().__init__(name=i18ncE('kajongg', 'Original Call'),
+                         shortcut=i18ncE('kajongg game dialog:Key for Original Call', 'O'))
 
     def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server tells all others"""
@@ -461,9 +444,8 @@ class MessageDiscard(ClientMessage, ServerMessage):
  #   sendScore = True
 
     def __init__(self) ->None:
-        ClientMessage.__init__(self,
-                               name=i18ncE('kajongg', 'Discard'),
-                               shortcut=i18ncE('kajongg game dialog:Key for Discard', 'D'))
+        super().__init__(name=i18ncE('kajongg', 'Discard'),
+                         shortcut=i18ncE('kajongg game dialog:Key for Discard', 'D'))
 
     def serverAction(self, table:'ServerTable',  msg:'Request') ->None:
         """the server mirrors that action"""
@@ -834,7 +816,7 @@ class MessageDangerousGame(ServerMessage):
     """the game server tells us who played dangerous game"""
 
     def __init__(self) ->None:
-        ServerMessage.__init__(self, name=i18ncE('kajongg', 'Dangerous Game'))
+        super().__init__(name=i18ncE('kajongg', 'Dangerous Game'))
 
     def clientAction(self, client:'Client', move:'Move') ->Any:
         """mirror the dangerous game action locally"""
@@ -849,7 +831,7 @@ class MessageNoChoice(ServerMessage):
     """the game server tells us who had no choice avoiding dangerous game"""
 
     def __init__(self) ->None:
-        ServerMessage.__init__(self, name=i18ncE('kajongg', 'No Choice'))
+        super().__init__(name=i18ncE('kajongg', 'No Choice'))
         self.move:Optional['Move'] = None
 
     def clientAction(self, client:'Client', move:'Move') ->Any:
@@ -911,9 +893,8 @@ class MessageOK(ClientMessage):
     """a client says OK"""
 
     def __init__(self) ->None:
-        ClientMessage.__init__(self,
-                               name=i18ncE('kajongg', 'OK'),
-                               shortcut=i18ncE('kajongg game dialog:Key for OK', 'O'))
+        super().__init__(name=i18ncE('kajongg', 'OK'),
+                         shortcut=i18ncE('kajongg game dialog:Key for OK', 'O'))
 
     def toolTip(self, button:'DlgButton', tile:Tile) ->Tuple[str, bool, str]:
         """return text and warning flag for button and text for tile for button and text for tile"""
@@ -925,9 +906,8 @@ class MessageNoClaim(NotifyAtOnceMessage, ServerMessage):
     """A player explicitly says he will not claim a tile"""
 
     def __init__(self) ->None:
-        NotifyAtOnceMessage.__init__(self,
-                                     name=i18ncE('kajongg', 'No Claim'),
-                                     shortcut=i18ncE('kajongg game dialog:Key for No claim', 'N'))
+        super().__init__(name=i18ncE('kajongg', 'No Claim'),
+                         shortcut=i18ncE('kajongg game dialog:Key for No claim', 'N'))
 
     def toolTip(self, button:'DlgButton', tile:Tile) ->Tuple[str, bool, str]:
         """return text and warning flag for button and text for tile for button and text for tile"""

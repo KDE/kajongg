@@ -70,7 +70,7 @@ class KApplication(QApplication):
 
     def __init__(self) ->None:
         assert not Internal.isServer, 'KApplication is not supported for the server'
-        QApplication.__init__(self, sys.argv)
+        super().__init__(sys.argv)
 
         # Qt uses sys.argv[0] as application name
         # which is used by QStandardPaths - if we start kajongg.py directly,
@@ -170,7 +170,7 @@ class IconLabel(QLabel):
     """for use in messages and about dialog"""
 
     def __init__(self, iconName:str, dialog:QDialog) ->None:
-        QLabel.__init__(self)
+        super().__init__()
         icon = KIcon(iconName)
         option = QStyleOption()
         option.initFrom(dialog)
@@ -257,7 +257,7 @@ class KDialog(CaptionMixin, QDialog):
     Close = QDialogButtonBox.StandardButton.Close
 
     def __init__(self, parent:Optional[QWidget]=None) ->None:
-        QDialog.__init__(self, parent)
+        super().__init__(parent)
         self.buttonBox = QDialogButtonBox()
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
@@ -424,7 +424,7 @@ class KStatusBar(QStatusBar):
     """stub"""
 
     def __init__(self, *args:Any, **kwargs:Any) ->None:
-        QStatusBar.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.__items:List[MyStatusBarItem] = []
 
     def hasItem(self, idx:int) ->bool:
@@ -457,7 +457,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
     """stub"""
 
     def __init__(self) ->None:
-        QMainWindow.__init__(self)
+        super().__init__()
         self.actionStatusBar: 'Action'
         self.actionToolBar: 'Action'
         self.actionFullscreen: 'Action'
@@ -510,7 +510,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         self.actionFullscreen.setChecked(
             self.windowState() & Qt.WindowState.WindowFullScreen == Qt.WindowState.WindowFullScreen)
         if event:
-            QMainWindow.showEvent(self, event)
+            super().showEvent(event)
 
     def hideEvent(self, event:Optional[QHideEvent]) ->None:
         """save status"""
@@ -518,7 +518,7 @@ class KXmlGuiWindow(CaptionMixin, QMainWindow):
         Internal.Preferences.toolBarVisible = self.toolBar(
         ).isVisible()
         if event:
-            QMainWindow.hideEvent(self, event)
+            super().hideEvent(event)
 
     def toggleStatusBar(self, checked:bool) ->None:
         """show / hide status bar"""
@@ -652,7 +652,7 @@ class KConfig(ConfigParser):
     without support for a default section."""
 
     def __init__(self, path:Optional[str]=None) ->None:
-        ConfigParser.__init__(self, delimiters=('=', ))
+        super().__init__(delimiters=('=', ))
         if path is None:
             path = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.AppConfigLocation)
             path = os.path.join(path, 'kajonggrc')
@@ -755,7 +755,7 @@ class ItemBool(KConfigSkeletonItem):
     """boolean preferences setting used by KOnfigSkeleton"""
 
     def __init__(self, skeleton:'KConfigSkeleton', key:str, value:bool, default:bool) ->None:
-        KConfigSkeletonItem.__init__(self, skeleton, key, value, default)
+        super().__init__(skeleton, key, value, default)
 
     def getFromConfig(self) ->None:
         """if not there, use default"""
@@ -772,7 +772,7 @@ class ItemString(KConfigSkeletonItem):
     def __init__(self, skeleton:'KConfigSkeleton', key:str, value:str, default:str) ->None:
         if value == '':
             value = default
-        KConfigSkeletonItem.__init__(self, skeleton, key, value, default)
+        super().__init__(skeleton, key, value, default)
 
 
 class ItemInt(KConfigSkeletonItem):
@@ -780,7 +780,7 @@ class ItemInt(KConfigSkeletonItem):
     """integer preferences setting used by KOnfigSkeleton"""
 
     def __init__(self, skeleton:'KConfigSkeleton', key:str, value:int, default:int) ->None:
-        KConfigSkeletonItem.__init__(self, skeleton, key, value, default)
+        super().__init__(skeleton, key, value, default)
         self.minValue = -99999
         self.maxValue = 99999999
 
@@ -806,7 +806,7 @@ class KConfigSkeleton(QObject):
     configChanged = Signal()
 
     def __init__(self) ->None:
-        QObject.__init__(self)
+        super().__init__()
         self.currentGroup:str
         self.items:List[KConfigSkeletonItem] = []
         self.toolBarActions:str
@@ -993,7 +993,7 @@ class KLanguageButton(QWidget):
         """self and children"""
         self.button.deleteLater()
         self.popup.deleteLater()
-        QWidget.deleteLater(self)
+        super().deleteLater()
 
     def setText(self, txt:str) ->None:
         """proxy: sets the button text"""
@@ -1046,7 +1046,7 @@ class AboutKajonggDialog(KDialog):
         # pylint: disable=too-many-locals, too-many-statements
         from twisted import __version__
 
-        KDialog.__init__(self, parent)
+        super().__init__(parent)
         self.setCaption(i18n('About Kajongg'))
         self.setButtons(KDialog.Close)
         vLayout = QVBoxLayout()
@@ -1178,7 +1178,7 @@ class LicenseDialog(KDialog):
     """see kaboutapplicationdialog.cpp"""
 
     def __init__(self, parent:QWidget, licenseFile:Optional[str]) ->None:
-        KDialog.__init__(self, parent)
+        super().__init__(parent)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setCaption(i18n("License Agreement"))
         self.setButtons(KDialog.Close)
@@ -1228,7 +1228,7 @@ class KConfigDialog(KDialog):
         'QLineEdit': 'setText'}
 
     def __init__(self, parent:QWidget, name:str, preferences:'SetupPreferences') ->None:
-        KDialog.__init__(self, parent)
+        super().__init__(parent)
         self.pages: List[QWidget]
         self.setCaption(i18n('Configure'))
         self.name = name
@@ -1332,7 +1332,7 @@ class KConfigDialog(KDialog):
         """OK pressed"""
         if self.updateButtons():
             self.updateSettings()
-        KDialog.accept(self)
+        super().accept()
 
     def updateButtons(self) ->bool:
         """Updates the Apply and Default buttons. Returns True if there was a changed setting"""
@@ -1377,7 +1377,7 @@ class KSeparator(QFrame):
     """used for toolbar editor"""
 
     def __init__(self, parent:QWidget) ->None:
-        QFrame.__init__(self, parent)
+        super().__init__(parent)
         self.setLineWidth(1)
         self.setMidLineWidth(0)
         self.setFrameShape(QFrame.Shape.HLine)
@@ -1393,7 +1393,7 @@ class ToolBarItem(QListWidgetItem):
         self.action = action
         self.parent = parent
         self.emptyIcon:QIcon
-        QListWidgetItem.__init__(self, self.__icon(), self.__text(), parent)
+        super().__init__(self.__icon(), self.__text(), parent)
         # drop between items, not onto items
         self.setFlags(
             cast(Qt.ItemFlag, (self.flags() | Qt.ItemFlag.ItemIsDragEnabled) & ~Qt.ItemFlag.ItemIsDropEnabled))
@@ -1422,7 +1422,7 @@ class ToolBarList(QListWidget):
     """QListWidget without internal moves"""
 
     def __init__(self, parent:QWidget) ->None:
-        QListWidget.__init__(self, parent)
+        super().__init__(parent)
         self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)  # no internal moves
 
 
@@ -1432,7 +1432,7 @@ class KEditToolBar(KDialog):
 
     def __init__(self, parent:Optional[QWidget]=None) ->None:
         # pylint: disable=too-many-statements
-        KDialog.__init__(self, parent)
+        super().__init__(parent)
         self.setCaption(i18n('Configure Toolbars'))
         StateSaver(self)
         self.inactiveLabel = QLabel(i18n("A&vailable actions:"), self)

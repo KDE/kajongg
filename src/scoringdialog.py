@@ -80,7 +80,7 @@ class ScoreGroupItem(ScoreTreeItem):
     """represents a group in the tree like Points, Payments, Balance"""
 
     def __init__(self, content:str) ->None:
-        ScoreTreeItem.__init__(self, content)
+        super().__init__(content)
 
     def content(self, column:int) ->str:
         """return content stored in this item"""
@@ -92,7 +92,7 @@ class ScorePlayerItem(ScoreTreeItem):
     """represents a player in the tree"""
 
     def __init__(self, content:Tuple[str, List[Any]]) ->None:
-        ScoreTreeItem.__init__(self, content)
+        super().__init__(content)
 
     def content(self, column:int) ->Union[str, Any, None]:
         """return the content stored in this node"""
@@ -147,7 +147,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
     colors.append(QColor('orange'))
 
     def __init__(self, parent:Optional['QObject']=None) ->None:
-        QStyledItemDelegate.__init__(self, parent)
+        super().__init__(parent)
 
     def paint(self, painter:Optional[QPainter], option:'QStyleOptionViewItem',
         index:Union[QModelIndex,'QPersistentModelIndex']) ->None:
@@ -176,7 +176,7 @@ class ScoreItemDelegate(QStyledItemDelegate):
                         else:
                             painter.drawPolyline(chart)
             return
-        QStyledItemDelegate.paint(self, painter, option, index)
+        super().paint(painter, option, index)
 
 
 class ScoreModel(TreeModel):
@@ -328,7 +328,7 @@ class ScoreViewLeft(QTreeView):
     """subclass for defining sizeHint"""
 
     def __init__(self, parent:Optional[QWidget]=None) ->None:
-        QTreeView.__init__(self, parent)
+        super().__init__(parent)
         self.setItemDelegate(ScoreItemDelegate(self))
 
     def __col0Width(self) ->int:
@@ -352,7 +352,7 @@ class ScoreViewRight(QTreeView):
     """we need to subclass for catching events"""
 
     def __init__(self, parent:Optional[QWidget]=None) ->None:
-        QTreeView.__init__(self, parent)
+        super().__init__(parent)
         self.setItemDelegate(ScoreItemDelegate(self))
 
     def changeEvent(self, event:Optional[QEvent]) ->None:
@@ -378,7 +378,7 @@ class HorizontalScrollBar(QScrollBar):
     """We subclass here because we want to react on show/hide"""
 
     def __init__(self, scoreTable:'ScoreTable', parent:Optional[QWidget]=None) ->None:
-        QScrollBar.__init__(self, parent)
+        super().__init__(parent)
         self.scoreTable = scoreTable
 
     def showEvent(self, unusedEvent:Optional[QEvent]) ->None:
@@ -620,13 +620,13 @@ class PenaltyBox(QSpinBox):
     """with its own validator, we only accept multiples of parties"""
 
     def __init__(self, parties:int, parent:Optional[QWidget]=None) ->None:
-        QSpinBox.__init__(self, parent)
+        super().__init__(parent)
         self.parties = parties
         self.prevValue = 0
 
     def validate(self, inputData:str, pos:int) -> Tuple[QValidator.State, str, int]:  # type:ignore[override]
         """check if value is a multiple of parties"""
-        _ = QSpinBox.validate(self, inputData, pos)
+        _ = super().validate(inputData, pos)
         result = _[0]
         inputData = _[1]
         newPos = _[2]
@@ -661,7 +661,7 @@ class RuleBox(QCheckBox):
     """additional attribute: ruleId"""
 
     def __init__(self, rule:'Rule') ->None:
-        QCheckBox.__init__(self, i18n(rule.name))
+        super().__init__(i18n(rule.name))
         self.rule = rule
 
     def setApplicable(self, applicable:bool) ->None:
@@ -685,7 +685,7 @@ class PenaltyDialog(QDialog):
 
     def __init__(self, game:'ScoringGame', parent:Optional[QWidget]=None) ->None:
         """selection for this player, tiles are the still available tiles"""
-        QDialog.__init__(self, parent)
+        super().__init__(parent)
         decorateWindow(self, i18n("Penalty"))
         self.game = game
         grid = QGridLayout(self)
@@ -816,7 +816,7 @@ class ScoringDialog(QWidget):
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, scene:'ScoringScene', parent:Optional[QWidget]=None) ->None:
-        QWidget.__init__(self, parent)
+        super().__init__(parent)
         self.scene = scene
         decorateWindow(self, i18nc("@title:window", "Scoring for this Hand"))
         self.nameLabels = list(QLabel() for x in range(4))

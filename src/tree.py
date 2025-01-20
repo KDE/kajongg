@@ -72,9 +72,6 @@ class RootItem(TreeItem):
 
     """an item for header data"""
 
-    def __init__(self, content:Any) ->None:
-        TreeItem.__init__(self, content)
-
     def content(self, column:int) ->Any:
         """content held by this item"""
         return self.raw[column]

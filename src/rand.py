@@ -67,31 +67,31 @@ class CountingRandom(Random):
     def random(self) ->float:
         """the central randomizator"""
         CountingRandom.count += 1
-        return Random.random(self)
+        return super().random()
 
     def seed(self, a:Any=None, version:int=2) ->None:
         CountingRandom.count = 0
-        Random.seed(self, a, version)
+        super().seed(a, version)
         if Debug.random:
             if self.game:
                 self.game.debug(f'Random gets seed {a}')
 
     def randrange(self, start:int, stop:Optional[int]=None, step:int=1) ->int:
         with CountRandomCalls(self, f'randrange({start},{stop},step={step})'):
-            return Random.randrange(self, start, stop, step)
+            return super().randrange(start, stop, step)
 
     def choice(self, seq:SupportsLenAndGetItem[_T]) ->_T:
         """Choose a random element from a non-empty sequence."""
         if len(seq) == 1:
             return seq[0]
         with CountRandomCalls(self, f'choice({seq})'):
-            return Random.choice(self, seq)
+            return super().choice(seq)
 
     def sample(self, population:Sequence[_T],
         k:int, *, counts:Optional[Iterable[int]]=None) ->list[_T]:
         """add debug output to sample. Chooses k unique random elements"""
         with CountRandomCalls(self, f'sample({population}, {k})'):
-            return Random.sample(self, population, k, counts=counts)
+            return super().sample(population, k, counts=counts)
 
     def shuffle(self, x:MutableSequence[Any], random:Optional[Any]=None) ->None:
         """add debug output to shuffle. Shuffles list x in place."""
@@ -99,8 +99,7 @@ class CountingRandom(Random):
             try:
                 # Python 3.10 or earlier
                 # pylint:disable=deprecated-argument,too-many-function-args
-                Random.shuffle(self, x, random)  # type:ignore[call-arg]
+                super().shuffle(x, random)  # type:ignore[call-arg]
             except TypeError:
                 # Python 3.11 or later
-                # pylint:disable=deprecated-argument
-                Random.shuffle(self, x)
+                super().shuffle(x)

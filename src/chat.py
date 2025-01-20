@@ -100,7 +100,7 @@ class ChatView(MJTableView):
     """define a minimum size"""
 
     def __init__(self) ->None:
-        MJTableView.__init__(self)
+        super().__init__()
 
     def sizeHint(self) ->QSize:
         """sizeHint"""
@@ -150,7 +150,7 @@ class ChatWindow(QWidget):
         self.activateWindow()
         self.setWindowState(cast(Qt.WindowState, self.windowState() & ~Qt.WindowState.WindowMinimized))
         self.raise_()
-        QWidget.show(self)
+        super().show()
 
     def isVisible(self) ->bool:
         """not only visible but also not minimized"""

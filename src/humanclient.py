@@ -55,7 +55,7 @@ class SelectChow(KDialogIgnoringEscape):
     """asks which of the possible chows is wanted"""
 
     def __init__(self, chows:'MeldList', propose:Optional['Meld'], deferred:Deferred) ->None:
-        KDialogIgnoringEscape.__init__(self)
+        super().__init__()
         decorateWindow(self)
         self.setWindowFlags(cast(Qt.WindowType, Qt.WindowType.CustomizeWindowHint | Qt.WindowType.WindowTitleHint))
         self.setButtons(KDialog.NoButton)
@@ -94,7 +94,7 @@ class SelectKong(KDialogIgnoringEscape):
     """asks which of the possible kongs is wanted"""
 
     def __init__(self, kongs:'MeldList', deferred:Deferred) ->None:
-        KDialogIgnoringEscape.__init__(self)
+        super().__init__()
         decorateWindow(self)
         self.setButtons(KDialog.NoButton)
         self.kongs = kongs
@@ -128,7 +128,7 @@ class DlgButton(QPushButton):
     """special button for ClientDialog"""
 
     def __init__(self, message:'ClientMessage', parent:'ClientDialog') ->None:
-        QPushButton.__init__(self, parent)
+        super().__init__(parent)
         self.message = message
         self.client:'HumanClient' = parent.client
         self.setMinimumHeight(25)
@@ -153,7 +153,7 @@ class DlgButton(QPushButton):
                         game.myself.handBoard.keyPressEvent(event)
                     self.setFocus()
                     return
-            QPushButton.keyPressEvent(self, event)
+            super().keyPressEvent(event)
 
     def setWarning(self, warn:bool) ->None:
         """if warn, show a warning icon on the button"""
@@ -168,7 +168,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
     """a simple popup dialog for asking the player what he wants to do"""
 
     def __init__(self, client:'HumanClient', parent:Optional[QWidget]=None) ->None:
-        QDialog.__init__(self, parent)
+        super().__init__(parent)
         decorateWindow(self, i18n('Choose'))
         self.tables:List[ClientTable]
         self.setObjectName('ClientDialog')
@@ -202,7 +202,7 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
                     self.selectButton(btn.message)
                     event.accept()
                     return
-            QDialog.keyPressEvent(self, event)
+            super().keyPressEvent(event)
 
     def __declareButton(self, message:'ClientMessage') ->None:
         """define a button"""
@@ -405,7 +405,7 @@ class HumanClient(Client):
     humanClients : List['HumanClient'] = []
 
     def __init__(self) ->None:
-        Client.__init__(self)
+        super().__init__()
         HumanClient.humanClients.append(self)
         self.table = None
         self.ruleset:Ruleset
@@ -539,7 +539,7 @@ class HumanClient(Client):
 
     def remote_tableRemoved(self, tableid:int, message:str, *args:Any) ->None:
         """update table list"""
-        Client.remote_tableRemoved(self, tableid, message, *args)
+        super().remote_tableRemoved(tableid, message, *args)
         self.__updateTableList()
         if message:
             if self.name not in args or not message.endswith('has logged out'):
@@ -547,7 +547,7 @@ class HumanClient(Client):
 
     def __receiveTables(self, tables:List[List[Any]]) ->None:
         """now we already know all rulesets for those tables"""
-        Client.remote_newTables(self, tables)
+        super().remote_newTables(tables)
         if not Internal.autoPlay:
             if self.hasLocalServer():
                 # when playing a local game, only show pending tables with
@@ -585,7 +585,7 @@ class HumanClient(Client):
 
     def tableChanged(self, table:ClientTable) ->Tuple[Optional[ClientTable], ClientTable]:
         """update table list"""
-        oldTable, newTable = Client.tableChanged(self, table)
+        oldTable, newTable = super().tableChanged(table)
         if oldTable and oldTable == self.table:
             # this happens if a table has more than one human player and
             # one of them leaves the table. In that case, the other players
@@ -694,7 +694,7 @@ class HumanClient(Client):
         """server sends move. We ask the user. answers is a list with possible answers,
         the default answer being the first in the list."""
         if not Options.gui:
-            return Client.ask(self, move, answers)
+            return super().ask(move, answers)
         scene = Internal.scene
         assert scene
         assert self.game

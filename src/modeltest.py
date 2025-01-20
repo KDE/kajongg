@@ -46,7 +46,7 @@ class ModelTest(QObject):
         """
         Connect to all of the models signals, Whenever anything happens recheck everything.
         """
-        QObject.__init__(self, parent)
+        super().__init__(parent)
         self._model = _model
         self.model = cast(QAbstractItemModel, sip_cast(_model, QAbstractItemModel))  # type:ignore[arg-type]
         self.insert:List[Dict] = []

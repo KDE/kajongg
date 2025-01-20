@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0-only
 import weakref
 from typing import Optional, TYPE_CHECKING, List, Dict, Union, cast
 
-from qt import QGraphicsRectItem, QColor
+from qt import QColor
 from tile import Tile, TileList, Meld, MeldList
 from tileset import Tileset
 from uitile import UITile
@@ -94,7 +94,7 @@ class HandBoard(Board):
         self._player = weakref.ref(player)
         self.exposedMeldDistance:float = 0.15
         self.concealedMeldDistance:float = 0.0
-        Board.__init__(self, 15.6, 2.0, Tileset.current())
+        super().__init__(15.6, 2.0, Tileset.current())
         self.isHandBoard = True
         self.tileDragEnabled = False
         self.setParentItem(player.front)
@@ -109,7 +109,7 @@ class HandBoard(Board):
 
     def computeRect(self) ->None:
         """also adjust the scale for maximum usage of space"""
-        Board.computeRect(self)
+        super().computeRect()
         rect = self.rect()
         rect.setWidth(rect.width() + 2 * self.tileset.shadowHeight())
         self.setRect(rect)
@@ -341,9 +341,6 @@ class PlayingHandBoard(HandBoard):
 
     """a board showing the tiles a player holds"""
 
-    def __init__(self, player:'VisiblePlayer') ->None:
-        HandBoard.__init__(self, player)
-
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in HandBoard"""
         allTiles = self.uiTiles[:]
@@ -375,12 +372,10 @@ class PlayingHandBoard(HandBoard):
         if isAlive(self):
             # aborting a running game: the underlying C++ object might
             # already have been destroyed
+            super().setEnabled(enabled)
             assert self.player
             assert self.player.game
-            self.tileDragEnabled = (
-                enabled
-                and self.player == self.player.game.myself)
-            QGraphicsRectItem.setEnabled(self, enabled)
+            self.tileDragEnabled &= self.player == self.player.game.myself
 
     def dragMoveEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """only dragging to discard board should be possible"""
@@ -421,7 +416,7 @@ class PlayingHandBoard(HandBoard):
 
     def addUITile(self, uiTile:UITile) ->None:
         """add uiTile to this board"""
-        Board.addUITile(self, uiTile)
+        super().addUITile(uiTile)
         assert self.player
         assert self.player.game
         if uiTile.isBonus and not self.player.game.isScoringGame():

@@ -28,7 +28,7 @@ class QueryException(Exception):
     """as the name says"""
 
     def __init__(self, msg:str) ->None:
-        Exception.__init__(self, msg)
+        super().__init__(msg)
 
 
 class DBCursor(sqlite3.Cursor, ReprMixin):
@@ -36,7 +36,7 @@ class DBCursor(sqlite3.Cursor, ReprMixin):
     """logging wrapper"""
 
     def __init__(self, dbHandle:'DBHandle') ->None:
-        sqlite3.Cursor.__init__(self, dbHandle)
+        super().__init__(dbHandle)
         self.statement:str
         self.parameters:Optional[Tuple[Union[str, int], ...]] = None
 
@@ -53,9 +53,9 @@ class DBCursor(sqlite3.Cursor, ReprMixin):
                     sqlite3.Cursor.executemany(
                         self, statement, parameters)
                 elif parameters:
-                    sqlite3.Cursor.execute(self, statement, parameters)
+                    super().execute(statement, parameters)
                 else:
-                    sqlite3.Cursor.execute(self, statement)
+                    super().execute(statement)
         except sqlite3.Error as exc:
             msg = f"{self!r}: ERROR {exc}"
             if mayFail:
@@ -84,7 +84,7 @@ class DBHandle(sqlite3.Connection, ReprMixin):
         self.path = path
         self.identifier = None
         try:
-            sqlite3.Connection.__init__(self, self.path, timeout=10.0, detect_types=sqlite3.PARSE_DECLTYPES)
+            super().__init__(self.path, timeout=10.0, detect_types=sqlite3.PARSE_DECLTYPES)
         except sqlite3.Error as exc:
             if hasattr(exc, 'message'):
                 msg = exc.message
@@ -104,10 +104,10 @@ class DBHandle(sqlite3.Connection, ReprMixin):
         self.inTransaction = datetime.datetime.now()
         if Debug.sql:
             logDebug('starting transaction')
-        return sqlite3.Connection.__enter__(self)
+        return super().__enter__()
 
     def __exit__(self, *args:Any) ->Literal[False]:
-        sqlite3.Connection.__exit__(self, *args)
+        super().__exit__(*args)
         if Debug.sql:
             logDebug('finished transaction')
         self.inTransaction = None

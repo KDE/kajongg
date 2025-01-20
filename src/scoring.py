@@ -24,7 +24,7 @@ from animation import animate
 from log import logException, logDebug, logWarning, i18n
 from query import Query
 from uitile import UITile, UIMeld
-from board import WindLabel, Board
+from board import WindLabel
 from game import Game
 from games import Games
 from hand import Hand
@@ -56,7 +56,7 @@ class SwapDialog(QMessageBox):
     """ask the user if two players should change seats"""
 
     def __init__(self, swappers:List[Player], parent:Optional['QWidget']=None) ->None:
-        QMessageBox.__init__(self, parent)
+        super().__init__(parent)
         decorateWindow(self, i18nc("@title:window", "Swap Seats"))
         self.setText(
             i18n("By the rules, %1 and %2 should now exchange their seats. ",
@@ -80,7 +80,7 @@ class SelectPlayers(SelectRuleset):
     """a dialog for selecting four players. Used only for scoring game."""
 
     def __init__(self) ->None:
-        SelectRuleset.__init__(self)
+        super().__init__()
         Players.load()
         decorateWindow(self, i18nc("@title:window", "Select four players"))
         self.names:List[str]
@@ -173,7 +173,7 @@ class ScoringHandBoard(HandBoard):
     def __init__(self, player:'ScoringPlayer') ->None:
         self.__moveHelper:Optional['QGraphicsItemGroup'] = None
         self.uiMelds:List[UIMeld] = []  # uiMelds and uiTiles are administered independently
-        HandBoard.__init__(self, player)
+        super().__init__(player)
         self.player:'ScoringPlayer'
 
     def meldVariants(self, tile:UITile, forLowerHalf:bool) ->MeldList:
@@ -303,11 +303,11 @@ class ScoringHandBoard(HandBoard):
         return len(meld)
 
     def addUITile(self, uiTile:UITile) ->None:
-        Board.addUITile(self, uiTile)
+        super().addUITile(uiTile)
         self.showMoveHelper()
 
     def removeUITile(self, uiTile:UITile) ->None:
-        Board.removeUITile(self, uiTile)
+        super().removeUITile(uiTile)
         self.showMoveHelper()
 
     def showMoveHelper(self, visible:Optional[bool]=None) ->None:
@@ -370,7 +370,7 @@ class ScoringPlayer(VisiblePlayer, Player):
 
     def clearHand(self) ->None:
         """clears attributes related to current hand"""
-        Player.clearHand(self)
+        super().clearHand()
         if self.game and self.game.wall:
             assert self.game
             assert self.game.wall
@@ -533,8 +533,7 @@ class ScoringGame(Game):
 
     def __init__(self, names:List[Tuple[Wind, str]], ruleset:'Ruleset', gameid:Optional[int]=None,
         wantedGame:Optional[str]=None, client:Optional['Client']=None) ->None:
-        Game.__init__(
-            self,
+        super().__init__(
             names,
             ruleset,
             gameid=gameid,
@@ -595,7 +594,7 @@ class ScoringGame(Game):
         if self.wall:
             self.wall.hide()
         SideText.removeAll()
-        return Game.close(self)
+        return super().close()
 
     @staticmethod
     def isScoringGame() ->bool:

@@ -28,7 +28,7 @@ class MJTableView(QTableView):
     """a QTableView with app specific defaults"""
 
     def __init__(self, parent:Optional['QWidget']=None) ->None:
-        QTableView.__init__(self, parent)
+        super().__init__(parent)
         if header := self.horizontalHeader():
             header.setStretchLastSection(True)
         self.setAlternatingRowColors(True)
@@ -52,7 +52,7 @@ class ListComboBox(QComboBox):
     attribute 'name'."""
 
     def __init__(self, items:List[Any], parent:Optional['QWidget']=None) ->None:
-        QComboBox.__init__(self, parent)
+        super().__init__(parent)
         self.items = items
 
     @property

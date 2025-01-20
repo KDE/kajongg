@@ -191,7 +191,7 @@ class RuleList(list):
     def __getitem__(self, key:Union[int, str]) ->'RuleBase':  # type:ignore[override]
         """find rule by key"""
         if isinstance(key, int):
-            return list.__getitem__(self, key)
+            return super().__getitem__(key)
         for rule in self:
             if rule.key() == key:
                 return rule
@@ -200,22 +200,22 @@ class RuleList(list):
     def __setitem__(self, key:str, rule:'RuleBase') ->None:  # type:ignore
         """set rule by key"""
         if isinstance(key, int):
-            list.__setitem__(self, key, rule)
+            super().__setitem__(key, rule)
             return
         for idx, oldRule in enumerate(self):
             if oldRule.key() == key:
-                list.__setitem__(self, idx, rule)
+                super().__setitem__(idx, rule)
                 return
-        list.append(self, rule)
+        super().append(rule)
 
     def __delitem__(self, key:Union[int, str]) ->None:  # type:ignore
         """delete this rule"""
         if isinstance(key, int):
-            list.__delitem__(self, key)
+            super().__delitem__(key)
             return
         for idx, rule in enumerate(self):
             if rule.key() == key:
-                list.__delitem__(self, idx)
+                super().__delitem__(idx)
                 return
         raise KeyError
 
@@ -848,7 +848,7 @@ class Rule(RuleBase):
 
     def __init__(self, name:str, definition:str='', points:int=0, doubles:int=0, limits:float=0,
             description:str='', explainTemplate:str='', debug:bool=False) ->None:
-        RuleBase.__init__(self, name, definition, description)
+        super().__init__(name, definition, description)
         self.hasSelectable = False
         self.explainTemplate = explainTemplate
         self.score = Score(points, doubles, limits)
@@ -976,7 +976,7 @@ class ParameterRule(RuleBase):
     prefix: str = ''
 
     def __init__(self, name:str, definition:str, description:str, parameter:Union[str, int, bool]):
-        RuleBase.__init__(self, name, definition, description)
+        super().__init__(name, definition, description)
         defParts = definition.split('||')
         self.parName = defParts[0][len(self.prefix):]
         self.score = Score()
@@ -1008,7 +1008,7 @@ class IntRule(ParameterRule):
     prefix = 'int'
 
     def __init__(self, name:str, definition:str, description:str, parameter:int):
-        ParameterRule.__init__(self, name, definition, description, int(parameter))
+        super().__init__(name, definition, description, int(parameter))
         self.minimum = 0
         for defPart in definition.split('||'):
             if defPart.startswith('Omin='):
@@ -1031,7 +1031,7 @@ class BoolRule(ParameterRule):
 
     def __init__(self, name:str, definition:str, description:str, parameter:str):
         _ = parameter not in ('false', 'False', False, 0, '0', None, '')
-        ParameterRule.__init__(self, name, definition, description, _)
+        super().__init__(name, definition, description, _)
 
 
 class StrRule(ParameterRule):
@@ -1040,7 +1040,7 @@ class StrRule(ParameterRule):
     prefix = 'str'
 
     def __init__(self, name:str, definition:str, description:str, parameter:str) ->None:
-        ParameterRule.__init__(self, name, definition, description, parameter)
+        super().__init__(name, definition, description, parameter)
 
 
 class PredefinedRuleset(Ruleset):
@@ -1051,7 +1051,7 @@ class PredefinedRuleset(Ruleset):
     preRulesets : List['PredefinedRuleset'] = []
 
     def __init__(self, name:str='') ->None:
-        Ruleset.__init__(self, name or 'general predefined ruleset')
+        super().__init__(name or 'general predefined ruleset')
 
     @staticmethod
     def rulesets() ->Sequence[Ruleset]:

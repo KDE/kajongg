@@ -72,7 +72,7 @@ class RulesetItem(RuleTreeItem):
     """represents a ruleset in the tree"""
 
     def __init__(self, content:Ruleset) ->None:
-        RuleTreeItem.__init__(self, content)
+        super().__init__(content)
 
     @property
     def raw(self) ->Ruleset:
@@ -101,7 +101,7 @@ class RuleListItem(RuleTreeItem):
     """represents a list of rules in the tree"""
 
     def __init__(self, content:List[ParameterRule]) ->None:
-        RuleTreeItem.__init__(self, content)
+        super().__init__(content)
 
     @property
     def raw(self) ->'RuleList':
@@ -125,7 +125,7 @@ class RuleItem(RuleTreeItem):
     """represents a rule in the tree"""
 
     def __init__(self, content:ParameterRule) ->None:
-        RuleTreeItem.__init__(self, content)
+        super().__init__(content)
 
     @property
     def raw(self) ->Rule:
@@ -278,9 +278,6 @@ class EditableRuleModel(RuleModel):
 
     """add methods needed for editing"""
 
-    def __init__(self, rulesets:List[Ruleset], title:str, parent:Optional['QObject']=None) ->None:
-        RuleModel.__init__(self, rulesets, title, parent)
-
     def __setRuleData(self, column:int, content:Union[Rule, ParameterRule],
         value:Union[str, int, bool]) ->Tuple[bool, Optional[str]]:
         """change rule data in the model"""
@@ -373,7 +370,7 @@ class RuleTreeView(QTreeView):
                  btnCopy:Optional[QPushButton]=None,
                  btnRemove:Optional[QPushButton]=None,
                  btnCompare:Optional[QPushButton]=None, parent:Optional[QWidget]=None) ->None:
-        QTreeView.__init__(self, parent)
+        super().__init__(parent)
         self.name = name
         self.setObjectName('RuleTreeView')
         self.btnCopy = btnCopy
@@ -586,7 +583,7 @@ class RulesetSelector(QWidget):
             differ.hide()
             marked.append(differ)
         if event:
-            QWidget.hideEvent(self, event)
+            super().hideEvent(event)
         for _ in marked:
             del differs[_]
 

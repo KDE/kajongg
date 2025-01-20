@@ -24,7 +24,7 @@ class StateSaver(QObject):
     savers : Dict['QWidget', 'StateSaver'] = {}
 
     def __init__(self, *widgets:'QWidget') ->None:
-        QObject.__init__(self)
+        super().__init__()
         pref = Internal.Preferences
         assert pref
         self.widgets = []

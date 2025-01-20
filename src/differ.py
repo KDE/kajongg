@@ -83,7 +83,7 @@ class RulesetDiffer(QDialog):
 
     def __init__(self, leftRulesets:List['Ruleset'], rightRulesets:List['Ruleset'],
         parent:Optional['QWidget']=None) ->None:
-        QDialog.__init__(self, parent)
+        super().__init__(parent)
         leftRulesets, rightRulesets = leftRulesets[:], rightRulesets[:]
         # remove rulesets from right which are also on the left side
         for left in leftRulesets:

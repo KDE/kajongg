@@ -678,7 +678,7 @@ class PlayingGame(Game):
         self.__activePlayer:Optional[PlayingPlayer] = None
         self.prevActivePlayer:Optional[PlayingPlayer] = None
         self.defaultNameBrush = None
-        Game.__init__(self, names, ruleset,
+        super().__init__(names, ruleset,
                       gameid, wantedGame=wantedGame, client=client)
         self.players[East].lastSource = TileSource.East14th
         self.playOpen = playOpen
@@ -782,7 +782,7 @@ class PlayingGame(Game):
 
         if seed in ('proposed', host):
             # we reserved the game id by writing a record with seed == host
-            Game.saveStartTime(self)
+            super().saveStartTime()
 
     def _saveScores(self) ->None:
         """save computed values to database, update score table
@@ -790,7 +790,7 @@ class PlayingGame(Game):
         if self.shouldSave:
             if self.belongsToRobotPlayer():
                 assert False, 'shouldSave must not be True for robot player'
-            Game._saveScores(self)
+            super()._saveScores()
 
     def nextPlayer(self, current:Optional[PlayingPlayer]=None) ->PlayingPlayer:
         """return the player after current or after activePlayer"""
@@ -845,7 +845,7 @@ class PlayingGame(Game):
         for player in self.players:
             handWonMatches = player.hand.won == (player == self.winner)
             assert handWonMatches, f'hand.won:{player.hand.won} winner:{player == self.winner}'
-        Game.saveHand(self)
+        super().saveHand()
 
     def _mustExchangeSeats(self, pairs:List[List[Player]]) ->List[List[Player]]:
         """filter: which player pairs should really swap places?"""

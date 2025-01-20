@@ -125,7 +125,7 @@ class SceneWithFocusRect(QGraphicsScene):
         """
         prev = self.focusItem()
         if event:
-            QGraphicsScene.focusInEvent(self, event)
+            super().focusInEvent(event)
         if prev and bool(prev.flags() & QGraphicsItem.GraphicsItemFlag.ItemIsFocusable) and prev != self.focusItem():
             self.setFocusItem(prev)
 
@@ -364,7 +364,7 @@ class PlayingScene(GameScene):
         QGraphicsView.drawBackground always wants a pixmap
         for a huge rect like 4000x3000 where my screen only has
         1920x1200"""
-        GameScene.setupUi(self)
+        super().setupUi()
         self.setObjectName("PlayingField")
 
         self.discardBoard = DiscardBoard()
@@ -374,7 +374,7 @@ class PlayingScene(GameScene):
 
     def showWall(self) ->None:
         """shows the wall according to the game rules (length may vary)"""
-        GameScene.showWall(self)
+        super().showWall()
         self.discardBoard.maximize()
 
     def abort(self) ->'Deferred':
@@ -405,7 +405,7 @@ class PlayingScene(GameScene):
             if mod in (Qt.KeyboardModifier.NoModifier, Qt.KeyboardModifier.ShiftModifier):
                 if self.clientDialog:
                     self.clientDialog.keyPressEvent(event)
-            GameScene.keyPressEvent(self, event)
+            super().keyPressEvent(event)
 
     def adjustSceneView(self) ->None:
         """adjust the view such that exactly the wanted things are displayed
@@ -413,7 +413,7 @@ class PlayingScene(GameScene):
         if self.game:
             with AnimationSpeed():
                 self.discardBoard.maximize()
-        GameScene.adjustSceneView(self)
+        super().adjustSceneView()
 
     @property
     def startingGame(self) ->bool:
@@ -426,10 +426,6 @@ class PlayingScene(GameScene):
         if value != self.__startingGame:
             self.__startingGame = value
             self.mainWindow.updateGUI()
-
-    def applySettings(self) ->None:
-        """apply preferences"""
-        GameScene.applySettings(self)
 
     def toggleDemoMode(self, checked:bool) ->None:
         """switch on / off for autoPlay"""
@@ -447,7 +443,7 @@ class PlayingScene(GameScene):
         """update some actions, all auxiliary windows and the statusbar"""
         if not isAlive(self):
             return
-        GameScene.updateSceneGUI(self)
+        super().updateSceneGUI()
         game = self.game
         mainWindow = self.mainWindow
         if not game:
@@ -475,7 +471,7 @@ class PlayingScene(GameScene):
     def changeAngle(self) ->None:
         """now that no animation is running, really change"""
         self.discardBoard.lightSource = self.newLightSource()
-        GameScene.changeAngle(self)
+        super().changeAngle()
 
 
 class ScoringScene(GameScene):
@@ -501,13 +497,13 @@ class ScoringScene(GameScene):
 
     def handSelectorChanged(self, handBoard:'HandBoard') ->None:
         """update all relevant dialogs"""
-        GameScene.handSelectorChanged(self, handBoard)
+        super().handSelectorChanged(handBoard)
         if self.scoringDialog:
             self.scoringDialog.slotInputChanged()
 
     def setupUi(self) ->None:
         """create all other widgets"""
-        GameScene.setupUi(self)
+        super().setupUi()
         self.setObjectName("ScoringScene")
         self.selectorBoard = SelectorBoard()
         self.addItem(self.selectorBoard)
@@ -582,7 +578,7 @@ class ScoringScene(GameScene):
                 if self.game:
                     if self.__navigateScoringGame(event):
                         return
-            GameScene.keyPressEvent(self, event)
+            super().keyPressEvent(event)
 
     def adjustSceneView(self) ->None:
         """adjust the view such that exactly the wanted things are displayed
@@ -590,11 +586,11 @@ class ScoringScene(GameScene):
         if self.game:
             with AnimationSpeed():
                 self.selectorBoard.maximize()
-        GameScene.adjustSceneView(self)
+        super().adjustSceneView()
 
     def prepareHand(self) ->None:
         """redecorate wall"""
-        GameScene.prepareHand(self)
+        super().prepareHand()
         if self.scoringDialog:
             self.scoringDialog.clearLastTileCombo()
 
@@ -602,7 +598,7 @@ class ScoringScene(GameScene):
         """update some actions, all auxiliary windows and the statusbar"""
         if not isAlive(self):
             return
-        GameScene.updateSceneGUI(self)
+        super().updateSceneGUI()
         game = self.game
         mainWindow = self.mainWindow
         for action in [mainWindow.actionScoreGame, mainWindow.actionPlayGame]:
@@ -614,7 +610,7 @@ class ScoringScene(GameScene):
     def changeAngle(self) ->None:
         """now that no animation is running, really change"""
         self.selectorBoard.lightSource = self.newLightSource()
-        GameScene.changeAngle(self)
+        super().changeAngle()
 
     def computeLastTile(self) ->'Tile':
         """compile hand info into a string as needed by the scoring engine"""

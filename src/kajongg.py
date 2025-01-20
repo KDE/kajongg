@@ -57,7 +57,7 @@ class CommandLineOption(QCommandLineOption):
     def __init__(self, name : str, description : str, valueName : Optional[str] =None,
         defaultValue : Optional[str]=None, optName : Optional[str]=None,
         argType : Optional[Type]=None, singleshot:bool=False) ->None:
-        QCommandLineOption.__init__(self, [name], description, valueName or '', defaultValue or '')
+        super().__init__([name], description, valueName or '', defaultValue or '')
         if argType is None:
             if valueName is None:
                 argType = bool
@@ -150,7 +150,7 @@ class EvHandler(QObject):
         """will be called for all events"""
         from log import EventData
         EventData(receiver, event)
-        return QObject.eventFilter(self, receiver, event)
+        return super().eventFilter(receiver, event)
 
 from util import gitHead
 

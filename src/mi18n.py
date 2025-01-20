@@ -142,7 +142,7 @@ class KDETranslator(QTranslator):
     translator for its own strings. Use this with qi18nc()"""
 
     def __init__(self, parent:QObject) ->None:
-        QTranslator.__init__(self, parent)
+        super().__init__(parent)
 
     def translate(self, context:str, text:str,  # type:ignore[override]
         disambiguation:Optional[bytes]=None, numerus:int=-1) ->str:
@@ -151,7 +151,7 @@ class KDETranslator(QTranslator):
         # Qt doc says str but on Debian Bookworm, .pyi says bytes
         if Debug.neutral:
             return text  # type:ignore[return-value]
-        result = QTranslator.translate(self, context, text, disambiguation, numerus)  # type:ignore[arg-type]
+        result = super().translate(context, text, disambiguation, numerus)  # type:ignore[arg-type]
         if result:
             return result  # type:ignore[return-value]
         if not MLocale.currentLanguages():

@@ -34,7 +34,7 @@ class GamesModel(QAbstractTableModel):
     """data for the list of games"""
 
     def __init__(self) ->None:
-        QAbstractTableModel.__init__(self)
+        super().__init__()
         self._resultRows:List[List[Any]] = []
 
     def columnCount(self, unusedParent:Union[QModelIndex,QPersistentModelIndex]=QModelIndex()) ->int:
@@ -87,7 +87,7 @@ class GamesModel(QAbstractTableModel):
                 return dateVal.strftime('%c')
             if index.column() == 0:
                 return int(unformatted)
-        return QAbstractTableModel.data(self, index, role)
+        return super().data(index, role)
 
     def headerData(self, section:int, orientation:Qt.Orientation, role:int=Qt.ItemDataRole.DisplayRole) ->Optional[str]:
         """for the two visible columns"""
@@ -169,7 +169,7 @@ class Games(QDialog):
                 self.delete()
                 event.ignore()
                 return
-            QDialog.keyPressEvent(self, event)
+            super().keyPressEvent(event)
 
     def selectionChanged(self) ->None:
         """update button states according to selection"""

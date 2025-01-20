@@ -118,7 +118,7 @@ class WindLabel(QLabel):
     """QLabel holding the wind tile"""
 
     def __init__(self, wind:Optional[Wind]=None, parent:Optional['QWidget']=None):
-        QLabel.__init__(self, parent)
+        super().__init__(parent)
         if wind is None:
             wind = East
         self.__wind:Wind
@@ -183,7 +183,7 @@ class Board(QGraphicsRectItem, ReprMixin):
     showShadowsBetweenRows = False
 
     def __init__(self, width:float, height:float, tileset:Tileset, boardRotation:int=0) ->None:
-        QGraphicsRectItem.__init__(self)
+        super().__init__()
         self.uiTiles:List[UITile] = []
         self.isHandBoard:bool = False
         self._focusTile:Optional[UITile] = None
@@ -220,7 +220,7 @@ class Board(QGraphicsRectItem, ReprMixin):
     def setVisible(self, value:bool) ->None:
         """also update focusRect if it belongs to this board"""
         if self.scene() and isAlive(self):
-            QGraphicsRectItem.setVisible(self, value)
+            super().setVisible(value)
             cast('SceneWithFocusRect', self.scene()).focusRect.refresh()
 
     def hide(self) ->None:
@@ -275,7 +275,7 @@ class Board(QGraphicsRectItem, ReprMixin):
     def setEnabled(self, enabled:bool) ->None:
         """enable/disable this board"""
         self.tileDragEnabled = enabled
-        QGraphicsRectItem.setEnabled(self, enabled)
+        super().setEnabled(enabled)
 
     def _focusableTiles(self, sortDir:Qt.Key=Qt.Key.Key_Right) ->List[UITile]:
         """return a list of all tiles in this board sorted such that
@@ -331,7 +331,7 @@ class Board(QGraphicsRectItem, ReprMixin):
             if key in Board.arrows:
                 self.__moveCursor(key)
             else:
-                QGraphicsRectItem.keyPressEvent(self, event)
+                super().keyPressEvent(event)
 
     def __moveCursor(self, key:Qt.Key) ->None:
         """move focus"""
@@ -463,7 +463,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         rect.setWidth(sizeX)
         rect.setHeight(sizeY)
         self.prepareGeometryChange()
-        QGraphicsRectItem.setRect(self, rect)
+        super().setRect(rect)
 
     @property
     def width(self) ->float:
@@ -641,7 +641,7 @@ class CourtBoard(Board):
     penColor = QColor('green')
 
     def __init__(self, width:int, height:int) ->None:
-        Board.__init__(self, width, height, Tileset.current())
+        super().__init__(width, height, Tileset.current())
         self.setAcceptDrops(True)
 
     def maximize(self) ->None:
@@ -683,7 +683,7 @@ class SelectorBoard(CourtBoard):
     """a board containing all possible tiles for selection"""
 
     def __init__(self) ->None:
-        CourtBoard.__init__(self, 9, 7)
+        super().__init__(9, 7)
         self.allSelectorTiles:List[UITile] = []
 
     def checkTiles(self) ->None:
@@ -815,7 +815,7 @@ class FittingView(QGraphicsView):
 
     def __init__(self, parent:Optional['QWidget']=None) ->None:
         """generate a fitting view with our favourite properties"""
-        QGraphicsView.__init__(self, parent)
+        super().__init__(parent)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         vpol = QSizePolicy()
@@ -908,7 +908,7 @@ class FittingView(QGraphicsView):
         """release self.tilePressed"""
         if event:
             self.tilePressed = None
-            QGraphicsView.mouseReleaseEvent(self, event)
+            super().mouseReleaseEvent(event)
 
     def mouseMoveEvent(self, event:Optional['QMouseEvent']) ->None:
         """selects the correct uiTile"""
@@ -922,7 +922,7 @@ class FittingView(QGraphicsView):
                     self.dragObject.exec(Qt.DropAction.MoveAction)
                     self.dragObject = None
                     return
-            QGraphicsView.mouseMoveEvent(self, event)
+            super().mouseMoveEvent(event)
 
     def drag(self, uiTile:UITile) ->QDrag:
         """return a drag object"""
@@ -945,7 +945,7 @@ class YellowText(QGraphicsRectItem):
     """a yellow rect with a message, used for claims"""
 
     def __init__(self, parent:QGraphicsRectItem) ->None:
-        QGraphicsRectItem.__init__(self, parent)
+        super().__init__(parent)
         self.parent = parent
         self.font:QFont = QFont()
         self.font.setPointSize(48)
@@ -988,7 +988,7 @@ class DiscardBoard(CourtBoard):
     penColor = QColor('orange')
 
     def __init__(self) ->None:
-        CourtBoard.__init__(self, 11, 9)
+        super().__init__(11, 9)
         self.__places:List[Tuple[float, int]]
         self.__lastDiscarded:Optional[UITile] = None
         self.__discardTilesOrderedLeaveHole:bool = True
@@ -1000,7 +1000,7 @@ class DiscardBoard(CourtBoard):
     def hide(self) ->None:
         """remove all uiTile references so they can be garbage collected"""
         self.__lastDiscarded = None
-        CourtBoard.hide(self)
+        super().hide()
 
     def setRandomPlaces(self, game:'PlayingGame') ->None:
         """precompute random positions"""

@@ -65,7 +65,7 @@ class TwistedSocketNotifier(QObject):
     """
 
     def __init__(self, parent:Optional[QObject], reactor:'QtReactor', watcher:unix.Client, socketType:QSocketNotifier.Type) ->None:
-        QObject.__init__(self, parent)
+        super().__init__(parent)
         self.reactor = reactor
         self.watcher:Optional[unix.Client] = watcher
         fd = watcher.fileno()

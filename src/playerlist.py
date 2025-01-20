@@ -31,7 +31,7 @@ class PlayerList(QDialog):
     """QtSQL Model view of the players"""
 
     def __init__(self, parent:Optional['QWidget']=None):
-        QDialog.__init__(self, parent)
+        super().__init__(parent)
         self._data:Dict[str, int] = {}
         self.table = QTableWidget(self)
         if header := self.table.horizontalHeader():
@@ -186,4 +186,4 @@ class PlayerList(QDialog):
             elif key == Qt.Key.Key_Delete:
                 self.delete()
             else:
-                QDialog.keyPressEvent(self, event)
+                super().keyPressEvent(event)

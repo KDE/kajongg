@@ -117,4 +117,4 @@ class ConfigDialog(KConfigDialog):
         if Qt.KeyboardModifier.ControlModifier | mod and key in '123456789'[:len(self.pages)]:
             self.setCurrentPage(self.pages[int(key) - 1])
             return
-        KConfigDialog.keyPressEvent(self, event)
+        super().keyPressEvent(event)

@@ -176,7 +176,7 @@ class MainWindow(KXmlGuiWindow):
 
     def sizeHint(self) ->'QSize':
         """give the main window a sensible default size"""
-        result = KXmlGuiWindow.sizeHint(self)
+        result = super().sizeHint()
         result.setWidth(result.height() * 3 // 2)
                         # we want space to the right for the buttons
         # the default is too small. Use at least 2/3 of screen height and 1/2
@@ -326,11 +326,11 @@ class MainWindow(KXmlGuiWindow):
     def close(self, unusedResult:Any=None) ->bool:
         """wrap close() because we call it with a QTimer"""
         if isAlive(self):
-            return KXmlGuiWindow.close(self)
+            return super().close()
         return True  # is closed
 
     def closeEvent(self, event:Optional[QEvent]) ->None:
-        KXmlGuiWindow.closeEvent(self, event)
+        super().closeEvent(event)
         if event:
             if event.isAccepted() and self.exitReady:
                 QTimer.singleShot(5000, self.aboutToQuit)

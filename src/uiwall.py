@@ -189,7 +189,7 @@ class UIWallSide(Board, ReprMixin):
     penColor = QColor('red')
 
     def __init__(self, tileset:Tileset, boardRotation:int, length:float):
-        Board.__init__(self, length, 1, tileset, boardRotation=boardRotation)
+        super().__init__(length, 1, tileset, boardRotation=boardRotation)
         self.length = length
         self.disc:'WindDisc'
         self.message:YellowText
@@ -229,13 +229,13 @@ class UIKongBox(KongBox):
         """fill the box"""
         for uiTile in self._tiles:
             cast(UITile, uiTile).cross = False
-        KongBox.fill(self, tiles)
+        super().fill(tiles)
         for uiTile in self._tiles:
             cast(UITile, uiTile).cross = True
 
     def pop(self, count:int) ->List[Union['Piece', UITile]]:
         """get count tiles from kong box"""
-        result = KongBox.pop(self, count)
+        result = super().pop(count)
         for uiTile in result:
             cast(UITile, uiTile).cross = False
         return result
@@ -262,7 +262,7 @@ class UIWall(Wall):
         # use any tile because the face is never shown anyway.
         self.initWindDiscs()
         game.wall = self
-        Wall.__init__(self, game)
+        super().__init__(game)
         self.tiles:Sequence[UITile] = [cast(UITile, x) for x in self.tiles]  # type:ignore[assignment]
         self.__square = Board(1, 1, Tileset.current())
         self.__square.setZValue(ZValues.markerZ)

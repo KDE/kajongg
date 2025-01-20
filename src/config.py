@@ -48,7 +48,7 @@ class StringParameter(Parameter):
     def __init__(self, group:str, name:str, default:Optional[str]=None) ->None:
         if default is None:
             default = ''
-        Parameter.__init__(self, group, name, default)
+        super().__init__(group, name, default)
         self.value = ''
 
     def add(self, skeleton:KConfigSkeleton) ->None:
@@ -67,7 +67,7 @@ class BoolParameter(Parameter):
     def __init__(self, group:str, name:str, default:Optional[bool]=None) ->None:
         if default is None:
             default = False
-        Parameter.__init__(self, group, name, default)
+        super().__init__(group, name, default)
         self.value = default
 
     def add(self, skeleton:KConfigSkeleton) ->None:
@@ -84,7 +84,7 @@ class IntParameter(Parameter):
         """minValue and maxValue are also used by the edit widget"""
         if default is None:
             default = 0
-        Parameter.__init__(self, group, name, default)
+        super().__init__(group, name, default)
         self.value = default
         self.minValue = minValue
         self.maxValue = maxValue
@@ -108,7 +108,7 @@ class SetupPreferences(KConfigSkeleton):
             logException('Preferences is not None')
         self.__watching = defaultdict(list)  # type:ignore
         Internal.Preferences = self
-        KConfigSkeleton.__init__(self)
+        super().__init__()
         self.configChanged.connect(self.callTriggers)
         self.__oldValues  = defaultdict(str)  # type:ignore
         self.addString('General', 'tilesetName', 'default')
@@ -158,7 +158,7 @@ class SetupPreferences(KConfigSkeleton):
     def __setattr__(self, name:str, value:Union[int, str, bool]) ->None:
         """undefined attributes might be parameters"""
         if name not in SetupPreferences._Parameters:
-            KConfigSkeleton.__setattr__(self, name, value)
+            super().__setattr__(name, value)
             return
         par = SetupPreferences._Parameters[name]
         par.item.setValue(value)

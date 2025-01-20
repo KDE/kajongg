@@ -428,7 +428,7 @@ class IntDict(defaultdict, ReprMixin):
     to update the leaves, getting the sums for free"""
 
     def __init__(self, parent: Optional['IntDict']=None) ->None:
-        defaultdict.__init__(self, int)
+        super().__init__(int)
         self.parent = parent
 
     def copy(self) -> 'IntDict':
@@ -490,26 +490,26 @@ class IntDict(defaultdict, ReprMixin):
 
     def __contains__(self, tile: object) ->bool:
         """does not contain tiles with count 0"""
-        return defaultdict.__contains__(self, tile) and self[tile] > 0
+        return super().__contains__(tile) and self[tile] > 0
 
     def __setitem__(self, key: Any, value: Any) ->None:
         """also update parent if given"""
         if self.parent is not None:
             self.parent[key] += value - defaultdict.get(self, key, cast(Any, 0))
-        defaultdict.__setitem__(self, key, value)
+        super().__setitem__(key, value)
 
     def __delitem__(self, key: Any) ->None:
         """also update parent if given"""
         if self.parent is not None:
-            self.parent[key] -= defaultdict.get(self, key, cast(Any, 0))
-        defaultdict.__delitem__(self, key)
+            self.parent[key] -= super().get(key, cast(Any, 0))
+        super().__delitem__(key)
 
     def clear(self) ->None:
         """also update parent if given"""
         if self.parent is not None:
             for key, value in defaultdict.items(self):
                 self.parent[key] -= value
-        defaultdict.clear(self)
+        super().clear()
 
     def __str__(self) ->str:
         """sort the result for better log comparison"""

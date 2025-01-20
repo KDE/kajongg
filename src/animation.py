@@ -41,8 +41,8 @@ class Animation(QPropertyAnimation, ReprMixin):
         self.uid = Animation.clsUid
         assert isinstance(graphicsObject, QObject)
         _ = propName.encode()
-        QPropertyAnimation.__init__(self, graphicsObject, _, parent)
-        QPropertyAnimation.setEndValue(self, endValue)
+        super().__init__(graphicsObject, _, parent)
+        super().setEndValue(endValue)
         assert Internal.Preferences
         duration = Internal.Preferences.animationDuration()
         self.setDuration(duration)
@@ -158,7 +158,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
     current = None
     clsUid = 0
     def __init__(self, animations:List[Animation], parent:Optional['QObject']=None) ->None:
-        QParallelAnimationGroup.__init__(self, parent)
+        super().__init__(parent)
         self.animations = animations
         self.uid = ParallelAnimationGroup.clsUid
         ParallelAnimationGroup.clsUid += 1
@@ -205,7 +205,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
                 if hasattr(graphicsObject, 'board') and not isAlive(graphicsObject.board):
                     graphicsObject.clearActiveAnimation(animation)
                     self.removeAnimation(animation)
-        QParallelAnimationGroup.updateCurrentTime(self, value)
+        super().updateCurrentTime(value)
 
     def start(self, unusedResults:str='DIREKT') ->Deferred:  # type: ignore[override]
         """start the animation, returning its deferred"""

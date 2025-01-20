@@ -565,12 +565,13 @@ class PieceList(TileList):
 
     def index(self, value : Tile, start: int =None , stop: int =None) ->int:  # type: ignore
         """Also accept Tile."""
+        # FIXME: overload?
         if value.__class__ is Tile:
             for result, _ in enumerate(self):
                 if _ == value:
                     return result
             raise ValueError(f'{value!r} is not in list {self!r}')
-        return TileList.index(self, cast(Any, value), start,  stop)
+        return super().index(cast(Any, value), start,  stop)
 
     def remove(self, value : Tile) ->None:
         """Can also remove Tile."""
@@ -583,7 +584,7 @@ class PieceList(TileList):
                     break
             else:
                 raise ValueError(f'{self} does not contain {value!r}')
-        TileList.remove(self, cast(Any, value))
+        super().remove(cast(Any, value))
 
 # those two must come first
 
@@ -666,7 +667,7 @@ class Meld(TileTuple, ReprMixin):
         self.isHonorMeld:bool
         self.isWindMeld:bool
         if not hasattr(self, '_fixed'):  # already defined if I am from cache
-            TileTuple.__init__(self, iterable)
+            super().__init__(iterable)
             self.case = ''.join('a' if x.isExposed else 'A' for x in self)
             if self not in self.cache:
                 self.cache[self] = self
@@ -703,33 +704,22 @@ class Meld(TileTuple, ReprMixin):
                     self,
                     'concealed',
                     Meld(x.concealed for x in self))
-                TileTuple.__setattr__(self, 'declared', self.concealed)
-                TileTuple.__setattr__(
-                    self,
-                    'exposed',
-                    Meld(x.exposed for x in self))
-                TileTuple.__setattr__(self, 'exposedClaimed', self.exposed)
+                super().__setattr__('declared', self.concealed)
+                super().__setattr__('exposed', Meld(x.exposed for x in self))
+                super().__setattr__('exposedClaimed', self.exposed)
             else:
-                TileTuple.__setattr__(
-                    self,
-                    'concealed',
-                    Meld(x.concealed for x in self))
-                TileTuple.__setattr__(
-                    self, 'declared',
+                super().__setattr__('concealed', Meld(x.concealed for x in self))
+                super().__setattr__('declared',
                     Meld([self[0].exposed, self[1].concealed, self[2].concealed, self[3].exposed]))
-                TileTuple.__setattr__(
-                    self,
-                    'exposed',
-                    Meld(x.exposed for x in self))
-                TileTuple.__setattr__(
-                    self, 'exposedClaimed',
+                super().__setattr__('exposed', Meld(x.exposed for x in self))
+                super().__setattr__('exposedClaimed',
                     Meld([self[0].exposed, self[1].exposed, self[2].exposed, self[3].concealed]))
 
     def __setattr__(self, name:str, value:'Meld') ->None:
         if (hasattr(self, '_fixed')
                 and not name.endswith('__hasRules')):
             raise TypeError
-        TileTuple.__setattr__(self, name, value)
+        super().__setattr__(name, value)
 
     def __prepareRules(self, ruleset:'Ruleset') ->None:
         """prepare rules from ruleset"""
@@ -956,14 +946,14 @@ class MeldList(list):
     def __getitem__(self, key):
         if isinstance(key, slice):
             return type(self)(list.__getitem__(self, key))
-        return list.__getitem__(self, key)
+        return super().__getitem__(key)
 
     def extend(self, values:Iterable[Meld]) ->None:
-        list.extend(self, values)
+        super().extend(values)
         self.sort()
 
     def append(self, value:Meld) ->None:
-        list.append(self, value)
+        super().append(value)
         self.sort()
 
     def tiles(self) ->TileTuple:

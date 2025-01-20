@@ -112,7 +112,7 @@ https://wiki.qt.io/Technical_FAQ#How_can_I_align_the_checkboxes_in_a_view.3F"""
                     option.rect.height()))
             viewItemOption.rect = newRect
         if painter:
-            QStyledItemDelegate.paint(self, painter, viewItemOption, index)
+            super().paint(painter, viewItemOption, index)
 
     def editorEvent(self, event:Optional[QEvent], model:Optional['QAbstractItemModel'],
         option:QStyleOptionViewItem, index:Union[QModelIndex,'QPersistentModelIndex']) ->bool:

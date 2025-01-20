@@ -33,7 +33,7 @@ class KDialogIgnoringEscape(KDialog):
             if event.key() == Qt.Key.Key_Escape:
                 event.ignore()
             else:
-                KDialog.keyPressEvent(self, event)
+                super().keyPressEvent(event)
 
 
 class MustChooseKDialog(KDialogIgnoringEscape):
@@ -55,7 +55,7 @@ class MustChooseKDialog(KDialogIgnoringEscape):
                     break
         if not isAlive(parent):
             parent = None
-        KDialogIgnoringEscape.__init__(self, parent)
+        super().__init__(parent)
 
     def closeEvent(self, event:Optional['QEvent']) ->None:
         """self.chosen is currently not used, never allow this"""
@@ -77,7 +77,7 @@ class Prompt(MustChooseKDialog, ReprMixin):
         self.msg = msg
         self.default = default
         if Options.gui:
-            MustChooseKDialog.__init__(self)
+            super().__init__()
             self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
             self.setCaption(caption or '')
             KMessageBox.createKMessageBox(
@@ -99,7 +99,7 @@ class DeferredDialog(Deferred):
     """make dialogs usable as Deferred"""
 
     def __init__(self, dlg:KDialog, modal:bool=True, always:bool=False) ->None:
-        Deferred.__init__(self)
+        super().__init__()
         self.dlg:Optional[KDialog] = dlg
         self.modal = modal
         self.always = always
@@ -150,7 +150,7 @@ class DeferredDialog(Deferred):
     def cancel(self) ->None:
         """we want no answer, just let the dialog disappear"""
         self.__removeFromScene()
-        Deferred.cancel(self)
+        super().cancel()
 
     def __removeFromScene(self) ->None:
         """remove ourself"""
@@ -166,7 +166,7 @@ class QuestionYesNo(DeferredDialog):
     def __init__(self, msg:str, modal:bool=True, always:bool=False, caption:Optional[str]=None) ->None:
         dialog = Prompt(msg, icon=QMessageBox.Icon.Question,
                         buttons=KDialog.Yes | KDialog.No, default=KDialog.Yes, caption=caption)
-        DeferredDialog.__init__(self, dialog, modal=modal, always=always)
+        super().__init__(dialog, modal=modal, always=always)
 
 
 class WarningYesNo(DeferredDialog):
@@ -176,7 +176,7 @@ class WarningYesNo(DeferredDialog):
     def __init__(self, msg:str, modal:bool=True, caption:Optional[str]=None) ->None:
         dialog = Prompt(msg, icon=QMessageBox.Icon.Warning,
                         buttons=KDialog.Yes | KDialog.No, default=KDialog.Yes, caption=caption)
-        DeferredDialog.__init__(self, dialog, modal=modal)
+        super().__init__(dialog, modal=modal)
 
 
 class Information(DeferredDialog):
@@ -186,7 +186,7 @@ class Information(DeferredDialog):
     def __init__(self, msg:str, modal:bool=True, caption:Optional[str]=None) ->None:
         dialog = Prompt(msg, icon=QMessageBox.Icon.Information,
                         buttons=KDialog.Ok, caption=caption)
-        DeferredDialog.__init__(self, dialog, modal=modal)
+        super().__init__(dialog, modal=modal)
 
 
 class Sorry(DeferredDialog):
@@ -196,7 +196,7 @@ class Sorry(DeferredDialog):
     def __init__(self, msg:str, modal:bool=True, caption:Optional[str]=None, always:bool=False) ->None:
         dialog = Prompt(msg, icon=QMessageBox.Icon.Information,
                         buttons=KDialog.Ok, caption=caption or 'Sorry')
-        DeferredDialog.__init__(self, dialog, modal=modal, always=always)
+        super().__init__(dialog, modal=modal, always=always)
 
 
 def NoPrompt(unusedMsg:str) ->Deferred:

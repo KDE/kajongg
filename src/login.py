@@ -247,7 +247,7 @@ class LoginDlg(KDialog):
 
     def __init__(self) ->None:
         """self.servers is a list of tuples containing server and last playername"""
-        KDialog.__init__(self, None)
+        super().__init__(None)
         decorateWindow(self, i18nc('kajongg', 'Login'))
         self.setupUi()
 
@@ -396,7 +396,7 @@ class AddUserDialog(KDialog):
     """add a user account on a server: This dialog asks for the needed attributes"""
 
     def __init__(self, url:str, username:str, password:str):
-        KDialog.__init__(self)
+        super().__init__()
         decorateWindow(self, i18nc("@title:window", "Create User Account"))
         self.setButtons(KDialog.Ok | KDialog.Cancel)
         vbox = QVBoxLayout()

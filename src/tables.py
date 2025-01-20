@@ -145,7 +145,7 @@ class SelectRuleset(QDialog):
     """a dialog for selecting a ruleset"""
 
     def __init__(self, server:Optional['Url']=None) ->None:
-        QDialog.__init__(self, None)
+        super().__init__(None)
         decorateWindow(self, i18n('Select a ruleset'))
         self.buttonBox = KDialogButtonBox(self)
         self.buttonBox.setStandardButtons(
@@ -311,7 +311,7 @@ class TableList(QWidget):
         self.view.showColumn(2)
         self.view.showColumn(4)
         if tableCount or not self.client.hasLocalServer():
-            QWidget.show(self)
+            super().show()
             if self.client.hasLocalServer():
                 self.view.hideColumn(0)
                 self.view.hideColumn(2)

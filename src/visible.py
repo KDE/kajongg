@@ -170,7 +170,7 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
     def getsRobbed(self, tile:Tile) ->None:
         """used for robbing the kong from this player"""
-        PlayingPlayer.getsRobbed(self, tile)
+        super().getsRobbed(tile)
         assert self.handBoard
         lastDiscard = self.handBoard[tile.exposed][-1]  # type:ignore[index]
         lastDiscard.change_name(lastDiscard.concealed)
@@ -183,18 +183,13 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
         assert Internal.Preferences
         _ = cast(List['UITile'], tiles)
         with AnimationSpeed(speed=int(Internal.Preferences.animationSpeed) if animated else 99):
-            PlayingPlayer.addConcealedTiles(self, TileList(x.tile for x in _))
+            super().addConcealedTiles(TileList(x.tile for x in _))
             self.syncHandBoard(_)
 
     def declaredMahJongg(self, concealed:'MeldList', withDiscard:Optional[Tile], lastTile:Tile, lastMeld:'Meld') ->None:
         """player declared mah jongg. Determine last meld, show
         concealed tiles grouped to melds"""
-        PlayingPlayer.declaredMahJongg(
-            self,
-            concealed,
-            withDiscard,
-            lastTile,
-            lastMeld)
+        super().declaredMahJongg(concealed, withDiscard, lastTile, lastMeld)
         if withDiscard:
             # withDiscard is a Tile, we need the UITile
             discardedTile = cast('PlayingScene', Internal.scene).discardBoard.claimDiscard()
@@ -210,12 +205,12 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
 
     def removeConcealedTile(self, tile:Tile) ->None:
         """remove from my melds or tiles"""
-        PlayingPlayer.removeConcealedTile(self, tile)
+        super().removeConcealedTile(tile)
         self.syncHandBoard()
 
     def makeTileKnown(self, tile:Tile) ->None:
         """give an unknown tileItem a name"""
-        PlayingPlayer.makeTileKnown(self, tile)
+        super().makeTileKnown(tile)
         assert tile.isKnown
         assert self.handBoard
         matchingTiles = sorted(
@@ -268,4 +263,4 @@ class VisiblePlayingGame(PlayingGame):
         scene.game = None
         SideText.removeAll()
         scene.mainWindow.updateGUI()
-        return PlayingGame.close(self)
+        return super().close()
