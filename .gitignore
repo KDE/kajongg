@@ -12,3 +12,4 @@ CMakeLists.txt.user*
 .cache
 .idea
 /cmake-build*
+/.mypy_cache/

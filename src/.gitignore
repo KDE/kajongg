@@ -18,3 +18,4 @@ build
 core
 dist
 games-kajongg-law.ico
+/.mypy_cache/
