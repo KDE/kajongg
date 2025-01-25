@@ -2,7 +2,7 @@
 Copyright (c) 2007-2008 Qtrac Ltd <mark@qtrac.eu>
 Copyright (C) 2008-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-SPDX-License-Identifier: GPL-2.0
+SPDX-License-Identifier: GPL-2.0-only
 
 """
 

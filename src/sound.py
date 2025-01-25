@@ -3,7 +3,7 @@
 """
 Copyright (C) 2010-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-SPDX-License-Identifier: GPL-2.0
+SPDX-License-Identifier: GPL-2.0-only
 
 """
 

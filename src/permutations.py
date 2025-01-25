@@ -2,7 +2,7 @@
 
 """Copyright (C) 2013-2016 Wolfgang Rohdewald <wolfgang@rohdewald.de>
 
-SPDX-License-Identifier: GPL-2.0
+SPDX-License-Identifier: GPL-2.0-only
 
 Read the user manual for a description of the interface to this scoring engine
 """
