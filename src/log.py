@@ -15,9 +15,8 @@ from locale import getpreferredencoding
 
 # we must not import twisted or we need to change kajongg.py
 
-from qtpy import PYQT_VERSION
 from common import Internal, Debug
-from qt import Qt, QEvent
+from qt import Qt, QEvent, PYQT_VERSION
 from util import elapsedSince, traceback, gitHead, callers
 from mi18n import i18n
 from dialogs import Sorry, Information, NoPrompt

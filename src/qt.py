@@ -9,7 +9,16 @@ SPDX-License-Identifier: GPL-2.0-only
 
 # pylint: disable=unused-import
 
-from qtpy import QT5, QT6, PYQT5, PYQT6
+
+# pylint: disable=wrong-import-position
+
+from qtpy import QT5, QT6, PYQT5, PYQT6, PYSIDE2, PYSIDE6
+
+if QT6:
+    from qtpy.QtCore import QKeyCombination  # type: ignore
+
+from qtpy.compat import isalive as qtpy_isalive
+from qtpy import QT_VERSION, API_NAME, PYQT_VERSION
 from qtpy.QtCore import QAbstractAnimation
 from qtpy.QtCore import QAbstractItemModel
 from qtpy.QtCore import QAbstractTableModel

@@ -15,7 +15,7 @@ import os
 import logging
 from typing import Tuple, List, Optional, Type, Any
 
-from qtpy import QT5, PYSIDE2
+from qt import QT5, PYSIDE2
 from qt import QObject, QCommandLineParser, QCommandLineOption, Qt, QGuiApplication
 from kde import KApplication
 from mi18n import i18n, MLocale
