@@ -9,6 +9,9 @@ SPDX-License-Identifier: GPL-2.0-only
 
 # pylint: disable=unused-import
 
+import os
+if not os.environ.get('QT_API'):
+    os.environ['QT_API'] = 'PYQT6'
 
 # pylint: disable=wrong-import-position
 
