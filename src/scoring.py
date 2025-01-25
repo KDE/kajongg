@@ -35,6 +35,7 @@ from tables import SelectRuleset
 from uiwall import UIWall, SideText
 from guiutil import decorateWindow, BlockSignals, rotateCenter, sceneRotation
 from mi18n import i18nc
+from util import callers
 
 if TYPE_CHECKING:
     from qt import QWidget, QEvent, QGraphicsSceneDragDropEvent, QGraphicsItem, QGraphicsItemGroup, QObject
@@ -203,7 +204,10 @@ class ScoringHandBoard(HandBoard):
         """return the meld with uiTile, optionally removing it"""
         for idx, myMeld in enumerate(self.uiMelds):
             if uiTile in myMeld:
+                uiMeld = self.uiMelds[idx]
                 if remove:
+                    if Debug.uitiles:
+                        logDebug(f'{callers()}.{self.debug_name()}.uiMeldWithTile({uiTile}) removes {uiMeld}')
                     del self.uiMelds[idx]
                 return myMeld
         return UIMeld(uiTile)
@@ -223,6 +227,8 @@ class ScoringHandBoard(HandBoard):
         assert isinstance(uiTile, UITile), uiTile
         uiMeld = self.uiMeldWithTile(uiTile, remove=True)
         self.player.removeMeld(uiMeld.meld)  # uiMeld must already be deleted
+        if Debug.uitiles:
+            logDebug(f'{self.debug_name()}.loseMeld({uiTile}) removed {uiMeld.meld} from {self.player}')
         self.sync()
         return uiMeld
 
@@ -276,8 +282,12 @@ class ScoringHandBoard(HandBoard):
         for uitile, tile in zip(uiMeld, newMeld):
             uitile.change_name(tile)
         self.uiMelds.append(uiMeld)
+        if Debug.uitiles:
+            logDebug(f'{self.debug_name()}.dropMeld({uiTile}) appends{uiMeld}')
         assert self.player
         self.player.addMeld(uiMeld.meld)
+        if Debug.uitiles:
+            logDebug(f'{self.debug_name()}.dropMeld({uiTile}) added {uiMeld.meld} to {self.player}')
         self.sync()
         self.hasLogicalFocus = senderBoard == self or senderBoard.empty
         self.checkTiles()

@@ -195,6 +195,7 @@ class Debug:
     wallSize = '0'
     i18n = False
     isalive = False
+    uitiles = False
 
     def __init__(self) ->None:
         raise TypeError('Debug is not meant to be instantiated')

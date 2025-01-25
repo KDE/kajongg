@@ -624,6 +624,8 @@ class Board(QGraphicsRectItem, ReprMixin):
 
     def addUITile(self, uiTile:UITile) ->None:
         """add uiTile to this board"""
+        if Debug.uitiles:
+            logDebug(f'{self.debug_name()}.addUITile({uiTile})')
         self.uiTiles.append(uiTile)
         # if Internal.mainWindow:
             # FIXME scoring game: move Pung to player: first two tiles
@@ -632,6 +634,8 @@ class Board(QGraphicsRectItem, ReprMixin):
 
     def removeUITile(self, uiTile:UITile) ->None:
         """remove uiTile from this board"""
+        if Debug.uitiles:
+            logDebug(f'{self.debug_name()}.removeUITile({uiTile})')
         self.uiTiles.remove(uiTile)
         if self.currentFocusTile == uiTile:
             self.focusTile = None
