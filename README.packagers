@@ -3,7 +3,7 @@ Dependencies for kajongg: Please look at the file debian.control
 all content of debian.control is used by make_debian_package,
 so its syntax must follow debian package rules
 
-Kajongg uses the wrapper qtpy around PyQt5/PyQt6/Pyside2/Pyside6. If more than one is installed, kajongg uses PyQt5.
+Kajongg uses the wrapper qtpy around PyQt6/Pyside6. kajongg tries PyQt6 first.
 The environment variable QT_API can override that, see https://github.com/spyder-ide/qtpy#requirements
 
 If you see segfaults, Pyside is usually better for finding the reason.

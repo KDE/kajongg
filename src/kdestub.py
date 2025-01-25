@@ -42,9 +42,7 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 
 # pylint: disable=wildcard-import,unused-wildcard-import
 from qt import *
-from qtpy import QT5, QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
-if QT6:
-    from qtpy.QtCore import QKeyCombination  # type: ignore
+from qtpy import QT6, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
 
 # pylint: disable=wrong-import-position
 
@@ -102,8 +100,7 @@ class KApplication(QApplication):
         self.translators.append(_)
         self.installTranslator(_)
         for language in reversed(list(MLocale.extendRegionLanguages(MLocale.currentLanguages()))):
-            _ = QLibraryInfo.location(QLibraryInfo.TranslationsPath)  # type:ignore[attr-defined]
-            # qtpy maps location() to path() for Qt6
+            _ = QLibraryInfo.path(QLibraryInfo.LibraryPath.TranslationsPath)
             self.installTranslatorFile(os.path.join( _, f'qtbase_{language}.qm'))
             self.installTranslatorFile(f'/usr/share/locale/{language}/LC_MESSAGES/kwidgetsaddons5_qt.qm')
 
@@ -706,10 +703,9 @@ class Action(QAction):
                 name = ''
             parent.actionCollection().addAction(name, self)
         if shortcut:
-            if QT6:
-                if isinstance(shortcut, QKeyCombination):
-                    shortcut = shortcut.key()
-                    assert shortcut
+            if isinstance(shortcut, QKeyCombination):
+                shortcut = shortcut.key()
+                assert shortcut
             shortcut = cast(Qt.Key, shortcut)
             self.setShortcut(QKeySequence(shortcut | Qt.KeyboardModifier.ControlModifier))  # type:ignore[operator]
             self.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
@@ -1063,9 +1059,6 @@ class AboutKajonggDialog(KDialog):
         underVersions = ['Qt' + QT_VERSION +' API=' + API_NAME]
         if PYQT_VERSION:
             underVersions.append('sip ' + SIP_VERSION_STR)
-        if PYSIDE2:
-            import PySide2
-            underVersions.append('PySide2 ' + PySide2.__version__)
         if PYSIDE6:
             import PySide6
             underVersions.append('PySide6 ' + PySide6.__version__)

@@ -880,7 +880,7 @@ class FittingView(QGraphicsView):
         """set blue focus frame"""
         if not event:
             return
-        tiles = self.tileAt(event.pos())  # qtpy makes sure pos() does the same in Qt5 and Qt6
+        tiles = self.tileAt(event.pos())
         if tiles:
             if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
                 for uiTile in tiles:

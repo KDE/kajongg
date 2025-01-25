@@ -15,11 +15,9 @@ if not os.environ.get('QT_API'):
 
 # pylint: disable=wrong-import-position
 
-from qtpy import QT5, QT6, PYQT5, PYQT6, PYSIDE2, PYSIDE6
+from qtpy import QT6, PYQT6, PYSIDE6
 
-if QT6:
-    from qtpy.QtCore import QKeyCombination  # type: ignore
-
+from qtpy.QtCore import QKeyCombination
 from qtpy.compat import isalive as qtpy_isalive
 from qtpy import QT_VERSION, API_NAME, PYQT_VERSION
 from qtpy.QtCore import QAbstractAnimation
@@ -140,23 +138,12 @@ from qtpy.QtWidgets import QVBoxLayout
 from qtpy.QtWidgets import QWidget
 from qtpy.QtGui import QValidator
 from qtpy.QtGui import QGuiApplication
-try:
-    # it seems this moved in Qt6
-    from qtpy.QtSvgWidgets import QGraphicsSvgItem  # type: ignore
-except ImportError:
-    # as it was in Qt5:
-    from qtpy.QtSvg import QGraphicsSvgItem  # type:ignore[assignment,attr-defined,no-redef]
+from qtpy.QtSvgWidgets import QGraphicsSvgItem  # type: ignore
 from qtpy.QtSvg import QSvgRenderer
 
-# pylint:disable=c-extension-no-member
 
 HAVE_SIP = True
-if PYQT5:
-    from PyQt5 import sip
-    def sip_cast(obj, _type):
-        """hide not so nice things in qt.py"""
-        return sip.cast(obj, _type)
-elif PYQT6:
+if PYQT6:
     from PyQt6 import sip  # type:ignore[no-redef]
     def sip_cast(obj, _type):
         """hide not so nice things in qt.py"""

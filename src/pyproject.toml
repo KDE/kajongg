@@ -7,6 +7,6 @@ module = [
     "kdepaths.*",
     "appversion",
     "zope.interface",
-    "PyQt5.*",
+    "PyQt6.*",
     "twisted.*"]
 ignore_missing_imports = true

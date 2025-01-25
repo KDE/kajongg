@@ -146,7 +146,7 @@ class KDETranslator(QTranslator):
 
     def translate(self, context:str, text:str,  # type:ignore[override]
         disambiguation:Optional[bytes]=None, numerus:int=-1) ->str:
-        """context should be the class name defined by qt5 or kf5.
+        """context should be the class name defined by Qt.
         PyQt uses str, Pyside uses bytes - so just ignore typing warnings"""
         # Qt doc says str but on Debian Bookworm, .pyi says bytes
         if Debug.neutral:
@@ -155,7 +155,7 @@ class KDETranslator(QTranslator):
         if result:
             return result  # type:ignore[return-value]
         if not MLocale.currentLanguages():
-            # when starting kajongg.py, qt5 loads translators for the system default
+            # when starting kajongg.py, Qt loads translators for the system default
             # language. I do not know how to avoid that. And I cannot delete
             # translators I do not own. So if we want no translation, just return text.
             # But we still need to install our own QTranslator overriding the ones
