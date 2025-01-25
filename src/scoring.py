@@ -209,6 +209,10 @@ class ScoringHandBoard(HandBoard):
                     if Debug.uitiles:
                         logDebug(f'{callers()}.{self.debug_name()}.uiMeldWithTile({uiTile}) removes {uiMeld}')
                     del self.uiMelds[idx]
+                    self.player.removeMeld(uiMeld.meld)
+                    if Debug.uitiles:
+                        logDebug(f'{self.debug_name()}.loseMeld({uiTile}) removed {uiMeld.meld} from {self.player}')
+                    self.sync()
                 return myMeld
         return UIMeld(uiTile)
 
@@ -226,10 +230,6 @@ class ScoringHandBoard(HandBoard):
         """loses a UIMeld. Only first uiTile is given"""
         assert isinstance(uiTile, UITile), uiTile
         uiMeld = self.uiMeldWithTile(uiTile, remove=True)
-        self.player.removeMeld(uiMeld.meld)  # uiMeld must already be deleted
-        if Debug.uitiles:
-            logDebug(f'{self.debug_name()}.loseMeld({uiTile}) removed {uiMeld.meld} from {self.player}')
-        self.sync()
         scoringScene().handSelectorChanged(self)
         return uiMeld
 
