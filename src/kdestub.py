@@ -1114,9 +1114,9 @@ class AboutKajonggDialog(KDialog):
                 "(C) 2008-2017 Wolfgang Rohdewald",
                 '<a href="https://apps.kde.org/kajongg">https://apps.kde.org/kajongg</a>']))
         licenseLabel = QLabel()
+        licenseLabel.setOpenExternalLinks(True)
         licenseLabel.setText(
-            f'<a href="file://{self.licenseFile()}">GNU General Public License Version 2</a>')
-        licenseLabel.linkActivated.connect(self.showLicense)
+            '<a href="https://spdx.org/licenses/GPL-2.0-only.html">GNU General Public License Version 2</a>')
         aboutLayout.addWidget(aboutLabel)
         aboutLayout.addWidget(licenseLabel)
         aboutWidget.setLayout(aboutLayout)
@@ -1150,68 +1150,6 @@ class AboutKajonggDialog(KDialog):
         vLayout.addWidget(self.buttonBox)
         self.setLayout(vLayout)
         self.buttonBox.setFocus()
-
-    @staticmethod
-    def licenseFile() ->Optional[str]:
-        """which may currently only be 1: GPL_V2"""
-        if QT5:
-            # pyqt 2.3.0 does not seem to handle this
-            prefix = QLibraryInfo.location(QLibraryInfo.LibraryLocation.PrefixPath)  # type:ignore[attr-defined]
-        else:
-            prefix = QLibraryInfo.path(QLibraryInfo.LibraryPath.PrefixPath)  # type:ignore[attr-defined]
-        for path in ('COPYING', '../COPYING',
-                     f'{prefix}/share/kf5/licenses/GPL_V2'):
-            path = os.path.abspath(path)
-            if os.path.exists(path):
-                return path
-        return None
-
-    @classmethod
-    def showLicense(cls) ->None:
-        """as the name says"""
-        assert Internal.mainWindow
-        LicenseDialog(Internal.mainWindow, cls.licenseFile()).exec()
-
-
-class LicenseDialog(KDialog):
-
-    """see kaboutapplicationdialog.cpp"""
-
-    def __init__(self, parent:QWidget, licenseFile:Optional[str]) ->None:
-        super().__init__(parent)
-        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        self.setCaption(i18n("License Agreement"))
-        self.setButtons(KDialog.Close)
-        self.buttonBox.setFocus()
-        if licenseFile is None:
-            licenseText = 'no license file found'
-        else:
-            with open('x' + licenseFile, 'r', encoding='utf-8') as _:
-                licenseText = _.read()
-        self.licenseBrowser = QTextBrowser()
-        self.licenseBrowser.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
-        self.licenseBrowser.setText(licenseText)
-
-        vLayout = QVBoxLayout()
-        vLayout.addWidget(self.licenseBrowser)
-        vLayout.addWidget(self.buttonBox)
-        self.setLayout(vLayout)
-
-    def sizeHint(self) ->QSize:
-        """try to set up the dialog such that the full width of the
-        document is visible without horizontal scroll-bars being required"""
-        if document := self.licenseBrowser.document():
-            idealWidth = document.idealWidth()
-        if style := self.style():
-            idealWidth += style.pixelMetric(QStyle.PixelMetric.PM_LayoutLeftMargin)
-            idealWidth += style.pixelMetric(QStyle.PixelMetric.PM_LayoutRightMargin)
-        if scrollbar := self.licenseBrowser.verticalScrollBar():
-            idealWidth += scrollbar.width() * 2 + 1
-        # try to allow enough height for a reasonable number of lines to be
-        # shown
-        metrics = QFontMetrics(self.licenseBrowser.font())
-        idealHeight = metrics.height() * 30
-        return KDialog.sizeHint(self).expandedTo(QSize(int(idealWidth), idealHeight))
 
 
 class KConfigDialog(KDialog):
