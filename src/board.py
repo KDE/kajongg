@@ -36,7 +36,8 @@ if TYPE_CHECKING:
     from uiwall import UIWallSide, UIWall
     from game import PlayingGame, Game
     from message import ClientMessage
-    from scene import SceneWithFocusRect
+    from scene import SceneWithFocusRect, ScoringScene
+    from handboard import HandBoard
 
 
 class WindDisc(DrawOnTopMixin, AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
@@ -734,8 +735,8 @@ class SelectorBoard(CourtBoard):
     def dropMeld(self, uiTile:UITile, forLowerHalf:bool=False) ->None:  # pylint: disable=unused-argument
         """drop UIMeld containing uiTile into selector board"""
         assert uiTile.board
-        uiMeld = uiTile.board.uiMeldWithTile(uiTile, remove=True)
-        senderHand = uiMeld[0].board
+        senderHand = uiTile.board
+        uiMeld = senderHand.uiMeldWithTile(uiTile, remove=True)
         if senderHand == self:
             return
         for myTile in uiMeld:
@@ -744,6 +745,7 @@ class SelectorBoard(CourtBoard):
         (senderHand if not senderHand.empty else self).hasLogicalFocus = True
         self._noPen()
         animate()
+        cast('ScoringScene', Internal.scene).handSelectorChanged(cast('HandBoard', senderHand))
 
     def loseMeld(self, uiTile:UITile, meld:Meld) ->UIMeld:
         """loses a UIMeld. First uiTile is given, the rest should be as defined by meld"""

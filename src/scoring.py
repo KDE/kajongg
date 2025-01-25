@@ -230,6 +230,7 @@ class ScoringHandBoard(HandBoard):
         if Debug.uitiles:
             logDebug(f'{self.debug_name()}.loseMeld({uiTile}) removed {uiMeld.meld} from {self.player}')
         self.sync()
+        scoringScene().handSelectorChanged(self)
         return uiMeld
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
