@@ -296,7 +296,7 @@ class HandBoard(Board):
         The sender board must not be self, see ScoringPlayer.moveMeld"""
         if self.empty and not adding:
             return
-        allTiles = self.uiTiles[:]
+        allTiles = self[:]
         if adding:
             allTiles.extend(adding)
         self.placeTiles(allTiles)
@@ -343,7 +343,7 @@ class PlayingHandBoard(HandBoard):
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in HandBoard"""
-        allTiles = self.uiTiles[:]
+        allTiles = self[:]
         if adding:
             allTiles.extend(adding)
         newTiles = self.placeTiles(allTiles)

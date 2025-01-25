@@ -600,7 +600,9 @@ class Board(QGraphicsRectItem, ReprMixin):
         if isinstance(index, str):
             _ = Tile(index)
             return sorted((x for x in self if x.tile is _), key=lambda x: x.sortKey())
-        raise NotImplementedError
+        if isinstance(index, slice):
+            return sorted(self.uiTiles.__getitem__(index), key=lambda x: x.sortKey())
+        raise NotImplementedError(f': index={index}')
 
     def __iter__(self) -> Iterator[UITile]:
         """just to make this clear to mypy"""
