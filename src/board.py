@@ -231,7 +231,9 @@ class Board(QGraphicsRectItem, ReprMixin):
         self.uiTiles = []
         self._focusTile = None
         if isAlive(self):
-            self.setVisible(False)
+            for uiTile in self:
+                uiTile.hide()
+            super().hide()
 
     def clear(self) ->None:
         """clear away all tiles"""
