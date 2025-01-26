@@ -233,6 +233,13 @@ class Board(QGraphicsRectItem, ReprMixin):
         if isAlive(self):
             self.setVisible(False)
 
+    def clear(self) ->None:
+        """clear away all tiles"""
+        if not self.empty:
+            for uiTile in self:
+                uiTile.setBoard(None)
+            self.uiTiles = []
+
     def autoSelectTile(self) ->None:
         """call this when Kajongg should automatically focus
         on an appropriate uiTile"""
@@ -698,10 +705,7 @@ class SelectorBoard(CourtBoard):
 
     def load(self, game:'Game') ->None:
         """load the tiles according to game.ruleset"""
-        if not self.empty:
-            for uiTile in self:
-                uiTile.setBoard(None)
-            self.uiTiles = []
+        self.clear()
         self.allSelectorTiles = [UITile(x) for x in elements.all(game.ruleset)]
         self.refill()
 
