@@ -102,6 +102,7 @@ class MainWindow(KXmlGuiWindow):
         self.playerWindow:Optional[PlayerList] = None
         self.rulesetWindow:Optional[RulesetSelector] = None
         self.confDialog:Optional[ConfigDialog] = None
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.__installReactor()
         if Options.gui:
             KStandardAction.preferences(
