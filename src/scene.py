@@ -546,7 +546,7 @@ class ScoringScene(GameScene):
             assert self.scoringDialog
             if movingLastMeld:
                 self.scoringDialog.clearLastTileCombo()
-            receiver.dropTile(uiTile, toConcealed)
+            receiver.dropMeld(uiTile, toConcealed)
             if movingLastMeld and receiver == currentBoard:
                 self.scoringDialog.fillLastTileCombo()
 

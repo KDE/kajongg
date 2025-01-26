@@ -222,14 +222,14 @@ class ScoringHandBoard(HandBoard):
         assert isinstance(uiTile, UITile), uiTile
         return self.uiMeldWithTile(uiTile)
 
-    def deselect(self, uiMeld:UIMeld) ->None:
-        """remove uiMeld from old board"""
-        for idx, myMeld in enumerate(self.uiMelds):
-            if all(id(uiMeld[x]) == id(myMeld[x]) for x in range(len(uiMeld))):
+    def deselect(self, meld:UIMeld) ->None:
+        """remove meld from old board"""
+        for idx, uiMeld in enumerate(self.uiMelds):
+            if all(id(meld[x]) == id(uiMeld[x]) for x in range(len(meld))):
                 del self.uiMelds[
                     idx]  # do not use uiMelds.remove: If we have 2
                 break                 # identical melds, it removes the wrong one
-        self.player.removeMeld(uiMeld)  # uiMeld must already be deleted
+        self.player.removeMeld(meld)  # uiMeld must already be deleted
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in ScoringHandBoard"""
@@ -264,14 +264,14 @@ class ScoringHandBoard(HandBoard):
         uiTile = cast('MimeData', event.mimeData()).uiTile
         forLowerHalf = self.mapFromScene(
             QPointF(event.scenePos())).y() >= self.rect().height() / 2.0
-        if self.dropTile(uiTile, forLowerHalf):
+        if self.dropMeld(uiTile, forLowerHalf):
             event.accept()
         else:
             event.ignore()
         self._noPen()
 
-    def dropTile(self, uiTile:UITile, forLowerHalf:bool) ->bool:
-        """drop uiTile into lower or upper half of our hand"""
+    def dropMeld(self, uiTile:UITile, forLowerHalf:bool) ->bool:
+        """drop UIMeld containing uiTile into lower or upper half of our hand"""
         senderBoard = cast('SelectorBoard', uiTile.board)
         assert senderBoard
         newMeld = senderBoard.chooseVariant(uiTile, forLowerHalf)
@@ -280,11 +280,6 @@ class ScoringHandBoard(HandBoard):
         uiMeld = senderBoard.assignUITiles(uiTile, newMeld)
         for uitile, tile in zip(uiMeld, newMeld):
             uitile.change_name(tile)
-        return self.dropMeld(uiMeld)
-
-    def dropMeld(self, uiMeld:UIMeld) ->bool:
-        """drop uiMeld into our hand"""
-        senderBoard = uiMeld[0].board
         senderBoard.deselect(uiMeld)
         self.uiMelds.append(uiMeld)
         assert self.player

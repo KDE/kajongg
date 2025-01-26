@@ -686,17 +686,13 @@ class SelectorBoard(CourtBoard):
         """drop a uiTile into the selector"""
         if event:
             uiTile = cast(MimeData, event.mimeData()).uiTile
-            self.dropTile(uiTile)
+            self.dropMeld(uiTile)
             event.accept()
 
-    def dropTile(self, uiTile:UITile, forLowerHalf:bool=False) ->None:  # pylint: disable=unused-argument
-        """drop uiTile into selector board"""
+    def dropMeld(self, uiTile:UITile, forLowerHalf:bool=False) ->None:  # pylint: disable=unused-argument
+        """drop UIMeld containing uiTile into selector board"""
         assert uiTile.board
         uiMeld = uiTile.board.uiMeldWithTile(uiTile)
-        self.dropMeld(uiMeld)
-
-    def dropMeld(self, uiMeld:UIMeld) ->None:
-        """drop uiMeld into selector board"""
         senderHand = uiMeld[0].board
         if senderHand == self:
             return
