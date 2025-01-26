@@ -34,8 +34,6 @@ if TYPE_CHECKING:
 
 class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin): # type:ignore[misc]
 
-    # pylint:disable=too-many-instance-attributes
-
     """The text written on the wall"""
 
     sideTexts : List['SideText'] = []

@@ -200,6 +200,7 @@ int-import-graph=
 
 # Maximum number of arguments for function / method
 max-args=8
+max-positional-arguments=11
 
 # Maximum number of locals for function / method body
 max-locals=15
@@ -247,7 +248,7 @@ defining-attr-methods=__init__,__new__,setUp,setupUi,setupActions,setupUILastTil
 [SIMILARITIES]
 
 # Minimum lines number of a similarity.
-min-similarity-lines=8
+min-similarity-lines=11
 
 # Ignore comments when computing similarities.
 # this way I can locally disable this with a comment
@@ -285,4 +286,4 @@ max-module-lines=1300
 # tab).
 indent-string='    '
 
-extension-pkg-whitelist=sip,PySide2
+extension-pkg-whitelist=sip,PySide2,PyQt6

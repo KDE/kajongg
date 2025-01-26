@@ -701,7 +701,7 @@ class ServerTable(Table, ReprMixin):
                 self.game.seed)
             if Debug.process and sys.platform != 'win32':
                 logDebug(
-                    f'MEM:{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+                    f'MEM:{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')  # pylint:disable=possibly-used-before-assignment
             return
         self.game.sortPlayers()
         self.tellAll(None, Message.ReadyForHandStart, self.startHand,

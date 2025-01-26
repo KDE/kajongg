@@ -746,9 +746,8 @@ class Game:
         if winner:
             winner.wonCount += 1
             guilty = winner.usedDangerousFrom
-            if guilty:
-                payAction = self.ruleset.findUniqueOption('payforall')
-            if guilty and payAction:
+            payAction = self.ruleset.findUniqueOption('payforall') if guilty else None
+            if payAction:
                 if Debug.dangerousGame:
                     self.debug(f'{self.handId}: winner {winner}. {guilty} pays for all')
                 guilty.hand.usedRules.append(UsedRule(payAction))
@@ -841,7 +840,7 @@ class PlayingGame(Game):
         if self.finished() and Options.csv:
             gameWinner = max(self.players, key=lambda x: x.balance)
             if Debug.process and sys.platform != 'win32':
-                self.csvTags.append(f'MEM:{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')
+                self.csvTags.append(f'MEM:{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')  # pylint:disable=possibly-used-before-assignment
             if Options.rounds:
                 self.csvTags.append(f'ROUNDS:{Options.rounds}')
             _ = CsvRow.fields

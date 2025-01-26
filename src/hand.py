@@ -71,7 +71,6 @@ class Hand(ReprMixin):
             lastSource:Type[TileSource.SourceClass]=TileSource.Unknown, lastTile:Optional[Tile]=None,
             lastMeld:Optional[Meld]=None, announcements:Optional[Set[str]]=None,
             prevHand:Optional['Hand']=None) ->'Hand':
-        # pylint: disable=unused-argument
         """since a Hand instance is never changed, we can use a cache"""
         if string:
             cache = player.handCache
@@ -96,7 +95,7 @@ class Hand(ReprMixin):
             prevHand:Optional['Hand']=None) ->None:
         """evaluate string for player. rules are to be applied in any case"""
 
-        # pylint: disable=too-many-branches, too-many-statements
+        # pylint: disable=too-many-statements
         self.is_from_cache:bool
         if self.is_from_cache:
             return

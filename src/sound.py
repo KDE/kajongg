@@ -227,7 +227,8 @@ class Voice(ReprMixin):
         elif 'HOMEPATH' in os.environ:
             home = os.environ['HOMEPATH']
         else:
-            logException('have neither HOME nor HOMEPATH')
+            logWarning('have neither HOME nor HOMEPATH')
+            home = ''
         if home:
             if self.directory.startswith(home):
                 return 'local'

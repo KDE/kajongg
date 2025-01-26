@@ -61,7 +61,7 @@ def __insertArgs(translatedTemplate:str, *args:Any) ->str:
     result = translatedTemplate
     if '%' in result:
         for idx in range(len(args)):
-            result = result.replace(f'%{int(idx + 1)}', '{%d}' % idx)  # pylint:disable=consider-using-f-string
+            result = result.replace(f'%{int(idx + 1)}', '{%d}' % idx)
         result = result.format(*args)
     for ignore in ['numid', 'filename', 'interface']:
         result = result.replace(f'<{ignore}>', '')
@@ -170,7 +170,7 @@ class MLocale:
 
     __cached_availableLanguages = None
 
-    translation:Optional[gettext.NullTranslations]  = None
+    translation:Optional[gettext.NullTranslations]  = None  # pylint:disable=used-before-assignment
 
     @classmethod
     def gettext(cls, txt:str) ->str:

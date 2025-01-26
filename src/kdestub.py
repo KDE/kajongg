@@ -44,7 +44,6 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 from qt import *
 from qtpy import QT5, QT6, PYSIDE2, PYSIDE6, QT_VERSION, API_NAME, PYQT_VERSION
 if QT6:
-    # pylint:disable=no-name-in-module
     from qtpy.QtCore import QKeyCombination  # type: ignore
 
 # pylint: disable=wrong-import-position
@@ -317,7 +316,7 @@ class KUser:
         """stub"""
         if sys.platform == 'win32':
             return self.loginName()
-        return pwd.getpwnam(self.loginName()).pw_gecos.replace(',', '')
+        return pwd.getpwnam(self.loginName()).pw_gecos.replace(',', '')  # pylint:disable=possibly-used-before-assignment
 
     @staticmethod
     def loginName() ->str:

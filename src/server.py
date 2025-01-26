@@ -36,7 +36,7 @@ def cleanExit(*unusedArgs: Any) ->None:
                               # setting to None does not call close(), do we
                               # need close?
         logging.shutdown()
-        os._exit(0)  # pylint: disable=protected-access
+        os._exit(0)
     except NameError:
         logging.shutdown()
     try:

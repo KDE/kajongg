@@ -83,7 +83,7 @@ class ClientTable(Table):
     """the table as seen by the client"""
     # pylint: disable=too-many-arguments
 
-    def __init__(self, client:'Client', tableid:int, ruleset:Ruleset, gameid:int,
+    def __init__(self, client:'Client', tableid:int, ruleset:Ruleset, gameid:int,  # pylint:disable=too-many-positional-arguments
                  suspendedAt:str, running:bool,
                  playOpen:bool, autoPlay:bool, wantedGame:str, playerNames:List[str],
                  playersOnline:List[PlayingPlayer], endValues:Tuple[List[int], List[int]]) ->None:
