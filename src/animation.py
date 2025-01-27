@@ -19,7 +19,7 @@ from qt import QPropertyAnimation, QParallelAnimationGroup, \
 from qt import Property, QGraphicsObject, QGraphicsItem, QPointF, QObject
 
 from common import Internal, Debug, isAlive, ReprMixin, id4
-from log import logDebug, logException
+from log import logDebug, logFailure
 
 if TYPE_CHECKING:
     from qt import QGraphicsScene
@@ -163,7 +163,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
         self.uid = ParallelAnimationGroup.clsUid
         ParallelAnimationGroup.clsUid += 1
         self.deferred:Deferred = Deferred()
-        self.deferred.addErrback(logException)
+        self.deferred.addErrback(logFailure)
         self.steps = 0
         self.debug = any(x.debug for x in self.animations)
         self.debug |= f'G{id4(self)}g' in Debug.animation
@@ -173,7 +173,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
                 logDebug(f'Chaining Animation group G_{id4(self)} to G{ParallelAnimationGroup.current}')
             self.doAfter = ParallelAnimationGroup.current.doAfter
             ParallelAnimationGroup.current.doAfter = []
-            ParallelAnimationGroup.current.deferred.addCallback(self.start).addErrback(logException)
+            ParallelAnimationGroup.current.deferred.addCallback(self.start).addErrback(logFailure)
         else:
             self.start()
         ParallelAnimationGroup.running.append(self)
@@ -243,7 +243,7 @@ class ParallelAnimationGroup(QParallelAnimationGroup, ReprMixin):
             assert Internal.Preferences
             _ = ','.join(f'A_{id4(x)}' for x in self.animations)
             logDebug(f'{self} started with speed {int(Internal.Preferences.animationSpeed)} ({_})')
-        return succeed(None).addErrback(logException)
+        return succeed(None).addErrback(logFailure)
 
     def allFinished(self) ->None:
         """all animations have finished. Cleanup and callback"""
@@ -477,7 +477,7 @@ def animate() ->Deferred:
             return ParallelAnimationGroup(animations).deferred
     elif ParallelAnimationGroup.current:
         return ParallelAnimationGroup.current.deferred
-    return succeed(None).addErrback(logException)
+    return succeed(None).addErrback(logFailure)
 
 
 def doCallbackWithSpeed(result:Any, speed:int, callback:Callable, *args:Any, **kwargs:Any) ->None:
@@ -494,5 +494,5 @@ def animateAndDo(callback:Callable, *args:Any, **kwargs:Any) ->Deferred:
         # we might be called very early
         result.addCallback(
             doCallbackWithSpeed, Internal.Preferences.animationSpeed,
-            callback, *args, **kwargs).addErrback(logException)
+            callback, *args, **kwargs).addErrback(logFailure)
     return result

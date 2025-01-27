@@ -24,6 +24,7 @@ from dialogs import Sorry, Information, NoPrompt
 
 if TYPE_CHECKING:
     from twisted.internet.defer import Deferred
+    from twisted.python.failure import Failure
     from qt import QObject
 
 SERVERMARK = '&&SERVER&&'
@@ -159,6 +160,9 @@ def logWarning(msg:Union[Exception, str], withGamePrefix:bool=True) ->'Deferred'
     """log this message and show it on stdout"""
     return logMessage(msg, logging.WARNING, True, withGamePrefix=withGamePrefix)
 
+def logFailure(failure:'Failure') ->None:
+    """twisted failure"""
+    logError(f'{failure.getErrorMessage()} {failure.getTraceback()}')
 
 def logException(exception: Union[Exception, str], withGamePrefix:bool=True) ->None:
     """logs error message and re-raises exception if we are not server"""

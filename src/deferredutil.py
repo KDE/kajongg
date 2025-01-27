@@ -16,7 +16,7 @@ from typing import List, Dict, Any, TYPE_CHECKING, Optional, Tuple, Union, Seque
 from twisted.spread import pb
 from twisted.internet.defer import Deferred
 
-from log import logInfo, logDebug, logException
+from log import logInfo, logDebug, logException, logFailure
 from mi18n import i18nE
 from message import Message
 from common import Debug, ReprMixin, id4
@@ -412,7 +412,7 @@ class DeferredBlock(ReprMixin):
             isClient = rec.__class__.__name__.endswith('Client')
             if isClient:
                 defer = Deferred()
-                defer.addCallback(cast('Client', rec).remote_move, command, **kwargs).addErrback(logException)
+                defer.addCallback(cast('Client', rec).remote_move, command, **kwargs).addErrback(logFailure)
                 defer.command = command.name  # type:ignore[attr-defined]
                 defer.notifying = 'notifying' in kwargs  # type:ignore[attr-defined]
                 self.__addRequest(defer, rec, aboutPlayer)  # type:ignore[arg-type]

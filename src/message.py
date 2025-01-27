@@ -10,7 +10,7 @@ SPDX-License-Identifier: GPL-2.0-only
 import datetime
 from typing import Dict, Tuple, Optional, TYPE_CHECKING, List, Any, Union, cast
 
-from log import logWarning, logException, logDebug
+from log import logWarning, logException, logDebug, logFailure
 from mi18n import i18n, i18nc, i18ncE
 from sound import Voice
 from tile import Tile, TileTuple, Meld, MeldList
@@ -554,7 +554,7 @@ class MessageReadyForGameStart(ServerMessage):
         return client.readyForGameStart(  # type:ignore[attr-defined]
             move.tableid, move.gameid,
             move.wantedGame, move.playerNames, shouldSave=move.shouldSave).addCallback(
-                hideTableList).addErrback(logException)
+                hideTableList).addErrback(logFailure)
 
 
 class MessageNoGameStart(NotifyAtOnceMessage):
@@ -862,7 +862,7 @@ class MessageNoChoice(ServerMessage):
         # otherwise we have a visible artifact of the discarded tile.
         # Only when animations are disabled. Why?
 #        Internal.mainWindow.centralView.resizeEvent(None)
-        return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain).addErrback(logException)
+        return client.ask(move, [Message.OK]).addCallback(self.hideConcealedAgain).addErrback(logFailure)
 
     def hideConcealedAgain(self, result:Tuple[Message, None]) ->Tuple[Message, None]:
         """only show them for explaining the 'no choice'"""

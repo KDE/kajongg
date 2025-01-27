@@ -69,7 +69,7 @@ Internal.reactor = reactor  # type:ignore[assignment]
 
 from player import Players
 from query import Query, initDb
-from log import logDebug, logWarning, logError, logInfo, logException, SERVERMARK
+from log import logDebug, logWarning, logError, logInfo, logException, SERVERMARK, logFailure
 from mi18n import i18n, i18nE
 from util import elapsedSince
 from message import Message, ChatMessage
@@ -110,7 +110,7 @@ class DBPasswordChecker:
             return fail(credError.UnauthorizedLogin(srvMessage(template, cred.username)))
         userid, password = query.records[0]
         defer1 = maybeDeferred(cred.checkPassword, password.encode('utf-8'))
-        defer1.addCallback(DBPasswordChecker._checkedPassword, userid).addErrback(logException)
+        defer1.addCallback(DBPasswordChecker._checkedPassword, userid).addErrback(logFailure)
         return defer1
 
     @staticmethod
@@ -264,7 +264,7 @@ class MJServer:
             deferred = self.sendTables(srvUser, [table])
             if user == srvUser:
                 result = deferred
-                deferred.addCallback(sent).addErrback(logException)
+                deferred.addCallback(sent).addErrback(logFailure)
         assert result
         return result
 

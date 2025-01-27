@@ -21,7 +21,7 @@ from qt import QDialog, QVBoxLayout, QGridLayout, \
 from kde import KIcon, KDialog
 from dialogs import Sorry, Information, QuestionYesNo, KDialogIgnoringEscape
 from guiutil import decorateWindow
-from log import i18n, logWarning, logException, logDebug, logError
+from log import i18n, logWarning, logException, logDebug, logError, logFailure
 from message import Message, ChatMessage
 from chat import ChatWindow
 from common import Options, SingleshotOptions, Internal, Debug, isAlive
@@ -443,7 +443,7 @@ class HumanClient(Client):
                     client.logout(
                     ).addCallback(
                         disconnectedClient,
-                        client).addErrback(logException))
+                        client).addErrback(logFailure))
         return DeferredList(deferreds)
 
     def __loggedIn(self, connection:Connection) ->None:
@@ -570,8 +570,8 @@ class HumanClient(Client):
             self.callServer(
                 'needRulesets',
                 needRulesets).addCallback(
-                    gotRulesets).addErrback(logException).addCallback(
-                        self.__receiveTables).addErrback(logException)
+                    gotRulesets).addErrback(logFailure).addCallback(
+                        self.__receiveTables).addErrback(logFailure)
         else:
             self.__receiveTables(tables)
 
@@ -605,7 +605,7 @@ class HumanClient(Client):
                         if self.beginQuestion:
                             self.beginQuestion.cancel()
                         Sorry(i18n('Player %1 has left the table', name)).addCallback(
-                            sorried).addErrback(logException).addCallback(self.showTableList).addErrback(logException)
+                            sorried).addErrback(logFailure).addCallback(self.showTableList).addErrback(logFailure)
                         break
         self.__updateTableList()
         return oldTable, newTable
@@ -687,7 +687,7 @@ class HumanClient(Client):
                 Internal.mainWindow.updateGUI()
         assert self.game
         assert not self.game.isFirstHand()
-        return Information(i18n("Ready for next hand?"), modal=False).addCallback(answered).addErrback(logException)
+        return Information(i18n("Ready for next hand?"), modal=False).addCallback(answered).addErrback(logFailure)
 
     def ask(self, move:'Move', answers:List['ClientMessage']) ->Deferred:
         """server sends move. We ask the user. answers is a list with possible answers,
@@ -808,12 +808,12 @@ class HumanClient(Client):
                 self.game.rotateWinds()
                 _ = self.game.close()
                 if Internal.mainWindow:
-                    _.addCallback(Internal.mainWindow.close).addErrback(logException)
+                    _.addCallback(Internal.mainWindow.close).addErrback(logFailure)
         assert self.table and self.table.tableid == tableid
         if Internal.scene:
             # update the balances in the status bar:
             Internal.scene.mainWindow.updateGUI()
-        Information(i18n(message, *args)).addCallback(yes).addErrback(logException)
+        Information(i18n(message, *args)).addCallback(yes).addErrback(logFailure)
 
     def remote_serverDisconnects(self, result:Optional[str]=None) ->None:
         """we logged out or lost connection to the server.
@@ -900,7 +900,7 @@ class HumanClient(Client):
             ruleset = selectDialog.cbRuleset.current
         deferred = self.__requestNewTableFromServer(ruleset=ruleset)
         if self.hasLocalServer():
-            deferred.addCallback(self.__newLocalTable).addErrback(logException)
+            deferred.addCallback(self.__newLocalTable).addErrback(logFailure)
         assert self.tableList
         self.tableList.requestedNewTable = True
 
@@ -925,7 +925,7 @@ class HumanClient(Client):
             self.connection = None
             if Debug.connections:
                 logDebug(f'sending logout to server for {self}')
-            return self.callServer('logout').addCallback(loggedout, conn).addErrback(logException)
+            return self.callServer('logout').addCallback(loggedout, conn).addErrback(logFailure)
         return succeed(None)
 
     def __logCallServer(self, *args:Any) ->None:

@@ -11,7 +11,7 @@ from typing import Optional, Union, TYPE_CHECKING, Any, Generator, Literal, cast
 
 from twisted.internet.defer import succeed, Deferred
 
-from log import logDebug, logException
+from log import logDebug, logFailure
 from mi18n import i18n, i18nc
 from common import LIGHTSOURCES, Internal, isAlive, ZValues, Debug
 from common import ReprMixin, Speeds, id4
@@ -527,7 +527,7 @@ class ScoringScene(GameScene):
             self.game = None
             return succeed(True)
         return QuestionYesNo(i18n("Do you really want to abort this game?"), always=True).addCallback(
-            answered).addErrback(logException)
+            answered).addErrback(logFailure)
 
     def __moveTile(self, uiTile:UITile, wind:str, toConcealed:bool) ->None:
         """the user pressed a wind letter or X for center, wanting to move a uiTile there"""

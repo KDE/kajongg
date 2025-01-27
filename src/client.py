@@ -17,7 +17,7 @@ from twisted.internet.task import deferLater
 from twisted.internet.defer import Deferred, succeed, fail
 from twisted.python.failure import Failure
 from util import Duration
-from log import logDebug, logException, logWarning
+from log import logDebug, logException, logWarning, logFailure
 from mi18n import i18nc
 from message import Message
 from common import Internal, Debug, Options, ReprMixin
@@ -453,7 +453,7 @@ class Client(pb.Referenceable):
             return answer
         # return answer only after animation ends. Put answer into
         # the Deferred returned by animate().
-        return animate().addCallback(lambda x: answer).addErrback(logException)
+        return animate().addCallback(lambda x: answer).addErrback(logFailure)
 
     def claimed(self, move:Move) ->Optional[Deferred]:
         """somebody claimed a discarded tile"""
