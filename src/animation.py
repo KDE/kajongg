@@ -492,7 +492,8 @@ def animateAndDo(callback:Callable, *args:Any, **kwargs:Any) ->Deferred:
     result = animate()
     if Internal.Preferences:
         # we might be called very early
-        result.addCallback(
-            doCallbackWithSpeed, Internal.Preferences.animationSpeed,
-            callback, *args, **kwargs).addErrback(logFailure)
+        speed = Internal.Preferences.animationSpeed
+        assert isinstance(speed, int)
+        result.addCallback(doCallbackWithSpeed, speed, callback, *args, **kwargs)
+        result.addErrback(logFailure)
     return result
