@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0-only
 
 """
 
-from typing import Dict, Union, Optional, TYPE_CHECKING, List, Tuple, cast
+from typing import Dict, Union, Optional, TYPE_CHECKING, List, Tuple, cast, Iterator, overload
 
 from qt import Qt, QPointF, QPoint, QRectF, QMimeData, QSize
 from qt import QGraphicsRectItem, QSizePolicy, QFrame, QFont
@@ -578,6 +578,28 @@ class Board(QGraphicsRectItem, ReprMixin):
     def faceSize(self) ->'QSizeF':
         """the current face size"""
         return self._tileset.faceSize
+
+    @overload
+    def __getitem__(self, index:Union[int, str, Tile]) -> UITile:
+        ...
+    @overload
+    def __getitem__(self, index:slice) -> List[UITile]:
+        ...
+
+    def __getitem__(self, index):
+        """board[-1] would return rightmost tile, sorted by X position"""
+        if isinstance(index, int):
+            return self.uiTiles[index]
+        if isinstance(index, Tile):
+            return sorted((x for x in self if x.tile is index), key=lambda x: x.sortKey())
+        if isinstance(index, str):
+            _ = Tile(index)
+            return sorted((x for x in self if x.tile is _), key=lambda x: x.sortKey())
+        raise NotImplementedError
+
+    def __iter__(self) -> Iterator[UITile]:
+        """just to make this clear to mypy"""
+        return iter(self.uiTiles)
 
     def placeTile(self, uiTile:UITile) ->None:
         """places the uiTile in the scene"""
