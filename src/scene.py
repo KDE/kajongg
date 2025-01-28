@@ -378,7 +378,7 @@ class PlayingScene(GameScene):
 
     def abort(self) ->'Deferred':
         """abort current game"""
-        def gotAnswer(gotResult:'Deferred', autoPlaying:bool) ->Union[bool, 'Deferred']:
+        def gotAnswer(gotResult:Any, autoPlaying:bool) ->Union[bool, 'Deferred']:
             """user answered"""
             result:Union[bool, 'Deferred'] = gotResult
             if result is True:

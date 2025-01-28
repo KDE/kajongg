@@ -648,13 +648,14 @@ class Connection:
 
     def ping(self) ->None:
         """regularly check if server is still there"""
+        def disconnected(unusedResult:Any) ->None:
+            self.client.remote_serverDisconnects()
         if self.client.connection:
             # when pinging starts, we do have a connection and when the
             # connection goes away, it does not come back
             self.client.callServer(
                 'ping').addCallback(
-                    self.pingLater).addErrback(
-                        self.client.remote_serverDisconnects)
+                    self.pingLater).addErrback(disconnected)
 
     def __str__(self) ->str:
         return f'{self.username}@{self.url}'

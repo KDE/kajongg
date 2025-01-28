@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-2.0-only
 
 """
 
-from typing import Optional, TYPE_CHECKING, Dict
+from typing import Optional, TYPE_CHECKING, Dict, Any
 import sqlite3
 
 from mi18n import i18n, i18nc
@@ -142,7 +142,7 @@ class PlayerList(QDialog):
 
     def delete(self) ->None:
         """delete selected entry"""
-        def answered(result:bool) ->None:
+        def answered(result:Any) ->None:
             """coming from QuestionYesNo"""
             if result is True:
                 self.__deletePlayer(playerId)

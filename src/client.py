@@ -373,7 +373,8 @@ class Client(pb.Referenceable):
         """the Message classes are not pb.copyable, convert them into their names"""
         return Message.OK.name if value is None else Message.jelly(value, value)
 
-    def remote_move(self, playerName:str, command:str, *unusedArgs:Any, **kwargs:Any) ->Deferred:
+    def remote_move(self, playerName:Optional[str], command:Union[Message, str],
+		*unusedArgs:Any, **kwargs:Any) ->Deferred:
         """the server sends us info or a question and always wants us to answer"""
         if Internal.scene and not isAlive(Internal.scene):
             return fail()

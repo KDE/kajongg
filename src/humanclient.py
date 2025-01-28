@@ -645,7 +645,7 @@ class HumanClient(Client):
                 return clientReady()
             return Message.NoGameStart
 
-        def cancelled(unused:'Request') ->'ServerMessage':
+        def cancelled(unused:Failure) ->'ServerMessage':
             """the user does not want to start now. Back to table list"""
             if Debug.table:
                 logDebug(f'{self.name}: Readyforgamestart returns Message.NoGameStart '
@@ -784,10 +784,10 @@ class HumanClient(Client):
         return answer, args
 
 
-    def __answerError(self, answer:Message, move:'Move', answers:List[Message]) ->None:
+    def __answerError(self, result: Any, move:'Move', answers:List['ClientMessage']) ->None:
         """an error happened while determining the answer to server"""
         logException(
-            f"{self.game.myself.name if self.game else 'NOGAME'} {answer} {move} {answers}")
+            f"{result} {self.game.myself.name if self.game else 'NOGAME'} {move} {answers}")
 
     def remote_abort(self, tableid:int, message: str, *args:Any) ->None:
         """the server aborted this game"""
