@@ -109,7 +109,7 @@ def parseOptions() ->None:
     parser.process(Internal.app)
     for option in options:
         if parser.isSet(option):
-            value = parser.value(option)
+            value = parser.value(option) if option.valueName() else ''
             if option.optName == 'debug':
                 msg = Debug.setOptions(value)
                 if msg:
