@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-2.0
 
 from itertools import chain
 from types import GeneratorType
-from typing import Dict, Any, Optional, cast, SupportsIndex, Union, Tuple, Sequence, Type
+from typing import Dict, Any, Optional, cast, Union, Tuple, Sequence, Type
 from typing import Iterator, List, TYPE_CHECKING, Generator, Iterable
 from log import logException
 from mi18n import i18n, i18nc
@@ -563,7 +563,7 @@ class PieceList(TileList):
             return any(x.name2() == _ for x in self)
         return any(x is value for x in self)
 
-    def index(self, value : SupportsIndex, start: int =None , stop: int =None) ->int:  # type: ignore
+    def index(self, value : Tile, start: int =None , stop: int =None) ->int:  # type: ignore
         """Also accept Tile."""
         if value.__class__ is Tile:
             for result, _ in enumerate(self):

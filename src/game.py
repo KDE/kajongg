@@ -748,6 +748,7 @@ class Game:
             guilty = winner.usedDangerousFrom
             payAction = self.ruleset.findUniqueOption('payforall') if guilty else None
             if payAction:
+                assert isinstance(guilty, Player)  # mypy should be able to infer this
                 if Debug.dangerousGame:
                     self.debug(f'{self.handId}: winner {winner}. {guilty} pays for all')
                 guilty.hand.usedRules.append(UsedRule(payAction))

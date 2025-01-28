@@ -63,7 +63,7 @@ if NOTFOUND:
 if TYPE_CHECKING:
     from deferredutil import Request
     from twisted.internet.defer import Deferred
-    from qt import QSize, QKeySequence
+    from qt import QSize
     from scene import GameScene
 
 def cleanExit(*unusedArgs:Any) ->None:
