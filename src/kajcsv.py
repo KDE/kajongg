@@ -49,7 +49,8 @@ class Csv:
 class CsvRow(ReprMixin):
     """represent a row in kajongg.csv"""
 
-    fields = IntEnum('Field', 'RULESET AI COMMIT PY_VERSION GAME TAGS PLAYERS', start=0)
+    Fields = IntEnum('Fields', 'RULESET AI COMMIT PY_VERSION GAME TAGS PLAYERS', start=0)
+    # FIXME: namedtuple?
 
     commitDates : Dict[str, datetime.datetime] = {}
 
@@ -85,60 +86,60 @@ class CsvRow(ReprMixin):
     @property
     def game(self) ->str:
         """return the game"""
-        return self.row[self.fields.GAME]
+        return self.row[self.Fields.GAME]
 
     @game.setter
     def game(self, value:str) ->None:
-        self.row[self.fields.GAME] = value
+        self.row[self.Fields.GAME] = value
 
     @property
     def ruleset(self) ->str:
         """return the ruleset"""
-        return self.row[self.fields.RULESET]
+        return self.row[self.Fields.RULESET]
 
     @ruleset.setter
     def ruleset(self, value:str) ->None:
-        self.row[self.fields.RULESET] = value
+        self.row[self.Fields.RULESET] = value
 
     @property
     def aiVariant(self) ->str:
         """return the AI used"""
-        return self.row[self.fields.AI]
+        return self.row[self.Fields.AI]
 
     @aiVariant.setter
     def aiVariant(self, value:str) ->None:
-        self.row[self.fields.AI] = value
+        self.row[self.Fields.AI] = value
 
     @property
     def commit(self) ->str:
         """return the git commit"""
-        return self.row[self.fields.COMMIT]
+        return self.row[self.Fields.COMMIT]
 
     @commit.setter
     def commit(self, value:str) ->None:
-        self.row[self.fields.COMMIT] = value
+        self.row[self.Fields.COMMIT] = value
 
     @property
     def py_version(self) ->str:
         """return the python version"""
-        return self.row[self.fields.PY_VERSION]
+        return self.row[self.Fields.PY_VERSION]
 
     @py_version.setter
     def py_version(self, value:str) ->None:
-        self.row[self.fields.PY_VERSION] = value
+        self.row[self.Fields.PY_VERSION] = value
 
     @property
     def tags(self) ->str:
         """return the tags"""
-        return self.row[self.fields.TAGS]
+        return self.row[self.Fields.TAGS]
 
     @tags.setter
     def tags(self, value:str) ->None:
-        self.row[self.fields.TAGS] = value
+        self.row[self.Fields.TAGS] = value
 
     def result(self) ->Tuple[str, ...]:
         """return a tuple with the fields holding the result"""
-        return tuple(self.row[self.fields.PLAYERS:])
+        return tuple(self.row[self.Fields.PLAYERS:])
 
     def write(self) ->None:
         """write to Options.csv"""
@@ -154,7 +155,7 @@ class CsvRow(ReprMixin):
         """return string for comparisons"""
         result = [self.game, self.ruleset, self.aiVariant,
                   self.commitDate or datetime.datetime.fromtimestamp(0), self.py_version]
-        result.extend(self.row[self.fields.TAGS:])
+        result.extend(self.row[self.Fields.TAGS:])
         return result
 
     def __lt__(self, other:Any) ->bool:
@@ -170,17 +171,17 @@ class CsvRow(ReprMixin):
     def data(self, field:int) ->str:
         """return a string representing this field for messages"""
         result = self.row[field]
-        if field == self.fields.COMMIT:
+        if field == self.Fields.COMMIT:
             result = f'{result}({self.commitDate})'
         return result
 
     def differs_for(self, other:'CsvRow') ->Optional[Tuple[str, str]]:
         """return the field names for the source attributes causing a difference.
         Possible values are commit and py_version. If both rows are identical, return None."""
-        if self.row[self.fields.PLAYERS:] != other.row[self.fields.PLAYERS:]:
+        if self.row[self.Fields.PLAYERS:] != other.row[self.Fields.PLAYERS:]:
             differing = []
             same = []
-            for cause in (self.fields.COMMIT, self.fields.PY_VERSION):
+            for cause in (self.Fields.COMMIT, self.Fields.PY_VERSION):
                 if self.row[cause] != other.row[cause]:
                     _ = f'{cause.name} {self.data(cause)} != {other.data(cause)}'
                     differing.append(_)

@@ -408,7 +408,7 @@ class CSV(ReprMixin):
             rows = list(reversed(sorted(
                 x for x in self.rows
                 if ruleset == x.ruleset and aiVariant == x.aiVariant and game == x.game)))
-            for fixedField in (CsvRow.fields.PY_VERSION, CsvRow.fields.COMMIT):
+            for fixedField in (CsvRow.Fields.PY_VERSION, CsvRow.Fields.COMMIT):
                 for fixedValue in set(x[fixedField] for x in rows):
                     checkRows = [x for x in rows if x[fixedField] == fixedValue]
                     for warned in self.compareRows(checkRows):

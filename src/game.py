@@ -844,8 +844,8 @@ class PlayingGame(Game):
                 self.csvTags.append(f'MEM:{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}')  # pylint:disable=possibly-used-before-assignment
             if Options.rounds:
                 self.csvTags.append(f'ROUNDS:{Options.rounds}')
-            _ = CsvRow.fields
-            row = [''] * CsvRow.fields.PLAYERS
+            _ = CsvRow.Fields
+            row = [''] * CsvRow.Fields.PLAYERS
             row[_.GAME] = str(self.seed)
             row[_.RULESET] = self.ruleset.name
             row[_.AI] = Options.AI
