@@ -567,11 +567,11 @@ class HumanClient(Client):
         rulesetHashes = {x[1] for x in tables}
         needRulesets = [x for x in rulesetHashes if not Ruleset.hashIsKnown(x)]
         if needRulesets:
-            self.callServer(
-                'needRulesets',
-                needRulesets).addCallback(
-                    gotRulesets).addErrback(logFailure).addCallback(
-                        self.__receiveTables).addErrback(logFailure)
+            _ = self.callServer('needRulesets', needRulesets)
+            _ = _.addCallback(gotRulesets)
+            _ = _.addErrback(logFailure)
+            _ = _.addCallback(self.__receiveTables)
+            _.addErrback(logFailure)
         else:
             self.__receiveTables(tables)
 
