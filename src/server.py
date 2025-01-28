@@ -464,7 +464,7 @@ def kajonggServer() ->None:
         sys.exit(1)
     realm = MJRealm()
     realm.server = MJServer()
-    kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])
+    kajonggPortal = portal.Portal(realm, [DBPasswordChecker()])  # type: ignore[arg-type,list-item]
     import predefined
     predefined.load()
     try:
