@@ -62,7 +62,7 @@ parts:
         rsync -a --ignore-existing $CRAFT_PART_INSTALL/ /
   kajongg:
     after:
-    - libkmahjongg
+      - libkmahjongg
     parse-info:
       - usr/share/metainfo/org.kde.kajongg.appdata.xml
     plugin: cmake
