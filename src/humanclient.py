@@ -35,6 +35,7 @@ from rule import Ruleset
 from player import PlayingPlayer
 from game import PlayingGame
 from visible import VisiblePlayingGame
+from tile import Tile
 
 
 
@@ -42,7 +43,7 @@ if TYPE_CHECKING:
     from qt import QEvent, QKeyEvent
     from deferredutil import Request
     from move import Move
-    from tile import Tile, Meld, MeldList
+    from tile import Meld, MeldList
     from uitile import UITile
     from message import ClientMessage, ServerMessage
     from scene import PlayingScene
@@ -264,9 +265,9 @@ class ClientDialog(QDialog):  # pylint:disable=too-many-instance-attributes
             result = [x for x in self.buttons if x.message == answer][0]
             result.setFocus()
             if answer in [Message.Discard, Message.OriginalCall]:
-                for uiTile in game.myself.handBoard.uiTiles:
-                    if uiTile.tile is parameter:
-                        game.myself.handBoard.focusTile = uiTile
+                handBoard = game.myself.handBoard
+                assert isinstance(parameter, Tile)
+                handBoard.focusTile = handBoard[parameter][0]  # type:ignore[index]
         return result
 
     def askHuman(self, move:'Move', answers:List['ClientMessage'], deferred:Deferred) ->None:

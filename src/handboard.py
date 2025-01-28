@@ -171,7 +171,7 @@ class HandBoard(Board):
     def lowerHalfTiles(self) ->List[UITile]:
         """return a list with all single tiles of the lower half melds
         without boni"""
-        return [x for x in self.uiTiles if x.yoffset > 0 and not x.isBonus]
+        return [x for x in self if x.yoffset > 0 and not x.isBonus]
 
     def newLowerMelds(self) ->MeldList:
         """a list of melds for the hand as it should look after sync"""
@@ -313,7 +313,7 @@ class HandBoard(Board):
         assert self.player
         for tile in self.player.bonusTiles:
             logExposed.append(tile)
-        for uiTile in self.uiTiles:
+        for uiTile in self:
             if uiTile.yoffset == 0 or uiTile.isBonus:
                 physExposed.append(uiTile.tile)
             else:
@@ -410,15 +410,13 @@ class PlayingHandBoard(HandBoard):
         if self.focusTile and self.focusTile.tile is tile:
             lastDiscard = self.focusTile
         else:
-            matchingTiles = sorted(self.tilesByElement(tile),
-                                   key=lambda x: x.xoffset)
             # if an opponent player discards, we want to discard from the
             # right end of the hand# thus minimizing tile movement
             # within the hand
-            lastDiscard = matchingTiles[-1]
+            lastDiscard = self[tile][-1]  # type:ignore[index]
         assert Internal.scene
         cast('PlayingScene', Internal.scene).discardBoard.discardTile(lastDiscard)
-        for uiTile in self.uiTiles:
+        for uiTile in self:
             uiTile.focusable = False
 
     def addUITile(self, uiTile:UITile) ->None:

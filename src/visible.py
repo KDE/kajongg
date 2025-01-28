@@ -171,10 +171,8 @@ class VisiblePlayingPlayer(VisiblePlayer, PlayingPlayer):
     def getsRobbed(self, tile:Tile) ->None:
         """used for robbing the kong from this player"""
         PlayingPlayer.getsRobbed(self, tile)
-        tile = tile.exposed
         assert self.handBoard
-        hbTiles = self.handBoard.uiTiles
-        lastDiscard = [x for x in hbTiles if x.tile == tile][-1]
+        lastDiscard = self.handBoard[tile.exposed][-1]  # type:ignore[index]
         lastDiscard.change_name(lastDiscard.concealed)
         cast('PlayingScene', Internal.scene).discardBoard.discardTile(lastDiscard)
         assert lastDiscard.isConcealed

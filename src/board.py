@@ -278,7 +278,7 @@ class Board(QGraphicsRectItem, ReprMixin):
         the next list element.
         respect board orientation: Right Arrow should always move right
         relative to the screen, not relative to the board"""
-        return sorted((x for x in self.uiTiles if x.focusable), key=lambda x: x.sortKey(sortDir))
+        return sorted((x for x in self if x.focusable), key=lambda x: x.sortKey(sortDir))
 
     @property
     def hasLogicalFocus(self) ->bool:
@@ -340,7 +340,7 @@ class Board(QGraphicsRectItem, ReprMixin):
             tiles = [
                 x for x in tiles if (x.xoffset,
                                      x.yoffset) != oldPos or x == self.focusTile]
-            assert tiles, [str(x) for x in self.uiTiles]
+            assert tiles, [str(x) for x in self]
             tiles.append(tiles[0])
             self.focusTile = tiles[tiles.index(self.focusTile) + 1]
 
@@ -400,14 +400,14 @@ class Board(QGraphicsRectItem, ReprMixin):
 
     def tileAt(self, xoffset:int, yoffset:int, level:int=0) ->Optional[UITile]:
         """if there is a uiTile at this place, return it"""
-        for uiTile in self.uiTiles:
+        for uiTile in self:
             if (uiTile.xoffset, uiTile.yoffset, uiTile.level) == (xoffset, yoffset, level):
                 return uiTile
         return None
 
     def tilesByElement(self, element:Tile) ->List[UITile]:
         """return all child items holding a uiTile for element"""
-        return [x for x in self.uiTiles if x.tile is element]
+        return [x for x in self if x.tile is element]
 
     def rotatedLightSource(self) ->str:
         """the light source we need for the original uiTile before it is rotated"""
@@ -491,7 +491,7 @@ class Board(QGraphicsRectItem, ReprMixin):
 
     def showShadowsChanged(self, unusedOldValue:bool, newValue:bool) ->None:
         """set active lightSource"""
-        for uiTile in self.uiTiles:
+        for uiTile in self:
             uiTile.setClippingFlags()
         self._reload(self.tileset, showShadows=newValue)
 
@@ -536,7 +536,7 @@ class Board(QGraphicsRectItem, ReprMixin):
             self._tileset = tileset
             self._lightSource = lightSource
             self.setGeometry()
-            for uiTile in self.uiTiles:
+            for uiTile in self:
                 self.placeTile(uiTile)
                 uiTile.update()
             self.computeRect()
@@ -660,7 +660,7 @@ class CourtBoard(Board):
         yScaleFactor = yAvail / yNeeded
         self.setPos(newSceneX, newSceneY)
         self.setScale(min(xScaleFactor, yScaleFactor))
-        for uiTile in self.uiTiles:
+        for uiTile in self:
             assert uiTile.board
             uiTile.board.placeTile(uiTile)
 
@@ -678,7 +678,7 @@ class SelectorBoard(CourtBoard):
 
     def load(self, game:'Game') ->None:
         """load the tiles according to game.ruleset"""
-        for uiTile in self.uiTiles:
+        for uiTile in self:
             uiTile.setBoard(None)
         self.uiTiles = []
         self.allSelectorTiles = [UITile(x) for x in elements.all(game.ruleset)]
@@ -692,7 +692,7 @@ class SelectorBoard(CourtBoard):
                 self.__placeAvailable(uiTile)
                 uiTile.dark = False
                 uiTile.focusable = True
-            self.focusTile = self.tilesByElement(Tile('c1'))[0]
+            self.focusTile = self['c1'][0]  # type:ignore[index]
 
     def debug_name(self) ->str:
         """for debugging messages"""
