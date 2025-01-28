@@ -105,14 +105,15 @@ class Animation(QPropertyAnimation, ReprMixin):
 
     def __str__(self) ->str:
         """for debug messages"""
-        currentValue = 'notAlive'
-        endValue = 'notAlive'
-        targetObject = 'notAlive'
-        if isAlive(self) and isAlive(self.targetObject()):
-            currentValue = getattr(self.targetObject(), self.pName())
-            endValue = self.endValue()
-            if _ := self.targetObject():
-                targetObject:Union[QObject, str] = _
+        if not isAlive(self):
+            return 'notAlive'
+        if not isAlive(self.targetObject()):
+            return f'{self.ident()} {self.pName()}: target notAlive'
+        currentValue = getattr(self.targetObject(), self.pName())
+        endValue = self.endValue()
+        targetObject = None
+        if _ := self.targetObject():
+            targetObject = _
         return (f'{self.ident()} {self.pName()}: {self.formatValue(currentValue)}->'
                 f'{self.formatValue(endValue)} for {targetObject} duration={int(self.duration())}ms')
 
