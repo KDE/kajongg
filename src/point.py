@@ -9,11 +9,11 @@ SPDX-License-Identifier: GPL-2.0-only
 
 from functools import total_ordering
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Union, TYPE_CHECKING
 
-from log import logWarning, logException
 from common import ReprMixin
-from wind import Wind, East, NoWind
+from wind import Wind, East
+from query import Query
 
 if TYPE_CHECKING:
     from game import Game
@@ -22,77 +22,89 @@ if TYPE_CHECKING:
 @total_ordering
 class Point(ReprMixin):
 
-    """A point in time of a game. Useful for positioning after abort/restart"""
+    """A point in time of a game. Useful for positioning after abort/restart
 
-    def __init__(self, game:'Game', string:Optional[str]=None, stringIdx:int=0) ->None:
+        Point does not care about wind or players or about any rules.
+
+        seed: the seed for the random generator, shown in window title
+        prevailing: the prevailing wind of the current round
+        rotated: how often we rotated within current round
+        notRotated: how often we did NOT rotate since last rotation
+        moveCount: Number of executed moves within current hand
+    """
+
+    def __init__(self, game:'Game', source:Union[str, int, 'Game', 'Point']) -> None:
+        """Default values point to start of game"""
         self.game = game
-        self.seed = game.seed
+        self.seed = 0
         self.prevailing:Wind = East
         self.rotated = 0
         self.notRotated = 0
-        self.moveCount = 0
-        if string is None:
-            self.prevailing = game.roundWind
-            self.rotated = game.rotated
-            self.notRotated = game.notRotated
-            self.moveCount = len(game.moves)
-        else:
-            self.__scanPoint(string, stringIdx)
-        assert self.rotated < 5, self
+        self.moveCount = 0   # within current hand
+        self.handCount = 0   # unique ID over all hands of a game for data base
 
-    def __scanPoint(self, string:str, stringIdx:int) ->None:
-        """get the --game option.
-        stringIdx 0 is the part in front of ..
-        stringIdx 1 is the part after ..
+        if isinstance(source, str):
+            self.__init_from_string(source)
+        elif isinstance(source, int):
+            self.__init_from_db(source)
+        elif isinstance(source, Point):
+            self.__init_from_point(source)
+        else:
+            self.__init_from_game(source)
+
+    def __init_from_string(self, string:str) ->None:
+        """Init myself from string
+
+            String format: SEED/Wrnm
+            where only trailing parameters can be omitted.
+
+            SEED: 1..n digits: the seed
+            W: 1 char:         prevailing wind
+            r: 0..1 digit:     rotations within current round
+            n: 0..n chars:     how often we currently did not rotate. Encoded in letters a..z
+            m: 0..n digits:    Number of current move within current hand
         """
-        # pylint: disable=too-many-return-statements,too-many-branches
-        if not string:
-            return
-        seed = int(string.split('/')[0])
-        assert self.seed is None or self.seed == seed, string
-        self.seed = seed
-        if '/' not in string:
-            if stringIdx == 1:
-                self.prevailing = NoWind
-            return
-        string1 = string.split('/')[1]
-        if not string1:
-            logException(f'--game={string} must specify the wanted round')
-        parts = string1.split('..')
-        if len(parts) == 2:
-            if stringIdx == 0 and parts[0] == '':
-                return
-            if stringIdx == 1 and parts[1] == '':
-                self.prevailing = NoWind
-                return
-        point = parts[min(stringIdx, len(parts) - 1)]
-        if point[0].lower() not in 'eswn':
-            logException(f'--game={string} must specify the round wind')
-        handWind = Wind(point[0])
-        ruleset = self.game.ruleset
-        self.prevailing = handWind
-        minRounds = ruleset.minRounds  # type:ignore[attr-defined]
-        if self.roundsFinished > minRounds:
-            logWarning(
-                f'Ruleset {ruleset.name} has {int(minRounds)} minimum rounds '
-                f'but you want round {int(self.roundsFinished + 1)}({handWind})')
-            self.prevailing = Wind.all4[minRounds - 1]
-            return
-        self.rotated = int(point[1]) - 1
-        if self.rotated > 3:
-            logWarning(
-                f'You want {int(self.rotated)} rotations, reducing to maximum of 3')
-            self.rotated = 3
-            return
-        for char in point[2:]:
-            if char < 'a':
-                logWarning(f'you want {char}, changed to a')
-                char = 'a'
-            if char > 'z':
-                logWarning(f'you want {char}, changed to z')
-                char = 'z'
-            self.notRotated = self.notRotated * 26 + ord(char) - ord('a') + 1
-        return
+
+        self.seed = int(string.split('/')[0])
+        normalized = string
+        if normalized.endswith('/'):
+            normalized = normalized[:-1]
+        if '/' in normalized:
+            rest = normalized.split('/')[1]
+            self.prevailing = Wind(rest[0])
+            rest = rest[1:]
+            if rest:
+                self.rotated = int(rest[0])
+                rest = rest[1:]
+                while rest and rest[0] >= 'a' and rest[0] <= 'z':
+                    self.notRotated = self.notRotated * 26 + ord(rest[0]) - ord('a') + 1
+                    rest = rest[1:]
+                if rest:
+                    self.moveCount = int(rest)
+
+    def __init_from_point(self, other:'Point') ->None:
+        """Init myself from a Game instance"""
+        self.seed = other.seed
+        self.prevailing = other.prevailing
+        self.rotated = other.rotated
+        self.notRotated = other.notRotated
+        self.moveCount = other.moveCount
+        self.handCount = other.handCount
+
+    def __init_from_game(self, game:'Game') ->None:
+        """Init myself from a Game instance"""
+        self.seed = game.seed
+        self.prevailing = game.roundWind
+        self.rotated = game.rotated
+        self.notRotated = game.notRotated
+        self.moveCount = len(game.moves)
+        self.handCount = game.handctr
+
+    def __init_from_db(self, gameid:int) ->None:
+        """last recorded position"""
+        self.handctr, self.rotated, self.notRotated, self.prevailing = Query(
+            'select {fields} from score where game=? order by hand desc limit 1', (gameid, ),
+            fields='hand, rotated, notrotated, prevailing').tuple()
 
     def prompt(self, withSeed:bool=True, withAI:bool=True, withMoveCount:bool=False) ->str:
         """
@@ -178,3 +190,54 @@ class Point(ReprMixin):
             return NotImplemented
         return (self.prevailing, self.rotated, self.notRotated) < (
             other.prevailing, other.rotated, other.notRotated)
+
+class PointRange(ReprMixin):
+
+    """Represents a range of points: Point..Point
+        start and end are included.
+        If end is None: open end
+    """
+
+    def __init__(self, game:'Game',
+            first_point:Optional[Point]=None,
+            last_point:Optional[Point]=None) ->None:
+
+        if first_point is None:
+            first_point = Point(game, game.seed)
+        if first_point > last_point:
+            raise UserWarning(f'{first_point}..{last_point} is a negative range')
+        self.first_point = first_point
+        self.last_point = last_point
+
+    @classmethod
+    def from_string(cls, game: 'Game', string:str) -> 'PointRange':
+        """parse a string like first..last"""
+        if string is None:
+            string = ''
+
+        full_str = string
+        if '/' not in full_str:
+            full_str += '/'
+        seed_str, pos_str = full_str.split('/')
+        seed = int(seed_str)
+
+        positions = pos_str.split('..')
+        first_pos = Point(game, f'{seed}/{positions[0]}')
+
+        last_pos:Optional[Point] = None   # default
+        if len(positions) > 1:
+            last_pos = Point(game, f'{seed}/{positions[1]}')
+
+        return PointRange(game, first_pos, last_pos)
+
+    @property
+    def seed(self) ->int:
+        """from first_pos"""
+        return self.first_point.seed
+
+    def __str__(self) ->str:
+        """used in traffic"""
+        result = f'{self.first_point.seed}/{self.first_point}'
+        if self.last_point:
+            result += f'..{self.last_point}'
+        return result

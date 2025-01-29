@@ -83,7 +83,7 @@ class Game:
         self.gameid:Optional[int] = gameid
         self.playOpen:bool = False
         self.autoPlay:bool = False
-        self.handctr = 0
+        self.handctr:int = 0
         self.roundHandCount = 0
         self.divideAt:Optional[int] = None
         self.__lastDiscard:Optional[Tile] = None  # always uppercase
@@ -125,7 +125,7 @@ class Game:
     @property
     def point(self) ->Point:
         """current position in game"""
-        result = Point(self)
+        result = Point(self, self)
         if result != self._currentPoint:
             self._prevPoint = self._currentPoint
             self._currentPoint = result
@@ -593,9 +593,10 @@ class Game:
         """The game is over after minRounds completed rounds. Also,
         check if we reached the second point defined by --game.
         If we did, the game is over too"""
-        last = Point(self, self.wantedGame, 1)
-        if self.point > last:
-            return True
+        # FIXME: re-enable
+        # last = Point(self, self.wantedGame)
+        # if self.point > last:
+        #     return True
         if Options.rounds:
             return self.roundsFinished >= Options.rounds
         if self.ruleset:
@@ -866,9 +867,10 @@ class PlayingGame(Game):
     def _scanGameOption(self) ->None:
         """scan the --game option and go to start of wanted hand"""
         if self.wantedGame and '/' in self.wantedGame:
-            first, last = (Point(self, self.wantedGame, x) for x in (0, 1))
-            if first > last:
-                raise UserWarning(f'{first}..{last} is a negative range')
+            # FIXME re-enable
+            # first, last = (Point(self, self.wantedGame, x) for x in (0, 1))
+            # if first > last:
+            #     raise UserWarning(f'{first}..{last} is a negative range')
             point = Point(self, self.wantedGame)
             self.goto(point)
 
