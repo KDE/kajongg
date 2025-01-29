@@ -145,6 +145,8 @@ class Point(ReprMixin):
         return self.prompt()
 
     def __eq__(self, other:object) ->bool:
+        if other is None:
+            return False
         if not isinstance(other, Point):
             return NotImplemented
         return (self.roundsFinished, self.rotated, self.notRotated) == \
@@ -154,12 +156,18 @@ class Point(ReprMixin):
         return not self == other
 
     def __gt__(self, other:object) ->bool:
+        if other is None:
+            # open end
+            return False
         if not isinstance(other, Point):
             return NotImplemented
         return (self.roundsFinished, self.rotated, self.notRotated) > (
             other.roundsFinished, other.rotated, other.notRotated)
 
     def __lt__(self, other:object) ->bool:
+        if other is None:
+            # open end
+            return True
         if not isinstance(other, Point):
             return NotImplemented
         return (self.roundsFinished, self.rotated, self.notRotated) < (
