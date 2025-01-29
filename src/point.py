@@ -153,6 +153,12 @@ class Point(ReprMixin):
     def __ne__(self, other:object) ->bool:
         return not self == other
 
+    def __gt__(self, other:object) ->bool:
+        if not isinstance(other, Point):
+            return NotImplemented
+        return (self.roundsFinished, self.rotated, self.notRotated) > (
+            other.roundsFinished, other.rotated, other.notRotated)
+
     def __lt__(self, other:object) ->bool:
         if not isinstance(other, Point):
             return NotImplemented
