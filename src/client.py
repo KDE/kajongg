@@ -377,7 +377,7 @@ class Client(pb.Referenceable):
         """the server sends us info or a question and always wants us to answer"""
         if Internal.scene and not isAlive(Internal.scene):
             return fail()
-        if self.game:
+        if self.game and playerName:
             player = cast(PlayingPlayer, self.game.playerByName(playerName))
         elif playerName:
             player = PlayingPlayer(None, playerName)
