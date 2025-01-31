@@ -692,7 +692,7 @@ class Action(QAction):
 
     def __init__(self, parent:'KXmlGuiWindow', name:Optional[str]=None,
         icon:Optional[str]=None, slot:Optional[Callable]=None,
-        shortcut:Union[QKeySequence, Qt.Key, None]=None, actionData:Optional[Union[str, Type[QWidget]]]=None) ->None:
+        shortcut:Optional[str]=None, actionData:Optional[Union[str, Type[QWidget]]]=None) ->None:
         super().__init__(parent)
         if icon:
             self.setIcon(KIcon(icon))
@@ -703,11 +703,7 @@ class Action(QAction):
                 name = ''
             parent.actionCollection().addAction(name, self)
         if shortcut:
-            if isinstance(shortcut, QKeyCombination):
-                shortcut = shortcut.key()
-                assert shortcut
-            shortcut = cast(Qt.Key, shortcut)
-            self.setShortcut(QKeySequence(shortcut | Qt.KeyboardModifier.ControlModifier))  # type:ignore[operator]
+            self.setShortcut(QKeySequence(shortcut))
             self.setShortcutContext(Qt.ShortcutContext.ApplicationShortcut)
         if actionData is not None:
             self.setData(actionData)

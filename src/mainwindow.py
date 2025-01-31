@@ -188,7 +188,7 @@ class MainWindow(KXmlGuiWindow):
         result.setWidth(width)
         return result
 
-    def _kajonggToggleAction(self, name:str, icon:str, shortcut:Optional['Qt.Key']=None,
+    def _kajonggToggleAction(self, name:str, icon:str, shortcut:Optional[str]=None,
         actionData:Optional[Union[str, Type['QWidget']]]=None) ->Action:
         """a checkable action"""
         res = Action(self,
@@ -227,26 +227,26 @@ class MainWindow(KXmlGuiWindow):
             "scoreGame",
             "draw-freehand",
             self.startScoringGame,
-            Qt.Key.Key_C)
+            "Ctrl+C")
         self.actionPlayGame = Action(
             self,
             "play",
             "arrow-right",
             self.playGame,
-            Qt.Key.Key_N)
+            "Ctrl+N")
         self.actionAbortGame = Action(
             self,
             "abort",
             "dialog-close",
             self.abortAction,
-            Qt.Key.Key_W)
+            "Ctrl+W")
         self.actionAbortGame.setEnabled(False)
         self.actionQuit = Action(
             self,
             "quit",
             "application-exit",
             self.close,
-            Qt.Key.Key_Q)
+            "Ctrl+Q")
         self.actionPlayers = Action(
             self,
             "players", "im-user", self.slotPlayers)
@@ -256,33 +256,33 @@ class MainWindow(KXmlGuiWindow):
             "games-kajongg-law",
             self.slotRulesets)
         self.actionChat = self._kajonggToggleAction("chat", "call-start",
-                                                    shortcut=Qt.Key.Key_H, actionData=ChatWindow)
+                                                    shortcut="Ctrl+H", actionData=ChatWindow)
         self.actionChat.setEnabled(False)
         self.actionAngle = Action(
             self,
             "angle",
             "object-rotate-left",
             self.changeAngle,
-            Qt.Key.Key_G)
+            "Ctrl+G")
         self.actionAngle.setEnabled(False)
         self.actionScoreTable = self._kajonggToggleAction(
             "scoreTable", "format-list-ordered",
-            Qt.Key.Key_T, actionData=ScoreTable)
+            "Ctrl+T", actionData=ScoreTable)
         self.actionScoreTable.setEnabled(False)
         self.actionExplain = self._kajonggToggleAction(
             "explain", "applications-education",
-            Qt.Key.Key_E, actionData=ExplainView)
+            "Ctrl+E", actionData=ExplainView)
         self.actionExplain.setEnabled(False)
         self.actionFullscreen = self._kajonggToggleAction(
             "fullscreen", "view-fullscreen",
-            shortcut=cast(Qt.Key, Qt.Key.Key_F | Qt.KeyboardModifier.ShiftModifier))  # type:ignore[operator]
+            shortcut="Ctrl+Shift+F")
         self.actionFullscreen.toggled.connect(self.fullScreen)
         self.actionAutoPlay = Action(
             self,
             "demoMode",
             "arrow-right-double",
             None,
-            Qt.Key.Key_D)
+            "Ctrl+D")
         self.actionAutoPlay.setCheckable(True)
         self.actionAutoPlay.setEnabled(True)
         self.actionAutoPlay.toggled.connect(self._toggleDemoMode)
