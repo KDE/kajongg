@@ -112,23 +112,6 @@ class SceneWithFocusRect(QGraphicsScene):
         self.focusRect = FocusRect()
         self.addItem(self.focusRect)
 
-    def focusInEvent(self, event:Optional['QFocusEvent']) ->None:
-        """
-        Work around a qt bug. See U{https://bugreports.qt-project.org/browse/QTBUG-32890}.
-        This can be reproduced as follows:
-         - ./kajongg.py --game=2/E2 --demo --ruleset=BMJA
-               such that the human player is the first one to discard a tile.
-         - wait until the main screen has been built
-         - click with the mouse into the middle of that window
-         - press left arrow key
-         - this will violate the assertion in UITile.keyPressEvent.
-        """
-        prev = self.focusItem()
-        if event:
-            super().focusInEvent(event)
-        if prev and bool(prev.flags() & QGraphicsItem.GraphicsItemFlag.ItemIsFocusable) and prev != self.focusItem():
-            self.setFocusItem(prev)
-
     @property
     def focusBoard(self) ->Optional['Board']:
         """get / set the board that has its focusRect shown"""

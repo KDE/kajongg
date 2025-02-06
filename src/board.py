@@ -362,8 +362,7 @@ class Board(QGraphicsRectItem, ReprMixin):
             self.focusTile = tiles[tiles.index(self.focusTile) + 1]
 
     def mapMouseTile(self, uiTile:UITile) ->UITile:
-        """map the pressed tile to the wanted tile. For melds, this would
-        be the first tile no matter which one is pressed"""
+        """map the pressed tile to the wanted tile. Scoring games need this"""
         return uiTile
 
     def uiMeldWithTile(self, uiTile:UITile, remove:bool=False) ->UIMeld:  # pylint: disable=unused-argument
@@ -885,20 +884,14 @@ class FittingView(QGraphicsView):
                         items.append(other)
         return uniqueList(sorted(items, key=lambda x: -x.level))
 
-    def mousePressEvent(self, event:Optional['QMouseEvent']) ->None:
-        """set blue focus frame"""
-        if not event:
-            return
+    def __setFocusTile(self, event:'QMouseEvent') ->Optional[UITile]:
+        """set focus on first tile of meld"""
         tiles = self.tileAt(event.pos())
         if tiles:
-            if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
-                for uiTile in tiles:
-                    assert uiTile.board
-                    print(
-                        f'{str(uiTile)}: board.level:{uiTile.board.level}')
-            board = tiles[0].board
+            tile = tiles[0]
+            board = tile.board
             assert board
-            uiTile = board.mapMouseTile(tiles[0])
+            uiTile = board.mapMouseTile(tile)
             if uiTile.focusable:
                 board.focusTile = uiTile
                 board.hasLogicalFocus = True
@@ -906,18 +899,31 @@ class FittingView(QGraphicsView):
                 if hasattr(Internal.scene, 'clientDialog'):
                     if Internal.scene.clientDialog:
                         Internal.scene.clientDialog.buttons[0].setFocus()
-                self.tilePressed = uiTile
-            else:
-                event.ignore()
-        else:
-            self.tilePressed = None
-            event.ignore()
+                return uiTile
+        event.ignore()
+        return None
+
+    def mousePressEvent(self, event:Optional['QMouseEvent']) ->None:
+        """set blue focus frame"""
+        if event:
+            self.tilePressed = self.__setFocusTile(event)
+            if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
+                for uiTile in self.tileAt(event.pos()):
+                    assert uiTile.board
+                    print(f'{uiTile}: board.level:{uiTile.board.level}')
+            super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event:Optional['QMouseEvent']) ->None:
         """release self.tilePressed"""
         if event:
-            self.tilePressed = None
             super().mouseReleaseEvent(event)
+            # scene.focusItem() may have disappeared since mousePressEvent:
+            # 1. start scoring game, if needed select main window by clicking on its frame
+            # 2. click on a tile in the center. This will set focusItem to None!
+            # 3. use cursor to move position (hjkl): this fails
+            # so we must call __setFocusTile() again
+            self.__setFocusTile(event)
+            self.tilePressed = None
 
     def mouseMoveEvent(self, event:Optional['QMouseEvent']) ->None:
         """selects the correct uiTile"""
