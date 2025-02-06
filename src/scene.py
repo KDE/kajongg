@@ -551,7 +551,8 @@ class ScoringScene(GameScene):
         key = event.key()
         uiTile = cast(UITile, self.focusItem())
         if uiTile is None:
-            logError(f'received key {key}/{chr(key)} but focusItem() is None')
+            logError(f'received key {key}/{event.text()} but focusItem() is None, '
+                     f'scene.activePanel: {self.activePanel()}')
             return False
         wind = Wind.normalized(key)
         if wind is not None:
