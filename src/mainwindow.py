@@ -553,6 +553,7 @@ class MainWindow(KXmlGuiWindow):
     def changeEvent(self, event:Optional[QEvent]) ->None:
         """when the applicationwide language changes, recreate GUI"""
         if event:
+            super().changeEvent(event)
             if event.type() == QEvent.Type.LanguageChange:
                 self.setupGUI()
                 self.retranslateUi()
