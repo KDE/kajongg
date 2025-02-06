@@ -62,3 +62,11 @@ default ports correspond to protocol versions:
 8302 release/24.05, release/24.08, master
 8301 Applications/16.12, release/24.02
 84xx KDE4: 8000 plus major version: 4.9.5 is 8409
+
+
+[b][u]Debugging[/b][/u]
+
+TODO: document all --debug options
+
+Pressing Shift while clicking the mouse on a tile will display internal
+info about that tile on stdout.

@@ -280,7 +280,9 @@ class Board(QGraphicsRectItem, ReprMixin):
             logDebug(f"{self.debug_name()}: new focus uiTile "
                      f"{self._focusTile.tile if self._focusTile else 'None'} from {stack('')[-1]}")
         if self.hasLogicalFocus:
-            cast('SceneWithFocusRect', self.scene()).focusBoard = self
+            scene = self.scene()
+            if scene:
+                cast('SceneWithFocusRect', scene).focusBoard = self
 
     def setEnabled(self, enabled:bool) ->None:
         """enable/disable this board"""
