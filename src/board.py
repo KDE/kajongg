@@ -415,13 +415,6 @@ class Board(QGraphicsRectItem, ReprMixin):
         else:
             self.setPen(QPen(Qt.PenStyle.NoPen))
 
-    def tileAt(self, xoffset:int, yoffset:int, level:int=0) ->Optional[UITile]:
-        """if there is a uiTile at this place, return it"""
-        for uiTile in self:
-            if (uiTile.xoffset, uiTile.yoffset, uiTile.level) == (xoffset, yoffset, level):
-                return uiTile
-        return None
-
     def tilesByElement(self, element:Tile) ->List[UITile]:
         """return all child items holding a uiTile for element"""
         return [x for x in self if x.tile is element]
