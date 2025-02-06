@@ -180,7 +180,8 @@ class EventData(str):
 
     """used for generating a nice string"""
     events = {y: x for x, y in QEvent.__dict__.items() if isinstance(y, int)}
-    # those are not documented for qevent but appear in Qt6/qtbase/src/corelib/kernel/qcoreevent.h
+    # the following appear in Qt6/qtbase/src/corelib/kernel/qcoreevent.h but are not included.
+    # if they were, we could just print event.type().name, but now name is only 15/16 etc for those
     extra = {
         15: 'Create',
         16: 'Destroy',
