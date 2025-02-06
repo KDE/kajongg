@@ -255,15 +255,16 @@ class GameScene(SceneWithFocusRect):
         game = self.game
         assert Internal.Preferences
         mainWindow = self.mainWindow
-        for action in [mainWindow.actionScoreGame, mainWindow.actionPlayGame]:
-            action.setEnabled(not bool(game))
-        mainWindow.actionAbortGame.setEnabled(bool(game))
-        mainWindow.actionAngle.setEnabled(
-            bool(game) and bool(Internal.Preferences.showShadows))
-        for view in [self.explainView, self.scoreTable]:
-            if view:
-                view.refresh()
-        self.__showBalance()
+        if mainWindow:
+            for action in [mainWindow.actionScoreGame, mainWindow.actionPlayGame]:
+                action.setEnabled(not bool(game))
+            mainWindow.actionAbortGame.setEnabled(bool(game))
+            mainWindow.actionAngle.setEnabled(
+                bool(game) and bool(Internal.Preferences.showShadows))
+            for view in [self.explainView, self.scoreTable]:
+                if view:
+                    view.refresh()
+            self.__showBalance()
 
     def newLightSource(self) ->Union[Literal['NE'], Literal['NW'], Literal['SW'], Literal['SE']]:
         """next value"""
