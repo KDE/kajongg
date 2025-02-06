@@ -550,10 +550,10 @@ class ScoringScene(GameScene):
         """keyboard navigation in a scoring game"""
         key = event.key()
         uiTile = cast(UITile, self.focusItem())
-        wind = Wind.normalized(key)
         if uiTile is None:
             logError(f'received key {key}/{chr(key)} but focusItem() is None')
             return False
+        wind = Wind.normalized(key)
         if wind is not None:
             shift = bool(event.modifiers() & Qt.KeyboardModifier.ShiftModifier)
             self.__moveTile(uiTile, wind, shift)
