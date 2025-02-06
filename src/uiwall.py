@@ -10,7 +10,7 @@ from typing import List, TYPE_CHECKING, Optional, Literal, Dict, Any, Union, cas
 
 from common import Internal, ZValues, ReprMixin, Speeds, DrawOnTopMixin
 from wind import Wind, East
-from qt import QPointF, QGraphicsObject, QFontMetrics
+from qt import QPointF, QGraphicsObject, QFontMetrics, QGraphicsItem
 from qt import QPen, QColor, QFont, QRectF
 
 from guiutil import Painter, sceneRotation
@@ -24,7 +24,7 @@ from animation import ParallelAnimationGroup, AnimatedMixin, animateAndDo
 
 if TYPE_CHECKING:
     from twisted.internet.defer import Deferred
-    from qt import QGraphicsItem, QPainter, QStyleOptionGraphicsItem, QWidget
+    from qt import QPainter, QStyleOptionGraphicsItem, QWidget
     from tile import Piece
     from visible import VisiblePlayingGame
     from scoring import ScoringGame
@@ -38,7 +38,7 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin): # typ
 
     sideTexts : List['SideText'] = []
 
-    def __init__(self, parent:Optional['QGraphicsItem']=None) ->None:
+    def __init__(self, parent:Optional[QGraphicsItem]=None) ->None:
         assert parent is None
         assert len(self.sideTexts) < 4
         self.__name = f't{len(self.sideTexts)}'
@@ -54,6 +54,8 @@ class SideText(AnimatedMixin, QGraphicsObject, ReprMixin, DrawOnTopMixin): # typ
         self.__boundingRect:Optional[QRectF] = None
         self.__font:QFont = QFont()
         self.animateNextChange = False
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, False)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
 
     def adaptedFont(self) ->QFont:
         """Font with the correct point size for the wall"""
