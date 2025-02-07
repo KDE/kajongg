@@ -203,6 +203,11 @@ class HandBoard(Board):
                 meldX += meldDistance
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
 
+    def __findMaxX(self, positions:List[TileAttr], row:int) ->float:
+        """find the rightmost position for row"""
+        x_values = [position.xoffset for position in positions if position.yoffset == row]
+        return max(x_values) if x_values else 0.0
+
     def __placeBoniInRow(self, bonusTiles:List[UITile], tilePositions:List[TileAttr],
         bonusY:int, keepTogether:bool=True) ->List[TileAttr]:
         """Try to place bonusTiles in upper or in lower row.
@@ -210,8 +215,7 @@ class HandBoard(Board):
         If there is no space, return None
 
         returns list(TileAttr)"""
-        positions = [x.xoffset for x in tilePositions if x.yoffset == bonusY]
-        rightmostTileX = max(positions) if positions else 0
+        rightmostTileX = self.__findMaxX(tilePositions, bonusY)
         placeBoni = bonusTiles[:]
         while 13 - len(placeBoni) < rightmostTileX + 1 + self.exposedMeldDistance:
             if keepTogether:
