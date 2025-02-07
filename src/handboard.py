@@ -74,6 +74,14 @@ class TileAttr(ReprMixin):
             and player == player.game.myself
             and meld.isConcealed and not meld.isKong)
 
+    def apply_to(self, board:Board, uiTile:UITile) -> None:
+        """Change uiTile according to self"""
+        uiTile.level = 0  # for tiles coming from the wall
+        uiTile.change_name(self.tile)
+        uiTile.setBoard(board, self.xoffset, self.yoffset)
+        uiTile.dark = self.dark
+        uiTile.focusable = self.focusable
+
     def __str__(self) ->str:
         assert self.xoffset is not None
         return (
@@ -282,11 +290,7 @@ class HandBoard(Board):
                 [x for x in tiles if x.isBonus], newPositions):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
         for uiTile, newPos in result.items():
-            uiTile.level = 0  # for tiles coming from the wall
-            uiTile.change_name(newPos.tile)
-            uiTile.setBoard(self, newPos.xoffset, newPos.yoffset)
-            uiTile.dark = newPos.dark
-            uiTile.focusable = newPos.focusable
+            newPos.apply_to(self, uiTile)
         return list(result.keys())
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
