@@ -203,7 +203,7 @@ class HandBoard(Board):
                 meldX += meldDistance
         return sorted(result, key=lambda x: x.yoffset * 100 + x.xoffset)
 
-    def placeBoniInRow(self, bonusTiles:List[UITile], tilePositions:List[TileAttr],
+    def __placeBoniInRow(self, bonusTiles:List[UITile], tilePositions:List[TileAttr],
         bonusY:int, keepTogether:bool=True) ->List[TileAttr]:
         """Try to place bonusTiles in upper or in lower row.
         tilePositions are the normal tiles, already placed.
@@ -236,13 +236,13 @@ class HandBoard(Board):
             return []
         bonusTiles = sorted(bonusTiles, key=lambda x: hash(x.tile))
         result = (
-            self.placeBoniInRow(bonusTiles, newTilePositions, 0)
+            self.__placeBoniInRow(bonusTiles, newTilePositions, 0)
             or
-            self.placeBoniInRow(bonusTiles, newTilePositions, 1))
+            self.__placeBoniInRow(bonusTiles, newTilePositions, 1))
         if not result:
             # we cannot place all bonus tiles in the same row!
-            result = self.placeBoniInRow(bonusTiles, newTilePositions, 0, keepTogether=False)
-            result.extend(self.placeBoniInRow(
+            result = self.__placeBoniInRow(bonusTiles, newTilePositions, 0, keepTogether=False)
+            result.extend(self.__placeBoniInRow(
                 bonusTiles[len(result):], newTilePositions, 1, keepTogether=False))
 
         assert len(bonusTiles) == len(result)
