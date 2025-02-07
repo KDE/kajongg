@@ -239,7 +239,7 @@ class HandBoard(Board):
         right adjusted. If necessary, extend to the right even
         outside of our board"""
         result:List[TileAttr] = []
-        bonusTiles = sorted(bonusTiles[:], key=lambda x: hash(x.tile))
+        bonusTiles.sort(key=lambda x: hash(x.tile))
         result.extend(self.__placeBoniInRow(bonusTiles, after, 0))
         result.extend(self.__placeBoniInRow(bonusTiles, after, 1))
         if len(bonusTiles):
