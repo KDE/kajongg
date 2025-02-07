@@ -231,7 +231,7 @@ class HandBoard(Board):
             xPos += 1
         return result
 
-    def newBonusPositions(self, bonusTiles:List[UITile], newTilePositions:List[TileAttr]) ->List[TileAttr]:
+    def __newBonusPositions(self, bonusTiles:List[UITile], newTilePositions:List[TileAttr]) ->List[TileAttr]:
         """return list(TileAttr)
         calculate places for bonus tiles. Try to put them all in one row,
         right adjusted. If necessary, extend to the right even
@@ -290,7 +290,7 @@ class HandBoard(Board):
                 oldTiles[match.tile].remove(match)
                 if not oldTiles[match.tile]:
                     del oldTiles[match.tile]
-        for newBonusPosition in self.newBonusPositions(
+        for newBonusPosition in self.__newBonusPositions(
                 [x for x in tiles if x.isBonus], newPositions):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
         for uiTile, newPos in result.items():
