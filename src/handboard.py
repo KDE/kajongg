@@ -209,24 +209,27 @@ class HandBoard(Board):
         return max(x_values) if x_values else 0.0
 
     def __placeBoniInRow(self, bonusTiles:List[UITile], after:List[float],
-        bonusY:int, keepTogether:bool=True) ->List[TileAttr]:
+        bonusY:int, keepTogether:bool=True, maxTilesInRow=13) ->List[TileAttr]:
         """Try to place bonusTiles in upper or in lower row.
         tilePositions are the normal tiles, already placed.
-        If there is no space, return None
+        Placed boni are removed from bonusTiles.
+        Returns all tiles that could be placed."""
 
-        returns list(TileAttr)"""
         placeBoni = bonusTiles[:]
-        while 13 - len(placeBoni) < after[bonusY] + 1 + self.exposedMeldDistance:
+        while maxTilesInRow - len(placeBoni) < after[bonusY] + 1 + self.exposedMeldDistance:
             if keepTogether:
                 return []
             placeBoni = placeBoni[:-1]
+        for _ in placeBoni:
+            bonusTiles.remove(_)
         result = []
-        xPos = 13 - len(placeBoni)
+        xPos = maxTilesInRow - len(placeBoni)
         newBonusTiles = [self.tileAttrClass(x) for x in placeBoni]
         for bonus in sorted(newBonusTiles, key=lambda x: x.tile.key):
             bonus.xoffset, bonus.yoffset = xPos, bonusY
             bonus.dark = False
             result.append(bonus)
+            after[bonusY] += 1
             xPos += 1
         return result
 
@@ -235,20 +238,22 @@ class HandBoard(Board):
         calculate places for bonus tiles. Try to put them all in one row,
         right adjusted. If necessary, extend to the right even
         outside of our board"""
-        if not bonusTiles:
-            return []
-        bonusTiles = sorted(bonusTiles, key=lambda x: hash(x.tile))
-        result = (
-            self.__placeBoniInRow(bonusTiles, after, 0)
-            or
-            self.__placeBoniInRow(bonusTiles, after, 1))
-        if not result:
+        result:List[TileAttr] = []
+        bonusTiles = sorted(bonusTiles[:], key=lambda x: hash(x.tile))
+        result.extend(self.__placeBoniInRow(bonusTiles, after, 0))
+        result.extend(self.__placeBoniInRow(bonusTiles, after, 1))
+        if len(bonusTiles):
             # we cannot place all bonus tiles in the same row!
-            result = self.__placeBoniInRow(bonusTiles, after, 0, keepTogether=False)
-            result.extend(self.__placeBoniInRow(
-                bonusTiles[len(result):], after, 1, keepTogether=False))
+            result.extend(self.__placeBoniInRow(bonusTiles, after, 0, keepTogether=False))
+            result.extend(self.__placeBoniInRow(bonusTiles, after, 1, keepTogether=False))
+        maxTilesInRow = 13
+        while len(bonusTiles):
+            maxTilesInRow += 1
+            assert maxTilesInRow < 99, f'cannot place {bonusTiles}'
+            result.extend(self.__placeBoniInRow(bonusTiles, after, 0, keepTogether=False, maxTilesInRow=maxTilesInRow))
+            result.extend(self.__placeBoniInRow(bonusTiles, after, 1, keepTogether=False, maxTilesInRow=maxTilesInRow))
 
-        assert len(bonusTiles) == len(result)
+        assert len(bonusTiles) == 0, f'Could not place those: {bonusTiles}'
         return result
 
     def placeTiles(self, tiles:List[UITile]) ->List[UITile]:
