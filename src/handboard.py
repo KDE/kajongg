@@ -52,17 +52,17 @@ class TileAttr(ReprMixin):
             assert yoffset is not None
             self.xoffset = xoffset  # type:ignore[assignment]
             self.yoffset = yoffset
-            self.dark = self.setDark()
+            self.dark = self._setDark()
             # dark and focusable are different in a ScoringHandBoard
-            self.focusable = self.setFocusable(hand, meld, idx)
+            self.focusable = self._setFocusable(hand, meld, idx)
             if self.tile.name2() in Debug.focusable:
                 logDebug(f'TileAttr {self.tile}:{self.focusable}')
 
-    def setDark(self) ->bool:
+    def _setDark(self) ->bool:
         """should the tile appear darker?"""
         return self.tile.isConcealed if self.yoffset == 0 else not self.tile.isKnown
 
-    def setFocusable(self, hand:'HandBoard', meld:Meld, idx:Optional[int]) ->bool: # pylint: disable=unused-argument
+    def _setFocusable(self, hand:'HandBoard', meld:Meld, idx:Optional[int]) ->bool: # pylint: disable=unused-argument
         """is it focusable?"""
         player = hand.player
         assert player
