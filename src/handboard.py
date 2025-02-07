@@ -208,16 +208,15 @@ class HandBoard(Board):
         x_values = [position.xoffset for position in positions if position.yoffset == row]
         return max(x_values) if x_values else 0.0
 
-    def __placeBoniInRow(self, bonusTiles:List[UITile], tilePositions:List[TileAttr],
+    def __placeBoniInRow(self, bonusTiles:List[UITile], after:List[float],
         bonusY:int, keepTogether:bool=True) ->List[TileAttr]:
         """Try to place bonusTiles in upper or in lower row.
         tilePositions are the normal tiles, already placed.
         If there is no space, return None
 
         returns list(TileAttr)"""
-        rightmostTileX = self.__findMaxX(tilePositions, bonusY)
         placeBoni = bonusTiles[:]
-        while 13 - len(placeBoni) < rightmostTileX + 1 + self.exposedMeldDistance:
+        while 13 - len(placeBoni) < after[bonusY] + 1 + self.exposedMeldDistance:
             if keepTogether:
                 return []
             placeBoni = placeBoni[:-1]
@@ -231,7 +230,7 @@ class HandBoard(Board):
             xPos += 1
         return result
 
-    def __newBonusPositions(self, bonusTiles:List[UITile], newTilePositions:List[TileAttr]) ->List[TileAttr]:
+    def __newBonusPositions(self, bonusTiles:List[UITile], after:List[float]) ->List[TileAttr]:
         """return list(TileAttr)
         calculate places for bonus tiles. Try to put them all in one row,
         right adjusted. If necessary, extend to the right even
@@ -240,14 +239,14 @@ class HandBoard(Board):
             return []
         bonusTiles = sorted(bonusTiles, key=lambda x: hash(x.tile))
         result = (
-            self.__placeBoniInRow(bonusTiles, newTilePositions, 0)
+            self.__placeBoniInRow(bonusTiles, after, 0)
             or
-            self.__placeBoniInRow(bonusTiles, newTilePositions, 1))
+            self.__placeBoniInRow(bonusTiles, after, 1))
         if not result:
             # we cannot place all bonus tiles in the same row!
-            result = self.__placeBoniInRow(bonusTiles, newTilePositions, 0, keepTogether=False)
+            result = self.__placeBoniInRow(bonusTiles, after, 0, keepTogether=False)
             result.extend(self.__placeBoniInRow(
-                bonusTiles[len(result):], newTilePositions, 1, keepTogether=False))
+                bonusTiles[len(result):], after, 1, keepTogether=False))
 
         assert len(bonusTiles) == len(result)
         return result
@@ -290,8 +289,8 @@ class HandBoard(Board):
                 oldTiles[match.tile].remove(match)
                 if not oldTiles[match.tile]:
                     del oldTiles[match.tile]
-        for newBonusPosition in self.__newBonusPositions(
-                [x for x in tiles if x.isBonus], newPositions):
+        after = list(self.__findMaxX(newPositions, x) for x in (0, 1))
+        for newBonusPosition in self.__newBonusPositions([x for x in tiles if x.isBonus], after):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
         for uiTile, newPos in result.items():
             newPos.apply_to(self, uiTile)
