@@ -297,11 +297,10 @@ class HandBoard(Board):
     def __placeBonusTiles(self, result:Dict[UITile, TileAttr], tiles:List[UITile]) ->None:
         """Temporary code, directly after extraction from placeTiles()"""
         after = list(self.__findMaxX(list(result.values()), x) for x in (0, 1))
-        oldBonusTiles = defaultdict(list)
-        for uiTile in filter(lambda x: x.isBonus, tiles):
-            oldBonusTiles[uiTile.tile].append(uiTile)
-        for newBonusPosition in self.__newBonusPositions([x for x in tiles if x.isBonus], after):
-            result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
+        boni = list(filter(lambda x: x.isBonus, tiles))
+        oldBonusTiles = {x.tile: x for x in boni}
+        for newBonusPosition in self.__newBonusPositions(boni, after):
+            result[oldBonusTiles[newBonusPosition.tile]] = newBonusPosition
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in HandBoard.
