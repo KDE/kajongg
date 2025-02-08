@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-2.0-only
 """
 
 import weakref
+from collections import defaultdict
 from typing import Optional, TYPE_CHECKING, List, Dict, Union, cast
 
 from qt import QColor
@@ -261,12 +262,10 @@ class HandBoard(Board):
     def placeTiles(self, tiles:List[UITile]) ->List[UITile]:
         """tiles are all tiles for this board.
         returns a list of those uiTiles which are placed on the board"""
-        oldTiles:Dict[Tile, List[UITile]] = {}
+        oldTiles = defaultdict(list)
         for uiTile in tiles:
             assert isinstance(uiTile, UITile), f'uiTile is {type(uiTile)}'
             if not uiTile.isBonus:
-                if uiTile.tile not in oldTiles:
-                    oldTiles[uiTile.tile] = []
                 oldTiles[uiTile.tile].append(uiTile)
         result:Dict[UITile, TileAttr] = {}
         newPositions = self.listNewTilePositions()
@@ -300,12 +299,9 @@ class HandBoard(Board):
     def __placeBonusTiles(self, result:Dict[UITile, TileAttr], tiles:List[UITile]) ->None:
         """Temporary code, directly after extraction from placeTiles()"""
         after = list(self.__findMaxX(list(result.values()), x) for x in (0, 1))
-        oldBonusTiles:Dict[Tile, List[UITile]] = {}
+        oldBonusTiles = defaultdict(list)
         for uiTile in tiles:
-            assert isinstance(uiTile, UITile), f'uiTile is {type(uiTile)}'
             if uiTile.isBonus:
-                if uiTile.tile not in oldBonusTiles:
-                    oldBonusTiles[uiTile.tile] = []
                 oldBonusTiles[uiTile.tile].append(uiTile)
         for newBonusPosition in self.__newBonusPositions([x for x in tiles if x.isBonus], after):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
