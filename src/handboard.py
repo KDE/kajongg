@@ -262,33 +262,33 @@ class HandBoard(Board):
         oldTiles = defaultdict(list)
         for uiTile in filter(lambda x: not x.isBonus, tiles):
             oldTiles[uiTile.tile].append(uiTile)
-        result:Dict[UITile, TileAttr] = {}
+        matches:Dict[UITile, TileAttr] = {}
         newPositions = self.listNewTilePositions()
         for newPosition in newPositions:
             assert isinstance(newPosition.tile, Tile)
-            matches = oldTiles.get(newPosition.tile) \
+            candidates = oldTiles.get(newPosition.tile) \
                 or oldTiles.get(newPosition.tile.swapped) \
                 or oldTiles.get(Tile.unknown)
-            if not matches and not newPosition.tile.isKnown and oldTiles:
+            if not candidates and not newPosition.tile.isKnown and oldTiles:
                 # 13 orphans, robbing Kong, lastTile is single:
                 # no oldTiles exist
-                matches = list(oldTiles.values())[0]
-            if matches:
-                # no matches happen when we move a uiTile within a board,
-                # here we simply ignore existing tiles with no matches
-                matches = sorted(
-                    matches, key=lambda x:
+                candidates = list(oldTiles.values())[0]
+            if candidates:
+                # no candidates happen when we move a uiTile within a board,
+                # here we simply ignore existing tiles with no candidates
+                candidates = sorted(
+                    candidates, key=lambda x:
                     + abs(newPosition.yoffset - x.yoffset) * 100 # pylint: disable=cell-var-from-loop
                     + x.xoffset)
                 # pylint is too cautious here. Check with later versions.
-                match = matches[0]
-                result[match] = newPosition
+                match = candidates[0]
+                matches[match] = newPosition
                 oldTiles[match.tile].remove(match)
                 if not oldTiles[match.tile]:
                     del oldTiles[match.tile]
-        for uiTile, newPos in result.items():
+        for uiTile, newPos in matches.items():
             newPos.apply_to(self, uiTile)
-        after = list(self.__findMaxX(list(result.values()), x) for x in (0, 1))
+        after = list(self.__findMaxX(list(matches.values()), x) for x in (0, 1))
         self.__placeBonusTiles(after, tiles)
 
     def __placeBonusTiles(self, after:List[float], tiles:List[UITile]) ->None:
