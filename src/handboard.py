@@ -242,7 +242,7 @@ class HandBoard(Board):
         right adjusted. If necessary, extend to the right even
         outside of our board"""
         result:List[TileAttr] = []
-        bonusTiles.sort(key=lambda x: hash(x.tile))
+        bonusTiles = bonusTiles[:]  # do not change passed list
         result.extend(self.__placeBoniInRow(bonusTiles, after, 0))
         result.extend(self.__placeBoniInRow(bonusTiles, after, 1))
         if len(bonusTiles):
@@ -255,8 +255,6 @@ class HandBoard(Board):
             assert maxTilesInRow < 99, f'cannot place {bonusTiles}'
             result.extend(self.__placeBoniInRow(bonusTiles, after, 0, keepTogether=False, maxTilesInRow=maxTilesInRow))
             result.extend(self.__placeBoniInRow(bonusTiles, after, 1, keepTogether=False, maxTilesInRow=maxTilesInRow))
-
-        assert len(bonusTiles) == 0, f'Could not place those: {bonusTiles}'
         return result
 
     def placeTiles(self, tiles:List[UITile]) ->None:
@@ -288,17 +286,17 @@ class HandBoard(Board):
                 oldTiles[match.tile].remove(match)
                 if not oldTiles[match.tile]:
                     del oldTiles[match.tile]
-        self.__placeBonusTiles(result, tiles)
         for uiTile, newPos in result.items():
             newPos.apply_to(self, uiTile)
-
-    def __placeBonusTiles(self, result:Dict[UITile, TileAttr], tiles:List[UITile]) ->None:
-        """Temporary code, directly after extraction from placeTiles()"""
         after = list(self.__findMaxX(list(result.values()), x) for x in (0, 1))
-        boni = list(filter(lambda x: x.isBonus, tiles))
-        oldBonusTiles = {x.tile: x for x in boni}
-        for newBonusPosition in self.__newBonusPositions(boni, after):
-            result[oldBonusTiles[newBonusPosition.tile]] = newBonusPosition
+        self.__placeBonusTiles(after, tiles)
+
+    def __placeBonusTiles(self, after:List[float], tiles:List[UITile]) ->None:
+        """Temporary code, directly after extraction from placeTiles()"""
+        boni = list(sorted(filter(lambda x: x.isBonus, tiles), key=lambda x: hash(x.tile)))
+        positions = self.__newBonusPositions(boni, after)
+        for tile, position in zip(boni, positions):
+            position.apply_to(self, tile)
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in HandBoard.
