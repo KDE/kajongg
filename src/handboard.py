@@ -262,16 +262,12 @@ class HandBoard(Board):
         """tiles are all tiles for this board.
         returns a list of those uiTiles which are placed on the board"""
         oldTiles:Dict[Tile, List[UITile]] = {}
-        oldBonusTiles:Dict[Tile, List[UITile]] = {}
         for uiTile in tiles:
             assert isinstance(uiTile, UITile), f'uiTile is {type(uiTile)}'
-            if uiTile.isBonus:
-                targetDict = oldBonusTiles
-            else:
-                targetDict = oldTiles
-            if uiTile.tile not in targetDict:
-                targetDict[uiTile.tile] = []
-            targetDict[uiTile.tile].append(uiTile)
+            if not uiTile.isBonus:
+                if uiTile.tile not in oldTiles:
+                    oldTiles[uiTile.tile] = []
+                oldTiles[uiTile.tile].append(uiTile)
         result:Dict[UITile, TileAttr] = {}
         newPositions = self.listNewTilePositions()
         for newPosition in newPositions:
@@ -296,12 +292,23 @@ class HandBoard(Board):
                 oldTiles[match.tile].remove(match)
                 if not oldTiles[match.tile]:
                     del oldTiles[match.tile]
-        after = list(self.__findMaxX(newPositions, x) for x in (0, 1))
-        for newBonusPosition in self.__newBonusPositions([x for x in tiles if x.isBonus], after):
-            result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
+        self.__placeBonusTiles(result, tiles)
         for uiTile, newPos in result.items():
             newPos.apply_to(self, uiTile)
         return list(result.keys())
+
+    def __placeBonusTiles(self, result:Dict[UITile, TileAttr], tiles:List[UITile]) ->None:
+        """Temporary code, directly after extraction from placeTiles()"""
+        after = list(self.__findMaxX(list(result.values()), x) for x in (0, 1))
+        oldBonusTiles:Dict[Tile, List[UITile]] = {}
+        for uiTile in tiles:
+            assert isinstance(uiTile, UITile), f'uiTile is {type(uiTile)}'
+            if uiTile.isBonus:
+                if uiTile.tile not in oldBonusTiles:
+                    oldBonusTiles[uiTile.tile] = []
+                oldBonusTiles[uiTile.tile].append(uiTile)
+        for newBonusPosition in self.__newBonusPositions([x for x in tiles if x.isBonus], after):
+            result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in HandBoard.
