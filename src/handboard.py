@@ -263,10 +263,8 @@ class HandBoard(Board):
         """tiles are all tiles for this board.
         returns a list of those uiTiles which are placed on the board"""
         oldTiles = defaultdict(list)
-        for uiTile in tiles:
-            assert isinstance(uiTile, UITile), f'uiTile is {type(uiTile)}'
-            if not uiTile.isBonus:
-                oldTiles[uiTile.tile].append(uiTile)
+        for uiTile in filter(lambda x: not x.isBonus, tiles):
+            oldTiles[uiTile.tile].append(uiTile)
         result:Dict[UITile, TileAttr] = {}
         newPositions = self.listNewTilePositions()
         for newPosition in newPositions:
@@ -300,9 +298,8 @@ class HandBoard(Board):
         """Temporary code, directly after extraction from placeTiles()"""
         after = list(self.__findMaxX(list(result.values()), x) for x in (0, 1))
         oldBonusTiles = defaultdict(list)
-        for uiTile in tiles:
-            if uiTile.isBonus:
-                oldBonusTiles[uiTile.tile].append(uiTile)
+        for uiTile in filter(lambda x: x.isBonus, tiles):
+            oldBonusTiles[uiTile.tile].append(uiTile)
         for newBonusPosition in self.__newBonusPositions([x for x in tiles if x.isBonus], after):
             result[oldBonusTiles[newBonusPosition.tile][0]] = newBonusPosition
 
