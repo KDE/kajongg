@@ -297,6 +297,7 @@ class GameScene(SceneWithFocusRect):
                 wind.disc.hide()
                 delattr(wind, 'disc')
         self.focusRect.hide()
+        UITile.clsUid = 0
 
 
 class PlayingScene(GameScene):
