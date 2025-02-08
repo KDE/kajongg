@@ -215,14 +215,16 @@ class HandBoard(Board):
         Placed boni are removed from bonusTiles.
         Returns all tiles that could be placed."""
 
+        result:List[TileAttr] = []
         placeBoni = bonusTiles[:]
         while maxTilesInRow - len(placeBoni) < after[bonusY] + 1 + self.exposedMeldDistance:
             if keepTogether:
                 return []
             placeBoni = placeBoni[:-1]
+            if not placeBoni:
+                return result
         for _ in placeBoni:
             bonusTiles.remove(_)
-        result = []
         xPos = maxTilesInRow - len(placeBoni)
         newBonusTiles = [self.tileAttrClass(x) for x in placeBoni]
         for bonus in sorted(newBonusTiles, key=lambda x: x.tile.key):
