@@ -259,9 +259,8 @@ class HandBoard(Board):
         assert len(bonusTiles) == 0, f'Could not place those: {bonusTiles}'
         return result
 
-    def placeTiles(self, tiles:List[UITile]) ->List[UITile]:
-        """tiles are all tiles for this board.
-        returns a list of those uiTiles which are placed on the board"""
+    def placeTiles(self, tiles:List[UITile]) ->None:
+        """tiles are all tiles for this board."""
         oldTiles = defaultdict(list)
         for uiTile in filter(lambda x: not x.isBonus, tiles):
             oldTiles[uiTile.tile].append(uiTile)
@@ -292,7 +291,6 @@ class HandBoard(Board):
         self.__placeBonusTiles(result, tiles)
         for uiTile, newPos in result.items():
             newPos.apply_to(self, uiTile)
-        return list(result.keys())
 
     def __placeBonusTiles(self, result:Dict[UITile, TileAttr], tiles:List[UITile]) ->None:
         """Temporary code, directly after extraction from placeTiles()"""
@@ -359,12 +357,12 @@ class PlayingHandBoard(HandBoard):
         allTiles = self[:]
         if adding:
             allTiles.extend(adding)
-        newTiles = self.placeTiles(allTiles)
-        source = adding if adding else newTiles
+        self.placeTiles(allTiles)
+        source = adding if adding else self[:]
         focusCandidates = [x for x in source if x.focusable and x.tile.isConcealed]
         if not focusCandidates:
             # happens if we just exposed a claimed meld
-            focusCandidates = [x for x in newTiles if x.focusable and x.tile.isConcealed]
+            focusCandidates = [x for x in self[:] if x.focusable and x.tile.isConcealed]
         focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
         if focusCandidates:
             self.focusTile = focusCandidates[0]
