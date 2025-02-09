@@ -252,3 +252,11 @@ class EventData(str):
         else:
             result = f'unknown :{event.type()}'
         return f'Event:{result}'
+
+    def __init__(self, receiver, event, prefix=None):
+        self.receiver = receiver
+        self.event = event
+        self.prefix = prefix
+
+    def __str__(self):\
+        return f'{self.eventName(self.event)} for {self.eventReceiver(self.receiver)}'
