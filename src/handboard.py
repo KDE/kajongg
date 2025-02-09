@@ -289,9 +289,9 @@ class HandBoard(Board):
         for uiTile, newPos in matches.items():
             newPos.apply_to(self, uiTile)
         after = list(self.__findMaxX(list(matches.values()), x) for x in (0, 1))
-        self.__placeBonusTiles(after, tiles)
+        self._placeBonusTiles(after, tiles)
 
-    def __placeBonusTiles(self, after:List[float], tiles:List[UITile]) ->None:
+    def _placeBonusTiles(self, after:List[float], tiles:List[UITile]) ->None:
         """Temporary code, directly after extraction from placeTiles()"""
         boni = list(sorted(filter(lambda x: x.isBonus, tiles), key=lambda x: hash(x.tile)))
         positions = self.__newBonusPositions(boni, after)
