@@ -192,7 +192,7 @@ class GameScene(SceneWithFocusRect):
         assert isinstance(Internal.Preferences.windTilesetName, str)
         self.windTileset = Tileset(Internal.Preferences.windTilesetName)
 
-    def showWall(self) ->None:
+    def showWall(self) ->None: # FIXME is unused
         """shows the wall according to the game rules (length may vary)"""
         if self.game:
             UIWall(self.game)   # sets self.game.wall
