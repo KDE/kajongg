@@ -15,7 +15,7 @@ from locale import getpreferredencoding
 
 # we must not import twisted or we need to change kajongg.py
 
-from common import Internal, Debug
+from common import Internal, Debug, isAlive
 from qt import Qt, QEvent, PYQT_VERSION
 from util import elapsedSince, traceback, gitHead, callers
 from mi18n import i18n
@@ -191,6 +191,8 @@ class EventData(str):
     events.update(extra)
     keys = {y: x for x, y in Qt.__dict__.items() if isinstance(y, int)}
 
+    prevFocusItem = None
+
     def __new__(cls, receiver:'QObject', event:'QEvent', prefix:Optional[str]=None) ->'EventData':
         """create the wanted string"""
         name = cls.eventName(event)
@@ -257,6 +259,12 @@ class EventData(str):
         self.receiver = receiver
         self.event = event
         self.prefix = prefix
+        if Debug.focusable and isAlive(Internal.scene):
+            _ = Internal.scene.focusItem()
+            if _ is not self.prevFocusItem:
+                if EventData.prevFocusItem or _:
+                    logDebug(f'{self} focusItem: {EventData.prevFocusItem} -> {_}')
+                EventData.prevFocusItem = _
 
     def __str__(self):\
         return f'{self.eventName(self.event)} for {self.eventReceiver(self.receiver)}'
