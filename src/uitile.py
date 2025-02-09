@@ -401,7 +401,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
         """redirect and generate Debug output"""
         if self.tile.name2() in Debug.focusable:
             newStr = 'focusable' if value else 'unfocusable'
-            logDebug(f"{newStr}: {self.tile.name2()} from {stack('')[-2]}")
+            logDebug(f"{newStr}: {self} from {stack('')[-2]}")
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsFocusable, value)
 
     @property
