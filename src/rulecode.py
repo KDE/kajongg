@@ -390,10 +390,10 @@ class StandardMahJongg(MJRule):
         if maxChows < 0:
             return set()
         if maxChows == 0:
-            checkTiles = set(inHand)
+            check_tiles = set(inHand)
         else:
-            checkTiles = set(inHand) & elements.honors
-        for tileName in checkTiles:
+            check_tiles = set(inHand) & elements.honors
+        for tileName in check_tiles:
             count = inHand.count(tileName)
             if count == 1:
                 isolated += 1
