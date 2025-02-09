@@ -350,20 +350,25 @@ class PlayingHandBoard(HandBoard):
 
     """a board showing the tiles a player holds"""
 
+    def __bestFocusTile(self, adding:Optional[List[UITile]]=None) ->Optional[UITile]:
+        """Where should we put focus?"""
+        source = adding if adding else self[:]
+        focusCandidates = [x for x in source if x.focusable and x.tile.isConcealed]
+        if not focusCandidates:
+            # happens if we just exposed a claimed meld
+            focusCandidates = [x for x in self[:] if x.focusable and x.tile.isConcealed]
+        if focusCandidates := sorted(focusCandidates, key=lambda x: x.xoffset):
+            return focusCandidates[0]
+        return None
+
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in HandBoard"""
         allTiles = self[:]
         if adding:
             allTiles.extend(adding)
         self.placeTiles(allTiles)
-        source = adding if adding else self[:]
-        focusCandidates = [x for x in source if x.focusable and x.tile.isConcealed]
-        if not focusCandidates:
-            # happens if we just exposed a claimed meld
-            focusCandidates = [x for x in self[:] if x.focusable and x.tile.isConcealed]
-        focusCandidates = sorted(focusCandidates, key=lambda x: x.xoffset)
-        if focusCandidates:
-            self.focusTile = focusCandidates[0]
+        if _ := self.__bestFocusTile(adding):
+            self.focusTile = _
         assert Internal.scene
         Internal.scene.handSelectorChanged(self)
         self.hasLogicalFocus = bool(adding)
