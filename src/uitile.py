@@ -227,7 +227,7 @@ class UITile(AnimatedMixin, QGraphicsObject, ReprMixin):  # type:ignore[misc]
                         self.boundingRect())
         if self.cross:
             self.__paintCross(painter)
-        if Debug.graphics:
+        if Debug.graphics or self.tile.exposed.name2() in Debug.focusable:
             self.__paintId(painter)
 
     def __paintId(self, painter:QPainter) ->None:
