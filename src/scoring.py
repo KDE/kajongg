@@ -252,6 +252,7 @@ class ScoringHandBoard(HandBoard):
                 col[row] += 1
             col[row] += self.exposedMeldDistance
         self._placeBonusTiles(col, boni)
+        # self.checkTiles() does not work here
 
     def dragMoveEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """allow dropping of uiTile from ourself only to other state (open/concealed)"""
@@ -327,6 +328,9 @@ class ScoringHandBoard(HandBoard):
         if not meld:
             logWarning(f'ScoringBoard.focusRectWidth: there is no meld with focus tile {focus}')
             return 1
+        if Debug.focusable:
+            logDebug(f'{callers()}.{self}.focusRectWidth for focusTile {self.focusTile} '
+                     f'found UIMeld {meld} with tiles {list(x for x in meld)}')
         return len(meld)
 
     def addUITile(self, uiTile:UITile) ->None:

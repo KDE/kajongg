@@ -69,6 +69,8 @@ class FocusRect(QGraphicsRectItem, ReprMixin):
                 f'assigning focusRect to a non-alive board {type(value)}/{value}')
             return
         if value:
+            if Debug.focusable:
+                logDebug(f'FocusRect {self}: board: {self._board} -> {value}')
             self._board = value
             self.refresh()
 
@@ -120,7 +122,11 @@ class SceneWithFocusRect(QGraphicsScene):
     @focusBoard.setter
     def focusBoard(self, board:Optional[Union[DiscardBoard, SelectorBoard]]) ->None:
         """get / set the board that has its focusRect shown"""
+        if Debug.focusable:
+            logDebug(f'scene.focusRect gets focusBoard {board}, has focusItem {self.focusItem()}')
         self.focusRect.board = board
+        if Debug.focusable:
+            logDebug(f'scene.focusRect is set, scene has focusItem {self.focusItem()}')
 
 
 class GameScene(SceneWithFocusRect):

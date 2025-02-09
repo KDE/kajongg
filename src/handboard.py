@@ -309,13 +309,13 @@ class HandBoard(Board):
         if adding:
             allTiles.extend(adding)
         self.placeTiles(allTiles)
+        self.checkTiles()
 
     def checkTiles(self) ->None:
         """does the logical state match the displayed tiles?"""
-        return
-# FIXME: when exactly should I call this? afterQueuedAnimations does not help
-        # test case: scoring game. move meld from exposed to concealed using the mouse
-        logExposed:TileList = TileList()  # pylint: disable=unreachable
+        # FIXME: when exactly should I call this? afterQueuedAnimations does not help
+        #    test case: scoring game. move meld from exposed to concealed using the mouse
+        logExposed:TileList = TileList()
         physExposed:TileList = TileList()
         logConcealed:TileList = TileList()
         physConcealed:TileList = TileList()

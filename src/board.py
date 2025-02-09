@@ -269,6 +269,8 @@ class Board(QGraphicsRectItem, ReprMixin):
     def focusTile(self, uiTile:Optional[UITile]) ->None:
         """the uiTile of this board with focus. This is per Board!"""
         if uiTile is self._focusTile:
+            if Debug.focusable:
+                logDebug(f'{self}.focusTile: is already on {uiTile}')
             return
         if uiTile:
             assert uiTile.isKnown, uiTile
@@ -276,9 +278,9 @@ class Board(QGraphicsRectItem, ReprMixin):
                 assert uiTile.focusable, uiTile
             self.__prevPos = uiTile.sortKey()
         self._focusTile = uiTile
-        if self._focusTile and self._focusTile.tile.name2() in Debug.focusable:
-            logDebug(f"{self.debug_name()}: new focus uiTile "
-                     f"{self._focusTile.tile if self._focusTile else 'None'} from {stack('')[-1]}")
+        if self._focusTile and self._focusTile.tile.exposed.name2() in Debug.focusable:
+            logDebug(f"{self.debug_name()}: new focus "
+                     f"{self._focusTile if self._focusTile else 'None'} from {stack('')[-1]}")
         if self.hasLogicalFocus:
             scene = self.scene()
             if scene:
@@ -1053,7 +1055,6 @@ class DiscardBoard(CourtBoard):
 
         The user uses the mouse for discarding a tile"""
         if event:
-            assert Internal.scene
             assert Internal.scene
             uiTile = cast(MimeData, event.mimeData()).uiTile
             assert isinstance(uiTile, UITile), uiTile
