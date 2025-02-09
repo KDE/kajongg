@@ -223,6 +223,8 @@ class ScoringHandBoard(HandBoard):
                 return result
         logWarning(f'Scoring game: cannot find UIMeld for {meld}')
         if self.uiMelds:
+            # when could this happen?
+            logWarning(f'XXXXXXXXXXXXXX findUIMeld returning uiMelds[1]: {self.uiMelds[1]}')
             return self.uiMelds[1] # FIXME why not 0 ?
         raise ValueError('Scoring Game: findUIMeld() in absence of any uiMelds')
 
