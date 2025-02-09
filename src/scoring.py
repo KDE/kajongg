@@ -8,7 +8,6 @@ SPDX-License-Identifier: GPL-2.0-only
 """
 
 import datetime
-from itertools import chain
 from typing import Tuple, Optional, TYPE_CHECKING, List, cast, Any
 
 from qt import QPointF, QRectF, QDialogButtonBox
@@ -237,7 +236,22 @@ class ScoringHandBoard(HandBoard):
 
     def sync(self, adding:Optional[List[UITile]]=None) ->None:
         """place all tiles in ScoringHandBoard"""
-        self.placeTiles(cast(List[UITile], list(chain(*self.uiMelds))))
+        col = [0.0, 0.0]
+        boni:List[UITile] = []
+        for uiMeld in self.uiMelds:
+            if uiMeld[0].tile.isBonus:
+                boni.append(uiMeld[0])
+                continue
+            row = 0 if uiMeld.meld[0].isExposed else 1
+            for idx, tile in enumerate(uiMeld):
+                tile.level = 0
+                tile.setBoard(self, col[row], row)
+                # FIXME Folgendes UIMeld sollte sich selber so einstellen
+                tile.focusable = idx == 0
+                tile.dark = bool(row) or tile.tile.isConcealed
+                col[row] += 1
+            col[row] += self.exposedMeldDistance
+        self._placeBonusTiles(col, boni)
 
     def dragMoveEvent(self, event:Optional['QGraphicsSceneDragDropEvent']) ->None:
         """allow dropping of uiTile from ourself only to other state (open/concealed)"""
@@ -362,11 +376,6 @@ class ScoringHandBoard(HandBoard):
         else:
             if self.__moveHelper:
                 self.__moveHelper.setVisible(False)
-
-    def newLowerMelds(self) ->MeldList:
-        """a list of melds for the hand as it should look after sync"""
-        assert self.player
-        return MeldList(self.player.concealedMelds)
 
 
 class ScoringPlayer(VisiblePlayer, Player):
