@@ -408,7 +408,7 @@ class Player(ReprMixin):
     def colorizeName(self) ->None:
         """virtual: colorize Name on wall"""
 
-    def getsFocus(self, unusedResults:Optional[List['Request']]=None) ->None:
+    def getsFocus(self, unusedResults:Any=None) ->None:
         """virtual: player gets focus on his hand"""
 
     def __announcements(self) -> Set:
