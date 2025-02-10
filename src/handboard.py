@@ -210,7 +210,7 @@ class HandBoard(Board):
         return max(x_values) if x_values else 0.0
 
     def __placeBoniInRow(self, bonusTiles:List[UITile], after:List[float],
-        bonusY:int, keepTogether:bool=True, maxTilesInRow=13) ->List[TileAttr]:
+        bonusY:int, keepTogether:bool, maxTilesInRow:int) ->List[TileAttr]:
         """Try to place bonusTiles in upper or in lower row.
         tilePositions are the normal tiles, already placed.
         Placed boni are removed from bonusTiles.
@@ -243,18 +243,20 @@ class HandBoard(Board):
         outside of our board"""
         result:List[TileAttr] = []
         bonusTiles = bonusTiles[:]  # do not change passed list
-        result.extend(self.__placeBoniInRow(bonusTiles, after, 0))
-        result.extend(self.__placeBoniInRow(bonusTiles, after, 1))
+        assert self.player
+        assert self.player.game
+        maxTilesInRow = 13
+        result.extend(self.__placeBoniInRow(bonusTiles, after, 0, True, maxTilesInRow))
+        result.extend(self.__placeBoniInRow(bonusTiles, after, 1, True, maxTilesInRow))
         if len(bonusTiles):
             # we cannot place all bonus tiles in the same row!
-            result.extend(self.__placeBoniInRow(bonusTiles, after, 0, keepTogether=False))
-            result.extend(self.__placeBoniInRow(bonusTiles, after, 1, keepTogether=False))
-        maxTilesInRow = 13
+            result.extend(self.__placeBoniInRow(bonusTiles, after, 0, False, maxTilesInRow))
+            result.extend(self.__placeBoniInRow(bonusTiles, after, 1, False, maxTilesInRow))
         while len(bonusTiles):
             maxTilesInRow += 1
             assert maxTilesInRow < 99, f'cannot place {bonusTiles}'
-            result.extend(self.__placeBoniInRow(bonusTiles, after, 0, keepTogether=False, maxTilesInRow=maxTilesInRow))
-            result.extend(self.__placeBoniInRow(bonusTiles, after, 1, keepTogether=False, maxTilesInRow=maxTilesInRow))
+            result.extend(self.__placeBoniInRow(bonusTiles, after, 0, False, maxTilesInRow))
+            result.extend(self.__placeBoniInRow(bonusTiles, after, 1, False, maxTilesInRow))
         return result
 
     def placeTiles(self, tiles:List[UITile]) ->None:
