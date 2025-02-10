@@ -245,7 +245,7 @@ class HandBoard(Board):
         bonusTiles = bonusTiles[:]  # do not change passed list
         assert self.player
         assert self.player.game
-        maxTilesInRow = 13
+        maxTilesInRow = self.player.game.ruleset.dealtTiles
         result.extend(self.__placeBoniInRow(bonusTiles, after, 0, True, maxTilesInRow))
         result.extend(self.__placeBoniInRow(bonusTiles, after, 1, True, maxTilesInRow))
         if len(bonusTiles):

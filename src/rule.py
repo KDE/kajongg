@@ -351,6 +351,7 @@ class Ruleset:
         self.doublingMeldRules:List[Rule] = []
         self.doublingHandRules:List[Rule] = []
         self.standardMJRule:Optional['Rule'] = None
+        self.dealtTiles:int
         self.limit:int
         self.roofOff:bool
         self.mustDeclareCallingHand:bool

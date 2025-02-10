@@ -106,6 +106,11 @@ class ClassicalChinese(PredefinedRuleset):
     def addParameterRules(self) ->None:
         """as the name says"""
         self.parameterRules.createRule(
+            'Tiles in Hand',
+            'intdealtTiles',
+            description='# of tiles dealt for every player',
+            parameter=13)
+        self.parameterRules.createRule(
             'Points Needed for Mah Jongg',
             'intminMJPoints',
             parameter=0)
@@ -374,10 +379,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
     def addParameterRules(self) ->None:
         """those differ for BMJA from standard"""
         super().addParameterRules()
-        self.parameterRules['kongBoxSize'].parameter = 14  # type:ignore[attr-defined]
-        self.parameterRules['maxChows'].parameter = 1  # type:ignore[attr-defined]
-        self.parameterRules['limit'].parameter = 1000  # type:ignore[attr-defined]
-        self.parameterRules['mustDeclareCallingHand'].parameter = True  # type:ignore[attr-defined]
+        self.parameterRules['dealtTiles'].parameter = 16  # type:ignore[attr-defined]
 
     def loadRules(self) ->None:
         super().loadRules()
@@ -407,7 +409,6 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.meldRules.createRule('Own Flower', 'FOwnFlower', doubles=1)
         self.meldRules.createRule('Own Season', 'FOwnSeason', doubles=1)
         del self.winnerRules['LastTileTakenfromDeadWall']
-        del self.winnerRules['HiddenTreasure']
         del self.winnerRules['FalseColorGame']
         del self.winnerRules['ConcealedTrueColorGame']
         del self.winnerRules['Eastwonninetimesinarow']
@@ -495,6 +496,66 @@ class ClassicalChineseBMJA(ClassicalChinese):
             'FCallingHand||Ohand=Purity',
             doubles=3)
 
+
+class Taiwanese16(ClassicalChinese):
+
+    """Taiwanese rules with 16 tiles in hand"""
+
+    def __init__(self, name:Optional[str]=None) ->None:
+        super().__init__(name or i18nE('Taiwanese 16-tile game, FOR DEVELOPERS'))
+
+    def _initRuleset(self) ->None:
+        """set the description"""
+        super()._initRuleset()
+        self.description = i18n(
+            'Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug.cgi?id=298821')
+
+    def addParameterRules(self) ->None:
+        """those differ for BMJA from standard"""
+        super().addParameterRules()
+        self.parameterRules['dealtTiles'].parameter = 16  # type:ignore[attr-defined]
+
+    def loadRules(self) ->None:
+        super().loadRules()
+        del self.mjRules['StandardMahJongg']
+        self.mjRules.createRule(
+            'Standard Mah Jongg',
+            'FStandardMahJongg16',
+            points=20)
+        del self.winnerRules['ZeroPointHand']
+        originalCall = self.winnerRules.pop('MahJonggwithOriginalCall')
+        self.winnerRules.createRule(
+            'Original Call', originalCall.definition, doubles=1,
+            description=originalCall.description)
+        del self.handRules['OwnFlowerandOwnSeason']
+        del self.handRules['ThreeConcealedPongs']
+        self.meldRules.createRule('Own Flower', 'FOwnFlower', doubles=1)
+        self.meldRules.createRule('Own Season', 'FOwnSeason', doubles=1)
+        del self.winnerRules['LastTileTakenfromDeadWall']
+        del self.winnerRules['HiddenTreasure']
+        del self.winnerRules['FalseColorGame']
+        del self.winnerRules['ConcealedTrueColorGame']
+        del self.winnerRules['Eastwonninetimesinarow']
+        del self.winnerRules['LastTileCompletesPairof28']
+        del self.winnerRules['LastTileCompletesPairofTerminalsorHonors']
+        del self.winnerRules['LastTileisOnlyPossibleTile']
+        del self.winnerRules['TrueColorGame']
+        del self.winnerRules['ThreeGreatScholars']
+        self.winnerRules.createRule('Purity', 'FPurity', doubles=3,
+                                    description=i18n('Only same-colored tiles (no chows, dragons or winds)'))
+        self.handRules['AllFlowers'].score.doubles = 2
+        self.handRules['AllSeasons'].score.doubles = 2
+        self.penaltyRules.createRule(
+            'False Naming of Discard, Claimed for Chow/Pung/Kong',
+            points=-50)
+        self.penaltyRules.createRule(
+            'False Declaration of Mah Jongg by One Player',
+            'Oabsolute payees=3', limits=-0.5)
+        self.winnerRules.createRule(
+            'False Naming of Discard, Claimed for Mah Jongg',
+            'FFalseDiscardForMJ||Opayforall')
+
+
 def load() ->None:
     """load predefined rulesets.
     add new predefined rulesets here.
@@ -502,3 +563,4 @@ def load() ->None:
     assert not PredefinedRuleset.classes
     PredefinedRuleset.classes.add(ClassicalChineseDMJL)
     PredefinedRuleset.classes.add(ClassicalChineseBMJA)
+    PredefinedRuleset.classes.add(Taiwanese16)

@@ -339,7 +339,7 @@ class StandardMahJongg(MJRule):
         """winner rules are not yet applied to hand"""
         # pylint: disable=too-many-return-statements
         # too many return statements
-        if len(hand.melds) != 5:
+        if len(hand.melds) != 13:
             return False
         if any(len(x) not in (2, 3, 4) for x in hand.melds):
             return False
@@ -499,6 +499,34 @@ class StandardMahJongg(MJRule):
                         result.append(Tile(group, value + 1))
         return set(result)
 
+
+class StandardMahJongg16(StandardMahJongg):
+
+    def appliesToHand(hand:'Hand') ->bool:
+        """winner rules are not yet applied to hand"""
+        # pylint: disable=too-many-return-statements
+        # too many return statements
+        if len(hand.melds) != 6:
+            return False
+        if any(len(x) not in (2, 3, 4) for x in hand.melds):
+            return False
+        if any(x.isRest or x.isKnitted for x in hand.melds):
+            return False
+        if sum(x.isChow for x in hand.melds) > hand.ruleset.maxChows:
+            return False
+        if hand.arranged is None:
+            # this is only Hand.__arrange
+            return True
+        assert hand.score
+        if hand.score.total() < hand.ruleset.minMJPoints:
+            return False
+        if hand.score.doubles >= hand.ruleset.minMJDoubles:
+            # shortcut
+            return True
+        # but maybe we have enough doubles by winning:
+        doublingWinnerRules = sum(
+            x.rule.score.doubles for x in hand.matchingWinnerRules())
+        return hand.score.doubles + doublingWinnerRules >= hand.ruleset.minMJDoubles
 
 class SquirmingSnake(StandardMahJongg):
     cache : Tuple[str, ...] = ()

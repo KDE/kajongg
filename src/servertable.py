@@ -84,7 +84,7 @@ class ServerGame(PlayingGame):
             player.clearHand()
             # 13 tiles at least, with names as given by wall
             # compensate boni
-            while len(player.concealedTiles) != 13:
+            while len(player.concealedTiles) != self.ruleset.dealtTiles:
                 player.addConcealedTiles(self.wall.deal())
         super().initHand()
 
@@ -645,7 +645,7 @@ class ServerTable(Table, ReprMixin):
                 if player == clientPlayer or self.game.playOpen:
                     tiles = player.concealedTiles
                 else:
-                    tiles = TileTuple(Tile.unknown * 13)  # type: ignore
+                    tiles = TileTuple(Tile.unknown * self.game.ruleset.dealtTiles)  # type: ignore
                 block.tell(player, [clientPlayer], Message.SetConcealedTiles,
                            tiles=TileTuple(chain(tiles, player.bonusTiles)))
         block.callback(self.dealt)

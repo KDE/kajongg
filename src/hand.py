@@ -211,7 +211,7 @@ class Hand(ReprMixin):
         declaredTiles = TileTuple(self.declaredMelds)
         self.tilesInHand = TileList(x for x in self.tiles
                                     if x not in declaredTiles)
-        self.lenOffset = (len(self.tiles) - 13
+        self.lenOffset = (len(self.tiles) - self.ruleset.dealtTiles
                           - sum(x.isKong for x in self.melds))
 
         last = self.__lastTile
