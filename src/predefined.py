@@ -379,6 +379,10 @@ class ClassicalChineseBMJA(ClassicalChinese):
     def addParameterRules(self) ->None:
         """those differ for BMJA from standard"""
         super().addParameterRules()
+        self.parameterRules['kongBoxSize'].parameter = 14  # type:ignore[attr-defined]
+        self.parameterRules['maxChows'].parameter = 1  # type:ignore[attr-defined]
+        self.parameterRules['limit'].parameter = 1000  # type:ignore[attr-defined]
+        self.parameterRules['mustDeclareCallingHand'].parameter = True  # type:ignore[attr-defined]
         self.parameterRules['dealtTiles'].parameter = 16  # type:ignore[attr-defined]
 
     def loadRules(self) ->None:
@@ -409,6 +413,7 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.meldRules.createRule('Own Flower', 'FOwnFlower', doubles=1)
         self.meldRules.createRule('Own Season', 'FOwnSeason', doubles=1)
         del self.winnerRules['LastTileTakenfromDeadWall']
+        del self.winnerRules['HiddenTreasure']
         del self.winnerRules['FalseColorGame']
         del self.winnerRules['ConcealedTrueColorGame']
         del self.winnerRules['Eastwonninetimesinarow']

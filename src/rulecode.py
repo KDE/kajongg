@@ -339,7 +339,7 @@ class StandardMahJongg(MJRule):
         """winner rules are not yet applied to hand"""
         # pylint: disable=too-many-return-statements
         # too many return statements
-        if len(hand.melds) != 13:
+        if len(hand.melds) != 5:
             return False
         if any(len(x) not in (2, 3, 4) for x in hand.melds):
             return False
