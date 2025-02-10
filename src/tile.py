@@ -19,6 +19,7 @@ from wind import Wind, East, South, West, North
 if TYPE_CHECKING:
     from rule import Rule, Ruleset
     from hand import Hand
+    from uitile import UITile
 
 class Tile(ReprMixin):  # pylint:disable=too-many-instance-attributes
 
@@ -542,7 +543,7 @@ class Piece(Tile):
         return result
 
     def __init__(self, *args: Any) ->None:  # pylint: disable=unused-argument # type: ignore
-        self.uiTile = None  # might be a UITile
+        self.img:Optional['UITile'] = None
 
     def __hash__(self) ->int:
         """this is not inherited from Tile. I am sure there is a good reason."""
