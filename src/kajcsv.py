@@ -50,7 +50,6 @@ class CsvRow(ReprMixin):
     """represent a row in kajongg.csv"""
 
     Fields = IntEnum('Fields', 'RULESET AI COMMIT PY_VERSION GAME TAGS PLAYERS', start=0)
-    # FIXME: namedtuple?
 
     commitDates : Dict[str, datetime.datetime] = {}
 

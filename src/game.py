@@ -570,9 +570,6 @@ class Game:
         # create the game instance
         game = cls(players, ruleset, gameid=gameid, client=client, wantedGame=resume_at)
 
-        # FIXME wie geht game zum richtigen Startpunkt? Hier ist kein goto,
-        # Game.__init__ verwendet dazu nur wantedGame, also ganz von vorne
-
         for qScore in qScores:
             player = game.players.byId(qScore.player)
             if not player:
