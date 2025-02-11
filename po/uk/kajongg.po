@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-10-10 00:37+0000\n"
+"POT-Creation-Date: 2025-02-11 00:39+0000\n"
 "PO-Revision-Date: 2024-10-10 22:21+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
@@ -30,7 +30,7 @@ msgstr "Перегляд"
 msgid "Toolbar"
 msgstr "Панель інструментів"
 
-#: src/background.py:71 src/tileset.py:50
+#: src/background.py:71 src/tileset.py:48
 msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "У файлі <filename>%1</filename> не міститься коректних зображень SVG"
 
@@ -59,12 +59,12 @@ msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "Опис:"
 
-#: src/board.py:315
+#: src/board.py:335
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
 msgid "hjklHJKL"
 msgstr "hjklHJKL"
 
-#: src/board.py:365
+#: src/board.py:385
 msgid "Choose from"
 msgstr "Оберіть з "
 
@@ -72,7 +72,7 @@ msgstr "Оберіть з "
 msgid "Time"
 msgstr "Час"
 
-#: src/chat.py:51 src/playerlist.py:86
+#: src/chat.py:51 src/playerlist.py:90
 msgid "Player"
 msgstr "Гравець"
 
@@ -167,19 +167,19 @@ msgctxt "Kajongg-Rule"
 msgid "not defined"
 msgstr "не визначено"
 
-#: src/game.py:558
+#: src/game.py:404
 msgid "Score computed manually"
 msgstr "Рахунок, обчислений вручну"
 
-#: src/game.py:655
+#: src/game.py:502
 msgid "Player %1 not known"
 msgstr "Невідомий гравець %1"
 
-#: src/game.py:1082
+#: src/game.py:925
 msgid "Short living wall: Tile is invisible, hence dangerous"
 msgstr "Короткотривала стіна: зараз плитку не видно, отже вона є небезпечною"
 
-#: src/games.py:95 src/playerlist.py:63 src/tables.py:66
+#: src/games.py:95 src/playerlist.py:67 src/tables.py:67
 msgid "Players"
 msgstr "Гравці"
 
@@ -197,19 +197,19 @@ msgctxt "start a new game"
 msgid "&New"
 msgstr "&Нова"
 
-#: src/games.py:128
+#: src/games.py:129
 msgid "&Load"
 msgstr "&Завантажити"
 
-#: src/games.py:132 src/playerlist.py:53
+#: src/games.py:134 src/playerlist.py:56
 msgid "&Delete"
 msgstr "&Вилучити"
 
-#: src/games.py:136
+#: src/games.py:139
 msgid "Show only pending games"
 msgstr "Показувати лише ігри з черги"
 
-#: src/games.py:238
+#: src/games.py:247
 msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
@@ -217,46 +217,46 @@ msgstr ""
 "Ви справді бажаєте вилучити <numid>%1</numid> ігор?<br>Вилучення буде "
 "остаточним, ви не зможете скасувати його за допомогою кнопки «Скасувати»"
 
-#: src/guiutil.py:132 src/kdestub.py:129 src/kdestub.py:132
+#: src/guiutil.py:134 src/kdestub.py:127 src/kdestub.py:130
 msgid "Kajongg"
 msgstr "Kajongg"
 
-#: src/humanclient.py:65
+#: src/humanclient.py:66
 msgid "Which chow do you want to expose?"
 msgstr "Який чоу ви бажаєте відкрити?"
 
-#: src/humanclient.py:103
+#: src/humanclient.py:104
 msgid "Which kong do you want to declare?"
 msgstr "Який конг ви бажаєте оголосити?"
 
-#: src/humanclient.py:170
+#: src/humanclient.py:172
 msgid "Choose"
 msgstr "Вибір"
 
-#: src/humanclient.py:380
+#: src/humanclient.py:383
 msgid "You cannot say %1"
 msgstr "Ви не можете оголосити %1"
 
-#: src/humanclient.py:605
+#: src/humanclient.py:608
 msgid "Player %1 has left the table"
 msgstr "Гравець %1 полишив гральний стіл"
 
-#: src/humanclient.py:668
+#: src/humanclient.py:671
 msgid ""
 "The game on table <numid>%1</numid> can begin. Are you ready to play now?"
 msgstr "Можна розпочинати гру на столі <numid>%1</numid>. Готові до гри?"
 
-#: src/humanclient.py:688
+#: src/humanclient.py:691
 msgid "Ready for next hand?"
 msgstr "Готові до наступної комбінації?"
 
-#: src/humanclient.py:962
+#: src/humanclient.py:967
 msgid "The connection to the server %1 broke, please try again later."
 msgstr ""
 "Не вдається встановити з’єднання з сервером %1, будь ласка, повторіть спробу "
 "пізніше."
 
-#: src/kajongg.py:81 src/kdestub.py:1086
+#: src/kajongg.py:81 src/kdestub.py:1099
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Маджонґ — старовинна китайська гра на дошці для 4 гравців"
 
@@ -327,105 +327,105 @@ msgstr ""
 "використати спеціальний сервер, який вже запущено і який очікуватиме на дані "
 "на порту PORT. Призначено лише для тестування."
 
-#: src/kdestub.py:269
+#: src/kdestub.py:285
 msgid "&OK"
 msgstr "&Гаразд"
 
-#: src/kdestub.py:271
+#: src/kdestub.py:286
 msgid "&Apply"
 msgstr "&Застосувати"
 
-#: src/kdestub.py:273
+#: src/kdestub.py:287
 msgid "&Cancel"
 msgstr "&Скасувати"
 
-#: src/kdestub.py:275 src/kdestub.py:460
+#: src/kdestub.py:288 src/kdestub.py:476
 msgid "&Help"
 msgstr "&Довідка"
 
-#: src/kdestub.py:278
+#: src/kdestub.py:289
 msgid "&Defaults"
 msgstr "&Типові значення"
 
-#: src/kdestub.py:343
+#: src/kdestub.py:359
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Пок&азувати смужку стану"
 
-#: src/kdestub.py:349
+#: src/kdestub.py:365
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Показати панель &інструментів"
 
-#: src/kdestub.py:355
+#: src/kdestub.py:371
 msgid "Configure Tool&bars..."
 msgstr "Налаштувати пенал&и..."
 
-#: src/kdestub.py:357
+#: src/kdestub.py:373
 msgid "Configure toolbars"
 msgstr "Налаштувати панелі інструментів"
 
-#: src/kdestub.py:364
+#: src/kdestub.py:380
 msgid "Configure &Kajongg..."
 msgstr "&Налаштувати Kajongg…"
 
-#: src/kdestub.py:366 src/kdestub.py:1206
+#: src/kdestub.py:382 src/kdestub.py:1160
 msgid "Configure"
 msgstr "Налаштувати"
 
-#: src/kdestub.py:456
+#: src/kdestub.py:472
 msgid "&Game"
 msgstr "&Гра"
 
-#: src/kdestub.py:457
+#: src/kdestub.py:473
 msgid "&View"
 msgstr "П&ерегляд"
 
-#: src/kdestub.py:458
+#: src/kdestub.py:474
 msgid "&Settings"
 msgstr "П&араметри"
 
-#: src/kdestub.py:466
+#: src/kdestub.py:484
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Довідка"
 
-#: src/kdestub.py:469 src/kdestub.py:848
+#: src/kdestub.py:487 src/kdestub.py:864
 msgid "Switch Application Language"
 msgstr "Перемкнути мову програми"
 
-#: src/kdestub.py:473
+#: src/kdestub.py:491
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "П&ро Kajongg"
 
-#: src/kdestub.py:853
+#: src/kdestub.py:869
 msgid "Please choose the language which should be used for this application:"
 msgstr "Будь ласка, виберіть мову, яку слід використовувати в цій програмі:"
 
-#: src/kdestub.py:872
+#: src/kdestub.py:888
 msgid "Add Fallback Language"
 msgstr "Додати запасну мову"
 
-#: src/kdestub.py:884
+#: src/kdestub.py:900
 msgid "Primary language:"
 msgstr "Головна мова:"
 
-#: src/kdestub.py:884
+#: src/kdestub.py:900
 msgid "Fallback language:"
 msgstr "Запасна мова:"
 
-#: src/kdestub.py:890
+#: src/kdestub.py:906
 msgid "Remove"
 msgstr "Вилучити"
 
-#: src/kdestub.py:894
+#: src/kdestub.py:910
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr "Це головна мова програми, і вона буде використовуватися першою."
 
-#: src/kdestub.py:896
+#: src/kdestub.py:912
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
@@ -433,32 +433,32 @@ msgstr ""
 "Ця мова буде використовуватися, якщо попередня мова не має належного "
 "перекладу."
 
-#: src/kdestub.py:1026
+#: src/kdestub.py:1042
 msgid "About Kajongg"
 msgstr "Про Kajongg"
 
-#: src/kdestub.py:1049
+#: src/kdestub.py:1062
 msgid "Version: %1"
 msgstr "Версія: %1"
 
-#: src/kdestub.py:1050
+#: src/kdestub.py:1063
 msgid "Protocol version %1"
 msgstr "Версія протоколу %1"
 
-#: src/kdestub.py:1053
+#: src/kdestub.py:1066
 msgid "Original author"
 msgstr "Перший автор"
 
-#: src/kdestub.py:1060
+#: src/kdestub.py:1073
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "KDE Frameworks (не встановлено або не можна скористатися)"
 
-#: src/kdestub.py:1066
+#: src/kdestub.py:1079
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "Використовуємо версії %1"
 
-#: src/kdestub.py:1087
+#: src/kdestub.py:1100
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -466,7 +466,7 @@ msgstr ""
 "Це класичний маджонґ для чотирьох гравців. Якщо вам потрібен пасьянс "
 "«маджонґ», будь ласка, скористайтеся програмою kmahjongg."
 
-#: src/kdestub.py:1104
+#: src/kdestub.py:1117
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -474,23 +474,19 @@ msgstr ""
 "Будь ласка, користуйтесь <a href=\"https://bugs.kde.org\">https://bugs.kde."
 "org</a> для повідомлень про помилки."
 
-#: src/kdestub.py:1109
+#: src/kdestub.py:1122
 msgid "Authors:"
 msgstr "Автори:"
 
-#: src/kdestub.py:1159
-msgid "License Agreement"
-msgstr "Ліцензійна угода"
-
-#: src/kdestub.py:1408
+#: src/kdestub.py:1363
 msgid "Configure Toolbars"
 msgstr "Налаштувати панелі"
 
-#: src/kdestub.py:1410
+#: src/kdestub.py:1365
 msgid "A&vailable actions:"
 msgstr "&Наявні дії:"
 
-#: src/kdestub.py:1421
+#: src/kdestub.py:1376
 msgid "Curr&ent actions:"
 msgstr "Пот&очні дії:"
 
@@ -498,7 +494,7 @@ msgstr "Пот&очні дії:"
 msgid "trying to start local server %1"
 msgstr "намагаємося запустити локальний сервер %1"
 
-#: src/login.py:188 src/login.py:636
+#: src/login.py:188 src/login.py:637
 msgid "removed stale socket <filename>%1</filename>"
 msgstr "вилучено застарілий сокет <filename>%1</filename>"
 
@@ -511,210 +507,210 @@ msgctxt "kajongg"
 msgid "Login"
 msgstr "Вхід"
 
-#: src/login.py:299 src/login.py:405
+#: src/login.py:300 src/login.py:406
 msgid "Game server:"
 msgstr "Ігровий сервер:"
 
-#: src/login.py:302 src/login.py:407
+#: src/login.py:303 src/login.py:408
 msgid "Username:"
 msgstr "Користувач:"
 
-#: src/login.py:305 src/login.py:410
+#: src/login.py:306 src/login.py:411
 msgid "Password:"
 msgstr "Пароль:"
 
-#: src/login.py:307
+#: src/login.py:308
 msgctxt "kajongg"
 msgid "Ruleset:"
 msgstr "Набір правил:"
 
-#: src/login.py:399
+#: src/login.py:400
 msgctxt "@title:window"
 msgid "Create User Account"
 msgstr "Створення облікового запису користувача"
 
-#: src/login.py:413
+#: src/login.py:414
 msgid "Repeat password:"
 msgstr "Повторіть пароль:"
 
-#: src/login.py:564
+#: src/login.py:565
 msgid "You are already connected to server %1"
 msgstr "Ваш комп’ютер вже з’єднано з сервером %1"
 
-#: src/login.py:604
+#: src/login.py:605
 msgctxt "USER is not known on SERVER"
 msgid "%1 is not known on %2, do you want to open an account?"
 msgstr "На %2 немає користувача %1, бажаєте створити такий обліковий запис?"
 
-#: src/login.py:617
+#: src/login.py:618
 msgid "Server %1 did not answer"
 msgstr "Сервер %1 не надіслав відповіді"
 
-#: src/login.py:619
+#: src/login.py:620
 msgid "Server %1 refused connection"
 msgstr "Сервером %1 відмовлено у встановленні з’єднання"
 
-#: src/login.py:621
+#: src/login.py:622
 msgid "Server %1 does not run a kajongg server"
 msgstr "На сервері %1 не запущено серверної частини kajongg"
 
-#: src/login.py:623
+#: src/login.py:624
 msgid "Address for server %1 cannot be found"
 msgstr "Не вдалося знайти адреси сервера %1"
 
-#: src/login.py:626
+#: src/login.py:627
 msgid "Login to server %1 failed: You have no network connection"
 msgstr ""
 "Спроба увійти на сервер %1 завершилася невдало: ваш комп’ютер не з’єднано з "
 "мережею"
 
-#: src/login.py:637
+#: src/login.py:638
 msgid "Please try again"
 msgstr "Будь ласка, спробуйте ще раз"
 
-#: src/mainwindow.py:483
+#: src/mainwindow.py:486
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "&Рахунок гри вручну"
 
-#: src/mainwindow.py:485
+#: src/mainwindow.py:488
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Гра справжніми плитками"
 
-#: src/mainwindow.py:488
+#: src/mainwindow.py:491
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "О&бчислення рахунку гри справжніми плитками."
 
-#: src/mainwindow.py:490
+#: src/mainwindow.py:493
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Грати"
 
-#: src/mainwindow.py:493
+#: src/mainwindow.py:496
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Почати нову гру."
 
-#: src/mainwindow.py:495
+#: src/mainwindow.py:498
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "П&ерервати гру"
 
-#: src/mainwindow.py:499
+#: src/mainwindow.py:502
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Перервати поточну гру."
 
-#: src/mainwindow.py:501
+#: src/mainwindow.py:504
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "Ви&йти з Kajongg"
 
-#: src/mainwindow.py:504
+#: src/mainwindow.py:507
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Гравці"
 
-#: src/mainwindow.py:507
+#: src/mainwindow.py:510
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "Визначити ваших гравців."
 
-#: src/mainwindow.py:509
+#: src/mainwindow.py:512
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "&Набори правил"
 
-#: src/mainwindow.py:512
+#: src/mainwindow.py:515
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "Налаштувати набори правил."
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:519
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "З&мінити кут огляду"
 
-#: src/mainwindow.py:517
+#: src/mainwindow.py:520
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Кут"
 
-#: src/mainwindow.py:520
+#: src/mainwindow.py:523
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Змінити вигляд плиток."
 
-#: src/mainwindow.py:524
+#: src/mainwindow.py:527
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "Повноекранний &режим"
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:530
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "П&ідсумкова таблиця"
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:532
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "&Рахунки"
 
-#: src/mainwindow.py:531
+#: src/mainwindow.py:534
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Показати або приховати підсумкову таблицю поточної гри."
 
-#: src/mainwindow.py:533
+#: src/mainwindow.py:536
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "По&яснення рахунку"
 
-#: src/mainwindow.py:534
+#: src/mainwindow.py:537
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "По&яснити"
 
-#: src/mainwindow.py:536
+#: src/mainwindow.py:539
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Надати пояснення щодо обчислення результатів гравців у поточній грі."
 
-#: src/mainwindow.py:538
+#: src/mainwindow.py:541
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "Режим &демонстрації"
 
-#: src/mainwindow.py:541
+#: src/mainwindow.py:544
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr ""
 "Дозволити комп’ютеру замінити вас. Якщо потрібно, буде запущено нову "
 "локальну гру."
 
-#: src/mainwindow.py:543
+#: src/mainwindow.py:546
 msgid "C&hat"
 msgstr "С&пілкування"
 
-#: src/mainwindow.py:546
+#: src/mainwindow.py:549
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Спілкування з іншими гравцями."
 
-#: src/message.py:262
+#: src/message.py:250
 msgid "saying %1 violates Original Call"
 msgstr "оголошення %1 порушує початкових виклик"
 
-#: src/message.py:275
+#: src/message.py:263
 msgid ""
 "claiming %1 is dangerous because you will have to discard a dangerous tile"
 msgstr ""
 "оголошення %1 є небезпечним, оскільки вам доведеться відкинути небезпечну "
 "плитку"
 
-#: src/message.py:280
+#: src/message.py:268
 msgid ""
 "claiming %1 for %2 is dangerous because you will have to discard a dangerous "
 "tile"
@@ -722,79 +718,79 @@ msgstr ""
 "оголошення %1 для %2 є небезпечним, оскільки вам доведеться відкинути "
 "небезпечну плитку"
 
-#: src/message.py:283
+#: src/message.py:271
 msgid "You may say %1"
 msgstr "Ви можете оголосити %1"
 
-#: src/message.py:293
+#: src/message.py:280
 msgctxt "kajongg"
 msgid "Pung"
 msgstr "Панг"
 
-#: src/message.py:294
+#: src/message.py:281
 msgctxt "kajongg game dialog:Key for Pung"
 msgid "P"
 msgstr "P"
 
-#: src/message.py:313
+#: src/message.py:299
 msgctxt "kajongg"
 msgid "Kong"
 msgstr "Конг"
 
-#: src/message.py:314
+#: src/message.py:300
 msgctxt "kajongg game dialog:Key for Kong"
 msgid "K"
 msgstr "K"
 
-#: src/message.py:340
+#: src/message.py:326
 msgid "saying Kong for %1 violates Original Call"
 msgstr "оголошення конгу для %1 порушує початковий виклик"
 
-#: src/message.py:344
+#: src/message.py:330
 msgid "You may say Kong for %1"
 msgstr "Вам слід оголосити конг для %1"
 
-#: src/message.py:359
+#: src/message.py:344
 msgctxt "kajongg"
 msgid "Chow"
 msgstr "Чоу"
 
-#: src/message.py:360
+#: src/message.py:345
 msgctxt "kajongg game dialog:Key for Chow"
 msgid "C"
 msgstr "C"
 
-#: src/message.py:394
+#: src/message.py:378
 msgctxt "kajongg"
 msgid "Mah Jongg"
 msgstr "Маджонґ"
 
-#: src/message.py:395
+#: src/message.py:379
 msgctxt "kajongg game dialog:Key for Mah Jongg"
 msgid "M"
 msgstr "M"
 
-#: src/message.py:403
+#: src/message.py:387
 msgid "Press here and you win"
 msgstr "Натисніть тут, щоб виграти"
 
-#: src/message.py:418
+#: src/message.py:401
 msgctxt "kajongg"
 msgid "Original Call"
 msgstr "Початковий виклик"
 
-#: src/message.py:419
+#: src/message.py:402
 msgctxt "kajongg game dialog:Key for Original Call"
 msgid "O"
 msgstr "O"
 
-#: src/message.py:435
+#: src/message.py:418
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
 msgstr ""
 "відкидання %1 з проголошенням початкового виклику робить цю комбінацію "
 "непридатною для виграшу"
 
-#: src/message.py:439
+#: src/message.py:422
 msgid ""
 "Discard a tile, declaring Original Call meaning you need only one tile to "
 "complete the hand and will not alter the hand in any way (except bonus tiles)"
@@ -803,76 +799,76 @@ msgstr ""
 "потрібна лише одна плитка для завершення комбінації і що комбінація не буде "
 "вже ніяк змінюватися (окрім бонусних плиток)"
 
-#: src/message.py:465
+#: src/message.py:447
 msgctxt "kajongg"
 msgid "Discard"
 msgstr "Відкинути"
 
-#: src/message.py:466
+#: src/message.py:448
 msgctxt "kajongg game dialog:Key for Discard"
 msgid "D"
 msgstr "D"
 
-#: src/message.py:483
+#: src/message.py:465
 msgid "discarding %1 violates Original Call"
 msgstr "відкидання %1 порушує початковий виклик"
 
-#: src/message.py:486
+#: src/message.py:468
 msgid "discarding %1 is Dangerous Game"
 msgstr "відкидання %1 робить гру небезпечною"
 
-#: src/message.py:489
+#: src/message.py:471
 msgid "discard the least useful tile"
 msgstr "відкиньте найнепотрібнішу плитку"
 
-#: src/message.py:569
+#: src/message.py:551
 msgid "%1 is not ready to start the game"
 msgstr "Гравець %1 не готовий розпочати гру"
 
-#: src/message.py:608
+#: src/message.py:590
 msgid "Kajongg <numid>%1</numid>"
 msgstr "Kajongg <numid>%1</numid>"
 
-#: src/message.py:694
+#: src/message.py:676
 msgctxt "kajongg"
 msgid "Violates Original Call"
 msgstr "Суперечить початковому виклику"
 
-#: src/message.py:837
+#: src/message.py:819
 msgctxt "kajongg"
 msgid "Dangerous Game"
 msgstr "Небезпечна гра"
 
-#: src/message.py:852
+#: src/message.py:834
 msgctxt "kajongg"
 msgid "No Choice"
 msgstr "Немає вибору"
 
-#: src/message.py:915
+#: src/message.py:896
 msgctxt "kajongg"
 msgid "OK"
 msgstr "Гаразд"
 
-#: src/message.py:916
+#: src/message.py:897
 msgctxt "kajongg game dialog:Key for OK"
 msgid "O"
 msgstr "O"
 
-#: src/message.py:920
+#: src/message.py:901
 msgid "Confirm that you saw the message"
 msgstr "Підтвердити перегляд цього повідомлення"
 
-#: src/message.py:929
+#: src/message.py:909
 msgctxt "kajongg"
 msgid "No Claim"
 msgstr "Не оголошувати"
 
-#: src/message.py:930
+#: src/message.py:910
 msgctxt "kajongg game dialog:Key for No claim"
 msgid "N"
 msgstr "N"
 
-#: src/message.py:934
+#: src/message.py:914
 msgid "You cannot or do not want to claim this tile"
 msgstr "Ви не можете або вам не варто оголошувати цю плитку"
 
@@ -932,20 +928,20 @@ msgstr "Гравець %1 відкрив багато вітрів"
 msgid "Player %1 exposed many dragons"
 msgstr "Гравець %1 відкрив багато драконів"
 
-#: src/playerlist.py:48
+#: src/playerlist.py:50
 msgctxt "define a new player"
 msgid "&New"
 msgstr "&Новий"
 
-#: src/playerlist.py:106
+#: src/playerlist.py:110
 msgid "Player %1 already exists"
 msgstr "Запис гравця %1 вже існує"
 
-#: src/playerlist.py:116
+#: src/playerlist.py:121
 msgid "Error while adding player %1: %2"
 msgstr "Помилка під час спроби додати запис гравця %1: %2"
 
-#: src/playerlist.py:171
+#: src/playerlist.py:176
 msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
@@ -1108,83 +1104,89 @@ msgid "The hand contains too many tiles"
 msgstr "У комбінації занадто багато плиток"
 
 #: src/predefined.py:109
+#, fuzzy
+#| msgid "Zero Point Hand"
+msgid "Tiles in Hand"
+msgstr "Нульова комбінація"
+
+#: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
 msgstr "Кількість очок для маджонгу"
 
-#: src/predefined.py:113
+#: src/predefined.py:118
 msgid "Minimum number of doubles needed for Mah Jongg"
 msgstr "Мінімальна кількість дублів, потрібна для маджонгу"
 
-#: src/predefined.py:116
+#: src/predefined.py:121
 msgid "Points for a Limit Hand"
 msgstr "Кількість очок для обмеження комбінації"
 
-#: src/predefined.py:120
+#: src/predefined.py:125
 msgid "Play with the roof off"
 msgstr "Грати без стелі"
 
-#: src/predefined.py:121
+#: src/predefined.py:126
 msgid "Play with no upper scoring limit"
 msgstr "Грати без обмеження рахунків згори"
 
-#: src/predefined.py:123
+#: src/predefined.py:128
 msgid "Claim Timeout"
 msgstr "Тайм-аут оголошення"
 
-#: src/predefined.py:127
+#: src/predefined.py:132
 msgid "Size of Kong Box"
 msgstr "Розмір панелі конгу"
 
-#: src/predefined.py:128
+#: src/predefined.py:133
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
 msgstr ""
 "Для плиток-замінників під час оголошення конгів використовується поле конгів"
 
-#: src/predefined.py:130
+#: src/predefined.py:135
 msgid "Play with Bonus Tiles"
 msgstr "Грати з бонусними плитками"
 
-#: src/predefined.py:131
+#: src/predefined.py:136
 msgid "Bonus tiles increase the luck factor"
 msgstr "Бонусні плитки збільшують коефіцієнт удачі"
 
-#: src/predefined.py:133
+#: src/predefined.py:138
 msgid "Minimum number of rounds in game"
 msgstr "Мінімальна кількість раундів у грі"
 
-#: src/predefined.py:137
+#: src/predefined.py:142
 msgid "number of allowed chows"
 msgstr "кількість дозволених чоу"
 
-#: src/predefined.py:138
+#: src/predefined.py:143
 msgid "The number of chows a player may build"
 msgstr "Кількість чоу, які може збудувати гравець"
 
-#: src/predefined.py:140
+#: src/predefined.py:145
 msgid "must declare calling hand"
 msgstr "слід вказати гравця, що оголошує"
 
-#: src/predefined.py:142
+#: src/predefined.py:147
 msgid "Mah Jongg is only allowed after having declared to have a calling hand"
 msgstr "Маджонґ можливий лише після оголошення виклику"
 
-#: src/predefined.py:144
+#: src/predefined.py:149
 msgid "Standard Rotation"
 msgstr "Стандартне обертання"
 
-#: src/predefined.py:147
+#: src/predefined.py:152
 msgid "Discard tiles ordered"
 msgstr "Відкинути замовлені плитки"
 
-#: src/predefined.py:149
+#: src/predefined.py:154
 msgid "Discard tiles ordered from top left"
 msgstr "Відкинути замовлені плитки згори ліворуч"
 
-#: src/predefined.py:151
+#: src/predefined.py:156
 msgid "Leave holes for claimed discards"
 msgstr "Лишати дірки для оголошених відкидань"
 
-#: src/predefined.py:154
+#: src/predefined.py:159
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
@@ -1192,43 +1194,43 @@ msgstr ""
 "Лише при відкиданні замовлених плиток: не розташовувати наступне відкидання "
 "там, де було оголошене відкидання"
 
-#: src/predefined.py:163
+#: src/predefined.py:168
 msgid "Last Tile Completes Pair of 2..8"
 msgstr "Остання плитка завершує пару 2..8"
 
-#: src/predefined.py:167
+#: src/predefined.py:172
 msgid "Last Tile Completes Pair of Terminals or Honors"
 msgstr "Остання плитка завершує пару терміналів або чеснот"
 
-#: src/predefined.py:170
+#: src/predefined.py:175
 msgid "Last Tile is Only Possible Tile"
 msgstr "Остання плитка є єдиною можливою плиткою"
 
-#: src/predefined.py:174
+#: src/predefined.py:179
 msgid "Won with Last Tile Taken from Wall"
 msgstr "Виграш за останньою плиткою, взятою зі стіни"
 
-#: src/predefined.py:179
+#: src/predefined.py:184
 msgid "Zero Point Hand"
 msgstr "Нульова комбінація"
 
-#: src/predefined.py:180
+#: src/predefined.py:185
 msgid "The hand has 0 basis points excluding bonus tiles"
 msgstr "У комбінації 0 основних очок без бонусних плиток"
 
-#: src/predefined.py:181
+#: src/predefined.py:186
 msgid "No Chow"
 msgstr "Без чоу"
 
-#: src/predefined.py:183
+#: src/predefined.py:188
 msgid "Only Concealed Melds"
 msgstr "Лише приховані комбінації"
 
-#: src/predefined.py:187
+#: src/predefined.py:192
 msgid "False Color Game"
 msgstr "Гра з фальшивими кольорами"
 
-#: src/predefined.py:188
+#: src/predefined.py:193
 msgid ""
 "Only same-colored tiles (only bamboo/stone/character) plus any number of "
 "winds and dragons"
@@ -1236,119 +1238,119 @@ msgstr ""
 "Лише плитки одного кольору (лише бамбуки/камені/символи) і будь-яка "
 "кількість вітрів і драконів"
 
-#: src/predefined.py:191
+#: src/predefined.py:196
 msgid "True Color Game"
 msgstr "Гра зі справжніми кольорами"
 
-#: src/predefined.py:192
+#: src/predefined.py:197
 msgid "Only same-colored tiles (only bamboo/stone/character)"
 msgstr "Лише плитки одного кольору (лише бамбуки/камені/символи)"
 
-#: src/predefined.py:194
+#: src/predefined.py:199
 msgid "Concealed True Color Game"
 msgstr "Приховані справжні кольори гри"
 
-#: src/predefined.py:195
+#: src/predefined.py:200
 msgid "All tiles concealed and of the same suit, no honors"
 msgstr "Всі плитки приховано, всі плитки однієї масті, без нагород"
 
-#: src/predefined.py:197
+#: src/predefined.py:202
 msgid "Only Terminals and Honors"
 msgstr "Лише термінали і чесноти"
 
-#: src/predefined.py:198
+#: src/predefined.py:203
 msgid "Only winds, dragons, 1 and 9"
 msgstr "Лише вітри, дракони, 1 і 9"
 
-#: src/predefined.py:199
+#: src/predefined.py:204
 msgid "Only Honors"
 msgstr "Лише чесноти"
 
-#: src/predefined.py:200
+#: src/predefined.py:205
 msgid "Only winds and dragons"
 msgstr "Лише вітри і дракони"
 
-#: src/predefined.py:202
+#: src/predefined.py:207
 msgid "Hidden Treasure"
 msgstr "Прихований скарб"
 
-#: src/predefined.py:203
+#: src/predefined.py:208
 msgid "Only hidden Pungs or Kongs, last tile from wall"
 msgstr "Лише приховані панги і конги, остання плитка зі стіни"
 
-#: src/predefined.py:205
+#: src/predefined.py:210
 msgid "Heads and Tails"
 msgstr "Голови і хвости"
 
-#: src/predefined.py:206
+#: src/predefined.py:211
 msgid "Only 1 and 9"
 msgstr "Лише 1 і 9"
 
-#: src/predefined.py:208
+#: src/predefined.py:213
 msgid "Fourfold Plenty"
 msgstr "Чотири по чотири"
 
-#: src/predefined.py:209
+#: src/predefined.py:214
 msgid "4 Kongs"
 msgstr "4 конги"
 
-#: src/predefined.py:211 src/predefined.py:429
+#: src/predefined.py:216 src/predefined.py:431
 msgid "Three Great Scholars"
 msgstr "Три великих вчених"
 
-#: src/predefined.py:212 src/predefined.py:334
+#: src/predefined.py:217 src/predefined.py:337
 msgid "3 Pungs or Kongs of dragons"
 msgstr "3 панги або конги драконів"
 
-#: src/predefined.py:213
+#: src/predefined.py:218
 msgid "Four Blessings Hovering over the Door"
 msgstr "Чотири насолоди увійшли у твої двері"
 
-#: src/predefined.py:215 src/predefined.py:339
+#: src/predefined.py:220 src/predefined.py:342
 msgid "4 Pungs or Kongs of winds"
 msgstr "4 панги або конги вітрів"
 
-#: src/predefined.py:216
+#: src/predefined.py:221
 msgid "Imperial Jade"
 msgstr "Імперський нефрит"
 
-#: src/predefined.py:217
+#: src/predefined.py:222
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
 msgstr "Лише зелені плитки: зелений дракон і бамбуки 2,3,4,6,8"
 
-#: src/predefined.py:218
+#: src/predefined.py:223
 msgid "Gathering the Plum Blossom from the Roof"
 msgstr "Виростити виноград на плоскому даху"
 
-#: src/predefined.py:220
+#: src/predefined.py:225
 msgid "Mah Jong with stone 5 from the dead wall"
 msgstr "Маджонґ з каменем 5 з мертвої стіни"
 
-#: src/predefined.py:222
+#: src/predefined.py:227
 msgid "Plucking the Moon from the Bottom of the Sea"
 msgstr "Доторкнутися до місяця з дна моря"
 
-#: src/predefined.py:223
+#: src/predefined.py:228
 msgid "Mah Jong with the last tile from the wall being a stone 1"
 msgstr "Маджонґ з останньою плиткою зі стіни, яка є каменем 1"
 
-#: src/predefined.py:225
+#: src/predefined.py:230
 msgid "Scratching a Carrying Pole"
 msgstr "Підпиляти опорну жердину"
 
-#: src/predefined.py:226
+#: src/predefined.py:231
 msgid "Robbing the Kong of bamboo 2"
 msgstr "Пограбування конгу з бамбуку 2"
 
-#: src/predefined.py:232
+#: src/predefined.py:237 src/predefined.py:527
 msgid "Standard Mah Jongg"
 msgstr "Стандартний маджонґ"
 
-#: src/predefined.py:237
+#: src/predefined.py:242
 msgid "Nine Gates"
 msgstr "Дев’ять воріт"
 
-#: src/predefined.py:239
+#: src/predefined.py:244
 msgid ""
 "A concealed hand in one color 1112345678999 plus last tile of this suit "
 "(from wall or discarded)"
@@ -1356,11 +1358,11 @@ msgstr ""
 "Прихована послідовність одного кольору 1112345678999 із останньою плиткою у "
 "масті (зі стіни чи відкинутого)"
 
-#: src/predefined.py:241
+#: src/predefined.py:246
 msgid "Thirteen Orphans"
 msgstr "Тринадцять сиріт"
 
-#: src/predefined.py:242
+#: src/predefined.py:247
 msgid ""
 "13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
 "with one of them"
@@ -1368,100 +1370,100 @@ msgstr ""
 "13 плиток без пари: всі дракони, вітри, 1, 9 і чотирнадцята плитка, що є "
 "парною до одної з решти"
 
-#: src/predefined.py:246
+#: src/predefined.py:251
 msgid "Pung/Kong of Dragons"
 msgstr "Панг/конг драконів"
 
-#: src/predefined.py:248
+#: src/predefined.py:253
 msgid "Pung/Kong of Own Wind"
 msgstr "Панг/конг власного вітру"
 
-#: src/predefined.py:251
+#: src/predefined.py:256
 msgid "Pung/Kong of Round Wind"
 msgstr "Панг/конг обхідного вітру"
 
-#: src/predefined.py:255
+#: src/predefined.py:260
 msgid "Exposed Kong"
 msgstr "Відкритий конг"
 
-#: src/predefined.py:258
+#: src/predefined.py:263
 msgid "Exposed Kong of Terminals"
 msgstr "Відкритий конг терміналів"
 
-#: src/predefined.py:261
+#: src/predefined.py:266
 msgid "Exposed Kong of Honors"
 msgstr "Відкритий конг чеснот"
 
-#: src/predefined.py:264
+#: src/predefined.py:269
 msgid "Exposed Pung"
 msgstr "Відкритий панг"
 
-#: src/predefined.py:267
+#: src/predefined.py:272
 msgid "Exposed Pung of Terminals"
 msgstr "Відкритий панг терміналів"
 
-#: src/predefined.py:270
+#: src/predefined.py:275
 msgid "Exposed Pung of Honors"
 msgstr "Відкритий панг чеснот"
 
-#: src/predefined.py:274
+#: src/predefined.py:279
 msgid "Concealed Kong"
 msgstr "Прихований конг"
 
-#: src/predefined.py:277
+#: src/predefined.py:282
 msgid "Concealed Kong of Terminals"
 msgstr "Прихований конг терміналів"
 
-#: src/predefined.py:280
+#: src/predefined.py:285
 msgid "Concealed Kong of Honors"
 msgstr "Прихований конг чеснот"
 
-#: src/predefined.py:283
+#: src/predefined.py:288
 msgid "Concealed Pung"
 msgstr "Прихований панг"
 
-#: src/predefined.py:286
+#: src/predefined.py:291
 msgid "Concealed Pung of Terminals"
 msgstr "Прихований панг терміналів"
 
-#: src/predefined.py:289
+#: src/predefined.py:294
 msgid "Concealed Pung of Honors"
 msgstr "Прихований панг чеснот"
 
-#: src/predefined.py:292
+#: src/predefined.py:297
 msgid "Pair of Own Wind"
 msgstr "Пара власного вітру"
 
-#: src/predefined.py:294
+#: src/predefined.py:299
 msgid "Pair of Round Wind"
 msgstr "Пара обхідного вітру"
 
-#: src/predefined.py:296
+#: src/predefined.py:301
 msgid "Pair of Dragons"
 msgstr "Пара драконів"
 
-#: src/predefined.py:300
+#: src/predefined.py:305
 msgid "Flower"
 msgstr "Квітка"
 
-#: src/predefined.py:302
+#: src/predefined.py:307
 msgid "Season"
 msgstr "Пора року"
 
-#: src/predefined.py:313
+#: src/predefined.py:316
 msgid "Classical Chinese DMJL"
 msgstr "Класична китайська (DMJL)"
 
-#: src/predefined.py:319
+#: src/predefined.py:322
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgstr ""
 "Класичні китайські правила, визначені Deutsche Mah Jongg Liga (DMJL) e.V."
 
-#: src/predefined.py:326
+#: src/predefined.py:329
 msgid "Squirming Snake"
 msgstr "Змія, що звивається"
 
-#: src/predefined.py:327
+#: src/predefined.py:330
 msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
@@ -1469,71 +1471,71 @@ msgstr ""
 "Всі плитки одного кольору. Панг або конг з 1 і 9, пара 2, 5 або 8 і два чоу "
 "з того, що залишилося"
 
-#: src/predefined.py:330
+#: src/predefined.py:333
 msgid "Little Three Dragons"
 msgstr "Малі три дракони"
 
-#: src/predefined.py:331
+#: src/predefined.py:334
 msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
 msgstr "2 панги або конги драконів і 1 пара драконів"
 
-#: src/predefined.py:333
+#: src/predefined.py:336
 msgid "Big Three Dragons"
 msgstr "Великі три дракони"
 
-#: src/predefined.py:336
+#: src/predefined.py:339
 msgid "Little Four Joys"
 msgstr "Малі чотири задоволення"
 
-#: src/predefined.py:337
+#: src/predefined.py:340
 msgid "3 Pungs or Kongs of winds and 1 pair of winds"
 msgstr "3 панги або конги вітрів і пара вітрів"
 
-#: src/predefined.py:338
+#: src/predefined.py:341
 msgid "Big Four Joys"
 msgstr "Великі чотири задоволення"
 
-#: src/predefined.py:344
+#: src/predefined.py:347
 msgid "False Naming of Discard, Claimed for Chow"
 msgstr "Помилкове визначення відкидання, оголошення чоу"
 
-#: src/predefined.py:347
+#: src/predefined.py:350
 msgid "False Naming of Discard, Claimed for Pung/Kong"
 msgstr "Помилкове визначення відкидання, оголошення пангу/конгу"
 
-#: src/predefined.py:350 src/predefined.py:443
+#: src/predefined.py:353 src/predefined.py:445 src/predefined.py:557
 msgid "False Declaration of Mah Jongg by One Player"
 msgstr "Помилкове оголошення маджонгу одним гравцем"
 
-#: src/predefined.py:353
+#: src/predefined.py:356
 msgid "False Declaration of Mah Jongg by Two Players"
 msgstr "Помилкове оголошення маджонгу двома гравцями"
 
-#: src/predefined.py:356
+#: src/predefined.py:359
 msgid "False Declaration of Mah Jongg by Three Players"
 msgstr "Помилкове оголошення маджонгу трьома гравцями"
 
-#: src/predefined.py:359 src/predefined.py:446
+#: src/predefined.py:362 src/predefined.py:448 src/predefined.py:560
 msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr "Помилкове визначення відкидання, оголошення маджонґу"
 
-#: src/predefined.py:370
+#: src/predefined.py:371
 msgid "Classical Chinese BMJA"
 msgstr "Класичні китайські (BMJA)"
 
-#: src/predefined.py:376
+#: src/predefined.py:377
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
 msgstr "Класичні китайські правила, визначені British Mah-Jong Association"
 
-#: src/predefined.py:391
+#: src/predefined.py:393 src/predefined.py:533
 msgid "Original Call"
 msgstr "Початковий виклик"
 
-#: src/predefined.py:395
+#: src/predefined.py:397
 msgid "Gates of Heaven"
 msgstr "Небесні ворота"
 
-#: src/predefined.py:396
+#: src/predefined.py:398
 msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
@@ -1541,20 +1543,20 @@ msgstr ""
 "Всі приховані плитки одного кольору: значення 11112345678999 з однією парою "
 "від 2 до 8 (остання плитка зі стіни або відкинутого)"
 
-#: src/predefined.py:399
+#: src/predefined.py:401
 msgid "Wriggling Snake"
 msgstr "Змія, що вигинається"
 
-#: src/predefined.py:400
+#: src/predefined.py:402
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
 msgstr "Пара одиниць і послідовність від 2 до 9 однієї масті з кожним з вітрів"
 
-#: src/predefined.py:402
+#: src/predefined.py:404
 msgid "Triple Knitting"
 msgstr "Потрійне в’язання"
 
-#: src/predefined.py:403
+#: src/predefined.py:405
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
@@ -1562,124 +1564,134 @@ msgstr ""
 "Чотири набори трьох плиток різних мастей та одна пара: без вітрів або "
 "драконів."
 
-#: src/predefined.py:404
+#: src/predefined.py:406
 msgid "Knitting"
 msgstr "В’язання"
 
-#: src/predefined.py:405
+#: src/predefined.py:407
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr "7 пар плиток у будь-яких 2 з 3 мастей; без вітрів або драконів"
 
-#: src/predefined.py:407
+#: src/predefined.py:409
 msgid "All pair honors"
 msgstr "Врахування всіх пар"
 
-#: src/predefined.py:408
+#: src/predefined.py:410
 msgid "7 pairs of 1s/9s/Winds/Dragons"
 msgstr "7 пар 1, 9, вітрів або драконів"
 
-#: src/predefined.py:411
+#: src/predefined.py:413 src/predefined.py:537
 msgid "Own Flower"
 msgstr "Власна квітка"
 
-#: src/predefined.py:412
+#: src/predefined.py:414 src/predefined.py:538
 msgid "Own Season"
 msgstr "Власна пора року"
 
-#: src/predefined.py:424
+#: src/predefined.py:426
 msgid "Buried Treasure"
 msgstr "Прихований скарб"
 
-#: src/predefined.py:425
+#: src/predefined.py:427
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
 msgstr "Приховані панги одної масті з вітрами або драконами і парою"
 
-#: src/predefined.py:426
+#: src/predefined.py:428 src/predefined.py:549
 msgid "Purity"
 msgstr "Чистота"
 
-#: src/predefined.py:427
+#: src/predefined.py:429 src/predefined.py:550
 msgid "Only same-colored tiles (no chows, dragons or winds)"
 msgstr "Лише плитки одного кольору (без чоу, драконів та вітрів)"
 
-#: src/predefined.py:430
+#: src/predefined.py:432
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
 msgstr "3 панги або конги драконів і будь-який панг або конг з парою"
 
-#: src/predefined.py:433
+#: src/predefined.py:435
 msgid "The 13 Unique Wonders"
 msgstr "13 унікальних чудес"
 
-#: src/predefined.py:440
+#: src/predefined.py:442 src/predefined.py:554
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
 msgstr "Помилкове визначення відкидання, оголошення чоу, пангу або конгу"
 
-#: src/predefined.py:450
+#: src/predefined.py:452
 msgid "Calling for Only Honors"
 msgstr "Виклик лише чеснот"
 
-#: src/predefined.py:454
+#: src/predefined.py:456
 msgid "Calling for Wriggling Snake"
 msgstr "Виклик змії, що вигинається"
 
-#: src/predefined.py:458
+#: src/predefined.py:460
 msgid "Calling for Triple Knitting"
 msgstr "Виклик потрійного в’язання"
 
-#: src/predefined.py:462
+#: src/predefined.py:464
 msgid "Calling for Gates of Heaven"
 msgstr "Виклик Небесних воріт"
 
-#: src/predefined.py:465
+#: src/predefined.py:467
 msgid "Calling for Knitting"
 msgstr "Виклики в’язання"
 
-#: src/predefined.py:469
+#: src/predefined.py:471
 msgid "Calling for Imperial Jade"
 msgstr "Виклик Імперського нефриту"
 
-#: src/predefined.py:473
+#: src/predefined.py:475
 msgid "Calling for The 13 Unique Wonders"
 msgstr "Виклик 13 унікальних чудес"
 
-#: src/predefined.py:476
+#: src/predefined.py:478
 msgid "Calling for Three Great Scholars"
 msgstr "Виклик Трьох великих вчених"
 
-#: src/predefined.py:479
+#: src/predefined.py:481
 msgid "Calling for All pair honors"
 msgstr "Врахування всіх викликів пар"
 
-#: src/predefined.py:483
+#: src/predefined.py:485
 msgid "Calling for Heads and Tails"
 msgstr "Виклики голів і хвостів"
 
-#: src/predefined.py:487
+#: src/predefined.py:489
 msgid "Calling for Four Blessings Hovering over the Door"
 msgstr "Виклик Чотирьох насолод, що увійшли у твої двері"
 
-#: src/predefined.py:490
+#: src/predefined.py:492
 msgid "Calling for Buried Treasure"
 msgstr "Виклик Прихованого скарбу"
 
-#: src/predefined.py:494
+#: src/predefined.py:496
 msgid "Calling for Fourfold Plenty"
 msgstr "Виклик Чотири по чотири"
 
-#: src/predefined.py:498
+#: src/predefined.py:500
 msgid "Calling for Purity"
 msgstr "Виклик Чистоти"
 
-#: src/query.py:196
+#: src/predefined.py:510
+msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
+msgstr ""
+
+#: src/predefined.py:516
+msgid ""
+"Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
+"cgi?id=298821"
+msgstr ""
+
+#: src/query.py:197
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
 msgstr "Локальна гра"
 
-#: src/query.py:376
+#: src/query.py:430
 msgid "Database %1 updated from schema %2 to %3"
 msgstr "Базу даних %1 оновлено з версії схеми %2 до версії %3"
 
-#: src/rule.py:49 src/scoringdialog.py:710 src/scoringdialog.py:788
+#: src/rule.py:49 src/scoringdialog.py:703 src/scoringdialog.py:782
 msgid "points"
 msgstr "очки"
 
@@ -1708,66 +1720,66 @@ msgctxt "Kajongg"
 msgid "%1 limits"
 msgstr "%1 обмежень"
 
-#: src/rule.py:365
+#: src/rule.py:366
 msgid "Meld Rules"
 msgstr "Правила комбінування"
 
-#: src/rule.py:366
+#: src/rule.py:367
 msgid ""
 "Meld rules are applied to single melds independent of the rest of the hand"
 msgstr ""
 "Правила комбінування застосовуються до окремих комбінацій незалежно від "
 "решти комбінації"
 
-#: src/rule.py:367
+#: src/rule.py:368
 msgid "Hand Rules"
 msgstr "Правила комбінацій"
 
-#: src/rule.py:368
+#: src/rule.py:369
 msgid "Hand rules are applied to the entire hand, for all players"
 msgstr "Правила комбінації застосовуються до всієї комбінації для всіх гравців"
 
-#: src/rule.py:369
+#: src/rule.py:370
 msgid "Winner Rules"
 msgstr "Правила перемоги"
 
-#: src/rule.py:370
+#: src/rule.py:371
 msgid "Winner rules are applied to the entire hand but only for the winner"
 msgstr ""
 "Правила переможця застосовуються до всієї комбінації, але лише для переможця"
 
-#: src/rule.py:371
+#: src/rule.py:372
 msgid "Loser Rules"
 msgstr "Правила програшу"
 
-#: src/rule.py:372
+#: src/rule.py:373
 msgid "Loser rules are applied to the entire hand but only for non-winners"
 msgstr ""
 "Правила програшу застосовуються до всієї комбінації, але лише для того, хто "
 "програв"
 
-#: src/rule.py:373
+#: src/rule.py:374
 msgid "Mah Jongg Rules"
 msgstr "Правила маджонґ"
 
-#: src/rule.py:374
+#: src/rule.py:375
 msgid "Only hands matching a Mah Jongg rule can win"
 msgstr "Виграти можуть лише комбінації, що відповідають правилу маджонґ"
 
-#: src/rule.py:375
+#: src/rule.py:376
 msgctxt "kajongg"
 msgid "Options"
 msgstr "Параметри"
 
-#: src/rule.py:376
+#: src/rule.py:377
 msgid "Here we have several special game related options"
 msgstr "Тут показано декілька пов’язаних з грою параметрів"
 
-#: src/rule.py:377
+#: src/rule.py:378
 msgid "Penalties"
 msgstr "Покарання"
 
-#: src/rule.py:378
+#: src/rule.py:379
 msgid ""
 "Penalties are applied manually by the user. They are only used for scoring "
 "games.\n"
@@ -1781,49 +1793,49 @@ msgstr ""
 "ніколи не призведе до ситуації,\n"
 "коли вам доведеться сплачувати за програш грошима."
 
-#: src/rule.py:578
+#: src/rule.py:579
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
 msgstr "Копія%1 %2"
 
-#: src/rule.py:934
+#: src/rule.py:935
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
 msgstr "%4 містить некоректні значення %2/%3 у правилі «%1»"
 
-#: src/rule.py:1022
+#: src/rule.py:1023
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 є надто малим, мінімальним є значення %3"
 
-#: src/rulesetselector.py:503
+#: src/rulesetselector.py:511
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "Налаштування наборів правил"
 
-#: src/rulesetselector.py:522
+#: src/rulesetselector.py:530
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "Правило"
 
-#: src/rulesetselector.py:583
+#: src/rulesetselector.py:592
 msgid "C&opy"
 msgstr "&Копіювати"
 
-#: src/rulesetselector.py:584
+#: src/rulesetselector.py:593
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "По&рівняти"
 
-#: src/rulesetselector.py:585
+#: src/rulesetselector.py:594
 msgid "&Remove"
 msgstr "Ви&лучити"
 
-#: src/rulesetselector.py:586
+#: src/rulesetselector.py:595
 msgid "&Close"
 msgstr "За&крити"
 
-#: src/scene.py:396 src/scene.py:527
+#: src/scene.py:389 src/scene.py:517
 msgid "Do you really want to abort this game?"
 msgstr "Ви справді бажаєте перервати цю гру?"
 
@@ -1849,229 +1861,229 @@ msgctxt "@title:window"
 msgid "Select four players"
 msgstr "Вибір чотирьох гравців"
 
-#: src/scoring.py:332
+#: src/scoring.py:360
 msgid "Move Exposed Tiles Here"
 msgstr "Пересуньте сюди відкриті плитки"
 
-#: src/scoring.py:333
+#: src/scoring.py:361
 msgid "Move Concealed Tiles Here"
 msgstr "Пересуньте сюди приховані плитки"
 
-#: src/scoring.py:651
+#: src/scoring.py:673
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
 "Будь ласка, вкажіть чотирьох гравців за допомогою пункту меню "
 "<interface>Параметри -> Гравці</interface>"
 
-#: src/scoringdialog.py:247
+#: src/scoringdialog.py:258
 msgid "Round/Hand"
 msgstr "Раунд/Гравець"
 
-#: src/scoringdialog.py:280 src/scoringdialog.py:840
+#: src/scoringdialog.py:299 src/scoringdialog.py:834
 msgctxt "kajongg"
 msgid "Score"
 msgstr "Рахунок"
 
-#: src/scoringdialog.py:280
+#: src/scoringdialog.py:299
 msgctxt "kajongg"
 msgid "Payments"
 msgstr "Сплати"
 
-#: src/scoringdialog.py:281
+#: src/scoringdialog.py:300
 msgctxt "kajongg"
 msgid "Balance"
 msgstr "Баланс"
 
-#: src/scoringdialog.py:281
+#: src/scoringdialog.py:300
 msgctxt "kajongg"
 msgid "Chart"
 msgstr "Діаграма"
 
-#: src/scoringdialog.py:427
+#: src/scoringdialog.py:410
 msgctxt "kajongg"
 msgid "Scores"
 msgstr "Рахунки"
 
-#: src/scoringdialog.py:467
+#: src/scoringdialog.py:452
 msgctxt "kajongg"
 msgid "Used Rules"
 msgstr "Використані правила"
 
-#: src/scoringdialog.py:501
+#: src/scoringdialog.py:487
 msgid "Final scores for game <numid>%1</numid>"
 msgstr "Остаточний рахунок гри <numid>%1</numid>"
 
-#: src/scoringdialog.py:503
+#: src/scoringdialog.py:489
 msgid "Scores for game <numid>%1</numid>"
 msgstr "Рахунок гри <numid>%1</numid>"
 
-#: src/scoringdialog.py:576
+#: src/scoringdialog.py:569
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "Пояснення рахунку"
 
-#: src/scoringdialog.py:592
+#: src/scoringdialog.py:585
 msgid "There is no active game"
 msgstr "Немає активної гри"
 
-#: src/scoringdialog.py:595
+#: src/scoringdialog.py:588
 msgid "%1"
 msgstr "%1"
 
-#: src/scoringdialog.py:609
+#: src/scoringdialog.py:602
 msgid "Manual score for %1: %2 points"
 msgstr "Обчислений вручну рахунок %1: %2 очок"
 
-#: src/scoringdialog.py:696
+#: src/scoringdialog.py:689
 msgid "Penalty"
 msgstr "Штраф"
 
-#: src/scoringdialog.py:699
+#: src/scoringdialog.py:692
 msgid "Offense:"
 msgstr "Обман:"
 
-#: src/scoringdialog.py:706
+#: src/scoringdialog.py:699
 msgid "Total Penalty"
 msgstr "Загальний штраф"
 
-#: src/scoringdialog.py:734
+#: src/scoringdialog.py:727
 msgid "&Execute"
 msgstr "&Виконати"
 
-#: src/scoringdialog.py:811
+#: src/scoringdialog.py:805
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
 msgstr "сплачує %1 очок"
 
-#: src/scoringdialog.py:816
+#: src/scoringdialog.py:810
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
 msgstr "отримує %1 очок"
 
-#: src/scoringdialog.py:827
+#: src/scoringdialog.py:821
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
 msgstr "Рахунок для цієї комбінації"
 
-#: src/scoringdialog.py:838
+#: src/scoringdialog.py:832
 msgctxt "kajongg"
 msgid "Player"
 msgstr "Гравець"
 
-#: src/scoringdialog.py:839
+#: src/scoringdialog.py:833
 msgctxt "kajongg"
 msgid "Wind"
 msgstr "Вітер"
 
-#: src/scoringdialog.py:841
+#: src/scoringdialog.py:835
 msgid "Winner"
 msgstr "Переможець"
 
-#: src/scoringdialog.py:847
+#: src/scoringdialog.py:841
 msgctxt "kajongg"
 msgid "Draw"
 msgstr "Нічия"
 
-#: src/scoringdialog.py:849
+#: src/scoringdialog.py:843
 msgid "&Penalties"
 msgstr "По&карання"
 
-#: src/scoringdialog.py:851
+#: src/scoringdialog.py:845
 msgid "&Save Hand"
 msgstr "&Зберегти комбінацію"
 
-#: src/scoringdialog.py:873
+#: src/scoringdialog.py:867
 msgid "&Last Tile:"
 msgstr "&Остання плитка:"
 
-#: src/scoringdialog.py:882
+#: src/scoringdialog.py:876
 msgid "L&ast Meld:"
 msgstr "&Остання комбінація:"
 
-#: src/server.py:120
+#: src/server.py:122
 msgid "Wrong password"
 msgstr "Неправильний пароль"
 
-#: src/server.py:216
+#: src/server.py:218
 msgid "table with id <numid>%1</numid> not found"
 msgstr "стола з ідентифікатором <numid>%1</numid> не знайдено"
 
-#: src/server.py:364
+#: src/server.py:366
 msgid "Player %1 has logged out"
 msgstr "Гравець %1 вийшов з облікового запису на сервері"
 
-#: src/server.py:434
+#: src/server.py:436
 msgid "the server will listen on PORT ({int(defaultPort)})"
 msgstr "сервер очікуватиме на дані на порту ПОРТ ({int(defaultPort)})"
 
-#: src/server.py:437
+#: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "сервер очікуватиме на дані на вказаному сокеті"
 
-#: src/server.py:441
+#: src/server.py:443
 msgid "name of the database"
 msgstr "назва бази даних"
 
-#: src/server.py:445
+#: src/server.py:447
 msgid "do not terminate local game server after last client disconnects"
 msgstr ""
 "не зупиняти роботу локального сервера гри після від’єднання останнього "
 "клієнта"
 
-#: src/servertable.py:180
+#: src/servertable.py:181
 msgid "You already joined this table"
 msgstr "Ви вже приєдналися до цього стола"
 
-#: src/servertable.py:182
+#: src/servertable.py:183
 msgid "All seats are already taken"
 msgstr "Всі місця вже зайнято"
 
-#: src/servertable.py:187
+#: src/servertable.py:188
 msgid "takes a seat"
 msgstr "сідає"
 
-#: src/servertable.py:195
+#: src/servertable.py:196
 msgid "leaves the table"
 msgstr "полишає стіл"
 
-#: src/servertable.py:241
+#: src/servertable.py:242
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 1"
 msgstr "Робот 1"
 
-#: src/servertable.py:244
+#: src/servertable.py:245
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 2"
 msgstr "Робот 2"
 
-#: src/servertable.py:245
+#: src/servertable.py:246
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 3"
 msgstr "Робот 3"
 
-#: src/servertable.py:301
+#: src/servertable.py:302
 msgid "Only the initiator %1 can start this game, you are %2"
 msgstr "Лише ініціатор %1 може розпочати цю гру, ви ж — %2"
 
-#: src/servertable.py:700
+#: src/servertable.py:701
 msgid "Game <numid>%1</numid> is over!"
 msgstr "Гру <numid>%1</numid> завершено!"
 
-#: src/servertable.py:729
+#: src/servertable.py:730
 msgid "%1 wrongly said %2 for meld %3"
 msgstr "%1 помилково повідомлено про %2 для комбінації %3"
 
-#: src/servertable.py:734
+#: src/servertable.py:735
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
 msgstr ""
 "%1 помилково повідомлено про %2: оголошено про %3 прихованих плиток, але "
 "виявлено лише %4"
 
-#: src/servertable.py:771
+#: src/servertable.py:772
 msgid "declareKong:%1 wrongly said Kong for meld %2"
 msgstr "declareKong: %1 помилково повідомлено про конг у комбінації %2"
 
-#: src/servertable.py:820
+#: src/servertable.py:821
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
 msgstr "%1 проголошено маджонґ: комбінація %2 не є виграшною"
 
@@ -2079,36 +2091,36 @@ msgstr "%1 проголошено маджонґ: комбінація %2 не �
 msgid "No voices will be heard because the program %1 is missing"
 msgstr "Звуків не буде чути, оскільки не виявлено програми %1"
 
-#: src/sound.py:374
+#: src/sound.py:375
 msgid "cannot write <filename>%1</filename>: %2"
 msgstr "не вдалося виконати запис до <filename>%1</filename>: %2"
 
-#: src/sound.py:377
+#: src/sound.py:378
 msgid "The voice files have changed, their checksum has changed."
 msgstr ""
 "Файли озвучування було змінено, оскільки змінилася контрольна сума цих "
 "файлів."
 
-#: src/sound.py:378
+#: src/sound.py:379
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
 msgstr ""
 "Будь ласка, перевстановіть kajongg або віддайте таку команду із відповідними "
 "правами доступу:"
 
-#: src/tables.py:64
+#: src/tables.py:65
 msgid "Table"
 msgstr "Стіл"
 
-#: src/tables.py:68
+#: src/tables.py:69
 msgctxt "table status"
 msgid "Status"
 msgstr "Стан"
 
-#: src/tables.py:69
+#: src/tables.py:70
 msgid "Ruleset"
 msgstr "Набір правил"
 
-#: src/tables.py:148
+#: src/tables.py:149
 msgid "Select a ruleset"
 msgstr "Вибір набору правил"
 
@@ -2117,40 +2129,40 @@ msgctxt "allocate a new table"
 msgid "&New"
 msgstr "С&творити"
 
-#: src/tables.py:189 src/tables.py:316 src/tables.py:348
+#: src/tables.py:187 src/tables.py:331 src/tables.py:363
 msgid "Allocate a new table"
 msgstr "Створити новий стіл"
 
-#: src/tables.py:192 src/tables.py:317 src/tables.py:349
+#: src/tables.py:193 src/tables.py:332 src/tables.py:364
 msgid "&Join"
 msgstr "При&єднатися"
 
-#: src/tables.py:196 src/tables.py:318 src/tables.py:350
+#: src/tables.py:194 src/tables.py:333 src/tables.py:365
 msgid "Join a table"
 msgstr "Приєднатися до столу"
 
-#: src/tables.py:198
+#: src/tables.py:200
 msgid "&Leave"
 msgstr "По&лишити"
 
-#: src/tables.py:202
+#: src/tables.py:201
 msgid "Leave a table"
 msgstr "Полишити стіл"
 
-#: src/tables.py:205
+#: src/tables.py:207
 msgctxt "Kajongg-Ruleset"
 msgid "Compare"
 msgstr "Порівняти"
 
-#: src/tables.py:210
+#: src/tables.py:208
 msgid "Compare the rules of this table with my own rulesets"
 msgstr "Порівняти правила з цієї таблиці з вашими власними правилами"
 
-#: src/tables.py:212
+#: src/tables.py:214
 msgid "&Chat"
 msgstr "Сп&ілкування"
 
-#: src/tables.py:217
+#: src/tables.py:221
 msgid "&Start"
 msgstr "&Почати"
 
@@ -2159,194 +2171,194 @@ msgid "Start playing on a table. Empty seats will be taken by robot players."
 msgstr ""
 "Почати гру за столом. За порожніми місцями гратимуть комп’ютерні гравці."
 
-#: src/tables.py:267
+#: src/tables.py:281
 msgid "opens a chat window"
 msgstr "відкриває вікно спілкування"
 
-#: src/tables.py:286
+#: src/tables.py:300
 msgid "Local Games with Ruleset %1"
 msgstr "Локальні ігри з набором правил %1"
 
-#: src/tables.py:290
+#: src/tables.py:304
 msgid "Tables at %1"
 msgstr "Столи на %1"
 
-#: src/tables.py:342
+#: src/tables.py:357
 msgid "Start a new game"
 msgstr "Почати нову гру"
 
-#: src/tables.py:344
+#: src/tables.py:359
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
 msgstr "П&родовжити"
 
-#: src/tables.py:346
+#: src/tables.py:361
 msgid "Resume the selected suspended game"
 msgstr "Продовжити позначену призупинену гру"
 
-#: src/tables.py:364
+#: src/tables.py:379
 msgid "Chat with others on this table"
 msgstr "Спілкування з іншими гравцями стола"
 
-#: src/tables.py:367
+#: src/tables.py:382
 msgid "For chatting with others on this table, please first take a seat"
 msgstr ""
 "Щоб розпочати спілкування з іншими гравцями цього стола, вам слід спершу "
 "сісти за стіл"
 
-#: src/tile.py:276
+#: src/tile.py:277
 msgctxt "kajongg"
 msgid "hidden"
 msgstr "прихований"
 
-#: src/tile.py:277
+#: src/tile.py:278
 msgctxt "kajongg"
 msgid "stone"
 msgstr "камінь"
 
-#: src/tile.py:278
+#: src/tile.py:279
 msgctxt "kajongg"
 msgid "bamboo"
 msgstr "бамбук"
 
-#: src/tile.py:279
+#: src/tile.py:280
 msgctxt "kajongg"
 msgid "character"
 msgstr "символ"
 
-#: src/tile.py:280
+#: src/tile.py:281
 msgctxt "kajongg"
 msgid "wind"
 msgstr "вітер"
 
-#: src/tile.py:281
+#: src/tile.py:282
 msgctxt "kajongg"
 msgid "dragon"
 msgstr "дракон"
 
-#: src/tile.py:282
+#: src/tile.py:283
 msgctxt "kajongg"
 msgid "flower"
 msgstr "квітка"
 
-#: src/tile.py:283
+#: src/tile.py:284
 msgctxt "kajongg"
 msgid "season"
 msgstr "пора року"
 
-#: src/tile.py:289
+#: src/tile.py:290
 msgctxt "kajongg"
 msgid "tile"
 msgstr "плитка"
 
-#: src/tile.py:290
+#: src/tile.py:291
 msgctxt "kajongg"
 msgid "white"
 msgstr "білий"
 
-#: src/tile.py:291
+#: src/tile.py:292
 msgctxt "kajongg"
 msgid "red"
 msgstr "червоний"
 
-#: src/tile.py:292
+#: src/tile.py:293
 msgctxt "kajongg"
 msgid "green"
 msgstr "зелений"
 
-#: src/tile.py:293
+#: src/tile.py:294
 msgctxt "kajongg"
 msgid "East"
 msgstr "Схід"
 
-#: src/tile.py:294
+#: src/tile.py:295
 msgctxt "kajongg"
 msgid "South"
 msgstr "Південь"
 
-#: src/tile.py:295
+#: src/tile.py:296
 msgctxt "kajongg"
 msgid "West"
 msgstr "Захід"
 
-#: src/tile.py:296
+#: src/tile.py:297
 msgctxt "kajongg"
 msgid "North"
 msgstr "Північ"
 
-#: src/tile.py:305
+#: src/tile.py:306
 msgid "East Wind"
 msgstr "Східний вітер"
 
-#: src/tile.py:306
+#: src/tile.py:307
 msgid "South Wind"
 msgstr "Південний вітер"
 
-#: src/tile.py:307
+#: src/tile.py:308
 msgid "West Wind"
 msgstr "Західний вітер"
 
-#: src/tile.py:308
+#: src/tile.py:309
 msgid "North Wind"
 msgstr "Північний вітер"
 
-#: src/tile.py:310
+#: src/tile.py:311
 #, python-brace-format
 msgctxt "kajongg tile name"
 msgid "{group} {value}"
 msgstr "{group} {value}"
 
-#: src/tile.py:889
+#: src/tile.py:880
 msgctxt "kajongg meld type"
 msgid "Bonus"
 msgstr "Бонус"
 
-#: src/tile.py:891
+#: src/tile.py:882
 msgctxt "kajongg meld type"
 msgid "&single"
 msgstr "о&диниця"
 
-#: src/tile.py:893
+#: src/tile.py:884
 msgctxt "kajongg meld type"
 msgid "&pair"
 msgstr "&пара"
 
-#: src/tile.py:895
+#: src/tile.py:886
 msgctxt "kajongg meld type"
 msgid "&chow"
 msgstr "&чоу"
 
-#: src/tile.py:897
+#: src/tile.py:888
 msgctxt "kajongg meld type"
 msgid "p&ung"
 msgstr "п&анг"
 
-#: src/tile.py:899
+#: src/tile.py:890
 msgctxt "kajongg meld type"
 msgid "c&laimed kong"
 msgstr "про&голошений конг"
 
-#: src/tile.py:901
+#: src/tile.py:892
 msgctxt "kajongg meld type"
 msgid "k&ong"
 msgstr "к&онг"
 
-#: src/tile.py:902
+#: src/tile.py:893
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
 msgstr "решта файлів"
 
-#: src/tile.py:909
+#: src/tile.py:900
 msgctxt "kajongg meld state"
 msgid "Exposed"
 msgstr "Відкрито"
 
-#: src/tile.py:910
+#: src/tile.py:901
 msgctxt "kajongg meld state"
 msgid "Concealed"
 msgstr "Приховано"
 
-#: src/tile.py:916
+#: src/tile.py:907
 #, python-brace-format
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
@@ -2389,6 +2401,9 @@ msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "Ви користуєтеся клієнтською програмою версії %1. Для роботи з цим сервером "
 "потрібна версія програми %2."
+
+#~ msgid "License Agreement"
+#~ msgstr "Ліцензійна угода"
 
 #~ msgid "play only ROUNDS rounds per game. Only for debugging!"
 #~ msgstr "грати лише ROUNDS раундів у грі. Лише для діагностики!"

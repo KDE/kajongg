@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-10-10 00:37+0000\n"
+"POT-Creation-Date: 2025-02-11 00:39+0000\n"
 "PO-Revision-Date: 2024-10-25 14:55+0200\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
@@ -32,7 +32,7 @@ msgstr "Visualitza"
 msgid "Toolbar"
 msgstr "Barra d'eines"
 
-#: src/background.py:71 src/tileset.py:50
+#: src/background.py:71 src/tileset.py:48
 msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "el fitxer <filename>%1</filename> no conté un SVG vàlid"
 
@@ -61,12 +61,12 @@ msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "Descripció:"
 
-#: src/board.py:315
+#: src/board.py:335
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
 msgid "hjklHJKL"
 msgstr "hjklHJKL"
 
-#: src/board.py:365
+#: src/board.py:385
 msgid "Choose from"
 msgstr "Trieu entre"
 
@@ -74,7 +74,7 @@ msgstr "Trieu entre"
 msgid "Time"
 msgstr "Temps"
 
-#: src/chat.py:51 src/playerlist.py:86
+#: src/chat.py:51 src/playerlist.py:90
 msgid "Player"
 msgstr "Jugador"
 
@@ -169,19 +169,19 @@ msgctxt "Kajongg-Rule"
 msgid "not defined"
 msgstr "no s'ha definit"
 
-#: src/game.py:558
+#: src/game.py:404
 msgid "Score computed manually"
 msgstr "Puntuació calculada manualment"
 
-#: src/game.py:655
+#: src/game.py:502
 msgid "Player %1 not known"
 msgstr "El jugador %1 és desconegut"
 
-#: src/game.py:1082
+#: src/game.py:925
 msgid "Short living wall: Tile is invisible, hence dangerous"
 msgstr "Paret de vida curta: La peça és invisible i, per tant, perillosa"
 
-#: src/games.py:95 src/playerlist.py:63 src/tables.py:66
+#: src/games.py:95 src/playerlist.py:67 src/tables.py:67
 msgid "Players"
 msgstr "Jugadors"
 
@@ -199,19 +199,19 @@ msgctxt "start a new game"
 msgid "&New"
 msgstr "&Nou"
 
-#: src/games.py:128
+#: src/games.py:129
 msgid "&Load"
 msgstr "&Carrega"
 
-#: src/games.py:132 src/playerlist.py:53
+#: src/games.py:134 src/playerlist.py:56
 msgid "&Delete"
 msgstr "Sup&rimix"
 
-#: src/games.py:136
+#: src/games.py:139
 msgid "Show only pending games"
 msgstr "Mostra només els jocs pendents"
 
-#: src/games.py:238
+#: src/games.py:247
 msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
@@ -219,47 +219,47 @@ msgstr ""
 "Segur que voleu suprimir <numid>%1</numid> jocs?<br>Açò serà definitiu. No "
 "podreu cancel·lar-ho amb el botó Cancel·la"
 
-#: src/guiutil.py:132 src/kdestub.py:129 src/kdestub.py:132
+#: src/guiutil.py:134 src/kdestub.py:127 src/kdestub.py:130
 msgid "Kajongg"
 msgstr "Kajongg"
 
-#: src/humanclient.py:65
+#: src/humanclient.py:66
 msgid "Which chow do you want to expose?"
 msgstr "Quin chow voleu exposar?"
 
-#: src/humanclient.py:103
+#: src/humanclient.py:104
 msgid "Which kong do you want to declare?"
 msgstr "Quin kong voleu declarar?"
 
-#: src/humanclient.py:170
+#: src/humanclient.py:172
 msgid "Choose"
 msgstr "Selecciona"
 
-#: src/humanclient.py:380
+#: src/humanclient.py:383
 msgid "You cannot say %1"
 msgstr "No podeu dir %1"
 
-#: src/humanclient.py:605
+#: src/humanclient.py:608
 msgid "Player %1 has left the table"
 msgstr "El jugador %1 ha deixat la taula"
 
-#: src/humanclient.py:668
+#: src/humanclient.py:671
 msgid ""
 "The game on table <numid>%1</numid> can begin. Are you ready to play now?"
 msgstr ""
 "El joc en la taula <numid>%1</numid> pot començar. Esteu preparat per a "
 "jugar ara?"
 
-#: src/humanclient.py:688
+#: src/humanclient.py:691
 msgid "Ready for next hand?"
 msgstr "Preparat per a la mà següent?"
 
-#: src/humanclient.py:962
+#: src/humanclient.py:967
 msgid "The connection to the server %1 broke, please try again later."
 msgstr ""
 "La connexió amb el servidor %1 s'ha trencat, intenteu-ho de nou més tard."
 
-#: src/kajongg.py:81 src/kdestub.py:1086
+#: src/kajongg.py:81 src/kdestub.py:1099
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Mah Jongg - l'antic joc xinés de taula per a quatre jugadors"
 
@@ -327,99 +327,99 @@ msgstr ""
 "utilitza un servidor dedicat que ja s'està executant i escoltant en un PORT. "
 "Està pensat només per a proves"
 
-#: src/kdestub.py:269
+#: src/kdestub.py:285
 msgid "&OK"
 msgstr "D'ac&ord"
 
-#: src/kdestub.py:271
+#: src/kdestub.py:286
 msgid "&Apply"
 msgstr "&Aplica"
 
-#: src/kdestub.py:273
+#: src/kdestub.py:287
 msgid "&Cancel"
 msgstr "C&ancel·la"
 
-#: src/kdestub.py:275 src/kdestub.py:460
+#: src/kdestub.py:288 src/kdestub.py:476
 msgid "&Help"
 msgstr "&Ajuda"
 
-#: src/kdestub.py:278
+#: src/kdestub.py:289
 msgid "&Defaults"
 msgstr "Valors pre&determinats"
 
-#: src/kdestub.py:343
+#: src/kdestub.py:359
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Mostra la barra d'est&at"
 
-#: src/kdestub.py:349
+#: src/kdestub.py:365
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Mostra la barra d'&eines"
 
-#: src/kdestub.py:355
+#: src/kdestub.py:371
 msgid "Configure Tool&bars..."
 msgstr "Configura les &barres d'eines…"
 
-#: src/kdestub.py:357
+#: src/kdestub.py:373
 msgid "Configure toolbars"
 msgstr "Configura les barres d'eines"
 
-#: src/kdestub.py:364
+#: src/kdestub.py:380
 msgid "Configure &Kajongg..."
 msgstr "Configura &Kajongg…"
 
-#: src/kdestub.py:366 src/kdestub.py:1206
+#: src/kdestub.py:382 src/kdestub.py:1160
 msgid "Configure"
 msgstr "Configura"
 
-#: src/kdestub.py:456
+#: src/kdestub.py:472
 msgid "&Game"
 msgstr "&Joc"
 
-#: src/kdestub.py:457
+#: src/kdestub.py:473
 msgid "&View"
 msgstr "&Vista"
 
-#: src/kdestub.py:458
+#: src/kdestub.py:474
 msgid "&Settings"
 msgstr "Con&figuració"
 
-#: src/kdestub.py:466
+#: src/kdestub.py:484
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Ajuda"
 
-#: src/kdestub.py:469 src/kdestub.py:848
+#: src/kdestub.py:487 src/kdestub.py:864
 msgid "Switch Application Language"
 msgstr "Canvi de l'idioma de l'aplicació"
 
-#: src/kdestub.py:473
+#: src/kdestub.py:491
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "Quant a &Kajongg"
 
-#: src/kdestub.py:853
+#: src/kdestub.py:869
 msgid "Please choose the language which should be used for this application:"
 msgstr "Seleccioneu l'idioma que s'ha d'utilitzar en esta aplicació:"
 
-#: src/kdestub.py:872
+#: src/kdestub.py:888
 msgid "Add Fallback Language"
 msgstr "Afig un idioma alternatiu"
 
-#: src/kdestub.py:884
+#: src/kdestub.py:900
 msgid "Primary language:"
 msgstr "Idioma principal:"
 
-#: src/kdestub.py:884
+#: src/kdestub.py:900
 msgid "Fallback language:"
 msgstr "Idioma alternatiu:"
 
-#: src/kdestub.py:890
+#: src/kdestub.py:906
 msgid "Remove"
 msgstr "Elimina"
 
-#: src/kdestub.py:894
+#: src/kdestub.py:910
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
@@ -427,7 +427,7 @@ msgstr ""
 "Este és l'idioma principal de l'aplicació, el qual s'utilitzarà primer abans "
 "que qualsevol altre."
 
-#: src/kdestub.py:896
+#: src/kdestub.py:912
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
@@ -435,32 +435,32 @@ msgstr ""
 "Este és l'idioma que s'utilitzarà si cap dels idiomes previs no tenen una "
 "traducció apropiada."
 
-#: src/kdestub.py:1026
+#: src/kdestub.py:1042
 msgid "About Kajongg"
 msgstr "Quant a Kajongg"
 
-#: src/kdestub.py:1049
+#: src/kdestub.py:1062
 msgid "Version: %1"
 msgstr "Versió: %1"
 
-#: src/kdestub.py:1050
+#: src/kdestub.py:1063
 msgid "Protocol version %1"
 msgstr "Versió del protocol %1"
 
-#: src/kdestub.py:1053
+#: src/kdestub.py:1066
 msgid "Original author"
 msgstr "Autor original"
 
-#: src/kdestub.py:1060
+#: src/kdestub.py:1073
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "Frameworks de KDE (no instal·lat o no utilitzable)"
 
-#: src/kdestub.py:1066
+#: src/kdestub.py:1079
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "S'utilitzen les versions %1"
 
-#: src/kdestub.py:1087
+#: src/kdestub.py:1100
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -468,7 +468,7 @@ msgstr ""
 "Este és el clàssic Mah Jongg per a quatre jugadors. Si esteu buscant el Mah "
 "Jongg solitari, utilitzeu l'aplicació kmahjongg."
 
-#: src/kdestub.py:1104
+#: src/kdestub.py:1117
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -476,23 +476,19 @@ msgstr ""
 "Utilitzeu <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> per a "
 "informar dels errors."
 
-#: src/kdestub.py:1109
+#: src/kdestub.py:1122
 msgid "Authors:"
 msgstr "Autoria:"
 
-#: src/kdestub.py:1159
-msgid "License Agreement"
-msgstr "Acord de llicència"
-
-#: src/kdestub.py:1408
+#: src/kdestub.py:1363
 msgid "Configure Toolbars"
 msgstr "Configureu les barres d'eines"
 
-#: src/kdestub.py:1410
+#: src/kdestub.py:1365
 msgid "A&vailable actions:"
 msgstr "A&ccions disponibles:"
 
-#: src/kdestub.py:1421
+#: src/kdestub.py:1376
 msgid "Curr&ent actions:"
 msgstr "Acc&ions actuals:"
 
@@ -500,7 +496,7 @@ msgstr "Acc&ions actuals:"
 msgid "trying to start local server %1"
 msgstr "s'està provant d'iniciar el servidor local %1"
 
-#: src/login.py:188 src/login.py:636
+#: src/login.py:188 src/login.py:637
 msgid "removed stale socket <filename>%1</filename>"
 msgstr "s'ha eliminat el sòcol caducat <filename>%1</filename>"
 
@@ -513,284 +509,284 @@ msgctxt "kajongg"
 msgid "Login"
 msgstr "Inici de sessió"
 
-#: src/login.py:299 src/login.py:405
+#: src/login.py:300 src/login.py:406
 msgid "Game server:"
 msgstr "Servidor del joc:"
 
-#: src/login.py:302 src/login.py:407
+#: src/login.py:303 src/login.py:408
 msgid "Username:"
 msgstr "Nom d'usuari:"
 
-#: src/login.py:305 src/login.py:410
+#: src/login.py:306 src/login.py:411
 msgid "Password:"
 msgstr "Contrasenya:"
 
-#: src/login.py:307
+#: src/login.py:308
 msgctxt "kajongg"
 msgid "Ruleset:"
 msgstr "Joc de regles:"
 
-#: src/login.py:399
+#: src/login.py:400
 msgctxt "@title:window"
 msgid "Create User Account"
 msgstr "Creeu un compte d'usuari"
 
-#: src/login.py:413
+#: src/login.py:414
 msgid "Repeat password:"
 msgstr "Repetiu la contrasenya:"
 
-#: src/login.py:564
+#: src/login.py:565
 msgid "You are already connected to server %1"
 msgstr "Ja esteu connectat amb el servidor %1"
 
-#: src/login.py:604
+#: src/login.py:605
 msgctxt "USER is not known on SERVER"
 msgid "%1 is not known on %2, do you want to open an account?"
 msgstr "%1 no és conegut a %2, voleu obrir un compte?"
 
-#: src/login.py:617
+#: src/login.py:618
 msgid "Server %1 did not answer"
 msgstr "El servidor %1 no ha contestat"
 
-#: src/login.py:619
+#: src/login.py:620
 msgid "Server %1 refused connection"
 msgstr "El servidor %1 ha rebutjat la connexió"
 
-#: src/login.py:621
+#: src/login.py:622
 msgid "Server %1 does not run a kajongg server"
 msgstr "El servidor %1 no està executant cap servidor del kajongg"
 
-#: src/login.py:623
+#: src/login.py:624
 msgid "Address for server %1 cannot be found"
 msgstr "No s'ha pogut trobar l'adreça del servidor %1"
 
-#: src/login.py:626
+#: src/login.py:627
 msgid "Login to server %1 failed: You have no network connection"
 msgstr ""
 "No s'ha pogut connectar amb el servidor %1: no hi ha cap connexió de xarxa"
 
-#: src/login.py:637
+#: src/login.py:638
 msgid "Please try again"
 msgstr "Torneu-ho a provar"
 
-#: src/mainwindow.py:483
+#: src/mainwindow.py:486
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "&Puntuació manual del joc"
 
-#: src/mainwindow.py:485
+#: src/mainwindow.py:488
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "Joc manual"
 
-#: src/mainwindow.py:488
+#: src/mainwindow.py:491
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "&Puntuació d'un joc manual."
 
-#: src/mainwindow.py:490
+#: src/mainwindow.py:493
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&Juga"
 
-#: src/mainwindow.py:493
+#: src/mainwindow.py:496
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "Inicia una partida nova."
 
-#: src/mainwindow.py:495
+#: src/mainwindow.py:498
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "&Interromp la partida"
 
-#: src/mainwindow.py:499
+#: src/mainwindow.py:502
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "Interromp la partida actual."
 
-#: src/mainwindow.py:501
+#: src/mainwindow.py:504
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "I&x de Kajongg"
 
-#: src/mainwindow.py:504
+#: src/mainwindow.py:507
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "&Jugadors"
 
-#: src/mainwindow.py:507
+#: src/mainwindow.py:510
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "Definiu els vostres jugadors."
 
-#: src/mainwindow.py:509
+#: src/mainwindow.py:512
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "Jocs de &regles"
 
-#: src/mainwindow.py:512
+#: src/mainwindow.py:515
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "Personalitza els jocs de regles."
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:519
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "&Canvia l'angle visual"
 
-#: src/mainwindow.py:517
+#: src/mainwindow.py:520
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "Angle"
 
-#: src/mainwindow.py:520
+#: src/mainwindow.py:523
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "Canvia l'aparença visual de les fitxes."
 
-#: src/mainwindow.py:524
+#: src/mainwindow.py:527
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "&Mode de pantalla completa"
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:530
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "Taula de puntuacion&s"
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:532
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "Puntuacion&s"
 
-#: src/mainwindow.py:531
+#: src/mainwindow.py:534
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "Mostra o oculta la taula puntuacions pel joc actual."
 
-#: src/mainwindow.py:533
+#: src/mainwindow.py:536
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "&Explica les puntuacions"
 
-#: src/mainwindow.py:534
+#: src/mainwindow.py:537
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "&Explica"
 
-#: src/mainwindow.py:536
+#: src/mainwindow.py:539
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "Explica les puntuacions per a tots els jugadors en la partida actual."
 
-#: src/mainwindow.py:538
+#: src/mainwindow.py:541
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "Mode &demostració"
 
-#: src/mainwindow.py:541
+#: src/mainwindow.py:544
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr "Deixeu que l'ordinador jugue per a tu. Inicia una partida nova si cal."
 
-#: src/mainwindow.py:543
+#: src/mainwindow.py:546
 msgid "C&hat"
 msgstr "&Xat"
 
-#: src/mainwindow.py:546
+#: src/mainwindow.py:549
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "Xat amb els altres jugadors."
 
-#: src/message.py:262
+#: src/message.py:250
 msgid "saying %1 violates Original Call"
 msgstr "dir %1 viola la crida original"
 
-#: src/message.py:275
+#: src/message.py:263
 msgid ""
 "claiming %1 is dangerous because you will have to discard a dangerous tile"
 msgstr "reclamar %1 és perillós perquè hauràs de descartar una fitxa perillosa"
 
-#: src/message.py:280
+#: src/message.py:268
 msgid ""
 "claiming %1 for %2 is dangerous because you will have to discard a dangerous "
 "tile"
 msgstr ""
 "reclamar %1 i %2 és perillós perquè hauràs de descartar una fitxa perillosa"
 
-#: src/message.py:283
+#: src/message.py:271
 msgid "You may say %1"
 msgstr "Podeu dir %1"
 
-#: src/message.py:293
+#: src/message.py:280
 msgctxt "kajongg"
 msgid "Pung"
 msgstr "Pung"
 
-#: src/message.py:294
+#: src/message.py:281
 msgctxt "kajongg game dialog:Key for Pung"
 msgid "P"
 msgstr "P"
 
-#: src/message.py:313
+#: src/message.py:299
 msgctxt "kajongg"
 msgid "Kong"
 msgstr "Kong"
 
-#: src/message.py:314
+#: src/message.py:300
 msgctxt "kajongg game dialog:Key for Kong"
 msgid "K"
 msgstr "K"
 
-#: src/message.py:340
+#: src/message.py:326
 msgid "saying Kong for %1 violates Original Call"
 msgstr "dir Kong per a %1 viola la crida original"
 
-#: src/message.py:344
+#: src/message.py:330
 msgid "You may say Kong for %1"
 msgstr "Podeu dir Kong per a %1"
 
-#: src/message.py:359
+#: src/message.py:344
 msgctxt "kajongg"
 msgid "Chow"
 msgstr "Chow"
 
-#: src/message.py:360
+#: src/message.py:345
 msgctxt "kajongg game dialog:Key for Chow"
 msgid "C"
 msgstr "C"
 
-#: src/message.py:394
+#: src/message.py:378
 msgctxt "kajongg"
 msgid "Mah Jongg"
 msgstr "Mah Jongg"
 
-#: src/message.py:395
+#: src/message.py:379
 msgctxt "kajongg game dialog:Key for Mah Jongg"
 msgid "M"
 msgstr "M"
 
-#: src/message.py:403
+#: src/message.py:387
 msgid "Press here and you win"
 msgstr "Premeu ací i guanyeu"
 
-#: src/message.py:418
+#: src/message.py:401
 msgctxt "kajongg"
 msgid "Original Call"
 msgstr "Crida original"
 
-#: src/message.py:419
+#: src/message.py:402
 msgctxt "kajongg game dialog:Key for Original Call"
 msgid "O"
 msgstr "O"
 
-#: src/message.py:435
+#: src/message.py:418
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
 msgstr ""
 "en descartar %1 i declarar la crida original fa que esta mà no es puga "
 "guanyar"
 
-#: src/message.py:439
+#: src/message.py:422
 msgid ""
 "Discard a tile, declaring Original Call meaning you need only one tile to "
 "complete the hand and will not alter the hand in any way (except bonus tiles)"
@@ -799,76 +795,76 @@ msgstr ""
 "necessita una fitxa per a completar la mà i no alterarà la mà de cap forma "
 "(excepte les fitxes de bonificació)"
 
-#: src/message.py:465
+#: src/message.py:447
 msgctxt "kajongg"
 msgid "Discard"
 msgstr "Descarta"
 
-#: src/message.py:466
+#: src/message.py:448
 msgctxt "kajongg game dialog:Key for Discard"
 msgid "D"
 msgstr "D"
 
-#: src/message.py:483
+#: src/message.py:465
 msgid "discarding %1 violates Original Call"
 msgstr "en descartar %1 es viola la crida original"
 
-#: src/message.py:486
+#: src/message.py:468
 msgid "discarding %1 is Dangerous Game"
 msgstr "descartar %1 és joc perillós"
 
-#: src/message.py:489
+#: src/message.py:471
 msgid "discard the least useful tile"
 msgstr "descarta la fitxa menys útil"
 
-#: src/message.py:569
+#: src/message.py:551
 msgid "%1 is not ready to start the game"
 msgstr "%1 no està preparat per a iniciar el joc"
 
-#: src/message.py:608
+#: src/message.py:590
 msgid "Kajongg <numid>%1</numid>"
 msgstr "Kajongg <numid>%1</numid>"
 
-#: src/message.py:694
+#: src/message.py:676
 msgctxt "kajongg"
 msgid "Violates Original Call"
 msgstr "Viola la crida original"
 
-#: src/message.py:837
+#: src/message.py:819
 msgctxt "kajongg"
 msgid "Dangerous Game"
 msgstr "Joc perillós"
 
-#: src/message.py:852
+#: src/message.py:834
 msgctxt "kajongg"
 msgid "No Choice"
 msgstr "Cap selecció"
 
-#: src/message.py:915
+#: src/message.py:896
 msgctxt "kajongg"
 msgid "OK"
 msgstr "D'acord"
 
-#: src/message.py:916
+#: src/message.py:897
 msgctxt "kajongg game dialog:Key for OK"
 msgid "O"
 msgstr "B"
 
-#: src/message.py:920
+#: src/message.py:901
 msgid "Confirm that you saw the message"
 msgstr "Confirmeu que heu vist el missatge"
 
-#: src/message.py:929
+#: src/message.py:909
 msgctxt "kajongg"
 msgid "No Claim"
 msgstr "No hi ha reclamacions"
 
-#: src/message.py:930
+#: src/message.py:910
 msgctxt "kajongg game dialog:Key for No claim"
 msgid "N"
 msgstr "N"
 
-#: src/message.py:934
+#: src/message.py:914
 msgid "You cannot or do not want to claim this tile"
 msgstr "No podeu o no voleu reclamar esta fitxa"
 
@@ -929,20 +925,20 @@ msgstr "El jugador %1 ha exposat molts vents"
 msgid "Player %1 exposed many dragons"
 msgstr "El jugador %1 ha exposat molts dracs"
 
-#: src/playerlist.py:48
+#: src/playerlist.py:50
 msgctxt "define a new player"
 msgid "&New"
 msgstr "&Nou"
 
-#: src/playerlist.py:106
+#: src/playerlist.py:110
 msgid "Player %1 already exists"
 msgstr "El jugador %1 ja existix"
 
-#: src/playerlist.py:116
+#: src/playerlist.py:121
 msgid "Error while adding player %1: %2"
 msgstr "S'ha produït un error en afegir el jugador %1: %2"
 
-#: src/playerlist.py:171
+#: src/playerlist.py:176
 msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
@@ -1104,82 +1100,88 @@ msgid "The hand contains too many tiles"
 msgstr "La mà conté massa fitxes"
 
 #: src/predefined.py:109
+#, fuzzy
+#| msgid "Zero Point Hand"
+msgid "Tiles in Hand"
+msgstr "Mà de zero punts"
+
+#: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
 msgstr "Punts necessaris per Mah Jongg"
 
-#: src/predefined.py:113
+#: src/predefined.py:118
 msgid "Minimum number of doubles needed for Mah Jongg"
 msgstr "Nombre mínim de dobles necessaris per Mah Jongg"
 
-#: src/predefined.py:116
+#: src/predefined.py:121
 msgid "Points for a Limit Hand"
 msgstr "Punts per a una mà limitada"
 
-#: src/predefined.py:120
+#: src/predefined.py:125
 msgid "Play with the roof off"
 msgstr "Juga sense límit («roof off»)"
 
-#: src/predefined.py:121
+#: src/predefined.py:126
 msgid "Play with no upper scoring limit"
 msgstr "Juga sense límit de puntuació superior"
 
-#: src/predefined.py:123
+#: src/predefined.py:128
 msgid "Claim Timeout"
 msgstr "S'ha esgotat el temps de reclamació"
 
-#: src/predefined.py:127
+#: src/predefined.py:132
 msgid "Size of Kong Box"
 msgstr "Mida del quadro Kong"
 
-#: src/predefined.py:128
+#: src/predefined.py:133
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
 msgstr "El quadro Kong s'utilitza per a substituir fitxes en declarar kongs"
 
-#: src/predefined.py:130
+#: src/predefined.py:135
 msgid "Play with Bonus Tiles"
 msgstr "Juga amb fitxes de bonificació"
 
-#: src/predefined.py:131
+#: src/predefined.py:136
 msgid "Bonus tiles increase the luck factor"
 msgstr "Les fitxes de bonificació incrementen el factor sort"
 
-#: src/predefined.py:133
+#: src/predefined.py:138
 msgid "Minimum number of rounds in game"
 msgstr "Nombre màxim de tandes al joc"
 
-#: src/predefined.py:137
+#: src/predefined.py:142
 msgid "number of allowed chows"
 msgstr "Nombre de chows permesos"
 
-#: src/predefined.py:138
+#: src/predefined.py:143
 msgid "The number of chows a player may build"
 msgstr "El nombre de chows que pot construir un jugador"
 
-#: src/predefined.py:140
+#: src/predefined.py:145
 msgid "must declare calling hand"
 msgstr "ha de declarar una mà de crida"
 
-#: src/predefined.py:142
+#: src/predefined.py:147
 msgid "Mah Jongg is only allowed after having declared to have a calling hand"
 msgstr "El Mah Jongg només es permet després d'haver declarat una mà de crida"
 
-#: src/predefined.py:144
+#: src/predefined.py:149
 msgid "Standard Rotation"
 msgstr "Rotació estàndard"
 
-#: src/predefined.py:147
+#: src/predefined.py:152
 msgid "Discard tiles ordered"
 msgstr "Descarta les fitxes ordenades"
 
-#: src/predefined.py:149
+#: src/predefined.py:154
 msgid "Discard tiles ordered from top left"
 msgstr "Descarta les fitxes ordenades des de la part superior esquerra"
 
-#: src/predefined.py:151
+#: src/predefined.py:156
 msgid "Leave holes for claimed discards"
 msgstr "Deixa forats per a les descartades reclamades"
 
-#: src/predefined.py:154
+#: src/predefined.py:159
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
@@ -1187,43 +1189,43 @@ msgstr ""
 "Només quan es descarten les fitxes ordenades: no col·loqueu la descartada "
 "següent a on estava la descartada reclamada"
 
-#: src/predefined.py:163
+#: src/predefined.py:168
 msgid "Last Tile Completes Pair of 2..8"
 msgstr "L'última fitxa completa el parell de 2..8"
 
-#: src/predefined.py:167
+#: src/predefined.py:172
 msgid "Last Tile Completes Pair of Terminals or Honors"
 msgstr "L'última fitxa completa el parell de terminals o d'honors"
 
-#: src/predefined.py:170
+#: src/predefined.py:175
 msgid "Last Tile is Only Possible Tile"
 msgstr "L'última fitxa és l'única possible"
 
-#: src/predefined.py:174
+#: src/predefined.py:179
 msgid "Won with Last Tile Taken from Wall"
 msgstr "Guanya amb l'última fitxa agafada de la paret"
 
-#: src/predefined.py:179
+#: src/predefined.py:184
 msgid "Zero Point Hand"
 msgstr "Mà de zero punts"
 
-#: src/predefined.py:180
+#: src/predefined.py:185
 msgid "The hand has 0 basis points excluding bonus tiles"
 msgstr "La mà té 0 punts de base excloent les fitxes de bonificació"
 
-#: src/predefined.py:181
+#: src/predefined.py:186
 msgid "No Chow"
 msgstr "Cap Chow"
 
-#: src/predefined.py:183
+#: src/predefined.py:188
 msgid "Only Concealed Melds"
 msgstr "Només les combinacions ocultes"
 
-#: src/predefined.py:187
+#: src/predefined.py:192
 msgid "False Color Game"
 msgstr "Joc de color fals"
 
-#: src/predefined.py:188
+#: src/predefined.py:193
 msgid ""
 "Only same-colored tiles (only bamboo/stone/character) plus any number of "
 "winds and dragons"
@@ -1231,119 +1233,119 @@ msgstr ""
 "Només les fitxes del mateix color (només bambú/pedra/caràcter) més qualsevol "
 "nombre de vents i dracs"
 
-#: src/predefined.py:191
+#: src/predefined.py:196
 msgid "True Color Game"
 msgstr "Joc de color real"
 
-#: src/predefined.py:192
+#: src/predefined.py:197
 msgid "Only same-colored tiles (only bamboo/stone/character)"
 msgstr "Només les fitxes del mateix color (només bambú/pedra/caràcter)"
 
-#: src/predefined.py:194
+#: src/predefined.py:199
 msgid "Concealed True Color Game"
 msgstr "Joc ocult de color real"
 
-#: src/predefined.py:195
+#: src/predefined.py:200
 msgid "All tiles concealed and of the same suit, no honors"
 msgstr "Totes les fitxes ocultes i del mateix coll, sense honors"
 
-#: src/predefined.py:197
+#: src/predefined.py:202
 msgid "Only Terminals and Honors"
 msgstr "Només terminals i honors"
 
-#: src/predefined.py:198
+#: src/predefined.py:203
 msgid "Only winds, dragons, 1 and 9"
 msgstr "Només vents, dracs, 1 i 9"
 
-#: src/predefined.py:199
+#: src/predefined.py:204
 msgid "Only Honors"
 msgstr "Només honors"
 
-#: src/predefined.py:200
+#: src/predefined.py:205
 msgid "Only winds and dragons"
 msgstr "Només vents i dracs"
 
-#: src/predefined.py:202
+#: src/predefined.py:207
 msgid "Hidden Treasure"
 msgstr "Tresor amagat"
 
-#: src/predefined.py:203
+#: src/predefined.py:208
 msgid "Only hidden Pungs or Kongs, last tile from wall"
 msgstr "Només Pungs o Kongs ocults, l'última fitxa de la paret"
 
-#: src/predefined.py:205
+#: src/predefined.py:210
 msgid "Heads and Tails"
 msgstr "Caps i cues"
 
-#: src/predefined.py:206
+#: src/predefined.py:211
 msgid "Only 1 and 9"
 msgstr "Només 1 i 9"
 
-#: src/predefined.py:208
+#: src/predefined.py:213
 msgid "Fourfold Plenty"
 msgstr "Completament quadriculat"
 
-#: src/predefined.py:209
+#: src/predefined.py:214
 msgid "4 Kongs"
 msgstr "4 Kongs"
 
-#: src/predefined.py:211 src/predefined.py:429
+#: src/predefined.py:216 src/predefined.py:431
 msgid "Three Great Scholars"
 msgstr "Tres grans savis"
 
-#: src/predefined.py:212 src/predefined.py:334
+#: src/predefined.py:217 src/predefined.py:337
 msgid "3 Pungs or Kongs of dragons"
 msgstr "3 Pungs o Kongs de dracs"
 
-#: src/predefined.py:213
+#: src/predefined.py:218
 msgid "Four Blessings Hovering over the Door"
 msgstr "Quatre benediccions flotant sobre la porta"
 
-#: src/predefined.py:215 src/predefined.py:339
+#: src/predefined.py:220 src/predefined.py:342
 msgid "4 Pungs or Kongs of winds"
 msgstr "4 Pungs o Kongs de vents"
 
-#: src/predefined.py:216
+#: src/predefined.py:221
 msgid "Imperial Jade"
 msgstr "Jade imperial"
 
-#: src/predefined.py:217
+#: src/predefined.py:222
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
 msgstr "Només fitxes verdes, dracs verds i bambú 2,3,4,6,8"
 
-#: src/predefined.py:218
+#: src/predefined.py:223
 msgid "Gathering the Plum Blossom from the Roof"
 msgstr "Arreplegant la pruna florida des de la teulada"
 
-#: src/predefined.py:220
+#: src/predefined.py:225
 msgid "Mah Jong with stone 5 from the dead wall"
 msgstr "Mah Jong amb pedra 5 de la paret morta"
 
-#: src/predefined.py:222
+#: src/predefined.py:227
 msgid "Plucking the Moon from the Bottom of the Sea"
 msgstr "Traent la lluna del fons del mar"
 
-#: src/predefined.py:223
+#: src/predefined.py:228
 msgid "Mah Jong with the last tile from the wall being a stone 1"
 msgstr "Mah Jong amb l'última fitxa de la paret que és una pedra 1"
 
-#: src/predefined.py:225
+#: src/predefined.py:230
 msgid "Scratching a Carrying Pole"
 msgstr "Rascant un pal de càrrega"
 
-#: src/predefined.py:226
+#: src/predefined.py:231
 msgid "Robbing the Kong of bamboo 2"
 msgstr "Robant el «Kong» de bambú 2"
 
-#: src/predefined.py:232
+#: src/predefined.py:237 src/predefined.py:527
 msgid "Standard Mah Jongg"
 msgstr "Mah Jongg estàndard"
 
-#: src/predefined.py:237
+#: src/predefined.py:242
 msgid "Nine Gates"
 msgstr "Nou portes"
 
-#: src/predefined.py:239
+#: src/predefined.py:244
 msgid ""
 "A concealed hand in one color 1112345678999 plus last tile of this suit "
 "(from wall or discarded)"
@@ -1351,11 +1353,11 @@ msgstr ""
 "Una mà oculta en un color 1112345678999 més l'última fitxa d'esta suit (de "
 "la paret o descartada)"
 
-#: src/predefined.py:241
+#: src/predefined.py:246
 msgid "Thirteen Orphans"
 msgstr "Tretze orfes"
 
-#: src/predefined.py:242
+#: src/predefined.py:247
 msgid ""
 "13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
 "with one of them"
@@ -1363,101 +1365,101 @@ msgstr ""
 "13 fitxes úniques: tots els dracs, els vents, 1, 9 i la 14a fitxa construint "
 "una parella amb una d'estes"
 
-#: src/predefined.py:246
+#: src/predefined.py:251
 msgid "Pung/Kong of Dragons"
 msgstr "El Pung/Kong de dracs"
 
-#: src/predefined.py:248
+#: src/predefined.py:253
 msgid "Pung/Kong of Own Wind"
 msgstr "El Pung/Kong de vent propi"
 
-#: src/predefined.py:251
+#: src/predefined.py:256
 msgid "Pung/Kong of Round Wind"
 msgstr "El Pung/Kong de vent dominant"
 
-#: src/predefined.py:255
+#: src/predefined.py:260
 msgid "Exposed Kong"
 msgstr "Kong exposat"
 
-#: src/predefined.py:258
+#: src/predefined.py:263
 msgid "Exposed Kong of Terminals"
 msgstr "Kong exposat de terminals"
 
-#: src/predefined.py:261
+#: src/predefined.py:266
 msgid "Exposed Kong of Honors"
 msgstr "Kong exposat d'honors"
 
-#: src/predefined.py:264
+#: src/predefined.py:269
 msgid "Exposed Pung"
 msgstr "Pung exposat"
 
-#: src/predefined.py:267
+#: src/predefined.py:272
 msgid "Exposed Pung of Terminals"
 msgstr "Pung exposat de terminals"
 
-#: src/predefined.py:270
+#: src/predefined.py:275
 msgid "Exposed Pung of Honors"
 msgstr "Pung exposat d'honors"
 
-#: src/predefined.py:274
+#: src/predefined.py:279
 msgid "Concealed Kong"
 msgstr "Kong ocult"
 
-#: src/predefined.py:277
+#: src/predefined.py:282
 msgid "Concealed Kong of Terminals"
 msgstr "Kong ocult de terminals"
 
-#: src/predefined.py:280
+#: src/predefined.py:285
 msgid "Concealed Kong of Honors"
 msgstr "Kong ocult d'honors"
 
-#: src/predefined.py:283
+#: src/predefined.py:288
 msgid "Concealed Pung"
 msgstr "Pung ocult"
 
-#: src/predefined.py:286
+#: src/predefined.py:291
 msgid "Concealed Pung of Terminals"
 msgstr "Pung ocult de terminals"
 
-#: src/predefined.py:289
+#: src/predefined.py:294
 msgid "Concealed Pung of Honors"
 msgstr "Pung ocult d'honors"
 
-#: src/predefined.py:292
+#: src/predefined.py:297
 msgid "Pair of Own Wind"
 msgstr "Parella de vents propis"
 
-#: src/predefined.py:294
+#: src/predefined.py:299
 msgid "Pair of Round Wind"
 msgstr "Parella de vents dominants"
 
-#: src/predefined.py:296
+#: src/predefined.py:301
 msgid "Pair of Dragons"
 msgstr "Parella de dracs"
 
-#: src/predefined.py:300
+#: src/predefined.py:305
 msgid "Flower"
 msgstr "Flor"
 
-#: src/predefined.py:302
+#: src/predefined.py:307
 msgid "Season"
 msgstr "Estació"
 
-#: src/predefined.py:313
+#: src/predefined.py:316
 msgid "Classical Chinese DMJL"
 msgstr "Xinesa clàssica DMJL"
 
-#: src/predefined.py:319
+#: src/predefined.py:322
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgstr ""
 "Xinesa clàssica tal com ha sigut definit per la Deutsche Mah Jongg Liga "
 "(DMJL) e.V."
 
-#: src/predefined.py:326
+#: src/predefined.py:329
 msgid "Squirming Snake"
 msgstr "Serp serpentejant"
 
-#: src/predefined.py:327
+#: src/predefined.py:330
 msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
@@ -1465,72 +1467,72 @@ msgstr ""
 "Totes les fitxes del mateix color. Pung o Kong d'1 i 9, parella de 2, 5 o 8 "
 "i dos Chows dels valors restants"
 
-#: src/predefined.py:330
+#: src/predefined.py:333
 msgid "Little Three Dragons"
 msgstr "Tres petits dracs"
 
-#: src/predefined.py:331
+#: src/predefined.py:334
 msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
 msgstr "2 Pungs o Kongs de dracs i una parella de dracs"
 
-#: src/predefined.py:333
+#: src/predefined.py:336
 msgid "Big Three Dragons"
 msgstr "Tres grans dracs"
 
-#: src/predefined.py:336
+#: src/predefined.py:339
 msgid "Little Four Joys"
 msgstr "Quatre xicotetes joies"
 
-#: src/predefined.py:337
+#: src/predefined.py:340
 msgid "3 Pungs or Kongs of winds and 1 pair of winds"
 msgstr "3 Pungs o Kongs de vents i una parella de vents"
 
-#: src/predefined.py:338
+#: src/predefined.py:341
 msgid "Big Four Joys"
 msgstr "Quatre grans joies"
 
-#: src/predefined.py:344
+#: src/predefined.py:347
 msgid "False Naming of Discard, Claimed for Chow"
 msgstr "Nom fals de descart, reclamat per Chow"
 
-#: src/predefined.py:347
+#: src/predefined.py:350
 msgid "False Naming of Discard, Claimed for Pung/Kong"
 msgstr "Nom fals de descart, reclamat per Pung/Kong"
 
-#: src/predefined.py:350 src/predefined.py:443
+#: src/predefined.py:353 src/predefined.py:445 src/predefined.py:557
 msgid "False Declaration of Mah Jongg by One Player"
 msgstr "Declaració falsa de Mah Jongg d'un jugador"
 
-#: src/predefined.py:353
+#: src/predefined.py:356
 msgid "False Declaration of Mah Jongg by Two Players"
 msgstr "Declaració falsa de Mah Jongg de dos jugadors"
 
-#: src/predefined.py:356
+#: src/predefined.py:359
 msgid "False Declaration of Mah Jongg by Three Players"
 msgstr "Declaració falsa de Mah Jongg de tres jugadors"
 
-#: src/predefined.py:359 src/predefined.py:446
+#: src/predefined.py:362 src/predefined.py:448 src/predefined.py:560
 msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr "Nom fals de descart, reclamat per Mah Jongg"
 
-#: src/predefined.py:370
+#: src/predefined.py:371
 msgid "Classical Chinese BMJA"
 msgstr "Xinesa clàssica BMJA"
 
-#: src/predefined.py:376
+#: src/predefined.py:377
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
 msgstr ""
 "Xinesa clàssica tal com ha sigut definit per la British Mah-Jong Association"
 
-#: src/predefined.py:391
+#: src/predefined.py:393 src/predefined.py:533
 msgid "Original Call"
 msgstr "Crida original"
 
-#: src/predefined.py:395
+#: src/predefined.py:397
 msgid "Gates of Heaven"
 msgstr "Portes del cel"
 
-#: src/predefined.py:396
+#: src/predefined.py:398
 msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
@@ -1538,21 +1540,21 @@ msgstr ""
 "Totes les fitxes ocultes del mateix color: valors 1-1-1-2-3-4-5-6-7-8-9-9-9 "
 "amb un parell de 2 a 8 (última fitxa del mur o descartada)"
 
-#: src/predefined.py:399
+#: src/predefined.py:401
 msgid "Wriggling Snake"
 msgstr "Serp serpentejant"
 
-#: src/predefined.py:400
+#: src/predefined.py:402
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
 msgstr ""
 "Parella d'1 i una escala de 2 a 9 del mateix coll amb cada un dels vents"
 
-#: src/predefined.py:402
+#: src/predefined.py:404
 msgid "Triple Knitting"
 msgstr "Triple mitja"
 
-#: src/predefined.py:403
+#: src/predefined.py:405
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
@@ -1560,124 +1562,134 @@ msgstr ""
 "Quatre jocs de tres fitxes de diferents colls i una parella: Sense vents ni "
 "dracs"
 
-#: src/predefined.py:404
+#: src/predefined.py:406
 msgid "Knitting"
 msgstr "Mitja"
 
-#: src/predefined.py:405
+#: src/predefined.py:407
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr "7 parelles de fitxes en 2 colls de 3; sense vents ni dracs"
 
-#: src/predefined.py:407
+#: src/predefined.py:409
 msgid "All pair honors"
 msgstr "Tots els parells d'honors"
 
-#: src/predefined.py:408
+#: src/predefined.py:410
 msgid "7 pairs of 1s/9s/Winds/Dragons"
 msgstr "7 parelles d'1/9/vents/dracs"
 
-#: src/predefined.py:411
+#: src/predefined.py:413 src/predefined.py:537
 msgid "Own Flower"
 msgstr "Flor pròpia"
 
-#: src/predefined.py:412
+#: src/predefined.py:414 src/predefined.py:538
 msgid "Own Season"
 msgstr "Estació pròpia"
 
-#: src/predefined.py:424
+#: src/predefined.py:426
 msgid "Buried Treasure"
 msgstr "Tresor amagat"
 
-#: src/predefined.py:425
+#: src/predefined.py:427
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
 msgstr "Pungs ocults d'un coll amb vents/dracs i una parella"
 
-#: src/predefined.py:426
+#: src/predefined.py:428 src/predefined.py:549
 msgid "Purity"
 msgstr "Puresa"
 
-#: src/predefined.py:427
+#: src/predefined.py:429 src/predefined.py:550
 msgid "Only same-colored tiles (no chows, dragons or winds)"
 msgstr "Només fitxes del mateix color (sense chows, dracs ni vents)"
 
-#: src/predefined.py:430
+#: src/predefined.py:432
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
 msgstr "3 pungs o kongs de dracs més qualsevol pung/kong i una parella"
 
-#: src/predefined.py:433
+#: src/predefined.py:435
 msgid "The 13 Unique Wonders"
 msgstr "13 meravelles úniques"
 
-#: src/predefined.py:440
+#: src/predefined.py:442 src/predefined.py:554
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
 msgstr "Nom fals de descart, reclamat per chow/pung/kong"
 
-#: src/predefined.py:450
+#: src/predefined.py:452
 msgid "Calling for Only Honors"
 msgstr "Crida per a només honors"
 
-#: src/predefined.py:454
+#: src/predefined.py:456
 msgid "Calling for Wriggling Snake"
 msgstr "Crida per a serp serpentejant"
 
-#: src/predefined.py:458
+#: src/predefined.py:460
 msgid "Calling for Triple Knitting"
 msgstr "Crida per a triple mitja"
 
-#: src/predefined.py:462
+#: src/predefined.py:464
 msgid "Calling for Gates of Heaven"
 msgstr "Crida per a portes del cel"
 
-#: src/predefined.py:465
+#: src/predefined.py:467
 msgid "Calling for Knitting"
 msgstr "Crida per a mitja"
 
-#: src/predefined.py:469
+#: src/predefined.py:471
 msgid "Calling for Imperial Jade"
 msgstr "Crida per a jade imperial"
 
-#: src/predefined.py:473
+#: src/predefined.py:475
 msgid "Calling for The 13 Unique Wonders"
 msgstr "Crida per les 13 meravelles úniques"
 
-#: src/predefined.py:476
+#: src/predefined.py:478
 msgid "Calling for Three Great Scholars"
 msgstr "Crida per a tres grans savis"
 
-#: src/predefined.py:479
+#: src/predefined.py:481
 msgid "Calling for All pair honors"
 msgstr "Crida per a tots els parells d'honors"
 
-#: src/predefined.py:483
+#: src/predefined.py:485
 msgid "Calling for Heads and Tails"
 msgstr "Crida per a caps i cues"
 
-#: src/predefined.py:487
+#: src/predefined.py:489
 msgid "Calling for Four Blessings Hovering over the Door"
 msgstr "Crida per a quatre benediccions flotant sobre la porta"
 
-#: src/predefined.py:490
+#: src/predefined.py:492
 msgid "Calling for Buried Treasure"
 msgstr "Crida per a tresor amagat"
 
-#: src/predefined.py:494
+#: src/predefined.py:496
 msgid "Calling for Fourfold Plenty"
 msgstr "Crida per a abundància a quadro"
 
-#: src/predefined.py:498
+#: src/predefined.py:500
 msgid "Calling for Purity"
 msgstr "Crida per a puresa"
 
-#: src/query.py:196
+#: src/predefined.py:510
+msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
+msgstr ""
+
+#: src/predefined.py:516
+msgid ""
+"Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
+"cgi?id=298821"
+msgstr ""
+
+#: src/query.py:197
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
 msgstr "Partida local"
 
-#: src/query.py:376
+#: src/query.py:430
 msgid "Database %1 updated from schema %2 to %3"
 msgstr "La base de dades %1 s'ha actualitzat de l'esquema %2 al %3"
 
-#: src/rule.py:49 src/scoringdialog.py:710 src/scoringdialog.py:788
+#: src/rule.py:49 src/scoringdialog.py:703 src/scoringdialog.py:782
 msgid "points"
 msgstr "punts"
 
@@ -1706,67 +1718,67 @@ msgctxt "Kajongg"
 msgid "%1 limits"
 msgstr "%1 límits"
 
-#: src/rule.py:365
+#: src/rule.py:366
 msgid "Meld Rules"
 msgstr "Regles de les combinacions"
 
-#: src/rule.py:366
+#: src/rule.py:367
 msgid ""
 "Meld rules are applied to single melds independent of the rest of the hand"
 msgstr ""
 "Les regles de les combinacions s'apliquen a les combinacions individuals "
 "independentment de la resta de la mà"
 
-#: src/rule.py:367
+#: src/rule.py:368
 msgid "Hand Rules"
 msgstr "Regles de la mà"
 
-#: src/rule.py:368
+#: src/rule.py:369
 msgid "Hand rules are applied to the entire hand, for all players"
 msgstr "Les regles de la mà s'apliquen a tota la mà, per a tots els jugadors"
 
-#: src/rule.py:369
+#: src/rule.py:370
 msgid "Winner Rules"
 msgstr "Regles del guanyador"
 
-#: src/rule.py:370
+#: src/rule.py:371
 msgid "Winner rules are applied to the entire hand but only for the winner"
 msgstr ""
 "Les regles del guanyador s'apliquen a tota la mà, però només per al guanyador"
 
-#: src/rule.py:371
+#: src/rule.py:372
 msgid "Loser Rules"
 msgstr "Regles dels perdedors"
 
-#: src/rule.py:372
+#: src/rule.py:373
 msgid "Loser rules are applied to the entire hand but only for non-winners"
 msgstr ""
 "Les regles dels perdedors s'apliquen a tota la mà, però només per als no "
 "guanyadors"
 
-#: src/rule.py:373
+#: src/rule.py:374
 msgid "Mah Jongg Rules"
 msgstr "Regles del Mah Jongg"
 
-#: src/rule.py:374
+#: src/rule.py:375
 msgid "Only hands matching a Mah Jongg rule can win"
 msgstr ""
 "Només poden guanyar les mans que coincidisquen amb una regla del Mah Jongg"
 
-#: src/rule.py:375
+#: src/rule.py:376
 msgctxt "kajongg"
 msgid "Options"
 msgstr "Opcions"
 
-#: src/rule.py:376
+#: src/rule.py:377
 msgid "Here we have several special game related options"
 msgstr "Ací hi ha diverses opcions especials relacionades amb el joc"
 
-#: src/rule.py:377
+#: src/rule.py:378
 msgid "Penalties"
 msgstr "Penalitzacions"
 
-#: src/rule.py:378
+#: src/rule.py:379
 msgid ""
 "Penalties are applied manually by the user. They are only used for scoring "
 "games.\n"
@@ -1779,49 +1791,49 @@ msgstr ""
 "Kajongg mai permetrà que esteu en una situació en què hàgeu\n"
 "de pagar una multa"
 
-#: src/rule.py:578
+#: src/rule.py:579
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
 msgstr "Còpia%1 de %2"
 
-#: src/rule.py:934
+#: src/rule.py:935
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
 msgstr "%4 té valors impossibles %2/%3 en la regla «%1»"
 
-#: src/rule.py:1022
+#: src/rule.py:1023
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 és massa xicotet, el valor mínim és %3"
 
-#: src/rulesetselector.py:503
+#: src/rulesetselector.py:511
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "Personalització dels jocs de regles"
 
-#: src/rulesetselector.py:522
+#: src/rulesetselector.py:530
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "Regla"
 
-#: src/rulesetselector.py:583
+#: src/rulesetselector.py:592
 msgid "C&opy"
 msgstr "C&opia"
 
-#: src/rulesetselector.py:584
+#: src/rulesetselector.py:593
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "Co&mpara"
 
-#: src/rulesetselector.py:585
+#: src/rulesetselector.py:594
 msgid "&Remove"
 msgstr "E&limina"
 
-#: src/rulesetselector.py:586
+#: src/rulesetselector.py:595
 msgid "&Close"
 msgstr "Tan&ca"
 
-#: src/scene.py:396 src/scene.py:527
+#: src/scene.py:389 src/scene.py:517
 msgid "Do you really want to abort this game?"
 msgstr "Segur que voleu interrompre esta partida?"
 
@@ -1847,228 +1859,228 @@ msgctxt "@title:window"
 msgid "Select four players"
 msgstr "Seleccioneu els quatre jugadors"
 
-#: src/scoring.py:332
+#: src/scoring.py:360
 msgid "Move Exposed Tiles Here"
 msgstr "Mou ací les fitxes exposades"
 
-#: src/scoring.py:333
+#: src/scoring.py:361
 msgid "Move Concealed Tiles Here"
 msgstr "Mou ací les fitxes ocultes"
 
-#: src/scoring.py:651
+#: src/scoring.py:673
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
 "Definiu quatre jugadors en <interface>Configuració -> Jugadors</interface>"
 
-#: src/scoringdialog.py:247
+#: src/scoringdialog.py:258
 msgid "Round/Hand"
 msgstr "Tanda/mà"
 
-#: src/scoringdialog.py:280 src/scoringdialog.py:840
+#: src/scoringdialog.py:299 src/scoringdialog.py:834
 msgctxt "kajongg"
 msgid "Score"
 msgstr "Puntuació"
 
-#: src/scoringdialog.py:280
+#: src/scoringdialog.py:299
 msgctxt "kajongg"
 msgid "Payments"
 msgstr "Pagaments"
 
-#: src/scoringdialog.py:281
+#: src/scoringdialog.py:300
 msgctxt "kajongg"
 msgid "Balance"
 msgstr "Balanç"
 
-#: src/scoringdialog.py:281
+#: src/scoringdialog.py:300
 msgctxt "kajongg"
 msgid "Chart"
 msgstr "Diagrama"
 
-#: src/scoringdialog.py:427
+#: src/scoringdialog.py:410
 msgctxt "kajongg"
 msgid "Scores"
 msgstr "Puntuacions"
 
-#: src/scoringdialog.py:467
+#: src/scoringdialog.py:452
 msgctxt "kajongg"
 msgid "Used Rules"
 msgstr "Regles utilitzades"
 
-#: src/scoringdialog.py:501
+#: src/scoringdialog.py:487
 msgid "Final scores for game <numid>%1</numid>"
 msgstr "Puntuacions finals pel joc <numid>%1</numid>"
 
-#: src/scoringdialog.py:503
+#: src/scoringdialog.py:489
 msgid "Scores for game <numid>%1</numid>"
 msgstr "Puntuacions pel joc <numid>%1</numid>"
 
-#: src/scoringdialog.py:576
+#: src/scoringdialog.py:569
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "Explicació de les puntuacions"
 
-#: src/scoringdialog.py:592
+#: src/scoringdialog.py:585
 msgid "There is no active game"
 msgstr "No hi ha cap joc actiu"
 
-#: src/scoringdialog.py:595
+#: src/scoringdialog.py:588
 msgid "%1"
 msgstr "%1"
 
-#: src/scoringdialog.py:609
+#: src/scoringdialog.py:602
 msgid "Manual score for %1: %2 points"
 msgstr "Puntuació manual per a %1: %2 punts"
 
-#: src/scoringdialog.py:696
+#: src/scoringdialog.py:689
 msgid "Penalty"
 msgstr "Penalització"
 
-#: src/scoringdialog.py:699
+#: src/scoringdialog.py:692
 msgid "Offense:"
 msgstr "Infracció:"
 
-#: src/scoringdialog.py:706
+#: src/scoringdialog.py:699
 msgid "Total Penalty"
 msgstr "Penalització total"
 
-#: src/scoringdialog.py:734
+#: src/scoringdialog.py:727
 msgid "&Execute"
 msgstr "&Executa"
 
-#: src/scoringdialog.py:811
+#: src/scoringdialog.py:805
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
 msgstr "paga %1 punts"
 
-#: src/scoringdialog.py:816
+#: src/scoringdialog.py:810
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
 msgstr "obté %1 punts"
 
-#: src/scoringdialog.py:827
+#: src/scoringdialog.py:821
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
 msgstr "Puntuació per a esta mà"
 
-#: src/scoringdialog.py:838
+#: src/scoringdialog.py:832
 msgctxt "kajongg"
 msgid "Player"
 msgstr "Jugador"
 
-#: src/scoringdialog.py:839
+#: src/scoringdialog.py:833
 msgctxt "kajongg"
 msgid "Wind"
 msgstr "Vent"
 
-#: src/scoringdialog.py:841
+#: src/scoringdialog.py:835
 msgid "Winner"
 msgstr "Guanyador"
 
-#: src/scoringdialog.py:847
+#: src/scoringdialog.py:841
 msgctxt "kajongg"
 msgid "Draw"
 msgstr "Empat"
 
-#: src/scoringdialog.py:849
+#: src/scoringdialog.py:843
 msgid "&Penalties"
 msgstr "&Penalitzacions"
 
-#: src/scoringdialog.py:851
+#: src/scoringdialog.py:845
 msgid "&Save Hand"
 msgstr "Guar&da la mà"
 
-#: src/scoringdialog.py:873
+#: src/scoringdialog.py:867
 msgid "&Last Tile:"
 msgstr "&Última fitxa:"
 
-#: src/scoringdialog.py:882
+#: src/scoringdialog.py:876
 msgid "L&ast Meld:"
 msgstr "D&arrera combinació:"
 
-#: src/server.py:120
+#: src/server.py:122
 msgid "Wrong password"
 msgstr "Contrasenya errònia"
 
-#: src/server.py:216
+#: src/server.py:218
 msgid "table with id <numid>%1</numid> not found"
 msgstr "no s'ha trobat la taula amb l'id <numid>%1</numid>"
 
-#: src/server.py:364
+#: src/server.py:366
 msgid "Player %1 has logged out"
 msgstr "El jugador %1 s'ha desconnectat"
 
-#: src/server.py:434
+#: src/server.py:436
 msgid "the server will listen on PORT ({int(defaultPort)})"
 msgstr "el servidor escoltarà en el PORT ({int(defaultPort)})"
 
-#: src/server.py:437
+#: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "el servidor escoltarà en el SÒCOL"
 
-#: src/server.py:441
+#: src/server.py:443
 msgid "name of the database"
 msgstr "nom de la base de dades"
 
-#: src/server.py:445
+#: src/server.py:447
 msgid "do not terminate local game server after last client disconnects"
 msgstr ""
 "no finalitzeu el servidor de joc local després que l'últim client es "
 "desconnecte"
 
-#: src/servertable.py:180
+#: src/servertable.py:181
 msgid "You already joined this table"
 msgstr "Ja vos heu unit a esta taula"
 
-#: src/servertable.py:182
+#: src/servertable.py:183
 msgid "All seats are already taken"
 msgstr "Tots els seients són ocupats"
 
-#: src/servertable.py:187
+#: src/servertable.py:188
 msgid "takes a seat"
 msgstr "pren un seient"
 
-#: src/servertable.py:195
+#: src/servertable.py:196
 msgid "leaves the table"
 msgstr "abandona la taula"
 
-#: src/servertable.py:241
+#: src/servertable.py:242
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 1"
 msgstr "Robot 1"
 
-#: src/servertable.py:244
+#: src/servertable.py:245
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 2"
 msgstr "Robot 2"
 
-#: src/servertable.py:245
+#: src/servertable.py:246
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 3"
 msgstr "Robot 3"
 
-#: src/servertable.py:301
+#: src/servertable.py:302
 msgid "Only the initiator %1 can start this game, you are %2"
 msgstr "Només l'iniciador %1 pot iniciar este joc, vós sou %2"
 
-#: src/servertable.py:700
+#: src/servertable.py:701
 msgid "Game <numid>%1</numid> is over!"
 msgstr "El joc <numid>%1</numid> ha acabat!"
 
-#: src/servertable.py:729
+#: src/servertable.py:730
 msgid "%1 wrongly said %2 for meld %3"
 msgstr "%1 ha dit incorrectament %2 per a la combinació %3"
 
-#: src/servertable.py:734
+#: src/servertable.py:735
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
 msgstr ""
 "%1 ha dit incorrectament %2: diu que té %3 fitxes ocultes, però només en té "
 "%4"
 
-#: src/servertable.py:771
+#: src/servertable.py:772
 msgid "declareKong:%1 wrongly said Kong for meld %2"
 msgstr "declara Kong:%1 ha dit incorrectament Kong per a la combinació %2"
 
-#: src/servertable.py:820
+#: src/servertable.py:821
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
 msgstr "%1 reclama MahJongg: esta no és una mà guanyadora: %2"
 
@@ -2076,33 +2088,33 @@ msgstr "%1 reclama MahJongg: esta no és una mà guanyadora: %2"
 msgid "No voices will be heard because the program %1 is missing"
 msgstr "No se sentirà cap veu perquè falta el programa %1"
 
-#: src/sound.py:374
+#: src/sound.py:375
 msgid "cannot write <filename>%1</filename>: %2"
 msgstr "no es pot escriure <filename>%1</filename>: %2"
 
-#: src/sound.py:377
+#: src/sound.py:378
 msgid "The voice files have changed, their checksum has changed."
 msgstr ""
 "Els fitxers de veu han canviat, les seues sumes de verificació han canviat."
 
-#: src/sound.py:378
+#: src/sound.py:379
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
 msgstr "Torneu a instal·lar Kajongg, o feu-ho amb els permisos suficients:"
 
-#: src/tables.py:64
+#: src/tables.py:65
 msgid "Table"
 msgstr "Taula"
 
-#: src/tables.py:68
+#: src/tables.py:69
 msgctxt "table status"
 msgid "Status"
 msgstr "Estat"
 
-#: src/tables.py:69
+#: src/tables.py:70
 msgid "Ruleset"
 msgstr "Joc de regles"
 
-#: src/tables.py:148
+#: src/tables.py:149
 msgid "Select a ruleset"
 msgstr "Seleccioneu un joc de regles"
 
@@ -2111,40 +2123,40 @@ msgctxt "allocate a new table"
 msgid "&New"
 msgstr "&Nova"
 
-#: src/tables.py:189 src/tables.py:316 src/tables.py:348
+#: src/tables.py:187 src/tables.py:331 src/tables.py:363
 msgid "Allocate a new table"
 msgstr "Allotja una taula nova"
 
-#: src/tables.py:192 src/tables.py:317 src/tables.py:349
+#: src/tables.py:193 src/tables.py:332 src/tables.py:364
 msgid "&Join"
 msgstr "&Unix-te"
 
-#: src/tables.py:196 src/tables.py:318 src/tables.py:350
+#: src/tables.py:194 src/tables.py:333 src/tables.py:365
 msgid "Join a table"
 msgstr "Unix-te a una taula"
 
-#: src/tables.py:198
+#: src/tables.py:200
 msgid "&Leave"
 msgstr "I&x"
 
-#: src/tables.py:202
+#: src/tables.py:201
 msgid "Leave a table"
 msgstr "Deixa una taula"
 
-#: src/tables.py:205
+#: src/tables.py:207
 msgctxt "Kajongg-Ruleset"
 msgid "Compare"
 msgstr "Compara"
 
-#: src/tables.py:210
+#: src/tables.py:208
 msgid "Compare the rules of this table with my own rulesets"
 msgstr "Compara les regles d'esta taula amb els meus jocs de regles"
 
-#: src/tables.py:212
+#: src/tables.py:214
 msgid "&Chat"
 msgstr "&Xat"
 
-#: src/tables.py:217
+#: src/tables.py:221
 msgid "&Start"
 msgstr "&Inicia"
 
@@ -2153,192 +2165,192 @@ msgid "Start playing on a table. Empty seats will be taken by robot players."
 msgstr ""
 "Comença a jugar en una taula. Els seients buits els ocuparan jugadors robots."
 
-#: src/tables.py:267
+#: src/tables.py:281
 msgid "opens a chat window"
 msgstr "obri una finestra de xat"
 
-#: src/tables.py:286
+#: src/tables.py:300
 msgid "Local Games with Ruleset %1"
 msgstr "Partides locals amb el joc de regles %1"
 
-#: src/tables.py:290
+#: src/tables.py:304
 msgid "Tables at %1"
 msgstr "Taules a %1"
 
-#: src/tables.py:342
+#: src/tables.py:357
 msgid "Start a new game"
 msgstr "Inicia una partida nova"
 
-#: src/tables.py:344
+#: src/tables.py:359
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
 msgstr "&Reprén"
 
-#: src/tables.py:346
+#: src/tables.py:361
 msgid "Resume the selected suspended game"
 msgstr "Reprén el joc suspés seleccionat"
 
-#: src/tables.py:364
+#: src/tables.py:379
 msgid "Chat with others on this table"
 msgstr "Xat amb altres d'esta taula"
 
-#: src/tables.py:367
+#: src/tables.py:382
 msgid "For chatting with others on this table, please first take a seat"
 msgstr "Per a xatejar amb altres d'esta taula, primer preneu un seient"
 
-#: src/tile.py:276
+#: src/tile.py:277
 msgctxt "kajongg"
 msgid "hidden"
 msgstr "ocult"
 
-#: src/tile.py:277
+#: src/tile.py:278
 msgctxt "kajongg"
 msgid "stone"
 msgstr "pedra"
 
-#: src/tile.py:278
+#: src/tile.py:279
 msgctxt "kajongg"
 msgid "bamboo"
 msgstr "bambú"
 
-#: src/tile.py:279
+#: src/tile.py:280
 msgctxt "kajongg"
 msgid "character"
 msgstr "caràcter"
 
-#: src/tile.py:280
+#: src/tile.py:281
 msgctxt "kajongg"
 msgid "wind"
 msgstr "vent"
 
-#: src/tile.py:281
+#: src/tile.py:282
 msgctxt "kajongg"
 msgid "dragon"
 msgstr "drac"
 
-#: src/tile.py:282
+#: src/tile.py:283
 msgctxt "kajongg"
 msgid "flower"
 msgstr "flor"
 
-#: src/tile.py:283
+#: src/tile.py:284
 msgctxt "kajongg"
 msgid "season"
 msgstr "estació"
 
-#: src/tile.py:289
+#: src/tile.py:290
 msgctxt "kajongg"
 msgid "tile"
 msgstr "fitxa"
 
-#: src/tile.py:290
+#: src/tile.py:291
 msgctxt "kajongg"
 msgid "white"
 msgstr "blanc"
 
-#: src/tile.py:291
+#: src/tile.py:292
 msgctxt "kajongg"
 msgid "red"
 msgstr "roig"
 
-#: src/tile.py:292
+#: src/tile.py:293
 msgctxt "kajongg"
 msgid "green"
 msgstr "verd"
 
-#: src/tile.py:293
+#: src/tile.py:294
 msgctxt "kajongg"
 msgid "East"
 msgstr "Est"
 
-#: src/tile.py:294
+#: src/tile.py:295
 msgctxt "kajongg"
 msgid "South"
 msgstr "Sud"
 
-#: src/tile.py:295
+#: src/tile.py:296
 msgctxt "kajongg"
 msgid "West"
 msgstr "Oest"
 
-#: src/tile.py:296
+#: src/tile.py:297
 msgctxt "kajongg"
 msgid "North"
 msgstr "Nord"
 
-#: src/tile.py:305
+#: src/tile.py:306
 msgid "East Wind"
 msgstr "Vent de l'est"
 
-#: src/tile.py:306
+#: src/tile.py:307
 msgid "South Wind"
 msgstr "Vent del sud"
 
-#: src/tile.py:307
+#: src/tile.py:308
 msgid "West Wind"
 msgstr "Vent de l'oest"
 
-#: src/tile.py:308
+#: src/tile.py:309
 msgid "North Wind"
 msgstr "Vent del nord"
 
-#: src/tile.py:310
+#: src/tile.py:311
 #, python-brace-format
 msgctxt "kajongg tile name"
 msgid "{group} {value}"
 msgstr "{group} {value}"
 
-#: src/tile.py:889
+#: src/tile.py:880
 msgctxt "kajongg meld type"
 msgid "Bonus"
 msgstr "Bonificació"
 
-#: src/tile.py:891
+#: src/tile.py:882
 msgctxt "kajongg meld type"
 msgid "&single"
 msgstr "&individual"
 
-#: src/tile.py:893
+#: src/tile.py:884
 msgctxt "kajongg meld type"
 msgid "&pair"
 msgstr "&parella"
 
-#: src/tile.py:895
+#: src/tile.py:886
 msgctxt "kajongg meld type"
 msgid "&chow"
 msgstr "&chow"
 
-#: src/tile.py:897
+#: src/tile.py:888
 msgctxt "kajongg meld type"
 msgid "p&ung"
 msgstr "p&ung"
 
-#: src/tile.py:899
+#: src/tile.py:890
 msgctxt "kajongg meld type"
 msgid "c&laimed kong"
 msgstr "kong rec&lamat"
 
-#: src/tile.py:901
+#: src/tile.py:892
 msgctxt "kajongg meld type"
 msgid "k&ong"
 msgstr "k&ong"
 
-#: src/tile.py:902
+#: src/tile.py:893
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
 msgstr "resta de fitxers"
 
-#: src/tile.py:909
+#: src/tile.py:900
 msgctxt "kajongg meld state"
 msgid "Exposed"
 msgstr "Exposada"
 
-#: src/tile.py:910
+#: src/tile.py:901
 msgctxt "kajongg meld state"
 msgid "Concealed"
 msgstr "Oculta"
 
-#: src/tile.py:916
+#: src/tile.py:907
 #, python-brace-format
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
@@ -2380,3 +2392,6 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "El vostre client té la versió %1 però necessiteu %2 per a este servidor"
+
+#~ msgid "License Agreement"
+#~ msgstr "Acord de llicència"

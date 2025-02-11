@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-10-10 00:37+0000\n"
+"POT-Creation-Date: 2025-02-11 00:39+0000\n"
 "PO-Revision-Date: 2025-01-14 18:30+0400\n"
 "Last-Translator: Zayed Al-Saidi <zayed.alsaidi@gmail.com>\n"
 "Language-Team: ar\n"
@@ -28,7 +28,7 @@ msgstr "اعرض"
 msgid "Toolbar"
 msgstr "شريط الأدوات"
 
-#: src/background.py:71 src/tileset.py:50
+#: src/background.py:71 src/tileset.py:48
 msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "الملف <filename>%1</filename> لا يحتوي على SVG صالح"
 
@@ -57,12 +57,12 @@ msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "الوصف:"
 
-#: src/board.py:315
+#: src/board.py:335
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
 msgid "hjklHJKL"
 msgstr "hjklHJKL"
 
-#: src/board.py:365
+#: src/board.py:385
 msgid "Choose from"
 msgstr "اختر من"
 
@@ -70,7 +70,7 @@ msgstr "اختر من"
 msgid "Time"
 msgstr "الوقت"
 
-#: src/chat.py:51 src/playerlist.py:86
+#: src/chat.py:51 src/playerlist.py:90
 msgid "Player"
 msgstr "اللاعب"
 
@@ -165,19 +165,19 @@ msgctxt "Kajongg-Rule"
 msgid "not defined"
 msgstr "غير محدد"
 
-#: src/game.py:558
+#: src/game.py:404
 msgid "Score computed manually"
 msgstr "حسبت النتيجة يدويا"
 
-#: src/game.py:655
+#: src/game.py:502
 msgid "Player %1 not known"
 msgstr "اللاعب %1 غير معروف"
 
-#: src/game.py:1082
+#: src/game.py:925
 msgid "Short living wall: Tile is invisible, hence dangerous"
 msgstr "جدار حي قصير: القطع غير مرئية، وبالتالي خطير"
 
-#: src/games.py:95 src/playerlist.py:63 src/tables.py:66
+#: src/games.py:95 src/playerlist.py:67 src/tables.py:67
 msgid "Players"
 msgstr "اللاعبون"
 
@@ -195,19 +195,19 @@ msgctxt "start a new game"
 msgid "&New"
 msgstr "&جديد"
 
-#: src/games.py:128
+#: src/games.py:129
 msgid "&Load"
 msgstr "&حمّل"
 
-#: src/games.py:132 src/playerlist.py:53
+#: src/games.py:134 src/playerlist.py:56
 msgid "&Delete"
 msgstr "اح&ذف"
 
-#: src/games.py:136
+#: src/games.py:139
 msgid "Show only pending games"
 msgstr "أظهر الألعاب المعلقة فقط"
 
-#: src/games.py:238
+#: src/games.py:247
 msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
@@ -215,44 +215,44 @@ msgstr ""
 "هل تريد حقًا حذف ألعاب <numid>%1</numid>؟<br>سيكون هذا نهائيًا، ولا يمكنك "
 "إلغاؤه باستخدام زر الإلغاء"
 
-#: src/guiutil.py:132 src/kdestub.py:129 src/kdestub.py:132
+#: src/guiutil.py:134 src/kdestub.py:127 src/kdestub.py:130
 msgid "Kajongg"
 msgstr "كاجونغ"
 
-#: src/humanclient.py:65
+#: src/humanclient.py:66
 msgid "Which chow do you want to expose?"
 msgstr "ما هو الطعام الذي تريد كشفه؟"
 
-#: src/humanclient.py:103
+#: src/humanclient.py:104
 msgid "Which kong do you want to declare?"
 msgstr "ما هو الكونغ الذي تريد إعلانه؟"
 
-#: src/humanclient.py:170
+#: src/humanclient.py:172
 msgid "Choose"
 msgstr "اختر"
 
-#: src/humanclient.py:380
+#: src/humanclient.py:383
 msgid "You cannot say %1"
 msgstr "لا يمكنك قول %1"
 
-#: src/humanclient.py:605
+#: src/humanclient.py:608
 msgid "Player %1 has left the table"
 msgstr "لقد غادر اللاعب %1 الطاولة"
 
-#: src/humanclient.py:668
+#: src/humanclient.py:671
 msgid ""
 "The game on table <numid>%1</numid> can begin. Are you ready to play now?"
 msgstr "يمكن أن تبدأ اللعبة على الطاولة <numid>%1</numid>. هل أنت جاهز للعب؟"
 
-#: src/humanclient.py:688
+#: src/humanclient.py:691
 msgid "Ready for next hand?"
 msgstr "جاهز لليد القادمة؟"
 
-#: src/humanclient.py:962
+#: src/humanclient.py:967
 msgid "The connection to the server %1 broke, please try again later."
 msgstr "انقطع الاتصال بالخادم %1، يرجى المحاولة مرة أخرى لاحقًا."
 
-#: src/kajongg.py:81 src/kdestub.py:1086
+#: src/kajongg.py:81 src/kdestub.py:1099
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "ما كونغ - لعبة لوحية صينية قديمة لأربعة لاعبين"
 
@@ -316,136 +316,136 @@ msgid ""
 "for testing"
 msgstr "استخدم خادمًا مخصصًا يعمل حاليا ويستمع على المنفذ. لأغراض الاختبار فقط"
 
-#: src/kdestub.py:269
+#: src/kdestub.py:285
 msgid "&OK"
 msgstr "&حسنًا"
 
-#: src/kdestub.py:271
+#: src/kdestub.py:286
 msgid "&Apply"
 msgstr "&طبّق"
 
-#: src/kdestub.py:273
+#: src/kdestub.py:287
 msgid "&Cancel"
 msgstr "أل&غِ"
 
-#: src/kdestub.py:275 src/kdestub.py:460
+#: src/kdestub.py:288 src/kdestub.py:476
 msgid "&Help"
 msgstr "م&ساعدة"
 
-#: src/kdestub.py:278
+#: src/kdestub.py:289
 msgid "&Defaults"
 msgstr "ال&مبدئيات"
 
-#: src/kdestub.py:343
+#: src/kdestub.py:359
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "اعرض شريط ال&حالة"
 
-#: src/kdestub.py:349
+#: src/kdestub.py:365
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "اعرض شريط الأ&دوات"
 
-#: src/kdestub.py:355
+#: src/kdestub.py:371
 msgid "Configure Tool&bars..."
 msgstr "اضبط أ&شرطة الأدوات..."
 
-#: src/kdestub.py:357
+#: src/kdestub.py:373
 msgid "Configure toolbars"
 msgstr "اضبط أشرطة الأدوات"
 
-#: src/kdestub.py:364
+#: src/kdestub.py:380
 msgid "Configure &Kajongg..."
 msgstr "اضبط &كاجونغ..."
 
-#: src/kdestub.py:366 src/kdestub.py:1206
+#: src/kdestub.py:382 src/kdestub.py:1160
 msgid "Configure"
 msgstr "اضبط"
 
-#: src/kdestub.py:456
+#: src/kdestub.py:472
 msgid "&Game"
 msgstr "&لعبة"
 
-#: src/kdestub.py:457
+#: src/kdestub.py:473
 msgid "&View"
 msgstr "&عرض"
 
-#: src/kdestub.py:458
+#: src/kdestub.py:474
 msgid "&Settings"
 msgstr "إ&عدادات"
 
-#: src/kdestub.py:466
+#: src/kdestub.py:484
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "م&ساعدة"
 
-#: src/kdestub.py:469 src/kdestub.py:848
+#: src/kdestub.py:487 src/kdestub.py:864
 msgid "Switch Application Language"
 msgstr "بدل لغة التطبيق..."
 
-#: src/kdestub.py:473
+#: src/kdestub.py:491
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "&حول كاجونغ"
 
-#: src/kdestub.py:853
+#: src/kdestub.py:869
 msgid "Please choose the language which should be used for this application:"
 msgstr "فضلًا اختر اللغة التي تودّ استخدام التّطبيق بها:"
 
-#: src/kdestub.py:872
+#: src/kdestub.py:888
 msgid "Add Fallback Language"
 msgstr "أضف لغة احتياطيّة"
 
-#: src/kdestub.py:884
+#: src/kdestub.py:900
 msgid "Primary language:"
 msgstr "اللغة الأساسيّة:"
 
-#: src/kdestub.py:884
+#: src/kdestub.py:900
 msgid "Fallback language:"
 msgstr "اللغة الاحتياطية:"
 
-#: src/kdestub.py:890
+#: src/kdestub.py:906
 msgid "Remove"
 msgstr "أزل"
 
-#: src/kdestub.py:894
+#: src/kdestub.py:910
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr "هذه لغة التّطبيق الأساسيّة التي ستُستخدم أوّلًا وقبل أيّة لغة أخرى."
 
-#: src/kdestub.py:896
+#: src/kdestub.py:912
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
 msgstr "هذه اللغة التي ستُستخدم في حال لم تحتوي اللغات السّابقة على نصّ ترجمة."
 
-#: src/kdestub.py:1026
+#: src/kdestub.py:1042
 msgid "About Kajongg"
 msgstr "حول كاجونغ"
 
-#: src/kdestub.py:1049
+#: src/kdestub.py:1062
 msgid "Version: %1"
 msgstr "الإصدارة: %1"
 
-#: src/kdestub.py:1050
+#: src/kdestub.py:1063
 msgid "Protocol version %1"
 msgstr "إصدار الميفاق %1"
 
-#: src/kdestub.py:1053
+#: src/kdestub.py:1066
 msgid "Original author"
 msgstr "المؤلف الأصلي"
 
-#: src/kdestub.py:1060
+#: src/kdestub.py:1073
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "إطار عمل كِيدِي (لم يثبت أو لم يستعمل)"
 
-#: src/kdestub.py:1066
+#: src/kdestub.py:1079
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "يستخدم الإصدارات %1"
 
-#: src/kdestub.py:1087
+#: src/kdestub.py:1100
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -453,7 +453,7 @@ msgstr ""
 "هذه هي لعبة ماه جونغ الكلاسيكية لأربعة لاعبين. إذا كنت تبحث عن لعبة سوليتير "
 "ماهجونغ يرجى استخدام تطبيق ماهجونج ك."
 
-#: src/kdestub.py:1104
+#: src/kdestub.py:1117
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -461,23 +461,19 @@ msgstr ""
 "رجاءً استخدم <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> "
 "للإبلاغ عن العلل."
 
-#: src/kdestub.py:1109
+#: src/kdestub.py:1122
 msgid "Authors:"
 msgstr "المؤلفون:"
 
-#: src/kdestub.py:1159
-msgid "License Agreement"
-msgstr "اتّفاقيّة التّرخيص"
-
-#: src/kdestub.py:1408
+#: src/kdestub.py:1363
 msgid "Configure Toolbars"
 msgstr "اضبط أشرطة الأدوات"
 
-#: src/kdestub.py:1410
+#: src/kdestub.py:1365
 msgid "A&vailable actions:"
 msgstr "الإجراءات المتو&فّرة:"
 
-#: src/kdestub.py:1421
+#: src/kdestub.py:1376
 msgid "Curr&ent actions:"
 msgstr "الإجراءات ال&حاليّة:"
 
@@ -485,7 +481,7 @@ msgstr "الإجراءات ال&حاليّة:"
 msgid "trying to start local server %1"
 msgstr "يحاول بدء خادم محلي %1"
 
-#: src/login.py:188 src/login.py:636
+#: src/login.py:188 src/login.py:637
 msgid "removed stale socket <filename>%1</filename>"
 msgstr "أُزيل مقبس بائد <filename>%1</filename>"
 
@@ -498,281 +494,281 @@ msgctxt "kajongg"
 msgid "Login"
 msgstr "ولوج"
 
-#: src/login.py:299 src/login.py:405
+#: src/login.py:300 src/login.py:406
 msgid "Game server:"
 msgstr "خادم اللعب:"
 
-#: src/login.py:302 src/login.py:407
+#: src/login.py:303 src/login.py:408
 msgid "Username:"
 msgstr "اسم المستخدم:"
 
-#: src/login.py:305 src/login.py:410
+#: src/login.py:306 src/login.py:411
 msgid "Password:"
 msgstr "كلمة السر:"
 
-#: src/login.py:307
+#: src/login.py:308
 msgctxt "kajongg"
 msgid "Ruleset:"
 msgstr "قواعد اللعب:"
 
-#: src/login.py:399
+#: src/login.py:400
 msgctxt "@title:window"
 msgid "Create User Account"
 msgstr "أنشئ حسابًا"
 
-#: src/login.py:413
+#: src/login.py:414
 msgid "Repeat password:"
 msgstr "&كرّر كلمة السر:"
 
-#: src/login.py:564
+#: src/login.py:565
 msgid "You are already connected to server %1"
 msgstr "متّصل بالفعل بـ %1"
 
-#: src/login.py:604
+#: src/login.py:605
 msgctxt "USER is not known on SERVER"
 msgid "%1 is not known on %2, do you want to open an account?"
 msgstr "%1 غير معروف في %2، هل تريد فتح حساب؟"
 
-#: src/login.py:617
+#: src/login.py:618
 msgid "Server %1 did not answer"
 msgstr "لم يقم الخادم %1 بالرد"
 
-#: src/login.py:619
+#: src/login.py:620
 msgid "Server %1 refused connection"
 msgstr "رُفض الاتصال بالخادم %1"
 
-#: src/login.py:621
+#: src/login.py:622
 msgid "Server %1 does not run a kajongg server"
 msgstr "الخادم %1 لا يقوم بتشغيل خادم كاجونغ"
 
-#: src/login.py:623
+#: src/login.py:624
 msgid "Address for server %1 cannot be found"
 msgstr "لا يمكن العثور على عنوان الخادم %1"
 
-#: src/login.py:626
+#: src/login.py:627
 msgid "Login to server %1 failed: You have no network connection"
 msgstr "فشل الولوج إلى الخادم %1: ليس لديك اتصال بالشبكة"
 
-#: src/login.py:637
+#: src/login.py:638
 msgid "Please try again"
 msgstr "فضلًا جرّب مجدّدًا."
 
-#: src/mainwindow.py:483
+#: src/mainwindow.py:486
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "&سجّل نقاط لعبة يدوية"
 
-#: src/mainwindow.py:485
+#: src/mainwindow.py:488
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "لعبة يدوية"
 
-#: src/mainwindow.py:488
+#: src/mainwindow.py:491
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "&سجّل نقاط لعبة يدوية."
 
-#: src/mainwindow.py:490
+#: src/mainwindow.py:493
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "&شغل"
 
-#: src/mainwindow.py:493
+#: src/mainwindow.py:496
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "ابدأ لعبة جديدة."
 
-#: src/mainwindow.py:495
+#: src/mainwindow.py:498
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "أ&لغ اللعبة"
 
-#: src/mainwindow.py:499
+#: src/mainwindow.py:502
 msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "ألغ اللعبة الحالية."
 
-#: src/mainwindow.py:501
+#: src/mainwindow.py:504
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "أنه &كاجونغ"
 
-#: src/mainwindow.py:504
+#: src/mainwindow.py:507
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "اللاعبون"
 
-#: src/mainwindow.py:507
+#: src/mainwindow.py:510
 msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "عرّف لاعبيك"
 
-#: src/mainwindow.py:509
+#: src/mainwindow.py:512
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "&مجموعات القواعد"
 
-#: src/mainwindow.py:512
+#: src/mainwindow.py:515
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr "خصص مجموعات القواعد."
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:519
 msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "غيّر زاوية الرؤية"
 
-#: src/mainwindow.py:517
+#: src/mainwindow.py:520
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "الزاوية"
 
-#: src/mainwindow.py:520
+#: src/mainwindow.py:523
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "غيّر المظهر المرئي للقطع."
 
-#: src/mainwindow.py:524
+#: src/mainwindow.py:527
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr "وضع ملء ال&شاشة"
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:530
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "&تسجيل النقاط الطاولة"
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:532
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "ال&نتائج"
 
-#: src/mainwindow.py:531
+#: src/mainwindow.py:534
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "إظهار أو إخفاء طاولة النتائج للعبة الحالية."
 
-#: src/mainwindow.py:533
+#: src/mainwindow.py:536
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "ا&شرح النتائج"
 
-#: src/mainwindow.py:534
+#: src/mainwindow.py:537
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "ا&شرح"
 
-#: src/mainwindow.py:536
+#: src/mainwindow.py:539
 msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "اشرح النتيجة لجميع اللاعبين في اللعبة الحالية."
 
-#: src/mainwindow.py:538
+#: src/mainwindow.py:541
 msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "ال&وضع التجريبي"
 
-#: src/mainwindow.py:541
+#: src/mainwindow.py:544
 msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr "دع الحاسوب يتولى الأمر نيابة عنك. ابدأ لعبة محلية جديدة إذا لزم الأمر."
 
-#: src/mainwindow.py:543
+#: src/mainwindow.py:546
 msgid "C&hat"
 msgstr "&دردشة"
 
-#: src/mainwindow.py:546
+#: src/mainwindow.py:549
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "دردش مع اللاعبين الأخرين"
 
-#: src/message.py:262
+#: src/message.py:250
 msgid "saying %1 violates Original Call"
 msgstr "قول %1 ينتهك النداء الأصلي"
 
-#: src/message.py:275
+#: src/message.py:263
 msgid ""
 "claiming %1 is dangerous because you will have to discard a dangerous tile"
 msgstr "إن المطالبة بـ %1 أمر خطير لأنه سيتعين عليك التخلص من القطعة الخطيرة"
 
-#: src/message.py:280
+#: src/message.py:268
 msgid ""
 "claiming %1 for %2 is dangerous because you will have to discard a dangerous "
 "tile"
 msgstr ""
 "إن المطالبة بـ %1 لـ %2 أمر خطير لأنه سيتعين عليك التخلص من القطعة الخطيرة"
 
-#: src/message.py:283
+#: src/message.py:271
 msgid "You may say %1"
 msgstr "يمكنك أن تقول %1"
 
-#: src/message.py:293
+#: src/message.py:280
 msgctxt "kajongg"
 msgid "Pung"
 msgstr "بونغ"
 
-#: src/message.py:294
+#: src/message.py:281
 msgctxt "kajongg game dialog:Key for Pung"
 msgid "P"
 msgstr "P"
 
-#: src/message.py:313
+#: src/message.py:299
 msgctxt "kajongg"
 msgid "Kong"
 msgstr "كونغ"
 
-#: src/message.py:314
+#: src/message.py:300
 msgctxt "kajongg game dialog:Key for Kong"
 msgid "K"
 msgstr "كلفن"
 
-#: src/message.py:340
+#: src/message.py:326
 msgid "saying Kong for %1 violates Original Call"
 msgstr "قول كونغ لـ %1 ينتهك النداء الأصلي"
 
-#: src/message.py:344
+#: src/message.py:330
 msgid "You may say Kong for %1"
 msgstr "يمكنك قول كونغ لـ %1"
 
-#: src/message.py:359
+#: src/message.py:344
 msgctxt "kajongg"
 msgid "Chow"
 msgstr "تشاو"
 
-#: src/message.py:360
+#: src/message.py:345
 msgctxt "kajongg game dialog:Key for Chow"
 msgid "C"
 msgstr "C"
 
-#: src/message.py:394
+#: src/message.py:378
 msgctxt "kajongg"
 msgid "Mah Jongg"
 msgstr "ما كونغ"
 
-#: src/message.py:395
+#: src/message.py:379
 msgctxt "kajongg game dialog:Key for Mah Jongg"
 msgid "M"
 msgstr "م"
 
-#: src/message.py:403
+#: src/message.py:387
 msgid "Press here and you win"
 msgstr "اضغط هنا وستفوز"
 
-#: src/message.py:418
+#: src/message.py:401
 msgctxt "kajongg"
 msgid "Original Call"
 msgstr "النداء الأصلي"
 
-#: src/message.py:419
+#: src/message.py:402
 msgctxt "kajongg game dialog:Key for Original Call"
 msgid "O"
 msgstr "O"
 
-#: src/message.py:435
+#: src/message.py:418
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
 msgstr "تجاهل %1 وإعلان النداء الأصلي يجعل هذه اليد غير قابلة للفوز"
 
-#: src/message.py:439
+#: src/message.py:422
 msgid ""
 "Discard a tile, declaring Original Call meaning you need only one tile to "
 "complete the hand and will not alter the hand in any way (except bonus tiles)"
@@ -780,76 +776,76 @@ msgstr ""
 "تخلص من قطعة، معلناً \"النداء الأصلي\" مما يعني أنك تحتاج إلى قطعة واحدة فقط "
 "لإكمال اليد ولن تغير اليد بأي شكل من الأشكال (باستثناء قطع المكافآت)"
 
-#: src/message.py:465
+#: src/message.py:447
 msgctxt "kajongg"
 msgid "Discard"
 msgstr "أهمِل"
 
-#: src/message.py:466
+#: src/message.py:448
 msgctxt "kajongg game dialog:Key for Discard"
 msgid "D"
 msgstr "D"
 
-#: src/message.py:483
+#: src/message.py:465
 msgid "discarding %1 violates Original Call"
 msgstr "تجاهل %1 ينتهك النداء الأصلي"
 
-#: src/message.py:486
+#: src/message.py:468
 msgid "discarding %1 is Dangerous Game"
 msgstr "تجاهل %1 لعبة خطيرة"
 
-#: src/message.py:489
+#: src/message.py:471
 msgid "discard the least useful tile"
 msgstr "تجاهل القطعة الأقل فائدة"
 
-#: src/message.py:569
+#: src/message.py:551
 msgid "%1 is not ready to start the game"
 msgstr "%1 غير جاهز لبدء اللعبة"
 
-#: src/message.py:608
+#: src/message.py:590
 msgid "Kajongg <numid>%1</numid>"
 msgstr "كاجونغ <numid>%1</numid>"
 
-#: src/message.py:694
+#: src/message.py:676
 msgctxt "kajongg"
 msgid "Violates Original Call"
 msgstr "ينتهك النداء الأصلي"
 
-#: src/message.py:837
+#: src/message.py:819
 msgctxt "kajongg"
 msgid "Dangerous Game"
 msgstr "لعبة خطيرة"
 
-#: src/message.py:852
+#: src/message.py:834
 msgctxt "kajongg"
 msgid "No Choice"
 msgstr "لا خيار"
 
-#: src/message.py:915
+#: src/message.py:896
 msgctxt "kajongg"
 msgid "OK"
 msgstr "حسنًا"
 
-#: src/message.py:916
+#: src/message.py:897
 msgctxt "kajongg game dialog:Key for OK"
 msgid "O"
 msgstr "O"
 
-#: src/message.py:920
+#: src/message.py:901
 msgid "Confirm that you saw the message"
 msgstr "أكد من أنك شاهدت الرسالة"
 
-#: src/message.py:929
+#: src/message.py:909
 msgctxt "kajongg"
 msgid "No Claim"
 msgstr "لا يوجد مطالبة"
 
-#: src/message.py:930
+#: src/message.py:910
 msgctxt "kajongg game dialog:Key for No claim"
 msgid "N"
 msgstr "N"
 
-#: src/message.py:934
+#: src/message.py:914
 msgid "You cannot or do not want to claim this tile"
 msgstr "لا يمكنك أو لا تريد المطالبة بهذا القطعة"
 
@@ -907,20 +903,20 @@ msgstr "كشف اللاعب %1 عن العديد من الرياح"
 msgid "Player %1 exposed many dragons"
 msgstr "كشف اللاعب %1 عن العديد من التنانين"
 
-#: src/playerlist.py:48
+#: src/playerlist.py:50
 msgctxt "define a new player"
 msgid "&New"
 msgstr "&جديد"
 
-#: src/playerlist.py:106
+#: src/playerlist.py:110
 msgid "Player %1 already exists"
 msgstr "اللاعب %1 موجود بالفعل"
 
-#: src/playerlist.py:116
+#: src/playerlist.py:121
 msgid "Error while adding player %1: %2"
 msgstr "خطأ أثناء إضافة اللاعب %1: %2"
 
-#: src/playerlist.py:171
+#: src/playerlist.py:176
 msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
@@ -1078,82 +1074,88 @@ msgid "The hand contains too many tiles"
 msgstr "اليد تحتوي على الكثير من القطع"
 
 #: src/predefined.py:109
+#, fuzzy
+#| msgid "Zero Point Hand"
+msgid "Tiles in Hand"
+msgstr "يد نقطة الصفر"
+
+#: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
 msgstr "النقاط المطلوبة لماه جونغ"
 
-#: src/predefined.py:113
+#: src/predefined.py:118
 msgid "Minimum number of doubles needed for Mah Jongg"
 msgstr "الحد الأدنى لعدد الزوجي المطلوب لماه جونغ"
 
-#: src/predefined.py:116
+#: src/predefined.py:121
 msgid "Points for a Limit Hand"
 msgstr "نقاط ليد محدودة"
 
-#: src/predefined.py:120
+#: src/predefined.py:125
 msgid "Play with the roof off"
 msgstr "إلعب بالسقف مغلقاً"
 
-#: src/predefined.py:121
+#: src/predefined.py:126
 msgid "Play with no upper scoring limit"
 msgstr "إلعب دون حد أعلى لتسجيل النقاط"
 
-#: src/predefined.py:123
+#: src/predefined.py:128
 msgid "Claim Timeout"
 msgstr "مهلة المطالبة"
 
-#: src/predefined.py:127
+#: src/predefined.py:132
 msgid "Size of Kong Box"
 msgstr "حجم صندوق كونغ"
 
-#: src/predefined.py:128
+#: src/predefined.py:133
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
 msgstr "يستستخدم صندوق الكونغ لاستبدال القطع عند إعلان الكونغ"
 
-#: src/predefined.py:130
+#: src/predefined.py:135
 msgid "Play with Bonus Tiles"
 msgstr "إلعب بقطع المكافآت"
 
-#: src/predefined.py:131
+#: src/predefined.py:136
 msgid "Bonus tiles increase the luck factor"
 msgstr "قطع المكافآت تزيد من عامل الحظ"
 
-#: src/predefined.py:133
+#: src/predefined.py:138
 msgid "Minimum number of rounds in game"
 msgstr "الحد الأدنى لعدد التشاوات في اللعبة"
 
-#: src/predefined.py:137
+#: src/predefined.py:142
 msgid "number of allowed chows"
 msgstr "عدد التشاوات المسموح بها"
 
-#: src/predefined.py:138
+#: src/predefined.py:143
 msgid "The number of chows a player may build"
 msgstr "عدد التشاوات التي يمكن للاعب أن يبنيها"
 
-#: src/predefined.py:140
+#: src/predefined.py:145
 msgid "must declare calling hand"
 msgstr "يجب أن يعلن عن يد مناداة"
 
-#: src/predefined.py:142
+#: src/predefined.py:147
 msgid "Mah Jongg is only allowed after having declared to have a calling hand"
 msgstr "لا يُسمح لماه جونغ إلا بعد أن أعلن أن لديه يد منادة"
 
-#: src/predefined.py:144
+#: src/predefined.py:149
 msgid "Standard Rotation"
 msgstr "الدوران القياسي"
 
-#: src/predefined.py:147
+#: src/predefined.py:152
 msgid "Discard tiles ordered"
 msgstr "تجاهل القطع المطلوبة"
 
-#: src/predefined.py:149
+#: src/predefined.py:154
 msgid "Discard tiles ordered from top left"
 msgstr "تجاهل القطع المطلوبة من أعلى اليسار"
 
-#: src/predefined.py:151
+#: src/predefined.py:156
 msgid "Leave holes for claimed discards"
 msgstr "ترك ثقوب للمرتجعات المطالب بها"
 
-#: src/predefined.py:154
+#: src/predefined.py:159
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
@@ -1161,43 +1163,43 @@ msgstr ""
 "فقط عند التخلص من القطع المطلوبة: لا تضع القطعة المهملة التالية في المكان "
 "الذي كانت القطعة المهملة المطالب بها"
 
-#: src/predefined.py:163
+#: src/predefined.py:168
 msgid "Last Tile Completes Pair of 2..8"
 msgstr "آخر قطعة تكمل زوجًا من 2..8"
 
-#: src/predefined.py:167
+#: src/predefined.py:172
 msgid "Last Tile Completes Pair of Terminals or Honors"
 msgstr "آخر قطعة تكمل آخر زوج من المحطات أو الشرف"
 
-#: src/predefined.py:170
+#: src/predefined.py:175
 msgid "Last Tile is Only Possible Tile"
 msgstr "القطعة الأخيرة هي القعطة الوحيدة الممكنة"
 
-#: src/predefined.py:174
+#: src/predefined.py:179
 msgid "Won with Last Tile Taken from Wall"
 msgstr "فاز بآخر قطعة مأخوذة من الحائط"
 
-#: src/predefined.py:179
+#: src/predefined.py:184
 msgid "Zero Point Hand"
 msgstr "يد نقطة الصفر"
 
-#: src/predefined.py:180
+#: src/predefined.py:185
 msgid "The hand has 0 basis points excluding bonus tiles"
 msgstr "اليد لديها 0 نقطة أساس باستثناء قطع المكافآت"
 
-#: src/predefined.py:181
+#: src/predefined.py:186
 msgid "No Chow"
 msgstr "لا تشاو"
 
-#: src/predefined.py:183
+#: src/predefined.py:188
 msgid "Only Concealed Melds"
 msgstr "الخلطات المخفية فقط"
 
-#: src/predefined.py:187
+#: src/predefined.py:192
 msgid "False Color Game"
 msgstr "لعبة الألوان الزائفة"
 
-#: src/predefined.py:188
+#: src/predefined.py:193
 msgid ""
 "Only same-colored tiles (only bamboo/stone/character) plus any number of "
 "winds and dragons"
@@ -1205,119 +1207,119 @@ msgstr ""
 "قطع من نفس اللون فقط (فقط خيزران/حجر/حرف) بالإضافة إلى أي عدد من الرياح "
 "والتنانين"
 
-#: src/predefined.py:191
+#: src/predefined.py:196
 msgid "True Color Game"
 msgstr "لعبة الألوان الحقيقية"
 
-#: src/predefined.py:192
+#: src/predefined.py:197
 msgid "Only same-colored tiles (only bamboo/stone/character)"
 msgstr "قطع بنفس اللون فقط (فقط من خيزران/حجر/حرف)"
 
-#: src/predefined.py:194
+#: src/predefined.py:199
 msgid "Concealed True Color Game"
 msgstr "لعبة الألوان الحقيقية المخفية"
 
-#: src/predefined.py:195
+#: src/predefined.py:200
 msgid "All tiles concealed and of the same suit, no honors"
 msgstr "جميع القطع مخفية ومن نفس النوع، دون الشرف"
 
-#: src/predefined.py:197
+#: src/predefined.py:202
 msgid "Only Terminals and Honors"
 msgstr "المحطات والشرف فقط"
 
-#: src/predefined.py:198
+#: src/predefined.py:203
 msgid "Only winds, dragons, 1 and 9"
 msgstr "الرياح فقط، التنانين، 1 و 9"
 
-#: src/predefined.py:199
+#: src/predefined.py:204
 msgid "Only Honors"
 msgstr "الشرف فقط"
 
-#: src/predefined.py:200
+#: src/predefined.py:205
 msgid "Only winds and dragons"
 msgstr "الرياح والتنين فقط"
 
-#: src/predefined.py:202
+#: src/predefined.py:207
 msgid "Hidden Treasure"
 msgstr "الكنز المخفي"
 
-#: src/predefined.py:203
+#: src/predefined.py:208
 msgid "Only hidden Pungs or Kongs, last tile from wall"
 msgstr "فقط البونغ أو الكونغ المخفي، آخر قطعة من الجدار"
 
-#: src/predefined.py:205
+#: src/predefined.py:210
 msgid "Heads and Tails"
 msgstr "الرؤوس والذيول"
 
-#: src/predefined.py:206
+#: src/predefined.py:211
 msgid "Only 1 and 9"
 msgstr "1 و 9 فقط"
 
-#: src/predefined.py:208
+#: src/predefined.py:213
 msgid "Fourfold Plenty"
 msgstr "أربعة أضعاف الكثير"
 
-#: src/predefined.py:209
+#: src/predefined.py:214
 msgid "4 Kongs"
 msgstr "4 كونغات"
 
-#: src/predefined.py:211 src/predefined.py:429
+#: src/predefined.py:216 src/predefined.py:431
 msgid "Three Great Scholars"
 msgstr "ثلاثة علماء كبار"
 
-#: src/predefined.py:212 src/predefined.py:334
+#: src/predefined.py:217 src/predefined.py:337
 msgid "3 Pungs or Kongs of dragons"
 msgstr "3 بونغات أو كونغ التنانين"
 
-#: src/predefined.py:213
+#: src/predefined.py:218
 msgid "Four Blessings Hovering over the Door"
 msgstr "أربع بركات تحوم فوق الباب"
 
-#: src/predefined.py:215 src/predefined.py:339
+#: src/predefined.py:220 src/predefined.py:342
 msgid "4 Pungs or Kongs of winds"
 msgstr "4 بونغات أو كونغات الرياح"
 
-#: src/predefined.py:216
+#: src/predefined.py:221
 msgid "Imperial Jade"
 msgstr "اليشم الإمبراطوري"
 
-#: src/predefined.py:217
+#: src/predefined.py:222
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
 msgstr "البلاط الأخضر فقط: التنين الأخضر والخيزران 2،3،4،6،8"
 
-#: src/predefined.py:218
+#: src/predefined.py:223
 msgid "Gathering the Plum Blossom from the Roof"
 msgstr "جمع زهر البرقوق من السطح"
 
-#: src/predefined.py:220
+#: src/predefined.py:225
 msgid "Mah Jong with stone 5 from the dead wall"
 msgstr "ماه جونغ بالحجر 5 من الجدار الميت"
 
-#: src/predefined.py:222
+#: src/predefined.py:227
 msgid "Plucking the Moon from the Bottom of the Sea"
 msgstr "انتشال القمر من قاع البحر"
 
-#: src/predefined.py:223
+#: src/predefined.py:228
 msgid "Mah Jong with the last tile from the wall being a stone 1"
 msgstr "ماه جونغ مع كون آخر قطعة من الجدار حجرًا 1"
 
-#: src/predefined.py:225
+#: src/predefined.py:230
 msgid "Scratching a Carrying Pole"
 msgstr "خدش عمود الحمل"
 
-#: src/predefined.py:226
+#: src/predefined.py:231
 msgid "Robbing the Kong of bamboo 2"
 msgstr "سرقة كونغ من الخيزران 2"
 
-#: src/predefined.py:232
+#: src/predefined.py:237 src/predefined.py:527
 msgid "Standard Mah Jongg"
 msgstr "معيار ماه جونغ"
 
-#: src/predefined.py:237
+#: src/predefined.py:242
 msgid "Nine Gates"
 msgstr "تسعة أبواب"
 
-#: src/predefined.py:239
+#: src/predefined.py:244
 msgid ""
 "A concealed hand in one color 1112345678999 plus last tile of this suit "
 "(from wall or discarded)"
@@ -1325,11 +1327,11 @@ msgstr ""
 "يد مخفية بلون واحد 1112345678999 بالإضافة إلى القطعة الأخير من هذا النوع (من "
 "الحائط أو المهملة)"
 
-#: src/predefined.py:241
+#: src/predefined.py:246
 msgid "Thirteen Orphans"
 msgstr "ثلاثة عشر يتيما"
 
-#: src/predefined.py:242
+#: src/predefined.py:247
 msgid ""
 "13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
 "with one of them"
@@ -1337,101 +1339,101 @@ msgstr ""
 "13 قطعة مفردة: جميع التنانين والرياح و1 و9 والقطعة الرابعة عشر تبني زوجًا مع "
 "واحد منهم"
 
-#: src/predefined.py:246
+#: src/predefined.py:251
 msgid "Pung/Kong of Dragons"
 msgstr "بونغ/كونغ التنانين"
 
-#: src/predefined.py:248
+#: src/predefined.py:253
 msgid "Pung/Kong of Own Wind"
 msgstr "بونغ/كونغ رياحه"
 
-#: src/predefined.py:251
+#: src/predefined.py:256
 msgid "Pung/Kong of Round Wind"
 msgstr "بونغ/كونغ الرياح المستديرة"
 
-#: src/predefined.py:255
+#: src/predefined.py:260
 msgid "Exposed Kong"
 msgstr "كونغ مكشوف"
 
-#: src/predefined.py:258
+#: src/predefined.py:263
 msgid "Exposed Kong of Terminals"
 msgstr "كونغ المحطات مكشوف"
 
-#: src/predefined.py:261
+#: src/predefined.py:266
 msgid "Exposed Kong of Honors"
 msgstr "كونغ الشرف مكشوف"
 
-#: src/predefined.py:264
+#: src/predefined.py:269
 msgid "Exposed Pung"
 msgstr "بونغ مكشوف"
 
-#: src/predefined.py:267
+#: src/predefined.py:272
 msgid "Exposed Pung of Terminals"
 msgstr "بونغ المحطات مكشوف"
 
-#: src/predefined.py:270
+#: src/predefined.py:275
 msgid "Exposed Pung of Honors"
 msgstr "بونغ الشرف مكشوف"
 
-#: src/predefined.py:274
+#: src/predefined.py:279
 msgid "Concealed Kong"
 msgstr "كونغ المخفي"
 
-#: src/predefined.py:277
+#: src/predefined.py:282
 msgid "Concealed Kong of Terminals"
 msgstr "كونغ المحطات المخفي"
 
-#: src/predefined.py:280
+#: src/predefined.py:285
 msgid "Concealed Kong of Honors"
 msgstr "كونغ الشرف المخفي"
 
-#: src/predefined.py:283
+#: src/predefined.py:288
 msgid "Concealed Pung"
 msgstr "بونغ مخفي"
 
-#: src/predefined.py:286
+#: src/predefined.py:291
 msgid "Concealed Pung of Terminals"
 msgstr "بونغ المحطات المخفي"
 
-#: src/predefined.py:289
+#: src/predefined.py:294
 msgid "Concealed Pung of Honors"
 msgstr "بونغ الشرف المخفي"
 
-#: src/predefined.py:292
+#: src/predefined.py:297
 msgid "Pair of Own Wind"
 msgstr "زوج من الرياح الخاصة"
 
-#: src/predefined.py:294
+#: src/predefined.py:299
 msgid "Pair of Round Wind"
 msgstr "زوج من الرياح المستديرة"
 
-#: src/predefined.py:296
+#: src/predefined.py:301
 msgid "Pair of Dragons"
 msgstr "زوج من التنانين"
 
-#: src/predefined.py:300
+#: src/predefined.py:305
 msgid "Flower"
 msgstr "وردة"
 
-#: src/predefined.py:302
+#: src/predefined.py:307
 msgid "Season"
 msgstr "فصل"
 
-#: src/predefined.py:313
+#: src/predefined.py:316
 msgid "Classical Chinese DMJL"
 msgstr "الصينية الكلاسيكية DMJL"
 
-#: src/predefined.py:319
+#: src/predefined.py:322
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgstr ""
 "اللغة الصينية الكلاسيكية كما تم تعريفها من قبل Deutsche Mah Jongg Liga "
 "(DMJL) e.V."
 
-#: src/predefined.py:326
+#: src/predefined.py:329
 msgid "Squirming Snake"
 msgstr "الثعبان المتلوي"
 
-#: src/predefined.py:327
+#: src/predefined.py:330
 msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
@@ -1439,71 +1441,71 @@ msgstr ""
 "جميع القطع من نفس اللون. بونغ أو كونغ من 1 و9، زوج من 2 أو 5 أو 8 واثنين من "
 "تشاو من القيم المتبقية"
 
-#: src/predefined.py:330
+#: src/predefined.py:333
 msgid "Little Three Dragons"
 msgstr "التنانين الثلاثة الصغيرة"
 
-#: src/predefined.py:331
+#: src/predefined.py:334
 msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
 msgstr "2 بونغ أو كونغ التنانين وزوج واحد من التنانين"
 
-#: src/predefined.py:333
+#: src/predefined.py:336
 msgid "Big Three Dragons"
 msgstr "التنانين الثلاثة الكبار"
 
-#: src/predefined.py:336
+#: src/predefined.py:339
 msgid "Little Four Joys"
 msgstr "أفراح الأربعة الصغيرة"
 
-#: src/predefined.py:337
+#: src/predefined.py:340
 msgid "3 Pungs or Kongs of winds and 1 pair of winds"
 msgstr "3 بونغ أو كونغ من الرياح وزوج واحد من الرياح"
 
-#: src/predefined.py:338
+#: src/predefined.py:341
 msgid "Big Four Joys"
 msgstr "أفراح الأربعة الكبار"
 
-#: src/predefined.py:344
+#: src/predefined.py:347
 msgid "False Naming of Discard, Claimed for Chow"
 msgstr "تسمية زائفة للتجاهل، المطالب بها لتشاو"
 
-#: src/predefined.py:347
+#: src/predefined.py:350
 msgid "False Naming of Discard, Claimed for Pung/Kong"
 msgstr "تسمية زائفة للتجاهل، طُولب بها لبونغ/كونغ"
 
-#: src/predefined.py:350 src/predefined.py:443
+#: src/predefined.py:353 src/predefined.py:445 src/predefined.py:557
 msgid "False Declaration of Mah Jongg by One Player"
 msgstr "إعلان كاذب لماه جونغ من لاعب واحد"
 
-#: src/predefined.py:353
+#: src/predefined.py:356
 msgid "False Declaration of Mah Jongg by Two Players"
 msgstr "إعلان كاذب عن ماه جونغ من قبل لاعبين"
 
-#: src/predefined.py:356
+#: src/predefined.py:359
 msgid "False Declaration of Mah Jongg by Three Players"
 msgstr "إعلان كاذب عن ماه جونغ من قبل ثلاثة لاعبين"
 
-#: src/predefined.py:359 src/predefined.py:446
+#: src/predefined.py:362 src/predefined.py:448 src/predefined.py:560
 msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr "تسمية زائفة للتجاهل، المزعومة لماه جونغ"
 
-#: src/predefined.py:370
+#: src/predefined.py:371
 msgid "Classical Chinese BMJA"
 msgstr "BMJA الصينية الكلاسيكية"
 
-#: src/predefined.py:376
+#: src/predefined.py:377
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
 msgstr "اللغة الصينية الكلاسيكية كما حددتها جمعية ماه جونغ البريطانية"
 
-#: src/predefined.py:391
+#: src/predefined.py:393 src/predefined.py:533
 msgid "Original Call"
 msgstr "النداء الأصلي"
 
-#: src/predefined.py:395
+#: src/predefined.py:397
 msgid "Gates of Heaven"
 msgstr "أبواب الجنة"
 
-#: src/predefined.py:396
+#: src/predefined.py:398
 msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
@@ -1511,143 +1513,153 @@ msgstr ""
 "جميع القطع مخفية بنفس اللون: القيم 1112345678999 مع زوج واحد من 2 إلى 8 (آخر "
 "قطعة من الجدار أو تم التخلص منها)"
 
-#: src/predefined.py:399
+#: src/predefined.py:401
 msgid "Wriggling Snake"
 msgstr "الثعبان المتلوي"
 
-#: src/predefined.py:400
+#: src/predefined.py:402
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
 msgstr "زوج من الأول وجولة من 2 إلى 9 في نفس النوع مع كل من الرياح"
 
-#: src/predefined.py:402
+#: src/predefined.py:404
 msgid "Triple Knitting"
 msgstr "حياكة ثلاثية"
 
-#: src/predefined.py:403
+#: src/predefined.py:405
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
 msgstr "أربع مجموعات من ثلاثة قطع بأنواع مختلفة وزوج: لا رياح أو تنانين"
 
-#: src/predefined.py:404
+#: src/predefined.py:406
 msgid "Knitting"
 msgstr "الحياكة"
 
-#: src/predefined.py:405
+#: src/predefined.py:407
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr "7 أزواج من القطع في أي 2 من 3 أنواع،  لا رياح أو تنانين"
 
-#: src/predefined.py:407
+#: src/predefined.py:409
 msgid "All pair honors"
 msgstr "كل الشرف الزوجية"
 
-#: src/predefined.py:408
+#: src/predefined.py:410
 msgid "7 pairs of 1s/9s/Winds/Dragons"
 msgstr "7 أزواج من الأوائل/تسعات/الرياح/التنانين"
 
-#: src/predefined.py:411
+#: src/predefined.py:413 src/predefined.py:537
 msgid "Own Flower"
 msgstr "الزهرة الخاصة"
 
-#: src/predefined.py:412
+#: src/predefined.py:414 src/predefined.py:538
 msgid "Own Season"
 msgstr "الموسم الخاص"
 
-#: src/predefined.py:424
+#: src/predefined.py:426
 msgid "Buried Treasure"
 msgstr "الكنز المدفون"
 
-#: src/predefined.py:425
+#: src/predefined.py:427
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
 msgstr "بونغات مخفية لنوع واحدة مع رياح/تنين وزوج"
 
-#: src/predefined.py:426
+#: src/predefined.py:428 src/predefined.py:549
 msgid "Purity"
 msgstr "الطهارة"
 
-#: src/predefined.py:427
+#: src/predefined.py:429 src/predefined.py:550
 msgid "Only same-colored tiles (no chows, dragons or winds)"
 msgstr "القطع ذات اللون نفسه فقط (بدون تشاو أو تنانين أو رياح)"
 
-#: src/predefined.py:430
+#: src/predefined.py:432
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
 msgstr "3 بونغ أو كونغ التنانين بالإضافة إلى أي بونغ/كونغ وزوج"
 
-#: src/predefined.py:433
+#: src/predefined.py:435
 msgid "The 13 Unique Wonders"
 msgstr "العجائب الثلاثة عشر الفريدة"
 
-#: src/predefined.py:440
+#: src/predefined.py:442 src/predefined.py:554
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
 msgstr "تسمية زائفة للتجاهل، تمت المطالبة بها لتشاو/بونغ/كونغ"
 
-#: src/predefined.py:450
+#: src/predefined.py:452
 msgid "Calling for Only Honors"
 msgstr "النداء إلى الشرف فقط"
 
-#: src/predefined.py:454
+#: src/predefined.py:456
 msgid "Calling for Wriggling Snake"
 msgstr "نداء الثعبان المتلوي"
 
-#: src/predefined.py:458
+#: src/predefined.py:460
 msgid "Calling for Triple Knitting"
 msgstr "النداء إلى الحياكة الثلاثية"
 
-#: src/predefined.py:462
+#: src/predefined.py:464
 msgid "Calling for Gates of Heaven"
 msgstr "النداء إلى أبواب السماء"
 
-#: src/predefined.py:465
+#: src/predefined.py:467
 msgid "Calling for Knitting"
 msgstr "النداء إلى الحياكة"
 
-#: src/predefined.py:469
+#: src/predefined.py:471
 msgid "Calling for Imperial Jade"
 msgstr "النداء إلى اليشم الإمبراطوري"
 
-#: src/predefined.py:473
+#: src/predefined.py:475
 msgid "Calling for The 13 Unique Wonders"
 msgstr "النداء إلى العجائب الثلاثة عشر الفريدة"
 
-#: src/predefined.py:476
+#: src/predefined.py:478
 msgid "Calling for Three Great Scholars"
 msgstr "النداء لثلاثة من العلماء الكبار"
 
-#: src/predefined.py:479
+#: src/predefined.py:481
 msgid "Calling for All pair honors"
 msgstr "النداء إلى الشرف لجميع الأزواج"
 
-#: src/predefined.py:483
+#: src/predefined.py:485
 msgid "Calling for Heads and Tails"
 msgstr "النداء الرؤوس والذيول"
 
-#: src/predefined.py:487
+#: src/predefined.py:489
 msgid "Calling for Four Blessings Hovering over the Door"
 msgstr "النداء بأربع صلوات على الباب"
 
-#: src/predefined.py:490
+#: src/predefined.py:492
 msgid "Calling for Buried Treasure"
 msgstr "النداء إلى الكنز المدفون"
 
-#: src/predefined.py:494
+#: src/predefined.py:496
 msgid "Calling for Fourfold Plenty"
 msgstr "النداء إلى الوفرة بأربعة أضعاف"
 
-#: src/predefined.py:498
+#: src/predefined.py:500
 msgid "Calling for Purity"
 msgstr "النداء إلى الطهارة"
 
-#: src/query.py:196
+#: src/predefined.py:510
+msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
+msgstr ""
+
+#: src/predefined.py:516
+msgid ""
+"Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
+"cgi?id=298821"
+msgstr ""
+
+#: src/query.py:197
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
 msgstr "لعبة محلية"
 
-#: src/query.py:376
+#: src/query.py:430
 msgid "Database %1 updated from schema %2 to %3"
 msgstr "حُدثت قاعدة البيانات %1 من المخطط %2 إلى %3"
 
-#: src/rule.py:49 src/scoringdialog.py:710 src/scoringdialog.py:788
+#: src/rule.py:49 src/scoringdialog.py:703 src/scoringdialog.py:782
 msgid "points"
 msgstr "نقاط"
 
@@ -1676,61 +1688,61 @@ msgctxt "Kajongg"
 msgid "%1 limits"
 msgstr "%1 حدا"
 
-#: src/rule.py:365
+#: src/rule.py:366
 msgid "Meld Rules"
 msgstr "قواعد الخلط"
 
-#: src/rule.py:366
+#: src/rule.py:367
 msgid ""
 "Meld rules are applied to single melds independent of the rest of the hand"
 msgstr "تطبّق قواعد الخلط على الخلطات الفردية بشكل مستقل عن بقية اليد"
 
-#: src/rule.py:367
+#: src/rule.py:368
 msgid "Hand Rules"
 msgstr "قواعد اليد"
 
-#: src/rule.py:368
+#: src/rule.py:369
 msgid "Hand rules are applied to the entire hand, for all players"
 msgstr "تُطبق قواعد اليد على اليد بأكملها، لجميع اللاعبين"
 
-#: src/rule.py:369
+#: src/rule.py:370
 msgid "Winner Rules"
 msgstr "قواعد الفائز"
 
-#: src/rule.py:370
+#: src/rule.py:371
 msgid "Winner rules are applied to the entire hand but only for the winner"
 msgstr "تُطبق قواعد الفائز على كامل اليد ولكن على الفائز فقط"
 
-#: src/rule.py:371
+#: src/rule.py:372
 msgid "Loser Rules"
 msgstr "قواعد الخاسر"
 
-#: src/rule.py:372
+#: src/rule.py:373
 msgid "Loser rules are applied to the entire hand but only for non-winners"
 msgstr "تُطبق قواعد الخاسر على كامل اليد ولكن فقط لغير الفائزين"
 
-#: src/rule.py:373
+#: src/rule.py:374
 msgid "Mah Jongg Rules"
 msgstr "قواعد ماه جونغ"
 
-#: src/rule.py:374
+#: src/rule.py:375
 msgid "Only hands matching a Mah Jongg rule can win"
 msgstr "الأيدي المطابقة لقاعدة ماه جونغ هي وحدها القادرة على الفوز"
 
-#: src/rule.py:375
+#: src/rule.py:376
 msgctxt "kajongg"
 msgid "Options"
 msgstr "خيارات"
 
-#: src/rule.py:376
+#: src/rule.py:377
 msgid "Here we have several special game related options"
 msgstr "هنا لدينا العديد من الخيارات الخاصة المتعلقة باللعبة"
 
-#: src/rule.py:377
+#: src/rule.py:378
 msgid "Penalties"
 msgstr "العقوبات"
 
-#: src/rule.py:378
+#: src/rule.py:379
 msgid ""
 "Penalties are applied manually by the user. They are only used for scoring "
 "games.\n"
@@ -1743,49 +1755,49 @@ msgstr ""
 "عند اللعب ضد الحاسوب أو عبر الشبكة، لن يسمح لك كاجونغ أبدًا بالوقوع\n"
 " في موقف حيث يتعين عليك دفع عقوبة"
 
-#: src/rule.py:578
+#: src/rule.py:579
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
 msgstr "نسخة%1 عن %2"
 
-#: src/rule.py:934
+#: src/rule.py:935
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
 msgstr "%4 لها قيم مستحيلة %2/%3 في القاعدة \"%1\""
 
-#: src/rule.py:1022
+#: src/rule.py:1023
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 صغير جدًا، الحد الأدنى للقيمة هو %3"
 
-#: src/rulesetselector.py:503
+#: src/rulesetselector.py:511
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr "خصّص مجموعات القواعد"
 
-#: src/rulesetselector.py:522
+#: src/rulesetselector.py:530
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "القاعدة"
 
-#: src/rulesetselector.py:583
+#: src/rulesetselector.py:592
 msgid "C&opy"
 msgstr "ا&نسخ"
 
-#: src/rulesetselector.py:584
+#: src/rulesetselector.py:593
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "قارن"
 
-#: src/rulesetselector.py:585
+#: src/rulesetselector.py:594
 msgid "&Remove"
 msgstr "أ&زل"
 
-#: src/rulesetselector.py:586
+#: src/rulesetselector.py:595
 msgid "&Close"
 msgstr "أ&غلق"
 
-#: src/scene.py:396 src/scene.py:527
+#: src/scene.py:389 src/scene.py:517
 msgid "Do you really want to abort this game?"
 msgstr "هل تريد حقًا إنهاء هذه اللعبة؟"
 
@@ -1811,223 +1823,223 @@ msgctxt "@title:window"
 msgid "Select four players"
 msgstr "حدد أربعة لاعبين"
 
-#: src/scoring.py:332
+#: src/scoring.py:360
 msgid "Move Exposed Tiles Here"
 msgstr "انقل القطع المكشوفة هنا"
 
-#: src/scoring.py:333
+#: src/scoring.py:361
 msgid "Move Concealed Tiles Here"
 msgstr "انقل القطع المخفية هنا"
 
-#: src/scoring.py:651
+#: src/scoring.py:673
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr "يرجى تحديد أربعة لاعبين في <interface>إعدادات|اللاعبون</interface>"
 
-#: src/scoringdialog.py:247
+#: src/scoringdialog.py:258
 msgid "Round/Hand"
 msgstr "جولة/يد"
 
-#: src/scoringdialog.py:280 src/scoringdialog.py:840
+#: src/scoringdialog.py:299 src/scoringdialog.py:834
 msgctxt "kajongg"
 msgid "Score"
 msgstr "النتيجة"
 
-#: src/scoringdialog.py:280
+#: src/scoringdialog.py:299
 msgctxt "kajongg"
 msgid "Payments"
 msgstr "حالات السداد"
 
-#: src/scoringdialog.py:281
+#: src/scoringdialog.py:300
 msgctxt "kajongg"
 msgid "Balance"
 msgstr "الرصيد"
 
-#: src/scoringdialog.py:281
+#: src/scoringdialog.py:300
 msgctxt "kajongg"
 msgid "Chart"
 msgstr "الرسم البياني"
 
-#: src/scoringdialog.py:427
+#: src/scoringdialog.py:410
 msgctxt "kajongg"
 msgid "Scores"
 msgstr "النتائج"
 
-#: src/scoringdialog.py:467
+#: src/scoringdialog.py:452
 msgctxt "kajongg"
 msgid "Used Rules"
 msgstr "القواعد المستعملة"
 
-#: src/scoringdialog.py:501
+#: src/scoringdialog.py:487
 msgid "Final scores for game <numid>%1</numid>"
 msgstr "النتائج النهائية للمباراة <numid>%1</numid>"
 
-#: src/scoringdialog.py:503
+#: src/scoringdialog.py:489
 msgid "Scores for game <numid>%1</numid>"
 msgstr "نتائج مباراة <numid>%1</numid>"
 
-#: src/scoringdialog.py:576
+#: src/scoringdialog.py:569
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "اشرح النتائج"
 
-#: src/scoringdialog.py:592
+#: src/scoringdialog.py:585
 msgid "There is no active game"
 msgstr "لا توجد لعبة نشطة"
 
-#: src/scoringdialog.py:595
+#: src/scoringdialog.py:588
 msgid "%1"
 msgstr "%1"
 
-#: src/scoringdialog.py:609
+#: src/scoringdialog.py:602
 msgid "Manual score for %1: %2 points"
 msgstr "النتيجة اليدوية لـ %1: %2 نقطة"
 
-#: src/scoringdialog.py:696
+#: src/scoringdialog.py:689
 msgid "Penalty"
 msgstr "العقوبة‎‎"
 
-#: src/scoringdialog.py:699
+#: src/scoringdialog.py:692
 msgid "Offense:"
 msgstr "المخالفة:"
 
-#: src/scoringdialog.py:706
+#: src/scoringdialog.py:699
 msgid "Total Penalty"
 msgstr "مجموعة العقوبة"
 
-#: src/scoringdialog.py:734
+#: src/scoringdialog.py:727
 msgid "&Execute"
 msgstr "&نفّذ"
 
-#: src/scoringdialog.py:811
+#: src/scoringdialog.py:805
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
 msgstr "يدفع %1 نقطة"
 
-#: src/scoringdialog.py:816
+#: src/scoringdialog.py:810
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
 msgstr "يحصل %1 نقطة"
 
-#: src/scoringdialog.py:827
+#: src/scoringdialog.py:821
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
 msgstr "تسجيل النقاط لهذه اليد"
 
-#: src/scoringdialog.py:838
+#: src/scoringdialog.py:832
 msgctxt "kajongg"
 msgid "Player"
 msgstr "اللاعب"
 
-#: src/scoringdialog.py:839
+#: src/scoringdialog.py:833
 msgctxt "kajongg"
 msgid "Wind"
 msgstr "ريح"
 
-#: src/scoringdialog.py:841
+#: src/scoringdialog.py:835
 msgid "Winner"
 msgstr "الفائز"
 
-#: src/scoringdialog.py:847
+#: src/scoringdialog.py:841
 msgctxt "kajongg"
 msgid "Draw"
 msgstr "اسحب"
 
-#: src/scoringdialog.py:849
+#: src/scoringdialog.py:843
 msgid "&Penalties"
 msgstr "ال&عقوبات"
 
-#: src/scoringdialog.py:851
+#: src/scoringdialog.py:845
 msgid "&Save Hand"
 msgstr "ا&حفظ اليد"
 
-#: src/scoringdialog.py:873
+#: src/scoringdialog.py:867
 msgid "&Last Tile:"
 msgstr "أ&خر قطعة:"
 
-#: src/scoringdialog.py:882
+#: src/scoringdialog.py:876
 msgid "L&ast Meld:"
 msgstr "أخر &خلط:"
 
-#: src/server.py:120
+#: src/server.py:122
 msgid "Wrong password"
 msgstr "كلمة سر خاطئة."
 
-#: src/server.py:216
+#: src/server.py:218
 msgid "table with id <numid>%1</numid> not found"
 msgstr "لم يعثر على الطاولة التي تحمل المعرف <numid>%1</numid>"
 
-#: src/server.py:364
+#: src/server.py:366
 msgid "Player %1 has logged out"
 msgstr "غادر اللاعب %1"
 
-#: src/server.py:434
+#: src/server.py:436
 msgid "the server will listen on PORT ({int(defaultPort)})"
 msgstr "سوف يستمع الخادم إلى المنفذ ({int(defaultPort)})"
 
-#: src/server.py:437
+#: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "سوف يستمع الخادم على SOCKET"
 
-#: src/server.py:441
+#: src/server.py:443
 msgid "name of the database"
 msgstr "اسم قاعدة البيانات"
 
-#: src/server.py:445
+#: src/server.py:447
 msgid "do not terminate local game server after last client disconnects"
 msgstr "لا تقم بإنهاء خادم اللعبة المحلي بعد قطع اتصال العميل الأخير"
 
-#: src/servertable.py:180
+#: src/servertable.py:181
 msgid "You already joined this table"
 msgstr "لقد انضممت فعلًا إلى هذه الطاولة"
 
-#: src/servertable.py:182
+#: src/servertable.py:183
 msgid "All seats are already taken"
 msgstr "جميع المقاعد مشغولة بالفعل"
 
-#: src/servertable.py:187
+#: src/servertable.py:188
 msgid "takes a seat"
 msgstr "يشغل مقعدًا"
 
-#: src/servertable.py:195
+#: src/servertable.py:196
 msgid "leaves the table"
 msgstr "يترك الطاولة"
 
-#: src/servertable.py:241
+#: src/servertable.py:242
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 1"
 msgstr "زيد"
 
-#: src/servertable.py:244
+#: src/servertable.py:245
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 2"
 msgstr "عمرو"
 
-#: src/servertable.py:245
+#: src/servertable.py:246
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 3"
 msgstr "سعد"
 
-#: src/servertable.py:301
+#: src/servertable.py:302
 msgid "Only the initiator %1 can start this game, you are %2"
 msgstr "فقط البادئ %1 يمكنه بدء هذه اللعبة، أنت %2"
 
-#: src/servertable.py:700
+#: src/servertable.py:701
 msgid "Game <numid>%1</numid> is over!"
 msgstr "انتهت اللعبة <numid>%1</numid>!"
 
-#: src/servertable.py:729
+#: src/servertable.py:730
 msgid "%1 wrongly said %2 for meld %3"
 msgstr "قال %1 بشكل خاطئ %2 للخلط %3"
 
-#: src/servertable.py:734
+#: src/servertable.py:735
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
 msgstr "%1 قال بشكل خاطئ %2: يدعي أنه أخفى قطع %3 ولكن لديه %4 فقط"
 
-#: src/servertable.py:771
+#: src/servertable.py:772
 msgid "declareKong:%1 wrongly said Kong for meld %2"
 msgstr "أعلن كونغ:%1 قال خطًأ كونغ للخلط %2"
 
-#: src/servertable.py:820
+#: src/servertable.py:821
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
 msgstr "%1 يطالب بماها كونغ: هذه ليست يد رابحة: %2"
 
@@ -2035,32 +2047,32 @@ msgstr "%1 يطالب بماها كونغ: هذه ليست يد رابحة: %2"
 msgid "No voices will be heard because the program %1 is missing"
 msgstr "لن يتم سماع أي أصوات لأن البرنامج %1 مفقود"
 
-#: src/sound.py:374
+#: src/sound.py:375
 msgid "cannot write <filename>%1</filename>: %2"
 msgstr "لا يمكن كتابة <filename>%1</filename>: %2"
 
-#: src/sound.py:377
+#: src/sound.py:378
 msgid "The voice files have changed, their checksum has changed."
 msgstr "تغيرت الملفات الصوتية، وتغير مجموعها الاختباري."
 
-#: src/sound.py:378
+#: src/sound.py:379
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
 msgstr "يرجى إعادة تثبيت كاجونغ أو القيام به مع الأذونات الكافية:"
 
-#: src/tables.py:64
+#: src/tables.py:65
 msgid "Table"
 msgstr "الطاولة"
 
-#: src/tables.py:68
+#: src/tables.py:69
 msgctxt "table status"
 msgid "Status"
 msgstr "الحالة"
 
-#: src/tables.py:69
+#: src/tables.py:70
 msgid "Ruleset"
 msgstr "قواعد اللعب"
 
-#: src/tables.py:148
+#: src/tables.py:149
 msgid "Select a ruleset"
 msgstr "اختر مجموعة قواعد اللعب"
 
@@ -2069,40 +2081,40 @@ msgctxt "allocate a new table"
 msgid "&New"
 msgstr "&جديد"
 
-#: src/tables.py:189 src/tables.py:316 src/tables.py:348
+#: src/tables.py:187 src/tables.py:331 src/tables.py:363
 msgid "Allocate a new table"
 msgstr "أنشئ طاولة جديدة"
 
-#: src/tables.py:192 src/tables.py:317 src/tables.py:349
+#: src/tables.py:193 src/tables.py:332 src/tables.py:364
 msgid "&Join"
 msgstr "انضمام"
 
-#: src/tables.py:196 src/tables.py:318 src/tables.py:350
+#: src/tables.py:194 src/tables.py:333 src/tables.py:365
 msgid "Join a table"
 msgstr "انضم لطاولة"
 
-#: src/tables.py:198
+#: src/tables.py:200
 msgid "&Leave"
 msgstr "ا&ترك"
 
-#: src/tables.py:202
+#: src/tables.py:201
 msgid "Leave a table"
 msgstr "اترك الطاولة"
 
-#: src/tables.py:205
+#: src/tables.py:207
 msgctxt "Kajongg-Ruleset"
 msgid "Compare"
 msgstr "قارن"
 
-#: src/tables.py:210
+#: src/tables.py:208
 msgid "Compare the rules of this table with my own rulesets"
 msgstr "قارن قواعد هذه الطاولة مع مجموعات قواعدي"
 
-#: src/tables.py:212
+#: src/tables.py:214
 msgid "&Chat"
 msgstr "&دردش"
 
-#: src/tables.py:217
+#: src/tables.py:221
 msgid "&Start"
 msgstr "ا&بدأ"
 
@@ -2110,192 +2122,192 @@ msgstr "ا&بدأ"
 msgid "Start playing on a table. Empty seats will be taken by robot players."
 msgstr "ابدأ اللعب على الطاولة. سيشغل اللاعبون الآليون المقاعد الفارغة."
 
-#: src/tables.py:267
+#: src/tables.py:281
 msgid "opens a chat window"
 msgstr "تفتح نافذة الدردشة"
 
-#: src/tables.py:286
+#: src/tables.py:300
 msgid "Local Games with Ruleset %1"
 msgstr "الألعاب المحلية بمجموعة القواعد %1"
 
-#: src/tables.py:290
+#: src/tables.py:304
 msgid "Tables at %1"
 msgstr "الطاولات في %1"
 
-#: src/tables.py:342
+#: src/tables.py:357
 msgid "Start a new game"
 msgstr "ابدأ لعبة جديدة"
 
-#: src/tables.py:344
+#: src/tables.py:359
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
 msgstr "ا&ستأنف"
 
-#: src/tables.py:346
+#: src/tables.py:361
 msgid "Resume the selected suspended game"
 msgstr "استئناف اللعبة المعلقة المحددة"
 
-#: src/tables.py:364
+#: src/tables.py:379
 msgid "Chat with others on this table"
 msgstr "دردش مع الآخرين على هذه الطاولة"
 
-#: src/tables.py:367
+#: src/tables.py:382
 msgid "For chatting with others on this table, please first take a seat"
 msgstr "للدردشة مع الآخرين على هذه الطاولة، يرجى الجلوس أولاً"
 
-#: src/tile.py:276
+#: src/tile.py:277
 msgctxt "kajongg"
 msgid "hidden"
 msgstr "مخفي"
 
-#: src/tile.py:277
+#: src/tile.py:278
 msgctxt "kajongg"
 msgid "stone"
 msgstr "حجر"
 
-#: src/tile.py:278
+#: src/tile.py:279
 msgctxt "kajongg"
 msgid "bamboo"
 msgstr "خيزران"
 
-#: src/tile.py:279
+#: src/tile.py:280
 msgctxt "kajongg"
 msgid "character"
 msgstr "حرف"
 
-#: src/tile.py:280
+#: src/tile.py:281
 msgctxt "kajongg"
 msgid "wind"
 msgstr "ريح"
 
-#: src/tile.py:281
+#: src/tile.py:282
 msgctxt "kajongg"
 msgid "dragon"
 msgstr "تنين"
 
-#: src/tile.py:282
+#: src/tile.py:283
 msgctxt "kajongg"
 msgid "flower"
 msgstr "زهرة"
 
-#: src/tile.py:283
+#: src/tile.py:284
 msgctxt "kajongg"
 msgid "season"
 msgstr "فصل"
 
-#: src/tile.py:289
+#: src/tile.py:290
 msgctxt "kajongg"
 msgid "tile"
 msgstr "قطعة"
 
-#: src/tile.py:290
+#: src/tile.py:291
 msgctxt "kajongg"
 msgid "white"
 msgstr "أبيض"
 
-#: src/tile.py:291
+#: src/tile.py:292
 msgctxt "kajongg"
 msgid "red"
 msgstr "أحمر"
 
-#: src/tile.py:292
+#: src/tile.py:293
 msgctxt "kajongg"
 msgid "green"
 msgstr "أخضر"
 
-#: src/tile.py:293
+#: src/tile.py:294
 msgctxt "kajongg"
 msgid "East"
 msgstr "شرق"
 
-#: src/tile.py:294
+#: src/tile.py:295
 msgctxt "kajongg"
 msgid "South"
 msgstr "الجنوب"
 
-#: src/tile.py:295
+#: src/tile.py:296
 msgctxt "kajongg"
 msgid "West"
 msgstr "الغرب"
 
-#: src/tile.py:296
+#: src/tile.py:297
 msgctxt "kajongg"
 msgid "North"
 msgstr "الشمال"
 
-#: src/tile.py:305
+#: src/tile.py:306
 msgid "East Wind"
 msgstr "رياح شرقية"
 
-#: src/tile.py:306
+#: src/tile.py:307
 msgid "South Wind"
 msgstr "رياح جنوبية"
 
-#: src/tile.py:307
+#: src/tile.py:308
 msgid "West Wind"
 msgstr "رياح غربية"
 
-#: src/tile.py:308
+#: src/tile.py:309
 msgid "North Wind"
 msgstr "رياح شمالية"
 
-#: src/tile.py:310
+#: src/tile.py:311
 #, python-brace-format
 msgctxt "kajongg tile name"
 msgid "{group} {value}"
 msgstr "{group} {value}"
 
-#: src/tile.py:889
+#: src/tile.py:880
 msgctxt "kajongg meld type"
 msgid "Bonus"
 msgstr "مكافأة"
 
-#: src/tile.py:891
+#: src/tile.py:882
 msgctxt "kajongg meld type"
 msgid "&single"
 msgstr "&مفرد"
 
-#: src/tile.py:893
+#: src/tile.py:884
 msgctxt "kajongg meld type"
 msgid "&pair"
 msgstr "&زوج"
 
-#: src/tile.py:895
+#: src/tile.py:886
 msgctxt "kajongg meld type"
 msgid "&chow"
 msgstr "&تشاو"
 
-#: src/tile.py:897
+#: src/tile.py:888
 msgctxt "kajongg meld type"
 msgid "p&ung"
 msgstr "&بونغ"
 
-#: src/tile.py:899
+#: src/tile.py:890
 msgctxt "kajongg meld type"
 msgid "c&laimed kong"
 msgstr "كونغ ال&مطلوب"
 
-#: src/tile.py:901
+#: src/tile.py:892
 msgctxt "kajongg meld type"
 msgid "k&ong"
 msgstr "كونغ"
 
-#: src/tile.py:902
+#: src/tile.py:893
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
 msgstr "بقية القطع"
 
-#: src/tile.py:909
+#: src/tile.py:900
 msgctxt "kajongg meld state"
 msgid "Exposed"
 msgstr "مكشوف"
 
-#: src/tile.py:910
+#: src/tile.py:901
 msgctxt "kajongg meld state"
 msgid "Concealed"
 msgstr "مخفي"
 
-#: src/tile.py:916
+#: src/tile.py:907
 #, python-brace-format
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
@@ -2334,6 +2346,9 @@ msgstr "عميلك لديه إصدار أقدم من 4.9.0 ولكنك تحتاج
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "عمليك لديه الإصدار %1 ولكنك تحتاج إلى %2 لهذا الخادم"
+
+#~ msgid "License Agreement"
+#~ msgstr "اتّفاقيّة التّرخيص"
 
 #, fuzzy
 #~| msgid "Not using Python KDE bindings"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2024-10-10 00:37+0000\n"
+"POT-Creation-Date: 2025-02-11 00:39+0000\n"
 "PO-Revision-Date: 2013-01-02 09:50+0700\n"
 "Last-Translator: sutha <sutha@khmeros.info>\n"
 "Language-Team: Khmer <support@khmeros>\n"
@@ -29,7 +29,7 @@ msgstr "ទិដ្ឋភាព​"
 msgid "Toolbar"
 msgstr "របារ​ឧបករណ៍"
 
-#: src/background.py:71 src/tileset.py:50
+#: src/background.py:71 src/tileset.py:48
 msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "ឯកសារ​​ <filename>%1</filename> មាន​​ SVG ដែល​មិន​ត្រឹមត្រូវ​"
 
@@ -68,12 +68,12 @@ msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "សេចក្ដីពិពណ៌នា ៖"
 
-#: src/board.py:315
+#: src/board.py:335
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
 msgid "hjklHJKL"
 msgstr "hjklHJKL"
 
-#: src/board.py:365
+#: src/board.py:385
 msgid "Choose from"
 msgstr "ជ្រើស​ពី "
 
@@ -81,7 +81,7 @@ msgstr "ជ្រើស​ពី "
 msgid "Time"
 msgstr "ពេលវេលា"
 
-#: src/chat.py:51 src/playerlist.py:86
+#: src/chat.py:51 src/playerlist.py:90
 msgid "Player"
 msgstr "អ្នកលេង"
 
@@ -182,19 +182,19 @@ msgctxt "Kajongg-Rule"
 msgid "not defined"
 msgstr "មិន​បានកំណត់​"
 
-#: src/game.py:558
+#: src/game.py:404
 msgid "Score computed manually"
 msgstr "បាន​គណនា​ពិន្ទុ​ដោយដៃ​"
 
-#: src/game.py:655
+#: src/game.py:502
 msgid "Player %1 not known"
 msgstr "មិន​ស្គាល់​អ្នក​លេង​​ %1 ​"
 
-#: src/game.py:1082
+#: src/game.py:925
 msgid "Short living wall: Tile is invisible, hence dangerous"
 msgstr "ជញ្ជាំង​សកម្ម​ខ្លី ៖ មើល​មិន​ឃើញ​ក្រឡា​ក្បឿង ដូច្នេះ​វា​គ្រោះថ្នាក់​ណាស់"
 
-#: src/games.py:95 src/playerlist.py:63 src/tables.py:66
+#: src/games.py:95 src/playerlist.py:67 src/tables.py:67
 msgid "Players"
 msgstr "អ្នក​លេង"
 
@@ -215,19 +215,19 @@ msgctxt "start a new game"
 msgid "&New"
 msgstr "ថ្មី"
 
-#: src/games.py:128
+#: src/games.py:129
 msgid "&Load"
 msgstr "ផ្ទុក"
 
-#: src/games.py:132 src/playerlist.py:53
+#: src/games.py:134 src/playerlist.py:56
 msgid "&Delete"
 msgstr "លុប"
 
-#: src/games.py:136
+#: src/games.py:139
 msgid "Show only pending games"
 msgstr "បង្ហាញ​តែ​ល្បែង​ដែល​រង់ចាំ"
 
-#: src/games.py:238
+#: src/games.py:247
 msgid ""
 "Do you really want to delete <numid>%1</numid> games?<br>This will be final, "
 "you cannot cancel it with the cancel button"
@@ -235,44 +235,44 @@ msgstr ""
 "តើ​​អ្នក​ពិត​ជា​ចង់​លុប​ល្បែ​ង​​ <numid>%1</numid> ឬ ​?<br>វា​នឹង​ត្រូវ​បាន​បញ្ចប់​​​ ​អ្នក​មិន​អាច​បោះបង់​វា​ដោយ​"
 "ចុច​​ប៊ូតុង​បោះបង់​ឡើយ​​"
 
-#: src/guiutil.py:132 src/kdestub.py:129 src/kdestub.py:132
+#: src/guiutil.py:134 src/kdestub.py:127 src/kdestub.py:130
 msgid "Kajongg"
 msgstr "Kajongg"
 
-#: src/humanclient.py:65
+#: src/humanclient.py:66
 msgid "Which chow do you want to expose?"
 msgstr "តើ​អ្នក​ចង់​បង្ហាញ​ chow មួយ​ណា ?"
 
-#: src/humanclient.py:103
+#: src/humanclient.py:104
 msgid "Which kong do you want to declare?"
 msgstr "តើ​អ្នក​ចង់​ប្រកាស​អំពី​ kong មួយ​ណា ?"
 
-#: src/humanclient.py:170
+#: src/humanclient.py:172
 msgid "Choose"
 msgstr "ជ្រើស​"
 
-#: src/humanclient.py:380
+#: src/humanclient.py:383
 msgid "You cannot say %1"
 msgstr "អ្នក​មិនអាច​និយាយ​​ %1"
 
-#: src/humanclient.py:605
+#: src/humanclient.py:608
 msgid "Player %1 has left the table"
 msgstr "អ្នក​លេង​​ %1 បាន​ចេញ​​​ពី​តារាង"
 
-#: src/humanclient.py:668
+#: src/humanclient.py:671
 msgid ""
 "The game on table <numid>%1</numid> can begin. Are you ready to play now?"
 msgstr ""
 
-#: src/humanclient.py:688
+#: src/humanclient.py:691
 msgid "Ready for next hand?"
 msgstr "សម្រាប់​ដៃ​បន្ទាប់​រួចហើយ​​ឬ​ ?"
 
-#: src/humanclient.py:962
+#: src/humanclient.py:967
 msgid "The connection to the server %1 broke, please try again later."
 msgstr "ការ​តភ្ជាប់​ទៅកាន់​ម៉ាស៊ីន​បម្រើ​​ %1 បាន​ខូច​​ សូម​ព្យាយាម​ម្ដង​ទៀត​​ពេលក្រោយ​ ។​"
 
-#: src/kajongg.py:81 src/kdestub.py:1086
+#: src/kajongg.py:81 src/kdestub.py:1099
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Mah Jongg - ល្បែង​ក្ដារ​ចិន​បុរាណ​សម្រាប់​អ្នក​លេង​ ៤​ នាក់​"
 
@@ -342,92 +342,92 @@ msgid ""
 "for testing"
 msgstr "ប្រើ​ម៉ាស៊ីន​បម្រើ​ដែល​ទទួល​បញ្ជា​នៅ​លើរន្ធ ។ ប្រើ​សម្រាប់​តែ​ការ​សាកល្បង​ប៉ុណ្ណោះ"
 
-#: src/kdestub.py:269
+#: src/kdestub.py:285
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "OK"
 msgid "&OK"
 msgstr "យល់ព្រម​"
 
-#: src/kdestub.py:271
+#: src/kdestub.py:286
 msgid "&Apply"
 msgstr ""
 
-#: src/kdestub.py:273
+#: src/kdestub.py:287
 msgid "&Cancel"
 msgstr ""
 
-#: src/kdestub.py:275 src/kdestub.py:460
+#: src/kdestub.py:288 src/kdestub.py:476
 msgid "&Help"
 msgstr ""
 
-#: src/kdestub.py:278
+#: src/kdestub.py:289
 msgid "&Defaults"
 msgstr ""
 
-#: src/kdestub.py:343
+#: src/kdestub.py:359
 #, fuzzy
 #| msgid "Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "របារ​ឧបករណ៍"
 
-#: src/kdestub.py:349
+#: src/kdestub.py:365
 #, fuzzy
 #| msgid "Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "របារ​ឧបករណ៍"
 
-#: src/kdestub.py:355
+#: src/kdestub.py:371
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
 msgid "Configure Tool&bars..."
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/kdestub.py:357
+#: src/kdestub.py:373
 msgid "Configure toolbars"
 msgstr ""
 
-#: src/kdestub.py:364
+#: src/kdestub.py:380
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
 msgid "Configure &Kajongg..."
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/kdestub.py:366 src/kdestub.py:1206
+#: src/kdestub.py:382 src/kdestub.py:1160
 msgid "Configure"
 msgstr ""
 
-#: src/kdestub.py:456
+#: src/kdestub.py:472
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "Game"
 msgid "&Game"
 msgstr "ល្បែង "
 
-#: src/kdestub.py:457
+#: src/kdestub.py:473
 #, fuzzy
 #| msgid "View"
 msgid "&View"
 msgstr "ទិដ្ឋភាព​"
 
-#: src/kdestub.py:458
+#: src/kdestub.py:474
 msgid "&Settings"
 msgstr ""
 
-#: src/kdestub.py:466
+#: src/kdestub.py:484
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr ""
 
-#: src/kdestub.py:469 src/kdestub.py:848
+#: src/kdestub.py:487 src/kdestub.py:864
 msgid "Switch Application Language"
 msgstr ""
 
-#: src/kdestub.py:473
+#: src/kdestub.py:491
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
@@ -435,69 +435,69 @@ msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/kdestub.py:853
+#: src/kdestub.py:869
 msgid "Please choose the language which should be used for this application:"
 msgstr ""
 
-#: src/kdestub.py:872
+#: src/kdestub.py:888
 msgid "Add Fallback Language"
 msgstr ""
 
-#: src/kdestub.py:884
+#: src/kdestub.py:900
 msgid "Primary language:"
 msgstr ""
 
-#: src/kdestub.py:884
+#: src/kdestub.py:900
 msgid "Fallback language:"
 msgstr ""
 
-#: src/kdestub.py:890
+#: src/kdestub.py:906
 #, fuzzy
 #| msgid "R&emove"
 msgid "Remove"
 msgstr "យកចេញ"
 
-#: src/kdestub.py:894
+#: src/kdestub.py:910
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr ""
 
-#: src/kdestub.py:896
+#: src/kdestub.py:912
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
 msgstr ""
 
-#: src/kdestub.py:1026
+#: src/kdestub.py:1042
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
 msgid "About Kajongg"
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/kdestub.py:1049
+#: src/kdestub.py:1062
 msgid "Version: %1"
 msgstr ""
 
-#: src/kdestub.py:1050
+#: src/kdestub.py:1063
 msgid "Protocol version %1"
 msgstr ""
 
-#: src/kdestub.py:1053
+#: src/kdestub.py:1066
 msgid "Original author"
 msgstr "អ្នក​និពន្ធ​ដើម"
 
-#: src/kdestub.py:1060
+#: src/kdestub.py:1073
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr ""
 
-#: src/kdestub.py:1066
+#: src/kdestub.py:1079
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr ""
 
-#: src/kdestub.py:1087
+#: src/kdestub.py:1100
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -505,31 +505,27 @@ msgstr ""
 "នេះ​ជា​ Mah Jongg បុរាណ​សម្រាប់​អ្នក​លេង ៤ នាក់ ។ ប្រសិនបើ​អ្នក​កំពុង​រកមើល​ Mah Jongg "
 "solitaire សូម​ប្រើ​កម្មវិធី kmahjongg ។​"
 
-#: src/kdestub.py:1104
+#: src/kdestub.py:1117
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
 msgstr ""
 
-#: src/kdestub.py:1109
+#: src/kdestub.py:1122
 #, fuzzy
 #| msgid "Author:"
 msgid "Authors:"
 msgstr "អ្នកនិពន្ធ ៖"
 
-#: src/kdestub.py:1159
-msgid "License Agreement"
-msgstr ""
-
-#: src/kdestub.py:1408
+#: src/kdestub.py:1363
 msgid "Configure Toolbars"
 msgstr ""
 
-#: src/kdestub.py:1410
+#: src/kdestub.py:1365
 msgid "A&vailable actions:"
 msgstr ""
 
-#: src/kdestub.py:1421
+#: src/kdestub.py:1376
 msgid "Curr&ent actions:"
 msgstr ""
 
@@ -539,7 +535,7 @@ msgstr ""
 msgid "trying to start local server %1"
 msgstr "ចាប់ផ្ដើម​ម៉ាស៊ីន​បម្រើ​ល្បែង​មូលដ្ឋាន"
 
-#: src/login.py:188 src/login.py:636
+#: src/login.py:188 src/login.py:637
 msgid "removed stale socket <filename>%1</filename>"
 msgstr "បាន​យក​រន្ធ​ចាស់​ចេញ​ហើយ​​ <filename>%1</filename>"
 
@@ -554,70 +550,70 @@ msgctxt "kajongg"
 msgid "Login"
 msgstr "ចូល​"
 
-#: src/login.py:299 src/login.py:405
+#: src/login.py:300 src/login.py:406
 msgid "Game server:"
 msgstr "ម៉ាស៊ីន​បម្រើ​ល្បែង​ ៖​"
 
-#: src/login.py:302 src/login.py:407
+#: src/login.py:303 src/login.py:408
 msgid "Username:"
 msgstr "ឈ្មោះ​អ្នក​ប្រើ​ ៖"
 
-#: src/login.py:305 src/login.py:410
+#: src/login.py:306 src/login.py:411
 msgid "Password:"
 msgstr "ពាក្យ​សម្ងាត់​ ៖"
 
-#: src/login.py:307
+#: src/login.py:308
 msgctxt "kajongg"
 msgid "Ruleset:"
 msgstr "សំណុំ​ក្បួន​ ៖"
 
-#: src/login.py:399
+#: src/login.py:400
 #, fuzzy
 #| msgid "Create User Account"
 msgctxt "@title:window"
 msgid "Create User Account"
 msgstr "បង្កើត​គណនី​អ្នក​ប្រើ​"
 
-#: src/login.py:413
+#: src/login.py:414
 msgid "Repeat password:"
 msgstr "បង្កើត​​​ពាក្យ​សម្ងាត់​ម្តង​ទៀត​ ៖"
 
-#: src/login.py:564
+#: src/login.py:565
 msgid "You are already connected to server %1"
 msgstr "អ្នក​បាន​តភ្ជាប់​ទៅ​ម៉ាស៊ីន​បម្រើ​រួចហើយ %1"
 
-#: src/login.py:604
+#: src/login.py:605
 msgctxt "USER is not known on SERVER"
 msgid "%1 is not known on %2, do you want to open an account?"
 msgstr "%1 មិន​ស្គាល់​កំហុស​​លើ​ %2 តើ​អ្នក​ចង់​បើក​គណនី​ឬ ?"
 
-#: src/login.py:617
+#: src/login.py:618
 msgid "Server %1 did not answer"
 msgstr ""
 
-#: src/login.py:619
+#: src/login.py:620
 msgid "Server %1 refused connection"
 msgstr ""
 
-#: src/login.py:621
+#: src/login.py:622
 msgid "Server %1 does not run a kajongg server"
 msgstr ""
 
-#: src/login.py:623
+#: src/login.py:624
 msgid "Address for server %1 cannot be found"
 msgstr ""
 
-#: src/login.py:626
+#: src/login.py:627
 #, fuzzy
 #| msgid "You have no network connection (error code %1)."
 msgid "Login to server %1 failed: You have no network connection"
 msgstr "អ្នក​មិន​បាន​តភ្ជាប់​បណ្ដាញ (កូដ​កំហុស %1) ។"
 
-#: src/login.py:637
+#: src/login.py:638
 msgid "Please try again"
 msgstr "សូម​ព្យាយាម​ម្ដងទៀត"
 
-#: src/mainwindow.py:483
+#: src/mainwindow.py:486
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Score Manual Game"
@@ -625,12 +621,12 @@ msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
 msgstr "ល្បែង​ដាក់​ពិន្ទុ​ដោយដៃ"
 
-#: src/mainwindow.py:485
+#: src/mainwindow.py:488
 msgctxt "@action:intoolbar"
 msgid "Manual Game"
 msgstr "ល្បែង​លេង​ដោយដៃ"
 
-#: src/mainwindow.py:488
+#: src/mainwindow.py:491
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "&Score a manual game."
@@ -638,12 +634,12 @@ msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
 msgstr "ល្បែង​ដាក់​ពិន្ទុ​ដោយ​ដៃ ។"
 
-#: src/mainwindow.py:490
+#: src/mainwindow.py:493
 msgctxt "@action:intoolbar"
 msgid "&Play"
 msgstr "លេង"
 
-#: src/mainwindow.py:493
+#: src/mainwindow.py:496
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Start a new game."
@@ -651,7 +647,7 @@ msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
 msgstr "ចាប់ផ្ដើម​ល្បែង​ថ្មី ។"
 
-#: src/mainwindow.py:495
+#: src/mainwindow.py:498
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Abort Game"
@@ -659,7 +655,7 @@ msgctxt "@action:inmenu"
 msgid "&Abort Game"
 msgstr "បោះបង់​ល្បែង"
 
-#: src/mainwindow.py:499
+#: src/mainwindow.py:502
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Abort the current game."
@@ -667,7 +663,7 @@ msgctxt "kajongg @info:tooltip"
 msgid "Abort the current game."
 msgstr "បោះបង់​ល្បែង​បច្ចុប្បន្ន ។"
 
-#: src/mainwindow.py:501
+#: src/mainwindow.py:504
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Quit Kajongg"
@@ -675,12 +671,12 @@ msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
 msgstr "ចេញ​ពី Kajongg"
 
-#: src/mainwindow.py:504
+#: src/mainwindow.py:507
 msgctxt "@action:intoolbar"
 msgid "&Players"
 msgstr "អ្នកលេង"
 
-#: src/mainwindow.py:507
+#: src/mainwindow.py:510
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "define your players."
@@ -688,19 +684,19 @@ msgctxt "kajongg @info:tooltip"
 msgid "define your players."
 msgstr "កំណត់​អ្នកលេង​របស់អ្នក ។"
 
-#: src/mainwindow.py:509
+#: src/mainwindow.py:512
 #, fuzzy
 #| msgid "Rulesets"
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
 msgstr "សំណុំ​​ក្បួន​"
 
-#: src/mainwindow.py:512
+#: src/mainwindow.py:515
 msgctxt "kajongg @info:tooltip"
 msgid "customize rulesets."
 msgstr ""
 
-#: src/mainwindow.py:516
+#: src/mainwindow.py:519
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Change Visual Angle"
@@ -708,12 +704,12 @@ msgctxt "@action:inmenu"
 msgid "&Change Visual Angle"
 msgstr "ផ្លាស់​ប្ដូរ​មុំ​ចក្ខុ"
 
-#: src/mainwindow.py:517
+#: src/mainwindow.py:520
 msgctxt "@action:intoolbar"
 msgid "Angle"
 msgstr "មុំ"
 
-#: src/mainwindow.py:520
+#: src/mainwindow.py:523
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Change the visual appearance of the tiles."
@@ -721,12 +717,12 @@ msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
 msgstr "ផ្លាស់ប្ដូរ​រូបរាង​ក្រឡាក្បឿង ។"
 
-#: src/mainwindow.py:524
+#: src/mainwindow.py:527
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
 msgstr ""
 
-#: src/mainwindow.py:527
+#: src/mainwindow.py:530
 #, fuzzy
 #| msgctxt "kajongg @action:inmenu"
 #| msgid "&Score Table"
@@ -734,17 +730,17 @@ msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
 msgstr "តារាង​ពិន្ទុ"
 
-#: src/mainwindow.py:529
+#: src/mainwindow.py:532
 msgctxt "kajongg @action:intoolbar"
 msgid "&Scores"
 msgstr "ពិន្ទុ"
 
-#: src/mainwindow.py:531
+#: src/mainwindow.py:534
 msgctxt "kajongg @info:tooltip"
 msgid "Show or hide the score table for the current game."
 msgstr "បង្ហាញ ឬ​លាក់​តារាង​ពិន្ទុ​សម្រាប់​ល្បែង​បច្ចុប្បន្ន ។"
 
-#: src/mainwindow.py:533
+#: src/mainwindow.py:536
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Explain Scores"
@@ -752,12 +748,12 @@ msgctxt "@action:inmenu"
 msgid "&Explain Scores"
 msgstr "ពន្យល់​អំពី​ពិន្ទុ"
 
-#: src/mainwindow.py:534
+#: src/mainwindow.py:537
 msgctxt "@action:intoolbar"
 msgid "&Explain"
 msgstr "ពន្យល់"
 
-#: src/mainwindow.py:536
+#: src/mainwindow.py:539
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Explain the scoring for all players in the current game."
@@ -765,7 +761,7 @@ msgctxt "kajongg @info:tooltip"
 msgid "Explain the scoring for all players in the current game."
 msgstr "ពន្យល់​អំពី​ការ​ដាក់​ពិន្ទុ​សម្រាប់​អ្នកលេង​ទាំងអស់​នៅ​ក្នុង​ល្បែង​បច្ចុប្បន្ន ។"
 
-#: src/mainwindow.py:538
+#: src/mainwindow.py:541
 #, fuzzy
 #| msgctxt "@action:inmenu"
 #| msgid "&Demo Mode"
@@ -773,7 +769,7 @@ msgctxt "@action:inmenu"
 msgid "&Demo Mode"
 msgstr "របៀប​បង្ហាញ​សាក​ល្បង"
 
-#: src/mainwindow.py:541
+#: src/mainwindow.py:544
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid ""
@@ -782,11 +778,11 @@ msgctxt "kajongg @info:tooltip"
 msgid "Let the computer take over for you. Start a new local game if needed."
 msgstr "អនុញ្ញាត​ឲ្យ​កុំព្យូទ័រ​គ្រប់គ្រង​អ្នក ។ ចាប់ផ្ដើម​ល្បែង​មូលដ្ឋាន​ថ្មី ប្រសិនបើ​ចាំបាច់ ។"
 
-#: src/mainwindow.py:543
+#: src/mainwindow.py:546
 msgid "C&hat"
 msgstr "ជជែក"
 
-#: src/mainwindow.py:546
+#: src/mainwindow.py:549
 #, fuzzy
 #| msgctxt "@info:tooltip"
 #| msgid "Chat with the other players."
@@ -794,92 +790,92 @@ msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
 msgstr "ជជែកជាមួយ​អ្នកលេង​ផ្សេងទៀត ។"
 
-#: src/message.py:262
+#: src/message.py:250
 msgid "saying %1 violates Original Call"
 msgstr "ការ​និយាយ %1 បំពាន​ការ​ហៅ​ដើម"
 
-#: src/message.py:275
+#: src/message.py:263
 msgid ""
 "claiming %1 is dangerous because you will have to discard a dangerous tile"
 msgstr "អះអាង​ថា %1 គ្រោះថ្នាក់ ពីព្រោះ​អ្នក​នឹង​ត្រូវ​បោះបង់​ក្រឡា​ក្បឿង​ដែល​គ្រោះថ្នាក់"
 
-#: src/message.py:280
+#: src/message.py:268
 msgid ""
 "claiming %1 for %2 is dangerous because you will have to discard a dangerous "
 "tile"
 msgstr "អះអាង​ថា %1 សម្រាប់ %2 គ្រោះថ្នាក់ ពីព្រោះ​អ្នក​ត្រូវតែ​បោះបង់​ក្រឡា​ក្បឿង​ដែល​គ្រោះថ្នាក់"
 
-#: src/message.py:283
+#: src/message.py:271
 msgid "You may say %1"
 msgstr "អ្នក​អាច​និយាយ​​ %1"
 
-#: src/message.py:293
+#: src/message.py:280
 msgctxt "kajongg"
 msgid "Pung"
 msgstr "Pung"
 
-#: src/message.py:294
+#: src/message.py:281
 msgctxt "kajongg game dialog:Key for Pung"
 msgid "P"
 msgstr "P"
 
-#: src/message.py:313
+#: src/message.py:299
 msgctxt "kajongg"
 msgid "Kong"
 msgstr "Kong"
 
-#: src/message.py:314
+#: src/message.py:300
 msgctxt "kajongg game dialog:Key for Kong"
 msgid "K"
 msgstr "K"
 
-#: src/message.py:340
+#: src/message.py:326
 msgid "saying Kong for %1 violates Original Call"
 msgstr "ការ​និយាយ Kong សម្រាប់ %1 បំពាន​ការ​ហៅ​ដើម"
 
-#: src/message.py:344
+#: src/message.py:330
 msgid "You may say Kong for %1"
 msgstr "អ្នក​អាច​និយាយ Kong សម្រាប់ %1"
 
-#: src/message.py:359
+#: src/message.py:344
 msgctxt "kajongg"
 msgid "Chow"
 msgstr "Chow"
 
-#: src/message.py:360
+#: src/message.py:345
 msgctxt "kajongg game dialog:Key for Chow"
 msgid "C"
 msgstr "C"
 
-#: src/message.py:394
+#: src/message.py:378
 msgctxt "kajongg"
 msgid "Mah Jongg"
 msgstr "Mah Jongg"
 
-#: src/message.py:395
+#: src/message.py:379
 msgctxt "kajongg game dialog:Key for Mah Jongg"
 msgid "M"
 msgstr "M"
 
-#: src/message.py:403
+#: src/message.py:387
 msgid "Press here and you win"
 msgstr "ចុច​ទីនេះ អ្នក​នឹង​ឈ្នះ"
 
-#: src/message.py:418
+#: src/message.py:401
 msgctxt "kajongg"
 msgid "Original Call"
 msgstr "Original Call"
 
-#: src/message.py:419
+#: src/message.py:402
 msgctxt "kajongg game dialog:Key for Original Call"
 msgid "O"
 msgstr "O"
 
-#: src/message.py:435
+#: src/message.py:418
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
 msgstr "ការ​បោះបង់ %1 និង​ការ​អះអាង Original Call ធ្វើឲ្យ​ដៃ​នេះ​មិន​អាច​ឈ្នះ​បាន"
 
-#: src/message.py:439
+#: src/message.py:422
 msgid ""
 "Discard a tile, declaring Original Call meaning you need only one tile to "
 "complete the hand and will not alter the hand in any way (except bonus tiles)"
@@ -887,60 +883,60 @@ msgstr ""
 "បោះបង់​ក្រឡា​ក្បឿង អះអាង​ Original Call មាន​ន័យ​ថា​អ្នក​ត្រូវការ​តែ​ក្រឡា​ក្បឿង​មួយ​ប៉ុណ្ណោះ​ ដើម្បី​បញ្ចប់​"
 "ដៃ​នេះ ហើយ​នឹង​មិន​ប្ដូរ​ដៃ​ណាមួយ​ទេ (លើកលែងតែ​ក្រឡា​ក្បឿង​បន្ថែម)"
 
-#: src/message.py:465
+#: src/message.py:447
 msgctxt "kajongg"
 msgid "Discard"
 msgstr "បោះចោល​"
 
-#: src/message.py:466
+#: src/message.py:448
 msgctxt "kajongg game dialog:Key for Discard"
 msgid "D"
 msgstr "D"
 
-#: src/message.py:483
+#: src/message.py:465
 msgid "discarding %1 violates Original Call"
 msgstr "ការ​បោះបង់ %1 បំពាន Original Call"
 
-#: src/message.py:486
+#: src/message.py:468
 msgid "discarding %1 is Dangerous Game"
 msgstr "ការ​បោះបង់ %1 គឺជា Dangerous Game"
 
-#: src/message.py:489
+#: src/message.py:471
 msgid "discard the least useful tile"
 msgstr "បោះបង់​ក្រឡា​ក្បឿង​ដែល​មាន​ប្រយោជន៍​តិច​បំផុត"
 
-#: src/message.py:569
+#: src/message.py:551
 #, fuzzy
 #| msgid "Do you really want to abort this game?"
 msgid "%1 is not ready to start the game"
 msgstr "តើ​អ្នក​ពិត​ជា​ចង់​បោះ​បង់​ល្បែង​នេះ​​ឬ​ ?"
 
-#: src/message.py:608
+#: src/message.py:590
 msgid "Kajongg <numid>%1</numid>"
 msgstr "Kajongg <numid>%1</numid>"
 
-#: src/message.py:694
+#: src/message.py:676
 #, fuzzy
 #| msgid "Violates Original Call"
 msgctxt "kajongg"
 msgid "Violates Original Call"
 msgstr "Violates Original Call"
 
-#: src/message.py:837
+#: src/message.py:819
 #, fuzzy
 #| msgid "Dangerous Game"
 msgctxt "kajongg"
 msgid "Dangerous Game"
 msgstr "​ល្បែង​គ្រោះថ្នាក់​"
 
-#: src/message.py:852
+#: src/message.py:834
 #, fuzzy
 #| msgid "No Choice"
 msgctxt "kajongg"
 msgid "No Choice"
 msgstr "គ្មាន​ជម្រើស"
 
-#: src/message.py:915
+#: src/message.py:896
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "OK"
@@ -948,26 +944,26 @@ msgctxt "kajongg"
 msgid "OK"
 msgstr "យល់ព្រម​"
 
-#: src/message.py:916
+#: src/message.py:897
 msgctxt "kajongg game dialog:Key for OK"
 msgid "O"
 msgstr "O"
 
-#: src/message.py:920
+#: src/message.py:901
 msgid "Confirm that you saw the message"
 msgstr "អះអាង​ថា​អ្នក​បាន​ឃើញ​សារ"
 
-#: src/message.py:929
+#: src/message.py:909
 msgctxt "kajongg"
 msgid "No Claim"
 msgstr "មិន​អះអាង"
 
-#: src/message.py:930
+#: src/message.py:910
 msgctxt "kajongg game dialog:Key for No claim"
 msgid "N"
 msgstr "N"
 
-#: src/message.py:934
+#: src/message.py:914
 msgid "You cannot or do not want to claim this tile"
 msgstr "អ្នក​មិន​អាច ឬ​មិន​ចង់​អះអាង​ក្រឡា​ក្បឿង​នេះ"
 
@@ -1034,18 +1030,18 @@ msgstr "អ្នកលេង %1 បាន​បង្ហាញ​ខ្យល�
 msgid "Player %1 exposed many dragons"
 msgstr "អ្នកលេង %1 បាន​បង្ហាញ​នាគ​ជាច្រើន"
 
-#: src/playerlist.py:48
+#: src/playerlist.py:50
 msgctxt "define a new player"
 msgid "&New"
 msgstr "ថ្មី"
 
-#: src/playerlist.py:106
+#: src/playerlist.py:110
 #, fuzzy
 #| msgid "User %1 already exists"
 msgid "Player %1 already exists"
 msgstr "មាន​អ្នក​ប្រើ​ %1 រួច​ហើយ"
 
-#: src/playerlist.py:116
+#: src/playerlist.py:121
 #, fuzzy
 #| msgid ""
 #| "Unknown error for player %1: %2\n"
@@ -1055,7 +1051,7 @@ msgstr ""
 "កំហុស​​មិន​ស្គាល់​​សម្រាប់​អ្នក​លេង​​ %1 ៖​ %2\n"
 "%3"
 
-#: src/playerlist.py:171
+#: src/playerlist.py:176
 msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
@@ -1212,246 +1208,252 @@ msgid "The hand contains too many tiles"
 msgstr "ដៃ​មាន​ក្រឡា​ក្បឿង​ច្រើន"
 
 #: src/predefined.py:109
+#, fuzzy
+#| msgid "Zero Point Hand"
+msgid "Tiles in Hand"
+msgstr "ដៃ​ពិន្ទុ​សូន្យ​​"
+
+#: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
 msgstr "ពិន្ទុ​ដែល​ត្រូវ​ការ​សម្រាប់​ Mah Jongg"
 
-#: src/predefined.py:113
+#: src/predefined.py:118
 msgid "Minimum number of doubles needed for Mah Jongg"
 msgstr "ចំនួន​អប្បបរមា​ទ្វេដង​ដែល​នឹង​ត្រូវការ​សម្រាប់ Mah Jongg"
 
-#: src/predefined.py:116
+#: src/predefined.py:121
 msgid "Points for a Limit Hand"
 msgstr "ពិន្ទុ​សម្រាប់​ដៃ​មាន​កំណត់"
 
-#: src/predefined.py:120
+#: src/predefined.py:125
 msgid "Play with the roof off"
 msgstr "លេខ​ដោយ​​បិទ roof"
 
-#: src/predefined.py:121
+#: src/predefined.py:126
 msgid "Play with no upper scoring limit"
 msgstr "លេខ​ដោយ​មិន​កំណត់​ការ​រមូរ​ឡើង​លើ"
 
-#: src/predefined.py:123
+#: src/predefined.py:128
 msgid "Claim Timeout"
 msgstr "អស់​ពេល​ទាម​ទារ"
 
-#: src/predefined.py:127
+#: src/predefined.py:132
 msgid "Size of Kong Box"
 msgstr "ទំហំ​​​របស់​ Kong Box"
 
-#: src/predefined.py:128
+#: src/predefined.py:133
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
 msgstr "Kong Box ត្រូវ​បាន​ប្រើ​សម្រាប់​ក្រឡា​ក្បឿង​ជំនួស នៅ​ពេល​ប្រកាស kongs"
 
-#: src/predefined.py:130
+#: src/predefined.py:135
 msgid "Play with Bonus Tiles"
 msgstr "លេង​ជាមួយ​ក្រឡា​ក្បឿង​បន្ថែម​​"
 
-#: src/predefined.py:131
+#: src/predefined.py:136
 msgid "Bonus tiles increase the luck factor"
 msgstr "ក្រឡា​ក្បឿង​បន្ថែម​បង្កើន​សំណាង"
 
-#: src/predefined.py:133
+#: src/predefined.py:138
 msgid "Minimum number of rounds in game"
 msgstr "ចំនួន​ជុំ​អប្បបរមា​ក្នុង​ល្បែង"
 
-#: src/predefined.py:137
+#: src/predefined.py:142
 msgid "number of allowed chows"
 msgstr "ចំនួន allowed ដែល​បាន​អនុញ្ញាត"
 
-#: src/predefined.py:138
+#: src/predefined.py:143
 msgid "The number of chows a player may build"
 msgstr "The number of chows a player may build"
 
-#: src/predefined.py:140
+#: src/predefined.py:145
 msgid "must declare calling hand"
 msgstr "must declare calling hand"
 
-#: src/predefined.py:142
+#: src/predefined.py:147
 msgid "Mah Jongg is only allowed after having declared to have a calling hand"
 msgstr "Mah Jongg is only allowed after having declared to have a calling hand"
 
-#: src/predefined.py:144
+#: src/predefined.py:149
 #, fuzzy
 #| msgid "Standard Mah Jongg"
 msgid "Standard Rotation"
 msgstr "​Mah Jongg ស្តង់ដារ​"
 
-#: src/predefined.py:147
+#: src/predefined.py:152
 msgid "Discard tiles ordered"
 msgstr ""
 
-#: src/predefined.py:149
+#: src/predefined.py:154
 msgid "Discard tiles ordered from top left"
 msgstr ""
 
-#: src/predefined.py:151
+#: src/predefined.py:156
 msgid "Leave holes for claimed discards"
 msgstr ""
 
-#: src/predefined.py:154
+#: src/predefined.py:159
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
 
-#: src/predefined.py:163
+#: src/predefined.py:168
 msgid "Last Tile Completes Pair of 2..8"
 msgstr "ក្រឡា​ក្បឿង​ចុង​ក្រោយ​បំពេញ​គូរ​ ២..៨"
 
-#: src/predefined.py:167
+#: src/predefined.py:172
 msgid "Last Tile Completes Pair of Terminals or Honors"
 msgstr "ក្រឡា​ក្បឿង​ចុង​ក្រោយ​បំពេញ Terminals ឬ​ Honors មួយ​គូ"
 
-#: src/predefined.py:170
+#: src/predefined.py:175
 msgid "Last Tile is Only Possible Tile"
 msgstr "ក្រឡា​ក្បឿង​ចុង​ក្រោយ​ជា​ក្រឡា​ក្បឿង​ដែល​អាច​មាន​"
 
-#: src/predefined.py:174
+#: src/predefined.py:179
 msgid "Won with Last Tile Taken from Wall"
 msgstr "បាន​ឈ្នះ​ក្រឡា​ក្បឿង​ចុង​ក្រោយ​ដែល​បាន​យក​ចេញ​ពី​ជញ្ជាំង"
 
-#: src/predefined.py:179
+#: src/predefined.py:184
 msgid "Zero Point Hand"
 msgstr "ដៃ​ពិន្ទុ​សូន្យ​​"
 
-#: src/predefined.py:180
+#: src/predefined.py:185
 msgid "The hand has 0 basis points excluding bonus tiles"
 msgstr "ដៃ​មាន​ពិន្ទុ​គោល​ ០ មិន​រួម​បញ្ចូល​ក្រឡា​ក្បឿង​បន្ថែម​ទេ"
 
-#: src/predefined.py:181
+#: src/predefined.py:186
 msgid "No Chow"
 msgstr "គ្មាន Chow"
 
-#: src/predefined.py:183
+#: src/predefined.py:188
 msgid "Only Concealed Melds"
 msgstr "តែ​ពិន្ទុ​បញ្ចូល​គ្នា​ដែល​បាន​លាក់​ប៉ុណ្ណោះ"
 
-#: src/predefined.py:187
+#: src/predefined.py:192
 msgid "False Color Game"
 msgstr "ល្បែង​ពណ៌​ក្លែងក្លាយ​"
 
-#: src/predefined.py:188
+#: src/predefined.py:193
 msgid ""
 "Only same-colored tiles (only bamboo/stone/character) plus any number of "
 "winds and dragons"
 msgstr "តែ​ក្រឡា​ក្បឿង​ដែល​មាន​ពណ៌​ដូច​គ្នា​ប៉ុណ្ណោះ​ (តែ​ឫស្សី​/ថ្ម​/អក្សរ​) រួម​ទាំង​ខ្យល់ និង​នាគ​​មួយ​ចំនួន"
 
-#: src/predefined.py:191
+#: src/predefined.py:196
 msgid "True Color Game"
 msgstr "ល្បែង​ពណ៌​ធម្មជាតិ"
 
-#: src/predefined.py:192
+#: src/predefined.py:197
 msgid "Only same-colored tiles (only bamboo/stone/character)"
 msgstr "តែ​ក្រឡា​​ក្បឿង​មាន​ពណ៌​ដូច​គ្នា​​ប៉ុណ្ណោះ (តែ​ឫស្សី/ថ្ម​/តួ​អក្សរ​)"
 
-#: src/predefined.py:194
+#: src/predefined.py:199
 msgid "Concealed True Color Game"
 msgstr "​ល្បែង​ពណ៌​ធម្មជាតិ​​ដែល​បានលាក់​"
 
-#: src/predefined.py:195
+#: src/predefined.py:200
 msgid "All tiles concealed and of the same suit, no honors"
 msgstr "All tiles concealed and of the same suit, no honors"
 
-#: src/predefined.py:197
+#: src/predefined.py:202
 msgid "Only Terminals and Honors"
 msgstr "Terminals និង​ Honors តែប៉ុណ្ណោះ​"
 
-#: src/predefined.py:198
+#: src/predefined.py:203
 msgid "Only winds, dragons, 1 and 9"
 msgstr "តែ​ខ្យល់​ នាគ ១ និង ៩ ប៉ុណ្ណោះ"
 
-#: src/predefined.py:199
+#: src/predefined.py:204
 msgid "Only Honors"
 msgstr "​Honors តែប៉ុណ្ណោះ​"
 
-#: src/predefined.py:200
+#: src/predefined.py:205
 msgid "Only winds and dragons"
 msgstr "Terminals និង​ Honors តែប៉ុណ្ណោះ​"
 
-#: src/predefined.py:202
+#: src/predefined.py:207
 msgid "Hidden Treasure"
 msgstr "កំណប់​ដែល​បាន​លាក់"
 
-#: src/predefined.py:203
+#: src/predefined.py:208
 msgid "Only hidden Pungs or Kongs, last tile from wall"
 msgstr "តែ​ Pungs ឬ​ Kongs ដែល​បាន​លាក់ និង​ក្រឡា​ក្បឿង​ចុង​ក្រោយ​មក​ពី​ជញ្ជាំង​ប៉ុណ្ណោះ"
 
-#: src/predefined.py:205
+#: src/predefined.py:210
 msgid "Heads and Tails"
 msgstr "ក្បាល និង​កន្ទុយ"
 
-#: src/predefined.py:206
+#: src/predefined.py:211
 msgid "Only 1 and 9"
 msgstr "តែ​ ១ និង ៩"
 
-#: src/predefined.py:208
+#: src/predefined.py:213
 msgid "Fourfold Plenty"
 msgstr "មួយ​ភាគ​​បួន​ភាគច្រើន​"
 
-#: src/predefined.py:209
+#: src/predefined.py:214
 msgid "4 Kongs"
 msgstr "Kong"
 
-#: src/predefined.py:211 src/predefined.py:429
+#: src/predefined.py:216 src/predefined.py:431
 msgid "Three Great Scholars"
 msgstr "អ្នក​ប្រាជ្ញ​ល្បីល្បាញ​បី​នាក់​"
 
-#: src/predefined.py:212 src/predefined.py:334
+#: src/predefined.py:217 src/predefined.py:337
 msgid "3 Pungs or Kongs of dragons"
 msgstr "Pungs ឬ​ Kongs ៣ របស់​នាគ"
 
-#: src/predefined.py:213
+#: src/predefined.py:218
 #, fuzzy
 #| msgid "Four Blessings Hovering Over the Door"
 msgid "Four Blessings Hovering over the Door"
 msgstr "ពរ​បួន​ប្រការ​សំកាំង​នៅ​លើ​ទ្វារ"
 
-#: src/predefined.py:215 src/predefined.py:339
+#: src/predefined.py:220 src/predefined.py:342
 msgid "4 Pungs or Kongs of winds"
 msgstr "Pungs ឬ​ Kongs ៤ របស់​ខ្យល់"
 
-#: src/predefined.py:216
+#: src/predefined.py:221
 msgid "Imperial Jade"
 msgstr "គុជ​​"
 
-#: src/predefined.py:217
+#: src/predefined.py:222
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
 msgstr "តែ​ក្រឡា​ក្បឿង​ពណ៌​បៃតង ៖ នាគ​ និង​ឫស្សី​បៃតង​ ២,៣,៤,៦,៨"
 
-#: src/predefined.py:218
+#: src/predefined.py:223
 msgid "Gathering the Plum Blossom from the Roof"
 msgstr "ប្រមូល​ផ្កា​ព្រូន​ពី​លើ​ដំបូល"
 
-#: src/predefined.py:220
+#: src/predefined.py:225
 msgid "Mah Jong with stone 5 from the dead wall"
 msgstr "Mah Jong មាន​ថ្ម​ ៥ ដុំ​ដែល​បាន​មក​ពី​ជញ្ជាំង​មរណៈ"
 
-#: src/predefined.py:222
+#: src/predefined.py:227
 msgid "Plucking the Moon from the Bottom of the Sea"
 msgstr "រើស​ព្រះចន្ទ​ពី​បាត​សមុទ្រ"
 
-#: src/predefined.py:223
+#: src/predefined.py:228
 msgid "Mah Jong with the last tile from the wall being a stone 1"
 msgstr "Mah Jong ដែល​មាន​ក្រឡា​ក្បឿង​ចុងក្រោយ​ពី​ជញ្ជាំង​នឹង​ក្លាយ​ជា​ថ្ម ១"
 
-#: src/predefined.py:225
+#: src/predefined.py:230
 msgid "Scratching a Carrying Pole"
 msgstr "កេះ​ស្នែង​សែង"
 
-#: src/predefined.py:226
+#: src/predefined.py:231
 msgid "Robbing the Kong of bamboo 2"
 msgstr "លួច​ Kong ដែល​មាន​ឫស្សី ២"
 
-#: src/predefined.py:232
+#: src/predefined.py:237 src/predefined.py:527
 msgid "Standard Mah Jongg"
 msgstr "​Mah Jongg ស្តង់ដារ​"
 
-#: src/predefined.py:237
+#: src/predefined.py:242
 msgid "Nine Gates"
 msgstr "ក្លោង​ទ្វា​ប្រាំបួន​"
 
-#: src/predefined.py:239
+#: src/predefined.py:244
 #, fuzzy
 #| msgid ""
 #| "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 "
@@ -1463,114 +1465,114 @@ msgstr ""
 "គ្រប់​ក្រឡា​ក្បឿង​ដែល​លាក់​ពណ៌​ដូច​គ្នា​ ៖ តម្លៃ​ ១-១-១-២-៣-៤-៥-៦-៧-៨-៩-៩-៩ រួម​ទាំង​ក្រឡា​ក្បឿង​ផ្សេង​"
 "ទៀត​ដែល​មាន​ពណ៌​ដូច​គ្នា​ (ពី​ជញ្ជាំង​ ឬ​បាន​បោះ​បង់​)"
 
-#: src/predefined.py:241
+#: src/predefined.py:246
 msgid "Thirteen Orphans"
 msgstr "ក្មេង​កំព្រា​ដប់​បី​នាក់"
 
-#: src/predefined.py:242
+#: src/predefined.py:247
 msgid ""
 "13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
 "with one of them"
 msgstr ""
 "ក្រឡា​ក្បឿង​ទោល ១​៣ ៖ នាគ​ទាំង​អស់​ ខ្យល់  ១,៩ និង​អគារ​ធ្វើ​ពី​ក្រឡា​ក្បឿង​ទី ១​៤ គូ​ដែល​មាន​ពួក​វា​មួយ"
 
-#: src/predefined.py:246
+#: src/predefined.py:251
 msgid "Pung/Kong of Dragons"
 msgstr "Pung/Kong របស់​នាគ"
 
-#: src/predefined.py:248
+#: src/predefined.py:253
 msgid "Pung/Kong of Own Wind"
 msgstr "Pung/Kong របស់​ខ្យល់​ផ្ទាល់"
 
-#: src/predefined.py:251
+#: src/predefined.py:256
 msgid "Pung/Kong of Round Wind"
 msgstr "Pung/Kong របស់​ខ្យល់​មូល"
 
-#: src/predefined.py:255
+#: src/predefined.py:260
 msgid "Exposed Kong"
 msgstr "បង្ហាញ Kong"
 
-#: src/predefined.py:258
+#: src/predefined.py:263
 msgid "Exposed Kong of Terminals"
 msgstr "បង្ហាញ Kong របស់ Terminals"
 
-#: src/predefined.py:261
+#: src/predefined.py:266
 msgid "Exposed Kong of Honors"
 msgstr "បាន​បង្ហាញ Kong របស់ Honors"
 
-#: src/predefined.py:264
+#: src/predefined.py:269
 msgid "Exposed Pung"
 msgstr "បាន​បង្ហាញ Pung"
 
-#: src/predefined.py:267
+#: src/predefined.py:272
 msgid "Exposed Pung of Terminals"
 msgstr "បាន​បង្ហាញ Pung របស់ Terminals"
 
-#: src/predefined.py:270
+#: src/predefined.py:275
 msgid "Exposed Pung of Honors"
 msgstr "បង្ហាញ Pung របស់ Honors"
 
-#: src/predefined.py:274
+#: src/predefined.py:279
 msgid "Concealed Kong"
 msgstr "លាក់ Kong"
 
-#: src/predefined.py:277
+#: src/predefined.py:282
 msgid "Concealed Kong of Terminals"
 msgstr "លាក់ Kong របស់ Terminals"
 
-#: src/predefined.py:280
+#: src/predefined.py:285
 msgid "Concealed Kong of Honors"
 msgstr "លាក់ Kong របស់ Honors"
 
-#: src/predefined.py:283
+#: src/predefined.py:288
 msgid "Concealed Pung"
 msgstr "លាក់ Pung"
 
-#: src/predefined.py:286
+#: src/predefined.py:291
 msgid "Concealed Pung of Terminals"
 msgstr "លាក់ Pung របស់ Terminals"
 
-#: src/predefined.py:289
+#: src/predefined.py:294
 msgid "Concealed Pung of Honors"
 msgstr "លាក់ Pung របស់ Honors"
 
-#: src/predefined.py:292
+#: src/predefined.py:297
 #, fuzzy
 #| msgid "Pair of Own Wind"
 msgid "Pair of Own Wind"
 msgstr "ខ្យល់​ផ្ទាល់​មួយ​គូ"
 
-#: src/predefined.py:294
+#: src/predefined.py:299
 #, fuzzy
 #| msgid "Pair of Round Wind"
 msgid "Pair of Round Wind"
 msgstr "ខ្យល់​មូល​មួយ​គូ"
 
-#: src/predefined.py:296
+#: src/predefined.py:301
 msgid "Pair of Dragons"
 msgstr "នាគ​មួយ​គូ"
 
-#: src/predefined.py:300
+#: src/predefined.py:305
 msgid "Flower"
 msgstr "ផ្កា"
 
-#: src/predefined.py:302
+#: src/predefined.py:307
 msgid "Season"
 msgstr "រដូវ"
 
-#: src/predefined.py:313
+#: src/predefined.py:316
 msgid "Classical Chinese DMJL"
 msgstr "DMJL ចិន​បុរាណ"
 
-#: src/predefined.py:319
+#: src/predefined.py:322
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgstr "ចិន​បុរាណ​ដែល​បាន​កំណត់​​ដោយ​​ Deutsche Mah Jongg Liga (DMJL) e.V."
 
-#: src/predefined.py:326
+#: src/predefined.py:329
 msgid "Squirming Snake"
 msgstr "ពស់​កម្រើក"
 
-#: src/predefined.py:327
+#: src/predefined.py:330
 msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
@@ -1578,71 +1580,71 @@ msgstr ""
 "គ្រប់​ក្រឡា​ក្បឿង​ដែល​មាន​ពណ៌​ដូច​គ្នា ។ Pung ឬ​ Kong នៃ ១ និង ៩ គូ​នៃ​ ២, ៥ ឬ​ ៨ និង​ Chows ២ នៃ​"
 "តម្លៃ​ដែល​នៅ​សល់"
 
-#: src/predefined.py:330
+#: src/predefined.py:333
 msgid "Little Three Dragons"
 msgstr "នាគ​បី​តូច​ៗ"
 
-#: src/predefined.py:331
+#: src/predefined.py:334
 msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
 msgstr "Pungs ឬ​ Kongs ២ របស់​នាគ ឬ​នាគ ១ គូ"
 
-#: src/predefined.py:333
+#: src/predefined.py:336
 msgid "Big Three Dragons"
 msgstr "នាគ​​បី​ធំ​ៗ"
 
-#: src/predefined.py:336
+#: src/predefined.py:339
 msgid "Little Four Joys"
 msgstr "ខ្យល់​បួន​តូច​ៗ"
 
-#: src/predefined.py:337
+#: src/predefined.py:340
 msgid "3 Pungs or Kongs of winds and 1 pair of winds"
 msgstr "Pungs ​ឬ​ Kongs ៣ របស់​ខ្យល់ និង ខ្យល់ ១ គូ"
 
-#: src/predefined.py:338
+#: src/predefined.py:341
 msgid "Big Four Joys"
 msgstr "ខ្យល់​បួន​ធំ​ៗ"
 
-#: src/predefined.py:344
+#: src/predefined.py:347
 msgid "False Naming of Discard, Claimed for Chow"
 msgstr "បរាជ័យ​ក្នុង​ការ​ដាក់​ឈ្មោះ​​ក្រឡា​ក្បឿង​ដែល​បាន​បោះ​បង់ ទាម​ទារ​រក​ Chow "
 
-#: src/predefined.py:347
+#: src/predefined.py:350
 msgid "False Naming of Discard, Claimed for Pung/Kong"
 msgstr "បរាជ័យ​​ក្នុង​ការ​ដាក់​ឈ្មោះ​ក្រឡា​ក្បឿង​ដែល​បាន​បោះ​​បង់  ទាម​ទារ​រក​ Pung/Kong"
 
-#: src/predefined.py:350 src/predefined.py:443
+#: src/predefined.py:353 src/predefined.py:445 src/predefined.py:557
 msgid "False Declaration of Mah Jongg by One Player"
 msgstr "បរាជ័យ​ក្នុង​ការ​ប្រកាស Mah Jongg ដោយ​អ្នក​លេង​ម្នាក់"
 
-#: src/predefined.py:353
+#: src/predefined.py:356
 msgid "False Declaration of Mah Jongg by Two Players"
 msgstr "បរាជ័យ​ក្នុង​ការ​ប្រកាស​ Mah Jongg ដោយ​អ្នក​លេង​ពីរ​នាក់"
 
-#: src/predefined.py:356
+#: src/predefined.py:359
 msgid "False Declaration of Mah Jongg by Three Players"
 msgstr "បរាជ័យ​ក្នុង​ការ​ប្រកាស​ Mah Jongg ដោយ​អ្នក​លេង​បីនាក់"
 
-#: src/predefined.py:359 src/predefined.py:446
+#: src/predefined.py:362 src/predefined.py:448 src/predefined.py:560
 msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr "បរាជ័យ​ក្នុង​ការ​ដាក់​ឈ្មោះ​ក្រឡា​ក្បឿង​ដែល​បាន​បោះ​បង់ ទាម​ទារ​រក​ Mah Jongg"
 
-#: src/predefined.py:370
+#: src/predefined.py:371
 msgid "Classical Chinese BMJA"
 msgstr "BMJA ចិន​បុរាណ"
 
-#: src/predefined.py:376
+#: src/predefined.py:377
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
 msgstr "ចិន​បុរាណ​ដែល​បាន​កំណត់​ដោយ​សមាគម British Mah-Jong"
 
-#: src/predefined.py:391
+#: src/predefined.py:393 src/predefined.py:533
 msgid "Original Call"
 msgstr "Original Call"
 
-#: src/predefined.py:395
+#: src/predefined.py:397
 msgid "Gates of Heaven"
 msgstr "ច្រក​ចូល​ទៅស្ថានសួគ៍"
 
-#: src/predefined.py:396
+#: src/predefined.py:398
 #, fuzzy
 #| msgid ""
 #| "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 "
@@ -1654,145 +1656,155 @@ msgstr ""
 "គ្រប់​ក្រឡា​ក្បឿង​ដែល​លាក់​ពណ៌​ដូច​គ្នា​ ៖ តម្លៃ​ ១-១-១-២-៣-៤-៥-៦-៧-៨-៩-៩-៩ រួម​ទាំង​ក្រឡា​ក្បឿង​ផ្សេង​"
 "ទៀត​ដែល​មាន​ពណ៌​ដូច​គ្នា​ (ពី​ជញ្ជាំង​ ឬ​បាន​បោះ​បង់​)"
 
-#: src/predefined.py:399
+#: src/predefined.py:401
 msgid "Wriggling Snake"
 msgstr "ពស់​ឆ្វាយរង្វេល"
 
-#: src/predefined.py:400
+#: src/predefined.py:402
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
 msgstr "គួរ​ទី​មួយ និង​ការ​ដំណើរការ​ពី ២ ទៅ ៩ នៅ​ក្នុង​សំណុំ​ដូចគ្នា​នឹង​ខ្យល់​នីមួយ"
 
-#: src/predefined.py:402
+#: src/predefined.py:404
 msgid "Triple Knitting"
 msgstr "ការ​ដេរប៉ាក់​បី"
 
-#: src/predefined.py:403
+#: src/predefined.py:405
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
 msgstr "បួន​សំណុំ​នៃ​ក្រឡា​ក្បឿង​បី​នៅ​ក្នុង​សំណុំ និង​គូ​ផ្សេងគ្នា ៖ គ្មាន​ខ្យល់ និង​នាគ"
 
-#: src/predefined.py:404
+#: src/predefined.py:406
 msgid "Knitting"
 msgstr "ការ​ដេរប៉ាក់"
 
-#: src/predefined.py:405
+#: src/predefined.py:407
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr "ក្រឡា​ក្បឿង ៧ គូ​នៃ​សំណុំ ២ ក្នុង​ចំណោម ៣ គ្មាន​ខ្យល់ និង​នាគ"
 
-#: src/predefined.py:407
+#: src/predefined.py:409
 msgid "All pair honors"
 msgstr "honors គ្រប់គូ"
 
-#: src/predefined.py:408
+#: src/predefined.py:410
 msgid "7 pairs of 1s/9s/Winds/Dragons"
 msgstr "ខ្យល់/នាគ​/ទី ១/ទី ៩ ប្រាំពី​គូ"
 
-#: src/predefined.py:411
+#: src/predefined.py:413 src/predefined.py:537
 msgid "Own Flower"
 msgstr "ម្ចាស់​ផ្កា"
 
-#: src/predefined.py:412
+#: src/predefined.py:414 src/predefined.py:538
 msgid "Own Season"
 msgstr "ម្ចាស់​រដូវ"
 
-#: src/predefined.py:424
+#: src/predefined.py:426
 msgid "Buried Treasure"
 msgstr "កំណប់​ដែល​បាន​លាក់"
 
-#: src/predefined.py:425
+#: src/predefined.py:427
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
 msgstr "លាក់ pungs នៃ​សំណុំ​មួយ​ដែល​មាន​ខ្យល់/នាគ និង​មួយ​គូ"
 
-#: src/predefined.py:426
+#: src/predefined.py:428 src/predefined.py:549
 msgid "Purity"
 msgstr "បរិសុទ្ធ"
 
-#: src/predefined.py:427
+#: src/predefined.py:429 src/predefined.py:550
 msgid "Only same-colored tiles (no chows, dragons or winds)"
 msgstr "តែ​ក្រឡាក្បឿង​មាន​ពណ៌​ដូច​គ្នា​តែប៉ុណ្ណោះ (គ្មាន chows នាគ ឬ​ខ្យល់)"
 
-#: src/predefined.py:430
+#: src/predefined.py:432
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
 msgstr "Pungs ៣ ឬ Kongs នាគ​បួករួម​នឹង pung/kong និង​គូ​ណាមួយ"
 
-#: src/predefined.py:433
+#: src/predefined.py:435
 msgid "The 13 Unique Wonders"
 msgstr "វត្ថុអច្ឆរិយគ្មាន​ពីរ​ទាំង ១៣"
 
-#: src/predefined.py:440
+#: src/predefined.py:442 src/predefined.py:554
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
 msgstr "បរាជ័យ​​ក្នុង​ការ​ដាក់​ឈ្មោះ​ក្រឡា​ក្បឿង​ដែល​បាន​បោះ​​បង់  ទាម​ទារ​រក​ Chow/Pung/Kong"
 
-#: src/predefined.py:450
+#: src/predefined.py:452
 msgid "Calling for Only Honors"
 msgstr "ការ​ហៅតែ Honors"
 
-#: src/predefined.py:454
+#: src/predefined.py:456
 msgid "Calling for Wriggling Snake"
 msgstr "ការ​ហៅ​ពស់​ឆ្វាយរង្វេល"
 
-#: src/predefined.py:458
+#: src/predefined.py:460
 msgid "Calling for Triple Knitting"
 msgstr "ការ​ហៅ​ការ​ដេរ​ប៉ាក់​បី"
 
-#: src/predefined.py:462
+#: src/predefined.py:464
 msgid "Calling for Gates of Heaven"
 msgstr "ការ​ហៅ​ច្រក​ឋានសួគ៍"
 
-#: src/predefined.py:465
+#: src/predefined.py:467
 msgid "Calling for Knitting"
 msgstr "ការ​ហៅ​ការ​ដេរ​ប៉ាក់"
 
-#: src/predefined.py:469
+#: src/predefined.py:471
 msgid "Calling for Imperial Jade"
 msgstr "ការ​ហៅ​គុជ"
 
-#: src/predefined.py:473
+#: src/predefined.py:475
 #, fuzzy
 #| msgid "Calling for 13 Unique Wonders"
 msgid "Calling for The 13 Unique Wonders"
 msgstr "ការ​ហៅ​វត្ថុ​អច្ឆរិយ​គ្មាន​ពីរ​ទាំង ១៣"
 
-#: src/predefined.py:476
+#: src/predefined.py:478
 msgid "Calling for Three Great Scholars"
 msgstr "ការ​ហៅ​អ្នក​ប្រាជ្ញ​ល្បីល្បាញ​បី​នាក់​"
 
-#: src/predefined.py:479
+#: src/predefined.py:481
 msgid "Calling for All pair honors"
 msgstr "ការ​ហៅ honors គ្រប់​គូ​ទាំងអស់"
 
-#: src/predefined.py:483
+#: src/predefined.py:485
 msgid "Calling for Heads and Tails"
 msgstr "ការ​ហៅ​ក្បាល និង​កន្ទុយ"
 
-#: src/predefined.py:487
+#: src/predefined.py:489
 msgid "Calling for Four Blessings Hovering over the Door"
 msgstr "ការ​ហៅ​ពរ​បួន​ប្រការដែល​​សំកាំង​នៅ​លើ​ទ្វារ"
 
-#: src/predefined.py:490
+#: src/predefined.py:492
 msgid "Calling for Buried Treasure"
 msgstr "ការ​ហៅ​កំណប់​ដែល​បាន​លាក់"
 
-#: src/predefined.py:494
+#: src/predefined.py:496
 msgid "Calling for Fourfold Plenty"
 msgstr "ការ​ហៅ​មួយ​ភាគ​​បួន​ភាគច្រើន​"
 
-#: src/predefined.py:498
+#: src/predefined.py:500
 msgid "Calling for Purity"
 msgstr "ការ​ហៅ​ភាព​បរិសុទ្ធ"
 
-#: src/query.py:196
+#: src/predefined.py:510
+msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
+msgstr ""
+
+#: src/predefined.py:516
+msgid ""
+"Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
+"cgi?id=298821"
+msgstr ""
+
+#: src/query.py:197
 msgctxt "kajongg name for local game server"
 msgid "Local Game"
 msgstr "ល្បែង​មូលដ្ឋាន​"
 
-#: src/query.py:376
+#: src/query.py:430
 msgid "Database %1 updated from schema %2 to %3"
 msgstr ""
 
-#: src/rule.py:49 src/scoringdialog.py:710 src/scoringdialog.py:788
+#: src/rule.py:49 src/scoringdialog.py:703 src/scoringdialog.py:782
 msgid "points"
 msgstr "ពិន្ទុ"
 
@@ -1825,61 +1837,61 @@ msgctxt "Kajongg"
 msgid "%1 limits"
 msgstr "%1 ដែនកំណត់​"
 
-#: src/rule.py:365
+#: src/rule.py:366
 msgid "Meld Rules"
 msgstr "ក្បួន​បញ្ចូល​គ្នា"
 
-#: src/rule.py:366
+#: src/rule.py:367
 msgid ""
 "Meld rules are applied to single melds independent of the rest of the hand"
 msgstr "ក្បួន​បញ្ចូល​គ្នា​នឹង​ត្រូវ​អនុវត្ត​ជា​មួយ​នឹង​ការ​បញ្ចូល​គ្នា​តែ​មួយ​ដោយ​ប្រើ​ដៃ​មួយ​ណា​ក៏​បាន​ដែរ"
 
-#: src/rule.py:367
+#: src/rule.py:368
 msgid "Hand Rules"
 msgstr "ក្បួន​ដៃ​"
 
-#: src/rule.py:368
+#: src/rule.py:369
 msgid "Hand rules are applied to the entire hand, for all players"
 msgstr "ក្បួន​ដៃ​នឹង​​ត្រូវ​អនុវត្ត​ជា​មួយ​នឹង​ដៃ​ទាំង​ពីរ សម្រាប់​អ្នក​លេង​គ្រប់​គ្នា"
 
-#: src/rule.py:369
+#: src/rule.py:370
 msgid "Winner Rules"
 msgstr "ក្បួន​អ្នក​ឈ្នះ​"
 
-#: src/rule.py:370
+#: src/rule.py:371
 msgid "Winner rules are applied to the entire hand but only for the winner"
 msgstr "​អ្នក​ឈ្នះ​នឹង​ត្រូវ​អនុវត្ត​ជា​មួយ​ដៃ​ទាំង​ពីរ សម្រាប់​តែ​អ្នក​លេង​ដែល​ឈ្នះ​ប៉ុណ្ណោះ"
 
-#: src/rule.py:371
+#: src/rule.py:372
 msgid "Loser Rules"
 msgstr "ក្បួន​អ្នក​ចាញ់"
 
-#: src/rule.py:372
+#: src/rule.py:373
 msgid "Loser rules are applied to the entire hand but only for non-winners"
 msgstr "ក្បួន​អ្នក​ឈ្នះ​នឹង​ត្រូវ​អនុវត្ត​ជា​មួយ​ដៃ​ទាំង​ពីរ សម្រាប់​តែ​អ្នក​លេង​ដែល​ឈ្នះ​ប៉ុណ្ណោះ"
 
-#: src/rule.py:373
+#: src/rule.py:374
 msgid "Mah Jongg Rules"
 msgstr "ក្បូន​ Mah Jongg ​​"
 
-#: src/rule.py:374
+#: src/rule.py:375
 msgid "Only hands matching a Mah Jongg rule can win"
 msgstr "មាន​តែ​ការ​ប្រកួត​ដោយ​ដៃ​តែ​មួយ​ដោយ​ប្រើ​ក្បួន​ Mah Jongg ប៉ុណ្ណោះ​ទើប​អាច​ឈ្នះ​បាន"
 
-#: src/rule.py:375
+#: src/rule.py:376
 msgctxt "kajongg"
 msgid "Options"
 msgstr "ជម្រើស​"
 
-#: src/rule.py:376
+#: src/rule.py:377
 msgid "Here we have several special game related options"
 msgstr "នៅ​ទី​នេះ យើង​មាន​ជម្រើស​ដែល​ទាក់​ទង​នឹង​ល្បែង​ពិសេស​មួយ​ចំនួន"
 
-#: src/rule.py:377
+#: src/rule.py:378
 msgid "Penalties"
 msgstr "ពិន័យ​​"
 
-#: src/rule.py:378
+#: src/rule.py:379
 msgid ""
 "Penalties are applied manually by the user. They are only used for scoring "
 "games.\n"
@@ -1891,53 +1903,53 @@ msgstr ""
 "នៅ​ពេល​លេង​ទល់​នឹង​កុំព្យូទ័រ ឬ​តាម​បណ្ដាញ Kajongg នឹង​មិន​ឲ្យ​អ្នក\n"
 "ធ្លាក់​ទៅ​ក្នុង​ស្ថានភាព​ដែល​អ្នក​​ត្រូវ​ទទួល​ពិន័យ​ទេ"
 
-#: src/rule.py:578
+#: src/rule.py:579
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
 msgstr "ច្បាប់​ចម្លង​ %1 នៃ​ %2"
 
-#: src/rule.py:934
+#: src/rule.py:935
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
 msgstr "%4 មាន​តម្លៃ​ដែល​មិន​អាច​ប្រើ​បាន​​​ %2/%3 ក្នុង​ក្បួន​​ \"%1\""
 
-#: src/rule.py:1022
+#: src/rule.py:1023
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
 msgstr "%1: %2 តូច​ពេក តម្លៃ​អប្បបរមា​គឺ %3"
 
-#: src/rulesetselector.py:503
+#: src/rulesetselector.py:511
 msgctxt "@title:window"
 msgid "Customize rulesets"
 msgstr ""
 
-#: src/rulesetselector.py:522
+#: src/rulesetselector.py:530
 msgctxt "kajongg"
 msgid "Rule"
 msgstr "ក្បួន​"
 
-#: src/rulesetselector.py:583
+#: src/rulesetselector.py:592
 msgid "C&opy"
 msgstr ""
 
-#: src/rulesetselector.py:584
+#: src/rulesetselector.py:593
 #, fuzzy
 #| msgid "Compare"
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
 msgstr "ប្រៀបធៀប​​"
 
-#: src/rulesetselector.py:585
+#: src/rulesetselector.py:594
 #, fuzzy
 #| msgid "R&emove"
 msgid "&Remove"
 msgstr "យកចេញ"
 
-#: src/rulesetselector.py:586
+#: src/rulesetselector.py:595
 msgid "&Close"
 msgstr ""
 
-#: src/scene.py:396 src/scene.py:527
+#: src/scene.py:389 src/scene.py:517
 msgid "Do you really want to abort this game?"
 msgstr "តើ​អ្នក​ពិត​ជា​ចង់​បោះ​បង់​ល្បែង​នេះ​​ឬ​ ?"
 
@@ -1967,231 +1979,231 @@ msgctxt "@title:window"
 msgid "Select four players"
 msgstr "ជ្រើស​អ្នក​លេង​បួន​នាក់"
 
-#: src/scoring.py:332
+#: src/scoring.py:360
 msgid "Move Exposed Tiles Here"
 msgstr "ផ្លាស់​ទី​ក្រឡា​ក្បឿង​ដែល​បង្ហាញ​​ទីនេះ​"
 
-#: src/scoring.py:333
+#: src/scoring.py:361
 msgid "Move Concealed Tiles Here"
 msgstr "ផ្លាស់ទី​ក្រឡា​ក្បឿង​ដែល​បាន​លាក់​ទីនេះ​"
 
-#: src/scoring.py:651
+#: src/scoring.py:673
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr "សូម​កំណត់​អ្នក​លេង​បួន​នាក់​នៅ​ក្នុង <interface>ការ​កំណត់|អ្នក​លេង</interface>"
 
-#: src/scoringdialog.py:247
+#: src/scoringdialog.py:258
 msgid "Round/Hand"
 msgstr "មូល/ដៃ"
 
-#: src/scoringdialog.py:280 src/scoringdialog.py:840
+#: src/scoringdialog.py:299 src/scoringdialog.py:834
 msgctxt "kajongg"
 msgid "Score"
 msgstr "ពិន្ទុ​"
 
-#: src/scoringdialog.py:280
+#: src/scoringdialog.py:299
 msgctxt "kajongg"
 msgid "Payments"
 msgstr "ការ​ចំណាយ"
 
-#: src/scoringdialog.py:281
+#: src/scoringdialog.py:300
 msgctxt "kajongg"
 msgid "Balance"
 msgstr "តុល្យភាព"
 
-#: src/scoringdialog.py:281
+#: src/scoringdialog.py:300
 msgctxt "kajongg"
 msgid "Chart"
 msgstr "គំនូស​តាង"
 
-#: src/scoringdialog.py:427
+#: src/scoringdialog.py:410
 msgctxt "kajongg"
 msgid "Scores"
 msgstr "ពិន្ទុ"
 
-#: src/scoringdialog.py:467
+#: src/scoringdialog.py:452
 msgctxt "kajongg"
 msgid "Used Rules"
 msgstr "ក្បួន​ដែន​បាន​ប្រើ​​"
 
-#: src/scoringdialog.py:501
+#: src/scoringdialog.py:487
 msgid "Final scores for game <numid>%1</numid>"
 msgstr "ពិន្ទុ​​ចុងក្រោយ​សម្រាប់​ល្បែង​ <numid>%1</numid>"
 
-#: src/scoringdialog.py:503
+#: src/scoringdialog.py:489
 msgid "Scores for game <numid>%1</numid>"
 msgstr "ពិន្ទុ​​សម្រាប់​ល្បែង​​ <numid>%1</numid>"
 
-#: src/scoringdialog.py:576
+#: src/scoringdialog.py:569
 #, fuzzy
 #| msgid "Explain Scores"
 msgctxt "@title:window"
 msgid "Explain Scores"
 msgstr "រៀបរាប់​ពិន្ទុ"
 
-#: src/scoringdialog.py:592
+#: src/scoringdialog.py:585
 msgid "There is no active game"
 msgstr "មិន​មាន​ល្បែង​សកម្ម​​"
 
-#: src/scoringdialog.py:595
+#: src/scoringdialog.py:588
 msgid "%1"
 msgstr ""
 
-#: src/scoringdialog.py:609
+#: src/scoringdialog.py:602
 msgid "Manual score for %1: %2 points"
 msgstr "ពិន្ទុ​រក​បាន​ដោយដៃ​សម្រាប់​​ %1 ៖ %2 ពិន្ទុ​​"
 
-#: src/scoringdialog.py:696
+#: src/scoringdialog.py:689
 msgid "Penalty"
 msgstr "ការពិន័យ​"
 
-#: src/scoringdialog.py:699
+#: src/scoringdialog.py:692
 msgid "Offense:"
 msgstr "កំហុស​ ៖"
 
-#: src/scoringdialog.py:706
+#: src/scoringdialog.py:699
 msgid "Total Penalty"
 msgstr "ពិន័យ​សរុប​"
 
-#: src/scoringdialog.py:734
+#: src/scoringdialog.py:727
 msgid "&Execute"
 msgstr "ប្រតិបត្តិ​"
 
-#: src/scoringdialog.py:811
+#: src/scoringdialog.py:805
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
 msgstr "បង់ %1 ពិន្ទុ"
 
-#: src/scoringdialog.py:816
+#: src/scoringdialog.py:810
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
 msgstr "ទទួល​បាន %1 ពិន្ទុ"
 
-#: src/scoringdialog.py:827
+#: src/scoringdialog.py:821
 #, fuzzy
 #| msgid "Scoring for this Hand"
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
 msgstr "ដាក់​ពិន្ទុ​សម្រាប់​ដៃ​នេះ​"
 
-#: src/scoringdialog.py:838
+#: src/scoringdialog.py:832
 msgctxt "kajongg"
 msgid "Player"
 msgstr "អ្នក​លេង"
 
-#: src/scoringdialog.py:839
+#: src/scoringdialog.py:833
 msgctxt "kajongg"
 msgid "Wind"
 msgstr "ខ្យល់"
 
-#: src/scoringdialog.py:841
+#: src/scoringdialog.py:835
 msgid "Winner"
 msgstr "អ្នក​ឈ្នះ​"
 
-#: src/scoringdialog.py:847
+#: src/scoringdialog.py:841
 msgctxt "kajongg"
 msgid "Draw"
 msgstr "ស្មើ"
 
-#: src/scoringdialog.py:849
+#: src/scoringdialog.py:843
 msgid "&Penalties"
 msgstr "ពិន័យ​"
 
-#: src/scoringdialog.py:851
+#: src/scoringdialog.py:845
 msgid "&Save Hand"
 msgstr "រក្សាទុក​ដៃ​"
 
-#: src/scoringdialog.py:873
+#: src/scoringdialog.py:867
 msgid "&Last Tile:"
 msgstr "ក្រឡាក្បឿង​ចុងក្រោយ​ ៖"
 
-#: src/scoringdialog.py:882
+#: src/scoringdialog.py:876
 msgid "L&ast Meld:"
 msgstr "បញ្ចូល​ពិន្ទុ​ចុង​ក្រោយ ៖"
 
-#: src/server.py:120
+#: src/server.py:122
 msgid "Wrong password"
 msgstr "ពាក្យ​សម្ងាត់​មិន​ត្រឹមត្រូវ"
 
-#: src/server.py:216
+#: src/server.py:218
 msgid "table with id <numid>%1</numid> not found"
 msgstr "រក​មិន​ឃើញ​​ <numid>%1</numid> តារាង​ដែល​​មាន​លេខ​សម្គាល់​​"
 
-#: src/server.py:364
+#: src/server.py:366
 msgid "Player %1 has logged out"
 msgstr "អ្នក​លេង​​ %1 បាន​ចេញ​​"
 
-#: src/server.py:434
+#: src/server.py:436
 #, fuzzy
 #| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
 msgstr "ម៉ាស៊ីន​បម្រើ​នឹង​ស្ដាប់​លើ​ច្រក (%d)"
 
-#: src/server.py:437
+#: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "ម៉ាស៊ីន​បម្រើ​នឹង​ស្ដាប់​លើ​រន្ធ"
 
-#: src/server.py:441
+#: src/server.py:443
 msgid "name of the database"
 msgstr "ឈ្មោះ​របស់​មូលដ្ឋាន​ទិន្នន័យ​​​"
 
-#: src/server.py:445
+#: src/server.py:447
 msgid "do not terminate local game server after last client disconnects"
 msgstr "កុំ​បញ្ចប់​ដំណើរការ​ម៉ាស៊ីន​បម្រើ​ល្បែង​មូលដ្ឋាន បន្ទាប់ពី​កម្មវិធី​ចុងក្រោយ​ត្រូវ​បាន​ផ្ដាច់"
 
-#: src/servertable.py:180
+#: src/servertable.py:181
 msgid "You already joined this table"
 msgstr "អ្នក​បាន​ភ្ជាប់​តារាង​នេះ​​រួច​​ហើយ​​"
 
-#: src/servertable.py:182
+#: src/servertable.py:183
 msgid "All seats are already taken"
 msgstr "គ្រប់​កន្លែង​អង្គុយ​​ត្រូវ​បាន​យក​រួច​ហើយ​​"
 
-#: src/servertable.py:187
+#: src/servertable.py:188
 msgid "takes a seat"
 msgstr "អង្គុយ"
 
-#: src/servertable.py:195
+#: src/servertable.py:196
 msgid "leaves the table"
 msgstr "ចាកចេញ​ពី​តារាង"
 
-#: src/servertable.py:241
+#: src/servertable.py:242
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 1"
 msgstr "មនុស្សយន្ត ១"
 
-#: src/servertable.py:244
+#: src/servertable.py:245
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 2"
 msgstr "មនុស្សយន្ត ២"
 
-#: src/servertable.py:245
+#: src/servertable.py:246
 msgctxt "kajongg, name of robot player, to be translated"
 msgid "Robot 3"
 msgstr "មនុស្សយន្ត ៣"
 
-#: src/servertable.py:301
+#: src/servertable.py:302
 msgid "Only the initiator %1 can start this game, you are %2"
 msgstr "មាន​តែ​អ្នក​ចាប់​​ផ្ដើម​​​ %1 ប៉ុណ្ណោះ​ទើប ​អាច​ចាប់​ផ្ដើម​ល្បែង​នេះ​បាន​ អ្នក​ជា​​ %2"
 
-#: src/servertable.py:700
+#: src/servertable.py:701
 #, fuzzy
 #| msgid "Kajongg <numid>%1</numid>"
 msgid "Game <numid>%1</numid> is over!"
 msgstr "Kajongg <numid>%1</numid>"
 
-#: src/servertable.py:729
+#: src/servertable.py:730
 msgid "%1 wrongly said %2 for meld %3"
 msgstr "%1 បាន​និយាយ​ខុស​ %2 សម្រាប់​ការ​បញ្ចូល​គ្នា​ %3"
 
-#: src/servertable.py:734
+#: src/servertable.py:735
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
 msgstr "%1 បាន​និយាយ​ខុស​ %2 ៖ ទាម​ទារ​ឲ្យ​មាន​ក្រឡា​ក្បឿង​ដែល​បាន​លាក់ %3 ប៉ុន្តែ​មាន​តែ​ %4"
 
-#: src/servertable.py:771
+#: src/servertable.py:772
 msgid "declareKong:%1 wrongly said Kong for meld %2"
 msgstr "declareKong ៖ %1 ​​​ Kong បាន​និយាយ​ខុស​សម្រាប់​ការ​បញ្ចូល​គ្នា​​​ %2"
 
-#: src/servertable.py:820
+#: src/servertable.py:821
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
 msgstr "%1 ការ​ទាម​ទារ​​ MahJongg ៖​ នេះ​មិនមែន​ជា​ដៃ​ដែល​ឈ្នះ​​ ៖​ %2​ ទេ​"
 
@@ -2199,32 +2211,32 @@ msgstr "%1 ការ​ទាម​ទារ​​ MahJongg ៖​ នេះ​�
 msgid "No voices will be heard because the program %1 is missing"
 msgstr "នឹង​គ្មាន​សំឡេង​បន្លឺ​ឡើង​ទេ ដោយ​សារ​តែ​បាត់​កម្មវិធី %1"
 
-#: src/sound.py:374
+#: src/sound.py:375
 msgid "cannot write <filename>%1</filename>: %2"
 msgstr "មិន​អាច​សរសេរ <filename>%1</filename> ៖ %2"
 
-#: src/sound.py:377
+#: src/sound.py:378
 msgid "The voice files have changed, their checksum has changed."
 msgstr ""
 
-#: src/sound.py:378
+#: src/sound.py:379
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
 msgstr ""
 
-#: src/tables.py:64
+#: src/tables.py:65
 msgid "Table"
 msgstr "តារាង"
 
-#: src/tables.py:68
+#: src/tables.py:69
 msgctxt "table status"
 msgid "Status"
 msgstr "ស្ថានភាព"
 
-#: src/tables.py:69
+#: src/tables.py:70
 msgid "Ruleset"
 msgstr "សំណុំ​​ក្បួន​"
 
-#: src/tables.py:148
+#: src/tables.py:149
 msgid "Select a ruleset"
 msgstr "ជ្រើស​សំណុំ​ក្បួន​"
 
@@ -2233,40 +2245,40 @@ msgctxt "allocate a new table"
 msgid "&New"
 msgstr "ថ្មី"
 
-#: src/tables.py:189 src/tables.py:316 src/tables.py:348
+#: src/tables.py:187 src/tables.py:331 src/tables.py:363
 msgid "Allocate a new table"
 msgstr "ផ្ដល់​តារាង​ថ្មី"
 
-#: src/tables.py:192 src/tables.py:317 src/tables.py:349
+#: src/tables.py:193 src/tables.py:332 src/tables.py:364
 msgid "&Join"
 msgstr "ភ្ជាប់"
 
-#: src/tables.py:196 src/tables.py:318 src/tables.py:350
+#: src/tables.py:194 src/tables.py:333 src/tables.py:365
 msgid "Join a table"
 msgstr "ភ្ជាប់​តារាង"
 
-#: src/tables.py:198
+#: src/tables.py:200
 msgid "&Leave"
 msgstr "ផ្ដាច់"
 
-#: src/tables.py:202
+#: src/tables.py:201
 msgid "Leave a table"
 msgstr "ផ្ដាច់​តារាង"
 
-#: src/tables.py:205
+#: src/tables.py:207
 msgctxt "Kajongg-Ruleset"
 msgid "Compare"
 msgstr "ប្រៀបធៀប​"
 
-#: src/tables.py:210
+#: src/tables.py:208
 msgid "Compare the rules of this table with my own rulesets"
 msgstr "ប្រៀប​ធៀប​ក្បួន​របស់​តារាង​​​​នេះ​ជា​មួយ​សំណុំ​ក្បួន​របស់​ខ្ញុំ"
 
-#: src/tables.py:212
+#: src/tables.py:214
 msgid "&Chat"
 msgstr "ជជែក"
 
-#: src/tables.py:217
+#: src/tables.py:221
 msgid "&Start"
 msgstr "ចាប់​ផ្តើម​"
 
@@ -2274,105 +2286,105 @@ msgstr "ចាប់​ផ្តើម​"
 msgid "Start playing on a table. Empty seats will be taken by robot players."
 msgstr "ចាប់​ផ្ដើម​លេង​នៅ​លើ​តុ ។ អ្នក​ជា​មនុស្ស​យន្ត​នឹង​អង្គុយ​លើ​កៅអី​ទំនេរ ។"
 
-#: src/tables.py:267
+#: src/tables.py:281
 msgid "opens a chat window"
 msgstr "បើក​បង្អួច​ជជែក"
 
-#: src/tables.py:286
+#: src/tables.py:300
 msgid "Local Games with Ruleset %1"
 msgstr "ល្បែង​មូលដ្ឋាន​ដែលមាន Ruleset %1"
 
-#: src/tables.py:290
+#: src/tables.py:304
 msgid "Tables at %1"
 msgstr "តារាង​នៅ​ %1"
 
-#: src/tables.py:342
+#: src/tables.py:357
 msgid "Start a new game"
 msgstr "ចាប់​ផ្ដើម​ល្បែង​ថ្មី"
 
-#: src/tables.py:344
+#: src/tables.py:359
 msgctxt "resuming a local suspended game"
 msgid "&Resume"
 msgstr "បន្ត"
 
-#: src/tables.py:346
+#: src/tables.py:361
 msgid "Resume the selected suspended game"
 msgstr "បន្ត​លេង​ល្បែង​ដែល​បាន​ផ្អាក"
 
-#: src/tables.py:364
+#: src/tables.py:379
 msgid "Chat with others on this table"
 msgstr "ជជែក​ជាមួយ​អ្នក​ផ្សេងទៀត​ដែល​នៅ​ក្នុង​តា​រាង​នេះ"
 
-#: src/tables.py:367
+#: src/tables.py:382
 msgid "For chatting with others on this table, please first take a seat"
 msgstr "សម្រាប់​ការ​ជជែក​ជាមួយ​អ្នក​ផ្សេងទៀត​នៅ​ក្នុង​តារាង​នេះ សូម​អង្គុយ​ជាមុនសិន"
 
-#: src/tile.py:276
+#: src/tile.py:277
 msgctxt "kajongg"
 msgid "hidden"
 msgstr "ដែលលាក់​"
 
-#: src/tile.py:277
+#: src/tile.py:278
 msgctxt "kajongg"
 msgid "stone"
 msgstr "ថ្ម​"
 
-#: src/tile.py:278
+#: src/tile.py:279
 msgctxt "kajongg"
 msgid "bamboo"
 msgstr "bamboo"
 
-#: src/tile.py:279
+#: src/tile.py:280
 msgctxt "kajongg"
 msgid "character"
 msgstr "តួ​អក្សរ​"
 
-#: src/tile.py:280
+#: src/tile.py:281
 msgctxt "kajongg"
 msgid "wind"
 msgstr "ខ្យល់"
 
-#: src/tile.py:281
+#: src/tile.py:282
 msgctxt "kajongg"
 msgid "dragon"
 msgstr "នាគ"
 
-#: src/tile.py:282
+#: src/tile.py:283
 msgctxt "kajongg"
 msgid "flower"
 msgstr "ផ្កា"
 
-#: src/tile.py:283
+#: src/tile.py:284
 msgctxt "kajongg"
 msgid "season"
 msgstr "រដូវ"
 
-#: src/tile.py:289
+#: src/tile.py:290
 msgctxt "kajongg"
 msgid "tile"
 msgstr "ក្រឡាក្បឿង​"
 
-#: src/tile.py:290
+#: src/tile.py:291
 msgctxt "kajongg"
 msgid "white"
 msgstr "ពណ៌ស​"
 
-#: src/tile.py:291
+#: src/tile.py:292
 msgctxt "kajongg"
 msgid "red"
 msgstr "ពណ៌ក្រហម​"
 
-#: src/tile.py:292
+#: src/tile.py:293
 msgctxt "kajongg"
 msgid "green"
 msgstr "ពណ៌បៃតង​"
 
-#: src/tile.py:293
+#: src/tile.py:294
 msgctxt "kajongg"
 msgid "East"
 msgstr ""
 
-#: src/tile.py:294
+#: src/tile.py:295
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "south"
@@ -2380,12 +2392,12 @@ msgctxt "kajongg"
 msgid "South"
 msgstr "ខាងត្បូង​"
 
-#: src/tile.py:295
+#: src/tile.py:296
 msgctxt "kajongg"
 msgid "West"
 msgstr ""
 
-#: src/tile.py:296
+#: src/tile.py:297
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "north"
@@ -2393,75 +2405,75 @@ msgctxt "kajongg"
 msgid "North"
 msgstr "ខាងជើង​"
 
-#: src/tile.py:305
+#: src/tile.py:306
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "Wind"
 msgid "East Wind"
 msgstr "ខ្យល់"
 
-#: src/tile.py:306
+#: src/tile.py:307
 msgid "South Wind"
 msgstr ""
 
-#: src/tile.py:307
+#: src/tile.py:308
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "Wind"
 msgid "West Wind"
 msgstr "ខ្យល់"
 
-#: src/tile.py:308
+#: src/tile.py:309
 msgid "North Wind"
 msgstr ""
 
-#: src/tile.py:310
+#: src/tile.py:311
 #, python-brace-format
 msgctxt "kajongg tile name"
 msgid "{group} {value}"
 msgstr ""
 
-#: src/tile.py:889
+#: src/tile.py:880
 msgctxt "kajongg meld type"
 msgid "Bonus"
 msgstr ""
 
-#: src/tile.py:891
+#: src/tile.py:882
 msgctxt "kajongg meld type"
 msgid "&single"
 msgstr "តែមួយ​"
 
-#: src/tile.py:893
+#: src/tile.py:884
 msgctxt "kajongg meld type"
 msgid "&pair"
 msgstr "គូ​"
 
-#: src/tile.py:895
+#: src/tile.py:886
 msgctxt "kajongg meld type"
 msgid "&chow"
 msgstr "&chow"
 
-#: src/tile.py:897
+#: src/tile.py:888
 msgctxt "kajongg meld type"
 msgid "p&ung"
 msgstr "p&ung"
 
-#: src/tile.py:899
+#: src/tile.py:890
 msgctxt "kajongg meld type"
 msgid "c&laimed kong"
 msgstr "បាន​អះអាង kong"
 
-#: src/tile.py:901
+#: src/tile.py:892
 msgctxt "kajongg meld type"
 msgid "k&ong"
 msgstr "k&ong"
 
-#: src/tile.py:902
+#: src/tile.py:893
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
 msgstr ""
 
-#: src/tile.py:909
+#: src/tile.py:900
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "exposed"
@@ -2469,7 +2481,7 @@ msgctxt "kajongg meld state"
 msgid "Exposed"
 msgstr "បាន​លាតត្រដាង​"
 
-#: src/tile.py:910
+#: src/tile.py:901
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "concealed"
@@ -2477,7 +2489,7 @@ msgctxt "kajongg meld state"
 msgid "Concealed"
 msgstr "បាន​លាក់​"
 
-#: src/tile.py:916
+#: src/tile.py:907
 #, python-brace-format
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
