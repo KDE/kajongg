@@ -1,17 +1,17 @@
 # Translation of kajongg.po to Catalan (Valencian)
-# Copyright (C) 2010-2024 This_file_is_part_of_KDE
+# Copyright (C) 2010-2025 This_file_is_part_of_KDE
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# SPDX-FileCopyrightText: 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023, 2024 Josep M. Ferrer <txemaq@gmail.com>
 # Manuel Tortosa Moreno <manutortosa@chakra-project.org>, 2010, 2011.
 # Antoni Bella Pérez <antonibella5@yahoo.com>, 2014, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
+# Josep M. Ferrer <txemaq@gmail.com>, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023, 2024, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-02-11 00:39+0000\n"
-"PO-Revision-Date: 2024-10-25 14:55+0200\n"
+"PO-Revision-Date: 2025-02-11 09:57+0100\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca@valencia\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: &\n"
-"X-Generator: Lokalize 24.08.2\n"
+"X-Generator: Lokalize 22.12.3\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -1100,10 +1100,8 @@ msgid "The hand contains too many tiles"
 msgstr "La mà conté massa fitxes"
 
 #: src/predefined.py:109
-#, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
-msgstr "Mà de zero punts"
+msgstr "Fitxes a la mà"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1672,13 +1670,15 @@ msgstr "Crida per a puresa"
 
 #: src/predefined.py:510
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "Joc taiwanés de 16 fitxes, PER A DESENVOLUPADORS"
 
 #: src/predefined.py:516
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"Mah Jongg taiwanés de 16 fitxes, primera alfa. Vegeu https://bugs.kde.org/"
+"show_bug.cgi?id=298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
@@ -2392,6 +2392,3 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "El vostre client té la versió %1 però necessiteu %2 per a este servidor"
-
-#~ msgid "License Agreement"
-#~ msgstr "Acord de llicència"

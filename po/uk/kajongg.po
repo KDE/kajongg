@@ -3,13 +3,13 @@
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# Yuri Chornoivan <yurchor@ukr.net>, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2024.
+# Yuri Chornoivan <yurchor@ukr.net>, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2024, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-02-11 00:39+0000\n"
-"PO-Revision-Date: 2024-10-10 22:21+0300\n"
+"PO-Revision-Date: 2025-02-11 08:51+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -1104,10 +1104,8 @@ msgid "The hand contains too many tiles"
 msgstr "У комбінації занадто багато плиток"
 
 #: src/predefined.py:109
-#, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
-msgstr "Нульова комбінація"
+msgstr "Плитки на руках"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1674,13 +1672,15 @@ msgstr "Виклик Чистоти"
 
 #: src/predefined.py:510
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "Тайванська гра з 16 плитками, для розробників"
 
 #: src/predefined.py:516
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"Тайванський маджонґ з 16 плитками, рання альфа. Див. https://bugs.kde.org/"
+"show_bug.cgi?id=298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"

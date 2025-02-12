@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-02-11 00:39+0000\n"
-"PO-Revision-Date: 2024-10-11 19:52+0200\n"
+"PO-Revision-Date: 2025-02-11 07:29+0100\n"
 "Last-Translator: Matjaž Jeran <matjaz.jeran@amis.net>\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Language: sl\n"
@@ -1093,10 +1093,8 @@ msgid "The hand contains too many tiles"
 msgstr "Zbirka vsebuje preveč ploščic"
 
 #: src/predefined.py:109
-#, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
-msgstr "Zbirka z nič točkami"
+msgstr "Ploščice v roki"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1661,13 +1659,15 @@ msgstr "Klicanje za Čistost"
 
 #: src/predefined.py:510
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "Tajvanska igra s 16 ploščicami, ZA RAZVIJALCE"
 
 #: src/predefined.py:516
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"Tajvanski Mah Jong s 16 ploščicami, zgodnji alfa. Glejte https://bugs.kde."
+"org/show_bug.cgi?id=298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"

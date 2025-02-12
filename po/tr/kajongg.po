@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-02-11 00:39+0000\n"
-"PO-Revision-Date: 2025-01-11 17:25+0300\n"
+"PO-Revision-Date: 2025-02-11 10:30+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -1090,10 +1090,8 @@ msgid "The hand contains too many tiles"
 msgstr "Elde çok fazla taş var"
 
 #: src/predefined.py:109
-#, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
-msgstr "Sıfır Puan Eli"
+msgstr "Eldeki Taşlar"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1659,13 +1657,15 @@ msgstr "Saflık Çağrılıyor"
 
 #: src/predefined.py:510
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "16 taşlı Tayvan oyunu, GELİŞTİRİCİLER İÇİN"
 
 #: src/predefined.py:516
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"16 taşlı Tayvan Mah Jongg oyunu, erken alfa sürüm. https://bugs.kde.org/"
+"show_bug.cgi?id=298821 adresine bakın."
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
