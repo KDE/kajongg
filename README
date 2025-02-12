@@ -23,6 +23,26 @@ Support for Windows is very new, there might be a few things missing. Still to b
 
 Kajongg is part of the KDE games, your Linux distribution should bring it to you.
 
+This should work for most distros:
+
+However, for kajongg master, install from software manager:
+
+git
+Python3-pip
+Python3-qtpy
+python3-pyqt6
+python3-pyqt6.qtsvg
+Python3-twisted
+kdegames-mahjongg-data-kf5
+
+(instead of pyqt6, pyside6 would also do)
+
+Then open a terminal window and enter
+
+git clone https://github.com/KDE/kajongg.git
+cd kajongg/src
+./kajongg.py
+
 
 [b][u]More[/b][/u]
 

@@ -108,7 +108,7 @@ class KApplication(QApplication):
     def desktopSize(cls) -> QSize:
         """The size of the current screen"""
         try:
-            result = Internal.app.desktop().availableGeometry()
+            result = QGuiApplication.primaryScreen().availableGeometry()
         except AttributeError:
             assert Internal.mainWindow
             screen = Internal.mainWindow.screen()
