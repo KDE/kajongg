@@ -2303,6 +2303,3 @@ msgstr "您的客户端版本老于 4.9.0，但服务器需要 %1"
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "您的客户端版本是 %1，但此服务器需要的是 %2"
-
-#~ msgid "License Agreement"
-#~ msgstr "许可协议"
