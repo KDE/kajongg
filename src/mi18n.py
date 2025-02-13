@@ -225,7 +225,10 @@ class MLocale:
     @classmethod
     def currentLanguages(cls) ->List[str]:
         """the currently used languages, primary first"""
-        languages = Internal.kajonggrc.group('Locale').readEntry('Language')
+        try:
+            languages = Internal.kajonggrc.group('Locale').readEntry('Language')
+        except AttributeError:
+            return []
         if not languages:
             return []
         languages = languages.split(':')
