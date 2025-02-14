@@ -4,7 +4,7 @@
 # Mickael Sibelle <kimael@gmail.com>, 2009, 2010.
 # Wolfgang Rohdewald <wolfgang@rohdewald.de>, 2009, 2012.
 # Mickaël Sibelle <kimael@gmail.com>, 2010, 2012.
-# SPDX-FileCopyrightText: 2012, 2013, 2024 Xavier Besnard <xavier.besnard@kde.org>
+# SPDX-FileCopyrightText: 2012, 2013, 2024, 2025 Xavier Besnard <xavier.besnard@kde.org>
 # Arnaud R. <kasai@redwolf.fr>, 2013.
 # Simon Depiets <sdepiets@gmail.com>, 2017, 2018, 2019.
 # Xavier Besnard <xavier.besnard@kde.org>, 2020, 2021, 2022.
@@ -25,7 +25,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Accelerator-Marker: &\n"
 "X-Environment: kde\n"
-"X-Generator: Lokalize 23.08.5\n"
+"X-Generator: Lokalize 24.12.2\n"
 "X-Text-Markup: kde4\n"
 
 msgctxt "kajongg"
