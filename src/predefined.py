@@ -383,7 +383,6 @@ class ClassicalChineseBMJA(ClassicalChinese):
         self.parameterRules['maxChows'].parameter = 1  # type:ignore[attr-defined]
         self.parameterRules['limit'].parameter = 1000  # type:ignore[attr-defined]
         self.parameterRules['mustDeclareCallingHand'].parameter = True  # type:ignore[attr-defined]
-        self.parameterRules['dealtTiles'].parameter = 16  # type:ignore[attr-defined]
 
     def loadRules(self) ->None:
         super().loadRules()
