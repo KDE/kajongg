@@ -4,7 +4,7 @@
 # Mickael Sibelle <kimael@gmail.com>, 2009, 2010.
 # Wolfgang Rohdewald <wolfgang@rohdewald.de>, 2009, 2012.
 # Mickaël Sibelle <kimael@gmail.com>, 2010, 2012.
-# SPDX-FileCopyrightText: 2012, 2013, 2024 Xavier Besnard <xavier.besnard@kde.org>
+# SPDX-FileCopyrightText: 2012, 2013, 2024, 2025 Xavier Besnard <xavier.besnard@kde.org>
 # Arnaud R. <kasai@redwolf.fr>, 2013.
 # Simon Depiets <sdepiets@gmail.com>, 2017, 2018, 2019.
 # Xavier Besnard <xavier.besnard@kde.org>, 2020, 2021, 2022.
@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-02-11 00:39+0000\n"
-"PO-Revision-Date: 2024-10-11 08:06+0200\n"
+"PO-Revision-Date: 2025-02-12 09:36+0100\n"
 "Last-Translator: Xavier Besnard <xavier.besnard@kde.org>\n"
 "Language-Team: French <French <kde-francophone@kde.org>>\n"
 "Language: fr\n"
@@ -25,7 +25,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Accelerator-Marker: &\n"
 "X-Environment: kde\n"
-"X-Generator: Lokalize 23.08.5\n"
+"X-Generator: Lokalize 24.12.2\n"
 "X-Text-Markup: kde4\n"
 
 msgctxt "kajongg"
@@ -1120,10 +1120,8 @@ msgid "The hand contains too many tiles"
 msgstr "La main contient trop de tuiles"
 
 #: src/predefined.py:109
-#, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
-msgstr "Main à zéro point"
+msgstr "Tuiles en main"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1707,13 +1705,15 @@ msgstr "Appel pour la Pureté"
 
 #: src/predefined.py:510
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "Jeu taïwanais à 16 tuiles, POUR L'ÉQUIPE DE DÉVELOPPEMENT"
 
 #: src/predefined.py:516
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"Jeu de Mah Jongg taïwanais à 16 tuiles , alpha très préliminaire. Veuillez "
+"consulter la page « https://bugs.kde.org/show_bug.cgi?id=298821 »."
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
