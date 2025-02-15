@@ -417,7 +417,7 @@ class Player(ReprMixin):
 
     def makeTileKnown(self, tile:Tile) -> None:
         """used when somebody else discards a tile"""
-        assert not self._concealedTiles[0].isKnown
+        assert not self._concealedTiles[0].isKnown, f'{self._concealedTiles=}{self._concealedTiles[0].isKnown=}'
         self._concealedTiles[0] = tile
         self._hand = None
 
@@ -703,8 +703,7 @@ class PlayingPlayer(Player):  # pylint:disable=too-many-instance-attributes
             for tileName in tiles:
                 src, dst = (Tile.unknown, tileName) if show else (
                     tileName, Tile.unknown)
-                assert src != dst, (
-                    self, src, dst, tiles, self._concealedTiles)
+                assert src != dst, f'{self=} {src=} {dst=} {tiles=} {self._concealedTiles=}'
                 if src not in self._concealedTiles:
                     logException(f'{self}: showConcealedTiles({tiles}): {src} not in {self._concealedTiles}.')
                 idx = self._concealedTiles.index(src)
