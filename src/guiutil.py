@@ -148,14 +148,20 @@ def rotateCenter(item:'QGraphicsItem', angle:float) ->None:
 def sceneRotation(item:'QGraphicsItem') ->int:
     """the combined rotation of item and all parents in degrees: 0,90,180 or 270"""
     transform = item.sceneTransform()
-    matrix:Tuple[int, ...] = (
-        round(transform.m11()),
-        round(transform.m12()),
-        round(transform.m21()),
-        round(transform.m22()))
-    matrix = tuple(1 if x > 0 else -1 if x < 0 else 0 for x in matrix)
-    rotations:Dict[Tuple[int, ...], int] = {(0, 0, 0, 0): 0, (1, 0, 0, 1): 0, (
-        0, 1, -1, 0): 90, (-1, 0, 0, -1): 180, (0, -1, 1, 0): 270}
+    matrix_raw:Tuple[int, ...] = (
+        round(transform.m11()),  # horizontal scaling factor
+        round(transform.m12()),  # vertical shearing factor
+        round(transform.m21()),  # horizontal shearing factor
+        round(transform.m22()))  # vertical scaling factor
+    matrix = tuple(1 if x > 0 else -1 if x < 0 else 0 for x in matrix_raw)
+    rotations:Dict[Tuple[int, ...], int] = {
+        (0, 0, 0, 0): 0,
+        (1, 0, 0, 1): 0,
+        (0, 1, -1, 0): 90,
+        (1, 1, -1, 1): 90,
+        (-1, 0, 0, -1): 180,
+        (0, -1, 1, 0): 270,
+        (1, -1, 1, 1): 270}
     if matrix not in rotations:
-        raise ValueError(f'matrix unknown:{str(matrix)}')
+        raise ValueError(f'{item=} matrix unknown:{matrix=} {matrix_raw=}')
     return rotations[matrix]
