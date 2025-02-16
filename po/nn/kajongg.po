@@ -2323,6 +2323,3 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Klienten din har versjon %1, men du treng %2 for denne tenaren."
-
-#~ msgid "License Agreement"
-#~ msgstr "Lisensavtale"

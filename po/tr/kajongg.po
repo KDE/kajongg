@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-02-11 00:39+0000\n"
-"PO-Revision-Date: 2025-02-11 10:30+0300\n"
+"PO-Revision-Date: 2025-02-15 21:26+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -358,7 +358,7 @@ msgstr "Araç Çubuğunu &Göster"
 
 #: src/kdestub.py:371
 msgid "Configure Tool&bars..."
-msgstr "&Araç Çubuklarını Yapılandır..."
+msgstr "&Araç Çubuklarını Yapılandır…"
 
 #: src/kdestub.py:373
 msgid "Configure toolbars"
@@ -366,7 +366,7 @@ msgstr "Araç çubuklarını yapılandır"
 
 #: src/kdestub.py:380
 msgid "Configure &Kajongg..."
-msgstr "&Kajongg’u Yapılandır..."
+msgstr "&Kajongg’u Yapılandır…"
 
 #: src/kdestub.py:382 src/kdestub.py:1160
 msgid "Configure"
