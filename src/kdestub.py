@@ -107,14 +107,7 @@ class KApplication(QApplication):
     @classmethod
     def desktopSize(cls) -> QSize:
         """The size of the current screen"""
-        try:
-            result = Internal.app.desktop().availableGeometry()
-        except AttributeError:
-            assert Internal.mainWindow
-            screen = Internal.mainWindow.screen()
-            assert screen
-            result = screen.availableGeometry()
-        return result
+        return QGuiApplication.primaryScreen().availableGeometry()
 
 
 class CaptionMixin:
