@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-02-11 00:39+0000\n"
+"POT-Creation-Date: 2025-03-07 00:39+0000\n"
 "PO-Revision-Date: 2024-12-20 21:51+0530\n"
 "Last-Translator: kali <skkalwar999@gmail.com>\n"
 "Language-Team: Sanskrit <kde-i18n-doc@kde.org>\n"
@@ -216,7 +216,7 @@ msgstr ""
 "किं भवन्तः वास्तवमेव विलोपयितुम् इच्छन्ति<numid> %1</numid> क्रीडाः ?<br> इदं अन्तिमं "
 "भविष्यति, रद्दीकरणबटनेन रद्दं कर्तुं न शक्नुथ"
 
-#: src/guiutil.py:134 src/kdestub.py:127 src/kdestub.py:130
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "कजोङ्ग्"
 
@@ -255,7 +255,7 @@ msgstr "अग्रिमहस्तस्य कृते सज्जाः?
 msgid "The connection to the server %1 broke, please try again later."
 msgstr "%1 सर्वरेण सह संयोजनं भग्नम्, कृपया पश्चात् पुनः प्रयासं कुर्वन्तु ।"
 
-#: src/kajongg.py:81 src/kdestub.py:1099
+#: src/kajongg.py:81 src/kdestub.py:1092
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "मह जोङ्ग् - ४ खिलाडिनां कृते प्राचीनः चीनीयः बोर्डक्रीडा"
 
@@ -321,136 +321,136 @@ msgid ""
 msgstr ""
 "PORT इत्यत्र पूर्वमेव चालितं शृण्वन् च समर्पितं सर्वरं उपयुज्यताम् । केवलं परीक्षणार्थं अभिप्रेतम्"
 
-#: src/kdestub.py:285
+#: src/kdestub.py:278
 msgid "&OK"
 msgstr "&अस्तु"
 
-#: src/kdestub.py:286
+#: src/kdestub.py:279
 msgid "&Apply"
 msgstr "&आचरतु"
 
-#: src/kdestub.py:287
+#: src/kdestub.py:280
 msgid "&Cancel"
 msgstr "&निरसयतु"
 
-#: src/kdestub.py:288 src/kdestub.py:476
+#: src/kdestub.py:281 src/kdestub.py:469
 msgid "&Help"
 msgstr "&साहाय्यम्‌"
 
-#: src/kdestub.py:289
+#: src/kdestub.py:282
 msgid "&Defaults"
 msgstr "&पूर्वनिर्धारित"
 
-#: src/kdestub.py:359
+#: src/kdestub.py:352
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "St&atusbar दर्शयतु"
 
-#: src/kdestub.py:365
+#: src/kdestub.py:358
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "&Toolbar दर्शयतु"
 
-#: src/kdestub.py:371
+#: src/kdestub.py:364
 msgid "Configure Tool&bars..."
 msgstr "Tool&bars विन्यस्तं कुर्वन्तु..."
 
-#: src/kdestub.py:373
+#: src/kdestub.py:366
 msgid "Configure toolbars"
 msgstr "साधनपट्टिकाः विन्यस्यताम्"
 
-#: src/kdestub.py:380
+#: src/kdestub.py:373
 msgid "Configure &Kajongg..."
 msgstr "विन्यस्तं कुर्वन्तु & Kajongg..."
 
-#: src/kdestub.py:382 src/kdestub.py:1160
+#: src/kdestub.py:375 src/kdestub.py:1153
 msgid "Configure"
 msgstr "विन्यस्तं कुर्वन्तु"
 
-#: src/kdestub.py:472
+#: src/kdestub.py:465
 msgid "&Game"
 msgstr "&क्रीडा"
 
-#: src/kdestub.py:473
+#: src/kdestub.py:466
 msgid "&View"
 msgstr "&दृश्यं"
 
-#: src/kdestub.py:474
+#: src/kdestub.py:467
 msgid "&Settings"
 msgstr "&सेटिंग्स"
 
-#: src/kdestub.py:484
+#: src/kdestub.py:477
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&साहाय्यम्‌"
 
-#: src/kdestub.py:487 src/kdestub.py:864
+#: src/kdestub.py:480 src/kdestub.py:857
 msgid "Switch Application Language"
 msgstr "अनुप्रयोग भाषा स्विच करें"
 
-#: src/kdestub.py:491
+#: src/kdestub.py:484
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "&Calmonum विषये"
 
-#: src/kdestub.py:869
+#: src/kdestub.py:862
 msgid "Please choose the language which should be used for this application:"
 msgstr "कृपया अस्य अनुप्रयोगस्य कृते या भाषायाः उपयोगः करणीयः इति चिनुत:"
 
-#: src/kdestub.py:888
+#: src/kdestub.py:881
 msgid "Add Fallback Language"
 msgstr "Fallback Language योजयतु"
 
-#: src/kdestub.py:900
+#: src/kdestub.py:893
 msgid "Primary language:"
 msgstr "प्राथमिक भाषा :"
 
-#: src/kdestub.py:900
+#: src/kdestub.py:893
 msgid "Fallback language:"
 msgstr "Fallback भाषा :"
 
-#: src/kdestub.py:906
+#: src/kdestub.py:899
 msgid "Remove"
 msgstr "अपाकरोति"
 
-#: src/kdestub.py:910
+#: src/kdestub.py:903
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr "एषा मुख्या अनुप्रयोगभाषा यस्याः उपयोगः प्रथमं भविष्यति, अन्यभाषाभ्यः पूर्वं ।"
 
-#: src/kdestub.py:912
+#: src/kdestub.py:905
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
 msgstr "एषा एव भाषा यस्याः उपयोगः भविष्यति यदि पूर्वभाषासु सम्यक् अनुवादः नास्ति।"
 
-#: src/kdestub.py:1042
+#: src/kdestub.py:1035
 msgid "About Kajongg"
 msgstr "कपासस्य विषये"
 
-#: src/kdestub.py:1062
+#: src/kdestub.py:1055
 msgid "Version: %1"
 msgstr "संस्करणम् : %1"
 
-#: src/kdestub.py:1063
+#: src/kdestub.py:1056
 msgid "Protocol version %1"
 msgstr "प्रोटोकॉल संस्करण %1"
 
-#: src/kdestub.py:1066
+#: src/kdestub.py:1059
 msgid "Original author"
 msgstr "मूल लेखक"
 
-#: src/kdestub.py:1073
+#: src/kdestub.py:1066
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "KDE Frameworks (न संस्थापितम् अथवा अप्रयोज्यम्)"
 
-#: src/kdestub.py:1079
+#: src/kdestub.py:1072
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "%1 संस्करणानाम् उपयोगः"
 
-#: src/kdestub.py:1100
+#: src/kdestub.py:1093
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -458,7 +458,7 @@ msgstr ""
 "चतुर्णां क्रीडकानां कृते एषः शास्त्रीयः माह जोङ्ग् अस्ति । यदि भवान् Mah Jongg solitaire "
 "इत्यस्य अन्वेषणं करोति तर्हि कृपया kmahjongg इति अनुप्रयोगस्य उपयोगं कुर्वन्तु।"
 
-#: src/kdestub.py:1117
+#: src/kdestub.py:1110
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -466,19 +466,19 @@ msgstr ""
 "कृपया दोषाणां सूचनां दातुं <a href=\"https://bugs.kde.org\">https://bugs.kde.org "
 "इत्यस्य</a> उपयोगं कुर्वन्तु ।"
 
-#: src/kdestub.py:1122
+#: src/kdestub.py:1115
 msgid "Authors:"
 msgstr "लेखकाः :"
 
-#: src/kdestub.py:1363
+#: src/kdestub.py:1356
 msgid "Configure Toolbars"
 msgstr "Toolbars विन्यस्तं कुर्वन्तु"
 
-#: src/kdestub.py:1365
+#: src/kdestub.py:1358
 msgid "A&vailable actions:"
 msgstr "अ&उपलब्धा क्रियाः :"
 
-#: src/kdestub.py:1376
+#: src/kdestub.py:1369
 msgid "Curr&ent actions:"
 msgstr "वर्तमान क्रियाः :"
 
@@ -878,32 +878,32 @@ msgstr "न वर्णनं लभ्यते"
 msgid "no E-Mail address available"
 msgstr "कोऽपि E-Mail पता उपलब्धः नास्ति"
 
-#: src/player.py:726
+#: src/player.py:725
 msgid "%1 claiming MahJongg: She does not really have tile %2"
 msgstr "%1 claiming MahJongg: तस्याः वस्तुतः टाइल् %2 नास्ति"
 
-#: src/player.py:735
+#: src/player.py:734
 msgid ""
 "%1 claiming MahJongg: She did not pass all concealed tiles to the server"
 msgstr "%1 claiming MahJongg: सा सर्वाणि गुप्त टाइल्स् सर्वरं प्रति न पारितवती"
 
-#: src/player.py:856
+#: src/player.py:855
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
 msgstr "खिलाडी %1 3 अथवा 4 उजागरित मेल्ड्स् सन्ति, सर्वे हरिताः सन्ति"
 
-#: src/player.py:864
+#: src/player.py:863
 msgid "Player %1 may try a True Color Game"
 msgstr "%1 खिलाडी True Color Game इत्यस्य प्रयासं कर्तुं शक्नोति"
 
-#: src/player.py:867
+#: src/player.py:866
 msgid "Player %1 may try an All Terminals Game"
 msgstr "%1 खिलाडी All Terminals Game इत्यस्य प्रयासं कर्तुं शक्नोति"
 
-#: src/player.py:880
+#: src/player.py:879
 msgid "Player %1 exposed many winds"
 msgstr "खिलाडी %1 अनेकवायुः उजागरितवान्"
 
-#: src/player.py:884
+#: src/player.py:883
 msgid "Player %1 exposed many dragons"
 msgstr "%1 खिलाडी अनेके अजगराः उजागरितवान्"
 
@@ -1265,7 +1265,7 @@ msgstr "चतुर्गुणं बहु"
 msgid "4 Kongs"
 msgstr "४ राजानः"
 
-#: src/predefined.py:216 src/predefined.py:431
+#: src/predefined.py:216 src/predefined.py:430
 msgid "Three Great Scholars"
 msgstr "त्रयः महान् विद्वांसः"
 
@@ -1313,7 +1313,7 @@ msgstr "एकं वहनध्रुवं खरचयन्"
 msgid "Robbing the Kong of bamboo 2"
 msgstr "वेणुस्य कोङ्गस्य लुण्ठनम् २"
 
-#: src/predefined.py:237 src/predefined.py:527
+#: src/predefined.py:237 src/predefined.py:526
 msgid "Standard Mah Jongg"
 msgstr "मानक मह जोंग"
 
@@ -1472,7 +1472,7 @@ msgstr "Discard इत्यस्य False Naming, Claimed for Chow"
 msgid "False Naming of Discard, Claimed for Pung/Kong"
 msgstr "Discard इत्यस्य False Naming, Pung/Kong इत्यस्य कृते दावान् कृतः"
 
-#: src/predefined.py:353 src/predefined.py:445 src/predefined.py:557
+#: src/predefined.py:353 src/predefined.py:444 src/predefined.py:556
 msgid "False Declaration of Mah Jongg by One Player"
 msgstr "एकेन खिलाडिना मह जोङ्गस्य मिथ्याघोषणा"
 
@@ -1484,7 +1484,7 @@ msgstr "द्वयोः खिलाडयोः मह जोङ्गस्
 msgid "False Declaration of Mah Jongg by Three Players"
 msgstr "त्रयः खिलाडयः मह जोङ्गस्य मिथ्याघोषणा"
 
-#: src/predefined.py:362 src/predefined.py:448 src/predefined.py:560
+#: src/predefined.py:362 src/predefined.py:447 src/predefined.py:559
 msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr "Discard इत्यस्य False Naming, Mah Jongg इत्यस्य कृते दावान् कृतः"
 
@@ -1496,15 +1496,15 @@ msgstr "शास्त्रीय चीनी बीएमजेए"
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
 msgstr "ब्रिटिश-माह-जोङ्ग-सङ्घेन परिभाषितं शास्त्रीय-चीनी-भाषा"
 
-#: src/predefined.py:393 src/predefined.py:533
+#: src/predefined.py:392 src/predefined.py:532
 msgid "Original Call"
 msgstr "मूल आह्वान"
 
-#: src/predefined.py:397
+#: src/predefined.py:396
 msgid "Gates of Heaven"
 msgstr "स्वर्गस्य द्वाराणि"
 
-#: src/predefined.py:398
+#: src/predefined.py:397
 msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
@@ -1512,139 +1512,139 @@ msgstr ""
 "समानवर्णस्य गुप्ताः सर्वे टाइल्स्: मूल्यानि १११२३४५६७८९९९ २ तः ८ पर्यन्तं एकयुग्मेन सह "
 "(अन्तिम टाइल् भित्तितः अथवा परित्यक्तम्)"
 
-#: src/predefined.py:401
+#: src/predefined.py:400
 msgid "Wriggling Snake"
 msgstr "विवर्तमानः सर्पः"
 
-#: src/predefined.py:402
+#: src/predefined.py:401
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
 msgstr "१ युग्मं २ तः ९ पर्यन्तं धावनं च प्रत्येकं वायुना सह एकस्मिन् सूटे"
 
-#: src/predefined.py:404
+#: src/predefined.py:403
 msgid "Triple Knitting"
 msgstr "त्रिगुण बुनाई"
 
-#: src/predefined.py:405
+#: src/predefined.py:404
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
 msgstr ""
 "भिन्न-भिन्न-सूट्-मध्ये त्रीणां टाइल्-समूहानां चत्वारि सेट्-युग्मं च : नो विन्ड्स् वा ड्रैगन्स् इति"
 
-#: src/predefined.py:406
+#: src/predefined.py:405
 msgid "Knitting"
 msgstr "बुनाई"
 
-#: src/predefined.py:407
+#: src/predefined.py:406
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr "३ सूट् मध्ये कस्मिन् अपि २ मध्ये ७ टाइल्-युग्मानि; न वाताः अजगराः वा"
 
-#: src/predefined.py:409
+#: src/predefined.py:408
 msgid "All pair honors"
 msgstr "सर्वे युग्मसम्मानाः"
 
-#: src/predefined.py:410
+#: src/predefined.py:409
 msgid "7 pairs of 1s/9s/Winds/Dragons"
 msgstr "१s/९s/वायु/अजगरस्य ७ युग्मानि"
 
-#: src/predefined.py:413 src/predefined.py:537
+#: src/predefined.py:412 src/predefined.py:536
 msgid "Own Flower"
 msgstr "स्वकीयं पुष्पम्"
 
-#: src/predefined.py:414 src/predefined.py:538
+#: src/predefined.py:413 src/predefined.py:537
 msgid "Own Season"
 msgstr "स्वकीयः ऋतुः"
 
-#: src/predefined.py:426
+#: src/predefined.py:425
 msgid "Buried Treasure"
 msgstr "दफन निधि"
 
-#: src/predefined.py:427
+#: src/predefined.py:426
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
 msgstr "एकस्य सूटस्य गुप्तपुङ्ग्स् वायुभिः/अजगरैः सह युग्मेन च"
 
-#: src/predefined.py:428 src/predefined.py:549
+#: src/predefined.py:427 src/predefined.py:548
 msgid "Purity"
 msgstr "शुद्धि"
 
-#: src/predefined.py:429 src/predefined.py:550
+#: src/predefined.py:428 src/predefined.py:549
 msgid "Only same-colored tiles (no chows, dragons or winds)"
 msgstr "केवलं समानवर्णाः टाइल्स् (न चाउस्, ड्रैगनः, वायुः वा)"
 
-#: src/predefined.py:432
+#: src/predefined.py:431
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
 msgstr "३ अजगरस्य पुङ्गः वा कोङ्गः प्लस् कोऽपि पुङ्गः/कोङ्गः युग्मं च"
 
-#: src/predefined.py:435
+#: src/predefined.py:434
 msgid "The 13 Unique Wonders"
 msgstr "१३ अद्वितीय आश्चर्य"
 
-#: src/predefined.py:442 src/predefined.py:554
+#: src/predefined.py:441 src/predefined.py:553
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
 msgstr "डिस्कार्डस्य मिथ्यानामकरणं, चाउ/पुङ्ग/काङ्गस्य कृते दावान्"
 
-#: src/predefined.py:452
+#: src/predefined.py:451
 msgid "Calling for Only Honors"
 msgstr "केवलं सम्मानस्य आह्वानम्"
 
-#: src/predefined.py:456
+#: src/predefined.py:455
 msgid "Calling for Wriggling Snake"
 msgstr "विवर्तमानसर्पस्य आह्वानम्"
 
-#: src/predefined.py:460
+#: src/predefined.py:459
 msgid "Calling for Triple Knitting"
 msgstr "त्रिगुण बुनाई इत्यस्य आह्वानम्"
 
-#: src/predefined.py:464
+#: src/predefined.py:463
 msgid "Calling for Gates of Heaven"
 msgstr "स्वर्गद्वाराणां आह्वानं कुर्वन्"
 
-#: src/predefined.py:467
+#: src/predefined.py:466
 msgid "Calling for Knitting"
 msgstr "बुनाई कृते आह्वानम्"
 
-#: src/predefined.py:471
+#: src/predefined.py:470
 msgid "Calling for Imperial Jade"
 msgstr "इम्पेरियल् जेड् इत्यस्य आह्वानम्"
 
-#: src/predefined.py:475
+#: src/predefined.py:474
 msgid "Calling for The 13 Unique Wonders"
 msgstr "The 13 Unique Wonders इत्यस्य आह्वानम्"
 
-#: src/predefined.py:478
+#: src/predefined.py:477
 msgid "Calling for Three Great Scholars"
 msgstr "त्रयः महान् विद्वांसः आह्वयन्"
 
-#: src/predefined.py:481
+#: src/predefined.py:480
 msgid "Calling for All pair honors"
 msgstr "आह्वानं सर्वेषां युग्मसम्मानानां कृते"
 
-#: src/predefined.py:485
+#: src/predefined.py:484
 msgid "Calling for Heads and Tails"
 msgstr "शिरः पुच्छं च आह्वयन्"
 
-#: src/predefined.py:489
+#: src/predefined.py:488
 msgid "Calling for Four Blessings Hovering over the Door"
 msgstr "द्वारस्य उपरि भ्रमन्तः चत्वारः आशीर्वादाः आह्वयन्"
 
-#: src/predefined.py:492
+#: src/predefined.py:491
 msgid "Calling for Buried Treasure"
 msgstr "दफननिधिं आह्वयति"
 
-#: src/predefined.py:496
+#: src/predefined.py:495
 msgid "Calling for Fourfold Plenty"
 msgstr "चतुर्गुणं बहु आह्वयति"
 
-#: src/predefined.py:500
+#: src/predefined.py:499
 msgid "Calling for Purity"
 msgstr "शुद्धतायाः आह्वानम्"
 
-#: src/predefined.py:510
+#: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
 msgstr ""
 
-#: src/predefined.py:516
+#: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"

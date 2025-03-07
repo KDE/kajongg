@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-02-11 00:39+0000\n"
+"POT-Creation-Date: 2025-03-07 00:39+0000\n"
 "PO-Revision-Date: 2025-02-12 09:36+0100\n"
 "Last-Translator: Xavier Besnard <xavier.besnard@kde.org>\n"
 "Language-Team: French <French <kde-francophone@kde.org>>\n"
@@ -226,7 +226,7 @@ msgstr ""
 "définitif, vous ne pourrez pas annuler cette suppression avec le bouton "
 "« Annuler »"
 
-#: src/guiutil.py:134 src/kdestub.py:127 src/kdestub.py:130
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -266,7 +266,7 @@ msgid "The connection to the server %1 broke, please try again later."
 msgstr ""
 "La connexion au serveur %1 est interrompue, veuillez ré-essayer plus tard."
 
-#: src/kajongg.py:81 src/kdestub.py:1099
+#: src/kajongg.py:81 src/kdestub.py:1092
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Mah Jongg - le très ancien jeu de plateau chinois pour 4 joueurs"
 
@@ -338,100 +338,100 @@ msgstr ""
 "Utiliser un serveur dédié déjà en fonction et écoutant sur le port « PORT ». "
 "Réservé uniquement à des besoins de tests."
 
-#: src/kdestub.py:285
+#: src/kdestub.py:278
 msgid "&OK"
 msgstr "&Ok"
 
-#: src/kdestub.py:286
+#: src/kdestub.py:279
 msgid "&Apply"
 msgstr "&Appliquer"
 
-#: src/kdestub.py:287
+#: src/kdestub.py:280
 msgid "&Cancel"
 msgstr "Annu&ler"
 
-#: src/kdestub.py:288 src/kdestub.py:476
+#: src/kdestub.py:281 src/kdestub.py:469
 msgid "&Help"
 msgstr "&Aide"
 
-#: src/kdestub.py:289
+#: src/kdestub.py:282
 msgid "&Defaults"
 msgstr "Réglages par &défaut"
 
-#: src/kdestub.py:359
+#: src/kdestub.py:352
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Afficher la barre d'ét&at"
 
-#: src/kdestub.py:365
+#: src/kdestub.py:358
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Afficher la barre d'ou&tils"
 
-#: src/kdestub.py:371
+#: src/kdestub.py:364
 msgid "Configure Tool&bars..."
 msgstr "Configurer les &barres d'outils"
 
-#: src/kdestub.py:373
+#: src/kdestub.py:366
 msgid "Configure toolbars"
 msgstr "Configurer les barres d'outils"
 
-#: src/kdestub.py:380
+#: src/kdestub.py:373
 msgid "Configure &Kajongg..."
 msgstr "Configurer &Kajongg..."
 
-#: src/kdestub.py:382 src/kdestub.py:1160
+#: src/kdestub.py:375 src/kdestub.py:1153
 msgid "Configure"
 msgstr "Configurer"
 
-#: src/kdestub.py:472
+#: src/kdestub.py:465
 msgid "&Game"
 msgstr "&Partie"
 
-#: src/kdestub.py:473
+#: src/kdestub.py:466
 msgid "&View"
 msgstr "&Vue"
 
-#: src/kdestub.py:474
+#: src/kdestub.py:467
 msgid "&Settings"
 msgstr "&Configuration"
 
-#: src/kdestub.py:484
+#: src/kdestub.py:477
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Aide"
 
-#: src/kdestub.py:487 src/kdestub.py:864
+#: src/kdestub.py:480 src/kdestub.py:857
 msgid "Switch Application Language"
 msgstr "Changer la langue de l'application"
 
-#: src/kdestub.py:491
+#: src/kdestub.py:484
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "À propos de &Kajongg"
 
-#: src/kdestub.py:869
+#: src/kdestub.py:862
 msgid "Please choose the language which should be used for this application:"
 msgstr ""
 "Veuillez choisir la langue qui devra être utilisée pour cette application :"
 
-#: src/kdestub.py:888
+#: src/kdestub.py:881
 msgid "Add Fallback Language"
 msgstr "Ajouter une langue secondaire"
 
-#: src/kdestub.py:900
+#: src/kdestub.py:893
 msgid "Primary language:"
 msgstr "Langue principale :"
 
-#: src/kdestub.py:900
+#: src/kdestub.py:893
 msgid "Fallback language:"
 msgstr "Langue secondaire :"
 
-#: src/kdestub.py:906
+#: src/kdestub.py:899
 msgid "Remove"
 msgstr "Supprimer"
 
-#: src/kdestub.py:910
+#: src/kdestub.py:903
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
@@ -439,7 +439,7 @@ msgstr ""
 "Il s'agit de la langue principale de l'application, qui sera utilisée avant "
 "toute autre langue."
 
-#: src/kdestub.py:912
+#: src/kdestub.py:905
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
@@ -447,32 +447,32 @@ msgstr ""
 "Il s'agit de la langue qui sera utilisée si l'une quelconque parmi les "
 "langues précédentes ne contient pas de traduction appropriée."
 
-#: src/kdestub.py:1042
+#: src/kdestub.py:1035
 msgid "About Kajongg"
 msgstr "À propos de Kajongg"
 
-#: src/kdestub.py:1062
+#: src/kdestub.py:1055
 msgid "Version: %1"
 msgstr "Version : %1"
 
-#: src/kdestub.py:1063
+#: src/kdestub.py:1056
 msgid "Protocol version %1"
 msgstr "Version du protocole %1"
 
-#: src/kdestub.py:1066
+#: src/kdestub.py:1059
 msgid "Original author"
 msgstr "Auteur original"
 
-#: src/kdestub.py:1073
+#: src/kdestub.py:1066
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "KDE Frameworks (non installé ou non utilisable)"
 
-#: src/kdestub.py:1079
+#: src/kdestub.py:1072
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "Utilise les versions %1"
 
-#: src/kdestub.py:1100
+#: src/kdestub.py:1093
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -480,7 +480,7 @@ msgstr ""
 "Il s'agit du jeu classique Mah Jongg pour quatre joueurs. Si vous cherchez "
 "le solitaire nommé Mah Jongg, veuillez utiliser l'application KMahjongg."
 
-#: src/kdestub.py:1117
+#: src/kdestub.py:1110
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -488,19 +488,19 @@ msgstr ""
 "Veuillez utiliser <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> "
 "pour signaler des bogues."
 
-#: src/kdestub.py:1122
+#: src/kdestub.py:1115
 msgid "Authors:"
 msgstr "Auteurs :"
 
-#: src/kdestub.py:1363
+#: src/kdestub.py:1356
 msgid "Configure Toolbars"
 msgstr "Configurer les barres d'outils"
 
-#: src/kdestub.py:1365
+#: src/kdestub.py:1358
 msgid "A&vailable actions:"
 msgstr "Ac&tions disponibles :"
 
-#: src/kdestub.py:1376
+#: src/kdestub.py:1369
 msgid "Curr&ent actions:"
 msgstr "Actions en &cours :"
 
@@ -912,33 +912,33 @@ msgstr "aucune description disponible"
 msgid "no E-Mail address available"
 msgstr "aucune adresse e-mail disponible"
 
-#: src/player.py:726
+#: src/player.py:725
 msgid "%1 claiming MahJongg: She does not really have tile %2"
 msgstr "%1 annonce « Mahjongg » : il n'a pas vraiment la tuile %2"
 
-#: src/player.py:735
+#: src/player.py:734
 msgid ""
 "%1 claiming MahJongg: She did not pass all concealed tiles to the server"
 msgstr ""
 "%1 annonce Mahjongg : il n'a pas donné toutes les tuiles cachées au serveur"
 
-#: src/player.py:856
+#: src/player.py:855
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
 msgstr "Le joueur %1 a 3 ou 4 combinaisons découvertes qui sont toutes vertes"
 
-#: src/player.py:864
+#: src/player.py:863
 msgid "Player %1 may try a True Color Game"
 msgstr "Le joueur %1 pourrait essayer une main de couleur pure"
 
-#: src/player.py:867
+#: src/player.py:866
 msgid "Player %1 may try an All Terminals Game"
 msgstr "Le joueur %1 pourrait essayer une main avec seulement des Extrémités"
 
-#: src/player.py:880
+#: src/player.py:879
 msgid "Player %1 exposed many winds"
 msgstr "Le joueur %1 a découvert plusieurs Vents"
 
-#: src/player.py:884
+#: src/player.py:883
 msgid "Player %1 exposed many dragons"
 msgstr "Le joueur %1 a découvert plusieurs Dragons"
 
@@ -1312,7 +1312,7 @@ msgstr "Quadruple Abondance"
 msgid "4 Kongs"
 msgstr "4 Carrés"
 
-#: src/predefined.py:216 src/predefined.py:431
+#: src/predefined.py:216 src/predefined.py:430
 msgid "Three Great Scholars"
 msgstr "Trois Grands Savants"
 
@@ -1360,7 +1360,7 @@ msgstr "Renversement du pilier de soutien"
 msgid "Robbing the Kong of bamboo 2"
 msgstr "Vol du Carré de Bambou 2"
 
-#: src/predefined.py:237 src/predefined.py:527
+#: src/predefined.py:237 src/predefined.py:526
 msgid "Standard Mah Jongg"
 msgstr "Mah Jongg standard"
 
@@ -1524,7 +1524,7 @@ msgid "False Naming of Discard, Claimed for Pung/Kong"
 msgstr ""
 "Mauvais nom donné à une tuile défaussée et réclamée pour Brelan ou Carré"
 
-#: src/predefined.py:353 src/predefined.py:445 src/predefined.py:557
+#: src/predefined.py:353 src/predefined.py:444 src/predefined.py:556
 msgid "False Declaration of Mah Jongg by One Player"
 msgstr "Mauvaise déclaration de « Mah Jongg » par un joueur"
 
@@ -1536,7 +1536,7 @@ msgstr "Mauvaise déclaration de « Mah Jongg » par deux joueurs"
 msgid "False Declaration of Mah Jongg by Three Players"
 msgstr "Mauvaise déclaration de « Mah Jongg » par trois joueurs"
 
-#: src/predefined.py:362 src/predefined.py:448 src/predefined.py:560
+#: src/predefined.py:362 src/predefined.py:447 src/predefined.py:559
 msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr "Mauvais nom donné à une tuile défaussée et réclamée pour « Mah Jongg »"
 
@@ -1549,15 +1549,15 @@ msgid "Classical Chinese as defined by the British Mah-Jong Association"
 msgstr ""
 "Chinois classique tel que défini par la « British Mah-Jong Association »"
 
-#: src/predefined.py:393 src/predefined.py:533
+#: src/predefined.py:392 src/predefined.py:532
 msgid "Original Call"
 msgstr "Appel Original"
 
-#: src/predefined.py:397
+#: src/predefined.py:396
 msgid "Gates of Heaven"
 msgstr "Portes du Paradis"
 
-#: src/predefined.py:398
+#: src/predefined.py:397
 msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
@@ -1566,22 +1566,22 @@ msgstr ""
 "1-1-1-2-3-4-5-6-7-8-9-9-9 complétées par une paire de 2 à 8 (dernière tuile "
 "du Mur ou défaussée)"
 
-#: src/predefined.py:401
+#: src/predefined.py:400
 msgid "Wriggling Snake"
 msgstr "Serpent frétillant"
 
-#: src/predefined.py:402
+#: src/predefined.py:401
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
 msgstr ""
 "Une paire de 1 et la séquence de 2 à 9 dans la même famille avec chacun des "
 "Vents"
 
-#: src/predefined.py:404
+#: src/predefined.py:403
 msgid "Triple Knitting"
 msgstr "Tricoté Triple"
 
-#: src/predefined.py:405
+#: src/predefined.py:404
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
@@ -1589,125 +1589,125 @@ msgstr ""
 "Quatre combinaisons avec trois tuiles des familles différents et une paire : "
 "pas de Vents ou de Dragons"
 
-#: src/predefined.py:406
+#: src/predefined.py:405
 msgid "Knitting"
 msgstr "Tricoté"
 
-#: src/predefined.py:407
+#: src/predefined.py:406
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr ""
 "7 paires de tuiles dans n'importe quelle famille parmi les 3; pas de Vents "
 "ou de Dragons"
 
-#: src/predefined.py:409
+#: src/predefined.py:408
 msgid "All pair honors"
 msgstr "Toutes les paires d'Honneurs"
 
-#: src/predefined.py:410
+#: src/predefined.py:409
 msgid "7 pairs of 1s/9s/Winds/Dragons"
 msgstr "7 paires d'Extrémités, de Vents ou de Dragons"
 
-#: src/predefined.py:413 src/predefined.py:537
+#: src/predefined.py:412 src/predefined.py:536
 msgid "Own Flower"
 msgstr "Fleur du joueur"
 
-#: src/predefined.py:414 src/predefined.py:538
+#: src/predefined.py:413 src/predefined.py:537
 msgid "Own Season"
 msgstr "Saison du joueur"
 
-#: src/predefined.py:426
+#: src/predefined.py:425
 msgid "Buried Treasure"
 msgstr "Trésor enterré"
 
-#: src/predefined.py:427
+#: src/predefined.py:426
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
 msgstr ""
 "Brelans cachés d'une même famille avec des Vents ou des Dragons et une paire"
 
-#: src/predefined.py:428 src/predefined.py:549
+#: src/predefined.py:427 src/predefined.py:548
 msgid "Purity"
 msgstr "Pureté"
 
-#: src/predefined.py:429 src/predefined.py:550
+#: src/predefined.py:428 src/predefined.py:549
 msgid "Only same-colored tiles (no chows, dragons or winds)"
 msgstr "Uniquement d'une même famille (pas de séquence, Dragons ou Vents)"
 
-#: src/predefined.py:432
+#: src/predefined.py:431
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
 msgstr ""
 "3 Brelans ou Carrés de Dragons associés à tout Brelan ou Carré et une pair"
 
-#: src/predefined.py:435
+#: src/predefined.py:434
 msgid "The 13 Unique Wonders"
 msgstr "Les treize uniques Merveilles"
 
-#: src/predefined.py:442 src/predefined.py:554
+#: src/predefined.py:441 src/predefined.py:553
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
 msgstr ""
 "Mauvais nom donné à une tuile défaussée et réclamée pour une séquence, un "
 "Brelan ou un Carré"
 
-#: src/predefined.py:452
+#: src/predefined.py:451
 msgid "Calling for Only Honors"
 msgstr "Appel uniquement pour des Honneurs"
 
-#: src/predefined.py:456
+#: src/predefined.py:455
 msgid "Calling for Wriggling Snake"
 msgstr "Appelant pour le Serpent Frétillant"
 
-#: src/predefined.py:460
+#: src/predefined.py:459
 msgid "Calling for Triple Knitting"
 msgstr "Appel pour un Tricoté Triple"
 
-#: src/predefined.py:464
+#: src/predefined.py:463
 msgid "Calling for Gates of Heaven"
 msgstr "Appel pour les Portes du Paradis"
 
-#: src/predefined.py:467
+#: src/predefined.py:466
 msgid "Calling for Knitting"
 msgstr "Appel pour un Tricoté"
 
-#: src/predefined.py:471
+#: src/predefined.py:470
 msgid "Calling for Imperial Jade"
 msgstr "Appel pour un Jade Impérial"
 
-#: src/predefined.py:475
+#: src/predefined.py:474
 msgid "Calling for The 13 Unique Wonders"
 msgstr "Appel pour les treize Uniques Merveilles"
 
-#: src/predefined.py:478
+#: src/predefined.py:477
 msgid "Calling for Three Great Scholars"
 msgstr "Appel pour les Trois Grands Savants"
 
-#: src/predefined.py:481
+#: src/predefined.py:480
 msgid "Calling for All pair honors"
 msgstr "Appel pour toutes les paires d'Honneurs"
 
-#: src/predefined.py:485
+#: src/predefined.py:484
 msgid "Calling for Heads and Tails"
 msgstr "Appel pour Les Extrémités"
 
-#: src/predefined.py:489
+#: src/predefined.py:488
 msgid "Calling for Four Blessings Hovering over the Door"
 msgstr "Appel pour les Quatre Aura de Bénédiction Sur la Porte"
 
-#: src/predefined.py:492
+#: src/predefined.py:491
 msgid "Calling for Buried Treasure"
 msgstr "Appel pour le Trésor Enterré"
 
-#: src/predefined.py:496
+#: src/predefined.py:495
 msgid "Calling for Fourfold Plenty"
 msgstr "Appel pour le Quadruple Plein"
 
-#: src/predefined.py:500
+#: src/predefined.py:499
 msgid "Calling for Purity"
 msgstr "Appel pour la Pureté"
 
-#: src/predefined.py:510
+#: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
 msgstr "Jeu taïwanais à 16 tuiles, POUR L'ÉQUIPE DE DÉVELOPPEMENT"
 
-#: src/predefined.py:516
+#: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"

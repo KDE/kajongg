@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-02-11 00:39+0000\n"
+"POT-Creation-Date: 2025-03-07 00:39+0000\n"
 "PO-Revision-Date: 2025-02-14 08:24+0100\n"
 "Last-Translator: Adrián Chaves (Gallaecio) <adrian@chaves.io>\n"
 "Language-Team: Proxecto Trasno (proxecto@trasno.gal)\n"
@@ -221,7 +221,7 @@ msgstr ""
 "Seguro que queres eliminar <numid>%1</numid> partidas?<br />Isto será "
 "definitivo, non pode cancelalo co botón de cancelar."
 
-#: src/guiutil.py:134 src/kdestub.py:127 src/kdestub.py:130
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -260,7 +260,7 @@ msgstr "Preparado para a próxima man?"
 msgid "The connection to the server %1 broke, please try again later."
 msgstr "Rachouse a conexión co servidor %1; inténtao de novo máis tarde."
 
-#: src/kajongg.py:81 src/kdestub.py:1099
+#: src/kajongg.py:81 src/kdestub.py:1092
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Mah Jongg - o antigo xogo de taboleiro chinés para catro xogadores"
 
@@ -328,106 +328,106 @@ msgstr ""
 "Usar un servidor dedicado en execución que escoite polo PORTO. Só para "
 "probas."
 
-#: src/kdestub.py:285
+#: src/kdestub.py:278
 msgid "&OK"
 msgstr "&Aceptar"
 
-#: src/kdestub.py:286
+#: src/kdestub.py:279
 msgid "&Apply"
 msgstr "&Aplicar"
 
-#: src/kdestub.py:287
+#: src/kdestub.py:280
 msgid "&Cancel"
 msgstr "&Cancelar"
 
-#: src/kdestub.py:288 src/kdestub.py:476
+#: src/kdestub.py:281 src/kdestub.py:469
 msgid "&Help"
 msgstr "&Axuda"
 
-#: src/kdestub.py:289
+#: src/kdestub.py:282
 msgid "&Defaults"
 msgstr "Valores &predeterminados"
 
-#: src/kdestub.py:359
+#: src/kdestub.py:352
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Amosar a barra de &estado"
 
-#: src/kdestub.py:365
+#: src/kdestub.py:358
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Amosar a barra de &ferramentas"
 
-#: src/kdestub.py:371
+#: src/kdestub.py:364
 msgid "Configure Tool&bars..."
 msgstr "Configurar as &barras de ferramentas…"
 
-#: src/kdestub.py:373
+#: src/kdestub.py:366
 msgid "Configure toolbars"
 msgstr "Configurar as barras de ferramentas"
 
-#: src/kdestub.py:380
+#: src/kdestub.py:373
 msgid "Configure &Kajongg..."
 msgstr "Configurar &Kajongg…"
 
-#: src/kdestub.py:382 src/kdestub.py:1160
+#: src/kdestub.py:375 src/kdestub.py:1153
 msgid "Configure"
 msgstr "Configurar"
 
-#: src/kdestub.py:472
+#: src/kdestub.py:465
 msgid "&Game"
 msgstr "&Partida"
 
-#: src/kdestub.py:473
+#: src/kdestub.py:466
 msgid "&View"
 msgstr "&Vista"
 
-#: src/kdestub.py:474
+#: src/kdestub.py:467
 msgid "&Settings"
 msgstr "&Configuración"
 
-#: src/kdestub.py:484
+#: src/kdestub.py:477
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Axuda"
 
-#: src/kdestub.py:487 src/kdestub.py:864
+#: src/kdestub.py:480 src/kdestub.py:857
 msgid "Switch Application Language"
 msgstr "Cambiar o idioma da aplicación"
 
-#: src/kdestub.py:491
+#: src/kdestub.py:484
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "Sobre &Kajongg"
 
-#: src/kdestub.py:869
+#: src/kdestub.py:862
 msgid "Please choose the language which should be used for this application:"
 msgstr "Escolla o idioma que debe usarse para esta aplicación:"
 
-#: src/kdestub.py:888
+#: src/kdestub.py:881
 msgid "Add Fallback Language"
 msgstr "Engadir un idioma de reserva"
 
-#: src/kdestub.py:900
+#: src/kdestub.py:893
 msgid "Primary language:"
 msgstr "Idioma primario:"
 
-#: src/kdestub.py:900
+#: src/kdestub.py:893
 msgid "Fallback language:"
 msgstr "Idioma de reserva:"
 
-#: src/kdestub.py:906
+#: src/kdestub.py:899
 msgid "Remove"
 msgstr "Retirar"
 
-#: src/kdestub.py:910
+#: src/kdestub.py:903
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr ""
 "Este é o idioma principal da aplicación, que terá prioridade sobre os outros."
 
-#: src/kdestub.py:912
+#: src/kdestub.py:905
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
@@ -435,32 +435,32 @@ msgstr ""
 "Este é o idioma que ha usarse se ningún dos idiomas anteriores contén unha "
 "tradución axeitada."
 
-#: src/kdestub.py:1042
+#: src/kdestub.py:1035
 msgid "About Kajongg"
 msgstr "Sobre Kajongg"
 
-#: src/kdestub.py:1062
+#: src/kdestub.py:1055
 msgid "Version: %1"
 msgstr "Versión: %1"
 
-#: src/kdestub.py:1063
+#: src/kdestub.py:1056
 msgid "Protocol version %1"
 msgstr "Versión %1 do protocolo"
 
-#: src/kdestub.py:1066
+#: src/kdestub.py:1059
 msgid "Original author"
 msgstr "Autor orixinal"
 
-#: src/kdestub.py:1073
+#: src/kdestub.py:1066
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr "Infraestruturas de KDE (non instaladas ou inutilizábeis)"
 
-#: src/kdestub.py:1079
+#: src/kdestub.py:1072
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "Usando as versións %1"
 
-#: src/kdestub.py:1100
+#: src/kdestub.py:1093
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -468,7 +468,7 @@ msgstr ""
 "Este é o Mah Jongg clásico para catro xogadores. Se está á busca do "
 "solitario Mah Jongg use a aplicación kmahjongg."
 
-#: src/kdestub.py:1117
+#: src/kdestub.py:1110
 msgid ""
 "Please use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> to "
 "report bugs."
@@ -476,19 +476,19 @@ msgstr ""
 "Use <a href=\"https://bugs.kde.org\">https://bugs.kde.org</a> para informar "
 "de fallos."
 
-#: src/kdestub.py:1122
+#: src/kdestub.py:1115
 msgid "Authors:"
 msgstr "Autores:"
 
-#: src/kdestub.py:1363
+#: src/kdestub.py:1356
 msgid "Configure Toolbars"
 msgstr "Configurar as barras de ferramentas"
 
-#: src/kdestub.py:1365
+#: src/kdestub.py:1358
 msgid "A&vailable actions:"
 msgstr "Accións &dispoñíbeis:"
 
-#: src/kdestub.py:1376
+#: src/kdestub.py:1369
 msgid "Curr&ent actions:"
 msgstr "Accións &actuais:"
 
@@ -893,34 +893,34 @@ msgstr "non hai ningunha descrición dispoñíbel"
 msgid "no E-Mail address available"
 msgstr "non hai ningún enderezo de correo dispoñíbel"
 
-#: src/player.py:726
+#: src/player.py:725
 msgid "%1 claiming MahJongg: She does not really have tile %2"
 msgstr "%1 cantou MahJongg: en realidade non ten a ficha %2"
 
-#: src/player.py:735
+#: src/player.py:734
 msgid ""
 "%1 claiming MahJongg: She did not pass all concealed tiles to the server"
 msgstr ""
 "%1 pretende ter MahJongg: Non lle pasou todas as fichas escondidas ao "
 "servidor"
 
-#: src/player.py:856
+#: src/player.py:855
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
 msgstr "O xogador %1 ten 3 ou 4 combinacións expostas, todas verdes."
 
-#: src/player.py:864
+#: src/player.py:863
 msgid "Player %1 may try a True Color Game"
 msgstr "O xogador %1 pode intentar un Xogo en Cor Verdadeira"
 
-#: src/player.py:867
+#: src/player.py:866
 msgid "Player %1 may try an All Terminals Game"
 msgstr "O xogador %1 pode intentar un Xogo Todas as Terminais"
 
-#: src/player.py:880
+#: src/player.py:879
 msgid "Player %1 exposed many winds"
 msgstr "O xogador %1 expuxo demasiados ventos"
 
-#: src/player.py:884
+#: src/player.py:883
 msgid "Player %1 exposed many dragons"
 msgstr "O xogador %1 expuxo demasiados dragóns"
 
@@ -1286,7 +1286,7 @@ msgstr "Plenitude Cuádrupla"
 msgid "4 Kongs"
 msgstr "4 Kongs"
 
-#: src/predefined.py:216 src/predefined.py:431
+#: src/predefined.py:216 src/predefined.py:430
 msgid "Three Great Scholars"
 msgstr "Tres Grandes Sabios"
 
@@ -1334,7 +1334,7 @@ msgstr "Rañar un Poste Portador"
 msgid "Robbing the Kong of bamboo 2"
 msgstr "Roubar o Kong de bambú 2"
 
-#: src/predefined.py:237 src/predefined.py:527
+#: src/predefined.py:237 src/predefined.py:526
 msgid "Standard Mah Jongg"
 msgstr "Mah Jongg estándar"
 
@@ -1496,7 +1496,7 @@ msgstr "Descartar cantando chow falsamente"
 msgid "False Naming of Discard, Claimed for Pung/Kong"
 msgstr "Descartar cantando pung ou kong falsamente"
 
-#: src/predefined.py:353 src/predefined.py:445 src/predefined.py:557
+#: src/predefined.py:353 src/predefined.py:444 src/predefined.py:556
 msgid "False Declaration of Mah Jongg by One Player"
 msgstr "Declaración falsa de Mah Jongg por un xogador"
 
@@ -1508,7 +1508,7 @@ msgstr "Declaración falsa de Mah Jongg por dous xogadores"
 msgid "False Declaration of Mah Jongg by Three Players"
 msgstr "Declaración falsa de Mah Jongg por tres xogadores"
 
-#: src/predefined.py:362 src/predefined.py:448 src/predefined.py:560
+#: src/predefined.py:362 src/predefined.py:447 src/predefined.py:559
 msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr "Descartar cantando Mah Jongg falsamente"
 
@@ -1520,15 +1520,15 @@ msgstr "BMJA chinés clásico"
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
 msgstr "Chinés clásico, tal e como o define a Asociación Británica do Mah-Jong"
 
-#: src/predefined.py:393 src/predefined.py:533
+#: src/predefined.py:392 src/predefined.py:532
 msgid "Original Call"
 msgstr "Cantar a primeira"
 
-#: src/predefined.py:397
+#: src/predefined.py:396
 msgid "Gates of Heaven"
 msgstr "Cancelas do Ceo"
 
-#: src/predefined.py:398
+#: src/predefined.py:397
 msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
@@ -1536,20 +1536,20 @@ msgstr ""
 "Todas as fichas escondidas da mesma cor: Valores 1112345678999 máis unha "
 "parella de entre 2 e 8 (a última ficha da muralla ou descartada)"
 
-#: src/predefined.py:401
+#: src/predefined.py:400
 msgid "Wriggling Snake"
 msgstr "Serpe ondulante"
 
-#: src/predefined.py:402
+#: src/predefined.py:401
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
 msgstr "Par de 1 e unha serie do 2 ao 9 no mesmo pau con cada un dos ventos"
 
-#: src/predefined.py:404
+#: src/predefined.py:403
 msgid "Triple Knitting"
 msgstr "Tripla Calceta"
 
-#: src/predefined.py:405
+#: src/predefined.py:404
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
@@ -1557,119 +1557,119 @@ msgstr ""
 "Catro grupos de tres fichas dos distintos paus e un par: ningún vento ou "
 "dragón"
 
-#: src/predefined.py:406
+#: src/predefined.py:405
 msgid "Knitting"
 msgstr "Calceta"
 
-#: src/predefined.py:407
+#: src/predefined.py:406
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr "7 parellas de fichas de 2 de 3 paus; ningún vento ou dragón"
 
-#: src/predefined.py:409
+#: src/predefined.py:408
 msgid "All pair honors"
 msgstr "Todos os parellas de honras"
 
-#: src/predefined.py:410
+#: src/predefined.py:409
 msgid "7 pairs of 1s/9s/Winds/Dragons"
 msgstr "7 parellas de 1/9/ventos/dragóns"
 
-#: src/predefined.py:413 src/predefined.py:537
+#: src/predefined.py:412 src/predefined.py:536
 msgid "Own Flower"
 msgstr "Flor Propia"
 
-#: src/predefined.py:414 src/predefined.py:538
+#: src/predefined.py:413 src/predefined.py:537
 msgid "Own Season"
 msgstr "Estación Propia"
 
-#: src/predefined.py:426
+#: src/predefined.py:425
 msgid "Buried Treasure"
 msgstr "Tesouro enterrado"
 
-#: src/predefined.py:427
+#: src/predefined.py:426
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
 msgstr "Pungs dun pau escondidos con ventos/dragóns e un par"
 
-#: src/predefined.py:428 src/predefined.py:549
+#: src/predefined.py:427 src/predefined.py:548
 msgid "Purity"
 msgstr "Pureza"
 
-#: src/predefined.py:429 src/predefined.py:550
+#: src/predefined.py:428 src/predefined.py:549
 msgid "Only same-colored tiles (no chows, dragons or winds)"
 msgstr "Só as fichas da mesma cor (sen chows, dragóns ou ventos)"
 
-#: src/predefined.py:432
+#: src/predefined.py:431
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
 msgstr "3 Pungs ou Kongs de dragóns máis calquera pung/kong e un par"
 
-#: src/predefined.py:435
+#: src/predefined.py:434
 msgid "The 13 Unique Wonders"
 msgstr "As 13 Marabillas Únicas"
 
-#: src/predefined.py:442 src/predefined.py:554
+#: src/predefined.py:441 src/predefined.py:553
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
 msgstr "Nomeamento de Descarte Falso, pedido para Chow/Pung/Kong"
 
-#: src/predefined.py:452
+#: src/predefined.py:451
 msgid "Calling for Only Honors"
 msgstr "Chamada de Só Honras"
 
-#: src/predefined.py:456
+#: src/predefined.py:455
 msgid "Calling for Wriggling Snake"
 msgstr "Chamada de Serpe Sinuosa"
 
-#: src/predefined.py:460
+#: src/predefined.py:459
 msgid "Calling for Triple Knitting"
 msgstr "Chamada de Tripla Calceta"
 
-#: src/predefined.py:464
+#: src/predefined.py:463
 msgid "Calling for Gates of Heaven"
 msgstr "Chamada de Cancelas do Ceo"
 
-#: src/predefined.py:467
+#: src/predefined.py:466
 msgid "Calling for Knitting"
 msgstr "Chamada de Calceta"
 
-#: src/predefined.py:471
+#: src/predefined.py:470
 msgid "Calling for Imperial Jade"
 msgstr "Chamada de Xade Imperial"
 
-#: src/predefined.py:475
+#: src/predefined.py:474
 msgid "Calling for The 13 Unique Wonders"
 msgstr "Chamada das 13 Marabillas Únicas"
 
-#: src/predefined.py:478
+#: src/predefined.py:477
 msgid "Calling for Three Great Scholars"
 msgstr "Chamada de Tres Grandes Sabios"
 
-#: src/predefined.py:481
+#: src/predefined.py:480
 msgid "Calling for All pair honors"
 msgstr "Chamada de Todos os parellas de Honras"
 
-#: src/predefined.py:485
+#: src/predefined.py:484
 msgid "Calling for Heads and Tails"
 msgstr "Chamada de Caras e Cruces"
 
-#: src/predefined.py:489
+#: src/predefined.py:488
 msgid "Calling for Four Blessings Hovering over the Door"
 msgstr "Chamada de Catro Beizóns Pairando sobre a Porta"
 
-#: src/predefined.py:492
+#: src/predefined.py:491
 msgid "Calling for Buried Treasure"
 msgstr "Chamada de Tesouro Enterrado"
 
-#: src/predefined.py:496
+#: src/predefined.py:495
 msgid "Calling for Fourfold Plenty"
 msgstr "Chamada de Plenitude Cuádrupla"
 
-#: src/predefined.py:500
+#: src/predefined.py:499
 msgid "Calling for Purity"
 msgstr "Chamada de Pureza"
 
-#: src/predefined.py:510
+#: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
 msgstr "Xogo taiwanés de 16 fichas, PARA DESENVOLVEMENTO"
 
-#: src/predefined.py:516
+#: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"

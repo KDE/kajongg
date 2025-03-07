@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-02-11 00:39+0000\n"
+"POT-Creation-Date: 2025-03-07 00:39+0000\n"
 "PO-Revision-Date: 2017-11-11 16:03+0200\n"
 "Last-Translator: scootergrisen\n"
 "Language-Team: Danish\n"
@@ -231,7 +231,7 @@ msgstr ""
 "Vil du virkelig slette <numid>%1</numid> spil?<br>Dette er definitivt, du "
 "kan ikke annullere det med knappen Annullér"
 
-#: src/guiutil.py:134 src/kdestub.py:127 src/kdestub.py:130
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -269,7 +269,7 @@ msgstr "Klar til næste hånd?"
 msgid "The connection to the server %1 broke, please try again later."
 msgstr "Forbindelsen til serveren %1 blev afbrudt. Prøv igen senere."
 
-#: src/kajongg.py:81 src/kdestub.py:1099
+#: src/kajongg.py:81 src/kdestub.py:1092
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
 msgstr "Mahjong - det ældgamle kinesiske brætspil til fire spillere"
 
@@ -345,143 +345,143 @@ msgid ""
 msgstr ""
 "brug en dedikeret server, som lytter på SOCKET. Kun til brug for testning"
 
-#: src/kdestub.py:285
+#: src/kdestub.py:278
 msgid "&OK"
 msgstr "&OK"
 
-#: src/kdestub.py:286
+#: src/kdestub.py:279
 msgid "&Apply"
 msgstr "&Anvend"
 
-#: src/kdestub.py:287
+#: src/kdestub.py:280
 msgid "&Cancel"
 msgstr "&Annullér"
 
-#: src/kdestub.py:288 src/kdestub.py:476
+#: src/kdestub.py:281 src/kdestub.py:469
 msgid "&Help"
 msgstr "&Hjælp"
 
-#: src/kdestub.py:289
+#: src/kdestub.py:282
 msgid "&Defaults"
 msgstr "&Standarder"
 
-#: src/kdestub.py:359
+#: src/kdestub.py:352
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
 msgstr "Vis &statuslinje"
 
-#: src/kdestub.py:365
+#: src/kdestub.py:358
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
 msgstr "Vis &værktøjslinje"
 
-#: src/kdestub.py:371
+#: src/kdestub.py:364
 msgid "Configure Tool&bars..."
 msgstr "Indstil &værktøjslinjer..."
 
-#: src/kdestub.py:373
+#: src/kdestub.py:366
 msgid "Configure toolbars"
 msgstr "Indstil værktøjslinjer"
 
-#: src/kdestub.py:380
+#: src/kdestub.py:373
 #, fuzzy
 #| msgid "Configure &Kajongg"
 msgid "Configure &Kajongg..."
 msgstr "Indstil &Kajongg"
 
-#: src/kdestub.py:382 src/kdestub.py:1160
+#: src/kdestub.py:375 src/kdestub.py:1153
 msgid "Configure"
 msgstr "Indstil"
 
-#: src/kdestub.py:472
+#: src/kdestub.py:465
 msgid "&Game"
 msgstr "&Spil"
 
-#: src/kdestub.py:473
+#: src/kdestub.py:466
 msgid "&View"
 msgstr "&Vis"
 
-#: src/kdestub.py:474
+#: src/kdestub.py:467
 msgid "&Settings"
 msgstr "&Indstillinger"
 
-#: src/kdestub.py:484
+#: src/kdestub.py:477
 msgctxt "@action:inmenu"
 msgid "&Help"
 msgstr "&Hjælp"
 
-#: src/kdestub.py:487 src/kdestub.py:864
+#: src/kdestub.py:480 src/kdestub.py:857
 msgid "Switch Application Language"
 msgstr "Skift programsprog"
 
-#: src/kdestub.py:491
+#: src/kdestub.py:484
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
 msgstr "&Om Kajongg"
 
-#: src/kdestub.py:869
+#: src/kdestub.py:862
 msgid "Please choose the language which should be used for this application:"
 msgstr ""
 
-#: src/kdestub.py:888
+#: src/kdestub.py:881
 msgid "Add Fallback Language"
 msgstr "Tilføj reservesprog"
 
-#: src/kdestub.py:900
+#: src/kdestub.py:893
 msgid "Primary language:"
 msgstr "Primært sprog:"
 
-#: src/kdestub.py:900
+#: src/kdestub.py:893
 msgid "Fallback language:"
 msgstr "Reservesprog:"
 
-#: src/kdestub.py:906
+#: src/kdestub.py:899
 #, fuzzy
 #| msgid "Remove"
 msgid "Remove"
 msgstr "Fjern"
 
-#: src/kdestub.py:910
+#: src/kdestub.py:903
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
 msgstr ""
 
-#: src/kdestub.py:912
+#: src/kdestub.py:905
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
 msgstr ""
 
-#: src/kdestub.py:1042
+#: src/kdestub.py:1035
 msgid "About Kajongg"
 msgstr "&Om Kajongg"
 
-#: src/kdestub.py:1062
+#: src/kdestub.py:1055
 #, fuzzy
 #| msgctxt "kajongg"
 #| msgid "Using versions %1"
 msgid "Version: %1"
 msgstr "Bruger versioner %1"
 
-#: src/kdestub.py:1063
+#: src/kdestub.py:1056
 msgid "Protocol version %1"
 msgstr "Protokolversion %1"
 
-#: src/kdestub.py:1066
+#: src/kdestub.py:1059
 msgid "Original author"
 msgstr "Oprindelig udvikler"
 
-#: src/kdestub.py:1073
+#: src/kdestub.py:1066
 msgid "KDE Frameworks (not installed or not usable)"
 msgstr ""
 
-#: src/kdestub.py:1079
+#: src/kdestub.py:1072
 msgctxt "kajongg"
 msgid "Using versions %1"
 msgstr "Bruger versioner %1"
 
-#: src/kdestub.py:1100
+#: src/kdestub.py:1093
 msgid ""
 "This is the classical Mah Jongg for four players. If you are looking for Mah "
 "Jongg solitaire please use the application kmahjongg."
@@ -490,7 +490,7 @@ msgstr ""
 "mahjong for en enkelt spiller, så brug venligst programmet kmahjongg i "
 "stedet."
 
-#: src/kdestub.py:1117
+#: src/kdestub.py:1110
 #, fuzzy
 #| msgid ""
 #| "Please use <a href=\"http://bugs.kde.org\">http://bugs.kde.org</a> to "
@@ -502,19 +502,19 @@ msgstr ""
 "Brug venligst <a href=\"http://bugs.kde.org\">http://bugs.kde.org</a> til at "
 "rapportere fejl."
 
-#: src/kdestub.py:1122
+#: src/kdestub.py:1115
 msgid "Authors:"
 msgstr "Forfattere:"
 
-#: src/kdestub.py:1363
+#: src/kdestub.py:1356
 msgid "Configure Toolbars"
 msgstr "Indstil værktøjslinjer"
 
-#: src/kdestub.py:1365
+#: src/kdestub.py:1358
 msgid "A&vailable actions:"
 msgstr "&Tilgængelige handlinger:"
 
-#: src/kdestub.py:1376
+#: src/kdestub.py:1369
 msgid "Curr&ent actions:"
 msgstr "&Nuværende handlinger:"
 
@@ -940,32 +940,32 @@ msgstr "ingen tilgængelig beskrivelse"
 msgid "no E-Mail address available"
 msgstr "ingen tilgængelig e-mailadresse"
 
-#: src/player.py:726
+#: src/player.py:725
 msgid "%1 claiming MahJongg: She does not really have tile %2"
 msgstr "%1 melder mahjong: Hun har faktisk ikke brikken %2"
 
-#: src/player.py:735
+#: src/player.py:734
 msgid ""
 "%1 claiming MahJongg: She did not pass all concealed tiles to the server"
 msgstr "%1 melder mahjong: Hun sendte ikke alle skjulte brikker til serveren"
 
-#: src/player.py:856
+#: src/player.py:855
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
 msgstr "Spiller %1 har tre eller fire viste sæt, alle er grønne"
 
-#: src/player.py:864
+#: src/player.py:863
 msgid "Player %1 may try a True Color Game"
 msgstr "Spiller %1 kan forsøge et spil i én kulør"
 
-#: src/player.py:867
+#: src/player.py:866
 msgid "Player %1 may try an All Terminals Game"
 msgstr "Spiller %1 kan forsøge et spil med kun ettere og niere"
 
-#: src/player.py:880
+#: src/player.py:879
 msgid "Player %1 exposed many winds"
 msgstr "Spiller %1 viste mange vinde"
 
-#: src/player.py:884
+#: src/player.py:883
 msgid "Player %1 exposed many dragons"
 msgstr "Spiller %1 viste mange drager"
 
@@ -1336,7 +1336,7 @@ msgstr "Firdobbelt overflod"
 msgid "4 Kongs"
 msgstr "Fire kong"
 
-#: src/predefined.py:216 src/predefined.py:431
+#: src/predefined.py:216 src/predefined.py:430
 msgid "Three Great Scholars"
 msgstr "Tre store lærde mænd"
 
@@ -1386,7 +1386,7 @@ msgstr "Kradser en bærestok"
 msgid "Robbing the Kong of bamboo 2"
 msgstr "Stjæler kong af 2 bambus"
 
-#: src/predefined.py:237 src/predefined.py:527
+#: src/predefined.py:237 src/predefined.py:526
 msgid "Standard Mah Jongg"
 msgstr "Standard mahjong"
 
@@ -1550,7 +1550,7 @@ msgstr "Forkert benævnelse af afsmid, taget til chow"
 msgid "False Naming of Discard, Claimed for Pung/Kong"
 msgstr "Forkert benævnelse af afsmid, taget til pong/kong"
 
-#: src/predefined.py:353 src/predefined.py:445 src/predefined.py:557
+#: src/predefined.py:353 src/predefined.py:444 src/predefined.py:556
 msgid "False Declaration of Mah Jongg by One Player"
 msgstr "Forkert melding af mahjong af én spiller"
 
@@ -1562,7 +1562,7 @@ msgstr "Forkert melding af mahjong af to spillere"
 msgid "False Declaration of Mah Jongg by Three Players"
 msgstr "Forkert melding af mahjong af tre spillere"
 
-#: src/predefined.py:362 src/predefined.py:448 src/predefined.py:560
+#: src/predefined.py:362 src/predefined.py:447 src/predefined.py:559
 msgid "False Naming of Discard, Claimed for Mah Jongg"
 msgstr "Forkert benævnelse af afsmid, taget til mahjong"
 
@@ -1574,15 +1574,15 @@ msgstr "Klassisk kinesisk BMJA"
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
 msgstr "Klassisk kinesisk som defineret af the British Mah-Jong Association"
 
-#: src/predefined.py:393 src/predefined.py:533
+#: src/predefined.py:392 src/predefined.py:532
 msgid "Original Call"
 msgstr "Oprindelig melding"
 
-#: src/predefined.py:397
+#: src/predefined.py:396
 msgid "Gates of Heaven"
 msgstr "Himmelens port"
 
-#: src/predefined.py:398
+#: src/predefined.py:397
 #, fuzzy
 #| msgid ""
 #| "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 "
@@ -1594,21 +1594,21 @@ msgstr ""
 "Alle skjulte brikker af samme kulør: Værdier 1-1-1-2-3-4-5-6-7-8-9-9-9 "
 "suppleret med endnu en brik af samme farve (fra muren eller afsmidt)"
 
-#: src/predefined.py:401
+#: src/predefined.py:400
 msgid "Wriggling Snake"
 msgstr "Slange der snor sig"
 
-#: src/predefined.py:402
+#: src/predefined.py:401
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
 msgstr ""
 "Par af ettere og en serie fra 2 til 9 i samme kulør med hver af vindene"
 
-#: src/predefined.py:404
+#: src/predefined.py:403
 msgid "Triple Knitting"
 msgstr "Tredobbelt knytning"
 
-#: src/predefined.py:405
+#: src/predefined.py:404
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
@@ -1616,124 +1616,124 @@ msgstr ""
 "Fire sæt af tre brikker i de forskellige kulører og et par: Ingen vinde "
 "eller drager"
 
-#: src/predefined.py:406
+#: src/predefined.py:405
 msgid "Knitting"
 msgstr "Knytning"
 
-#: src/predefined.py:407
+#: src/predefined.py:406
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
 msgstr ""
 "Syv par af brikker i vilkårlige to ud af tre kulører; ingen vinde eller "
 "drager"
 
-#: src/predefined.py:409
+#: src/predefined.py:408
 msgid "All pair honors"
 msgstr "Kun par i honnører"
 
-#: src/predefined.py:410
+#: src/predefined.py:409
 msgid "7 pairs of 1s/9s/Winds/Dragons"
 msgstr "Syv par af ettere/niere/vinde/drager"
 
-#: src/predefined.py:413 src/predefined.py:537
+#: src/predefined.py:412 src/predefined.py:536
 msgid "Own Flower"
 msgstr "Egen blomst"
 
-#: src/predefined.py:414 src/predefined.py:538
+#: src/predefined.py:413 src/predefined.py:537
 msgid "Own Season"
 msgstr "Egen årstid"
 
-#: src/predefined.py:426
+#: src/predefined.py:425
 msgid "Buried Treasure"
 msgstr "Begravet skat"
 
-#: src/predefined.py:427
+#: src/predefined.py:426
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
 msgstr "Skjulte pong i én kulør med vinde/drager og et par"
 
-#: src/predefined.py:428 src/predefined.py:549
+#: src/predefined.py:427 src/predefined.py:548
 msgid "Purity"
 msgstr "Renhed"
 
-#: src/predefined.py:429 src/predefined.py:550
+#: src/predefined.py:428 src/predefined.py:549
 msgid "Only same-colored tiles (no chows, dragons or winds)"
 msgstr "Kun brikker af samme farve (ingen chow, drager eller vinde)"
 
-#: src/predefined.py:432
+#: src/predefined.py:431
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
 msgstr ""
 "Tre pong eller kong af drager plus en hvilken som helst pung/kong og et par"
 
-#: src/predefined.py:435
+#: src/predefined.py:434
 msgid "The 13 Unique Wonders"
 msgstr "De 13 unikke vidundere"
 
-#: src/predefined.py:442 src/predefined.py:554
+#: src/predefined.py:441 src/predefined.py:553
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
 msgstr "Forkert benævnelse af afsmid, taget til chow/pong/kong"
 
-#: src/predefined.py:452
+#: src/predefined.py:451
 msgid "Calling for Only Honors"
 msgstr "Melder kun honnører"
 
-#: src/predefined.py:456
+#: src/predefined.py:455
 msgid "Calling for Wriggling Snake"
 msgstr "Melder slange der snor sig"
 
-#: src/predefined.py:460
+#: src/predefined.py:459
 msgid "Calling for Triple Knitting"
 msgstr "Melder tredobbelt knytning"
 
-#: src/predefined.py:464
+#: src/predefined.py:463
 msgid "Calling for Gates of Heaven"
 msgstr "Melder himmelens port"
 
-#: src/predefined.py:467
+#: src/predefined.py:466
 msgid "Calling for Knitting"
 msgstr "Melder knytning"
 
-#: src/predefined.py:471
+#: src/predefined.py:470
 msgid "Calling for Imperial Jade"
 msgstr "Melder imperial jade"
 
-#: src/predefined.py:475
+#: src/predefined.py:474
 #, fuzzy
 #| msgid "Calling for 13 Unique Wonders"
 msgid "Calling for The 13 Unique Wonders"
 msgstr "Melder 13 unikke vidundere"
 
-#: src/predefined.py:478
+#: src/predefined.py:477
 msgid "Calling for Three Great Scholars"
 msgstr "Melder tre store lærde mænd"
 
-#: src/predefined.py:481
+#: src/predefined.py:480
 msgid "Calling for All pair honors"
 msgstr "Melder par kun af honnører"
 
-#: src/predefined.py:485
+#: src/predefined.py:484
 msgid "Calling for Heads and Tails"
 msgstr "Melder hoveder og haler"
 
-#: src/predefined.py:489
+#: src/predefined.py:488
 msgid "Calling for Four Blessings Hovering over the Door"
 msgstr "Melder fire velsignelser svæver over døren"
 
-#: src/predefined.py:492
+#: src/predefined.py:491
 msgid "Calling for Buried Treasure"
 msgstr "Melder begravet skat"
 
-#: src/predefined.py:496
+#: src/predefined.py:495
 msgid "Calling for Fourfold Plenty"
 msgstr "Melder firdobbelt overflod"
 
-#: src/predefined.py:500
+#: src/predefined.py:499
 msgid "Calling for Purity"
 msgstr "Melder renhed"
 
-#: src/predefined.py:510
+#: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
 msgstr ""
 
-#: src/predefined.py:516
+#: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
