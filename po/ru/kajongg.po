@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-03-07 00:39+0000\n"
-"PO-Revision-Date: 2025-03-05 16:00+0300\n"
+"PO-Revision-Date: 2025-03-17 11:32+0300\n"
 "Last-Translator: Olesya Gerasimenko <translation-team@basealt.ru>\n"
 "Language-Team: Basealt Translation Team\n"
 "Language: ru\n"
@@ -1096,9 +1096,8 @@ msgid "The hand contains too many tiles"
 msgstr "В руке слишком много костей"
 
 #: src/predefined.py:109
-#, fuzzy
 msgid "Tiles in Hand"
-msgstr "Нет очков"
+msgstr "Кости в руке"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1663,13 +1662,15 @@ msgstr "Ожидание чистой масти"
 
 #: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "Тайваньская игра с 16 костями, ДЛЯ РАЗРАБОТЧИКОВ"
 
 #: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"Тайваньский маджонг с 16 костями, ранняя альфа-версия. См. https://bugs.kde."
+"org/show_bug.cgi?id=298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
