@@ -1,4 +1,4 @@
-# Translation of kajongg.po to Spanish
+# Spanish translations for kajongg.po package.
 #
 # SPDX-FileCopyrightText: 2010, 2011 Kira J. Fernandez <kirajfdez@gmail.com>
 # SPDX-FileCopyrightText: 2011, 2012 Kira J. Fernandez <kirajfdez@gmail.es>
@@ -361,7 +361,7 @@ msgstr "Mostrar la barra de &herramientas"
 
 #: src/kdestub.py:364
 msgid "Configure Tool&bars..."
-msgstr "Configurar las &barras de herramientas..."
+msgstr "Configurar las &barras de herramientas…"
 
 #: src/kdestub.py:366
 msgid "Configure toolbars"
@@ -369,7 +369,7 @@ msgstr "Configurar las barras de herramientas"
 
 #: src/kdestub.py:373
 msgid "Configure &Kajongg..."
-msgstr "Configurar &Kajongg..."
+msgstr "Configurar &Kajongg…"
 
 #: src/kdestub.py:375 src/kdestub.py:1153
 msgid "Configure"
@@ -2401,199 +2401,3 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Su cliente tiene la versión %1, pero necesita la %2 para este servidor"
-
-#~ msgid "License Agreement"
-#~ msgstr "Acuerdo de licencia"
-
-#~ msgid "play only ROUNDS rounds per game. Only for debugging!"
-#~ msgstr "Jugar solo ROUNDS rondas por partida. Solo para depuración."
-
-#~ msgid "unrecognized arguments:%1"
-#~ msgstr "Argumentos no reconocidos:%1"
-
-#~ msgid "Not using broken Python KDE bindings"
-#~ msgstr "No se están usando los vínculos rotos de KDE Python"
-
-#~ msgid "This player cannot be deleted. There are games associated with %1."
-#~ msgstr "Este jugador no se puede borrar. Hay juegos asociados con %1."
-
-#~ msgid "(C) 2008-2016 Wolfgang Rohdewald"
-#~ msgstr "© 2008-2016 Wolfgang Rohdewald"
-
-#~ msgid "Wolfgang Rohdewald"
-#~ msgstr "Wolfgang Rohdewald"
-
-#~ msgid ""
-#~ "cannot find any background in the following directories, is libkmahjongg "
-#~ "installed?"
-#~ msgstr ""
-#~ "no se puede encontrar ningún fondo en los siguientes directorios. ¿Está "
-#~ "instalado libkmahjongg?"
-
-#~ msgid "cannot find background %1, using default"
-#~ msgstr "no se puede encontrar el fondo %1, utilizando el predeterminado"
-
-#~ msgid "unknown background"
-#~ msgstr "fondo desconocido"
-
-#~ msgid "&Configure Toolbars"
-#~ msgstr "&Configurar las barras de herramientas"
-
-#~ msgctxt "@action:inmen"
-#~ msgid "&Help"
-#~ msgstr "A&yuda"
-
-#~ msgctxt "@action:inmen"
-#~ msgid "Switch Application &Language"
-#~ msgstr "Cambiar el &idioma de la aplicación"
-
-#~ msgctxt "running under version"
-#~ msgid ", "
-#~ msgstr ", "
-
-#~ msgid "unknown tileset"
-#~ msgstr "juego de fichas desconocido"
-
-#~ msgid "Do not use KDE bindings. Intended only for testing"
-#~ msgstr "No usar los atajos de teclado de KDE. Solo para pruebas."
-
-#~ msgid ""
-#~ "Force using Qt5. Currently Qt4 is used by default on Linux and Qt5 on "
-#~ "Windows"
-#~ msgstr ""
-#~ "Forzar el uso de Qt5. Actualmente se usa Qt4 por defecto en Linux y Qt5 "
-#~ "en Windows."
-
-#~ msgid "do not use KDE bindings. Only for testing"
-#~ msgstr "no usar los atajos de teclado de KDE. Solo para pruebas"
-
-#~ msgid "Force using Qt5. Currently Qt4 is used by default"
-#~ msgstr "Forzar el uso de Qt5. Actualmente se usa Qt4 por defecto."
-
-#~ msgctxt "@action:inmenu"
-#~ msgid "Help"
-#~ msgstr "Ayuda"
-
-#~ msgctxt "running under version"
-#~ msgid "Under %s"
-#~ msgstr "Debajo de %s"
-
-#~ msgid "Copy"
-#~ msgstr "Copiar"
-
-#~ msgctxt "Kajongg ruleset comparer"
-#~ msgid "Compare"
-#~ msgstr "Comparar"
-
-#~ msgid "start the server using Python 3. Meant only for testing."
-#~ msgstr "Iniciar en servidor usando Python 3. Solo para pruebas."
-
-#~ msgid ""
-#~ "All tiles concealed of same color: Values 1-1-1-2-3-4-5-6-7-8-9-9-9 and "
-#~ "another tile 2..8 of the same color"
-#~ msgstr ""
-#~ "Todas las fichas ocultas del mismo color: valores "
-#~ "1-1-1-2-3-4-5-6-7-8-9-9-9 más otra ficha del mismo color del 2 al 8"
-
-#~ msgctxt ""
-#~ "kajongg:keyboard commands for moving tiles to the players with wind ESWN "
-#~ "or to the central tile selector (X)"
-#~ msgid "ESWNX"
-#~ msgstr "ESWNX"
-
-#~ msgid "DNS lookup failed, address not found"
-#~ msgstr "Falló la búsqueda de DNS, dirección no encontrada"
-
-#~ msgctxt "Player"
-#~ msgid "Name"
-#~ msgstr "Nombre"
-
-#~ msgid ""
-#~ "Cannot save this. Possibly the name already exists. <br><br>Message from "
-#~ "database:<br><br><message>%1</message>"
-#~ msgstr ""
-#~ "No se puede guardar esto. Posiblemente, el nombre ya existe. "
-#~ "<br><br>Mensaje de la base de datos:<br><br><message>%1</message>"
-
-#~ msgctxt "@action:inmenu"
-#~ msgid "&Show Scoring Editor"
-#~ msgstr "Mo&strar el editor de puntuaciones"
-
-#~ msgctxt "@action:intoolbar"
-#~ msgid "&Scoring"
-#~ msgstr "&Puntuación"
-
-#~ msgctxt "kajongg @info:tooltip"
-#~ msgid "Show or hide the scoring editor for a manual game."
-#~ msgstr "Mostrar u ocultar el editor de puntuaciones para un juego manual."
-
-#~ msgid "All Greens"
-#~ msgstr "Todo verde"
-
-#~ msgid "{meldName}"
-#~ msgstr "{meldName}"
-
-#~ msgid "{meldType} of Own Wind ({value})"
-#~ msgstr "{meldType} de viento propio ({value})"
-
-#~ msgid "{meldType} of Round Wind ({value})"
-#~ msgstr "{meldType} de viento dominante ({value})"
-
-#~ msgctxt "kajongg"
-#~ msgid "east"
-#~ msgstr "este"
-
-#~ msgctxt "kajongg"
-#~ msgid "west"
-#~ msgstr "oeste"
-
-#~ msgctxt "kajongg"
-#~ msgid "own wind"
-#~ msgstr "viento propio"
-
-#~ msgctxt "kajongg"
-#~ msgid "round wind"
-#~ msgstr "viento dominante"
-
-#~ msgid "Ruleset: %1"
-#~ msgstr "Conjunto de reglas: %1"
-
-#~ msgid ""
-#~ "The game can begin. Are you ready to play now?\n"
-#~ "If you answer with NO, you will be removed from table %1."
-#~ msgstr ""
-#~ "El juego puede empezar. ¿Está listo para jugar ahora?\n"
-#~ "Si responde NO, será retirado de la mesa %1."
-
-#~ msgid "Aborted creating a user account"
-#~ msgstr "Se ha interrumpido la creación de la cuenta de usuario"
-
-#~ msgid "Calling"
-#~ msgstr "Reclamando"
-
-#~ msgid "The game is over!"
-#~ msgstr "¡El juego ha terminado!"
-
-#~ msgid ""
-#~ "You cannot specify hand/discard with --game when starting with --nogui"
-#~ msgstr ""
-#~ "No puede especificar mano/descarte con --game cuando haya iniciado con --"
-#~ "nogui"
-
-#~ msgid ""
-#~ "Cannot save your ruleset changes.<br>You probably introduced a duplicate "
-#~ "name. <br><br >Message from database:<br><br><message>%1</message>"
-#~ msgstr ""
-#~ "No se pueden guardar sus cambios en el conjunto de reglas."
-#~ "<br>Probablemente ha introducido un nombre duplicado. <br><br>Mensaje de "
-#~ "la base de datos: <br><br><message>%1</message>"
-
-#~ msgctxt "Kajongg ruleset comparer"
-#~ msgid "C&ompare"
-#~ msgstr "C&omparar"
-
-#~ msgid "play like a robot using ruleset"
-#~ msgstr "jugar como un robot usando un conjunto de reglas"
-
-#~ msgid "ruleset \"%1\" not found"
-#~ msgstr "conjunto de reglas «%1» no encontrado"
