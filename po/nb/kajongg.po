@@ -1084,7 +1084,6 @@ msgstr "Hånden har for mange brikker"
 
 #: src/predefined.py:109
 #, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
 msgstr "Nullpoeng-hånd"
 
