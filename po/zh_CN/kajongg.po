@@ -1052,7 +1052,7 @@ msgstr ""
 
 #: src/predefined.py:109
 msgid "Tiles in Hand"
-msgstr ""
+msgstr "手牌"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1603,13 +1603,14 @@ msgstr ""
 
 #: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "“台湾16张”游戏，针对开发者"
 
 #: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"“台湾16张”麻将，早期alpha阶段。见 https://bugs.kde.org/show_bug.cgi?id=298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
