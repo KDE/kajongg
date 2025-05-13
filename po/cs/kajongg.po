@@ -2312,6 +2312,3 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
-
-#~ msgid "License Agreement"
-#~ msgstr "Licenční ujednání"
