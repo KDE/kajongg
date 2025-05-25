@@ -68,7 +68,7 @@ msgstr "hjklHJKL"
 
 #: src/board.py:385
 msgid "Choose from"
-msgstr "Trieu entre"
+msgstr "Tria entre"
 
 #: src/chat.py:51
 msgid "Time"
@@ -217,7 +217,7 @@ msgid ""
 "you cannot cancel it with the cancel button"
 msgstr ""
 "Segur que voleu suprimir <numid>%1</numid> jocs?<br>Açò serà definitiu. No "
-"podreu cancel·lar-ho amb el botó Cancel·la"
+"podreu cancel·lar-ho amb el botó «Cancel·la»"
 
 #: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
 msgid "Kajongg"
@@ -1011,8 +1011,8 @@ msgid ""
 "she needs only one tile to complete the hand and announces she will not "
 "alter the hand in any way (except bonus tiles)"
 msgstr ""
-"En el primer descart, un jugador pot declarar Crida Original, que vol dir "
-"que necessita només una fitxa per a completar la mà i anuncia que no "
+"En el primer descart, un jugador pot declarar Crida Original, el qual vol "
+"dir que necessita només una fitxa per a completar la mà i anuncia que no "
 "alterarà la mà de cap forma (excepte les fitxes de bonificació)"
 
 #: src/predefined.py:65
