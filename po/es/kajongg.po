@@ -1,7 +1,8 @@
 # Spanish translations for kajongg.po package.
+# Copyright (C) 2010-2025 This file is copyright:
+# This file is distributed under the same license as the kajongg package.
 #
-# SPDX-FileCopyrightText: 2010, 2011 Kira J. Fernandez <kirajfdez@gmail.com>
-# SPDX-FileCopyrightText: 2011, 2012 Kira J. Fernandez <kirajfdez@gmail.es>
+# SPDX-FileCopyrightText: 2010, 2011, 2012 Kira J. Fernandez <kirajfdez@gmail.com>
 # SPDX-FileCopyrightText: 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023, 2024 Eloy Cuadra <ecuadra@eloihr.net>
 # SPDX-FileCopyrightText: 2012 Rocio Gallego <traducciones@rociogallego.com>
 # SPDX-FileCopyrightText: 2013 Javier Viñal <fjvinal@gmail.com>
@@ -12,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-03-07 00:39+0000\n"
-"PO-Revision-Date: 2025-02-11 20:01+0100\n"
+"PO-Revision-Date: 2025-06-11 16:48+0100\n"
 "Last-Translator: Sofía Priego <spriego@darksylvania.net>\n"
 "Language-Team: Spanish <kde-l10n-es@kde.org>\n"
 "Language: es\n"
