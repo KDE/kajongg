@@ -339,7 +339,7 @@ msgstr "&დახმარება"
 
 #: src/kdestub.py:282
 msgid "&Defaults"
-msgstr "&ნაგულისხმები პარამეტრები"
+msgstr "&ნაგულისხმევი პარამეტრები"
 
 #: src/kdestub.py:352
 msgctxt "@action:inmenu"
