@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-03-07 00:39+0000\n"
-"PO-Revision-Date: 2025-02-12 17:23+0400\n"
+"PO-Revision-Date: 2025-08-03 12:32+0400\n"
 "Last-Translator: Zayed Al-Saidi <zayed.alsaidi@gmail.com>\n"
 "Language-Team: ar\n"
 "Language: ar\n"
@@ -1568,7 +1568,7 @@ msgstr "الطهارة"
 
 #: src/predefined.py:428 src/predefined.py:549
 msgid "Only same-colored tiles (no chows, dragons or winds)"
-msgstr "القطع ذات اللون نفسه فقط (بدون تشاو أو تنانين أو رياح)"
+msgstr "القطع ذات اللون نفسه فقط (دون تشاو أو تنانين أو رياح)"
 
 #: src/predefined.py:431
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
