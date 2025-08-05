@@ -2120,7 +2120,7 @@ msgstr "ا&بدأ"
 
 #: src/tables.py:222
 msgid "Start playing on a table. Empty seats will be taken by robot players."
-msgstr "ابدأ اللعب على الطاولة. سيشغل اللاعبون الآليون المقاعد الفارغة."
+msgstr "ابدأ اللعب على الطاولة. سيشغل اللاعبون الآليّون المقاعد الفارغة."
 
 #: src/tables.py:281
 msgid "opens a chat window"
