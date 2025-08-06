@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-03-07 00:39+0000\n"
-"PO-Revision-Date: 2025-08-03 12:32+0400\n"
+"PO-Revision-Date: 2025-08-05 16:49+0400\n"
 "Last-Translator: Zayed Al-Saidi <zayed.alsaidi@gmail.com>\n"
 "Language-Team: ar\n"
 "Language: ar\n"
@@ -35,7 +35,7 @@ msgstr "الملف <filename>%1</filename> لا يحتوي على SVG صالح"
 #: src/backgroundselector.py:107
 msgctxt "BackgroundSelector"
 msgid "Preview"
-msgstr "معاينة"
+msgstr "عاين"
 
 #: src/backgroundselector.py:108
 msgctxt "BackgroundSelector"
@@ -50,7 +50,7 @@ msgstr "المؤلّف:"
 #: src/backgroundselector.py:110
 msgctxt "BackgroundSelector"
 msgid "Contact:"
-msgstr "الإتصال:"
+msgstr "الاتصال:"
 
 #: src/backgroundselector.py:111
 msgctxt "BackgroundSelector"
@@ -80,7 +80,7 @@ msgstr "الرّسالة"
 
 #: src/chat.py:125
 msgid "Chat on table %1 at %2"
-msgstr "دردش على الطولة %1 في %2"
+msgstr "دردش على الطاولة %1 في %2"
 
 #: src/client.py:69
 msgctxt "table status"
@@ -680,7 +680,7 @@ msgstr "&دردشة"
 #: src/mainwindow.py:549
 msgctxt "kajongg @info:tooltip"
 msgid "Chat with the other players."
-msgstr "دردش مع اللاعبين الأخرين"
+msgstr "دردش مع اللاعبين الأحرين"
 
 #: src/message.py:250
 msgid "saying %1 violates Original Call"
@@ -852,7 +852,7 @@ msgstr "لا يمكنك أو لا تريد المطالبة بهذا القطع�
 #: src/mjresource.py:92
 msgid ""
 "cannot find any %1 in the following directories, is libkmahjongg installed?"
-msgstr "لا يمكن العثور على أي %1 في الدلائل التالية، هل تم تثبيت libkmahjongg؟"
+msgstr "لا يمكن العثور على أي %1 في الدلائل التالية، هل libkmahjongg مثبتة؟"
 
 #: src/mjresource.py:116
 msgid "cannot find %1, using default"
@@ -941,8 +941,8 @@ msgid ""
 "The dead wall is also called kong box: The last 16 tiles of the wall used as "
 "source of replacement tiles"
 msgstr ""
-"يُسمى الجدار الميت أيضًا صندوق كونغ: ستستخدمت آخر 16 قطعة من الجدار كمصدر "
-"للقطع البديلة"
+"يُسمى الجدار الميت أيضًا صندوق كونغ: ستستخدم آخر 16 قطعة من الجدار كمصدر للقطع "
+"البديلة"
 
 #: src/predefined.py:46
 msgid "Last Tile is Last Tile of Wall"
@@ -1091,11 +1091,11 @@ msgstr "نقاط ليد محدودة"
 
 #: src/predefined.py:125
 msgid "Play with the roof off"
-msgstr "إلعب بالسقف مغلقاً"
+msgstr "العب بالسقف مغلقاً"
 
 #: src/predefined.py:126
 msgid "Play with no upper scoring limit"
-msgstr "إلعب دون حد أعلى لتسجيل النقاط"
+msgstr "العب دون حد أعلى لتسجيل النقاط"
 
 #: src/predefined.py:128
 msgid "Claim Timeout"
@@ -1107,11 +1107,11 @@ msgstr "حجم صندوق كونغ"
 
 #: src/predefined.py:133
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
-msgstr "يستستخدم صندوق الكونغ لاستبدال القطع عند إعلان الكونغ"
+msgstr "سيستخدم صندوق الكونغ لاستبدال القطع عند إعلان الكونغ"
 
 #: src/predefined.py:135
 msgid "Play with Bonus Tiles"
-msgstr "إلعب بقطع المكافآت"
+msgstr "العب بقطع المكافآت"
 
 #: src/predefined.py:136
 msgid "Bonus tiles increase the luck factor"
@@ -1171,7 +1171,7 @@ msgstr "آخر قطعة تكمل آخر زوج من المحطات أو الشر
 
 #: src/predefined.py:175
 msgid "Last Tile is Only Possible Tile"
-msgstr "القطعة الأخيرة هي القعطة الوحيدة الممكنة"
+msgstr "القطعة الأخيرة هي القطعة الوحيدة الممكنة"
 
 #: src/predefined.py:179
 msgid "Won with Last Tile Taken from Wall"
@@ -1424,8 +1424,7 @@ msgstr "الصينية الكلاسيكية DMJL"
 #: src/predefined.py:322
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgstr ""
-"اللغة الصينية الكلاسيكية كما تم تعريفها من قبل Deutsche Mah Jongg Liga "
-"(DMJL) e.V."
+"اللغة الصينية الكلاسيكية المعرفة من قبل Deutsche Mah Jongg Liga (DMJL) e.V."
 
 #: src/predefined.py:329
 msgid "Squirming Snake"
@@ -2037,7 +2036,7 @@ msgstr "%1 قال بشكل خاطئ %2: يدعي أنه أخفى قطع %3 ول�
 
 #: src/servertable.py:772
 msgid "declareKong:%1 wrongly said Kong for meld %2"
-msgstr "أعلن كونغ:%1 قال خطًأ كونغ للخلط %2"
+msgstr "أعلن كونغ:%1 قال خطأً كونغ للخلط %2"
 
 #: src/servertable.py:821
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
@@ -2045,7 +2044,7 @@ msgstr "%1 يطالب بماها كونغ: هذه ليست يد رابحة: %2"
 
 #: src/sound.py:70
 msgid "No voices will be heard because the program %1 is missing"
-msgstr "لن يتم سماع أي أصوات لأن البرنامج %1 مفقود"
+msgstr "لن يسمع أي صوت لأن البرنامج %1 مفقود"
 
 #: src/sound.py:375
 msgid "cannot write <filename>%1</filename>: %2"
@@ -2316,7 +2315,7 @@ msgstr "{name} {meldType} {state}"
 #: src/tilesetselector.py:141
 msgctxt "TilesetSelector"
 msgid "Preview"
-msgstr "معاينة"
+msgstr "عاين"
 
 #: src/tilesetselector.py:142
 msgctxt "TilesetSelector"
@@ -2331,7 +2330,7 @@ msgstr "المؤلّف:"
 #: src/tilesetselector.py:144
 msgctxt "TilesetSelector"
 msgid "Contact:"
-msgstr "الإتصال:"
+msgstr "الاتصال:"
 
 #: src/tilesetselector.py:145
 msgctxt "TilesetSelector"
