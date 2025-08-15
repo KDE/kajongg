@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-03-07 00:39+0000\n"
-"PO-Revision-Date: 2025-08-06 13:45+0400\n"
+"PO-Revision-Date: 2025-08-14 09:44+0400\n"
 "Last-Translator: Zayed Al-Saidi <zayed.alsaidi@gmail.com>\n"
 "Language-Team: ar\n"
 "Language: ar\n"
@@ -308,7 +308,7 @@ msgstr "لا تظهر واجهة مستخدم رسومية. لأغراض الا�
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr "استخدم خادمًا مخصصًا يعمل بالفعل ويستمع على SOCKET. لأغراض الاختبار فقط"
+msgstr "استخدم خادمًا مخصصًا يعمل فعلًا ويستمع على SOCKET. لأغراض الاختبار فقط"
 
 #: src/kajongg.py:101
 msgid ""
@@ -522,7 +522,7 @@ msgstr "&كرّر كلمة السر:"
 
 #: src/login.py:565
 msgid "You are already connected to server %1"
-msgstr "متّصل بالفعل بـ %1"
+msgstr "متّصل فعلًا بـ %1"
 
 #: src/login.py:605
 msgctxt "USER is not known on SERVER"
@@ -539,7 +539,7 @@ msgstr "رُفض الاتصال بالخادم %1"
 
 #: src/login.py:622
 msgid "Server %1 does not run a kajongg server"
-msgstr "الخادم %1 لا يقوم بتشغيل خادم كاجونغ"
+msgstr "الخادم %1 لا يشغل خادم كاجونغ"
 
 #: src/login.py:624
 msgid "Address for server %1 cannot be found"
@@ -910,7 +910,7 @@ msgstr "&جديد"
 
 #: src/playerlist.py:110
 msgid "Player %1 already exists"
-msgstr "اللاعب %1 موجود بالفعل"
+msgstr "اللاعب %1 موجود فعلًا"
 
 #: src/playerlist.py:121
 msgid "Error while adding player %1: %2"
@@ -1002,7 +1002,7 @@ msgid ""
 "win, the discarder pays the winner for all"
 msgstr ""
 "في بعض المواقف، يعتبر التخلص من قطعة لديها فرصة كبيرة لمساعدة شخص ما على "
-"الفوز أمرًا خطيرًا، وإذا كانت هذه القطعة تجعل شخصًا ما يفوز بالفعل، فإن المتخلص "
+"الفوز أمرًا خطيرًا، وإذا كانت هذه القطعة تجعل شخصًا ما يفوز فعلًا، فإن المتخلص "
 "يدفع للفائز مقابل الكل"
 
 #: src/predefined.py:70
@@ -1993,7 +1993,7 @@ msgstr "لقد انضممت فعلًا إلى هذه الطاولة"
 
 #: src/servertable.py:183
 msgid "All seats are already taken"
-msgstr "جميع المقاعد مشغولة بالفعل"
+msgstr "جميع المقاعد مشغولة فعلًا"
 
 #: src/servertable.py:188
 msgid "takes a seat"
