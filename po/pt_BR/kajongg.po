@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Luiz Fernando Ranghetti <elchevive@opensuse.org>, 2008, 2009, 2010, 2012, 2016, 2017, 2019, 2020, 2021, 2022.
-# Marcus Vinícius de Andrade Gama <marcus.gama@gmail.com>, 2010, 2012.
+# SPDX-FileCopyrightText: 2010, 2012, 2025 Marcus Vinícius de Andrade Gama <marcus.gama@gmail.com>
 # André Marcelo Alvarenga <alvarenga@kde.org>, 2010, 2011, 2012, 2013, 2014, 2015.
 # Aracele Torres <araceletorres@gmail.com>, 2010.
 # SPDX-FileCopyrightText: 2024 Geraldo Simiao <geraldosimiao@fedoraproject.org>
@@ -12,15 +12,15 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-03-07 00:39+0000\n"
-"PO-Revision-Date: 2024-08-02 11:47-0300\n"
-"Last-Translator: Geraldo Simiao <geraldosimiao@fedoraproject.org>\n"
+"PO-Revision-Date: 2025-08-14 18:25-0300\n"
+"Last-Translator: Marcus Gama <marcus.gama@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <kde-i18n-pt_BR@kde.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 24.05.2\n"
+"X-Generator: Lokalize 25.04.3\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -37,36 +37,26 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "o arquivo <filename>%1</filename> não contém nenhum SVG válido"
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "Visualização"
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "Propriedades"
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
 msgstr "Autor:"
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "Contato:"
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "Descrição:"
@@ -1118,10 +1108,8 @@ msgid "The hand contains too many tiles"
 msgstr "A jogada contém muitas peças"
 
 #: src/predefined.py:109
-#, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
-msgstr "Mão de zero pontos"
+msgstr "Peças na mão"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1688,13 +1676,15 @@ msgstr "Pedido de Pureza"
 
 #: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "Jogo taiwanês de 16 peças, PARA DESENVOLVEDORES"
 
 #: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"Mah Jongg taiwanês de 16 peças, alfa inicial. Veja https://bugs.kde.org/"
+"show_bug.cgi?id=298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
@@ -2374,36 +2364,26 @@ msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "Visualização"
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "Propriedades"
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
 msgstr "Autor:"
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "Contato:"
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "Descrição:"
