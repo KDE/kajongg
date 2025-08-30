@@ -5,20 +5,20 @@
 # Jeff Huang <s8321414@gmail.com>, 2017.
 # Frank Weng (a.k.a. Franklin) <franklin at goodhorse dot idv dot tw>, 2009, 2010.
 # pan93412 <pan93412@gmail.com>, 2019.
-# SPDX-FileCopyrightText: 2023 Kisaragi Hiu <mail@kisaragi-hiu.com>
+# SPDX-FileCopyrightText: 2023, 2025 Kisaragi Hiu <mail@kisaragi-hiu.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-03-07 00:39+0000\n"
-"PO-Revision-Date: 2023-12-25 01:06+0900\n"
+"PO-Revision-Date: 2025-08-29 20:39+0900\n"
 "Last-Translator: Kisaragi Hiu <mail@kisaragi-hiu.com>\n"
 "Language-Team: Traditional Chinese <zh-l10n@lists.slat.org>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 23.08.4\n"
+"X-Generator: Lokalize 25.11.70\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgctxt "kajongg"
@@ -36,36 +36,26 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "檔案 <filename>%1</filename> 沒有包含合法的 SVG"
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "預覽"
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "屬性"
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
 msgstr "作者："
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "聯絡人："
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "描述："
@@ -316,21 +306,16 @@ msgid "show no graphical user interface. Intended only for testing"
 msgstr "不顯示圖形介面。只做測試用"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
-msgstr "用專門的伺服器來監聽 SOCKET。只做測試用"
+msgstr "使用已在執行中且正監聽 SOCKET 的專用伺服器。只做測試用"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
-msgstr "用專門的伺服器來監聽 PORT。只做測試用"
+msgstr "使用已在執行中且正監聽 PORT 的專用伺服器。只做測試用"
 
 #: src/kdestub.py:278
 msgid "&OK"
@@ -1632,13 +1617,15 @@ msgstr "清一色加碰碰胡"
 
 #: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "臺灣 16 牌遊戲，開發者用"
 
 #: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"臺灣 16 牌麻將，初期 alpha 版。請見 https://bugs.kde.org/show_bug.cgi?"
+"id=298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
@@ -1961,10 +1948,8 @@ msgid "Player %1 has logged out"
 msgstr "玩家 %1 已登出"
 
 #: src/server.py:436
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "伺服器會監聽連接埠 (%d)"
+msgstr "伺服器會監聽連接埠 PORT ({int(defaultPort)})"
 
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
@@ -2304,36 +2289,26 @@ msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "預覽"
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "屬性"
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
 msgstr "作者："
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "聯絡人："
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "描述："
