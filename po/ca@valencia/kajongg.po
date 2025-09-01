@@ -233,7 +233,7 @@ msgstr "Quin kong voleu declarar?"
 
 #: src/humanclient.py:172
 msgid "Choose"
-msgstr "Selecciona"
+msgstr "Tria"
 
 #: src/humanclient.py:383
 msgid "You cannot say %1"
@@ -401,7 +401,7 @@ msgstr "Quant a &Kajongg"
 
 #: src/kdestub.py:862
 msgid "Please choose the language which should be used for this application:"
-msgstr "Seleccioneu l'idioma que s'ha d'utilitzar en esta aplicació:"
+msgstr "Trieu l'idioma que s'ha d'utilitzar en esta aplicació:"
 
 #: src/kdestub.py:881
 msgid "Add Fallback Language"
@@ -1857,7 +1857,7 @@ msgstr "&Conserva el seient"
 #: src/scoring.py:85
 msgctxt "@title:window"
 msgid "Select four players"
-msgstr "Seleccioneu els quatre jugadors"
+msgstr "Trieu els quatre jugadors"
 
 #: src/scoring.py:360
 msgid "Move Exposed Tiles Here"
@@ -2116,7 +2116,7 @@ msgstr "Joc de regles"
 
 #: src/tables.py:149
 msgid "Select a ruleset"
-msgstr "Seleccioneu un joc de regles"
+msgstr "Trieu un joc de regles"
 
 #: src/tables.py:186
 msgctxt "allocate a new table"
