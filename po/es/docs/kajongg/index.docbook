@@ -97,7 +97,7 @@
 <!--Short description of this document. Do not change unless necessary!-->
 <abstract>
 	<para
->Esta documentación describe el juego de &kajongg;</para>
+>Esta documentación describe el juego &kajongg;</para>
 </abstract>
 
 <!--List of relevant keywords-->
@@ -118,7 +118,7 @@
 	<keyword
 >tablero</keyword>
 	<keyword
->arcade</keyword>
+>recreativo</keyword>
 	<keyword
 >juego de fichas</keyword>
 	<keyword
@@ -138,12 +138,12 @@
 ><title
 >Tipo de juego:</title
 ><para
->Tablero, Arcade</para
+>Tablero, Recreativo</para
 ></note
 ><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
 	<note
 ><title
->Número de posibles jugadores:</title
+>Número de jugadores posibles:</title
 ><para
 >Cuatro</para
 ></note
@@ -151,14 +151,14 @@
 	<para
 >&kajongg; es un juego de tablero creado a partir del famoso juego oriental del Mahjongg (del chino <foreignphrase lang="zh"
 >麻將</foreignphrase
->). Se juega con cuatro jugadores. Hay muchos tipos de reglas diferentes en uso por el mundo. ahora mismo, &kajongg; soporta las reglas clásicas chinas tal como se juegan en Alemania; en un futuro se admitirán otros conjuntos de reglas. Es posible personalizar o añadir nuevos conjuntos de reglas. ¡Por favor, hágalo y envíeselos al autor del programa para que los integre! </para>
+>). Se juega con cuatro jugadores. Hay muchos tipos de reglas diferentes que se usan en diversas partes. En la actualidad, &kajongg; permite las reglas chinas clásicas, tal y como se usan en Alemania; en un futuro se admitirán otros conjuntos de reglas. Puedes personalizar y añadir nuevos conjuntos de reglas. Si lo haces, envíaselos al autor del programa para que los incluya. </para>
 	<para
->&kajongg; puede utilizarse de dos formas diferentes: puntuar un juego manual donde usted juega como siempre con la ayuda de su máquina y usa &kajongg;  para el cálculo de la puntuación y para llevar un registro. O puede utilizar  &kajongg; para jugar contra cualquier combinación de otros jugadores humanos o máquinas. </para>
+>&kajongg; se puede usar de dos formas distintas: para puntuar una partida manual en la que se juega de forma habitual, sin ayuda de la computadora, y donde se usa &kajongg; para calcular las puntuaciones y llevar un registro; o bien usar &kajongg; para jugar contra otros jugadores, ya sean humanos o máquinas. </para>
 </chapter>
 
 <chapter id="screen_layout"
 ><title
->La distribución de la pantalla</title>
+>La configuración de la pantalla</title>
 		<para>
 			<screenshot>
 				<screeninfo
@@ -175,16 +175,16 @@
 			</screenshot>
                 </para>
                 <para
->Rápida explicación de las partes de la pantalla de juego. </para>
+>Breve explicación de las partes de la pantalla de juego. </para>
 	<variablelist>
 		<varlistentry>
 			<term
 >Barra de herramientas</term>
 			<listitem
 ><para
->La barra de herramientas se encuentra bajo la barra de menú y contiene botones para la mayoría de las acciones utilizadas a menudo. El contenido de la barra de herramientas se puede edcitar. También puede hacerla invisible, dándole más espacio al tablero. </para
+>La barra de herramientas se encuentra debajo de la barra de menú y contiene botones para la mayoría de las acciones más usadas. El contenido de la barra de herramientas se puede modificar. También se puede ocultar, dejando más espacio para el tablero. </para
 ><para
->Dependiendo del tamaño de su pantalla, puede querer que la barra de herramientas sea invisible o moverla a la parte izquierda de la ventana. Puede hacerlo haciendo clic con el &RMB; sobre la barra de herramientas. </para
+>Dependiendo del tamaño de la pantalla, puedes querer que la barra de herramientas esté oculta o moverla a la parte izquierda de la ventana. Puedes hacerlo haciendo clic con el &RMB; sobre la barra de herramientas. </para
 ></listitem>
 		</varlistentry>
 		<varlistentry>
@@ -192,15 +192,15 @@
 >Tablero</term>
 			<listitem
 ><para
->El tablero es la sección más grande de la ventana. Puede ver las cuatro paredes con una longitud de 18 fichas (el número exacto depende de las reglas, como usar fichas de bonificación o no). Los nombres de los jugadores están escritos en las paredes, junto con el valor actual de la mano (si es conocido) y sus fichas de los vientos. El viento dominante tiene un fondo coloreado; el este en la captura de pantalla de arriba. </para
+>El tablero es la sección más grande de la ventana. Puedes ver las cuatro paredes con una longitud de 18 fichas (el número exacto depende de las reglas, como cuando se usan fichas de bonificación o no). Los nombres de los jugadores se muestran en las paredes, junto al valor actual de la mano (si se conoce) y sus fichas de vientos. El viento dominante tiene un fondo de color (al este en la captura de pantalla anterior). </para
 ><para
 >Cuando <link linkend="play"
->juegue</link
->, el interior de las paredes contiene las fichas descartadas por los jugadores. Están situadas de forma aleatoria. La última ficha descartada tiene un marco de enfoque azul. </para
+>juegues</link
+>, el interior de las paredes contiene las fichas descartadas por los jugadores. Están situadas de forma aleatoria. La última ficha descartada está dentro de un recuadro azul. </para
 ><para
->Cuando se <link linkend="scoreGame"
->puntúen manualmente los juegos</link
->, el interior de las paredes tiene una selección de todas las fichas disponibles, el selector central. Puede asignárselos a los jugadores utilizando el ratón o el teclado. </para>
+>Al <link linkend="scoreGame"
+>puntuar partidas manuales</link
+>, el interior de las paredes tiene una selección de todas las fichas disponibles, el selector central. Puedes asignárselas a los jugadores usando el ratón o el teclado. </para>
 			</listitem>
 		</varlistentry>
 		<varlistentry>
@@ -208,9 +208,9 @@
 >Región del jugador</term>
 			<listitem
 ><para
->Cada jugador tiene una zona de pantalla para sus fichas. La fila superior contiene fichas expuestas; la inferior, fichas ocultas. Cuando <link linkend="scoreGame"
->se puntúen juegos manuales</link
->, las fichas ocultas se muestran con una sombra sobre la ficha completa. Las fichas de bonificación van al extremo derecho. </para
+>Cada jugador tiene una zona de pantalla para sus fichas. La fila superior contiene las fichas expuestas; la inferior, las fichas ocultas. Al <link linkend="scoreGame"
+>puntuar partidas manuales</link
+>, las fichas ocultas se muestran sombreadas. Las fichas de bonificación están en el extremo derecho. </para
 ></listitem>
 		</varlistentry>
 		<varlistentry>
@@ -218,7 +218,7 @@
 >Diálogo</term>
 			<listitem
 ><para
->El diálogo presenta las opciones que tiene el jugador. La mayoría de las veces tiene un límite de tiempo con una barra de progreso que muestra el tiempo restante. </para
+>El diálogo presenta las opciones que tiene el jugador. La mayoría de las veces contiene un límite de tiempo con una barra de avance que muestra el tiempo restante. </para
 ></listitem>
 		</varlistentry>
 		<varlistentry>
@@ -234,20 +234,20 @@
 
 <chapter id="scoreGame"
 ><title
->Puntuar un juego manual</title
+>Puntuar una partida manual</title
 > <!-- do not change this! -->
 	<para
->Actualmente &kajongg; soporta la puntuación manual de los juegos. Se juega como de costumbre y, al final del juego, puede decirle a &kajongg; cuántas fichas tiene un jugador en la mano y todo lo que haga falta para que &kajongg; calcule la puntuación -que es lo que hará el programa. Alternativamente, puede calcular las puntuaciones a mano e introducirlas. &kajongg; efectuará los pagos entre los jugadores y escribirá los resultados en una base de datos. Es posible suspender un juego, empezar otro con jugadores diferentes y continuar juegos anteriores. Todas las reglas se guardan juntas con los juegos, así que juegos distintos pueden jugarse con reglas diversas. </para>
+>En este modo, &kajongg; solo se usa para llevar las puntuaciones. Se juega como de costumbre, con personas reales y en un tablero de verdad. Al final de la partida, puedes decirle a &kajongg; cuántas fichas tiene cada jugador en su mano y todo lo necesario para que &kajongg; calcule su puntuación. De forma alternativa, puedes calcular las puntuaciones de forma manual e introducirlas. &kajongg; efectuará los pagos entre los jugadores y escribirá el resultado en una base de datos. Se puede suspender una partida, empezar otra con jugadores diferentes y continuar partidas anteriores. Todas las reglas se guardan junto a las partidas, por lo que diferentes partidas se pueden jugar con diferentes reglas. </para>
         <itemizedlist>
             <listitem
 ><para
->Desde el menú, seleccione <menuchoice
+>En el menú, selecciona <menuchoice
 ><guimenu
 >Juego</guimenu
 > <guimenuitem
 >Puntuar juego manual</guimenuitem
 ></menuchoice
-> o pulse <keycombo action="simul"
+> o pulsa <keycombo action="simul"
 >&Ctrl;<keycap
 >C</keycap
 ></keycombo
@@ -255,21 +255,21 @@
 ></listitem>
             <listitem
 ><para
->Ahora puede seleccionar un juego sin terminar ya existente o comenzar un juego nuevo. Si empieza uno nuevo, se le preguntará por los jugadores y por el tipo de reglas. &kajongg; propondrá los mismos valores utilizados para el juego anterior. Si no existe ningún juego anterior, sugerirá los primeros cuatro jugadores definidos. Por favor, tenga en cuenta que no puede cambiar el conjunto de reglas ni ninguna de las reglas individuales después de hacer esta selección. Puede hacerlo con antelación en <link linkend="ruleset-options"
+>Ahora puedes seleccionar una partida sin terminar ya existente o empezar una nueva. Si empiezas una nueva, se te preguntará por los jugadores y por el conjunto de reglas. &kajongg; propondrá los mismos valores que hayas usado para la partida anterior. Si no existe ninguna partida anterior, te sugerirá los primeros cuatro jugadores definidos. Tenga en cuenta que no puedes cambiar el conjunto de reglas ni ninguna de las reglas individuales después de hacer esta selección. Puedes hacerlo con antelación en <link linkend="ruleset-options"
 >el editor de reglas</link
 >. </para
 ></listitem>
             <listitem
 ><para
->Ahora tiene una nueva ventana titulada <guilabel
+>Ahora tienes una nueva ventana con el título <guilabel
 >Puntuaciones para esta mano</guilabel
->. Lea <link linkend="enterhand-tiles"
->Deje que &kajongg; calcule la puntuación</link
+>. Consulta <link linkend="enterhand-tiles"
+>Deja que &kajongg; calcule la puntuación</link
 > para una descripción más detallada. </para
 ></listitem>
             <listitem
 ><para
->Después de guardar los resultados, continúe con la siguiente mano. </para
+>Después de guardar los resultados, continúa con la siguiente mano. </para
 ></listitem>
         </itemizedlist>
       <sect1 id="enterhand"
@@ -292,50 +292,50 @@
 		</mediaobject>
 	</screenshot>
 	<para
->Esta es la ventana para introducir resultados. Se muestra automáticamente cuando &kajongg; cree que lo puede necesitar. Siempre puede mostrarla u ocultarla presionando <keycombo action="simul"
+>Esta es la ventana para introducir resultados. Se muestra automáticamente cuando &kajongg; cree que lo puedes necesitar. Puedes mostrarla u ocultarla cuando quieras pulsando <keycombo action="simul"
 >&Ctrl;<keycap
 >S</keycap
 ></keycombo
-> o sleccionando la correspondiente opción del menú. </para>
+> o seleccionando la correspondiente opción del menú. </para>
 	<para
->Como siempre, el viento predominante tiene el fondo coloreado. </para>
+>Como siempre, el viento predominante tiene el fondo de color. </para>
 	<para
->Aquí puede introducir manualmente puntuaciones para todos los jugadores. Alternativamente, puede definir exactamente qué fichas tenía en la mano cada jugador. Si elige hacerlo, el campo correspondiente al valor de la puntuación manual aparecerá en gris. &kajongg; calculará la puntuación automáticamente. </para>
+>Aquí puedes introducir a mano las puntuaciones de todos los jugadores. De forma alternativa, puedes definir exactamente las fichas que tenía cada jugador en su mano. Si haces esto, el campo correspondiente al valor de la puntuación manual aparecerá en gris. &kajongg; calculará la puntuación de forma automática. </para>
 	<para
->Después de introducir todos los datos pertinentes para una mano, pulse el botón <guibutton
+>Después de introducir todos los datos necesarios para una mano, pulsa el botón <guibutton
 >Guardar mano</guibutton
->. Los valores de la mano se incorporarán a la base de datos y también se mostrarán en la tabla de puntuaciones. Puede que se le pida cambiar las posiciones de los jugadores, pero puede elegir no hacerlo. Los cambios propuestos no son todavía personalizables; si un juego de reglas necesita algo diferente, lo cambiaremos. </para>
+>. Los valores de la mano se incorporarán a la base de datos y también se mostrarán en la tabla de puntuaciones. Es posible que se te pida que cambies las posiciones de los jugadores, aunque puedes decidir no hacerlo. Los cambios propuestos no se pueden personalizar todavía (si un juego de reglas necesita algo distinto, lo cambiaremos). </para>
 	<para
->Si el jugador puede haber ganado, la casilla de verificación de la columna <guilabel
+>Si el jugador puede haber ganado, la casilla de la columna <guilabel
 >Ganador</guilabel
-> se habilitará. Haga clic aquí para marcar al ganador. </para>
+> se activará. Haz clic en ella para marcar al ganador. </para>
 	<para
->La barra de estado mostrará ahora los saldos de los jugadores, y usted podrá continuar con la siguiente mano. </para>
+>La barra de estado mostrará ahora los saldos de los jugadores, y podrás continuar con la siguiente mano. </para>
 	<sect3 id="enterhand-manually">
 	<title
 >Introducir la puntuación manualmente</title>
 	<para
->Un buen jugador probablemente preferirá calcular su propia puntuación por sí mismo. En ese caso, puede introducirla directamente. Esto solo es posible cuando no hay fichas seleccionadas para este jugador. </para>
+>Un buen jugador probablemente preferirá calcular su puntuación por sí mismo. En tal caso, puedes introducirla directamente. Esto solo es posible cuando no hay ninguna ficha seleccionada para dicho jugador. </para>
 	<para
->Si introduce una puntuación manual, debe contener todo excepto las penalizaciones; no tendrá reglas opcionales entre las que elegir. Hay una excepción, «Juego peligroso». Esto no influye en las puntuaciones, y tampoco es una infracción. Solo significa que el pago entre jugadores es diferente: el infractor se lo paga todo al ganador. Los otros dos jugadores no se intercambian pagos. Esto actualmente no es personalizable. </para>
+>Si introduces una puntuación manual, debe contener todo excepto las penalizaciones; no tendrás reglas opcionales entre las que elegir. Hay una excepción: «Juego peligroso». Esto no influye en las puntuaciones y tampoco es una infracción. Solo significa que el pago entre jugadores es diferente: el infractor se lo paga todo al ganador. Los otros dos jugadores no intercambian pagos. Esto no se puede personalizar en la actualidad. </para>
 	</sect3>
 	<sect3 id="enterhand-tiles">
 	<title
->Haga que &kajongg; calcule la puntuación</title>
+>Haz que &kajongg; calcule la puntuación</title>
 	<para
->Si le dice explícitamente a &kajongg; qué fichas tiene un jugador, el campo para introducir las puntuaciones estará en gris para ese jugador en esta ventana. Mientras asocie fichas a un jugador verá cómo esta puntuación aumenta, pero tan pronto como añada la decimocuarta la puntuación se hará cero. Esto puede sorprenderle pero, a menos que declare a esta como la mano ganadora, se reconoce como una mano larga, que siempre tiene cero puntos. Este comportamiento viene definido por el juego de reglas clásico chino; puede ser diferente si cambia las reglas o usa un conjunto distinto. </para>
+>Si le indicas explícitamente a &kajongg; qué fichas tiene un jugador, el campo para introducir las puntuaciones estará en gris para dicho jugador en esta ventana. Cuando asocies fichas a un jugador, verás cómo aumenta su puntuación. Pero, en cuanto añadas la decimocuarta, la puntuación será cero. Esto puede sorprenderte pero, a menos que declares a esta mano como ganadora, se reconoce como una mano larga, que siempre tiene cero puntos. Este comportamiento viene definido por el conjunto de reglas clásico chino. Puede ser diferente si cambias las reglas o usas un conjunto distinto. </para>
 	<para
->Puede asociar fichas y tanteos con un jugador utilizando el ratón, el teclado o ambos. Con el ratón, simplemente mueva las fichas arrastrándolas y soltándolas en la región del jugador. Cuando suelte la ficha, se le preguntará qué desea mover: Sencillo, Pung, Kong, Kong reclamado o Chow. La fila superior es para las fichas expuestas, la inferior, para las ocultas. Las fichas de bonificación aparecerán en el extremo derecho. También puede mover las fichas y los tanteos entre las filas, entre los jugadores y de vuelta al selector central. </para>
+>Puedes asociar fichas y tanteos a un jugador usando el ratón, el teclado o ambos. Con el ratón, mueve las fichas arrastrándolas y soltándolas en la región del jugador. Cuando sueltes la ficha, se te preguntará qué deseas mover: Sencillo, Pareja, Pung, Kong, Kong reclamado o Chow. La fila superior es para las fichas expuestas y la inferior para las ocultas. Las fichas de bonificación aparecerán en el extremo derecho. También puedes mover las fichas y los tanteos entre las filas, entre los jugadores y de vuelta al selector central. </para>
 	<para
->Si prefiere usar el teclado, puede usar &Tab; para moverse entre el selector central y las regiones de los jugadores. Las teclas <keycap
+>Si prefieres usar el teclado, puedes usar &Tab; para moverte entre el selector central y las regiones de los jugadores. Las teclas <keycap
 >eswnESWN</keycap
-> mueven una ficha hacia el el Este, el Sur, el Oeste y el Norte de cada jugador. Las teclas <keycap
+> mueven una ficha a los jugadores Este, Sur, Oeste y Norte. Las teclas <keycap
 >xX</keycap
 > la devuelven al selector central. <keycap
 >ESWN</keycap
-> mueve a la fila oculta, <keycap
+> la mueve a la fila oculta, <keycap
 >eswn</keycap
-> mueve a la fila expuesta. Puede mover el cursor entre fichas o tanteos usando las teclas de dirección. La ficha actualmente seleccionada tiene un marco azul. Como las teclas de dirección están lejos de las letras en el teclado, también puede usar las letras <keycap
+> la mueva a la fila expuesta. Puedes mover el cursor entre fichas o tanteos usando las teclas de dirección. La ficha seleccionada tiene un marco azul. Como las teclas de dirección están lejos de las letras en el teclado, también puedes usar las letras <keycap
 >hjkl</keycap
 > o <keycap
 >HJKL</keycap
@@ -345,21 +345,21 @@
 >jJ</keycap
 > mueve hacia abajo, <keycap
 >kK</keycap
-> mueve hacia arriba, y <keycap
+> mueve hacia arriba,y <keycap
 >lL</keycap
 > mueve a la derecha. Así es como lo hace el editor <command
 >vi</command
-> de Unix. El navegador de &kde; &konqueror; e incluso este programa de ayuda también reconocen esas teclas de la misma forma. Estas teclas pueden ser diferentes si utiliza un idioma diferente del inglés, pero no es posible configurarlo. </para>
+> de Unix. El navegador de &kde;, &konqueror;, e incluso este programa de ayuda, también reconocen esas teclas de la misma forma. Estas teclas pueden ser diferentes si usas un idioma distinto al inglés, aunque no se pueden configurar en la actualidad. </para>
 	<para
 >Las opciones <guilabel
 >Última ficha</guilabel
 > y <guilabel
 >Último tanteo</guilabel
-> se necesitan para algunas reglas como <guilabel
+> se necesitan para algunas reglas, como <guilabel
 >La última ficha completa la pareja</guilabel
->. Solo se puede usar para la mano ganadora. </para>
+>. Solo se pueden usar con la mano ganadora. </para>
 	<para
->En la parte derecha de la ventana puede aplicar manualmente algunas reglas. Qué reglas aparecen en esta lista depende del juego de reglas actual y de las fichas. En el ejemplo de la captura de pantalla de arriba, los jugadores que pierden pueden tener una opción de «juego peligroso» -de nuevo, dependiendo del juego de reglas y de sus fichas. Es el objetivo de los desarrolladores mantener esta lista de reglas seleccionables lo más corta posible. De manera óptima, &kajongg; debería siempre poder determinar automáticamente si una regla se aplica, pero a veces &kajongg; no dispone de suficiente información o conocimiento para decidir. </para>
+>En la parte derecha de la ventana, puedes aplicar a mano algunas reglas. Las reglas que aparecen en esta lista depende del conjunto de reglas actual y de las fichas. En el ejemplo de la captura de pantalla superior, los jugadores que pierden pueden tener una opción de «juego peligroso» (de nuevo, según el conjunto de reglas y de sus fichas). El propósito de los desarrolladores es mantener esta lista de reglas lo más corta posible. Idealmente, &kajongg; siempre debería poder determinar de forma automática si una regla se aplica, aunque a veces no dispone de suficiente información o conocimiento para decidir. </para>
 	</sect3>
 	</sect2>
 	<sect2 id="enterhand-penalties">
@@ -383,17 +383,17 @@
 >ventana para introducir los resultados a mano</link
 >, el botón de <guibutton
 >Penalizaciones</guibutton
-> invocará esta ventana, donde puede introducir las penalizaciones. Esto se puede hacer en cualquier momento, independientemente del mecanismo normal de puntuación.</para>
+> invocará esta ventana, donde puedes introducir las penalizaciones. Esto se puede hacer en cualquier momento, independientemente del mecanismo normal de puntuación.</para>
 	<para
 >La selección de <guilabel
 >infracción:</guilabel
-> muestra todas las infracciones que pueden aplicarse a las manos que tienen los jugadores. Elija entre ellas.</para>
+> muestra todas las infracciones que se pueden aplicar a las manos que tienen los jugadores. Elige entre ellas.</para>
 	<para
->Ahora puede adaptar la <guilabel
+>Ahora puedes adaptar la <guilabel
 >Penalización total</guilabel
->. Esta es la suma total que se mueve de los pagadores a los que reciben el pago. Será dividida equitativamente entre ellos.</para>
+>. Esta es la suma total que se mueve de los pagadores a los que reciben el pago. Se dividirá equitativamente entre ellos.</para>
 	<para
->Dependiendo del tipo de infracción, el número de pagadores y pagados varía. Se muestra el número correcto de jugadores. Si selecciona un jugador, &kajongg; se asegura de que este jugador solo figura una vez adaptando a los otros jugadores. </para>
+>Dependiendo del tipo de infracción, el número de pagadores y pagados varía. Se muestra el número correcto de jugadores. Si seleccionas un jugador, &kajongg; se asegura de que solo figure una vez adaptando los otros jugadores. </para>
 	</sect2>
 	</sect1>
 </chapter>
@@ -402,70 +402,70 @@
 ><title
 >Jugando</title>
 	<para
->En cualquier momento puede habilitar o deshabilitar el modo demostración. En el modo demostración, la máquina jugará por usted. Si no se está jugando ningún juego, se iniciará uno nuevo con el conjunto de reglas utilizado por última vez. </para>
+>En cualquier momento puedes activar o desactivar el modo de demostración. En este modo, la máquina jugará por ti. Si no estás jugando ninguna partida, se iniciará una nueva con el conjunto de reglas que hayas usado la última vez. </para>
         <sect1 id="robotplay">
         <title
 >Jugar contra la máquina</title>
          <para
->Primero obtendrá un diálogo de inicio de sesión. Introduzca el servidor de juego al que quiera conectarse y su nombre de usuario. Si elige la entrada especial <guilabel
+>Primero se mostrará un diálogo de inicio de sesión. Introduce el servidor de juego al que quieras conectarse y tu nombre de usuario. Si eliges la entrada especial <guilabel
 >Juego local</guilabel
-> , solo necesitará introducir su nombre (o aceptar el nombre propuesto) y el conjunto de reglas deseado. Esto iniciará inmediatamente un juego local donde usted jugará contra 3 jugadores-robot. Sin embargo, si existen juegos suspendidos, se mostrarán en una lista. Puede entonces seleccionar el juego que quiera continuar o iniciar uno nuevo. </para>
+> , solo necesitarás introducir tu nombre (o aceptar el nombre propuesto) y el conjunto de reglas que quieras. Esto iniciará inmediatamente una partida local donde jugarás contra 3 jugadores robot. Sin embargo, si hay partidas en pausa, se mostrarán en una lista. Podrás seleccionar la partida que quieras continuar o empezar una nueva. </para>
         </sect1>
         <sect1 id="humanplay">
         <title
 >Jugar con amigos</title>
         <para
->Si desea jugar contra personas reales, necesitará un servidor de juego al que todos los jugadores, incluido usted, necesitarán conectarse. Hágalo seleccionando cualquier servidor introduciendo manualmente un nuevo nombre de servidor y especificando su contraseña para ese servidor. Le será propuesta la última contraseña utilizada. </para
+>Si quieres jugar contra personas reales, necesitarás un servidor de juego al que todos los jugadores, incluido tú, deben conectarse. Selecciona un servidor escribiendo su nombre e introduciendo tu contraseña para el mismo. Se te propondrá la última contraseña que hayas usado. </para
 ><para
 >La forma más fácil consiste en usar el servidor de juego <literal
 >kajongg.org</literal
->. &kajongg; lo mostrará en la lista de posibles servidores de juego. Tenga en cuenta este servidor solo ofrece un servidor de juego, pero no una página web ni ningún otro servicio. </para
+>. &kajongg; lo mostrará en la lista de posibles servidores de juego. Ten en cuenta este servidor solo ofrece un servidor de juego, no una página web ni ningún otro servicio. </para
 ><para
->Si no tiene cuenta en ese servidor de juego con el nombre que ha introducido, se le preguntará si desea abrir una cuenta. Si dice que sí, obtendrá un nuevo diálogo donde puede introducir la contraseña que quiera dos veces. Su cuenta se creará automáticamente. </para
+>Si no tienes cuenta en ese servidor de juego con el nombre que has introducido, se te preguntará si quieres crear una cuenta. Si respondes que sí, se mostrará un nuevo diálogo donde debes introducir la contraseña que quieras dos veces. Tu cuenta se creará automáticamente. </para
 ><para
->Tras ingresar con éxito en el servidor de juego, obtendrá una lista de mesas con asientos disponibles en ese servidor. Únase a una mesa o cree una nueva. Si crea una nueva mesa, espere hasta que otros jugadores ocupen más asientos. Puede iniciar el juego en una mesa que haya creado en cualquier momento; los asientos que no estén tomados serán ocupados por jugadores robot. </para
+>Tras iniciar sesión con éxito en el servidor de juego, obtendrás una lista de mesas con asientos disponibles en dicho servidor. Únete a una mesa o crea una nueva. Si creas una nueva mesa, espera hasta que otros jugadores ocupen más asientos. Puedes empezar el juego de una mesa que hayas creado en cualquier momento. Los asientos libres serán ocupados por jugadores robot. </para
 ><para
->La lista de mesas también muestra el nombre del conjunto de reglas que se juega en cada mesa. El conjunto de reglas y su nombre se envía al servidor de juego por el jugador que inicia el juego en cada mesa. Si tiene un conjunto de reglas idéntico, la mesa muestra su nombre para el conjunto de reglas -esto puede ser útil si el que inicia la mesa habla otro idioma y ha nombrado al conjunto de reglas de forma diferente. También, si se muestra el nombre de su conjunto de reglas local, lo hace en color negro. Si no tiene un conjunto idéntico, el nombre aparece en rojo, y usted puede usar el botón <guibutton
+>La lista de mesas también muestra el nombre del conjunto de reglas con el que se juega en cada mesa. El conjunto de reglas y su nombre se envía al servidor de juego por el jugador que inicia la mesa. Si tienes un conjunto de reglas idéntico, la mesa muestra tu nombre para el conjunto de reglas (esto puede ser útil si el que inicia la mesa habla otro idioma y ha nombrado al conjunto de reglas de forma diferente). Además, si se muestra el nombre de tu conjunto de reglas local, se muestra en color negro. Si no tienes un conjunto de reglas idéntico, el nombre aparece en rojo, y puedes usar el botón <guibutton
 >Comparar</guibutton
-> para compararlo con sus propios conjuntos de reglas. </para
+> para compararlo con tus propios conjuntos de reglas. </para
 ><para
->Si no usa <literal
+>Si no usas <literal
 >kajongg.org</literal
-> ni ninguno de los servidores existentes, puede iniciar su propio servidor de juego para &kajongg; de dos formas diferentes: <itemizedlist
+> ni ninguno de los servidores existentes, puedes iniciar tu propio servidor de juego para &kajongg; de dos formas diferentes: <itemizedlist
 ><listitem
 ><para
->conectarse al servidor <literal
+>Conéctate al servidor <literal
 >localhost</literal
->. Este es su propio equipo. Si hace esto y no hay ningún servidor de juego en marcha, se iniciará uno automáticamente. Cuando termine de jugar, el servidor también se detendrá. Esto es distinto a seleccionar <guilabel
+>. Este es tu propio equipo. Si haces esto y no hay ningún servidor de juego en marcha, se iniciará uno automáticamente. Cuando termines de jugar, el servidor también se detendrá. Esto es distinto a seleccionar <guilabel
 >Juego local</guilabel
 >, que no permite conexiones de otros equipos. </para
 ></listitem
 ><listitem
 ><para
->iniciar manualmente un servidor en cualquier equipo que desee. Todo lo que necesita es ir a la línea de órdenes e iniciar el programa <command
+>Inicia manualmente un servidor en cualquier equipo que quieras. Todo lo que necesitas es ir a la línea de órdenes e iniciar el programa <command
 >kajonggserver</command
->. Introducir <command
+>. Introduce <command
 >kajonggserver --help</command
-> le mostrará todas las opciones disponibles, como cambiar el puerto predeterminad. Este servidor seguirá en marcha hasta que mate el proceso. </para
+> para mostrar todas las opciones disponibles, como cambiar el puerto predeterminado. Este servidor seguirá en marcha hasta que mates el proceso. </para
 ></listitem
 ></itemizedlist>
         </para
 ><para
->En ambos casos, necesita decirles a los otros jugadores cómo pueden conectarse a su servidor de juegos. Necesitarán la &URL; o simplemente una dirección IP y el puerto que su servidor está escuchando. Esto podría ser algo como <literal
+>En ambos casos, tienes que indicar a los otros jugadores cómo pueden conectarse a tu servidor de juego. Necesitarán la &URL; o una dirección IP y el puerto en el que escucha tu servidor. Podría ser algo similar a <literal
 >mypc.dyndns.org:8301</literal
->, siendo <literal
+>, donde <literal
 >8301</literal
-> el puerto. Por supuesto, necesitará configurar su cortafuegos para que el jugador remoto pueda conectarse a ese puerto. La comunicación estará cifrada. </para
+> es el puerto. Por supuesto, tendrás que configurar tu cortafuegos para que los jugadores remotos puedan conectarse a dicho puerto. La comunicación estará cifrada. </para
 ><para
->Para el número de puerto, consulte <guimenu
+>Para el número de puerto, consulta <guimenu
 >Ayuda</guimenu
 > <guimenuitem
 >Acerca de &kajongg;</guimenuitem
->. La versión del protocolo es el número de puerto. Para &kajongg; 17.04 es 8301. Si el jugador no introduce ningún puerto para el servidor de juego que desee, el cliente calcula el puerto del mismo modo. Por lo que si un equipo ejecuta varios servidores de juego con distintas versiones de protocolos, debería poder acceder automáticamente al servidor de juego correcto. No obstante, el servidor de juego y el cliente se asegurarán de que sus versiones sean compatibles, o le mostrarán una advertencia en caso contrario. </para
+>. La versión del protocolo es el número de puerto. Para &kajongg; 17.04 es 8301. Si el jugador no introduce ningún puerto para el servidor de juego, el cliente calcula el puerto del mismo modo. Por lo que si un equipo ejecuta varios servidores de juego con distintas versiones de protocolos, deberías poder acceder automáticamente al servidor de juego correcto. No obstante, el servidor de juego y el cliente se asegurarán de que sus versiones sean compatibles, o mostrarán una advertencia en caso contrario. </para
 ><para
->Si encuentra posibles errores, puede que desee usar la opción <command
+>Si encuentras errores, puede que quieras usar la opción <command
 >kajongg --debug=traffic</command
->. Esto le mostrará, en la consola donde se ha iniciado el servidor, qué mensajes están circulando entre el servidor de juegos y los clientes. Para más opciones, consulte <command
+>. Esto mostrará, en la consola donde se ha iniciado el servidor, los mensajes que están circulando entre el servidor de juegos y los clientes. Para más opciones, consulta <command
 >kajongg --help</command
 >. </para>
         <sect2 id="playing-caveats">
@@ -474,7 +474,7 @@
             <itemizedlist
 ><listitem
 ><para
->Si desea asegurarse de que nadie pueda hacer trampas, ninguno de los jugadores humanos deberían tener acceso a la máquina donde está funcionando el servidor de juegos. Por supuesto, no podrá evitar que dos jugadores se ayuden el uno al otro, porque no puede saber qué están haciendo. Dos jugadores pueden ser incluso la misma persona. </para
+>Si quieres asegurarte de que nadie pueda hacer trampas, ninguno de los jugadores humanos debería tener acceso a la máquina donde está funcionando el servidor de juegos. Por supuesto, no podrás evitar que dos jugadores se ayuden el uno al otro, porque no puedes saber qué están haciendo. Dos jugadores pueden ser incluso la misma persona. </para
 ></listitem
 ></itemizedlist>
         </sect2>
@@ -491,7 +491,7 @@
   <para
 >Como el programa &kajongg; sabe cómo jugar, esta descripción solo contiene cosas que pueden no ser obvias.</para>
   <para
->Si quiere aprender Mah Jong con más detalle, por favor consulte la <link linkend="bibliography"
+>Si quieres aprender Mah Jong con más detalle, consulta la <link linkend="bibliography"
 >bibliografía</link
 >.</para>
 <sect2 id="gamerules-aim">
@@ -937,7 +937,7 @@
 ><guimenu
 >Preferencias</guimenu
 > <guimenuitem
-> Configurar &kajongg;...</guimenuitem
+> Configurar &kajongg;…</guimenuitem
 ></menuchoice
 > abre el diálogo <guilabel
 > Configurar - &kajongg;</guilabel
@@ -1059,7 +1059,7 @@
 >Voces predefinidas para cada idioma. Se encuentran en un directorio como <filename class="directory"
 >/usr/share/kajongg/voices/LANG</filename
 >, donde LANG es el código de su idioma. Los directorios de voces directamente bajo <filename class="directory"
->.../kajongg/voices/</filename
+>…/kajongg/voices/</filename
 > son las versiones en inglés de Estados Unidos. Las voces predefinidas se asignan aleatoriamente a los jugadores. Esas voces tienen nombres como <literal
 >«varón1 varón2 mujer1 mujer2»</literal
 >, pero esos nombres no importan; el usuario nunca los ve. </para
