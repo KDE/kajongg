@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-03-07 00:39+0000\n"
-"PO-Revision-Date: 2025-08-29 20:39+0900\n"
+"PO-Revision-Date: 2025-09-25 01:53+0900\n"
 "Last-Translator: Kisaragi Hiu <mail@kisaragi-hiu.com>\n"
 "Language-Team: Traditional Chinese <zh-l10n@lists.slat.org>\n"
 "Language: zh_TW\n"
@@ -1056,10 +1056,8 @@ msgid "The hand contains too many tiles"
 msgstr "相公啦，張數太多"
 
 #: src/predefined.py:109
-#, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
-msgstr "屁胡"
+msgstr "手中的牌張"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
