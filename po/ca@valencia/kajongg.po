@@ -273,7 +273,7 @@ msgstr "Inicia en mode demostració"
 
 #: src/kajongg.py:87
 msgid "login to HOST"
-msgstr "connecta amb el SERVIDOR"
+msgstr "connecta amb l'AMFITRIÓ"
 
 #: src/kajongg.py:88
 msgid "start new TABLE"
@@ -936,7 +936,7 @@ msgstr "El jugador %1 ja existix"
 
 #: src/playerlist.py:121
 msgid "Error while adding player %1: %2"
-msgstr "S'ha produït un error en afegir el jugador %1: %2"
+msgstr "S'ha produït un error mentre s'afegia el jugador %1: %2"
 
 #: src/playerlist.py:176
 msgid ""
