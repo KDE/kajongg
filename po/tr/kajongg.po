@@ -13,15 +13,15 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-11-17 11:49+0000\n"
-"PO-Revision-Date: 2025-10-03 10:10+0300\n"
-"Last-Translator: Emir SARI <emir_sari@îcloud.com>\n"
+"PO-Revision-Date: 2025-12-23 11:35+0300\n"
+"Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 25.08.1\n"
+"X-Generator: Lokalize 25.12.0\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -1674,7 +1674,7 @@ msgstr "Yerel Oyun"
 
 #: src/query.py:430
 msgid "Database %1 updated from schema %2 to %3"
-msgstr "%1 veritabanı %2 şemasından %3 şemasına güncellendi"
+msgstr "%1 veri tabanı %2 şemasından %3 şemasına güncellendi"
 
 #: src/rule.py:49 src/scoringdialog.py:703 src/scoringdialog.py:782
 msgid "points"
@@ -2003,7 +2003,7 @@ msgstr "sunucu YUVA üstünde dinleme yapacak"
 
 #: src/server.py:443
 msgid "name of the database"
-msgstr "veritabanı adı"
+msgstr "veri tabanı adı"
 
 #: src/server.py:447
 msgid "do not terminate local game server after last client disconnects"
