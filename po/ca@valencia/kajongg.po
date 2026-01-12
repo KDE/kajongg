@@ -273,7 +273,7 @@ msgstr "Inicia en mode demostració"
 
 #: src/kajongg.py:87
 msgid "login to HOST"
-msgstr "connecta amb el SERVIDOR"
+msgstr "connecta amb l'AMFITRIÓ"
 
 #: src/kajongg.py:88
 msgid "start new TABLE"
