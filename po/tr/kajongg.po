@@ -2370,33 +2370,3 @@ msgstr "İstemci sürümünüz 4.9.0’dan daha eski, bu sunucu için %1 gerekiy
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "İstemci sürümünüz %1, bu sunucu için %2 gerekiyor"
-
-#~ msgid "License Agreement"
-#~ msgstr "Lisans Antlaşması"
-
-#~ msgid "play only ROUNDS rounds per game. Only for debugging!"
-#~ msgstr "oyun başına yalnızca EL el oyna. Yalnızca hata ayıklama için!"
-
-#~ msgid "unrecognized arguments:%1"
-#~ msgstr "tanınmayan değişkenler:%1"
-
-#~ msgid "Not using broken Python KDE bindings"
-#~ msgstr "Python KDE bağıntıları kullanılmıyor"
-
-#~ msgid "This player cannot be deleted. There are games associated with %1."
-#~ msgstr "Bu oyuncu silinemez. %1 ile ilişkilendirilmiş oyunlar var."
-
-#, fuzzy
-#~| msgid "Wolfgang Rohdewald"
-#~ msgid "(C) 2008-2016 Wolfgang Rohdewald"
-#~ msgstr "Wolfgang Rohdewald"
-
-#~ msgid "Wolfgang Rohdewald"
-#~ msgstr "Wolfgang Rohdewald"
-
-#~ msgid "Copy"
-#~ msgstr "Kopyala"
-
-#~ msgctxt "Kajongg ruleset comparer"
-#~ msgid "Compare"
-#~ msgstr "Karşılaştır"
