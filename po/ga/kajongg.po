@@ -32,39 +32,29 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr ""
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
-msgstr "Réamhamharc"
+msgstr ""
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
-msgstr "Airíonna"
+msgstr ""
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
-msgstr "Údar:"
+msgstr ""
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
-msgstr "Teagmháil:"
+msgstr ""
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
-msgstr "Cur Síos:"
+msgstr ""
 
 #: src/board.py:335
 msgctxt "kajongg:arrow keys hjkl like in konqueror"
@@ -163,11 +153,9 @@ msgid "Rule"
 msgstr ""
 
 #: src/differ.py:127
-#, fuzzy
-#| msgid "Compare"
 msgctxt "@title:window"
 msgid "Compare"
-msgstr "Cuir i gComparáid"
+msgstr ""
 
 #: src/differ.py:170 src/differ.py:172
 msgctxt "Kajongg-Rule"
@@ -195,12 +183,9 @@ msgid "Started"
 msgstr "Tosaithe"
 
 #: src/games.py:107
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Games"
 msgctxt "@title:window"
 msgid "Games"
-msgstr "Cluichí"
+msgstr ""
 
 #: src/games.py:124
 msgctxt "start a new game"
@@ -327,11 +312,8 @@ msgid ""
 msgstr ""
 
 #: src/kdestub.py:278
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "OK"
 msgid "&OK"
-msgstr "OK"
+msgstr ""
 
 #: src/kdestub.py:279
 msgid "&Apply"
@@ -350,53 +332,38 @@ msgid "&Defaults"
 msgstr ""
 
 #: src/kdestub.py:352
-#, fuzzy
-#| msgid "Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
-msgstr "Barra Uirlisí"
+msgstr ""
 
 #: src/kdestub.py:358
-#, fuzzy
-#| msgid "Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
-msgstr "Barra Uirlisí"
+msgstr ""
 
 #: src/kdestub.py:364
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Quit Kajongg"
 msgid "Configure Tool&bars..."
-msgstr "&Scoir ó Kajongg"
+msgstr ""
 
 #: src/kdestub.py:366
 msgid "Configure toolbars"
 msgstr ""
 
 #: src/kdestub.py:373
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Quit Kajongg"
 msgid "Configure &Kajongg..."
-msgstr "&Scoir ó Kajongg"
+msgstr ""
 
 #: src/kdestub.py:375 src/kdestub.py:1153
 msgid "Configure"
 msgstr ""
 
 #: src/kdestub.py:465
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Game"
 msgid "&Game"
-msgstr "Cluiche"
+msgstr ""
 
 #: src/kdestub.py:466
-#, fuzzy
-#| msgid "View"
 msgid "&View"
-msgstr "Amharc"
+msgstr ""
 
 #: src/kdestub.py:467
 msgid "&Settings"
@@ -412,12 +379,9 @@ msgid "Switch Application Language"
 msgstr ""
 
 #: src/kdestub.py:484
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Quit Kajongg"
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
-msgstr "&Scoir ó Kajongg"
+msgstr ""
 
 #: src/kdestub.py:862
 msgid "Please choose the language which should be used for this application:"
@@ -436,10 +400,8 @@ msgid "Fallback language:"
 msgstr ""
 
 #: src/kdestub.py:899
-#, fuzzy
-#| msgid "R&emove"
 msgid "Remove"
-msgstr "B&ain"
+msgstr ""
 
 #: src/kdestub.py:903
 msgid ""
@@ -454,11 +416,8 @@ msgid ""
 msgstr ""
 
 #: src/kdestub.py:1035
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Quit Kajongg"
 msgid "About Kajongg"
-msgstr "&Scoir ó Kajongg"
+msgstr ""
 
 #: src/kdestub.py:1055
 msgid "Version: %1"
@@ -494,10 +453,8 @@ msgid ""
 msgstr ""
 
 #: src/kdestub.py:1115
-#, fuzzy
-#| msgid "Author:"
 msgid "Authors:"
-msgstr "Údar:"
+msgstr ""
 
 #: src/kdestub.py:1356
 msgid "Configure Toolbars"
@@ -524,11 +481,9 @@ msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
 msgstr ""
 
 #: src/login.py:251
-#, fuzzy
-#| msgid "Login"
 msgctxt "kajongg"
 msgid "Login"
-msgstr "Logáil isteach"
+msgstr ""
 
 #: src/login.py:300 src/login.py:406
 msgid "Game server:"
@@ -590,12 +545,9 @@ msgid "Please try again"
 msgstr ""
 
 #: src/mainwindow.py:486
-#, fuzzy
-#| msgctxt "@info:tooltip"
-#| msgid "Start a new game."
 msgctxt "@action:inmenu"
 msgid "&Score Manual Game"
-msgstr "Tosaigh cluiche nua."
+msgstr ""
 
 #: src/mainwindow.py:488
 msgctxt "@action:intoolbar"
@@ -603,12 +555,9 @@ msgid "Manual Game"
 msgstr ""
 
 #: src/mainwindow.py:491
-#, fuzzy
-#| msgctxt "@info:tooltip"
-#| msgid "Start a new game."
 msgctxt "kajongg @info:tooltip"
 msgid "&Score a manual game."
-msgstr "Tosaigh cluiche nua."
+msgstr ""
 
 #: src/mainwindow.py:493
 msgctxt "@action:intoolbar"
@@ -616,20 +565,14 @@ msgid "&Play"
 msgstr "&Imir"
 
 #: src/mainwindow.py:496
-#, fuzzy
-#| msgctxt "@info:tooltip"
-#| msgid "Start a new game."
 msgctxt "kajongg @info:tooltip"
 msgid "Start a new game."
-msgstr "Tosaigh cluiche nua."
+msgstr ""
 
 #: src/mainwindow.py:498
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Abort Game"
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
-msgstr "&Tobscoir an Cluiche"
+msgstr ""
 
 #: src/mainwindow.py:502
 msgctxt "kajongg @info:tooltip"
@@ -637,12 +580,9 @@ msgid "Abort the current game."
 msgstr ""
 
 #: src/mainwindow.py:504
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Quit Kajongg"
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
-msgstr "&Scoir ó Kajongg"
+msgstr ""
 
 #: src/mainwindow.py:507
 msgctxt "@action:intoolbar"
@@ -655,11 +595,9 @@ msgid "define your players."
 msgstr ""
 
 #: src/mainwindow.py:512
-#, fuzzy
-#| msgid "Ruleset"
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
-msgstr "Tacar rialacha"
+msgstr ""
 
 #: src/mainwindow.py:515
 msgctxt "kajongg @info:tooltip"
@@ -687,12 +625,9 @@ msgid "F&ull Screen Mode"
 msgstr ""
 
 #: src/mainwindow.py:530
-#, fuzzy
-#| msgctxt "kajongg @action:intoolbar"
-#| msgid "&Scores"
 msgctxt "kajongg @action:inmenu"
 msgid "&Score Table"
-msgstr "&Scóir"
+msgstr ""
 
 #: src/mainwindow.py:532
 msgctxt "kajongg @action:intoolbar"
@@ -705,12 +640,9 @@ msgid "Show or hide the score table for the current game."
 msgstr ""
 
 #: src/mainwindow.py:536
-#, fuzzy
-#| msgctxt "@action:inmenu"
-#| msgid "&Explain Scores"
 msgctxt "@action:inmenu"
 msgid "&Explain Scores"
-msgstr "&Mínigh na Scóir"
+msgstr ""
 
 #: src/mainwindow.py:537
 msgctxt "@action:intoolbar"
@@ -813,19 +745,14 @@ msgid "Press here and you win"
 msgstr ""
 
 #: src/message.py:401
-#, fuzzy
-#| msgid "Original author"
 msgctxt "kajongg"
 msgid "Original Call"
-msgstr "An chéad údar"
+msgstr ""
 
 #: src/message.py:402
-#, fuzzy
-#| msgctxt "kajongg game dialog:Key for OK"
-#| msgid "O"
 msgctxt "kajongg game dialog:Key for Original Call"
 msgid "O"
-msgstr "O"
+msgstr ""
 
 #: src/message.py:418
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
@@ -860,10 +787,8 @@ msgid "discard the least useful tile"
 msgstr ""
 
 #: src/message.py:551
-#, fuzzy
-#| msgid "Do you really want to abort this game?"
 msgid "%1 is not ready to start the game"
-msgstr "An bhfuil tú cinnte gur mian leat an cluiche seo a scor?"
+msgstr ""
 
 #: src/message.py:590
 msgid "Kajongg <numid>%1</numid>"
@@ -885,12 +810,9 @@ msgid "No Choice"
 msgstr ""
 
 #: src/message.py:896
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "OK"
 msgctxt "kajongg"
 msgid "OK"
-msgstr "OK"
+msgstr ""
 
 #: src/message.py:897
 msgctxt "kajongg game dialog:Key for OK"
@@ -925,10 +847,8 @@ msgid "cannot find %1, using default"
 msgstr ""
 
 #: src/mjresource.py:131
-#, fuzzy
-#| msgid "Backgrounds"
 msgid "unknown name"
-msgstr "Cúlraí"
+msgstr ""
 
 #: src/mjresource.py:132
 msgid "unknown author"
@@ -1189,10 +1109,8 @@ msgid "Mah Jongg is only allowed after having declared to have a calling hand"
 msgstr ""
 
 #: src/predefined.py:149
-#, fuzzy
-#| msgid "Standard Mah Jongg"
 msgid "Standard Rotation"
-msgstr "Mah Jongg Caighdeánach"
+msgstr ""
 
 #: src/predefined.py:152
 msgid "Discard tiles ordered"
@@ -1706,11 +1624,9 @@ msgid "doubles"
 msgstr ""
 
 #: src/rule.py:51
-#, fuzzy
-#| msgid "limits"
 msgctxt "kajongg"
 msgid "limits"
-msgstr "teorainneacha"
+msgstr ""
 
 #: src/rule.py:91
 msgctxt "Kajongg"
@@ -1820,17 +1736,13 @@ msgid "C&opy"
 msgstr ""
 
 #: src/rulesetselector.py:593
-#, fuzzy
-#| msgid "Compare"
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
-msgstr "Cuir i gComparáid"
+msgstr ""
 
 #: src/rulesetselector.py:594
-#, fuzzy
-#| msgid "R&emove"
 msgid "&Remove"
-msgstr "B&ain"
+msgstr ""
 
 #: src/rulesetselector.py:595
 msgid "&Close"
@@ -1858,11 +1770,9 @@ msgid "&Keep seat"
 msgstr ""
 
 #: src/scoring.py:85
-#, fuzzy
-#| msgid "Select a ruleset"
 msgctxt "@title:window"
 msgid "Select four players"
-msgstr "Roghnaigh tacar rialacha"
+msgstr ""
 
 #: src/scoring.py:360
 msgid "Move Exposed Tiles Here"
@@ -1919,11 +1829,9 @@ msgid "Scores for game <numid>%1</numid>"
 msgstr ""
 
 #: src/scoringdialog.py:569
-#, fuzzy
-#| msgid "Explain Scores"
 msgctxt "@title:window"
 msgid "Explain Scores"
-msgstr "Mínigh Scóir"
+msgstr ""
 
 #: src/scoringdialog.py:585
 msgid "There is no active game"
@@ -2004,10 +1912,8 @@ msgid "L&ast Meld:"
 msgstr ""
 
 #: src/server.py:122
-#, fuzzy
-#| msgid "Password"
 msgid "Wrong password"
-msgstr "Focal Faire"
+msgstr ""
 
 #: src/server.py:218
 msgid "table with id <numid>%1</numid> not found"
@@ -2281,22 +2187,16 @@ msgid "North"
 msgstr ""
 
 #: src/tile.py:306
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Wind"
 msgid "East Wind"
-msgstr "Gaoth"
+msgstr ""
 
 #: src/tile.py:307
 msgid "South Wind"
 msgstr ""
 
 #: src/tile.py:308
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Wind"
 msgid "West Wind"
-msgstr "Gaoth"
+msgstr ""
 
 #: src/tile.py:309
 msgid "North Wind"
@@ -2365,39 +2265,29 @@ msgid "{state} {meldType} {name}"
 msgstr ""
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
-msgstr "Réamhamharc"
+msgstr ""
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
-msgstr "Airíonna"
+msgstr ""
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
-msgstr "Údar:"
+msgstr ""
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
-msgstr "Teagmháil:"
+msgstr ""
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
-msgstr "Cur Síos:"
+msgstr ""
 
 #: src/user.py:94
 msgid ""
@@ -2407,65 +2297,3 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
-
-#, fuzzy
-#~| msgid "(C) 2008,2009,2010,2011,2012 Wolfgang Rohdewald"
-#~ msgid "(C) 2008-2016 Wolfgang Rohdewald"
-#~ msgstr "© 2008,2009,2010,2011,2012 Wolfgang Rohdewald"
-
-#~ msgid "Wolfgang Rohdewald"
-#~ msgstr "Wolfgang Rohdewald"
-
-#, fuzzy
-#~| msgid "&Copy"
-#~ msgid "Copy"
-#~ msgstr "&Cóipeáil"
-
-#, fuzzy
-#~| msgid "Compare"
-#~ msgctxt "Kajongg ruleset comparer"
-#~ msgid "Compare"
-#~ msgstr "Cuir i gComparáid"
-
-#~ msgctxt "Player"
-#~ msgid "Name"
-#~ msgstr "Ainm"
-
-#~ msgctxt "@action:intoolbar"
-#~ msgid "&Scoring"
-#~ msgstr "&Scór"
-
-#~ msgctxt "kajongg"
-#~ msgid "own wind"
-#~ msgstr "do ghaoth féin"
-
-#~ msgid "Calling"
-#~ msgstr "Ag Glao"
-
-#~ msgid "&Quit"
-#~ msgstr "&Scoir"
-
-#~ msgctxt "Rulesetselector"
-#~ msgid "Score"
-#~ msgstr "Scór"
-
-#~ msgctxt "Rulesetselector"
-#~ msgid "Definition"
-#~ msgstr "Sainmhíniú"
-
-#~ msgid "Payer pays"
-#~ msgid_plural "Payers pay"
-#~ msgstr[0] "Íocann imreoir"
-#~ msgstr[1] "Íocann imreoirí"
-#~ msgstr[2] "Íocann imreoirí"
-#~ msgstr[3] "Íocann imreoirí"
-#~ msgstr[4] "Íocann imreoirí"
-
-#~ msgid "General"
-#~ msgstr "Ginearálta"
-
-#~ msgid "&Insert"
-#~ msgstr "&Ionsáigh"
-
-#~ msgid "Score:"
-#~ msgstr "Scór:"
