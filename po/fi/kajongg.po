@@ -1,6 +1,6 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
-# SPDX-FileCopyrightText: 2011, 2014, 2015, 2016, 2018, 2021, 2023, 2024 Tommi Nieminen <translator@legisign.org>
+# SPDX-FileCopyrightText: 2011, 2014, 2015, 2016, 2018, 2021, 2023, 2024, 2026 Tommi Nieminen <translator@legisign.org>
 # Lasse Liehu <lasse.liehu@gmail.com>, 2012, 2013, 2014.
 #
 # KDE Finnish translation sprint participants:
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-11-17 14:39+0000\n"
-"PO-Revision-Date: 2024-12-14 20:58+0200\n"
+"PO-Revision-Date: 2026-02-09 12:44+0200\n"
 "Last-Translator: Tommi Nieminen <translator@legisign.org>\n"
 "Language-Team: Finnish <kde-i18n-doc@kde.org>\n"
 "Language: fi\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 23.08.5\n"
+"X-Generator: Lokalize 25.04.0\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -103,11 +103,11 @@ msgstr "Uusi"
 
 #: src/configdialog.py:47
 msgid "Show tile shadows"
-msgstr "Näytä tiilien varjot"
+msgstr "Näytä laattojen varjot"
 
 #: src/configdialog.py:50
 msgid "Rearrange undisclosed tiles to melds"
-msgstr "Järjestä paljastamattomat tiilet sarjoiksi"
+msgstr "Järjestä paljastamattomat laatat sarjoiksi"
 
 #: src/configdialog.py:53
 msgid "Show only possible actions"
@@ -136,7 +136,7 @@ msgstr "Pelaa"
 
 #: src/configdialog.py:106
 msgid "Tiles"
-msgstr "Tiilet"
+msgstr "Laatat"
 
 #: src/configdialog.py:109
 msgid "Backgrounds"
@@ -179,7 +179,7 @@ msgstr "Pelaajaa %1 ei tunneta"
 
 #: src/game.py:925
 msgid "Short living wall: Tile is invisible, hence dangerous"
-msgstr "Lyhyt elävä muuri: tiili on näkymätön ja siten vaarallinen"
+msgstr "Lyhyt elävä muuri: laatta on näkymätön ja siten vaarallinen"
 
 #: src/games.py:95 src/playerlist.py:67 src/tables.py:67
 msgid "Players"
@@ -639,7 +639,7 @@ msgstr "Kulma"
 #: src/mainwindow.py:523
 msgctxt "kajongg @info:tooltip"
 msgid "Change the visual appearance of the tiles."
-msgstr "Muuta tiilien ulkoasua."
+msgstr "Muuta laattojen ulkoasua."
 
 #: src/mainwindow.py:527
 msgctxt "@action:inmenu"
@@ -706,7 +706,7 @@ msgstr "on vastoin alkuperäistä huutoa sanoa %1"
 msgid ""
 "claiming %1 is dangerous because you will have to discard a dangerous tile"
 msgstr ""
-"on vaarallista huutaa %1, koska joutuisit hylkäämään vaarallisen tiilen"
+"on vaarallista huutaa %1, koska joutuisit hylkäämään vaarallisen laatan"
 
 #: src/message.py:268
 msgid ""
@@ -714,7 +714,7 @@ msgid ""
 "tile"
 msgstr ""
 "on vaarallista huutaa %1 tilanteessa %2, koska joutuisit hylkäämään "
-"vaarallisen tiilen"
+"vaarallisen laataan"
 
 #: src/message.py:271
 msgid "You may say %1"
@@ -744,11 +744,11 @@ msgstr "K"
 
 #: src/message.py:326
 msgid "saying Kong for %1 violates Original Call"
-msgstr "gangin huutaminen tiilelle on vastoin alkuperäistä huutoa: %1"
+msgstr "gangin huutaminen laatalle on vastoin alkuperäistä huutoa: %1"
 
 #: src/message.py:330
 msgid "You may say Kong for %1"
-msgstr "Voit huutaa gangin tiilelle %1"
+msgstr "Voit huutaa gangin laatalle %1"
 
 # fi.wikipedia.org s.v. mahjongg: chi (吃 chī tai 上 shàng; ent. chow; tsao, jap. chi)
 #: src/message.py:344
@@ -788,7 +788,7 @@ msgstr "A"
 #: src/message.py:418
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
 msgstr ""
-"tiilen %1 hylkääminen ja alkuperäisen huudon esittäminen tekee pelin "
+"laatan %1 hylkääminen ja alkuperäisen huudon esittäminen tekee pelin "
 "mahdottomaksi voittaa"
 
 #: src/message.py:422
@@ -796,9 +796,9 @@ msgid ""
 "Discard a tile, declaring Original Call meaning you need only one tile to "
 "complete the hand and will not alter the hand in any way (except bonus tiles)"
 msgstr ""
-"Tiilen hylkääminen alkuperäisellä huudolla tarkoittaa, että tarvitset vain "
-"yhden tiilen täydentämään kätesi eikä kättä tarvitse mitenkään muuttaa "
-"(bonustiiliä lukuun ottamatta)"
+"Laatan hylkääminen alkuperäisellä huudolla tarkoittaa, että tarvitset vain "
+"yhden laatan täydentämään kätesi eikä kättä tarvitse mitenkään muuttaa "
+"(bonuslaattoja lukuun ottamatta)"
 
 #: src/message.py:447
 msgctxt "kajongg"
@@ -812,15 +812,15 @@ msgstr "H"
 
 #: src/message.py:465
 msgid "discarding %1 violates Original Call"
-msgstr "tiilen %1 hylkääminen on vastoin alkuperäistä huutoa"
+msgstr "laatan %1 hylkääminen on vastoin alkuperäistä huutoa"
 
 #: src/message.py:468
 msgid "discarding %1 is Dangerous Game"
-msgstr "tiilen %1 hylkääminen on vaarallista peliä"
+msgstr "laatan %1 hylkääminen on vaarallista peliä"
 
 #: src/message.py:471
 msgid "discard the least useful tile"
-msgstr "hylkää vähiten hyödyllinen tiili"
+msgstr "hylkää vähiten hyödyllinen laatta"
 
 #: src/message.py:551
 msgid "%1 is not ready to start the game"
@@ -871,7 +871,7 @@ msgstr "E"
 
 #: src/message.py:914
 msgid "You cannot or do not want to claim this tile"
-msgstr "Et voi etkä halua huutaa tätä tiiltä"
+msgstr "Et voi etkä halua huutaa tätä laattaa"
 
 #: src/mjresource.py:92
 msgid ""
@@ -900,12 +900,12 @@ msgstr "sähköpostiosoitetta ei saatavilla"
 
 #: src/player.py:725
 msgid "%1 claiming MahJongg: She does not really have tile %2"
-msgstr "%1 huutaa MahJongg: hänellä ei oikeasti ole tiiltä %2"
+msgstr "%1 huutaa MahJongg: hänellä ei oikeasti ole laattaa %2"
 
 #: src/player.py:734
 msgid ""
 "%1 claiming MahJongg: She did not pass all concealed tiles to the server"
-msgstr "%1 huutaa MahJongg: hän ei välittänyt kaikkia piilotiiliä palvelimelle"
+msgstr "%1 huutaa MahJongg: ei välittänyt kaikkia piilolaattoja palvelimelle"
 
 #: src/player.py:855
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
@@ -918,7 +918,7 @@ msgstr "Pelaaja %1 voi yrittää tosiväripeliä"
 # Suomenkielinen Wikipedia mainitsee päätytiilet vain ohimennen mutta merkitys selvä
 #: src/player.py:866
 msgid "Player %1 may try an All Terminals Game"
-msgstr "Pelaaja %1 voi yrittää kaikkien päätytiilten peliä"
+msgstr "Pelaaja %1 voi yrittää kaikkien päätylaattojen peliä"
 
 #: src/player.py:879
 msgid "Player %1 exposed many winds"
@@ -959,28 +959,28 @@ msgstr "Perinteinen kiinalainen"
 
 #: src/predefined.py:41
 msgid "Last Tile Taken from Dead Wall"
-msgstr "Viimeinen tiili otetaan kuolleesta muurista"
+msgstr "Viimeinen laattaa otetaan kuolleesta muurista"
 
 #: src/predefined.py:43
 msgid ""
 "The dead wall is also called kong box: The last 16 tiles of the wall used as "
 "source of replacement tiles"
 msgstr ""
-"Kuollutta muuria kutsutaan myös gang-sarjaksi: muurin 16:ta viimeistä tiiltä "
-"käytetään korvaustiilten lähteenä."
+"Kuollutta muuria kutsutaan myös gang-sarjaksi: muurin 16:ta viimeistä "
+"laattaa käytetään korvauslaattojen lähteenä."
 
 #: src/predefined.py:46
 msgid "Last Tile is Last Tile of Wall"
-msgstr "Viimeinen tiili on muurin viimeinen tiili"
+msgstr "Viimeinen laatta on muurin viimeinen laatta"
 
 #: src/predefined.py:48
 msgid ""
 "Winner said Mah Jong with the last tile taken from the living end of the wall"
-msgstr "Voittaja huutaa Mah Jong muurin elävän pään viimeisellä tiilellä"
+msgstr "Voittaja huutaa Mah Jong muurin elävän pään viimeisellä laatalla"
 
 #: src/predefined.py:50
 msgid "Last Tile is Last Tile of Wall Discarded"
-msgstr "Viimeinen tiili on hylätyn muurin viimeinen tiili"
+msgstr "Viimeinen laatta on hylätyn muurin viimeinen laatta"
 
 #: src/predefined.py:52
 msgid ""
@@ -988,7 +988,7 @@ msgid ""
 "the wall, discarded by another player"
 msgstr ""
 "Voittaja huutaa Mah Jong vaatimalla toisen pelaajan hylkäämän muurin elävän "
-"pään viimeisen tiilen"
+"pään viimeisen laatan"
 
 #: src/predefined.py:55
 msgid "Robbing the Kong"
@@ -1000,7 +1000,7 @@ msgid ""
 "declared"
 msgstr ""
 "Voittaja huutaa Mah Jong vaatimalla toisen pelaajan juuri huutaman gangin "
-"neljännen tiilen"
+"neljännen laatan"
 
 #: src/predefined.py:59
 msgid "Mah Jongg with Original Call"
@@ -1012,9 +1012,9 @@ msgid ""
 "she needs only one tile to complete the hand and announces she will not "
 "alter the hand in any way (except bonus tiles)"
 msgstr ""
-"Juuri ennen ensi hylkäystä pelaaja voi esittää alkuperäisen huudon, mikä "
-"tarkoittaa, että hän tarvitsee vain yhden tiilen täydentämään kätensä eikä "
-"kättä tarvitse muuttaa mitenkään (bonustiiliä lukuun ottamatta)"
+"Juuri ennen ensi hylkäystä pelaaja voi esittää alkuperäisen huudon, jolloin "
+"hän tarvitsee vain yhden laatan täydentääkseen kätensä, eikä kättä tarvitse "
+"muuttaa mitenkään (bonuslaattoja lukuun ottamatta)"
 
 #: src/predefined.py:65
 msgid "Dangerous Game"
@@ -1026,8 +1026,8 @@ msgid ""
 "to win is declared to be dangerous, and if that tile actually makes somebody "
 "win, the discarder pays the winner for all"
 msgstr ""
-"Joissakin tilanteissa voi väittää olevan vaarallista hylätä tiili, joka "
-"saattaa auttaa jotakuta voittamaan. Jos tiili todella auttaa jotakuta "
+"Joissakin tilanteissa voi väittää olevan vaarallista hylätä laatta, joka "
+"saattaa auttaa jotakuta voittamaan. Jos laatta todella auttaa jotakuta "
 "voittamaan, sen hylkääjä maksaa voittajalle kaikkien puolesta"
 
 #: src/predefined.py:70
@@ -1039,8 +1039,8 @@ msgid ""
 "Kong after Kong: Declare Kong and a second Kong with the replacement tile "
 "and Mah Jong with the second replacement tile"
 msgstr ""
-"Gang gangin jälkeen: huuda gang, toinen gang korvaavalla tiilellä ja Mah "
-"Jong toisella korvaavalla tiilellä"
+"Gang gangin jälkeen: huuda gang, toinen gang korvaavalla laatalla ja Mah "
+"Jong toisella korvaavalla laatalla"
 
 #: src/predefined.py:75
 msgid "Blessing of Heaven"
@@ -1048,7 +1048,7 @@ msgstr "Taivaan siunaus"
 
 #: src/predefined.py:76
 msgid "East says Mah Jong with the unmodified dealt tiles"
-msgstr "Itä huutaa Mah Jong muokkaamattomilla jaetuilla tiilillä"
+msgstr "Itä huutaa Mah Jong muokkaamattomilla jaetuilla laatoilla"
 
 #: src/predefined.py:78
 msgid "Blessing of Earth"
@@ -1059,7 +1059,7 @@ msgid ""
 "South, West or North says Mah Jong with the first tile discarded by East"
 msgstr ""
 "Etelä, länsi tai pohjoinen huutaa Mah Jong ensimmäisellä idän hylkäämällä "
-"tiilellä"
+"laatalla"
 
 #: src/predefined.py:81
 msgid "East won nine times in a row"
@@ -1097,13 +1097,11 @@ msgstr "Pitkä käsi"
 
 #: src/predefined.py:104
 msgid "The hand contains too many tiles"
-msgstr "Kädessä on liian monta tiiltä"
+msgstr "Kädessä on liian monta laattaa"
 
 #: src/predefined.py:109
-#, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
-msgstr "Nollan pisteen käsi"
+msgstr "Laatat kädessä"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1135,15 +1133,15 @@ msgstr "Gang-sarjan koko"
 
 #: src/predefined.py:133
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
-msgstr "Gang-sarja käytetään korvaustiiliksi gangien huutamisen jälkeen"
+msgstr "Gang-sarja käytetään korvauslaatoiksi gangien huutamisen jälkeen"
 
 #: src/predefined.py:135
 msgid "Play with Bonus Tiles"
-msgstr "Pelaa bonustiilillä"
+msgstr "Pelaa bonuslaatalla"
 
 #: src/predefined.py:136
 msgid "Bonus tiles increase the luck factor"
-msgstr "Bonustiilet lisäävät onnitekijää"
+msgstr "Bonuslaatat lisäävät sattuman mahdollisuutta"
 
 #: src/predefined.py:138
 msgid "Minimum number of rounds in game"
@@ -1179,7 +1177,7 @@ msgstr ""
 
 #: src/predefined.py:156
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Jätä aukot huudetuille hylkäyksille"
 
 #: src/predefined.py:159
 msgid ""
@@ -1189,19 +1187,19 @@ msgstr ""
 
 #: src/predefined.py:168
 msgid "Last Tile Completes Pair of 2..8"
-msgstr "Viimeinen tiili täydentää 2…8-parin"
+msgstr "Viimeinen laatta täydentää 2…8-parin"
 
 #: src/predefined.py:172
 msgid "Last Tile Completes Pair of Terminals or Honors"
-msgstr "Viimeinen tili täydentää pääty- tai arvotiiliparin"
+msgstr "Viimeinen laatta täydentää pääty- tai arvolaattaparin"
 
 #: src/predefined.py:175
 msgid "Last Tile is Only Possible Tile"
-msgstr "Viimeinen tiili on ainoa mahdollinen"
+msgstr "Viimeinen laatta on ainoa mahdollinen"
 
 #: src/predefined.py:179
 msgid "Won with Last Tile Taken from Wall"
-msgstr "Voitto, viimeinen tiili otettu muurista"
+msgstr "Voitto, viimeinen laatta otettu muurista"
 
 #: src/predefined.py:184
 msgid "Zero Point Hand"
@@ -1209,7 +1207,7 @@ msgstr "Nollan pisteen käsi"
 
 #: src/predefined.py:185
 msgid "The hand has 0 basis points excluding bonus tiles"
-msgstr "Kädellä on 0 peruspistettä bonustiilet pois lukien"
+msgstr "Kädellä on 0 peruspistettä bonuslaatat pois lukien"
 
 #: src/predefined.py:186
 msgid "No Chow"
@@ -1228,7 +1226,7 @@ msgid ""
 "Only same-colored tiles (only bamboo/stone/character) plus any number of "
 "winds and dragons"
 msgstr ""
-"Vain samanväriset tiilet (vain bambu/kivi/merkit) sekä miten monta tahansa "
+"Vain samanväriset laatat (vain bambu/kivi/merkit) sekä miten monta tahansa "
 "tuulta ja lohikäärmettä"
 
 #: src/predefined.py:196
@@ -1237,7 +1235,7 @@ msgstr "Tosiväripeli"
 
 #: src/predefined.py:197
 msgid "Only same-colored tiles (only bamboo/stone/character)"
-msgstr "Vain samanväriset tiilet (vain bambu/kivi/merkit)"
+msgstr "Vain samanväriset laatat (vain bambu/kivi/merkit)"
 
 #: src/predefined.py:199
 msgid "Concealed True Color Game"
@@ -1245,11 +1243,11 @@ msgstr "Piilotettu tosiväripeli"
 
 #: src/predefined.py:200
 msgid "All tiles concealed and of the same suit, no honors"
-msgstr "Kaikki tiilet piilossa ja samaa maata, ei arvotiiliä"
+msgstr "Kaikki laatat piilossa ja samaa maata, ei arvolaattoja"
 
 #: src/predefined.py:202
 msgid "Only Terminals and Honors"
-msgstr "Vain pääty- tai arvotiilet"
+msgstr "Vain pääty- tai arvolaatat"
 
 #: src/predefined.py:203
 msgid "Only winds, dragons, 1 and 9"
@@ -1257,7 +1255,7 @@ msgstr "Vain tuulet, lohikäärmeet, 1 ja 9"
 
 #: src/predefined.py:204
 msgid "Only Honors"
-msgstr "Vain arvotiilet"
+msgstr "Vain arvolaatat"
 
 #: src/predefined.py:205
 msgid "Only winds and dragons"
@@ -1269,7 +1267,7 @@ msgstr "Kätketty aarre"
 
 #: src/predefined.py:208
 msgid "Only hidden Pungs or Kongs, last tile from wall"
-msgstr "Vain piilo-pengit tai -gangit, muurin viimeinen tiili"
+msgstr "Vain piilo-pengit tai -gangit, muurin viimeinen laatta"
 
 #: src/predefined.py:210
 msgid "Heads and Tails"
@@ -1312,7 +1310,7 @@ msgstr "Keisarillinen jade"
 
 #: src/predefined.py:222
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
-msgstr "Vain vihreät tiilet: Vihreä lohikäärme ja bambu 2, 3, 4, 6, 8"
+msgstr "Vain vihreät laatat: Vihreä lohikäärme ja bambu 2, 3, 4, 6, 8"
 
 #: src/predefined.py:223
 msgid "Gathering the Plum Blossom from the Roof"
@@ -1380,11 +1378,11 @@ msgstr "Avoin gang"
 
 #: src/predefined.py:263
 msgid "Exposed Kong of Terminals"
-msgstr "Päätytiilten avoin gang"
+msgstr "Päätylaattojen avoin gang"
 
 #: src/predefined.py:266
 msgid "Exposed Kong of Honors"
-msgstr "Arvotiilten avoin gang"
+msgstr "Arvolaattojen avoin gang"
 
 #: src/predefined.py:269
 msgid "Exposed Pung"
@@ -1392,11 +1390,11 @@ msgstr "Avoin peng"
 
 #: src/predefined.py:272
 msgid "Exposed Pung of Terminals"
-msgstr "Päätytiilten avoin peng"
+msgstr "Päätylaattojen avoin peng"
 
 #: src/predefined.py:275
 msgid "Exposed Pung of Honors"
-msgstr "Arvotiilten avoin peng"
+msgstr "Arvolaattojen avoin peng"
 
 #: src/predefined.py:279
 msgid "Concealed Kong"
@@ -1404,11 +1402,11 @@ msgstr "Piilotettu gang"
 
 #: src/predefined.py:282
 msgid "Concealed Kong of Terminals"
-msgstr "Päätytiilten piilo-gang"
+msgstr "Päätylaattojen piilo-gang"
 
 #: src/predefined.py:285
 msgid "Concealed Kong of Honors"
-msgstr "Arvotiilten piilo-gang"
+msgstr "Arvolaattojen piilo-gang"
 
 #: src/predefined.py:288
 msgid "Concealed Pung"
@@ -1416,11 +1414,11 @@ msgstr "Piilo-peng"
 
 #: src/predefined.py:291
 msgid "Concealed Pung of Terminals"
-msgstr "Päätytiilten piilo-peng"
+msgstr "Päätylaattojen piilo-peng"
 
 #: src/predefined.py:294
 msgid "Concealed Pung of Honors"
-msgstr "Arvotiilten piilo-peng"
+msgstr "Arvolaattojen piilo-peng"
 
 #: src/predefined.py:297
 msgid "Pair of Own Wind"
@@ -1459,7 +1457,7 @@ msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
 msgstr ""
-"Kaikki tiilet samanvärisiä. Peng tai gang 1:stä ja 9:stä, pari 2:sta, 5:stä "
+"Kaikki laatat samanvärisiä. Peng tai gang 1:stä ja 9:stä, pari 2:sta, 5:stä "
 "ja 8:sta sekä kaksi chi’tä muista arvoista"
 
 #: src/predefined.py:333
@@ -1557,11 +1555,12 @@ msgstr ""
 
 #: src/predefined.py:406
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
-msgstr "7 tiiliparia missä tahansa 2 maassa 3:sta; ei tuulia tai lohikäärmeitä"
+msgstr ""
+"7 laattaparia missä tahansa 2 maassa 3:sta; ei tuulia tai lohikäärmeitä"
 
 #: src/predefined.py:408
 msgid "All pair honors"
-msgstr "Kaikki arvotiiliparit"
+msgstr "Kaikki arvolaattaparit"
 
 #: src/predefined.py:409
 msgid "7 pairs of 1s/9s/Winds/Dragons"
@@ -1589,7 +1588,7 @@ msgstr "Puhtaus"
 
 #: src/predefined.py:428 src/predefined.py:549
 msgid "Only same-colored tiles (no chows, dragons or winds)"
-msgstr "Vain samanväriset tiilet (ei chi’t, lohikäärmeet tai tuulet)"
+msgstr "Vain samanväriset laatat (ei chi’t, lohikäärmeet tai tuulet)"
 
 #: src/predefined.py:431
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
@@ -1663,13 +1662,15 @@ msgstr ""
 
 #: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "Taiwanilainen 16 laatan peli, KEHITTÄJILLE"
 
 #: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"Taiwanilainen 16 laatan mahjong, varhainen alfa. Ks. https://bugs.kde.org/"
+"show_bug.cgi?298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
@@ -1690,11 +1691,9 @@ msgid "doubles"
 msgstr ""
 
 #: src/rule.py:51
-#, fuzzy
-#| msgid "limits"
 msgctxt "kajongg"
 msgid "limits"
-msgstr "erikoiskättä"
+msgstr "rajat"
 
 #: src/rule.py:91
 msgctxt "Kajongg"
@@ -1852,11 +1851,11 @@ msgstr "Valitse neljä pelaajaa"
 
 #: src/scoring.py:360
 msgid "Move Exposed Tiles Here"
-msgstr "Siirrä paljastetut tiilet tänne"
+msgstr "Siirrä paljastetut laatat tänne"
 
 #: src/scoring.py:361
 msgid "Move Concealed Tiles Here"
-msgstr "Siirrä piilotetut tiilet tänne"
+msgstr "Siirrä piilotetut laatat tänne"
 
 #: src/scoring.py:673
 msgid "Please define four players in <interface>Settings|Players</interface>"
@@ -1982,7 +1981,7 @@ msgstr "&Tallenna käsi"
 
 #: src/scoringdialog.py:867
 msgid "&Last Tile:"
-msgstr "&Viimeinen tiili:"
+msgstr "&Viimeinen laatta:"
 
 #: src/scoringdialog.py:876
 msgid "L&ast Meld:"
@@ -2063,7 +2062,7 @@ msgstr "%1 huusi väärin %2 sarjalle %3"
 #: src/servertable.py:735
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
 msgstr ""
-"%1 huusi väärin %2: väittää hänellä olevan piilotiilet %3 mutta on vain %4"
+"%1 huusi väärin %2: väittää hänellä olevan piilolaatat %3 mutta on vain %4"
 
 #: src/servertable.py:772
 #, fuzzy
@@ -2230,7 +2229,7 @@ msgstr "vuodenaika"
 #: src/tile.py:290
 msgctxt "kajongg"
 msgid "tile"
-msgstr "tiili"
+msgstr "laatta"
 
 #: src/tile.py:291
 msgctxt "kajongg"
@@ -2327,7 +2326,7 @@ msgstr "&gang"
 #: src/tile.py:893
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
-msgstr "loput tiilet"
+msgstr "loput laatat"
 
 #: src/tile.py:900
 msgctxt "kajongg meld state"
