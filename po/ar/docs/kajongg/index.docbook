@@ -1,0 +1,1663 @@
+<?xml version="1.0" ?>
+<!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Arabic "INCLUDE"
+> <!-- change language only here -->
+  <!ENTITY % addindex "IGNORE"
+> <!-- do not change this! -->
+  <!ENTITY s1 "s1">
+  <!ENTITY s9 "s9">
+  <!ENTITY b1 "b1">
+  <!ENTITY b9 "b9">
+  <!ENTITY c1 "c1">
+  <!ENTITY c9 "c9">
+  <!ENTITY we "we">
+  <!ENTITY ws "ws">
+  <!ENTITY ww "ww">
+  <!ENTITY wn "wn">
+  <!ENTITY db "db">
+  <!ENTITY dr "dr">
+  <!ENTITY dg "dg">
+  <!ENTITY chow "chow">
+  <!ENTITY pung "pung">
+  <!ENTITY kong "kong">
+  <!ENTITY mahjongg "mahjongg">
+  <!ENTITY originalcall "originalcall">
+  <!ENTITY violatesoriginalcall "violatesoriginalcall">
+  <!ENTITY dangerousgame "dangerousgame">
+  <!ENTITY nochoice "nochoice">
+]>
+
+<!-- TODO: describe the window with the list of tables -->
+
+<book id="kajongg" lang="&language;"
+> <!-- do not change this! -->
+<bookinfo>
+	<title
+>دليل كاجونغ</title
+> <!-- This is the title of this docbook. -->
+<!-- List of immidiate authors begins here. -->
+<!--INPORTANT! - All other contributors: [to be determined] -->
+<authorgroup>
+<author
+>&Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </author>
+<othercredit role="translator"
+><firstname
+>زايد</firstname
+><surname
+>السعيدي</surname
+><affiliation
+><address
+><email
+>zayed.alsaidi@gmail.com</email
+></address
+></affiliation
+><contrib
+>التّرجمة العربيّة</contrib
+></othercredit
+> 
+</authorgroup>
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>2021-05-30</date
+><!-- Date of (re)writing, or update.-->
+<releaseinfo
+>ترس كيدي 21.04</releaseinfo>
+
+<!--Short description of this document. Do not change unless necessary!-->
+<abstract>
+	<para
+>يصف هذا التوثيق لعبة كاجونغ</para>
+</abstract>
+
+<!--List of relevant keywords-->
+<keywordset>
+	<keyword
+>كيدي</keyword
+> <!-- do not change this! -->
+	<keyword
+>ألعاب كيدي</keyword
+> <!-- do not change this! -->
+	<keyword
+>لعبة</keyword
+> <!-- do not change this! -->
+	<keyword
+>كاجونغ</keyword
+><!--Application name goes here-->
+<!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<keyword
+>لوحة</keyword>
+	<keyword
+>أركيد</keyword>
+	<keyword
+>لعبة قطع</keyword>
+	<keyword
+>قطع</keyword>
+<!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<keyword
+>أربعة لاعبين</keyword>
+<!--All other relevant keywords-->
+</keywordset>
+</bookinfo>
+<!--Content begins here: -->
+<chapter id="introduction"
+><title
+>مقدمة</title
+> <!-- do not change this! -->
+	<note
+><title
+>نوع اللعبة:</title
+><para
+>لوحية، أركيد</para
+></note
+><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<note
+><title
+>عدد اللاعبين الممكنين:</title
+><para
+>أربعة</para
+></note
+><!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<para
+>كاجونغ هي لعبة لوحية استُحدثت تيمناً بلعبة الماه جونغ الشرقية الشهيرة (من الصينية <foreignphrase lang="zh"
+>麻將</foreignphrase
+>). يلعبها أربعة لاعبين. تُستخدم مجموعات قواعد مختلفة في جميع أنحاء العالم. تدعم كاجونغ حالياً قواعد اللغة الصينية التقليدية كما تُلعَب في ألمانيا، وستُتبع بمجموعات قواعد رئيسية أخرى لاحقاً. يمكن تخصيص مجموعات القواعد أو إضافة قواعد جديدة؛ لذا يرجى القيام بذلك وإرسالها إلى مؤلف البرنامج لدمجها! </para>
+	<para
+>يمكن استخدام كاجونغ بطريقتين مختلفتين: تسجيل نتائج لعبة يدوية حيث تلعب كالمعتاد دون مساعدة الحاسوب وتستخدم كاجونغ لحساب النتائج وإمساك الدفاتر. أو يمكنك استخدام كاجونغ للعب ضد أي مزيج من اللاعبين البشريين أو اللاعبين الآليين. </para>
+</chapter>
+
+<chapter id="screen_layout"
+><title
+>تخطيط الشاشة</title>
+		<para>
+			<screenshot>
+				<screeninfo
+>لقطة شاشة لكاجونغ</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="gamescreen.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>لقطة شاشة</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+                </para>
+                <para
+>شرح سريع لأجزاء شاشة اللعبة. </para>
+	<variablelist>
+		<varlistentry>
+			<term
+>شريط الأدوات</term>
+			<listitem
+><para
+>يقع شريط الأدوات أسفل شريط القوائم ويحتوي على أزرار للإجراءات الأكثر استخداماً. يمكن تحرير محتوى شريط الأدوات، كما يمكن جعله غير مرئي لتوفير مساحة أكبر للوحة. </para
+><para
+>بناءً على حجم الشاشة، قد ترغب في إخفاء شريط الأدوات أو نقله إلى الجانب الأيسر من النافذة. يمكن القيام بذلك بالنقر بزر الفأرة الأيمن على شريط الأدوات. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>لوحة</term>
+			<listitem
+><para
+>اللوحة هي القسم الأكبر من النافذة. تظهر فيها الجدران الأربعة بطول 18 قطعة (يعتمد العدد الدقيق على القواعد، مثل استخدام قطع المكافآت من عدمه). كُتبت أسماء اللاعبين على الجدران، مع القيمة الحالية لليد (بقدر ما هو معروف) وقطع الرياح الخاصة بهم. للرياح السائدة خلفية ملونة، وهي الشرق في لقطة الشاشة أعلاه. </para
+><para
+>عند <link linkend="play"
+>اللعب</link
+>، يحتوي الجزء الداخلي من الجدران على القطع التي نبذها اللاعبون، وتوضع عشوائياً. وُضِع إطار تركيز أزرق حول آخر قطعة منبوذة. </para
+><para
+>عند <link linkend="scoreGame"
+>تسجيل نتائج الألعاب اليدوية</link
+>، يحتوي الجزء الداخلي من الجدران على مجموعة مختارة من جميع القطع المتاحة، وهو المحدد المركزي. يمكن تعيينها للاعبين باستخدام الفأرة أو لوحة المفاتيح. </para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>منطقة اللاعب</term>
+			<listitem
+><para
+>لكل لاعب نطاق شاشة لقطعه. يحتوي الصف العلوي على القطع المكشوفة، والصف السفلي على القطع المخفية. عند <link linkend="scoreGame"
+>تسجيل نتائج الألعاب اليدوية</link
+>، تُعرض القطع المخفية مع ظل فوق القطعة بأكملها. توضع قطع المكافآت في الطرف الأيمن. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>حواريّ</term>
+			<listitem
+><para
+>يعرض الحواريّ الخيارات المتاحة للاعب. غالباً ما يكون له مهلة زمنية مع شريط تقدم يوضح الوقت المتبقي. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>شريط الحالة</term>
+			<listitem
+><para
+>يقع شريط الحالة في أسفل الشاشة ويحتوي على الإجماليات الحالية للاعبين. </para
+></listitem>
+		</varlistentry>
+	</variablelist>
+</chapter>
+
+<chapter id="scoreGame"
+><title
+>تسجيل نتائج لعبة يدوية</title
+> <!-- do not change this! -->
+	<para
+>في هذا الوضع، تُستخدم كاجونغ فقط لتسجيل النتائج. تلعب كالمعتاد مع أشخاص حقيقيين على طاولة حقيقية، وفي نهاية اللعبة يمكنك إخبار كاجونغ بالقطع التي يحملها اللاعب في يده وكل شيء آخر تحتاج كاجونغ لمعرفته لحساب النتائج - وهو ما سيقوم به البرنامج. بدلاً من ذلك، يمكنك حساب نتائج اليد يدوياً وإدخالها؛ وعندها ستقوم كاجونغ بتوزيع المدفوعات بين اللاعبين وكتابة النتائج في قاعدة بيانات. يمكن تعليق اللعبة، وبدء لعبة أخرى مع لاعبين آخرين، واستئناف الألعاب القديمة. تُحفظ جميع القواعد مع الألعاب، لذا يمكن لعب ألعاب مختلفة بقواعد مختلفة. </para>
+        <itemizedlist>
+            <listitem
+><para
+>من القائمة، اختر <menuchoice
+><guimenu
+>لعبة</guimenu
+> <guimenuitem
+>سجل نتائج لعبة يدوية</guimenuitem
+></menuchoice
+> أو اضغط على الاختصار <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+>. </para
+></listitem>
+            <listitem
+><para
+>يمكنك الآن إما اختيار لعبة موجودة غير مكتملة أو بدء لعبة جديدة. إذا بدأت لعبة جديدة، فستُسأل عن اللاعبين ومجموعة القواعد. ستقترح كاجونغ القيم نفسها المستخدمة في اللعبة السابقة. إذا لم تكن هناك لعبة سابقة، فستقترح أول أربعة لاعبين مُعرفين. يرجى ملاحظة أنه لا يمكن تغيير مجموعة القواعد أو أي من قواعدها بعد هذا الاختيار. يمكن القيام بذلك مسبقاً في <link linkend="ruleset-options"
+>محرر مجموعة القواعد</link
+>. </para
+></listitem>
+            <listitem
+><para
+>ستظهر لك نافذة جديدة بعنوان <guilabel
+>تسجيل النتائج لهذه اليد</guilabel
+>. اقرأ <link linkend="enterhand-tiles"
+>اجعل كاجونغ تحسب النتيجة</link
+> للحصول على وصف مفصل. </para
+></listitem>
+            <listitem
+><para
+>بعد حفظ نتائج اليد، استمر مع اليد التالية. </para
+></listitem>
+        </itemizedlist>
+      <sect1 id="enterhand"
+><title
+>إدخال نتائج اليد</title>
+        <sect2 id="enterhand-scores">
+	<title
+>النتائج</title>
+	<screenshot>
+		<screeninfo
+>لقطة شاشة لكاجونغ</screeninfo>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="enterhand.png" format="PNG"/>
+			</imageobject
+>				<textobject
+><phrase
+>لقطة شاشة</phrase
+></textobject>
+		</mediaobject>
+	</screenshot>
+	<para
+>هذه هي نافذة إدخال نتائج اليد. تظهر آلياً عندما تعتقد كاجونغ أنك قد تحتاجها. يمكنك دائماً إظهارها أو إخفاؤها بالضغط على <keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+> أو باختيار عنصر القائمة المقابل. </para>
+	<para
+>كما هو معتاد دائماً، لُونت خلفية الرياح السائدة. </para>
+	<para
+>يمكنك هنا إدخال النتائج يدوياً لجميع اللاعبين. بدلاً من ذلك، يمكنك تحديد القطع التي كانت في يد اللاعب بدقة. إذا اخترت القيام بذلك، فسيُظلل الحقل المقابل لقيمة النتيجة اليدوية باللون الرمادي، وستحسب كاجونغ النتيجة آلياً. </para>
+	<para
+>بعد إدخال جميع البيانات ذات الصلة باليد، اضغط على زر <guibutton
+>احفظ اليد</guibutton
+>. ستُدرج قيم اليد في قاعدة البيانات، وتُعرض أيضاً في جدول النتائج. قد تُطالب بتغيير مواضع جلوس اللاعبين، ولكن يمكنك اختيار عدم تغيير المقاعد. التغييرات المقترحة غير قابلة للتخصيص حالياً - وإذا تطلبت مجموعة قواعد شيئاً مختلفاً، فسنقوم بتغيير ذلك. </para>
+	<para
+>إذا كان اللاعب قد فاز، فسيُفعل مربع الاختيار في عمود <guilabel
+>الفائز</guilabel
+> - انقر فوقه للفائز. </para>
+	<para
+>سيعرض شريط الحالة الآن الأرصدة المحدثة للاعبين، ويمكنك الاستمرار في اليد التالية. </para>
+	<sect3 id="enterhand-manually">
+	<title
+>أدخل النتيجة يدوياً</title>
+	<para
+>يفضل اللاعب الجيد غالباً حساب نتيجته بنفسه؛ وفي هذه الحالة يمكنك إدخالها مباشرة. لا يمكن القيام بذلك إلا عندما لا تكون هناك قطع مختارة لهذا اللاعب. </para>
+	<para
+>إذا أدخلت نتيجة يدوية، فيجب أن تتضمن بالفعل كل شيء باستثناء العقوبات، ولن تكون لديك قواعد اختيارية لتختار منها. هناك استثناء واحد: <quote
+>اللعب الخطير</quote
+>. هذا لا يؤثر على أي نتائج، ولا يعد مخالفة أيضاً. إنه يعني فقط أن الدفع بين اللاعبين مختلف: يدفع المخالف كل شيء للفائز نيابة عن الجميع. أما اللاعبان الآخران فلا يتبادلان المدفوعات. هذا غير قابل للتخصيص حالياً. </para>
+	</sect3>
+	<sect3 id="enterhand-tiles">
+	<title
+>اجعل كاجونغ تحسب النتيجة</title>
+	<para
+>إذا أخبرت كاجونغ صراحة بالقطع التي يمتلكها اللاعب، فسيُظلل إدخال النتائج باللون الرمادي لهذا اللاعب في هذه النافذة. أثناء ربط القطع باللاعب، سترى كيف تنمو نتيجته - ولكن بمجرد إضافة القطعة الرابعة عشرة، تصبح النتيجة صفراً. قد يفاجئك ذلك، ولكن ما لم تعلن أن هذه هي يد الفائز، فسيُنظر إليها على أنها يد طويلة تحصل دائماً على صفر من النقاط. حُدِد هذا السلوك بواسطة مجموعة قواعد اللغة الصينية التقليدية، وقد يختلف إذا غيرت القواعد أو استخدمت مجموعة قواعد مختلفة. </para>
+	<para
+>يمكنك ربط القطع والتركيبات باللاعب باستخدام الفأرة أو لوحة المفاتيح أو كليهما. باستخدام الفأرة، ما عليك سوى نقل القطع عن طريق سحبها وإفلاتها في منطقة اللاعب. عند إفلات القطعة، ستُسأل عما تريد نقله: مفردة، أو زوج، أو بونغ (Pung)، أو كونغ (Kong)، أو كونغ مطالب به، أو تشو (Chow). الصف العلوي مخصص للقطع المكشوفة، والصف السفلي للقطع المخفية. ستظهر قطع المكافآت في أقصى اليمين. يمكنك أيضاً نقل القطع والتركيبات بين الصفوف، وبين اللاعبين، وإعادتها إلى المحدد المركزي. </para>
+	<para
+>إذا كنت تفضل استخدام لوحة المفاتيح، يمكنك استخدام مفتاح &Tab; للتنقل بين المحدد المركزي ومناطق اللاعبين. تقوم المفاتيح <keycap
+>eswnESWN</keycap
+> بنقل القطعة إلى اللاعبين في جهات الشرق والجنوب والغرب والشمال. تقوم المفاتيح <keycap
+>xX</keycap
+> بإعادتها إلى المحدد المركزي. ينقل <keycap
+>ESWN</keycap
+> إلى الصف المخفي، بينما ينقل <keycap
+>eswn</keycap
+> إلى الصف المكشوف. يمكنك تحريك المؤشر بين القطع أو التركيبات باستخدام مفاتيح الأسهم؛ ويظهر إطار أزرق حول القطعة أو التركيبة المختارة حالياً. وبما أن مفاتيح الأسهم بعيدة عن الحروف في لوحة المفاتيح، يمكنك أيضاً استخدام الحروف <keycap
+>hjkl</keycap
+> أو <keycap
+>HJKL</keycap
+> لتحريك المؤشر. يحرك <keycap
+>hH</keycap
+> لليسار، و <keycap
+>jJ</keycap
+> للأسفل، و <keycap
+>kK</keycap
+> للأعلى، و <keycap
+>lL</keycap
+> لليمين. هكذا يفعل محرر يونكس <command
+>vi</command
+>. كما يدعم متصفح كيدي &konqueror; وحتى برنامج المساعدة هذا تلك المفاتيح بالطريقة نفسها. قد تختلف هذه المفاتيح إذا كنت تستخدم لغة أخرى غير الإنجليزية، ولكن لا يمكن ضبطها حالياً. </para>
+	<para
+>خيارا <guilabel
+>القطعة الأخيرة:</guilabel
+> و <guilabel
+>التركيبة الأخيرة:</guilabel
+> مطلوبان لبعض القواعد مثل <guilabel
+>القطعة الأخيرة تكمل الزوج</guilabel
+>. لا يمكن استخدامهما إلا ليد الفائز. </para>
+	<para
+>في الجزء الأيمن من النافذة، يمكنك تطبيق بعض القواعد يدوياً. تعتمد القواعد التي تظهر في هذه القائمة على مجموعة القواعد الحالية وعلى القطع. في مثال لقطة الشاشة أعلاه، قد يكون لدى اللاعبين الخاسرين خيار <quote
+>اللعب الخطير</quote
+> - مرة أخرى بناءً على مجموعة القواعد وعلى قطعهم. يهدف المطورون إلى إبقاء قائمة القواعد القابلة للاختيار يدوياً قصيرة قدر الإمكان. من الناحية المثالية، يجب أن تكون كاجونغ قادرة دائماً على التحديد الآلي لما إذا كانت القاعدة تنطبق، ولكن في بعض الأحيان لا تملك كاجونغ ما يكفي من المعلومات أو المعرفة لاتخاذ القرار. </para>
+	</sect3>
+	</sect2>
+	<sect2 id="enterhand-penalties">
+	<title
+>العقوبات</title>
+			<screenshot>
+				<screeninfo
+>لقطة شاشة لكاجونغ</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="penalty.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>لقطة شاشة</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+	<para
+>في <link linkend="enterhand"
+>نافذة إدخال نتائج اليد</link
+>، سيُظهر زر <guibutton
+>العقوبات</guibutton
+> هذه النافذة حيث يمكنك إدخال العقوبات. يمكن القيام بذلك في أي وقت بشكل مستقل عن آلية تسجيل النتائج العادية.</para>
+	<para
+>يعرض اختيار <guilabel
+>المخالفة:</guilabel
+> جميع المخالفات التي قد تنطبق على الأيدي التي يحملها اللاعبون. اختر من بينها.</para>
+	<para
+>يمكنك الآن تعديل <guilabel
+>إجمالي العقوبة</guilabel
+>. هذا هو المبلغ الإجمالي الذي يُنقل من الدافعين إلى المستلمين، وسيُقسم بالتساوي بينهم.</para>
+	<para
+>يختلف عدد الدافعين والمستلمين حسب نوع المخالفة. يُعرض العدد المناسب من اللاعبين. إذا اخترت لاعباً، فستضمن كاجونغ ظهور هذا اللاعب مرة واحدة فقط عن طريق تعديل اللاعبين الآخرين. </para>
+	</sect2>
+	</sect1>
+</chapter>
+
+<chapter  id="play"
+><title
+>يشغل</title>
+	<para
+>يمكنك في أي وقت تفعيل أو تعطيل الوضع التجريبي. في الوضع التجريبي، سيلعب الحاسوب نيابة عنك. إذا لم تكن هناك لعبة جارية حالياً، فستُبدأ لعبة جديدة بمجموعة القواعد الأخيرة المستخدمة. </para>
+        <sect1 id="robotplay">
+        <title
+>العب ضد الحاسوب</title>
+         <para
+>أولاً سيظهر لك حواريّ لتسجيل الدخول. أدخل خادم اللعبة الذي تريد الاتصال به واسم المستخدم الخاص بك. إذا اخترت الإدخال الخاص <guilabel
+>لعبة محلية</guilabel
+>، فستحتاج فقط إلى إدخال اسمك (أو قبول الاسم المقترح) ومجموعة القواعد المطلوبة. سيبدأ هذا فوراً لعبة محلية حيث تلعب ضد 3 لاعبين آليين. ومع ذلك، في حال وجود ألعاب معلقة، فستُعرض في قائمة؛ وعندها يمكنك اختيار اللعبة التي تريد مواصلتها أو بدء لعبة جديدة. </para>
+        </sect1>
+        <sect1 id="humanplay">
+        <title
+>العب مع الأصدقاء</title>
+        <para
+>إذا كنت تريد اللعب ضد أشخاص حقيقيين آخرين، فأنت بحاجة إلى خادم لعبة يجب أن يتصل به جميع اللاعبين، بمن فيهم أنت. قم بذلك عن طريق اختيار أي مضيف آخر أو عن طريق إدخال اسم مضيف جديد يدوياً وتحديد كلمة السر الخاصة بك لذلك المضيف. ستُقترح آخر كلمة سر مُستخدمة. </para
+><para
+>أسهل طريقة هي استخدام خادم اللعبة في <literal
+>kajongg.org</literal
+>. ستعرض كاجونغ هذا الخادم في قائمة خوادم اللعبة الممكنة. يرجى ملاحظة أن هذا الخادم يقدم خادم لعبة فقط ولا يقدم صفحة ويب أو أي خدمات أخرى. </para
+><para
+>إذا لم يكن لديك حساب على خادم اللعبة بالاسم الذي أدخلته، فستُسأل عما إذا كنت تريد فتح حساب. إذا وافقت، فسيظهر لك حواريّ جديد حيث يمكنك إدخال كلمة السر المطلوبة مرتين، وسيُنشأ حسابك آلياً. </para
+><para
+>بعد تسجيل الدخول بنجاح إلى خادم اللعبة، ستحصل على قائمة بالطاولات التي بها مقاعد شاغرة على ذلك الخادم. انضم إلى طاولة أو خصص طاولة جديدة. إذا خصصت طاولة جديدة، فانتظر حتى يشغل لاعبون آخرون المزيد من المقاعد. يمكنك بدء اللعبة على طاولة خصصتها في أي وقت، وسيُملأ اللاعبون الآليون المقاعد التي لم تُشغل. </para
+><para
+>تعرض قائمة الطاولات أيضاً اسم مجموعة القواعد التي تُلعب على تلك الطاولة. يُرسل اللاعب الذي أنشأ الطاولة مجموعة القواعد واسمها إلى خادم اللعبة. إذا كانت لديك مجموعة قواعد مطابقة، فستعرض الطاولة اسمك لمجموعة القواعد - قد يكون هذا مفيداً إذا كان منشئ الطاولة يتحدث لغة أخرى وسمى مجموعة القواعد بشكل مختلف. وأيضاً، إذا عُرض اسم مجموعة قواعدك المحلية، فسيظهر باللون الأسود. أما إذا لم تكن لديك مجموعة قواعد مطابقة، فسيظهر الاسم باللون الأحمر، ويمكنك استخدام زر <guibutton
+>قارن</guibutton
+> لمقارنتها بمجموعات القواعد الخاصة بك. </para
+><para
+>إذا كنت لا تستخدم <literal
+>kajongg.org</literal
+> أو أي خادم لعبة آخر موجود، يمكنك بدء خادم لعبة كاجونغ الخاص بك بطريقتين مختلفتين: <itemizedlist
+><listitem
+><para
+>الاتصال بالخادم <literal
+>localhost</literal
+>. هذا هو حاسوبك الخاص. إذا قمت بذلك ولم يكن هناك خادم لعبة يعمل، فسيُبدأ آلياً. وعندما تتوقف عن اللعب، سيُوقف الخادم أيضاً. يختلف هذا عن اختيار <guilabel
+>لعبة محلية</guilabel
+>، حيث لا يسمح الأخير بالاتصالات من الحواسيب الأخرى. </para
+></listitem
+><listitem
+><para
+>بدء تشغيل خادم يدوياً على أي حاسوب تريده. كل ما عليك فعله هو الذهاب إلى سطر الأوامر وبدء تشغيل البرنامج <command
+>kajonggserver</command
+>. سيُظهر إدخال <command
+>kajonggserver --help</command
+> جميع الخيارات المتاحة مثل تغيير المنفذ المبدئي. سيعمل هذا الخادم حتى تقوم بإيقافه. </para
+></listitem
+></itemizedlist>
+        </para
+><para
+>في كلتا الحالتين، يجب إخبار اللاعبين الآخرين بكيفية الوصول إلى خادم اللعبة الخاص بك. سيحتاجون إلى عنوان URL أو ببساطة عنوان IP والمنفذ الذي يستمع إليه خادمك. قد يكون هذا شيئاً مثل <literal
+>mypc.dyndns.org:8301</literal
+> حيث يمثل <literal
+>8301</literal
+> المنفذ. وبالطبع، يجب عليك ضبط جدار الحماية بحيث يمكن للاعب البعيد الوصول إلى ذلك المنفذ. سيكون الاتصال معمىً. </para
+><para
+>بالنسبة لرقم المنفذ، يرجى مراجعة <menuchoice
+><guimenu
+>مساعدة</guimenu
+> <guimenuitem
+>حول كاجونغ</guimenuitem
+></menuchoice
+>. إصدار البروتوكول هو رقم المنفذ. بالنسبة لنسخة كاجونغ 17.04 هذا الرقم هو 8301. إذا لم يدخل اللاعب منفذاً لخادم اللعبة المطلوب، فسيحسب العميل المنفذ بالطريقة نفسها. لذا إذا كان الحاسوب يشغل عدة خوادم ألعاب بإصدارات بروتوكول مختلفة، فيجب أن تصل عادةً إلى خادم اللعبة الصحيح آلياً. وعلى أي حال، سيضمن خادم اللعبة والعميل توافق إصداراتهما وسينبهانك في حال خلاف ذلك. </para
+><para
+>إذا واجهت أخطاء برمجية محتملة، فقد ترغب في استخدام الخيار <command
+>kajongg --debug=traffic</command
+>. سيُظهر لك هذا، على الصدفة التي بُدِئ فيها تشغيل خادم اللعبة، الرسائل التي تتدفق بين خادم اللعبة والعملاء. لمزيد من الخيارات، راجع <command
+>kajongg --help</command
+> </para>
+        <sect2 id="playing-caveats">
+        <title
+>تحذيرات</title>
+            <itemizedlist
+><listitem
+><para
+>إذا كنت تريد التأكد من عدم قدرة أحد على الغش، فلا ينبغي لأي من اللاعبين البشريين الوصول إلى الحاسوب الذي يعمل عليه خادم اللعبة. بالطبع لا يمكنك أبداً تجنب مساعدة لاعبين لبعضهما البعض لأنك لا تعرف ما يفعلانه حقاً. قد يكون اللاعبان في الواقع شخصاً واحداً. </para
+></listitem
+></itemizedlist>
+        </sect2>
+        </sect1>
+<sect1  id="gamerules"
+><title
+>قواعد اللعبة</title>
+<para
+>توجد أنواع مختلفة من الألعاب حول العالم. تدعم كاجونغ حالياً نوعين من قواعد اللغة الصينية التقليدية، أحدهما كما يُلعب في ألمانيا والآخر كما يُلعب في بريطانيا العظمى.</para
+><para
+>لا يتطرق هذا الوصف إلى التفاصيل، ولذا فهو ينطبق على كِلا النوعين.</para
+><para
+>ومع ذلك، فإن معظم القواعد الأساسية هي نفسها في معظم الأنواع.</para>
+  <para
+>بما أن برنامج كاجونغ يعرف كيفية اللعب، فإن هذا الوصف يحتوي فقط على الأشياء التي قد لا تكون واضحة.</para>
+  <para
+>إذا كنت ترغب في تعلم الماه جونغ بمزيد من التفصيل، يرجى الرجوع إلى <link linkend="bibliography"
+>المراجع</link
+>.</para>
+<sect2 id="gamerules-aim">
+  <title
+>هدف اللعبة</title>
+  <para
+>يحاول كل لاعب جمع القطع بحيث يحصل على يد فائزة؛ وعند تحقيق ذلك، ينادي <quote
+>ماه جونغ</quote
+>. في اليد الفائزة، تُجمع القطع عادةً في خمس تركيبات: أربع تركيبات من ثلاث أو أربع قطع لكل منها، وتركيبة خامسة تتكون من قطعتين متساويتين. تحتوي التركيبة العادية على ثلاث أو أربع قطع متطابقة (تسمى بونغ وكونغ على التوالي) أو ثلاث قطع متتالية مثل خيزران 3، خيزران 4، خيزران 5 (تسمى تشو).</para>
+  </sect2>
+  <sect2>
+    <title
+>مسار اللعبة</title>
+    <para
+>في البداية، يمتلك اللاعب الذي لديه رياح الشرق (كما هو موضح على الجدار) قطعة واحدة إضافية عن اللاعبين الآخرين. يبدأ لاعب الشرق بنبذ قطعة غير مرغوب فيها. </para>
+    <para
+>كلما نُبِذت قطعة، يمكن للاعبين الآخرين المطالبة بها عن طريق تحديد ما يمكنهم إكماله بتلك القطعة (تشو، بونغ، كونغ، ماه جونغ). يمكن للاعب التالي فقط المطالبة بـ "تشو" - أما المطالبات الأخرى فممكنة لجميع اللاعبين. التركيبة التي تكتمل بمطالبة ستُكشف - وتُجعل مرئية لجميع اللاعبين. </para
+><para
+>إذا لم يطالب أحد بالقطعة المنبوذة، يحصل اللاعب التالي، الجنوب (ثم الغرب والشمال) على قطعة من الجدار وينبذ قطعة غير مرغوب فيها.</para>
+      <para
+>هناك عدة قواعد تتعلق بموعد تمديد "بونغ" إلى "كونغ" (عن طريق المطالبة بالقطعة الرابعة أو الحصول عليها من الجدار) - لا تُشرح هذه القواعد هنا. لكن كاجونغ تعرفها بالطبع وتضمن احترامها. إذا أُعلن عن "كونغ"، يحصل اللاعب آلياً على قطعة بديلة من الجدار - وإلا فلن يكون من الممكن بناء التركيبات الخمس المذكورة أعلاه. </para>
+    </sect2>
+    <sect2>
+      <title
+>السنة والجولة واليد</title
+><para
+>عندما يطالب لاعب بـ "ماه جونغ" أو تنتهي اللعبة بالتعادل، تكتمل اليد. والآن، باستثناء حالات التعادل، تتبادل الرياح بين اللاعبين. يتكرر هذا حتى يحصل كل لاعب على كل ريح مرة واحدة. تسمى هذه الوحدة الكاملة جولة. تتكون اللعبة الكاملة، والتي تسمى أيضاً سنة، من أربع جولات من هذا القبيل: جولة ريح الشرق، جولة ريح الجنوب، جولة ريح الغرب، جولة ريح الشمال. تسمى ريح الجولة أيضاً الرياح السائدة، ويمكن أن تؤدي إلى نتائج أعلى.</para>
+	<para
+>لذا تتكون اللعبة الكاملة (سنة) من 16 يداً على الأقل. وبما أن الرياح لا تتبادل في حالات التعادل أو عندما ينادي لاعب الشرق "ماه جونغ"، فعادةً ما تكون هناك حاجة إلى عدد أكبر من الأيدي للعبة كاملة. </para
+></sect2
+><sect2
+><title
+>قطع المكافآت</title>
+    <para
+>يمكن أن تحتوي اللعبة على ثماني قطع مكافآت (ما لم تستبعدها القواعد). تُكشف هذه القطع بشكل منفصل على الجانب الأيمن من منطقة اللاعب لأنها لا تُستخدم أبداً لبناء التركيبات. ومع ذلك، فهي تولد نقاط مكافأة.</para>
+      <para
+>إذا حصل لاعب على قطعة مكافأة، فسيحصل آلياً أيضاً على قطعة بديلة من الجدار، ويُرن جرس.</para
+></sect2>
+      <sect2
+><title
+>تسجيل النتائج</title
+><para
+>في نهاية اليد، تُحسب نتيجة كل لاعب. أولاً، تُعد النقاط الأساسية مثل نقطتين لـ "بونغ" بسيط مكشوف أو 20 نقطة للفوز. بعد ذلك، تُطبق مجموعة أخرى من القواعد - يمكن لهذه القواعد مضاعفة النقاط مثل مضاعفة واحدة لتركيبة التنانين. عندما تُعرف نتيجة كل يد، تُدفع الفروق بين اللاعبين - بينما يحصل الفائز على نتيجته الكاملة مدفوعة من جميع اللاعبين الآخرين. يحصل الشرق دائماً على ضعف نتيجته ويدفع ضعفها.</para>
+	  <para
+>بالطبع تعرف كاجونغ جميع القواعد المعمول بها، لكن اللاعب الجيد يعرف أي التركيبات تحصل على أي نتيجة حتى يتمكن من التحسين. أثناء التعلم، يوصى بتفعيل نافذة <guimenuitem
+>اشرح النتائج</guimenuitem
+>.</para>
+	  <para
+>غالباً ما تختلف قواعد تسجيل النتائج الدقيقة - في كاجونغ أنت حر في تغييرها باستخدام <link linkend="ruleset-options"
+>محرر مجموعة القواعد</link
+>.</para>
+	  <para
+>يعرض لك محرر مجموعة القواعد أيضاً جميع القواعد المتاحة ومعانيها. ضع الفأرة فوقها وسيظهر نص مساعدة للقواعد الأكثر غرابة.</para>
+	</sect2>
+</sect1>
+<sect1 id="playing-play">
+        <title
+>كيف تلعب باستخدام كاجونغ</title>
+        <para
+>ستُطالب بما تريد القيام به. هذا حواريّ صغير يظهر إما على اليمين أو في الأسفل حسب حجم النافذة. إذا جعلته أعرض من طوله، فسيظهر الحواريّ على اليمين. في بعض الأحيان يكون للحواريّ مهلة زمنية - عندما تنتهي، يُختار أول رد ممكن لك آلياً. هذه المهلة قابلة للضبط في محرر مجموعة القواعد، ضمن <guilabel
+>خيارات</guilabel
+>، <guilabel
+>مهلة المطالبة</guilabel
+>. يجب أن يكون لجميع اللاعبين المهلة نفسها، ولهذا السبب يعد هذا جزءاً من مجموعة القواعد. </para
+><para
+>إذا كنت بحاجة إلى اختيار قطعة من يدك، يمكنك التنقل بين القطع باستخدام مفتاحي السهمين الأيمن والأيسر أو الحرفين <keycap
+>h</keycap
+> و <keycap
+>l</keycap
+> على لوحة المفاتيح. وبالطبع يمكنك استخدام الفأرة أيضاً. </para
+><para
+>يمكنك نبذ قطعة باستخدام لوحة المفاتيح بالطريقة نفسها المستخدمة في جميع الإجراءات. بدلاً من ذلك، يمكنك استخدام الفأرة ونقل القطعة من يدك إلى منطقة النبذ (الجزء الداخلي من الجدران). سيستمر الحاسوب في وضع القطعة في منطقة النبذ - لأن الوضع يجب أن يكون هو نفسه بالنسبة للاعبين. </para
+><para
+>غالباً ما تقدم الحواريّات خيارات لا يمكن تطبيقها حقاً مثل المناداة بـ "بونغ" عندما لا تملك القطع المطلوبة. هذا مقصود - تماماً كما في اللعبة الحقيقية. ولكن يمكنك ضبط الخيارات المستحيلة لإخفائها: عطل <guilabel
+>أظهر الإجراءات الممكنة فقط</guilabel
+> في صفحة <guilabel
+>اللعب</guilabel
+> من حواريّ الإعدادات. </para
+><para
+>توضع القطع المنبوذة عشوائياً بين الجدران. تحدد بعض أنواع الألعاب المكان الذي يجب أن توضع فيه القطع، ومع ذلك فإن هذا غير قابل للضبط بعد. عندما يصبح قابلاً للضبط، سيكون جزءاً من مجموعة القواعد. </para>
+	</sect1>
+</chapter>
+
+<chapter id="interface"
+><title
+>نظرة عامة على الواجهة</title
+> <!-- do not change this! -->
+<!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist
+> and <varlistentry
+>. Split the chapter into sections using <sect1(2,3)
+> for better viewing.-->
+
+<sect1 id="menu">
+<title
+>عناصر القائمة</title>
+
+		<variablelist>
+			<varlistentry id="game-menu-scoreGame">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></shortcut
+> <guimenu
+>لعبة</guimenu
+> <guimenuitem
+>سجل نتائج لعبة يدوية</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>تسجيل نتائج لعبة تُلعب يدوياً فقط.</action
+></para
+><para
+>يمكنك تحميل لعبة قديمة أو بدء لعبة جديدة. تظهر الألعاب المعلقة (أي غير المكتملة) فقط في قائمة الاختيار بشكل مبدئي. يمكنك اختيار إظهار جميع الألعاب بما في ذلك الألعاب المكتملة. يمكنك هنا أيضاً حذف الألعاب.</para
+></listitem>
+			</varlistentry>
+                        <varlistentry  id="game-menu-play">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>لعبة</guimenu
+> <guimenuitem
+>العب</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>اللعب مع الآخرين (بشر وحواسيب)</action
+>.</para
+></listitem>
+                        </varlistentry>
+                        <varlistentry  id="game-menu-abort">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></shortcut
+> <guimenu
+>لعبة</guimenu
+> <guimenuitem
+>أجهض اللعبة</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>إجهاض اللعبة الحالية. إذا كانت لعبة يدوية لتسجيل النتائج فقط، فيمكنك استئنافها لاحقاً. أما إذا كنت تلعب باستخدام كاجونغ، فإن اللعبة غير قابلة للاستئناف بعد.</action
+></para
+></listitem>
+                        </varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></shortcut
+> <guimenu
+>لعبة</guimenu
+> <guimenuitem
+>أنهِ كاجونغ</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>ينهي</action
+> كاجونغ.</para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-chat">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></shortcut
+> <guimenu
+>عرض</guimenu
+> <guimenuitem
+>دردشة</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>الدردشة</action
+></para>
+				<screenshot>
+					<screeninfo
+>نافذة المحادثة</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>نافذة المحادثة</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>يتيح لك الدردشة مع اللاعبين الآخرين. </para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-scoretable">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></shortcut
+> <guimenu
+>عرض</guimenu
+> <guimenuitem
+>جدول النقاط</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>تسجيل النقاط الطاولة</action
+></para>
+                                <screenshot>
+                                        <screeninfo
+>تسجيل النقاط الطاولة</screeninfo>
+                                        <mediaobject>
+                                                <imageobject>
+                                                <imagedata fileref="scoretable.png" format="PNG"/>
+                                                </imageobject>
+                                                <textobject>
+                                                <phrase
+>لقطة شاشة</phrase>
+                                                </textobject>
+                                        </mediaobject>
+                                </screenshot>
+    <para
+>يعرض جدول النقاط. الجولة/اليد تمثل الجولة الحالية (شرق، جنوب، غرب، شمال) متبوعة بعدد الأيدي التي لُعبت في تلك الجولة. يمتلك الفائز خلفية خضراء لقيمه. تظهر المدفوعات مقدار ما دفعه اللاعب أو استلمه من جميع اللاعبين الآخرين في هذه اليد. يظهر الرصيد الرصيد الحالي لجميع اللاعبين. يعرض المخطط البياني تطور قيم الرصيد. توفر التلميحات المزيد من التفاصيل: حيث تظهر جميع القواعد التي طُبقت على هذه اليد. فقط حرك الفأرة فوق القيمة التي تهمك.</para
+><para
+>يظهر الجزء السفلي مجموعة القواعد المستخدمة. يمكنك العثور على فاصل بين جدول النقاط ومجموعة القواعد المستخدمة يتيح لك تغيير الأحجام النسبية لكلا الجزءين. </para
+></listitem>
+                        </varlistentry>
+			<varlistentry id="view-explain-scores">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>E</keycap
+></keycombo
+></shortcut
+> <guimenu
+>عرض</guimenu
+> <guimenuitem
+>شرح النتائج</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>اشرح النتائج</action
+></para>
+				<screenshot>
+					<screeninfo
+>تسجيل النقاط الطاولة</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="explain.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>تسجيل النقاط الطاولة</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>يشرح كيفية حساب النقاط لليد الحالية. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></shortcut
+> <guimenu
+>عرض</guimenu
+> <guimenuitem
+>وضع ملء الشاشة</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>يبدل بين وضع ملء الشاشة والوضع العادي.</action
+></para
+></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>إعدادات</guimenu
+> <guimenuitem
+>اللاعبون</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>إضافة وتعديل وحذف اللاعبين.</action
+></para>
+				<para
+>كلمات المرور في هذا الجدول هي الكلمات المستخدمة مبدئيًا عند الولوج إلى خادم اللعبة. إن تغيير كلمة المرور التي اخترتها في البداية لخادم اللعبة ليس مفيدًا حاليًا لأنه لا توجد وسيلة لتغيير كلمة مرورك على خادم اللعبة أيضًا. سيتعين عليك أن تطلب من مدير خادم اللعبة القيام بذلك نيابة عنك مباشرة في قاعدة البيانات.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>إعدادات</guimenu
+> <guimenuitem
+>مجموعات القواعد</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>خصّص مجموعات القواعد.</action
+></para>
+				<para
+>استخدم محرر مجموعات القواعد لتخصيص مجموعات القواعد. لمزيد من التفاصيل راجع <link linkend="ruleset-options"
+>هنا</link
+>.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></shortcut
+> <guimenu
+>إعدادات</guimenu
+> <guimenuitem
+>غير زاوية الرؤية</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>يغير زاوية رؤية البلاطات عكس اتجاه عقارب الساعة.</action
+></para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></shortcut
+> <guimenu
+>إعدادات</guimenu
+> <guimenuitem
+>الوضع التجريبي</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>يفعل أو يعطل الوضع التجريبي. راجع <link linkend="play"
+>هنا</link
+> للتفاصيل.</action
+></para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+<para
+>بالإضافة إلى ذلك، يحتوي كاجونغ على عناصر قوائم <guimenu
+>الإعدادات</guimenu
+> و<guimenu
+>المساعدة</guimenu
+> الشائعة في كيدي، لمزيد من المعلومات اقرأ الأقسام حول <ulink url="help:/fundamentals/menus.html#menus-settings"
+>قائمة الإعدادات</ulink
+> و <ulink url="help:/fundamentals/menus.html#menus-help"
+>قائمة المساعدة</ulink
+> في أساسيات كيدي. </para>
+
+</sect1>
+</chapter>
+
+<chapter id="configuration"
+><title
+>ضبط اللعبة</title
+> <!-- do not change this! -->
+<!--This section describes configuration &GUI;. If your game is configured using menubar exclusively, please remove this section.-->
+<screenshot>
+<screeninfo
+>مربع حوار الضبط</screeninfo>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="config_play.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase
+>مربع حوار الضبط</phrase>
+	  </textobject>
+	</mediaobject>
+</screenshot>
+
+<para
+>يفتح عنصر القائمة <menuchoice
+><guimenu
+>إعدادات</guimenu
+> <guimenuitem
+>اضبط كاجونغ...</guimenuitem
+></menuchoice
+> مربع حوار <guilabel
+>اضبط - كاجونغ</guilabel
+>.</para>
+<para
+>إذا ضغطت على زر <guibutton
+>إلغاء</guibutton
+> هنا، فستُسترجع جميع تغييرات الضبط الخاصة بك، بما في ذلك كل ما قمت به باستخدام محرر مجموعات القواعد.</para>
+<para
+>يمكنك أيضًا تحديد الألسنة المختلفة باستخدام لوحة المفاتيح: <keycombo action="simul"
+>&Ctrl;<keycap
+>1</keycap
+></keycombo
+> يحدد اللسان الأول خيارات <guilabel
+>اللعب</guilabel
+>، <keycombo action="simul"
+>&Ctrl;<keycap
+>2</keycap
+></keycombo
+> يحدد اللسان الثاني، وهكذا. </para>
+
+<sect1 id="play-options"
+><title
+>خيارات اللعب</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<guilabel
+>أظهر ظلال القطع</guilabel>
+				</term>
+				<listitem
+><para
+>يعرض هذا البلاطات بحدود وظلال. كما توجد مساحة بين صفوف البلاط، وتظهر بلاطات الحائط بحيث يمكنك رؤية أن الحائط بارتفاع بلاطتين أو ثلاث. لذا إذا عطلت هذا الخيار، ستحصل على عرض أبسط ببلاطات أكبر قليلاً. قد يكون هذا مفيدًا للشاشات الصغيرة. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>أعد ترتيب القطع غير المكشوف عنها إلى الخلطات</guilabel>
+				</term>
+				<listitem
+><para
+>يقوم هذا بتجميع مجموعات الأوراق (melds) في اليد. أحيانًا قد لا يكون التجميع كما تريد، لذا قد تفضل عدم التجميع على الإطلاق، تمامًا كما في لعبة في العالم الحقيقي. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>أظهر الإجراءات الممكنة فقط</guilabel>
+				</term>
+				<listitem
+><para
+>عند اللعب، اعرض فقط الإجراءات الممكنة مثل <quote
+>لا مطالبة</quote
+> أو <quote
+>بونغ (Pung)</quote
+>. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>اقتراح ما يجب القيام به</guilabel>
+				</term>
+				<listitem
+><para
+>كلما كان لديك خيار من الإجراءات مثل المطالبة ببلاطة من عدمه أو اختيار البلاطة التي تريد التخلص منها، يمكن لكاجونغ مساعدتك بتقديم اقتراح. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>استخدم الأصوات إذا كانت متوفرة</guilabel>
+				</term>
+				<listitem
+><para
+>يتيح لك هذا سماع عمليات التخلص والمطالبات. إذا سجل لاعبون آخرون ملفات صوتية بأصواتهم الخاصة، فيمكنك سماعهم. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>دع الآخرين يسمعون صوتي</guilabel>
+				</term>
+				<listitem
+><para
+>إذا سجلت ملفات صوتية بصوتك، فسيتيح هذا الخيار للاعبين الآخرين سماع عمليات التخلص والمطالبات الخاصة بك بصوتك. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>سرعة التحريك:</guilabel>
+				</term>
+				<listitem
+><para
+>حدد مدى سرعة تحرك البلاطات. إذا حركت المنزلق إلى أقصى اليمين، فلن تُحرك البلاطات بحركة رسومية: سيتغير مكان البلاطات ببساطة. </para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+	<sect2
+><title
+>الصوت</title>
+	<para
+>يوفر اللعب تجربة أجمل بكثير إذا سمعت اللاعبين يطالبون بالبلاطات ويعلنون عن عمليات التخلص. كما أنه يسهل اللعب لأنه يمكنك التركيز على بلاطاتك الخاصة، ولن تضطر لمراقبة ما يتخلص منه الآخرون. </para>
+	<para
+>يأتي كاجونغ مع أصوات للاعبين مختلفين. تُسند الأصوات آليًا إلى اللاعبين. لكل لغة يجب أن يكون هناك أربعة أصوات، ويفضل أن يكون اثنان للذكور واثنان للإناث. يحاول كاجونغ استخدام أصوات بنفس اللغة التي يعمل بها كاجونغ. إذا لم يجد أصواتًا بتلك اللغة، فسيتراجع كاجونغ إلى لغات أخرى، مستخدمًا نفس لغات التراجع التي حددتها لكاجونغ (راجع <menuchoice
+><guimenu
+>مساعدة</guimenu
+> <guimenuitem
+>بدل لغة التطبيق</guimenuitem
+></menuchoice
+>). إذا لم توجد ملفات صوتية للغتك بعد، فأنت مدعو لتسجيلها والمساهمة بها في كاجونغ. </para>
+	 <itemizedlist
+><listitem
+><para
+>هذه هي الطريقة التي يمكنك بها توليد الأصوات بنفسك. يوجد مجلد منفصل لكل صوت. يرجى ملاحظة أن هذه المجلدات قد تكون في مكان آخر على نظامك، فهي تعتمد على كيفية تثبيت كيدي. فقط الجزء الذي يبدأ بـ <filename class="directory"
+>kajongg</filename
+> هو نفسه دائمًا. هناك مجموعتان من الأصوات بأماكن مختلفة في نظام الملفات: <itemizedlist
+><listitem
+><para
+>أصوات محددة مسبقًا لكل لغة. توجد في مجلد مثل <filename class="directory"
+>/usr/share/kajongg/voices/LANG</filename
+> حيث LANG هو رمز لغتك. أدلة الأصوات الموجودة مباشرة تحت <filename class="directory"
+>.../kajongg/voices/</filename
+> هي النسخ الإنجليزية الأمريكية. تُسند الأصوات المحددة مسبقًا عشوائيًا للاعبين. لهذه الأصوات أسماء مثل <quote
+><literal
+>male1 male2 female1 female2</literal
+></quote
+> لكن هذه الأسماء لا تهم، فلن يراها المستخدم أبدًا. </para
+></listitem
+><listitem
+><para
+>يمكن تعريف أصوات المستخدم لمستخدم معين. إذا استخدم كاجونغ مثل هذا الصوت، فيمكن نقله آليًا إلى اللاعبين الآخرين عبر الإنترنت. تعيش تلك الأصوات في مجلد مثل <filename class="directory"
+>~/.local/share/apps/kajongg/voices/</filename
+>. لذا إذا كان اسم دخولك هو joe، فقد يكون المسار <filename class="directory"
+>/home/joe/.local/share/apps/kajongg/voices/joe/</filename
+>. قد لا يكون المجلد <filename class="directory"
+>voices/</filename
+> موجودًا بعد - إذا كان الأمر كذلك، فأنشئه. </para
+></listitem
+></itemizedlist>
+		</para
+></listitem
+><listitem
+><para
+>الآن بعد أن عرفت أين تضع صوتك الجديد، أنشئ مجلدًا جديدًا له. </para
+></listitem
+><listitem
+><para
+>في ذلك المجلد الفرعي، يمكنك وضع الملفات الصوتية. يجب أن تُرمز باستخدام ضاغط الصوت <ulink url="https://xiph.org/vorbis/"
+>Ogg Vorbis</ulink
+>، ويجب أن تنتهي أسماء الملفات بالامتداد <filename class="extension"
+>.ogg</filename
+>. الملف الواحد له اسم مثل <filename
+>s3.ogg</filename
+> - وهذا هو الحجر 3. يجب عليك تعريف مثل هذه الملفات لكل البلاطات ولكل المطالبات والإعلانات. ولكن إذا فُقد ملف صوتي، فلن يحدث شيء سيء - فقط لن تسمع ذلك الصوت. التراجع إلى أصوات أو لغات أخرى يعمل فقط للأصوات الكاملة، وليس لملفات صوتية مفردة. </para
+></listitem
+><listitem
+><para
+>بعد تعريف جميع الملفات الصوتية لصوت محدد مسبقًا، يرجى التأكد من أن عملية كاجونغ لديها إذن الكتابة في مجلد الصوت الجديد. ابدأ كاجونغ واختبر الصوت. بعد أن يصبح كل شيء على ما يرام، يمكنك سحب إذن الكتابة (ويجب عليك فعل ذلك للأصوات المحددة مسبقًا). سيقوم كاجونغ آليًا بتوليد ملف يسمى <filename
+>md5sum</filename
+> يحتوي على مجموع فحوص (checksum) لجميع ملفات الصوت. كلما قمت بتغيير أو إضافة أو حذف ملف صوتي لصوت ما، سيحاول كاجونغ إعادة كتابة ذلك الملف. </para
+></listitem
+></itemizedlist>
+	<para
+>يرجى جعل طول الصوت قصيرًا ولكن تكلم بوضوح - يمكن لعب هذه اللعبة بسرعة كبيرة عندما تعتاد عليها. يكون الأمر أسهل إذا كتبت أولاً قائمة بكل ما يجب قوله. لا تقرأها كـ تسلسل من العناصر، بل حاول نطق كل عنصر كما لو كان الوحيد وكما ستفعل عند اللعب. اترك مسافة بين العناصر. قراءة هذا تحتاج إلى القليل من التدريب.</para>
+	<para
+>هذه مجرد إمكانية واحدة لإنشاء ملفات الصوت: </para
+><para
+><itemizedlist
+><listitem
+><para
+>سجل ملفًا صوتيًا باستخدام برنامج <command
+>qarecord</command
+>، واحفظه بتنسيق <acronym
+>WAV</acronym
+>. في هذا الملف الصوتي الواحد، انطق كل الأصوات. </para
+></listitem
+><listitem
+><para
+>حرر ذلك الملف باستخدام محرر الصوت <command
+>audacity</command
+>. في ذلك المحرر، استخدم الفأرة لتمييز نطاق من الموجات الصوتية. سيقوم المحرر بتشغيل ذلك الجزء. كرر العملية حتى تختار الجزء الصحيح. قد يكون هذا أسهل إذا اخترت <menuchoice
+><guimenu
+>عرض</guimenu
+> <guimenuitem
+>كبر للداخل</guimenuitem
+></menuchoice
+>. استخدم أمر القائمة <menuchoice
+><guimenu
+>ملف</guimenu
+> <guimenuitem
+>صدر التحديد</guimenuitem
+></menuchoice
+> واحفظه بتنسيق <filename class="extension"
+>.ogg</filename
+>. تحت <guilabel
+>خيارات</guilabel
+>، اختر جودة منخفضة - وهذا كافٍ بل ومطلوب لأن هذا يقلل من وقت نقل الأصوات إلى اللاعبين الآخرين. </para
+></listitem
+></itemizedlist
+></para>
+	<para
+>فيما يلي أسماء الملفات التي يجب عليك توليدها. ألحق دائمًا <filename class="extension"
+>.ogg</filename
+> بها:</para>
+
+<table>
+<title
+>أسماء ملفات الصوت</title>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry
+>&s1; .. &s9;</entry
+><entry
+>الحجر 1 إلى الحجر 9</entry>
+</row>
+<row>
+<entry
+>&b1; .. &b9;</entry>
+<entry
+>الخيزران 1 إلى الخيزران 9</entry>
+</row>
+<row>
+<entry
+>&c1; .. &c9;</entry>
+<entry
+>الرمز 1 إلى الرمز 9</entry>
+</row>
+<row>
+<entry
+>&we; &ws; &ww; &wn;</entry>
+<entry
+>الرياح الشرق، الجنوب، الغرب، الشمال</entry>
+</row>
+<row>
+<entry
+>&db; &dr; &dg;</entry>
+<entry
+>التنانين الأزرق/الأبيض، الأحمر، الأخضر</entry>
+</row>
+<row>
+<entry
+>&chow; &pung; &kong; &mahjongg;</entry>
+<entry
+>المطالبات الرئيسية</entry>
+</row>
+<row>
+<entry
+>&originalcall; &violatesoriginalcall;</entry>
+<entry
+>النداء الأصلي وانتهاكه</entry>
+</row>
+<row>
+<entry
+>&dangerousgame;</entry>
+<entry
+>لاعب يطلق مدفعًا (لعبة خطرة)</entry>
+</row>
+<row>
+<entry
+>&nochoice;</entry>
+<entry
+>لاعب يعلن أنه ليس لديه خيار سوى لعب لعبة خطرة</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+	</sect2>
+</sect1>
+
+<sect1 id="tiles-options"
+><title
+>خيارات القطع</title>
+        <screenshot>
+                <screeninfo
+>محدد مجموعة البلاطات</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_tiles.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>محدد مجموعة البلاطات</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>استخدم محدد <guilabel
+>البلاطات</guilabel
+> لاختيار رسوميات البلاطات. </para>
+</sect1>
+
+<sect1 id="background-options"
+><title
+>خيارات الخلفية</title>
+        <screenshot>
+                <screeninfo
+>محدد الخلفية</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_background.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>محدد الخلفية</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>استخدم محدد <guilabel
+>الخلفية</guilabel
+> لاختيار رسم خلفية للعبة. </para
+><para
+>تحتاج بعض الخلفيات مثل المناظر الطبيعية الصينية إلى بعض الوقت للتحميل. إذا شعرت أن البرنامج يجب أن يبدأ بشكل أسرع أو أن تغيير حجم النافذة الرئيسية يستغرق وقتًا طويلاً، فقد ترغب في تجربة خلفية أخرى. </para>
+</sect1>
+
+<sect1 id="ruleset-options"
+><title
+>محرر مجموعات القواعد</title>
+			<screenshot>
+				<screeninfo
+>محرر مجموعات القواعد</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="ruleseteditor.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>محرر مجموعات القواعد</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+			<para
+>استخدم محرر مجموعات القواعد لتخصيص مجموعات القواعد. تظهر مجموعات القواعد المحددة مسبقًا بخط مائل، بينما تظهر المجموعات المخصصة بخط عادي. لا يمكن تغيير مجموعات القواعد المحددة مسبقًا من قبل المستخدم بأي حال من الأحوال، ولكن تحديث كاجونغ قد يفعل ذلك. لن تتأثر مجموعات القواعد المخصصة أبدًا بالتحديث. </para
+><para
+>عند بدء لعبة جديدة، ستتمكن من اختيار مجموعة قواعد لتلك اللعبة. يمكن استخدام جميع مجموعات القواعد المعرفة في محرر مجموعات القواعد. تُحفظ مجموعة القواعد مع اللعبة، لذا يمكنك دائمًا تغيير مجموعات القواعد هنا - ستؤثر تغييراتك فقط على الألعاب المستقبلية. </para>
+			<sect2
+><title
+>القاعدة، النقاط، x2، الحدود</title
+><para
+>ببساطة انقر نقرًا مزدوجًا على أي شيء تريد تغييره. إذا مُسحت جميع القيم، فلن يكون لهذه القاعدة أي تأثير على اللعبة. لا يمكن حذف القواعد.</para>
+			</sect2>
+			<sect2
+><title
+>نسخ وإزالة</title
+><para
+>يمكنك نسخ وإزالة مجموعات قواعد كاملة. </para
+><para
+>مرة أخرى، يمكن القيام بذلك حتى لو كانت الألعاب الحالية تستخدم مجموعة القواعد هذه بما أن كل لعبة لديها نسخة مجموعة قواعد خاصة بها. يمكنك عرض مجموعات القواعد للألعاب القديمة: <link linkend="game-menu-scoreGame"
+>حمل</link
+> اللعبة القديمة و <link linkend="view-explain-scores"
+>اعرض جدول نقاطها</link
+>. </para>
+			</sect2>
+			<sect2
+><title
+>قارن</title
+><para>
+			<screenshot>
+				<screeninfo
+>مقارن مجموعات القواعد</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="differ.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>مقارن مجموعات القواعد</phrase
+></textobject>
+				</mediaobject>
+			</screenshot
+>يمكنك اختيار هذا الأمر عندما تُحدد مجموعة قواعد كاملة. يتيح لك مقارنة مجموعة القواعد المحددة بأي مجموعة قواعد أخرى. </para
+></sect2>
+</sect1>
+
+<sect1 id="default-keybindings">
+<title
+>ارتباطات المفاتيح المبدئية</title>
+
+<!-- TODO: not yet implemented
+<para
+>The menu entry <menuchoice
+><guimenu
+>Settings</guimenu
+> <guimenuitem
+>Configure ...</guimenuitem
+></menuchoice
+> allows you to change the default keyboard bindings.</para
+> -->
+
+<para
+>الاختصارات المبدئية هي كما يلي: </para>
+
+<para>
+<variablelist>
+
+<varlistentry>
+<term
+><keycap
+>F1</keycap
+></term>
+<listitem>
+<para
+>يعرض هذا الدليل. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>سجّل نقاط لعبة يدوية. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>العب لعبة مع الأصدقاء أو لاعبي الحاسوب. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>ألغ اللعبة الحالية. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>اخرج من البرنامج. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>يعرض جدول النقاط. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>يعرض نافذة دردشة. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>يغير زاوية الرؤية. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>يفعل أو يعطل الوضع التجريبي. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Shift;<keycap
+>F1</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>مساعدة "ما هذا". </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>وضع ملء الشاشة. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</para>
+
+</sect1>
+</chapter>
+
+<appendix id="problems"
+><title
+>مشاكل معروفة</title>
+        <itemizedlist>
+                <listitem
+><para
+>في وضع اللعب، العقوبات ليست ممكنة بعد.</para
+></listitem>
+                <listitem
+><para
+>لاعبو الحاسوب لا يزالون أغبياء نوعاً ما.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="future"
+><title
+>ميزات مستقبلية ممكنة</title>
+        <itemizedlist>
+                <listitem
+><para
+>إضافة المزيد من مجموعات القواعد. يجب أن يتم ذلك اختياريًا بواسطة الأشخاص الذين يستخدمون تلك المجموعات بانتظام.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+ <appendix id="faq"
+><title
+>الأسئلة الشائعة</title
+> <!-- do not change this! -->
+<!--This chapter is for frequently asked questions. Please use <qandaset
+> <qandaentry
+> only!-->
+<qandaset>
+<!--Following is a standard list of FAQ questions.-->
+        <qandaentry>
+                 <question
+><para
+>أريد تغيير شكل اللعبة. هل يمكنني ذلك؟ </para
+></question>
+                 <answer
+><para
+>نعم. لتغيير مظهر كاجونغ استخدم شريط القوائم لفتح <link linkend="configuration"
+>أداة الضبط</link
+>.</para
+></answer>
+        </qandaentry>
+        <qandaentry>
+                 <question
+><para
+>هل يمكنني استخدام لوحة المفاتيح لإسناد البلاطات للاعبين؟</para
+></question>
+                 <answer
+><para
+>نعم. راجع <link linkend="enterhand-tiles"
+>اجعل كاجونغ يحسب النقاط</link
+>.</para
+></answer>
+        </qandaentry>
+<!--Please add more Q&As if needed-->
+
+</qandaset>
+</appendix>
+
+<appendix id="credits"
+><title
+>الحقوق والترخيص</title
+> <!-- do not change this! -->
+<!--This chapter is for credits and licenses.-->
+	<para
+>كاجونغ لكيدي </para>
+
+	<para
+>حقوق نشر البرنامج &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+	<para
+>حقوق نشر التوثيق &copy; 2009-2017 &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </para>
+
+<!-- !!!do not change ANYTHING after this line!!!! -->
+<para
+>الترجمة: زايد السعيدي <email
+>zayed.alsaidi@gmail.com</email
+></para
+> 
+&underFDL;
+&underGPL;
+
+</appendix>
+
+<appendix id="bibliography">
+<title
+>ثبَت مراجع</title>
+        <itemizedlist>
+		<listitem
+><para
+>كتاب Das Chinesische Mah-Jongg-Spiel بواسطة Uwe Martens لعام 2005، Books on Demand GmbH، Norderstedt. هذا الكتاب مرجع ألماني ممتاز يحتوي على كل ما تريد معرفته عن القواعد المستخدمة في ألمانيا والعديد من الجوانب الأخرى للعبة.</para
+></listitem>
+                <listitem
+><para
+>كتاب The Complete Book of Mah-Jongg بواسطة A. D. Millington لعام 1977 (مع عدة طبعات ورقية حتى عام 2003)، Weidenfeld &amp; Nicolson، لندن. هذا هو المرجع النهائي للعبة ماجونغ الصينية الكلاسيكية كما تُلعب في العالم الغربي. يمكن أن يعطيك تلميحات قيمة حول استراتيجيات اللعبة.</para
+></listitem>
+		<listitem
+><para
+>كتاب Mah-Jong بواسطة Gwyn Headley و Yvonne Seeley، الطبعة الثالثة، 2008، A &amp; C Black Publishers Ltd.، لندن. هذا الكتاب مرجع سهل الاستخدام للغاية، يركز على القواعد المستخدمة في بريطانيا العظمى، والتي حددتها BMJA (الجمعية البريطانية للماجونغ).</para
+></listitem>
+		<listitem
+><para
+><ulink url="https://en.wikipedia.org/wiki/Mahjong"
+></ulink
+></para
+></listitem>
+		<listitem
+><para
+><ulink url="https://de.wikipedia.org/wiki/Mah-Jongg"
+></ulink
+></para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="installation">
+<title
+>التثبيت</title>
+<para
+>لـ لينكس: يجب أن تكون توزيعتك قد حزمت البرنامج لك. </para>
+<para
+>لـ ويندوز: يرجى مراجعة <ulink url="https://www.linux-apps.com/p/1109453/"
+></ulink
+> للحصول على مثبت ويندوز. </para>
+<para
+>إذا أردت تنزيل المصدر والتثبيت يدوياً: <itemizedlist>
+<listitem
+><para
+> <literal
+>git clone https://invent.kde.org/games/kajongg.git</literal
+> </para
+></listitem>
+<listitem
+><para
+>لأنظمة لينكس: <literal
+>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal
+> </para
+></listitem>
+<listitem
+><para
+>لأنظمة ويندوز: يرجى قراءة الملف <filename
+>README.windows</filename
+></para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>تعتمد كاجونغ على هذه الحزم: (أسماء حزم ديبيان بين قوسين) <itemizedlist>
+	<listitem
+><para
+>بايثون 3.8 أو أعلى (python3)</para
+></listitem>
+	<listitem
+><para
+>Qt6.5 أو أعلى (python3-pyqt6 و python3-pyqt6.qtsvg)</para
+></listitem>
+	<listitem
+><para
+>ارتباطات بايثون لـ Qt6 ‏(python3-pyqt6)</para
+></listitem>
+        <listitem
+><para
+>مكتبة python twisted نسخة 16.6.0 أو أعلى (python3-twisted)</para
+></listitem>
+        <listitem
+><para
+>sqlite3 (libsqlite3-0)</para
+></listitem>
+</itemizedlist>
+</para>
+
+</appendix>
+
+&documentation.index;
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-always-quote-attributes:t
+sgml-indent-step:0
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
