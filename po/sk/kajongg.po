@@ -13,8 +13,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 21.12.3\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Lokalize 21.12.3\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -31,36 +31,26 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr "súbor <filename>%1</filename> obsahuje neplatnú SVG"
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "Náhľad"
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "Vlastnosti"
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
 msgstr "Autor:"
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "Kontakt:"
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "Popis:"
@@ -314,9 +304,6 @@ msgstr ""
 "neukazovať žiadne grafické používateľské rozhranie. Určené len pre testovanie"
 
 #: src/kajongg.py:99
-#, fuzzy
-#| msgid ""
-#| "use a dedicated server listening on SOCKET. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
@@ -324,8 +311,6 @@ msgstr ""
 "použiť vyhradený server bude počúvajúci na SOCKET. Určené len pre testovanie"
 
 #: src/kajongg.py:101
-#, fuzzy
-#| msgid "use a dedicated server listening on PORT. Intended only for testing"
 msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
@@ -1107,8 +1092,6 @@ msgid "The hand contains too many tiles"
 msgstr "Ruka obsahuje príliš veľa hracích kameňov"
 
 #: src/predefined.py:109
-#, fuzzy
-#| msgid "Zero Point Hand"
 msgid "Tiles in Hand"
 msgstr "Ruka s nulovými bodmi"
 
@@ -1179,21 +1162,23 @@ msgstr "Štandardné otáčanie"
 
 #: src/predefined.py:152
 msgid "Discard tiles ordered"
-msgstr ""
+msgstr "Odhodené kamene usporiadané"
 
 #: src/predefined.py:154
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Odhodené kamene usporiadané zľava zhora"
 
 #: src/predefined.py:156
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Ponechať medzery pre nárokované odhodenia"
 
 #: src/predefined.py:159
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Iba pri usporiadanom odhodení kameňov: Neumiestňovať ďalšie odhodenie na "
+"miesto, kde bol nárokovaný odhodený kameň"
 
 #: src/predefined.py:168
 msgid "Last Tile Completes Pair of 2..8"
@@ -1677,13 +1662,15 @@ msgstr "Volanie pre Čistotu"
 
 #: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "Taiwanská hra so 16 kameňmi, PRE VÝVOJÁROV"
 
 #: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"Taiwanský 16-kameňový Mah Jongg, skorá alfa verzia. Pozrite https://bugs.kde."
+"org/show_bug.cgi?id=298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
@@ -2011,8 +1998,6 @@ msgid "Player %1 has logged out"
 msgstr "Hráč %1 sa odhlásil"
 
 #: src/server.py:436
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
 msgid "the server will listen on PORT ({int(defaultPort)})"
 msgstr "server bude počúvať na PORT (%d)"
 
@@ -2069,7 +2054,7 @@ msgstr "Hra <numid>%1</numid>je skončená!"
 
 #: src/servertable.py:730
 msgid "%1 wrongly said %2 for meld %3"
-msgstr "%1 chybne povedal Kong pre kombináciu %3"
+msgstr "%1 wrongly said %2 for meld %3"
 
 #: src/servertable.py:735
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
@@ -2357,36 +2342,26 @@ msgid "{state} {meldType} {name}"
 msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "Náhľad"
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "Vlastnosti"
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
 msgstr "Autor:"
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "Kontakt:"
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "Popis:"
