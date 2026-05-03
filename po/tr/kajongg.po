@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-# SPDX-FileCopyrightText: 2022, 2023, 2024, 2025 Emir SARI <emir_sari@icloud.com>
+# SPDX-FileCopyrightText: 2022, 2023, 2024, 2025, 2026 Emir SARI <emir_sari@icloud.com>
 # Osman Tosun <rainman.neu@gmail.com>, 2008.
 # obsoleteman <tulliana@gmail.com>, 2009.
 # Serhat Demirkol <serhat_demirkol@yahoo.com>, 2009.
@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-11-17 11:49+0000\n"
-"PO-Revision-Date: 2025-12-23 11:35+0300\n"
+"PO-Revision-Date: 2026-05-02 18:52+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 25.12.0\n"
+"X-Generator: Lokalize 25.12.3\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -315,7 +315,7 @@ msgid ""
 "use a dedicated server already running and listening on SOCKET. Intended "
 "only for testing"
 msgstr ""
-"YUVA üzerinde halihazırda çalışan ve dinleyen özel bir sunucu kullanın. "
+"YUVA üzerinde hâlihazırda çalışan ve dinleyen özel bir sunucu kullanın. "
 "Yalnızca sınama amaçlıdır"
 
 #: src/kajongg.py:101
@@ -323,7 +323,7 @@ msgid ""
 "use a dedicated server already running and listening on PORT. Intended only "
 "for testing"
 msgstr ""
-"KAPI üzerinde halihazırda çalışan ve dinleyen özel bir sunucu kullanın. "
+"KAPI üzerinde hâlihazırda çalışan ve dinleyen özel bir sunucu kullanın. "
 "Yalnızca sınama amaçlıdır"
 
 #: src/kdestub.py:278
