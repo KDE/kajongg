@@ -1,13 +1,13 @@
 # Copyright (C) 2024 This file is copyright:
 # This file is distributed under the same license as the kajongg package.
 #
-# SPDX-FileCopyrightText: 2024 Yaron Shahrabani <sh.yaron@gmail.com>
+# SPDX-FileCopyrightText: 2024, 2026 Yaron Shahrabani <sh.yaron@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-11-17 11:49+0000\n"
-"PO-Revision-Date: 2024-10-11 16:16+0300\n"
+"PO-Revision-Date: 2026-05-23 16:17+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
 "n % 10 == 0) ? 2 : 3));\n"
-"X-Generator: Lokalize 24.05.2\n"
+"X-Generator: Lokalize 26.04.0\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -1979,7 +1979,7 @@ msgstr ""
 
 #: src/servertable.py:701
 msgid "Game <numid>%1</numid> is over!"
-msgstr ""
+msgstr "המשחק <numid>%1</numid> נגמר!"
 
 #: src/servertable.py:730
 msgid "%1 wrongly said %2 for meld %3"
@@ -2007,11 +2007,11 @@ msgstr "לא ניתן לכתוב את <filename>%1</filename>: %2"
 
 #: src/sound.py:378
 msgid "The voice files have changed, their checksum has changed."
-msgstr ""
+msgstr "קובצי הקול השתנו, סיכום הביקורת השתנה."
 
 #: src/sound.py:379
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
-msgstr ""
+msgstr "נא להתקין את kajongg מחדש או לבצע את זה עם הרשאות מתאימות:"
 
 #: src/tables.py:65
 msgid "Table"
