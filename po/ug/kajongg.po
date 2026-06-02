@@ -8,14 +8,15 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-11-17 11:49+0000\n"
-"PO-Revision-Date: 2013-09-08 07:05+0900\n"
-"Last-Translator: Gheyret Kenji <gheyret@gmail.com>\n"
+"PO-Revision-Date: 2026-05-30 16:44-0400\n"
+"Last-Translator: Abduqadir Abliz <sahranbay@gmail.com>\n"
 "Language-Team: Uyghur Computer Science Association <UKIJ@yahoogroups.com>\n"
 "Language: ug\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.9\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -32,36 +33,26 @@ msgid "file <filename>%1</filename> contains no valid SVG"
 msgstr ""
 
 #: src/backgroundselector.py:107
-#, fuzzy
-#| msgid "Preview"
 msgctxt "BackgroundSelector"
 msgid "Preview"
 msgstr "ئالدىن كۆزەت"
 
 #: src/backgroundselector.py:108
-#, fuzzy
-#| msgid "Properties"
 msgctxt "BackgroundSelector"
 msgid "Properties"
 msgstr "خاسلىق"
 
 #: src/backgroundselector.py:109
-#, fuzzy
-#| msgid "Author:"
 msgctxt "BackgroundSelector"
 msgid "Author:"
-msgstr "ئاپتور:"
+msgstr "يازغۇچى:"
 
 #: src/backgroundselector.py:110
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "BackgroundSelector"
 msgid "Contact:"
 msgstr "ئالاقەداش:"
 
 #: src/backgroundselector.py:111
-#, fuzzy
-#| msgid "Description:"
 msgctxt "BackgroundSelector"
 msgid "Description:"
 msgstr "چۈشەندۈرۈش:"
@@ -99,7 +90,7 @@ msgstr "ئېسىپ قويۇلدى"
 #: src/client.py:74
 msgctxt "table status"
 msgid "Running"
-msgstr "ئىجرادا"
+msgstr "ئىجرا قىلىنىۋاتىدۇ"
 
 #: src/client.py:75
 msgctxt "table status"
@@ -137,7 +128,7 @@ msgstr ""
 #: src/configdialog.py:103
 msgctxt "kajongg"
 msgid "Play"
-msgstr "قوي"
+msgstr "ياڭرات"
 
 #: src/configdialog.py:106
 msgid "Tiles"
@@ -163,8 +154,6 @@ msgid "Rule"
 msgstr "قائىدە"
 
 #: src/differ.py:127
-#, fuzzy
-#| msgid "Compare"
 msgctxt "@title:window"
 msgid "Compare"
 msgstr "سېلىشتۇر"
@@ -195,12 +184,9 @@ msgid "Started"
 msgstr "باشلاندى"
 
 #: src/games.py:107
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Games"
 msgctxt "@title:window"
 msgid "Games"
-msgstr "ئويۇنلار"
+msgstr "ئويۇن"
 
 #: src/games.py:124
 msgctxt "start a new game"
@@ -227,7 +213,7 @@ msgstr ""
 
 #: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
 msgid "Kajongg"
-msgstr "Kajongg"
+msgstr ""
 
 #: src/humanclient.py:66
 msgid "Which chow do you want to expose?"
@@ -327,138 +313,116 @@ msgid ""
 msgstr ""
 
 #: src/kdestub.py:278
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "OK"
 msgid "&OK"
-msgstr "تامام"
+msgstr "جەزملە(&O)"
 
 #: src/kdestub.py:279
 msgid "&Apply"
-msgstr ""
+msgstr "قوللان(&A)"
 
 #: src/kdestub.py:280
 msgid "&Cancel"
-msgstr ""
+msgstr "ۋاز كەچ(&C)"
 
 #: src/kdestub.py:281 src/kdestub.py:469
 msgid "&Help"
-msgstr ""
+msgstr "ياردەم(&H)"
 
 #: src/kdestub.py:282
 msgid "&Defaults"
-msgstr ""
+msgstr "كۆڭۈلدىكى(&D)"
 
 #: src/kdestub.py:352
-#, fuzzy
-#| msgid "Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show St&atusbar"
-msgstr "قورال بالداق"
+msgstr "ھالەت بالدىقىنى كۆرسەت(&A)"
 
 #: src/kdestub.py:358
-#, fuzzy
-#| msgid "Toolbar"
 msgctxt "@action:inmenu"
 msgid "Show &Toolbar"
-msgstr "قورال بالداق"
+msgstr "قورال بالداق كۆرسەت(&T)"
 
 #: src/kdestub.py:364
-#, fuzzy
-#| msgid "Kajongg"
 msgid "Configure Tool&bars..."
-msgstr "Kajongg"
+msgstr "قورال بالداق سەپلە(&B)…"
 
 #: src/kdestub.py:366
 msgid "Configure toolbars"
 msgstr ""
 
 #: src/kdestub.py:373
-#, fuzzy
-#| msgid "Kajongg"
 msgid "Configure &Kajongg..."
-msgstr "Kajongg"
+msgstr ""
 
 #: src/kdestub.py:375 src/kdestub.py:1153
 msgid "Configure"
-msgstr ""
+msgstr "سەپلە"
 
 #: src/kdestub.py:465
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Game"
 msgid "&Game"
-msgstr "ئويۇن"
+msgstr "ئويۇن(&G)"
 
 #: src/kdestub.py:466
-#, fuzzy
-#| msgid "View"
 msgid "&View"
-msgstr "كۆرۈنۈش"
+msgstr "كۆرۈنۈش(&V)"
 
 #: src/kdestub.py:467
 msgid "&Settings"
-msgstr ""
+msgstr "تەڭشەك(&S)"
 
 #: src/kdestub.py:477
 msgctxt "@action:inmenu"
 msgid "&Help"
-msgstr ""
+msgstr "ياردەم(&H)"
 
 #: src/kdestub.py:480 src/kdestub.py:857
 msgid "Switch Application Language"
-msgstr ""
+msgstr "پىروگرامما تىلىنى ئۆزگەرت"
 
 #: src/kdestub.py:484
-#, fuzzy
-#| msgid "Kajongg"
 msgctxt "@action:inmenu"
 msgid "About &Kajongg"
-msgstr "Kajongg"
+msgstr ""
 
 #: src/kdestub.py:862
 msgid "Please choose the language which should be used for this application:"
-msgstr ""
+msgstr "پىروگراممىدا ئىشلىتىلىدىغان تىلنى تاللاڭ:"
 
 #: src/kdestub.py:881
 msgid "Add Fallback Language"
-msgstr ""
+msgstr "زاپاس تىلنى قوش"
 
 #: src/kdestub.py:893
 msgid "Primary language:"
-msgstr ""
+msgstr "ئاساسىي تىل:"
 
 #: src/kdestub.py:893
 msgid "Fallback language:"
-msgstr ""
+msgstr "زاپاس تىل:"
 
 #: src/kdestub.py:899
-#, fuzzy
-#| msgid "R&emove"
 msgid "Remove"
-msgstr "چىقىرىۋەت(&E)"
+msgstr "چىقىرىۋەت"
 
 #: src/kdestub.py:903
 msgid ""
 "This is the main application language which will be used first, before any "
 "other languages."
-msgstr ""
+msgstr "بۇ مۇشۇ پىروگراممىدا  باشقا تىللاردىن ئاۋۋال ئىشلىتىلىدىغان تىلدۇر."
 
 #: src/kdestub.py:905
 msgid ""
 "This is the language which will be used if any previous languages do not "
 "contain a proper translation."
-msgstr ""
+msgstr "بۇ ئالدىنقى تىلدا مۇۋاپىق تەرجىمە بولمىغاندا ئىشلىتىلىدىغان تىلدۇر."
 
 #: src/kdestub.py:1035
-#, fuzzy
-#| msgid "Kajongg"
 msgid "About Kajongg"
-msgstr "Kajongg"
+msgstr ""
 
 #: src/kdestub.py:1055
 msgid "Version: %1"
-msgstr ""
+msgstr "نەشرى: %1"
 
 #: src/kdestub.py:1056
 msgid "Protocol version %1"
@@ -466,7 +430,7 @@ msgstr ""
 
 #: src/kdestub.py:1059
 msgid "Original author"
-msgstr "ئەسلى ئاپتور"
+msgstr "ئەسلى يازغۇچى"
 
 #: src/kdestub.py:1066
 msgid "KDE Frameworks (not installed or not usable)"
@@ -490,22 +454,20 @@ msgid ""
 msgstr ""
 
 #: src/kdestub.py:1115
-#, fuzzy
-#| msgid "Author:"
 msgid "Authors:"
-msgstr "ئاپتور:"
+msgstr ""
 
 #: src/kdestub.py:1356
 msgid "Configure Toolbars"
-msgstr ""
+msgstr "قورال بالداق سەپلە"
 
 #: src/kdestub.py:1358
 msgid "A&vailable actions:"
-msgstr ""
+msgstr "ئىشلەتكىلى بولىدىغان مەشغۇلات(&V)"
 
 #: src/kdestub.py:1369
 msgid "Curr&ent actions:"
-msgstr ""
+msgstr "ھازىرقى مەشغۇلات(&E):"
 
 #: src/login.py:177
 msgid "trying to start local server %1"
@@ -520,11 +482,9 @@ msgid "started the local kajongg server: pid=<numid>%1</numid> %2"
 msgstr ""
 
 #: src/login.py:251
-#, fuzzy
-#| msgid "Login"
 msgctxt "kajongg"
 msgid "Login"
-msgstr "كىرىش"
+msgstr "تىزىمغا كىر"
 
 #: src/login.py:300 src/login.py:406
 msgid "Game server:"
@@ -611,12 +571,9 @@ msgid "Start a new game."
 msgstr "يېڭى ئويۇن باشلايدۇ."
 
 #: src/mainwindow.py:498
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Game"
 msgctxt "@action:inmenu"
 msgid "&Abort Game"
-msgstr "ئويۇن"
+msgstr ""
 
 #: src/mainwindow.py:502
 msgctxt "kajongg @info:tooltip"
@@ -624,11 +581,9 @@ msgid "Abort the current game."
 msgstr ""
 
 #: src/mainwindow.py:504
-#, fuzzy
-#| msgid "Kajongg"
 msgctxt "@action:inmenu"
 msgid "&Quit Kajongg"
-msgstr "Kajongg"
+msgstr ""
 
 #: src/mainwindow.py:507
 msgctxt "@action:intoolbar"
@@ -641,12 +596,9 @@ msgid "define your players."
 msgstr ""
 
 #: src/mainwindow.py:512
-#, fuzzy
-#| msgctxt "Kajongg"
-#| msgid "Rule"
 msgctxt "@action:intoolbar"
 msgid "&Rulesets"
-msgstr "قائىدە"
+msgstr ""
 
 #: src/mainwindow.py:515
 msgctxt "kajongg @info:tooltip"
@@ -671,7 +623,7 @@ msgstr ""
 #: src/mainwindow.py:527
 msgctxt "@action:inmenu"
 msgid "F&ull Screen Mode"
-msgstr ""
+msgstr "پۈتۈن ئېكران ھالىتى(&U)"
 
 #: src/mainwindow.py:530
 msgctxt "kajongg @action:inmenu"
@@ -759,7 +711,7 @@ msgstr ""
 #: src/message.py:300
 msgctxt "kajongg game dialog:Key for Kong"
 msgid "K"
-msgstr "K"
+msgstr ""
 
 #: src/message.py:326
 msgid "saying Kong for %1 violates Original Call"
@@ -794,16 +746,14 @@ msgid "Press here and you win"
 msgstr ""
 
 #: src/message.py:401
-#, fuzzy
-#| msgid "Original author"
 msgctxt "kajongg"
 msgid "Original Call"
-msgstr "ئەسلى ئاپتور"
+msgstr ""
 
 #: src/message.py:402
 msgctxt "kajongg game dialog:Key for Original Call"
 msgid "O"
-msgstr "O"
+msgstr ""
 
 #: src/message.py:418
 msgid "discarding %1 and declaring Original Call makes this hand unwinnable"
@@ -823,7 +773,7 @@ msgstr "تاشلىۋەت"
 #: src/message.py:448
 msgctxt "kajongg game dialog:Key for Discard"
 msgid "D"
-msgstr "D"
+msgstr ""
 
 #: src/message.py:465
 msgid "discarding %1 violates Original Call"
@@ -861,17 +811,14 @@ msgid "No Choice"
 msgstr ""
 
 #: src/message.py:896
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "OK"
 msgctxt "kajongg"
 msgid "OK"
-msgstr "تامام"
+msgstr "جەزملە"
 
 #: src/message.py:897
 msgctxt "kajongg game dialog:Key for OK"
 msgid "O"
-msgstr "O"
+msgstr ""
 
 #: src/message.py:901
 msgid "Confirm that you saw the message"
@@ -885,7 +832,7 @@ msgstr ""
 #: src/message.py:910
 msgctxt "kajongg game dialog:Key for No claim"
 msgid "N"
-msgstr "N"
+msgstr "شىمال"
 
 #: src/message.py:914
 msgid "You cannot or do not want to claim this tile"
@@ -901,10 +848,8 @@ msgid "cannot find %1, using default"
 msgstr ""
 
 #: src/mjresource.py:131
-#, fuzzy
-#| msgid "Backgrounds"
 msgid "unknown name"
-msgstr "تەگلىكلەر"
+msgstr ""
 
 #: src/mjresource.py:132
 msgid "unknown author"
@@ -1680,11 +1625,9 @@ msgid "doubles"
 msgstr ""
 
 #: src/rule.py:51
-#, fuzzy
-#| msgid "limits"
 msgctxt "kajongg"
 msgid "limits"
-msgstr "چەك"
+msgstr ""
 
 #: src/rule.py:91
 msgctxt "Kajongg"
@@ -1794,21 +1737,17 @@ msgid "C&opy"
 msgstr ""
 
 #: src/rulesetselector.py:593
-#, fuzzy
-#| msgid "Compare"
 msgctxt "Kajongg ruleset comparer"
 msgid "Co&mpare"
-msgstr "سېلىشتۇر"
+msgstr ""
 
 #: src/rulesetselector.py:594
-#, fuzzy
-#| msgid "R&emove"
 msgid "&Remove"
-msgstr "چىقىرىۋەت(&E)"
+msgstr "چىقىرىۋەت(&R)"
 
 #: src/rulesetselector.py:595
 msgid "&Close"
-msgstr ""
+msgstr "ياپ(&C)"
 
 #: src/scene.py:389 src/scene.py:517
 msgid "Do you really want to abort this game?"
@@ -1901,7 +1840,7 @@ msgstr ""
 
 #: src/scoringdialog.py:588
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: src/scoringdialog.py:602
 msgid "Manual score for %1: %2 points"
@@ -2231,12 +2170,9 @@ msgstr "يېشىل"
 #: src/tile.py:294
 msgctxt "kajongg"
 msgid "East"
-msgstr ""
+msgstr "شەرق"
 
 #: src/tile.py:295
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "south"
 msgctxt "kajongg"
 msgid "South"
 msgstr "جەنۇب"
@@ -2244,33 +2180,24 @@ msgstr "جەنۇب"
 #: src/tile.py:296
 msgctxt "kajongg"
 msgid "West"
-msgstr ""
+msgstr "غەرب"
 
 #: src/tile.py:297
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "north"
 msgctxt "kajongg"
 msgid "North"
 msgstr "شىمال"
 
 #: src/tile.py:306
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Wind"
 msgid "East Wind"
-msgstr "شامال"
+msgstr ""
 
 #: src/tile.py:307
 msgid "South Wind"
 msgstr ""
 
 #: src/tile.py:308
-#, fuzzy
-#| msgctxt "kajongg"
-#| msgid "Wind"
 msgid "West Wind"
-msgstr "شامال"
+msgstr ""
 
 #: src/tile.py:309
 msgid "North Wind"
@@ -2339,36 +2266,26 @@ msgid "{state} {meldType} {name}"
 msgstr ""
 
 #: src/tilesetselector.py:141
-#, fuzzy
-#| msgid "Preview"
 msgctxt "TilesetSelector"
 msgid "Preview"
 msgstr "ئالدىن كۆزەت"
 
 #: src/tilesetselector.py:142
-#, fuzzy
-#| msgid "Properties"
 msgctxt "TilesetSelector"
 msgid "Properties"
 msgstr "خاسلىق"
 
 #: src/tilesetselector.py:143
-#, fuzzy
-#| msgid "Author:"
 msgctxt "TilesetSelector"
 msgid "Author:"
-msgstr "ئاپتور:"
+msgstr "يازغۇچى:"
 
 #: src/tilesetselector.py:144
-#, fuzzy
-#| msgid "Contact:"
 msgctxt "TilesetSelector"
 msgid "Contact:"
 msgstr "ئالاقەداش:"
 
 #: src/tilesetselector.py:145
-#, fuzzy
-#| msgid "Description:"
 msgctxt "TilesetSelector"
 msgid "Description:"
 msgstr "چۈشەندۈرۈش:"
@@ -2382,7 +2299,6 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 
-#, fuzzy
 #~| msgid "Wolfgang Rohdewald"
 #~ msgid "(C) 2008-2016 Wolfgang Rohdewald"
 #~ msgstr "Wolfgang Rohdewald"
@@ -2390,12 +2306,10 @@ msgstr ""
 #~ msgid "Wolfgang Rohdewald"
 #~ msgstr "Wolfgang Rohdewald"
 
-#, fuzzy
 #~| msgid "&Copy"
 #~ msgid "Copy"
 #~ msgstr "كۆچۈر(&C)"
 
-#, fuzzy
 #~| msgid "Compare"
 #~ msgctxt "Kajongg ruleset comparer"
 #~ msgid "Compare"
