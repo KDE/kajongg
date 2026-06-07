@@ -1621,15 +1621,15 @@
 >Kajongg benötigt folgende Pakete: (Name des Debian-Pakts in Klammern) <itemizedlist>
 	<listitem
 ><para
->Python 3.5 oder höher (python3)</para
+>Python 3.8 oder höher (python3)</para
 ></listitem>
 	<listitem
 ><para
->Qt5.7 oder höher (python3-pyqt5 und python3-pyqt5.qtsvg)</para
+>Qt6.5 oder höher (python3-pyqt6 und python3-pyqt6.qtsvg)</para
 ></listitem>
 	<listitem
 ><para
->die Python-Anbindung für Qt5 (python3-pyqt5)</para
+>die Python-Anbindung für Qt6 (python3-pyqt6)</para
 ></listitem>
         <listitem
 ><para
