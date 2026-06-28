@@ -261,7 +261,7 @@ msgstr ""
 
 #: src/kajongg.py:81 src/kdestub.py:1092
 msgid "Mah Jongg - the ancient Chinese board game for 4 players"
-msgstr "Mah Jongg - l'antic joc xinés de taula per a quatre jugadors"
+msgstr "Mah Jongg – l'antic joc xinés de taula per a quatre jugadors"
 
 #: src/kajongg.py:85
 msgid "all robots play with visible concealed tiles"
@@ -1870,7 +1870,7 @@ msgstr "Mou ací les fitxes ocultes"
 #: src/scoring.py:673
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
-"Definiu quatre jugadors en <interface>Configuració -> Jugadors</interface>"
+"Definiu quatre jugadors en <interface>Configuració → Jugadors</interface>"
 
 #: src/scoringdialog.py:258
 msgid "Round/Hand"
