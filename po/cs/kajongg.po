@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-11-17 11:49+0000\n"
-"PO-Revision-Date: 2026-07-15 23:42+0200\n"
+"PO-Revision-Date: 2026-07-16 23:34+0200\n"
 "Last-Translator: Libor Filípek <libor.filipek@gmail.com>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "Language: cs\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.9\n"
+"X-Generator: Lokalize 26.04.3\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -105,7 +105,7 @@ msgstr "Zobrazit stíny kamenů"
 
 #: src/configdialog.py:50
 msgid "Rearrange undisclosed tiles to melds"
-msgstr "Přeskupit nezveřejněné kameny tak, aby vznikly kombinace"
+msgstr "Přeskupit nezveřejněné kameny tak, aby vznikly spojení"
 
 #: src/configdialog.py:53
 msgid "Show only possible actions"
@@ -227,7 +227,7 @@ msgstr "Který chow chcete odhalit?"
 
 #: src/humanclient.py:104
 msgid "Which kong do you want to declare?"
-msgstr "Který kong chcete vyhlásit?"
+msgstr "Který Kong chcete vyhlásit?"
 
 #: src/humanclient.py:172
 msgid "Choose"
@@ -755,7 +755,7 @@ msgstr "C"
 #: src/message.py:378
 msgctxt "kajongg"
 msgid "Mah Jongg"
-msgstr "Mah Jongg"
+msgstr "Mahjong"
 
 #: src/message.py:379
 msgctxt "kajongg game dialog:Key for Mah Jongg"
@@ -860,7 +860,7 @@ msgstr "N"
 
 #: src/message.py:914
 msgid "You cannot or do not want to claim this tile"
-msgstr ""
+msgstr "Tento kámen nemůžete nebo nechcete požadovat"
 
 #: src/mjresource.py:92
 msgid ""
@@ -887,36 +887,36 @@ msgstr "popis není dostupný"
 
 #: src/mjresource.py:138
 msgid "no E-Mail address available"
-msgstr ""
+msgstr "není k dispozici žádná e-mailová adresa"
 
 #: src/player.py:725
 msgid "%1 claiming MahJongg: She does not really have tile %2"
-msgstr ""
+msgstr "%1 požaduje MahJongg: Ve skutečnosti nemá žádný kámen %2"
 
 #: src/player.py:734
 msgid ""
 "%1 claiming MahJongg: She did not pass all concealed tiles to the server"
-msgstr ""
+msgstr "%1 požaduje Mahjongg: Všechny skryté kameny nebyly odevzdány serveru"
 
 #: src/player.py:855
 msgid "Player %1 has 3 or 4 exposed melds, all are green"
-msgstr ""
+msgstr "Hráč %1 má 3 nebo 4 odhalené spojení, všechny jsou zelené"
 
 #: src/player.py:863
 msgid "Player %1 may try a True Color Game"
-msgstr ""
+msgstr "Hráč %1 může zkusit pravou barevnou hru"
 
 #: src/player.py:866
 msgid "Player %1 may try an All Terminals Game"
-msgstr ""
+msgstr "Hráč %1 může zkusit všechny koncové hry"
 
 #: src/player.py:879
 msgid "Player %1 exposed many winds"
-msgstr ""
+msgstr "Hráč %1 odhalil mnoho větrů"
 
 #: src/player.py:883
 msgid "Player %1 exposed many dragons"
-msgstr ""
+msgstr "Hráč %1 odhalil mnoho draků"
 
 #: src/playerlist.py:50
 msgctxt "define a new player"
@@ -936,57 +936,65 @@ msgid ""
 "There are %1 finished and %2 unfinished games for %3, delete %3 anyway?  "
 "This will also delete all games played by %3!"
 msgstr ""
+"Pro %3 je %1 dokončených a %2 nedokončených her. Chcete %3 přesto smazat? "
+"Tím se také smažou všechny hry, které %3 hrál(a)!"
 
 #: src/predefined.py:29
 msgid "Classical Chinese standard"
-msgstr ""
+msgstr "Klasický čínský standard"
 
 #: src/predefined.py:35
 msgid "Classical Chinese"
-msgstr ""
+msgstr "Klasický čínský"
 
 #: src/predefined.py:41
 msgid "Last Tile Taken from Dead Wall"
-msgstr ""
+msgstr "Poslední kámen z mrtvé zdi"
 
 #: src/predefined.py:43
 msgid ""
 "The dead wall is also called kong box: The last 16 tiles of the wall used as "
 "source of replacement tiles"
 msgstr ""
+"Mrtvá zeď se také nazývá kong box: Posledních 16 kamenů ze zdi, která slouží "
+"jako zdroj náhradních kamenů"
 
 #: src/predefined.py:46
 msgid "Last Tile is Last Tile of Wall"
-msgstr ""
+msgstr "Poslední kámen je posledním kamenem zdi"
 
 #: src/predefined.py:48
 msgid ""
 "Winner said Mah Jong with the last tile taken from the living end of the wall"
-msgstr ""
+msgstr "Vítěz vyhrál Mahjong s posledním kamenem, který vzal z živé strany zdi"
 
 #: src/predefined.py:50
 msgid "Last Tile is Last Tile of Wall Discarded"
-msgstr ""
+msgstr "Poslední kámen je posledním kamenem ze zdi, která byla vyřazena"
 
 #: src/predefined.py:52
 msgid ""
 "Winner said Mah Jong by claiming the last tile taken from the living end of "
 "the wall, discarded by another player"
 msgstr ""
+"Vítěz vyhrál Mahjong tím, že si vzal poslední kámen, který byl odebrán z "
+"živé strany zdi a odhozen jiným hráčem"
 
 #: src/predefined.py:55
 msgid "Robbing the Kong"
-msgstr ""
+msgstr "Vykradení Kongu"
 
 #: src/predefined.py:56
 msgid ""
 "Winner said Mah Jong by claiming the 4th tile of a kong another player just "
 "declared"
 msgstr ""
+"Winner vyhrál Mahjong tím, že si vzal čtvrtý kámen z kongu, který právě "
+"vyhlásil jiný hráč"
 
 #: src/predefined.py:59
 msgid "Mah Jongg with Original Call"
-msgstr ""
+msgstr "Mahjong s původním požadavkem"
 
 #: src/predefined.py:62
 msgid ""
@@ -994,10 +1002,13 @@ msgid ""
 "she needs only one tile to complete the hand and announces she will not "
 "alter the hand in any way (except bonus tiles)"
 msgstr ""
+"Těsně před prvním odhozem může hráč vyhlásit původní požadavek, čímž dá "
+"najevo, že k dokončení kombinace mu chybí už jen jeden kámen, a oznámí, že "
+"kombinaci nijak neupraví (s výjimkou bonusových kamenů)."
 
 #: src/predefined.py:65
 msgid "Dangerous Game"
-msgstr ""
+msgstr "Nebezpečná hra"
 
 #: src/predefined.py:66
 msgid ""
@@ -1005,139 +1016,151 @@ msgid ""
 "to win is declared to be dangerous, and if that tile actually makes somebody "
 "win, the discarder pays the winner for all"
 msgstr ""
+"V některých situacích je odhození kamenu, u kterého je vysoká "
+"pravděpodobnost, že někomu pomůže vyhrát, považováno za nebezpečné, a pokud "
+"tento kámen skutečně někomu zajistí výhru, ten, kdo jej odhodil, zaplatí "
+"vítězi za všechny"
 
 #: src/predefined.py:70
 msgid "Twofold Fortune"
-msgstr ""
+msgstr "Dvojnásobné štěstí"
 
 #: src/predefined.py:71
 msgid ""
 "Kong after Kong: Declare Kong and a second Kong with the replacement tile "
 "and Mah Jong with the second replacement tile"
 msgstr ""
+"Kong za Kongem: Vyhlaste Kong a druhý Kong s náhradním kamenem a Mahjong s "
+"druhým náhradním kamenem"
 
 #: src/predefined.py:75
 msgid "Blessing of Heaven"
-msgstr ""
+msgstr "Nebeské požehnání"
 
 #: src/predefined.py:76
 msgid "East says Mah Jong with the unmodified dealt tiles"
-msgstr ""
+msgstr "Východ řekne Mahjong s nezměněnými rozdanými kameny"
 
 #: src/predefined.py:78
 msgid "Blessing of Earth"
-msgstr ""
+msgstr "Požehnání země"
 
 #: src/predefined.py:79
 msgid ""
 "South, West or North says Mah Jong with the first tile discarded by East"
 msgstr ""
+"Jih, Západ nebo Sever řekne Mahjong na základě prvního kamenu, který odhodil "
+"Východ"
 
 #: src/predefined.py:81
 msgid "East won nine times in a row"
-msgstr ""
+msgstr "Východ vyhrál devětkrát za sebou"
 
 #: src/predefined.py:82
 msgid "If that happens, East gets a limit score and the winds rotate"
 msgstr ""
+"Pokud k tomu dojde, Východ získá maximální počet bodů a směry větru se změní"
 
 #: src/predefined.py:87
 msgid ""
 "False Naming of Discard, Claimed for Mah Jongg and False Declaration of Mah "
 "Jongg"
 msgstr ""
+"Nesprávné označení vyřazené karty, požadavek o Mahjongu a nesprávné "
+"vyhlášení Mahjongu"
 
 #: src/predefined.py:93
 msgid "Own Flower and Own Season"
-msgstr ""
+msgstr "Vlastní květina a vlastní roční období"
 
 #: src/predefined.py:96
 msgid "All Flowers"
-msgstr ""
+msgstr "Všechny květiny"
 
 #: src/predefined.py:97
 msgid "All Seasons"
-msgstr ""
+msgstr "Všechna roční období"
 
 #: src/predefined.py:99
 msgid "Three Concealed Pongs"
-msgstr ""
+msgstr "Tři skryté Pongy"
 
 #: src/predefined.py:103
 msgid "Long Hand"
-msgstr ""
+msgstr "Dlouhá kombinace"
 
 #: src/predefined.py:104
 msgid "The hand contains too many tiles"
-msgstr ""
+msgstr "V kombinaci je příliš mnoho kamenů"
 
 #: src/predefined.py:109
 msgid "Tiles in Hand"
-msgstr ""
+msgstr "Kameny v kombinaci"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
-msgstr ""
+msgstr "Body potřebné pro Mahjong"
 
 #: src/predefined.py:118
 msgid "Minimum number of doubles needed for Mah Jongg"
-msgstr ""
+msgstr "Minimální počet dvojic potřebných pro Mahjong"
 
 #: src/predefined.py:121
 msgid "Points for a Limit Hand"
-msgstr ""
+msgstr "Body za omezenou kombinaci"
 
 #: src/predefined.py:125
 msgid "Play with the roof off"
-msgstr ""
+msgstr "Hrát bez střechy"
 
 #: src/predefined.py:126
 msgid "Play with no upper scoring limit"
-msgstr ""
+msgstr "Hrát bez horního limitu skóre"
 
 #: src/predefined.py:128
 msgid "Claim Timeout"
-msgstr ""
+msgstr "Požádat o timeout"
 
 #: src/predefined.py:132
 msgid "Size of Kong Box"
-msgstr ""
+msgstr "Velikost Kong Boxu"
 
 #: src/predefined.py:133
 msgid "The Kong Box is used for replacement tiles when declaring kongs"
-msgstr ""
+msgstr "Kong Box slouží k nahrazení kamenů při vyhlášení Kongu"
 
 #: src/predefined.py:135
 msgid "Play with Bonus Tiles"
-msgstr ""
+msgstr "Hrát s bonusovými kameny"
 
 #: src/predefined.py:136
 msgid "Bonus tiles increase the luck factor"
-msgstr ""
+msgstr "Bonusové kameny zvyšují faktor štěstí"
 
 #: src/predefined.py:138
 msgid "Minimum number of rounds in game"
-msgstr ""
+msgstr "Minimální počet kol ve hře"
 
 #: src/predefined.py:142
 msgid "number of allowed chows"
-msgstr ""
+msgstr "počet povolených chow"
 
 #: src/predefined.py:143
 msgid "The number of chows a player may build"
-msgstr ""
+msgstr "Počet chow, které může hráč sestavit"
 
 #: src/predefined.py:145
 msgid "must declare calling hand"
-msgstr ""
+msgstr "musí vyhlásit výherní kombinaci"
 
 #: src/predefined.py:147
 msgid "Mah Jongg is only allowed after having declared to have a calling hand"
 msgstr ""
+"Mahjong je povolen pouze poté, co hráč vyhlásí, že má výherní kombinaci."
 
 #: src/predefined.py:149
 msgid "Standard Rotation"
-msgstr ""
+msgstr "Standardní rotace"
 
 #: src/predefined.py:152
 msgid "Discard tiles ordered"
@@ -1145,131 +1168,135 @@ msgstr "Odhodit seřazené kameny"
 
 #: src/predefined.py:154
 msgid "Discard tiles ordered from top left"
-msgstr ""
+msgstr "Odhodit kameny v pořadí od levého horního rohu"
 
 #: src/predefined.py:156
 msgid "Leave holes for claimed discards"
-msgstr ""
+msgstr "Nechat mezery pro požadované odhozy"
 
 #: src/predefined.py:159
 msgid ""
 "Only when discarding tiles ordered: Do not place the next discard where the "
 "claimed discard was"
 msgstr ""
+"Pouze při odhazování kamenů v tomto pořadí: Další odhozený kámen nesmíte "
+"položit na místo, kde byla odhozen ten, o který jste si vyžádal"
 
 #: src/predefined.py:168
 msgid "Last Tile Completes Pair of 2..8"
-msgstr ""
+msgstr "Poslední kámen dokončuje pár 2..8"
 
 #: src/predefined.py:172
 msgid "Last Tile Completes Pair of Terminals or Honors"
-msgstr ""
+msgstr "Poslední kámen dokončuje pár koncových nebo čestných"
 
 #: src/predefined.py:175
 msgid "Last Tile is Only Possible Tile"
-msgstr ""
+msgstr "Poslední kámen je jediný možný kámen"
 
 #: src/predefined.py:179
 msgid "Won with Last Tile Taken from Wall"
-msgstr ""
+msgstr "Vyhrát s posledním kamenem odebraným ze zdi"
 
 #: src/predefined.py:184
 msgid "Zero Point Hand"
-msgstr ""
+msgstr "Kombinace nulového bodu"
 
 #: src/predefined.py:185
 msgid "The hand has 0 basis points excluding bonus tiles"
-msgstr ""
+msgstr "Tato kombinace má 0 základních bodů bez bonusových kamenů"
 
 #: src/predefined.py:186
 msgid "No Chow"
-msgstr ""
+msgstr "Žádný chow"
 
 #: src/predefined.py:188
 msgid "Only Concealed Melds"
-msgstr ""
+msgstr "Pouze skryté spojení"
 
 #: src/predefined.py:192
 msgid "False Color Game"
-msgstr ""
+msgstr "Hra s falešnými barvami"
 
 #: src/predefined.py:193
 msgid ""
 "Only same-colored tiles (only bamboo/stone/character) plus any number of "
 "winds and dragons"
 msgstr ""
+"Pouze kameny stejné barvy (pouze bambus, kámen a znak) plus libovolný počet "
+"větrů a draků"
 
 #: src/predefined.py:196
 msgid "True Color Game"
-msgstr ""
+msgstr "Hra s pravými barvami"
 
 #: src/predefined.py:197
 msgid "Only same-colored tiles (only bamboo/stone/character)"
-msgstr ""
+msgstr "Pouze kameny stejné barvy (pouze bambus, kámen a znak)"
 
 #: src/predefined.py:199
 msgid "Concealed True Color Game"
-msgstr ""
+msgstr "Hra se skrytými pravými barvami"
 
 #: src/predefined.py:200
 msgid "All tiles concealed and of the same suit, no honors"
-msgstr ""
+msgstr "Všechny kameny jsou skryté a stejné hodnoty, žádné čestné"
 
 #: src/predefined.py:202
 msgid "Only Terminals and Honors"
-msgstr ""
+msgstr "Pouze koncové a čestné"
 
 #: src/predefined.py:203
 msgid "Only winds, dragons, 1 and 9"
-msgstr ""
+msgstr "Pouze větry, draci, 1 a 9"
 
 #: src/predefined.py:204
 msgid "Only Honors"
-msgstr ""
+msgstr "Pouze čestné"
 
 #: src/predefined.py:205
 msgid "Only winds and dragons"
-msgstr ""
+msgstr "Pouze větry a draci"
 
 #: src/predefined.py:207
 msgid "Hidden Treasure"
-msgstr ""
+msgstr "Skrytý poklad"
 
 #: src/predefined.py:208
 msgid "Only hidden Pungs or Kongs, last tile from wall"
-msgstr ""
+msgstr "Pouze skryté Pung nebo Kong, poslední kámen ze zdi"
 
 #: src/predefined.py:210
 msgid "Heads and Tails"
-msgstr ""
+msgstr "Hlava a orel"
 
 #: src/predefined.py:211
 msgid "Only 1 and 9"
-msgstr ""
+msgstr "Pouze 1 a 9"
 
 #: src/predefined.py:213
 msgid "Fourfold Plenty"
-msgstr ""
+msgstr "Čtyřnásobná hojnost"
 
 #: src/predefined.py:214
 msgid "4 Kongs"
-msgstr ""
+msgstr "4 Kongy"
 
 #: src/predefined.py:216 src/predefined.py:430
 msgid "Three Great Scholars"
-msgstr ""
+msgstr "Tři velcí učenci"
 
 #: src/predefined.py:217 src/predefined.py:337
 msgid "3 Pungs or Kongs of dragons"
-msgstr ""
+msgstr "3 Pungy nebo Kongy draků"
 
 #: src/predefined.py:218
 msgid "Four Blessings Hovering over the Door"
-msgstr ""
+msgstr "Čtyři požehnání visící nad dveřmi"
 
 #: src/predefined.py:220 src/predefined.py:342
 msgid "4 Pungs or Kongs of winds"
-msgstr ""
+msgstr "4 Pungy nebo Kongy větrů"
 
 #: src/predefined.py:221
 msgid "Imperial Jade"
@@ -1277,27 +1304,27 @@ msgstr "Císařský nefrit"
 
 #: src/predefined.py:222
 msgid "Only green tiles: Green dragon and Bamboo 2,3,4,6,8"
-msgstr ""
+msgstr "Pouze zelené kameny: Zelený drak a Bambus 2, 3, 4, 6, 8"
 
 #: src/predefined.py:223
 msgid "Gathering the Plum Blossom from the Roof"
-msgstr ""
+msgstr "Sběr květů švestky ze střechy"
 
 #: src/predefined.py:225
 msgid "Mah Jong with stone 5 from the dead wall"
-msgstr ""
+msgstr "Mahjong s kamenem číslo 5 z mrtvé zdi"
 
 #: src/predefined.py:227
 msgid "Plucking the Moon from the Bottom of the Sea"
-msgstr ""
+msgstr "Zvedání měsíce z hlubin moře"
 
 #: src/predefined.py:228
 msgid "Mah Jong with the last tile from the wall being a stone 1"
-msgstr ""
+msgstr "Mahjong, kde poslední kamenem ze zdi je kámen s číslem 1"
 
 #: src/predefined.py:230
 msgid "Scratching a Carrying Pole"
-msgstr ""
+msgstr "Škrábání na nosné tyči"
 
 #: src/predefined.py:231
 msgid "Robbing the Kong of bamboo 2"
@@ -1483,7 +1510,7 @@ msgstr ""
 
 #: src/predefined.py:392 src/predefined.py:532
 msgid "Original Call"
-msgstr ""
+msgstr "Původní požadavek"
 
 #: src/predefined.py:396
 msgid "Gates of Heaven"
@@ -1572,7 +1599,7 @@ msgstr ""
 
 #: src/predefined.py:455
 msgid "Calling for Wriggling Snake"
-msgstr ""
+msgstr "Vyhlášení kroutícího se hada"
 
 #: src/predefined.py:459
 msgid "Calling for Triple Knitting"
@@ -1672,12 +1699,14 @@ msgstr "%1 mezních hodnot"
 
 #: src/rule.py:366
 msgid "Meld Rules"
-msgstr ""
+msgstr "Pravidla spojení"
 
 #: src/rule.py:367
 msgid ""
 "Meld rules are applied to single melds independent of the rest of the hand"
 msgstr ""
+"Pravidla pro spojení se uplatňují na jednotlivá spojení nezávisle na zbytku "
+"kombinací"
 
 #: src/rule.py:368
 msgid "Hand Rules"
@@ -1936,7 +1965,7 @@ msgstr ""
 
 #: src/scoringdialog.py:876
 msgid "L&ast Meld:"
-msgstr ""
+msgstr "P&oslední spojení:"
 
 #: src/server.py:122
 msgid "Wrong password"
@@ -2007,7 +2036,7 @@ msgstr "Hra <numid>%1</numid> skončila!"
 
 #: src/servertable.py:730
 msgid "%1 wrongly said %2 for meld %3"
-msgstr ""
+msgstr "%1 nesprávně řekl %2 pro spojení %3"
 
 #: src/servertable.py:735
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
@@ -2015,7 +2044,7 @@ msgstr ""
 
 #: src/servertable.py:772
 msgid "declareKong:%1 wrongly said Kong for meld %2"
-msgstr ""
+msgstr "vyhlásit Kong: %1 nesprávně řekl Kong pro spojení %2"
 
 #: src/servertable.py:821
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
