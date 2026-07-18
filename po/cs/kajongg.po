@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-11-17 11:49+0000\n"
-"PO-Revision-Date: 2026-07-16 23:34+0200\n"
+"PO-Revision-Date: 2026-07-17 23:29+0200\n"
 "Last-Translator: Libor Filípek <libor.filipek@gmail.com>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "Language: cs\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Lokalize 26.04.3\n"
+"X-Generator: Poedit 3.9\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -1328,103 +1328,107 @@ msgstr "Škrábání na nosné tyči"
 
 #: src/predefined.py:231
 msgid "Robbing the Kong of bamboo 2"
-msgstr ""
+msgstr "Okrást Konga o bambus 2"
 
 #: src/predefined.py:237 src/predefined.py:526
 msgid "Standard Mah Jongg"
-msgstr ""
+msgstr "Standardní Mahjong"
 
 #: src/predefined.py:242
 msgid "Nine Gates"
-msgstr ""
+msgstr "Devět bran"
 
 #: src/predefined.py:244
 msgid ""
 "A concealed hand in one color 1112345678999 plus last tile of this suit "
 "(from wall or discarded)"
 msgstr ""
+"Skrytá kombinace v jedné barvě 1112345678999 plus poslední kámen této barvy "
+"(ze zdi nebo z odhozu)"
 
 #: src/predefined.py:246
 msgid "Thirteen Orphans"
-msgstr ""
+msgstr "Třináct sirotků"
 
 #: src/predefined.py:247
 msgid ""
 "13 single tiles: All dragons, winds, 1, 9 and a 14th tile building a pair "
 "with one of them"
 msgstr ""
+"13 jednotlivých kamenů: Všichni draci, větry, 1, 9 a 14. kámen, který tvoří "
+"pár s jedním z nich"
 
 #: src/predefined.py:251
 msgid "Pung/Kong of Dragons"
-msgstr ""
+msgstr "Pung/Kong draků"
 
 #: src/predefined.py:253
 msgid "Pung/Kong of Own Wind"
-msgstr ""
+msgstr "Pung/Kong vlastního větru"
 
 #: src/predefined.py:256
 msgid "Pung/Kong of Round Wind"
-msgstr ""
+msgstr "Pung/Kong kruhového větru"
 
 #: src/predefined.py:260
 msgid "Exposed Kong"
-msgstr ""
+msgstr "Odhalený Kong"
 
 #: src/predefined.py:263
 msgid "Exposed Kong of Terminals"
-msgstr ""
+msgstr "Odhalený Kong z koncových"
 
 #: src/predefined.py:266
 msgid "Exposed Kong of Honors"
-msgstr ""
+msgstr "Odhalený Kong z čestných"
 
 #: src/predefined.py:269
 msgid "Exposed Pung"
-msgstr ""
+msgstr "Odhalený Pung"
 
 #: src/predefined.py:272
 msgid "Exposed Pung of Terminals"
-msgstr ""
+msgstr "Odhalený Pung z koncových"
 
 #: src/predefined.py:275
 msgid "Exposed Pung of Honors"
-msgstr ""
+msgstr "Odhalený Pung z čestných"
 
 #: src/predefined.py:279
 msgid "Concealed Kong"
-msgstr ""
+msgstr "Skrytý Kong"
 
 #: src/predefined.py:282
 msgid "Concealed Kong of Terminals"
-msgstr ""
+msgstr "Skrytý Kong z koncových"
 
 #: src/predefined.py:285
 msgid "Concealed Kong of Honors"
-msgstr ""
+msgstr "Skrytý Kong z čestných"
 
 #: src/predefined.py:288
 msgid "Concealed Pung"
-msgstr ""
+msgstr "Skrytý Pung"
 
 #: src/predefined.py:291
 msgid "Concealed Pung of Terminals"
-msgstr ""
+msgstr "Skrytý Pung z koncových"
 
 #: src/predefined.py:294
 msgid "Concealed Pung of Honors"
-msgstr ""
+msgstr "Skrytý Pung z čestných"
 
 #: src/predefined.py:297
 msgid "Pair of Own Wind"
-msgstr ""
+msgstr "Pár vlastního větru"
 
 #: src/predefined.py:299
 msgid "Pair of Round Wind"
-msgstr ""
+msgstr "Pár kruhového větru"
 
 #: src/predefined.py:301
 msgid "Pair of Dragons"
-msgstr ""
+msgstr "Pár draků"
 
 #: src/predefined.py:305
 msgid "Flower"
@@ -1436,77 +1440,80 @@ msgstr "Série"
 
 #: src/predefined.py:316
 msgid "Classical Chinese DMJL"
-msgstr ""
+msgstr "Klasický čínský DMJL"
 
 #: src/predefined.py:322
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgstr ""
+"Klasický čínský podle definice organizace Deutsche Mah Jongg Liga (DMJL) e.V."
 
 #: src/predefined.py:329
 msgid "Squirming Snake"
-msgstr ""
+msgstr "Kroutící se had"
 
 #: src/predefined.py:330
 msgid ""
 "All tiles of same color. Pung or Kong of 1 and 9, pair of 2, 5 or 8 and two "
 "Chows of the remaining values"
 msgstr ""
+"Všechny kameny stejné barvy. Pung nebo Kong z kamenů 1 a 9, pár kamenů 2, 5 "
+"nebo 8 a dva Chowy zbývajících hodnot"
 
 #: src/predefined.py:333
 msgid "Little Three Dragons"
-msgstr ""
+msgstr "Tři malí draci"
 
 #: src/predefined.py:334
 msgid "2 Pungs or Kongs of dragons and 1 pair of dragons"
-msgstr ""
+msgstr "2 Pungy nebo Kongy draků a 1 pár draků"
 
 #: src/predefined.py:336
 msgid "Big Three Dragons"
-msgstr ""
+msgstr "Tři velcí draci"
 
 #: src/predefined.py:339
 msgid "Little Four Joys"
-msgstr ""
+msgstr "Čtyři malé radosti"
 
 #: src/predefined.py:340
 msgid "3 Pungs or Kongs of winds and 1 pair of winds"
-msgstr ""
+msgstr "3 Pungy nebo Kongy z větrů a 1 pár větrů"
 
 #: src/predefined.py:341
 msgid "Big Four Joys"
-msgstr ""
+msgstr "Čtyři velké radosti"
 
 #: src/predefined.py:347
 msgid "False Naming of Discard, Claimed for Chow"
-msgstr ""
+msgstr "Nesprávné označení odhození, požadováno pro Chow"
 
 #: src/predefined.py:350
 msgid "False Naming of Discard, Claimed for Pung/Kong"
-msgstr ""
+msgstr "Nesprávné označení odhození, požadováno pro Pung/Kong"
 
 #: src/predefined.py:353 src/predefined.py:444 src/predefined.py:556
 msgid "False Declaration of Mah Jongg by One Player"
-msgstr ""
+msgstr "Nesprávné prohlášení jednoho hráče o Mahjongu"
 
 #: src/predefined.py:356
 msgid "False Declaration of Mah Jongg by Two Players"
-msgstr ""
+msgstr "Nesprávné prohlášení dvou hráčů o Mahjongu"
 
 #: src/predefined.py:359
 msgid "False Declaration of Mah Jongg by Three Players"
-msgstr ""
+msgstr "Nesprávné prohlášení tří hráčů o Mahjongu"
 
 #: src/predefined.py:362 src/predefined.py:447 src/predefined.py:559
 msgid "False Naming of Discard, Claimed for Mah Jongg"
-msgstr ""
+msgstr "Nesprávné označení odhození, požadováno pro Mahjong"
 
 #: src/predefined.py:371
 msgid "Classical Chinese BMJA"
-msgstr ""
+msgstr "Klasický čínský BMJA"
 
 #: src/predefined.py:377
 msgid "Classical Chinese as defined by the British Mah-Jong Association"
-msgstr ""
+msgstr "Klasický čínský podle definice Britské asociace Mahjongu"
 
 #: src/predefined.py:392 src/predefined.py:532
 msgid "Original Call"
@@ -1514,88 +1521,94 @@ msgstr "Původní požadavek"
 
 #: src/predefined.py:396
 msgid "Gates of Heaven"
-msgstr ""
+msgstr "Brány nebes"
 
 #: src/predefined.py:397
 msgid ""
 "All tiles concealed of same color: Values 1112345678999 with one pair from 2 "
 "to 8 (last tile from wall or discarded)"
 msgstr ""
+"Všechny skryté kameny jsou stejné barvy: Hodnoty 1112345678999 s jedním "
+"párem od 2 do 8 (poslední kámen ze stěny nebo z odhozených kamenů)"
 
 #: src/predefined.py:400
 msgid "Wriggling Snake"
-msgstr ""
+msgstr "Kroutící se had"
 
 #: src/predefined.py:401
 msgid ""
 "Pair of 1s and a run from 2 to 9 in the same suit with each of the winds"
 msgstr ""
+"Pár jedniček a postup od 2 do 9 ve stejné barvě, přičemž v každé z nich je "
+"jedna z větrných karet"
 
 #: src/predefined.py:403
 msgid "Triple Knitting"
-msgstr ""
+msgstr "Trojité zapletení"
 
 #: src/predefined.py:404
 msgid ""
 "Four sets of three tiles in the different suits and a pair: No Winds or "
 "Dragons"
 msgstr ""
+"Čtyři sady po třech kartách v různých barvách a jeden pár: žádné větry ani "
+"draci"
 
 #: src/predefined.py:405
 msgid "Knitting"
-msgstr ""
+msgstr "Zapletení"
 
 #: src/predefined.py:406
 msgid "7 pairs of tiles in any 2 out of 3 suits; no Winds or Dragons"
-msgstr ""
+msgstr "7 párů kamenů z libovolných 2 ze 3 barev; bez větrů a draků"
 
 #: src/predefined.py:408
 msgid "All pair honors"
-msgstr ""
+msgstr "Všechny páry čestných"
 
 #: src/predefined.py:409
 msgid "7 pairs of 1s/9s/Winds/Dragons"
-msgstr ""
+msgstr "7 párů 1/9/Větry/Draci"
 
 #: src/predefined.py:412 src/predefined.py:536
 msgid "Own Flower"
-msgstr ""
+msgstr "Vlastní květina"
 
 #: src/predefined.py:413 src/predefined.py:537
 msgid "Own Season"
-msgstr ""
+msgstr "Vlastní sezóna"
 
 #: src/predefined.py:425
 msgid "Buried Treasure"
-msgstr ""
+msgstr "Zakopaný poklad"
 
 #: src/predefined.py:426
 msgid "Concealed pungs of one suit with winds/dragons and a pair"
-msgstr ""
+msgstr "Skryté trojice jedné barvy spolu s větry/draky a párem"
 
 #: src/predefined.py:427 src/predefined.py:548
 msgid "Purity"
-msgstr ""
+msgstr "Řád"
 
 #: src/predefined.py:428 src/predefined.py:549
 msgid "Only same-colored tiles (no chows, dragons or winds)"
-msgstr ""
+msgstr "Pouze kameny stejné barvy (žádné chow, draci ani větry)"
 
 #: src/predefined.py:431
 msgid "3 Pungs or Kongs of dragons plus any pung/kong and a pair"
-msgstr ""
+msgstr "3 Pungy nebo Kongy s draky plus libovolný Pung/Kong a pár"
 
 #: src/predefined.py:434
 msgid "The 13 Unique Wonders"
-msgstr ""
+msgstr "13 jedinečných divů"
 
 #: src/predefined.py:441 src/predefined.py:553
 msgid "False Naming of Discard, Claimed for Chow/Pung/Kong"
-msgstr ""
+msgstr "Nesprávné označení odhození, požadováno pro Chow/Pung/Kong"
 
 #: src/predefined.py:451
 msgid "Calling for Only Honors"
-msgstr ""
+msgstr "Vyhlášení pouze čestných"
 
 #: src/predefined.py:455
 msgid "Calling for Wriggling Snake"
@@ -1603,61 +1616,63 @@ msgstr "Vyhlášení kroutícího se hada"
 
 #: src/predefined.py:459
 msgid "Calling for Triple Knitting"
-msgstr ""
+msgstr "Vyhlášeni trojitého zapletení"
 
 #: src/predefined.py:463
 msgid "Calling for Gates of Heaven"
-msgstr ""
+msgstr "Vyhlášení brány nebes"
 
 #: src/predefined.py:466
 msgid "Calling for Knitting"
-msgstr ""
+msgstr "Vyhlášení zapletení"
 
 #: src/predefined.py:470
 msgid "Calling for Imperial Jade"
-msgstr ""
+msgstr "Vyhlášení císařského nefritu"
 
 #: src/predefined.py:474
 msgid "Calling for The 13 Unique Wonders"
-msgstr ""
+msgstr "Vyhlášení 13 jedinečných divů"
 
 #: src/predefined.py:477
 msgid "Calling for Three Great Scholars"
-msgstr ""
+msgstr "Vyhlášení tří velkých učenců"
 
 #: src/predefined.py:480
 msgid "Calling for All pair honors"
-msgstr ""
+msgstr "Vyhlášení všech párů jako čestných"
 
 #: src/predefined.py:484
 msgid "Calling for Heads and Tails"
-msgstr ""
+msgstr "Vyhlášení hlavy a orla"
 
 #: src/predefined.py:488
 msgid "Calling for Four Blessings Hovering over the Door"
-msgstr ""
+msgstr "Vyhlášení čtyř požehnání visících nad dveřmi"
 
 #: src/predefined.py:491
 msgid "Calling for Buried Treasure"
-msgstr ""
+msgstr "Vyhlášení zakopaného pokladu"
 
 #: src/predefined.py:495
 msgid "Calling for Fourfold Plenty"
-msgstr ""
+msgstr "Vyhlášení čtyřnásobné hojnosti"
 
 #: src/predefined.py:499
 msgid "Calling for Purity"
-msgstr ""
+msgstr "Vyhlášení řádu"
 
 #: src/predefined.py:509
 msgid "Taiwanese 16-tile game, FOR DEVELOPERS"
-msgstr ""
+msgstr "Tchajwanská hra s 16 kameny, PRO VÝVOJÁŘE"
 
 #: src/predefined.py:515
 msgid ""
 "Taiwanese 16-Tiles Mah Jongg, early alpha. See https://bugs.kde.org/show_bug."
 "cgi?id=298821"
 msgstr ""
+"Tchajwanský Mahjong s 16 kameny, raná alfa verze. Viz https://bugs.kde.org/"
+"show_bug.cgi?id=298821"
 
 #: src/query.py:197
 msgctxt "kajongg name for local game server"
@@ -1666,7 +1681,7 @@ msgstr "Místní hra"
 
 #: src/query.py:430
 msgid "Database %1 updated from schema %2 to %3"
-msgstr ""
+msgstr "Databáze %1 byla aktualizována ze schématu %2 na schéma %3"
 
 #: src/rule.py:49 src/scoringdialog.py:703 src/scoringdialog.py:782
 msgid "points"
@@ -1675,7 +1690,7 @@ msgstr "body"
 #: src/rule.py:50
 msgctxt "kajongg"
 msgid "doubles"
-msgstr ""
+msgstr "páry"
 
 #: src/rule.py:51
 msgctxt "kajongg"
@@ -1690,7 +1705,7 @@ msgstr "%1 bodů"
 #: src/rule.py:93
 msgctxt "Kajongg"
 msgid "%1 doubles"
-msgstr ""
+msgstr "%1 párů"
 
 #: src/rule.py:98
 msgctxt "Kajongg"
@@ -1710,35 +1725,36 @@ msgstr ""
 
 #: src/rule.py:368
 msgid "Hand Rules"
-msgstr ""
+msgstr "Pravidla kombinací"
 
 #: src/rule.py:369
 msgid "Hand rules are applied to the entire hand, for all players"
-msgstr ""
+msgstr "Pravidla kombinací se vztahují na celé kombinace a pro všechny hráče"
 
 #: src/rule.py:370
 msgid "Winner Rules"
-msgstr ""
+msgstr "Pravidla vítězů"
 
 #: src/rule.py:371
 msgid "Winner rules are applied to the entire hand but only for the winner"
-msgstr ""
+msgstr "Pravidla vítězů se vztahují na celé kombinace, ale pouze pro vítěze"
 
 #: src/rule.py:372
 msgid "Loser Rules"
-msgstr ""
+msgstr "Pravidla poražených"
 
 #: src/rule.py:373
 msgid "Loser rules are applied to the entire hand but only for non-winners"
 msgstr ""
+"Pravidla poražených se vztahují na celé kombinace, ale pouze pro poražené"
 
 #: src/rule.py:374
 msgid "Mah Jongg Rules"
-msgstr ""
+msgstr "Pravidla Mahjong"
 
 #: src/rule.py:375
 msgid "Only hands matching a Mah Jongg rule can win"
-msgstr ""
+msgstr "Vyhrát mohou pouze kombinace, které splňují pravidla Mahjongu"
 
 #: src/rule.py:376
 msgctxt "kajongg"
@@ -1747,7 +1763,7 @@ msgstr "Možnosti"
 
 #: src/rule.py:377
 msgid "Here we have several special game related options"
-msgstr ""
+msgstr "Zde máme několik speciálních možností souvisejících s hrou"
 
 #: src/rule.py:378
 msgid "Penalties"
@@ -1761,21 +1777,24 @@ msgid ""
 "you get\n"
 "into a situation where you have to pay a penalty"
 msgstr ""
+"Postihy uděluje uživatel ručně. Používají se pouze ve hrách s bodováním.\n"
+"Při hře proti počítači nebo přes internet vás Kajongg nikdy nepustí\n"
+"do situace, kdy byste museli zaplatit postih"
 
 #: src/rule.py:579
 msgctxt "Ruleset._newKey:%1 is empty or space plus number"
 msgid "Copy%1 of %2"
-msgstr ""
+msgstr "Kopie %1 z %2"
 
 #: src/rule.py:935
 msgctxt "%1 can be a sentence"
 msgid "%4 have impossible values %2/%3 in rule \"%1\""
-msgstr ""
+msgstr "%4 obsahuje nepřípustné hodnoty %2/%3 v pravidle \"%1\""
 
 #: src/rule.py:1023
 msgctxt "wrong value for rule"
 msgid "%1: %2 is too small, minimal value is %3"
-msgstr ""
+msgstr "%1: %2 je příliš malé, minimální hodnota je %3"
 
 #: src/rulesetselector.py:511
 msgctxt "@title:window"
@@ -1806,7 +1825,7 @@ msgstr "&Zavřít"
 
 #: src/scene.py:389 src/scene.py:517
 msgid "Do you really want to abort this game?"
-msgstr ""
+msgstr "Opravdu chcete tuto hru ukončit?"
 
 #: src/scoring.py:60
 msgctxt "@title:window"
@@ -1815,7 +1834,7 @@ msgstr "Prohodit místa"
 
 #: src/scoring.py:62
 msgid "By the rules, %1 and %2 should now exchange their seats. "
-msgstr ""
+msgstr "Podle pravidel by si %1 a %2 měli nyní vyměnit místa. "
 
 #: src/scoring.py:64
 msgid "&Exchange"
@@ -1823,7 +1842,7 @@ msgstr "K&urz"
 
 #: src/scoring.py:66
 msgid "&Keep seat"
-msgstr ""
+msgstr "&Ponechat místa"
 
 #: src/scoring.py:85
 msgctxt "@title:window"
@@ -1832,19 +1851,20 @@ msgstr "Vyberte čtyři hráče"
 
 #: src/scoring.py:360
 msgid "Move Exposed Tiles Here"
-msgstr ""
+msgstr "Přesunout odkryté kameny sem"
 
 #: src/scoring.py:361
 msgid "Move Concealed Tiles Here"
-msgstr ""
+msgstr "Přesunout skryté kameny sem"
 
 #: src/scoring.py:673
 msgid "Please define four players in <interface>Settings|Players</interface>"
 msgstr ""
+"V části <interface>Nastavení|Hráči</interface> prosím definujte čtyři hráče"
 
 #: src/scoringdialog.py:258
 msgid "Round/Hand"
-msgstr ""
+msgstr "Kolo/Kombinace"
 
 #: src/scoringdialog.py:299 src/scoringdialog.py:834
 msgctxt "kajongg"
@@ -1859,7 +1879,7 @@ msgstr "Poplatky"
 #: src/scoringdialog.py:300
 msgctxt "kajongg"
 msgid "Balance"
-msgstr ""
+msgstr "Zůstatek"
 
 #: src/scoringdialog.py:300
 msgctxt "kajongg"
@@ -1874,24 +1894,24 @@ msgstr "Skóre"
 #: src/scoringdialog.py:452
 msgctxt "kajongg"
 msgid "Used Rules"
-msgstr ""
+msgstr "Použitá pravidla"
 
 #: src/scoringdialog.py:487
 msgid "Final scores for game <numid>%1</numid>"
-msgstr ""
+msgstr "Konečné skóre pro hru <numid>%1</numid>"
 
 #: src/scoringdialog.py:489
 msgid "Scores for game <numid>%1</numid>"
-msgstr ""
+msgstr "Skóre pro hru <numid>%1</numid>"
 
 #: src/scoringdialog.py:569
 msgctxt "@title:window"
 msgid "Explain Scores"
-msgstr ""
+msgstr "Vysvětlení skóre"
 
 #: src/scoringdialog.py:585
 msgid "There is no active game"
-msgstr ""
+msgstr "V současné době neprobíhá žádná hra"
 
 #: src/scoringdialog.py:588
 msgid "%1"
@@ -1899,7 +1919,7 @@ msgstr "%1"
 
 #: src/scoringdialog.py:602
 msgid "Manual score for %1: %2 points"
-msgstr ""
+msgstr "Ruční skóre pro %1: %2 bodů"
 
 #: src/scoringdialog.py:689
 msgid "Penalty"
@@ -1907,7 +1927,7 @@ msgstr "Postih"
 
 #: src/scoringdialog.py:692
 msgid "Offense:"
-msgstr ""
+msgstr "Přestupek:"
 
 #: src/scoringdialog.py:699
 msgid "Total Penalty"
@@ -1920,17 +1940,17 @@ msgstr "&Spustit"
 #: src/scoringdialog.py:805
 msgctxt "penalty dialog, appears behind paying player combobox"
 msgid "pays %1 points"
-msgstr ""
+msgstr "zaplaceno %1 bodů"
 
 #: src/scoringdialog.py:810
 msgctxt "penalty dialog, appears behind profiting player combobox"
 msgid "gets %1 points"
-msgstr ""
+msgstr "získáno %1 bodů"
 
 #: src/scoringdialog.py:821
 msgctxt "@title:window"
 msgid "Scoring for this Hand"
-msgstr ""
+msgstr "Skóre pro tuto kombinaci"
 
 #: src/scoringdialog.py:832
 msgctxt "kajongg"
@@ -1957,11 +1977,11 @@ msgstr "&Postih"
 
 #: src/scoringdialog.py:845
 msgid "&Save Hand"
-msgstr ""
+msgstr "&Uložené kombinace"
 
 #: src/scoringdialog.py:867
 msgid "&Last Tile:"
-msgstr ""
+msgstr "&Poslední kámen:"
 
 #: src/scoringdialog.py:876
 msgid "L&ast Meld:"
@@ -1973,7 +1993,7 @@ msgstr "Chybné heslo"
 
 #: src/server.py:218
 msgid "table with id <numid>%1</numid> not found"
-msgstr ""
+msgstr "stůl s ID <numid>%1</numid> nebyl nalezen"
 
 #: src/server.py:366
 msgid "Player %1 has logged out"
@@ -1981,35 +2001,35 @@ msgstr "Hráč %1 se odhlásil"
 
 #: src/server.py:436
 msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr ""
+msgstr "server bude naslouchat na portu ({int(defaultPort)})"
 
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
-msgstr ""
+msgstr "server bude naslouchat na soketu"
 
 #: src/server.py:443
 msgid "name of the database"
-msgstr ""
+msgstr "název databáze"
 
 #: src/server.py:447
 msgid "do not terminate local game server after last client disconnects"
-msgstr ""
+msgstr "neukončujte místní herní server po odpojení posledního klienta"
 
 #: src/servertable.py:181
 msgid "You already joined this table"
-msgstr ""
+msgstr "K tomuto stolu jste se již připojili"
 
 #: src/servertable.py:183
 msgid "All seats are already taken"
-msgstr ""
+msgstr "Všechna místa jsou již obsazena"
 
 #: src/servertable.py:188
 msgid "takes a seat"
-msgstr ""
+msgstr "se posadil"
 
 #: src/servertable.py:196
 msgid "leaves the table"
-msgstr ""
+msgstr "opustil stůl"
 
 #: src/servertable.py:242
 msgctxt "kajongg, name of robot player, to be translated"
@@ -2028,7 +2048,7 @@ msgstr "Robot 3"
 
 #: src/servertable.py:302
 msgid "Only the initiator %1 can start this game, you are %2"
-msgstr ""
+msgstr "Tuto hru může spustit pouze iniciátor %1, ty jsi %2"
 
 #: src/servertable.py:701
 msgid "Game <numid>%1</numid> is over!"
@@ -2040,7 +2060,7 @@ msgstr "%1 nesprávně řekl %2 pro spojení %3"
 
 #: src/servertable.py:735
 msgid "%1 wrongly said %2: claims to have concealed tiles %3 but only has %4"
-msgstr ""
+msgstr "%1 nesprávně uvedl %2: požadoval %3  skryté kameny, ale má pouze %4"
 
 #: src/servertable.py:772
 msgid "declareKong:%1 wrongly said Kong for meld %2"
@@ -2048,23 +2068,25 @@ msgstr "vyhlásit Kong: %1 nesprávně řekl Kong pro spojení %2"
 
 #: src/servertable.py:821
 msgid "%1 claiming MahJongg: This is not a winning hand: %2"
-msgstr ""
+msgstr "%1 tvrdí, že jde o Mahjong: Toto není výherní kombinace: %2"
 
 #: src/sound.py:70
 msgid "No voices will be heard because the program %1 is missing"
-msgstr ""
+msgstr "Nebudou slyšet žádné hlasy, protože chybí program %1"
 
 #: src/sound.py:375
 msgid "cannot write <filename>%1</filename>: %2"
-msgstr ""
+msgstr "nelze zapsat <filename>%1</filename>: %2"
 
 #: src/sound.py:378
 msgid "The voice files have changed, their checksum has changed."
-msgstr ""
+msgstr "Zvukové soubory se změnily, změnil se i jejich kontrolní součet."
 
 #: src/sound.py:379
 msgid "Please reinstall kajongg or do, with sufficient permissions:"
 msgstr ""
+"Přeinstalujte prosím Kajongg nebo proveďte následující příkaz s "
+"odpovídajícími oprávněními:"
 
 #: src/tables.py:65
 msgid "Table"
@@ -2081,7 +2103,7 @@ msgstr "Sada pravidel"
 
 #: src/tables.py:149
 msgid "Select a ruleset"
-msgstr ""
+msgstr "Vybrat sadu pravidel"
 
 #: src/tables.py:186
 msgctxt "allocate a new table"
@@ -2090,7 +2112,7 @@ msgstr "&Nová"
 
 #: src/tables.py:187 src/tables.py:331 src/tables.py:363
 msgid "Allocate a new table"
-msgstr ""
+msgstr "Vytvořit nový stůl"
 
 #: src/tables.py:193 src/tables.py:332 src/tables.py:364
 msgid "&Join"
@@ -2098,7 +2120,7 @@ msgstr "Připo&jit"
 
 #: src/tables.py:194 src/tables.py:333 src/tables.py:365
 msgid "Join a table"
-msgstr ""
+msgstr "Připojit se ke stolu"
 
 #: src/tables.py:200
 msgid "&Leave"
@@ -2106,7 +2128,7 @@ msgstr "Opus&tit"
 
 #: src/tables.py:201
 msgid "Leave a table"
-msgstr ""
+msgstr "Opustit stůl"
 
 #: src/tables.py:207
 msgctxt "Kajongg-Ruleset"
@@ -2115,7 +2137,7 @@ msgstr "Porovnat"
 
 #: src/tables.py:208
 msgid "Compare the rules of this table with my own rulesets"
-msgstr ""
+msgstr "Porovnat pravidla v této tabulce s mými vlastními pravidly"
 
 #: src/tables.py:214
 msgid "&Chat"
@@ -2127,19 +2149,19 @@ msgstr "&Spustit"
 
 #: src/tables.py:222
 msgid "Start playing on a table. Empty seats will be taken by robot players."
-msgstr ""
+msgstr "Začít hrát u stolu. Volná místa obsadí roboti."
 
 #: src/tables.py:281
 msgid "opens a chat window"
-msgstr ""
+msgstr "otevřít okno konverzace"
 
 #: src/tables.py:300
 msgid "Local Games with Ruleset %1"
-msgstr ""
+msgstr "Lokální hry se sadou pravidel %1"
 
 #: src/tables.py:304
 msgid "Tables at %1"
-msgstr ""
+msgstr "Stůl v %1"
 
 #: src/tables.py:357
 msgid "Start a new game"
@@ -2152,15 +2174,16 @@ msgstr "O&bnovit"
 
 #: src/tables.py:361
 msgid "Resume the selected suspended game"
-msgstr ""
+msgstr "Pokračovat ve vybrané přerušené hře"
 
 #: src/tables.py:379
 msgid "Chat with others on this table"
-msgstr ""
+msgstr "Konverzace s ostatními u tohoto stolu"
 
 #: src/tables.py:382
 msgid "For chatting with others on this table, please first take a seat"
 msgstr ""
+"Chcete-li si s ostatními u tohoto stolu popovídat, nejprve se prosím posaďte"
 
 #: src/tile.py:277
 msgctxt "kajongg"
@@ -2262,7 +2285,7 @@ msgstr "Severní vítr"
 #, python-brace-format
 msgctxt "kajongg tile name"
 msgid "{group} {value}"
-msgstr ""
+msgstr "{group} {value}"
 
 #: src/tile.py:880
 msgctxt "kajongg meld type"
@@ -2272,7 +2295,7 @@ msgstr "Bonus"
 #: src/tile.py:882
 msgctxt "kajongg meld type"
 msgid "&single"
-msgstr ""
+msgstr "&jednotlivé"
 
 #: src/tile.py:884
 msgctxt "kajongg meld type"
@@ -2282,7 +2305,7 @@ msgstr "&pár"
 #: src/tile.py:886
 msgctxt "kajongg meld type"
 msgid "&chow"
-msgstr ""
+msgstr "&chow"
 
 #: src/tile.py:888
 msgctxt "kajongg meld type"
@@ -2292,7 +2315,7 @@ msgstr "p&ung"
 #: src/tile.py:890
 msgctxt "kajongg meld type"
 msgid "c&laimed kong"
-msgstr ""
+msgstr "p&ožadovaný kong"
 
 #: src/tile.py:892
 msgctxt "kajongg meld type"
@@ -2302,23 +2325,23 @@ msgstr "k&ong"
 #: src/tile.py:893
 msgctxt "kajongg meld type"
 msgid "rest of tiles"
-msgstr ""
+msgstr "zbytek kamenů"
 
 #: src/tile.py:900
 msgctxt "kajongg meld state"
 msgid "Exposed"
-msgstr ""
+msgstr "Odhalený"
 
 #: src/tile.py:901
 msgctxt "kajongg meld state"
 msgid "Concealed"
-msgstr ""
+msgstr "Skrytý"
 
 #: src/tile.py:907
 #, python-brace-format
 msgctxt "kajongg meld name, do not translate parameter names"
 msgid "{state} {meldType} {name}"
-msgstr ""
+msgstr "{state} {meldType} {name}"
 
 #: src/tilesetselector.py:141
 msgctxt "TilesetSelector"
@@ -2349,7 +2372,8 @@ msgstr "Popis:"
 msgid ""
 "Your client has a version older than 4.9.0 but you need %1 for this server"
 msgstr ""
+"Váš klient má verzi starší než 4.9.0, ale pro tento server potřebujete %1"
 
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
-msgstr ""
+msgstr "Váš klient má verzi %1, ale pro tento server potřebujete verzi %2"
