@@ -801,7 +801,7 @@ msgid ""
 "complete the hand and will not alter the hand in any way (except bonus tiles)"
 msgstr ""
 "Beim Ablegen des ersten Ziegels kann ein Spieler „Ruf zu Beginn“ "
-"deklarieren. Das bedeutet, dass er nur noch einen Ziegel braucht, um zu "
+"deklarieren. Das bedeutet, dass er nur noch einen Ziegel benötigt, um zu "
 "gewinnen. Er darf dann seine Hand nicht mehr ändern (Bonusziegel "
 "ausgenommen)."
 
@@ -887,7 +887,7 @@ msgstr ""
 
 #: src/mjresource.py:116
 msgid "cannot find %1, using default"
-msgstr "%1 nicht gefunden, Standardsatz wird benutzt"
+msgstr "%1 nicht gefunden, Standardsatz wird verwendet"
 
 #: src/mjresource.py:131
 msgid "unknown name"
@@ -1023,7 +1023,7 @@ msgid ""
 "alter the hand in any way (except bonus tiles)"
 msgstr ""
 "Beim Ablegen des ersten Ziegels kann ein Spieler „Ruf zu Beginn“ "
-"deklarieren. Das bedeutet, dass er nur noch einen Ziegel braucht, um zu "
+"deklarieren. Das bedeutet, dass er nur noch einen Ziegel benötigt, um zu "
 "gewinnen. Er darf dann seine Hand nicht mehr ändern (Bonusziegel "
 "ausgenommen)."
 
@@ -1470,7 +1470,7 @@ msgstr "Klassische chinesische Regeln laut DMJL"
 msgid "Classical Chinese as defined by the Deutsche Mah Jongg Liga (DMJL) e.V."
 msgstr ""
 "Klassische chinesische Regeln nach der Definition der Deutschen Mah-Jongg "
-"Liga (DMJL) e.V."
+"Liga (DMJL) e. V."
 
 #: src/predefined.py:329
 msgid "Squirming Snake"
@@ -2412,13 +2412,13 @@ msgstr "Beschreibung:"
 msgid ""
 "Your client has a version older than 4.9.0 but you need %1 for this server"
 msgstr ""
-"Die Version dieses Programms ist älter als 4.9.0, Sie brauchen aber %1 für "
+"Die Version dieses Programms ist älter als 4.9.0, Sie benötigen aber %1 für "
 "diesen Server"
 
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
-"Ihr Programm hat die Version %1, Sie brauchen aber %2 für diesen Server"
+"Ihr Programm hat die Version %1, Sie benötigen aber %2 für diesen Server"
 
 #~ msgid "License Agreement"
 #~ msgstr "Lizenzvereinbarung"
