@@ -209,7 +209,7 @@
 >Manuelle Partie bewerten</title
 > <!-- do not change this! -->
 	<para
->In diesem Modus übernimmt &kajongg; nur das Bewerten einer Partie. Sie spielen wie immer, und am Ende jedes Spiels sagen Sie &kajongg;, welcher Spieler was hat, und alles andere, was &kajongg; braucht, um seine Hand zu bewerten. Alternativ können Sie die Werte auch selber berechnen und eingeben - meistens ist das am bequemsten. &kajongg; rechnet dann zwischen den Spielern ab und schreibt alles in eine Datenbank. Man kann eine Partie unterbrechen, eine andere mit anderen Spielern und anderen Regeln starten und alte Partien wiederaufnehmen. Alle Regeln werden zusammen mit den Partien gespeichert, dadurch kann man jede Partie mit anderen Regeln spielen. </para>
+>In diesem Modus übernimmt &kajongg; nur das Bewerten einer Partie. Sie spielen wie immer, und am Ende jedes Spiels sagen Sie &kajongg;, welcher Spieler was hat, und alles andere, was &kajongg; benötigt, um seine Hand zu bewerten. Alternativ können Sie die Werte auch selber berechnen und eingeben - meistens ist das am bequemsten. &kajongg; rechnet dann zwischen den Spielern ab und schreibt alles in eine Datenbank. Man kann eine Partie unterbrechen, eine andere mit anderen Spielern und anderen Regeln starten und alte Partien wiederaufnehmen. Alle Regeln werden zusammen mit den Partien gespeichert, dadurch kann man jede Partie mit anderen Regeln spielen. </para>
         <itemizedlist>
             <listitem
 ><para
@@ -299,9 +299,9 @@
 	<para
 >Wenn Sie &kajongg; explizit sagen, was für Ziegel ein Spieler hat, wird das Feld zur Punkteeingabe für diesen Spieler grau sein (keine Eingabe möglich). Während Sie einem Spieler Ziegel zuordnen, können Sie sehen, wie seine Punktezahl steigt - aber beim 14ten Ziegel auf 0 fällt. Das mag Sie überraschen, aber wenn das nicht der Gewinner ist, sind 14 Ziegel eine lange Hand und ergeben immer 0 Punkte. Das ist durch den Regelsatz Klassisch Chinesisch definiert, andere Regelsätze könnten sich auch anders verhalten. </para>
 	<para
->Sie können Ziegel und Figuren den Spielern wahlweise mit der Maus oder mit der Tastatur zuordnen. Mit der Maus ziehen Sie die Ziegel einfach an den gewünschten Ort - je nach dem, was Sie von wo nach wo verschieben, werden Sie dann gefragt, was Sie verschieben wollen, z.B. Einzelziegel oder Pong. Zur Erinnerung - im Spielerbereich ist die obere Zeile für offene Figuren, die untere für verdeckte. Sie können auch von Spieler zu Spieler und zurück ins Zentrum verschieben. </para>
+>Sie können Ziegel und Figuren den Spielern wahlweise mit der Maus oder mit der Tastatur zuordnen. Mit der Maus ziehen Sie die Ziegel einfach an den gewünschten Ort - je nach dem, was Sie von wo nach wo verschieben, werden Sie dann gefragt, was Sie verschieben möchten, z. B. Einzelziegel oder Pong. Zur Erinnerung - im Spielerbereich ist die obere Zeile für offene Figuren, die untere für verdeckte. Sie können auch von Spieler zu Spieler und zurück ins Zentrum verschieben. </para>
 	<para
->Wenn Sie die Tastatur bevorzugen, benutzen Sie &Tab;, um Ihre Position zwischen dem zentralen Auswahlbereich und den Spielerbereichen zu ändern. Die Tasten<keycap
+>Wenn Sie die Tastatur bevorzugen, verwenden Sie &Tab;, um Ihre Position zwischen dem zentralen Auswahlbereich und den Spielerbereichen zu ändern. Die Tasten<keycap
 >eswnESWN</keycap
 > verschieben einen Ziegel zu den Spielern Ost, Süd, West, Nord. Die Tasten <keycap
 >xX</keycap
@@ -313,7 +313,7 @@
 >hjkl</keycap
 > or <keycap
 >HJKL</keycap
-> benutzen, um Ihre Position zu ändern: <keycap
+> verwenden, um Ihre Position zu ändern: <keycap
 >hH</keycap
 > nach links, <keycap
 >jJ</keycap
@@ -329,7 +329,7 @@
 >Letzter Ziegel</guilabel
 > und <guilabel
 >Letzte Figur</guilabel
-> werden von manchen Regeln gebraucht, z.B. <guilabel
+> werden von manchen Regeln gebraucht, z. B. <guilabel
 >Letzter Ziegel komplettiert Paar</guilabel
 >. Sie können nur für die Gewinner-Hand verwendet werden. </para>
 	<para
@@ -395,9 +395,9 @@
 ><para
 >Am einfachsten ist es, den Spielserver auf <literal
 >kajongg.org</literal
-> zu benutzen. &kajongg; zeigt diesen Server in der Liste der vorhandenen Spielserver. Beachten Sie bitte, dass dort zurzeit nur ein Spielserver läuft, keine Webseite oder andere Dienste. </para
+> zu verwenden. &kajongg; zeigt diesen Server in der Liste der vorhandenen Spielserver. Beachten Sie bitte, dass dort zurzeit nur ein Spielserver läuft, keine Webseite oder andere Dienste. </para
 ><para
->Wenn Sie auf dem Spielserver kein Benutzerkonto mit dem eingegeben Namen haben, werden Sie gefragt, ob Sie eines anlegen wollen. Wenn Sie Ja sagen, wird ein neuer Dialog erscheinen, in dem Sie das gewünschte Passwort zweimal eingeben können. Ihr Benutzerkonto wird dann automatisch angelegt. </para
+>Wenn Sie auf dem Spielserver kein Benutzerkonto mit dem eingegeben Namen haben, werden Sie gefragt, ob Sie eines anlegen möchten. Wenn Sie Ja sagen, wird ein neuer Dialog erscheinen, in dem Sie das gewünschte Passwort zweimal eingeben können. Ihr Benutzerkonto wird dann automatisch angelegt. </para
 ><para
 >Nachdem Sie sich erfolgreich am Spielserver angemeldet haben, bekommen Sie eine Liste von Tischen mit freien Plätzen. Setzen Sie sich an einen Tisch oder legen Sie einen neuen an. Wenn Sie einen neuen Tisch anlegen, warten Sie, bis genug weitere Spieler sich drangesetzt haben. Sie können das Spiel jederzeit starten, die nicht besetzten Plätze werden automatisch von Rechnerspielern eingenommen. </para
 ><para
@@ -427,7 +427,7 @@
 ></itemizedlist>
         </para
 ><para
->In beiden Fällen müssen Sie den anderen Spielern mitteilen, wie sie Ihren Spielserver erreichen können. Sie benötigen die &URL; oder einfach eine IP-Adresse und den Port, auf dem Ihr Spielserver lauscht. Das könnte z.B. etwas wie <literal
+>In beiden Fällen müssen Sie den anderen Spielern mitteilen, wie sie Ihren Spielserver erreichen können. Sie benötigen die &URL; oder einfach eine IP-Adresse und den Port, auf dem Ihr Spielserver lauscht. Das könnte z. B. etwas wie <literal
 >mypc.dyndns.org:8301</literal
 > sein, wobei <literal
 >8301</literal
@@ -441,7 +441,7 @@
 ></menuchoice
 >. Die Version des Protokolls entspricht der Portnummer. Bei &kajongg; 17.04 lautet die Portnummer 8301. Wenn der Spieler keinen Port für den gewünschten Server angibt, berechnet sein Rechner den Portnummer auf die gleiche Art. Wenn also auf einem Rechner mehrere Spielserver mit verschiedenen Protokollversionen laufen, sollte normalerweise die Verbindung zum richtigen Spielserver automatisch hergestellt werden. Auf jeden Fall ist dadurch sichergestellt, das die Versionen auf dem Spielserver und dem Rechner übereinstimmen, falls nicht, erhalten Sie einen Warnhinweis. </para
 ><para
->Wenn Sie eventuelle Fehler finden, wollen Sie vielleicht die Option <command
+>Wenn Sie eventuelle Fehler finden, möchten Sie vielleicht die Option <command
 >kajongg ---debug=traffic</command
 > verwenden. Damit sehen Sie auf der Konsole, auf der Sie den Server gestartet haben, was für Meldungen zwischen dem Server und den Spieler-Rechnern ausgetauscht werden. Weiter Informationen finden Sie mit <command
 >kajongg --help</command
@@ -452,7 +452,7 @@
             <itemizedlist
 ><listitem
 ><para
->Wenn Sie sicherstellen wollen, dass niemand betrügen kann, sollte kein Mitspieler Zugriff auf den Spielserver haben. Natürlich kann man nie vermeiden, dass zwei Spieler einander helfen, weil man ja nicht wissen kann, was sie wirklich tun. Zwei Spieler könnten sogar ein und dieselbe Person sein. </para
+>Wenn Sie sicherstellen möchten, dass niemand betrügen kann, sollte kein Mitspieler Zugriff auf den Spielserver haben. Natürlich kann man nie vermeiden, dass zwei Spieler einander helfen, weil man ja nicht wissen kann, was sie wirklich tun. Zwei Spieler könnten sogar ein und dieselbe Person sein. </para
 ></listitem
 ></itemizedlist>
         </sect2>
@@ -512,7 +512,7 @@
 ><title
 >Bewertung</title
 ><para
->Am Ende jedes Spiels werden die Punkte für jeden Spieler berechnet. Zuerst werden die Basispunkte gezählt wie z.B. zwei Punkte für einen einfachen offenen Pong oder 20 Punkte für den Gewinner. Danach wird eine weitere Gruppe von Regeln angewandt - diese können die Punktzahl verdoppeln. Zum Beispiel für einen Pong von Drachen. Nachdem die Punktzahl für jeden Spieler berechnet ist, zahlen diese die Differenzen untereinander aus. Nur der Gewinner bekommt seine volle Punktzahl von allen Verlierern. Osten bekommt und bezahlt immer alles doppelt.</para>
+>Am Ende jedes Spiels werden die Punkte für jeden Spieler berechnet. Zuerst werden die Basispunkte gezählt wie z. B. zwei Punkte für einen einfachen offenen Pong oder 20 Punkte für den Gewinner. Danach wird eine weitere Gruppe von Regeln angewandt - diese können die Punktzahl verdoppeln. Zum Beispiel für einen Pong von Drachen. Nachdem die Punktzahl für jeden Spieler berechnet ist, zahlen diese die Differenzen untereinander aus. Nur der Gewinner bekommt seine volle Punktzahl von allen Verlierern. Osten bekommt und bezahlt immer alles doppelt.</para>
 	  <para
 >Natürlich kennt &kajongg; alle Bewertungsregeln, aber ein guter Spieler weiß, welche Kombinationen wieviel wert sind, um den Wert optimieren zu können. Während der Lernphase wird empfohlen, das Fenster  <guimenuitem
 >Wertung erklären</guimenuitem
@@ -529,21 +529,21 @@
         <title
 >Wie man mit &kajongg; spielt</title>
         <para
->Sie werden einen Dialog sehen, in denen Sie angeben können, was Sie tun wollen. Dieser Dialog erscheint entweder rechts oder unten, abhängig von der Größe des Fensters. Wenn Sie es breiter als hoch machen, erscheint er rechts. Manchmal wird der Dialog eine Bedenkzeit anbieten - wenn sie vorbei ist, wird automatisch die erste mögliche Antwort für Sie ausgewählt. Diese Bedenkzeit ist im Regel-Editor definierbar, unter <guilabel
+>Sie werden einen Dialog sehen, in denen Sie angeben können, was Sie tun möchten. Dieser Dialog erscheint entweder rechts oder unten, abhängig von der Größe des Fensters. Wenn Sie es breiter als hoch machen, erscheint er rechts. Manchmal wird der Dialog eine Bedenkzeit anbieten - wenn sie vorbei ist, wird automatisch die erste mögliche Antwort für Sie ausgewählt. Diese Bedenkzeit ist im Regel-Editor definierbar, unter <guilabel
 >Optionen</guilabel
 >, <guilabel
 >Bedenkzeit</guilabel
 >. Alle Spieler sollten dieselbe Bedenkzeit haben, darum ist sie Teil des Regelsatzes. </para
 ><para
->Wenn Sie einen Ziegel aus Ihrer Hand auswählen wollen, können Sie sich mit den &Right; und &Left; respektive den Tasten <keycap
+>Wenn Sie einen Ziegel aus Ihrer Hand auswählen möchten, können Sie sich mit den &Right; und &Left; respektive den Tasten <keycap
 >H</keycap
 > und <keycap
 >L</keycap
-> bewegen. Natürlich können Sie auch die Maus benutzen. </para
+> bewegen. Natürlich können Sie auch die Maus verwenden. </para
 ><para
 >Man kann einen Ziegel ablegen, indem man wie üblich mit den Pfeiltasten draufgeht und ihn auswählt. Alternativ geht das aber auch mit der Maus: Einfach den Ziegel ins Spielfeld ziehen. Die Platzierung im Spielfeld ist aber trotzdem zufällig und nicht dort, wo man ihn hinzieht. Weil die Platzierung für alle Spieler dieselbe sein soll, wird sie immer vom Rechner vorgenommen. </para
 ><para
->Oft wird der Dialog Auswahlmöglichkeiten anbieten, die gar nicht anwendbar sind, z.B. Pong, wenn Sie die nötigen Ziegel gar nicht haben. Das ist Absicht - wie in einem echten Spiel. Sie können dies Verhalten ändern, indem Sie im Einrichtungsdialog auf der Seite <guilabel
+>Oft wird der Dialog Auswahlmöglichkeiten anbieten, die gar nicht anwendbar sind, z. B. Pong, wenn Sie die nötigen Ziegel gar nicht haben. Das ist Absicht - wie in einem echten Spiel. Sie können dies Verhalten ändern, indem Sie im Einrichtungsdialog auf der Seite <guilabel
 >Spielen</guilabel
 > <guilabel
 >Nur mögliche Aktionen anzeigen</guilabel
@@ -1052,7 +1052,7 @@
 ></listitem
 ><listitem
 ><para
->Für jeden Benutzer können eigene Stimmen definiert werden. Werden diese Stimmen von &kajongg; benutzt, können Sie automatisch zu anderen Spielern im Internet übertragen werden. Diese Stimmen werden in einem Ordner wie <filename class="directory"
+>Für jeden Benutzer können eigene Stimmen definiert werden. Werden diese Stimmen von &kajongg; verwendet, können Sie automatisch zu anderen Spielern im Internet übertragen werden. Diese Stimmen werden in einem Ordner wie <filename class="directory"
 >~/.local/share/apps/kajongg/voices/</filename
 >. Ist Ihr Anmeldungsname zum Beispiel hans, dann ist dieser Ordner <filename class="directory"
 >/home/hans/.local/share/apps/kajongg/voices/hans/</filename
@@ -1102,7 +1102,7 @@
 ><para
 >Editieren Sie diese Datei mit dem Toneditor <command
 >audacity</command
->. In diesem Editor benutzen Sie die Maus, um eine Bereich der Tonwellen zu markieren. Der Editor wird diesen Teil abspielen. Wiederholen Sie das, bis Sie einen korrekten Teil markiert haben. Das geht einfacher, wenn Sie die Tonwellen vergrößern mit <menuchoice
+>. In diesem Editor verwenden Sie die Maus, um eine Bereich der Tonwellen zu markieren. Der Editor wird diesen Teil abspielen. Wiederholen Sie das, bis Sie einen korrekten Teil markiert haben. Das geht einfacher, wenn Sie die Tonwellen vergrößern mit <menuchoice
 ><guimenu
 >Ansicht</guimenu
 ><guimenuitem
