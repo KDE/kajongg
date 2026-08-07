@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2025-11-17 11:49+0000\n"
-"PO-Revision-Date: 2026-05-23 16:17+0300\n"
+"PO-Revision-Date: 2026-08-06 13:04+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
 "n % 10 == 0) ? 2 : 3));\n"
-"X-Generator: Lokalize 26.04.0\n"
+"X-Generator: Lokalize 26.04.3\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -1029,11 +1029,11 @@ msgstr ""
 
 #: src/predefined.py:96
 msgid "All Flowers"
-msgstr ""
+msgstr "כל הפרחים"
 
 #: src/predefined.py:97
 msgid "All Seasons"
-msgstr ""
+msgstr "כל העונות"
 
 #: src/predefined.py:99
 msgid "Three Concealed Pongs"
@@ -1049,7 +1049,7 @@ msgstr ""
 
 #: src/predefined.py:109
 msgid "Tiles in Hand"
-msgstr ""
+msgstr "אריחים ביד"
 
 #: src/predefined.py:114
 msgid "Points Needed for Mah Jongg"
@@ -1842,7 +1842,7 @@ msgstr "אין משחק פעיל"
 
 #: src/scoringdialog.py:588
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: src/scoringdialog.py:602
 msgid "Manual score for %1: %2 points"
@@ -1850,7 +1850,7 @@ msgstr ""
 
 #: src/scoringdialog.py:689
 msgid "Penalty"
-msgstr ""
+msgstr "עונש"
 
 #: src/scoringdialog.py:692
 msgid "Offense:"
@@ -1858,7 +1858,7 @@ msgstr "התקפה:"
 
 #: src/scoringdialog.py:699
 msgid "Total Penalty"
-msgstr ""
+msgstr "סך כל הענישה"
 
 #: src/scoringdialog.py:727
 msgid "&Execute"
