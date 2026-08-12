@@ -773,7 +773,7 @@ msgid ""
 "Discard a tile, declaring Original Call meaning you need only one tile to "
 "complete the hand and will not alter the hand in any way (except bonus tiles)"
 msgstr ""
-"تخلص من قطعة، معلناً \"النداء الأصلي\" مما يعني أنك تحتاج إلى قطعة واحدة فقط "
+"تخلص من قطعة، معلنًا \"النداء الأصلي\" مما يعني أنك تحتاج إلى قطعة واحدة فقط "
 "لإكمال اليد ولن تغير اليد بأي شكل من الأشكال (باستثناء قطع المكافآت)"
 
 #: src/message.py:447
@@ -1091,7 +1091,7 @@ msgstr "نقاط ليد محدودة"
 
 #: src/predefined.py:125
 msgid "Play with the roof off"
-msgstr "العب بالسقف مغلقاً"
+msgstr "العب بالسقف مغلقًا"
 
 #: src/predefined.py:126
 msgid "Play with no upper scoring limit"
@@ -2152,7 +2152,7 @@ msgstr "دردش مع الآخرين على هذه الطاولة"
 
 #: src/tables.py:382
 msgid "For chatting with others on this table, please first take a seat"
-msgstr "للدردشة مع الآخرين على هذه الطاولة، يرجى الجلوس أولاً"
+msgstr "للدردشة مع الآخرين على هذه الطاولة، يرجى الجلوس أولًا"
 
 #: src/tile.py:277
 msgctxt "kajongg"
