@@ -4,9 +4,9 @@
 Dependencies:
  - 'on': ['Linux', 'FreeBSD']
    'require':
-    'frameworks/extra-cmake-modules': '@latest-kf6'
-    'frameworks/kdoctools': '@latest-kf6'
-    'frameworks/ki18n': '@latest-kf6'
+    'frameworks/extra-cmake-modules': 'Frameworks/6.24'
+    'frameworks/kdoctools': 'Frameworks/6.24'
+    'frameworks/ki18n': 'Frameworks/6.24'
     'games/libkmahjongg': '@same'
 
 Options:
