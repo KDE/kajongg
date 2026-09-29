@@ -1,0 +1,1663 @@
+<?xml version="1.0" ?>
+<!--IMPORTANT: please note that 'Do not change this!' notice does not apply to translators -->
+<!DOCTYPE book PUBLIC "-//KDE//DTD DocBook XML V4.5-Based Variant V1.1//EN" "dtd/kdedbx45.dtd" [
+  <!ENTITY % Russian "INCLUDE"
+> <!-- change language only here -->
+  <!ENTITY % addindex "IGNORE"
+> <!-- do not change this! -->
+  <!ENTITY s1 "s1">
+  <!ENTITY s9 "s9">
+  <!ENTITY b1 "b1">
+  <!ENTITY b9 "b9">
+  <!ENTITY c1 "c1">
+  <!ENTITY c9 "c9">
+  <!ENTITY we "we">
+  <!ENTITY ws "ws">
+  <!ENTITY ww "ww">
+  <!ENTITY wn "wn">
+  <!ENTITY db "db">
+  <!ENTITY dr "dr">
+  <!ENTITY dg "dg">
+  <!ENTITY chow "chow">
+  <!ENTITY pung "pung">
+  <!ENTITY kong "kong">
+  <!ENTITY mahjongg "mahjongg">
+  <!ENTITY originalcall "originalcall">
+  <!ENTITY violatesoriginalcall "violatesoriginalcall">
+  <!ENTITY dangerousgame "dangerousgame">
+  <!ENTITY nochoice "nochoice">
+]>
+
+<!-- TODO: describe the window with the list of tables -->
+
+<book id="kajongg" lang="&language;"
+> <!-- do not change this! -->
+<bookinfo>
+	<title
+>Руководство пользователя &kajongg;</title
+> <!-- This is the title of this docbook. -->
+<!-- List of immidiate authors begins here. -->
+<!--INPORTANT! - All other contributors: [to be determined] -->
+<authorgroup>
+<author
+>&Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail; </author>
+<othercredit role="translator"
+><firstname
+>Александр</firstname
+><surname
+>Яворский</surname
+><affiliation
+><address
+><email
+>kekcuha@gmail.com</email
+></address
+></affiliation
+><contrib
+>Перевод на русский</contrib
+></othercredit
+> 
+</authorgroup>
+<legalnotice
+>&FDLNotice;</legalnotice>
+
+<date
+>30 мая 2021 г.</date
+><!-- Date of (re)writing, or update.-->
+<releaseinfo
+>KDE Gear 21.04</releaseinfo>
+
+<!--Short description of this document. Do not change unless necessary!-->
+<abstract>
+	<para
+>В этом руководстве описывается игра &kajongg;</para>
+</abstract>
+
+<!--List of relevant keywords-->
+<keywordset>
+	<keyword
+>KDE</keyword
+> <!-- do not change this! -->
+	<keyword
+>kdegames</keyword
+> <!-- do not change this! -->
+	<keyword
+>игра</keyword
+> <!-- do not change this! -->
+	<keyword
+>kajongg</keyword
+><!--Application name goes here-->
+<!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<keyword
+>настольная</keyword>
+	<keyword
+>аркада</keyword>
+	<keyword
+>игра с костями</keyword>
+	<keyword
+>кости</keyword>
+<!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<keyword
+>четыре игрока</keyword>
+<!--All other relevant keywords-->
+</keywordset>
+</bookinfo>
+<!--Content begins here: -->
+<chapter id="introduction"
+><title
+>Введение</title
+> <!-- do not change this! -->
+	<note
+><title
+>Тип игры:</title
+><para
+>Настольная, аркада</para
+></note
+><!-- Game genre. Use as many as necessary. Available game types are: Arcade, Board, Card, Dice, Toys, Logic, Strategy.-->
+	<note
+><title
+>Количество игроков:</title
+><para
+>Четыре</para
+></note
+><!--Number of possible players. It can be: One, Two,..., Multiplayer-->
+	<para
+>&kajongg; — настольная игра по мотивам знаменитой восточной игры маджонг (от китайского <foreignphrase lang="zh"
+>麻將</foreignphrase
+>). В неё играют вчетвером. В мире используется множество разных наборов правил. Сейчас &kajongg; поддерживает классические китайские правила в том виде, в каком в них играют в Германии; со временем появятся и другие основные наборы правил. Наборы правил можно изменять и добавлять — присылайте их автору программы, чтобы включить в неё! </para>
+	<para
+>&kajongg; можно использовать двумя способами. Первый — подсчёт очков в игре вручную: вы играете как обычно, без компьютера, а &kajongg; считает очки и ведёт учёт. Второй — игра в &kajongg; против любого сочетания живых и компьютерных игроков. </para>
+</chapter>
+
+<chapter id="screen_layout"
+><title
+>Расположение элементов на экране</title>
+		<para>
+			<screenshot>
+				<screeninfo
+>Снимок экрана &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="gamescreen.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Снимок экрана</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+                </para>
+                <para
+>Краткое описание частей игрового экрана. </para>
+	<variablelist>
+		<varlistentry>
+			<term
+>Панель инструментов</term>
+			<listitem
+><para
+>Панель инструментов находится под строкой меню и содержит кнопки для самых частых действий. Её состав можно изменять. Панель можно и скрыть, чтобы освободить место для игрового стола. </para
+><para
+>В зависимости от размера экрана панель инструментов может быть удобнее скрыть или переместить к левому краю окна. Это делается щелчком правой кнопкой мыши по панели. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Игровой стол</term>
+			<listitem
+><para
+>Игровой стол занимает бо́льшую часть окна. На нём четыре стены длиной по 18 костей (точное число зависит от правил, например, от того, используются ли кости цветов и сезонов). На стенах написаны имена игроков, текущая стоимость их руки (насколько она известна) и их ветер. Ветер раунда выделен цветным фоном — на снимке выше это восток. </para
+><para
+>Во время <link linkend="play"
+>игры</link
+> внутри стен лежат сброшенные игроками кости, в случайном порядке. Последняя сброшенная кость обведена синей рамкой. </para
+><para
+>При <link linkend="scoreGame"
+>подсчёте очков вручную</link
+> внутри стен находится набор всех доступных костей — центральная панель выбора. Кости можно распределять между игроками мышью или с клавиатуры. </para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Область игрока</term>
+			<listitem
+><para
+>У каждого игрока есть область экрана для его костей. В верхнем ряду лежат открытые кости, в нижнем — закрытые. При <link linkend="scoreGame"
+>подсчёте очков вручную</link
+> закрытые кости показываются затенёнными целиком. Кости цветов и сезонов помещаются справа. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Диалог</term>
+			<listitem
+><para
+>Диалог предлагает игроку варианты действий. Чаще всего время на выбор ограничено, и индикатор показывает, сколько его осталось. </para
+></listitem>
+		</varlistentry>
+		<varlistentry>
+			<term
+>Строка состояния</term>
+			<listitem
+><para
+>Строка состояния находится внизу экрана и показывает текущие итоги игроков. </para
+></listitem>
+		</varlistentry>
+	</variablelist>
+</chapter>
+
+<chapter id="scoreGame"
+><title
+>Подсчёт очков вручную</title
+> <!-- do not change this! -->
+	<para
+>В этом режиме &kajongg; только подсчитывает очки. Вы играете как обычно, с живыми людьми за настоящим столом, а в конце игры сообщаете &kajongg;, какие кости у игрока на руке, и всё остальное, что нужно для подсчёта очков, — а программа их подсчитывает. Можно также подсчитать очки руки самостоятельно и ввести их. Затем &kajongg; проводит расчёты между игроками и записывает результаты в базу данных. Игру можно приостановить, начать другую с другими игроками и вернуться к старым играм. Правила сохраняются вместе с играми, поэтому разные игры могут вестись по разным правилам. </para>
+        <itemizedlist>
+            <listitem
+><para
+>Выберите пункт меню <menuchoice
+><guimenu
+>Игра</guimenu
+> <guimenuitem
+>Подсчёт очков вручную</guimenuitem
+></menuchoice
+> или нажмите <keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+>. </para
+></listitem>
+            <listitem
+><para
+>Теперь можно выбрать существующую неоконченную игру или начать новую. Для новой игры нужно указать игроков и набор правил; &kajongg; предложит те же, что и в предыдущей игре, а если её не было — первых четырёх заданных игроков. После этого выбора набор правил и отдельные правила изменить нельзя. Сделать это можно заранее в <link linkend="ruleset-options"
+>редакторе наборов правил</link
+>. </para
+></listitem>
+            <listitem
+><para
+>Откроется окно <guilabel
+>Очки для этой руки</guilabel
+>. Подробное описание — в разделе <link linkend="enterhand-tiles"
+>Подсчёт очков средствами &kajongg;</link
+>. </para
+></listitem>
+            <listitem
+><para
+>Сохранив результаты руки, переходите к следующей. </para
+></listitem>
+        </itemizedlist>
+      <sect1 id="enterhand"
+><title
+>Ввод результатов руки</title>
+        <sect2 id="enterhand-scores">
+	<title
+>Очки</title>
+	<screenshot>
+		<screeninfo
+>Снимок экрана &kajongg;</screeninfo>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="enterhand.png" format="PNG"/>
+			</imageobject
+>				<textobject
+><phrase
+>Снимок экрана</phrase
+></textobject>
+		</mediaobject>
+	</screenshot>
+	<para
+>Это окно ввода результатов руки. Оно открывается само, когда &kajongg; считает, что оно может понадобиться. Показать или скрыть его можно в любой момент комбинацией клавиш <keycombo action="simul"
+>&Ctrl;<keycap
+>S</keycap
+></keycombo
+> или соответствующим пунктом меню. </para>
+	<para
+>Ветер раунда, как всегда, выделен цветным фоном. </para>
+	<para
+>Здесь можно вручную ввести очки всех игроков. Можно также точно указать, какие кости были на руке у игрока; тогда поле для ввода очков вручную станет недоступным, и &kajongg; подсчитает очки сам. </para>
+	<para
+>Введя все данные руки, нажмите кнопку <guibutton
+>Сохранить руку</guibutton
+>. Результаты руки будут записаны в базу данных и показаны в таблице очков. Программа может предложить пересадить игроков, но от этого можно отказаться. Предлагаемые пересадки пока не настраиваются; если для какого-то набора правил нужно иначе, мы это изменим. </para>
+	<para
+>Если игрок мог выиграть, в столбце <guilabel
+>Победитель</guilabel
+> становится доступен флажок — отметьте его у победителя. </para>
+	<para
+>В строке состояния появится обновлённый баланс игроков, и можно переходить к следующей руке. </para>
+	<sect3 id="enterhand-manually">
+	<title
+>Ввод очков вручную</title>
+	<para
+>Опытный игрок, скорее всего, предпочтёт подсчитать очки сам. Тогда их можно ввести напрямую — но только если этому игроку не назначено ни одной кости. </para>
+	<para
+>Очки, введённые вручную, должны уже учитывать всё, кроме штрафов: выбрать необязательные правила будет нельзя. Исключение одно — <quote
+>Рискованная игра</quote
+>. Она не влияет на очки и не считается нарушением; меняется только порядок расчётов: виновник платит победителю за всех, а двое других игроков между собой не рассчитываются. Пока это не настраивается. </para>
+	</sect3>
+	<sect3 id="enterhand-tiles">
+	<title
+>Подсчёт очков средствами &kajongg;</title>
+	<para
+>Если явно указать &kajongg;, какие кости у игрока, поле ввода очков для него в этом окне станет недоступным. По мере назначения костей видно, как растут его очки, но при добавлении 14-й кости они обнуляются. Это может удивить, однако если рука не объявлена выигрышной, она считается длинной рукой, а длинная рука всегда стоит ноль очков. Так определено классическим китайским набором правил; при изменении правил или другом наборе поведение может быть иным. </para>
+	<para
+>Назначать игроку кости и комбинации можно мышью, с клавиатуры или и так и так. Мышью кости просто перетаскиваются в область игрока; при отпускании кости программа спросит, что именно переносится: одиночная кость, пара, панг, конг, объявленный конг или чоу. Верхний ряд — для открытых костей, нижний — для закрытых. Кости цветов и сезонов появятся справа с краю. Кости и комбинации можно также перемещать между рядами, между игроками и обратно на центральную панель выбора. </para>
+	<para
+>С клавиатуры между центральной панелью выбора и областями игроков можно переходить клавишей &Tab;. Клавиши <keycap
+>eswnESWN</keycap
+> переносят кость игрокам Востока, Юга, Запада и Севера, клавиши <keycap
+>xX</keycap
+> — обратно на центральную панель. <keycap
+>ESWN</keycap
+> кладут кость в ряд закрытых, <keycap
+>eswn</keycap
+> — в ряд открытых. Между костями и комбинациями курсор перемещается клавишами со стрелками; выбранная кость или комбинация обведена синей рамкой. Поскольку стрелки далеко от буквенных клавиш, курсор можно перемещать и клавишами <keycap
+>hjkl</keycap
+> или <keycap
+>HJKL</keycap
+>: <keycap
+>hH</keycap
+> — влево, <keycap
+>jJ</keycap
+> — вниз, <keycap
+>kK</keycap
+> — вверх, <keycap
+>lL</keycap
+> — вправо. Так это устроено в редакторе <command
+>vi</command
+> для Unix; браузер &kde; &konqueror; и даже эта программа справки тоже поддерживают эти клавиши. При языке, отличном от английского, клавиши могут быть другими, но настроить их пока нельзя. </para>
+	<para
+>Параметры <guilabel
+>Последняя кость:</guilabel
+> и <guilabel
+>Последняя комбинация:</guilabel
+> нужны для некоторых правил, например, <guilabel
+>Последняя кость заканчивает пару</guilabel
+>. Они доступны только для выигрышной руки. </para>
+	<para
+>В правой части окна некоторые правила можно применить вручную. Какие правила попадут в этот список, зависит от текущего набора правил и от костей. В примере на снимке выше у проигравших игроков может быть вариант <quote
+>рискованная игра</quote
+> — опять же в зависимости от набора правил и их костей. Разработчики стремятся сделать список правил, выбираемых вручную, как можно короче: в идеале &kajongg; всегда сам определяет, применимо ли правило, но иногда ему не хватает сведений или знаний, чтобы решить. </para>
+	</sect3>
+	</sect2>
+	<sect2 id="enterhand-penalties">
+	<title
+>Штрафы</title>
+			<screenshot>
+				<screeninfo
+>Снимок экрана &kajongg;</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="penalty.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Снимок экрана</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+	<para
+>В <link linkend="enterhand"
+>окне ввода результатов руки</link
+> кнопка <guibutton
+>Штрафы</guibutton
+> открывает это окно для ввода штрафов. Это можно сделать в любой момент, независимо от обычного подсчёта очков.</para>
+	<para
+>В списке <guilabel
+>Нарушение:</guilabel
+> перечислены все нарушения, возможные при текущих руках игроков. Выберите нужное.</para>
+	<para
+>Теперь можно изменить значение <guilabel
+>Всего штраф</guilabel
+> — общую сумму, которая переходит от плательщиков к получателям. Она делится между ними поровну.</para>
+	<para
+>Число плательщиков и получателей зависит от вида нарушения; показывается нужное число игроков. При выборе игрока &kajongg; следит, чтобы он встречался только один раз, и соответственно меняет остальных. </para>
+	</sect2>
+	</sect1>
+</chapter>
+
+<chapter  id="play"
+><title
+>Игра</title>
+	<para
+>Демонстрационный режим можно включить или выключить в любой момент. В нём за вас играет компьютер. Если игра не идёт, начнётся новая с последним использованным набором правил. </para>
+        <sect1 id="robotplay">
+        <title
+>Игра против компьютера</title>
+         <para
+>Сначала откроется диалог входа. Укажите сервер игры, к которому нужно подключиться, и имя пользователя. Если выбрать особый вариант <guilabel
+>Локальная игра</guilabel
+>, достаточно ввести своё имя (или принять предложенное) и выбрать набор правил. Сразу начнётся локальная игра против трёх компьютерных игроков. Если же есть приостановленные игры, они будут показаны списком: можно выбрать игру, которую нужно продолжить, или начать новую. </para>
+        </sect1>
+        <sect1 id="humanplay">
+        <title
+>Игра с друзьями</title>
+        <para
+>Чтобы играть с другими людьми, нужен сервер игры, к которому подключаются все игроки, включая вас. Для этого выберите любой другой компьютер или введите новое имя хоста вручную и укажите свой пароль для этого хоста. Программа предложит последний использованный пароль. </para
+><para
+>Проще всего воспользоваться сервером игры <literal
+>kajongg.org</literal
+>; &kajongg; показывает его в списке доступных серверов. На этом сервере работает только сервер игры — ни веб-страницы, ни других служб там нет. </para
+><para
+>Если на сервере игры нет учётной записи с введённым именем, программа предложит её создать. При согласии откроется диалог, в котором нужно дважды ввести желаемый пароль, и учётная запись будет создана автоматически. </para
+><para
+>После входа на сервер игры откроется список столов со свободными местами. Присядьте за стол или организуйте новый. Организовав новый стол, подождите, пока другие игроки займут места. Начать игру за своим столом можно в любой момент — свободные места займут компьютерные игроки. </para
+><para
+>В списке столов показано и название набора правил, по которым играют за столом. Набор правил и его название отправляет на сервер игрок, организовавший стол. Если у вас есть такой же набор, показывается ваше название — это удобно, если организатор говорит на другом языке и назвал набор иначе. Название вашего локального набора выводится чёрным. Если же такого набора у вас нет, название выводится красным, и его можно сравнить со своими наборами кнопкой <guibutton
+>Сравнить</guibutton
+>. </para
+><para
+>Если вы не пользуетесь <literal
+>kajongg.org</literal
+> или другим существующим сервером игры, собственный сервер &kajongg; можно запустить двумя способами: <itemizedlist
+><listitem
+><para
+>подключиться к серверу <literal
+>localhost</literal
+>, то есть к собственному компьютеру. Если сервер игры не запущен, он запустится автоматически, а когда вы закончите играть, остановится. В отличие от варианта <guilabel
+>Локальная игра</guilabel
+>, так к серверу смогут подключаться другие компьютеры; </para
+></listitem
+><listitem
+><para
+>запустить сервер вручную на любом компьютере: в командной строке запустите программу <command
+>kajonggserver</command
+>. Команда <command
+>kajonggserver --help</command
+> выведет все доступные параметры, например, для смены порта по умолчанию. Такой сервер работает, пока его не остановить принудительно. </para
+></listitem
+></itemizedlist>
+        </para
+><para
+>В обоих случаях нужно сообщить другим игрокам, как подключиться к вашему серверу игры: &URL; или просто IP-адрес и порт, на котором сервер принимает подключения, например, <literal
+>mypc.dyndns.org:8301</literal
+>, где <literal
+>8301</literal
+> — порт. Разумеется, брандмауэр нужно настроить так, чтобы удалённые игроки могли достучаться до этого порта. Соединение шифруется. </para
+><para
+>Номер порта указан в окне <menuchoice
+><guimenu
+>Справка</guimenu
+> <guimenuitem
+>О программе &kajongg;</guimenuitem
+></menuchoice
+>: номер порта — это версия протокола. Для &kajongg; 17.04 это 8301. Если игрок не укажет порт сервера, клиент вычислит его так же. Поэтому если на компьютере работает несколько серверов игры с разными версиями протокола, подключение обычно само попадёт на нужный. В любом случае сервер и клиент проверяют совместимость своих версий и предупреждают, если они несовместимы. </para
+><para
+>При подозрении на ошибку может помочь параметр <command
+>kajongg --debug=traffic</command
+>: в консоли, где запущен сервер игры, будут показаны сообщения, которыми обмениваются сервер и клиенты. Остальные параметры — в выводе <command
+>kajongg --help</command
+> </para>
+        <sect2 id="playing-caveats">
+        <title
+>Предостережения</title>
+            <itemizedlist
+><listitem
+><para
+>Чтобы никто не мог жульничать, ни у одного из живых игроков не должно быть доступа к компьютеру, на котором работает сервер игры. Конечно, нельзя помешать двум игрокам помогать друг другу — ведь неизвестно, что они делают на самом деле. Два игрока вообще могут оказаться одним человеком. </para
+></listitem
+></itemizedlist>
+        </sect2>
+        </sect1>
+<sect1  id="gamerules"
+><title
+>Правила игры</title>
+<para
+>В мире существует множество вариантов игры. Сейчас &kajongg; поддерживает два варианта классических китайских правил: в том виде, в каком в них играют в Германии, и в том, в каком играют в Великобритании.</para
+><para
+>Это описание не вдаётся в подробности и поэтому подходит для обоих вариантов.</para
+><para
+>Впрочем, основные правила в большинстве вариантов одинаковы.</para>
+  <para
+>Поскольку &kajongg; сам знает, как играть, здесь описано только то, что может быть неочевидно.</para>
+  <para
+>Подробнее о маджонге — в <link linkend="bibliography"
+>списке литературы</link
+>.</para>
+<sect2 id="gamerules-aim">
+  <title
+>Цель игры</title>
+  <para
+>Каждый игрок старается собрать кости так, чтобы получилась выигрышная рука, и тогда объявляет <quote
+>маджонг</quote
+>. В выигрышной руке кости обычно сгруппированы в пять комбинаций: четыре по три или четыре кости и пятая из двух одинаковых костей. Обычная комбинация — это три или четыре одинаковые кости (панг и конг соответственно) либо три кости подряд, например, 3, 4 и 5 бамбука (чоу).</para>
+  </sect2>
+  <sect2>
+    <title
+>Ход игры</title>
+    <para
+>В начале у игрока с ветром Востока (он указан на стене) на одну кость больше, чем у остальных. Восток начинает игру, сбрасывая ненужную кость. </para>
+    <para
+>Сброшенную кость другие игроки могут забрать, объявив, что они ею дополнят (чоу, панг, конг, маджонг). Чоу может объявить только следующий игрок, остальные объявления доступны всем. Комбинация, собранная через объявление, открывается — становится видна всем игрокам. </para
+><para
+>Если сброшенную кость никто не забрал, следующий игрок — Юг (затем Запад и Север) — берёт кость из стены и сбрасывает ненужную.</para>
+      <para
+>Есть несколько правил о том, когда панг можно дополнить до конга (объявив четвёртую кость или взяв её из стены); здесь они не разбираются, но &kajongg;, конечно, их знает и следит за их соблюдением. При объявлении конга игрок автоматически получает из стены замещающую кость — иначе собрать пять комбинаций, о которых говорилось выше, было бы невозможно. </para>
+    </sect2>
+    <sect2>
+      <title
+>Год, раунд и рука</title
+><para
+>Когда игрок объявляет маджонг или партия заканчивается вничью, рука завершается. После этого, если не было ничьей, ветры переходят к следующим игрокам. Так повторяется, пока каждый игрок не побывает каждым ветром; всё это вместе называется раундом. Целая игра, или год, состоит из четырёх раундов: раунда восточного, южного, западного и северного ветра. Ветер раунда может давать дополнительные очки.</para>
+	<para
+>Таким образом, полная игра (год) длится не меньше 16 рук. Поскольку при ничьей и при маджонге Востока ветры не переходят, обычно рук требуется больше. </para
+></sect2
+><sect2
+><title
+>Кости цветов и сезонов</title>
+    <para
+>В игре может быть восемь костей цветов и сезонов (если правила их не исключают). Они выкладываются открыто отдельно, справа в области игрока, потому что в комбинации никогда не входят, но приносят дополнительные очки.</para>
+      <para
+>Получив кость цветов или сезонов, игрок автоматически получает из стены и замещающую кость. При этом звенит колокольчик.</para
+></sect2>
+      <sect2
+><title
+>Подсчёт очков</title
+><para
+>В конце руки подсчитываются очки каждого игрока. Сначала считаются базовые очки, например, 2 очка за простой открытый панг или 20 очков за выигрыш. Затем применяются правила, удваивающие очки, например, одно удвоение за комбинацию драконов. Когда очки каждой руки известны, игроки выплачивают друг другу разницу, а победителю все остальные выплачивают его очки полностью. Восток всегда получает и платит вдвойне.</para>
+	  <para
+>&kajongg;, конечно, знает все применимые правила, но хороший игрок и сам знает, сколько стоят какие комбинации, и может этим пользоваться. При обучении рекомендуется открыть окно <guimenuitem
+>Объяснение счёта</guimenuitem
+>.</para>
+	  <para
+>Точные правила подсчёта очков часто различаются; в &kajongg; их можно свободно менять в <link linkend="ruleset-options"
+>редакторе наборов правил</link
+>.</para>
+	  <para
+>Редактор наборов правил также показывает все доступные правила и их смысл: если навести на правило указатель мыши, для необычных правил появится подсказка.</para>
+	</sect2>
+</sect1>
+<sect1 id="playing-play">
+        <title
+>Как играть в &kajongg;</title>
+        <para
+>Программа будет спрашивать, что вы хотите сделать, в небольшом диалоге справа или снизу — в зависимости от размеров окна: если окно шире, чем выше, диалог появляется справа. Иногда время на ответ ограничено; когда оно истекает, автоматически выбирается первый возможный ответ. Это время настраивается в редакторе наборов правил: <guilabel
+>Параметры</guilabel
+>, <guilabel
+>Таймаут для объявления</guilabel
+>. У всех игроков оно должно быть одинаковым, поэтому входит в набор правил. </para
+><para
+>Чтобы выбрать кость на руке, переходите между костями клавишами со стрелками &Right; и &Left; или клавишами <keycap
+>h</keycap
+> и <keycap
+>l</keycap
+>. Можно, разумеется, пользоваться и мышью. </para
+><para
+>Сбросить кость можно с клавиатуры, как и при любых других действиях, или мышью, перетащив её с руки в область сброса (внутрь стен). Место кости в области сброса всё равно выбирает компьютер — оно должно быть одинаковым для всех игроков. </para
+><para
+>Часто диалоги предлагают действия, которые на самом деле неприменимы, например, объявить панг без нужных костей. Так задумано — как в настоящей игре. Но невозможные варианты можно убрать с помощью параметра <guilabel
+>Показывать только допустимые действия</guilabel
+> на странице <guilabel
+>Игра</guilabel
+> диалога настройки. </para
+><para
+>Сброшенные кости раскладываются между стенами в случайном порядке. Некоторые варианты игры определяют, куда класть кости, но пока это не настраивается; когда появится такая возможность, она станет частью набора правил. </para>
+	</sect1>
+</chapter>
+
+<chapter id="interface"
+><title
+>Обзор интерфейса</title
+> <!-- do not change this! -->
+<!-- This section has to do with menubar. Describe every single entry in order. Use <variablelist
+> and <varlistentry
+>. Split the chapter into sections using <sect1(2,3)
+> for better viewing.-->
+
+<sect1 id="menu">
+<title
+>Команды меню</title>
+
+		<variablelist>
+			<varlistentry id="game-menu-scoreGame">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Игра</guimenu
+> <guimenuitem
+>Подсчёт очков вручную</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Только подсчёт очков в игре, которая ведётся вручную.</action
+></para
+><para
+>Можно загрузить старую игру или начать новую. По умолчанию в списке показываются только неоконченные игры, но можно показать и все, включая оконченные. Здесь же игры можно удалять.</para
+></listitem>
+			</varlistentry>
+                        <varlistentry  id="game-menu-play">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Игра</guimenu
+> <guimenuitem
+>Начать</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Игра с другими (людьми и компьютерами)</action
+>.</para
+></listitem>
+                        </varlistentry>
+                        <varlistentry  id="game-menu-abort">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Игра</guimenu
+> <guimenuitem
+>Прервать игру</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Прерывает текущую игру. Если это был подсчёт очков в игре вручную, её можно продолжить позже. Игру в самом &kajongg; продолжить пока нельзя.</action
+></para
+></listitem>
+                        </varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Игра</guimenu
+> <guimenuitem
+>Выйти из &kajongg;</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Завершает работу</action
+> &kajongg;.</para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-chat">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Вид</guimenu
+> <guimenuitem
+>Разговор</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Разговор</action
+></para>
+				<screenshot>
+					<screeninfo
+>Окно разговора</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="chat.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Окно разговора</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Позволяет переговариваться с другими игроками. </para
+></listitem>
+			</varlistentry>
+			<varlistentry id="view-scoretable">
+                                <term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Вид</guimenu
+> <guimenuitem
+>Таблица очков</guimenuitem
+> </menuchoice
+></term>
+                                <listitem
+><para
+><action
+>Таблица очков</action
+></para>
+                                <screenshot>
+                                        <screeninfo
+>Таблица очков</screeninfo>
+                                        <mediaobject>
+                                                <imageobject>
+                                                <imagedata fileref="scoretable.png" format="PNG"/>
+                                                </imageobject>
+                                                <textobject>
+                                                <phrase
+>Снимок экрана</phrase>
+                                                </textobject>
+                                        </mediaobject>
+                                </screenshot>
+    <para
+>Показывает таблицу очков. В столбце «Раунд/рука» — текущий раунд (Восток, Юг, Запад, Север) и число сыгранных в нём рук. Значения победителя выделены зелёным фоном. «Платежи» показывают, сколько игрок заплатил остальным или получил от них за эту руку, «Баланс» — текущий баланс всех игроков, «График» — изменение баланса. Подробности — во всплывающих подсказках: в них перечислены все правила, применённые к руке. Просто наведите указатель мыши на интересующее значение.</para
+><para
+>В нижней части показан используемый набор правил. Между таблицей очков и набором правил есть разделитель, которым можно менять соотношение размеров частей. </para
+></listitem>
+                        </varlistentry>
+			<varlistentry id="view-explain-scores">
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>E</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Вид</guimenu
+> <guimenuitem
+>Объяснение счёта</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Объяснение счёта</action
+></para>
+				<screenshot>
+					<screeninfo
+>Таблица очков</screeninfo>
+					<mediaobject>
+						<imageobject>
+						<imagedata fileref="explain.png" format="PNG"/>
+						</imageobject>
+						<textobject>
+						<phrase
+>Таблица очков</phrase>
+						</textobject>
+					</mediaobject>
+				</screenshot>
+				<para
+>Объясняет, как подсчитаны очки текущей руки. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Вид</guimenu
+> <guimenuitem
+>Полноэкранный режим</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Переключает между полноэкранным и обычным режимом.</action
+></para
+></listitem>
+			</varlistentry>
+
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Параметры</guimenu
+> <guimenuitem
+>Игроки</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Добавление, изменение и удаление игроков.</action
+></para>
+				<para
+>Пароли в этой таблице по умолчанию используются для входа на сервер игры. Менять пароль, выбранный для сервера изначально, пока почти бесполезно: изменить свой пароль на самом сервере игры пока нельзя. Для этого пришлось бы попросить администратора сервера изменить его прямо в базе данных.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><guimenu
+>Параметры</guimenu
+> <guimenuitem
+>Правила</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Настройка наборов правил.</action
+></para>
+				<para
+>Наборы правил настраиваются в редакторе наборов правил. Подробнее — <link linkend="ruleset-options"
+>здесь</link
+>.</para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Параметры</guimenu
+> <guimenuitem
+>Сменить угол обзора</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Поворачивает угол обзора костей против часовой стрелки.</action
+></para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term
+><menuchoice
+><shortcut
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></shortcut
+> <guimenu
+>Параметры</guimenu
+> <guimenuitem
+>Демонстрационный режим</guimenuitem
+> </menuchoice
+></term>
+				<listitem
+><para
+><action
+>Включает или выключает демонстрационный режим. Подробнее — <link linkend="play"
+>здесь</link
+>.</action
+></para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+<para
+>Кроме того, в &kajongg; есть стандартные для &kde; пункты меню <guimenu
+>Параметры</guimenu
+> и <guimenu
+>Справка</guimenu
+>. Подробнее о них — в разделах <ulink url="help:/fundamentals/menus.html#menus-settings"
+>Меню «Настройка»</ulink
+> и <ulink url="help:/fundamentals/menus.html#menus-help"
+>Меню «Справка»</ulink
+> руководства «Основы &kde;». </para>
+
+</sect1>
+</chapter>
+
+<chapter id="configuration"
+><title
+>Настройка игры</title
+> <!-- do not change this! -->
+<!--This section describes configuration &GUI;. If your game is configured using menubar exclusively, please remove this section.-->
+<screenshot>
+<screeninfo
+>Диалог настройки</screeninfo>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="config_play.png" format="PNG"/>
+	  </imageobject>
+	  <textobject>
+	    <phrase
+>Диалог настройки</phrase>
+	  </textobject>
+	</mediaobject>
+</screenshot>
+
+<para
+>Пункт меню <menuchoice
+><guimenu
+>Параметры</guimenu
+> <guimenuitem
+>Настроить &kajongg;…</guimenuitem
+></menuchoice
+> открывает диалог <guilabel
+>Настройка — &kajongg;</guilabel
+>.</para>
+<para
+>Кнопка <guibutton
+>Отмена</guibutton
+> в этом диалоге отменяет все изменения настроек, включая сделанные в редакторе наборов правил.</para>
+<para
+>Вкладки можно переключать и с клавиатуры: <keycombo action="simul"
+>&Ctrl;<keycap
+>1</keycap
+></keycombo
+> открывает первую вкладку (<guilabel
+>Игра</guilabel
+>), <keycombo action="simul"
+>&Ctrl;<keycap
+>2</keycap
+></keycombo
+> — вторую и так далее. </para>
+
+<sect1 id="play-options"
+><title
+>Параметры игры</title>
+		<variablelist>
+			<varlistentry>
+				<term>
+					<guilabel
+>Показывать тени костей</guilabel>
+				</term>
+				<listitem
+><para
+>Кости показываются с рамками и тенями, между рядами костей остаётся промежуток, а кости стены изображаются так, что видно, что стена высотой в две или три кости. Если отключить этот параметр, изображение станет проще, а кости — чуть крупнее. Это может пригодиться на небольших экранах. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Группировать неоткрытые кости в комбинации</guilabel>
+				</term>
+				<listitem
+><para
+>Кости на руке группируются в комбинации. Иногда группировка может получиться не такой, как хотелось бы, и тогда удобнее обходиться без неё, как в настоящей игре. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Показывать только допустимые действия</guilabel>
+				</term>
+				<listitem
+><para
+>Во время игры предлагаются только допустимые действия, например, <quote
+>Нет объявления</quote
+> или <quote
+>Панг</quote
+>. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Подсказывать действия</guilabel>
+				</term>
+				<listitem
+><para
+>Когда нужно выбрать действие — например, забирать ли кость или какую кость сбросить, — &kajongg; может помочь подсказкой. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Использовать звуки, если возможно</guilabel>
+				</term>
+				<listitem
+><para
+>Сбросы и объявления сопровождаются звуком. Если другие игроки записали звуковые файлы своим голосом, вы их услышите. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Другие могут слышать мой голос</guilabel>
+				</term>
+				<listitem
+><para
+>Если вы записали звуковые файлы своим голосом, другие игроки будут слышать ваши сбросы и объявления вашим голосом. </para
+></listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>
+					<guilabel
+>Скорость анимации:</guilabel>
+				</term>
+				<listitem
+><para
+>Скорость перемещения костей. Если сдвинуть ползунок в крайнее правое положение, перемещение не анимируется: кости просто меняют место. </para
+></listitem>
+			</varlistentry>
+		</variablelist>
+
+	<sect2
+><title
+>Звук</title>
+	<para
+>Играть гораздо приятнее, когда слышно, как игроки объявляют кости и называют сброс. К тому же так проще: можно сосредоточиться на своих костях и не следить за тем, что сбрасывают другие. </para>
+	<para
+>В комплект &kajongg; входят голоса для разных игроков, и программа назначает их игрокам автоматически. Для каждого языка должно быть четыре голоса, желательно два мужских и два женских. &kajongg; старается использовать голоса на том языке, на котором работает сама. Если голосов на этом языке нет, используются другие языки — те же запасные языки, что заданы для &kajongg; (см. <menuchoice
+><guimenu
+>Справка</guimenu
+> <guimenuitem
+>Сменить язык интерфейса приложения</guimenuitem
+></menuchoice
+>). Если для вашего языка голосовых файлов ещё нет, запишите их и передайте в &kajongg;. </para>
+	 <itemizedlist
+><listitem
+><para
+>Вот как можно создать голоса самостоятельно. Для каждого голоса есть отдельная папка. Эти папки могут находиться в системе и в других местах, в зависимости от того, как установлена &kde;; неизменна только часть пути, начиная с <filename class="directory"
+>kajongg</filename
+>. Голоса делятся на две группы, которые хранятся в разных местах файловой системы: <itemizedlist
+><listitem
+><para
+>Стандартные голоса для каждого языка. Они находятся в папке вида <filename class="directory"
+>/usr/share/kajongg/voices/LANG</filename
+>, где LANG — код языка. Папки голосов непосредственно в <filename class="directory"
+>.../kajongg/voices/</filename
+> — американские английские. Стандартные голоса назначаются игрокам случайным образом. У них есть имена вроде <quote
+><literal
+>male1 male2 female1 female2</literal
+></quote
+>, но они ни на что не влияют, и пользователь их никогда не увидит. </para
+></listitem
+><listitem
+><para
+>Голоса пользователя задаются для конкретного пользователя. Если &kajongg; использует такой голос, он может автоматически передаваться другим игрокам через Интернет. Эти голоса находятся в папке вида <filename class="directory"
+>~/.local/share/apps/kajongg/voices/</filename
+>; например, для пользователя joe это может быть <filename class="directory"
+>/home/joe/.local/share/apps/kajongg/voices/joe/</filename
+>. Если папки <filename class="directory"
+>voices/</filename
+> ещё нет, создайте её. </para
+></listitem
+></itemizedlist>
+		</para
+></listitem
+><listitem
+><para
+>Теперь, зная, где должен лежать новый голос, создайте для него папку. </para
+></listitem
+><listitem
+><para
+>В эту папку помещаются звуковые файлы. Они должны быть сжаты кодеком <ulink url="https://xiph.org/vorbis/"
+>Ogg Vorbis</ulink
+> и иметь расширение <filename class="extension"
+>.ogg</filename
+>. Имя отдельного файла имеет вид <filename
+>s3.ogg</filename
+> — это кость «3 точки». Такие файлы нужны для всех костей, всех объявлений и возгласов. Впрочем, если какого-то файла нет, ничего страшного не произойдёт — просто этот звук не прозвучит. Замена другими голосами или языками работает только для голоса целиком, а не для отдельных файлов. </para
+></listitem
+><listitem
+><para
+>Подготовив все звуковые файлы стандартного голоса, убедитесь, что у процесса &kajongg; есть право записи в папку нового голоса. Запустите &kajongg; и проверьте голос. Когда всё в порядке, право записи можно отозвать (а для стандартных голосов это следует сделать). &kajongg; автоматически создаст файл <filename
+>md5sum</filename
+> с контрольной суммой всех звуковых файлов и будет пытаться перезаписать его при каждом изменении, добавлении или удалении звукового файла голоса. </para
+></listitem
+></itemizedlist>
+	<para
+>Звуки должны быть короткими, но чёткими: освоившись, в эту игру играют очень быстро. Проще сначала составить список всего, что нужно произнести. Не читайте его как перечень: произносите каждый пункт так, будто он единственный, и так, как сказали бы во время игры, оставляя паузы между пунктами. Для этого понадобится немного практики.</para>
+	<para
+>Вот один из способов создать звуковые файлы: </para
+><para
+><itemizedlist
+><listitem
+><para
+>Запишите звуковой файл программой <command
+>qarecord</command
+> и сохраните его в формате <acronym
+>WAV</acronym
+>. Произнесите все звуки в этот один файл. </para
+></listitem
+><listitem
+><para
+>Откройте этот файл в звуковом редакторе <command
+>audacity</command
+>. Выделите мышью участок звуковой волны — редактор воспроизведёт его. Повторяйте, пока не выделите нужный участок; это проще сделать, увеличив масштаб (<menuchoice
+><guimenu
+>View</guimenu
+> <guimenuitem
+>Zoom In</guimenuitem
+></menuchoice
+>). Выберите пункт меню <menuchoice
+><guimenu
+>File</guimenu
+> <guimenuitem
+>Export Selection</guimenuitem
+></menuchoice
+> и сохраните участок в формате <filename class="extension"
+>.ogg</filename
+>. В разделе <guilabel
+>Options</guilabel
+> выберите низкое качество: его достаточно, и так даже лучше, потому что звуки быстрее передаются другим игрокам. </para
+></listitem
+></itemizedlist
+></para>
+	<para
+>Ниже перечислены имена файлов, которые нужно создать. К каждому имени добавляется расширение <filename class="extension"
+>.ogg</filename
+>:</para>
+
+<table>
+<title
+>Имена звуковых файлов</title>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry
+>&s1; .. &s9;</entry
+><entry
+>От 1 до 9 точек</entry>
+</row>
+<row>
+<entry
+>&b1; .. &b9;</entry>
+<entry
+>От 1 до 9 бамбука</entry>
+</row>
+<row>
+<entry
+>&c1; .. &c9;</entry>
+<entry
+>От 1 до 9 символов</entry>
+</row>
+<row>
+<entry
+>&we; &ws; &ww; &wn;</entry>
+<entry
+>Ветры: Восток, Юг, Запад, Север</entry>
+</row>
+<row>
+<entry
+>&db; &dr; &dg;</entry>
+<entry
+>Драконы: синий или белый, красный, зелёный</entry>
+</row>
+<row>
+<entry
+>&chow; &pung; &kong; &mahjongg;</entry>
+<entry
+>Основные объявления</entry>
+</row>
+<row>
+<entry
+>&originalcall; &violatesoriginalcall;</entry>
+<entry
+>Просящая рука с раздачи и её нарушение</entry>
+</row>
+<row>
+<entry
+>&dangerousgame;</entry>
+<entry
+>Игрок сбрасывает опасную кость (рискованная игра)</entry>
+</row>
+<row>
+<entry
+>&nochoice;</entry>
+<entry
+>Игрок заявляет, что у него нет другого выбора, кроме рискованной игры</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+	</sect2>
+</sect1>
+
+<sect1 id="tiles-options"
+><title
+>Параметры костей</title>
+        <screenshot>
+                <screeninfo
+>Выбор набора костей</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_tiles.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Выбор набора костей</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>На вкладке <guilabel
+>Кости</guilabel
+> выбирается изображение костей. </para>
+</sect1>
+
+<sect1 id="background-options"
+><title
+>Параметры фона</title>
+        <screenshot>
+                <screeninfo
+>Выбор фона</screeninfo>
+                <mediaobject>
+                        <imageobject>
+                                <imagedata fileref="config_background.png" format="PNG"/>
+                        </imageobject>
+                        <textobject
+><phrase
+>Выбор фона</phrase
+></textobject>
+                </mediaobject>
+        </screenshot>
+	<para
+>На вкладке <guilabel
+>Фон</guilabel
+> выбирается фоновое изображение игры. </para
+><para
+>Некоторые фоны, например, «Китайский пейзаж», загружаются не сразу. Если программа, на ваш взгляд, запускается слишком долго или слишком медленно меняет размер главного окна, попробуйте другой фон. </para>
+</sect1>
+
+<sect1 id="ruleset-options"
+><title
+>Редактор наборов правил</title>
+			<screenshot>
+				<screeninfo
+>Редактор наборов правил</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="ruleseteditor.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Редактор наборов правил</phrase
+></textobject>
+				</mediaobject>
+			</screenshot>
+			<para
+>В редакторе наборов правил настраиваются наборы правил. Стандартные наборы показаны курсивом, изменённые — обычным шрифтом. Пользователь не может изменить стандартные наборы, но их может изменить обновление &kajongg;. Изменённые наборы обновление никогда не затрагивает. </para
+><para
+>При начале новой игры можно выбрать для неё набор правил — любой из заданных в редакторе. Набор правил сохраняется вместе с игрой, поэтому наборы здесь можно менять в любой момент: изменения затронут только будущие игры. </para>
+			<sect2
+><title
+>Правило, очки, дубли, лимиты</title
+><para
+>Чтобы изменить значение, просто дважды щёлкните по нему. Если очистить все значения, правило перестанет влиять на игру. Удалять правила нельзя.</para>
+			</sect2>
+			<sect2
+><title
+>Копирование и удаление</title
+><para
+>Наборы правил можно копировать и удалять целиком. </para
+><para
+>Это можно делать даже тогда, когда набор используется в существующих играх: у каждой игры своя копия набора правил. Посмотреть набор правил старой игры можно так: <link linkend="game-menu-scoreGame"
+>загрузите</link
+> игру и <link linkend="view-explain-scores"
+>откройте её таблицу очков</link
+>. </para>
+			</sect2>
+			<sect2
+><title
+>Сравнение</title
+><para>
+			<screenshot>
+				<screeninfo
+>Сравнение наборов правил</screeninfo>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="differ.png" format="PNG"/>
+					</imageobject>
+					<textobject
+><phrase
+>Сравнение наборов правил</phrase
+></textobject>
+				</mediaobject>
+			</screenshot
+>Команда доступна, когда выбран набор правил целиком, и позволяет сравнить его с любым другим набором. </para
+></sect2>
+</sect1>
+
+<sect1 id="default-keybindings">
+<title
+>Комбинации клавиш по умолчанию</title>
+
+<!-- TODO: not yet implemented
+<para
+>The menu entry <menuchoice
+><guimenu
+>Settings</guimenu
+> <guimenuitem
+>Configure ...</guimenuitem
+></menuchoice
+> allows you to change the default keyboard bindings.</para
+> -->
+
+<para
+>По умолчанию используются следующие комбинации клавиш: </para>
+
+<para>
+<variablelist>
+
+<varlistentry>
+<term
+><keycap
+>F1</keycap
+></term>
+<listitem>
+<para
+>Открывает это руководство. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>C</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Подсчёт очков в игре вручную. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>N</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Игра с друзьями или компьютерными игроками. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>W</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Прервать текущую игру. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>Q</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Выйти из программы. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>T</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Показать таблицу очков. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>H</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Открыть окно разговора. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>G</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Сменить угол обзора. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;<keycap
+>D</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Включить или выключить демонстрационный режим. </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Shift;<keycap
+>F1</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Справка «Что это?». </para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term
+><keycombo action="simul"
+>&Ctrl;&Shift;<keycap
+>F</keycap
+></keycombo
+></term>
+<listitem>
+<para
+>Полноэкранный режим. </para>
+</listitem>
+</varlistentry>
+
+</variablelist>
+</para>
+
+</sect1>
+</chapter>
+
+<appendix id="problems"
+><title
+>Известные проблемы</title>
+        <itemizedlist>
+                <listitem
+><para
+>В режиме игры штрафы пока не поддерживаются.</para
+></listitem>
+                <listitem
+><para
+>Компьютерные игроки пока довольно глупы.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="future"
+><title
+>Возможности, которые могут появиться</title>
+        <itemizedlist>
+                <listitem
+><para
+>Добавить наборы правил. Лучше, если это сделают люди, которые регулярно по ним играют.</para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+ <appendix id="faq"
+><title
+>Часто задаваемые вопросы</title
+> <!-- do not change this! -->
+<!--This chapter is for frequently asked questions. Please use <qandaset
+> <qandaentry
+> only!-->
+<qandaset>
+<!--Following is a standard list of FAQ questions.-->
+        <qandaentry>
+                 <question
+><para
+>Можно ли изменить внешний вид игры? </para
+></question>
+                 <answer
+><para
+>Да. Для этого откройте через строку меню <link linkend="configuration"
+>диалог настройки</link
+>.</para
+></answer>
+        </qandaentry>
+        <qandaentry>
+                 <question
+><para
+>Можно ли распределять кости между игроками с клавиатуры?</para
+></question>
+                 <answer
+><para
+>Да. См. <link linkend="enterhand-tiles"
+>Подсчёт очков средствами &kajongg;</link
+>.</para
+></answer>
+        </qandaentry>
+<!--Please add more Q&As if needed-->
+
+</qandaset>
+</appendix>
+
+<appendix id="credits"
+><title
+>Авторские права и лицензия</title
+> <!-- do not change this! -->
+<!--This chapter is for credits and licenses.-->
+	<para
+>&kajongg; для &kde; </para>
+
+	<para
+>Авторские права на программу &copy; &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail;, 2009–2017 </para>
+	<para
+>Авторские права на документацию &copy; &Wolfgang.Rohdewald; &Wolfgang.Rohdewald.mail;, 2009–2017 </para>
+
+<!-- !!!do not change ANYTHING after this line!!!! -->
+<para
+>Перевод на русский — Александр Яворский<email
+>kekcuha@gmail.com</email
+></para
+> 
+&underFDL;
+&underGPL;
+
+</appendix>
+
+<appendix id="bibliography">
+<title
+>Литература</title>
+        <itemizedlist>
+		<listitem
+><para
+>Uwe Martens, «Das Chinesische Mah-Jongg-Spiel», 2005, Books on Demand GmbH, Norderstedt. Превосходный справочник на немецком языке: всё о правилах, принятых в Германии, и о многих других сторонах игры.</para
+></listitem>
+                <listitem
+><para
+>A. D. Millington, «The Complete Book of Mah-Jongg», 1977 (несколько изданий в мягкой обложке до 2003 года), Weidenfeld &amp; Nicolson, London. Самый полный справочник по классическому китайскому маджонгу в том виде, в каком в него играют на Западе. Содержит ценные советы по стратегии игры.</para
+></listitem>
+		<listitem
+><para
+>Gwyn Headley, Yvonne Seeley, «Mah-Jong», 3-е издание, 2008, A &amp; C Black Publishers Ltd., London. Очень удобный справочник, посвящённый правилам, принятым в Великобритании и утверждённым BMJA (Британской ассоциацией маджонга).</para
+></listitem>
+		<listitem
+><para
+><ulink url="https://en.wikipedia.org/wiki/Mahjong"
+></ulink
+></para
+></listitem>
+		<listitem
+><para
+><ulink url="https://de.wikipedia.org/wiki/Mah-Jongg"
+></ulink
+></para
+></listitem>
+        </itemizedlist>
+</appendix>
+
+<appendix id="installation">
+<title
+>Установка</title>
+<para
+>Для Linux: пакет должен быть в вашем дистрибутиве. </para>
+<para
+>Для Windows: установщик для Windows доступен по адресу <ulink url="https://www.linux-apps.com/p/1109453/"
+></ulink
+>. </para>
+<para
+>Чтобы загрузить исходный код и установить программу вручную: <itemizedlist>
+<listitem
+><para
+> <literal
+>git clone https://invent.kde.org/games/kajongg.git</literal
+> </para
+></listitem>
+<listitem
+><para
+>Для Linux: <literal
+>cd kajongg ; mkdir build ; cd build; cmake .. &amp;&amp; make &amp;&amp; make install</literal
+> </para
+></listitem>
+<listitem
+><para
+>Для Windows: см. <filename
+>README.windows</filename
+></para
+></listitem>
+</itemizedlist>
+</para>
+<para
+>Kajongg зависит от следующих пакетов (в скобках — имена пакетов Debian): <itemizedlist>
+	<listitem
+><para
+>Python 3.8 или новее (python3)</para
+></listitem>
+	<listitem
+><para
+>Qt6.5 или новее (python3-pyqt6 и python3-pyqt6.qtsvg)</para
+></listitem>
+	<listitem
+><para
+>привязки Python к Qt6 (python3-pyqt6)</para
+></listitem>
+        <listitem
+><para
+>библиотека Python twisted 16.6.0 или новее (python3-twisted)</para
+></listitem>
+        <listitem
+><para
+>sqlite3 (libsqlite3-0)</para
+></listitem>
+</itemizedlist>
+</para>
+
+</appendix>
+
+&documentation.index;
+</book>
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-always-quote-attributes:t
+sgml-indent-step:0
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
