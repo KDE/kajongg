@@ -517,7 +517,7 @@ msgstr ""
 
 #: src/login.py:414
 msgid "Repeat password:"
-msgstr "Repite contrasigno:"
+msgstr "Repete contrasigno:"
 
 #: src/login.py:565
 msgid "You are already connected to server %1"
