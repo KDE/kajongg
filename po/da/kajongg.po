@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2017-11-11 16:03+0200\n"
 "Last-Translator: scootergrisen\n"
 "Language-Team: Danish\n"
@@ -231,7 +231,13 @@ msgstr ""
 "Vil du virkelig slette <numid>%1</numid> spil?<br>Dette er definitivt, du "
 "kan ikke annullere det med knappen Annullér"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2077,12 +2083,6 @@ msgstr "bordet med id'et <numid>%1</numid> blev ikke fundet"
 msgid "Player %1 has logged out"
 msgstr "Spilleren %1 har logget ud"
 
-#: src/server.py:436
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "serveren vil lytte på PORT (%d)"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "serveren vil lytte på SOCKET"
@@ -2468,6 +2468,11 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Din klient har version %1 men du skal bruge %2 til denne server"
+
+#, fuzzy
+#~| msgid "the server will listen on PORT (%d)"
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "serveren vil lytte på PORT (%d)"
 
 #~ msgid "License Agreement"
 #~ msgstr "Licensaftale"

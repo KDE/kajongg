@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2026-10-09 22:30+0200\n"
 "Last-Translator: Nemanja Hiršl <nemhirsl@gmail.com>\n"
 "Language-Team: Serbian <kde-i18n-sr@kde.org>\n"
@@ -236,7 +236,13 @@ msgstr ""
 "</html>|/|<html>Желите ли заиста да обришете %1 $[множ ^1 партију партије "
 "партија]?<br />Ово се не може опозвати.</html>"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Каџонг"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Каџонг"
 
@@ -2036,10 +2042,6 @@ msgstr "Табла под бројем %1 није нађена."
 msgid "Player %1 has logged out"
 msgstr "Играч %1 се одјавио."
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "Сервер ће слушати на овом порту ({int(defaultPort)})."
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "Сервер ће слушати на овом сокету."
@@ -2419,3 +2421,6 @@ msgstr "Ваш клијент је издања старијег од 4.9.0 а �
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Ваш клијент је издања %1 али вам треба %2 за овај сервер."
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "Сервер ће слушати на овом порту ({int(defaultPort)})."

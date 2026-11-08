@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2026-05-02 18:52+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
@@ -220,7 +220,13 @@ msgstr ""
 "<numid>%1</numid> oyunu silmek istediğinizden emin misiniz?<br>Bu son "
 "olacak, iptal düğmesiyle iptal edemezsiniz"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -1993,10 +1999,6 @@ msgstr "<numid>%1</numid> kimliğine sahip masa bulunamadı"
 msgid "Player %1 has logged out"
 msgstr "%1 oyuncusu çıktı"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "sunucu, KAPI üzerinde dinleme yapacak ({int(öntanımlıKapı)})"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "sunucu YUVA üstünde dinleme yapacak"
@@ -2370,3 +2372,6 @@ msgstr "İstemci sürümünüz 4.9.0’dan daha eski, bu sunucu için %1 gerekiy
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "İstemci sürümünüz %1, bu sunucu için %2 gerekiyor"
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "sunucu, KAPI üzerinde dinleme yapacak ({int(öntanımlıKapı)})"

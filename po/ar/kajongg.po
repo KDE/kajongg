@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2026-08-10 18:32+0400\n"
 "Last-Translator: Zayed Al-Saidi <zayed.alsaidi@gmail.com>\n"
 "Language-Team: ar\n"
@@ -215,7 +215,13 @@ msgstr ""
 "هل تريد حقًا حذف ألعاب <numid>%1</numid>؟<br>سيكون هذا نهائيًا، ولا يمكنك "
 "إلغاؤه باستخدام زر الإلغاء"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "كاجونغ"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "كاجونغ"
 
@@ -1971,10 +1977,6 @@ msgstr "لم يعثر على الطاولة التي تحمل المعرف <numi
 msgid "Player %1 has logged out"
 msgstr "غادر اللاعب %1"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "سوف يستمع الخادم إلى المنفذ ({int(defaultPort)})"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "سوف يستمع الخادم على SOCKET"
@@ -2345,6 +2347,9 @@ msgstr "عميلك لديه إصدار أقدم من 4.9.0 ولكنك تحتاج
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "عمليك لديه الإصدار %1 ولكنك تحتاج إلى %2 لهذا الخادم"
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "سوف يستمع الخادم إلى المنفذ ({int(defaultPort)})"
 
 #~ msgid "License Agreement"
 #~ msgstr "اتّفاقيّة التّرخيص"

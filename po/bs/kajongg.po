@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kdegames\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2015-02-04 15:43+0000\n"
 "Last-Translator: Samir Ribić <Unknown>\n"
 "Language-Team: Bosnian <bs@li.org>\n"
@@ -232,7 +232,13 @@ msgstr ""
 "Da li zaista želite da obrišete  <numid>%1</numid> igre?<br>Ovo će biti "
 "zadnje, ne možete ga otkazati sa cancel dugmetom"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2113,12 +2119,6 @@ msgstr "sto sa id <numid>%1</numid> nije pronađen"
 msgid "Player %1 has logged out"
 msgstr "Igrač %1 se odjavio"
 
-#: src/server.py:436
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "server ce slušati na PORTU(%d)"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "server ce slusati na SOCKET-u"
@@ -2505,6 +2505,11 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "Vas klijent posjeduje verziju %1 ali vama je potrebna %2 za ovaj server"
+
+#, fuzzy
+#~| msgid "the server will listen on PORT (%d)"
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "server ce slušati na PORTU(%d)"
 
 #~ msgid "License Agreement"
 #~ msgstr "Ugovor o korišćenju"

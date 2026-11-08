@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2025-02-11 20:43+0100\n"
 "Last-Translator: Stefan Asserhäll <stefan.asserhall@gmail.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -216,7 +216,13 @@ msgstr ""
 "Vill du verkligen ta bort <numid>%1</numid> spel?<br>Det här är slutligt. "
 "Det går inte att stoppa med knappen Avbryt."
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -1999,10 +2005,6 @@ msgstr "bordet med identifieraren <numid>%1</numid> hittades inte"
 msgid "Player %1 has logged out"
 msgstr "Spelaren %1 har loggat ut"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "servern lyssnar på PORT ({int(defaultPort)})"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "servern lyssnar på UTTAG"
@@ -2376,6 +2378,9 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Klienten har version %1 men du behöver %2 för den här servern"
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "servern lyssnar på PORT ({int(defaultPort)})"
 
 #~ msgid "License Agreement"
 #~ msgstr "Licensavtal"

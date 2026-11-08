@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2024-04-22 15:58\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
@@ -214,7 +214,13 @@ msgstr ""
 "您真的想要删除 <numid>%1</numid> 游戏吗？<br>这将是不可逆的，您不能使用取消按"
 "钮取消它。"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -1930,10 +1936,6 @@ msgstr "找不到编号为 <numid>%1</numid> 的牌桌"
 msgid "Player %1 has logged out"
 msgstr "玩家 %1 已注销"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "服务器将监听 PORT ({int(defaultPort)})"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "服务器将在套接字上监听请求"
@@ -2304,3 +2306,6 @@ msgstr "您的客户端版本老于 4.9.0，但服务器需要 %1"
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "您的客户端版本是 %1，但此服务器需要的是 %2"
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "服务器将监听 PORT ({int(defaultPort)})"

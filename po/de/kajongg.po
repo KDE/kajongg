@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2025-07-22 12:09+0200\n"
 "Last-Translator: Frank Steinmetzger <dev-kde@felsenfleischer.de>\n"
 "Language-Team: German <kde-i18n-de@kde.org>\n"
@@ -219,7 +219,13 @@ msgstr ""
 "endgültig, Sie könnten das Löschen nicht mit dem Abbrechen-Knopf rückgängig "
 "machen."
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2031,10 +2037,6 @@ msgstr "Tisch mit Nummer <numid>%1</numid> nicht gefunden"
 msgid "Player %1 has logged out"
 msgstr "Spieler %1 hat sich abgemeldet"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "der Server wird auf PORT ({int(defaultPort)}) lauschen"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "der Server wird auf SOCKET lauschen"
@@ -2419,6 +2421,9 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "Ihr Programm hat die Version %1, Sie benötigen aber %2 für diesen Server"
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "der Server wird auf PORT ({int(defaultPort)}) lauschen"
 
 #~ msgid "License Agreement"
 #~ msgstr "Lizenzvereinbarung"

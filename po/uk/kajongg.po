@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2025-02-11 08:51+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
@@ -217,7 +217,13 @@ msgstr ""
 "Ви справді бажаєте вилучити <numid>%1</numid> ігор?<br>Вилучення буде "
 "остаточним, ви не зможете скасувати його за допомогою кнопки «Скасувати»"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2012,10 +2018,6 @@ msgstr "стола з ідентифікатором <numid>%1</numid> не зн
 msgid "Player %1 has logged out"
 msgstr "Гравець %1 вийшов з облікового запису на сервері"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "сервер очікуватиме на дані на порту ПОРТ ({int(defaultPort)})"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "сервер очікуватиме на дані на вказаному сокеті"
@@ -2401,6 +2403,9 @@ msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "Ви користуєтеся клієнтською програмою версії %1. Для роботи з цим сервером "
 "потрібна версія програми %2."
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "сервер очікуватиме на дані на порту ПОРТ ({int(defaultPort)})"
 
 #~ msgid "License Agreement"
 #~ msgstr "Ліцензійна угода"

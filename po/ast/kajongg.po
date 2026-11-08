@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2023-11-07 21:26+0100\n"
 "Last-Translator: Enol P. <enolp@softastur.org>\n"
 "Language-Team: \n"
@@ -212,7 +212,11 @@ msgid ""
 "you cannot cancel it with the cancel button"
 msgstr ""
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+msgid "kajongg"
+msgstr ""
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr ""
 
@@ -1923,10 +1927,6 @@ msgstr ""
 
 #: src/server.py:366
 msgid "Player %1 has logged out"
-msgstr ""
-
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
 msgstr ""
 
 #: src/server.py:439

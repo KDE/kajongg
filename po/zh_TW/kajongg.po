@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 00:10+0000\n"
 "PO-Revision-Date: 2025-09-25 01:53+0900\n"
 "Last-Translator: Kisaragi Hiu <mail@kisaragi-hiu.com>\n"
 "Language-Team: Traditional Chinese <zh-l10n@lists.slat.org>\n"
@@ -216,7 +216,13 @@ msgid ""
 "you cannot cancel it with the cancel button"
 msgstr "您確定要刪除遊戲編號 <numid>%1</numid>？這動作無法取消。"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -1945,10 +1951,6 @@ msgstr "找不到牌桌代號 <numid>%1</numid>"
 msgid "Player %1 has logged out"
 msgstr "玩家 %1 已登出"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "伺服器會監聽連接埠 PORT ({int(defaultPort)})"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "伺服器會監聽 SOCKET"
@@ -2319,6 +2321,9 @@ msgstr "您的用戶端程式版本小於 4.9.0，但此伺服器需要 %1"
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "您的用戶端程式版本為 %1，但此伺服器需要 %2"
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "伺服器會監聽連接埠 PORT ({int(defaultPort)})"
 
 #~ msgid "License Agreement"
 #~ msgstr "授權協議"
