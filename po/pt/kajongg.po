@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 02:54+0000\n"
 "PO-Revision-Date: 2022-03-24 09:07+0000\n"
 "Last-Translator: José Nuno Coelho Pires <zepires@gmail.com>\n"
 "Language-Team: Portuguese <kde-i18n-pt@kde.org>\n"
@@ -242,7 +242,13 @@ msgstr ""
 "Deseja mesmo apagar os <numid>%1</numid> jogos?<br>Isto será definitivo, "
 "pelo que não poderá cancelar o processo"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2037,12 +2043,6 @@ msgstr "a mesa com o ID <numid>%1</numid> não foi encontrada"
 msgid "Player %1 has logged out"
 msgstr "O jogador %1 saiu"
 
-#: src/server.py:436
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "o servidor irá estar à escuta no PORTO (%d)"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "o servidor irá estar à escuta no SOCKET"
@@ -2434,6 +2434,11 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "O seu cliente tem a versão %1, mas precisa da %2 para este servidor"
+
+#, fuzzy
+#~| msgid "the server will listen on PORT (%d)"
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "o servidor irá estar à escuta no PORTO (%d)"
 
 #~ msgid "License Agreement"
 #~ msgstr "Acordo de Licença"

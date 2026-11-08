@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 02:54+0000\n"
 "PO-Revision-Date: 2013-11-20 06:55+0600\n"
 "Last-Translator: Sairan Kikkarin <sairan@computer.org>\n"
 "Language-Team: Kazakh <kde-i18n-doc@kde.org>\n"
@@ -229,7 +229,13 @@ msgstr ""
 "Шынымен <numid>%1</numid> деген ойынды өшірмексіз бе?<br>Осымен өшіріледі, "
 "енді қайту амалы болмайды"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2110,12 +2116,6 @@ msgstr "Идентификаторы <numid>%1</numid> деген үстел ж�
 msgid "Player %1 has logged out"
 msgstr "%1 ойыншы шығып кеті"
 
-#: src/server.py:436
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "сервер PORT (%d) портын тыңдап күтеді"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "сервер SOCKET портын тыңдап күтеді"
@@ -2497,6 +2497,11 @@ msgstr "Клиент бағдарламаңыздың нұсқасы 4.9.0, ал
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Клиент бағдарламаңыздың нұсқасы %1, ал бұл серверге керегі - %2"
+
+#, fuzzy
+#~| msgid "the server will listen on PORT (%d)"
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "сервер PORT (%d) портын тыңдап күтеді"
 
 #~ msgid "unrecognized arguments:%1"
 #~ msgstr "беймәлім аргументері:%1"

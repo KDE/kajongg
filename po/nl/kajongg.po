@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 02:54+0000\n"
 "PO-Revision-Date: 2025-11-21 13:21+0100\n"
 "Last-Translator: Freek de Kruijf <freekdekruijf@kde.nl>\n"
 "Language-Team: \n"
@@ -218,7 +218,13 @@ msgstr ""
 "Wilt u <numid>%1</numid> spellen verwijderen?<br>Dit is onomkeerbaar, u kunt "
 "niet het niet annuleren met de knop Annuleren"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2016,10 +2022,6 @@ msgstr "tafel met id <numid>%1</numid> niet gevonden"
 msgid "Player %1 has logged out"
 msgstr "Speler %1 is uitgelogd"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "de server zal luisteren op POORT ({int(defaultPort)})"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "de server zal luisteren op SOCKET"
@@ -2397,6 +2399,9 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Uw client heeft versie %1 maar u hebt %2 voor deze server nodig"
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "de server zal luisteren op POORT ({int(defaultPort)})"
 
 #~ msgid "License Agreement"
 #~ msgstr "Licentieovereenkomst"

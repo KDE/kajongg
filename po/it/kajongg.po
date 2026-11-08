@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 02:54+0000\n"
 "PO-Revision-Date: 2025-02-15 11:54+0100\n"
 "Last-Translator: Valter Mura <valtermura@gmail.com>\n"
 "Language-Team: Italian <kde-i18n-it@kde.org>\n"
@@ -215,7 +215,13 @@ msgstr ""
 "Vuoi davvero eliminare le partite <numid>%1</numid>?<br>L'azione sarà "
 "definitiva e non potrai annullarla col pulsante Annulla"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2013,10 +2019,6 @@ msgstr "tavolo con id <numid>%1</numid> non trovato"
 msgid "Player %1 has logged out"
 msgstr "Il giocatore %1 si è disconnesso"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "il server resterà in ascolto alla PORTA ({int(defaultPort)})"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "il server resterà in ascolto al SOCKET"
@@ -2399,6 +2401,9 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "La versione del tuo client è la %1, ma per questo server hai bisogno della %2"
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "il server resterà in ascolto alla PORTA ({int(defaultPort)})"
 
 #~ msgid "License Agreement"
 #~ msgstr "Accettazione della licenza"

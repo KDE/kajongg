@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kmj\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 02:54+0000\n"
 "PO-Revision-Date: 2014-06-12 02:05+0200\n"
 "Last-Translator: Sönke Dibbern <s_dibbern@web.de>\n"
 "Language-Team: Low Saxon <kde-i18n-nds@kde.org>\n"
@@ -231,7 +231,13 @@ msgstr ""
 "Wullt Du redig <numid>%1</numid> Spelen wegdoon?<br>Dat is duerhaftig un "
 "lett sik nich mit den „Afbreken“-Knoop torüchtrecken."
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2121,12 +2127,6 @@ msgstr "Disch mit de ID <numid>%1</numid> lett sik nich finnen."
 msgid "Player %1 has logged out"
 msgstr "Speler %1 hett sik afmeldt."
 
-#: src/server.py:436
-#, fuzzy
-#| msgid "the server will listen on PORT (%d)"
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "De Server warrt achter en Port (%d) luustern"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "De Server warrt op en Sockel luustern"
@@ -2512,6 +2512,11 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Dien Client hett de Verschoon %1, man för dissen Server bruukst Du %2"
+
+#, fuzzy
+#~| msgid "the server will listen on PORT (%d)"
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "De Server warrt achter en Port (%d) luustern"
 
 #~ msgid "License Agreement"
 #~ msgstr "Lizenzövereenkamen"

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
-"POT-Creation-Date: 2025-11-17 11:49+0000\n"
+"POT-Creation-Date: 2026-11-08 02:54+0000\n"
 "PO-Revision-Date: 2025-02-11 09:57+0100\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
@@ -219,7 +219,13 @@ msgstr ""
 "Realment voleu suprimir <numid>%1</numid> jocs?<br>Això serà definitiu. No "
 "podreu cancel·lar-ho amb el botó Cancel·la"
 
-#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:123
+#: src/guiutil.py:132
+#, fuzzy
+#| msgid "Kajongg"
+msgid "kajongg"
+msgstr "Kajongg"
+
+#: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
 msgstr "Kajongg"
 
@@ -2009,10 +2015,6 @@ msgstr "no s'ha trobat la taula amb l'id <numid>%1</numid>"
 msgid "Player %1 has logged out"
 msgstr "El jugador %1 s'ha desconnectat"
 
-#: src/server.py:436
-msgid "the server will listen on PORT ({int(defaultPort)})"
-msgstr "el servidor escoltarà en el PORT ({int(defaultPort)})"
-
 #: src/server.py:439
 msgid "the server will listen on SOCKET"
 msgstr "el servidor escoltarà en el SÒCOL"
@@ -2394,6 +2396,9 @@ msgstr ""
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr ""
 "El vostre client té la versió %1 però necessiteu %2 per a aquest servidor"
+
+#~ msgid "the server will listen on PORT ({int(defaultPort)})"
+#~ msgstr "el servidor escoltarà en el PORT ({int(defaultPort)})"
 
 #~ msgid "License Agreement"
 #~ msgstr "Acord de llicència"
