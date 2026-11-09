@@ -2358,7 +2358,3 @@ msgstr ""
 #: src/user.py:98
 msgid "Your client has version %1 but you need %2 for this server"
 msgstr "Din klient har versjon %1 men du trenger %2 for denne tjeneren"
-
-#, fuzzy
-#~ msgid "the server will listen on PORT ({int(defaultPort)})"
-#~ msgstr "tjeneren vil lytte på PORT (%d)"

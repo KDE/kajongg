@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kajongg\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2026-11-08 02:54+0000\n"
-"PO-Revision-Date: 2025-02-11 04:31+0100\n"
+"PO-Revision-Date: 2026-11-08 08:27+0100\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Poedit 3.10\n"
 
 msgctxt "kajongg"
 msgid "Game"
@@ -216,10 +216,8 @@ msgstr ""
 "შემდეგ ქმედებას გაუქმების ღილაკით ვეღარ გააუქმებთ"
 
 #: src/guiutil.py:132
-#, fuzzy
-#| msgid "Kajongg"
 msgid "kajongg"
-msgstr "Kajongg"
+msgstr "kajongg"
 
 #: src/guiutil.py:134 src/kdestub.py:120 src/kdestub.py:121 src/kdestub.py:123
 msgid "Kajongg"
