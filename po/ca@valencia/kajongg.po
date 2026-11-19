@@ -876,7 +876,7 @@ msgstr "No podeu o no voleu reclamar esta fitxa"
 msgid ""
 "cannot find any %1 in the following directories, is libkmahjongg installed?"
 msgstr ""
-"no s'ha pogut trobar cap %1 als directoris següents, està instal·lada "
+"no s'ha trobat cap %1 als directoris següents, està instal·lada "
 "«libkmahjongg»?"
 
 #: src/mjresource.py:116
