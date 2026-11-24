@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: kdegames-kde4\n"
 "Report-Msgid-Bugs-To: wolfgang@rohdewald.de\n"
 "POT-Creation-Date: 2026-11-08 02:54+0000\n"
-"PO-Revision-Date: 2026-11-16 19:15+0300\n"
+"PO-Revision-Date: 2026-11-23 18:11+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -348,7 +348,7 @@ msgstr "&Yardım"
 
 #: src/kdestub.py:282
 msgid "&Defaults"
-msgstr "Ö&ntanımlılar"
+msgstr "&Varsayılanlar"
 
 #: src/kdestub.py:352
 msgctxt "@action:inmenu"
@@ -875,7 +875,7 @@ msgstr "bu dizinlerde %1 bulunamadı, libmahjongg kurulu mu?"
 
 #: src/mjresource.py:116
 msgid "cannot find %1, using default"
-msgstr "%1 bulunamadı, öntanımlı kullanılıyor"
+msgstr "%1 bulunamadı, varsayılan kullanılıyor"
 
 #: src/mjresource.py:131
 msgid "unknown name"
